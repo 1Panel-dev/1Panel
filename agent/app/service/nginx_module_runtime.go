@@ -1,17 +1,21 @@
 package service
 
 import (
+	"errors"
+	"fmt"
 	"os"
 	"path"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
 // nginxCompressibleTypes is shared by gzip_types and brotli_types so both
@@ -254,6 +258,27 @@ func readNginxUserBrotliDirectives(install model.AppInstall) map[string][]string
 	return directives
 }
 
+// nginxBrotliValueRe whitelists what a brotli value may contain. The values
+// are written into nginx.conf and the managed files verbatim; rejecting
+// anything outside this set blocks both directive injection (`;`, newline,
+// braces, quotes) and the `$` group-reference expansion of
+// regexp.ReplaceAllString, which the in-place rewrite uses.
+var nginxBrotliValueRe = regexp.MustCompile(`^[a-zA-Z0-9._+\-/:* ]+$`)
+
+// validateNginxBrotliValues rejects any value outside the whitelist. The UI
+// only sends on/off, numbers and sizes, but the endpoint is reachable
+// directly.
+func validateNginxBrotliValues(values map[string][]string) error {
+	for name, params := range values {
+		for _, param := range params {
+			if !nginxBrotliValueRe.MatchString(param) {
+				return buserr.WithDetail("ErrInvalidParams", fmt.Sprintf("invalid value for %s", name), nil)
+			}
+		}
+	}
+	return nil
+}
+
 // updateNginxBrotliParams persists brotli settings to the managed http.d file.
 //
 // Writing is refused unless the module is enabled and built: the directives
@@ -270,6 +295,9 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 	values := make(map[string][]string, len(params))
 	for _, param := range params {
 		values[param.Name] = param.Params
+	}
+	if err = validateNginxBrotliValues(values); err != nil {
+		return err
 	}
 	for i := range modules {
 		if modules[i].Name != nginxBrotliModuleName {
@@ -333,9 +361,33 @@ func updateNginxBrotliParams(params []dto.NginxParam) error {
 			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
 			return err
 		}
+		// The directory is bind-mounted read-only and the include is a glob: a
+		// missing mount or an unrecognised include lets nginx -t pass while
+		// loading nothing. Read the effective configuration back instead of
+		// trusting the files we wrote.
+		if err = assertNginxBrotliActive(install.ContainerName); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return buserr.New("ErrBrotliUnsupported")
+		}
 		return nil
 	}
 	return buserr.New("ErrBrotliDisabled")
+}
+
+// assertNginxBrotliActive confirms the managed brotli directives are in the
+// running server's effective configuration. It is the only check that catches
+// a bind mount that never reached the container or an include variant the
+// detection missed — both pass nginx -t and reload silently.
+func assertNginxBrotliActive(containerName string) error {
+	out, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+		"docker", "exec", "-i", containerName, "nginx", "-T")
+	if err != nil {
+		return err
+	}
+	if !nginxModuleUserDirectiveRe.MatchString(out) {
+		return errors.New("brotli directives are not in the effective nginx configuration")
+	}
+	return nil
 }
 
 // updateUserNginxBrotliParams rewrites the brotli directives the user wrote
@@ -414,7 +466,11 @@ func updateUserNginxBrotliParams(install model.AppInstall, values map[string][]s
 // Dynamic modules need a ready build for the current target, otherwise the
 // .so is missing and nginx would reject the directives. Static modules are
 // compiled into the binary and carry no artifacts, so an enabled static
-// module is considered ready.
+// module is considered ready. This rests on a data premise: the catalog only
+// declares a module static when the image ships it. Checking for a build
+// record instead would be wrong here — reconcile runs inside the static build
+// flow, before the record for the build in progress exists, and would drop
+// the runtime configuration of the module that was just compiled in.
 func nginxModuleRuntimeReady(module dto.NginxModule, target dto.NginxModuleTarget) bool {
 	if module.BuildMode == nginxModuleBuildStatic {
 		return true

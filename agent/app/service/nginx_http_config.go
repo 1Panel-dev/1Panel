@@ -33,14 +33,14 @@ const (
 
 var (
 	// nginxHTTPIncludeRe matches the include line wherever it appears. The
-	// absolute path prefix and whitespace are optional in the match so a
-	// variant written by an older installer or by hand still counts; a
-	// commented-out copy does not.
-	nginxHTTPIncludeRe = regexp.MustCompile(`(?m)^[ \t]*include\s+(/usr/local/openresty/nginx/conf/)?http\.d/\*\.conf\s*;[ \t]*\r?$`)
+	// absolute path prefix, quoting and whitespace are all optional in the
+	// match so a variant written by an older installer or by hand still
+	// counts; a commented-out copy does not.
+	nginxHTTPIncludeRe = regexp.MustCompile(`(?m)^[ \t]*include\s+"?(/usr/local/openresty/nginx/conf/)?http\.d/\*\.conf"?\s*;[ \t]*\r?$`)
 
 	// nginxConfDIncludeRe locates the site-config include, the preferred
 	// insertion point, and captures its indentation.
-	nginxConfDIncludeRe = regexp.MustCompile(`(?m)^([ \t]*)include\s+(/usr/local/openresty/nginx/conf/)?conf\.d/\*\.conf\s*;[ \t]*\r?$`)
+	nginxConfDIncludeRe = regexp.MustCompile(`(?m)^([ \t]*)include\s+"?(/usr/local/openresty/nginx/conf/)?conf\.d/\*\.conf"?\s*;[ \t]*\r?$`)
 
 	// nginxHTTPBlockStartRe locates the http block opening, the fallback
 	// insertion point, and captures its indentation.

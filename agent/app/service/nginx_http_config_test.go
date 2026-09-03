@@ -122,6 +122,12 @@ func TestNginxHTTPIncludeRe(t *testing.T) {
 		{"present", plainNginxConf + "    " + nginxHTTPIncludeDirective + "\n", true},
 		{"absent", plainNginxConf, false},
 		{"commented out", "# " + nginxHTTPIncludeDirective, false},
+		// nginx accepts quoted paths, and a hand-written or legacy installer
+		// may use them; a quoted include must count as present.
+		{"quoted absolute path", `include "/usr/local/openresty/nginx/conf/http.d/*.conf";`, true},
+		{"quoted with extra whitespace", `  include   "/usr/local/openresty/nginx/conf/http.d/*.conf"  ;`, true},
+		{"relative path form", `    include http.d/*.conf;`, true},
+		{"a different directory does not count", `    include /usr/local/openresty/nginx/conf/conf.d/*.conf;`, false},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -129,5 +135,42 @@ func TestNginxHTTPIncludeRe(t *testing.T) {
 				t.Fatalf("expected %v, got %v", tc.want, got)
 			}
 		})
+	}
+}
+
+// The anchor for insertion must tolerate the same variants, or a config with
+// a quoted conf.d include would take the http-block fallback for no reason.
+func TestInsertNginxHTTPIncludeWithQuotedConfDAnchor(t *testing.T) {
+	quoted := strings.Replace(plainNginxConf,
+		"    include /usr/local/openresty/nginx/conf/conf.d/*.conf;",
+		`    include "/usr/local/openresty/nginx/conf/conf.d/*.conf";`, 1)
+	got, err := insertNginxHTTPInclude(quoted)
+	if err != nil {
+		t.Fatal(err)
+	}
+	httpIdx := strings.Index(got, "conf/http.d/*.conf")
+	confDIdx := strings.Index(got, "conf/conf.d/*.conf")
+	if httpIdx < 0 || confDIdx < 0 || httpIdx > confDIdx {
+		t.Fatalf("quoted anchor not used; include misplaced:\n%s", got)
+	}
+}
+
+// A CRLF file must keep its own line endings after insertion.
+func TestInsertNginxHTTPIncludeKeepsCRLFStyle(t *testing.T) {
+	crlf := strings.ReplaceAll(plainNginxConf, "\n", "\r\n")
+	got, err := insertNginxHTTPInclude(crlf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	idx := strings.Index(got, nginxHTTPIncludeDirective)
+	if idx < 0 {
+		t.Fatal("include missing")
+	}
+	if got[idx-1] == '\n' || (idx >= 2 && got[idx-2:idx] != "\r\n" && got[idx-1] != ' ') {
+		// The inserted line must end with \r\n like the rest of the file.
+	}
+	end := idx + len(nginxHTTPIncludeDirective)
+	if end+2 > len(got) || got[end:end+2] != "\r\n" {
+		t.Fatalf("inserted line does not end with CRLF: %q", got[end:end+4])
 	}
 }

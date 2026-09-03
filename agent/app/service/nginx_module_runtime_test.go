@@ -204,3 +204,28 @@ func TestNginxModuleUserConfigPathsCoversDefaultDir(t *testing.T) {
 		t.Error("conf/default must be scanned: it is included at http scope")
 	}
 }
+
+// Values outside the whitelist must never reach nginx.conf or the managed
+// files: they could inject directives or trigger regexp group expansion.
+func TestValidateNginxBrotliValues(t *testing.T) {
+	valid := map[string][]string{
+		"brotli":            {"on"},
+		"brotli_comp_level": {"11"},
+		"brotli_min_length": {"1k"},
+		"brotli_types":      {"text/plain", "application/json", "application/ld+json"},
+	}
+	if err := validateNginxBrotliValues(valid); err != nil {
+		t.Fatalf("legitimate values rejected: %v", err)
+	}
+	for name, bad := range map[string]string{
+		"directive injection": "off; gzip on",
+		"newline injection":   "off\nbrotli off;",
+		"group reference":     "$1",
+		"brace":               "${1}",
+		"quote":               `"on"`,
+	} {
+		if err := validateNginxBrotliValues(map[string][]string{"brotli": {bad}}); err == nil {
+			t.Errorf("%s: %q must be rejected", name, bad)
+		}
+	}
+}
