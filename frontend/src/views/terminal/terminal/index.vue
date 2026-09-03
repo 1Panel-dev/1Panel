@@ -46,7 +46,7 @@
                 <!-- The Terminal itself is rendered by components/terminal/host.vue and teleported here. -->
                 <div
                     class="terminal-slot"
-                    :ref="(el: any) => store.setSlot(item.key, el)"
+                    :ref="(el: any) => onSlot(item.key, el)"
                     :style="{
                         height: `calc(100vh - ${loadHeight()})`,
                         'background-color': `var(--panel-logs-bg-color)`,
@@ -235,7 +235,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated } from 'vue';
 import HostDialog from '@/views/terminal/terminal/host-create.vue';
 import type Node from 'element-plus/es/components/tree/src/model/node';
 import { ElTree } from 'element-plus';
@@ -307,10 +307,7 @@ const acceptParams = async () => {
         if (!store.find(terminalValue.value)) {
             terminalValue.value = store.entries[0].key;
         }
-        await nextTick();
-        for (const item of store.entries) {
-            store.instances[item.key]?.refit();
-        }
+        await claim();
         store.sync();
     }
     timer = setInterval(store.sync, 1000 * 5);
@@ -338,6 +335,43 @@ const cleanTimer = () => {
     clearInterval(Number(timer));
     timer = null;
 };
+
+// Slots are claimed explicitly, not from the ref callback: under a locked menu tab
+// (keep-alive) the page keeps rendering while detached, and the dock takes the
+// Terminals over meanwhile. Only a visible page owns its slots; release on leave
+// and take them back on return, the same way the dock does.
+const slotEls: Record<string, HTMLElement> = {};
+const onSlot = (key: string, el: HTMLElement | null) => {
+    if (el) slotEls[key] = el;
+    else delete slotEls[key];
+};
+let pageVisible = true;
+const claim = async () => {
+    for (const item of store.entries) {
+        if (pageVisible) {
+            store.setSlot(item.key, slotEls[item.key] || null);
+        } else if (store.slots[item.key] && store.slots[item.key] === slotEls[item.key]) {
+            store.setSlot(item.key, null);
+        }
+    }
+    if (!pageVisible) return;
+    await nextTick();
+    for (const item of store.entries) {
+        store.instances[item.key]?.refit();
+    }
+};
+watch(
+    () => store.entries.length,
+    () => nextTick(claim),
+);
+onActivated(() => {
+    pageVisible = true;
+    claim();
+});
+onDeactivated(() => {
+    pageVisible = false;
+    claim();
+});
 
 const loadHeight = () => {
     return openMenuTabs.value ? '250px' : '210px';
@@ -487,6 +521,8 @@ onBeforeUnmount(() => {
     document.removeEventListener('fullscreenchange', changeFullScreen);
     // parent refs are already null in the parent's onUnmounted, so leave-page cleanup lives here
     cleanTimer();
+    pageVisible = false;
+    claim();
 });
 
 onMounted(() => {
