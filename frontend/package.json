@@ -48,7 +48,7 @@
         "pinia": "^3.0.4",
         "pinia-plugin-persistedstate": "^4.7.1",
         "punycode": "^2.3.1",
-        "qs": "^6.15.3",
+        "qs": "^6.16.0",
         "screenfull": "^6.0.2",
         "sortablejs": "^1.15.7",
         "uuid": "^14.0.1",
