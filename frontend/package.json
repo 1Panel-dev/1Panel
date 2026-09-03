@@ -88,7 +88,7 @@
         "vite": "^8.2.0",
         "vite-plugin-compression": "^0.5.1",
         "vite-plugin-eslint2": "^5.3.0",
-        "vite-svg-loader": "^5.1.1",
+        "vite-svg-loader": "^5.1.2",
         "vue-eslint-parser": "^10.4.1",
         "vue-tsc": "^3.3.9"
     },
