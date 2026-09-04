@@ -27,7 +27,10 @@ type verifyErrorResponse struct {
 	Message string `json:"message"`
 }
 
-const defaultVerifyTimeout = 30 * time.Second
+const (
+	defaultVerifyTimeout   = 30 * time.Second
+	defaultVerifyMaxTokens = 16
+)
 
 func SkipVerification(provider string) bool {
 	switch provider {
@@ -116,20 +119,20 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		}
 		headers["anthropic-version"] = "2023-06-01"
 		request.Body = mustJSON(map[string]interface{}{
-			"model": model, "max_tokens": 1, "stream": false,
+			"model": model, "max_tokens": defaultVerifyMaxTokens, "stream": false,
 			"messages": []map[string]interface{}{{"role": "user", "content": []map[string]string{{"type": "text", "text": "test"}}}},
 		})
 	case "openai-responses":
 		request.URL = baseURL + "/responses"
 		headers["Authorization"] = "Bearer " + apiKey
-		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "test", "max_output_tokens": 1, "stream": false})
+		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "test", "max_output_tokens": defaultVerifyMaxTokens, "stream": false})
 	default:
 		request.URL = baseURL + "/chat/completions"
 		if provider != "ollama" || strings.TrimSpace(apiKey) != "" {
 			headers["Authorization"] = "Bearer " + apiKey
 		}
 		request.Body = mustJSON(map[string]interface{}{
-			"model": model, "messages": []map[string]string{{"role": "user", "content": "test"}}, "max_tokens": 1, "stream": false,
+			"model": model, "messages": []map[string]string{{"role": "user", "content": "test"}}, "max_tokens": defaultVerifyMaxTokens, "stream": false,
 		})
 	}
 	return request
