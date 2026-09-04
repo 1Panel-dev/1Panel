@@ -42,19 +42,8 @@ func (f *Fail2ban) Status() (bool, bool, bool) {
 	isEnable, _ := controller.CheckEnable("fail2ban.service")
 	isActive, _ := controller.CheckActive("fail2ban.service")
 	isExist, _ := controller.CheckExist("fail2ban.service")
-	if !isActive && isFail2banAlive() {
-		isActive = true
-	}
 
 	return isEnable, isActive, isExist
-}
-
-func isFail2banAlive() bool {
-	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(5*time.Second)).RunWithStdout("fail2ban-client", "ping")
-	if err != nil {
-		return false
-	}
-	return strings.Contains(strings.ToLower(stdout), "pong")
 }
 
 func (f *Fail2ban) Version() string {
