@@ -1338,7 +1338,7 @@ func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAcco
 
 func requiresInitialAgentAccountModels(provider string) bool {
 	switch provider {
-	case "custom", "vllm", "ollama":
+	case "custom", "vllm", "ollama", "llmman":
 		return true
 	default:
 		return false

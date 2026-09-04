@@ -43,8 +43,8 @@ func BuildOpenClawProviderPatch(provider, modelName, apiType, authMode, baseURL,
 		providerKey = "moonshot"
 		resolvedAPIType = "openai-completions"
 		usesBearer = false
-	case "ollama":
-		apiKey = "ollama"
+	case "ollama", "llmman":
+		apiKey = provider
 		usesBearer = false
 	case "openai", "openrouter", "anthropic":
 		preserveQualifiedModel = strings.Contains(modelName, "/")
