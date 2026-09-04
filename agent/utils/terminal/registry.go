@@ -39,6 +39,14 @@ func List(owner string) []Info {
 	return out
 }
 
+// CloseAll ends every live session; core calls it when the panel user logs out.
+func CloseAll() {
+	sessions.Range(func(_, v any) bool {
+		v.(*Session).Close()
+		return true
+	})
+}
+
 // CloseSession closes id on behalf of owner.
 func CloseSession(id, owner string) error {
 	s, ok := Lookup(id, owner)

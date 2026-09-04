@@ -178,6 +178,17 @@ func (b *BaseApi) CloseTerminalSession(c *gin.Context) {
 	helper.Success(c)
 }
 
+// @Tags Terminal
+// @Summary Close every terminal session (panel user logged out)
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/closeAll [post]
+func (b *BaseApi) CloseAllTerminalSessions(c *gin.Context) {
+	terminal.CloseAll()
+	helper.Success(c)
+}
+
 // sanitizeTerminalTitle keeps the title a short single line.
 func sanitizeTerminalTitle(title string) string {
 	title = strings.Join(strings.Fields(title), " ")
