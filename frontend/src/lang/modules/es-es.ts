@@ -3960,6 +3960,14 @@ const message = {
         gzipMinLengthHelper: 'Tamaño mínimo para comprimir',
         gzipCompLevelHelper: 'Nivel de compresión',
         gzipHelper: 'Habilitar compresión para transmisión',
+        brotliHelper: 'Habilitar compresión brotli, normalmente menor que gzip',
+        brotliCompLevelHelper: 'Tasa de compresión brotli, de 0 a 11',
+        brotliManagedExternallyHelper:
+            'Brotli está configurado manualmente en nginx.conf; el panel muestra los valores en vigor y no los sobrescribe.',
+        brotliManagedUnavailableHelper:
+            'El panel no pudo añadir automáticamente la configuración brotli gestionada a nginx.conf; los valores siguientes no tendrán efecto.',
+        brotliMinLengthHelper: 'Tamaño mínimo de respuesta para comprimir con brotli',
+        brotliSaveFailed: 'No se pudo guardar la configuración de brotli; la configuración gzip anterior se aplicó',
         connections: 'Conexiones activas',
         accepts: 'Aceptadas',
         handled: 'Gestionadas',

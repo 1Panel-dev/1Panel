@@ -7,6 +7,12 @@ export namespace Nginx {
         params: string[];
     }
 
+    export interface NginxBrotliRes {
+        params: NginxParam[];
+        managedExternally: boolean;
+        managedUnavailable: boolean;
+    }
+
     export interface NginxConfigReq {
         operate: string;
         websiteId?: number;

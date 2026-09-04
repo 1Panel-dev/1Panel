@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -162,6 +163,51 @@ func nginxModuleDynamicSupported(install model.AppInstall) bool {
 	buildPath := path.Join(install.GetPath(), nginxModuleBuildDir)
 	return fileOp.Stat(path.Join(buildPath, nginxModuleBuilderFile)) &&
 		fileOp.Stat(path.Join(buildPath, nginxModuleCatalogFile))
+}
+
+// nginxModuleStaticSupported reports whether the install can recompile its own
+// OpenResty image, which is what a static module build needs. Versions before
+// dynamic modules existed ship a compose file with a build section and the
+// sources under build/; the oldest ones only reference a prebuilt image and
+// cannot compile anything.
+func nginxModuleStaticSupported(install model.AppInstall) bool {
+	if !files.NewFileOp().Stat(path.Join(install.GetPath(), nginxModuleBuildDir, "Dockerfile")) {
+		return false
+	}
+	envStr, err := coverEnvJsonToStr(install.Env)
+	if err != nil {
+		return false
+	}
+	project, err := dockerUtils.GetComposeProject(install.Name, install.GetPath(),
+		[]byte(install.DockerCompose), []byte(envStr), true)
+	if err != nil {
+		return false
+	}
+	for _, service := range project.AllServices() {
+		if service.Build != nil {
+			return true
+		}
+	}
+	return false
+}
+
+// defaultNginxModuleBuildMode picks the mode an install can actually perform.
+//
+// Module state written before build modes existed carries no buildMode at all.
+// Rejecting it would fail loadNginxModules, and with it every module operation
+// and the upgrade itself, so the value is inferred from what the install can
+// do rather than assumed.
+func defaultNginxModuleBuildMode(install model.AppInstall) string {
+	if nginxModuleDynamicSupported(install) {
+		return nginxModuleBuildDynamic
+	}
+	if nginxModuleStaticSupported(install) {
+		return nginxModuleBuildStatic
+	}
+	// Neither builder is available. Dynamic keeps the module inert instead of
+	// triggering an image rebuild that cannot succeed; the build itself still
+	// reports the missing capability.
+	return nginxModuleBuildDynamic
 }
 
 func syncNginxModuleBuilder(detailBuildDir, installBuildDir string) error {
@@ -654,9 +700,55 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 			return fmt.Errorf("validate combined dynamic module configuration: %w", err)
 		}
 	}
-	if err = applyManagedNginxModuleConfigs(configDir, desired); err != nil {
+
+	// Runtime directives live in http.d because load_module is main-context
+	// while directives such as "brotli on" are http-context. Both sets are
+	// written before nginx -t runs, so nginx only ever observes the final,
+	// consistent state; on failure both are rolled back together.
+	//
+	// The include that loads http.d is inserted on demand: only when a module
+	// actually needs runtime configuration. An install whose nginx.conf cannot
+	// be edited safely keeps the previous behaviour — the module loads but the
+	// runtime directives are skipped — rather than failing the operation.
+	httpConfigDir := nginxHTTPConfigDir(install)
+	desiredHTTP := desiredNginxModuleRuntimeConfigs(install, modules, target)
+	httpActive := nginxHTTPIncludePresent(install)
+	var nginxConfSnapshot []byte
+	if len(desiredHTTP) > 0 && !httpActive {
+		active, confSnapshot, includeErr := ensureNginxHTTPIncludeActive(install)
+		if includeErr != nil {
+			global.LOG.Warnf("cannot insert the http.d include into nginx.conf, skipping runtime directives: %v", includeErr)
+			desiredHTTP = nil
+		} else {
+			httpActive = active
+			nginxConfSnapshot = confSnapshot
+		}
+	}
+	var httpSnapshot nginxModuleConfigSnapshot
+	if httpActive {
+		if httpSnapshot, err = snapshotManagedNginxHTTPConfigs(httpConfigDir); err != nil {
+			return err
+		}
+	}
+	restore := func() {
 		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		if httpActive {
+			_ = applyManagedNginxHTTPConfigs(httpConfigDir, httpSnapshot)
+		}
+		if nginxConfSnapshot != nil {
+			_ = os.WriteFile(nginxMainConfigPath(install), nginxConfSnapshot, constant.FilePerm)
+		}
+	}
+
+	if err = applyManagedNginxModuleConfigs(configDir, desired); err != nil {
+		restore()
 		return err
+	}
+	if httpActive {
+		if err = applyManagedNginxHTTPConfigs(httpConfigDir, desiredHTTP); err != nil {
+			restore()
+			return err
+		}
 	}
 	if !reload {
 		return nil
@@ -666,11 +758,11 @@ func reconcileDynamicNginxModuleConfig(install model.AppInstall, modules []dto.N
 		return nil
 	}
 	if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
-		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		restore()
 		return err
 	}
 	if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
-		_ = applyManagedNginxModuleConfigs(configDir, snapshot)
+		restore()
 		return err
 	}
 	return nil
@@ -722,6 +814,14 @@ func applyManagedNginxModuleConfigs(configDir string, desired map[string][]byte)
 	return nil
 }
 
+// hasEnabledStaticNginxModules reports whether a full image rebuild is needed.
+//
+// Module state is the only input on purpose. RESTY_CONFIG_OPTIONS_MORE in .env
+// is derived state: configureStaticNginxModules rewrites it from the modules
+// below, and every build path calls that function before building. Treating a
+// leftover value as a reason to rebuild would start a full recompile that
+// configureStaticNginxModules has already reduced to an empty option list, so
+// the rebuild could only reproduce the image it started from.
 func hasEnabledStaticNginxModules(modules []dto.NginxModule) bool {
 	for _, module := range modules {
 		normalizeNginxModule(&module)
@@ -730,17 +830,6 @@ func hasEnabledStaticNginxModules(modules []dto.NginxModule) bool {
 		}
 	}
 	return false
-}
-
-func staticNginxBuildRequired(install model.AppInstall, modules []dto.NginxModule) bool {
-	if hasEnabledStaticNginxModules(modules) {
-		return true
-	}
-	envs, err := gotenv.Read(install.GetEnvPath())
-	if err != nil {
-		return false
-	}
-	return strings.TrimSpace(envs["RESTY_CONFIG_OPTIONS_MORE"]) != ""
 }
 
 func configureStaticNginxModules(install model.AppInstall, modules []dto.NginxModule, mirror string) error {
@@ -807,11 +896,17 @@ func executeNginxModuleBuild(install model.AppInstall, reqModules []string, forc
 	if err != nil {
 		return err
 	}
-	staticBuild := staticNginxBuildRequired(install, modules)
-	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) {
-		if !nginxModuleDynamicSupported(install) {
-			return errors.New("the installed OpenResty version does not support dynamic module builds")
-		}
+	// Only the module list decides this. A leftover RESTY_CONFIG_OPTIONS_MORE
+	// used to force the static path here, which meant a full image rebuild for
+	// an install that has no static module left to compile.
+	staticBuild := hasEnabledStaticNginxModules(modules)
+	if !staticBuild && hasDynamicNginxModuleBuildTask(modules, reqModules) && !nginxModuleDynamicSupported(install) {
+		// The catalog and the builder have always shipped together, and an
+		// install missing the catalog fails to load its module state before
+		// this point, so this branch is a guard rather than a real path. Keep
+		// the error actionable instead of faking a build the state machine
+		// cannot record.
+		return buserr.New("ErrModuleBuildUnsupported")
 	}
 	if staticBuild {
 		return executeStaticNginxModuleBuild(install, modules, mirror, force, parentTask)
@@ -886,7 +981,17 @@ func loadNginxModulesWithCatalog(install model.AppInstall, catalogPath string) (
 			Builds: state.Builds, LastError: state.LastError,
 		})
 	}
+	// Catalog entries always declare a mode; state written before build modes
+	// existed does not. Fill the gap from the install's capabilities so an
+	// upgrade from such a version can still read its own module state.
+	fallbackMode := ""
 	for i := range modules {
+		if modules[i].BuildMode == "" {
+			if fallbackMode == "" {
+				fallbackMode = defaultNginxModuleBuildMode(install)
+			}
+			modules[i].BuildMode = fallbackMode
+		}
 		if err = validateNginxModuleBuildMode(modules[i]); err != nil {
 			return nil, err
 		}

@@ -17,6 +17,17 @@ type NginxParam struct {
 	Params []string `json:"params"`
 }
 
+// NginxBrotliRes carries the brotli settings together with where they live.
+// ManagedExternally is true when the user defined brotli by hand, in which
+// case the panel only reports the values and must not write its own copy.
+// ManagedUnavailable is true when the panel could not wire the managed
+// configuration into nginx.conf at all, so the reported values are inert.
+type NginxBrotliRes struct {
+	Params             []NginxParam `json:"params"`
+	ManagedExternally  bool         `json:"managedExternally"`
+	ManagedUnavailable bool         `json:"managedUnavailable"`
+}
+
 type NginxAuthRes struct {
 	Enable bool            `json:"enable"`
 	Items  []dto.NginxAuth `json:"items"`

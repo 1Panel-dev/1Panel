@@ -459,6 +459,13 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 		}); err != nil {
 			return err
 		}
+		// Upgrades deliberately keep the user's nginx.conf, so corrected gzip
+		// defaults shipped with a new version would never reach existing
+		// installations. Rewrite only an untouched factory configuration, and
+		// never fail the upgrade over it.
+		if gzipErr := upgradeStockNginxGzipConfig(u.candidate); gzipErr != nil {
+			t.Logf("WARNING: update stock gzip configuration failed, keeping the current one: %v", gzipErr)
+		}
 	} else if err = appInstallRepo.Save(context.Background(), &u.candidate); err != nil {
 		return err
 	}

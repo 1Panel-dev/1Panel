@@ -32,7 +32,7 @@ type NginxService struct {
 
 type INginxService interface {
 	GetNginxConfig() (*response.NginxFile, error)
-	GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error)
+	GetConfigByScope(req request.NginxScopeReq) (interface{}, error)
 	UpdateConfigByScope(req request.NginxConfigUpdate) error
 	GetStatus() (response.NginxStatus, error)
 	UpdateConfigFile(req request.NginxConfigFileUpdate) error
@@ -62,7 +62,10 @@ func (n NginxService) GetNginxConfig() (*response.NginxFile, error) {
 	return &response.NginxFile{Content: string(byteContent)}, nil
 }
 
-func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.NginxParam, error) {
+func (n NginxService) GetConfigByScope(req request.NginxScopeReq) (interface{}, error) {
+	if req.Scope == dto.Brotli {
+		return getNginxBrotliParams()
+	}
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil, nil
@@ -71,6 +74,9 @@ func (n NginxService) GetConfigByScope(req request.NginxScopeReq) ([]response.Ng
 }
 
 func (n NginxService) UpdateConfigByScope(req request.NginxConfigUpdate) error {
+	if req.Scope == dto.Brotli {
+		return updateNginxBrotliParams(getNginxParams(req.Params, dto.BrotliKeys))
+	}
 	keys, ok := dto.ScopeKeyMap[req.Scope]
 	if !ok || len(keys) == 0 {
 		return nil
