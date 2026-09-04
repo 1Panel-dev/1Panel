@@ -16,7 +16,7 @@ export const getAgentProviderDisplayName = (provider: string, displayName?: stri
 };
 
 export const isAgentAccountVerificationSkipped = (provider?: string): boolean =>
-    ['vllm', 'ollama', 'kimi-coding'].includes((provider || '').toLowerCase());
+    ['vllm', 'ollama', 'llmman', 'kimi-coding'].includes((provider || '').toLowerCase());
 
 export const supportsAgentModelConfig = (agentType: string): boolean => {
     return agentType === 'openclaw' || agentType === 'hermes-agent';

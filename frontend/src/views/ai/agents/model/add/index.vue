@@ -271,7 +271,7 @@ const manualVerifyIndex = ref(-1);
 const editModels = ref<AI.AgentAccountModel[]>([]);
 const modelConfigMode = ref<'discover' | 'manual'>('discover');
 const modelDiscoveryFailed = ref(false);
-const initialModelProviders = ['custom', 'vllm', 'ollama'];
+const initialModelProviders = ['custom', 'vllm', 'ollama', 'llmman'];
 const { isIntl } = useGlobalStore();
 
 const form = reactive({
