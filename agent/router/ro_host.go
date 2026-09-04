@@ -84,6 +84,9 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.GET("/terminal/local", baseApi.WsLocalTerminal)
 		hostRouter.GET("/terminal/ssh", baseApi.WsHostSSH)
 		hostRouter.GET("/terminal/container", baseApi.WsContainerTerminal)
+		hostRouter.POST("/terminal/sessions/search", baseApi.SearchTerminalSessions)
+		hostRouter.POST("/terminal/sessions/close", baseApi.CloseTerminalSession)
+		hostRouter.POST("/terminal/sessions/closeAll", baseApi.CloseAllTerminalSessions)
 
 		hostRouter.GET("/disks", baseApi.GetCompleteDiskInfo)
 		hostRouter.POST("/disks/partition", baseApi.PartitionDisk)

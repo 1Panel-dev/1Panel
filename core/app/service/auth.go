@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"net/http"
 	"strings"
 	"time"
 
@@ -20,6 +21,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -61,7 +63,17 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 			return err
 		}
 	}
+	CloseTerminalSessions()
 	return nil
+}
+
+// CloseTerminalSessions tells the local agent to end every kept-alive web terminal.
+// A logged-out panel has nobody watching, so nothing it left running should survive.
+// ponytail: local agent only; shells on other nodes are the multi-node proxy's job.
+func CloseTerminalSessions() {
+	if _, err := proxy_local.NewLocalClient("/api/v2/hosts/terminal/sessions/closeAll", http.MethodPost, nil, nil); err != nil {
+		global.LOG.Warnf("close terminal sessions on logout failed, err: %v", err)
+	}
 }
 
 func (u *AuthService) VerifyCode(code string) (bool, error) {

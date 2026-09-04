@@ -74,11 +74,12 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
-import { TabsStore } from '@/store';
+import { TabsStore, TerminalSessionStore } from '@/store';
 import i18n from '@/lang';
 import { Close, DArrowLeft, DArrowRight, Lock, More, Unlock } from '@element-plus/icons-vue';
 
 const tabsStore = TabsStore();
+const terminalSessions = TerminalSessionStore();
 
 const props = defineProps({
     tabItem: {
@@ -98,6 +99,10 @@ const menuName = computed(() => {
     }
     if (props.tabItem.meta.detail) {
         title = title + '-' + i18n.global.t(props.tabItem.meta.detail);
+    }
+    // live sessions: off the page only pinned ones survive, under a locked (keep-alive) tab all do
+    if (props.tabItem.path === '/terminal' && terminalSessions.entries.length > 0) {
+        title = title + ' (' + i18n.global.t('terminal.sessionCount', [terminalSessions.entries.length]) + ')';
     }
     return title;
 });

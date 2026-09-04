@@ -678,6 +678,7 @@ XfsNotFound: 'XFS dosya sistemi algılanmadı, lütfen önce xfsprogs''i yükley
 # terminal
 TerminalAIBlockedRiskyCommand: 'Riskli komut engellendi: {{ .command }}'
 TerminalAIThinking: 'AI dusunuyor...'
+TerminalOutputTruncated: '[çıktı kısaltıldı, yalnızca son çıktı gösteriliyor]'
 TerminalAIReadyToExecute: 'Dusunme tamamlandi, calistirmak icin Enter tusuna basin (sure: {{ .duration }}, token: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI istegi basarisiz oldu: {{ .err }}'
 

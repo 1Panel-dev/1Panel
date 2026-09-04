@@ -678,6 +678,7 @@ XfsNotFound: 'xfs not found; install xfsprogs first'
 # terminal
 TerminalAIBlockedRiskyCommand: 'blocked risky command: {{ .command }}'
 TerminalAIThinking: 'AI is thinking...'
+TerminalOutputTruncated: '[output truncated, showing recent output only]'
 TerminalAIReadyToExecute: 'Thinking complete, press Enter to execute (duration: {{ .duration }}, tokens: {{ .tokens }})'
 TerminalAIRequestFailed: 'AI request failed: {{ .err }}'
 

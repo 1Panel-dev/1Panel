@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
@@ -19,11 +20,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"github.com/pkg/errors"
+	gossh "golang.org/x/crypto/ssh"
 )
 
 // @Tags Terminal
 // @Summary Ws local terminal
 // @Param command query string false "command"
+// @Param session query string false "session id to reattach"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -36,6 +39,8 @@ func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
 // @Summary Ws host SSH
 // @Param id query integer false "id"
 // @Param command query string false "command"
+// @Param session query string false "session id to reattach"
+// @Param title query string false "session title shown in the session list"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -122,25 +127,75 @@ func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, 
 	}
 	defer wsConn.Close()
 
-	client, clientErr := connect()
-	if wshandleError(wsConn, errors.WithMessage(clientErr, "failed to set up the connection. Please check the host information")) {
+	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+	opts := terminal.SessionOptions{
+		Owner:   loadAuditUser(c),
+		Title:   sanitizeTerminalTitle(c.Query("title")),
+		HostID:  uint(max(hostID, 0)),
+		Cols:    cols,
+		Rows:    rows,
+		InitCmd: command,
+	}
+	err := terminal.Serve(wsConn, strings.TrimSpace(c.Query("session")), opts, func() (*gossh.Client, error) {
+		client, err := connect()
+		if err != nil {
+			return nil, errors.WithMessage(err, "failed to set up the connection. Please check the host information")
+		}
+		return client.Client, nil
+	})
+	if err != nil {
+		_ = wshandleError(wsConn, err)
+	}
+}
+
+// @Tags Terminal
+// @Summary List the caller's live terminal sessions
+// @Success 200 {array} terminal.Info
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/search [post]
+func (b *BaseApi) SearchTerminalSessions(c *gin.Context) {
+	helper.SuccessWithData(c, terminal.List(loadAuditUser(c)))
+}
+
+// @Tags Terminal
+// @Summary Close a terminal session
+// @Accept json
+// @Param request body dto.TerminalSessionClose true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/close [post]
+func (b *BaseApi) CloseTerminalSession(c *gin.Context) {
+	var req dto.TerminalSessionClose
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	defer client.Close()
-
-	sws, err := terminal.NewLogicSshWsSession(cols, rows, client.Client, wsConn, command)
-	if wshandleError(wsConn, err) {
+	if err := terminal.CloseSession(req.ID, loadAuditUser(c)); err != nil {
+		helper.BadRequest(c, err)
 		return
 	}
-	defer sws.Close()
+	helper.Success(c)
+}
 
-	quitChan := make(chan bool, 3)
-	sws.Start(quitChan)
-	go sws.Wait(quitChan)
+// @Tags Terminal
+// @Summary Close every terminal session (panel user logged out)
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/terminal/sessions/closeAll [post]
+func (b *BaseApi) CloseAllTerminalSessions(c *gin.Context) {
+	terminal.CloseAll()
+	helper.Success(c)
+}
 
-	<-quitChan
-
-	closeTerminalConn(wsConn)
+// sanitizeTerminalTitle keeps the title a short single line.
+func sanitizeTerminalTitle(title string) string {
+	title = strings.Join(strings.Fields(title), " ")
+	if r := []rune(title); len(r) > 64 {
+		title = string(r[:64])
+	}
+	return title
 }
 
 func closeTerminalConn(wsConn *websocket.Conn) {

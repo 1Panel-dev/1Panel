@@ -1,6 +1,7 @@
 import http from '@/api';
 import { ResPage } from '../interface';
 import { Host } from '../interface/host';
+import { TerminalSession } from '../interface/terminal';
 import { encodeBase64Fields } from '@/utils/base64';
 import { deepCopy } from '@/utils/misc';
 export const searchHosts = (params: Host.SearchWithPage) => {
@@ -52,4 +53,11 @@ export const loadLocalConn = () => {
 };
 export const testLocalConn = () => {
     return http.post<boolean>(`/settings/ssh/check`);
+};
+
+// live web terminal sessions of the caller; ssh ones live on the local node, local shells on the operated node
+export const searchTerminalSessions = (localNode: boolean) => {
+    return localNode
+        ? http.postLocalNode<TerminalSession[]>(`/hosts/terminal/sessions/search`)
+        : http.post<TerminalSession[]>(`/hosts/terminal/sessions/search`);
 };
