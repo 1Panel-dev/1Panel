@@ -125,7 +125,7 @@ func (s *DockerPortGuardService) LoadPublishedPorts(ctx context.Context) ([]dto.
 	}
 	defer cli.Close()
 
-	endpoints, err := discoverDockerEndpoints(ctx, cli)
+	endpoints, err := discoverDockerEndpoints(ctx, cli, false)
 	if err != nil {
 		return nil, err
 	}
@@ -163,7 +163,7 @@ func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPo
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		markDockerGuardReconcileFailure(&base, reconcileErr)
 	}
-	endpoints, err := discoverDockerEndpoints(ctx, cli)
+	endpoints, err := discoverDockerEndpoints(ctx, cli, true)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
 	}
@@ -378,7 +378,7 @@ func (s *DockerPortGuardService) rejectHostInputDockerGuardEndpoints(
 	if err != nil {
 		return nil
 	}
-	endpoints, err := discoverDockerEndpoints(ctx, cli)
+	endpoints, err := discoverDockerEndpoints(ctx, cli, true)
 	if err != nil {
 		return nil
 	}
@@ -739,8 +739,8 @@ func dockerFirewallVersion(backend string) string {
 	return version
 }
 
-func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.DockerPortGuardEndpoint, error) {
-	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: true})
+func discoverDockerEndpoints(ctx context.Context, cli *client.Client, all bool) ([]dto.DockerPortGuardEndpoint, error) {
+	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: all})
 	if err != nil {
 		return nil, err
 	}
@@ -763,7 +763,7 @@ func discoverDockerEndpoints(ctx context.Context, cli *client.Client) ([]dto.Doc
 			} else if hostIP == "" {
 				hostIP = "0.0.0.0"
 			}
-			endpoints = append(endpoints, dto.DockerPortGuardEndpoint{Family: family, HostIP: hostIP, HostPort: port.PublicPort, Protocol: port.Type, ContainerID: item.ID, ContainerName: name, ContainerPort: port.PrivatePort, Compose: compose, Application: application, Sources: []string{}})
+			endpoints = append(endpoints, dto.DockerPortGuardEndpoint{Family: family, HostIP: hostIP, HostPort: port.PublicPort, Protocol: port.Type, ContainerID: item.ID, ContainerName: name, ContainerState: item.State, ContainerPort: port.PrivatePort, Compose: compose, Application: application, Sources: []string{}})
 		}
 	}
 	return endpoints, nil

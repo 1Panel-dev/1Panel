@@ -396,7 +396,7 @@ import i18n from '@/lang';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
 import { MsgError, MsgSuccess } from '@/utils/message';
-import { dockerGuardManagementTarget } from '@/views/host/firewall/docker/model';
+import { dockerGuardEndpointManagementMessage, dockerGuardManagementTarget } from '@/views/host/firewall/docker/model';
 import { formatHostAddress } from '@/views/host/firewall/utils/validation';
 import RuleImport from '@/views/host/firewall/rule/import/index.vue';
 import RuleOperate from '@/views/host/firewall/rule/operate/index.vue';
@@ -422,6 +422,7 @@ interface UsageEntry {
     pid?: number;
     docker?: boolean;
     dockerManagementTarget?: Firewall.DockerGuardEndpoint['managementTarget'];
+    dockerEndpoint?: Firewall.DockerGuardEndpoint;
 }
 
 interface DisplayNotice {
@@ -775,19 +776,25 @@ const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
             owner: `Docker: ${endpoint.containerName || endpoint.containerID?.slice(0, 12) || '-'}`,
             docker: true,
             dockerManagementTarget: dockerGuardManagementTarget(endpoint),
+            dockerEndpoint: endpoint,
         }));
     return [...processes, ...docker];
 };
 const usageEntryPortText = (entry: UsageEntry) => entry.ports.join(', ') || '-';
+const dockerUsageMessage = (entry: UsageEntry) => {
+    if (entry.dockerManagementTarget === 'host_firewall') {
+        return i18n.global.t('firewall.dockerInputUseHostFirewall');
+    }
+    if (entry.dockerManagementTarget === 'container_guard') {
+        return i18n.global.t('firewall.dockerInputNotProtected');
+    }
+    return entry.dockerEndpoint
+        ? dockerGuardEndpointManagementMessage(entry.dockerEndpoint)
+        : i18n.global.t('firewall.dockerTrafficPathUnknown');
+};
 const usageEntryLabel = (entry: UsageEntry) =>
     entry.docker
-        ? `${entry.owner} (${usageEntryPortText(entry)}) — ${i18n.global.t(
-              entry.dockerManagementTarget === 'host_firewall'
-                  ? 'firewall.dockerInputUseHostFirewall'
-                  : entry.dockerManagementTarget === 'container_guard'
-                    ? 'firewall.dockerInputNotProtected'
-                    : 'firewall.dockerTrafficPathUnknown',
-          )}`
+        ? `${entry.owner} (${usageEntryPortText(entry)}) — ${dockerUsageMessage(entry)}`
         : `${entry.owner} (${usageEntryPortText(entry)})`;
 const openUsageDetail = (entry: UsageEntry) => {
     if (entry.docker) {

@@ -4179,6 +4179,16 @@ const message = {
         dockerTrafficPathMixed: '選択したポートは異なるアクセス経路を使用しています。個別に設定してください。',
         dockerTrafficPathUnknown:
             'このポートのアクセス経路を確認できません。Docker ネットワーク設定を確認して再試行してください。',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Docker の NAT ルールを読み取れません。ファイアウォールコマンドと実行権限を確認してから更新してください。',
+            proxy_inspect_failed:
+                'docker-proxy プロセスを確認できません。システムのプロセス情報を読み取れることを確認してから更新してください。',
+            nat_chain_unreachable:
+                'このポートの Docker 転送ルールは見つかりましたが、NAT 入口チェーンが有効ではありません。Docker のファイアウォールルールを確認するか Docker を再起動してから更新してください。',
+            no_matching_path:
+                'このポートに有効な Docker 転送ルールまたはプロキシプロセスが見つかりません。対象のコンテナを起動または再起動してから更新してください。解決しない場合は Docker ネットワーク設定を確認してください。',
+        },
         dockerTrafficPathPending: 'アクセス経路を確認中',
         dockerInputPolicyNotEffective:
             'このポートはホストが直接受信するため、既存のコンテナポート保護ルールは適用されません。ホストファイアウォールで設定してください。',

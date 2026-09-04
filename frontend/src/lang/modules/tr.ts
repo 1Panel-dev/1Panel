@@ -4263,6 +4263,16 @@ const message = {
         dockerTrafficPathMixed: 'Seçilen portlar farklı erişim yolları kullanıyor. Bunları ayrı ayrı yapılandırın.',
         dockerTrafficPathUnknown:
             'Bu portun erişim yolu belirlenemedi. Docker ağ yapılandırmasını kontrol edip tekrar deneyin.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Docker NAT kuralları okunamadı. Güvenlik duvarı komutlarını ve izinlerini kontrol edip sayfayı yenileyin.',
+            proxy_inspect_failed:
+                'docker-proxy işlemleri incelenemedi. Sistem işlem bilgilerine erişimi kontrol edip sayfayı yenileyin.',
+            nat_chain_unreachable:
+                'Bu port için bir Docker yönlendirme kuralı var ancak NAT giriş zinciri etkin değil. Docker güvenlik duvarı kurallarını kontrol edin veya Docker’ı yeniden başlatıp sayfayı yenileyin.',
+            no_matching_path:
+                'Bu port için etkin bir Docker yönlendirme kuralı veya proxy işlemi bulunamadı. Konteyneri başlatın ya da yeniden başlatıp sayfayı yenileyin. Sorun sürerse Docker ağ yapılandırmasını kontrol edin.',
+        },
         dockerTrafficPathPending: 'Erişim yolu bekleniyor',
         dockerInputPolicyNotEffective:
             'Bu port doğrudan ana makine tarafından alındığından mevcut konteyner port koruma kuralı uygulanmaz. Ana makine güvenlik duvarında yapılandırın.',

@@ -241,8 +241,10 @@ import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 import {
     dockerGuardEndpointKey,
+    dockerGuardEndpointManagementMessage,
     dockerGuardEndpointStatusMessage,
     dockerGuardManagementTarget,
+    isDockerGuardRuntimeEndpoint,
 } from '@/views/host/firewall/docker/model';
 import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { newUUID } from '@/utils/id';
@@ -294,6 +296,7 @@ const containerRows = computed(() => {
         .filter((container) => container.key !== '__orphan__')
         .map((container) => {
             const name = container.name || i18n.global.t('firewall.orphanEndpoints');
+            const runtimeEndpoints = container.endpoints.filter(isDockerGuardRuntimeEndpoint);
             const containerMatches = [name, container.application, container.compose]
                 .filter(Boolean)
                 .some((item) => item!.toLowerCase().includes(keyword));
@@ -304,7 +307,7 @@ const containerRows = computed(() => {
                     .some((item) => String(item).toLowerCase().includes(keyword));
             };
             const portGroups = container.portGroups.flatMap((group) => {
-                const endpoints = group.endpoints.filter(endpointMatches);
+                const endpoints = group.endpoints.filter(isDockerGuardRuntimeEndpoint).filter(endpointMatches);
                 if (!endpoints.length) return [];
                 if (endpoints.length === group.endpoints.length) return [group];
                 return endpoints.map((endpoint) => ({
@@ -317,7 +320,7 @@ const containerRows = computed(() => {
             return {
                 ...container,
                 name,
-                endpoints: container.endpoints.filter(endpointMatches),
+                endpoints: runtimeEndpoints.filter(endpointMatches),
                 portGroups,
             };
         })
@@ -406,12 +409,11 @@ const displaySources = (endpoint: Firewall.DockerGuardEndpoint) =>
     formatHostAddressList(endpoint.sources, endpoint.family);
 const endpointStatusMessage = (endpoint: Firewall.DockerGuardEndpoint) =>
     dockerGuardEndpointStatusMessage(data.base, endpoint);
-const isDockerPolicyEndpoint = (endpoint: Firewall.DockerGuardEndpoint) =>
-    dockerGuardManagementTarget(endpoint) === 'container_guard' && Boolean(endpoint.policyUUID);
+const isDockerPolicyEndpoint = (endpoint: Firewall.DockerGuardEndpoint) => Boolean(endpoint.policyUUID);
 const endpointPrompt = (endpoint: Firewall.DockerGuardEndpoint) => {
     const target = dockerGuardManagementTarget(endpoint);
     if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputUseHostFirewall');
-    if (target === 'needs_diagnosis') return i18n.global.t('firewall.dockerTrafficPathUnknown');
+    if (target === 'needs_diagnosis') return dockerGuardEndpointManagementMessage(endpoint);
     return i18n.global.t('firewall.dockerGuardUnprotected');
 };
 

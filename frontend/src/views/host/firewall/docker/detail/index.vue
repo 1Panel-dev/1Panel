@@ -179,6 +179,7 @@ import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import {
+    dockerGuardEndpointManagementMessage,
     dockerGuardEndpointStatusMessage,
     dockerGuardManagementTarget,
     isValidDockerGuardSource,
@@ -294,6 +295,13 @@ const toggleSelection = (key: string) => {
 };
 const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     if (!endpoints.length) return;
+    const endpointToDiagnose = endpoints.find(
+        (endpoint) => dockerGuardManagementTarget(endpoint) === 'needs_diagnosis',
+    );
+    if (endpointToDiagnose) {
+        MsgWarning(dockerGuardEndpointManagementMessage(endpointToDiagnose));
+        return;
+    }
     const targets = new Set(endpoints.map(dockerGuardManagementTarget));
     if (targets.size !== 1) {
         MsgWarning(i18n.global.t('firewall.dockerTrafficPathMixed'));
@@ -302,10 +310,6 @@ const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     const target = [...targets][0];
     if (target === 'host_firewall') {
         MsgWarning(i18n.global.t('firewall.dockerInputUseHostFirewall'));
-        return;
-    }
-    if (target !== 'container_guard') {
-        MsgWarning(i18n.global.t('firewall.dockerTrafficPathUnknown'));
         return;
     }
     policyEndpoints.value = endpoints;
@@ -395,9 +399,11 @@ const portMappingLabel = (row: Firewall.DockerGuardPortGroup) => {
 };
 const protectionSummary = (row: Firewall.DockerGuardEndpoint) => {
     const target = dockerGuardManagementTarget(row);
-    if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputUseHostFirewall');
-    if (target === 'needs_diagnosis') return i18n.global.t('firewall.dockerTrafficPathUnknown');
-    if (!row.policyUUID) return i18n.global.t('firewall.dockerGuardUnprotected');
+    if (!row.policyUUID) {
+        if (target === 'host_firewall') return i18n.global.t('firewall.dockerInputUseHostFirewall');
+        if (target === 'needs_diagnosis') return dockerGuardEndpointManagementMessage(row);
+        return i18n.global.t('firewall.dockerGuardUnprotected');
+    }
     let summary = i18n.global.t('firewall.denyAll');
     if (row.mode === 'deny_sources') {
         summary = `${i18n.global.t('firewall.deny')}: ${formatHostAddressList(row.sources, row.family)}`;

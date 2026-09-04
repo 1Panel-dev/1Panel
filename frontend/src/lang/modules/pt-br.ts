@@ -4282,6 +4282,16 @@ const message = {
             'As portas selecionadas usam caminhos de acesso diferentes. Configure-as separadamente.',
         dockerTrafficPathUnknown:
             'Não foi possível determinar o caminho de acesso desta porta. Verifique a rede do Docker e tente novamente.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Não foi possível ler as regras NAT do Docker. Verifique os comandos e as permissões do firewall e atualize a página.',
+            proxy_inspect_failed:
+                'Não foi possível inspecionar os processos docker-proxy. Verifique o acesso às informações dos processos e atualize a página.',
+            nat_chain_unreachable:
+                'Existe uma regra de encaminhamento do Docker para esta porta, mas a cadeia de entrada NAT não está ativa. Verifique as regras do firewall do Docker ou reinicie o Docker e atualize a página.',
+            no_matching_path:
+                'Nenhuma regra de encaminhamento do Docker ativa ou processo proxy foi encontrado para esta porta. Inicie ou reinicie o contêiner e atualize a página. Se o problema continuar, verifique a rede do Docker.',
+        },
         dockerTrafficPathPending: 'Caminho de acesso pendente',
         dockerInputPolicyNotEffective:
             'O host recebe esta porta diretamente, portanto a regra de proteção da porta do contêiner não se aplica. Configure-a no firewall do host.',

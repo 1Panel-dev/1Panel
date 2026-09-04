@@ -4194,6 +4194,16 @@ const message = {
         dockerTrafficPathMixed: 'The selected ports use different access paths. Configure them separately.',
         dockerTrafficPathUnknown:
             'The access path for this port could not be determined. Check the Docker network configuration and try again.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Docker NAT rules could not be read. Check the firewall commands and permissions, then refresh.',
+            proxy_inspect_failed:
+                'docker-proxy processes could not be inspected. Check access to system process information, then refresh.',
+            nat_chain_unreachable:
+                'A Docker forwarding rule exists for this port, but the NAT ingress chain is inactive. Check the Docker firewall rules or restart Docker, then refresh.',
+            no_matching_path:
+                'No active Docker forwarding rule or proxy process was found for this port. Start or restart the container, then refresh. If the issue persists, check the Docker network configuration.',
+        },
         dockerTrafficPathPending: 'Access path pending',
         dockerInputPolicyNotEffective:
             'The host receives this port directly, so the existing container port protection rule does not apply. Configure it in the host firewall instead.',

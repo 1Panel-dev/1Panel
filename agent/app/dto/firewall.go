@@ -165,6 +165,7 @@ type DockerPortGuardEndpoint struct {
 	Protocol         string   `json:"protocol"`
 	ContainerID      string   `json:"containerID"`
 	ContainerName    string   `json:"containerName"`
+	ContainerState   string   `json:"containerState,omitempty"`
 	ContainerPort    uint16   `json:"containerPort"`
 	Compose          string   `json:"compose,omitempty"`
 	Application      string   `json:"application,omitempty"`
