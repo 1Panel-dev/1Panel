@@ -235,7 +235,10 @@ func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRu
 	case filter.ChangeCreate:
 		return markerCount > 0
 	case filter.ChangeAdopt:
-		return plan.Previous == nil || !containsObservedRule(snapshot, *plan.Previous)
+		if commandIndex == 0 {
+			return plan.Previous == nil || !containsObservedRule(snapshot, *plan.Previous)
+		}
+		return markerCount > 0
 	case filter.ChangeUpdate:
 		if commandIndex == 0 {
 			return markerCount == 0
@@ -342,14 +345,20 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			return filter.NativeRulePlan{}, targetErr
 		}
 		position = *target.Locator.Position
+		appendAtEnd := position == maximumObservedPosition(snapshot)
+		restoreAtEnd := change.RestoreAtEnd || appendAtEnd
 		plan.Previous = &target
 		plan.Expected = observedForRule(normalized, marker, position)
+		if appendAtEnd {
+			plan.Expected.Locator.NativeID = ""
+			plan.Expected.Locator.Position = nil
+		}
 		plan.Commands = []filter.NativeCommand{
 			deletePositionCommand(position),
-			insertCommand(position, normalized, marker),
+			positionedCommand(position, normalized, marker, appendAtEnd),
 		}
 		plan.RollbackCommands = []filter.NativeCommand{
-			insertCommand(position, target.Rule, observedComment(target)),
+			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 			deleteRuleCommand(normalized, marker),
 		}
 	case filter.ChangeUpdate:

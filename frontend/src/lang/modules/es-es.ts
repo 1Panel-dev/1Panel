@@ -4242,6 +4242,16 @@ const message = {
         dockerTrafficPathMixed: 'Los puertos seleccionados usan rutas de acceso diferentes. Configúralos por separado.',
         dockerTrafficPathUnknown:
             'No se pudo determinar la ruta de acceso de este puerto. Comprueba la red de Docker e inténtalo de nuevo.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'No se pudieron leer las reglas NAT de Docker. Comprueba los comandos y permisos del firewall y actualiza la página.',
+            proxy_inspect_failed:
+                'No se pudieron inspeccionar los procesos docker-proxy. Comprueba el acceso a la información de procesos y actualiza la página.',
+            nat_chain_unreachable:
+                'Existe una regla de reenvío de Docker para este puerto, pero la cadena de entrada NAT no está activa. Comprueba las reglas del firewall de Docker o reinicia Docker y actualiza la página.',
+            no_matching_path:
+                'No se encontró una regla de reenvío de Docker activa ni un proceso proxy para este puerto. Inicia o reinicia el contenedor y actualiza la página. Si continúa, comprueba la red de Docker.',
+        },
         dockerTrafficPathPending: 'Ruta de acceso pendiente',
         dockerInputPolicyNotEffective:
             'El host recibe este puerto directamente, por lo que la regla de protección del puerto del contenedor no se aplica. Configúralo en el firewall del host.',

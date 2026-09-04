@@ -4102,6 +4102,16 @@ const message = {
         dockerTrafficPathMixed: '선택한 포트가 서로 다른 접근 경로를 사용합니다. 각각 설정하세요.',
         dockerTrafficPathUnknown:
             '이 포트의 접근 경로를 확인할 수 없습니다. Docker 네트워크 설정을 확인한 후 다시 시도하세요.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Docker NAT 규칙을 읽을 수 없습니다. 방화벽 명령과 실행 권한을 확인한 후 새로 고침하세요.',
+            proxy_inspect_failed:
+                'docker-proxy 프로세스를 확인할 수 없습니다. 시스템 프로세스 정보에 대한 접근 권한을 확인한 후 새로 고침하세요.',
+            nat_chain_unreachable:
+                '이 포트의 Docker 전달 규칙은 있지만 NAT 진입 체인이 활성화되지 않았습니다. Docker 방화벽 규칙을 확인하거나 Docker를 다시 시작한 후 새로 고침하세요.',
+            no_matching_path:
+                '이 포트에 활성 Docker 전달 규칙이나 프록시 프로세스가 없습니다. 해당 컨테이너를 시작하거나 다시 시작한 후 새로 고침하세요. 문제가 계속되면 Docker 네트워크 설정을 확인하세요.',
+        },
         dockerTrafficPathPending: '접근 경로 확인 대기',
         dockerInputPolicyNotEffective:
             '이 포트는 호스트가 직접 수신하므로 기존 컨테이너 포트 보호 규칙이 적용되지 않습니다. 호스트 방화벽에서 설정하세요.',

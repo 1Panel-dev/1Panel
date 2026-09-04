@@ -395,6 +395,7 @@ export namespace Firewall {
         protocol: 'tcp' | 'udp';
         containerID?: string;
         containerName?: string;
+        containerState?: 'created' | 'running' | 'paused' | 'restarting' | 'removing' | 'exited' | 'dead';
         containerPort?: number;
         compose?: string;
         application?: string;

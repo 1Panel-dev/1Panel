@@ -4261,6 +4261,16 @@ const message = {
             'Tetapkan sekatan akses untuk port yang diterbitkan oleh bekas Docker pada hos. Port tanpa perlindungan mengekalkan tingkah laku akses lalai Docker.',
         dockerTrafficPathMixed: 'Port yang dipilih menggunakan laluan akses berbeza. Tetapkannya secara berasingan.',
         dockerTrafficPathUnknown: 'Laluan akses port ini tidak dapat ditentukan. Semak rangkaian Docker dan cuba lagi.',
+        dockerTrafficPathReason: {
+            nat_inspect_failed:
+                'Peraturan NAT Docker tidak dapat dibaca. Semak arahan dan kebenaran tembok api, kemudian muat semula.',
+            proxy_inspect_failed:
+                'Proses docker-proxy tidak dapat diperiksa. Semak akses kepada maklumat proses sistem, kemudian muat semula.',
+            nat_chain_unreachable:
+                'Peraturan pemajuan Docker wujud untuk port ini, tetapi rantaian masuk NAT tidak aktif. Semak peraturan tembok api Docker atau mulakan semula Docker, kemudian muat semula.',
+            no_matching_path:
+                'Tiada peraturan pemajuan Docker aktif atau proses proksi ditemui untuk port ini. Mulakan atau mulakan semula bekas, kemudian muat semula. Jika masalah berterusan, semak konfigurasi rangkaian Docker.',
+        },
         dockerTrafficPathPending: 'Laluan akses belum ditentukan',
         dockerInputPolicyNotEffective:
             'Port ini diterima terus oleh hos, jadi peraturan perlindungan port bekas sedia ada tidak digunakan. Tetapkannya dalam firewall hos.',

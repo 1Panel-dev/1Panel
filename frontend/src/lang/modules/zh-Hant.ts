@@ -3919,6 +3919,14 @@ const message = {
         dockerGuardHelper: '為 Docker 容器發佈到主機的連接埠設定存取限制；未設定防護的連接埠維持 Docker 預設存取方式。',
         dockerTrafficPathMixed: '所選連接埠使用不同的存取方式，請分別設定。',
         dockerTrafficPathUnknown: '暫時無法確認此連接埠的存取方式，請檢查 Docker 網路設定後重試。',
+        dockerTrafficPathReason: {
+            nat_inspect_failed: '無法讀取 Docker NAT 規則，請檢查防火牆命令及執行權限後重新整理。',
+            proxy_inspect_failed: '無法檢查 docker-proxy 程序，請確認可讀取系統程序資訊後重新整理。',
+            nat_chain_unreachable:
+                '已找到此連接埠的 Docker 轉送規則，但 NAT 入口鏈未生效，請檢查 Docker 防火牆規則或重新啟動 Docker 後重新整理。',
+            no_matching_path:
+                '未找到此連接埠生效的 Docker 轉送規則或代理程序，請啟動或重新啟動對應容器後重新整理；若仍異常，請檢查 Docker 網路設定。',
+        },
         dockerTrafficPathPending: '存取方式待確認',
         dockerInputPolicyNotEffective: '此連接埠由主機直接接收，現有容器連接埠防護規則不會生效，請改用主機防火牆設定。',
         dockerInputUseHostFirewall: '此連接埠需要透過主機防火牆設定存取規則，請前往主機防火牆進行設定。',

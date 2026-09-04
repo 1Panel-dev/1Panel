@@ -3968,6 +3968,14 @@ const message = {
         dockerGuardHelper: '为 Docker 容器发布到宿主机的端口配置访问限制；未设置防护的端口保持 Docker 默认访问方式。',
         dockerTrafficPathMixed: '所选端口使用不同的访问方式，请分别设置。',
         dockerTrafficPathUnknown: '暂时无法确认该端口的访问方式，请检查 Docker 网络配置后重试。',
+        dockerTrafficPathReason: {
+            nat_inspect_failed: '无法读取 Docker NAT 规则，请检查防火墙命令及执行权限后刷新重试。',
+            proxy_inspect_failed: '无法检查 docker-proxy 进程，请确认系统进程信息可读取后刷新重试。',
+            nat_chain_unreachable:
+                '已找到该端口的 Docker 转发规则，但 NAT 入口链未生效，请检查 Docker 防火墙规则或重启 Docker 后刷新。',
+            no_matching_path:
+                '未找到该端口生效的 Docker 转发规则或代理进程，请启动或重启对应容器后刷新；若仍异常，请检查 Docker 网络配置。',
+        },
         dockerTrafficPathPending: '访问方式待确认',
         dockerInputPolicyNotEffective: '该端口由主机直接接收，现有容器端口防护规则不会生效，请改用主机防火墙设置。',
         dockerInputUseHostFirewall: '该端口需要通过主机防火墙设置访问规则，请前往主机防火墙进行配置。',
