@@ -45,12 +45,24 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
     const add = (init: { title: string; wsID: number; args?: string; status?: 'online' | 'closed' }) => {
         const key = newUUID();
         const q = `title=${encodeURIComponent(init.title)}`;
+        let title = init.title;
+        let args = init.args || '';
+        if (init.wsID === 0) {
+            // A local shell is pinned to the node it was opened on. Without this the
+            // websocket url would follow later node switches and a reconnect after a
+            // blip would silently open a shell on a different node. ssh shells (wsID > 0)
+            // always run on the master, see components/terminal/index.vue.
+            const { currentNode } = useGlobalStore();
+            const node = /operateNode=([^&]+)/.exec(args)?.[1] || encodeURIComponent(currentNode.value || 'local');
+            if (!args.includes('operateNode=')) args = [args, `operateNode=${node}`].filter(Boolean).join('&');
+            if (node !== 'local') title = `${title} (${decodeURIComponent(node)})`;
+        }
         entries.value.push({
             key,
-            title: init.title,
+            title,
             wsID: init.wsID,
             endpoint: init.wsID === 0 ? localEndpoint : sshEndpoint,
-            args: [init.wsID === 0 ? '' : `id=${init.wsID}`, init.args || '', q].filter(Boolean).join('&'),
+            args: [init.wsID === 0 ? '' : `id=${init.wsID}`, args, q].filter(Boolean).join('&'),
             sessionId: '',
             status: init.status || 'online',
             latency: 0,
@@ -98,6 +110,7 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
                 // attached elsewhere = another browser tab is using it; do not steal it
                 if (s.attached || entries.value.some((e) => e.sessionId === s.id)) continue;
                 if (s.hostId > 0 && !fromLocalNode) continue; // ssh sessions are served by the local node
+                // a local shell found on the master while another node is selected must stay pinned to the master
                 const key = add({
                     title: s.title || i18n.global.t('terminal.localhost'),
                     wsID: s.hostId,
