@@ -265,6 +265,19 @@ func (w WebsiteService) GetWebsites() ([]response.WebsiteDTO, error) {
 	return websiteDTOs, nil
 }
 
+func newWebsiteCreateHTTPSOp(sslID uint) request.WebsiteHTTPSOp {
+	return request.WebsiteHTTPSOp{
+		Enable:                true,
+		WebsiteSSLID:          sslID,
+		Type:                  constant.SSLExisted,
+		HttpConfig:            constant.HTTPToHTTPS,
+		SSLProtocol:           []string{"TLSv1.3", "TLSv1.2"},
+		Algorithm:             "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
+		Hsts:                  true,
+		HstsIncludeSubDomains: true,
+	}
+}
+
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
 	alias := create.Alias
 	if alias == "default" {
@@ -313,6 +326,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		appInstall    *model.AppInstall
 		runtime       *model.Runtime
 		primaryDomain string
+		initialSSL    *websiteInitialSSL
 	)
 	if website.Type == constant.Stream {
 		if create.StreamConfig.StreamPorts == "" {
@@ -339,6 +353,29 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		}
 		website.PrimaryDomain = primaryDomain
 		website.Protocol = constant.ProtocolHTTP
+		for _, domain := range domains {
+			if domain.SSL {
+				create.EnableSSL = true
+				break
+			}
+		}
+		if create.EnableSSL {
+			if create.WebsiteSSLID == 0 {
+				return buserr.New("ErrSSLValid")
+			}
+			websiteSSL, sslErr := websiteSSLRepo.GetFirst(repo.WithByID(create.WebsiteSSLID))
+			if sslErr != nil {
+				return sslErr
+			}
+			if websiteSSL.Pem == "" || websiteSSL.PrivateKey == "" {
+				return buserr.New("ErrSSLValid")
+			}
+			sslReq := newWebsiteCreateHTTPSOp(websiteSSL.ID)
+			website.Protocol = constant.ProtocolHTTPS
+			website.WebsiteSSLID = websiteSSL.ID
+			website.HttpConfig = sslReq.HttpConfig
+			initialSSL = &websiteInitialSSL{certificate: *websiteSSL, request: sslReq}
+		}
 	}
 
 	createTask, err := task.NewTaskWithOps(website.PrimaryDomain, task.TaskCreate, task.TaskScopeWebsite, create.TaskID, 0)
@@ -490,7 +527,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	configNginx := func(t *task.Task) error {
-		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig); err != nil {
+		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig, initialSSL); err != nil {
 			return err
 		}
 		if create.Type == constant.Static && create.TemplateOutputID > 0 {
@@ -547,36 +584,6 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 	}
 
 	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)
-
-	if create.EnableSSL {
-		enableSSL := func(t *task.Task) error {
-			websiteModel, err := websiteSSLRepo.GetFirst(repo.WithByID(create.WebsiteSSLID))
-			if err != nil {
-				return err
-			}
-			website.Protocol = constant.ProtocolHTTPS
-			website.WebsiteSSLID = create.WebsiteSSLID
-			appSSLReq := request.WebsiteHTTPSOp{
-				WebsiteID:             website.ID,
-				Enable:                true,
-				WebsiteSSLID:          websiteModel.ID,
-				Type:                  "existed",
-				HttpConfig:            "HTTPToHTTPS",
-				SSLProtocol:           []string{"TLSv1.3", "TLSv1.2"},
-				Algorithm:             "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
-				Hsts:                  true,
-				HstsIncludeSubDomains: true,
-			}
-			if err = applySSL(website, *websiteModel, appSSLReq); err != nil {
-				return err
-			}
-			if err = websiteRepo.Save(context.Background(), website); err != nil {
-				return err
-			}
-			return nil
-		}
-		createTask.AddSubTaskWithIgnoreErr(i18n.GetMsgByKey("EnableSSL"), enableSSL)
-	}
 
 	if len(create.FtpUser) != 0 && len(create.FtpPassword) != 0 {
 		createFtpUser := func(t *task.Task) error {
