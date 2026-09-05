@@ -1073,6 +1073,9 @@ const submit = async (formEl: FormInstance | undefined) => {
 watch(
     () => website.value.domains,
     () => {
+        if (website.value.domains.some((domain: any) => domain.ssl) && !website.value.enableSSL) {
+            website.value.enableSSL = true;
+        }
         tryAutoSelectSSL();
     },
     { deep: true },
@@ -1089,6 +1092,9 @@ watch(
     () => website.value.enableSSL,
     (enabled) => {
         if (!enabled) {
+            website.value.domains.forEach((domain: any) => {
+                domain.ssl = false;
+            });
             applySSLSelection(undefined);
             userSelectedSSL.value = false;
             return;
