@@ -9,9 +9,29 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/gin-gonic/gin"
 )
+
+func (b *BaseApi) UpdatePanelFirewallPort(c *gin.Context) {
+	if !global.IsMaster {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
+	var request struct {
+		OldPort uint `json:"oldPort" validate:"required,min=1,max=65535"`
+		NewPort uint `json:"newPort" validate:"required,min=1,max=65535"`
+	}
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	if err := firewallService.UpdatePanelPort(c.Request.Context(), request.OldPort, request.NewPort); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
 
 // @Tags Firewall
 // @Summary Load firewall base info

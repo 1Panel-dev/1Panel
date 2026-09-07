@@ -8,6 +8,7 @@ import (
 var (
 	ErrAdapterUnavailable   = errors.New("firewall rule adapter is unavailable")
 	ErrInventoryUnavailable = errors.New("firewall rule inventory is unavailable")
+	ErrFamilyUnavailable    = errors.New("firewall address family is unavailable")
 )
 
 type ChangeOperation string

@@ -69,7 +69,12 @@ func Init() {
 		global.LOG.Errorf("find 1panel service port failed")
 		return
 	}
-	if err := iptables_helper.RestoreBaseChains(panelPort); err != nil {
+	requiredPorts, err := service.LoadRequiredFirewallPortWhiteList()
+	if err != nil {
+		global.LOG.Errorf("load required firewall ports failed, err: %v", err)
+		return
+	}
+	if err := iptables_helper.RestoreBaseChains(panelPort, requiredPorts); err != nil {
 		global.LOG.Errorf("restore iptables base chains failed, err: %v", err)
 		return
 	}
@@ -99,7 +104,12 @@ func repairIptablesIPv6BaseChains(clientName string) {
 		return
 	}
 	panelPort := service.LoadPanelPort()
-	if err := iptables_helper.RepairIPv6BaseChains(panelPort); err != nil {
+	requiredPorts, err := service.LoadRequiredFirewallPortWhiteList()
+	if err != nil {
+		global.LOG.Warnf("load required firewall ports for IPv6 repair failed, err: %v", err)
+		return
+	}
+	if err := iptables_helper.RepairIPv6BaseChains(panelPort, requiredPorts); err != nil {
 		global.LOG.Warnf("repair IPv6 iptables base chains failed, err: %v", err)
 		return
 	}

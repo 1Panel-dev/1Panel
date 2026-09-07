@@ -242,25 +242,20 @@ const checkDataFormat = (item: any): boolean => {
 
 const compareRules = (importedRules: any[]) => {
     const newRules: any[] = [];
-    const conflictRules: any[] = [];
     const duplicateRules: any[] = [];
 
+    const ruleKey = (rule: Firewall.RuleForward | Firewall.RuleInfo) =>
+        `${rule.family}:${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}:${rule.interface || ''}`;
+    const existingKeys = new Set(currentRules.value.map(ruleKey));
     for (const importedRule of importedRules) {
-        const key = `${importedRule.family}:${importedRule.protocol}:${importedRule.port}:${importedRule.targetIP}:${importedRule.targetPort}:${importedRule.interface || ''}`;
-
-        const existingRule = currentRules.value.find((rule) => {
-            const existingKey = `${rule.family}:${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}:${rule.interface || ''}`;
-            return existingKey === key;
-        });
-
-        if (!existingRule) {
+        if (!existingKeys.has(ruleKey(importedRule))) {
             newRules.push({ ...importedRule, status: 'new' });
         } else {
             duplicateRules.push({ ...importedRule, status: 'duplicate' });
         }
     }
 
-    displayData.value = [...newRules, ...conflictRules, ...duplicateRules];
+    displayData.value = [...newRules, ...duplicateRules];
     paginationConfig.total = displayData.value.length;
     search();
 };

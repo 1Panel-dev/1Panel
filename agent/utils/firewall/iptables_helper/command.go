@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
@@ -92,10 +93,14 @@ func RunIPv6WithStdContext(ctx context.Context, tab string, args ...string) (str
 		return "", executableErr
 	}
 	if !commands.IPv6Available() {
-		return "", fmt.Errorf("ip6tables command family is unavailable")
+		return "", fmt.Errorf("%w: ip6tables/ip6tables-restore are not installed", filter.ErrFamilyUnavailable)
 	}
-	stdout, err := runTables(ctx, commands.IPv6, tab, true, true, args...)
+	ignoreExist1 := len(args) == 0 || (args[0] != "-S" && args[0] != "-L" && args[0] != "-nL")
+	stdout, err := runTables(ctx, commands.IPv6, tab, ignoreExist1, true, args...)
 	if err != nil {
+		if strings.Contains(err.Error(), "Address family not supported") || strings.Contains(err.Error(), "Protocol not supported") {
+			return stdout, fmt.Errorf("%w: %v", filter.ErrFamilyUnavailable, err)
+		}
 		global.LOG.Errorf("ip6tables command failed [table=%s, args=%s]: %v", tab, strings.Join(args, " "), err)
 		return stdout, err
 	}
@@ -120,13 +125,6 @@ func CheckIPv6ChainExist(tab, chain string) (bool, error) {
 	return false, nil
 }
 
-func RunWithoutIgnore(tab string, args ...string) (string, error) {
-	stdout, err := runIptables(context.Background(), tab, false, false, args...)
-	if err != nil {
-		return stdout, err
-	}
-	return stdout, nil
-}
 func Run(tab string, args ...string) error {
 	if _, err := RunWithStd(tab, args...); err != nil {
 		return err

@@ -16,6 +16,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
@@ -122,7 +123,11 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 		return nil, fmt.Errorf("json umarshal resp data failed, err: %v", err)
 	}
 	if respJson.Code != http.StatusOK {
-		return nil, errors.New(strings.ReplaceAll(respJson.Message, i18n.Get("ErrInternalServerKey"), ""))
+		message := respJson.Message
+		if global.I18n != nil {
+			message = strings.ReplaceAll(message, i18n.Get("ErrInternalServerKey"), "")
+		}
+		return nil, errors.New(message)
 	}
 
 	return respJson.Data, nil

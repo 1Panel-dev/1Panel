@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/cmd"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	upgradeUtil "github.com/1Panel-dev/1Panel/core/utils/upgrade"
 	"github.com/spf13/cobra"
 	"golang.org/x/term"
@@ -341,13 +342,26 @@ func port() {
 		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePortFormat"))
 		return
 	}
+	newPortStr = strconv.Itoa(newPort)
+	db, err := loadDBConn("core.db")
+	if err != nil {
+		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
+		return
+	}
+	var oldPort setting
+	if err := db.Where("key = ?", "ServerPort").First(&oldPort).Error; err != nil {
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
+		return
+	}
+	if oldPort.Value == newPortStr {
+		return
+	}
 	if common.ScanPort(newPort) {
 		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePortUsed"))
 		return
 	}
-	db, err := loadDBConn("core.db")
-	if err != nil {
-		fmt.Println(i18n.GetMsgWithMapForCmd("DBConnErr", map[string]interface{}{"err": err.Error()}))
+	if err := proxy_local.UpdatePanelPort(oldPort.Value, uint(newPort)); err != nil {
+		fmt.Println(i18n.GetMsgWithMapForCmd("UpdatePortErr", map[string]interface{}{"err": err.Error()}))
 		return
 	}
 	if err := setSettingByKey(db, "ServerPort", newPortStr); err != nil {

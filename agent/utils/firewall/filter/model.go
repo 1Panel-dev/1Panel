@@ -91,6 +91,7 @@ const (
 	ScopeNoticeUnmanagedActiveScopes    ScopeNoticeCode = "unmanaged_active_scopes"
 	ScopeNoticeRuntimePermanentMismatch ScopeNoticeCode = "runtime_permanent_mismatch"
 	ScopeNoticeManagedScopeMissing      ScopeNoticeCode = "managed_scope_missing"
+	ScopeNoticeFamilyUnavailable        ScopeNoticeCode = "family_unavailable"
 )
 
 const (
@@ -257,56 +258,6 @@ func isBasicChain(chain string) bool {
 	}
 }
 
-type ScopePattern struct {
-	Provider   Provider
-	Families   []Family
-	Table      string
-	Zone       string
-	Chains     []string
-	Directions []Direction
-}
-
-func (p ScopePattern) Matches(scope Scope) bool {
-	scope = scope.Normalize()
-	return p.Provider == scope.Provider &&
-		containsFamily(p.Families, scope.Family) &&
-		strings.EqualFold(p.Table, scope.Table) &&
-		strings.EqualFold(p.Zone, scope.Zone) &&
-		containsFold(p.Chains, scope.Chain) &&
-		containsDirection(p.Directions, scope.Direction)
-}
-
-func MVPScopePatterns() []ScopePattern {
-	return []ScopePattern{
-		{
-			Provider:   ProviderIptables,
-			Families:   []Family{FamilyIPv4, FamilyIPv6},
-			Table:      "filter",
-			Chains:     []string{BasicBeforeChain, IptablesInputChain, BasicAfterChain},
-			Directions: []Direction{DirectionInput},
-		},
-		{
-			Provider:   ProviderNftables,
-			Families:   []Family{FamilyIPv4, FamilyIPv6},
-			Table:      "filter",
-			Chains:     []string{BasicBeforeChain, IptablesInputChain, BasicAfterChain},
-			Directions: []Direction{DirectionInput},
-		},
-		{
-			Provider:   ProviderFirewalld,
-			Families:   []Family{FamilyIPv4, FamilyIPv6, FamilyInet},
-			Zone:       "public",
-			Directions: []Direction{DirectionInput},
-		},
-		{
-			Provider:   ProviderUFW,
-			Families:   []Family{FamilyIPv4, FamilyIPv6},
-			Chains:     []string{"incoming"},
-			Directions: []Direction{DirectionInput},
-		},
-	}
-}
-
 type FirewallRule struct {
 	UUID               string     `json:"uuid,omitempty"`
 	Scope              Scope      `json:"scope"`
@@ -353,51 +304,8 @@ type Snapshot struct {
 }
 
 type Capabilities struct {
-	Scopes                []ScopePattern
-	Marker                bool
-	AtomicApply           bool
-	TransactionalRollback bool
-	OwnedChains           bool
-	ExplicitPosition      bool
-	ExplicitPriority      bool
-	NativePort            bool
-}
-
-func (c Capabilities) SupportsScope(scope Scope) bool {
-	for _, pattern := range c.Scopes {
-		if pattern.Matches(scope) {
-			return true
-		}
-	}
-	return false
-}
-
-func containsFamily(values []Family, target Family) bool {
-	for _, value := range values {
-		if value == target {
-			return true
-		}
-	}
-	return false
-}
-
-func containsDirection(values []Direction, target Direction) bool {
-	for _, value := range values {
-		if value == target {
-			return true
-		}
-	}
-	return false
-}
-
-func containsFold(values []string, target string) bool {
-	if len(values) == 0 {
-		return target == ""
-	}
-	for _, value := range values {
-		if strings.EqualFold(value, target) {
-			return true
-		}
-	}
-	return false
+	Marker           bool
+	OwnedChains      bool
+	ExplicitPosition bool
+	ExplicitPriority bool
 }

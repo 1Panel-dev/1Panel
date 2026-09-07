@@ -43,6 +43,7 @@ type DesiredRule struct {
 	RuleKey             string       `json:"ruleKey"`
 	Origin              RuleOrigin   `json:"origin"`
 	Protected           bool         `json:"protected,omitempty"`
+	Expanded            bool         `json:"expanded,omitempty"`
 	Marker              string       `json:"marker,omitempty"`
 	ObservedInstanceKey string       `json:"observedInstanceKey,omitempty"`
 }
@@ -54,12 +55,14 @@ type RuntimeUsage struct {
 }
 
 type InventoryItem struct {
-	Rule     FirewallRule   `json:"rule"`
-	Observed *ObservedRule  `json:"observed,omitempty"`
-	Desired  *DesiredRule   `json:"desired,omitempty"`
-	State    InventoryState `json:"state"`
-	Match    InventoryMatch `json:"match"`
-	Usage    *RuntimeUsage  `json:"usage,omitempty"`
+	Incompatible bool           `json:"incompatible,omitempty"`
+	Error        string         `json:"error,omitempty"`
+	Rule         FirewallRule   `json:"rule"`
+	Observed     *ObservedRule  `json:"observed,omitempty"`
+	Desired      *DesiredRule   `json:"desired,omitempty"`
+	State        InventoryState `json:"state"`
+	Match        InventoryMatch `json:"match"`
+	Usage        *RuntimeUsage  `json:"usage,omitempty"`
 }
 
 type Inventory struct {
@@ -97,12 +100,12 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 				return nil, fmt.Errorf("normalize observed firewall rule %d: %w", index, err)
 			}
 			candidate.rule.Rule = normalized
-			candidate.ruleKey, err = RuleKey(normalized)
+			candidate.ruleKey, err = normalizedRuleKey(normalized)
 			if err != nil {
 				return nil, err
 			}
 			byRuleKey[candidate.ruleKey] = append(byRuleKey[candidate.ruleKey], index)
-			if instanceKey, err := InstanceKey(candidate.rule); err == nil {
+			if instanceKey, err := instanceKeyWithRuleKey(candidate.rule, candidate.ruleKey); err == nil {
 				candidate.instanceKey = instanceKey
 				byInstanceKey[instanceKey] = append(byInstanceKey[instanceKey], index)
 			}
@@ -119,7 +122,7 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 			return nil, fmt.Errorf("normalize desired firewall rule %q: %w", desired.UUID, err)
 		}
 		desired.Rule = normalized
-		calculatedKey, err := RuleKey(normalized)
+		calculatedKey, err := normalizedRuleKey(normalized)
 		if err != nil {
 			return nil, err
 		}

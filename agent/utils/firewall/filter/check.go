@@ -331,21 +331,6 @@ func snapshotHasOwnedRule(snapshot Snapshot, desired DesiredRule) bool {
 	return false
 }
 
-func RuleCovers(existing, requested FirewallRule) bool {
-	existing, existingErr := NormalizeRule(existing)
-	requested, requestedErr := NormalizeRule(requested)
-	if existingErr != nil || requestedErr != nil || existing.Scope.Key() != requested.Scope.Key() {
-		return false
-	}
-	return familyCovers(existing.Scope.Family, requested.Scope.Family) &&
-		protocolCovers(existing.Protocol, requested.Protocol) &&
-		addressCovers(existing.SourceAddress, requested.SourceAddress) &&
-		addressCovers(existing.DestinationAddress, requested.DestinationAddress) &&
-		portCovers(existing.SourcePort, requested.SourcePort) &&
-		portCovers(existing.DestinationPort, requested.DestinationPort) &&
-		(existing.Interface == "" || existing.Interface == requested.Interface)
-}
-
 func RulesOverlap(left, right FirewallRule) bool {
 	left, leftErr := NormalizeRule(left)
 	right, rightErr := NormalizeRule(right)
@@ -361,16 +346,8 @@ func RulesOverlap(left, right FirewallRule) bool {
 		(left.Interface == "" || right.Interface == "" || left.Interface == right.Interface)
 }
 
-func familyCovers(existing, requested Family) bool {
-	return existing == FamilyInet || existing == requested
-}
-
 func familiesOverlap(left, right Family) bool {
 	return left == FamilyInet || right == FamilyInet || left == right
-}
-
-func protocolCovers(existing, requested string) bool {
-	return existing == "all" || existing == requested
 }
 
 func protocolsOverlap(left, right string) bool {

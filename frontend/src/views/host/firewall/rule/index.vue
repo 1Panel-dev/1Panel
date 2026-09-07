@@ -874,7 +874,7 @@ const toRuleRows = (items: Firewall.InventoryItem[]): RuleRow[] =>
         return {
             ...item,
             rowKey:
-                item.desired?.uuid ||
+                (item.desired && `${scopeIdentity(item.rule)}:${item.desired.rule.uuid || item.desired.uuid}`) ||
                 item.observed?.instanceKey ||
                 item.observed?.marker ||
                 `${scopeIdentity(item.rule)}:${nativeGroup}:${item.observed?.locator.position ?? index}`,
@@ -933,6 +933,8 @@ const notices = computed<DisplayNotice[]>(() => {
 const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
     const value = (notice.values || []).join(', ') || '-';
     switch (notice.code) {
+        case 'family_unavailable':
+            return value;
         case 'default_scope_mismatch':
             return i18n.global.t('firewall.scopeDefaultMismatch', [value]);
         case 'managed_scope_inactive':
@@ -983,6 +985,7 @@ const ruleStateDetail = (row: Firewall.InventoryItem) =>
 const ruleStateTooltip = (row: Firewall.InventoryItem) => `${ruleStateTitle(row)}：${ruleStateDetail(row)}`;
 
 const ruleIssueText = (row: Firewall.InventoryItem) => {
+    if (row.error) return row.error;
     if (row.observed?.persistence && row.observed.persistence !== 'converged') {
         return i18n.global.t('firewall.plan_runtime_permanent_mismatch');
     }
@@ -1078,10 +1081,14 @@ const usageOwnersSummary = (owners: string[]) => {
 };
 
 const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
+    const count = new Set(selected.map((row) => row.desired?.uuid)).size;
     const accepted = selected.filter((row) => row.rule.action === 'accept' && Boolean(row.observed));
     const risky = accepted.filter((row) => isWildcardDestinationPort(row.rule) || ruleUsageEntries(row).length > 0);
     if (selected.length > 1 && risky.length > 0) {
-        return i18n.global.t('firewall.deleteRiskRulesConfirm', [selected.length, risky.length]);
+        return i18n.global.t('firewall.deleteRiskRulesConfirm', [
+            count,
+            new Set(risky.map((row) => row.desired?.uuid)).size,
+        ]);
     }
     if (selected.length === 1 && accepted.length === 1) {
         const [row] = accepted;
@@ -1096,7 +1103,7 @@ const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
             return i18n.global.t('firewall.deleteUsedRuleConfirm', [usageOwnersSummary(owners)]);
         }
     }
-    return i18n.global.t('firewall.deleteRuleConfirm', [selected.length]);
+    return i18n.global.t('firewall.deleteRuleConfirm', [count]);
 };
 
 const removeRules = async (selected: RuleRow[]) => {
@@ -1110,7 +1117,7 @@ const removeRules = async (selected: RuleRow[]) => {
         return;
     }
     loading.value = true;
-    const uuids = selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : []));
+    const uuids = [...new Set(selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : [])))];
     try {
         let succeeded = 0;
         let failed = 0;
@@ -1255,6 +1262,7 @@ const removeRule = (row: RuleRow) => removeRules([row]);
 
 const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     Boolean(row.desired?.uuid) &&
+    !row.desired?.expanded &&
     (row.desired?.origin === 'created' || row.desired?.origin === 'adopted') &&
     !row.desired?.protected &&
     !isIptablesSystemPresetScope(row.rule.scope) &&

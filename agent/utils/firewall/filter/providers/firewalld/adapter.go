@@ -51,12 +51,8 @@ func (a *Adapter) Capabilities(ctx context.Context) (filter.Capabilities, error)
 		return filter.Capabilities{}, err
 	}
 	return filter.Capabilities{
-		Scopes: []filter.ScopePattern{{
-			Provider: filter.ProviderFirewalld, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6, filter.FamilyInet},
-			Zone: filter.FirewalldInputZone, Directions: []filter.Direction{filter.DirectionInput},
-		}},
+
 		ExplicitPriority: explicitPriority,
-		NativePort:       true,
 	}, nil
 }
 

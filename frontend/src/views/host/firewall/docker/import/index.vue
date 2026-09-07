@@ -124,21 +124,24 @@ const onImport = async () => {
     }
     for (const group of groups.values()) {
         const policy = group[0];
-        try {
-            await upsertDockerPortGuardPolicies({
-                endpoints: group.map(({ family, hostIP, hostPort, protocol }) => ({
-                    family,
-                    hostIP,
-                    hostPort,
-                    protocol,
-                })),
-                mode: policy.mode,
-                sources: policy.sources,
-                description: policy.description,
-            });
-            success += group.length;
-        } catch {
-            failed += group.length;
+        for (let offset = 0; offset < group.length; offset += 256) {
+            const batch = group.slice(offset, offset + 256);
+            try {
+                await upsertDockerPortGuardPolicies({
+                    endpoints: batch.map(({ family, hostIP, hostPort, protocol }) => ({
+                        family,
+                        hostIP,
+                        hostPort,
+                        protocol,
+                    })),
+                    mode: policy.mode,
+                    sources: policy.sources,
+                    description: policy.description,
+                });
+                success += batch.length;
+            } catch {
+                failed += batch.length;
+            }
         }
     }
     loading.value = false;

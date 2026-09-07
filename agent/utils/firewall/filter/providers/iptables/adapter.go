@@ -76,7 +76,7 @@ func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error
 		return nil
 	}
 	if err := a.checker.CheckMultiport(ctx, rule.Scope.Family); err != nil {
-		return fmt.Errorf("%w: iptables multiport is unavailable for %s: %v", filter.ErrUnsupportedScope, rule.Scope.Family, err)
+		return fmt.Errorf("inspect iptables multiport for %s: %w", rule.Scope.Family, err)
 	}
 	if a.multiportOK == nil {
 		a.multiportOK = make(map[filter.Family]bool, 2)
@@ -87,12 +87,7 @@ func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error
 
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
-		Scopes: []filter.ScopePattern{{
-			Provider: filter.ProviderIptables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
-			Chains:     native.BasicChains(),
-			Directions: []filter.Direction{filter.DirectionInput},
-		}}, Marker: true, OwnedChains: true, ExplicitPosition: true,
-		AtomicApply: false, TransactionalRollback: false,
+		Marker: true, OwnedChains: true, ExplicitPosition: true,
 	}, nil
 }
 
@@ -718,6 +713,11 @@ func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string,
 	var err error
 	if scope.Family == filter.FamilyIPv6 {
 		output, err = native.RunIPv6WithStdContext(ctx, scope.Table, "-S", scope.Chain)
+		if err != nil && !errors.Is(err, filter.ErrFamilyUnavailable) {
+			if table, readErr := native.RunIPv6WithStdContext(ctx, scope.Table, "-S"); readErr == nil && !containsChainDeclaration(table, scope.Chain) {
+				return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
+			}
+		}
 	} else {
 		output, err = native.RunWithStdContext(ctx, scope.Table, "-S", scope.Chain)
 	}
@@ -798,14 +798,14 @@ func runtimeExecutable(logical string) (string, error) {
 	switch logical {
 	case "ip6tables":
 		if !commands.IPv6Available() {
-			return "", fmt.Errorf("ip6tables command family is unavailable")
+			return "", fmt.Errorf("%w: ip6tables command family is unavailable", filter.ErrFamilyUnavailable)
 		}
 		return commands.IPv6, nil
 	case "iptables-restore":
 		return commands.Restore4, nil
 	case "ip6tables-restore":
 		if commands.Restore6 == "" {
-			return "", fmt.Errorf("ip6tables-restore command family is unavailable")
+			return "", fmt.Errorf("%w: ip6tables-restore command family is unavailable", filter.ErrFamilyUnavailable)
 		}
 		return commands.Restore6, nil
 	}

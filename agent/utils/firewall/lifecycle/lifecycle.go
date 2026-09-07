@@ -162,36 +162,6 @@ func InstalledProviders() []string {
 	return providers
 }
 
-func NewNetfilterClients() ([]Client, error) {
-	clients := make([]Client, 0, 2)
-	if which("nft") {
-		client, err := providers.NewNftables()
-		if err != nil {
-			return nil, err
-		}
-		clients = append(clients, client)
-	}
-	if commands, err := ResolveIptablesCommands(); err == nil {
-		client, err := providers.NewIptables(commands.IPv4)
-		if err != nil {
-			return nil, err
-		}
-		clients = append(clients, client)
-	}
-	if len(clients) == 0 {
-		return nil, fmt.Errorf("no supported forwarding backend detected (iptables/iptables-nft/nftables)")
-	}
-	return clients, nil
-}
-
-func DetectProvider() (string, error) {
-	runtime, err := DetectRuntime()
-	if err != nil {
-		return "", err
-	}
-	return runtime.Provider, nil
-}
-
 type State struct {
 	Name     string
 	IsActive bool

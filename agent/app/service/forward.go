@@ -25,7 +25,7 @@ import (
 
 type IForwardingService interface {
 	LoadBaseInfo() (dto.FirewallSubsystemStatus, error)
-	SearchRules(request dto.ForwardRuleSearch) (int64, interface{}, error)
+	SearchRules(request dto.ForwardRuleSearch) (int64, []dto.ForwardRule, error)
 	OperateRules(request dto.ForwardRuleOperate) error
 	Enable() error
 	QueueInitialization(dto.FirewallInitializationTask) (dto.FilterChainOperationResponse, error)
@@ -123,7 +123,7 @@ func forwardingDisplayName(backend string) string {
 	}
 }
 
-func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, interface{}, error) {
+func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, []dto.ForwardRule, error) {
 	if request.Strategy != "" {
 		return 0, nil, nil
 	}
@@ -153,6 +153,9 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, i
 	inventory = filtered
 	total := len(inventory)
 	start, end := (request.Page-1)*request.PageSize, request.Page*request.PageSize
+	if request.All {
+		start, end = 0, total
+	}
 	if start > total {
 		return int64(total), make([]dto.ForwardRule, 0), nil
 	}
