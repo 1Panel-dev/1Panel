@@ -107,6 +107,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	if err = checkVllmVersionAccess(install.App.Key, detail.Version); err != nil {
+		return err
+	}
 	if install.App.Key == vllmAppKeyForUpgrade && !isVllmUpgradeVersionAllowed(install.Version, detail.Version, loadVllmImageFromEnv(install.Env)) {
 		return errors.New("vLLM can only upgrade within the same image type")
 	}

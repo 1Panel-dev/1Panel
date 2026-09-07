@@ -956,6 +956,9 @@ const message = {
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',
+            vllmDeployProfile: 'Modelo de implantação',
+            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
+            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',

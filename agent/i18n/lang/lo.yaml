@@ -129,6 +129,7 @@ ErrComposeProjectNameParse: 'ບໍ່ສາມາດວິເຄາະຊື່
 ErrComposeProjectNameEmpty: 'ບໍ່ສາມາດກຳນົດຊື່ໂຄງການຈາກການຕັ້ງຄ່າ Docker Compose ຫຼື ໂຟນເດີແມ່ຂອງໄຟລ໌ໄດ້. ກະລຸນາປ້ອນຊື່ແລ້ວລອງໃໝ່.'
 ErrComposeNameInvalid: 'ຊື່ໂຄງການ Compose ບໍ່ຖືກຕ້ອງ: ຕ້ອງເລີ່ມດ້ວຍຕົວພິມນ້ອຍ ຫຼື ຕົວເລກ, ໃຊ້ໄດ້ສະເພາະຕົວພິມນ້ອຍ, ຕົວເລກ, ຂີດກາງ ແລະ ຂີດລຸ່ມ, ຄວາມຍາວ 1-256 ຕົວອັກສອນ.'
 ErrAppVersionUnavailable: 'ເວີຊັນແອັບນີ້ຖືກລຶບອອກຈາກບໍລິການທາງໄກແລ້ວ ກະລຸນາເລືອກເວີຊັນອື່ນແລ້ວລອງໃໝ່'
+ErrVllmGB10ProOnly: 'ເວີຊັນ vLLM ນີ້ມີໃຫ້ໃຊ້ສະເພາະໃນ 1Panel Professional Edition ເທົ່ານັ້ນ.'
 ErrAppWarn: 'ສະຖານະແອັບຜິດປົກກະຕິ; ກະລຸນາກວດສອບບັນທຶກ'
 ErrAppParamKey: 'ພາຣາມິເຕີຂອງແອັບບໍ່ຖືກຕ້ອງ: {{ .name }}'
 ErrAppUpgrade: 'ອັບເກຣດແອັບລົ້ມເຫຼວ: {{ .name }} {{ .err }}'

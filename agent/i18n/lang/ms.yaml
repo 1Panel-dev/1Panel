@@ -139,6 +139,7 @@ ErrComposeProjectNameParse: 'Gagal menghurai nama projek daripada output konfigu
 ErrComposeProjectNameEmpty: 'Nama projek tidak dapat diperoleh daripada konfigurasi Docker Compose atau direktori induk fail. Masukkan nama dan cuba lagi.'
 ErrComposeNameInvalid: 'Nama projek Compose tidak sah: mesti bermula dengan huruf kecil atau nombor, hanya mengandungi huruf kecil, nombor, tanda sempang dan garis bawah, serta sepanjang 1-256 aksara.'
 ErrAppVersionUnavailable: 'Versi aplikasi ini telah dialih keluar daripada perkhidmatan jauh. Sila pilih versi lain dan cuba lagi.'
+ErrVllmGB10ProOnly: 'Versi vLLM ini hanya tersedia dalam 1Panel Edisi Profesional.'
 ErrAppWarn: 'Status tidak normal, sila semak log'
 ErrAppParamKey: 'Parameter {{ .name }} medan tidak normal'
 ErrAppUpgrade: 'Peningkatan {{ .name }} aplikasi gagal {{ .err }}'

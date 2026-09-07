@@ -2249,6 +2249,9 @@ func getAppVersions(key string, details []model.AppDetail) []string {
 	hasLatest := false
 	latestVersion := ""
 	for _, detail := range details {
+		if !canAccessVllmVersion(key, detail.Version) {
+			continue
+		}
 		if key != "mssql" && strings.Contains(detail.Version, "latest") {
 			hasLatest = true
 			latestVersion = detail.Version

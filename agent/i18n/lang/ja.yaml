@@ -139,6 +139,7 @@ ErrComposeProjectNameParse: 'Docker Compose 設定出力からプロジェクト
 ErrComposeProjectNameEmpty: 'Docker Compose 設定またはファイルの親ディレクトリからプロジェクト名を推定できません。名前を入力して再試行してください。'
 ErrComposeNameInvalid: 'Compose プロジェクト名の形式が正しくありません。小文字または数字で始まり、小文字、数字、ハイフン、アンダースコアのみを使用した 1～256 文字にしてください。'
 ErrAppVersionUnavailable: '現在のアプリケーションバージョンはリモートサービスから削除されています。別のバージョンを選択して再試行してください。'
+ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
 ErrAppWarn: '異常な状態です。ログを確認してください'
 ErrAppParamKey: 'パラメータ {{ .name }} フィールドが異常です'
 ErrAppUpgrade: 'アプリケーション {{ .name }} のアップグレードに失敗しました {{ .err }}'

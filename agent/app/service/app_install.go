@@ -675,6 +675,9 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		return versions, err
 	}
 	for _, detail := range details {
+		if !canAccessVllmVersion(app.Key, detail.Version) {
+			continue
+		}
 		ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(detail.ID), appIgnoreUpgradeRepo.WithScope("version"))
 		if len(ignores) > 0 {
 			continue

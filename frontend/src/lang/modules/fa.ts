@@ -935,6 +935,9 @@ const message = {
             from_remote: 'این مدل از طریق 1Panel دانلود نشده است، لاگ مربوط به دریافت وجود ندارد.',
             no_logs: 'لاگ دریافت این مدل حذف شده است و قابل مشاهده نیست.',
             vllmVersionHelper: 'برای سرورهای FusionXpark GB 10، لطفاً نسخه -cu130 را انتخاب کنید.',
+            vllmDeployProfile: 'مدل استقرار',
+            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
+            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
