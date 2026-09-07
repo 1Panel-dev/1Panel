@@ -3,6 +3,7 @@ package terminal
 import (
 	"os"
 	"os/exec"
+	"sync"
 	"syscall"
 	"time"
 	"unsafe"
@@ -23,6 +24,9 @@ type LocalCommand struct {
 
 	cmd *exec.Cmd
 	pty *os.File
+
+	closeOnce sync.Once
+	closeErr  error
 }
 
 func NewCommand(name string, arg ...string) (*LocalCommand, error) {
@@ -60,26 +64,36 @@ func (lcmd *LocalCommand) Write(p []byte) (n int, err error) {
 }
 
 func (lcmd *LocalCommand) Close() error {
-	if lcmd.pty != nil {
-		lcmd.pty.Write([]byte{3})
-		time.Sleep(50 * time.Millisecond)
-
-		lcmd.pty.Write([]byte{4})
-		time.Sleep(50 * time.Millisecond)
-
-		lcmd.pty.Write([]byte("exit\n"))
-		time.Sleep(50 * time.Millisecond)
-	}
-	if lcmd.cmd != nil && lcmd.cmd.Process != nil {
-		lcmd.cmd.Process.Signal(syscall.SIGTERM)
-		time.Sleep(50 * time.Millisecond)
-
-		if lcmd.cmd.ProcessState == nil || !lcmd.cmd.ProcessState.Exited() {
-			lcmd.cmd.Process.Kill()
+	lcmd.closeOnce.Do(func() {
+		if lcmd.pty != nil {
+			_, _ = lcmd.pty.Write([]byte{3})
+			time.Sleep(50 * time.Millisecond)
+			_, _ = lcmd.pty.Write([]byte{4})
+			time.Sleep(50 * time.Millisecond)
+			_, _ = lcmd.pty.Write([]byte("exit\n"))
+			time.Sleep(50 * time.Millisecond)
 		}
+		if lcmd.cmd != nil && lcmd.cmd.Process != nil {
+			_ = lcmd.cmd.Process.Signal(syscall.SIGTERM)
+			time.Sleep(50 * time.Millisecond)
+			_ = lcmd.cmd.Process.Kill()
+		}
+		if lcmd.pty != nil {
+			lcmd.closeErr = lcmd.pty.Close()
+		}
+	})
+	return lcmd.closeErr
+}
+
+func (lcmd *LocalCommand) WaitResult() error {
+	return lcmd.cmd.Wait()
+}
+
+func (lcmd *LocalCommand) Signal(signal os.Signal) error {
+	if lcmd.cmd == nil || lcmd.cmd.Process == nil {
+		return os.ErrProcessDone
 	}
-	_ = lcmd.pty.Close()
-	return nil
+	return lcmd.cmd.Process.Signal(signal)
 }
 
 func (lcmd *LocalCommand) ResizeTerminal(width int, height int) error {
@@ -108,7 +122,7 @@ func (lcmd *LocalCommand) ResizeTerminal(width int, height int) error {
 }
 
 func (lcmd *LocalCommand) Wait(quitChan chan bool) {
-	if err := lcmd.cmd.Wait(); err != nil {
+	if err := lcmd.WaitResult(); err != nil {
 		global.LOG.Errorf("ssh session wait failed, err: %v", err)
 		setQuit(quitChan)
 	}

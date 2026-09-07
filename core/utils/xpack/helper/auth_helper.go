@@ -1,9 +1,20 @@
 package helper
 
 import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"net/http"
+	"time"
+
 	"github.com/1Panel-dev/1Panel/core/app/auth"
 	baseDto "github.com/1Panel-dev/1Panel/core/app/dto"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/mfa"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
+	terminalsession "github.com/1Panel-dev/1Panel/core/utils/terminal_session"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack/providers"
 	"github.com/gin-gonic/gin"
 )
@@ -56,7 +67,13 @@ func (a *authHelper) ResetSuperAdminUser(name, password string) error {
 }
 
 func (a *authHelper) CoreAPIAuthMiddleware() gin.HandlerFunc {
-	return auth.APIAuthMiddleware(auth.LoadAPIAuthConfig, nil)
+	return auth.APIAuthMiddleware(auth.LoadAPIAuthConfig, func(c *gin.Context, _ auth.APIAuthConfig) {
+		name, _ := repo.NewISettingRepo().GetValueByKey("UserName")
+		c.Set("API_AUTH_USERNAME", name)
+		c.Set(psession.GinContextSessionUserKey, psession.SessionUser{
+			ID: psession.SuperAdminSessionUserID, Name: name, Role: "ADMIN",
+		})
+	})
 }
 
 func (a *authHelper) CoreRBACMiddlewares() []gin.HandlerFunc { return nil }
@@ -71,10 +88,25 @@ func (a *authHelper) MFAClose(_ *gin.Context) error {
 	return auth.MFAClose()
 }
 func (a *authHelper) GenerateApiKey(_ *gin.Context) (string, error) {
-	return auth.GenerateApiKey()
+	apiKey, err := auth.GenerateApiKey()
+	if err != nil {
+		return "", err
+	}
+	userID := psession.SuperAdminSessionUserID
+	if err := a.RevokeTerminalSessions("auth_session", userID, terminalsession.APIAuthSessionID(userID)); err != nil {
+		global.LOG.Warnf("revoke API terminal sessions after API key generation failed, err: %v", err)
+	}
+	return apiKey, nil
 }
 func (a *authHelper) UpdateApiConfig(c *gin.Context, req baseDto.ApiInterfaceConfig) error {
-	return auth.UpdateApiConfig(req)
+	if err := auth.UpdateApiConfig(req); err != nil {
+		return err
+	}
+	userID := psession.SuperAdminSessionUserID
+	if err := a.RevokeTerminalSessions("auth_session", userID, terminalsession.APIAuthSessionID(userID)); err != nil {
+		global.LOG.Warnf("revoke API terminal sessions after API config update failed, err: %v", err)
+	}
+	return nil
 }
 
 func (a *authHelper) GetCurrentUserInfo(_ *gin.Context) (*baseDto.CurrentUserInfo, error) {
@@ -90,8 +122,44 @@ func (a *authHelper) SyncPasswordExpirationTime(expirationDays string) error {
 	return auth.SyncPasswordExpirationTime(expirationDays)
 }
 func (a *authHelper) UpdateCurrentUserInfo(c *gin.Context, req baseDto.CurrentUserUpdate) error {
-	return auth.UpdateCurrentUserInfo(c, req)
+	identity, _ := terminalsession.FromContext(c)
+	if err := auth.UpdateCurrentUserInfo(c, req); err != nil {
+		return err
+	}
+	if identity.UserID != "" {
+		if err := a.RevokeTerminalSessions("user", identity.UserID, ""); err != nil {
+			global.LOG.Warnf("revoke terminal sessions after user update failed, err: %v", err)
+		}
+	}
+	return nil
 }
 func (a *authHelper) HandlePasswordExpired(c *gin.Context, old, new string) error {
-	return auth.HandlePasswordExpired(c, old, new)
+	identity, _ := terminalsession.FromContext(c)
+	if err := auth.HandlePasswordExpired(c, old, new); err != nil {
+		return err
+	}
+	if identity.UserID != "" {
+		if err := a.RevokeTerminalSessions("user", identity.UserID, ""); err != nil {
+			global.LOG.Warnf("revoke terminal sessions after password change failed, err: %v", err)
+		}
+	}
+	return nil
+}
+
+func (a *authHelper) RevokeTerminalSessions(scope, userID, authSessionID string) error {
+	body, err := json.Marshal(map[string]string{
+		"scope": scope, "userId": userID, "authSessionId": authSessionID,
+	})
+	if err != nil {
+		return err
+	}
+	_, err = proxy_local.NewLocalClientWithContext(
+		context.Background(),
+		"/api/v2/internal/terminal/sessions/revoke",
+		http.MethodPost,
+		bytes.NewReader(body),
+		nil,
+		5*time.Second,
+	)
+	return err
 }

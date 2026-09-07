@@ -10,6 +10,7 @@ type HostRouter struct{}
 func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
 	baseApi := v2.ApiGroupApp.BaseApi
+	Router.POST("/internal/terminal/sessions/revoke", baseApi.RevokeTerminalSessions)
 	{
 		hostRouter.POST("", baseApi.CreateHost)
 		hostRouter.POST("/info", baseApi.GetHostByID)

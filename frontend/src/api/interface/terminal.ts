@@ -10,6 +10,7 @@ export interface ReqTerminal {
 
 export interface TerminalSession {
     id: string;
+    kind: 'local' | 'ssh' | 'container';
     title: string;
     hostId: number;
     attached: boolean;

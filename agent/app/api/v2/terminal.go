@@ -1,7 +1,9 @@
 package v2
 
 import (
+	"crypto/sha256"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -32,7 +34,7 @@ import (
 // @Security Timestamp
 // @Router /hosts/terminal/local [get]
 func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
-	b.runSSHSession(c, loadLocalConn, c.DefaultQuery("command", ""))
+	b.runSSHSession(c, "local", loadLocalConn, c.DefaultQuery("command", ""))
 }
 
 // @Tags Terminal
@@ -46,7 +48,7 @@ func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
 // @Security Timestamp
 // @Router /hosts/terminal/ssh [get]
 func (b *BaseApi) WsHostSSH(c *gin.Context) {
-	b.runSSHSession(c, func() (*ssh.SSHClient, error) {
+	b.runSSHSession(c, "ssh", func() (*ssh.SSHClient, error) {
 		hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
 		if hostID <= 0 {
 			return nil, errors.New("missing host id")
@@ -70,26 +72,33 @@ func (b *BaseApi) WsContainerTerminal(c *gin.Context) {
 		return
 	}
 	defer wsConn.Close()
-
-	slave, err := loadContainerTerminalCommand(c)
-	if wshandleError(wsConn, err) {
-		return
-	}
-	defer slave.Close()
-
-	tty, err := terminal.NewLocalWsSession(cols, rows, wsConn, slave, false)
-	if wshandleError(wsConn, err) {
+	identity, ok := loadTerminalIdentity(c)
+	if !ok {
+		_ = wshandleError(wsConn, errors.New("missing terminal identity"))
 		return
 	}
 
-	quitChan := make(chan bool, 3)
-	tty.Start(quitChan)
-	go slave.Wait(quitChan)
+	opts := terminal.SessionOptions{
+		Identity: identity,
+		Kind:     "container",
+		Target:   containerTerminalTarget(c),
+		Cols:     cols,
+		Rows:     rows,
+	}
+	if err := terminal.ServeCommand(wsConn, strings.TrimSpace(c.Query("session")), opts, func() (*terminal.LocalCommand, error) {
+		return loadContainerTerminalCommand(c)
+	}); err != nil {
+		_ = wshandleError(wsConn, err)
+	}
+}
 
-	<-quitChan
-
-	global.LOG.Info("websocket finished")
-	closeTerminalConn(wsConn)
+func containerTerminalTarget(c *gin.Context) string {
+	query := c.Request.URL.Query()
+	for _, key := range []string{"cols", "rows", "session", "terminalRevalidate"} {
+		query.Del(key)
+	}
+	sum := sha256.Sum256([]byte(query.Encode()))
+	return hex.EncodeToString(sum[:])
 }
 
 func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
@@ -120,21 +129,30 @@ func prepareTerminalSession(c *gin.Context) (*websocket.Conn, int, int, bool) {
 	return wsConn, cols, rows, true
 }
 
-func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, error), command string) {
+func (b *BaseApi) runSSHSession(c *gin.Context, kind string, connect func() (*ssh.SSHClient, error), command string) {
 	wsConn, cols, rows, ok := prepareTerminalSession(c)
 	if !ok {
 		return
 	}
 	defer wsConn.Close()
+	identity, ok := loadTerminalIdentity(c)
+	if !ok {
+		_ = wshandleError(wsConn, errors.New("missing terminal identity"))
+		return
+	}
 
-	hostID, _ := strconv.Atoi(c.DefaultQuery("id", "0"))
+	hostID := 0
+	if kind == "ssh" {
+		hostID, _ = strconv.Atoi(c.DefaultQuery("id", "0"))
+	}
 	opts := terminal.SessionOptions{
-		Owner:   loadAuditUser(c),
-		Title:   sanitizeTerminalTitle(c.Query("title")),
-		HostID:  uint(max(hostID, 0)),
-		Cols:    cols,
-		Rows:    rows,
-		InitCmd: command,
+		Identity: identity,
+		Kind:     kind,
+		Title:    sanitizeTerminalTitle(c.Query("title")),
+		HostID:   uint(max(hostID, 0)),
+		Cols:     cols,
+		Rows:     rows,
+		InitCmd:  command,
 	}
 	err := terminal.Serve(wsConn, strings.TrimSpace(c.Query("session")), opts, func() (*gossh.Client, error) {
 		client, err := connect()
@@ -155,7 +173,12 @@ func (b *BaseApi) runSSHSession(c *gin.Context, connect func() (*ssh.SSHClient, 
 // @Security Timestamp
 // @Router /hosts/terminal/sessions/search [post]
 func (b *BaseApi) SearchTerminalSessions(c *gin.Context) {
-	helper.SuccessWithData(c, terminal.List(loadAuditUser(c)))
+	identity, ok := loadTerminalIdentity(c)
+	if !ok {
+		helper.BadRequest(c, errors.New("missing terminal identity"))
+		return
+	}
+	helper.SuccessWithData(c, terminal.List(identity))
 }
 
 // @Tags Terminal
@@ -171,7 +194,12 @@ func (b *BaseApi) CloseTerminalSession(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := terminal.CloseSession(req.ID, loadAuditUser(c)); err != nil {
+	identity, ok := loadTerminalIdentity(c)
+	if !ok {
+		helper.BadRequest(c, errors.New("missing terminal identity"))
+		return
+	}
+	if err := terminal.CloseSession(req.ID, identity); err != nil {
 		helper.BadRequest(c, err)
 		return
 	}
@@ -179,14 +207,40 @@ func (b *BaseApi) CloseTerminalSession(c *gin.Context) {
 }
 
 // @Tags Terminal
-// @Summary Close every terminal session (panel user logged out)
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/terminal/sessions/closeAll [post]
 func (b *BaseApi) CloseAllTerminalSessions(c *gin.Context) {
-	terminal.CloseAll()
+	identity, ok := loadTerminalIdentity(c)
+	if !ok {
+		helper.BadRequest(c, errors.New("missing terminal identity"))
+		return
+	}
+	terminal.Revoke("auth_session", identity.UserID, identity.AuthSessionID)
 	helper.Success(c)
+}
+
+func (b *BaseApi) RevokeTerminalSessions(c *gin.Context) {
+	var req dto.TerminalSessionRevoke
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if (req.Scope == "auth_session" && (req.UserID == "" || req.AuthSessionID == "")) ||
+		(req.Scope == "user" && req.UserID == "") {
+		helper.BadRequest(c, errors.New("missing terminal revocation identity"))
+		return
+	}
+	terminal.Revoke(req.Scope, req.UserID, req.AuthSessionID)
+	helper.Success(c)
+}
+
+func loadTerminalIdentity(c *gin.Context) (terminal.Identity, bool) {
+	identity := terminal.Identity{
+		UserID:        strings.TrimSpace(c.GetHeader(terminal.HeaderUserID)),
+		AuthSessionID: strings.TrimSpace(c.GetHeader(terminal.HeaderAuthSessionID)),
+	}
+	return identity, identity.Valid()
 }
 
 // sanitizeTerminalTitle keeps the title a short single line.

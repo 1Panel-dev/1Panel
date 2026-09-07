@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -31,8 +32,9 @@ type attachment struct {
 	writeMu sync.Mutex
 	cursor  uint64 // ring offset of the next byte to send; guarded by writeMu
 
-	done      chan struct{}
-	closeOnce sync.Once
+	done                chan struct{}
+	closeOnce           sync.Once
+	revalidateRequested atomic.Bool
 }
 
 // Run reads client messages until the websocket fails or this attachment is closed.
@@ -44,7 +46,7 @@ func (a *attachment) Run() {
 			global.LOG.Errorf("[A panic occurred during receive ws message, error message: %v", r)
 		}
 		a.close(websocket.CloseNormalClosure, "")
-		a.sess.detach(a, clean)
+		a.sess.detach(a, clean, a.revalidateRequested.Load(), a.cursorOffset())
 	}()
 
 	_ = a.ws.SetReadDeadline(time.Now().Add(pongWait))
@@ -52,6 +54,7 @@ func (a *attachment) Run() {
 		return a.ws.SetReadDeadline(time.Now().Add(pongWait))
 	})
 	go a.pingLoop()
+	go a.revalidateLoop()
 
 	// close() shuts the websocket, which is what ends this loop.
 	for {
@@ -93,6 +96,25 @@ func (a *attachment) Run() {
 				global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
 			}
 		}
+	}
+}
+
+func (a *attachment) cursorOffset() uint64 {
+	a.writeMu.Lock()
+	defer a.writeMu.Unlock()
+	return a.cursor
+}
+
+func (a *attachment) revalidateLoop() {
+	timer := time.NewTimer(revalidateInterval)
+	defer timer.Stop()
+	select {
+	case <-a.done:
+		return
+	case <-timer.C:
+		a.revalidateRequested.Store(true)
+		a.sess.markRevalidation(a, a.cursorOffset())
+		a.close(CloseCodeRevalidate, "terminal authorization revalidation required")
 	}
 }
 

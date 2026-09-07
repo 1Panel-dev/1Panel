@@ -36,6 +36,7 @@ const emit = defineEmits(['session', 'expired']);
 // Close codes of the agent's session protocol (agent/utils/terminal/session.go).
 const CLOSE_SESSION_NOT_FOUND = 4404;
 const CLOSE_ATTACHED_ELSEWHERE = 4409;
+const CLOSE_REVALIDATE = 4410;
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 const fitAddon = new FitAddon();
@@ -53,6 +54,7 @@ let wsEndpoint = '';
 let wsArgs = '';
 let closing = false;
 let reconnecting = false;
+let revalidating = false;
 let reconnectStartedAt = 0;
 let reconnectDelay = 1000;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -290,13 +292,19 @@ const initWebSocket = async (endpoint_: string, args: string = '') => {
     if (sessionId.value) {
         conn += `&session=${encodeURIComponent(sessionId.value)}`;
     }
+    if (revalidating) {
+        conn += '&terminalRevalidate=1';
+    }
     const authError = await checkStreamAuth(conn);
     if (token !== initWebSocketToken || !termReady.value) {
         return;
     }
     if (authError) {
         reconnecting = false;
+        revalidating = false;
+        sessionId.value = '';
         showWebSocketAuthError(authError);
+        emit('expired');
         return;
     }
     if (heartbeatTimer.value) {
@@ -395,10 +403,12 @@ const onWSReceive = (message: MessageEvent) => {
         }
         case 'session': {
             const wasReconnect = reconnecting;
+            const wasRevalidate = revalidating;
             reconnecting = false;
+            revalidating = false;
             reconnectDelay = 1000;
             sessionId.value = wsMsg.id || '';
-            if (wasReconnect) {
+            if (wasReconnect && !wasRevalidate) {
                 // replay is a tail of recent output, start from a clean screen
                 term.value?.reset();
             }
@@ -433,8 +443,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
     }
     terminalSocket.value = undefined;
     if (closing || !sessionId.value) {
-        // deliberate close, or a terminal without an agent side session (container, app, ...)
-        term.value?.write('The connection has been disconnected.');
+		term.value?.write('The connection has been disconnected.');
         term.value?.write(ev.reason);
         return;
     }
@@ -452,6 +461,10 @@ const closeRealTerminal = (ev: CloseEvent) => {
         case CLOSE_ATTACHED_ELSEWHERE:
             reconnecting = false;
             writeNotice('31', i18n.global.t('terminal.sessionKicked'));
+            return;
+        case CLOSE_REVALIDATE:
+            revalidating = true;
+            scheduleReconnect();
             return;
         default:
             scheduleReconnect();
@@ -487,6 +500,7 @@ const scheduleReconnect = () => {
 
 const stopReconnect = () => {
     reconnecting = false;
+    revalidating = false;
     if (reconnectTimer) {
         clearTimeout(reconnectTimer);
         reconnectTimer = null;
