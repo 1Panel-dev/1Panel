@@ -684,7 +684,10 @@ func (b *BaseApi) StopWget(c *gin.Context) {
 		return
 	}
 
-	files.CancelDownload(req.Key)
+	if err := files.CancelDownload(req.Key); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
 	helper.Success(c)
 }
 

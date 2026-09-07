@@ -3,17 +3,18 @@
         <template #content>
             <div class="space-y-4 p-4" :loading="loading">
                 <div
-                    v-for="(value, index) in res"
-                    :key="index"
+                    v-for="value in res"
+                    :key="value.key"
                     class="rounded-lg p-4 shadow-sm border border-gray-100 transition-all duration-200 hover:shadow-md"
-                    :class="{ completed: value.percent === 100 }"
+                    :class="{ completed: getStatus(value) === 'Success' }"
                 >
                     <div class="flex items-center gap-3">
                         <div class="flex-1">
                             <MsgInfo :info="value.name" width="300" class="text-gray-700" />
                             <div class="text-gray-500">
-                                {{ value.percent === 100 ? $t('file.downloadSuccess') : $t('file.downloading') }}
+                                {{ getStatusText(value) }}
                             </div>
+                            <div v-if="value.error" class="text-red-500 break-all">{{ value.error }}</div>
                         </div>
                     </div>
 
@@ -26,18 +27,19 @@
                                 </span>
                             </div>
                             <el-button
-                                v-if="value.percent !== 100"
+                                v-if="isActive(value) && keys.includes(value.key)"
                                 link
                                 type="danger"
                                 size="small"
-                                @click="onStop(index)"
+                                :loading="stoppingKeys.includes(value.key)"
+                                @click="onStop(value.key)"
                             >
                                 {{ $t('commons.button.stop') }}
                             </el-button>
                         </div>
                         <div class="w-full">
                             <el-progress
-                                v-if="value.total === 0 && value.percent != 100"
+                                v-if="value.total === 0 && isActive(value)"
                                 :percentage="100"
                                 :indeterminate="true"
                                 :duration="1"
@@ -50,7 +52,7 @@
                                 :percentage="value.percent"
                                 :stroke-width="8"
                                 class="progress-bar"
-                                :status="value.percent === 100 ? 'success' : ''"
+                                :status="getProgressStatus(value)"
                             />
                         </div>
                     </div>
@@ -63,7 +65,7 @@
 <script lang="ts" setup>
 import { fileWgetKeys, stopWgetFile } from '@/api/modules/files';
 import { computeSize } from '@/utils/size';
-import { onBeforeUnmount, ref } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
 import MsgInfo from '@/components/msg-info/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
@@ -75,13 +77,26 @@ const { currentNode: globalCurrentNode } = useGlobalStore();
 let processSocket: WebSocket | null = null;
 let sendTimer: ReturnType<typeof setInterval> | null = null;
 let initProcessToken = 0;
-const res = ref([]);
+interface DownloadProcess {
+    key: string;
+    name: string;
+    written: number;
+    total: number;
+    percent: number;
+    status?: 'Downloading' | 'Retrying' | 'Success' | 'Failed' | 'Canceled';
+    attempt?: number;
+    error?: string;
+}
+
+const res = ref<DownloadProcess[]>([]);
+const stoppingKeys = ref<string[]>([]);
 const keys = ref(['']);
 const open = ref(false);
 const loading = ref(false);
 
 const em = defineEmits(['close']);
 const handleClose = () => {
+    initProcessToken++;
     closeSocket();
     open.value = false;
     em('close', open.value);
@@ -98,7 +113,8 @@ const clearSendTimer = () => {
 };
 const closeSocket = () => {
     clearSendTimer();
-    if (isWsOpen()) {
+    if (processSocket) {
+        processSocket.onmessage = null;
         processSocket.close();
     }
     processSocket = null;
@@ -106,10 +122,47 @@ const closeSocket = () => {
 
 const onOpenProcess = () => {};
 const onMessage = (message: any) => {
-    res.value = JSON.parse(message.data);
+    let processes: DownloadProcess[];
+    try {
+        processes = JSON.parse(message.data) || [];
+    } catch {
+        return;
+    }
+    if (!Array.isArray(processes)) return;
+    res.value = processes.map((value, index) => ({
+        ...value,
+        key: value.key || (processes.length === keys.value.length ? keys.value[index] : `legacy:${value.name}`),
+    }));
+    if (res.value.every((value) => !isActive(value))) {
+        closeSocket();
+    }
 };
 const onerror = () => {};
 const onClose = () => {};
+
+const getStatus = (value: DownloadProcess) => value.status || (value.percent === 100 ? 'Success' : 'Downloading');
+const isActive = (value: DownloadProcess) => ['Downloading', 'Retrying'].includes(getStatus(value));
+const getStatusText = (value: DownloadProcess) => {
+    switch (getStatus(value)) {
+        case 'Success':
+            return i18n.global.t('file.downloadSuccess');
+        case 'Failed':
+            return i18n.global.t('commons.status.failed');
+        case 'Canceled':
+            return i18n.global.t('commons.status.canceled');
+        case 'Retrying':
+            return `${i18n.global.t('commons.button.retry')} (${value.attempt}/3)`;
+        default:
+            return i18n.global.t('file.downloading');
+    }
+};
+const getProgressStatus = (value: DownloadProcess) => {
+    const status = getStatus(value);
+    if (status === 'Success') return 'success';
+    if (status === 'Failed') return 'exception';
+    if (status === 'Canceled') return 'warning';
+    return '';
+};
 
 const initProcess = async () => {
     const token = ++initProcessToken;
@@ -136,12 +189,14 @@ const initProcess = async () => {
 };
 
 const getKeys = async () => {
+    const token = ++initProcessToken;
     keys.value = [];
     res.value = [];
     loading.value = true;
     try {
         const res = await fileWgetKeys();
-        if (res.data && res.data.keys.length > 0) {
+        if (token !== initProcessToken || !open.value) return;
+        if (res.data?.keys?.length > 0) {
             keys.value = res.data.keys;
             initProcess();
         }
@@ -169,9 +224,10 @@ const getFileSize = (size: number) => {
     return computeSize(size);
 };
 
-const onStop = async (index: number) => {
-    const key = keys.value[index];
-    if (!key) return;
+const onStop = async (key: string) => {
+    if (!keys.value.includes(key) || stoppingKeys.value.includes(key)) return;
+    const node = globalCurrentNode.value;
+    const token = initProcessToken;
     try {
         await ElMessageBox.confirm(i18n.global.t('file.stopWgetConfirm'), i18n.global.t('commons.button.tip'), {
             type: 'warning',
@@ -181,16 +237,24 @@ const onStop = async (index: number) => {
     } catch {
         return;
     }
+    if (node !== globalCurrentNode.value || token !== initProcessToken || !open.value) return;
+    stoppingKeys.value.push(key);
     try {
-        await stopWgetFile(key);
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        keys.value = keys.value.filter((_, i) => i !== index);
-        res.value = res.value.filter((_, i) => i !== index);
-        if (keys.value.length === 0 || res.value.length === 0) {
-            handleClose();
+        await stopWgetFile(key, node);
+        if (token === initProcessToken && open.value && node === globalCurrentNode.value) {
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         }
-    } catch (e) {}
+    } catch (e) {
+    } finally {
+        stoppingKeys.value = stoppingKeys.value.filter((item) => item !== key);
+    }
 };
+
+watch(globalCurrentNode, () => {
+    handleClose();
+    keys.value = [];
+    res.value = [];
+});
 
 onBeforeUnmount(() => {
     initProcessToken++;

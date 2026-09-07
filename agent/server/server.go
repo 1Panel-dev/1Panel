@@ -29,6 +29,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/validator"
 	"github.com/1Panel-dev/1Panel/agent/init/viper"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
@@ -96,6 +97,9 @@ func Start() {
 	dir.Init()
 	log.Init()
 	global.LOG.Info("agent startup: logger initialized")
+	if err := files.CleanupInterruptedDownloads(); err != nil {
+		global.LOG.Warnf("clean interrupted remote downloads: %s", err)
+	}
 	db.Init()
 	global.LOG.Info("agent startup: database initialized")
 	migration.Init()
