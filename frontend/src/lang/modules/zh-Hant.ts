@@ -4009,6 +4009,11 @@ const message = {
         editRuleConfirm: '將修改以下欄位：{0}。提交後會立即套用並回讀驗證，是否繼續？',
     },
     runtime: {
+        importEnv: '匯入環境變數',
+        envImportError: '第 {0} 行：{1}',
+        envInvalidAssignment: '應為有效的變數名稱=value',
+        envUnclosedQuote: '引號未閉合',
+        envUnexpectedText: '閉合引號後有多餘內容',
         runtime: '執行環境',
         default: '預設',
         workDir: '工作目錄',

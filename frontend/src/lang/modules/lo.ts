@@ -4168,6 +4168,11 @@ const message = {
         editRuleConfirm: 'ຈະປ່ຽນຟິວຕໍ່ໄປນີ້: {0}. ກົດຈະຖືກນຳໃຊ້ແລະກວດສອບທັນທີ. ສືບຕໍ່ບໍ?',
     },
     runtime: {
+        importEnv: 'ນຳເຂົ້າຕົວແປສະພາບແວດລ້ອມ',
+        envImportError: 'ແຖວ {0}: {1}',
+        envInvalidAssignment: 'ຕ້ອງເປັນຮູບແບບ NAME=value ທີ່ຖືກຕ້ອງ',
+        envUnclosedQuote: 'ເຄື່ອງໝາຍວົງຢືມຍັງບໍ່ປິດ',
+        envUnexpectedText: 'ມີຂໍ້ຄວາມເກີນຫຼັງເຄື່ອງໝາຍວົງຢືມປິດ',
         runtime: 'ຣັນທາມ (Runtime)',
         default: 'ຄ່າເລີ່ມຕົ້ນ',
         workDir: 'ໂຟນເດີທີ່ເຮັດວຽກ',

@@ -4390,6 +4390,11 @@ const message = {
             'Os seguintes campos serão alterados: {0}. A regra será aplicada e verificada imediatamente. Continuar?',
     },
     runtime: {
+        importEnv: 'Importar variáveis de ambiente',
+        envImportError: 'Linha {0}: {1}',
+        envInvalidAssignment: 'Era esperada uma atribuição NOME=valor válida',
+        envUnclosedQuote: 'Aspas não fechadas',
+        envUnexpectedText: 'Texto inesperado após as aspas de fechamento',
         runtime: 'Runtime',
         workDir: 'Diretório de trabalho',
         localHelper: 'Para problemas de instalação em ambiente local e uso em ambiente offline, consulte ',

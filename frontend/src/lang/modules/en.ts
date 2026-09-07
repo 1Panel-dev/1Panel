@@ -4300,6 +4300,11 @@ const message = {
             'The following fields will change: {0}. The rule will be applied and verified immediately. Continue?',
     },
     runtime: {
+        importEnv: 'Import Environment Variables',
+        envImportError: 'Line {0}: {1}',
+        envInvalidAssignment: 'Expected a valid NAME=value assignment',
+        envUnclosedQuote: 'Unclosed quote',
+        envUnexpectedText: 'Unexpected text after the closing quote',
         runtime: 'Runtime',
         default: 'Default',
         workDir: 'Working directory',

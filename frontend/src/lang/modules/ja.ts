@@ -4284,6 +4284,11 @@ const message = {
         editRuleConfirm: '次の項目を変更します：{0}。ルールは直ちに適用され、再検証されます。続行しますか？',
     },
     runtime: {
+        importEnv: '環境変数をインポート',
+        envImportError: '{0} 行目：{1}',
+        envInvalidAssignment: '有効な NAME=value 形式で入力してください',
+        envUnclosedQuote: '引用符が閉じられていません',
+        envUnexpectedText: '閉じ引用符の後に余分な文字があります',
         runtime: 'ランタイム',
         workDir: '作業ディレクトリ',
         localHelper:

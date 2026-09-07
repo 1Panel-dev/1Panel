@@ -4353,6 +4353,11 @@ const message = {
             'Se modificarán los siguientes campos: {0}. La regla se aplicará y verificará inmediatamente. ¿Continuar?',
     },
     runtime: {
+        importEnv: 'Importar variables de entorno',
+        envImportError: 'Línea {0}: {1}',
+        envInvalidAssignment: 'Se esperaba una asignación NOMBRE=valor válida',
+        envUnclosedQuote: 'Comillas sin cerrar',
+        envUnexpectedText: 'Texto inesperado después de las comillas de cierre',
         runtime: 'Runtime',
         default: 'Predeterminado',
         workDir: 'Directorio de trabajo',

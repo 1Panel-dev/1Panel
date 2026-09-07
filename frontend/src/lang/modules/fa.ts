@@ -4257,6 +4257,11 @@ const message = {
         editRuleConfirm: 'فیلدهای زیر تغییر می‌کنند: {0}. قانون بلافاصله اعمال و بررسی می‌شود. ادامه می‌دهید؟',
     },
     runtime: {
+        importEnv: 'وارد کردن متغیرهای محیطی',
+        envImportError: 'خط {0}: {1}',
+        envInvalidAssignment: 'یک عبارت معتبر NAME=value لازم است',
+        envUnclosedQuote: 'علامت نقل قول بسته نشده است',
+        envUnexpectedText: 'متن اضافی پس از علامت نقل قول پایانی',
         runtime: 'محیط اجرا',
         default: 'پیش‌فرض',
         workDir: 'دایرکتوری کاری',
