@@ -7,3 +7,12 @@ export interface ReqTerminal {
     password: string;
     key: string;
 }
+
+export interface TerminalSession {
+    id: string;
+    title: string;
+    hostId: number;
+    attached: boolean;
+    createdAt: string;
+    detachedAt: string;
+}

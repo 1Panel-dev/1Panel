@@ -245,6 +245,7 @@ func (u *SettingService) Update(c *gin.Context, key, value string) error {
 	case "BindDomain":
 		if len(value) != 0 {
 			_ = global.SESSION.Clean()
+			CloseTerminalSessions()
 		}
 		if err := u.clearPasskeySettings(); err != nil {
 			return err
@@ -609,6 +610,7 @@ func (u *SettingService) deleteCurrentSession(c *gin.Context) {
 		return
 	}
 	_ = global.SESSION.DeleteByID(sessionUser.ID)
+	CloseTerminalSessions()
 }
 
 func (u *SettingService) clearPasskeySettings() error {
