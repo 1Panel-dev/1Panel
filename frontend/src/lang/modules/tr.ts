@@ -958,6 +958,9 @@ const message = {
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
             vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',
+            vllmDeployProfile: 'Dağıtım modeli',
+            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
+            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',

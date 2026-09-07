@@ -960,6 +960,9 @@ const message = {
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
             vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
+            vllmDeployProfile: 'Model penggunaan',
+            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
+            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',

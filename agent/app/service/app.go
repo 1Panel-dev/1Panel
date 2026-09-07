@@ -223,6 +223,9 @@ func (a AppService) GetAppDetailByKey(appKey, version string) (response.AppDetai
 	if err != nil {
 		return appDetailDTO, err
 	}
+	if err = checkVllmVersionAccess(app.Key, version); err != nil {
+		return appDetailDTO, err
+	}
 	appDetail, err := appDetailRepo.GetFirst(appDetailRepo.WithAppId(app.ID), appDetailRepo.WithVersion(version))
 	if err != nil {
 		return appDetailDTO, err
@@ -241,14 +244,17 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if err != nil {
 		return appDetailDTO, err
 	}
+	app, err := appRepo.GetFirst(repo.WithByID(detail.AppId))
+	if err != nil {
+		return appDetailDTO, err
+	}
+	if err = checkVllmVersionAccess(app.Key, detail.Version); err != nil {
+		return appDetailDTO, err
+	}
 	appDetailDTO.AppDetail = detail
 	appDetailDTO.Enable = true
 
 	if appType == "runtime" {
-		app, err := appRepo.GetFirst(repo.WithByID(appID))
-		if err != nil {
-			return appDetailDTO, err
-		}
 		fileOp := files.NewFileOp()
 
 		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
@@ -319,10 +325,6 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 
 	appDetailDTO.HostMode = isHostModel(appDetailDTO.DockerCompose)
 
-	app, err := appRepo.GetFirst(repo.WithByID(detail.AppId))
-	if err != nil {
-		return appDetailDTO, err
-	}
 	if err := checkLimit(app); err != nil {
 		appDetailDTO.Enable = false
 	}
@@ -372,6 +374,9 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	}
 	app, err = appRepo.GetFirst(repo.WithByID(appDetail.AppId))
 	if err != nil {
+		return
+	}
+	if err = checkVllmVersionAccess(app.Key, appDetail.Version); err != nil {
 		return
 	}
 	if DatabaseKeys[app.Key] > 0 {

@@ -939,6 +939,9 @@ const message = {
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
             vllmVersionHelper: 'FusionXpark GB 10 サーバーでは -cu130 バージョンを選択してください。',
+            vllmDeployProfile: 'デプロイモデル',
+            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
+            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',

@@ -139,6 +139,7 @@ ErrComposeProjectNameParse: 'Falha ao analisar o nome do projeto na saída de co
 ErrComposeProjectNameEmpty: 'Não foi possível derivar um nome de projeto da configuração do Docker Compose nem do diretório pai do arquivo. Informe um nome e tente novamente.'
 ErrComposeNameInvalid: 'Nome de projeto Compose inválido: deve começar com uma letra minúscula ou número, conter apenas letras minúsculas, números, hífens e sublinhados e ter de 1 a 256 caracteres.'
 ErrAppVersionUnavailable: 'Esta versão do aplicativo foi removida do serviço remoto. Selecione outra versão e tente novamente.'
+ErrVllmGB10ProOnly: 'Esta versão do vLLM está disponível apenas no 1Panel Professional Edition.'
 ErrAppWarn: 'Status anormal, verifique o log'
 ErrAppParamKey: 'O campo de parâmetro {{ .name }} está anormal'
 ErrAppUpgrade: 'Falha na atualização do aplicativo {{ .name }} {{ .err }}'
