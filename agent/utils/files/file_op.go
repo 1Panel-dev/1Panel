@@ -1267,12 +1267,12 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 		fileName := archFile.NameInArchive
 		var err error
 		if header, ok := archFile.Header.(cZip.FileHeader); ok {
-			if header.NonUTF8 && header.Flags == 0 {
-				fileName, err = decodeGBK(fileName)
-				if err != nil {
-					return err
-				}
+			header, err = normalizeZipEntry(header)
+			if err != nil {
+				return err
 			}
+			fileName = header.Name
+			info = header.FileInfo()
 		}
 		header, hasTarHeader := getArchiveTarHeader(archFile)
 		ownership, hasOwnership := getArchiveOwnership(archFile)
@@ -1281,7 +1281,7 @@ func (f FileOp) extractArchiveWithSDK(ctx context.Context, input io.Reader, dst 
 			return err
 		}
 		extractionStarted = true
-		if archFile.FileInfo.IsDir() {
+		if info.IsDir() {
 			if filePath == root {
 				return ensureArchiveDirectory(root, constant.DirPerm)
 			}
@@ -1448,6 +1448,12 @@ func (f FileOp) decompressWithSDKState(ctx context.Context, srcFile string, dst 
 	if err != nil {
 		return false, err
 	}
+	if cType == Zip || cType == SdkZip {
+		if _, err := inspectZipPaths(ctx, input); err != nil {
+			_ = input.Close()
+			return false, err
+		}
+	}
 	var extractor archiver.Extractor = getFormat(cType)
 	if cType == X7z {
 		extractor = archiver.SevenZip{Password: secret}
@@ -1561,6 +1567,12 @@ func (f FileOp) Decompress(ctx context.Context, srcFile string, dst string, cTyp
 }
 
 func (f FileOp) DecompressWithOptions(ctx context.Context, srcFile string, dst string, cType CompressType, secret string, options DecompressOptions) error {
+	if cType == Zip {
+		handled, err := f.decompressZipWithPathCompatibility(ctx, srcFile, dst, options)
+		if handled || err != nil {
+			return err
+		}
+	}
 	if cType == X7z && options.PreserveOwner {
 		return f.decompressSevenZipWithFallback(ctx, srcFile, dst, secret, options)
 	}
