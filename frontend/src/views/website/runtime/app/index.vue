@@ -1,10 +1,10 @@
 <template>
-    <el-form-item :label="$t('app.app')" prop="appID">
+    <el-form-item :label="$t('app.app')" prop="appDetailID" :rules="Rules.requiredSelect">
         <el-row :gutter="20">
             <el-col :span="12">
                 <el-select
                     v-model="runtime.appID"
-                    :disabled="mode === 'edit'"
+                    :disabled="mode === 'edit' || loadingVersion"
                     @change="changeApp(runtime.appID)"
                     class="p-w-200"
                 >
@@ -14,7 +14,8 @@
             <el-col :span="12">
                 <el-select
                     v-model="runtime.version"
-                    :disabled="mode === 'edit'"
+                    :disabled="loadingVersion"
+                    :loading="loadingVersion"
                     @change="changeVersion()"
                     class="p-w-200"
                 >
@@ -36,6 +37,7 @@ import { getAppByKey, getAppDetail, getCurrentNodeCustomAppConfig, searchApp } f
 import { useVModel } from '@vueuse/core';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { resolveRuntimeAppResource } from '@/utils/runtime-app-resource';
+import { Rules } from '@/global/form-rules';
 const { isOffline, isXpackOrEE } = useGlobalStore();
 
 const props = defineProps({
@@ -54,6 +56,7 @@ const props = defineProps({
 });
 const apps = ref<App.AppItem[]>([]);
 const appVersions = ref<string[]>([]);
+const loadingVersion = ref(false);
 const emit = defineEmits(['update:modelValue']);
 const runtime = useVModel(props, 'modelValue', emit);
 const appReq = reactive({
@@ -73,10 +76,15 @@ const changeApp = (appID: number) => {
 };
 
 const changeVersion = async () => {
+    runtime.value.appDetailID = undefined;
+    loadingVersion.value = true;
     try {
         const res = await getAppDetail(runtime.value.appID, runtime.value.version, 'runtime');
         runtime.value.appDetailID = res.data.id;
-    } catch (error) {}
+    } catch (error) {
+    } finally {
+        loadingVersion.value = false;
+    }
 };
 
 const getApp = async (appkey: string, mode: string) => {

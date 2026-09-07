@@ -640,6 +640,12 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		runtime.Version = req.Version
 		return runtimeRepo.Save(runtime)
 	}
+	appDetail, err := getRuntimeUpdateAppDetail(runtime, req)
+	if err != nil {
+		return err
+	}
+	versionChanged := appDetail.ID != runtime.AppDetailID || appDetail.Version != runtime.Version
+	req.Version = appDetail.Version
 	oldImage := runtime.Image
 	oldEnv := runtime.Env
 	var hostPorts []string
@@ -659,23 +665,6 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			}
 		}
 
-		appDetail, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))
-		if err != nil {
-			return err
-		}
-		app, err := appRepo.GetFirst(repo.WithByID(appDetail.AppId))
-		if err != nil {
-			return err
-		}
-		fileOp := files.NewFileOp()
-		appVersionDir := path.Join(global.Dir.AppResourceDir, app.Resource, app.Key, appDetail.Version)
-		if !fileOp.Stat(appVersionDir) || appDetail.Update {
-			if err := downloadApp(app, appDetail, nil, nil); err != nil {
-				return err
-			}
-			_ = fileOp.Rename(path.Join(runtime.GetPath(), "run.sh"), path.Join(runtime.GetPath(), "run.sh.bak"))
-			_ = fileOp.CopyFile(path.Join(appVersionDir, "run.sh"), runtime.GetPath())
-		}
 	}
 
 	if containerName, ok := req.Params["CONTAINER_NAME"]; ok && containerName != getRuntimeEnv(runtime.Env, "CONTAINER_NAME") {
@@ -683,6 +672,36 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			return err
 		}
 		runtime.ContainerName = containerName.(string)
+	}
+
+	app, err := appRepo.GetFirst(repo.WithByID(appDetail.AppId))
+	if err != nil {
+		return err
+	}
+	fileOp := files.NewFileOp()
+	appVersionDir := filepath.Join(app.GetAppResourcePath(), appDetail.Version)
+	refreshTemplate := !fileOp.Stat(appVersionDir) || appDetail.Update
+	if err = downloadApp(app, appDetail, nil, nil); err != nil {
+		return err
+	}
+	if versionChanged {
+		if err = updateRuntimeVersionFiles(runtime, appVersionDir); err != nil {
+			return err
+		}
+	} else if refreshTemplate && runtime.Type != constant.RuntimePHP {
+		if err = fileOp.CopyFile(filepath.Join(appVersionDir, "run.sh"), runtime.GetPath()); err != nil {
+			return err
+		}
+	}
+	if runtime.Type == constant.RuntimePHP {
+		composeContent, err := fileOp.GetContent(runtime.GetComposePath())
+		if err != nil {
+			return err
+		}
+		req.Environments, err = getDockerComposeEnvironments(composeContent)
+		if err != nil {
+			return err
+		}
 	}
 
 	projectDir := path.Join(global.Dir.RuntimeDir, runtime.Type, runtime.Name)
@@ -702,19 +721,21 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 			ExtraHosts:   req.ExtraHosts,
 		},
 	}
-	composeContent, envContent, _, err := handleParams(create, projectDir)
+	composeContent, envContent, forms, err := handleParams(create, projectDir)
 	if err != nil {
 		return err
 	}
 	runtime.Remark = req.Remark
+	runtime.AppDetailID = appDetail.ID
+	runtime.Version = appDetail.Version
 	runtime.Env = string(envContent)
 	runtime.DockerCompose = string(composeContent)
 
 	switch runtime.Type {
 	case constant.RuntimePHP:
 		runtime.Image = req.Image
+		runtime.Params = string(forms)
 		runtime.Status = constant.StatusBuilding
-		_ = runtimeRepo.Save(runtime)
 		client, err := docker.NewClient()
 		if err != nil {
 			return err
@@ -724,14 +745,18 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if err != nil {
 			return err
 		}
-		go buildRuntime(runtime, imageID, oldEnv, req.Rebuild)
+		if err = runtimeRepo.Save(runtime); err != nil {
+			return err
+		}
+		go buildRuntime(runtime, imageID, oldEnv, req.Rebuild || versionChanged)
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
-		runtime.Version = req.Version
 		runtime.CodeDir = req.CodeDir
 		runtime.Port = strings.Join(hostPorts, ",")
 		runtime.Status = constant.StatusReCreating
 		runtime.ContainerName = req.Params["CONTAINER_NAME"].(string)
-		_ = runtimeRepo.Save(runtime)
+		if err = runtimeRepo.Save(runtime); err != nil {
+			return err
+		}
 		go reCreateRuntime(runtime)
 	}
 	return nil
