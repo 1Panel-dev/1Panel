@@ -34,7 +34,7 @@ const (
 
 func SkipVerification(provider string) bool {
 	switch provider {
-	case "vllm", "ollama", "kimi-coding":
+	case "vllm", "ollama", "llmman", "kimi-coding":
 		return true
 	default:
 		return false
@@ -128,7 +128,7 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "test", "max_output_tokens": defaultVerifyMaxTokens, "stream": false})
 	default:
 		request.URL = baseURL + "/chat/completions"
-		if provider != "ollama" || strings.TrimSpace(apiKey) != "" {
+		if (provider != "ollama" && provider != "llmman") || strings.TrimSpace(apiKey) != "" {
 			headers["Authorization"] = "Bearer " + apiKey
 		}
 		request.Body = mustJSON(map[string]interface{}{

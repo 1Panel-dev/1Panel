@@ -92,7 +92,7 @@ func NewClient(cfg ClientConfig) (Client, error) {
 	if strings.TrimSpace(cfg.Model) == "" {
 		return nil, fmt.Errorf("model is required")
 	}
-	if strings.TrimSpace(cfg.APIKey) == "" && providerKey != "ollama" {
+	if strings.TrimSpace(cfg.APIKey) == "" && providerKey != "ollama" && providerKey != "llmman" {
 		return nil, fmt.Errorf("api key is required")
 	}
 	baseURL := normalizeBaseURL(providerKey, cfg.BaseURL)

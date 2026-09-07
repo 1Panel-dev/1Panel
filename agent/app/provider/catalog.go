@@ -46,6 +46,15 @@ var catalog = map[string]Meta{
 		Key: "ollama", DisplayName: "Ollama", Sort: 15, DefaultAPIType: "openai-responses",
 		APIConfigs: editableAPIConfigs(false, "openai-responses", "openai-completions", "openai-embeddings"),
 	},
+	// llmman (https://github.com/llmmanorg/llmman): local runner with Ollama/OpenAI-compatible routes on 127.0.0.1:17434.
+	"llmman": {
+		Key: "llmman", DisplayName: "llmman", Sort: 16, DefaultAPIType: "openai-responses",
+		APIConfigs: []APIConfig{
+			{APIType: "openai-responses", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
+			{APIType: "openai-completions", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
+			{APIType: "openai-embeddings", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
+		},
+	},
 	"vllm": {
 		Key: "vllm", DisplayName: "vLLM", Sort: 20, DefaultAPIType: "openai-completions", EnvKey: "VLLM_API_KEY",
 		APIConfigs: editableAPIConfigs(false, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
@@ -453,6 +462,7 @@ var legacyModelPrefixes = map[string][]string{
 	"custom":              {"custom"},
 	"vllm":                {"custom"},
 	"ollama":              {"ollama"},
+	"llmman":              {"llmman"},
 	"deepseek":            {"deepseek"},
 	"bailian-coding-plan": {"bailian-coding-plan"},
 	"ark-coding-plan":     {"ark-coding-plan"},
