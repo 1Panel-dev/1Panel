@@ -277,38 +277,11 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			return nil, err
 		}
 	}
-	interPrivateKey, interPublicKey, _, err := createPrivateKey(websiteSSL.KeyType)
-	if err != nil {
-		return nil, err
-	}
 	notAfter := time.Now()
 	if req.Unit == "year" {
 		notAfter = notAfter.AddDate(req.Time, 0, 0)
 	} else {
 		notAfter = notAfter.AddDate(0, 0, req.Time)
-	}
-	interCsr := &x509.Certificate{
-		SerialNumber:          big.NewInt(time.Now().Unix() + 2),
-		Subject:               rootCsr.Subject,
-		NotBefore:             time.Now(),
-		NotAfter:              notAfter,
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-		MaxPathLen:            0,
-		MaxPathLenZero:        true,
-		KeyUsage:              x509.KeyUsageCertSign | x509.KeyUsageCRLSign,
-	}
-	interDer, err := x509.CreateCertificate(rand.Reader, interCsr, rootCsr, interPublicKey, rootPrivateKey)
-	if err != nil {
-		return nil, err
-	}
-	interCert, err := x509.ParseCertificate(interDer)
-	if err != nil {
-		return nil, err
-	}
-	interCertBlock := &pem.Block{
-		Type:  "CERTIFICATE",
-		Bytes: interCert.Raw,
 	}
 	_, publicKey, privateKeyBytes, err := createPrivateKey(websiteSSL.KeyType)
 	if err != nil {
@@ -336,7 +309,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		IPAddresses:           ips,
 	}
 
-	der, err := x509.CreateCertificate(rand.Reader, csr, interCert, publicKey, interPrivateKey)
+	der, err := x509.CreateCertificate(rand.Reader, csr, rootCsr, publicKey, rootPrivateKey)
 	if err != nil {
 		return nil, err
 	}
@@ -349,7 +322,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		Type:  "CERTIFICATE",
 		Bytes: cert.Raw,
 	}
-	websiteSSL.Pem = string(pem.EncodeToMemory(certBlock)) + string(pem.EncodeToMemory(rootCertBlock)) + string(pem.EncodeToMemory(interCertBlock))
+	websiteSSL.Pem = string(pem.EncodeToMemory(certBlock))
 	websiteSSL.PrivateKey = string(privateKeyBytes)
 	websiteSSL.ExpireDate = cert.NotAfter
 	websiteSSL.StartDate = cert.NotBefore
