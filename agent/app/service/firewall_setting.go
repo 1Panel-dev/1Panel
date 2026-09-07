@@ -195,7 +195,17 @@ func (s *FirewallSettingService) Operate(ctx context.Context, request dto.Firewa
 	}
 	switch request.Subsystem {
 	case "system":
-		return s.operateSystem(request)
+		if err := s.operateSystem(request); err != nil {
+			return err
+		}
+		if request.Operation == "initialize" {
+			service := newFirewallService()
+			if err := service.restoreStoredFirewallRules(ctx, filter.Provider(request.Backend)); err != nil {
+				return err
+			}
+			return service.syncConfiguredFirewallPorts(ctx)
+		}
+		return nil
 	case "forwarding":
 		return s.operateForwarding(request)
 	case "docker":
@@ -260,6 +270,8 @@ func dockerGuardBackendInitialized(backend string) (bool, error) {
 }
 
 func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperation) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
 	if _, err := lifecycle.NewClientFor(request.Backend); err != nil {
 		return err
 	}
@@ -294,7 +306,7 @@ func (s *FirewallSettingService) operateSystem(request dto.FirewallBackendOperat
 	if request.Operation == "select" {
 		return nil
 	}
-	initErr := newFirewallService().OperateFilterChain(dto.FilterChainOperation{
+	initErr := newFirewallService().operateFilterChainBaseLocked(request.Backend, dto.FilterChainOperation{
 		Name: constant.FirewallBasicChain, Operate: string(firewall.BaseOperationInit),
 	})
 	if initErr != nil {
@@ -321,6 +333,9 @@ func systemFirewallBackendInitializedWithClientFactory(
 	if supportsManagedFilterChains(backend) {
 		for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
 			initialized, _, err := loadSystemFirewallFamilyStatus(backend, family)
+			if family == constant.FirewallFamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+				continue
+			}
 			if err != nil {
 				return false, err
 			}

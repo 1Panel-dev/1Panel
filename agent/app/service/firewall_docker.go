@@ -138,28 +138,30 @@ func (s *DockerPortGuardService) LoadPublishedPorts(ctx context.Context) ([]dto.
 }
 
 func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {
-	selectedBackend := selectedDockerFirewallBackend("")
-	base := s.runtimeStatus(s.guardRuntime(selectedBackend), selectedBackend)
-	base.Version = s.loadFirewallVersion(selectedBackend)
 	policies, err := s.policies.ListManaged(ctx)
 	if err != nil {
 		return dto.DockerPortGuardList{}, err
 	}
+	unavailable := func() dto.DockerPortGuardList {
+		backend := selectedDockerFirewallBackend("")
+		base := s.runtimeStatus(s.guardRuntime(backend), backend)
+		base.Version = s.loadFirewallVersion(backend)
+		base.Message = agenti18n.Get("ErrDockerFailed")
+		return dto.DockerPortGuardList{Base: base, Containers: []dto.DockerPortGuardContainer{}, OrphanPolicies: dockerGuardPolicyEndpoints(policies)}
+	}
 	cli, err := s.client()
 	if err != nil {
-		base.Message = agenti18n.Get("ErrDockerFailed")
-		return dto.DockerPortGuardList{Base: base, Containers: []dto.DockerPortGuardContainer{}, OrphanPolicies: dockerGuardPolicyEndpoints(policies)}, nil
+		return unavailable(), nil
 	}
 	defer cli.Close()
 	info, err := cli.Info(ctx)
 	if err != nil {
-		base.Message = agenti18n.Get("ErrDockerFailed")
-		return dto.DockerPortGuardList{Base: base, Containers: []dto.DockerPortGuardContainer{}, OrphanPolicies: dockerGuardPolicyEndpoints(policies)}, nil
+		return unavailable(), nil
 	}
 	detectedBackend := dockerFirewallBackend(info)
-	base.Backend = selectedDockerFirewallBackend(detectedBackend)
-	base = s.runtimeStatus(s.guardRuntime(base.Backend), base.Backend)
-	base.Version = s.loadFirewallVersion(base.Backend)
+	backend := selectedDockerFirewallBackend(detectedBackend)
+	base := s.runtimeStatus(s.guardRuntime(backend), backend)
+	base.Version = s.loadFirewallVersion(backend)
 	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
 		markDockerGuardReconcileFailure(&base, reconcileErr)
 	}

@@ -19,6 +19,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
@@ -31,7 +32,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/1Panel-dev/1Panel/core/utils/controller"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/core/utils/firewall"
 	"github.com/1Panel-dev/1Panel/core/utils/menutree"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
@@ -41,6 +41,8 @@ import (
 )
 
 type SettingService struct{}
+
+var panelPortChangeMu sync.Mutex
 
 type ISettingService interface {
 	GetSettingInfo() (*dto.SettingInfo, error)
@@ -346,9 +348,9 @@ func (u *SettingService) UpdateProxy(req dto.ProxyUpdate) error {
 }
 
 func (u *SettingService) UpdatePort(port uint) error {
-	if common.ScanPort(int(port)) {
-		return buserr.WithDetail("ErrPortInUsed", port, nil)
-	}
+	panelPortChangeMu.Lock()
+	defer panelPortChangeMu.Unlock()
+
 	oldPort, err := settingRepo.Get(repo.WithByKey("ServerPort"))
 	if err != nil {
 		return err
@@ -356,7 +358,10 @@ func (u *SettingService) UpdatePort(port uint) error {
 	if oldPort.Value == fmt.Sprintf("%v", port) {
 		return nil
 	}
-	if err := firewall.UpdatePort(oldPort.Value, fmt.Sprintf("%v", port)); err != nil {
+	if common.ScanPort(int(port)) {
+		return buserr.WithDetail("ErrPortInUsed", port, nil)
+	}
+	if err := proxy_local.UpdatePanelPort(oldPort.Value, port); err != nil {
 		return err
 	}
 

@@ -152,13 +152,13 @@ func hasBaseChainBinding(output string) bool {
 
 func loadFamilyInitStatus(family filter.Family) (bool, bool, error) {
 	for _, chain := range BasicChains() {
-		if _, err := run("list", "chain", TableFamily(family), TableName, chain); err != nil {
-			return false, false, nil
+		if _, exists, err := firewallutil.ReadNftObject(run, "list", "chain", TableFamily(family), TableName, chain); err != nil || !exists {
+			return false, false, err
 		}
 	}
-	stdout, err := run("list", "chain", TableFamily(family), TableName, InputChain)
-	if err != nil {
-		return false, false, nil
+	stdout, exists, err := firewallutil.ReadNftObject(run, "list", "chain", TableFamily(family), TableName, InputChain)
+	if err != nil || !exists {
+		return false, false, err
 	}
 	for _, chain := range BasicChains() {
 		if !strings.Contains(stdout, "jump "+chain) {

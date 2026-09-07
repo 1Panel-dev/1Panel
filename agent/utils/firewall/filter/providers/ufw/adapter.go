@@ -80,10 +80,7 @@ func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule
 
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
-		Scopes: []filter.ScopePattern{{
-			Provider: filter.ProviderUFW, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6},
-			Chains: []string{filter.UFWInputChain}, Directions: []filter.Direction{filter.DirectionInput},
-		}},
+
 		Marker: true, ExplicitPosition: true,
 	}, nil
 }

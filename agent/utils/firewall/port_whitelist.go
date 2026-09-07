@@ -284,3 +284,20 @@ func ExcludePorts(ports, excluded []PortWhitelist) []PortWhitelist {
 	}
 	return result
 }
+
+func NormalizeRequiredPorts(ports []PortWhitelist) ([]PortWhitelist, error) {
+	result := make([]PortWhitelist, 0, len(ports))
+	for _, port := range ports {
+		port.Protocol = strings.ToLower(strings.TrimSpace(port.Protocol))
+		if port.Protocol != "tcp" && port.Protocol != "udp" {
+			return nil, fmt.Errorf("unsupported required firewall port protocol %q", port.Protocol)
+		}
+		portNumber, err := strconv.Atoi(strings.TrimSpace(port.Port))
+		if err != nil || portNumber < 1 || portNumber > 65535 {
+			return nil, fmt.Errorf("invalid required firewall port %q", port.Port)
+		}
+		port.Port = strconv.Itoa(portNumber)
+		result = append(result, port)
+	}
+	return NormalizePortWhitelist(result), nil
+}

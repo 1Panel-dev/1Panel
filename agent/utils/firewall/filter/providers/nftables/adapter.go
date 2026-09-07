@@ -29,10 +29,7 @@ func (a *Adapter) Provider() filter.Provider { return filter.ProviderNftables }
 
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
-		Scopes: []filter.ScopePattern{{
-			Provider: filter.ProviderNftables, Families: []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}, Table: "filter",
-			Chains: []string{filter.BasicBeforeChain, filter.IptablesInputChain, filter.BasicAfterChain}, Directions: []filter.Direction{filter.DirectionInput},
-		}}, Marker: true, AtomicApply: true, TransactionalRollback: true, OwnedChains: true, ExplicitPosition: true,
+		Marker: true, OwnedChains: true, ExplicitPosition: true,
 	}, nil
 }
 
@@ -541,9 +538,14 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 type systemBackend struct{}
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
+	output, err := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
 		"nft", "-n", "-n", "-a", "list", "chain", nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope),
 	)
+	if err != nil && scope.Family == filter.FamilyIPv6 &&
+		(strings.Contains(err.Error(), "Address family not supported") || strings.Contains(err.Error(), "Protocol not supported")) {
+		return output, fmt.Errorf("%w: %v", filter.ErrFamilyUnavailable, err)
+	}
+	return output, err
 }
 
 func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {

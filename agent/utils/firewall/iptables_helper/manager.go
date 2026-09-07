@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
@@ -28,7 +29,7 @@ func (m *Manager) Cleanup() error {
 		return err
 	}
 	if commands, err := lifecycle.ResolveIptablesCommands(); err == nil && commands.IPv6Available() {
-		if err := cleanupBaseChains(true); err != nil {
+		if err := cleanupBaseChains(true); err != nil && !errors.Is(err, filter.ErrFamilyUnavailable) {
 			return err
 		}
 	}
@@ -86,7 +87,7 @@ func (m *Manager) disableBase() error {
 	if err := setBaseChainBindings(false, false); err != nil {
 		return err
 	}
-	if err := UnbindIPv6BaseChains(); err != nil {
+	if err := UnbindIPv6BaseChains(); err != nil && !errors.Is(err, filter.ErrFamilyUnavailable) {
 		return err
 	}
 	return m.updateSetting("IptablesStatus", constant.StatusDisable)
@@ -235,7 +236,7 @@ func saveBaseChains() error {
 	return nil
 }
 
-func RestoreBaseChains(panelPort string) error {
+func RestoreBaseChains(panelPort string, requiredPorts []firewall.PortWhitelist) error {
 	port, err := strconv.Atoi(panelPort)
 	if err != nil || port < 1 || port > 65535 {
 		return fmt.Errorf("invalid panel port %q", panelPort)
@@ -260,7 +261,7 @@ func RestoreBaseChains(panelPort string) error {
 	if err := ensureBaseChainsFamily(true); err != nil {
 		return err
 	}
-	input, err = buildBaseChainsRestoreScript(global.Dir.FirewallDir, panelPort, true)
+	input, err = buildBaseChainsRestoreScript(global.Dir.FirewallDir, panelPort, true, requiredPorts...)
 	if err != nil {
 		return err
 	}
@@ -270,7 +271,7 @@ func RestoreBaseChains(panelPort string) error {
 	return nil
 }
 
-func buildBaseChainsRestoreScript(firewallDir, panelPort string, ipv6 bool) (string, error) {
+func buildBaseChainsRestoreScript(firewallDir, panelPort string, ipv6 bool, requiredPorts ...firewall.PortWhitelist) (string, error) {
 	var script strings.Builder
 	script.WriteString("*filter\n")
 	for _, chain := range BasicChains() {
@@ -313,6 +314,17 @@ func buildBaseChainsRestoreScript(firewallDir, panelPort string, ipv6 bool) (str
 		script.WriteString(panelRule)
 		script.WriteByte('\n')
 	}
+	if ipv6 {
+		defaults, err := ipv6BaseDefaultRules(panelPort, requiredPorts)
+		if err != nil {
+			return "", err
+		}
+		for _, rule := range defaults {
+			if !containsIptablesRule(script.String(), rule) {
+				script.WriteString(rule + "\n")
+			}
+		}
+	}
 	script.WriteString("COMMIT\n")
 	return script.String(), nil
 }
@@ -322,7 +334,7 @@ func (m *Manager) initPreRules() error {
 	if err != nil {
 		return err
 	}
-	return applyRequiredFirewallPortWhiteListRules(requiredPorts, false, true)
+	return applyRequiredFirewallPortWhiteListRules(requiredPorts, false, true, false)
 }
 
 func (m *Manager) ensureIPv6BaseChains() error {
@@ -330,7 +342,7 @@ func (m *Manager) ensureIPv6BaseChains() error {
 	if err != nil || !commands.IPv6Available() {
 		return nil
 	}
-	return EnsureIPv6BaseChains(m.panelPort())
+	return m.EnsureIPv6BaseChains()
 }
 
 func (m *Manager) SyncRequiredPorts(withSave bool) error {
@@ -338,27 +350,60 @@ func (m *Manager) SyncRequiredPorts(withSave bool) error {
 	if err != nil {
 		return err
 	}
-	return applyRequiredFirewallPortWhiteListRules(requiredPorts, withSave, false)
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
+		ipv6 := family == constant.FirewallFamilyIPv6
+		if ipv6 && !commands.IPv6Available() {
+			continue
+		}
+		checkChain := CheckChainExist
+		if ipv6 {
+			checkChain = CheckIPv6ChainExist
+		}
+		initialized, err := checkChain(FilterTab, BasicBeforeChain)
+		if ipv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		if !initialized {
+			continue
+		}
+		if err := applyRequiredFirewallPortWhiteListRules(requiredPorts, withSave, false, ipv6); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
-func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitelist, withSave, includeDefaults bool) error {
-	portWhiteList, err := validateRequiredFirewallPorts(portWhiteList)
+func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitelist, withSave, includeDefaults, ipv6 bool) error {
+	portWhiteList, err := firewall.NormalizeRequiredPorts(portWhiteList)
 	if err != nil {
 		return err
 	}
-	beforeRules, err := ReadFilterRulesByChain(BasicBeforeChain)
+	run, save := RunWithStd, SaveRulesToFile
+	beforeFile, afterFile := BasicBeforeFileName, BasicAfterFileName
+	if ipv6 {
+		run, save = RunIPv6WithStd, SaveIPv6RulesToFile
+		beforeFile, afterFile = IPv6FileName(beforeFile), IPv6FileName(afterFile)
+	}
+	beforeRules, err := readFilterRulesByChain(BasicBeforeChain, run)
 	if err != nil {
 		return err
 	}
-	afterRules, err := ReadFilterRulesByChain(BasicAfterChain)
+	afterRules, err := readFilterRulesByChain(BasicAfterChain, run)
 	if err != nil {
 		return err
 	}
-	beforeRaw, err := RunWithStd(FilterTab, "-S", BasicBeforeChain)
+	beforeRaw, err := run(FilterTab, "-S", BasicBeforeChain)
 	if err != nil {
 		return err
 	}
-	afterRaw, err := RunWithStd(FilterTab, "-S", BasicAfterChain)
+	afterRaw, err := run(FilterTab, "-S", BasicAfterChain)
 	if err != nil {
 		return err
 	}
@@ -368,34 +413,21 @@ func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitel
 		if resolveErr != nil {
 			return resolveErr
 		}
-		if err := restoreRules(commands.Restore4, script); err != nil {
-			return fmt.Errorf("batch sync required IPv4 firewall ports: %w", err)
+		restore := commands.Restore4
+		if ipv6 {
+			restore = commands.Restore6
+		}
+		if err := restoreRules(restore, script); err != nil {
+			return fmt.Errorf("batch sync required firewall ports with %s: %w", restore, err)
 		}
 	}
 	if !withSave {
 		return nil
 	}
-	if err := SaveRulesToFile(FilterTab, BasicBeforeChain, BasicBeforeFileName); err != nil {
+	if err := save(FilterTab, BasicBeforeChain, beforeFile); err != nil {
 		return err
 	}
-	return SaveRulesToFile(FilterTab, BasicAfterChain, BasicAfterFileName)
-}
-
-func validateRequiredFirewallPorts(ports []firewall.PortWhitelist) ([]firewall.PortWhitelist, error) {
-	result := make([]firewall.PortWhitelist, 0, len(ports))
-	for _, port := range ports {
-		port.Protocol = strings.ToLower(strings.TrimSpace(port.Protocol))
-		if port.Protocol != "tcp" && port.Protocol != "udp" {
-			return nil, fmt.Errorf("unsupported required firewall port protocol %q", port.Protocol)
-		}
-		portNumber, err := strconv.Atoi(strings.TrimSpace(port.Port))
-		if err != nil || portNumber < 1 || portNumber > 65535 {
-			return nil, fmt.Errorf("invalid required firewall port %q", port.Port)
-		}
-		port.Port = strconv.Itoa(portNumber)
-		result = append(result, port)
-	}
-	return firewall.NormalizePortWhitelist(result), nil
+	return save(FilterTab, BasicAfterChain, afterFile)
 }
 
 func buildRequiredPortsRestoreScript(
@@ -474,9 +506,17 @@ func containsIptablesRule(output, rule string) bool {
 }
 
 func countIptablesRule(output, rule string) int {
+	canonical := func(value string) string {
+		value = strings.TrimSpace(value)
+		if strings.Contains(value, " -j ACCEPT") {
+			return strings.Replace(value, " -j ACCEPT", "", 1) + " -j ACCEPT"
+		}
+		return value
+	}
+	rule = canonical(rule)
 	count := 0
 	for _, line := range strings.Split(output, "\n") {
-		if strings.TrimSpace(line) == rule {
+		if canonical(line) == rule {
 			count++
 		}
 	}

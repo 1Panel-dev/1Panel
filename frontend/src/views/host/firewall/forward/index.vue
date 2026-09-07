@@ -45,12 +45,7 @@
                             <el-button v-permission v-node-admin @click="onImport">
                                 {{ $t('commons.button.import') }}
                             </el-button>
-                            <el-button
-                                v-permission
-                                v-node-admin
-                                :disabled="paginationConfig.total === 0"
-                                @click="onExport"
-                            >
+                            <el-button v-permission v-node-admin :disabled="loading" @click="onExport">
                                 {{ $t('commons.button.export') }}
                             </el-button>
                         </el-button-group>
@@ -154,7 +149,6 @@ import { ElMessageBox } from 'element-plus';
 const loading = ref();
 const selects = ref<any>([]);
 const searchName = ref();
-const searchStrategy = ref('');
 
 const isInit = ref(false);
 const isBind = ref(false);
@@ -229,7 +223,7 @@ const search = async () => {
         return;
     }
     let params = {
-        strategy: searchStrategy.value,
+        strategy: '',
         info: searchName.value,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
@@ -318,12 +312,12 @@ const onImport = () => {
 };
 
 const loadAllRules = async (): Promise<Firewall.RuleForward[]> => {
-    if (paginationConfig.total === 0) return [];
     const response = await searchForwardRule({
+        all: true,
         strategy: '',
         info: '',
         page: 1,
-        pageSize: Math.max(1, paginationConfig.total),
+        pageSize: paginationConfig.pageSize,
     });
     return (response.data.items || []).map((item) => ({
         operation: '',

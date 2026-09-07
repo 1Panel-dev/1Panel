@@ -61,6 +61,7 @@ export namespace Firewall {
         ipv6: BackendFamilyStatus;
     }
     export interface ForwardRuleSearch extends ReqPage {
+        all?: boolean;
         strategy: string;
         info: string;
     }
@@ -154,6 +155,7 @@ export namespace Firewall {
         ruleKey: string;
         origin: RuleOrigin;
         protected?: boolean;
+        expanded?: boolean;
         marker?: string;
         observedInstanceKey?: string;
     }
@@ -165,6 +167,8 @@ export namespace Firewall {
     }
 
     export interface InventoryItem {
+        incompatible?: boolean;
+        error?: string;
         rule: Rule;
         observed?: ObservedRule;
         desired?: DesiredRule;
@@ -174,6 +178,7 @@ export namespace Firewall {
     }
 
     export type ScopeNoticeCode =
+        | 'family_unavailable'
         | 'default_scope_mismatch'
         | 'managed_scope_inactive'
         | 'unmanaged_active_scopes'

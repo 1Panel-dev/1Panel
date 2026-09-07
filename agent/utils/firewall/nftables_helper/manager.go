@@ -124,7 +124,7 @@ func (m *Manager) initPreRules() error {
 	if err != nil {
 		return err
 	}
-	ports, err = validateRequiredPorts(ports)
+	ports, err = firewall.NormalizeRequiredPorts(ports)
 	if err != nil {
 		return err
 	}
@@ -153,16 +153,37 @@ func (m *Manager) SyncRequiredPorts() error {
 	if err != nil {
 		return err
 	}
-	ports, err = validateRequiredPorts(ports)
+	ports, err = firewall.NormalizeRequiredPorts(ports)
 	if err != nil {
 		return err
 	}
+	commands, err := requiredPortSyncCommands(run, ports)
+	if err != nil {
+		return err
+	}
+	if err := runBatch(commands...); err != nil {
+		return err
+	}
+	return PersistRuleset(context.Background())
+}
+
+func requiredPortSyncCommands(run func(...string) (string, error), ports []firewall.PortWhitelist) ([][]string, error) {
 	commands := make([][]string, 0)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
+		_, exists, err := firewall.ReadNftObject(run, "list", "table", tableFamily, TableName)
+		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		if !exists {
+			continue
+		}
 		stdout, err := run("-n", "-a", "list", "chain", tableFamily, TableName, BasicBeforeChain)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		existing := requiredPortRules(stdout)
 		missing, staleHandles := requiredPortChanges(existing, ports)
@@ -173,30 +194,7 @@ func (m *Manager) SyncRequiredPorts() error {
 			commands = append(commands, []string{"delete", "rule", tableFamily, TableName, BasicBeforeChain, "handle", handle})
 		}
 	}
-	if err := runBatch(commands...); err != nil {
-		return err
-	}
-	if err := PersistRuleset(context.Background()); err != nil {
-		return err
-	}
-	return nil
-}
-
-func validateRequiredPorts(ports []firewall.PortWhitelist) ([]firewall.PortWhitelist, error) {
-	result := make([]firewall.PortWhitelist, 0, len(ports))
-	for _, port := range ports {
-		port.Protocol = strings.ToLower(strings.TrimSpace(port.Protocol))
-		if port.Protocol != "tcp" && port.Protocol != "udp" {
-			return nil, fmt.Errorf("unsupported required firewall port protocol %q", port.Protocol)
-		}
-		portNumber, err := strconv.Atoi(strings.TrimSpace(port.Port))
-		if err != nil || portNumber < 1 || portNumber > 65535 {
-			return nil, fmt.Errorf("invalid required firewall port %q", port.Port)
-		}
-		port.Port = strconv.Itoa(portNumber)
-		result = append(result, port)
-	}
-	return firewall.NormalizePortWhitelist(result), nil
+	return commands, nil
 }
 
 type requiredPortRule struct {

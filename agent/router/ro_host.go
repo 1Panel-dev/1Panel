@@ -23,6 +23,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 
 		hostRouter.POST("/firewall/base", baseApi.LoadFirewallBaseInfo)
 		hostRouter.POST("/firewall/operate", baseApi.OperateFirewall)
+		hostRouter.POST("/firewall/port", baseApi.UpdatePanelFirewallPort)
 		hostRouter.GET("/firewall/settings", baseApi.LoadFirewallSettings)
 		hostRouter.POST("/firewall/settings/operate", baseApi.OperateFirewallBackend)
 		hostRouter.POST("/firewall/forward/base", baseApi.LoadForwardingBaseInfo)

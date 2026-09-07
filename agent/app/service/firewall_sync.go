@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
@@ -66,7 +67,7 @@ type firewallRuleSyncEntry struct {
 }
 
 type firewallRuleSyncScopePlan struct {
-	runtime  *firewallRuleRuntime
+	runtime  *filterruntime.Engine
 	snapshot filter.Snapshot
 	entries  []*firewallRuleSyncEntry
 }
@@ -98,6 +99,8 @@ func (s *FirewallService) previewSystemRuleSync(
 	clientIP string,
 	request dto.FirewallRuleSyncRequest,
 ) (dto.FirewallRuleSyncPreview, error) {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
 	plan, err := s.loadFirewallRuleSyncPlan(ctx, clientIP, request)
 	if err != nil {
 		return dto.FirewallRuleSyncPreview{}, err
@@ -110,6 +113,8 @@ func (s *FirewallService) syncRules(
 	clientIP string,
 	request dto.FirewallRuleSyncRequest,
 ) (dto.FirewallRuleSyncResult, error) {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
 	plan, err := s.loadFirewallRuleSyncPlan(ctx, clientIP, request)
 	if err != nil {
 		return dto.FirewallRuleSyncResult{}, err
@@ -121,9 +126,6 @@ func (s *FirewallService) syncRules(
 }
 
 func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provider filter.Provider) error {
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-
 	result, err := s.syncRules(ctx, "", dto.FirewallRuleSyncRequest{
 		Subsystem:      "system",
 		TargetProvider: provider,
@@ -164,11 +166,12 @@ func (s *FirewallService) adoptLegacyHostFirewallRuleOwnership(ctx context.Conte
 	if err != nil {
 		return err
 	}
+	desiredByScope, failures := s.desiredFirewallRulesByScope(ctx, stored, selected)
+	if len(failures) > 0 {
+		return errors.New(failures[0].Error)
+	}
 	for _, scope := range filter.ManagedInputScopes(selected) {
-		desired, err := s.desiredFirewallRulesForScope(ctx, stored, scope)
-		if err != nil {
-			return err
-		}
+		desired := desiredByScope[scope.Key()]
 		if len(desired) == 0 {
 			continue
 		}
@@ -261,6 +264,13 @@ func (s *FirewallService) loadFirewallRuleSyncPlan(
 	seenSnapshots := make(map[string]struct{}, len(scopes))
 	for _, scope := range scopes {
 		snapshot, observeErr := runtime.ObserveMutation(ctx, scope)
+		if errors.Is(observeErr, filter.ErrFamilyUnavailable) {
+			for _, entry := range entriesByScope[scope.Key()] {
+				entry.err = observeErr
+				entry.item.Status, entry.item.Reason = firewallRuleSyncBlocked, observeErr.Error()
+			}
+			continue
+		}
 		if observeErr != nil {
 			return firewallSystemSyncPlan{}, observeErr
 		}
@@ -446,6 +456,8 @@ func (s *FirewallService) syncSystemRules(
 		return nil
 	}, nil)
 	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallVerifyTargetStep"), func(t *task.Task) error {
+		firewallRuleMutationMu.Lock()
+		defer firewallRuleMutationMu.Unlock()
 		verified, verifyErr := s.loadFirewallRuleSyncPlan(t.TaskCtx, clientIP, taskRequest)
 		if verifyErr != nil {
 			return verifyErr
@@ -1089,7 +1101,7 @@ type firewallScopeReconciler struct {
 	ctx            context.Context
 	clientIP       string
 	protectedPorts []firewall.PortWhitelist
-	runtime        *firewallRuleRuntime
+	runtime        *filterruntime.Engine
 	snapshot       filter.Snapshot
 	entries        []*firewallRuleSyncEntry
 }

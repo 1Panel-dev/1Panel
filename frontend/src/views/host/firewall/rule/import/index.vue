@@ -156,7 +156,7 @@ const normalizeImportedRule = (rule: Firewall.Rule): Firewall.Rule[] => {
         ...rule,
         uuid: undefined,
         nativeKind: undefined,
-        priority: undefined,
+        priority: provider.value === 'firewalld' && rule.scope.provider === 'firewalld' ? rule.priority : undefined,
         orderIndex: undefined,
         orderBucket: undefined,
         scope: targetScope(family),
@@ -234,30 +234,30 @@ const onImport = async () => {
     let success = 0;
     let failed = 0;
     try {
-        const plans: Firewall.RuleCheckResult[] = [];
-        for (let offset = 0; offset < selects.value.length; offset += 256) {
-            const batch = selects.value.slice(offset, offset + 256);
-            plans.push(...(await checkFirewallRules({ items: batch.map((rule) => ({ rule })) })).data.items);
-        }
-        const items: Firewall.CreateItem[] = [];
-        for (const plan of plans) {
-            try {
-                const item = importedCreateRequest(plan);
-                if (item) {
-                    items.push(item);
-                } else {
-                    success++;
+        const selected = [...selects.value].sort((left, right) =>
+            JSON.stringify(left.scope).localeCompare(JSON.stringify(right.scope)),
+        );
+        for (let offset = 0; offset < selected.length; offset += 256) {
+            const batch = selected.slice(offset, offset + 256);
+            const plans = (await checkFirewallRules({ items: batch.map((rule) => ({ rule })) })).data.items;
+            const items: Firewall.CreateItem[] = [];
+            for (const plan of plans) {
+                try {
+                    const item = importedCreateRequest(plan);
+                    if (item) {
+                        items.push(item);
+                    } else {
+                        success++;
+                    }
+                } catch {
+                    failed++;
                 }
-            } catch {
-                failed++;
             }
-        }
-        items.sort((left, right) => JSON.stringify(left.rule.scope).localeCompare(JSON.stringify(right.rule.scope)));
-        for (let offset = 0; offset < items.length; offset += 256) {
-            const batch = items.slice(offset, offset + 256);
-            const result = (await createFirewallRules({ items: batch })).data;
-            success += result.succeeded;
-            failed += result.failed + result.skipped;
+            if (items.length > 0) {
+                const result = (await createFirewallRules({ items })).data;
+                success += result.succeeded;
+                failed += result.failed + result.skipped;
+            }
         }
     } catch {
         failed += selects.value.length - success - failed;

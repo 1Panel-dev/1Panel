@@ -2,6 +2,7 @@ package dto
 
 type ForwardRuleSearch struct {
 	PageInfo
+	All      bool   `json:"all,omitempty"`
 	Info     string `json:"info"`
 	Status   string `json:"status"`
 	Strategy string `json:"strategy"`

@@ -7,14 +7,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
-type UFW struct {
-	CmdStr string
-}
+type UFW struct{}
 
 func NewUFW() (*UFW, error) {
-	var ufw UFW
-	ufw.CmdStr = fmt.Sprintf("LANGUAGE=en_US:en %s ufw", cmd.SudoHandleCmd())
-	return &ufw, nil
+	return &UFW{}, nil
 }
 
 func (f *UFW) Name() string {

@@ -23,17 +23,26 @@ type FilterRules struct {
 }
 
 func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
+	return readFilterRulesByChain(chain, RunWithStd)
+}
+
+func readFilterRulesByChain(chain string, run func(string, ...string) (string, error)) ([]FilterRules, error) {
 	var rules []FilterRules
 	if cmd.CheckIllegal(chain) {
 		return rules, buserr.New("ErrCmdIllegal")
 	}
-	stdout, err := RunWithStd(FilterTab, "-nL", chain)
+	stdout, err := run(FilterTab, "-nL", chain)
 	if err != nil {
 		return rules, fmt.Errorf("load filter fules by chain %s failed, %v", chain, err)
 	}
 	lines := strings.Split(stdout, "\n")
 	for i := 0; i < len(lines); i++ {
 		fields := strings.Fields(lines[i])
+		if len(fields) > 2 && strings.Contains(fields[2], ":") {
+			fields = append(fields, "")
+			copy(fields[3:], fields[2:])
+			fields[2] = "--"
+		}
 		if len(fields) < 5 {
 			continue
 		}
@@ -64,7 +73,7 @@ func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
 	case constant.FirewallFamilyIPv4:
 		return loadInitStatus(tab, RunWithStd, true)
 	case constant.FirewallFamilyIPv6:
-		return loadInitStatus(tab, RunIPv6WithStd, false)
+		return loadInitStatus(tab, RunIPv6WithStd, true)
 	default:
 		return false, false, fmt.Errorf("unsupported iptables family %q", family)
 	}
@@ -191,7 +200,7 @@ func loadPort(position string, portStr []string) string {
 }
 
 func loadIP(ipStr string) string {
-	if ipStr == ANYWHERE || ipStr == "0.0.0.0/0" {
+	if ipStr == ANYWHERE || ipStr == "0.0.0.0/0" || ipStr == "::/0" {
 		return ""
 	}
 	return ipStr

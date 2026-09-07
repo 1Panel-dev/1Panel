@@ -41,6 +41,10 @@ func RuleKey(rule FirewallRule) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return normalizedRuleKey(normalized)
+}
+
+func normalizedRuleKey(normalized FirewallRule) (string, error) {
 	identity := ruleIdentity{
 		Scope:              normalized.Scope.Key(),
 		Family:             normalized.Scope.Family,
@@ -71,6 +75,10 @@ func InstanceKey(rule ObservedRule) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	return instanceKeyWithRuleKey(rule, ruleKey)
+}
+
+func instanceKeyWithRuleKey(rule ObservedRule, ruleKey string) (string, error) {
 	locator, err := validatedLocator(rule.Locator, rule.Rule.Scope)
 	if err != nil {
 		return "", err
