@@ -4223,6 +4223,11 @@ const message = {
         editRuleConfirm: '다음 필드가 변경됩니다: {0}. 규칙이 즉시 적용되고 다시 검증됩니다. 계속하시겠습니까?',
     },
     runtime: {
+        importEnv: '환경 변수 가져오기',
+        envImportError: '{0}행: {1}',
+        envInvalidAssignment: '유효한 NAME=value 형식이 필요합니다',
+        envUnclosedQuote: '따옴표가 닫히지 않았습니다',
+        envUnexpectedText: '닫는 따옴표 뒤에 불필요한 텍스트가 있습니다',
         runtime: '실행 환경',
         workDir: '작업 디렉토리',
         localHelper: '로컬 환경 설치 및 오프라인 환경 사용 관련 문제는 다음을 참조하세요 ',

@@ -4383,6 +4383,11 @@ const message = {
         editRuleConfirm: 'Medan berikut akan diubah: {0}. Peraturan akan digunakan dan disahkan serta-merta. Teruskan?',
     },
     runtime: {
+        importEnv: 'Import Pemboleh Ubah Persekitaran',
+        envImportError: 'Baris {0}: {1}',
+        envInvalidAssignment: 'Penetapan NAME=value yang sah diperlukan',
+        envUnclosedQuote: 'Tanda petikan tidak ditutup',
+        envUnexpectedText: 'Teks tidak dijangka selepas tanda petikan penutup',
         runtime: 'Runtime',
         workDir: 'Direktori kerja',
         localHelper:

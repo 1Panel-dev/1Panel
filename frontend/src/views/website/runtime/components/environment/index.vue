@@ -11,7 +11,7 @@
                 <div class="mt-1">=</div>
             </el-col>
             <el-col :span="7">
-                <el-form-item :prop="`environments.${index}.value`" :rules="rules.value">
+                <el-form-item :prop="`environments.${index}.value`">
                     <el-input v-model="env.value" :placeholder="$t('runtime.envValue')" />
                 </el-form-item>
             </el-col>
@@ -23,19 +23,59 @@
                 </el-form-item>
             </el-col>
         </el-row>
-        <el-row :gutter="20">
-            <el-col :span="4">
-                <el-button v-permission @click="addEnv">{{ $t('commons.button.add') }}</el-button>
-            </el-col>
-        </el-row>
+        <div class="flex flex-wrap gap-2">
+            <el-button v-permission @click="addEnv">{{ $t('commons.button.add') }}</el-button>
+            <el-button v-permission icon="Upload" @click="openImport">{{ $t('runtime.importEnv') }}</el-button>
+        </div>
     </div>
+    <el-dialog
+        v-model="importVisible"
+        :title="$t('runtime.importEnv')"
+        width="min(680px, 90vw)"
+        append-to-body
+        destroy-on-close
+        :close-on-click-modal="false"
+        @closed="importText = ''"
+    >
+        <el-input
+            v-model="importText"
+            type="textarea"
+            :rows="8"
+            :aria-label="$t('runtime.environment')"
+            placeholder="KEY=value"
+            spellcheck="false"
+        />
+        <el-alert
+            v-if="parsed.error"
+            class="mt-3"
+            type="error"
+            :closable="false"
+            :title="$t('runtime.envImportError', [parsed.error.line, $t('runtime.' + parsed.error.reason)])"
+        />
+        <el-table v-else-if="parsed.entries.length" :data="parsed.entries" max-height="260" class="mt-3">
+            <el-table-column prop="key" :label="$t('runtime.envKey')" min-width="120" show-overflow-tooltip />
+            <el-table-column prop="value" :label="$t('runtime.envValue')" min-width="180" show-overflow-tooltip />
+        </el-table>
+        <template #footer>
+            <el-button @click="importVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button
+                v-permission
+                type="primary"
+                :disabled="!!parsed.error || !parsed.entries.length"
+                @click="importEnv"
+            >
+                {{ $t('commons.button.confirm') }}
+            </el-button>
+        </template>
+    </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { Runtime } from '@/api/interface/runtime';
+import { mergeEnvironments, parseEnvironment } from '@/utils/runtime-environment';
 
 const props = defineProps({
     environments: {
@@ -49,6 +89,22 @@ const props = defineProps({
 });
 
 const { showHelper } = props;
+
+const importVisible = ref(false);
+const importText = ref('');
+const parsed = computed(() => parseEnvironment(importText.value));
+
+const openImport = () => {
+    importText.value = '';
+    importVisible.value = true;
+};
+
+const importEnv = () => {
+    if (parsed.value.error || !parsed.value.entries.length) return;
+    mergeEnvironments(props.environments, parsed.value.entries);
+    importVisible.value = false;
+    importText.value = '';
+};
 
 const rules = reactive<FormRules>({
     value: [Rules.requiredInput],

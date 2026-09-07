@@ -4074,6 +4074,11 @@ const message = {
         editRuleConfirm: '将修改以下字段：{0}。提交后会立即应用并回读验证，是否继续？',
     },
     runtime: {
+        importEnv: '导入环境变量',
+        envImportError: '第 {0} 行：{1}',
+        envInvalidAssignment: '应为有效的变量名=value',
+        envUnclosedQuote: '引号未闭合',
+        envUnexpectedText: '闭合引号后存在多余内容',
         runtime: '运行环境',
         default: '默认',
         workDir: '工作目录',

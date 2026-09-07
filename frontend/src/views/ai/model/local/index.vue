@@ -40,7 +40,7 @@ type LocalTab = 'ollama' | 'vllm' | 'tensorrt' | 'downloader';
 
 const route = useRoute();
 const router = useRouter();
-const { isFxplay } = useGlobalStore();
+const { isFxplay, isProductPro } = useGlobalStore();
 
 const tabLabels: Record<LocalTab, string> = {
     ollama: 'Ollama',
@@ -66,7 +66,10 @@ const currentTab = computed<LocalTab>(() => {
     if (tab === 'vllm' || tab === 'downloader' || (tab === 'tensorrt' && isFxplay.value)) {
         return tab;
     }
-    return 'ollama';
+    if (tab === 'tensorrt') {
+        return 'ollama';
+    }
+    return isProductPro.value ? 'vllm' : 'ollama';
 });
 
 const currentComponent = computed(() => {

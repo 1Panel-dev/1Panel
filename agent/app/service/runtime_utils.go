@@ -838,21 +838,49 @@ func restartRuntime(runtime *model.Runtime) (err error) {
 }
 
 func getDockerComposeEnvironments(yml []byte) ([]request.Environment, error) {
-	var (
-		composeProject docker.ComposeProject
-		err            error
-	)
-	err = yaml.Unmarshal(yml, &composeProject)
-	if err != nil {
+	var project struct {
+		Services yaml.Node `yaml:"services"`
+	}
+	if err := yaml.Unmarshal(yml, &project); err != nil {
 		return nil, err
 	}
+	services := &project.Services
+	if services.Kind == yaml.AliasNode {
+		services = services.Alias
+	}
+	if services.Kind != 0 && services.Kind != yaml.MappingNode {
+		return nil, fmt.Errorf("unsupported services format")
+	}
 	var res []request.Environment
-	for _, service := range composeProject.Services {
-		for key, value := range service.Environment.Variables {
-			res = append(res, request.Environment{
-				Key:   key,
-				Value: value,
-			})
+	// Keep the file order for both services and environment entries.
+	for i := 1; i < len(services.Content); i += 2 {
+		var service struct {
+			Environment yaml.Node `yaml:"environment"`
+		}
+		if err := services.Content[i].Decode(&service); err != nil {
+			return nil, err
+		}
+		environment := &service.Environment
+		if environment.Kind == yaml.AliasNode {
+			environment = environment.Alias
+		}
+		switch environment.Kind {
+		case yaml.MappingNode:
+			for j := 0; j < len(environment.Content); j += 2 {
+				res = append(res, request.Environment{Key: environment.Content[j].Value, Value: environment.Content[j+1].Value})
+			}
+		case yaml.SequenceNode:
+			for _, item := range environment.Content {
+				var entry string
+				if err := item.Decode(&entry); err != nil {
+					return nil, err
+				}
+				key, value, _ := strings.Cut(entry, "=")
+				res = append(res, request.Environment{Key: key, Value: value})
+			}
+		case 0:
+		default:
+			return nil, fmt.Errorf("unsupported environment format")
 		}
 	}
 	return res, nil

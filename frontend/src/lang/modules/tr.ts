@@ -4387,6 +4387,11 @@ const message = {
         editRuleConfirm: 'Şu alanlar değiştirilecek: {0}. Kural hemen uygulanıp doğrulanacak. Devam edilsin mi?',
     },
     runtime: {
+        importEnv: 'Ortam Değişkenlerini İçe Aktar',
+        envImportError: 'Satır {0}: {1}',
+        envInvalidAssignment: 'Geçerli bir NAME=value ataması bekleniyor',
+        envUnclosedQuote: 'Kapatılmamış tırnak',
+        envUnexpectedText: 'Kapanış tırnağından sonra beklenmeyen metin',
         runtime: 'Çalışma Zamanı',
         default: 'Varsayılan',
         workDir: 'Çalışma dizini',
