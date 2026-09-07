@@ -1,0 +1,483 @@
+package service
+
+import (
+	"errors"
+	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"strings"
+	"time"
+
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+)
+
+// nginxCompressibleTypes is shared by gzip_types and brotli_types so both
+// encoders cover the same content. Already compressed formats (images other
+// than SVG, woff/woff2, archives, media) are deliberately excluded:
+// recompressing them costs CPU and usually grows the payload.
+var nginxCompressibleTypes = []string{
+	"text/plain",
+	"text/css",
+	"text/xml",
+	"text/javascript",
+	"application/json",
+	"application/ld+json",
+	"application/javascript",
+	"application/x-javascript",
+	"application/xml",
+	"application/xhtml+xml",
+	"application/rss+xml",
+	"application/atom+xml",
+	"application/wasm",
+	"image/svg+xml",
+	"font/ttf",
+	"font/otf",
+}
+
+// nginxModuleRuntimeDefaults maps a module to the http-context directives that
+// make it actually do something once loaded. Without these, enabling a module
+// only emits load_module, leaving it loaded but inert.
+//
+// brotli_static is intentionally omitted: nginx does not verify that a .br
+// file is newer than its source, so a stale artifact would be served
+// indefinitely with no error.
+var nginxModuleRuntimeDefaults = map[string][]nginxHTTPDirective{
+	"ngx_brotli": {
+		{Name: "brotli", Params: []string{"on"}},
+		// Brotli level 5 reaches roughly gzip level 9 ratio at a fraction of
+		// the cost. The nginx default of 6 is tuned for static assets and is
+		// too expensive for dynamic responses.
+		{Name: "brotli_comp_level", Params: []string{"5"}},
+		{Name: "brotli_min_length", Params: []string{"1k"}},
+		{Name: "brotli_types", Params: nginxCompressibleTypes},
+	},
+}
+
+// nginxModuleRuntimeLoadOrder keeps managed file names stable and ordered
+// independently of the module load order used for load_module.
+var nginxModuleRuntimeLoadOrder = map[string]int{
+	"ngx_brotli": 100,
+}
+
+func nginxModuleRuntimeOrder(name string) int {
+	if order, ok := nginxModuleRuntimeLoadOrder[name]; ok {
+		return order
+	}
+	return 900
+}
+
+// desiredNginxModuleRuntimeConfigs renders the managed http.d files for every
+// enabled module that has a ready build and known runtime defaults.
+//
+// Values the user changed through the compression settings page are read back
+// from the current managed file, so reconciling after an unrelated module
+// change does not silently reset them to the defaults.
+//
+// A module the user already configured by hand in nginx.conf is skipped
+// entirely. Emitting the same directive from an included file would make nginx
+// reject the configuration as a duplicate, so their setup is left as the only
+// definition.
+func desiredNginxModuleRuntimeConfigs(install model.AppInstall, modules []dto.NginxModule, target dto.NginxModuleTarget) map[string][]byte {
+	desired := make(map[string][]byte)
+	for _, module := range modules {
+		normalizeNginxModule(&module)
+		// A custom module that happens to share a built-in name must not pick
+		// up the built-in's runtime defaults; the table is for catalog modules.
+		if module.Custom {
+			continue
+		}
+		directives, ok := nginxModuleRuntimeDefaults[module.Name]
+		if !ok || !module.Enable {
+			continue
+		}
+		if !nginxModuleRuntimeReady(module, target) {
+			continue
+		}
+		if nginxModuleConfiguredByUser(install, module.Name) {
+			continue
+		}
+		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(module.Name), module.Name)
+		current := readNginxHTTPDirectives(path.Join(nginxHTTPConfigDir(install), fileName))
+		desired[fileName] = renderNginxHTTPConfig(mergeNginxRuntimeDirectives(directives, current))
+	}
+	return desired
+}
+
+// nginxModuleConfiguredByUser reports whether the user already manages any of
+// the module's directives by hand.
+//
+// Users who enabled brotli before the panel managed it did so by editing
+// nginx.conf or a file it includes. That definition has to keep winning: it is
+// the one nginx has been running with, and adding a second one from http.d
+// would break the configuration outright.
+//
+// Any brotli* directive counts, not just the primary one. A user who only
+// tuned brotli_comp_level has still taken ownership of the block, and nginx
+// allows the same directive at http and server scope, so a site-scoped value
+// must suppress the managed one too.
+func nginxModuleConfiguredByUser(install model.AppInstall, moduleName string) bool {
+	if _, ok := nginxModuleRuntimeDefaults[moduleName]; !ok {
+		return false
+	}
+	for _, filePath := range nginxModuleUserConfigPaths(install) {
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			continue
+		}
+		if nginxModuleUserDirectiveRe.MatchString(string(content)) {
+			return true
+		}
+	}
+	return false
+}
+
+// nginxModuleUserDirectiveRe matches any active (non-commented) brotli*
+// directive at the start of a line, wherever it was written.
+var nginxModuleUserDirectiveRe = regexp.MustCompile(`(?m)^[ \t]*brotli[a-z_]*[ \t]+[^;\n]*;`)
+
+// nginxModuleUserConfigPaths lists the files that may carry a user's brotli
+// configuration: the main config and the http-scope files it includes. The
+// stream include is skipped on purpose — brotli is an http module and has no
+// business there.
+func nginxModuleUserConfigPaths(install model.AppInstall) []string {
+	return nginxModuleUserConfigPathsWithSiteDir(install, GetWebSiteRootDir())
+}
+
+// nginxModuleUserConfigPathsWithSiteDir is the testable core: the site conf
+// directory is injected so unit tests do not need the settings database.
+func nginxModuleUserConfigPathsWithSiteDir(install model.AppInstall, siteDir string) []string {
+	paths := []string{nginxMainConfigPath(install)}
+	paths = append(paths, globConfFiles(path.Join(siteDir, "conf.d"))...)
+	paths = append(paths, globConfFiles(path.Join(install.GetPath(), nginxModuleConfDir, "default"))...)
+	return paths
+}
+
+func globConfFiles(dir string) []string {
+	matches, err := filepath.Glob(path.Join(dir, "*.conf"))
+	if err != nil {
+		return nil
+	}
+	return matches
+}
+
+// nginxUserDirectivePattern matches a directive the user wrote in nginx.conf,
+// capturing its indentation so a rewrite can keep the line's shape. Leading
+// whitespace only, so a commented-out line never matches.
+func nginxUserDirectivePattern(name string) *regexp.Regexp {
+	return regexp.MustCompile(`(?m)^([ \t]*)` + regexp.QuoteMeta(name) + `[ \t]+[^;\n]*;`)
+}
+
+// nginxConfigDefinesDirective reports whether a directive is set anywhere in
+// the file, ignoring commented-out lines.
+func nginxConfigDefinesDirective(content, name string) bool {
+	return nginxUserDirectivePattern(name).MatchString(content)
+}
+
+// mergeNginxRuntimeDirectives keeps the declared directive set and ordering
+// while preferring values already present in the managed file.
+func mergeNginxRuntimeDirectives(defaults []nginxHTTPDirective, current map[string][]string) []nginxHTTPDirective {
+	if len(current) == 0 {
+		return defaults
+	}
+	merged := make([]nginxHTTPDirective, 0, len(defaults))
+	for _, directive := range defaults {
+		if params, ok := current[directive.Name]; ok && len(params) > 0 {
+			directive.Params = params
+		}
+		merged = append(merged, directive)
+	}
+	return merged
+}
+
+// nginxBrotliModuleName is the catalog name of the brotli module.
+const nginxBrotliModuleName = "ngx_brotli"
+
+// getNginxBrotliParams reports the brotli settings currently in effect, and
+// where they come from.
+//
+// Brotli is normally served from the managed http.d file instead of
+// nginx.conf, so the directives can be removed together with the module. When
+// the module is disabled the declared defaults are returned, which lets the
+// settings page show what would be applied once it is enabled.
+//
+// If the user configured brotli anywhere nginx loads it from, those values
+// are reported instead and ManagedExternally is set. Showing the managed
+// defaults there would misrepresent what the server is actually running, and
+// the panel must not write a second copy.
+func getNginxBrotliParams() (*response.NginxBrotliRes, error) {
+	install, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	managedExternally := nginxModuleConfiguredByUser(install, nginxBrotliModuleName)
+	var current map[string][]string
+	if managedExternally {
+		current = readNginxUserBrotliDirectives(install)
+	} else {
+		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+		current = readNginxHTTPDirectives(path.Join(nginxHTTPConfigDir(install), fileName))
+	}
+	res := &response.NginxBrotliRes{
+		ManagedExternally: managedExternally,
+		// Without the include, values the panel would write would never reach
+		// nginx, so they are reported as unavailable rather than shown as if
+		// they were in effect.
+		ManagedUnavailable: !managedExternally && !nginxHTTPIncludePresent(install),
+	}
+	for _, directive := range mergeNginxRuntimeDirectives(nginxModuleRuntimeDefaults[nginxBrotliModuleName], current) {
+		res.Params = append(res.Params, response.NginxParam{Name: directive.Name, Params: directive.Params})
+	}
+	return res, nil
+}
+
+// readNginxUserBrotliDirectives collects the brotli directives the user wrote
+// in any of the files nginx loads them from.
+func readNginxUserBrotliDirectives(install model.AppInstall) map[string][]string {
+	directives := make(map[string][]string)
+	for _, filePath := range nginxModuleUserConfigPaths(install) {
+		content, err := os.ReadFile(filePath)
+		if err != nil {
+			continue
+		}
+		for _, name := range dto.BrotliKeys {
+			pattern := regexp.MustCompile(`(?m)^[ \t]*` + regexp.QuoteMeta(name) + `[ \t]+([^;\n]*);`)
+			if match := pattern.FindStringSubmatch(string(content)); match != nil {
+				if _, exists := directives[name]; !exists {
+					directives[name] = strings.Fields(strings.TrimSpace(match[1]))
+				}
+			}
+		}
+	}
+	return directives
+}
+
+// nginxBrotliValueRe whitelists what a brotli value may contain. The values
+// are written into nginx.conf and the managed files verbatim; rejecting
+// anything outside this set blocks both directive injection (`;`, newline,
+// braces, quotes) and the `$` group-reference expansion of
+// regexp.ReplaceAllString, which the in-place rewrite uses.
+var nginxBrotliValueRe = regexp.MustCompile(`^[a-zA-Z0-9._+\-/:* ]+$`)
+
+// validateNginxBrotliValues rejects any value outside the whitelist. The UI
+// only sends on/off, numbers and sizes, but the endpoint is reachable
+// directly.
+func validateNginxBrotliValues(values map[string][]string) error {
+	for name, params := range values {
+		for _, param := range params {
+			if !nginxBrotliValueRe.MatchString(param) {
+				return buserr.WithDetail("ErrInvalidParams", fmt.Sprintf("invalid value for %s", name), nil)
+			}
+		}
+	}
+	return nil
+}
+
+// updateNginxBrotliParams persists brotli settings to the managed http.d file.
+//
+// Writing is refused unless the module is enabled and built: the directives
+// would reference a module that is not loaded and nginx would fail to start.
+func updateNginxBrotliParams(params []dto.NginxParam) error {
+	install, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	modules, err := loadNginxModules(install)
+	if err != nil {
+		return err
+	}
+	values := make(map[string][]string, len(params))
+	for _, param := range params {
+		values[param.Name] = param.Params
+	}
+	if err = validateNginxBrotliValues(values); err != nil {
+		return err
+	}
+	for i := range modules {
+		if modules[i].Name != nginxBrotliModuleName {
+			continue
+		}
+		if !modules[i].Enable {
+			return buserr.New("ErrBrotliDisabled")
+		}
+		// The user configured brotli in nginx.conf before the panel managed
+		// it. Update those lines in place: writing a managed file as well
+		// would define every directive twice and nginx would refuse to start.
+		if nginxModuleConfiguredByUser(install, nginxBrotliModuleName) {
+			return updateUserNginxBrotliParams(install, values)
+		}
+		// A managed write needs the include. Installations missing it are
+		// upgraded in place here; when nginx.conf cannot be edited safely the
+		// write is refused with an actionable error instead of writing values
+		// nginx would never load.
+		if !nginxHTTPIncludePresent(install) {
+			configPath := nginxMainConfigPath(install)
+			content, readErr := os.ReadFile(configPath)
+			if readErr != nil {
+				return readErr
+			}
+			updated, insErr := insertNginxHTTPInclude(string(content))
+			if insErr != nil {
+				return buserr.New("ErrBrotliUnsupported")
+			}
+			if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
+				return err
+			}
+			if err = os.MkdirAll(nginxHTTPConfigDir(install), constant.DirPerm); err != nil {
+				return err
+			}
+			if err = nginxCheckAndReload(string(content), configPath, install.ContainerName); err != nil {
+				return err
+			}
+		}
+		fileName := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+		configDir := nginxHTTPConfigDir(install)
+		snapshot, snapErr := snapshotManagedNginxHTTPConfigs(configDir)
+		if snapErr != nil {
+			return snapErr
+		}
+		merged := mergeNginxRuntimeDirectives(nginxModuleRuntimeDefaults[nginxBrotliModuleName], values)
+		desired := map[string][]byte{fileName: renderNginxHTTPConfig(merged)}
+		for name, content := range snapshot {
+			if name != fileName {
+				desired[name] = content
+			}
+		}
+		if err = applyManagedNginxHTTPConfigs(configDir, desired); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return err
+		}
+		// The directory is bind-mounted read-only and the include is a glob: a
+		// missing mount or an unrecognised include lets nginx -t pass while
+		// loading nothing. Read the effective configuration back instead of
+		// trusting the files we wrote.
+		if err = assertNginxBrotliActive(install.ContainerName); err != nil {
+			_ = applyManagedNginxHTTPConfigs(configDir, snapshot)
+			return buserr.New("ErrBrotliUnsupported")
+		}
+		return nil
+	}
+	return buserr.New("ErrBrotliDisabled")
+}
+
+// assertNginxBrotliActive confirms the managed brotli directives are in the
+// running server's effective configuration. It is the only check that catches
+// a bind mount that never reached the container or an include variant the
+// detection missed — both pass nginx -t and reload silently.
+func assertNginxBrotliActive(containerName string) error {
+	out, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout(
+		"docker", "exec", "-i", containerName, "nginx", "-T")
+	if err != nil {
+		return err
+	}
+	if !nginxModuleUserDirectiveRe.MatchString(out) {
+		return errors.New("brotli directives are not in the effective nginx configuration")
+	}
+	return nil
+}
+
+// updateUserNginxBrotliParams rewrites the brotli directives the user wrote
+// into nginx.conf, in place.
+//
+// Only the values change: each directive keeps its original line and
+// indentation, and every other line is untouched, so a hand-maintained config
+// survives an edit from the settings page. Directives the user did not write
+// are not introduced, since the panel cannot know where they intended them.
+//
+// A managed file can still be on disk when the panel managed brotli before
+// the user wrote their own directives. Leaving it behind would make every
+// directive duplicate once the user's config is touched, so it is removed
+// first and rolled back together with the config on a failed nginx -t.
+func updateUserNginxBrotliParams(install model.AppInstall, values map[string][]string) error {
+	configPath := nginxMainConfigPath(install)
+	content, err := os.ReadFile(configPath)
+	if err != nil {
+		return err
+	}
+	configDir := nginxHTTPConfigDir(install)
+	httpSnapshot, snapErr := snapshotManagedNginxHTTPConfigs(configDir)
+	if snapErr != nil {
+		return snapErr
+	}
+	managedFile := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+	if _, stale := httpSnapshot[managedFile]; stale {
+		remaining := make(map[string][]byte, len(httpSnapshot))
+		for name, fileContent := range httpSnapshot {
+			if name != managedFile {
+				remaining[name] = fileContent
+			}
+		}
+		if err = applyManagedNginxHTTPConfigs(configDir, remaining); err != nil {
+			return err
+		}
+	}
+	restore := func() {
+		_ = writeNginxFileAtomic(configPath, content)
+		_ = applyManagedNginxHTTPConfigs(configDir, httpSnapshot)
+	}
+
+	updated := string(content)
+	for _, name := range dto.BrotliKeys {
+		params, ok := values[name]
+		if !ok || len(params) == 0 {
+			continue
+		}
+		pattern := nginxUserDirectivePattern(name)
+		if !pattern.MatchString(updated) {
+			continue
+		}
+		replacement := "${1}" + name + " " + strings.Join(params, " ") + ";"
+		updated = pattern.ReplaceAllString(updated, replacement)
+	}
+	if updated == string(content) {
+		return nil
+	}
+	if err = writeNginxFileAtomic(configPath, []byte(updated)); err != nil {
+		restore()
+		return err
+	}
+	if err = opNginx(install.ContainerName, constant.NginxCheck); err != nil {
+		restore()
+		return err
+	}
+	if err = opNginx(install.ContainerName, constant.NginxReload); err != nil {
+		restore()
+		return err
+	}
+	return nil
+}
+
+// nginxModuleRuntimeReady reports whether the module is actually usable.
+//
+// Dynamic modules need a ready build for the current target, otherwise the
+// .so is missing and nginx would reject the directives. Static modules are
+// compiled into the binary and carry no artifacts, so an enabled static
+// module is considered ready. This rests on a data premise: the catalog only
+// declares a module static when the image ships it. Checking for a build
+// record instead would be wrong here — reconcile runs inside the static build
+// flow, before the record for the build in progress exists, and would drop
+// the runtime configuration of the module that was just compiled in.
+func nginxModuleRuntimeReady(module dto.NginxModule, target dto.NginxModuleTarget) bool {
+	if module.BuildMode == nginxModuleBuildStatic {
+		return true
+	}
+	build := findCurrentNginxModuleBuild(module, target)
+	if build == nil || build.Status != nginxModuleStatusReady {
+		build = findLatestNginxModuleBuild(module, target)
+	}
+	return build != nil && build.Status == nginxModuleStatusReady
+}

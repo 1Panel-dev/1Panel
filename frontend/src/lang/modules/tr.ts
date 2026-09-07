@@ -3978,6 +3978,14 @@ const message = {
         gzipMinLengthHelper: 'Minimum Sıkıştırılmış Dosya',
         gzipCompLevelHelper: 'Sıkıştırma Oranı',
         gzipHelper: 'İletim için sıkıştırmayı etkinleştir',
+        brotliHelper: 'brotli sıkıştırmayı etkinleştir, genellikle gzip ile karşılaştırıldığında daha küçüktür',
+        brotliCompLevelHelper: 'Brotli sıkıştırma oranı, 0 ile 11 arası',
+        brotliManagedExternallyHelper:
+            'Brotli, nginx.conf dosyasında elle yapılandırıldı; panel yalnızca geçerli değerleri gösterir ve üzerine yazmaz.',
+        brotliManagedUnavailableHelper:
+            'Panel, yönetilen brotli yapılandırmasını nginx.conf dosyasına otomatik olarak ekleyemedi; aşağıdaki değerler etkin olmayacak.',
+        brotliMinLengthHelper: 'brotli ile sıkıştırılacak minimum yanıt boyutu',
+        brotliSaveFailed: 'Brotli ayarları kaydedilemedi; yukarıdaki gzip ayarları uygulandı',
         connections: 'Aktif bağlantılar',
         accepts: 'Kabul edilenler',
         handled: 'İşlenenler',
