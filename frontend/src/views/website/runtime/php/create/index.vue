@@ -33,7 +33,7 @@
                 </el-radio-group>
             </el-form-item>
             <div v-if="runtime.resource === 'appstore'">
-                <el-form-item :label="$t('app.app')" prop="appID">
+                <el-form-item :label="$t('app.app')" prop="appDetailID" :rules="Rules.requiredSelect">
                     <el-row :gutter="20">
                         <el-col :span="12">
                             <el-select
@@ -51,12 +51,7 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12">
-                            <el-select
-                                v-model="runtime.version"
-                                :disabled="mode === 'edit'"
-                                @change="changeVersion()"
-                                class="p-w-200"
-                            >
+                            <el-select v-model="runtime.version" @change="changeVersion()" class="p-w-200">
                                 <el-option
                                     v-for="(version, index) in appVersions"
                                     :key="index"
@@ -390,19 +385,27 @@ const changePHPVersion = (version: string) => {
 const changeVersion = () => {
     loading.value = true;
     initParam.value = false;
+    runtime.appDetailID = undefined;
     extensions.value = undefined;
     getAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
             runtime.appDetailID = res.data.id;
-            runtime.image = res.data.image + ':' + runtime.version;
+            if (mode.value === 'create') {
+                runtime.image = res.data.image + ':' + runtime.version;
+            }
             appParams.value = res.data.params;
             const fileds = res.data.params.formFields;
             formFields.value = {};
             for (const index in fileds) {
                 formFields.value[fileds[index]['envKey']] = fileds[index];
-                runtime.params[fileds[index]['envKey']] = fileds[index]['default'];
+                const key = fileds[index]['envKey'];
+                if (mode.value === 'create' || runtime.params[key] === undefined || key === 'PHP_VERSION') {
+                    runtime.params[key] = fileds[index]['default'];
+                }
                 if (fileds[index]['envKey'] == 'PHP_VERSION') {
-                    runtime.image = '1panel-php-fpm:' + fileds[index]['default'];
+                    if (mode.value === 'create') {
+                        runtime.image = '1panel-php-fpm:' + fileds[index]['default'];
+                    }
                 }
             }
             initParam.value = true;

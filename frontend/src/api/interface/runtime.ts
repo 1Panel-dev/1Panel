@@ -92,7 +92,7 @@ export namespace Runtime {
 
     export interface RuntimeUpdate {
         name: string;
-        appDetailID: number;
+        appDetailID?: number;
         image: string;
         params: object;
         type: string;

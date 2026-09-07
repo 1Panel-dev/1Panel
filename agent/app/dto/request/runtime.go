@@ -66,14 +66,15 @@ type RuntimeDelete struct {
 }
 
 type RuntimeUpdate struct {
-	Name    string `json:"name"`
-	ID      uint   `json:"id"`
-	Image   string `json:"image"`
-	Version string `json:"version"`
-	Rebuild bool   `json:"rebuild"`
-	Source  string `json:"source"`
-	CodeDir string `json:"codeDir"`
-	Remark  string `json:"remark"`
+	AppDetailID uint   `json:"appDetailId"`
+	Name        string `json:"name"`
+	ID          uint   `json:"id"`
+	Image       string `json:"image"`
+	Version     string `json:"version"`
+	Rebuild     bool   `json:"rebuild"`
+	Source      string `json:"source"`
+	CodeDir     string `json:"codeDir"`
+	Remark      string `json:"remark"`
 
 	Params map[string]interface{} `json:"params"`
 	NodeConfig
