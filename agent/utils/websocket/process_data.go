@@ -150,9 +150,12 @@ func getDownloadProcess(progress DownloadProgress) (res []byte, err error) {
 			continue
 		}
 		downloadProcess := &files.Process{}
-		_ = json.Unmarshal([]byte(value), downloadProcess)
+		if err := json.Unmarshal([]byte(value), downloadProcess); err != nil {
+			continue
+		}
+		downloadProcess.Key = k
 		result = append(result, *downloadProcess)
-		if downloadProcess.Percent == 100 {
+		if downloadProcess.Status == "" && downloadProcess.Percent == 100 {
 			global.CACHE.Del(k)
 		}
 	}

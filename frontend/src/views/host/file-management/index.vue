@@ -643,10 +643,13 @@
                                 :label="$t('file.updateTime')"
                                 prop="modTime"
                                 width="180"
-                                :formatter="dateFormat"
                                 show-overflow-tooltip
                                 :sortable="'custom'"
-                            ></el-table-column>
+                            >
+                                <template #default="{ row }">
+                                    {{ row.modTime ? dateFormatSimpleWithSecond(row.modTime) : '-' }}
+                                </template>
+                            </el-table-column>
                             <el-table-column :label="$t('file.remark')" prop="remark" width="180" show-overflow-tooltip>
                                 <template #default="{ row }">
                                     <span>{{ row.remark ? row.remark : '-' }}</span>
@@ -748,7 +751,7 @@ import {
 } from '@/api/modules/files';
 import { computeSize } from '@/utils/size';
 import { copyText } from '@/utils/clipboard';
-import { dateFormat } from '@/utils/date';
+import { dateFormatSimpleWithSecond } from '@/utils/date';
 import { downloadFile, getFileType, getIcon, isConvertible } from '@/utils/file';
 import { getRandomStr } from '@/utils/id';
 import { File } from '@/api/interface/file';

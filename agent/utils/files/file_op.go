@@ -6,12 +6,16 @@ import (
 	"bufio"
 	"compress/gzip"
 	"context"
+	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/binary"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"math"
 	"net"
 	"net/http"
 	"net/url"
@@ -38,6 +42,7 @@ import (
 	"github.com/mholt/archiver/v4"
 	"github.com/spf13/afero"
 	"golang.org/x/sync/singleflight"
+	"golang.org/x/sys/unix"
 )
 
 const (
@@ -347,9 +352,12 @@ func (f FileOp) Rename(oldName string, newName string) error {
 }
 
 type downloadTask struct {
-	resp *http.Response
-	file *os.File
-	dst  string
+	mu         sync.Mutex
+	cancel     context.CancelFunc
+	done       chan struct{}
+	dst        string
+	finished   bool
+	cleanupErr error
 }
 
 var (
@@ -357,18 +365,15 @@ var (
 	downloadTasks = make(map[string]*downloadTask)
 )
 
-type WriteCounter struct {
-	Total   uint64
-	Written uint64
-	Key     string
-	Name    string
-}
-
 type Process struct {
+	Key     string  `json:"key,omitempty"`
 	Total   uint64  `json:"total"`
 	Written uint64  `json:"written"`
 	Percent float64 `json:"percent"`
 	Name    string  `json:"name"`
+	Status  string  `json:"status,omitempty"`
+	Attempt int     `json:"attempt,omitempty"`
+	Error   string  `json:"error,omitempty"`
 }
 
 type DownloadProxyConfig struct {
@@ -382,33 +387,6 @@ type DownloadProxyConfig struct {
 type DownloadOptions struct {
 	IgnoreCertificate bool
 	Proxy             *DownloadProxyConfig
-}
-
-func (w *WriteCounter) Write(p []byte) (n int, err error) {
-	n = len(p)
-	w.Written += uint64(n)
-	w.SaveProcess()
-	return n, nil
-}
-
-func (w *WriteCounter) SaveProcess() {
-	percentValue := 0.0
-	if w.Total > 0 {
-		percent := float64(w.Written) / float64(w.Total) * 100
-		percentValue, _ = strconv.ParseFloat(fmt.Sprintf("%.2f", percent), 64)
-	}
-	process := Process{
-		Total:   w.Total,
-		Written: w.Written,
-		Percent: percentValue,
-		Name:    w.Name,
-	}
-	by, _ := json.Marshal(process)
-	if percentValue < 100 {
-		global.CACHE.Set(w.Key, string(by))
-	} else {
-		global.CACHE.SetWithTTL(w.Key, string(by), time.Second*time.Duration(10))
-	}
 }
 
 func buildDownloadProxyURL(proxy DownloadProxyConfig) (*url.URL, error) {
@@ -446,10 +424,11 @@ func buildDownloadProxyURL(proxy DownloadProxyConfig) (*url.URL, error) {
 }
 
 func newDownloadHTTPClient(options DownloadOptions) (*http.Client, error) {
-	if !options.IgnoreCertificate && options.Proxy == nil {
-		return &http.Client{}, nil
-	}
-	transport := &http.Transport{}
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.DialContext = (&net.Dialer{Timeout: 30 * time.Second, KeepAlive: 30 * time.Second}).DialContext
+	transport.TLSHandshakeTimeout = 15 * time.Second
+	transport.ResponseHeaderTimeout = 30 * time.Second
+	transport.DisableCompression = true
 	if options.IgnoreCertificate {
 		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	}
@@ -463,115 +442,608 @@ func newDownloadHTTPClient(options DownloadOptions) (*http.Client, error) {
 	return &http.Client{Transport: transport}, nil
 }
 
-func (f FileOp) DownloadFileWithProcess(url, dst, key string, options DownloadOptions) error {
+type downloadState struct {
+	written  int64
+	total    int64
+	etag     string
+	finalURL string
+}
+
+type downloadPolicy struct {
+	retries     int
+	retryDelay  time.Duration
+	idleTimeout time.Duration
+}
+
+var remoteDownloadPolicy = downloadPolicy{retries: 3, retryDelay: 2 * time.Second, idleTimeout: 90 * time.Second}
+
+func saveDownloadProcess(process Process) {
+	if process.Total > 0 {
+		process.Percent = math.Min(99.99, float64(process.Written)/float64(process.Total)*100)
+	}
+	ttl := time.Duration(-1)
+	switch process.Status {
+	case "Success":
+		process.Percent = 100
+		ttl = 10 * time.Minute
+	case "Failed", "Canceled":
+		ttl = 10 * time.Minute
+	}
+	by, _ := json.Marshal(process)
+	global.CACHE.SetWithTTL(process.Key, string(by), ttl)
+}
+
+func (f FileOp) DownloadFileWithProcess(rawURL, dst, key string, options DownloadOptions) error {
+	request, err := http.NewRequest(http.MethodGet, rawURL, nil)
+	if err != nil || request.URL.Host == "" || (request.URL.Scheme != "http" && request.URL.Scheme != "https") {
+		return buserr.New("ErrWgetRemoteFailed")
+	}
 	client, err := newDownloadHTTPClient(options)
 	if err != nil {
 		return err
 	}
-	defer client.CloseIdleConnections()
-
-	request, err := http.NewRequest("GET", url, nil)
+	parent, err := filepath.EvalSymlinks(filepath.Dir(dst))
 	if err != nil {
-		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
-	}
-	request.Header.Set("Accept-Encoding", "identity")
-
-	resp, err := client.Do(request)
-	if err != nil {
-		global.LOG.Errorf("get download file [%s] error, err %s", dst, err.Error())
-		return buserr.WithDetail("ErrWgetRemoteFailed", err.Error(), err)
-	}
-
-	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
-		_ = resp.Body.Close()
-		global.LOG.Errorf("wget remote returned non-success status %s for url %s", resp.Status, url)
-		return buserr.WithDetail("ErrWgetRemoteFailed", resp.StatusCode, nil)
-	}
-
-	ct := strings.ToLower(resp.Header.Get("Content-Type"))
-	dstExt := strings.ToLower(filepath.Ext(dst))
-	if (strings.Contains(ct, "text/html") || strings.Contains(ct, "text/xml")) &&
-		dstExt != ".html" && dstExt != ".htm" && dstExt != ".xml" && dstExt != ".svg" {
-		_, _ = io.Copy(io.Discard, io.LimitReader(resp.Body, 64*1024))
-		_ = resp.Body.Close()
-		detail := fmt.Sprintf("Content-Type: %s", ct)
-		global.LOG.Errorf("wget got html/xml response for non-html file %s, url %s, %s", dst, url, detail)
-		return buserr.WithDetail("ErrWgetInvalidContentType", detail, nil)
-	}
-
-	out, err := os.Create(dst)
-	if err != nil {
-		global.LOG.Errorf("create download file [%s] error, err %s", dst, err.Error())
-		resp.Body.Close()
+		client.CloseIdleConnections()
 		return err
 	}
-
-	downloadMu.Lock()
-	downloadTasks[key] = &downloadTask{
-		resp: resp,
-		file: out,
-		dst:  dst,
+	dst, err = filepath.Abs(filepath.Join(parent, filepath.Base(dst)))
+	if err != nil {
+		client.CloseIdleConnections()
+		return err
 	}
+	original, err := os.Lstat(dst)
+	if err != nil && !os.IsNotExist(err) {
+		client.CloseIdleConnections()
+		return err
+	}
+	if original != nil && !original.Mode().IsRegular() {
+		client.CloseIdleConnections()
+		return fmt.Errorf("download target must be a regular file")
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	task := &downloadTask{cancel: cancel, done: make(chan struct{}), dst: dst}
+	downloadMu.Lock()
+	for _, active := range downloadTasks {
+		if active.dst == dst {
+			downloadMu.Unlock()
+			cancel()
+			client.CloseIdleConnections()
+			return buserr.New("TaskIsExecuting")
+		}
+	}
+	if _, exists := downloadTasks[key]; exists {
+		downloadMu.Unlock()
+		cancel()
+		client.CloseIdleConnections()
+		return buserr.New("TaskIsExecuting")
+	}
+	downloadTasks[key] = task
 	downloadMu.Unlock()
+	saveDownloadProcess(Process{Key: key, Name: filepath.Base(dst), Status: "Downloading"})
 
 	go func() {
+		defer client.CloseIdleConnections()
+		defer cancel()
 		defer func() {
-			out.Close()
-			resp.Body.Close()
-
 			downloadMu.Lock()
 			delete(downloadTasks, key)
 			downloadMu.Unlock()
+			close(task.done)
 		}()
-
-		counter := &WriteCounter{}
-		counter.Key = key
-		if resp.ContentLength > 0 {
-			counter.Total = uint64(resp.ContentLength)
+		process := Process{Key: key, Name: filepath.Base(dst), Status: "Downloading"}
+		update := func(state downloadState, status string, attempt int) {
+			process.Written = uint64(state.written)
+			process.Total = uint64(max(0, state.total))
+			process.Status = status
+			process.Attempt = attempt
+			saveDownloadProcess(process)
 		}
-		counter.Name = filepath.Base(dst)
-
-		if _, err := io.Copy(out, io.TeeReader(resp.Body, counter)); err != nil {
-			global.LOG.Errorf("save download file [%s] error, err %s", dst, err.Error())
-			global.CACHE.Del(counter.Key)
-			return
+		part := filepath.Join(filepath.Dir(dst), ".1panel-download-"+rand.Text()+".part")
+		out, runErr := os.OpenFile(part, os.O_RDWR|os.O_CREATE|os.O_EXCL, 0666)
+		var record string
+		var partInfo os.FileInfo
+		if runErr == nil {
+			partInfo, runErr = out.Stat()
 		}
-
-		value := global.CACHE.Get(counter.Key)
-		if value == "" {
-			return
+		if runErr == nil {
+			// Remember umask-derived permissions, but keep incomplete content private.
+			runErr = out.Chmod(0600)
 		}
-		process := &Process{}
-		if err := json.Unmarshal([]byte(value), process); err != nil {
-			return
+		if runErr == nil {
+			record, runErr = recordDownloadPart(out.Name(), partInfo)
 		}
-		process.Percent = 100
-		process.Name = counter.Name
-		process.Total = process.Written
-		by, _ := json.Marshal(process)
-		global.CACHE.Set(counter.Key, string(by))
+		if runErr == nil {
+			runErr = runRemoteDownload(ctx, client, rawURL, dst, out, remoteDownloadPolicy, update)
+		}
+		task.mu.Lock()
+		if ctx.Err() != nil {
+			runErr = ctx.Err()
+		}
+		if runErr == nil {
+			runErr = publishDownload(out, dst, original, partInfo.Mode())
+		}
+		task.finished = true
+		task.mu.Unlock()
+		if out != nil {
+			closeErr := out.Close()
+			if runErr == nil && closeErr != nil && !errors.Is(closeErr, os.ErrClosed) {
+				runErr = closeErr
+			}
+			if cleanupErr := removeDownloadPart(out.Name(), partInfo); cleanupErr != nil {
+				task.cleanupErr = cleanupErr
+				runErr = errors.Join(runErr, cleanupErr)
+			} else if record != "" {
+				if cleanupErr := os.Remove(record); cleanupErr != nil && !os.IsNotExist(cleanupErr) {
+					task.cleanupErr = cleanupErr
+					runErr = errors.Join(runErr, cleanupErr)
+				}
+			}
+		}
+		if runErr != nil {
+			process.Status = "Failed"
+			if errors.Is(runErr, context.Canceled) && task.cleanupErr == nil {
+				process.Status = "Canceled"
+			} else {
+				process.Error = downloadErrorDetail(runErr)
+				global.LOG.Errorf("remote download [%s] failed: %s", key, process.Error)
+			}
+		} else {
+			process.Status = "Success"
+			process.Total = process.Written
+		}
+		saveDownloadProcess(process)
 	}()
 	return nil
 }
 
-func CancelDownload(key string) {
+func CancelDownload(key string) error {
 	downloadMu.Lock()
-	task, ok := downloadTasks[key]
-	if !ok {
-		downloadMu.Unlock()
+	task := downloadTasks[key]
+	downloadMu.Unlock()
+	if task == nil {
+		return nil
+	}
+	task.mu.Lock()
+	if !task.finished {
+		task.cancel()
+	}
+	task.mu.Unlock()
+	<-task.done
+	return task.cleanupErr
+}
+
+func downloadErrorDetail(err error) string {
+	var urlErr *url.Error
+	if errors.As(err, &urlErr) {
+		// Signed URLs and proxy credentials must not appear in progress messages or logs.
+		return urlErr.Err.Error()
+	}
+	return err.Error()
+}
+
+func retryDownloadError(err error) bool {
+	if errors.Is(err, context.Canceled) {
+		return false
+	}
+	var certificateErr *tls.CertificateVerificationError
+	var unknownAuthority x509.UnknownAuthorityError
+	var hostnameErr x509.HostnameError
+	var invalidCert x509.CertificateInvalidError
+	if errors.As(err, &certificateErr) || errors.As(err, &unknownAuthority) ||
+		errors.As(err, &hostnameErr) || errors.As(err, &invalidCert) {
+		return false
+	}
+	var dnsErr *net.DNSError
+	if errors.As(err, &dnsErr) && !dnsErr.IsTimeout && !dnsErr.IsTemporary {
+		return false
+	}
+	var netErr net.Error
+	return errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) ||
+		errors.Is(err, context.DeadlineExceeded) || errors.Is(err, syscall.ECONNRESET) ||
+		errors.Is(err, syscall.ECONNREFUSED) || errors.Is(err, syscall.EPIPE) ||
+		(errors.As(err, &netErr) && (netErr.Timeout() || netErr.Temporary()))
+}
+
+func runRemoteDownload(ctx context.Context, client *http.Client, rawURL, dst string, out *os.File,
+	policy downloadPolicy, update func(downloadState, string, int)) error {
+	state := downloadState{total: -1}
+	for attempt := 0; ; attempt++ {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		update(state, "Downloading", attempt)
+		retry, retryAfter, err := downloadAttempt(ctx, client, rawURL, dst, out, &state, policy.idleTimeout,
+			func() { update(state, "Downloading", attempt) })
+		if err == nil {
+			return nil
+		}
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		if !retry || attempt >= policy.retries {
+			return err
+		}
+		update(state, "Retrying", attempt+1)
+		delay := max(policy.retryDelay*time.Duration(1<<attempt), retryAfter)
+		if delay > 30*time.Second {
+			delay = 30 * time.Second
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return ctx.Err()
+		case <-timer.C:
+		}
+	}
+}
+
+func downloadAttempt(ctx context.Context, client *http.Client, rawURL, dst string, out *os.File,
+	state *downloadState, idleTimeout time.Duration, progress func()) (bool, time.Duration, error) {
+	attemptCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	request, err := http.NewRequestWithContext(attemptCtx, http.MethodGet, rawURL, nil)
+	if err != nil {
+		return false, 0, err
+	}
+	request.Header.Set("Accept-Encoding", "identity")
+	offset := int64(0)
+	if state.written > 0 && state.etag != "" {
+		offset = state.written
+		request.Header.Set("Range", fmt.Sprintf("bytes=%d-", offset))
+		request.Header.Set("If-Range", state.etag)
+	}
+	resp, err := client.Do(request)
+	if err != nil {
+		return retryDownloadError(err), 0, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode == http.StatusRequestedRangeNotSatisfiable && offset > 0 {
+		state.etag = ""
+		return true, 0, fmt.Errorf("remote range is no longer available (HTTP 416)")
+	}
+	switch resp.StatusCode {
+	case 408, 429, 500, 502, 503, 504:
+		delay := time.Duration(0)
+		if seconds, err := strconv.ParseInt(resp.Header.Get("Retry-After"), 10, 32); err == nil && seconds > 0 {
+			delay = time.Duration(seconds) * time.Second
+		} else if date, err := http.ParseTime(resp.Header.Get("Retry-After")); err == nil {
+			delay = max(0, time.Until(date))
+		}
+		return true, delay, fmt.Errorf("remote download returned HTTP %d", resp.StatusCode)
+	}
+	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusPartialContent {
+		return false, 0, fmt.Errorf("remote download returned HTTP %d", resp.StatusCode)
+	}
+	ct := strings.ToLower(resp.Header.Get("Content-Type"))
+	ext := strings.ToLower(filepath.Ext(dst))
+	if (strings.Contains(ct, "text/html") || strings.Contains(ct, "text/xml")) &&
+		ext != ".html" && ext != ".htm" && ext != ".xml" && ext != ".svg" {
+		return false, 0, fmt.Errorf("unexpected download Content-Type: %s", ct)
+	}
+	if encoding := resp.Header.Get("Content-Encoding"); encoding != "" && !strings.EqualFold(encoding, "identity") {
+		return false, 0, fmt.Errorf("unexpected download Content-Encoding: %s", encoding)
+	}
+	responseURL := resp.Request.URL.String()
+	etag := strings.TrimSpace(resp.Header.Get("ETag"))
+	expected := resp.ContentLength
+	if resp.StatusCode == http.StatusPartialContent {
+		start, end, total, valid := parseDownloadRange(resp.Header.Get("Content-Range"))
+		if offset == 0 || !valid || start != offset || end != total-1 ||
+			(state.total >= 0 && state.total != total) || (etag != "" && etag != state.etag) ||
+			responseURL != state.finalURL || (expected >= 0 && expected != end-start+1) {
+			state.etag = ""
+			return true, 0, fmt.Errorf("invalid or changed remote download range")
+		}
+		expected = end - start + 1
+		state.total = total
+	} else {
+		// A full response must replace the partial content, never append to it.
+		if err := out.Truncate(0); err != nil {
+			return false, 0, err
+		}
+		if _, err := out.Seek(0, io.SeekStart); err != nil {
+			return false, 0, err
+		}
+		state.written = 0
+		state.total = expected
+		state.finalURL = responseURL
+		state.etag = ""
+		if len(etag) >= 2 && strings.HasPrefix(etag, "\"") && strings.HasSuffix(etag, "\"") {
+			state.etag = etag
+		}
+	}
+	progress()
+	timer := time.AfterFunc(idleTimeout, cancel)
+	defer timer.Stop()
+	buf := make([]byte, 128*1024)
+	readBytes := int64(0)
+	lastProgress := time.Now()
+	for {
+		n, readErr := resp.Body.Read(buf)
+		if attemptCtx.Err() != nil {
+			if ctx.Err() != nil {
+				return false, 0, ctx.Err()
+			}
+			return true, 0, fmt.Errorf("download read idle timeout")
+		}
+		if n > 0 {
+			timer.Reset(idleTimeout)
+			if expected >= 0 && readBytes+int64(n) > expected {
+				return false, 0, fmt.Errorf("remote body exceeds declared length")
+			}
+			written, writeErr := out.Write(buf[:n])
+			state.written += int64(written)
+			readBytes += int64(written)
+			if writeErr != nil {
+				return false, 0, writeErr
+			}
+			if written != n {
+				return false, 0, io.ErrShortWrite
+			}
+			if time.Since(lastProgress) >= 200*time.Millisecond {
+				progress()
+				lastProgress = time.Now()
+			}
+		}
+		if readErr != nil {
+			progress()
+			if readErr == io.EOF {
+				if expected >= 0 && readBytes != expected {
+					return true, 0, io.ErrUnexpectedEOF
+				}
+				return false, 0, nil
+			}
+			return retryDownloadError(readErr), 0, readErr
+		}
+	}
+}
+
+func parseDownloadRange(value string) (start, end, total int64, valid bool) {
+	if !strings.HasPrefix(value, "bytes ") {
 		return
 	}
-	dst := task.dst
-	downloadMu.Unlock()
-
-	_ = task.file.Close()
-	_ = task.resp.Body.Close()
-
-	if dst != "" {
-		_ = os.Remove(dst)
+	span, size, ok := strings.Cut(strings.TrimPrefix(value, "bytes "), "/")
+	first, last, okSpan := strings.Cut(span, "-")
+	if !ok || !okSpan {
+		return
 	}
-	global.CACHE.Del(key)
+	var err error
+	if start, err = strconv.ParseInt(first, 10, 64); err != nil {
+		return
+	}
+	if end, err = strconv.ParseInt(last, 10, 64); err != nil {
+		return
+	}
+	if total, err = strconv.ParseInt(size, 10, 64); err != nil {
+		return
+	}
+	valid = start >= 0 && end >= start && total > end
+	return
+}
+
+func publishDownload(out *os.File, dst string, original os.FileInfo, createdMode os.FileMode) error {
+	current, err := os.Lstat(dst)
+	if original == nil {
+		if err == nil {
+			return fmt.Errorf("download target was created by another operation")
+		}
+		if !os.IsNotExist(err) {
+			return err
+		}
+		if err := out.Chmod(createdMode); err != nil {
+			return err
+		}
+	} else {
+		if err != nil || !current.Mode().IsRegular() || !os.SameFile(original, current) ||
+			current.Size() != original.Size() || !current.ModTime().Equal(original.ModTime()) ||
+			current.Mode() != original.Mode() {
+			return fmt.Errorf("download target changed during download")
+		}
+		if owner, ok := original.Sys().(*syscall.Stat_t); ok {
+			currentOwner, sameType := current.Sys().(*syscall.Stat_t)
+			if !sameType || currentOwner.Uid != owner.Uid || currentOwner.Gid != owner.Gid {
+				return fmt.Errorf("download target ownership changed during download")
+			}
+			if err := out.Chown(int(owner.Uid), int(owner.Gid)); err != nil {
+				return err
+			}
+		}
+		if err := out.Chmod(original.Mode()); err != nil {
+			return err
+		}
+		if err := preserveDownloadTargetAttrs(dst, out, original); err != nil {
+			return err
+		}
+	}
+	if err := out.Sync(); err != nil {
+		return err
+	}
+	if err := out.Close(); err != nil {
+		return err
+	}
+	if original == nil {
+		// Link is an atomic no-replace publication for a previously absent target.
+		return os.Link(out.Name(), dst)
+	}
+	return os.Rename(out.Name(), dst)
+}
+
+func preserveDownloadTargetAttrs(dst string, out *os.File, original os.FileInfo) error {
+	fd, err := unix.Open(dst, unix.O_RDONLY|unix.O_NOFOLLOW|unix.O_NONBLOCK|unix.O_CLOEXEC, 0)
+	if err != nil {
+		return err
+	}
+	source := os.NewFile(uintptr(fd), dst)
+	defer source.Close()
+	info, err := source.Stat()
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() || !os.SameFile(original, info) {
+		return fmt.Errorf("download target changed while preserving attributes")
+	}
+	names, err := downloadXattrNames(fd)
+	if err != nil {
+		return err
+	}
+	outNames, err := downloadXattrNames(int(out.Fd()))
+	if err != nil {
+		return err
+	}
+	wanted := make(map[string]bool, len(names))
+	for _, name := range names {
+		wanted[name] = true
+	}
+	// Inherited ACLs on the temporary file must not grant access absent from the original.
+	for _, name := range outNames {
+		if !wanted[name] {
+			if err := unix.Fremovexattr(int(out.Fd()), name); err != nil {
+				return err
+			}
+		}
+	}
+	for _, name := range names {
+		size, err := unix.Fgetxattr(fd, name, nil)
+		if err != nil {
+			return err
+		}
+		value := make([]byte, size)
+		n, err := unix.Fgetxattr(fd, name, value)
+		if err != nil {
+			return err
+		}
+		if err := unix.Fsetxattr(int(out.Fd()), name, value[:n], 0); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func downloadXattrNames(fd int) ([]string, error) {
+	size, err := unix.Flistxattr(fd, nil)
+	if errors.Is(err, unix.ENOTSUP) || errors.Is(err, unix.EOPNOTSUPP) {
+		return nil, nil
+	}
+	if err != nil || size == 0 {
+		return nil, err
+	}
+	names := make([]byte, size)
+	n, err := unix.Flistxattr(fd, names)
+	if err != nil {
+		return nil, err
+	}
+	return strings.FieldsFunc(string(names[:n]), func(r rune) bool { return r == 0 }), nil
+}
+
+type downloadPartRecord struct {
+	Path   string
+	Device uint64
+	Inode  uint64
+}
+
+func recordDownloadPart(part string, info os.FileInfo) (string, error) {
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok || global.Dir.TmpDir == "" {
+		return "", fmt.Errorf("download temporary file identity unavailable")
+	}
+	dir := filepath.Join(global.Dir.TmpDir, "remote-downloads")
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return "", err
+	}
+	if err := validateDownloadRecordDir(dir); err != nil {
+		return "", err
+	}
+	record := filepath.Join(dir, filepath.Base(part)+".json")
+	data, err := json.Marshal(downloadPartRecord{Path: part, Device: uint64(stat.Dev), Inode: uint64(stat.Ino)})
+	if err != nil {
+		return "", err
+	}
+	file, err := os.OpenFile(record, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		return "", err
+	}
+	_, writeErr := file.Write(data)
+	syncErr := file.Sync()
+	closeErr := file.Close()
+	return record, errors.Join(writeErr, syncErr, closeErr)
+}
+
+func removeDownloadPart(part string, original os.FileInfo) error {
+	current, err := os.Lstat(part)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if original == nil || !current.Mode().IsRegular() || !os.SameFile(original, current) {
+		return fmt.Errorf("download temporary file changed: %s", part)
+	}
+	return os.Remove(part)
+}
+
+func validateDownloadRecordDir(dir string) error {
+	info, err := os.Lstat(dir)
+	if err != nil {
+		return err
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !info.IsDir() || info.Mode().Perm()&0077 != 0 || !ok || int(stat.Uid) != os.Geteuid() {
+		return fmt.Errorf("download recovery directory must be private and owned by the agent")
+	}
+	return nil
+}
+
+// Run before accepting requests. Only recorded, identity-matched partial files may be removed.
+func CleanupInterruptedDownloads() error {
+	dir := filepath.Join(global.Dir.TmpDir, "remote-downloads")
+	if err := validateDownloadRecordDir(dir); err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	entries, err := os.ReadDir(dir)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	var errs []error
+	for _, entry := range entries {
+		if !entry.Type().IsRegular() || !strings.HasSuffix(entry.Name(), ".part.json") {
+			continue
+		}
+		recordPath := filepath.Join(dir, entry.Name())
+		data, err := os.ReadFile(recordPath)
+		var record downloadPartRecord
+		if err != nil || json.Unmarshal(data, &record) != nil || !filepath.IsAbs(record.Path) ||
+			!strings.HasPrefix(filepath.Base(record.Path), ".1panel-download-") ||
+			filepath.Base(record.Path)+".json" != entry.Name() {
+			errs = append(errs, fmt.Errorf("invalid download recovery record: %s", entry.Name()))
+			continue
+		}
+		info, err := os.Lstat(record.Path)
+		if err == nil {
+			stat, ok := info.Sys().(*syscall.Stat_t)
+			if !ok || !info.Mode().IsRegular() || uint64(stat.Dev) != record.Device || uint64(stat.Ino) != record.Inode {
+				errs = append(errs, fmt.Errorf("download recovery file identity changed: %s", record.Path))
+				continue
+			}
+			err = removeDownloadPart(record.Path, info)
+		}
+		if err != nil && !os.IsNotExist(err) {
+			errs = append(errs, err)
+			continue
+		}
+		if err := os.Remove(recordPath); err != nil {
+			errs = append(errs, err)
+		}
+	}
+	return errors.Join(errs...)
 }
 
 func (f FileOp) DownloadFile(url, dst string) error {
