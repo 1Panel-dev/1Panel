@@ -2147,6 +2147,11 @@ const message = {
             'A sessão não está mais disponível, pressione Enter ou clique em reconectar para abrir uma nova',
         sessionKicked: 'Esta sessão foi aberta em outra janela',
         sessionCount: '{0} sessões',
+        sessionRules: 'Regras da sessão de terminal',
+        sessionRuleClose: 'Fechar o terminal encerra a sessão imediatamente.',
+        sessionRuleDisconnect: 'Recupere em até 30 minutos após atualizar, fechar o navegador ou perder a conexão.',
+        sessionRuleRevalidate: 'A sessão termina se o login for inválido ou a verificação exceder o tempo limite.',
+        sessionRuleResources: 'Mais terminais consomem mais recursos. Feche os que não estiver usando.',
         minimize: 'Minimizar',
         closeAllSessions: 'Fechar todas as sessões',
         closeAllConfirm: 'Todas as sessões de terminal serão desconectadas e não poderão ser recuperadas. Continuar?',
@@ -6989,6 +6994,8 @@ const message = {
             submitSuccess: 'Tarefa de sincronização enviada com sucesso.',
         },
         vm: {
+            countLimitHelper:
+                'A edição Professional permite criar até {0} máquinas virtuais. A edição Enterprise não limita a quantidade.',
             vm: 'Máquina virtual',
             title: 'Gerenciamento de Máquinas Virtuais',
             healthCheck: 'Verificação de integridade',

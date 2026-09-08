@@ -2133,6 +2133,12 @@ const message = {
             "Oturum artık kullanılamıyor, yeni bir oturum açmak için Enter'a basın veya yeniden bağlan'a tıklayın",
         sessionKicked: 'Bu oturum başka bir pencerede açıldı',
         sessionCount: '{0} oturum',
+        sessionRules: 'Terminal oturumu kuralları',
+        sessionRuleClose: 'Terminali kapatmak oturumu hemen sonlandırır.',
+        sessionRuleDisconnect:
+            'Yenileme, tarayıcı kapanması veya bağlantı kaybından sonra 30 dakika içinde kurtarılabilir.',
+        sessionRuleRevalidate: 'Giriş geçersizse veya doğrulama zaman aşımına uğrarsa oturum sona erer.',
+        sessionRuleResources: 'Daha fazla terminal daha fazla kaynak tüketir. Kullanmadığınız terminalleri kapatın.',
         minimize: 'Küçült',
         closeAllSessions: 'Tüm oturumları kapat',
         closeAllConfirm: 'Tüm terminal oturumları kesilecek ve geri alınamayacak. Devam edilsin mi?',
@@ -6956,6 +6962,8 @@ const message = {
             submitSuccess: 'Senkronizasyon görevi başarıyla gönderildi.',
         },
         vm: {
+            countLimitHelper:
+                'Professional sürümü en fazla {0} sanal makine oluşturulmasına izin verir. Enterprise sürümünde sayı sınırı yoktur.',
             vm: 'Sanal Makine',
             title: 'Sanal Makine Yönetimi',
             healthCheck: 'Sağlık kontrolü',

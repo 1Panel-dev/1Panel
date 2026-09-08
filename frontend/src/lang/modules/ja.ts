@@ -2103,6 +2103,11 @@ const message = {
             'セッションは無効になりました。Enter キーまたは再接続をクリックして新しいセッションを開いてください',
         sessionKicked: 'このセッションは別のウィンドウで開かれました',
         sessionCount: '{0} セッション',
+        sessionRules: 'ターミナルセッションのルール',
+        sessionRuleClose: 'ターミナルを閉じると、セッションは即座に終了します。',
+        sessionRuleDisconnect: '再読み込み、ブラウザー終了、通信切断後は30分以内に復元できます。',
+        sessionRuleRevalidate: 'ログインが無効、または認証がタイムアウトするとセッションは終了します。',
+        sessionRuleResources: '端末が増えるほどリソース消費も増えます。不要な端末は閉じてください。',
         minimize: '最小化',
         closeAllSessions: 'すべてのセッションを閉じる',
         closeAllConfirm: 'すべてのターミナルセッションが切断され、復元できません。続行しますか？',
@@ -6837,6 +6842,8 @@ const message = {
             submitSuccess: '同期タスクが送信されました。',
         },
         vm: {
+            countLimitHelper:
+                'Professional 版では最大 {0} 台の仮想マシンを作成できます。Enterprise 版には台数制限がありません。',
             vm: '仮想マシン',
             title: '仮想マシン管理',
             healthCheck: 'ヘルスチェック',

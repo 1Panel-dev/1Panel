@@ -1,11 +1,12 @@
 <template>
-    <div>
+    <div class="terminal-page" :class="{ 'is-mobile': isMobile }">
         <el-tabs
             type="card"
-            class="terminal-tabs card-interval"
+            class="terminal-tabs"
             style="background-color: var(--panel-terminal-tag-bg-color)"
             v-model="terminalValue"
-            :before-leave="beforeLeave"
+            addable
+            @tab-add="showConnections = !showConnections"
             @tab-change="quickCmd = ''"
             @edit="handleTabsRemove"
         >
@@ -17,31 +18,34 @@
                 :name="item.key"
             >
                 <template #label>
-                    <span class="custom-tabs-label">
-                        <span
-                            v-if="item.status === 'online'"
-                            :style="`color: ${
-                                item.latency < 100 ? '#69db7c' : item.latency < 300 ? '#f59f00' : '#d9480f'
-                            }; display: inline-flex; align-items: center`"
-                        >
-                            <span>&nbsp;{{ item.latency }}&nbsp;ms&nbsp;</span>
-                            <el-icon>
-                                <circleCheck />
-                            </el-icon>
+                    <el-tooltip
+                        :content="`${item.title} · ${
+                            item.status === 'online' ? `${item.latency} ms` : $t('commons.button.reconnect')
+                        }`"
+                        placement="top-start"
+                        :show-after="300"
+                    >
+                        <span class="terminal-tab-label">
+                            <span v-if="item.status === 'online'" class="terminal-tab-status" aria-hidden="true">
+                                <span class="terminal-status-dot"></span>
+                            </span>
+                            <el-button
+                                v-else
+                                icon="Refresh"
+                                class="terminal-tab-reconnect"
+                                :aria-label="$t('commons.button.reconnect')"
+                                link
+                                @click.stop="onReconnect(item)"
+                            />
+                            <span class="terminal-tab-title">{{ item.title }}</span>
+                            <span
+                                v-if="item.key === terminalValue && item.status === 'online'"
+                                class="terminal-tab-latency"
+                            >
+                                {{ item.latency }} ms
+                            </span>
                         </span>
-                        <el-button
-                            v-if="item.status === 'closed'"
-                            icon="Refresh"
-                            class="text-white"
-                            size="default"
-                            link
-                            @click="onReconnect(item)"
-                        />
-                        <span v-if="item.title.length <= 20">&nbsp;{{ item.title }}&nbsp;</span>
-                        <el-tooltip v-else :content="item.title" placement="top-start">
-                            <span>&nbsp;{{ item.title.substring(0, 17) }}...&nbsp;</span>
-                        </el-tooltip>
-                    </span>
+                    </el-tooltip>
                 </template>
                 <!-- The Terminal itself is rendered by components/terminal/host.vue and teleported here. -->
                 <div
@@ -99,115 +103,121 @@
                     />
                 </div>
             </el-tab-pane>
-            <el-tab-pane :closable="false" name="newTabs">
-                <template #label>
-                    <el-button v-popover="popoverRef" class="tagButton" icon="Plus"></el-button>
-                    <el-popover
-                        ref="popoverRef"
-                        width="320px"
-                        trigger="hover"
-                        virtual-triggering
-                        persistent
-                        :offset="-4"
-                    >
-                        <div class="p-2 space-y-2">
-                            <div class="flex gap-2">
-                                <button
-                                    v-if="!isNodeAdmin"
-                                    @click="onNewSsh"
-                                    class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+            <template #add-icon>
+                <el-popover
+                    v-model:visible="showConnections"
+                    width="320px"
+                    trigger="click"
+                    placement="bottom-start"
+                    persistent
+                >
+                    <template #reference>
+                        <el-button
+                            class="terminal-action terminal-add"
+                            @click.stop
+                            @keydown.stop
+                            icon="Plus"
+                            text
+                            :aria-label="$t('terminal.createConn')"
+                        />
+                    </template>
+                    <div class="p-2 space-y-2">
+                        <div class="flex gap-2">
+                            <button
+                                v-if="!isNodeAdmin"
+                                @click="onNewSsh"
+                                class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+                            >
+                                <el-icon
+                                    class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
                                 >
-                                    <el-icon
-                                        class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
-                                    >
-                                        <Plus />
-                                    </el-icon>
-                                    <span
-                                        class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
-                                    >
-                                        {{ $t('terminal.createConn') }}
-                                    </span>
-                                </button>
-                                <button
-                                    @click="onNewLocal"
-                                    class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+                                    <Plus />
+                                </el-icon>
+                                <span
+                                    class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
                                 >
-                                    <el-icon
-                                        class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
-                                    >
-                                        <House />
-                                    </el-icon>
-                                    <span
-                                        class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
-                                    >
-                                        {{ $t('terminal.localhost') }}
-                                    </span>
-                                </button>
-                            </div>
-                            <template v-if="!isNodeAdmin">
-                                <el-divider class="my-0" />
+                                    {{ $t('terminal.createConn') }}
+                                </span>
+                            </button>
+                            <button
+                                @click="onNewLocal"
+                                class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
+                            >
+                                <el-icon
+                                    class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
+                                >
+                                    <House />
+                                </el-icon>
+                                <span
+                                    class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
+                                >
+                                    {{ $t('terminal.localhost') }}
+                                </span>
+                            </button>
+                        </div>
+                        <template v-if="!isNodeAdmin">
+                            <el-divider class="my-0" />
 
-                                <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
-                                    <el-input
-                                        v-model="hostFilterInfo"
-                                        class="w-full"
-                                        clearable
-                                        suffix-icon="Search"
-                                        :placeholder="$t('commons.button.search')"
-                                        size="small"
-                                    >
-                                        <template #prefix>
-                                            <el-icon class="el-input__icon"><Search /></el-icon>
-                                        </template>
-                                    </el-input>
-                                </div>
-                                <el-tree
-                                    ref="treeRef"
-                                    :expand-on-click-node="false"
-                                    node-key="id"
-                                    :default-expand-all="true"
-                                    :data="hostTree"
-                                    :props="defaultProps"
-                                    :filter-node-method="filterHost"
-                                    :empty-text="$t('terminal.noHost')"
-                                    class="host-tree"
+                            <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
+                                <el-input
+                                    v-model="hostFilterInfo"
+                                    class="w-full"
+                                    clearable
+                                    suffix-icon="Search"
+                                    :placeholder="$t('commons.button.search')"
+                                    size="small"
                                 >
-                                    <template #default="{ node, data }">
-                                        <span class="custom-tree-node w-full">
-                                            <span
-                                                v-if="node.label === 'Default'"
-                                                class="text-xs font-medium text-[var(--el-text-color-primary)]"
-                                            >
-                                                {{ $t('commons.table.default') }}
+                                    <template #prefix>
+                                        <el-icon class="el-input__icon"><Search /></el-icon>
+                                    </template>
+                                </el-input>
+                            </div>
+                            <el-tree
+                                ref="treeRef"
+                                :expand-on-click-node="false"
+                                node-key="id"
+                                :default-expand-all="true"
+                                :data="hostTree"
+                                :props="defaultProps"
+                                :filter-node-method="filterHost"
+                                :empty-text="$t('terminal.noHost')"
+                                class="host-tree"
+                            >
+                                <template #default="{ node, data }">
+                                    <span class="custom-tree-node w-full">
+                                        <span
+                                            v-if="node.label === 'Default'"
+                                            class="text-xs font-medium text-[var(--el-text-color-primary)]"
+                                        >
+                                            {{ $t('commons.table.default') }}
+                                        </span>
+                                        <div v-else class="w-full min-w-0">
+                                            <span v-if="node.label.length <= 22">
+                                                <a
+                                                    @click="onClickConn(node, data)"
+                                                    class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
+                                                >
+                                                    {{ node.label }}
+                                                </a>
                                             </span>
-                                            <div v-else class="w-full min-w-0">
-                                                <span v-if="node.label.length <= 22">
+                                            <el-tooltip v-else :content="node.label" placement="right">
+                                                <span>
                                                     <a
                                                         @click="onClickConn(node, data)"
                                                         class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
                                                     >
-                                                        {{ node.label }}
+                                                        {{ node.label.substring(0, 30) }}...
                                                     </a>
                                                 </span>
-                                                <el-tooltip v-else :content="node.label" placement="right">
-                                                    <span>
-                                                        <a
-                                                            @click="onClickConn(node, data)"
-                                                            class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
-                                                        >
-                                                            {{ node.label.substring(0, 30) }}...
-                                                        </a>
-                                                    </span>
-                                                </el-tooltip>
-                                            </div>
-                                        </span>
-                                    </template>
-                                </el-tree>
-                            </template>
-                        </div>
-                    </el-popover>
-                </template>
-            </el-tab-pane>
+                                            </el-tooltip>
+                                        </div>
+                                    </span>
+                                </template>
+                            </el-tree>
+                        </template>
+                    </div>
+                </el-popover>
+            </template>
             <div v-if="store.entries.length === 0">
                 <el-empty
                     :style="{ height: `calc(100vh - ${loadEmptyHeight()})`, 'background-color': '#000' }"
@@ -215,15 +225,17 @@
                 ></el-empty>
             </div>
         </el-tabs>
-        <el-tooltip :content="loadTooltip()" placement="top">
-            <el-button
-                @click="toggleFullscreen"
-                v-if="!isMobile"
-                class="bg-transparent border-0 absolute right-[50px] font-semibold text-sm"
-                :style="{ top: loadFullScreenHeight() }"
-                icon="FullScreen"
-            ></el-button>
-        </el-tooltip>
+        <div v-if="!isMobile" class="terminal-actions">
+            <el-tooltip :content="loadTooltip()" placement="top">
+                <el-button
+                    class="terminal-action"
+                    icon="FullScreen"
+                    text
+                    :aria-label="loadTooltip()"
+                    @click="toggleFullscreen"
+                />
+            </el-tooltip>
+        </div>
 
         <HostDialog
             ref="dialogRef"
@@ -276,9 +288,8 @@ let quickCmd = ref();
 let batchVal = ref();
 let isBatch = ref<boolean>(false);
 
-const popoverRef = ref();
-
 const hostFilterInfo = ref('');
+const showConnections = ref(false);
 const hostTree = ref<Array<Host.HostTree>>();
 const treeRef = ref<InstanceType<typeof ElTree>>();
 const defaultProps = {
@@ -379,9 +390,6 @@ const loadHeight = () => {
 const loadEmptyHeight = () => {
     return openMenuTabs.value ? '201px' : '156px';
 };
-const loadFullScreenHeight = () => {
-    return openMenuTabs.value ? '105px' : '60px';
-};
 
 const handleTabsRemove = async (targetName: string, action: 'remove' | 'add') => {
     if (action !== 'remove') {
@@ -454,13 +462,8 @@ function batchInput() {
     batchVal.value = '';
 }
 
-function beforeLeave(activeName: string) {
-    if (activeName === 'newTabs') {
-        return false;
-    }
-}
-
 const onNewSsh = () => {
+    showConnections.value = false;
     if (isNodeAdmin.value) {
         MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
         return;
@@ -477,6 +480,7 @@ const openTab = async (title: string, wsID: number, error: string) => {
 };
 
 const onNewLocal = async () => {
+    showConnections.value = false;
     const res = await testLocalConn();
     if (!res.data) {
         dialogRef.value!.acceptParams({ isLocal: true });
@@ -501,6 +505,7 @@ const onReconnect = async (item: any) => {
 };
 
 const onConnTerminal = async (title: string, wsID: number) => {
+    showConnections.value = false;
     if (isNodeAdmin.value) {
         MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
         return;
@@ -535,9 +540,50 @@ onMounted(() => {
 </script>
 
 <style lang="scss" scoped>
+.terminal-page {
+    --terminal-actions-width: 40px;
+    position: relative;
+    min-width: 0;
+    padding-top: 7px;
+
+    &.is-mobile {
+        --terminal-actions-width: 0px;
+    }
+}
+
+.terminal-actions {
+    position: absolute;
+    top: 7px;
+    right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    width: var(--terminal-actions-width);
+    height: var(--el-tabs-header-height, 40px);
+}
+
+.terminal-action {
+    width: 32px;
+    height: 32px;
+    margin: 0;
+    padding: 0;
+    border-radius: 6px;
+    color: var(--el-text-color-regular);
+
+    &:hover {
+        color: var(--el-color-primary);
+    }
+}
+
+.terminal-add {
+    margin: 0 4px;
+}
+
 .terminal-tabs {
     :deep(.el-tabs__header) {
-        padding: 0;
+        justify-content: flex-start;
+        padding: 0 var(--terminal-actions-width) 0 0;
+        min-height: var(--el-tabs-header-height);
         position: relative;
         margin: 0 0 3px 0;
     }
@@ -551,6 +597,17 @@ onMounted(() => {
     :deep(.el-tabs__item) {
         padding: 0;
     }
+    :deep(.el-tabs__nav-wrap) {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
+    :deep(.el-tabs__new-tab) {
+        width: auto;
+        height: auto;
+        margin: 0;
+        border: 0;
+    }
     :deep(.el-tabs__item.is-active) {
         color: var(--panel-terminal-tag-active-text-color);
         background-color: var(--panel-terminal-tag-active-bg-color);
@@ -561,11 +618,81 @@ onMounted(() => {
     :deep(.el-tabs__item.is-active:hover) {
         color: var(--panel-terminal-tag-active-text-color);
     }
+    :deep(.el-tabs__header .el-tabs__item.is-closable) {
+        padding: 0 12px;
+
+        .is-icon-close {
+            width: 14px;
+            margin-left: 6px;
+            right: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity var(--el-transition-duration);
+        }
+
+        &.is-active,
+        &:hover,
+        &:focus-within {
+            .is-icon-close {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        @media (hover: none), (pointer: coarse) {
+            .is-icon-close {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+    }
 }
 
-.tagButton {
-    border: 0;
-    background-color: var(--el-tabs__item);
+.terminal-tab-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+    max-width: 220px;
+}
+
+.terminal-tab-status,
+.terminal-tab-reconnect {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 14px;
+    height: 14px;
+    padding: 0;
+}
+
+.terminal-status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--el-color-success);
+}
+
+.terminal-tab-reconnect {
+    color: inherit;
+}
+
+.terminal-tab-title {
+    min-width: 0;
+    max-width: 140px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.terminal-tab-latency {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    opacity: 0.7;
 }
 
 .terminal-slot {
@@ -597,9 +724,6 @@ onMounted(() => {
     color: #6b778c;
     font-size: 32px;
     font-weight: 600;
-}
-.el-tabs--top.el-tabs--card > .el-tabs__header .el-tabs__item:last-child {
-    padding-right: 0px;
 }
 .el-input__wrapper {
     border-radius: 50px;

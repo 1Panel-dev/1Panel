@@ -23,7 +23,21 @@
         <!-- minimize keeps sessions alive; X closes them all (with confirm) -->
         <template #header>
             <div class="flex items-center">
-                <span class="el-dialog__title flex-1">{{ $t('menu.terminal') }}</span>
+                <div class="terminal-dock-title flex-1">
+                    <span class="el-dialog__title">{{ $t('menu.terminal') }}</span>
+                    <el-popover placement="bottom-start" :width="380" trigger="hover" :show-after="200">
+                        <template #reference>
+                            <el-icon class="terminal-rules-icon" tabindex="0"><InfoFilled /></el-icon>
+                        </template>
+                        <div class="terminal-rules-title">{{ $t('terminal.sessionRules') }}</div>
+                        <ul class="terminal-rules-list">
+                            <li>{{ $t('terminal.sessionRuleClose') }}</li>
+                            <li>{{ $t('terminal.sessionRuleDisconnect') }}</li>
+                            <li>{{ $t('terminal.sessionRuleRevalidate') }}</li>
+                            <li>{{ $t('terminal.sessionRuleResources') }}</li>
+                        </ul>
+                    </el-popover>
+                </div>
                 <el-tooltip :content="$t('terminal.minimize')" placement="top">
                     <el-button link icon="Minus" @click="open = false" />
                 </el-tooltip>
@@ -35,8 +49,15 @@
 
         <template #content>
             <div class="terminal-dock-toolbar">
-                <el-tabs v-model="active" type="card" closable class="terminal-dock-tabs" @tab-remove="store.remove">
-                    <el-tab-pane v-for="item in store.entries" :key="item.key" :name="item.key">
+                <el-tabs
+                    v-model="active"
+                    type="card"
+                    class="terminal-dock-tabs"
+                    addable
+                    @tab-add="showConnections = !showConnections"
+                    @tab-remove="store.remove"
+                >
+                    <el-tab-pane v-for="item in store.entries" :key="item.key" :name="item.key" closable>
                         <template #label>
                             <span
                                 class="terminal-status-dot"
@@ -45,53 +66,65 @@
                             <span class="terminal-tab-title" :title="item.title">{{ item.title }}</span>
                         </template>
                     </el-tab-pane>
-                </el-tabs>
-
-                <el-popover trigger="click" width="280px" @before-enter="loadHosts">
-                    <template #reference>
-                        <el-button type="primary" plain icon="Plus" size="small">
-                            {{ $t('terminal.createConn') }}
-                        </el-button>
-                    </template>
-                    <el-button link class="w-full" @click="connect(0, $t('terminal.localhost'))">
-                        <el-icon class="mr-1"><House /></el-icon>
-                        {{ $t('terminal.localhost') }}
-                    </el-button>
-                    <template v-if="!isNodeAdmin">
-                        <el-divider class="my-1" />
-                        <el-input
-                            v-model="hostFilter"
-                            size="small"
-                            clearable
-                            :placeholder="$t('commons.button.search')"
-                            class="mb-1"
-                        />
-                        <el-tree
-                            ref="treeRef"
-                            node-key="id"
-                            default-expand-all
-                            :expand-on-click-node="false"
-                            :data="hostTree"
-                            :filter-node-method="filterHost"
-                            :empty-text="$t('terminal.noHost')"
-                            class="terminal-dock-tree"
+                    <template #add-icon>
+                        <el-popover
+                            v-model:visible="showConnections"
+                            trigger="click"
+                            placement="bottom-start"
+                            width="280px"
+                            @before-enter="loadHosts"
                         >
-                            <template #default="{ node, data }">
-                                <span v-if="node.level === 1" class="text-xs font-medium">
-                                    {{ node.label === 'Default' ? $t('commons.table.default') : node.label }}
-                                </span>
-                                <a
-                                    v-else
-                                    class="text-xs hover:text-[var(--el-color-primary)] truncate"
-                                    :title="node.label"
-                                    @click="connect(data.id, node.label)"
-                                >
-                                    {{ node.label }}
-                                </a>
+                            <template #reference>
+                                <el-button
+                                    class="terminal-dock-add"
+                                    @click.stop
+                                    @keydown.stop
+                                    icon="Plus"
+                                    text
+                                    :aria-label="$t('terminal.createConn')"
+                                />
                             </template>
-                        </el-tree>
+                            <el-button link class="w-full" @click="connect(0, $t('terminal.localhost'))">
+                                <el-icon class="mr-1"><House /></el-icon>
+                                {{ $t('terminal.localhost') }}
+                            </el-button>
+                            <template v-if="!isNodeAdmin">
+                                <el-divider class="my-1" />
+                                <el-input
+                                    v-model="hostFilter"
+                                    size="small"
+                                    clearable
+                                    :placeholder="$t('commons.button.search')"
+                                    class="mb-1"
+                                />
+                                <el-tree
+                                    ref="treeRef"
+                                    node-key="id"
+                                    default-expand-all
+                                    :expand-on-click-node="false"
+                                    :data="hostTree"
+                                    :filter-node-method="filterHost"
+                                    :empty-text="$t('terminal.noHost')"
+                                    class="terminal-dock-tree"
+                                >
+                                    <template #default="{ node, data }">
+                                        <span v-if="node.level === 1" class="text-xs font-medium">
+                                            {{ node.label === 'Default' ? $t('commons.table.default') : node.label }}
+                                        </span>
+                                        <a
+                                            v-else
+                                            class="text-xs hover:text-[var(--el-color-primary)] truncate"
+                                            :title="node.label"
+                                            @click="connect(data.id, node.label)"
+                                        >
+                                            {{ node.label }}
+                                        </a>
+                                    </template>
+                                </el-tree>
+                            </template>
+                        </el-popover>
                     </template>
-                </el-popover>
+                </el-tabs>
             </div>
 
             <div v-if="store.entries.length === 0" class="terminal-dock-empty">
@@ -128,6 +161,7 @@ const onTerminalPage = computed(() => route.path.startsWith('/terminal'));
 
 const open = ref(false);
 const active = ref('');
+const showConnections = ref(false);
 let timer: ReturnType<typeof setInterval> | null = null;
 
 const show = async () => {
@@ -141,6 +175,7 @@ const show = async () => {
 
 // park releases every slot so the Terminals go back to the off-screen host.
 const park = () => {
+    showConnections.value = false;
     if (timer) clearInterval(timer);
     timer = null;
     claim();
@@ -184,6 +219,7 @@ watch(hostFilter, (v) => treeRef.value?.filter(v));
 const filterHost = (value: string, data: any) => !value || data.label.toLowerCase().includes(value.toLowerCase());
 
 const connect = async (wsID: number, title: string) => {
+    showConnections.value = false;
     if (wsID === 0) {
         const res = await testLocalConn();
         if (!res.data) {
@@ -265,6 +301,42 @@ watch(onTerminalPage, (v) => {
     letter-spacing: 2px;
 }
 
+.terminal-dock-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.terminal-rules-icon {
+    color: var(--el-text-color-secondary);
+    font-size: 15px;
+    cursor: help;
+
+    &:hover,
+    &:focus {
+        color: var(--el-color-primary);
+        outline: none;
+    }
+}
+
+.terminal-rules-title {
+    margin-bottom: 6px;
+    color: var(--el-text-color-primary);
+    font-weight: 500;
+}
+
+.terminal-rules-list {
+    margin: 0;
+    padding-left: 18px;
+    color: var(--el-text-color-regular);
+    line-height: 1.7;
+
+    li + li {
+        margin-top: 4px;
+    }
+}
+
 .terminal-dock-toolbar {
     display: flex;
     align-items: center;
@@ -277,6 +349,7 @@ watch(onTerminalPage, (v) => {
     flex: 1;
 
     :deep(.el-tabs__header) {
+        justify-content: flex-start;
         margin-bottom: 0;
     }
 
@@ -284,6 +357,31 @@ watch(onTerminalPage, (v) => {
         max-width: 220px;
         height: 34px;
         padding: 0 12px;
+    }
+
+    :deep(.el-tabs__nav-wrap) {
+        flex: 0 1 auto;
+        min-width: 0;
+    }
+
+    :deep(.el-tabs__new-tab) {
+        width: auto;
+        height: auto;
+        margin: 0;
+        border: 0;
+    }
+}
+
+.terminal-dock-add {
+    width: 32px;
+    height: 32px;
+    margin: 0 4px;
+    padding: 0;
+    border-radius: 6px;
+    color: var(--el-text-color-regular);
+
+    &:hover {
+        color: var(--el-color-primary);
     }
 }
 

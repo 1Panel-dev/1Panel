@@ -37,7 +37,7 @@ const (
 	CloseCodeSessionNotFound = 4404
 	// CloseCodeAttachedElsewhere: a newer websocket took over the session.
 	CloseCodeAttachedElsewhere = 4409
-	CloseCodeRevalidate = 4410
+	CloseCodeRevalidate        = 4410
 )
 
 var errSessionClosed = errors.New("terminal session is closed")
@@ -169,13 +169,9 @@ func Open(client *gossh.Client, opts SessionOptions) (*Session, error) {
 	if err := validateSessionOptions(opts); err != nil {
 		return nil, err
 	}
-	if err := reserveSessionSlot(opts.Identity); err != nil {
-		return nil, err
-	}
 	ring := newRingBuffer()
 	backend, err := newSSHBackend(client, opts.Cols, opts.Rows, opts.InitCmd, ring)
 	if err != nil {
-		releaseSessionSlot(opts.Identity)
 		return nil, err
 	}
 	return openBackend(backend, ring, opts), nil
@@ -187,9 +183,6 @@ func OpenCommand(command *LocalCommand, opts SessionOptions) (*Session, error) {
 	}
 	if command == nil {
 		return nil, errors.New("nil terminal command")
-	}
-	if err := reserveSessionSlot(opts.Identity); err != nil {
-		return nil, err
 	}
 	ring := newRingBuffer()
 	return openBackend(newCommandBackend(command, ring), ring, opts), nil
@@ -216,7 +209,7 @@ func openBackend(backend sessionBackend, ring *ringBuffer, opts SessionOptions) 
 		done:          make(chan struct{}),
 	}
 	s.closeFn = sync.OnceFunc(s.doClose)
-	registerReservedSession(s)
+	registerSession(s)
 	go s.pump()
 	go s.keepaliveLoop()
 	go s.waitBackend()

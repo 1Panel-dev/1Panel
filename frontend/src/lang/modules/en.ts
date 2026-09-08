@@ -2112,6 +2112,11 @@ const message = {
         sessionExpired: 'Session is no longer available, press Enter or click reconnect to open a new one',
         sessionKicked: 'This session was opened in another window',
         sessionCount: '{0} sessions',
+        sessionRules: 'Terminal session rules',
+        sessionRuleClose: 'Closing a terminal ends its session immediately.',
+        sessionRuleDisconnect: 'Recover within 30 minutes after a refresh, browser closure, or network loss.',
+        sessionRuleRevalidate: 'Sessions end if login is invalid or verification times out.',
+        sessionRuleResources: 'More terminals use more resources. Close terminals you no longer need.',
         minimize: 'Minimize',
         closeAllSessions: 'Close all sessions',
         closeAllConfirm: 'All terminal sessions will be disconnected and cannot be recovered. Continue?',
@@ -6846,6 +6851,8 @@ const message = {
             submitSuccess: 'Sync task submitted.',
         },
         vm: {
+            countLimitHelper:
+                'The Professional edition supports up to {0} virtual machines. Enterprise has no VM count limit.',
             vm: 'VM',
             title: 'Virtual Machines',
             healthCheck: 'Health Check',

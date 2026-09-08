@@ -2139,6 +2139,13 @@ const message = {
         sessionExpired: 'Sesi tidak lagi tersedia, tekan Enter atau klik sambung semula untuk membuka sesi baharu',
         sessionKicked: 'Sesi ini telah dibuka di tetingkap lain',
         sessionCount: '{0} sesi',
+        sessionRules: 'Peraturan sesi terminal',
+        sessionRuleClose: 'Menutup terminal menamatkan sesi serta-merta.',
+        sessionRuleDisconnect:
+            'Boleh dipulihkan dalam 30 minit selepas muat semula, pelayar ditutup atau rangkaian terputus.',
+        sessionRuleRevalidate: 'Sesi tamat jika log masuk tidak sah atau pengesahan melebihi had masa.',
+        sessionRuleResources:
+            'Lebih banyak terminal menggunakan lebih banyak sumber. Tutup terminal yang tidak lagi diperlukan.',
         minimize: 'Minimumkan',
         closeAllSessions: 'Tutup semua sesi',
         closeAllConfirm: 'Semua sesi terminal akan diputuskan dan tidak boleh dipulihkan. Teruskan?',
@@ -6949,6 +6956,8 @@ const message = {
             submitSuccess: 'Tugas penyegerakan berjaya dihantar.',
         },
         vm: {
+            countLimitHelper:
+                'Edisi Professional membenarkan penciptaan sehingga {0} mesin maya. Edisi Enterprise tidak mengehadkan bilangannya.',
             vm: 'Mesin Maya',
             title: 'Pengurusan Mesin Maya',
             healthCheck: 'Pemeriksaan kesihatan',
