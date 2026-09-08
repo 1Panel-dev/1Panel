@@ -16,7 +16,7 @@ import (
 )
 
 const (
-	coreKeyPrefix      = "core:v1:"
+	agentKeyPrefix     = "agent:v1:"
 	secretSchemaV1     = 1
 	maxSecretLength    = 256 * 1024
 	maxSecretHeaders   = 64
@@ -33,10 +33,10 @@ func ExportSecretPlain(config model.AlertConfig) (string, error) {
 	if config.Type != constant.Custom {
 		return "", fmt.Errorf("alert config %d is not a custom webhook", config.ID)
 	}
-	if !strings.HasPrefix(config.SecretConfig, coreKeyPrefix) {
-		return "", fmt.Errorf("custom webhook secret is not encrypted with the core key")
+	if !strings.HasPrefix(config.SecretConfig, agentKeyPrefix) {
+		return "", fmt.Errorf("custom webhook secret is not encrypted with the agent key")
 	}
-	payload := strings.TrimPrefix(config.SecretConfig, coreKeyPrefix)
+	payload := strings.TrimPrefix(config.SecretConfig, agentKeyPrefix)
 	if payload == "" {
 		return "", fmt.Errorf("custom webhook secret ciphertext is empty")
 	}
@@ -59,19 +59,20 @@ func ExportSecretPlain(config model.AlertConfig) (string, error) {
 	return string(canonical), nil
 }
 
+// Read the source Agent key, never the Core configuration or Core database key.
 func loadEncryptKey() (string, error) {
-	if key := strings.TrimSpace(global.CONF.Base.EncryptKey); key != "" {
-		return key, nil
+	if global.AgentDB == nil {
+		return "", fmt.Errorf("source Agent database is unavailable")
 	}
-	if global.DB != nil {
-		var setting model.Setting
-		if err := global.DB.Where("key = ?", "EncryptKey").First(&setting).Error; err == nil {
-			if key := strings.TrimSpace(setting.Value); key != "" {
-				return key, nil
-			}
-		}
+	var setting model.Setting
+	if err := global.AgentDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
+		return "", fmt.Errorf("read source Agent encrypt key: %w", err)
 	}
-	return "", fmt.Errorf("custom webhook core encrypt key is empty")
+	key := strings.TrimSpace(setting.Value)
+	if key == "" {
+		return "", fmt.Errorf("source Agent encrypt key is empty")
+	}
+	return key, nil
 }
 
 func decodeAndValidateSecret(plainText string) (secretConfig, error) {

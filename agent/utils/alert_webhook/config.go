@@ -22,7 +22,6 @@ const (
 	MaskedSecret               = "******"
 	DefaultGenericJSONTemplate = `{"schema_version":"1","title":"{{title}}","message":"{{message}}","type":"{{type}}","node_name":"{{nodeName}}","timestamp":"{{timestamp}}"}`
 
-	coreKeyPrefix  = "core:v1:"
 	agentKeyPrefix = "agent:v1:"
 
 	maxDisplayNameRunes = 64
@@ -864,17 +863,6 @@ func decryptSecret(cipherText string) (dto.AlertCustomWebhookSecretConfig, error
 }
 
 func encryptSecretPlain(plainText string) (string, error) {
-	coreKey, coreAvailable, err := loadCoreEncryptKey()
-	if err != nil {
-		return "", err
-	}
-	if coreAvailable {
-		cipherText, err := encrypt.StringEncryptWithKey(plainText, coreKey)
-		if err != nil {
-			return "", fmt.Errorf("encrypt custom webhook secret with core key: %w", err)
-		}
-		return coreKeyPrefix + cipherText, nil
-	}
 	key, err := loadAgentEncryptKey()
 	if err != nil {
 		return "", err
@@ -887,61 +875,22 @@ func encryptSecretPlain(plainText string) (string, error) {
 }
 
 func decryptSecretPlain(cipherText string) (string, error) {
-	if strings.TrimSpace(cipherText) == "" {
-		return "", fmt.Errorf("custom webhook secret is empty")
+	if !strings.HasPrefix(cipherText, agentKeyPrefix) {
+		return "", fmt.Errorf("unsupported custom webhook secret format")
 	}
-	var (
-		payload string
-		key     string
-		err     error
-	)
-	switch {
-	case strings.HasPrefix(cipherText, coreKeyPrefix):
-		payload = strings.TrimPrefix(cipherText, coreKeyPrefix)
-		var available bool
-		key, available, err = loadCoreEncryptKey()
-		if err != nil {
-			return "", err
-		}
-		if !available {
-			return "", fmt.Errorf("decrypt custom webhook secret: core encrypt key is unavailable")
-		}
-	case strings.HasPrefix(cipherText, agentKeyPrefix):
-		payload = strings.TrimPrefix(cipherText, agentKeyPrefix)
-		key, err = loadAgentEncryptKey()
-		if err != nil {
-			return "", err
-		}
-	default:
-		payload = cipherText
-		key, err = loadAgentEncryptKey()
-		if err != nil {
-			return "", err
-		}
-	}
+	payload := strings.TrimPrefix(cipherText, agentKeyPrefix)
 	if payload == "" {
 		return "", fmt.Errorf("decrypt custom webhook secret: ciphertext is empty")
+	}
+	key, err := loadAgentEncryptKey()
+	if err != nil {
+		return "", err
 	}
 	plainText, err := encrypt.StringDecryptWithKey(payload, key)
 	if err != nil {
 		return "", fmt.Errorf("decrypt custom webhook secret: %w", err)
 	}
 	return plainText, nil
-}
-
-func loadCoreEncryptKey() (string, bool, error) {
-	if global.CoreDB == nil {
-		return "", false, nil
-	}
-	var setting model.Setting
-	if err := global.CoreDB.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
-		return "", true, fmt.Errorf("custom webhook core encrypt key is unavailable")
-	}
-	key := strings.TrimSpace(setting.Value)
-	if key == "" {
-		return "", true, fmt.Errorf("custom webhook core encrypt key is empty")
-	}
-	return key, true, nil
 }
 
 func loadAgentEncryptKey() (string, error) {
