@@ -67,12 +67,12 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 			if err != nil {
 				return err
 			}
-			normalizeContainerEndpointSettings(ctx, client, networkConf, nil)
+			if err := normalizeContainerEndpointSettings(ctx, client, networkConf, nil); err != nil {
+				return err
+			}
 
 			cleanupErr, err := switchContainer(ctx, client, req.Name, oldContainer, func() (container.CreateResponse, error) {
-				return createContainerWithDynamicIPFallback(func() (container.CreateResponse, error) {
-					return client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
-				}, networkConf.EndpointsConfig, oldContainer.NetworkSettings)
+				return client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 			}, config.Tty, t)
 			if err != nil {
 				return fmt.Errorf("update container failed, err: %v", err)
@@ -138,8 +138,14 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				config.Image = req.Image
 				hostConf := cloneContainerHostConfig(oldContainer.HostConfig)
 				preserveContainerVolumeMounts(hostConf, oldContainer.Mounts)
+				networkConf, extraNetworks := buildContainerRecoverNetworkConfig(oldContainer.NetworkSettings, hostConf)
+				if err := normalizeContainerEndpointSettings(ctx, client, networkConf, extraNetworks); err != nil {
+					upgradeErr := fmt.Errorf("prepare networks for container %s failed: %w", item, err)
+					upgradeErrors = append(upgradeErrors, upgradeErr)
+					return upgradeErr
+				}
 				cleanupErr, err := switchContainer(ctx, client, item, oldContainer, func() (container.CreateResponse, error) {
-					return createContainerWithOldNetworks(ctx, client, config, hostConf, oldContainer.NetworkSettings, item)
+					return createContainerWithNetworks(ctx, client, config, hostConf, networkConf, extraNetworks, item)
 				}, config.Tty, t)
 				if err != nil {
 					upgradeErr := fmt.Errorf("upgrade container %s failed: %w", item, err)
@@ -242,9 +248,8 @@ func (l *containerOperationMutex) lock(names ...string) func() {
 }
 
 type containerNetworkAttachment struct {
-	name      string
-	endpoint  *network.EndpointSettings
-	isDynamic bool
+	name     string
+	endpoint *network.EndpointSettings
 }
 
 type containerSwitchLogger interface {
@@ -604,9 +609,8 @@ func disconnectOriginalContainerNetworks(ctx context.Context, cli containerSwitc
 			return disconnected, fmt.Errorf("disconnect original container from network %s failed: %w", name, err)
 		}
 		disconnected = append(disconnected, containerNetworkAttachment{
-			name:      name,
-			endpoint:  endpoints[name],
-			isDynamic: isDynamicContainerNetwork(oldContainer.NetworkSettings, name),
+			name:     name,
+			endpoint: endpoints[name],
 		})
 	}
 	return disconnected, nil
@@ -616,10 +620,6 @@ func reconnectOriginalContainerNetworks(ctx context.Context, cli containerSwitch
 	var reconnectErr error
 	for _, attachment := range attachments {
 		err := cli.NetworkConnect(ctx, attachment.name, containerID, attachment.endpoint)
-		if err != nil && attachment.isDynamic && strings.Contains(err.Error(), unsupportedUserSpecifiedIPAddress) {
-			attachment.endpoint.IPAMConfig = nil
-			err = cli.NetworkConnect(ctx, attachment.name, containerID, attachment.endpoint)
-		}
 		if err != nil {
 			reconnectErr = errors.Join(reconnectErr, fmt.Errorf("reconnect original container to network %s failed: %w", attachment.name, err))
 		}
@@ -652,7 +652,7 @@ func restoreOriginalContainer(ctx context.Context, cli containerSwitchClient, ol
 	reconnectErr := reconnectOriginalContainerNetworks(ctx, cli, oldContainerID, disconnectedNetworks)
 	logContainerSwitchStep(logger, "ContainerRollbackReconnectOld", currentName, reconnectErr)
 	rollbackErr = errors.Join(rollbackErr, reconnectErr)
-	if wasRunning {
+	if wasRunning && reconnectErr == nil {
 		restartErr := restartOriginalContainer(ctx, cli, oldContainerID)
 		logContainerSwitchStep(logger, "ContainerRollbackRestartOld", currentName, restartErr)
 		rollbackErr = errors.Join(rollbackErr, restartErr)
@@ -660,17 +660,8 @@ func restoreOriginalContainer(ctx context.Context, cli containerSwitchClient, ol
 	return rollbackErr
 }
 
-func createContainerWithOldNetworks(ctx context.Context, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkSettings *container.NetworkSettings, name string) (container.CreateResponse, error) {
-	networkConf, extraNetworks := buildContainerRecoverNetworkConfig(networkSettings, hostConf)
-	normalizeContainerEndpointSettings(ctx, client, networkConf, extraNetworks)
-	var primaryEndpoints map[string]*network.EndpointSettings
-	if networkConf != nil {
-		primaryEndpoints = networkConf.EndpointsConfig
-	}
-
-	created, err := createContainerWithDynamicIPFallback(func() (container.CreateResponse, error) {
-		return client.ContainerCreate(ctx, config, hostConf, networkConf, nil, name)
-	}, primaryEndpoints, networkSettings)
+func createContainerWithNetworks(ctx context.Context, client *client.Client, config *container.Config, hostConf *container.HostConfig, networkConf *network.NetworkingConfig, extraNetworks map[string]*network.EndpointSettings, name string) (container.CreateResponse, error) {
+	created, err := client.ContainerCreate(ctx, config, hostConf, networkConf, nil, name)
 	if err != nil {
 		return created, err
 	}
@@ -682,26 +673,10 @@ func createContainerWithOldNetworks(ctx context.Context, client *client.Client, 
 	sort.Strings(extraNames)
 	for _, item := range extraNames {
 		err := client.NetworkConnect(ctx, item, created.ID, extraNetworks[item])
-		if clearUnsupportedDynamicEndpointIPAM(err, map[string]*network.EndpointSettings{item: extraNetworks[item]}, networkSettings) {
-			err = client.NetworkConnect(ctx, item, created.ID, extraNetworks[item])
-		}
 		if err != nil {
 			_ = client.ContainerRemove(ctx, created.ID, container.RemoveOptions{Force: true})
 			return created, err
 		}
 	}
 	return created, nil
-}
-
-func createContainerWithDynamicIPFallback(
-	create func() (container.CreateResponse, error),
-	endpoints map[string]*network.EndpointSettings,
-	networkSettings *container.NetworkSettings,
-) (container.CreateResponse, error) {
-	for {
-		created, err := create()
-		if err == nil || created.ID != "" || !clearUnsupportedDynamicEndpointIPAM(err, endpoints, networkSettings) {
-			return created, err
-		}
-	}
 }

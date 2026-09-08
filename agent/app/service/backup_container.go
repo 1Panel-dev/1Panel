@@ -582,6 +582,10 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 	if config.Image == "" {
 		return fmt.Errorf("container image not found in backup file")
 	}
+	networkConf, extraNetworks := buildContainerRecoverNetworkConfig(recoverCtx.inspectInfo.NetworkSettings, hostConfig)
+	if err := normalizeContainerEndpointSettings(ctx, recoverCtx.client, networkConf, extraNetworks); err != nil {
+		return err
+	}
 	if !checkImageExist(recoverCtx.client, config.Image) {
 		if err := pullImages(taskItem, recoverCtx.client, config.Image); err != nil {
 			return err
@@ -596,7 +600,7 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 		return err
 	}
 
-	createRes, err := createContainerWithOldNetworks(ctx, recoverCtx.client, config, hostConfig, recoverCtx.inspectInfo.NetworkSettings, recoverCtx.targetName)
+	createRes, err := createContainerWithNetworks(ctx, recoverCtx.client, config, hostConfig, networkConf, extraNetworks, recoverCtx.targetName)
 	if err != nil {
 		return err
 	}
@@ -604,7 +608,7 @@ func stepRecreateContainer(recoverCtx *containerRecoverContext, taskItem *task.T
 	return nil
 }
 
-func normalizeContainerEndpointSettings(ctx context.Context, cli *client.Client, primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) {
+func normalizeContainerEndpointSettings(ctx context.Context, cli *client.Client, primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) error {
 	if cli.NewVersionError(ctx, "1.44", "specify mac-address per network") != nil {
 		removeEndpointMacAddresses(primary, extras)
 	}
@@ -619,11 +623,14 @@ func normalizeContainerEndpointSettings(ctx context.Context, cli *client.Client,
 			}
 			info, err := cli.NetworkInspect(ctx, netName, network.InspectOptions{})
 			if err != nil {
-				continue
+				return fmt.Errorf("inspect network %s failed: %w", netName, err)
 			}
-			removeUnsupportedEndpointStaticIP(netName, info, endpoint)
+			if err := validateContainerEndpointStaticIP(netName, info, endpoint); err != nil {
+				return err
+			}
 		}
 	}
+	return nil
 }
 
 func removeEndpointMacAddresses(primary *network.NetworkingConfig, extras map[string]*network.EndpointSettings) {
@@ -641,24 +648,28 @@ func removeEndpointMacAddresses(primary *network.NetworkingConfig, extras map[st
 	}
 }
 
-func removeUnsupportedEndpointStaticIP(netName string, info network.Inspect, endpoint *network.EndpointSettings) {
+func validateContainerEndpointStaticIP(netName string, info network.Inspect, endpoint *network.EndpointSettings) error {
 	if endpoint == nil || endpoint.IPAMConfig == nil {
-		return
+		return nil
 	}
-	if isDefaultBridgeNetwork(netName, info) {
-		endpoint.IPAMConfig = nil
-		return
+	ipam := endpoint.IPAMConfig
+	if err := ipam.Validate(); err != nil {
+		return fmt.Errorf("invalid IP configuration for network %s: %w", netName, err)
+	}
+	if ipam.IPv4Address == "" && ipam.IPv6Address == "" {
+		return nil
+	}
+	if netName == "host" || netName == "none" || isDefaultBridgeNetwork(netName, info) {
+		return fmt.Errorf("network %s does not support static IP configuration", netName)
 	}
 
-	if endpoint.IPAMConfig.IPv4Address != "" && !networkSupportsStaticIP(info, endpoint.IPAMConfig.IPv4Address, false) {
-		endpoint.IPAMConfig.IPv4Address = ""
+	if ipam.IPv4Address != "" && !networkSupportsStaticIP(info, ipam.IPv4Address, false) {
+		return fmt.Errorf("static IPv4 address %s is not in a configured subnet of network %s", ipam.IPv4Address, netName)
 	}
-	if endpoint.IPAMConfig.IPv6Address != "" && !networkSupportsStaticIP(info, endpoint.IPAMConfig.IPv6Address, true) {
-		endpoint.IPAMConfig.IPv6Address = ""
+	if ipam.IPv6Address != "" && !networkSupportsStaticIP(info, ipam.IPv6Address, true) {
+		return fmt.Errorf("static IPv6 address %s is not in a configured subnet of network %s", ipam.IPv6Address, netName)
 	}
-	if endpoint.IPAMConfig.IPv4Address == "" && endpoint.IPAMConfig.IPv6Address == "" && len(endpoint.IPAMConfig.LinkLocalIPs) == 0 {
-		endpoint.IPAMConfig = nil
-	}
+	return nil
 }
 
 func isDefaultBridgeNetwork(netName string, info network.Inspect) bool {
@@ -673,6 +684,7 @@ func networkSupportsStaticIP(info network.Inspect, ip string, isIPv6 bool) bool 
 	if err != nil {
 		return false
 	}
+	addr = addr.Unmap()
 	if addr.Is6() != isIPv6 {
 		return false
 	}
@@ -824,39 +836,6 @@ func buildContainerRecoverNetworkConfig(networkSettings *container.NetworkSettin
 		return nil, extraNetworks
 	}
 	return config, extraNetworks
-}
-
-const unsupportedUserSpecifiedIPAddress = "user specified IP address is supported only when connecting to networks with user configured subnets"
-
-func clearUnsupportedDynamicEndpointIPAM(err error, endpoints map[string]*network.EndpointSettings, networkSettings *container.NetworkSettings) bool {
-	if err == nil || !strings.Contains(err.Error(), unsupportedUserSpecifiedIPAddress) {
-		return false
-	}
-	for name, endpoint := range endpoints {
-		if !isDynamicContainerNetwork(networkSettings, name) || endpoint == nil || endpoint.IPAMConfig == nil {
-			continue
-		}
-		if strings.Contains(err.Error(), "network "+name+":") {
-			endpoint.IPAMConfig = nil
-			return true
-		}
-	}
-	cleared := false
-	for name, endpoint := range endpoints {
-		if isDynamicContainerNetwork(networkSettings, name) && endpoint != nil && endpoint.IPAMConfig != nil {
-			endpoint.IPAMConfig = nil
-			cleared = true
-		}
-	}
-	return cleared
-}
-
-func isDynamicContainerNetwork(networkSettings *container.NetworkSettings, name string) bool {
-	if networkSettings == nil || name == "bridge" {
-		return false
-	}
-	endpoint := networkSettings.Networks[name]
-	return endpoint != nil && endpoint.IPAMConfig == nil && (endpoint.IPAddress != "" || endpoint.GlobalIPv6Address != "")
 }
 
 func cloneContainerConfig(config *container.Config) *container.Config {
