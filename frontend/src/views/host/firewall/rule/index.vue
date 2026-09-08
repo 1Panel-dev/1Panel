@@ -430,11 +430,6 @@ interface DisplayNotice {
     text: string;
 }
 
-interface PriorityPositionRange {
-    min: number;
-    max: number;
-}
-
 type RuleFilter = 'family:ipv4' | 'family:ipv6' | 'action:accept' | 'action:deny' | `state:${Firewall.InventoryState}`;
 
 const ruleFilterStorageKey = 'firewall-rule-filters';
@@ -499,6 +494,7 @@ const visibleIptablesChains = ref<string[]>(
 );
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
+const positionRanges = ref<Partial<Record<Firewall.Family, Firewall.PositionRange>>>({});
 const inventoryTotal = ref(0);
 const managedTotal = ref(0);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
@@ -584,6 +580,7 @@ const search = async () => {
     if (!isFirewallReady.value) {
         loading.value = false;
         inventoryItems.value = [];
+        positionRanges.value = {};
         scopeNotices.value = [];
         paginationConfig.total = 0;
         inventoryTotal.value = 0;
@@ -595,6 +592,7 @@ const search = async () => {
     if (scopes.length === 0) {
         loading.value = false;
         inventoryItems.value = [];
+        positionRanges.value = {};
         scopeNotices.value = [];
         paginationConfig.total = 0;
         inventoryTotal.value = 0;
@@ -617,6 +615,11 @@ const search = async () => {
             return;
         }
         inventoryItems.value = response.data.items || [];
+        positionRanges.value = {
+            ipv4: response.data.ipv4Range,
+            ipv6: response.data.ipv6Range,
+            inet: response.data.ipv4Range,
+        };
         scopeNotices.value = response.data.notices || [];
         paginationConfig.total = total;
         inventoryTotal.value = response.data.allTotal || 0;
@@ -804,70 +807,6 @@ const openUsageDetail = (entry: UsageEntry) => {
     if (entry.pid !== undefined) processDetailRef.value?.acceptParams(entry.pid);
 };
 const scopeIdentity = (rule: Firewall.Rule) => JSON.stringify(rule.scope);
-const sameIptablesPositionScope = (rule: Firewall.Rule, family: Firewall.Family, chain: string) =>
-    (rule.scope.provider === 'iptables' || rule.scope.provider === 'nftables') &&
-    rule.scope.family === family &&
-    rule.scope.table === 'filter' &&
-    rule.scope.chain === chain &&
-    rule.scope.direction === 'input';
-
-const priorityPositionRanges = (
-    item?: Firewall.InventoryItem,
-    sourceItems: Firewall.InventoryItem[] = inventoryItems.value,
-): Partial<Record<Firewall.Family, PriorityPositionRange>> => {
-    if (provider.value === 'firewalld') return {};
-    const extraPosition = item ? 0 : 1;
-    if (provider.value === 'ufw') {
-        if (!item) {
-            const maxPosition = sourceItems.reduce((max, row) => Math.max(max, row.observed?.locator.position || 0), 0);
-            const range = { min: 1, max: Math.max(1, maxPosition + 1) };
-            return { ipv4: range, ipv6: range };
-        }
-        const family = item.rule.scope.family;
-        const positions = sourceItems
-            .filter((row) => row.rule.scope.family === family && row.observed?.locator.position)
-            .map((row) => row.observed!.locator.position!);
-        const currentPosition = item.observed?.locator.position || 1;
-        return {
-            [family]: {
-                min: positions.length > 0 ? Math.min(...positions) : currentPosition,
-                max: positions.length > 0 ? Math.max(...positions) : currentPosition,
-            },
-        };
-    }
-    const chain = item?.rule.scope.chain || '1PANEL_BASIC';
-    return Object.fromEntries(
-        (['ipv4', 'ipv6'] as Firewall.Family[]).map((family) => {
-            const scopeRows = sourceItems
-                .filter((row) => sameIptablesPositionScope(row.rule, family, chain))
-                .sort(
-                    (left, right) => (left.observed?.locator.position || 0) - (right.observed?.locator.position || 0),
-                );
-            const maxPosition = scopeRows.reduce((max, row) => Math.max(max, row.observed?.locator.position || 0), 0);
-            if (!item || item.rule.scope.family !== family) {
-                return [family, { min: 1, max: Math.max(1, maxPosition + extraPosition) }];
-            }
-            const currentPosition = item.observed?.locator.position || 1;
-            const currentIndex = scopeRows.findIndex(
-                (row) => row.observed?.locator.position === item.observed?.locator.position,
-            );
-            let min = currentPosition;
-            let max = currentPosition;
-            for (let index = currentIndex - 1; index >= 0 && isEditableManagedRule(scopeRows[index]); index--) {
-                min = scopeRows[index].observed?.locator.position || min;
-            }
-            for (
-                let index = currentIndex + 1;
-                index < scopeRows.length && isEditableManagedRule(scopeRows[index]);
-                index++
-            ) {
-                max = scopeRows[index].observed?.locator.position || max;
-            }
-            return [family, { min, max }];
-        }),
-    );
-};
-
 const toRuleRows = (items: Firewall.InventoryItem[]): RuleRow[] =>
     items.map((item, index) => {
         const nativeGroup = item.rule.orderBucket || item.rule.nativeKind || 'default';
@@ -1009,11 +948,16 @@ const openCreate = async () => {
             return;
         }
     }
-    const sourceItems = await loadAllInventoryItems();
+    const ranges = { ...positionRanges.value };
+    if (isDirectBackend.value) {
+        for (const family of ['ipv4', 'ipv6'] as const) {
+            ranges[family] = { min: 1, max: (ranges[family]?.max || 0) + 1 };
+        }
+    }
     ruleOperateRef.value?.acceptParams(
         provider.value as Firewall.Provider,
         undefined,
-        priorityPositionRanges(undefined, sourceItems),
+        ranges,
         supportsFirewalldPriority.value,
     );
 };
@@ -1293,13 +1237,14 @@ const displayRulePriority = (row: Firewall.InventoryItem) => {
     return row.observed?.locator.position ?? '-';
 };
 
-const openEdit = async (row: RuleRow) => {
+const openEdit = (row: RuleRow) => {
     if (!isEditableManagedRule(row)) return;
-    const sourceItems = await loadAllInventoryItems();
+    const currentPosition = row.observed?.locator.position || row.rule.orderIndex || 1;
+    const range = positionRanges.value[row.rule.scope.family] || { min: currentPosition, max: currentPosition };
     ruleOperateRef.value?.acceptParams(
         provider.value as Firewall.Provider,
         row,
-        priorityPositionRanges(row, sourceItems),
+        provider.value === 'firewalld' ? positionRanges.value : { [row.rule.scope.family]: range },
         supportsFirewalldPriority.value,
     );
 };

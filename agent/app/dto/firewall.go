@@ -90,6 +90,8 @@ type FirewallSystemPort struct {
 }
 
 type FirewallRuleInventoryResponse struct {
+	IPv4Range    filter.PositionRange   `json:"ipv4Range"`
+	IPv6Range    filter.PositionRange   `json:"ipv6Range"`
 	Total        int64                  `json:"total"`
 	AllTotal     int64                  `json:"allTotal"`
 	ManagedTotal int64                  `json:"managedTotal"`

@@ -211,12 +211,7 @@ const previewRules = ref<Firewall.Rule[]>([]);
 const previewVisible = ref(false);
 const checkCompleted = ref(false);
 
-interface PriorityPositionRange {
-    min: number;
-    max: number;
-}
-
-const positionRanges = ref<Partial<Record<Firewall.Family, PriorityPositionRange>>>({});
+const positionRanges = ref<Partial<Record<Firewall.Family, Firewall.PositionRange>>>({});
 const firewalldPrioritySupported = ref(true);
 
 interface BatchPlanItem {
@@ -308,10 +303,8 @@ const selectedPositionRanges = computed(() => {
     if (families.length === 0) return [{ min: 1, max: 1 }];
     return families.map((family) => positionRanges.value[family] || { min: 1, max: 1 });
 });
-const positionalPriorityMin = computed(() => Math.max(1, ...selectedPositionRanges.value.map((range) => range.min)));
-const positionalPriorityMax = computed(() => Math.min(...selectedPositionRanges.value.map((range) => range.max)));
-const priorityMin = computed(() => (provider.value === 'firewalld' ? -32768 : positionalPriorityMin.value));
-const priorityMax = computed(() => (provider.value === 'firewalld' ? 32767 : positionalPriorityMax.value));
+const priorityMin = computed(() => Math.max(...selectedPositionRanges.value.map((range) => range.min)));
+const priorityMax = computed(() => Math.min(...selectedPositionRanges.value.map((range) => range.max)));
 const showingPreview = computed(() => previewVisible.value && previewRules.value.length > 0);
 
 const supportedPlanReasons = new Set([
@@ -465,8 +458,7 @@ const resetForm = () => {
     form.destinationAddress = '';
     form.destinationPorts = [''];
     form.action = 'accept';
-    form.priority =
-        provider.value === 'firewalld' || provider.value === 'ufw' ? undefined : positionalPriorityMax.value;
+    form.priority = provider.value === 'firewalld' || provider.value === 'ufw' ? undefined : priorityMax.value;
     form.description = '';
     editingUUID.value = '';
     editingRule.value = undefined;
@@ -477,7 +469,7 @@ const resetForm = () => {
 const acceptParams = (
     value: Firewall.Provider,
     item?: Firewall.InventoryItem,
-    ranges: Partial<Record<Firewall.Family, PriorityPositionRange>> = {},
+    ranges: Partial<Record<Firewall.Family, Firewall.PositionRange>> = {},
     supportsExplicitPriority = true,
 ) => {
     provider.value = value;
@@ -507,7 +499,7 @@ const acceptParams = (
         form.destinationPorts = [rule.destinationPort || ''];
         if (form.destinationPorts.length === 0) form.destinationPorts = [''];
         form.action = rule.action === 'reject' ? 'drop' : rule.action;
-        form.priority = provider.value === 'firewalld' ? rule.priority : currentPosition || positionalPriorityMax.value;
+        form.priority = provider.value === 'firewalld' ? rule.priority : currentPosition || priorityMax.value;
         form.description = rule.description || '';
     }
     drawerVisible.value = true;

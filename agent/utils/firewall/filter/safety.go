@@ -43,22 +43,16 @@ func ProtectSnapshot(snapshot Snapshot, ports []PortWhitelist) (Snapshot, error)
 }
 
 func GuardMutation(
-	snapshot Snapshot,
 	target ObservedRule,
 	after FirewallRule,
 	clientIP string,
 	protectedPorts ...PortWhitelist,
 ) error {
+	if target.Protected {
+		return ErrProtectedRule
+	}
 	if RuleBlocksManagementConnection(after, clientIP, protectedPorts...) {
 		return ErrLockoutRisk
-	}
-	for _, observed := range snapshot.Rules {
-		if !observed.Protected || SameLocator(observed.Locator, target.Locator) {
-			continue
-		}
-		if RulesOverlap(observed.Rule, after) && observed.Rule.Action != after.Action {
-			return ErrLockoutRisk
-		}
 	}
 	return nil
 }

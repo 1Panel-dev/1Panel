@@ -11,32 +11,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
-	filterufw "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/ufw"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
 type panelPortWhitelistKey struct{}
-
-func (s *FirewallService) panelSystemPorts(provider string, port uint) ([]dto.FirewallSystemPort, error) {
-	ports := []dto.FirewallSystemPort{{Port: strconv.Itoa(int(port)), Protocol: "tcp"}}
-	if provider != constant.FirewallProviderUFW {
-		return ports, nil
-	}
-	ipv6Enabled := s.ufwIPv6Enabled
-	if ipv6Enabled == nil {
-		ipv6Enabled = filterufw.IPv6Enabled
-	}
-	enabled, err := ipv6Enabled()
-	if err != nil {
-		return nil, err
-	}
-	ports[0].Family = constant.FirewallFamilyIPv4
-	if enabled {
-		ports = append(ports, dto.FirewallSystemPort{Family: constant.FirewallFamilyIPv6, Port: ports[0].Port, Protocol: "tcp"})
-	}
-	return ports, nil
-}
 
 func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uint) error {
 	if oldPort == 0 || oldPort > 65535 || port == 0 || port > 65535 {
@@ -82,10 +61,7 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 		return err
 	}
 	protected := firewall.NormalizePortWhitelist(append(configured, required...))
-	ports, err := s.panelSystemPorts(provider, port)
-	if err != nil {
-		return err
-	}
+	ports := systemPorts([]firewall.PortWhitelist{{Port: strconv.Itoa(int(port)), Protocol: "tcp"}})
 	for _, port := range ports {
 		if err := s.ensureSystemPort(ctx, port); err != nil {
 			return err
@@ -102,6 +78,9 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 			port.Protocol = "all"
 			ports = append(ports, port)
 		}
+	}
+	if provider == constant.FirewallProviderFirewalld {
+		ports = append(ports, dto.FirewallSystemPort{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"})
 	}
 	for _, port := range ports {
 		if panelPortStillRequired(port, protected) {

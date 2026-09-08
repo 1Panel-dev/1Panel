@@ -11,7 +11,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
 
@@ -21,7 +20,7 @@ func PersistRuleset(ctx context.Context) error {
 	var ruleset strings.Builder
 	run := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second))
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		stdout, exists, err := firewall.ReadNftObject(func(args ...string) (string, error) {
+		stdout, exists, err := readNftObject(func(args ...string) (string, error) {
 			return run.RunWithOptionalSudoAndStdout("nft", args...)
 		}, "list", "table", TableFamily(family), TableName)
 		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
@@ -51,7 +50,7 @@ func Restore() error {
 	existing := make([]string, 0, 2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		_, exists, err := firewall.ReadNftObject(run, "list", "table", tableFamily, TableName)
+		_, exists, err := readNftObject(run, "list", "table", tableFamily, TableName)
 		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
 			continue
 		}
