@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
@@ -78,16 +78,12 @@ function buildRegisteredMenuList(source: RouteRecordRaw[]): RouteRecordRaw[] {
 }
 
 const screenWidth = ref(0);
-const listeningWindow = () => {
-    window.onresize = () => {
-        return (() => {
-            screenWidth.value = document.body.clientWidth;
-            if (!isCollapse.value && screenWidth.value < 1200) menuStore.setCollapse();
-            if (isCollapse.value && screenWidth.value > 1200) menuStore.setCollapse();
-        })();
-    };
+const handleWindowResize = () => {
+    screenWidth.value = document.body.clientWidth;
+    if (!isCollapse.value && screenWidth.value < 1200) menuStore.setCollapse();
+    if (isCollapse.value && screenWidth.value > 1200) menuStore.setCollapse();
 };
-listeningWindow();
+window.addEventListener('resize', handleWindowResize);
 const emit = defineEmits(['menuClick', 'openTask']);
 const handleMenuClick = (path) => {
     emit('menuClick', path);
@@ -285,10 +281,18 @@ function adjustAndCleanMenu(menuItem, list) {
 }
 
 onMounted(() => {
+    screenWidth.value = document.body.clientWidth;
+    if (!isCollapse.value && screenWidth.value < 1200) {
+        menuStore.setCollapse();
+    }
     if (!menuStore.menuList || menuStore.menuList.length === 0) {
         menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
     }
     search();
+});
+
+onBeforeUnmount(() => {
+    window.removeEventListener('resize', handleWindowResize);
 });
 
 watch(

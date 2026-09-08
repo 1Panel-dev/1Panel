@@ -30,7 +30,7 @@
             />
             <el-date-picker
                 v-model="timeRange"
-                class="p-w-360"
+                class="host-log-time-range"
                 type="datetimerange"
                 range-separator="-"
                 :start-placeholder="$t('commons.search.timeStart')"
@@ -292,5 +292,13 @@ watch([keyword, priority, service], () => {
     background: var(--panel-logs-bg-color);
     border: 1px solid var(--el-border-color-darker);
     border-radius: 4px;
+}
+
+@media only screen and (max-width: 767px) {
+    :deep(.host-log-time-range.el-date-editor) {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
 }
 </style>

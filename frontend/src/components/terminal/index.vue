@@ -72,6 +72,9 @@ const aiNotice = ref({
     message: '',
 });
 let aiNoticeTimer: ReturnType<typeof setTimeout> | null = null;
+let resizeFrame: number | undefined;
+let lastResizeColumns = 0;
+let lastResizeRows = 0;
 
 const readyWatcher = watch(
     () => webSocketReady.value && termReady.value,
@@ -214,6 +217,12 @@ function onClose(isKeepShow: boolean = false) {
     closing = true;
     stopReconnect();
     window.removeEventListener('resize', changeTerminalSize);
+    if (resizeFrame !== undefined) {
+        cancelAnimationFrame(resizeFrame);
+        resizeFrame = undefined;
+    }
+    lastResizeColumns = 0;
+    lastResizeRows = 0;
     clearAINotice();
     webSocketReady.value = false;
     try {
@@ -239,6 +248,8 @@ function onClose(isKeepShow: boolean = false) {
 
 const initTerminal = (online: boolean = false): boolean => {
     newTerm();
+    lastResizeColumns = 0;
+    lastResizeRows = 0;
     if (terminalElement.value) {
         term.value.open(terminalElement.value);
         applyTerminalBackground(terminalStore.backgroundColor);
@@ -253,6 +264,16 @@ const initTerminal = (online: boolean = false): boolean => {
 };
 
 function changeTerminalSize() {
+    if (resizeFrame !== undefined) {
+        return;
+    }
+    resizeFrame = requestAnimationFrame(() => {
+        resizeFrame = undefined;
+        resizeTerminal();
+    });
+}
+
+function resizeTerminal() {
     if (!terminalElement.value || !term.value) return;
     if (terminalElement.value.clientWidth <= 0 || terminalElement.value.clientHeight <= 0) {
         return;
@@ -261,6 +282,11 @@ function changeTerminalSize() {
     fitAddon.fit();
     if (isWsOpen()) {
         const { cols, rows } = term.value;
+        if (cols === lastResizeColumns && rows === lastResizeRows) {
+            return;
+        }
+        lastResizeColumns = cols;
+        lastResizeRows = rows;
         terminalSocket.value!.send(
             JSON.stringify({
                 type: 'resize',
@@ -335,6 +361,7 @@ const showWebSocketAuthError = (message: string) => {
 
 const runRealTerminal = () => {
     webSocketReady.value = true;
+    changeTerminalSize();
     term.value?.focus();
     // a reattached shell already ran its init command
     if (initCmd.value !== '' && !sessionId.value) {
@@ -443,7 +470,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
     }
     terminalSocket.value = undefined;
     if (closing || !sessionId.value) {
-		term.value?.write('The connection has been disconnected.');
+        term.value?.write('The connection has been disconnected.');
         term.value?.write(ev.reason);
         return;
     }

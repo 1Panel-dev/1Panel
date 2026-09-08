@@ -233,6 +233,8 @@ onMounted(() => {
     flex-direction: column;
     position: relative;
     height: 100vh;
+    height: 100dvh;
+    min-width: 0;
     transition: margin-left 0.3s;
     margin-left: var(--panel-menu-width);
     background-color: var(--panel-main-bg-color-9);
@@ -241,6 +243,8 @@ onMounted(() => {
 .app-main {
     padding: 7px 20px;
     flex: 1;
+    min-width: 0;
+    min-height: 0;
     overflow: auto;
 }
 .app-sidebar {
@@ -307,6 +311,13 @@ onMounted(() => {
     .main-container,
     .sidebar-container {
         transition: none;
+    }
+}
+
+@media (max-width: 767px) {
+    .app-main {
+        padding-right: 12px;
+        padding-left: 12px;
     }
 }
 </style>

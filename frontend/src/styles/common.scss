@@ -78,7 +78,8 @@ html {
 
 .input-help {
     font-size: 12px;
-    word-break: keep-all;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     color: #adb0bc;
     width: 100%;
     display: inline-block;
@@ -112,8 +113,10 @@ html {
     left: 45%;
     transform: translate(-50%, -50%);
     width: 400px;
+    max-width: calc(100% - 24px);
     text-align: center;
     font-size: 14px;
+    overflow-wrap: anywhere;
     .bt {
         margin-top: -2px;
     }
@@ -311,6 +314,22 @@ html {
     display: flex;
     align-items: center;
     justify-content: flex-end;
+}
+
+@media only screen and (max-width: 767px) {
+    .mask-prompt {
+        left: 50%;
+        width: calc(100% - 24px);
+    }
+
+    .dialog-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .el-button + .el-button {
+            margin-left: 0;
+        }
+    }
 }
 
 .monaco-editor-tree-light .el-tree-node__content:hover {

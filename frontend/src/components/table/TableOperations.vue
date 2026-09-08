@@ -5,7 +5,7 @@
         :row="cardRow"
         :ellipsis="ellipsis"
         :extra="2"
-        :trigger="trigger"
+        :trigger="resolvedTrigger"
         :dropdown-style="dropdownStyle"
     />
     <el-table-column
@@ -22,7 +22,7 @@
                 :buttons="buttons"
                 :row="row"
                 :ellipsis="ellipsis"
-                :trigger="trigger"
+                :trigger="resolvedTrigger"
                 :dropdown-style="dropdownStyle"
             />
         </template>
@@ -31,11 +31,15 @@
 
 <script setup lang="ts">
 import { computed, type PropType } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
 
 import FuTableOperationActions from './TableOperationActions.vue';
 import type { FuTableOperationButton } from './shared';
 
 defineOptions({ name: 'FuTableOperations' });
+
+type DropdownTrigger = 'hover' | 'click' | 'contextmenu';
+type DropdownTriggerValue = DropdownTrigger | DropdownTrigger[];
 
 const normalizeWidth = (value?: string | number) => {
     if (value === undefined || value === null || value === '') {
@@ -77,8 +81,8 @@ const props = defineProps({
         default: 2,
     },
     trigger: {
-        type: String,
-        default: 'hover',
+        type: [String, Array] as PropType<DropdownTriggerValue>,
+        default: undefined,
     },
     fixed: {
         type: [Boolean, String],
@@ -97,6 +101,11 @@ const props = defineProps({
         default: undefined,
     },
 });
+
+const hasFinePointer = useMediaQuery('(hover: hover) and (pointer: fine)');
+const resolvedTrigger = computed<DropdownTriggerValue>(
+    () => props.trigger ?? (hasFinePointer.value ? 'hover' : 'click'),
+);
 
 const resolvedFixed = computed(() => {
     if (props.fixed !== undefined) {

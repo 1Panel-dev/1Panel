@@ -1,11 +1,4 @@
 .mobile {
-    .monitor-tags {
-        position: inherit;
-        top: 13px;
-    }
-    .mobile-monitor-chart {
-        margin-top: 20px !important;
-    }
     .search-button {
         float: none !important;
         .table-button {
@@ -36,23 +29,28 @@
     .router_card_button {
         padding: 2px 0;
     }
-    .el-drawer.rtl {
-        width: 80% !important;
-    }
     .site-form-wrapper {
+        box-sizing: border-box;
         width: 90% !important;
+        max-width: 100%;
         min-width: auto !important;
         .el-form-item__label {
             width: auto !important;
         }
     }
     .moblie-form {
-        overflow: auto;
-        .el-input {
-            width: 350px;
+        width: 100%;
+        min-width: 0;
+
+        .el-input,
+        .el-textarea {
+            width: 100%;
+            max-width: 100%;
         }
+
         .el-textarea__inner {
-            width: 350px;
+            width: 100%;
+            max-width: 100%;
         }
     }
 
@@ -78,12 +76,76 @@
         }
     }
 
-    @media only screen and (max-width: 768px) {
+    @media only screen and (max-width: 767px) {
         .el-col-xs-24 {
             margin-bottom: 10px;
         }
     }
-    .el-dialog {
-        --el-dialog-width: 80% !important;
+}
+
+@media only screen and (max-width: 1024px) {
+    .el-dialog:not(.is-fullscreen) {
+        min-width: min(420px, calc(100vw - 24px));
+        max-width: calc(100vw - 24px);
+        max-height: calc(100vh - 24px);
+        max-height: calc(100dvh - 24px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+
+        .el-dialog__header,
+        .el-dialog__footer {
+            flex: 0 0 auto;
+        }
+
+        .el-dialog__body {
+            min-width: 0;
+            min-height: 0;
+            overflow: auto;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .el-drawer {
+        max-width: 100vw;
+        max-height: 100vh;
+        max-height: 100dvh;
+
+        &.rtl,
+        &.ltr {
+            min-width: min(100vw, 480px);
+            max-width: 100vw;
+        }
+
+        .el-drawer__header,
+        .el-drawer__footer {
+            flex: 0 0 auto;
+            min-width: 0;
+        }
+
+        .el-drawer__body {
+            min-width: 0;
+            min-height: 0;
+            overflow: auto;
+            overflow-wrap: anywhere;
+        }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .el-dialog:not(.is-fullscreen) {
+        width: calc(100vw - 24px) !important;
+        min-width: 0;
+        max-width: calc(100vw - 24px);
+        margin: 12px auto;
+    }
+
+    .el-picker__popper {
+        max-width: calc(100vw - 24px);
+
+        .el-picker-panel {
+            max-width: calc(100vw - 24px);
+            overflow-x: auto;
+        }
     }
 }

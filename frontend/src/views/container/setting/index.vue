@@ -49,19 +49,22 @@
                             label-width="auto"
                         >
                             <el-form-item :label="$t('container.mirrors')" prop="mirrors">
-                                <div class="w-full" v-if="form.mirrors">
+                                <div
+                                    class="flex w-full min-w-0 flex-col items-start gap-2 md:flex-row md:gap-0"
+                                    v-if="form.mirrors"
+                                >
                                     <el-input
                                         type="textarea"
                                         :rows="5"
                                         disabled
                                         v-model="form.mirrors"
-                                        style="width: calc(100% - 80px)"
+                                        class="w-full min-w-0 md:flex-1"
                                     />
                                     <el-button
                                         v-permission
                                         @click="onChangeMirrors"
                                         icon="Setting"
-                                        class="custom-input-textarea"
+                                        class="custom-input-textarea w-full md:w-auto"
                                     >
                                         {{ $t('commons.button.set') }}
                                     </el-button>
@@ -74,7 +77,7 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flex flx-align-center" v-if="!isFxplay">
+                                <span class="input-help flex min-w-0 flex-wrap flx-align-center" v-if="!isFxplay">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}
@@ -82,15 +85,23 @@
                                 </span>
                             </el-form-item>
                             <el-form-item :label="$t('container.registries')" prop="registries">
-                                <div class="w-full" v-if="form.registries">
+                                <div
+                                    class="flex w-full min-w-0 flex-col items-start gap-2 md:flex-row md:gap-0"
+                                    v-if="form.registries"
+                                >
                                     <el-input
                                         type="textarea"
                                         :rows="5"
                                         disabled
                                         v-model="form.registries"
-                                        style="width: calc(100% - 80px)"
+                                        class="w-full min-w-0 md:flex-1"
                                     />
-                                    <el-button v-permission @click="onChangeRegistries" icon="Setting">
+                                    <el-button
+                                        v-permission
+                                        class="w-full md:w-auto"
+                                        @click="onChangeRegistries"
+                                        icon="Setting"
+                                    >
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                 </div>

@@ -1,7 +1,7 @@
 <template>
     <div class="footer" :class="{ 'footer--mobile': isMobile }">
-        <div class="flex w-full flex-col gap-4 md:justify-between md:flex-row">
-            <div class="flex flex-wrap gap-4">
+        <div class="footer-content">
+            <div class="footer-copyright">
                 <a v-if="!isIntl && !isFxplay" href="https://fit2cloud.com/" target="_blank">
                     Copyright © 2014-{{ year }} {{ $t('commons.fit2cloud') }}
                 </a>
@@ -9,10 +9,8 @@
                     Copyright © {{ year }} {{ $t('commons.lingxia') }}
                 </a>
             </div>
-            <div class="footer-actions">
-                <FooterNavigation />
-                <SystemUpgrade />
-            </div>
+            <FooterNavigation class="footer-navigation-panel" />
+            <SystemUpgrade class="footer-upgrade" />
         </div>
     </div>
 </template>
@@ -37,7 +35,7 @@ const year = new Date().getFullYear();
     background: var(--panel-footer-bg);
     border-top: 1px solid var(--panel-footer-border);
     box-sizing: border-box;
-    padding: 10px 20px;
+    padding: 10px 12px;
     a {
         font-size: 12px;
         color: #858585;
@@ -53,20 +51,52 @@ const year = new Date().getFullYear();
 }
 
 .footer--mobile {
-    min-height: 108px;
+    min-height: 76px;
 }
 
-.footer-actions {
+.footer-content {
     display: flex;
+    width: 100%;
     flex-wrap: wrap;
     align-items: center;
-    row-gap: 8px;
+    justify-content: center;
+    gap: 8px 12px;
 }
 
-@media (max-width: 767px) {
-    .footer-actions {
-        column-gap: 8px;
-        justify-content: center;
+.footer-copyright {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.footer-navigation-panel {
+    order: -1;
+    flex-basis: 100%;
+}
+
+.footer-upgrade {
+    white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+    .footer-content {
+        flex-wrap: nowrap;
+        justify-content: flex-start;
+        gap: 0;
+    }
+
+    .footer {
+        padding: 10px 20px;
+    }
+
+    .footer-copyright {
+        justify-content: flex-start;
+    }
+
+    .footer-navigation-panel {
+        order: 0;
+        flex-basis: auto;
+        margin-left: auto;
     }
 }
 </style>

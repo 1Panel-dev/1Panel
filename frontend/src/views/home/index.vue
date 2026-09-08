@@ -10,12 +10,17 @@
             ]"
         />
 
-        <el-alert v-if="!isSafety && showEntranceWarn" class="card-interval" type="warning" @close="hideEntrance">
+        <el-alert
+            v-if="!isSafety && showEntranceWarn"
+            class="card-interval dashboard-entrance-alert"
+            type="warning"
+            @close="hideEntrance"
+        >
             <template #title>
-                <span class="flx-align-center">
+                <span class="flx-align-center dashboard-entrance-alert-title">
                     <span>{{ $t('home.entranceHelper') }}</span>
                     <el-link
-                        style="font-size: 12px; margin-left: 5px"
+                        class="dashboard-entrance-alert-link"
                         icon="Position"
                         v-if="isAdmin"
                         @click="jumpToPath(router, '/settings/safe')"
@@ -123,7 +128,7 @@
                         </el-select>
                     </template>
                     <template #body>
-                        <div style="position: relative; margin-top: 60px">
+                        <div class="monitor-chart-content">
                             <div class="monitor-tags" :style="monitorTagsStyle" v-if="chartOption === 'network'">
                                 <el-tag>
                                     {{ $t('monitor.up') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesSent) }}
@@ -144,7 +149,7 @@
                                 <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
                             </div>
 
-                            <div v-if="chartOption === 'io'" style="margin-top: 40px" class="mobile-monitor-chart">
+                            <div v-if="chartOption === 'io'" class="mobile-monitor-chart">
                                 <v-charts
                                     height="383px"
                                     id="ioChart"
@@ -153,7 +158,7 @@
                                     :dataZoom="true"
                                 />
                             </div>
-                            <div v-if="chartOption === 'network'" style="margin-top: 40px" class="mobile-monitor-chart">
+                            <div v-if="chartOption === 'network'" class="mobile-monitor-chart">
                                 <v-charts
                                     height="383px"
                                     id="networkChart"
@@ -1160,6 +1165,55 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+.dashboard-entrance-alert-title {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+
+    > span {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+}
+
+.dashboard-entrance-alert-link {
+    flex: 0 0 auto;
+    font-size: 12px;
+}
+
+.monitor-chart-content {
+    position: relative;
+    margin-top: 60px;
+}
+
+.mobile-monitor-chart {
+    margin-top: 40px;
+}
+
+@media only screen and (max-width: 767px) {
+    .dashboard-entrance-alert {
+        padding-right: 40px;
+
+        :deep(.el-alert__content),
+        :deep(.el-alert__title) {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .dashboard-entrance-alert-title {
+        width: 100%;
+        align-items: flex-start;
+
+        > span {
+            flex: 0 0 100%;
+            width: 100%;
+            overflow-wrap: break-word;
+            text-wrap: balance;
+        }
+    }
+}
+
 @media only screen and (min-width: 992px) {
     .dashboard-right {
         contain: size;
@@ -1283,6 +1337,44 @@ onBeforeUnmount(() => {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+@media only screen and (max-width: 1024px) {
+    .monitor-chart-content {
+        margin-top: 20px;
+    }
+
+    .monitor-chart-content .monitor-tags {
+        position: static;
+        display: grid;
+        width: 100%;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+
+        :deep(.el-tag) {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 24px;
+            justify-content: center;
+            padding-block: 3px;
+            line-height: 1.3;
+            text-align: center;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .mobile-monitor-chart {
+        margin-top: 0;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .monitor-chart-content .monitor-tags {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .version {

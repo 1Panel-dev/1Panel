@@ -59,11 +59,14 @@ defineProps({
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 12px;
+        min-width: 0;
 
         .header-left {
             display: flex;
             align-items: center;
             gap: 12px;
+            min-width: 0;
 
             .header-span {
                 position: relative;
@@ -72,6 +75,8 @@ defineProps({
                 margin-left: 18px;
                 display: flex;
                 align-items: center;
+                min-width: 0;
+                overflow-wrap: anywhere;
 
                 &::before {
                     position: absolute;
@@ -90,11 +95,34 @@ defineProps({
         .header-right {
             display: flex;
             align-items: center;
+            min-width: 0;
         }
     }
 
     .body-content {
         margin-top: 20px;
+    }
+}
+
+@media (max-width: 767px) {
+    .home-card .header {
+        flex-wrap: wrap;
+        align-items: flex-start;
+
+        .header-left {
+            flex: 1 1 200px;
+            max-width: 100%;
+        }
+
+        .header-right {
+            flex: 0 1 auto;
+            max-width: 100%;
+            margin-left: auto;
+        }
+
+        .header-right:empty {
+            display: none;
+        }
     }
 }
 </style>

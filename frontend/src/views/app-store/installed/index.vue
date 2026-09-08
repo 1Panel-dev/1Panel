@@ -32,12 +32,17 @@
         <template #main>
             <div>
                 <MainDiv :heightDiff="mode === 'upgrade' ? 280 : 300">
-                    <el-alert type="info" :closable="false" v-if="mode === 'installed' && !isIntl">
+                    <el-alert
+                        class="app-install-alert"
+                        type="info"
+                        :closable="false"
+                        v-if="mode === 'installed' && !isIntl"
+                    >
                         <template #title>
-                            <span class="flx-align-center">
-                                {{ $t('app.installHelper') }}
+                            <span class="flx-align-center app-install-helper">
+                                <span class="app-install-helper-text">{{ $t('app.installHelper') }}</span>
                                 <el-link
-                                    class="ml-5"
+                                    class="app-install-helper-link"
                                     icon="Position"
                                     @click="jumpToPath(router, '/containers/setting')"
                                     type="primary"
@@ -563,6 +568,42 @@ onUnmounted(() => {
 .d-button {
     .el-button + .el-button {
         margin-left: 0;
+    }
+}
+
+.app-install-helper {
+    min-width: 0;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+}
+
+.app-install-helper-text {
+    min-width: 0;
+    overflow-wrap: break-word;
+}
+
+.app-install-helper-link {
+    flex: 0 0 auto;
+}
+
+@media only screen and (max-width: 767px) {
+    .app-install-alert {
+        :deep(.el-alert__content),
+        :deep(.el-alert__title) {
+            width: 100%;
+            min-width: 0;
+        }
+    }
+
+    .app-install-helper {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .app-install-helper-text {
+        flex: 0 0 100%;
+        width: 100%;
+        text-wrap: balance;
     }
 }
 </style>
