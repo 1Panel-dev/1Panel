@@ -3363,6 +3363,7 @@ const message = {
         setting: 'Actualizar a la edición comercial permite personalizar logo, mensaje de bienvenida y más.',
         monitor: 'La edición comercial permite ver estado web en tiempo real, tendencias, logs, etc.',
         alert: 'La edición comercial permite recibir alertas SMS y ver logs, control total de eventos clave.',
+        vm: 'Actualice a la edición comercial para gestionar máquinas virtuales, imágenes, plantillas, redes virtuales y recursos de almacenamiento en 1Panel.',
         node: 'Actualizar a la edición comercial permite administrar varios servidores Linux con 1Panel.',
         nodeApp:
             'Actualizar a la edición comercial permite actualizar versiones de aplicaciones multinodo sin cambiar de nodo manualmente.',
@@ -6418,6 +6419,14 @@ const message = {
             nodeDashTitle4: 'Gestión de Tareas Programadas',
             nodeDashContent4:
                 'Gestión unificada de tareas programadas multi-nodo, admite monitoreo de estado, inicio/parada rápida y ejecución manual por activación',
+            vmTitle1: 'Máquinas virtuales',
+            vmContent1: 'Cree y gestione máquinas virtuales, consulte su estado y ajuste los recursos asignados.',
+            vmTitle2: 'Imágenes y plantillas',
+            vmContent2: 'Gestione imágenes ISO y plantillas para simplificar la creación de máquinas virtuales.',
+            vmTitle3: 'Redes virtuales',
+            vmContent3: 'Gestione redes virtuales y configure las conexiones de red de las máquinas virtuales.',
+            vmTitle4: 'Grupos de almacenamiento',
+            vmContent4: 'Gestione grupos de almacenamiento y asigne recursos a las máquinas virtuales.',
             nodeTitle1: 'Adición de Nodo en un Clic',
             nodeContent1: 'Integra rápidamente múltiples nodos de servidor',
             nodeTitle2: 'Actualización en Lote',

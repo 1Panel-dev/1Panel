@@ -3350,6 +3350,7 @@ const message = {
         monitor:
             'Ticari sürüme yükselterek web sitesinin gerçek zamanlı durumunu, ziyaretçi eğilimlerini, kaynaklarını ve istek günlüklerini görüntüleyebilirsiniz.',
         alert: 'Ticari sürüme yükselterek SMS uyarıları alabilir, uyarı günlüklerini görüntüleyebilir ve kritik olayları takip edebilirsiniz.',
+        vm: '1Panel ile sanal makineleri, imajları, şablonları, sanal ağları ve depolama kaynaklarını yönetmek için ticari sürüme yükseltin.',
         node: 'Ticari sürüme yükselterek 1Panel ile birden fazla Linux sunucusunu yönetebilirsiniz.',
         nodeApp:
             'Ticari sürüme yükselterek düğümleri manuel değiştirmeden çok düğümlü uygulama sürümlerini toplu olarak yükseltebilirsiniz.',
@@ -6417,6 +6418,14 @@ const message = {
             nodeDashTitle4: 'Zamanlanmış Görev Yönetimi',
             nodeDashContent4:
                 'Çoklu düğüm zamanlanmış görevlerinin birleşik yönetimi, durum izleme, hızlı başlatma/durdurma ve manuel tetikleme çalıştırma desteği',
+            vmTitle1: 'Sanal makineler',
+            vmContent1: 'Sanal makineler oluşturun ve yönetin, durumlarını izleyin ve kaynak tahsisini ayarlayın.',
+            vmTitle2: 'İmajlar ve şablonlar',
+            vmContent2: 'Sanal makine oluşturmayı kolaylaştırmak için ISO imajlarını ve şablonları yönetin.',
+            vmTitle3: 'Sanal ağlar',
+            vmContent3: 'Sanal ağları yönetin ve sanal makinelerin ağ bağlantılarını yapılandırın.',
+            vmTitle4: 'Depolama havuzları',
+            vmContent4: 'Depolama havuzlarını yönetin ve sanal makinelere depolama kaynakları tahsis edin.',
             nodeTitle1: 'Tek Tıkla Düğüm Ekleme',
             nodeContent1: 'Birden fazla sunucu düğümünü hızlıca entegre eder',
             nodeTitle2: 'Toplu Yükseltme',

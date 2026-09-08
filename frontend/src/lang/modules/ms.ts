@@ -3357,6 +3357,7 @@ const message = {
         monitor:
             'Naik taraf ke Edisi Komersial untuk melihat status laman web masa nyata, trend pelawat, sumber trafik, log permintaan dan lain-lain.',
         alert: 'Naik taraf ke Edisi Komersial untuk menerima amaran SMS dan melihat log amaran.',
+        vm: 'Naik taraf kepada edisi komersial untuk mengurus mesin maya, imej, templat, rangkaian maya dan sumber storan dalam 1Panel.',
         node: 'Naik taraf ke Edisi Komersial untuk mengurus berbilang pelayan Linux dengan 1Panel.',
         nodeApp:
             'Naik taraf ke Edisi Komersial untuk menaik taraf versi aplikasi berbilang nod tanpa menukar nod secara manual.',
@@ -6410,6 +6411,14 @@ const message = {
             nodeDashTitle4: 'Pengurusan Tugas Berjadual',
             nodeDashContent4:
                 'Pengurusan bersatu tugas berjadual berbilang nod, menyokong pemantauan status, mula/henti pantas dan pelaksanaan pencetus manual',
+            vmTitle1: 'Mesin maya',
+            vmContent1: 'Cipta dan urus mesin maya, pantau statusnya dan laraskan peruntukan sumber.',
+            vmTitle2: 'Imej dan templat',
+            vmContent2: 'Urus imej ISO dan templat untuk memudahkan penciptaan mesin maya.',
+            vmTitle3: 'Rangkaian maya',
+            vmContent3: 'Urus rangkaian maya dan konfigurasikan sambungan rangkaian mesin maya.',
+            vmTitle4: 'Kumpulan storan',
+            vmContent4: 'Urus kumpulan storan dan peruntukkan sumber storan kepada mesin maya.',
             nodeTitle1: 'Satu Klik Tambah Node',
             nodeContent1: 'Mengintegrasikan pelbagai nod pelayan dengan cepat',
             nodeTitle2: 'Kelompok Naik Taraf',
