@@ -38,6 +38,7 @@
                         <el-col :span="12" :xs="24" :sm="24" :md="12" class="min-w-0">
                             <el-select
                                 v-model="runtime.appID"
+                                :validate-event="false"
                                 :disabled="mode === 'edit'"
                                 @change="changeApp(runtime.appID)"
                                 class="w-full min-w-0 lg:!w-[200px]"
@@ -51,7 +52,12 @@
                             </el-select>
                         </el-col>
                         <el-col :span="12" :xs="24" :sm="24" :md="12" class="min-w-0">
-                            <el-select v-model="runtime.version" @change="changeVersion()" class="p-w-200">
+                            <el-select
+                                v-model="runtime.version"
+                                :validate-event="false"
+                                @change="changeVersion()"
+                                class="p-w-200"
+                            >
                                 <el-option
                                     v-for="(version, index) in appVersions"
                                     :key="index"
@@ -391,6 +397,7 @@ const changeVersion = () => {
     getAppDetail(runtime.appID, runtime.version, 'runtime')
         .then((res) => {
             runtime.appDetailID = res.data.id;
+            runtimeForm.value?.clearValidate('appDetailID');
             if (mode.value === 'create') {
                 runtime.image = res.data.image + ':' + runtime.version;
             }
