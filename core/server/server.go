@@ -53,6 +53,7 @@ func Start() {
 	service.SyncScriptLibraryOnStartup()
 
 	proxy.Init()
+	service.CloseTerminalSessions("all", "", "")
 
 	rootRouter := router.Routers()
 

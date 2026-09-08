@@ -35,6 +35,7 @@ type AuthProvider interface {
 	SyncPasswordExpirationTime(expirationDays string) error
 	UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error
 	HandlePasswordExpired(c *gin.Context, old, new string) error
+	RevokeTerminalSessions(scope, userID, authSessionID string) error
 
 	CoreAPIAuthMiddleware() gin.HandlerFunc
 	CoreRBACMiddlewares() []gin.HandlerFunc

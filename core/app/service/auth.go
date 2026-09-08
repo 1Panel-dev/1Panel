@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"net/http"
 	"strings"
 	"time"
 
@@ -21,7 +20,8 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/core/utils/passkey"
-	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
+	terminalsession "github.com/1Panel-dev/1Panel/core/utils/terminal_session"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"github.com/go-webauthn/webauthn/protocol"
 	"github.com/go-webauthn/webauthn/webauthn"
@@ -50,6 +50,7 @@ func NewIAuthService() IAuthService {
 }
 
 func (u *AuthService) LogOut(c *gin.Context) error {
+	identity, _ := terminalsession.FromContext(c)
 	httpsSetting, err := settingRepo.Get(repo.WithByKey("SSL"))
 	if err != nil {
 		return err
@@ -63,16 +64,13 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 			return err
 		}
 	}
-	CloseTerminalSessions()
+	CloseTerminalSessions("auth_session", identity.UserID, identity.AuthSessionID)
 	return nil
 }
 
-// CloseTerminalSessions tells the local agent to end every kept-alive web terminal.
-// A logged-out panel has nobody watching, so nothing it left running should survive.
-// ponytail: local agent only; shells on other nodes are the multi-node proxy's job.
-func CloseTerminalSessions() {
-	if _, err := proxy_local.NewLocalClient("/api/v2/hosts/terminal/sessions/closeAll", http.MethodPost, nil, nil); err != nil {
-		global.LOG.Warnf("close terminal sessions on logout failed, err: %v", err)
+func CloseTerminalSessions(scope, userID, authSessionID string) {
+	if err := xpack.AuthProvider.RevokeTerminalSessions(scope, userID, authSessionID); err != nil {
+		global.LOG.Warnf("revoke terminal sessions failed, scope=%s, err: %v", scope, err)
 	}
 }
 
