@@ -1,11 +1,13 @@
 package ssh
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"net"
 	"path"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -243,6 +245,105 @@ func (c *SSHClient) RunWithStreamOutput(command string, outputCallback func(stri
 	<-doneCh
 
 	return err
+}
+
+var ErrCommandTerminationUnconfirmed = errors.New("remote command termination could not be confirmed; check the source node before retrying")
+
+func (c *SSHClient) RunWithStreamOutputContext(ctx context.Context, command string, outputCallback func(string)) error {
+	return c.runStreamContext(ctx, command, outputCallback, 15*time.Second, 45*time.Second)
+}
+
+func (c *SSHClient) runStreamContext(ctx context.Context, command string, outputCallback func(string), heartbeatInterval, heartbeatTimeout time.Duration) (err error) {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	ctx, cancel := context.WithCancelCause(ctx)
+	closed := make(chan struct{})
+	stop := context.AfterFunc(ctx, func() {
+		c.Close()
+		close(closed)
+	})
+	heartbeatDone := make(chan struct{})
+	go func() {
+		defer close(heartbeatDone)
+		c.watchStreamConnection(ctx, cancel, heartbeatInterval, heartbeatTimeout)
+	}()
+	defer func() {
+		cause := context.Cause(ctx)
+		cancel(nil)
+		c.Close()
+		<-heartbeatDone
+		if !stop() {
+			<-closed
+		}
+		if cause != nil {
+			err = errors.Join(cause, ErrCommandTerminationUnconfirmed, err)
+		}
+	}()
+	session, err := c.Client.NewSession()
+	if err != nil {
+		return err
+	}
+	defer session.Close()
+	writer := &streamCallbackWriter{callback: outputCallback}
+	session.Stdout = writer
+	session.Stderr = writer
+	if err := session.Run(command); err != nil {
+		var exitErr *gossh.ExitError
+		if !errors.As(err, &exitErr) {
+			return errors.Join(ErrCommandTerminationUnconfirmed, err)
+		}
+		return err
+	}
+	return nil
+}
+
+func (c *SSHClient) watchStreamConnection(ctx context.Context, cancel context.CancelCauseFunc, interval, timeout time.Duration) {
+	ticker := time.NewTicker(interval)
+	defer ticker.Stop()
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+		}
+		result := make(chan error, 1)
+		go func() {
+			_, _, err := c.Client.SendRequest("keepalive@openssh.com", true, nil)
+			result <- err
+		}()
+		timer := time.NewTimer(timeout)
+		select {
+		case err := <-result:
+			timer.Stop()
+			if err != nil {
+				cancel(err)
+				return
+			}
+		case <-ctx.Done():
+			timer.Stop()
+			<-result // Closing the owned transport releases SendRequest.
+			return
+		case <-timer.C:
+			cancel(errors.New("SSH keepalive response timed out"))
+			<-result
+			return
+		}
+	}
+}
+
+type streamCallbackWriter struct {
+	mu       sync.Mutex
+	callback func(string)
+}
+
+func (w *streamCallbackWriter) Write(p []byte) (int, error) {
+	w.mu.Lock()
+	defer w.mu.Unlock()
+	if w.callback != nil {
+		w.callback(string(p))
+	}
+	return len(p), nil
 }
 
 func DialWithTimeout(network, addr string, useProxy bool, config *gossh.ClientConfig) (*gossh.Client, error) {
