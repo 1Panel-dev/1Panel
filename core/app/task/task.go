@@ -2,6 +2,7 @@ package task
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -10,7 +11,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
@@ -19,9 +19,13 @@ import (
 )
 
 type ActionFunc func(*Task) error
+type ContextActionFunc func(context.Context, *Task) error
 type RollbackFunc func(*Task)
 
+var ErrExecutionUnconfirmed = errors.New("task execution termination could not be confirmed")
+
 type Task struct {
+	TaskCtx           context.Context
 	Name              string
 	TaskID            string
 	Logger            *logrus.Logger
@@ -41,6 +45,9 @@ type SubTask struct {
 	Retry             int
 	Timeout           time.Duration
 	Action            ActionFunc
+	ContextAction     ContextActionFunc
+	ShouldRetry       func(error) bool
+	RetryBackoff      time.Duration
 	Rollback          RollbackFunc
 	Error             error
 	IgnoreErr         bool
@@ -113,7 +120,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 		Operate:    operate,
 	}
 	taskRepo := repo.NewITaskRepo()
-	task := &Task{Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
+	task := &Task{TaskID: taskID, Name: name, logFile: logFile, Logger: logger, taskRepo: taskRepo, Task: taskModel}
 	return task, nil
 }
 
@@ -132,53 +139,128 @@ func (t *Task) AddSubTaskWithOps(name string, action ActionFunc, rollback Rollba
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
+func (t *Task) AddSubTaskWithContext(name string, action ContextActionFunc, rollback RollbackFunc, retry int, timeout time.Duration) *SubTask {
+	subTask := &SubTask{RootTask: t, Name: name, Retry: retry, Timeout: timeout, ContextAction: action, Rollback: rollback}
+	t.SubTasks = append(t.SubTasks, subTask)
+	return subTask
+}
+
+func (t *Task) Context() context.Context {
+	if t.TaskCtx != nil {
+		return t.TaskCtx
+	}
+	return context.Background()
+}
+
 func (t *Task) AddSubTaskWithIgnoreErr(name string, action ActionFunc) {
 	subTask := &SubTask{RootTask: t, Name: name, Retry: 0, Timeout: 10 * time.Minute, Action: action, Rollback: nil, IgnoreErr: true}
 	t.SubTasks = append(t.SubTasks, subTask)
 }
 
 func (s *SubTask) Execute() error {
+	if s.Timeout < 0 || s.Retry < 0 || (s.Action == nil && s.ContextAction == nil) {
+		return fmt.Errorf("invalid subtask execution options")
+	}
 	subTaskName := s.Name
 	if s.Name == "" {
 		subTaskName = i18n.GetMsgByKey("SubTask")
 	}
 	s.RootTask.LogStart(subTaskName)
 	var err error
+	attempted := false
 	for i := 0; i < s.Retry+1; i++ {
+		if err = s.RootTask.Context().Err(); err != nil {
+			break
+		}
 		if i > 0 {
 			s.RootTask.Log(i18n.GetWithName("TaskRetry", strconv.Itoa(i)))
 		}
-		ctx, cancel := context.WithTimeout(context.Background(), s.Timeout)
-		defer cancel()
-
-		done := make(chan error)
-		go func() {
-			done <- s.Action(s.RootTask)
-		}()
-
+		var started bool
+		err, started = s.executeAttempt(subTaskName)
+		attempted = attempted || started
+		if err == nil {
+			s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", subTaskName))
+			return nil
+		}
+		s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
+		if i == s.Retry || !s.canRetry(err) {
+			break
+		}
+		timer := time.NewTimer(s.retryDelay(i))
 		select {
-		case <-ctx.Done():
-			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
-			if s.CancelWhenTimeout {
-				return buserr.New(i18n.GetWithName("TaskTimeout", subTaskName))
-			}
-		case err = <-done:
-			if err != nil {
-				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
-			} else {
-				s.RootTask.Log(i18n.GetWithName("SubTaskSuccess", subTaskName))
-				return nil
-			}
+		case <-s.RootTask.Context().Done():
+			timer.Stop()
+			err = s.RootTask.Context().Err()
+		case <-timer.C:
 		}
-
-		if i == s.Retry {
-			if s.Rollback != nil {
-				s.Rollback(s.RootTask)
-			}
-		}
-		time.Sleep(1 * time.Second)
+	}
+	if parentErr := s.RootTask.Context().Err(); parentErr != nil {
+		err = errors.Join(parentErr, err)
+	}
+	if attempted && s.Rollback != nil && !errors.Is(err, ErrExecutionUnconfirmed) {
+		s.Rollback(s.RootTask)
 	}
 	return err
+}
+
+func (s *SubTask) executeAttempt(name string) (error, bool) {
+	parent := s.RootTask.Context()
+	var ctx context.Context
+	var cancel context.CancelFunc
+	if s.Timeout == 0 {
+		ctx, cancel = context.WithCancel(parent)
+	} else {
+		ctx, cancel = context.WithTimeout(parent, s.Timeout)
+	}
+	defer cancel()
+	if err := ctx.Err(); err != nil {
+		return err, false
+	}
+	done := make(chan error, 1)
+	go func() {
+		if s.ContextAction != nil {
+			done <- s.ContextAction(ctx, s.RootTask)
+		} else {
+			done <- s.Action(s.RootTask)
+		}
+	}()
+	var err error
+	select {
+	case err = <-done:
+	case <-ctx.Done():
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			s.RootTask.Log(i18n.GetWithName("TaskTimeout", name))
+		}
+		err = <-done
+	}
+	if ctx.Err() != nil {
+		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
+			return errors.Join(fmt.Errorf("%s: %w", i18n.GetWithName("TaskTimeout", name), ctx.Err()), err), true
+		}
+		return errors.Join(ctx.Err(), err), true
+	}
+	return err, true
+}
+
+func (s *SubTask) canRetry(err error) bool {
+	if s.RootTask.Context().Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, ErrExecutionUnconfirmed) {
+		return false
+	}
+	if errors.Is(err, context.DeadlineExceeded) && (s.CancelWhenTimeout || s.ShouldRetry == nil) {
+		return false
+	}
+	return s.ShouldRetry == nil || s.ShouldRetry(err)
+}
+
+func (s *SubTask) retryDelay(attempt int) time.Duration {
+	if s.RetryBackoff <= 0 {
+		return time.Second
+	}
+	delay := min(s.RetryBackoff, 30*time.Second)
+	for i := 0; i < attempt && delay < 30*time.Second; i++ {
+		delay = min(delay*2, 30*time.Second)
+	}
+	return delay
 }
 
 func (t *Task) updateTask(task *model.Task) {
@@ -187,6 +269,9 @@ func (t *Task) updateTask(task *model.Task) {
 
 func (t *Task) Execute() error {
 	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
+		if t.logFile != nil {
+			_ = t.logFile.Close()
+		}
 		return err
 	}
 	var err error
@@ -200,14 +285,19 @@ func (t *Task) Execute() error {
 				t.Rollbacks = append(t.Rollbacks, subTask.Rollback)
 			}
 		} else {
-			if subTask.IgnoreErr {
+			if subTask.IgnoreErr && !errors.Is(err, context.Canceled) && !errors.Is(err, context.DeadlineExceeded) && !errors.Is(err, ErrExecutionUnconfirmed) {
 				err = nil
 				continue
 			}
 			t.Task.ErrorMsg = err.Error()
 			t.Task.Status = constant.StatusFailed
-			for _, rollback := range t.Rollbacks {
-				rollback(t)
+			if errors.Is(err, context.Canceled) && !errors.Is(err, ErrExecutionUnconfirmed) {
+				t.Task.Status = constant.StatusCanceled
+			}
+			if !errors.Is(err, ErrExecutionUnconfirmed) {
+				for _, rollback := range t.Rollbacks {
+					rollback(t)
+				}
 			}
 			t.updateTask(t.Task)
 			break
@@ -222,7 +312,9 @@ func (t *Task) Execute() error {
 	t.Log("[TASK-END]")
 	t.Task.EndAt = time.Now()
 	t.updateTask(t.Task)
-	_ = t.logFile.Close()
+	if t.logFile != nil {
+		_ = t.logFile.Close()
+	}
 	return err
 }
 

@@ -22,14 +22,15 @@ import (
 const maxStreamOutputCapture = 64 * 1024
 
 type CommandHelper struct {
-	context      context.Context
-	workDir      string
-	outputFile   string
-	env          []string
-	timeout      time.Duration
-	taskItem     *task.Task
-	logger       *log.Logger
-	IgnoreExist1 bool
+	context            context.Context
+	workDir            string
+	outputFile         string
+	env                []string
+	timeout            time.Duration
+	taskItem           *task.Task
+	logger             *log.Logger
+	IgnoreExist1       bool
+	preserveErrorCause bool
 }
 
 type Option func(*CommandHelper)
@@ -356,8 +357,18 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	}()
 	select {
 	case err := <-done:
+		if c.preserveErrorCause && newContext != nil && newContext.Err() != nil {
+			if cmd.Process != nil && cmd.Process.Pid > 0 {
+				_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+			}
+			return "", newContext.Err()
+		}
 		if err != nil {
-			return handleErr(&stdout, &stderr, c.IgnoreExist1, err)
+			out, resultErr := handleErr(&stdout, &stderr, c.IgnoreExist1, err)
+			if c.preserveErrorCause && resultErr != nil {
+				resultErr = &commandError{message: resultErr.Error(), cause: err}
+			}
+			return out, resultErr
 		}
 		return stdout.String(), nil
 	case <-contextDone(newContext):
@@ -374,6 +385,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 			err = newContext.Err()
 		}
 		<-done
+		if c.preserveErrorCause {
+			err = &commandError{message: err.Error(), cause: newContext.Err()}
+		}
 		return "", err
 	}
 }
@@ -413,6 +427,18 @@ func WithContext(ctx context.Context) Option {
 		s.context = ctx
 	}
 }
+
+func WithErrorCause() Option {
+	return func(s *CommandHelper) { s.preserveErrorCause = true }
+}
+
+type commandError struct {
+	message string
+	cause   error
+}
+
+func (e *commandError) Error() string { return e.message }
+func (e *commandError) Unwrap() error { return e.cause }
 
 func WithTimeout(timeout time.Duration) Option {
 	return func(s *CommandHelper) {
