@@ -6928,6 +6928,8 @@ const message = {
             },
             overview: 'Overview',
             dependencies: 'Dependencies',
+            architectureUnsupported:
+                'The current system architecture {0} is not supported. VM features currently support AMD64 and ARM64 only.',
             dependencyPurpose: 'Purpose',
             dependencyPurposeMap: {
                 libvirt: 'Provides VM management services for lifecycle control and resource scheduling.',

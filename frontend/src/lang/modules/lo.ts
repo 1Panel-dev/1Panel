@@ -6696,6 +6696,8 @@ const message = {
             },
             overview: 'ພາບລວມ',
             dependencies: 'ສິ່ງຂຶ້ນກັບ',
+            architectureUnsupported:
+                'ສະຖາປັດຕະຍະກຳລະບົບ {0} ຍັງບໍ່ຮອງຮັບ. ຟັງຊັນ VM ປັດຈຸບັນຮອງຮັບສະເພາະ AMD64 ແລະ ARM64.',
             dependencyPurpose: 'ຈຸດປະສົງ',
             dependencyPurposeMap: {
                 libvirt: 'ໃຫ້ບໍລິການຈັດການ VM ສຳລັບຄວບຄຸມວົງຈອນຊີວິດ ແລະ ຈັດສັນຊັບພະຍາກອນ.',

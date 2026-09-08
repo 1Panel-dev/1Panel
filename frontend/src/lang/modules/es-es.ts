@@ -7037,6 +7037,8 @@ const message = {
                 },
             },
             dependencies: 'Dependencias',
+            architectureUnsupported:
+                'La arquitectura actual del sistema, {0}, no es compatible. Las funciones de VM solo admiten AMD64 y ARM64.',
             dependencyPurpose: 'Propósito',
             dependencyPurposeMap: {
                 libvirt: 'Proporciona servicios de gestión de VM para el ciclo de vida y la planificación de recursos.',

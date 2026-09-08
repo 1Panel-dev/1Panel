@@ -7033,6 +7033,8 @@ const message = {
                 },
             },
             dependencies: 'Kebergantungan',
+            architectureUnsupported:
+                'Seni bina sistem semasa {0} tidak disokong. Ciri VM kini hanya menyokong AMD64 dan ARM64.',
             dependencyPurpose: 'Tujuan',
             dependencyPurposeMap: {
                 libvirt: 'Menyediakan perkhidmatan pengurusan VM untuk kitar hayat dan penjadualan sumber.',

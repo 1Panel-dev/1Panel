@@ -135,6 +135,7 @@ ClusterMasterNotExist: "Node utama kluster terputus, sila padamkan nod anak."
 # mesin maya
 ErrVMNotFound: "Mesin maya tidak wujud"
 ErrVMAlreadyExists: "Mesin maya sudah wujud"
+ErrVMCountLimit: "Edisi Professional membenarkan penciptaan sehingga {{ .limit }} mesin maya. Padamkan mesin maya sedia ada atau naik taraf kepada Enterprise dan cuba lagi."
 ErrVMImageAlreadyExists: "Fail imej mesin maya sudah wujud: {{ .detail }}"
 ErrVMStoragePathInUse: "Laluan kolam storan sudah digunakan oleh [{{ .name }}]"
 ErrVMHelperNotFound: "1panel-kvm tidak ditemui"

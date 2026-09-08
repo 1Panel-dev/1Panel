@@ -135,6 +135,7 @@ ClusterMasterNotExist: "ໂນດຫຼັກຂອງຄລັສເຕີຖ�
 # virtual machine
 ErrVMNotFound: "ບໍ່ມີເຄື່ອງສະເໝືອນ"
 ErrVMAlreadyExists: "ມີເຄື່ອງສະເໝືອນຢູ່ແລ້ວ"
+ErrVMCountLimit: "ລຸ້ນ Professional ສາມາດສ້າງເຄື່ອງສະເໝືອນໄດ້ສູງສຸດ {{ .limit }} ເຄື່ອງ. ກະລຸນາລຶບເຄື່ອງສະເໝືອນທີ່ມີຢູ່ ຫຼື ອັບເກຣດເປັນລຸ້ນ Enterprise ແລ້ວລອງອີກຄັ້ງ."
 ErrVMImageAlreadyExists: "ມີອິມເມຈເຄື່ອງສະເໝືອນຢູ່ແລ້ວ: {{ .detail }}"
 ErrVMStoragePathInUse: "ເສັ້ນທາງພູນຈັດເກັບຖືກໃຊ້ໂດຍ [{{ .name }}] ແລ້ວ"
 ErrVMHelperNotFound: "ບໍ່ພົບ 1panel-kvm"

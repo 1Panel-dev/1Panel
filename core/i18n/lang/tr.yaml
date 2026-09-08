@@ -135,6 +135,7 @@ ClusterMasterNotExist: "Küme ana düğümü bağlantısı kesildi, lütfen alt 
 # sanal makine
 ErrVMNotFound: "Sanal makine mevcut değil"
 ErrVMAlreadyExists: "Sanal makine zaten mevcut"
+ErrVMCountLimit: "Professional sürümü en fazla {{ .limit }} sanal makine oluşturulmasına izin verir. Mevcut bir sanal makineyi silin veya Enterprise sürümüne yükseltip tekrar deneyin."
 ErrVMImageAlreadyExists: "Sanal makine imaj dosyası zaten mevcut: {{ .detail }}"
 ErrVMStoragePathInUse: "Depolama havuzu yolu zaten [{{ .name }}] tarafından kullanılıyor"
 ErrVMHelperNotFound: "1panel-kvm bulunamadı"
