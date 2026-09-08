@@ -19,7 +19,7 @@
         <span v-if="actions.more.length" class="fu-table-operations__action">
             <el-dropdown class="fu-table-more-button" :trigger="trigger" @command="handleButtonClick">
                 <span class="fu-table-operations__dropdown-trigger">
-                    <el-button class="fu-table-operations__button" link type="primary" @click.stop>
+                    <el-button class="fu-table-operations__button" link type="primary">
                         {{ t('fu.table.more') }}
                     </el-button>
                 </span>
@@ -50,13 +50,19 @@ import { isOperationDisabled, isOperationVisible, type FuTableOperationButton } 
 
 defineOptions({ name: 'FuTableOperationActions' });
 
+type DropdownTrigger = 'hover' | 'click' | 'contextmenu';
+type DropdownTriggerValue = DropdownTrigger | DropdownTrigger[];
+
 const { t } = useI18n();
 const props = defineProps({
     buttons: { type: Array as PropType<FuTableOperationButton[]>, default: () => [] },
     row: { type: Object, required: true },
     ellipsis: { type: Number, default: 2 },
     extra: { type: Number, default: 0 },
-    trigger: { type: String, default: 'hover' },
+    trigger: {
+        type: [String, Array] as PropType<DropdownTriggerValue>,
+        default: 'hover',
+    },
     dropdownStyle: { type: Object as PropType<Record<string, string> | undefined>, default: undefined },
 });
 

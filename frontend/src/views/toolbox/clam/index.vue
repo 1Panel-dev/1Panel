@@ -2,7 +2,7 @@
     <div>
         <LayoutContent v-loading="loading" v-if="!isRecordShow && !isSettingShow" :title="$t('toolbox.clam.clam')">
             <template #prompt>
-                <el-alert type="info" :closable="false">
+                <el-alert class="clam-helper-alert" type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.clam.clamHelper') }}
                         <el-link class="ml-1 text-xs" v-if="!isFxplay" @click="toDoc()" type="primary">
@@ -52,6 +52,7 @@
                     :class="{ mask: !clamStatus.isRunning }"
                     v-if="!isSettingShow"
                     :pagination-config="paginationConfig"
+                    :scrollbar-always-on="isMobile"
                     v-model:selects="selects"
                     @sort-change="search"
                     @search="search"
@@ -60,7 +61,7 @@
                     <el-table-column type="selection" fix />
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :min-width="60"
+                        :min-width="isMobile ? 140 : 60"
                         prop="name"
                         sortable
                         show-overflow-tooltip
@@ -163,6 +164,7 @@
                         :buttons="buttons"
                         :ellipsis="10"
                         :label="$t('commons.table.operate')"
+                        :fixed="isMobile ? false : 'right'"
                         fix
                     />
                 </ComplexTable>
@@ -202,7 +204,7 @@ import { routerToFileWithPath, routerToName } from '@/utils/router';
 const loading = ref();
 const selects = ref<any>([]);
 
-const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
+const { docsUrl, isFxplay, isProductPro, isMobile } = useGlobalStore();
 const data = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'clam-page-size',
@@ -394,3 +396,23 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style scoped lang="scss">
+@media only screen and (max-width: 767px) {
+    .clam-helper-alert {
+        :deep(.el-alert__content),
+        :deep(.el-alert__title) {
+            width: 100%;
+            min-width: 0;
+        }
+
+        :deep(.el-alert__title) {
+            display: block;
+        }
+
+        :deep(.el-link) {
+            white-space: nowrap;
+        }
+    }
+}
+</style>

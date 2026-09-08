@@ -111,12 +111,12 @@
                 <el-tab-pane :label="$t('commons.table.port')">
                     <div class="mt-1.5">
                         <el-row :gutter="20">
-                            <el-col :span="8">
+                            <el-col :span="8" :xs="24">
                                 <el-form-item :label="$t('commons.table.port')" prop="port">
                                     <el-input v-model.number="mcpServer.port" />
                                 </el-form-item>
                             </el-col>
-                            <el-col :span="6">
+                            <el-col :span="6" :xs="24">
                                 <el-form-item :label="$t('app.allowPort')" prop="hostIP">
                                     <el-switch
                                         v-model="mcpServer.hostIP"

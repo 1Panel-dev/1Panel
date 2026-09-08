@@ -176,9 +176,9 @@
                                     </el-icon>
                                     <span class="sm:inline hidden pl-1">{{ $t('commons.button.refresh') }}</span>
                                 </el-text>
-                                <el-divider direction="vertical" v-if="!isMobile" class="!mx-0" />
-                                <el-dropdown @command="handleCreate" v-if="!isMobile" trigger="click">
-                                    <el-text size="small">
+                                <el-divider direction="vertical" class="!mx-0" />
+                                <el-dropdown @command="handleCreate" trigger="click">
+                                    <el-text size="small" class="cursor-pointer">
                                         {{ $t('commons.button.create') }}
                                         <el-icon><arrow-down /></el-icon>
                                     </el-text>
@@ -280,6 +280,69 @@
                                             ></svg-icon>
                                             <small :title="node.label" class="tree-node-label">{{ node.label }}</small>
                                         </template>
+                                    </span>
+                                    <span
+                                        v-if="isMobile && data.id !== 'new-dir' && data.id !== 'new-file'"
+                                        class="tree-node-mobile-actions"
+                                        @click.stop
+                                    >
+                                        <el-dropdown
+                                            trigger="click"
+                                            @command="(command) => handleMobileTreeCommand(command, data, node)"
+                                        >
+                                            <el-button
+                                                class="mobile-tree-node-action"
+                                                link
+                                                :aria-label="$t('tabs.more')"
+                                            >
+                                                <el-icon><MoreFilled /></el-icon>
+                                            </el-button>
+                                            <template #dropdown>
+                                                <el-dropdown-menu>
+                                                    <fu-dropdown-item
+                                                        v-if="data.isDir"
+                                                        v-permission
+                                                        v-node-admin
+                                                        command="dir"
+                                                    >
+                                                        <svg-icon
+                                                            class="tree-context-menu__icon"
+                                                            iconName="p-file-folder"
+                                                        ></svg-icon>
+                                                        {{ $t('file.dir') }}
+                                                    </fu-dropdown-item>
+                                                    <fu-dropdown-item
+                                                        v-if="data.isDir"
+                                                        v-permission
+                                                        v-node-admin
+                                                        command="file"
+                                                    >
+                                                        <svg-icon
+                                                            class="tree-context-menu__icon"
+                                                            iconName="p-file-normal"
+                                                        ></svg-icon>
+                                                        {{ $t('menu.files') }}
+                                                    </fu-dropdown-item>
+                                                    <el-dropdown-item command="copy">
+                                                        <el-icon><CopyDocument /></el-icon>
+                                                        {{ $t('file.copyDir') }}
+                                                    </el-dropdown-item>
+                                                    <fu-dropdown-item v-permission v-node-admin command="rename">
+                                                        <el-icon><Edit /></el-icon>
+                                                        {{ $t('file.rename') }}
+                                                    </fu-dropdown-item>
+                                                    <fu-dropdown-item
+                                                        v-permission
+                                                        v-node-admin
+                                                        command="delete"
+                                                        divided
+                                                    >
+                                                        <el-icon><Delete /></el-icon>
+                                                        {{ $t('commons.button.delete') }}
+                                                    </fu-dropdown-item>
+                                                </el-dropdown-menu>
+                                            </template>
+                                        </el-dropdown>
                                     </span>
                                 </template>
                             </el-tree-v2>
@@ -504,7 +567,7 @@ import { copyText } from '@/utils/clipboard';
 import { getIcon } from '@/utils/file';
 import { newUUID } from '@/utils/id';
 import { TreeNodeData } from 'element-plus/es/components/tree-v2/src/types';
-import { CopyDocument, Delete, Edit, Refresh, Top } from '@element-plus/icons-vue';
+import { CopyDocument, Delete, Edit, MoreFilled, Refresh, Top } from '@element-plus/icons-vue';
 import { loadBaseDir } from '@/api/modules/setting';
 import CodeTabs from './tabs/index.vue';
 import FileHistoryDrawer from './history/index.vue';
@@ -1841,6 +1904,23 @@ const deleteFromContextMenu = async () => {
     }
 };
 
+const handleMobileTreeCommand = (command: string, data: any, node: any) => {
+    treeContextMenu.data = data;
+    treeContextMenu.node = node;
+    if (command === 'dir' || command === 'file') {
+        return createFromContextMenu(command);
+    }
+    if (command === 'copy') {
+        return copyPathFromContextMenu();
+    }
+    if (command === 'rename') {
+        return renameFromContextMenu();
+    }
+    if (command === 'delete') {
+        return deleteFromContextMenu();
+    }
+};
+
 const currentEditingNode = ref<any>(null);
 
 const createNewNode = (command: string) => {
@@ -2157,7 +2237,8 @@ defineExpose({ acceptParams });
 .tree-node-content {
     display: inline-flex;
     align-items: center;
-    width: 100%;
+    flex: 1 1 auto;
+    width: auto;
     min-width: 0;
 }
 
@@ -2171,10 +2252,24 @@ defineExpose({ acceptParams });
 }
 
 .tree-node-label {
+    flex: 1 1 auto;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.tree-node-mobile-actions {
+    flex: 0 0 32px;
+    margin-left: auto;
+}
+
+.mobile-tree-node-action {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+    margin: 0;
+    padding: 0;
 }
 
 :deep(.el-tabs) {
@@ -2231,7 +2326,7 @@ defineExpose({ acceptParams });
     border-left: 3px solid var(--el-color-primary);
 }
 
-@media (max-width: 599px) {
+@media (max-width: 767px) {
     .code-header {
         min-height: 44px;
         padding-right: 12px !important;

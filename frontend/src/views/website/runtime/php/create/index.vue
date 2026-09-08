@@ -34,13 +34,13 @@
             </el-form-item>
             <div v-if="runtime.resource === 'appstore'">
                 <el-form-item :label="$t('app.app')" prop="appDetailID" :rules="Rules.requiredSelect">
-                    <el-row :gutter="20">
-                        <el-col :span="12">
+                    <el-row :gutter="20" class="w-[calc(100%+20px)] gap-y-3 lg:w-auto lg:gap-y-0">
+                        <el-col :span="12" :xs="24" :sm="24" :md="12" class="min-w-0">
                             <el-select
                                 v-model="runtime.appID"
                                 :disabled="mode === 'edit'"
                                 @change="changeApp(runtime.appID)"
-                                class="p-w-200"
+                                class="w-full min-w-0 lg:!w-[200px]"
                             >
                                 <el-option
                                     v-for="(app, index) in apps"
@@ -50,13 +50,14 @@
                                 ></el-option>
                             </el-select>
                         </el-col>
-                        <el-col :span="12">
+                        <el-col :span="12" :xs="24" :sm="24" :md="12" class="min-w-0">
                             <el-select v-model="runtime.version" @change="changeVersion()" class="p-w-200">
                                 <el-option
                                     v-for="(version, index) in appVersions"
                                     :key="index"
                                     :label="version"
                                     :value="version"
+                                    class="w-full min-w-0 lg:!w-[200px]"
                                 ></el-option>
                             </el-select>
                         </el-col>

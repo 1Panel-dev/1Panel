@@ -547,7 +547,6 @@ func (f FileOp) DownloadFileWithProcess(rawURL, dst, key string, options Downloa
 			partInfo, runErr = out.Stat()
 		}
 		if runErr == nil {
-			// Remember umask-derived permissions, but keep incomplete content private.
 			runErr = out.Chmod(0600)
 		}
 		if runErr == nil {

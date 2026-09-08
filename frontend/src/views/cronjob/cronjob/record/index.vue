@@ -7,7 +7,7 @@
                         <el-popover
                             v-if="dialogData.rowData.name.length >= 15"
                             placement="top-start"
-                            trigger="hover"
+                            :trigger="hasFinePointer ? 'hover' : 'click'"
                             width="250"
                             :content="$t('cronjob.' + dialogData.rowData.type) + ' - ' + dialogData.rowData.name"
                         >
@@ -80,7 +80,7 @@
         <LayoutContent :title="$t('cronjob.record')" :reload="true">
             <template #rightToolBar>
                 <el-date-picker
-                    class="mr-2.5"
+                    class="mr-2.5 record-time-range"
                     @change="search(true)"
                     v-model="timeRangeLoad"
                     type="datetimerange"
@@ -257,6 +257,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
+import { useMediaQuery } from '@vueuse/core';
 import { Cronjob } from '@/api/interface/cronjob';
 import { searchRecords, handleOnce, updateStatus, cleanRecords, stopCronjob } from '@/api/modules/cronjob';
 import { dateFormat } from '@/utils/date';
@@ -268,6 +269,8 @@ import { listDbItems } from '@/api/modules/database';
 import { listAppInstalled } from '@/api/modules/app';
 import { shortcuts } from '@/utils/shortcuts';
 import { hasBackup } from '../helper';
+
+const hasFinePointer = useMediaQuery('(hover: hover) and (pointer: fine)');
 
 const loading = ref();
 const hasRecords = ref();
@@ -480,6 +483,7 @@ defineExpose({
 <style lang="scss" scoped>
 .infinite-list {
     height: calc(100vh - 320px);
+    height: calc(100dvh - 320px);
     .select-sign {
         &::before {
             float: left;
@@ -516,6 +520,48 @@ defineExpose({
     }
     .mainRowClass {
         min-width: 1200px;
+    }
+}
+
+@media only screen and (max-width: 1024px) {
+    .mainClass {
+        overflow: visible;
+    }
+
+    .mainRowClass {
+        min-width: 0;
+        flex-direction: column;
+
+        > .el-col {
+            flex: 0 0 100%;
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+}
+
+@media only screen and (max-width: 767px) {
+    .infinite-list {
+        height: 320px;
+        height: clamp(220px, 38dvh, 360px);
+    }
+
+    .descriptionWide,
+    .description {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .page-item {
+        float: none;
+        max-width: 100%;
+        overflow-x: auto;
+    }
+
+    :global(.record-time-range.el-date-editor) {
+        width: 100%;
+        max-width: 100%;
+        margin-right: 0;
     }
 }
 </style>

@@ -107,7 +107,7 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
             if (r.status !== 'fulfilled') return;
             const fromLocalNode = i === 1 || node === 'local';
             for (const s of r.value.data || []) {
-				if (s.kind !== 'local' && s.kind !== 'ssh') continue;
+                if (s.kind !== 'local' && s.kind !== 'ssh') continue;
                 // attached elsewhere = another browser tab is using it; do not steal it
                 if (s.attached || entries.value.some((e) => e.sessionId === s.id)) continue;
                 if (s.hostId > 0 && !fromLocalNode) continue; // ssh sessions are served by the local node

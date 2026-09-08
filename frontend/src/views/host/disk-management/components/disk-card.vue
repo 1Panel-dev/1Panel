@@ -1,10 +1,12 @@
 <template>
-    <el-card class="shadow-sm">
+    <el-card class="disk-card shadow-sm">
         <div class="border-b pb-4">
             <div class="flex items-center space-x-4">
                 <div>
-                    <h3 class="text-lg">
-                        {{ $t('home.disk') }}{{ $t('commons.table.name') }}: {{ diskInfo.device }}
+                    <h3 class="disk-title text-lg">
+                        <span class="disk-title__name">
+                            {{ $t('home.disk') }}{{ $t('commons.table.name') }}: {{ diskInfo.device }}
+                        </span>
                         <el-tag size="small" type="warning" v-if="scope === 'system'">
                             {{ $t('disk.systemDisk') }}
                         </el-tag>
@@ -20,26 +22,28 @@
                             {{ $t('disk.unpartitionedDisk') }}
                         </el-tag>
                     </h3>
-                    <div class="flex items-center space-x-6 text-sm">
-                        <el-text type="info">{{ $t('container.size') }}: {{ diskInfo.size }}</el-text>
-                        <el-text type="info">
+                    <div class="disk-summary text-sm">
+                        <el-text type="info" class="disk-summary__item">
+                            {{ $t('container.size') }}: {{ diskInfo.size }}
+                        </el-text>
+                        <el-text type="info" class="disk-summary__item">
                             {{ $t('disk.partition') }}:
                             <span v-if="diskInfo.partitions">
                                 {{ diskInfo.partitions?.length }}
                             </span>
                             <span v-else>0</span>
                         </el-text>
-                        <el-text type="info" v-if="diskInfo.diskType" class="flex items-center">
+                        <el-text type="info" v-if="diskInfo.diskType" class="disk-summary__item">
                             {{ $t('disk.diskType') }}:
                             <el-tag class="ml-2" size="small" type="info">{{ diskInfo.diskType }}</el-tag>
                         </el-text>
-                        <el-text type="info" v-if="diskInfo.model" class="flex items-center">
+                        <el-text type="info" v-if="diskInfo.model" class="disk-summary__item">
                             {{ $t('disk.model') }}:
-                            <span class="ml-2">{{ diskInfo.model }}</span>
+                            <span class="disk-summary__value ml-2">{{ diskInfo.model }}</span>
                         </el-text>
-                        <el-text type="info" v-if="diskInfo.serial" class="flex items-center">
+                        <el-text type="info" v-if="diskInfo.serial" class="disk-summary__item">
                             {{ $t('disk.serial') }}:
-                            <span class="ml-2">{{ diskInfo.serial }}</span>
+                            <span class="disk-summary__value ml-2">{{ diskInfo.serial }}</span>
                         </el-text>
                         <div
                             v-if="
@@ -63,16 +67,20 @@
             </div>
         </div>
         <div v-if="diskInfo.partitions && diskInfo.partitions.length > 0">
-            <el-table :data="diskInfo.partitions" class="w-full">
-                <el-table-column prop="device" :label="$t('disk.partition') + $t('commons.table.name')" min-width="100">
+            <el-table :data="diskInfo.partitions" class="w-full" :scrollbar-always-on="isMobile">
+                <el-table-column
+                    prop="device"
+                    :label="$t('disk.partition') + $t('commons.table.name')"
+                    :min-width="columnMinWidth(100, 120)"
+                >
                     <template #default="{ row }">
                         <span class="font-medium">{{ row.device.split('/').pop() }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="size" :label="$t('container.size')" min-width="40" />
-                <el-table-column prop="used" :label="$t('home.used')" min-width="40" />
-                <el-table-column prop="avail" :label="$t('home.available')" min-width="40" />
-                <el-table-column prop="usePercent" :label="$t('home.percent')" min-width="60">
+                <el-table-column prop="size" :label="$t('container.size')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="used" :label="$t('home.used')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="avail" :label="$t('home.available')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="usePercent" :label="$t('home.percent')" :min-width="columnMinWidth(60, 120)">
                     <template #default="{ row }">
                         <el-progress
                             :percentage="row.usePercent"
@@ -82,7 +90,7 @@
                         />
                     </template>
                 </el-table-column>
-                <el-table-column prop="mountPoint" :label="$t('disk.mountPoint')" min-width="120">
+                <el-table-column prop="mountPoint" :label="$t('disk.mountPoint')" :min-width="columnMinWidth(120, 160)">
                     <template #default="{ row }">
                         <span v-if="row.mountPoint != ''">
                             {{ row.mountPoint }}
@@ -90,7 +98,7 @@
                         <el-tag v-else size="small" type="warning">{{ $t('disk.unmounted') }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="filesystem" :label="$t('disk.filesystem')" min-width="80">
+                <el-table-column prop="filesystem" :label="$t('disk.filesystem')" :min-width="columnMinWidth(80, 100)">
                     <template #default="{ row }">
                         <el-tag size="small" type="info" v-if="row.filesystem != ''">{{ row.filesystem }}</el-tag>
                     </template>
@@ -117,16 +125,20 @@
             <el-text v-if="scope === 'system'">{{ $t('disk.systemDiskHelper') }}</el-text>
         </div>
         <div v-if="diskInfo.partitions == undefined && diskInfo.mountPoint != ''">
-            <el-table :data="[diskInfo]" class="w-full">
-                <el-table-column prop="device" :label="$t('disk.partition') + $t('commons.table.name')" min-width="100">
+            <el-table :data="[diskInfo]" class="w-full" :scrollbar-always-on="isMobile">
+                <el-table-column
+                    prop="device"
+                    :label="$t('disk.partition') + $t('commons.table.name')"
+                    :min-width="columnMinWidth(100, 120)"
+                >
                     <template #default="{ row }">
                         <span class="font-medium">{{ row.device.split('/').pop() }}</span>
                     </template>
                 </el-table-column>
-                <el-table-column prop="size" :label="$t('container.size')" min-width="40" />
-                <el-table-column prop="used" :label="$t('home.used')" min-width="40" />
-                <el-table-column prop="avail" :label="$t('home.available')" min-width="40" />
-                <el-table-column prop="usePercent" :label="$t('home.percent')" min-width="60">
+                <el-table-column prop="size" :label="$t('container.size')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="used" :label="$t('home.used')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="avail" :label="$t('home.available')" :min-width="columnMinWidth(40, 80)" />
+                <el-table-column prop="usePercent" :label="$t('home.percent')" :min-width="columnMinWidth(60, 120)">
                     <template #default="{ row }">
                         <el-progress
                             :percentage="row.usePercent"
@@ -136,7 +148,7 @@
                         />
                     </template>
                 </el-table-column>
-                <el-table-column prop="mountPoint" :label="$t('disk.mountPoint')" min-width="120">
+                <el-table-column prop="mountPoint" :label="$t('disk.mountPoint')" :min-width="columnMinWidth(120, 160)">
                     <template #default="{ row }">
                         <span v-if="row.mountPoint != ''">
                             {{ row.mountPoint }}
@@ -144,7 +156,7 @@
                         <el-tag v-else size="small" type="warning">{{ $t('disk.unmounted') }}</el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column prop="filesystem" :label="$t('disk.filesystem')" min-width="80">
+                <el-table-column prop="filesystem" :label="$t('disk.filesystem')" :min-width="columnMinWidth(80, 100)">
                     <template #default="{ row }">
                         <el-tag size="small" type="info" v-if="row.filesystem != ''">{{ row.filesystem }}</el-tag>
                     </template>
@@ -177,8 +189,10 @@ import { Host } from '@/api/interface/host';
 import i18n from '@/lang';
 import { unmountDisk } from '@/api/modules/host';
 import { MsgSuccess } from '@/utils/message';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits(['partition', 'search', 'mount']);
+const { isMobile } = useGlobalStore();
 
 defineProps({
     diskInfo: {
@@ -194,6 +208,8 @@ defineProps({
 const handlePartition = (diskInfo: Host.DiskInfo) => {
     emit('partition', diskInfo);
 };
+
+const columnMinWidth = (desktop: number, mobile: number) => (isMobile.value ? mobile : desktop);
 
 const mount = (diskInfo: Host.DiskInfo) => {
     emit('mount', diskInfo);
@@ -217,3 +233,49 @@ const unmount = (diskInfo: Host.DiskInfo) => {
     });
 };
 </script>
+
+<style scoped lang="scss">
+.disk-title {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.disk-title__name,
+.disk-summary__value {
+    min-width: 0;
+    overflow-wrap: anywhere;
+}
+
+.disk-summary {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+}
+
+.disk-summary__item {
+    display: inline-flex;
+    min-width: 0;
+    max-width: 100%;
+    align-items: center;
+}
+
+@media only screen and (max-width: 767px) {
+    .disk-card {
+        --el-card-padding: 12px;
+    }
+
+    .disk-summary {
+        align-items: flex-start;
+        gap: 8px 12px;
+    }
+
+    .disk-summary__item {
+        flex: 1 1 140px;
+    }
+}
+</style>

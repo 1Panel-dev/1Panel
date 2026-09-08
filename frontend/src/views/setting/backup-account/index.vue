@@ -27,10 +27,16 @@
                         </span>
                     </template>
                 </el-alert>
-                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                <ComplexTable
+                    :pagination-config="paginationConfig"
+                    @sort-change="search"
+                    @search="search"
+                    :data="data"
+                    :scrollbar-always-on="isMobile"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
-                        :min-width="80"
+                        :min-width="isMobile ? 140 : 80"
                         prop="name"
                         show-overflow-tooltip
                     >
@@ -98,9 +104,9 @@
                         show-overflow-tooltip
                     />
                     <fu-table-operations
-                        width="300px"
+                        :width="isMobile ? 100 : 300"
                         :buttons="buttons"
-                        :ellipsis="10"
+                        :ellipsis="isMobile ? 0 : 10"
                         :label="$t('commons.table.operate')"
                         fix
                     />
@@ -125,7 +131,7 @@ import { MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isProductPro, isFxplay, docsUrl } = useGlobalStore();
+const { isProductPro, isFxplay, docsUrl, isMobile } = useGlobalStore();
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({

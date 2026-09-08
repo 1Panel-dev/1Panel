@@ -729,4 +729,43 @@ onBeforeUnmount(() => {
         min-width: 100px;
     }
 }
+
+@media (max-width: 767px) {
+    .table-footer-container {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+
+        .footer-left {
+            width: 100%;
+            max-width: 100%;
+            min-width: 0;
+            flex-shrink: 1;
+            flex-wrap: wrap;
+
+            &:empty {
+                display: none;
+            }
+
+            :deep(.footer-left-button) {
+                width: 100%;
+                max-width: 100%;
+                min-width: 0;
+            }
+
+            :deep(.footer-left-button .el-select) {
+                flex: 1 1 auto;
+                max-width: 100%;
+                min-width: 0;
+            }
+        }
+    }
+
+    .complex-table__pagination {
+        flex: 0 1 auto;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+}
 </style>

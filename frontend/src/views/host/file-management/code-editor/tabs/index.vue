@@ -114,7 +114,7 @@ const onDropdownVisibleChange = (visible: boolean, currentPath: string) => {
     white-space: nowrap;
 }
 
-@media (max-width: 599px) {
+@media (max-width: 767px) {
     .el-dropdown-link {
         max-width: 112px;
     }

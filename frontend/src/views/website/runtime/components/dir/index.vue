@@ -15,7 +15,7 @@
     </el-form-item>
     <div v-if="appKey == 'node'">
         <el-row :gutter="20">
-            <el-col :span="18">
+            <el-col :span="18" :xs="24" :sm="24" :md="18">
                 <el-form-item :label="$t('runtime.runScript')" prop="params.EXEC_SCRIPT">
                     <el-select
                         v-model="runtime.params['EXEC_SCRIPT']"
@@ -43,7 +43,7 @@
                     </span>
                 </el-form-item>
             </el-col>
-            <el-col :span="6">
+            <el-col :span="6" :xs="24" :sm="24" :md="6">
                 <el-form-item :label="$t('runtime.customScript')" prop="params.CUSTOM_SCRIPT">
                     <el-switch
                         v-model="runtime.params['CUSTOM_SCRIPT']"

@@ -3,8 +3,8 @@ import { useRoute } from 'vue-router';
 import { MenuStore } from '@/store';
 import { DeviceType } from '@/enums/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-/** 参考 Bootstrap 的响应式设计 WIDTH = 600 */
-const WIDTH = 600;
+/** 与 Tailwind CSS 的 md 断点保持一致 */
+const MOBILE_BREAKPOINT = 768;
 
 /** 根据大小变化重新布局 */
 export default () => {
@@ -13,16 +13,20 @@ export default () => {
     const menuStore = MenuStore();
     const _isMobile = () => {
         const rect = document.body.getBoundingClientRect();
-        return rect.width - 1 < WIDTH;
+        return rect.width < MOBILE_BREAKPOINT;
+    };
+
+    const _syncLayout = () => {
+        const isMobileScreen = _isMobile();
+        globalStore.toggleDevice(isMobileScreen ? DeviceType.Mobile : DeviceType.Desktop);
+        if (isMobileScreen) {
+            menuStore.closeSidebar(true);
+        }
     };
 
     const _resizeHandler = () => {
         if (!document.hidden) {
-            const isMobileScreen = _isMobile();
-            globalStore.toggleDevice(isMobileScreen ? DeviceType.Mobile : DeviceType.Desktop);
-            if (isMobileScreen) {
-                menuStore.closeSidebar(true);
-            }
+            _syncLayout();
         }
     };
 
@@ -40,10 +44,7 @@ export default () => {
     });
 
     onMounted(() => {
-        if (_isMobile()) {
-            globalStore.toggleDevice(DeviceType.Mobile);
-            menuStore.closeSidebar(true);
-        }
+        _syncLayout();
     });
 
     onBeforeUnmount(() => {
