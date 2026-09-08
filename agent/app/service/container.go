@@ -536,7 +536,9 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 		if err != nil {
 			return err
 		}
-		normalizeContainerEndpointSettings(ctx, client, networkConf, nil)
+		if err := normalizeContainerEndpointSettings(ctx, client, networkConf, nil); err != nil {
+			return err
+		}
 		con, err := client.ContainerCreate(ctx, config, hostConf, networkConf, &v1.Platform{}, req.Name)
 		if err != nil {
 			taskItem.Log(i18n.GetMsgByKey("ContainerCreateFailed"))
@@ -646,14 +648,9 @@ func loadContainerNetworkInfo(name string, endpoint *network.EndpointSettings) d
 	if endpoint.IPAMConfig != nil {
 		item.LinkLocalIPs = append([]string(nil), endpoint.IPAMConfig.LinkLocalIPs...)
 	}
-	if name != "bridge" {
-		if endpoint.IPAMConfig != nil {
-			item.Ipv4 = endpoint.IPAMConfig.IPv4Address
-			item.Ipv6 = endpoint.IPAMConfig.IPv6Address
-		} else {
-			item.Ipv4 = endpoint.IPAddress
-			item.Ipv6 = endpoint.GlobalIPv6Address
-		}
+	if name != "bridge" && endpoint.IPAMConfig != nil {
+		item.Ipv4 = endpoint.IPAMConfig.IPv4Address
+		item.Ipv6 = endpoint.IPAMConfig.IPv6Address
 	}
 	return item
 }
