@@ -2153,6 +2153,13 @@ const message = {
         sessionExpired: 'La sesión ya no está disponible, pulse Enter o haga clic en reconectar para abrir una nueva',
         sessionKicked: 'Esta sesión se abrió en otra ventana',
         sessionCount: '{0} sesiones',
+        sessionRules: 'Reglas de la sesión de terminal',
+        sessionRuleClose: 'Cerrar el terminal finaliza la sesión de inmediato.',
+        sessionRuleDisconnect:
+            'Recuperable durante 30 minutos tras recargar, cerrar el navegador o perder la conexión.',
+        sessionRuleRevalidate:
+            'La sesión termina si el inicio de sesión no es válido o la verificación tarda demasiado.',
+        sessionRuleResources: 'Más terminales consumen más recursos. Cierra los que ya no necesites.',
         minimize: 'Minimizar',
         closeAllSessions: 'Cerrar todas las sesiones',
         closeAllConfirm: 'Se desconectarán todas las sesiones de terminal y no se podrán recuperar. ¿Continuar?',
@@ -6951,6 +6958,8 @@ const message = {
             submitSuccess: 'La tarea de sincronización se ha enviado correctamente.',
         },
         vm: {
+            countLimitHelper:
+                'La edición Professional permite crear hasta {0} máquinas virtuales. Enterprise no limita la cantidad.',
             vm: 'Máquina virtual',
             title: 'Gestión de máquinas virtuales',
             healthCheck: 'Comprobación de estado',

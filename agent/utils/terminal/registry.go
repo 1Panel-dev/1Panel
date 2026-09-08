@@ -2,7 +2,6 @@ package terminal
 
 import (
 	"errors"
-	"fmt"
 	"sort"
 	"sync"
 )
@@ -10,13 +9,6 @@ import (
 // sessions is the process wide registry of live sessions, keyed by id.
 // Open stores, Close deletes.
 var sessions sync.Map
-
-const maxSessionsPerIdentity = 10
-
-var (
-	sessionSlotsMu sync.Mutex
-	sessionSlots   = make(map[Identity]int)
-)
 
 var errSessionNotFound = errors.New("terminal session not found")
 
@@ -34,47 +26,12 @@ func (i Identity) Valid() bool {
 	return i.UserID != "" && i.AuthSessionID != ""
 }
 
-func reserveSessionSlot(identity Identity) error {
-	if !identity.Valid() {
-		return errors.New("missing terminal identity")
-	}
-	sessionSlotsMu.Lock()
-	defer sessionSlotsMu.Unlock()
-	if sessionSlots[identity] >= maxSessionsPerIdentity {
-		return fmt.Errorf("terminal session limit reached (maximum %d)", maxSessionsPerIdentity)
-	}
-	sessionSlots[identity]++
-	return nil
-}
-
-func releaseSessionSlot(identity Identity) {
-	sessionSlotsMu.Lock()
-	defer sessionSlotsMu.Unlock()
-	releaseSessionSlotLocked(identity)
-}
-
-func releaseSessionSlotLocked(identity Identity) {
-	remaining := sessionSlots[identity] - 1
-	if remaining <= 0 {
-		delete(sessionSlots, identity)
-		return
-	}
-	sessionSlots[identity] = remaining
-}
-
-func registerReservedSession(s *Session) {
+func registerSession(s *Session) {
 	sessions.Store(s.ID, s)
 }
 
 func unregisterSession(s *Session) {
-	sessionSlotsMu.Lock()
-	defer sessionSlotsMu.Unlock()
-	current, ok := sessions.Load(s.ID)
-	if !ok || current != s {
-		return
-	}
-	sessions.Delete(s.ID)
-	releaseSessionSlotLocked(Identity{UserID: s.UserID, AuthSessionID: s.AuthSessionID})
+	sessions.CompareAndDelete(s.ID, s)
 }
 
 func Lookup(id string, identity Identity) (*Session, bool) {

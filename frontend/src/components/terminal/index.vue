@@ -54,6 +54,7 @@ let wsEndpoint = '';
 let wsArgs = '';
 let closing = false;
 let reconnecting = false;
+let reconnectNoticeShown = false;
 let revalidating = false;
 let reconnectStartedAt = 0;
 let reconnectDelay = 1000;
@@ -491,7 +492,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
             return;
         case CLOSE_REVALIDATE:
             revalidating = true;
-            scheduleReconnect();
+            scheduleReconnect(true);
             return;
         default:
             scheduleReconnect();
@@ -503,13 +504,13 @@ const writeNotice = (color: string, message: string) => {
 };
 
 // scheduleReconnect retries with backoff for as long as the agent keeps a detached session.
-const scheduleReconnect = () => {
+const scheduleReconnect = (forRevalidation = false) => {
     const now = Date.now();
     if (!reconnecting) {
         reconnecting = true;
         reconnectStartedAt = now;
         reconnectDelay = 1000;
-        writeNotice('33', i18n.global.t('terminal.sessionReconnecting'));
+        reconnectNoticeShown = false;
     } else if (now - reconnectStartedAt > reconnectWindow) {
         reconnecting = false;
         sessionId.value = '';
@@ -517,12 +518,21 @@ const scheduleReconnect = () => {
         emit('expired');
         return;
     }
-    reconnectTimer = setTimeout(() => {
-        reconnectTimer = null;
-        if (closing || !sessionId.value) return;
-        initWebSocket(wsEndpoint, wsArgs);
-    }, reconnectDelay);
-    reconnectDelay = Math.min(reconnectDelay * 2, 8000);
+    if (!forRevalidation && !reconnectNoticeShown) {
+        writeNotice('33', i18n.global.t('terminal.sessionReconnecting'));
+        reconnectNoticeShown = true;
+    }
+    reconnectTimer = setTimeout(
+        () => {
+            reconnectTimer = null;
+            if (closing || !sessionId.value) return;
+            initWebSocket(wsEndpoint, wsArgs);
+        },
+        forRevalidation ? 0 : reconnectDelay,
+    );
+    if (!forRevalidation) {
+        reconnectDelay = Math.min(reconnectDelay * 2, 8000);
+    }
 };
 
 const stopReconnect = () => {

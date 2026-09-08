@@ -2071,6 +2071,11 @@ const message = {
         sessionExpired: '세션을 더 이상 사용할 수 없습니다. Enter 키를 누르거나 다시 연결을 클릭하여 새 세션을 여세요',
         sessionKicked: '이 세션은 다른 창에서 열렸습니다',
         sessionCount: '세션 {0}개',
+        sessionRules: '터미널 세션 규칙',
+        sessionRuleClose: '터미널을 닫으면 세션이 즉시 종료됩니다.',
+        sessionRuleDisconnect: '새로고침, 브라우저 종료, 네트워크 끊김 후 30분 이내에 복구할 수 있습니다.',
+        sessionRuleRevalidate: '로그인이 무효이거나 인증 시간이 초과되면 세션이 종료됩니다.',
+        sessionRuleResources: '터미널이 많을수록 리소스 사용량이 늘어납니다. 사용하지 않는 터미널은 닫아 주세요.',
         minimize: '최소화',
         closeAllSessions: '모든 세션 닫기',
         closeAllConfirm: '모든 터미널 세션이 끊기며 복구할 수 없습니다. 계속하시겠습니까?',
@@ -6700,6 +6705,8 @@ const message = {
             submitSuccess: '동기화 작업이 제출되었습니다.',
         },
         vm: {
+            countLimitHelper:
+                'Professional 버전에서는 가상 머신을 최대 {0}대까지 생성할 수 있습니다. Enterprise 버전은 대수 제한이 없습니다.',
             vm: '가상 머신',
             title: '가상 머신 관리',
             healthCheck: '상태 점검',
