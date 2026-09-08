@@ -54,6 +54,11 @@ type RuntimeUsage struct {
 	Reason string   `json:"reason,omitempty"`
 }
 
+type PositionRange struct {
+	Min int `json:"min"`
+	Max int `json:"max"`
+}
+
 type InventoryItem struct {
 	Incompatible bool           `json:"incompatible,omitempty"`
 	Error        string         `json:"error,omitempty"`

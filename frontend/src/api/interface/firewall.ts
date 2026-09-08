@@ -166,6 +166,11 @@ export namespace Firewall {
         reason?: string;
     }
 
+    export interface PositionRange {
+        min: number;
+        max: number;
+    }
+
     export interface InventoryItem {
         incompatible?: boolean;
         error?: string;
@@ -192,6 +197,8 @@ export namespace Firewall {
     }
 
     export interface Inventory {
+        ipv4Range: PositionRange;
+        ipv6Range: PositionRange;
         total: number;
         allTotal: number;
         managedTotal: number;

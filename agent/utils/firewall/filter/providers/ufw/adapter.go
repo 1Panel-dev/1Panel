@@ -1200,6 +1200,32 @@ func statusActive(output string) bool {
 	return false
 }
 
+func IsIPv6Unavailable(err error) bool {
+	if err == nil {
+		return false
+	}
+	if joined, ok := err.(interface{ Unwrap() []error }); ok {
+		causes := joined.Unwrap()
+		for _, cause := range causes {
+			if !IsIPv6Unavailable(cause) {
+				return false
+			}
+		}
+		return len(causes) > 0
+	}
+	if wrapped, ok := err.(interface{ Unwrap() error }); ok {
+		return IsIPv6Unavailable(wrapped.Unwrap())
+	}
+	message := err.Error()
+	if strings.Contains(message, "Permission denied") || strings.Contains(message, "Operation not permitted") {
+		return false
+	}
+	return strings.Contains(message, "ERROR: IPv6 support not enabled") ||
+		strings.Contains(message, "ERROR: Adding IPv6 rule failed: IPv6 not enabled") ||
+		(strings.Contains(message, "ip6tables") &&
+			(strings.Contains(message, ": Address family not supported by protocol") || strings.Contains(message, ": Protocol not supported")))
+}
+
 type systemBackend struct{}
 
 func (systemBackend) Read(ctx context.Context, args ...string) (string, error) {

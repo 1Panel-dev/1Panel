@@ -44,7 +44,6 @@ type FirewallService struct {
 	restoreForwarding      func(context.Context) error
 	restoreDockerGuard     func(context.Context) error
 	baseClient             func() (lifecycle.Client, error)
-	ufwIPv6Enabled         func() (bool, error)
 }
 
 type firewallRuleRuntimeResolver interface {
@@ -97,7 +96,6 @@ func newFirewallService() *FirewallService {
 		},
 		restoreDockerGuard: ReconcileDockerPortGuard,
 		baseClient:         selectedSystemFirewallClient,
-		ufwIPv6Enabled:     filterufw.IPv6Enabled,
 	}
 }
 
@@ -566,6 +564,11 @@ func finalizeFirewallInventory(
 	response dto.FirewallRuleInventoryResponse,
 	request dto.FirewallRuleInventory,
 ) dto.FirewallRuleInventoryResponse {
+	provider := request.Scope.Provider
+	if len(request.Scopes) > 0 {
+		provider = request.Scopes[0].Provider
+	}
+	response.IPv4Range, response.IPv6Range = filter.InventoryPositionRanges(provider, response.Items)
 	response.AllTotal = int64(len(response.Items))
 	for _, item := range response.Items {
 		if isDeletableManagedInventoryItem(item) {
@@ -1804,7 +1807,7 @@ func (s *FirewallService) reorderRule(ctx context.Context, clientIP, ruleUUID st
 	if err != nil {
 		return err
 	}
-	if err := filter.GuardMutation(snapshot, observed, after, clientIP, protectedPorts...); err != nil {
+	if err := filter.GuardMutation(observed, after, clientIP, protectedPorts...); err != nil {
 		return err
 	}
 	return s.executeManagedMutation(ctx, managedMutationRequest{
@@ -1885,7 +1888,7 @@ func (s *FirewallService) prepareManagedUpdate(
 	if err != nil {
 		return preparedManagedUpdate{}, err
 	}
-	if err := filter.GuardMutation(snapshot, observed, after, clientIP, protectedPorts...); err != nil {
+	if err := filter.GuardMutation(observed, after, clientIP, protectedPorts...); err != nil {
 		return preparedManagedUpdate{}, err
 	}
 	return preparedManagedUpdate{
@@ -2098,10 +2101,16 @@ func (s *FirewallService) ensureSystemPort(ctx context.Context, port dto.Firewal
 	if err == nil {
 		return nil
 	}
-	if !errors.Is(err, filter.ErrInventoryUnavailable) {
-		return err
+	if errors.Is(err, filter.ErrInventoryUnavailable) {
+		err = s.appendUFWSystemPortUnverified(ctx, port, err)
 	}
-	return s.appendUFWSystemPortUnverified(ctx, port, err)
+	if port.Family == constant.FirewallFamilyIPv6 && filterufw.IsIPv6Unavailable(err) {
+		if global.LOG != nil {
+			global.LOG.Warnf("skip accepted UFW IPv6 port %s/%s: %v", port.Port, port.Protocol, err)
+		}
+		return nil
+	}
+	return err
 }
 
 func (s *FirewallService) appendUFWSystemPortUnverified(
@@ -3032,7 +3041,13 @@ func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error 
 func systemPorts(ports []firewall.PortWhitelist) []dto.FirewallSystemPort {
 	result := make([]dto.FirewallSystemPort, 0, len(ports))
 	for _, port := range ports {
-		result = append(result, dto.FirewallSystemPort{Family: port.Family, Port: port.Port, Protocol: port.Protocol})
+		families := []string{port.Family}
+		if port.Family == "" {
+			families = []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6}
+		}
+		for _, family := range families {
+			result = append(result, dto.FirewallSystemPort{Family: family, Port: port.Port, Protocol: port.Protocol})
+		}
 	}
 	return result
 }

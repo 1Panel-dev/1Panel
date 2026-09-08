@@ -171,7 +171,7 @@ func requiredPortSyncCommands(run func(...string) (string, error), ports []firew
 	commands := make([][]string, 0)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		_, exists, err := firewall.ReadNftObject(run, "list", "table", tableFamily, TableName)
+		_, exists, err := readNftObject(run, "list", "table", tableFamily, TableName)
 		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
 			continue
 		}

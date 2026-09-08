@@ -310,7 +310,7 @@ func (s *FirewallService) loadFirewallRuleSyncPlan(
 			}
 			entry.match = inventoryItem.Match
 			entry.item.Status, entry.item.Reason = s.classifyFirewallRuleSyncCandidate(
-				clientIP, snapshot, entry, inventoryItem,
+				clientIP, entry, inventoryItem,
 			)
 		}
 		if !hasCompileErrors {
@@ -634,7 +634,6 @@ func scopesWithFirewallSyncCandidates(scopes []filter.Scope, candidates map[stri
 
 func (s *FirewallService) classifyFirewallRuleSyncCandidate(
 	clientIP string,
-	snapshot filter.Snapshot,
 	entry *firewallRuleSyncEntry,
 	item filter.InventoryItem,
 ) (firewallsync.Status, string) {
@@ -658,7 +657,7 @@ func (s *FirewallService) classifyFirewallRuleSyncCandidate(
 		if err != nil {
 			return firewallRuleSyncBlocked, err.Error()
 		}
-		if err := filter.GuardMutation(snapshot, *item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
+		if err := filter.GuardMutation(*item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
 			return firewallRuleSyncBlocked, err.Error()
 		}
 		return firewallRuleSyncReady, "target rule differs from database policy"
@@ -1347,7 +1346,7 @@ func firewallRuleSyncChange(
 		if item.Observed == nil {
 			return filter.DesiredChange{}, false, filter.ErrRuleStale
 		}
-		if err := filter.GuardMutation(snapshot, *item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
+		if err := filter.GuardMutation(*item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
 			return filter.DesiredChange{}, false, err
 		}
 		before := firewallsync.ObservedRule(*item.Observed)
