@@ -3364,6 +3364,7 @@ const message = {
         monitor:
             'Faça upgrade para a edição comercial para acompanhar o status do site em tempo real, tendências de visitantes, origens de tráfego, logs de requisições e mais.',
         alert: 'Faça upgrade para a edição comercial para receber alertas por SMS e consultar os logs de alertas.',
+        vm: 'Atualize para a edição comercial para gerenciar máquinas virtuais, imagens, modelos, redes virtuais e recursos de armazenamento no 1Panel.',
         node: 'Atualize para a edição comercial para gerenciar vários servidores Linux com o 1Panel.',
         nodeApp:
             'Atualize para a edição comercial para atualizar versões de aplicativos multi-nó sem alternar manualmente entre os nós.',
@@ -6446,6 +6447,14 @@ const message = {
             nodeDashTitle4: 'Gerenciamento de Tarefas Agendadas',
             nodeDashContent4:
                 'Gerenciamento unificado de tarefas agendadas multi-nó, suporta monitoramento de status, início/parada rápida e execução manual por acionamento',
+            vmTitle1: 'Máquinas virtuais',
+            vmContent1: 'Crie e gerencie máquinas virtuais, consulte seu estado e ajuste a alocação de recursos.',
+            vmTitle2: 'Imagens e modelos',
+            vmContent2: 'Gerencie imagens ISO e modelos para simplificar a criação de máquinas virtuais.',
+            vmTitle3: 'Redes virtuais',
+            vmContent3: 'Gerencie redes virtuais e configure as conexões de rede das máquinas virtuais.',
+            vmTitle4: 'Pools de armazenamento',
+            vmContent4: 'Gerencie pools de armazenamento e aloque recursos para as máquinas virtuais.',
             nodeTitle1: 'Adição de Nó com Um Clique',
             nodeContent1: 'Integre rapidamente vários nós de servidor',
             nodeTitle2: 'Atualização em Lote',

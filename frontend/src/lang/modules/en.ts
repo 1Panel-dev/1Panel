@@ -3297,6 +3297,7 @@ const message = {
         monitor:
             'Upgrade to Commercial Edition to view real-time website status, visitor trends, traffic sources, request logs, and more.',
         alert: 'Upgrade to Commercial Edition to receive SMS alerts, review alert logs, and stay on top of key events.',
+        vm: 'Upgrade to the commercial edition to manage virtual machines, images, templates, virtual networks, and storage resources in 1Panel.',
         node: 'Upgrade to Commercial Edition to manage multiple Linux servers in 1Panel.',
         nodeApp: 'Upgrade to Commercial Edition to upgrade multi-node app versions without switching nodes manually.',
         nodeDashboard:
@@ -6316,6 +6317,14 @@ const message = {
             nodeDashTitle4: 'Scheduled Task Management',
             nodeDashContent4:
                 'Unified management of multi-node scheduled tasks, supports status monitoring, quick start/stop, and manual trigger execution',
+            vmTitle1: 'Virtual machines',
+            vmContent1: 'Create and manage virtual machines, monitor their status, and adjust resource allocation.',
+            vmTitle2: 'Images and templates',
+            vmContent2: 'Manage ISO images and virtual machine templates to simplify virtual machine creation.',
+            vmTitle3: 'Virtual networks',
+            vmContent3: 'Manage virtual networks and configure virtual machine network connections.',
+            vmTitle4: 'Storage pools',
+            vmContent4: 'Manage storage pools and allocate storage resources to virtual machines.',
             nodeTitle1: 'One-Click Node Addition',
             nodeContent1: 'Quickly integrate multiple server nodes',
             nodeTitle2: 'Batch Upgrade',
