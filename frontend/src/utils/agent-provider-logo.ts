@@ -9,6 +9,12 @@ export interface AgentProviderLogo {
 
 const asset = (name: string) => new URL(`../assets/images/ai-providers/${name}`, import.meta.url).href;
 
+// DaoXE brand mark (indigo-to-teal rounded square), inlined as a data URI so no binary
+// asset has to be added to the repository. Same 32x32 SVG that daoxe.com uses as favicon.
+const daoxeLogoDataUri =
+    'data:image/svg+xml;base64,' +
+    'PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJEYW9YRSI+CiAgPGRlZnM+CiAgICA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSIwIiB5MT0iMCIgeDI9IjEiIHkyPSIxIj4KICAgICAgPHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNjM2NmYxIi8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzBlYTVhNCIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+CiAgPHJlY3QgeD0iMSIgeT0iMSIgd2lkdGg9IjMwIiBoZWlnaHQ9IjMwIiByeD0iOCIgZmlsbD0idXJsKCNnKSIvPgogIDxwYXRoIGQ9Ik0xMC41IDkuNSBMMTYgMTYgTDEwLjUgMjIuNSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjZmZmZmZmIiBzdHJva2Utd2lkdGg9IjIuNiIKICAgICAgICBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4KICA8cmVjdCB4PSIxNy41IiB5PSIyMC40IiB3aWR0aD0iNi40IiBoZWlnaHQ9IjIuNCIgcng9IjEuMiIgZmlsbD0iI2ZmZmZmZiIvPgo8L3N2Zz4K';
+
 const aliyunLogo: AgentProviderLogo = {
     src: asset('aliyun.webp'),
     mark: 'QW',
@@ -111,6 +117,14 @@ const providerLogos: Record<string, AgentProviderLogo> = {
         color: '#101828',
         borderColor: '#dcdfe6',
         source: 'https://openrouter.ai/',
+    },
+    daoxe: {
+        src: daoxeLogoDataUri,
+        mark: 'DX',
+        background: '#ffffff',
+        color: '#6366f1',
+        borderColor: '#dcdfe6',
+        source: 'https://daoxe.com/',
     },
     anthropic: {
         src: asset('anthropic.png'),
