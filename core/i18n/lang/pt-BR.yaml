@@ -135,6 +135,7 @@ ClusterMasterNotExist: "O nó mestre do cluster está desconectado, por favor, e
 # máquina virtual
 ErrVMNotFound: "Máquina virtual não existe"
 ErrVMAlreadyExists: "Máquina virtual já existe"
+ErrVMCountLimit: "A edição Professional permite criar até {{ .limit }} máquinas virtuais. Exclua uma máquina virtual existente ou atualize para Enterprise e tente novamente."
 ErrVMImageAlreadyExists: "A imagem da máquina virtual já existe: {{ .detail }}"
 ErrVMStoragePathInUse: "O caminho do pool de armazenamento já é usado por [{{ .name }}]"
 ErrVMHelperNotFound: "1panel-kvm não encontrado"

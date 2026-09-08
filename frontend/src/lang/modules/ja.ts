@@ -6917,6 +6917,8 @@ const message = {
                 },
             },
             dependencies: '依存関係',
+            architectureUnsupported:
+                '現在のシステムアーキテクチャ {0} はサポートされていません。VM 機能は AMD64 と ARM64 のみをサポートしています。',
             dependencyPurpose: '用途',
             dependencyPurposeMap: {
                 libvirt: '仮想マシン管理サービスを提供し、ライフサイクルとリソーススケジューリングを担当します。',

@@ -7037,6 +7037,8 @@ const message = {
                 },
             },
             dependencies: 'Bağımlılıklar',
+            architectureUnsupported:
+                'Mevcut sistem mimarisi {0} desteklenmiyor. VM özellikleri şu anda yalnızca AMD64 ve ARM64 mimarilerini destekliyor.',
             dependencyPurpose: 'Amaç',
             dependencyPurposeMap: {
                 libvirt: 'Yaşam döngüsü denetimi ve kaynak zamanlaması için VM yönetim hizmetleri sağlar.',

@@ -7041,6 +7041,8 @@ const message = {
                 },
             },
             dependencies: 'Зависимости',
+            architectureUnsupported:
+                'Текущая архитектура системы {0} не поддерживается. Функции ВМ поддерживают только AMD64 и ARM64.',
             dependencyPurpose: 'Назначение',
             dependencyPurposeMap: {
                 libvirt: 'Предоставляет службу управления ВМ, отвечает за жизненный цикл и распределение ресурсов.',

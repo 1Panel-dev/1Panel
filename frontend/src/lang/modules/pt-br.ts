@@ -7075,6 +7075,8 @@ const message = {
                 },
             },
             dependencies: 'Dependências',
+            architectureUnsupported:
+                'A arquitetura atual do sistema, {0}, não é compatível. Os recursos de VM aceitam apenas AMD64 e ARM64.',
             dependencyPurpose: 'Finalidade',
             dependencyPurposeMap: {
                 libvirt:

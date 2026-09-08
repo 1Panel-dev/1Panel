@@ -135,6 +135,7 @@ ClusterMasterNotExist: "گره اصلی خوشه قطع شده است. گره‌
 # ماشین مجازی
 ErrVMNotFound: "ماشین مجازی وجود ندارد"
 ErrVMAlreadyExists: "ماشین مجازی از قبل وجود دارد"
+ErrVMCountLimit: "در نسخه Professional می‌توانید حداکثر {{ .limit }} ماشین مجازی ایجاد کنید. یک ماشین مجازی موجود را حذف کنید یا به نسخه Enterprise ارتقا دهید و دوباره تلاش کنید."
 ErrVMImageAlreadyExists: "فایل ایمیج ماشین مجازی از قبل وجود دارد: {{ .detail }}"
 ErrVMStoragePathInUse: "مسیر استخر ذخیره‌سازی قبلاً توسط [{{ .name }}] استفاده شده است"
 ErrVMHelperNotFound: "1panel-kvm یافت نشد"

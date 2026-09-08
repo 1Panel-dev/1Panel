@@ -135,6 +135,7 @@ ClusterMasterNotExist: "集群主节点失联，请删除子节点"
 # 虚拟机
 ErrVMNotFound: "虚拟机不存在"
 ErrVMAlreadyExists: "虚拟机已存在"
+ErrVMCountLimit: "专业版最多可创建 {{ .limit }} 台虚拟机，请删除已有虚拟机或升级企业版后重试。"
 ErrVMImageAlreadyExists: "虚拟机镜像文件已存在: {{ .detail }}"
 ErrVMStoragePathInUse: "存储池路径已被 [{{ .name }}] 使用"
 ErrVMHelperNotFound: "1panel-kvm 不存在"

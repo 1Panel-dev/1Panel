@@ -135,6 +135,7 @@ ClusterMasterNotExist: "Cluster master node is disconnected. Delete child nodes.
 # virtual machine
 ErrVMNotFound: "Virtual machine does not exist"
 ErrVMAlreadyExists: "Virtual machine already exists"
+ErrVMCountLimit: "The Professional edition supports up to {{ .limit }} virtual machines. Delete an existing VM or upgrade to Enterprise to create more."
 ErrVMImageAlreadyExists: "Virtual machine image already exists: {{ .detail }}"
 ErrVMStoragePathInUse: "Storage pool path is already used by [{{ .name }}]"
 ErrVMHelperNotFound: "1panel-kvm not found"

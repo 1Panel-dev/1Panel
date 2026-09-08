@@ -135,6 +135,7 @@ ClusterMasterNotExist: "クラスタのマスターノードが切断されて�
 # 仮想マシン
 ErrVMNotFound: "仮想マシンが存在しません"
 ErrVMAlreadyExists: "仮想マシンは既に存在します"
+ErrVMCountLimit: "Professional 版では最大 {{ .limit }} 台の仮想マシンを作成できます。既存の仮想マシンを削除するか、Enterprise 版にアップグレードしてから再試行してください。"
 ErrVMImageAlreadyExists: "仮想マシンのイメージファイルは既に存在します: {{ .detail }}"
 ErrVMStoragePathInUse: "ストレージプールのパスは既に [{{ .name }}] で使用されています"
 ErrVMHelperNotFound: "1panel-kvm が見つかりません"

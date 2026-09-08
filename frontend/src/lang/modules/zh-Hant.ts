@@ -6449,6 +6449,7 @@ const message = {
                 },
             },
             dependencies: '依賴',
+            architectureUnsupported: '目前系統架構 {0} 暫不支援虛擬機功能，目前僅支援 AMD64 和 ARM64。',
             dependencyPurpose: '作用',
             dependencyPurposeMap: {
                 libvirt: '提供虛擬機管理服務，負責虛擬機生命週期和資源調度。',

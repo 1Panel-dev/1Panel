@@ -135,6 +135,7 @@ ClusterMasterNotExist: "Основной узел кластера отключ�
 # виртуальная машина
 ErrVMNotFound: "Виртуальная машина не существует"
 ErrVMAlreadyExists: "Виртуальная машина уже существует"
+ErrVMCountLimit: "В редакции Professional можно создать не более {{ .limit }} виртуальных машин. Удалите существующую виртуальную машину или перейдите на Enterprise и повторите попытку."
 ErrVMImageAlreadyExists: "Файл образа виртуальной машины уже существует: {{ .detail }}"
 ErrVMStoragePathInUse: "Путь пула хранения уже используется [{{ .name }}]"
 ErrVMHelperNotFound: "1panel-kvm не найден"

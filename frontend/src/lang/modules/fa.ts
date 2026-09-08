@@ -6881,6 +6881,8 @@ const message = {
                 },
             },
             dependencies: 'وابستگی‌ها',
+            architectureUnsupported:
+                'معماری فعلی سیستم، {0}، پشتیبانی نمی‌شود. قابلیت ماشین مجازی در حال حاضر فقط از AMD64 و ARM64 پشتیبانی می‌کند.',
             dependencyPurpose: 'کاربرد',
             dependencyPurposeMap: {
                 libvirt: 'سرویس مدیریت ماشین مجازی را برای چرخه حیات و زمان‌بندی منابع فراهم می‌کند.',

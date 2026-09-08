@@ -6780,6 +6780,8 @@ const message = {
                 },
             },
             dependencies: '종속성',
+            architectureUnsupported:
+                '현재 시스템 아키텍처 {0}은(는) 지원되지 않습니다. VM 기능은 현재 AMD64 및 ARM64만 지원합니다.',
             dependencyPurpose: '용도',
             dependencyPurposeMap: {
                 libvirt: '가상 머신 관리 서비스를 제공하며 수명 주기와 리소스 스케줄링을 담당합니다.',

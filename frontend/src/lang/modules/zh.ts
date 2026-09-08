@@ -6514,6 +6514,7 @@ const message = {
             },
             overview: '概览',
             dependencies: '依赖',
+            architectureUnsupported: '当前系统架构 {0} 暂不支持虚拟机功能，目前仅支持 AMD64 和 ARM64。',
             dependencyPurpose: '作用',
             dependencyPurposeMap: {
                 libvirt: '提供虚拟机管理服务，负责虚拟机生命周期和资源调度。',

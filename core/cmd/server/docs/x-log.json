@@ -1745,7 +1745,7 @@
 		"formatZH": "更新 [name]",
 		"formatEN": "update user [name]"
 	},
-	"/core/enterprise/vms": {
+	"/core/xpack/vms": {
 		"bodyKeys": [
 			"name"
 		],
@@ -1754,7 +1754,7 @@
 		"formatZH": "创建虚拟机 [name]",
 		"formatEN": "create VM [name]"
 	},
-	"/core/enterprise/vms/del": {
+	"/core/xpack/vms/del": {
 		"bodyKeys": [
 			"name"
 		],
@@ -1763,14 +1763,14 @@
 		"formatZH": "删除虚拟机 [name]",
 		"formatEN": "delete VM [name]"
 	},
-	"/core/enterprise/vms/environment/enable": {
+	"/core/xpack/vms/environment/enable": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "启用虚拟机运行环境",
 		"formatEN": "enable VM runtime environment"
 	},
-	"/core/enterprise/vms/iso": {
+	"/core/xpack/vms/iso": {
 		"bodyKeys": [
 			"name",
 			"type"
@@ -1780,7 +1780,7 @@
 		"formatZH": "创建虚拟机镜像 [name] [type]",
 		"formatEN": "create VM ISO [name] [type]"
 	},
-	"/core/enterprise/vms/iso/del": {
+	"/core/xpack/vms/iso/del": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1798,7 +1798,7 @@
 		"formatZH": "删除虚拟机镜像 [name]",
 		"formatEN": "delete VM ISO [name]"
 	},
-	"/core/enterprise/vms/iso/update": {
+	"/core/xpack/vms/iso/update": {
 		"bodyKeys": [
 			"name",
 			"type"
@@ -1808,7 +1808,7 @@
 		"formatZH": "更新虚拟机镜像 [name] [type]",
 		"formatEN": "update VM ISO [name] [type]"
 	},
-	"/core/enterprise/vms/networks": {
+	"/core/xpack/vms/networks": {
 		"bodyKeys": [
 			"name",
 			"type"
@@ -1818,7 +1818,7 @@
 		"formatZH": "创建虚拟机网络 [name] [type]",
 		"formatEN": "create VM network [name] [type]"
 	},
-	"/core/enterprise/vms/networks/del": {
+	"/core/xpack/vms/networks/del": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1836,7 +1836,7 @@
 		"formatZH": "删除虚拟机网络 [name]",
 		"formatEN": "delete VM network [name]"
 	},
-	"/core/enterprise/vms/networks/update": {
+	"/core/xpack/vms/networks/update": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1854,7 +1854,7 @@
 		"formatZH": "更新虚拟机网络 [name]",
 		"formatEN": "update VM network [name]"
 	},
-	"/core/enterprise/vms/operate": {
+	"/core/xpack/vms/operate": {
 		"bodyKeys": [
 			"name",
 			"operate"
@@ -1864,14 +1864,14 @@
 		"formatZH": "操作虚拟机 [name] [operate]",
 		"formatEN": "operate VM [name] [operate]"
 	},
-	"/core/enterprise/vms/orphans/clean": {
+	"/core/xpack/vms/orphans/clean": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "清理虚拟机孤立数据",
 		"formatEN": "clean VM orphaned data"
 	},
-	"/core/enterprise/vms/rename": {
+	"/core/xpack/vms/rename": {
 		"bodyKeys": [
 			"name",
 			"newName"
@@ -1881,7 +1881,7 @@
 		"formatZH": "重命名虚拟机 [name] 为 [newName]",
 		"formatEN": "rename VM [name] to [newName]"
 	},
-	"/core/enterprise/vms/snapshots": {
+	"/core/xpack/vms/snapshots": {
 		"bodyKeys": [
 			"name",
 			"snapshotName"
@@ -1891,7 +1891,7 @@
 		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
 		"formatEN": "create VM [name] snapshot [snapshotName]"
 	},
-	"/core/enterprise/vms/snapshots/del": {
+	"/core/xpack/vms/snapshots/del": {
 		"bodyKeys": [
 			"name",
 			"snapshotName"
@@ -1901,7 +1901,7 @@
 		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
 		"formatEN": "delete VM [name] snapshot [snapshotName]"
 	},
-	"/core/enterprise/vms/snapshots/recover": {
+	"/core/xpack/vms/snapshots/recover": {
 		"bodyKeys": [
 			"name",
 			"snapshotName"
@@ -1911,7 +1911,7 @@
 		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
 		"formatEN": "recover VM [name] snapshot [snapshotName]"
 	},
-	"/core/enterprise/vms/storages": {
+	"/core/xpack/vms/storages": {
 		"bodyKeys": [
 			"name",
 			"type"
@@ -1921,7 +1921,7 @@
 		"formatZH": "创建虚拟机存储 [name] [type]",
 		"formatEN": "create VM storage [name] [type]"
 	},
-	"/core/enterprise/vms/storages/del": {
+	"/core/xpack/vms/storages/del": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1939,7 +1939,7 @@
 		"formatZH": "删除虚拟机存储 [name]",
 		"formatEN": "delete VM storage [name]"
 	},
-	"/core/enterprise/vms/storages/update": {
+	"/core/xpack/vms/storages/update": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1957,14 +1957,14 @@
 		"formatZH": "更新虚拟机存储 [name]",
 		"formatEN": "update VM storage [name]"
 	},
-	"/core/enterprise/vms/sync": {
+	"/core/xpack/vms/sync": {
 		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
 		"formatZH": "同步虚拟机",
 		"formatEN": "sync virtual machines"
 	},
-	"/core/enterprise/vms/templates": {
+	"/core/xpack/vms/templates": {
 		"bodyKeys": [
 			"name",
 			"templateName"
@@ -1974,7 +1974,7 @@
 		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
 		"formatEN": "create VM [name] template [templateName]"
 	},
-	"/core/enterprise/vms/templates/del": {
+	"/core/xpack/vms/templates/del": {
 		"bodyKeys": [
 			"id"
 		],
@@ -1992,7 +1992,7 @@
 		"formatZH": "删除虚拟机模板 [name]",
 		"formatEN": "delete VM template [name]"
 	},
-	"/core/enterprise/vms/update": {
+	"/core/xpack/vms/update": {
 		"bodyKeys": [
 			"name"
 		],
