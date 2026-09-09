@@ -2427,6 +2427,7 @@ const message = {
         downloadProcess: 'ຄວາມຄືບໜ້າການດາວໂຫຼດ',
         downloading: 'ກຳລັງດາວໂຫຼດ...',
         stopWgetConfirm: 'ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການຢຸດງານດາວໂຫຼດນີ້?',
+        downloadRecordsNotRemoved: 'ບາງບັນທຶກບໍ່ຖືກລຶບ. ກະລຸນາໂຫຼດໃໝ່ ແລະລອງອີກຄັ້ງ.',
         infoDetail: 'ຄຸນສົມບັດໄຟລ໌',
         root: 'ໄດເຣັກທໍຣີຮາກ (Root)',
         list: 'ລາຍການໄຟລ໌',

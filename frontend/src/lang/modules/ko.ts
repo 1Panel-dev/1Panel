@@ -2599,6 +2599,7 @@ const message = {
         panelInstallDir: '1Panel 설치 디렉터리는 삭제할 수 없습니다.',
         wgetTask: '다운로드 작업',
         stopWgetConfirm: '이 다운로드 작업을 중지하시겠습니까?',
+        downloadRecordsNotRemoved: '일부 기록을 제거하지 못했습니다. 새로 고침 후 다시 시도하세요.',
         existFileTitle: '동일한 이름의 파일 경고',
         existFileHelper: '업로드한 파일에 동일한 이름의 파일이 포함되어 있습니다. 덮어쓰시겠습니까?',
         existFileSize: '파일 크기 (새로운 -> 오래된)',

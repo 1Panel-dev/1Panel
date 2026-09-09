@@ -612,10 +612,50 @@ func CancelDownload(key string) error {
 	return task.cleanupErr
 }
 
+func RemoveDownloadRecords(keys []string) ([]string, error) {
+	if len(keys) == 0 || len(keys) > 1000 {
+		return nil, errors.New("between 1 and 1000 download keys are required")
+	}
+	for _, key := range keys {
+		if !strings.HasPrefix(key, "file-wget-") || len(key) <= len("file-wget-") || len(key) > 128 {
+			return nil, errors.New("invalid download key")
+		}
+	}
+	downloadMu.Lock()
+	defer downloadMu.Unlock()
+	removed := make([]string, 0, len(keys))
+	seen := make(map[string]bool, len(keys))
+	for _, key := range keys {
+		if seen[key] {
+			continue
+		}
+		seen[key] = true
+		if _, active := downloadTasks[key]; active {
+			continue
+		}
+		value := global.CACHE.Get(key)
+		if value == "" {
+			removed = append(removed, key)
+			continue
+		}
+		var process Process
+		if err := json.Unmarshal([]byte(value), &process); err != nil {
+			continue
+		}
+		terminal := process.Status == "Success" || process.Status == "Failed" || process.Status == "Canceled"
+		legacySuccess := process.Status == "" && process.Percent == 100
+		if !terminal && !legacySuccess {
+			continue
+		}
+		global.CACHE.Del(key)
+		removed = append(removed, key)
+	}
+	return removed, nil
+}
+
 func downloadErrorDetail(err error) string {
 	var urlErr *url.Error
 	if errors.As(err, &urlErr) {
-		// Signed URLs and proxy credentials must not appear in progress messages or logs.
 		return urlErr.Err.Error()
 	}
 	return err.Error()

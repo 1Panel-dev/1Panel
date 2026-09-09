@@ -1,7 +1,7 @@
 <template>
     <DialogPro v-model="open" :title="$t('file.downloadProcess')" size="small" @close="handleClose">
         <template #content>
-            <div class="space-y-4 p-4" :loading="loading">
+            <div v-loading="loading" class="space-y-4 p-4 min-h-[160px]">
                 <div
                     v-for="value in res"
                     :key="value.key"
@@ -9,8 +9,10 @@
                     :class="{ completed: getStatus(value) === 'Success' }"
                 >
                     <div class="flex items-center gap-3">
-                        <div class="flex-1">
-                            <MsgInfo :info="value.name" width="300" class="text-gray-700" />
+                        <div class="flex-1 min-w-0">
+                            <el-tooltip :content="value.name" placement="top">
+                                <div class="truncate text-gray-700">{{ value.name }}</div>
+                            </el-tooltip>
                             <div class="text-gray-500">
                                 {{ getStatusText(value) }}
                             </div>
@@ -63,10 +65,9 @@
 </template>
 
 <script lang="ts" setup>
-import { fileWgetKeys, stopWgetFile } from '@/api/modules/files';
+import { fileWgetKeys, stopWgetFile, removeWgetRecords } from '@/api/modules/files';
 import { computeSize } from '@/utils/size';
 import { onBeforeUnmount, ref, watch } from 'vue';
-import MsgInfo from '@/components/msg-info/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -90,6 +91,11 @@ interface DownloadProcess {
 
 const res = ref<DownloadProcess[]>([]);
 const stoppingKeys = ref<string[]>([]);
+const removingKeys = ref<string[]>([]);
+const removedKeys = ref<string[]>([]);
+const reportedFailures = new Set<string>();
+const reportedSuccesses = new Set<string>();
+const autoRemoveAttempts = new Map<string, number>();
 const keys = ref(['']);
 const open = ref(false);
 const loading = ref(false);
@@ -98,6 +104,7 @@ const em = defineEmits(['close']);
 const handleClose = () => {
     initProcessToken++;
     closeSocket();
+    loading.value = false;
     open.value = false;
     em('close', open.value);
 };
@@ -114,14 +121,21 @@ const clearSendTimer = () => {
 const closeSocket = () => {
     clearSendTimer();
     if (processSocket) {
+        processSocket.onopen = null;
         processSocket.onmessage = null;
+        processSocket.onerror = null;
+        processSocket.onclose = null;
         processSocket.close();
     }
     processSocket = null;
 };
 
-const onOpenProcess = () => {};
-const onMessage = (message: any) => {
+const onOpenProcess = () => {
+    sendProgressRequest();
+    sendMsg();
+};
+const onMessage = async (message: any) => {
+    const token = initProcessToken;
     let processes: DownloadProcess[];
     try {
         processes = JSON.parse(message.data) || [];
@@ -129,19 +143,94 @@ const onMessage = (message: any) => {
         return;
     }
     if (!Array.isArray(processes)) return;
-    res.value = processes.map((value, index) => ({
-        ...value,
-        key: value.key || (processes.length === keys.value.length ? keys.value[index] : `legacy:${value.name}`),
-    }));
-    if (res.value.every((value) => !isActive(value))) {
-        closeSocket();
+    loading.value = false;
+    res.value = processes
+        .map((value, index) => ({
+            ...value,
+            key: value.key || (processes.length === keys.value.length ? keys.value[index] : `legacy:${value.name}`),
+        }))
+        .filter((value) => !removedKeys.value.includes(value.key));
+    if (open.value) {
+        const failures = res.value.filter((value) => getStatus(value) === 'Failed' && !reportedFailures.has(value.key));
+        if (failures.length > 0) {
+            failures.forEach((value) => reportedFailures.add(value.key));
+            MsgError(failures.map((value) => `${value.name}: ${value.error || getStatusText(value)}`).join('\n'));
+        }
+        const successes = res.value.filter(
+            (value) => getStatus(value) === 'Success' && !reportedSuccesses.has(value.key),
+        );
+        if (successes.length > 0) {
+            successes.forEach((value) => reportedSuccesses.add(value.key));
+            MsgSuccess(successes.map((value) => `${value.name}: ${getStatusText(value)}`).join('\n'));
+        }
+        await onRemove(getAutoRemoveKeys());
+    }
+    if (token !== initProcessToken) return;
+    closeIdleSocket();
+};
+const onerror = () => {
+    if (open.value && loading.value) {
+        MsgError(i18n.global.t('commons.msg.operationFailed'));
+        handleClose();
     }
 };
-const onerror = () => {};
-const onClose = () => {};
+const onClose = () => {
+    clearSendTimer();
+    onerror();
+};
 
 const getStatus = (value: DownloadProcess) => value.status || (value.percent === 100 ? 'Success' : 'Downloading');
 const isActive = (value: DownloadProcess) => ['Downloading', 'Retrying'].includes(getStatus(value));
+const isRemovable = (value: DownloadProcess) =>
+    keys.value.includes(value.key) && ['Success', 'Failed', 'Canceled'].includes(getStatus(value));
+const getFinishedKeys = () => res.value.filter(isRemovable).map((value) => value.key);
+const getAutoRemoveKeys = () =>
+    res.value
+        .filter((value) => isRemovable(value) && (autoRemoveAttempts.get(value.key) || 0) < 3)
+        .map((value) => value.key);
+const closeIdleSocket = () => {
+    if (open.value && res.value.length === 0 && removingKeys.value.length === 0) {
+        keys.value = [];
+        handleClose();
+        return;
+    }
+    if (res.value.every((value) => !isActive(value)) && getAutoRemoveKeys().length === 0) closeSocket();
+};
+const onRemove = async (requestedKeys: string[]) => {
+    if (removingKeys.value.length > 0) return;
+    const removable = getFinishedKeys();
+    const selected = [...new Set(requestedKeys.filter((key) => removable.includes(key)))];
+    if (selected.length === 0) return;
+    const node = globalCurrentNode.value;
+    const token = initProcessToken;
+    removingKeys.value = selected;
+    try {
+        for (let offset = 0; offset < selected.length; offset += 1000) {
+            if (node !== globalCurrentNode.value || token !== initProcessToken || !open.value) return;
+            const batch = selected.slice(offset, offset + 1000);
+            batch.forEach((key) => autoRemoveAttempts.set(key, (autoRemoveAttempts.get(key) || 0) + 1));
+            const response = await removeWgetRecords(batch, node);
+            if (node !== globalCurrentNode.value || token !== initProcessToken || !open.value) return;
+            const removed = (response.data?.keys || []).filter((key) => batch.includes(key));
+            removedKeys.value.push(...removed);
+            res.value = res.value.filter((value) => !removed.includes(value.key));
+            keys.value = keys.value.filter((key) => !removed.includes(key));
+            closeIdleSocket();
+            if (removed.length !== batch.length) {
+                if (batch.some((key) => (autoRemoveAttempts.get(key) || 0) >= 3)) {
+                    MsgError(i18n.global.t('file.downloadRecordsNotRemoved'));
+                }
+                return;
+            }
+        }
+    } catch (error) {
+    } finally {
+        if (token === initProcessToken) {
+            removingKeys.value = [];
+            closeIdleSocket();
+        }
+    }
+};
 const getProgressPercent = (value: DownloadProcess) => {
     if (getStatus(value) === 'Success') return 100;
     if (!Number.isFinite(value.percent)) return 0;
@@ -171,7 +260,7 @@ const getProgressStatus = (value: DownloadProcess) => {
 };
 
 const initProcess = async () => {
-    const token = ++initProcessToken;
+    const token = initProcessToken;
     let href = window.location.href;
     let protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     let ipLocal = href.split('//')[1].split('/')[0];
@@ -183,6 +272,7 @@ const initProcess = async () => {
     }
     if (authError) {
         MsgError(authError);
+        handleClose();
         return;
     }
     closeSocket();
@@ -191,39 +281,40 @@ const initProcess = async () => {
     processSocket.onmessage = onMessage;
     processSocket.onerror = onerror;
     processSocket.onclose = onClose;
-    sendMsg();
 };
 
 const getKeys = async () => {
     const token = ++initProcessToken;
     keys.value = [];
     res.value = [];
+    removingKeys.value = [];
+    removedKeys.value = [];
+    reportedFailures.clear();
+    reportedSuccesses.clear();
+    autoRemoveAttempts.clear();
     loading.value = true;
     try {
         const res = await fileWgetKeys();
         if (token !== initProcessToken || !open.value) return;
         if (res.data?.keys?.length > 0) {
             keys.value = res.data.keys;
-            initProcess();
+            await initProcess();
+        } else {
+            handleClose();
         }
     } catch (error) {
-    } finally {
-        loading.value = false;
+        if (token === initProcessToken && open.value) handleClose();
     }
 };
 
+const sendProgressRequest = () => {
+    if (isWsOpen()) {
+        processSocket?.send(JSON.stringify({ type: 'wget', keys: keys.value }));
+    }
+};
 const sendMsg = () => {
     clearSendTimer();
-    sendTimer = setInterval(() => {
-        if (isWsOpen()) {
-            processSocket?.send(
-                JSON.stringify({
-                    type: 'wget',
-                    keys: keys.value,
-                }),
-            );
-        }
-    }, 1000);
+    sendTimer = setInterval(sendProgressRequest, 1000);
 };
 
 const getFileSize = (size: number) => {
@@ -260,6 +351,11 @@ watch(globalCurrentNode, () => {
     handleClose();
     keys.value = [];
     res.value = [];
+    removingKeys.value = [];
+    removedKeys.value = [];
+    reportedFailures.clear();
+    reportedSuccesses.clear();
+    autoRemoveAttempts.clear();
 });
 
 onBeforeUnmount(() => {

@@ -2471,6 +2471,7 @@ const message = {
         downloadProcess: 'پیشرفت دانلود',
         downloading: 'در حال دانلود...',
         stopWgetConfirm: 'آیا مطمئن هستید که می‌خواهید این وظیفه دانلود را متوقف کنید؟',
+        downloadRecordsNotRemoved: 'برخی رکوردها حذف نشدند. صفحه را تازه‌سازی کرده و دوباره تلاش کنید.',
         infoDetail: 'ویژگی‌های فایل',
         root: 'دایرکتوری ریشه',
         list: 'لیست فایل',

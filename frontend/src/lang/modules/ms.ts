@@ -2695,6 +2695,7 @@ const message = {
         panelInstallDir: 'Direktori pemasangan 1Panel tidak boleh dipadamkan',
         wgetTask: 'Tugas Muat Turun',
         stopWgetConfirm: 'Adakah anda pasti mahu menghentikan tugas muat turun ini?',
+        downloadRecordsNotRemoved: 'Sesetengah rekod tidak dibuang. Muat semula dan cuba lagi.',
         existFileTitle: 'Amaran fail dengan nama yang sama',
         existFileHelper: 'Fail yang dimuat naik mengandungi fail dengan nama yang sama. Adakah anda mahu menimpanya?',
         existFileSize: 'Saiz fail (baru -> lama)',

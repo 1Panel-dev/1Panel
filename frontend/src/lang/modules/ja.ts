@@ -2636,6 +2636,7 @@ const message = {
         panelInstallDir: '1Panelインストールディレクトリは削除できません',
         wgetTask: 'ダウンロードタスク',
         stopWgetConfirm: 'このダウンロードタスクを停止しますか？',
+        downloadRecordsNotRemoved: '一部の記録を削除できませんでした。更新して再試行してください。',
         existFileTitle: '同名ファイルの警告',
         existFileHelper: 'アップロードしたファイルに同じ名前のファイルが含まれています。上書きしますか？',
         existFileSize: 'ファイルサイズ（新しい -> 古い）',

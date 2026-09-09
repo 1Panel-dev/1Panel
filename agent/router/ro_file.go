@@ -43,6 +43,7 @@ func (f *FileRouter) InitRouter(Router *gin.RouterGroup) {
 		fileRouter.POST("/rename", baseApi.ChangeFileName)
 		fileRouter.POST("/wget", baseApi.WgetFile)
 		fileRouter.POST("/wget/stop", baseApi.StopWget)
+		fileRouter.POST("/wget/process/remove", baseApi.RemoveWgetRecords)
 		fileRouter.POST("/move", baseApi.MoveFile)
 		fileRouter.POST("/move/stop", baseApi.StopMoveFile)
 		fileRouter.GET("/download", baseApi.Download)

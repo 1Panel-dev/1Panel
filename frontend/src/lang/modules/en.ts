@@ -2494,6 +2494,7 @@ const message = {
         downloadProcess: 'Download progress',
         downloading: 'Downloading...',
         stopWgetConfirm: 'Are you sure you want to stop this download task?',
+        downloadRecordsNotRemoved: 'Some records were not removed. Refresh and try again.',
         infoDetail: 'File properties',
         root: 'Root directory',
         list: 'File list',
