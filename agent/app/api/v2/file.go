@@ -692,6 +692,28 @@ func (b *BaseApi) StopWget(c *gin.Context) {
 }
 
 // @Tags File
+// @Summary Remove finished download progress records without deleting files
+// @Accept json
+// @Param request body request.FileProcessRemoveReq true "request"
+// @Success 200 {object} response.FileProcessKeys
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /files/wget/process/remove [post]
+// @x-panel-log {"bodyKeys":["keys"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"移除已结束下载记录 [keys]","formatEN":"Remove finished download records [keys]"}
+func (b *BaseApi) RemoveWgetRecords(c *gin.Context) {
+	var req request.FileProcessRemoveReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	keys, err := files.RemoveDownloadRecords(req.Keys)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, response.FileProcessKeys{Keys: keys})
+}
+
+// @Tags File
 // @Summary Move file
 // @Accept json
 // @Param request body request.FileMove true "request"

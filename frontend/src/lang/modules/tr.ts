@@ -2684,6 +2684,7 @@ const message = {
         panelInstallDir: '1Panel kurulum dizini silinemez',
         wgetTask: 'İndirme Görevi',
         stopWgetConfirm: 'Bu indirme görevini durdurmak istediğinizden emin misiniz?',
+        downloadRecordsNotRemoved: 'Bazı kayıtlar kaldırılamadı. Yenileyip tekrar deneyin.',
         existFileTitle: 'Aynı ada sahip dosya uyarısı',
         existFileHelper: 'Yüklenen dosya, aynı ada sahip bir dosya içeriyor, üzerine yazmak istiyor musunuz?',
         existFileSize: 'Dosya boyutu (yeni -> eski)',

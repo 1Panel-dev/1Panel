@@ -2696,6 +2696,7 @@ const message = {
         panelInstallDir: 'El directorio de instalación de 1Panel no puede eliminarse',
         wgetTask: 'Tarea de descarga',
         stopWgetConfirm: '¿Confirmar que desea detener esta tarea de descarga?',
+        downloadRecordsNotRemoved: 'No se eliminaron algunos registros. Actualice e inténtelo de nuevo.',
         existFileTitle: 'Archivo con el mismo nombre',
         existFileHelper: 'El archivo cargado contiene un archivo con el mismo nombre, ¿desea sobrescribirlo?',
         existFileSize: 'Tamaño del archivo (nuevo -> viejo)',

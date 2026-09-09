@@ -2358,6 +2358,7 @@ const message = {
         downloading: '正在下載...',
         infoDetail: '檔案屬性',
         stopWgetConfirm: '確認停止該下載任務？',
+        downloadRecordsNotRemoved: '部分紀錄未移除，請重新整理後重試。',
         root: '根目錄',
         list: '檔案列表',
         sub: '子目錄',

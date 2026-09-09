@@ -158,6 +158,10 @@ type FileProcessReq struct {
 	Key string `json:"key"`
 }
 
+type FileProcessRemoveReq struct {
+	Keys []string `json:"keys" validate:"required,min=1,max=1000"`
+}
+
 type FileRoleUpdate struct {
 	Path  string `json:"path" validate:"required"`
 	User  string `json:"user" validate:"required"`

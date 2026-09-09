@@ -2388,6 +2388,7 @@ const message = {
         downloadProcess: '下载进度',
         downloading: '正在下载...',
         stopWgetConfirm: '确认停止该下载任务？',
+        downloadRecordsNotRemoved: '部分记录未移除，请刷新后重试。',
         infoDetail: '文件属性',
         root: '根目录',
         list: '文件列表',

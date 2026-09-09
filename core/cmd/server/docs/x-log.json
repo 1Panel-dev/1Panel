@@ -3503,6 +3503,13 @@
 		"formatZH": "下载 url =\u003e [path]/[name]",
 		"formatEN": "Download url =\u003e [path]/[name]"
 	},
+	"/files/wget/process/remove": {
+		"bodyKeys": ["keys"],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "移除已结束下载记录 [keys]",
+		"formatEN": "Remove finished download records [keys]"
+	},
 	"/files/wget/stop": {
 		"bodyKeys": [
 			"key"
