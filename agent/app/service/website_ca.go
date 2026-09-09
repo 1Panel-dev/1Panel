@@ -303,7 +303,7 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		NotAfter:              notAfter,
 		BasicConstraintsValid: true,
 		IsCA:                  false,
-		KeyUsage:              x509.KeyUsageDigitalSignature | x509.KeyUsageKeyEncipherment,
+		KeyUsage:              leafKeyUsage(websiteSSL.KeyType),
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		DNSNames:              domains,
 		IPAddresses:           ips,
@@ -364,6 +364,14 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 		}
 	}
 	return websiteSSL, nil
+}
+
+func leafKeyUsage(keyType string) x509.KeyUsage {
+	usage := x509.KeyUsageDigitalSignature
+	if ssl.KeyType(keyType) != certcrypto.EC256 && ssl.KeyType(keyType) != certcrypto.EC384 {
+		usage |= x509.KeyUsageKeyEncipherment
+	}
+	return usage
 }
 
 func createPrivateKey(keyType string) (privateKey any, publicKey any, privateKeyBytes []byte, err error) {
