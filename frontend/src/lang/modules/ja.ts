@@ -4081,10 +4081,7 @@ const message = {
         batchRuleLimit: '一度に作成できるルールは最大 {0} 件です',
         resolution_adopt: '管理対象にする',
         adoptRuleConfirm: '管理対象にすると、1Panel がこの既存ルールの保守と削除を行えるようになります。続行しますか？',
-        plan_equivalent_external_rule: '同じ外部ルールが既にあります。重複作成せず管理対象にできます。',
-        plan_multiple_equivalent_external_rules:
-            '同じ外部ルールが複数あります。管理対象にするルールを選択してください。',
-        plan_equivalent_managed_rule: '同じルールは既に 1Panel の管理対象です。重複作成は不要です。',
+        plan_exact_rule_conflict: '一致条件と優先度が同じで、許可・拒否の動作が逆のルールが存在します。',
         allRulesAlreadyExist: '確認した {0} 件のルールはすべて既に存在します。新しく作成するルールはありません。',
         ruleCheckResult: 'ルール確認結果',
         ruleCheckStatus_creatable: '作成可能',
@@ -4092,7 +4089,6 @@ const message = {
         ruleCheckStatus_error: 'エラー',
         ruleCheckExistingHelper: '同じルールが既に存在するため、今回はスキップします。',
         ruleCheckReadyHelper: '確認に合格しました。このルールは作成できます。',
-        ruleCheckExternalExists: '同じ外部ルールが既に存在するため、自動的にスキップされます。',
         ruleCheckBlockedHelper: 'エラーのあるルールは送信できません。戻って修正し、もう一度確認してください。',
         plan_managed_rule_drifted:
             '管理対象ルールが実際のファイアウォールと一致しません。先に不整合を解消してください。',
@@ -4101,7 +4097,6 @@ const message = {
         plan_protected_rule: 'このルールは保護されており、管理対象化、変更、削除はできません。',
         plan_blocked: 'このルールは安全に適用できません。ルールを更新して再試行してください。',
         scopeDefaultMismatch: 'システムの既定 zone は {0} です。このページでは public zone のみ管理します。',
-        scopeInactive: '管理対象の範囲が有効ではありません。新しいルールが現在の通信に適用されない場合があります。',
         scopeMissing: '管理対象スコープ {0} がありません。最初のルール適用時に安全に作成されます。',
         scopeUnmanagedActive: '他の有効な範囲が見つかりました：{0}。1Panel はそのルールを変更しません。',
         scopeRuntimeMismatch:
@@ -4159,13 +4154,11 @@ const message = {
             managedRuntimeCannotRemove: '管理対象の実行中ルールを安全に削除できません。',
             managedOrderBlocked:
                 '外部、認識不能、または保護されたルールを越えて管理対象ルールを並べ替えることはできません。',
-            mayBlockManagement: 'このルールにより現在の管理接続が遮断される可能性があります。',
             missingFromTarget: '対象ファイアウォールにこのルールがありません。',
             targetDiffers: '対象ルールがデータベースポリシーと異なります。',
             alreadyExistsInTarget: '対象ファイアウォールにこのルールは既に存在します。',
             onlyInTarget: 'このルールは対象ファイアウォールにのみ存在します。',
             stale: 'ファイアウォールルールの状態が古くなっています。更新して再試行してください。',
-            lockoutRisk: 'この変更により管理アクセスが遮断される可能性があります。',
             protectedRule: '保護されたファイアウォールルールは変更できません。',
             dockerAcceptReadOnly:
                 'この ACCEPT ルールは読み取り専用で、他のルールを同期しても保持されます。削除する場合は、ホスト上で手動で削除してください。',
@@ -4214,7 +4207,6 @@ const message = {
             no_matching_path:
                 'このポートに有効な Docker 転送ルールまたはプロキシプロセスが見つかりません。対象のコンテナを起動または再起動してから更新してください。解決しない場合は Docker ネットワーク設定を確認してください。',
         },
-        dockerTrafficPathPending: 'アクセス経路を確認中',
         dockerInputPolicyNotEffective:
             'このポートはホストが直接受信するため、既存のコンテナポート保護ルールは適用されません。ホストファイアウォールで設定してください。',
         dockerInputUseHostFirewall: 'このポートのアクセスはホストファイアウォールで設定してください。',
@@ -4286,7 +4278,7 @@ const message = {
             'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
         portWhiteList: 'ポートホワイトリスト',
         portWhiteListAlter:
-            '保存しても現在のファイアウォールルールはすぐに変更されません。新しいポートは、次回の初期化または起動時に許可されます。削除したポートを閉じるには、ルール一覧から既存のルールを手動で削除してください。',
+            '変更は保存時に即座に反映されます。追加したポートは自動的に許可されます。削除したポートは保護のみ解除されるため、閉じるにはルール一覧から許可ルールを削除してください。',
         portWhiteListHelper: 'IPv4/IPv6、TCP/UDP、単一ポート、8000-8100 のようなポート範囲に対応します。',
         chain: 'チェーン',
         sourceIP: '送信元 IP',

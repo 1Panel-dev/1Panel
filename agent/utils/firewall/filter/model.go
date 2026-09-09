@@ -112,7 +112,6 @@ var (
 	ErrUnsupportedScope = errors.New("unsupported firewall scope")
 	ErrInvalidRule      = errors.New("invalid firewall rule")
 	ErrProtectedRule    = errors.New("protected firewall rule cannot be modified")
-	ErrLockoutRisk      = errors.New("firewall change may lock out management access")
 	ErrCompositeRule    = errors.New("firewall rule must be atomic")
 	ErrExpansionLimit   = errors.New("firewall rule expansion limit exceeded")
 )

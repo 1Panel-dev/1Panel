@@ -70,16 +70,3 @@ export const whiteListRuleCount = (value: string): number => {
         return 0;
     }
 };
-
-export const whiteListRulesOverlap = (left: WhiteListRule, right: WhiteListRule): boolean => {
-    const first = normalizeWhiteListRule(left);
-    const second = normalizeWhiteListRule(right);
-    if (first.family !== second.family || first.protocol !== second.protocol) return false;
-    const range = (port: string) => {
-        const [start, end = start] = port.split('-').map(Number);
-        return { start, end };
-    };
-    const leftRange = range(first.port);
-    const rightRange = range(second.port);
-    return leftRange.start <= rightRange.end && rightRange.start <= leftRange.end;
-};

@@ -310,9 +310,6 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 	if normalized.UUID == "" {
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
 	}
-	if (change.Operation == filter.ChangeCreate || change.Operation == filter.ChangeUpdate) && isBroadDeny(normalized) {
-		return filter.NativeRulePlan{}, filter.ErrLockoutRisk
-	}
 
 	expected := observedForRule(normalized)
 	plan := filter.NativeRulePlan{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
@@ -387,11 +384,6 @@ func validateWritableRule(rule filter.FirewallRule) error {
 		return fmt.Errorf("%w: firewalld native kind %q is not writable", filter.ErrInvalidRule, rule.NativeKind)
 	}
 	return nil
-}
-
-func isBroadDeny(rule filter.FirewallRule) bool {
-	return (rule.Action == filter.ActionDrop || rule.Action == filter.ActionReject) &&
-		rule.SourceAddress == "" && rule.DestinationAddress == "" && rule.SourcePort == "" && rule.DestinationPort == ""
 }
 
 func observedForRule(rule filter.FirewallRule) filter.ObservedRule {
@@ -548,7 +540,6 @@ type zoneOutput struct {
 	ports    string
 	rich     string
 	services string
-	active   bool
 }
 
 func (a *Adapter) readScope(ctx context.Context, scope filter.Scope, permanent bool) (zoneOutput, error) {
@@ -571,9 +562,6 @@ func parseZoneOutput(output string) zoneOutput {
 	for _, line := range strings.Split(output, "\n") {
 		line = strings.TrimSpace(line)
 		switch {
-		case line == filter.FirewalldInputZone+" (active)":
-			parsed.active = true
-			inRichRules = false
 		case strings.HasPrefix(line, "ports:"):
 			parsed.ports = strings.TrimSpace(strings.TrimPrefix(line, "ports:"))
 			inRichRules = false
@@ -594,10 +582,7 @@ func parseZoneOutput(output string) zoneOutput {
 }
 
 func publicZoneNotices(runtime, permanent zoneOutput) []filter.ScopeNotice {
-	notices := make([]filter.ScopeNotice, 0, 2)
-	if !runtime.active {
-		notices = append(notices, filter.ScopeNotice{Code: filter.ScopeNoticeManagedScopeInactive})
-	}
+	notices := make([]filter.ScopeNotice, 0, 1)
 	mismatched := make([]string, 0, 3)
 	if !sameFields(runtime.ports, permanent.ports) {
 		mismatched = append(mismatched, "ports")

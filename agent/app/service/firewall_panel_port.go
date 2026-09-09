@@ -67,8 +67,6 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 			return err
 		}
 	}
-	cleanup := *s
-	cleanup.protectedPorts = func() ([]firewall.PortWhitelist, error) { return protected, nil }
 	ctx = context.WithValue(ctx, panelPortWhitelistKey{}, protected)
 	for index := range ports {
 		ports[index].Port = strconv.Itoa(int(oldPort))
@@ -86,7 +84,7 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 		if panelPortStillRequired(port, protected) {
 			continue
 		}
-		if err := cleanup.deleteSystemPort(ctx, port); err != nil {
+		if err := s.deleteSystemPort(ctx, port); err != nil {
 			warnPanelPortCleanupFailure(oldPort, err)
 		}
 	}

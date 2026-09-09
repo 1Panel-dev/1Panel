@@ -72,25 +72,11 @@ export const updateFirewallRule = (uuid: string, request: Firewall.UpdateRequest
     return http.post('/hosts/firewall/rules/update', { ...request, uuid }, TimeoutEnum.T_60S);
 };
 
-export const reorderFirewallRule = (uuid: string, request: Firewall.ReorderRequest) => {
-    return http.post('/hosts/firewall/rules/reorder', { ...request, uuid }, TimeoutEnum.T_60S);
-};
-
 export const loadDockerPortGuard = () =>
     http.get<Firewall.DockerGuardList>('/hosts/firewall/docker/ports', {}, { timeout: TimeoutEnum.T_40S });
 
 export const loadDockerPublishedPorts = () =>
     http.get<Firewall.DockerGuardContainer[]>('/hosts/firewall/docker/endpoints', {}, { timeout: TimeoutEnum.T_40S });
-
-export const syncDockerPortGuard = () =>
-    http.postWithConfig(
-        '/hosts/firewall/docker/sync',
-        {},
-        {
-            timeout: TimeoutEnum.T_60S,
-            skipErrorMessage: true,
-        },
-    );
 
 export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbind', taskID?: string) =>
     http.postWithConfig<Firewall.FilterChainOperationResult>(

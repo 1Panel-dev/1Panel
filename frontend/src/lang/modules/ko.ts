@@ -4008,10 +4008,7 @@ const message = {
         resolution_adopt: '관리 대상으로 전환',
         adoptRuleConfirm:
             '관리 대상으로 전환하면 1Panel이 이 기존 규칙을 유지하고 삭제할 수 있습니다. 계속하시겠습니까?',
-        plan_equivalent_external_rule:
-            '동일한 외부 규칙이 이미 있습니다. 중복 생성 대신 관리 대상으로 전환할 수 있습니다.',
-        plan_multiple_equivalent_external_rules: '동일한 외부 규칙이 여러 개 있습니다. 관리할 규칙을 선택하세요.',
-        plan_equivalent_managed_rule: '동일한 규칙을 1Panel이 이미 관리하고 있습니다. 중복 생성할 필요가 없습니다.',
+        plan_exact_rule_conflict: '일치 조건과 우선순위가 같지만 허용 또는 거부 동작이 반대인 규칙이 이미 있습니다.',
         allRulesAlreadyExist: '확인한 규칙 {0}개가 모두 이미 존재합니다. 새로 생성할 규칙이 없습니다.',
         ruleCheckResult: '규칙 검사 결과',
         ruleCheckStatus_creatable: '생성 가능',
@@ -4019,7 +4016,6 @@ const message = {
         ruleCheckStatus_error: '오류',
         ruleCheckExistingHelper: '동일한 규칙이 이미 존재하므로 이번 작업에서는 건너뜁니다.',
         ruleCheckReadyHelper: '검사를 통과했습니다. 이 규칙을 생성할 수 있습니다.',
-        ruleCheckExternalExists: '동일한 외부 규칙이 이미 존재하며 자동으로 건너뜁니다.',
         ruleCheckBlockedHelper: '오류가 있는 규칙은 제출할 수 없습니다. 돌아가서 수정한 후 다시 검사하세요.',
         plan_managed_rule_drifted: '관리 규칙이 실제 방화벽과 일치하지 않습니다. 먼저 불일치를 해결하세요.',
         plan_opaque_rule_in_target_scope: '대상 범위에 안전하게 분석할 수 없는 규칙이 있어 작업을 중지했습니다.',
@@ -4027,7 +4023,6 @@ const message = {
         plan_protected_rule: '이 규칙은 보호되어 관리 전환, 변경 또는 삭제할 수 없습니다.',
         plan_blocked: '이 규칙을 안전하게 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요.',
         scopeDefaultMismatch: '시스템 기본 zone은 {0}이며 이 페이지는 public zone만 관리합니다.',
-        scopeInactive: '관리 범위가 비활성 상태입니다. 새 규칙이 현재 트래픽에 적용되지 않을 수 있습니다.',
         scopeMissing: '관리 범위 {0}이(가) 없으며 첫 규칙을 적용할 때 안전하게 생성됩니다.',
         scopeUnmanagedActive: '다른 활성 범위가 감지되었습니다: {0}. 1Panel은 해당 규칙을 변경하지 않습니다.',
         scopeRuntimeMismatch: 'firewalld의 실행 중 구성과 영구 구성이 다릅니다. 방화벽을 재시작하세요.',
@@ -4081,13 +4076,11 @@ const message = {
             managedOnlyInTarget: '관리 규칙이 대상 방화벽에만 존재합니다.',
             managedRuntimeCannotRemove: '관리 중인 런타임 규칙을 안전하게 삭제할 수 없습니다.',
             managedOrderBlocked: '외부, 인식할 수 없거나 보호된 규칙을 넘어 관리 규칙의 순서를 변경할 수 없습니다.',
-            mayBlockManagement: '이 규칙은 현재 관리 연결을 차단할 수 있습니다.',
             missingFromTarget: '대상 방화벽에 이 규칙이 없습니다.',
             targetDiffers: '대상 규칙이 데이터베이스 정책과 다릅니다.',
             alreadyExistsInTarget: '대상 방화벽에 이 규칙이 이미 존재합니다.',
             onlyInTarget: '이 규칙은 대상 방화벽에만 존재합니다.',
             stale: '방화벽 규칙 상태가 오래되었습니다. 새로 고친 후 다시 시도하세요.',
-            lockoutRisk: '이 방화벽 변경으로 관리 접근이 차단될 수 있습니다.',
             protectedRule: '보호된 방화벽 규칙은 수정할 수 없습니다.',
             dockerAcceptReadOnly:
                 '이 ACCEPT 규칙은 읽기 전용이며 다른 규칙을 동기화할 때 그대로 유지됩니다. 제거하려면 호스트에서 수동으로 삭제하세요.',
@@ -4136,7 +4129,6 @@ const message = {
             no_matching_path:
                 '이 포트에 활성 Docker 전달 규칙이나 프록시 프로세스가 없습니다. 해당 컨테이너를 시작하거나 다시 시작한 후 새로 고침하세요. 문제가 계속되면 Docker 네트워크 설정을 확인하세요.',
         },
-        dockerTrafficPathPending: '접근 경로 확인 대기',
         dockerInputPolicyNotEffective:
             '이 포트는 호스트가 직접 수신하므로 기존 컨테이너 포트 보호 규칙이 적용되지 않습니다. 호스트 방화벽에서 설정하세요.',
         dockerInputUseHostFirewall: '이 포트의 접근 규칙은 호스트 방화벽에서 설정하세요.',
@@ -4206,7 +4198,7 @@ const message = {
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
         portWhiteList: '포트 화이트리스트',
         portWhiteListAlter:
-            '저장해도 현재 방화벽 규칙은 즉시 변경되지 않습니다. 새 포트는 다음 초기화 또는 시작 시 허용됩니다. 제거한 포트를 닫으려면 규칙 목록에서 기존 규칙을 수동으로 삭제하세요.',
+            '변경 사항은 저장 즉시 적용됩니다. 추가한 포트는 자동으로 허용됩니다. 포트를 제거하면 보호만 해제됩니다. 포트를 닫으려면 규칙 목록에서 허용 규칙을 삭제하세요.',
         portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, 단일 포트 및 8000-8100과 같은 포트 범위를 지원합니다.',
         chain: '체인',
         sourceIP: '소스 IP',

@@ -22,10 +22,6 @@ type FilterRules struct {
 	Description string `json:"description"`
 }
 
-func ReadFilterRulesByChain(chain string) ([]FilterRules, error) {
-	return readFilterRulesByChain(chain, RunWithStd)
-}
-
 func readFilterRulesByChain(chain string, run func(string, ...string) (string, error)) ([]FilterRules, error) {
 	var rules []FilterRules
 	if cmd.CheckIllegal(chain) {

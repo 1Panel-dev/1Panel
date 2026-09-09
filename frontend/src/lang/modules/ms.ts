@@ -4164,10 +4164,8 @@ const message = {
         resolution_adopt: 'Ambil alih pengurusan',
         adoptRuleConfirm:
             'Selepas diambil alih, 1Panel boleh menyelenggara dan memadam peraturan sedia ada ini. Teruskan?',
-        plan_equivalent_external_rule: 'Peraturan luaran yang sama sudah wujud. Ambil alih tanpa mencipta pendua.',
-        plan_multiple_equivalent_external_rules:
-            'Terdapat beberapa peraturan luaran yang sama. Pilih satu untuk diurus.',
-        plan_equivalent_managed_rule: 'Peraturan yang sama sudah diurus oleh 1Panel. Pendua tidak diperlukan.',
+        plan_exact_rule_conflict:
+            'Peraturan dengan syarat padanan dan keutamaan yang sama mempunyai tindakan benarkan atau sekat yang bertentangan.',
         allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
         ruleCheckResult: 'Keputusan semakan peraturan',
         ruleCheckStatus_creatable: 'Boleh dicipta',
@@ -4175,7 +4173,6 @@ const message = {
         ruleCheckStatus_error: 'Ralat',
         ruleCheckExistingHelper: 'Peraturan yang sama sudah wujud dan akan dilangkau.',
         ruleCheckReadyHelper: 'Semakan lulus. Peraturan ini boleh dicipta.',
-        ruleCheckExternalExists: 'Peraturan luaran yang sama sudah wujud dan akan dilangkau secara automatik.',
         ruleCheckBlockedHelper: 'Peraturan yang mempunyai ralat tidak boleh dihantar. Kembali, edit dan semak semula.',
         plan_managed_rule_drifted:
             'Peraturan terurus tidak sepadan dengan tembok api aktif. Selesaikan perbezaan dahulu.',
@@ -4185,7 +4182,6 @@ const message = {
         plan_protected_rule: 'Peraturan ini dilindungi dan tidak boleh diambil alih, diubah atau dipadam.',
         plan_blocked: 'Peraturan ini tidak dapat digunakan dengan selamat. Muat semula senarai dan cuba lagi.',
         scopeDefaultMismatch: 'Zon lalai sistem ialah {0}; halaman ini hanya mengurus zon public.',
-        scopeInactive: 'Skop terurus tidak aktif. Peraturan baharu mungkin tidak mempengaruhi trafik semasa.',
         scopeMissing: 'Skop terurus {0} tiada dan akan dicipta dengan selamat apabila peraturan pertama digunakan.',
         scopeUnmanagedActive: 'Skop aktif lain dikesan: {0}. 1Panel tidak akan mengubah peraturannya.',
         scopeRuntimeMismatch: 'Konfigurasi firewalld aktif dan kekal tidak sepadan. Mulakan semula firewall.',
@@ -4243,13 +4239,11 @@ const message = {
             managedRuntimeCannotRemove: 'Peraturan aktif terurus tidak dapat dipadam dengan selamat.',
             managedOrderBlocked:
                 'Peraturan terurus tidak boleh disusun semula merentasi peraturan luaran, tidak dikenali atau dilindungi.',
-            mayBlockManagement: 'Peraturan mungkin menyekat sambungan pengurusan semasa.',
             missingFromTarget: 'Peraturan tiada dalam tembok api sasaran.',
             targetDiffers: 'Peraturan sasaran berbeza daripada dasar pangkalan data.',
             alreadyExistsInTarget: 'Peraturan sudah wujud dalam tembok api sasaran.',
             onlyInTarget: 'Peraturan hanya wujud dalam tembok api sasaran.',
             stale: 'Keadaan peraturan tembok api sudah lapuk. Muat semula dan cuba lagi.',
-            lockoutRisk: 'Perubahan ini mungkin menyekat akses pengurusan.',
             protectedRule: 'Peraturan tembok api yang dilindungi ini tidak boleh diubah.',
             dockerAcceptReadOnly:
                 'Peraturan ACCEPT ini adalah baca sahaja dan akan dikekalkan semasa peraturan lain disegerakkan. Untuk membuangnya, padam secara manual pada hos.',
@@ -4297,7 +4291,6 @@ const message = {
             no_matching_path:
                 'Tiada peraturan pemajuan Docker aktif atau proses proksi ditemui untuk port ini. Mulakan atau mulakan semula bekas, kemudian muat semula. Jika masalah berterusan, semak konfigurasi rangkaian Docker.',
         },
-        dockerTrafficPathPending: 'Laluan akses belum ditentukan',
         dockerInputPolicyNotEffective:
             'Port ini diterima terus oleh hos, jadi peraturan perlindungan port bekas sedia ada tidak digunakan. Tetapkannya dalam firewall hos.',
         dockerInputUseHostFirewall: 'Konfigurasikan akses port ini dalam tembok api hos.',
@@ -4368,7 +4361,7 @@ const message = {
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
         portWhiteList: 'Senarai putih port',
         portWhiteListAlter:
-            'Menyimpan tidak mengubah peraturan firewall semasa dengan serta-merta. Port baharu akan dibuka pada pemulaan atau pengaktifan seterusnya. Untuk menutup port yang dialih keluar, padam peraturan sedia ada secara manual daripada senarai peraturan.',
+            'Perubahan berkuat kuasa serta-merta apabila disimpan. Port baharu dibenarkan secara automatik; mengalih keluar port hanya membuang perlindungannya. Untuk menutupnya, padam peraturan kebenaran dalam senarai peraturan.',
         portWhiteListHelper: 'Menyokong IPv4/IPv6, TCP/UDP, port tunggal dan julat seperti 8000-8100.',
         chain: 'Rantai',
         sourceIP: 'IP Sumber',

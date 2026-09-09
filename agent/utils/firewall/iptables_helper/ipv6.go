@@ -18,26 +18,6 @@ func (m *Manager) EnsureIPv6BaseChains() error {
 	return EnsureIPv6BaseChains(m.panelPort(), ports)
 }
 
-func RepairIPv6BaseChains(panelPort string, ports []firewall.PortWhitelist) error {
-	initialized, bound, err := LoadFamilyInitStatus(constant.FirewallFamilyIPv6, "base")
-	if err != nil {
-		return err
-	}
-	return repairIPv6BaseChains(initialized, bound, BindIPv6BaseChains, func() error {
-		return EnsureIPv6BaseChains(panelPort, ports)
-	})
-}
-
-func repairIPv6BaseChains(initialized, bound bool, bind, ensure func() error) error {
-	if initialized {
-		if bound {
-			return nil
-		}
-		return bind()
-	}
-	return ensure()
-}
-
 func EnsureIPv6BaseChains(panelPort string, ports []firewall.PortWhitelist) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil || !commands.IPv6Available() {
@@ -97,7 +77,7 @@ func buildIPv6BaseInitializationScript(dir, panelPort string, ports []firewall.P
 			return buildBaseChainsRestoreScript(dir, panelPort, true, ports...)
 		}
 	}
-	defaults, err := ipv6BaseDefaultRules(panelPort, ports)
+	defaults, err := baseDefaultRules(panelPort, ports, constant.FirewallFamilyIPv6)
 	if err != nil {
 		return "", err
 	}
@@ -112,14 +92,14 @@ func buildIPv6BaseInitializationScript(dir, panelPort string, ports []firewall.P
 	return script.String(), nil
 }
 
-func ipv6BaseDefaultRules(panelPort string, ports []firewall.PortWhitelist) ([]string, error) {
+func baseDefaultRules(panelPort string, ports []firewall.PortWhitelist, family string) ([]string, error) {
 	ports, err := firewall.NormalizeRequiredPorts(append([]firewall.PortWhitelist{{Port: panelPort, Protocol: "tcp"}}, ports...))
 	if err != nil {
 		return nil, err
 	}
 	rules := []string{"-A " + BasicBeforeChain + " " + IoRuleIn, "-A " + BasicBeforeChain + " " + EstablishedRule}
 	for _, port := range ports {
-		if port.Family == "" || port.Family == constant.FirewallFamilyIPv6 {
+		if port.Family == "" || port.Family == family {
 			rules = append(rules, iptablesPortRuleLine("-A", BasicBeforeChain, port.Protocol, port.Port))
 		}
 	}

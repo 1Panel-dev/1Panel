@@ -160,12 +160,6 @@ export namespace Firewall {
         observedInstanceKey?: string;
     }
 
-    export interface RuntimeUsage {
-        used: boolean;
-        usedBy?: string[];
-        reason?: string;
-    }
-
     export interface PositionRange {
         min: number;
         max: number;
@@ -179,7 +173,6 @@ export namespace Firewall {
         desired?: DesiredRule;
         state: InventoryState;
         match: InventoryMatch;
-        usage?: RuntimeUsage;
     }
 
     export type ScopeNoticeCode =
@@ -368,11 +361,6 @@ export namespace Firewall {
 
     export interface UpdateRequest {
         rule: Rule;
-    }
-
-    export interface ReorderRequest {
-        targetPosition?: number;
-        priority?: number;
     }
 
     export interface DockerGuardBase {

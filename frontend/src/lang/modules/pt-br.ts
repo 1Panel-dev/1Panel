@@ -4182,11 +4182,8 @@ const message = {
         batchRuleLimit: 'É possível criar no máximo {0} regras por vez',
         resolution_adopt: 'Assumir gerenciamento',
         adoptRuleConfirm: 'Depois disso, o 1Panel poderá manter e excluir esta regra existente. Continuar?',
-        plan_equivalent_external_rule:
-            'Já existe uma regra externa idêntica. Assuma seu gerenciamento sem criar uma duplicata.',
-        plan_multiple_equivalent_external_rules:
-            'Existem várias regras externas idênticas. Selecione uma para gerenciar.',
-        plan_equivalent_managed_rule: 'Uma regra idêntica já é gerenciada pelo 1Panel. Não é necessário duplicá-la.',
+        plan_exact_rule_conflict:
+            'Já existe uma regra com as mesmas condições e prioridade, mas com uma ação oposta de permitir ou negar.',
         allRulesAlreadyExist: 'Todas as {0} regras verificadas já existem. Não há novas regras para criar.',
         ruleCheckResult: 'Resultados da verificação de regras',
         ruleCheckStatus_creatable: 'Pode ser criada',
@@ -4194,7 +4191,6 @@ const message = {
         ruleCheckStatus_error: 'Erro',
         ruleCheckExistingHelper: 'Uma regra idêntica já existe e será ignorada.',
         ruleCheckReadyHelper: 'A verificação foi aprovada. Esta regra pode ser criada.',
-        ruleCheckExternalExists: 'Uma regra externa idêntica já existe e será ignorada automaticamente.',
         ruleCheckBlockedHelper: 'Regras com erros não podem ser enviadas. Volte, edite-as e verifique novamente.',
         plan_managed_rule_drifted:
             'A regra gerenciada não corresponde ao firewall ativo. Resolva a divergência primeiro.',
@@ -4204,7 +4200,6 @@ const message = {
         plan_protected_rule: 'Esta regra está protegida e não pode ser assumida, alterada ou excluída.',
         plan_blocked: 'A regra não pode ser aplicada com segurança. Atualize a lista e tente novamente.',
         scopeDefaultMismatch: 'A zona padrão do sistema é {0}; esta página gerencia apenas a zona public.',
-        scopeInactive: 'O escopo gerenciado está inativo. Novas regras podem não afetar o tráfego atual.',
         scopeMissing: 'O escopo gerenciado {0} não existe e será criado com segurança ao aplicar a primeira regra.',
         scopeUnmanagedActive: 'Outros escopos ativos foram detectados: {0}. O 1Panel não modificará suas regras.',
         scopeRuntimeMismatch: 'As configurações ativa e permanente do firewalld não coincidem. Reinicie o firewall.',
@@ -4261,13 +4256,11 @@ const message = {
             managedRuntimeCannotRemove: 'A regra ativa gerenciada não pode ser removida com segurança.',
             managedOrderBlocked:
                 'As regras gerenciadas não podem ser reordenadas através de regras externas, não reconhecidas ou protegidas.',
-            mayBlockManagement: 'A regra pode bloquear a conexão de gerenciamento atual.',
             missingFromTarget: 'A regra não existe no firewall de destino.',
             targetDiffers: 'A regra de destino difere da política do banco de dados.',
             alreadyExistsInTarget: 'A regra já existe no firewall de destino.',
             onlyInTarget: 'A regra existe apenas no firewall de destino.',
             stale: 'O estado da regra está desatualizado. Atualize e tente novamente.',
-            lockoutRisk: 'Esta alteração pode bloquear o acesso de gerenciamento.',
             protectedRule: 'Esta regra protegida do firewall não pode ser modificada.',
             dockerAcceptReadOnly:
                 'Esta regra ACCEPT é somente leitura e será preservada durante a sincronização das outras regras. Para removê-la, exclua-a manualmente no host.',
@@ -4317,7 +4310,6 @@ const message = {
             no_matching_path:
                 'Nenhuma regra de encaminhamento do Docker ativa ou processo proxy foi encontrado para esta porta. Inicie ou reinicie o contêiner e atualize a página. Se o problema continuar, verifique a rede do Docker.',
         },
-        dockerTrafficPathPending: 'Caminho de acesso pendente',
         dockerInputPolicyNotEffective:
             'O host recebe esta porta diretamente, portanto a regra de proteção da porta do contêiner não se aplica. Configure-a no firewall do host.',
         dockerInputUseHostFirewall: 'Configure o acesso a esta porta no firewall do host.',
@@ -4391,7 +4383,7 @@ const message = {
             'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
         portWhiteList: 'Lista branca de portas',
         portWhiteListAlter:
-            'Salvar não altera imediatamente as regras atuais do firewall. Novas portas serão abertas na próxima inicialização ou ativação. Para fechar uma porta removida, exclua manualmente a regra existente na lista de regras.',
+            'As alterações entram em vigor ao salvar. As portas adicionadas são liberadas automaticamente; remover uma porta apenas retira sua proteção. Para fechá-la, exclua a regra de permissão na lista de regras.',
         portWhiteListHelper: 'Suporta IPv4/IPv6, TCP/UDP, portas únicas e intervalos como 8000-8100.',
         chain: 'Cadeia',
         sourceIP: 'IP de Origem',

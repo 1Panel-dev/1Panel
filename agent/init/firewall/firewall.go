@@ -41,7 +41,7 @@ func Init() {
 		global.LOG.Warnf("restore forwarding rules failed, manual synchronization is available, err: %v", err)
 	}
 	if !needInit() {
-		repairIptablesIPv6BaseChains(clientName)
+		repairIptablesBaseChains(clientName)
 		return
 	}
 	defer initDockerPortGuard(ctx)
@@ -90,7 +90,7 @@ func Init() {
 
 }
 
-func repairIptablesIPv6BaseChains(clientName string) {
+func repairIptablesBaseChains(clientName string) {
 	if clientName != constant.FirewallProviderIptables {
 		return
 	}
@@ -99,21 +99,13 @@ func repairIptablesIPv6BaseChains(clientName string) {
 	if status != constant.StatusEnable {
 		return
 	}
-	initialized, bound, err := iptables_helper.LoadFamilyInitStatus(constant.FirewallFamilyIPv6, "base")
-	if err == nil && initialized && bound {
-		return
+	manager := iptables_helper.Manager{
+		PanelPort:         service.LoadPanelPort,
+		LoadRequiredPorts: service.LoadRequiredFirewallPortWhiteList,
 	}
-	panelPort := service.LoadPanelPort()
-	requiredPorts, err := service.LoadRequiredFirewallPortWhiteList()
-	if err != nil {
-		global.LOG.Warnf("load required firewall ports for IPv6 repair failed, err: %v", err)
-		return
+	if err := manager.RepairBaseChains(); err != nil {
+		global.LOG.Warnf("repair iptables base chains failed, err: %v", err)
 	}
-	if err := iptables_helper.RepairIPv6BaseChains(panelPort, requiredPorts); err != nil {
-		global.LOG.Warnf("repair IPv6 iptables base chains failed, err: %v", err)
-		return
-	}
-	global.LOG.Info("repaired IPv6 iptables base chains successfully")
 }
 
 func initDockerPortGuard(ctx context.Context) {
