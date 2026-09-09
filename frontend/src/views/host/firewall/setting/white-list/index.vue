@@ -71,7 +71,7 @@ import {
     WhiteListFamily,
     WhiteListProtocol,
     WhiteListRule,
-    whiteListRulesOverlap,
+    whiteListRuleKey,
 } from './model';
 
 interface WhiteListItem extends WhiteListRule {
@@ -127,7 +127,7 @@ const editRow = (row: WhiteListItem) => {
 const saveRow = (row: WhiteListItem) => {
     const rule = validateRule(row);
     if (!rule) return;
-    if (hasOverlap(rule, row)) {
+    if (hasDuplicate(rule, row)) {
         MsgError(i18n.global.t('commons.rule.duplicate'));
         return;
     }
@@ -163,8 +163,10 @@ const validateRule = (row: Pick<WhiteListItem, 'family' | 'protocol' | 'port'>):
     }
 };
 
-const hasOverlap = (rule: WhiteListRule, row?: WhiteListItem): boolean => {
-    return data.value.some((item) => item !== row && item.port !== '' && whiteListRulesOverlap(rule, item));
+const hasDuplicate = (rule: WhiteListRule, row?: WhiteListItem): boolean => {
+    return data.value.some(
+        (item) => item !== row && item.port !== '' && whiteListRuleKey(rule) === whiteListRuleKey(item),
+    );
 };
 
 const validateRules = (): WhiteListRule[] | undefined => {
@@ -173,7 +175,7 @@ const validateRules = (): WhiteListRule[] | undefined => {
         if (!item.port) continue;
         const rule = validateRule(item);
         if (!rule) return undefined;
-        if (rules.some((existing) => whiteListRulesOverlap(existing, rule))) {
+        if (rules.some((existing) => whiteListRuleKey(existing) === whiteListRuleKey(rule))) {
             MsgError(i18n.global.t('commons.rule.duplicate'));
             return undefined;
         }

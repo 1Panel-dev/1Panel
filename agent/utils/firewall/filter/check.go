@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrRuleConflict      = errors.New("firewall rule has identical conditions and an opposing action")
 	ErrRuleStale         = errors.New("firewall rule state is stale")
 	ErrRuleOperation     = errors.New("firewall rule operation is not allowed")
 	ErrRuleCheckRequired = errors.New("firewall rule must be checked again")
@@ -58,8 +59,6 @@ func CheckCreate(
 	snapshot Snapshot,
 	requested FirewallRule,
 	desired []DesiredRule,
-	clientIP string,
-	protectedPorts ...PortWhitelist,
 ) (RuleCheckResult, error) {
 	normalized, err := NormalizeRule(requested)
 	if err != nil {
@@ -79,11 +78,9 @@ func CheckCreate(
 		RequestedRule:    normalized,
 		RequestedRuleKey: ruleKey,
 	}
-	if RuleBlocksManagementConnection(normalized, clientIP, protectedPorts...) {
-		result.Decision = CheckDecisionBlocked
-		result.Classification = CheckClassificationProtected
-		result.Reason = "current_management_connection"
-		return finishCheck(result)
+	matchKey, err := RuleMatchKey(normalized)
+	if err != nil {
+		return RuleCheckResult{}, err
 	}
 
 	for _, owned := range desired {
@@ -91,7 +88,18 @@ func CheckCreate(
 		if err != nil {
 			return RuleCheckResult{}, err
 		}
-		if ownedKey != ruleKey || (owned.Origin != RuleOriginCreated && owned.Origin != RuleOriginAdopted) {
+		ownedMatchKey, err := RuleMatchKey(owned.Rule)
+		if err != nil {
+			return RuleCheckResult{}, err
+		}
+		if ownedMatchKey != matchKey || (owned.Origin != RuleOriginCreated && owned.Origin != RuleOriginAdopted) {
+			continue
+		}
+		if OppositeActions(normalized.Action, owned.Rule.Action) {
+			result.Decision, result.Classification, result.Reason = CheckDecisionBlocked, CheckClassificationConflict, "exact_rule_conflict"
+			return finishCheck(result)
+		}
+		if normalized.Action != owned.Rule.Action {
 			continue
 		}
 		owned.RuleKey = ownedKey
@@ -109,18 +117,12 @@ func CheckCreate(
 	}
 
 	exact := make([]ObservedRule, 0)
+	equivalentExternal := false
 	for _, observed := range snapshot.Rules {
 		if observed.ParseStatus != ParseStatusSupported {
 			if hydrated, ok := hydrateOwnedPartialRule(observed, desired); ok {
 				observed = hydrated
 			} else {
-				if observed.Rule.Scope.Provider == ProviderFirewalld && observed.Rule.NativeKind == NativeKindZoneService {
-					continue
-				}
-				result.Decision = CheckDecisionBlocked
-				result.Classification = CheckClassificationUnsupported
-				result.Reason = "opaque_rule_in_target_scope"
-				result.Candidates = append(result.Candidates, observed)
 				continue
 			}
 		}
@@ -129,12 +131,26 @@ func CheckCreate(
 			return RuleCheckResult{}, err
 		}
 		observed.Rule = observedRule
-		observedKey, err := RuleKey(observedRule)
+		observedKey, err := RuleMatchKey(observedRule)
 		if err != nil {
 			return RuleCheckResult{}, err
 		}
-		if observedKey == ruleKey {
-			exact = append(exact, observed)
+		if observedKey != matchKey {
+			continue
+		}
+		if OppositeActions(normalized.Action, observedRule.Action) {
+			result.Decision, result.Classification, result.Reason = CheckDecisionBlocked, CheckClassificationConflict, "exact_rule_conflict"
+			return finishCheck(result)
+		}
+		if normalized.Action == observedRule.Action {
+			equivalentExternal = true
+			key, err := RuleKey(observedRule)
+			if err != nil {
+				return RuleCheckResult{}, err
+			}
+			if key == ruleKey {
+				exact = append(exact, observed)
+			}
 		}
 	}
 
@@ -161,7 +177,10 @@ func CheckCreate(
 		result.Reason = "multiple_equivalent_external_rules"
 		result.Candidates = exact
 		result.AllowedActions = []CheckAction{CheckActionSelectAdopt, CheckActionCancel}
-	case result.Classification == CheckClassificationUnsupported:
+	case equivalentExternal:
+		result.Decision = CheckDecisionNoChange
+		result.Classification = CheckClassificationExactExternal
+		result.Reason = "equivalent_external_rule"
 	default:
 		result.AllowedActions = []CheckAction{CheckActionCreate}
 	}
@@ -241,52 +260,6 @@ func containsProtectedRule(rules []ObservedRule) bool {
 	return false
 }
 
-func RuleBlocksManagementConnection(
-	rule FirewallRule,
-	clientIP string,
-	protectedPorts ...PortWhitelist,
-) bool {
-	if rule.Action == ActionAccept {
-		return false
-	}
-	targetAddress := rule.SourceAddress
-	if targetAddress != "" {
-		client, err := netip.ParseAddr(strings.TrimSpace(clientIP))
-		if err != nil {
-			return false
-		}
-		if rule.Scope.Family == FamilyIPv4 {
-			client = client.Unmap()
-			if !client.Is4() {
-				return false
-			}
-		} else if rule.Scope.Family == FamilyIPv6 && (!client.Is6() || client.Is4In6()) {
-			return false
-		}
-		prefix, err := netip.ParsePrefix(targetAddress)
-		if err != nil || !prefix.Contains(client) {
-			return false
-		}
-	}
-	if rule.DestinationPort == "" {
-		return true
-	}
-	for _, protected := range protectedPorts {
-		family := strings.ToLower(strings.TrimSpace(protected.Family))
-		if family != "" && rule.Scope.Family != FamilyInet && string(rule.Scope.Family) != family {
-			continue
-		}
-		protocol := strings.ToLower(strings.TrimSpace(protected.Protocol))
-		if rule.Protocol != "all" && rule.Protocol != protocol {
-			continue
-		}
-		if portsOverlap(rule.DestinationPort, protected.Port) {
-			return true
-		}
-	}
-	return false
-}
-
 func FindCandidate(candidates []ObservedRule, selected string) (ObservedRule, error) {
 	matched := make([]ObservedRule, 0, 1)
 	for _, candidate := range candidates {
@@ -352,24 +325,6 @@ func familiesOverlap(left, right Family) bool {
 
 func protocolsOverlap(left, right string) bool {
 	return left == "all" || right == "all" || left == right
-}
-
-func addressCovers(existing, requested string) bool {
-	if existing == "" {
-		return true
-	}
-	if requested == "" {
-		return false
-	}
-	existingPrefix, err := netip.ParsePrefix(existing)
-	if err != nil {
-		return false
-	}
-	requestedPrefix, err := netip.ParsePrefix(requested)
-	if err != nil {
-		return false
-	}
-	return existingPrefix.Bits() <= requestedPrefix.Bits() && existingPrefix.Contains(requestedPrefix.Addr())
 }
 
 func addressesOverlap(left, right string) bool {

@@ -3873,9 +3873,7 @@ const message = {
         batchRuleLimit: '单次最多可创建 {0} 条规则',
         resolution_adopt: '纳管',
         adoptRuleConfirm: '纳入管理后，1Panel 将负责维护和删除这条现有规则，是否继续？',
-        plan_equivalent_external_rule: '系统中已有相同的外部规则，可以将它纳入管理，无需重复创建。',
-        plan_multiple_equivalent_external_rules: '系统中有多条相同的外部规则，请选择其中一条纳入管理。',
-        plan_equivalent_managed_rule: '相同规则已由 1Panel 管理，无需重复创建。',
+        plan_exact_rule_conflict: '已存在匹配条件和优先级相同、但允许与拒绝动作相反的规则。',
         allRulesAlreadyExist: '本次检查的 {0} 条规则均已存在，没有需要创建的新规则。',
         ruleCheckResult: '规则检查结果',
         ruleCheckStatus_creatable: '可创建',
@@ -3883,7 +3881,6 @@ const message = {
         ruleCheckStatus_error: '错误',
         ruleCheckExistingHelper: '系统中已存在相同规则，本次将自动跳过。',
         ruleCheckReadyHelper: '检查通过，可以创建该规则。',
-        ruleCheckExternalExists: '系统中已有相同的外部规则，本次将自动跳过。',
         ruleCheckBlockedHelper: '存在错误规则，不能提交。请返回修改后重新检查。',
         plan_managed_rule_drifted:
             '这条规则在 1Panel 中的记录与防火墙实际状态不一致，请先刷新规则；如仍异常，请重新同步。',
@@ -3893,7 +3890,6 @@ const message = {
         plan_protected_rule: '该规则受到保护，不能认领、修改或删除。',
         plan_blocked: '暂时无法处理这条规则，本次操作未生效。请刷新后重试；如仍失败，请检查规则状态。',
         scopeDefaultMismatch: '系统默认 zone 为 {0}，当前页面仅管理 public zone。',
-        scopeInactive: '当前托管范围未激活，新增规则可能不会作用于现有流量。',
         scopeMissing: '托管范围 {0} 尚未创建，应用首条规则时将以安全方式创建。',
         scopeUnmanagedActive: '检测到其他活动范围：{0}，1Panel 不会修改其中的规则。',
         scopeRuntimeMismatch: 'firewalld 运行配置与永久配置不一致，请重启防火墙。',
@@ -3948,13 +3944,11 @@ const message = {
             managedRuntimeCannotRemove: '该规则仅在当前运行中生效，1Panel 无法确认删除后的影响，因此本次不会删除。',
             managedOrderBlocked:
                 '调整规则顺序时会跨过外部规则、无法识别的规则或系统保护规则，为避免改变现有访问，本次不会调整。',
-            mayBlockManagement: '该规则可能导致当前 1Panel 管理页面无法访问。',
             missingFromTarget: '防火墙中缺少该规则，本次将补充。',
             targetDiffers: '防火墙中的规则与 1Panel 保存的设置不一致，本次将修复。',
             alreadyExistsInTarget: '防火墙中已存在相同规则，无需重复添加。',
             onlyInTarget: '该规则只存在于当前防火墙中。',
             stale: '检查后防火墙状态已发生变化，请刷新后重试。',
-            lockoutRisk: '执行后可能导致当前 1Panel 管理页面无法访问，本次操作已停止。',
             protectedRule: '这是保证系统正常运行的必要规则，不能修改。',
             dockerAcceptReadOnly:
                 '该 ACCEPT 规则为只读、不可同步；同步其他规则时会保留该规则。如需移除，请在主机上手动删除。',
@@ -3998,7 +3992,6 @@ const message = {
             no_matching_path:
                 '未找到该端口生效的 Docker 转发规则或代理进程，请启动或重启对应容器后刷新；若仍异常，请检查 Docker 网络配置。',
         },
-        dockerTrafficPathPending: '访问方式待确认',
         dockerInputPolicyNotEffective: '该端口由主机直接接收，现有容器端口防护规则不会生效，请改用主机防火墙设置。',
         dockerInputUseHostFirewall: '该端口需要通过主机防火墙设置访问规则，请前往主机防火墙进行配置。',
         dockerInputNotProtected: '宿主机 INPUT 规则不能直接保护此 Docker 发布端口，点击前往容器端口防护。',
@@ -4060,7 +4053,7 @@ const message = {
         unbindHelper: '解绑 解除绑定时，已添加的所有防火墙规则将失效，请谨慎操作，是否确认？',
         portWhiteList: '端口白名单',
         portWhiteListAlter:
-            '保存后不会立即更改当前防火墙规则。新增端口将在下次初始化或启动防火墙时自动放行；如需关闭已移出的端口，请前往规则列表手动删除现有规则。',
+            '白名单修改在保存后立即生效。新增端口自动放行；移出端口仅解除白名单保护，如需关闭，请前往规则列表手动删除放行规则。',
         portWhiteListHelper: '支持 IPv4/IPv6、TCP/UDP、单端口以及 8000-8100 格式的端口范围。',
         chain: '链',
         sourceIP: '源 IP',

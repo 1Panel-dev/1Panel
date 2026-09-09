@@ -2,8 +2,6 @@ package filter
 
 import (
 	"fmt"
-	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -48,12 +46,6 @@ type DesiredRule struct {
 	ObservedInstanceKey string       `json:"observedInstanceKey,omitempty"`
 }
 
-type RuntimeUsage struct {
-	Used   bool     `json:"used"`
-	UsedBy []string `json:"usedBy,omitempty"`
-	Reason string   `json:"reason,omitempty"`
-}
-
 type PositionRange struct {
 	Min int `json:"min"`
 	Max int `json:"max"`
@@ -67,7 +59,6 @@ type InventoryItem struct {
 	Desired      *DesiredRule   `json:"desired,omitempty"`
 	State        InventoryState `json:"state"`
 	Match        InventoryMatch `json:"match"`
-	Usage        *RuntimeUsage  `json:"usage,omitempty"`
 }
 
 type Inventory struct {
@@ -311,90 +302,4 @@ func inventoryStateForDesired(desired DesiredRule, match InventoryMatch) Invento
 	default:
 		return InventoryStateManaged
 	}
-}
-
-func RuntimeUsageKey(rule FirewallRule) string {
-	protocol := strings.ToLower(strings.TrimSpace(rule.Protocol))
-	port := strings.TrimSpace(rule.DestinationPort)
-	if port == "" || (protocol != "tcp" && protocol != "udp") {
-		return ""
-	}
-	return protocol + "\x00" + port
-}
-
-func AttachRuntimeUsage(items []InventoryItem, usage map[string]RuntimeUsage) []InventoryItem {
-	result := make([]InventoryItem, len(items))
-	copy(result, items)
-	for index := range result {
-		value, exists := runtimeUsageForRule(result[index].Rule, usage)
-		if !exists {
-			continue
-		}
-		value.UsedBy = normalizedUsageOwners(value.UsedBy)
-		value.Used = value.Used || len(value.UsedBy) > 0
-		result[index].Usage = &value
-	}
-	return result
-}
-
-func runtimeUsageForRule(rule FirewallRule, usage map[string]RuntimeUsage) (RuntimeUsage, bool) {
-	key := RuntimeUsageKey(rule)
-	if key == "" {
-		return RuntimeUsage{}, false
-	}
-	if value, exists := usage[key]; exists {
-		return value, true
-	}
-	intervals, err := portIntervals(rule.DestinationPort)
-	if err != nil {
-		return RuntimeUsage{}, false
-	}
-	protocolPrefix := strings.ToLower(strings.TrimSpace(rule.Protocol)) + "\x00"
-	combined := RuntimeUsage{}
-	found := false
-	for usageKey, value := range usage {
-		if !strings.HasPrefix(usageKey, protocolPrefix) {
-			continue
-		}
-		port, err := strconv.Atoi(strings.TrimPrefix(usageKey, protocolPrefix))
-		if err != nil || !portInIntervals(port, intervals) {
-			continue
-		}
-		found = true
-		combined.Used = combined.Used || value.Used
-		combined.UsedBy = append(combined.UsedBy, value.UsedBy...)
-		if combined.Reason == "" {
-			combined.Reason = value.Reason
-		} else if value.Reason != "" && combined.Reason != value.Reason {
-			combined.Reason = "multiple"
-		}
-	}
-	return combined, found
-}
-
-func portInIntervals(port int, intervals [][2]int) bool {
-	for _, interval := range intervals {
-		if port >= interval[0] && port <= interval[1] {
-			return true
-		}
-	}
-	return false
-}
-
-func normalizedUsageOwners(owners []string) []string {
-	seen := make(map[string]struct{}, len(owners))
-	result := make([]string, 0, len(owners))
-	for _, owner := range owners {
-		owner = strings.TrimSpace(owner)
-		if owner == "" {
-			continue
-		}
-		if _, exists := seen[owner]; exists {
-			continue
-		}
-		seen[owner] = struct{}{}
-		result = append(result, owner)
-	}
-	sort.Strings(result)
-	return result
 }

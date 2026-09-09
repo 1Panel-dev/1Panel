@@ -4097,10 +4097,8 @@ const message = {
         batchRuleLimit: 'A maximum of {0} rules can be created at a time',
         resolution_adopt: 'Take over management',
         adoptRuleConfirm: 'After takeover, 1Panel can maintain and delete this existing rule. Continue?',
-        plan_equivalent_external_rule:
-            'An identical external rule already exists. Take it over instead of creating a duplicate.',
-        plan_multiple_equivalent_external_rules: 'Multiple identical external rules exist. Select one to take over.',
-        plan_equivalent_managed_rule: 'An identical rule is already managed by 1Panel. No duplicate is needed.',
+        plan_exact_rule_conflict:
+            'A rule with identical matching conditions and priority has an opposing allow or deny action.',
         allRulesAlreadyExist: 'All {0} checked rules already exist. There are no new rules to create.',
         ruleCheckResult: 'Rule check results',
         ruleCheckStatus_creatable: 'Creatable',
@@ -4108,7 +4106,6 @@ const message = {
         ruleCheckStatus_error: 'Error',
         ruleCheckExistingHelper: 'An identical rule already exists and will be skipped.',
         ruleCheckReadyHelper: 'The check passed. This rule can be created.',
-        ruleCheckExternalExists: 'An identical external rule already exists and will be skipped automatically.',
         ruleCheckBlockedHelper: 'Rules with errors cannot be submitted. Go back, edit them, and check again.',
         plan_managed_rule_drifted:
             'The 1Panel management record differs from the live firewall rule. Check the system rule.',
@@ -4119,7 +4116,6 @@ const message = {
         plan_protected_rule: 'This rule is protected and cannot be taken over, changed, or deleted.',
         plan_blocked: 'This rule cannot be applied safely. Refresh the rules and try again.',
         scopeDefaultMismatch: 'The system default zone is {0}; this page manages only the public zone.',
-        scopeInactive: 'The managed scope is inactive. New rules may not affect current traffic.',
         scopeMissing: 'Managed scope {0} is missing and will be created safely when the first rule is applied.',
         scopeUnmanagedActive: 'Other active scopes were detected: {0}. 1Panel will not modify their rules.',
         scopeRuntimeMismatch: 'The active and permanent firewalld configurations differ. Restart the firewall.',
@@ -4173,13 +4169,11 @@ const message = {
             managedOnlyInTarget: 'The managed rule exists only in the target firewall.',
             managedRuntimeCannotRemove: 'The managed runtime rule cannot be removed safely.',
             managedOrderBlocked: 'Managed rules cannot be reordered across external, unrecognized, or protected rules.',
-            mayBlockManagement: 'The rule may block the current management connection.',
             missingFromTarget: 'The rule is missing from the target firewall.',
             targetDiffers: 'The target rule differs from the database policy.',
             alreadyExistsInTarget: 'The rule already exists in the target firewall.',
             onlyInTarget: 'The rule exists only in the target firewall.',
             stale: 'The firewall rule state is outdated. Refresh and try again.',
-            lockoutRisk: 'This firewall change may block management access.',
             protectedRule: 'This protected firewall rule cannot be modified.',
             dockerAcceptReadOnly:
                 'This ACCEPT rule is read-only and will be preserved while other rules are synchronized. To remove it, delete it manually on the host.',
@@ -4228,7 +4222,6 @@ const message = {
             no_matching_path:
                 'No active Docker forwarding rule or proxy process was found for this port. Start or restart the container, then refresh. If the issue persists, check the Docker network configuration.',
         },
-        dockerTrafficPathPending: 'Access path pending',
         dockerInputPolicyNotEffective:
             'The host receives this port directly, so the existing container port protection rule does not apply. Configure it in the host firewall instead.',
         dockerInputUseHostFirewall: 'Configure access for this port in the host firewall.',
@@ -4301,7 +4294,7 @@ const message = {
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
         portWhiteList: 'Port allowlist',
         portWhiteListAlter:
-            'Saving does not change the current firewall rules immediately. New ports are opened the next time the firewall is initialized or started. To close a removed port, delete its existing rule manually from the rule list.',
+            'Whitelist changes take effect immediately when saved. Added ports are allowed automatically; removing a port only removes whitelist protection. To close it, delete its allow rule from the rule list.',
         portWhiteListHelper: 'Supports IPv4/IPv6, TCP/UDP, single ports, and port ranges such as 8000-8100.',
         chain: 'Chain',
         sourceIP: 'Source IP',

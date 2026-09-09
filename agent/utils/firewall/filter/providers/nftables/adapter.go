@@ -238,9 +238,6 @@ func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filte
 	if normalized.Scope.Key() != snapshot.Scope.Key() || normalized.UUID == "" {
 		return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: invalid nftables mutation rule", filter.ErrInvalidRule)
 	}
-	if (change.Operation == filter.ChangeCreate || change.Operation == filter.ChangeUpdate) && broadDeny(normalized) {
-		return nil, filter.ObservedRule{}, nil, filter.ErrLockoutRisk
-	}
 	position := len(rules) + 1
 	marker := "1panel-rule:" + normalized.UUID
 	var previous *filter.ObservedRule
@@ -314,11 +311,6 @@ func ruleUUID(change filter.DesiredChange) string {
 		return change.Before.UUID
 	}
 	return ""
-}
-
-func broadDeny(rule filter.FirewallRule) bool {
-	return (rule.Action == filter.ActionDrop || rule.Action == filter.ActionReject) && rule.SourceAddress == "" &&
-		rule.DestinationAddress == "" && rule.SourcePort == "" && rule.DestinationPort == ""
 }
 
 func rebuildCommand(scope filter.Scope, rules []filter.ObservedRule) (filter.NativeCommand, error) {

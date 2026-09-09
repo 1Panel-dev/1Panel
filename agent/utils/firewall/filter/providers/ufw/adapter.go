@@ -315,9 +315,6 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 	if normalized.UUID == "" {
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
 	}
-	if (change.Operation == filter.ChangeCreate || change.Operation == filter.ChangeUpdate) && isBroadDeny(normalized) {
-		return filter.NativeRulePlan{}, filter.ErrLockoutRisk
-	}
 	marker := "1panel-rule:" + normalized.UUID
 	position := insertionPosition(snapshot, normalized)
 	expected := observedForRule(normalized, marker, position)
@@ -427,11 +424,6 @@ func validateWritableRule(rule filter.FirewallRule) error {
 		return fmt.Errorf("%w: ufw protocol %q is not supported", filter.ErrInvalidRule, rule.Protocol)
 	}
 	return nil
-}
-
-func isBroadDeny(rule filter.FirewallRule) bool {
-	return (rule.Action == filter.ActionDrop || rule.Action == filter.ActionReject) && rule.Protocol == "all" &&
-		rule.SourceAddress == "" && rule.DestinationAddress == "" && rule.DestinationPort == ""
 }
 
 func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChange, desired filter.FirewallRule, marker string, requireOwned bool) (filter.ObservedRule, error) {

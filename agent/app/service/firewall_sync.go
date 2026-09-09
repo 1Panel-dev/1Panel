@@ -15,7 +15,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
@@ -641,23 +640,12 @@ func (s *FirewallService) classifyFirewallRuleSyncCandidate(
 	case filter.InventoryMatchExact:
 		return firewallRuleSyncExisting, "rule already matches database policy"
 	case filter.InventoryMatchMissing:
-		protectedPorts, err := s.loadProtectedPorts()
-		if err != nil {
-			return firewallRuleSyncBlocked, err.Error()
-		}
-		if filter.RuleBlocksManagementConnection(entry.rule, clientIP, protectedPorts...) {
-			return firewallRuleSyncBlocked, "rule may block the current management connection"
-		}
 		return firewallRuleSyncReady, "rule is missing from target backend"
 	case filter.InventoryMatchChanged:
 		if item.Observed == nil {
 			return firewallRuleSyncBlocked, filter.ErrRuleStale.Error()
 		}
-		protectedPorts, err := s.loadProtectedPorts()
-		if err != nil {
-			return firewallRuleSyncBlocked, err.Error()
-		}
-		if err := filter.GuardMutation(*item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
+		if err := filter.GuardMutation(*item.Observed); err != nil {
 			return firewallRuleSyncBlocked, err.Error()
 		}
 		return firewallRuleSyncReady, "target rule differs from database policy"
@@ -693,18 +681,9 @@ func (s *FirewallService) executeFirewallSystemSyncPlan(
 	clientIP string,
 	plan firewallSystemSyncPlan,
 ) dto.FirewallRuleSyncResult {
-	protectedPorts, err := s.loadProtectedPorts()
-	if err != nil {
-		for _, entry := range plan.entries {
-			if entry.item.Status == firewallRuleSyncReady {
-				entry.fail(err)
-			}
-		}
-	}
-
 	for _, scopePlan := range plan.scopes {
 		reconciler := firewallScopeReconciler{
-			ctx: ctx, clientIP: clientIP, protectedPorts: protectedPorts,
+			ctx:     ctx,
 			runtime: scopePlan.runtime, snapshot: scopePlan.snapshot, entries: scopePlan.entries,
 		}
 		reconciler.reconcile()
@@ -1097,12 +1076,10 @@ func buildDockerDatabaseSyncPlan(
 }
 
 type firewallScopeReconciler struct {
-	ctx            context.Context
-	clientIP       string
-	protectedPorts []firewall.PortWhitelist
-	runtime        *filterruntime.Engine
-	snapshot       filter.Snapshot
-	entries        []*firewallRuleSyncEntry
+	ctx      context.Context
+	runtime  *filterruntime.Engine
+	snapshot filter.Snapshot
+	entries  []*firewallRuleSyncEntry
 }
 
 func (r *firewallScopeReconciler) reconcile() {
@@ -1177,7 +1154,7 @@ func (r *firewallScopeReconciler) apply(entries []*firewallRuleSyncEntry) {
 	changes := make([]filter.DesiredChange, 0, len(entries))
 	active := make([]*firewallRuleSyncEntry, 0, len(entries))
 	for _, entry := range entries {
-		change, changed, err := firewallRuleSyncChange(r.snapshot, r.entries, entry, r.clientIP, r.protectedPorts)
+		change, changed, err := firewallRuleSyncChange(r.snapshot, r.entries, entry)
 		if err != nil {
 			entry.fail(err)
 			continue
@@ -1297,8 +1274,6 @@ func firewallRuleSyncChange(
 	snapshot filter.Snapshot,
 	entries []*firewallRuleSyncEntry,
 	entry *firewallRuleSyncEntry,
-	clientIP string,
-	protectedPorts []firewall.PortWhitelist,
 ) (filter.DesiredChange, bool, error) {
 	if entry.remove != nil {
 		for index := range snapshot.Rules {
@@ -1328,9 +1303,6 @@ func firewallRuleSyncChange(
 	case filter.InventoryMatchExact:
 		return filter.DesiredChange{}, false, nil
 	case filter.InventoryMatchMissing:
-		if filter.RuleBlocksManagementConnection(entry.rule, clientIP, protectedPorts...) {
-			return filter.DesiredChange{}, false, filter.ErrLockoutRisk
-		}
 		change.Operation = filter.ChangeCreate
 		if position := firewallRuleSyncInsertionPosition(snapshot, entries, entry); position != nil {
 			if entry.rule.Scope.Provider == filter.ProviderUFW && *position > maxObservedFirewallPosition(snapshot) {
@@ -1346,7 +1318,7 @@ func firewallRuleSyncChange(
 		if item.Observed == nil {
 			return filter.DesiredChange{}, false, filter.ErrRuleStale
 		}
-		if err := filter.GuardMutation(*item.Observed, entry.rule, clientIP, protectedPorts...); err != nil {
+		if err := filter.GuardMutation(*item.Observed); err != nil {
 			return filter.DesiredChange{}, false, err
 		}
 		before := firewallsync.ObservedRule(*item.Observed)

@@ -296,13 +296,11 @@ const syncReasonKeys: Record<string, string> = {
     'managed rule exists only in target backend': 'managedOnlyInTarget',
     'managed runtime rule cannot be safely removed': 'managedRuntimeCannotRemove',
     'managed rule order cannot cross external, opaque, or protected rules': 'managedOrderBlocked',
-    'rule may block the current management connection': 'mayBlockManagement',
     'rule is missing from target backend': 'missingFromTarget',
     'target rule differs from database policy': 'targetDiffers',
     'rule already exists in target backend': 'alreadyExistsInTarget',
     'rule exists only in target backend': 'onlyInTarget',
     'firewall rule state is stale': 'stale',
-    'firewall change may lock out management access': 'lockoutRisk',
     'protected firewall rule cannot be modified': 'protectedRule',
 };
 

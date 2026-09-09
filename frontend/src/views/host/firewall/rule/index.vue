@@ -490,7 +490,7 @@ const showFirewallUnavailablePrompt = computed(
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>(loadCachedFilterValues(ruleFilterStorageKey, ruleFilterOptions, []));
 const visibleIptablesChains = ref<string[]>(
-    loadCachedFilterValues(chainFilterStorageKey, iptablesChains, iptablesChains),
+    loadCachedFilterValues(chainFilterStorageKey, iptablesChains, ['1PANEL_BASIC']),
 );
 const searchName = ref('');
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
@@ -861,9 +861,11 @@ const notices = computed<DisplayNotice[]>(() => {
     const unique = new Map<string, DisplayNotice>();
     scopeNotices.value.forEach((notice) => {
         if (notice.code === 'managed_scope_missing') return;
+        const text = scopeNoticeText(notice);
+        if (!text) return;
         const key = `${notice.code}:${(notice.values || []).join(',')}`;
         if (!unique.has(key)) {
-            unique.set(key, { key, text: scopeNoticeText(notice) });
+            unique.set(key, { key, text });
         }
     });
     return [...unique.values()];
@@ -876,14 +878,14 @@ const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
             return value;
         case 'default_scope_mismatch':
             return i18n.global.t('firewall.scopeDefaultMismatch', [value]);
-        case 'managed_scope_inactive':
-            return i18n.global.t('firewall.scopeInactive');
         case 'managed_scope_missing':
             return i18n.global.t('firewall.scopeMissing', [value]);
         case 'unmanaged_active_scopes':
             return i18n.global.t('firewall.scopeUnmanagedActive', [value]);
         case 'runtime_permanent_mismatch':
             return i18n.global.t('firewall.scopeRuntimeMismatch');
+        default:
+            return '';
     }
 };
 
@@ -935,9 +937,7 @@ const ruleIssueText = (row: Firewall.InventoryItem) => {
 };
 
 const openCreate = async () => {
-    const unavailableScope = scopeNotices.value.find((notice) =>
-        ['managed_scope_inactive', 'managed_scope_missing'].includes(notice.code),
-    );
+    const unavailableScope = scopeNotices.value.find((notice) => notice.code === 'managed_scope_missing');
     if (unavailableScope) {
         try {
             await ElMessageBox.confirm(scopeNoticeText(unavailableScope), i18n.global.t('commons.msg.infoTitle'), {

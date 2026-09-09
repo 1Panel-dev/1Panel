@@ -151,7 +151,7 @@
                                     class="rule-check-item-reason"
                                     :class="`is-${ruleCheckStatus(item.plan)}`"
                                 >
-                                    {{ ruleCheckDescription(item.plan) }}
+                                    {{ planReasonMessage(item.plan.reason) }}
                                 </span>
                             </div>
                         </div>
@@ -292,8 +292,7 @@ const wildcardAddressLabel = (family: Firewall.Family) =>
 const isWildcardAddress = (_family: Firewall.Family, address?: string) => !address?.trim();
 const priorityFieldLabel = computed(() => i18n.global.t('firewall.priority'));
 const showPriorityField = computed(() => {
-    if (provider.value === 'ufw') return mode.value === 'edit';
-    if (provider.value !== 'firewalld') return true;
+    if (provider.value !== 'firewalld') return mode.value === 'edit';
     return (
         firewalldPrioritySupported.value && (mode.value === 'create' || editingRule.value?.nativeKind === 'rich_rule')
     );
@@ -308,9 +307,7 @@ const priorityMax = computed(() => Math.min(...selectedPositionRanges.value.map(
 const showingPreview = computed(() => previewVisible.value && previewRules.value.length > 0);
 
 const supportedPlanReasons = new Set([
-    'equivalent_external_rule',
-    'multiple_equivalent_external_rules',
-    'equivalent_managed_rule',
+    'exact_rule_conflict',
     'managed_rule_drifted',
     'opaque_rule_in_target_scope',
     'runtime_permanent_mismatch',
@@ -326,12 +323,6 @@ const ruleCheckStatus = (result: Firewall.RuleCheckResult): RuleCheckDisplayStat
     if (result.decision === 'blocked') return 'error';
     if (result.decision === 'no_change' || result.classification === 'exact_external') return 'existing';
     return 'creatable';
-};
-
-const ruleCheckDescription = (result: Firewall.RuleCheckResult) => {
-    if (ruleCheckStatus(result) === 'creatable') return i18n.global.t('firewall.ruleCheckReadyHelper');
-    if (result.classification === 'exact_external') return i18n.global.t('firewall.ruleCheckExternalExists');
-    return planReasonMessage(result.reason);
 };
 
 const ruleCheckGroupDescription = (status: RuleCheckDisplayStatus) => {
@@ -458,7 +449,7 @@ const resetForm = () => {
     form.destinationAddress = '';
     form.destinationPorts = [''];
     form.action = 'accept';
-    form.priority = provider.value === 'firewalld' || provider.value === 'ufw' ? undefined : priorityMax.value;
+    form.priority = undefined;
     form.description = '';
     editingUUID.value = '';
     editingRule.value = undefined;
@@ -593,10 +584,7 @@ const buildRule = (
         destinationPort,
         action,
         priority: provider.value === 'firewalld' && firewalldPrioritySupported.value ? form.priority : undefined,
-        orderIndex:
-            provider.value === 'firewalld' || (provider.value === 'ufw' && mode.value === 'create')
-                ? undefined
-                : form.priority,
+        orderIndex: provider.value === 'firewalld' || mode.value === 'create' ? undefined : form.priority,
         description: form.description,
     };
 };

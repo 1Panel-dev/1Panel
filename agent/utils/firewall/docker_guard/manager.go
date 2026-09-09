@@ -130,8 +130,6 @@ var mutationMu sync.Mutex
 
 func NewManager() *Manager { return &Manager{runner: commandRunner{}} }
 
-func NewManagerWithRunner(runner Runner) *Manager { return &Manager{runner: runner} }
-
 func (m *Manager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()

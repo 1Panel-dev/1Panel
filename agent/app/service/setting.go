@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -18,7 +19,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/jinzhu/copier"
@@ -125,22 +125,10 @@ func (u *SettingService) GetWebsiteDir() string {
 }
 
 func (u *SettingService) Update(key, value string) error {
-	oldValue := constant.FirewallPortWhiteListValue
 	if key == constant.FirewallPortWhiteList {
-		if _, err := firewall.ParsePortWhitelist(value); err != nil {
-			return err
-		}
-		if val, err := settingRepo.GetValueByKey(key); err == nil {
-			oldValue = val
-		}
+		return newFirewallService().updatePortWhitelist(context.Background(), value)
 	}
-	if err := settingRepo.UpdateOrCreate(key, value); err != nil {
-		return err
-	}
-	if key == constant.FirewallPortWhiteList {
-		return ReleaseFirewallPortWhitelistAfterUpdate(oldValue)
-	}
-	return nil
+	return settingRepo.UpdateOrCreate(key, value)
 }
 
 func (u *SettingService) UpdateTerminalAI(req dto.TerminalAIInfo) error {

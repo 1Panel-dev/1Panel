@@ -22,10 +22,6 @@ type NftablesManager struct {
 
 func NewNftablesManager() *NftablesManager { return &NftablesManager{runner: commandRunner{}} }
 
-func NewNftablesManagerWithRunner(runner Runner) *NftablesManager {
-	return &NftablesManager{runner: runner}
-}
-
 func (m *NftablesManager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()

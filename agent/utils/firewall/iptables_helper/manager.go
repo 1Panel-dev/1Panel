@@ -203,6 +203,14 @@ func setBaseChainBindings(ipv6, bind bool) error {
 }
 
 func buildBaseChainBindingsRestoreScript(output string, bind bool) string {
+	lines := baseChainBindingCommands(output, bind)
+	if len(lines) == 0 {
+		return ""
+	}
+	return "*filter\n" + strings.Join(lines, "\n") + "\nCOMMIT\n"
+}
+
+func baseChainBindingCommands(output string, bind bool) []string {
 	lines := make([]string, 0, len(BasicChains())*2)
 	for _, chain := range BasicChains() {
 		binding := "-A " + InputChain + " -j " + chain
@@ -217,10 +225,7 @@ func buildBaseChainBindingsRestoreScript(output string, bind bool) string {
 			lines = append(lines, fmt.Sprintf("-I %s %d -j %s", InputChain, index+1, chain))
 		}
 	}
-	if len(lines) == 0 {
-		return ""
-	}
-	return "*filter\n" + strings.Join(lines, "\n") + "\nCOMMIT\n"
+	return lines
 }
 
 func saveBaseChains() error {
@@ -315,7 +320,7 @@ func buildBaseChainsRestoreScript(firewallDir, panelPort string, ipv6 bool, requ
 		script.WriteByte('\n')
 	}
 	if ipv6 {
-		defaults, err := ipv6BaseDefaultRules(panelPort, requiredPorts)
+		defaults, err := baseDefaultRules(panelPort, requiredPorts, constant.FirewallFamilyIPv6)
 		if err != nil {
 			return "", err
 		}

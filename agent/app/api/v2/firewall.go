@@ -452,7 +452,7 @@ func normalizeFirewallRuleUUID(c *gin.Context, value *string) bool {
 
 func handleFirewallRuleError(c *gin.Context, err error) {
 	switch {
-	case errors.Is(err, filter.ErrLockoutRisk), errors.Is(err, filter.ErrProtectedRule):
+	case errors.Is(err, filter.ErrProtectedRule):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_LOCKOUT_RISK", "ErrInvalidParams", err)
 	case errors.Is(err, filter.ErrRuleStale):
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_STALE", "ErrInvalidParams", err)
@@ -463,7 +463,7 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 	case errors.Is(err, filter.ErrUnsupportedScope), errors.Is(err, filter.ErrInvalidScope),
 		errors.Is(err, filter.ErrProviderUnavailable), errors.Is(err, filter.ErrAdapterUnavailable):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrInvalidParams", err)
-	case errors.Is(err, filter.ErrInvalidRule), errors.Is(err, filter.ErrRuleOperation),
+	case errors.Is(err, filter.ErrInvalidRule), errors.Is(err, filter.ErrRuleOperation), errors.Is(err, filter.ErrRuleConflict),
 		errors.Is(err, repo.ErrFirewallPersistenceInvalid):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_RULE_UNSUPPORTED", "ErrInvalidParams", err)
 	case errors.Is(err, filter.ErrVerificationFailed):

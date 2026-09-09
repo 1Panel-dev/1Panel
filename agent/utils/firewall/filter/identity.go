@@ -44,6 +44,56 @@ func RuleKey(rule FirewallRule) (string, error) {
 	return normalizedRuleKey(normalized)
 }
 
+func RuleMatchKey(rule FirewallRule) (string, error) {
+	normalized, err := NormalizeRule(rule)
+	if err != nil {
+		return "", err
+	}
+	normalized.Action, normalized.NativeKind, normalized.OrderBucket = "", "", ""
+	if normalized.Priority != nil && *normalized.Priority == 0 {
+		normalized.Priority = nil
+	}
+	return normalizedRuleKey(normalized)
+}
+
+func OppositeActions(left, right Action) bool {
+	return left == ActionAccept && (right == ActionDrop || right == ActionReject) ||
+		right == ActionAccept && (left == ActionDrop || left == ActionReject)
+}
+
+func CheckRuleCollision(requested, existing FirewallRule) error {
+	wanted, err := RuleMatchKey(requested)
+	if err != nil {
+		return err
+	}
+	actual, err := RuleMatchKey(existing)
+	if err != nil {
+		return err
+	}
+	if wanted != actual {
+		return nil
+	}
+	if requested.Action == existing.Action {
+		return fmt.Errorf("%w: equivalent rule already exists", ErrRuleOperation)
+	}
+	if OppositeActions(requested.Action, existing.Action) {
+		return ErrRuleConflict
+	}
+	return nil
+}
+
+func CheckObservedRuleCollisions(snapshot Snapshot, requested FirewallRule, excluded *Locator) error {
+	for _, observed := range snapshot.Rules {
+		if observed.ParseStatus != ParseStatusSupported || excluded != nil && SameLocator(observed.Locator, *excluded) {
+			continue
+		}
+		if err := CheckRuleCollision(requested, observed.Rule); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func normalizedRuleKey(normalized FirewallRule) (string, error) {
 	identity := ruleIdentity{
 		Scope:              normalized.Scope.Key(),

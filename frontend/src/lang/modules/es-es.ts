@@ -4143,10 +4143,8 @@ const message = {
         batchRuleLimit: 'Se pueden crear como máximo {0} reglas a la vez',
         resolution_adopt: 'Asumir la gestión',
         adoptRuleConfirm: 'Después de asumirla, 1Panel podrá mantener y eliminar esta regla existente. ¿Continuar?',
-        plan_equivalent_external_rule: 'Ya existe una regla externa idéntica. Puedes asumir su gestión sin duplicarla.',
-        plan_multiple_equivalent_external_rules:
-            'Existen varias reglas externas idénticas. Selecciona una para gestionarla.',
-        plan_equivalent_managed_rule: '1Panel ya gestiona una regla idéntica. No es necesario duplicarla.',
+        plan_exact_rule_conflict:
+            'Ya existe una regla con las mismas condiciones y prioridad, pero con una acción opuesta de permitir o denegar.',
         allRulesAlreadyExist: 'Las {0} reglas comprobadas ya existen. No hay reglas nuevas que crear.',
         ruleCheckResult: 'Resultados de la comprobación de reglas',
         ruleCheckStatus_creatable: 'Se puede crear',
@@ -4154,7 +4152,6 @@ const message = {
         ruleCheckStatus_error: 'Error',
         ruleCheckExistingHelper: 'Ya existe una regla idéntica y se omitirá.',
         ruleCheckReadyHelper: 'La comprobación se superó. Esta regla se puede crear.',
-        ruleCheckExternalExists: 'Ya existe una regla externa idéntica y se omitirá automáticamente.',
         ruleCheckBlockedHelper:
             'Las reglas con errores no se pueden enviar. Vuelve, modifícalas y compruébalas de nuevo.',
         plan_managed_rule_drifted:
@@ -4165,7 +4162,6 @@ const message = {
         plan_protected_rule: 'Esta regla está protegida y no se puede asumir, modificar ni eliminar.',
         plan_blocked: 'La regla no puede aplicarse de forma segura. Actualiza la lista e inténtalo de nuevo.',
         scopeDefaultMismatch: 'La zona predeterminada es {0}; esta página solo gestiona la zona public.',
-        scopeInactive: 'El ámbito gestionado está inactivo. Las reglas nuevas podrían no afectar al tráfico actual.',
         scopeMissing: 'Falta el ámbito gestionado {0}; se creará de forma segura al aplicar la primera regla.',
         scopeUnmanagedActive: 'Se detectaron otros ámbitos activos: {0}. 1Panel no modificará sus reglas.',
         scopeRuntimeMismatch:
@@ -4223,13 +4219,11 @@ const message = {
             managedRuntimeCannotRemove: 'La regla activa gestionada no se puede eliminar de forma segura.',
             managedOrderBlocked:
                 'Las reglas gestionadas no se pueden reordenar por encima de reglas externas, no reconocidas o protegidas.',
-            mayBlockManagement: 'La regla puede bloquear la conexión de administración actual.',
             missingFromTarget: 'La regla no existe en el firewall de destino.',
             targetDiffers: 'La regla de destino difiere de la política de la base de datos.',
             alreadyExistsInTarget: 'La regla ya existe en el firewall de destino.',
             onlyInTarget: 'La regla solo existe en el firewall de destino.',
             stale: 'El estado de la regla está desactualizado. Actualiza e inténtalo de nuevo.',
-            lockoutRisk: 'Este cambio puede bloquear el acceso de administración.',
             protectedRule: 'Esta regla protegida del firewall no se puede modificar.',
             dockerAcceptReadOnly:
                 'Esta regla ACCEPT es de solo lectura y se conservará al sincronizar las demás reglas. Para eliminarla, bórrela manualmente en el host.',
@@ -4278,7 +4272,6 @@ const message = {
             no_matching_path:
                 'No se encontró una regla de reenvío de Docker activa ni un proceso proxy para este puerto. Inicia o reinicia el contenedor y actualiza la página. Si continúa, comprueba la red de Docker.',
         },
-        dockerTrafficPathPending: 'Ruta de acceso pendiente',
         dockerInputPolicyNotEffective:
             'El host recibe este puerto directamente, por lo que la regla de protección del puerto del contenedor no se aplica. Configúralo en el firewall del host.',
         dockerInputUseHostFirewall: 'Configure el acceso a este puerto en el firewall del host.',
@@ -4355,7 +4348,7 @@ const message = {
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
         portWhiteList: 'Lista blanca de puertos',
         portWhiteListAlter:
-            'Guardar no cambia inmediatamente las reglas actuales del firewall. Los puertos nuevos se abrirán la próxima vez que se inicialice o inicie el firewall. Para cerrar un puerto eliminado, borre manualmente su regla existente en la lista de reglas.',
+            'Los cambios se aplican al guardar. Los puertos añadidos se permiten automáticamente; quitar un puerto solo elimina su protección. Para cerrarlo, elimine su regla de permiso en la lista de reglas.',
         portWhiteListHelper: 'Admite IPv4/IPv6, TCP/UDP, puertos individuales y rangos como 8000-8100.',
         chain: 'Cadena',
         sourceIP: 'IP de Origen',

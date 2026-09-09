@@ -429,9 +429,6 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		(normalized.Scope.Family == filter.FamilyIPv6 && normalized.Protocol == "icmp") {
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: protocol %q does not match %s", filter.ErrInvalidRule, normalized.Protocol, normalized.Scope.Family)
 	}
-	if (change.Operation == filter.ChangeCreate || change.Operation == filter.ChangeUpdate) && isBroadDeny(normalized) {
-		return filter.NativeRulePlan{}, filter.ErrLockoutRisk
-	}
 	marker := "1panel-rule:" + normalized.UUID
 	position := len(snapshot.Rules) + 1
 	verb := "-I"
@@ -690,12 +687,6 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 		}
 	}
 	return len(snapshot.Rules) + 1
-}
-
-func isBroadDeny(rule filter.FirewallRule) bool {
-	return (rule.Action == filter.ActionDrop || rule.Action == filter.ActionReject) &&
-		rule.SourceAddress == "" && rule.DestinationAddress == "" && rule.SourcePort == "" &&
-		rule.DestinationPort == ""
 }
 
 type systemBackend struct{}

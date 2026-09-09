@@ -4167,9 +4167,8 @@ const message = {
         batchRuleLimit: 'Bir seferde en fazla {0} kural oluşturulabilir',
         resolution_adopt: 'Yönetimi devral',
         adoptRuleConfirm: 'Devraldıktan sonra 1Panel bu mevcut kuralı yönetebilir ve silebilir. Devam edilsin mi?',
-        plan_equivalent_external_rule: 'Aynı harici kural zaten var. Kopya oluşturmak yerine yönetimi devralın.',
-        plan_multiple_equivalent_external_rules: 'Birden fazla aynı harici kural var. Yönetilecek kuralı seçin.',
-        plan_equivalent_managed_rule: 'Aynı kural zaten 1Panel tarafından yönetiliyor. Kopya gerekmez.',
+        plan_exact_rule_conflict:
+            'Aynı eşleşme koşullarına ve önceliğe sahip, ancak izin verme veya reddetme eylemi zıt olan bir kural zaten var.',
         allRulesAlreadyExist: 'Kontrol edilen {0} kuralın tümü zaten mevcut. Oluşturulacak yeni kural yok.',
         ruleCheckResult: 'Kural kontrol sonuçları',
         ruleCheckStatus_creatable: 'Oluşturulabilir',
@@ -4177,7 +4176,6 @@ const message = {
         ruleCheckStatus_error: 'Hata',
         ruleCheckExistingHelper: 'Aynı kural zaten mevcut ve atlanacak.',
         ruleCheckReadyHelper: 'Kontrol başarılı. Bu kural oluşturulabilir.',
-        ruleCheckExternalExists: 'Aynı harici kural zaten mevcut ve otomatik olarak atlanacak.',
         ruleCheckBlockedHelper: 'Hatalı kurallar gönderilemez. Geri dönüp düzenleyin ve yeniden kontrol edin.',
         plan_managed_rule_drifted: 'Yönetilen kural etkin güvenlik duvarıyla eşleşmiyor. Önce farkı giderin.',
         plan_opaque_rule_in_target_scope: 'Hedef kapsamda güvenle ayrıştırılamayan bir kural var. İşlem durduruldu.',
@@ -4185,7 +4183,6 @@ const message = {
         plan_protected_rule: 'Bu kural korumalıdır; yönetimi devralınamaz, değiştirilemez veya silinemez.',
         plan_blocked: 'Bu kural güvenle uygulanamıyor. Listeyi yenileyip tekrar deneyin.',
         scopeDefaultMismatch: 'Sistemin varsayılan zone değeri {0}; bu sayfa yalnızca public zone alanını yönetir.',
-        scopeInactive: 'Yönetilen kapsam etkin değil. Yeni kurallar mevcut trafiği etkilemeyebilir.',
         scopeMissing: 'Yönetilen {0} kapsamı eksik ve ilk kural uygulanırken güvenli şekilde oluşturulacak.',
         scopeUnmanagedActive: 'Başka etkin kapsamlar algılandı: {0}. 1Panel bunların kurallarını değiştirmez.',
         scopeRuntimeMismatch:
@@ -4243,13 +4240,11 @@ const message = {
             managedRuntimeCannotRemove: 'Yönetilen etkin kural güvenli bir şekilde kaldırılamıyor.',
             managedOrderBlocked:
                 'Yönetilen kurallar harici, tanınmayan veya korunan kuralların üzerinden yeniden sıralanamaz.',
-            mayBlockManagement: 'Kural mevcut yönetim bağlantısını engelleyebilir.',
             missingFromTarget: 'Kural hedef güvenlik duvarında bulunmuyor.',
             targetDiffers: 'Hedef kural veritabanı ilkesinden farklı.',
             alreadyExistsInTarget: 'Kural hedef güvenlik duvarında zaten mevcut.',
             onlyInTarget: 'Kural yalnızca hedef güvenlik duvarında mevcut.',
             stale: 'Güvenlik duvarı kuralının durumu güncel değil. Yenileyip tekrar deneyin.',
-            lockoutRisk: 'Bu değişiklik yönetim erişimini engelleyebilir.',
             protectedRule: 'Bu korumalı güvenlik duvarı kuralı değiştirilemez.',
             dockerAcceptReadOnly:
                 'Bu ACCEPT kuralı salt okunurdur ve diğer kurallar eşitlenirken korunur. Kaldırmak için ana makinede manuel olarak silin.',
@@ -4299,7 +4294,6 @@ const message = {
             no_matching_path:
                 'Bu port için etkin bir Docker yönlendirme kuralı veya proxy işlemi bulunamadı. Konteyneri başlatın ya da yeniden başlatıp sayfayı yenileyin. Sorun sürerse Docker ağ yapılandırmasını kontrol edin.',
         },
-        dockerTrafficPathPending: 'Erişim yolu bekleniyor',
         dockerInputPolicyNotEffective:
             'Bu port doğrudan ana makine tarafından alındığından mevcut konteyner port koruma kuralı uygulanmaz. Ana makine güvenlik duvarında yapılandırın.',
         dockerInputUseHostFirewall: 'Bu bağlantı noktasına erişimi ana makine güvenlik duvarında yapılandırın.',
@@ -4371,7 +4365,7 @@ const message = {
             'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
         portWhiteList: 'Port beyaz listesi',
         portWhiteListAlter:
-            'Kaydetmek mevcut güvenlik duvarı kurallarını hemen değiştirmez. Yeni portlar bir sonraki başlatma veya etkinleştirmede açılır. Listeden kaldırılan bir portu kapatmak için mevcut kuralı kurallar listesinden elle silin.',
+            'Değişiklikler kaydedildiğinde hemen uygulanır. Eklenen portlara otomatik olarak izin verilir. Portu listeden çıkarmak yalnızca korumasını kaldırır. Portu kapatmak için kural listesinden izin kuralını silin.',
         portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, tek portlar ve 8000-8100 gibi port aralıklarını destekler.',
         chain: 'Zincir',
         sourceIP: 'Kaynak IP',
