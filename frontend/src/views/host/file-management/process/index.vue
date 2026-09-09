@@ -49,7 +49,7 @@
                             />
                             <el-progress
                                 v-else
-                                :percentage="value.percent"
+                                :percentage="getProgressPercent(value)"
                                 :stroke-width="8"
                                 class="progress-bar"
                                 :status="getProgressStatus(value)"
@@ -142,6 +142,12 @@ const onClose = () => {};
 
 const getStatus = (value: DownloadProcess) => value.status || (value.percent === 100 ? 'Success' : 'Downloading');
 const isActive = (value: DownloadProcess) => ['Downloading', 'Retrying'].includes(getStatus(value));
+const getProgressPercent = (value: DownloadProcess) => {
+    if (getStatus(value) === 'Success') return 100;
+    if (!Number.isFinite(value.percent)) return 0;
+    const maximum = isActive(value) ? 99.99 : 100;
+    return Number(Math.min(maximum, Math.max(0, value.percent)).toFixed(2));
+};
 const getStatusText = (value: DownloadProcess) => {
     switch (getStatus(value)) {
         case 'Success':
