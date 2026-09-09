@@ -1,4 +1,4 @@
-import { shallowRef, ref, type Ref } from 'vue';
+import { shallowRef, ref, toRaw, type Ref } from 'vue';
 
 type TableRef = { refElTable?: any } | undefined;
 
@@ -15,6 +15,10 @@ export const useTableSelection = (
     let isSyncingTableSelection = false;
     let skipNextSelectionChange = false;
 
+    // Element Plus can return reactive proxies for rows supplied as plain objects.
+    const sameRow = (left: any, right: any) => toRaw(left) === toRaw(right);
+    const hasRow = (rows: any[], row: any) => rows.some((item) => sameRow(item, row));
+    const isRowSelected = (row: any) => hasRow(selectedRows.value, row);
     const getTable = () => tableRef.value?.refElTable;
     const clearTextSelection = () => window.getSelection?.()?.removeAllRanges();
     const hasActiveTextSelection = () => {
@@ -32,37 +36,38 @@ export const useTableSelection = (
         }
         isSyncingTableSelection = true;
         try {
-            table.clearSelection();
-            selectedRows.value
-                .filter((row) => getTableData().includes(row) && isRowSelectable(row))
-                .forEach((row) => table.toggleRowSelection(row, true));
+            const tableData = getTableData();
+            const nextRows = selectedRows.value.filter((row) => hasRow(tableData, row) && isRowSelectable(row));
+            const currentRows = table.getSelectionRows();
+            currentRows.filter((row) => !hasRow(nextRows, row)).forEach((row) => table.toggleRowSelection(row, false));
+            nextRows.filter((row) => !hasRow(currentRows, row)).forEach((row) => table.toggleRowSelection(row, true));
         } finally {
             isSyncingTableSelection = false;
         }
     };
-    const selectRow = (row: any, selected = !selectedRows.value.includes(row)) => {
+    const selectRow = (row: any, selected = !isRowSelected(row)) => {
         if (!isRowSelectable(row)) {
             return;
         }
         const nextRows = selected
-            ? selectedRows.value.includes(row)
+            ? isRowSelected(row)
                 ? selectedRows.value
                 : [...selectedRows.value, row]
-            : selectedRows.value.filter((item) => item !== row);
+            : selectedRows.value.filter((item) => !sameRow(item, row));
         setSelectedRows(nextRows);
         syncTableSelection();
     };
     const applyRangeSelection = (targetRow: any) => {
         if (!lastSelectedRow.value) return false;
         const tableData = getTableData();
-        const startIndex = tableData.indexOf(lastSelectedRow.value);
-        const endIndex = tableData.indexOf(targetRow);
+        const startIndex = tableData.findIndex((row) => sameRow(row, lastSelectedRow.value));
+        const endIndex = tableData.findIndex((row) => sameRow(row, targetRow));
         if (startIndex === -1 || endIndex === -1) return false;
 
         const [start, end] = [startIndex, endIndex].sort((a, b) => a - b);
         const rangeRows = tableData.slice(start, end + 1).filter(isRowSelectable);
         const nextRows = [...rangeBaseRows.value];
-        rangeRows.forEach((row) => !nextRows.includes(row) && nextRows.push(row));
+        rangeRows.forEach((row) => !hasRow(nextRows, row) && nextRows.push(row));
         setSelectedRows(nextRows);
         syncTableSelection();
         return true;
@@ -89,7 +94,7 @@ export const useTableSelection = (
             return;
         }
         lastSelectedRow.value = row;
-        rangeBaseRows.value = selection.filter((item) => item !== row);
+        rangeBaseRows.value = selection.filter((item) => !sameRow(item, row));
         clearTextSelection();
     };
     const clearSelects = () => {
@@ -99,11 +104,11 @@ export const useTableSelection = (
         rangeBaseRows.value = [];
     };
     const pruneSelection = () => {
-        const nextRows = selectedRows.value.filter((row) => getTableData().includes(row));
+        const nextRows = selectedRows.value.filter((row) => hasRow(getTableData(), row));
         if (nextRows.length !== selectedRows.value.length) {
             setSelectedRows(nextRows);
         }
-        if (lastSelectedRow.value && !nextRows.includes(lastSelectedRow.value)) {
+        if (lastSelectedRow.value && !hasRow(nextRows, lastSelectedRow.value)) {
             lastSelectedRow.value = null;
             rangeBaseRows.value = [];
         }
@@ -111,11 +116,10 @@ export const useTableSelection = (
     };
     const toggleSelection = () => {
         const selectableRows = getTableData().filter(isRowSelectable);
-        const allSelected =
-            selectableRows.length > 0 && selectableRows.every((row) => selectedRows.value.includes(row));
+        const allSelected = selectableRows.length > 0 && selectableRows.every(isRowSelected);
         const nextRows = allSelected
-            ? selectedRows.value.filter((row) => !selectableRows.includes(row))
-            : [...selectedRows.value, ...selectableRows.filter((row) => !selectedRows.value.includes(row))];
+            ? selectedRows.value.filter((row) => !hasRow(selectableRows, row))
+            : [...selectedRows.value, ...selectableRows.filter((row) => !isRowSelected(row))];
         setSelectedRows(nextRows);
         syncTableSelection();
     };
@@ -132,10 +136,12 @@ export const useTableSelection = (
             clearTextSelection();
             return;
         }
-        const selected = !selectedRows.value.includes(row);
-        selectRow(row, selected);
+        // Ordinary row clicks preserve existing selections; use the checkbox to deselect.
+        if (!isRowSelected(row)) {
+            selectRow(row, true);
+        }
         lastSelectedRow.value = row;
-        rangeBaseRows.value = selected ? selectedRows.value.filter((item) => item !== row) : selectedRows.value;
+        rangeBaseRows.value = selectedRows.value.filter((item) => !sameRow(item, row));
         clearTextSelection();
     };
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -147,6 +153,7 @@ export const useTableSelection = (
 
     return {
         selectedRows,
+        isRowSelected,
         clearSelects,
         pruneSelection,
         toggleSelection,

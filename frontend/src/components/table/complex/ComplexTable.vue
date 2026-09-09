@@ -40,7 +40,7 @@
                             <el-checkbox
                                 v-if="selectionColumn"
                                 class="complex-table__card-selection"
-                                :model-value="selectedRows.includes(cardRow)"
+                                :model-value="isRowSelected(cardRow)"
                                 :disabled="!isRowSelectable(cardRow)"
                                 @change="toggleCardSelection(cardRow, $event)"
                                 @click.stop
@@ -302,6 +302,7 @@ const isRowSelectable = (row: any) => {
 };
 const {
     selectedRows,
+    isRowSelected,
     clearSelects,
     pruneSelection,
     toggleSelection,
@@ -320,7 +321,7 @@ const handleRightClick = (row, column, event) => {
     if (!props.rightButtons?.length) {
         return;
     }
-    if (isRowSelectable(row) && !selectedRows.value.includes(row)) {
+    if (isRowSelectable(row) && !isRowSelected(row)) {
         clearSelects();
         selectRow(row, true);
     }
