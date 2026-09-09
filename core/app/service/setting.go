@@ -57,7 +57,7 @@ type ISettingService interface {
 	UpdateProxy(req dto.ProxyUpdate) error
 
 	GetTerminalInfo() (*dto.TerminalInfo, error)
-	UpdateTerminal(req dto.TerminalInfo) error
+	UpdateTerminal(req dto.TerminalUpdate) error
 
 	UpdateSystemSSL() error
 	GenerateRSAKey() error
@@ -559,7 +559,7 @@ func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {
 	for _, set := range setting {
 		settingMap[set.Key] = set.Value
 	}
-	var info dto.TerminalInfo
+	info := dto.TerminalInfo{ShowTerminalButton: "Enable"}
 	arr, err := json.Marshal(settingMap)
 	if err != nil {
 		return nil, err
@@ -569,39 +569,30 @@ func (u *SettingService) GetTerminalInfo() (*dto.TerminalInfo, error) {
 	}
 	return &info, err
 }
-func (u *SettingService) UpdateTerminal(req dto.TerminalInfo) error {
-	if err := settingRepo.UpdateOrCreate("LineHeight", req.LineHeight); err != nil {
-		return err
+func (u *SettingService) UpdateTerminal(req dto.TerminalUpdate) error {
+	settings := []struct {
+		key   string
+		value *string
+	}{
+		{"ShowTerminalButton", req.ShowTerminalButton},
+		{"LineHeight", req.LineHeight},
+		{"LetterSpacing", req.LetterSpacing},
+		{"FontSize", req.FontSize},
+		{"FontFamily", req.FontFamily},
+		{"CursorBlink", req.CursorBlink},
+		{"BackgroundColor", req.BackgroundColor},
+		{"ForegroundColor", req.ForegroundColor},
+		{"CursorStyle", req.CursorStyle},
+		{"Scrollback", req.Scrollback},
+		{"ScrollSensitivity", req.ScrollSensitivity},
 	}
-	if err := settingRepo.UpdateOrCreate("LetterSpacing", req.LetterSpacing); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("FontSize", req.FontSize); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("FontFamily", req.FontFamily); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("CursorBlink", req.CursorBlink); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("BackgroundColor", req.BackgroundColor); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("ForegroundColor", req.ForegroundColor); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("CursorBlink", req.CursorBlink); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("CursorStyle", req.CursorStyle); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("Scrollback", req.Scrollback); err != nil {
-		return err
-	}
-	if err := settingRepo.UpdateOrCreate("ScrollSensitivity", req.ScrollSensitivity); err != nil {
-		return err
+	for _, setting := range settings {
+		if setting.value == nil {
+			continue
+		}
+		if err := settingRepo.UpdateOrCreate(setting.key, *setting.value); err != nil {
+			return err
+		}
 	}
 	return nil
 }

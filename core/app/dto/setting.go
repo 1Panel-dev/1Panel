@@ -236,16 +236,31 @@ type MenuLabelSort struct {
 }
 
 type TerminalInfo struct {
-	LineHeight        string `json:"lineHeight"`
-	LetterSpacing     string `json:"letterSpacing"`
-	FontSize          string `json:"fontSize"`
-	FontFamily        string `json:"fontFamily"`
-	BackgroundColor   string `json:"backgroundColor"`
-	ForegroundColor   string `json:"foregroundColor"`
-	CursorBlink       string `json:"cursorBlink"`
-	CursorStyle       string `json:"cursorStyle"`
-	Scrollback        string `json:"scrollback"`
-	ScrollSensitivity string `json:"scrollSensitivity"`
+	ShowTerminalButton string `json:"showTerminalButton"`
+	LineHeight         string `json:"lineHeight"`
+	LetterSpacing      string `json:"letterSpacing"`
+	FontSize           string `json:"fontSize"`
+	FontFamily         string `json:"fontFamily"`
+	BackgroundColor    string `json:"backgroundColor"`
+	ForegroundColor    string `json:"foregroundColor"`
+	CursorBlink        string `json:"cursorBlink"`
+	CursorStyle        string `json:"cursorStyle"`
+	Scrollback         string `json:"scrollback"`
+	ScrollSensitivity  string `json:"scrollSensitivity"`
+}
+
+type TerminalUpdate struct {
+	ShowTerminalButton *string `json:"showTerminalButton,omitempty" validate:"omitempty,oneof=Enable Disable"`
+	LineHeight         *string `json:"lineHeight,omitempty"`
+	LetterSpacing      *string `json:"letterSpacing,omitempty"`
+	FontSize           *string `json:"fontSize,omitempty"`
+	FontFamily         *string `json:"fontFamily,omitempty"`
+	BackgroundColor    *string `json:"backgroundColor,omitempty"`
+	ForegroundColor    *string `json:"foregroundColor,omitempty"`
+	CursorBlink        *string `json:"cursorBlink,omitempty"`
+	CursorStyle        *string `json:"cursorStyle,omitempty"`
+	Scrollback         *string `json:"scrollback,omitempty"`
+	ScrollSensitivity  *string `json:"scrollSensitivity,omitempty"`
 }
 
 type AppstoreUpdate struct {

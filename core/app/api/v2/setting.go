@@ -149,14 +149,14 @@ func checkSettingValueRange(key, value string) bool {
 // @Tags System Setting
 // @Summary Update system terminal setting
 // @Accept json
-// @Param request body dto.TerminalInfo true "request"
+// @Param request body dto.TerminalUpdate true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /core/settings/terminal/update [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统终端配置","formatEN":"update system terminal setting"}
 func (b *BaseApi) UpdateTerminalSetting(c *gin.Context) {
-	var req dto.TerminalInfo
+	var req dto.TerminalUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}

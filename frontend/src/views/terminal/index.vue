@@ -68,6 +68,7 @@ const handleChange = (tab: any) => {
 const loadTerminalSetting = async () => {
     await getTerminalInfo().then((res) => {
         terminalStore.$patch({
+            showTerminalButton: res.data.showTerminalButton !== 'Disable',
             lineHeight: Number(res.data.lineHeight),
             letterSpacing: Number(res.data.letterSpacing),
             fontSize: Number(res.data.fontSize),

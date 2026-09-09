@@ -2015,6 +2015,8 @@ const message = {
         profileBlockDesc: 'ວັດແທກການບລັອກໃນ Channel, Select Statement ແລະ ກົນໄກ Synchronization.',
     },
     terminal: {
+        showTerminalButton: 'ສະແດງປຸ່ມ Terminal',
+        showTerminalButtonHelper: 'ສະແດງປຸ່ມທາງລັດ Terminal ຢູ່ມຸມຂວາລຸ່ມຂອງໜ້າ.',
         local: 'ພາຍໃນເຄື່ອງ (Local)',
         defaultConn: 'ການເຊື່ອມຕໍ່ເລີ່ມຕົ້ນ',
         defaultConnHelper:

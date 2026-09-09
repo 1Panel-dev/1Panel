@@ -126,7 +126,7 @@ export const getSettingBaseInfo = () => {
 export const getTerminalInfo = () => {
     return http.post<Setting.TerminalInfo>(`/core/settings/terminal/search`);
 };
-export const UpdateTerminalInfo = (param: Setting.TerminalInfo) => {
+export const UpdateTerminalInfo = (param: Partial<Setting.TerminalInfo>) => {
     return http.post(`/core/settings/terminal/update`, param);
 };
 export const getSystemAvailable = () => {

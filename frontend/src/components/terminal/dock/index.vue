@@ -1,6 +1,6 @@
 <template>
     <!-- Right edge handle: open a terminal from any page without leaving it. Hidden on the terminal page itself. -->
-    <div v-if="!onTerminalPage" class="terminal-dock-handle" @click="show">
+    <div v-if="terminalStore.showTerminalButton && !onTerminalPage" class="terminal-dock-handle" @click="show">
         <el-badge
             :value="store.entries.length"
             :hidden="store.entries.length === 0"
@@ -143,11 +143,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue';
+import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import i18n from '@/lang';
 import { ElTree } from 'element-plus';
-import { TerminalSessionStore } from '@/store';
+import { TerminalSessionStore, TerminalStore } from '@/store';
+import { getTerminalInfo } from '@/api/modules/setting';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
 import { MsgError } from '@/utils/message';
@@ -155,9 +156,15 @@ import { ElMessageBox } from 'element-plus';
 import { Host } from '@/api/interface/host';
 
 const store = TerminalSessionStore();
+const terminalStore = TerminalStore();
 const { isNodeAdmin } = useGlobalStore();
 const route = useRoute();
 const onTerminalPage = computed(() => route.path.startsWith('/terminal'));
+
+onMounted(async () => {
+    const res = await getTerminalInfo();
+    terminalStore.showTerminalButton = res.data.showTerminalButton !== 'Disable';
+});
 
 const open = ref(false);
 const active = ref('');

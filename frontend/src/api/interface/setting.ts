@@ -101,6 +101,7 @@ export namespace Setting {
         dashboardSimpleNodeVisible: string;
     }
     export interface TerminalInfo {
+        showTerminalButton?: string;
         lineHeight: string;
         letterSpacing: string;
         fontSize: string;

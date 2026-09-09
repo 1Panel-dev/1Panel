@@ -1984,6 +1984,8 @@ const message = {
         profileBlockDesc: '统计 Channel、Select 和同步原语的阻塞等待，用于定位长时间阻塞。',
     },
     terminal: {
+        showTerminalButton: '显示终端按钮',
+        showTerminalButtonHelper: '在页面右下角显示终端快捷按钮。',
         local: '本机',
         defaultConn: '默认连接',
         defaultConnHelper: '该操作将【{0}】打开终端后自动连接所在节点终端，是否继续？',

@@ -1954,6 +1954,8 @@ const message = {
         profileBlockDesc: '統計 Channel、Select 和同步原語的阻塞等待，用於定位長時間阻塞。',
     },
     terminal: {
+        showTerminalButton: '顯示終端按鈕',
+        showTerminalButtonHelper: '在頁面右下角顯示終端快捷按鈕。',
         local: '本機',
         defaultConn: '預設連接',
         defaultConnHelper: '該操作將【{0}】開啟終端後自動連線到所在節點終端，是否繼續？',

@@ -2031,6 +2031,8 @@ const message = {
         profileBlockDesc: 'Channel, Select 및 동기화 프리미티브의 차단 대기 시간을 측정합니다.',
     },
     terminal: {
+        showTerminalButton: '터미널 버튼 표시',
+        showTerminalButtonHelper: '페이지 오른쪽 아래에 터미널 바로가기 버튼을 표시합니다.',
         local: '로컬',
         defaultConn: '기본 연결',
         defaultConnHelper: '이 작업은 【{0}】의 터미널을 연 후 자동으로 노드 터미널에 연결됩니다. 계속하시겠습니까?',

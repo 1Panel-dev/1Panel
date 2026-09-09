@@ -11683,7 +11683,7 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.TerminalInfo"
+							"$ref": "#/definitions/dto.TerminalUpdate"
 						}
 					}
 				],
@@ -40868,6 +40868,47 @@ const docTemplate = `{
 					"type": "string"
 				},
 				"scrollback": {
+					"type": "string"
+				},
+				"showTerminalButton": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.TerminalUpdate": {
+			"properties": {
+				"backgroundColor": {
+					"type": "string"
+				},
+				"cursorBlink": {
+					"type": "string"
+				},
+				"cursorStyle": {
+					"type": "string"
+				},
+				"fontFamily": {
+					"type": "string"
+				},
+				"fontSize": {
+					"type": "string"
+				},
+				"foregroundColor": {
+					"type": "string"
+				},
+				"letterSpacing": {
+					"type": "string"
+				},
+				"lineHeight": {
+					"type": "string"
+				},
+				"scrollSensitivity": {
+					"type": "string"
+				},
+				"scrollback": {
+					"type": "string"
+				},
+				"showTerminalButton": {
 					"type": "string"
 				}
 			},
