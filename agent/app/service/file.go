@@ -159,6 +159,10 @@ func (f *FileService) SearchUploadWithPage(req request.SearchUploadWithPage) (in
 		})
 	}
 
+	sort.SliceStable(files, func(i, j int) bool {
+		return files[i].CreatedAt > files[j].CreatedAt
+	})
+
 	total, start, end := len(files), (req.Page-1)*req.PageSize, req.Page*req.PageSize
 	if start > total {
 		backData = make([]response.UploadInfo, 0)
