@@ -2087,6 +2087,8 @@ const message = {
         profileBlockDesc: 'Channel, select ve eşzamanlama araçlarındaki engelleme süresini ölçer.',
     },
     terminal: {
+        showTerminalButton: 'Terminal düğmesini göster',
+        showTerminalButtonHelper: 'Sayfanın sağ alt köşesinde terminal kısayol düğmesini gösterir.',
         local: 'Yerel',
         defaultConn: 'Varsayılan Bağlantı',
         defaultConnHelper:

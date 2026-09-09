@@ -2068,6 +2068,8 @@ const message = {
         profileBlockDesc: 'Measures blocking on channels, select statements, and synchronization primitives.',
     },
     terminal: {
+        showTerminalButton: 'Show Terminal Button',
+        showTerminalButtonHelper: 'Show the terminal shortcut button in the bottom-right corner of the page.',
         local: 'Local',
         defaultConn: 'Default Connection',
         defaultConnHelper:

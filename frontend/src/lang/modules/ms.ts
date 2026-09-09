@@ -2095,6 +2095,8 @@ const message = {
         profileBlockDesc: 'Mengukur sekatan pada Channel, Select dan primitif penyegerakan.',
     },
     terminal: {
+        showTerminalButton: 'Papar Butang Terminal',
+        showTerminalButtonHelper: 'Paparkan butang pintasan terminal di sudut kanan bawah halaman.',
         local: 'Tempatan',
         defaultConn: 'Sambungan Lalai',
         defaultConnHelper:

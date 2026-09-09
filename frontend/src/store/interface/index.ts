@@ -84,6 +84,7 @@ export interface MenuState {
 }
 
 export interface TerminalState {
+    showTerminalButton: boolean;
     lineHeight: number;
     letterSpacing: number;
     fontSize: number;

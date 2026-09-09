@@ -2107,6 +2107,8 @@ const message = {
         profileBlockDesc: 'Mide los bloqueos en canales, select y primitivas de sincronización.',
     },
     terminal: {
+        showTerminalButton: 'Mostrar botón de terminal',
+        showTerminalButtonHelper: 'Mostrar el botón de acceso al terminal en la esquina inferior derecha de la página.',
         local: 'Local',
         defaultConn: 'Conexión predeterminada',
         defaultConnHelper:

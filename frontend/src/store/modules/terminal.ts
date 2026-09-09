@@ -5,6 +5,7 @@ import { TerminalState } from '../interface';
 
 export const TerminalStore = defineStore('TerminalState', {
     state: (): TerminalState => ({
+        showTerminalButton: true,
         lineHeight: 1.2,
         letterSpacing: 1.2,
         fontSize: 12,
