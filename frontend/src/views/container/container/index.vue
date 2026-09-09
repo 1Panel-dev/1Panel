@@ -530,8 +530,8 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('container-page-size')) || 20,
     total: 0,
     state: 'all',
-    orderBy: 'createdAt',
-    order: 'null',
+    orderBy: 'name',
+    order: 'ascending',
 });
 const searchName = ref();
 const dialogUpgradeRef = ref();
