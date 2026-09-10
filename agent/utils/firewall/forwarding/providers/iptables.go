@@ -1,10 +1,12 @@
 package providers
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -14,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+	"github.com/mattn/go-shellwords"
 )
 
 type iptablesBackend interface {
@@ -39,6 +42,9 @@ func (systemIptablesBackend) Run(table string, args ...string) error {
 }
 
 func (systemIptablesBackend) RunWithStd(table string, args ...string) (string, error) {
+	if len(args) == 1 && args[0] == "-S" {
+		return iptables_helper.ReadTable(context.Background(), table, false)
+	}
 	return iptables_helper.RunWithStd(table, args...)
 }
 
@@ -47,6 +53,9 @@ func (systemIptablesBackend) RunIPv6(table string, args ...string) error {
 }
 
 func (systemIptablesBackend) RunIPv6WithStd(table string, args ...string) (string, error) {
+	if len(args) == 1 && args[0] == "-S" {
+		return iptables_helper.ReadTable(context.Background(), table, true)
+	}
 	return iptables_helper.RunIPv6WithStd(table, args...)
 }
 
@@ -114,7 +123,7 @@ func (l *iptablesNATAdapter) Name() string {
 }
 
 func (l *iptablesNATAdapter) List() ([]forwarding.Rule, error) {
-	stdout, err := l.backend.RunWithStd(iptables_helper.NatTab, "-nvL", forwarding.ChainPreRouting, "--line-numbers")
+	stdout, err := l.backend.RunWithStd(iptables_helper.NatTab, "-S")
 	if err != nil {
 		return nil, fmt.Errorf("failed to list NAT rules: %w", err)
 	}
@@ -122,7 +131,7 @@ func (l *iptablesNATAdapter) List() ([]forwarding.Rule, error) {
 	if !l.backend.IPv6Available() {
 		return rules, nil
 	}
-	stdout, err = l.backend.RunIPv6WithStd(iptables_helper.NatTab, "-nvL", forwarding.ChainPreRouting, "--line-numbers")
+	stdout, err = l.backend.RunIPv6WithStd(iptables_helper.NatTab, "-S")
 	if err != nil {
 		return nil, fmt.Errorf("failed to list IPv6 NAT rules: %w", err)
 	}
@@ -549,40 +558,70 @@ func (l *iptablesNATAdapter) Replay() error {
 
 func parseIptablesRules(stdout, family string) []forwarding.Rule {
 	var rules []forwarding.Rule
+	num := 0
+lines:
 	for _, line := range strings.Split(stdout, "\n") {
-		fields := strings.Fields(line)
-		if len(fields) < 11 {
+		fields, err := shellwords.Parse(line)
+		if err != nil || len(fields) < 2 || fields[0] != "-A" || fields[1] != forwarding.ChainPreRouting {
 			continue
 		}
-		rule := forwarding.Rule{
-			Num:       fields[0],
-			Family:    family,
-			Protocol:  loadProtocol(fields[4]),
-			Interface: fields[6],
-		}
-		for index := 10; index < len(fields); index++ {
-			field := fields[index]
-			if strings.HasPrefix(field, "dpt:") || strings.HasPrefix(field, "dpts:") {
-				rule.Port = loadSourcePort(field)
+		num++
+		rule := forwarding.Rule{Num: strconv.Itoa(num), Family: family}
+		target := ""
+		for index := 2; index < len(fields); index++ {
+			var value *string
+			switch fields[index] {
+			case "!":
+				continue lines
+			case "-p", "--protocol":
+				value = &rule.Protocol
+			case "-i", "--in-interface":
+				value = &rule.Interface
+			case "--dport", "--destination-port":
+				value = &rule.Port
+			case "-j", "--jump":
+				value = &target
+			case "--to-destination":
+				if index+1 >= len(fields) {
+					continue lines
+				}
+				index++
+				rule.TargetIP, rule.TargetPort = parseIptablesTarget(fields[index])
+			case "--to-ports", "--to-port":
+				value = &rule.TargetPort
+			case "-m", "--match", "--comment":
+				if index+1 >= len(fields) {
+					continue lines
+				}
+				index++
 			}
-			if strings.HasPrefix(field, "to:") {
-				rule.TargetIP, rule.TargetPort = parseIptablesTarget(strings.TrimPrefix(field, "to:"))
-			}
-			if field == "redir" && index+2 < len(fields) && fields[index+1] == "ports" {
-				rule.TargetPort = fields[index+2]
+			if value != nil {
+				if index+1 >= len(fields) {
+					continue lines
+				}
+				index++
+				*value = fields[index]
 			}
 		}
 		if rule.Protocol == "" || rule.Port == "" || rule.TargetPort == "" {
 			continue
 		}
-		if rule.TargetIP == "" {
+		switch target {
+		case "REDIRECT":
+			rule.TargetIP = "127.0.0.1"
 			if family == forwarding.FamilyIPv6 {
 				rule.TargetIP = "::1"
-			} else {
-				rule.TargetIP = "127.0.0.1"
 			}
+		case "DNAT":
+			if rule.TargetIP == "" {
+				continue
+			}
+		default:
+			continue
 		}
-		rule.TargetPort = strings.TrimPrefix(rule.TargetPort, ":")
+		rule.Protocol = loadProtocol(rule.Protocol)
+		rule.Port = strings.ReplaceAll(rule.Port, ":", "-")
+		rule.TargetPort = strings.ReplaceAll(rule.TargetPort, ":", "-")
 		rules = append(rules, rule)
 	}
 	return rules
@@ -616,15 +655,4 @@ func loadProtocol(protocol string) string {
 	default:
 		return protocol
 	}
-}
-
-func loadSourcePort(value string) string {
-	port := ""
-	if strings.Contains(value, "dpt:") {
-		port = strings.ReplaceAll(value, "dpt:", "")
-	}
-	if strings.Contains(value, "dpts:") {
-		port = strings.ReplaceAll(value, "dpts:", "")
-	}
-	return strings.ReplaceAll(port, ":", "-")
 }

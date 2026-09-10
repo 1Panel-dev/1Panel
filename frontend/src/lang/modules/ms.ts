@@ -4163,7 +4163,6 @@ const message = {
             drifted: 'Berbeza',
         },
         ruleTargetRequired: 'Masukkan sekurang-kurangnya satu alamat IP atau port',
-        batchRuleLimit: 'Maksimum {0} peraturan boleh dibuat pada satu masa',
         resolution_adopt: 'Ambil alih pengurusan',
         plan_duplicate_rules:
             'Peraturan pendua dengan syarat dan tindakan yang sama tidak boleh diambil alih untuk diurus. Padam peraturan pendua secara manual dan cuba lagi.',
@@ -4172,13 +4171,6 @@ const message = {
         plan_exact_rule_conflict:
             'Peraturan dengan syarat padanan yang sama mempunyai tindakan benarkan atau sekat yang bertentangan.',
         allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
-        ruleCheckResult: 'Keputusan semakan peraturan',
-        ruleCheckStatus_creatable: 'Boleh dicipta',
-        ruleCheckStatus_existing: 'Sudah wujud',
-        ruleCheckStatus_error: 'Ralat',
-        ruleCheckExistingHelper: 'Peraturan yang sama sudah wujud dan akan dilangkau.',
-        ruleCheckReadyHelper: 'Semakan lulus. Peraturan ini boleh dicipta.',
-        ruleCheckBlockedHelper: 'Peraturan yang mempunyai ralat tidak boleh dihantar. Kembali, edit dan semak semula.',
         plan_managed_rule_drifted:
             'Peraturan terurus tidak sepadan dengan tembok api aktif. Selesaikan perbezaan dahulu.',
         plan_opaque_rule_in_target_scope:
@@ -4242,8 +4234,6 @@ const message = {
             managedOrderDiffers: 'Susunan peraturan terurus berbeza daripada turutan pangkalan data.',
             managedOnlyInTarget: 'Peraturan terurus hanya wujud dalam tembok api sasaran.',
             managedRuntimeCannotRemove: 'Peraturan aktif terurus tidak dapat dipadam dengan selamat.',
-            managedOrderBlocked:
-                'Peraturan terurus tidak boleh disusun semula merentasi peraturan luaran, tidak dikenali atau dilindungi.',
             missingFromTarget: 'Peraturan tiada dalam tembok api sasaran.',
             targetDiffers: 'Peraturan sasaran berbeza daripada dasar pangkalan data.',
             alreadyExistsInTarget: 'Peraturan sudah wujud dalam tembok api sasaran.',
@@ -4352,8 +4342,6 @@ const message = {
         forwardPortHelper: 'Menyokong julat port, cth: 8080-8089',
         forwardInboundInterface: 'Antara Muka Rangkaian Masukan Penerusan',
         exportHelper: 'Akan mengeksport {0} peraturan firewall. Teruskan?',
-        importSuccess: '{0} peraturan berjaya diimport',
-        importPartialSuccess: 'Import selesai: {0} berjaya, {1} gagal',
         basicStatus: 'Firewall semasa tidak terikat. Sila ikat dahulu.',
         initMsg: 'Akan memulakan {0}, teruskan?',
         initDirectBackendConflictMsg:
@@ -4386,7 +4374,7 @@ const message = {
             'Peraturan ini membenarkan {0} mengakses {1}. Memadamnya mungkin menjejaskan akses kepada beberapa perkhidmatan. Teruskan?',
         deleteRiskRulesConfirm:
             'Akan memadam {0} peraturan. {1} peraturan benarkan mungkin menjejaskan akses perkhidmatan. Teruskan?',
-        editRuleConfirm: 'Medan berikut akan diubah: {0}. Peraturan akan digunakan dan disahkan serta-merta. Teruskan?',
+        editRuleConfirm: 'Adakah anda pasti mahu mengubah peraturan ini?',
     },
     runtime: {
         importEnv: 'Import Pemboleh Ubah Persekitaran',

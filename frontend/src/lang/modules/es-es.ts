@@ -4143,7 +4143,6 @@ const message = {
             drifted: 'Desviada',
         },
         ruleTargetRequired: 'Introduce al menos una dirección IP o un puerto',
-        batchRuleLimit: 'Se pueden crear como máximo {0} reglas a la vez',
         resolution_adopt: 'Asumir la gestión',
         plan_duplicate_rules:
             'No se pueden gestionar reglas duplicadas con las mismas condiciones y acciones. Elimine manualmente los duplicados y vuelva a intentarlo.',
@@ -4151,14 +4150,6 @@ const message = {
         plan_exact_rule_conflict:
             'Ya existe una regla con las mismas condiciones, pero con una acción opuesta de permitir o denegar.',
         allRulesAlreadyExist: 'Las {0} reglas comprobadas ya existen. No hay reglas nuevas que crear.',
-        ruleCheckResult: 'Resultados de la comprobación de reglas',
-        ruleCheckStatus_creatable: 'Se puede crear',
-        ruleCheckStatus_existing: 'Ya existe',
-        ruleCheckStatus_error: 'Error',
-        ruleCheckExistingHelper: 'Ya existe una regla idéntica y se omitirá.',
-        ruleCheckReadyHelper: 'La comprobación se superó. Esta regla se puede crear.',
-        ruleCheckBlockedHelper:
-            'Las reglas con errores no se pueden enviar. Vuelve, modifícalas y compruébalas de nuevo.',
         plan_managed_rule_drifted:
             'La regla gestionada no coincide con el firewall activo. Resuelve primero la diferencia.',
         plan_opaque_rule_in_target_scope:
@@ -4222,8 +4213,6 @@ const message = {
             managedOrderDiffers: 'El orden de las reglas gestionadas difiere del orden de la base de datos.',
             managedOnlyInTarget: 'La regla gestionada solo existe en el firewall de destino.',
             managedRuntimeCannotRemove: 'La regla activa gestionada no se puede eliminar de forma segura.',
-            managedOrderBlocked:
-                'Las reglas gestionadas no se pueden reordenar por encima de reglas externas, no reconocidas o protegidas.',
             missingFromTarget: 'La regla no existe en el firewall de destino.',
             targetDiffers: 'La regla de destino difiere de la política de la base de datos.',
             alreadyExistsInTarget: 'La regla ya existe en el firewall de destino.',
@@ -4337,8 +4326,6 @@ const message = {
         forwardPortHelper: 'Admite rangos de puertos, ej.: 8080-8089',
         forwardInboundInterface: 'Interfaz de Red de Entrada para Reenvío',
         exportHelper: 'A punto de exportar {0} reglas de firewall. ¿Continuar?',
-        importSuccess: 'Se importaron correctamente {0} reglas',
-        importPartialSuccess: 'Importación completada: {0} correctas, {1} fallidas',
         basicStatus: 'El firewall actual no está vinculado. Vincúlelo primero.',
         initMsg: 'A punto de inicializar {0}, ¿continuar?',
         initDirectBackendConflictMsg:
@@ -4373,8 +4360,7 @@ const message = {
             'Esta regla permite que {0} acceda a {1}. Eliminarla puede afectar al acceso a varios servicios. ¿Continuar?',
         deleteRiskRulesConfirm:
             'Se eliminarán {0} reglas. {1} reglas de acceso pueden afectar al acceso a servicios. ¿Continuar?',
-        editRuleConfirm:
-            'Se modificarán los siguientes campos: {0}. La regla se aplicará y verificará inmediatamente. ¿Continuar?',
+        editRuleConfirm: '¿Confirma que desea modificar esta regla?',
     },
     runtime: {
         importEnv: 'Importar variables de entorno',

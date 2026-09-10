@@ -121,7 +121,7 @@ func (b *BaseApi) SearchForwardingRules(c *gin.Context) {
 // @Summary Operate forwarding rules
 // @Accept json
 // @Param request body dto.ForwardRuleOperate true "request"
-// @Success 200
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/forward/operate [post]
@@ -132,11 +132,12 @@ func (b *BaseApi) OperateForwardingRules(c *gin.Context) {
 		return
 	}
 
-	if err := forwardingService.OperateRules(request); err != nil {
+	result, err := forwardingService.OperateRules(request)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Firewall
@@ -259,29 +260,30 @@ func (b *BaseApi) LoadFirewallNativeDetail(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Check unified firewall v2 rules for duplicates and conflicts
+// @Summary Adopt an external firewall rule
 // @Accept json
-// @Param request body dto.FirewallRuleCheck true "request"
-// @Success 200 {object} dto.FirewallRuleCheckResponse
+// @Param request body dto.FirewallRuleAdopt true "request"
+// @Success 200
 // @Failure 400 {object} dto.Response
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/rules/check [post]
-func (b *BaseApi) CheckFirewallRules(c *gin.Context) {
-	var request dto.FirewallRuleCheck
+// @Router /hosts/firewall/rules/adopt [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"纳管防火墙规则","formatEN":"adopt firewall rule"}
+func (b *BaseApi) AdoptFirewallRule(c *gin.Context) {
+	var request dto.FirewallRuleAdopt
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	result, err := firewallService.Check(c.Request.Context(), c.ClientIP(), request)
-	if err != nil {
+	if err := firewallService.Adopt(c.Request.Context(), request); err != nil {
 		handleFirewallRuleError(c, err)
 		return
 	}
-	helper.SuccessWithData(c, result)
+	helper.Success(c)
 }
 
 // @Tags Firewall
-// @Summary Create unified firewall v2 rules
+// @Summary Queue firewall rule creation
+// @Description Creation and import return a taskID immediately; validation and execution results are written to the task log.
 // @Accept json
 // @Param request body dto.FirewallRuleCreate true "request"
 // @Success 200 {object} dto.FirewallRuleCreateResponse
@@ -458,8 +460,6 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_STALE", "ErrInvalidParams", err)
 	case errors.Is(err, repo.ErrFirewallRuleRevisionConflict):
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_REVISION_CONFLICT", "ErrInvalidParams", err)
-	case errors.Is(err, filter.ErrRuleCheckRequired):
-		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_CHECK_REQUIRED", "ErrInvalidParams", err)
 	case errors.Is(err, filter.ErrUnsupportedScope), errors.Is(err, filter.ErrInvalidScope),
 		errors.Is(err, filter.ErrProviderUnavailable), errors.Is(err, filter.ErrAdapterUnavailable):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrInvalidParams", err)
@@ -598,7 +598,7 @@ func (b *BaseApi) OperateDockerPortGuard(c *gin.Context) {
 // @Summary Delete Docker port guard policies
 // @Accept json
 // @Param request body dto.DockerPortGuardPolicyBatchDelete true "request"
-// @Success 200
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/docker/policies/delete/batch [post]
@@ -608,32 +608,34 @@ func (b *BaseApi) DeleteDockerPortGuardPolicies(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	if err := dockerPortGuardService.DeletePolicies(c.Request.Context(), request); err != nil {
+	result, err := dockerPortGuardService.DeletePolicies(request)
+	if err != nil {
 		handleDockerPortGuardError(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Firewall
 // @Summary Batch upsert Docker port guard policies
 // @Accept json
 // @Param request body dto.DockerPortGuardPolicyBatch true "request"
-// @Success 200
+// @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/docker/policies/batch [post]
-// @x-panel-log {"bodyKeys":["mode"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量更新 Docker 端口防护策略 [mode]","formatEN":"batch update Docker port guard policies [mode]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"批量更新 Docker 端口防护策略","formatEN":"batch update Docker port guard policies"}
 func (b *BaseApi) UpsertDockerPortGuardPolicies(c *gin.Context) {
 	var request dto.DockerPortGuardPolicyBatch
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	if err := dockerPortGuardService.UpsertPolicies(c.Request.Context(), request); err != nil {
+	result, err := dockerPortGuardService.UpsertPolicies(request)
+	if err != nil {
 		handleDockerPortGuardError(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, result)
 }
 
 func handleDockerPortGuardError(c *gin.Context, err error) {

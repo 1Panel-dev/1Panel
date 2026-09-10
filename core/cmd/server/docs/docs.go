@@ -18626,7 +18626,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -18643,11 +18646,9 @@ const docTemplate = `{
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [
-						"mode"
-					],
-					"formatEN": "batch update Docker port guard policies [mode]",
-					"formatZH": "批量更新 Docker 端口防护策略 [mode]",
+					"bodyKeys": [],
+					"formatEN": "batch update Docker port guard policies",
+					"formatZH": "批量更新 Docker 端口防护策略",
 					"paramKeys": []
 				}
 			}
@@ -18670,7 +18671,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -18885,7 +18889,10 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
 					}
 				},
 				"security": [
@@ -18996,6 +19003,7 @@ const docTemplate = `{
 				"consumes": [
 					"application/json"
 				],
+				"description": "Creation and import return a taskID immediately; validation and execution results are written to the task log.",
 				"parameters": [
 					{
 						"description": "request",
@@ -19035,7 +19043,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create unified firewall v2 rules",
+				"summary": "Queue firewall rule creation",
 				"tags": [
 					"Firewall"
 				],
@@ -19048,7 +19056,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/hosts/firewall/rules/check": {
+		"/hosts/firewall/rules/adopt": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -19060,16 +19068,13 @@ const docTemplate = `{
 						"name": "request",
 						"required": true,
 						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleCheck"
+							"$ref": "#/definitions/dto.FirewallRuleAdopt"
 						}
 					}
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FirewallRuleCheckResponse"
-						}
+						"description": "OK"
 					},
 					"400": {
 						"description": "Bad Request",
@@ -19086,10 +19091,17 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Check unified firewall v2 rules for duplicates and conflicts",
+				"summary": "Adopt an external firewall rule",
 				"tags": [
 					"Firewall"
-				]
+				],
+				"x-panel-log": {
+					"bodyKeys": [],
+					"paramKeys": [],
+					"BeforeFunctions": [],
+					"formatZH": "纳管防火墙规则",
+					"formatEN": "adopt firewall rule"
+				}
 			}
 		},
 		"/hosts/firewall/rules/delete": {
@@ -35653,19 +35665,26 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.DockerPortGuardPolicyBatch": {
+		"dto.DockerPortGuardPolicy": {
 			"properties": {
 				"description": {
 					"maxLength": 256,
 					"type": "string"
 				},
-				"endpoints": {
-					"items": {
-						"$ref": "#/definitions/dto.DockerPortGuardEndpointIdentity"
-					},
-					"maxItems": 256,
-					"minItems": 1,
-					"type": "array"
+				"family": {
+					"enum": [
+						"ipv4",
+						"ipv6"
+					],
+					"type": "string"
+				},
+				"hostIP": {
+					"maxLength": 45,
+					"type": "string"
+				},
+				"hostPort": {
+					"minimum": 1,
+					"type": "integer"
 				},
 				"mode": {
 					"enum": [
@@ -35675,18 +35694,41 @@ const docTemplate = `{
 					],
 					"type": "string"
 				},
+				"protocol": {
+					"enum": [
+						"tcp",
+						"udp"
+					],
+					"type": "string"
+				},
 				"sources": {
 					"items": {
 						"type": "string"
 					},
-					"maxItems": 256,
 					"type": "array"
 				}
 			},
 			"required": [
-				"endpoints",
+				"family",
+				"hostIP",
+				"hostPort",
 				"mode",
-				"sources"
+				"protocol"
+			],
+			"type": "object"
+		},
+		"dto.DockerPortGuardPolicyBatch": {
+			"properties": {
+				"policies": {
+					"items": {
+						"$ref": "#/definitions/dto.DockerPortGuardPolicy"
+					},
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"policies"
 			],
 			"type": "object"
 		},
@@ -35696,7 +35738,6 @@ const docTemplate = `{
 					"items": {
 						"type": "string"
 					},
-					"maxItems": 256,
 					"minItems": 1,
 					"type": "array"
 				}
@@ -36094,84 +36135,21 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
-		"dto.FirewallRuleCheck": {
-			"properties": {
-				"items": {
-					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleCheckItem"
-					},
-					"maxItems": 256,
-					"minItems": 1,
-					"type": "array"
-				}
-			},
+		"dto.FirewallRuleAdopt": {
+			"type": "object",
 			"required": [
-				"items"
+				"scope",
+				"instanceKey"
 			],
-			"type": "object"
-		},
-		"dto.FirewallRuleCheckItem": {
 			"properties": {
-				"rule": {
-					"$ref": "#/definitions/filter.FirewallRule"
+				"scope": {
+					"$ref": "#/definitions/filter.Scope"
 				},
-				"uuid": {
-					"type": "string"
+				"instanceKey": {
+					"type": "string",
+					"maxLength": 128
 				}
-			},
-			"required": [
-				"rule"
-			],
-			"type": "object"
-		},
-		"dto.FirewallRuleCheckResponse": {
-			"properties": {
-				"items": {
-					"items": {
-						"$ref": "#/definitions/dto.FirewallRuleCheckResult"
-					},
-					"type": "array"
-				}
-			},
-			"type": "object"
-		},
-		"dto.FirewallRuleCheckResult": {
-			"properties": {
-				"allowedActions": {
-					"items": {
-						"$ref": "#/definitions/filter.CheckAction"
-					},
-					"type": "array"
-				},
-				"candidates": {
-					"items": {
-						"$ref": "#/definitions/filter.ObservedRule"
-					},
-					"type": "array"
-				},
-				"checkFlag": {
-					"type": "string"
-				},
-				"classification": {
-					"$ref": "#/definitions/filter.CheckClassification"
-				},
-				"decision": {
-					"$ref": "#/definitions/filter.CheckDecision"
-				},
-				"existingRuleUUID": {
-					"type": "string"
-				},
-				"reason": {
-					"type": "string"
-				},
-				"requestedRule": {
-					"$ref": "#/definitions/filter.FirewallRule"
-				},
-				"requestedRuleKey": {
-					"type": "string"
-				}
-			},
-			"type": "object"
+			}
 		},
 		"dto.FirewallRuleCreate": {
 			"properties": {
@@ -36179,7 +36157,6 @@ const docTemplate = `{
 					"items": {
 						"$ref": "#/definitions/dto.FirewallRuleCreateItem"
 					},
-					"maxItems": 256,
 					"minItems": 1,
 					"type": "array"
 				}
@@ -36208,15 +36185,6 @@ const docTemplate = `{
 		},
 		"dto.FirewallRuleCreateItem": {
 			"properties": {
-				"action": {
-					"$ref": "#/definitions/filter.CheckAction"
-				},
-				"adoptInstanceKey": {
-					"type": "string"
-				},
-				"checkFlag": {
-					"type": "string"
-				},
 				"rule": {
 					"$ref": "#/definitions/filter.FirewallRule"
 				},
@@ -36247,11 +36215,17 @@ const docTemplate = `{
 				"failed": {
 					"type": "integer"
 				},
+				"queued": {
+					"type": "boolean"
+				},
 				"skipped": {
 					"type": "integer"
 				},
 				"succeeded": {
 					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -36262,7 +36236,6 @@ const docTemplate = `{
 					"items": {
 						"type": "string"
 					},
-					"maxItems": 256,
 					"minItems": 1,
 					"type": "array"
 				}
@@ -36529,10 +36502,14 @@ const docTemplate = `{
 					"items": {
 						"$ref": "#/definitions/dto.ForwardRuleOperation"
 					},
-					"type": "array"
+					"type": "array",
+					"minItems": 1
 				}
 			},
-			"type": "object"
+			"type": "object",
+			"required": [
+				"rules"
+			]
 		},
 		"dto.ForwardRuleOperation": {
 			"properties": {
@@ -41196,59 +41173,6 @@ const docTemplate = `{
 				"ActionAccept",
 				"ActionDrop",
 				"ActionReject"
-			]
-		},
-		"filter.CheckAction": {
-			"enum": [
-				"create",
-				"create_anyway",
-				"adopt",
-				"select_adopt",
-				"cancel"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"CheckActionCreate",
-				"CheckActionCreateAnyway",
-				"CheckActionAdopt",
-				"CheckActionSelectAdopt",
-				"CheckActionCancel"
-			]
-		},
-		"filter.CheckClassification": {
-			"enum": [
-				"none",
-				"exact_managed",
-				"exact_external",
-				"covered",
-				"conflict",
-				"unsupported",
-				"protected"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"CheckClassificationNone",
-				"CheckClassificationExactManaged",
-				"CheckClassificationExactExternal",
-				"CheckClassificationCovered",
-				"CheckClassificationConflict",
-				"CheckClassificationUnsupported",
-				"CheckClassificationProtected"
-			]
-		},
-		"filter.CheckDecision": {
-			"enum": [
-				"ready",
-				"confirmation_required",
-				"blocked",
-				"no_change"
-			],
-			"type": "string",
-			"x-enum-varnames": [
-				"CheckDecisionReady",
-				"CheckDecisionConfirmationRequired",
-				"CheckDecisionBlocked",
-				"CheckDecisionNoChange"
 			]
 		},
 		"filter.DesiredRule": {

@@ -174,9 +174,6 @@ func (a *Adapter) PrepareRule(rule filter.FirewallRule) (filter.FirewallRule, er
 			return filter.FirewallRule{}, err
 		}
 	} else if normalized.NativeKind == filter.NativeKindZonePort && !isNativeZonePort(normalized) {
-		// Edit requests inherit the current native kind. Once a native zone port
-		// gains an address, loses its port, or changes to a deny action, it must
-		// be represented as a rich rule instead.
 		normalized.NativeKind = filter.NativeKindRichRule
 		normalized, err = filter.NormalizeRule(normalized)
 		if err != nil {
@@ -231,6 +228,9 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	executed := 0
 	for index, command := range rulePlan.Commands {
 		if err := a.writer.Run(ctx, command); err != nil {
+			if plan.CommandOnly {
+				return filter.ApplyResult{}, err
+			}
 			return filter.ApplyResult{}, a.compensate(ctx, rulePlan, executed, err)
 		}
 		executed = index + 1
@@ -328,7 +328,7 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 		if target.Locator.Canonical == expected.Locator.Canonical {
 			break
 		}
-		removeCommands, restoreCommands := pairedCommands(target.Rule, "remove", "add")
+		removeCommands, restoreCommands := observedPairedCommands(target, "remove", "add")
 		addCommands, removeNewCommands := missingRuleCommands(snapshot, normalized)
 		plan.Commands = append(removeCommands, addCommands...)
 		plan.RollbackCommands = append(restoreCommands, removeNewCommands...)
@@ -340,7 +340,15 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 		plan.Previous = &target
 		plan.Expected = target
 		plan.Expected.Rule.UUID = normalized.UUID
-		plan.Commands, plan.RollbackCommands = pairedCommands(target.Rule, "remove", "add")
+		plan.Commands, plan.RollbackCommands = observedPairedCommands(target, "remove", "add")
+		if change.CommandOnly {
+			switch target.Persistence {
+			case filter.PersistenceStatusRuntimeOnly:
+				plan.Commands, plan.RollbackCommands = plan.Commands[:1], plan.RollbackCommands[:1]
+			case filter.PersistenceStatusPermanentOnly:
+				plan.Commands, plan.RollbackCommands = plan.Commands[1:], plan.RollbackCommands[1:]
+			}
+		}
 	default:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
@@ -420,9 +428,20 @@ func missingRuleCommands(snapshot filter.Snapshot, rule filter.FirewallRule) ([]
 }
 
 func pairedCommands(rule filter.FirewallRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {
-	option := nativeOption(rule, operation)
-	rollback := nativeOption(rule, inverse)
-	selector := scopeSelector(rule.Scope)
+	return pairedNativeCommands(rule.Scope, nativeOption(rule, operation), nativeOption(rule, inverse))
+}
+
+func observedPairedCommands(observed filter.ObservedRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {
+	if observed.Rule.NativeKind != filter.NativeKindRichRule || observed.Raw == "" {
+		return pairedCommands(observed.Rule, operation, inverse)
+	}
+	return pairedNativeCommands(observed.Rule.Scope,
+		"--"+operation+"-rich-rule="+observed.Raw,
+		"--"+inverse+"-rich-rule="+observed.Raw)
+}
+
+func pairedNativeCommands(scope filter.Scope, option, rollback string) ([]filter.NativeCommand, []filter.NativeCommand) {
+	selector := scopeSelector(scope)
 	commands := []filter.NativeCommand{
 		{Executable: "firewall-cmd", Args: []string{selector, option}},
 		{Executable: "firewall-cmd", Args: []string{"--permanent", selector, option}},
@@ -464,7 +483,8 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	if target.Protected {
 		return filter.ObservedRule{}, filter.ErrProtectedRule
 	}
-	if target.ParseStatus != filter.ParseStatusSupported || target.Persistence != filter.PersistenceStatusConverged {
+	if target.ParseStatus != filter.ParseStatusSupported ||
+		(target.Persistence != filter.PersistenceStatusConverged && !(change.CommandOnly && change.Operation == filter.ChangeDelete)) {
 		return filter.ObservedRule{}, filter.ErrRuleStale
 	}
 	want := normalized
@@ -511,6 +531,11 @@ func scopeSelector(scope filter.Scope) string {
 }
 
 func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, executed int, cause error) error {
+	if plan.Operation == filter.ChangeCreate {
+		return cause
+	}
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
 	rollbackErr := a.rollback(ctx, plan.Expected.Rule.Scope, plan, executed)
 	if rollbackErr != nil {
 		return fmt.Errorf("firewalld apply failed: %w; compensation failed: %v", cause, rollbackErr)

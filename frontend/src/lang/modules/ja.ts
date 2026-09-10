@@ -4081,20 +4081,12 @@ const message = {
         protectedHelper: 'アクセスへの影響を防ぐため、編集や削除ができない重要なシステムルールです。',
         stateShort: { managed: 'パネル', adopted: '管理済', external: '外部', protected: '保護', drifted: '差異' },
         ruleTargetRequired: 'IP アドレスまたはポートを1つ以上入力してください',
-        batchRuleLimit: '一度に作成できるルールは最大 {0} 件です',
         resolution_adopt: '管理対象にする',
         plan_duplicate_rules:
             '条件とアクションが同じルールが重複しているため、管理対象に追加できません。重複ルールを手動で削除してから再試行してください。',
         adoptRuleConfirm: '管理対象にすると、1Panel がこの既存ルールの保守と削除を行えるようになります。続行しますか？',
         plan_exact_rule_conflict: '一致条件が同じで、許可・拒否の動作が逆のルールが存在します。',
         allRulesAlreadyExist: '確認した {0} 件のルールはすべて既に存在します。新しく作成するルールはありません。',
-        ruleCheckResult: 'ルール確認結果',
-        ruleCheckStatus_creatable: '作成可能',
-        ruleCheckStatus_existing: '既存',
-        ruleCheckStatus_error: 'エラー',
-        ruleCheckExistingHelper: '同じルールが既に存在するため、今回はスキップします。',
-        ruleCheckReadyHelper: '確認に合格しました。このルールは作成できます。',
-        ruleCheckBlockedHelper: 'エラーのあるルールは送信できません。戻って修正し、もう一度確認してください。',
         plan_managed_rule_drifted:
             '管理対象ルールが実際のファイアウォールと一致しません。先に不整合を解消してください。',
         plan_opaque_rule_in_target_scope: '対象範囲に安全に解析できないルールがあります。操作を停止しました。',
@@ -4157,8 +4149,6 @@ const message = {
             managedOrderDiffers: '管理対象ルールの順序がデータベースの順序と異なります。',
             managedOnlyInTarget: '管理対象ルールは対象ファイアウォールにのみ存在します。',
             managedRuntimeCannotRemove: '管理対象の実行中ルールを安全に削除できません。',
-            managedOrderBlocked:
-                '外部、認識不能、または保護されたルールを越えて管理対象ルールを並べ替えることはできません。',
             missingFromTarget: '対象ファイアウォールにこのルールがありません。',
             targetDiffers: '対象ルールがデータベースポリシーと異なります。',
             alreadyExistsInTarget: '対象ファイアウォールにこのルールは既に存在します。',
@@ -4268,8 +4258,6 @@ const message = {
         forwardPortHelper: 'ポート範囲をサポートします。例: 8080-8089',
         forwardInboundInterface: '転送入站ネットワークインターフェース',
         exportHelper: '{0} 件のファイアウォールルールをエクスポートします。続行しますか？',
-        importSuccess: '{0} 件のルールを正常にインポートしました',
-        importPartialSuccess: 'インポート完了: {0} 件成功、{1} 件失敗',
         basicStatus: '現在のファイアウォールはバインドされていません。先にバインドしてください。',
         initMsg: '{0} を初期化します。続行しますか？',
         initDirectBackendConflictMsg:
@@ -4303,7 +4291,7 @@ const message = {
             'このルールは {0} に {1} へのアクセスを許可しています。削除すると複数のサービスへのアクセスに影響する可能性があります。続行しますか？',
         deleteRiskRulesConfirm:
             '{0} 個のルールを削除します。そのうち {1} 個の許可ルールがサービスへのアクセスに影響する可能性があります。続行しますか？',
-        editRuleConfirm: '次の項目を変更します：{0}。ルールは直ちに適用され、再検証されます。続行しますか？',
+        editRuleConfirm: 'このルールを変更してもよろしいですか？',
     },
     runtime: {
         importEnv: '環境変数をインポート',

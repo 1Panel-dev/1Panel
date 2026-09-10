@@ -9,15 +9,6 @@ const (
 	StatusBlocked  Status = "blocked"
 )
 
-type Outcome string
-
-const (
-	OutcomeApplied Outcome = "applied"
-	OutcomeSkipped Outcome = "skipped"
-	OutcomeRemoved Outcome = "removed"
-	OutcomeFailed  Outcome = "failed"
-)
-
 type ReasonCode string
 
 const (

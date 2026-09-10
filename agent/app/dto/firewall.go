@@ -109,18 +109,6 @@ type FirewallRuleReset struct {
 	WithDockerRestart bool            `json:"withDockerRestart"`
 }
 
-type FirewallRuleCheckResult struct {
-	Decision         filter.CheckDecision       `json:"decision"`
-	Classification   filter.CheckClassification `json:"classification"`
-	Reason           string                     `json:"reason"`
-	RequestedRule    filter.FirewallRule        `json:"requestedRule"`
-	RequestedRuleKey string                     `json:"requestedRuleKey"`
-	ExistingRuleUUID string                     `json:"existingRuleUUID,omitempty"`
-	Candidates       []filter.ObservedRule      `json:"candidates,omitempty"`
-	AllowedActions   []filter.CheckAction       `json:"allowedActions,omitempty"`
-	CheckFlag        string                     `json:"checkFlag"`
-}
-
 type FirewallRuleInventory struct {
 	PageInfo
 	Scope         filter.Scope            `json:"scope,omitempty"`
@@ -213,14 +201,18 @@ type DockerPortGuardEndpointIdentity struct {
 }
 
 type DockerPortGuardPolicyBatch struct {
-	Endpoints   []DockerPortGuardEndpointIdentity `json:"endpoints" validate:"required,min=1,max=256,dive"`
-	Mode        string                            `json:"mode" validate:"required,oneof=deny_sources allow_sources deny_all"`
-	Sources     []string                          `json:"sources" validate:"max=256,dive,required,max=64"`
-	Description string                            `json:"description" validate:"max=256"`
+	Policies []DockerPortGuardPolicy `json:"policies" validate:"required,min=1,dive"`
 }
 
 type DockerPortGuardPolicyBatchDelete struct {
-	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required,max=64"`
+	UUIDs []string `json:"uuids" validate:"required,min=1,dive,required,max=64"`
+}
+
+type DockerPortGuardPolicy struct {
+	DockerPortGuardEndpointIdentity
+	Mode        string   `json:"mode" validate:"required,oneof=deny_sources allow_sources deny_all"`
+	Sources     []string `json:"sources" validate:"dive,required,max=64"`
+	Description string   `json:"description" validate:"max=256"`
 }
 
 type DockerPortGuardOperation struct {
@@ -228,34 +220,24 @@ type DockerPortGuardOperation struct {
 	TaskID    string `json:"taskID,omitempty" validate:"omitempty,max=64"`
 }
 
-type FirewallRuleCheckItem struct {
-	AdoptLocator *filter.Locator     `json:"adoptLocator,omitempty" validate:"excluded_with=UUID"`
-	UUID         string              `json:"uuid" validate:"omitempty,max=64"`
-	Rule         filter.FirewallRule `json:"rule" validate:"required"`
-}
-
-type FirewallRuleCheck struct {
-	Items []FirewallRuleCheckItem `json:"items" validate:"required,min=1,max=256,dive"`
-}
-
-type FirewallRuleCheckResponse struct {
-	Items []FirewallRuleCheckResult `json:"items"`
+type FirewallRuleAdopt struct {
+	Scope       filter.Scope `json:"scope" validate:"required"`
+	InstanceKey string       `json:"instanceKey" validate:"required,max=128"`
 }
 
 type FirewallRuleCreateItem struct {
-	Rule             filter.FirewallRule `json:"rule" validate:"required"`
-	CheckFlag        string              `json:"checkFlag"`
-	Action           filter.CheckAction  `json:"action"`
-	AdoptInstanceKey string              `json:"adoptInstanceKey"`
-	SourceKind       string              `json:"sourceKind" validate:"omitempty,oneof=user imported"`
-	SourceID         string              `json:"sourceID"`
+	Rule       filter.FirewallRule `json:"rule" validate:"required"`
+	SourceKind string              `json:"sourceKind" validate:"omitempty,oneof=user imported"`
+	SourceID   string              `json:"sourceID"`
 }
 
 type FirewallRuleCreate struct {
-	Items []FirewallRuleCreateItem `json:"items" validate:"required,min=1,max=256,dive"`
+	Items []FirewallRuleCreateItem `json:"items" validate:"required,min=1,dive"`
 }
 
 type FirewallRuleCreateResponse struct {
+	TaskID    string                      `json:"taskID,omitempty"`
+	Queued    bool                        `json:"queued,omitempty"`
 	Succeeded int                         `json:"succeeded"`
 	Failed    int                         `json:"failed"`
 	Skipped   int                         `json:"skipped"`
@@ -327,7 +309,7 @@ type FirewallRuleSyncFailure struct {
 }
 
 type FirewallRuleDelete struct {
-	UUIDs []string `json:"uuids" validate:"required,min=1,max=256,dive,required,max=64"`
+	UUIDs []string `json:"uuids" validate:"required,min=1,dive,required,max=64"`
 }
 
 type FirewallRuleDeleteResponse struct {
@@ -354,4 +336,23 @@ type FirewallRuleReorder struct {
 	UUID           string `json:"uuid" validate:"required,max=64"`
 	TargetPosition *int64 `json:"targetPosition"`
 	Priority       *int   `json:"priority"`
+}
+
+func (p *FirewallRuleSyncPreview) Add(item FirewallRuleSyncItem) {
+	p.Items = append(p.Items, item)
+	switch item.Status {
+	case firewallsync.StatusReady:
+		p.Ready++
+		p.Total++
+	case firewallsync.StatusExisting:
+		p.Existing++
+		p.Total++
+	case firewallsync.StatusRemove:
+		p.Removed++
+	case firewallsync.StatusBlocked:
+		p.Blocked++
+		if item.ReasonCode != firewallsync.ReasonReadOnlyRule {
+			p.Total++
+		}
+	}
 }

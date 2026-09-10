@@ -4182,7 +4182,6 @@ const message = {
             drifted: 'Divergente',
         },
         ruleTargetRequired: 'Informe pelo menos um endereço IP ou uma porta',
-        batchRuleLimit: 'É possível criar no máximo {0} regras por vez',
         resolution_adopt: 'Assumir gerenciamento',
         plan_duplicate_rules:
             'Regras duplicadas com condições e ações idênticas não podem ser gerenciadas. Exclua manualmente as regras duplicadas e tente novamente.',
@@ -4190,13 +4189,6 @@ const message = {
         plan_exact_rule_conflict:
             'Já existe uma regra com as mesmas condições, mas com uma ação oposta de permitir ou negar.',
         allRulesAlreadyExist: 'Todas as {0} regras verificadas já existem. Não há novas regras para criar.',
-        ruleCheckResult: 'Resultados da verificação de regras',
-        ruleCheckStatus_creatable: 'Pode ser criada',
-        ruleCheckStatus_existing: 'Já existe',
-        ruleCheckStatus_error: 'Erro',
-        ruleCheckExistingHelper: 'Uma regra idêntica já existe e será ignorada.',
-        ruleCheckReadyHelper: 'A verificação foi aprovada. Esta regra pode ser criada.',
-        ruleCheckBlockedHelper: 'Regras com erros não podem ser enviadas. Volte, edite-as e verifique novamente.',
         plan_managed_rule_drifted:
             'A regra gerenciada não corresponde ao firewall ativo. Resolva a divergência primeiro.',
         plan_opaque_rule_in_target_scope:
@@ -4259,8 +4251,6 @@ const message = {
             managedOrderDiffers: 'A ordem das regras gerenciadas difere da sequência do banco de dados.',
             managedOnlyInTarget: 'A regra gerenciada existe apenas no firewall de destino.',
             managedRuntimeCannotRemove: 'A regra ativa gerenciada não pode ser removida com segurança.',
-            managedOrderBlocked:
-                'As regras gerenciadas não podem ser reordenadas através de regras externas, não reconhecidas ou protegidas.',
             missingFromTarget: 'A regra não existe no firewall de destino.',
             targetDiffers: 'A regra de destino difere da política do banco de dados.',
             alreadyExistsInTarget: 'A regra já existe no firewall de destino.',
@@ -4372,8 +4362,6 @@ const message = {
         forwardPortHelper: 'Suporta intervalos de portas, ex. 8080-8089',
         forwardInboundInterface: 'Interface de Rede de Entrada para Encaminhamento',
         exportHelper: 'Prestes a exportar {0} regras de firewall. Continuar?',
-        importSuccess: '{0} regras importadas com sucesso',
-        importPartialSuccess: 'Importação concluída: {0} sucesso, {1} falha',
         basicStatus: 'O firewall atual não está vinculado. Vincule-o primeiro.',
         initMsg: 'Prestes a inicializar {0}, continuar?',
         initDirectBackendConflictMsg:
@@ -4408,8 +4396,7 @@ const message = {
             'Esta regra permite que {0} acesse {1}. Excluí-la pode afetar o acesso a vários serviços. Continuar?',
         deleteRiskRulesConfirm:
             'Excluirá {0} regras. {1} regras de liberação podem afetar o acesso aos serviços. Continuar?',
-        editRuleConfirm:
-            'Os seguintes campos serão alterados: {0}. A regra será aplicada e verificada imediatamente. Continuar?',
+        editRuleConfirm: 'Tem certeza de que deseja modificar esta regra?',
     },
     runtime: {
         importEnv: 'Importar variáveis de ambiente',

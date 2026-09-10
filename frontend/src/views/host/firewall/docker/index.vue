@@ -209,8 +209,14 @@
             </template>
         </DrawerPro>
 
-        <DockerGuardDetail ref="detailRef" :base="data.base" :containers="containerRows" @search="search" />
-        <DockerGuardImport ref="importRef" @search="search" />
+        <DockerGuardDetail
+            ref="detailRef"
+            :base="data.base"
+            :containers="containerRows"
+            @search="search"
+            @created="openRuleTask"
+        />
+        <DockerGuardImport ref="importRef" @created="openRuleTask" />
         <RuleSync ref="ruleSyncRef" @search="search" />
         <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
         <TaskLog ref="taskLogRef" @close="search" />
@@ -234,7 +240,9 @@ import {
     operateFirewallBackend,
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { ElMessageBox } from 'element-plus';
 import { Lock } from '@element-plus/icons-vue';
 import { downloadWithContent } from '@/utils/file';
@@ -255,6 +263,7 @@ const importRef = ref<InstanceType<typeof DockerGuardImport>>();
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
+const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID, true);
 const orphanDrawerVisible = ref(false);
 const searchName = ref('');
 const selects = ref<Firewall.DockerGuardContainer[]>([]);
@@ -518,13 +527,18 @@ const removePolicies = async (endpoints: Firewall.DockerGuardEndpoint[], batch: 
     }
     loading.value = true;
     try {
-        for (let offset = 0; offset < uuids.length; offset += 256) {
-            await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
+        const result = (await deleteDockerPortGuardPolicies({ uuids })).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
+            return;
         }
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await search();
-    } catch {
-        await search();
+        openRuleTask(result.taskID);
+    } catch (error) {
+        MsgError(
+            (isAxiosError(error) && error.response?.data?.message) ||
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
     } finally {
         loading.value = false;
     }

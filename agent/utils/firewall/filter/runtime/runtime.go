@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterfirewalld "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/providers/firewalld"
@@ -236,6 +237,35 @@ func (e *Engine) Capabilities(ctx context.Context) (filter.Capabilities, error) 
 	return e.adapter.Capabilities(ctx)
 }
 
+func (e *Engine) ExecuteCreate(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) error {
+	plan, err := e.adapter.Compile(snapshot, changes)
+	if err != nil {
+		return err
+	}
+	if !plan.CreatesOnly() {
+		return fmt.Errorf("%w: expected a create-only plan", filter.ErrInvalidRule)
+	}
+	_, err = e.adapter.Apply(ctx, plan)
+	return err
+}
+
+func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	changes = append([]filter.DesiredChange(nil), changes...)
+	for index := range changes {
+		changes[index].CommandOnly = true
+	}
+	plan, err := e.adapter.Compile(snapshot, changes)
+	if err != nil {
+		return err
+	}
+	plan.CommandOnly = true
+	_, err = e.adapter.Apply(ctx, plan)
+	return err
+}
+
 func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, filter.VerifyResult, error) {
 	plan, err := e.adapter.Compile(snapshot, changes)
 	if err != nil {
@@ -246,7 +276,7 @@ func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes 
 		return plan, filter.VerifyResult{}, err
 	}
 	if result.Verification != nil {
-		if !result.Verification.Matched {
+		if !result.Verification.Matched && !plan.CreatesOnly() {
 			if rollbackErr := e.Rollback(ctx, plan); rollbackErr != nil {
 				return plan, *result.Verification, errors.Join(filter.ErrVerificationFailed, rollbackErr)
 			}
@@ -255,9 +285,12 @@ func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes 
 	}
 	verification, err := e.adapter.Verify(ctx, plan)
 	if err != nil {
+		if plan.CreatesOnly() {
+			return plan, verification, err
+		}
 		return plan, verification, e.rollback(ctx, plan, err)
 	}
-	if !verification.Matched {
+	if !verification.Matched && !plan.CreatesOnly() {
 		if rollbackErr := e.Rollback(ctx, plan); rollbackErr != nil {
 			return plan, verification, errors.Join(filter.ErrVerificationFailed, rollbackErr)
 		}
@@ -270,6 +303,8 @@ func (e *Engine) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 	if !ok {
 		return fmt.Errorf("%w: provider %s does not support applied-plan rollback", filter.ErrAdapterUnavailable, e.adapter.Provider())
 	}
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
 	return rollbacker.Rollback(ctx, plan)
 }
 
