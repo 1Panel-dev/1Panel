@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -1320,6 +1321,10 @@ func appendPluginAllow(conf map[string]interface{}, pluginID string) {
 }
 
 func installOpenclawPlugin(mgr *cmd.CommandHelper, containerName, spec, pluginID string) error {
+	help, err := cmd.RunDockerExecWithStdout(time.Minute, containerName, "openclaw", "plugins", "install", "--help")
+	if err != nil {
+		return err
+	}
 	workdir := path.Join(openclawPluginPackageTmpDir, pluginID)
 	defer func() {
 		_ = mgr.Run("docker", "exec", containerName, "rm", "-rf", workdir)
@@ -1341,7 +1346,15 @@ func installOpenclawPlugin(mgr *cmd.CommandHelper, containerName, spec, pluginID
 	if pkgPath == "" {
 		return fmt.Errorf("openclaw plugin package not found")
 	}
-	return mgr.Run("docker", "exec", containerName, "openclaw", "plugins", "install", pkgPath, "--dangerously-force-unsafe-install")
+	args := []string{"exec", containerName, "openclaw", "plugins", "install", pkgPath}
+	// Newer CLIs require source confirmation; older releases do not support --force.
+	options := strings.Fields(help)
+	if slices.Contains(options, "--force") {
+		args = append(args, "--force")
+	} else if slices.Contains(options, "--dangerously-force-unsafe-install") {
+		args = append(args, "--dangerously-force-unsafe-install")
+	}
+	return mgr.Run("docker", args...)
 }
 
 func uninstallOpenclawPlugin(mgr *cmd.CommandHelper, containerName, pluginID string) error {
