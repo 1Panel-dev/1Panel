@@ -229,8 +229,9 @@ type DockerPortGuardOperation struct {
 }
 
 type FirewallRuleCheckItem struct {
-	UUID string              `json:"uuid" validate:"omitempty,max=64"`
-	Rule filter.FirewallRule `json:"rule" validate:"required"`
+	AdoptLocator *filter.Locator     `json:"adoptLocator,omitempty" validate:"excluded_with=UUID"`
+	UUID         string              `json:"uuid" validate:"omitempty,max=64"`
+	Rule         filter.FirewallRule `json:"rule" validate:"required"`
 }
 
 type FirewallRuleCheck struct {
@@ -342,8 +343,11 @@ type FirewallRuleDeleteFailure struct {
 }
 
 type FirewallRuleUpdate struct {
-	UUID string              `json:"uuid" validate:"required,max=64"`
-	Rule filter.FirewallRule `json:"rule" validate:"required"`
+	UUID        string               `json:"uuid" validate:"required,max=64"`
+	Rule        *filter.FirewallRule `json:"rule,omitempty" validate:"required_without_all=Description OrderIndex Priority,excluded_with=Description OrderIndex Priority"`
+	Description *string              `json:"description,omitempty" validate:"excluded_with=Rule"`
+	OrderIndex  *int64               `json:"orderIndex,omitempty" validate:"excluded_with=Rule Priority"`
+	Priority    *int                 `json:"priority,omitempty" validate:"excluded_with=Rule OrderIndex"`
 }
 
 type FirewallRuleReorder struct {

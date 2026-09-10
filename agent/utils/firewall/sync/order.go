@@ -11,45 +11,30 @@ func SupportsManagedOrder(provider filter.Provider) bool {
 	return provider == filter.ProviderIptables || provider == filter.ProviderNftables || provider == filter.ProviderUFW
 }
 
-func ManagedOrderDrift(snapshot filter.Snapshot, desiredMarkers []string) (map[string]struct{}, bool) {
+func ManagedOrderDrift(snapshot filter.Snapshot, desiredMarkers []string) map[string]struct{} {
 	if !SupportsManagedOrder(snapshot.Scope.Provider) || len(desiredMarkers) < 2 {
-		return nil, true
+		return nil
 	}
 	expected := make(map[string]struct{}, len(desiredMarkers))
 	for _, marker := range desiredMarkers {
 		expected[marker] = struct{}{}
 	}
 	actual := make([]string, 0, len(desiredMarkers))
-	segments := make(map[string]int, len(desiredMarkers))
-	segment := 0
+	present := make(map[string]struct{}, len(desiredMarkers))
 	for _, observed := range snapshot.Rules {
-		_, wanted := expected[observed.Marker]
-		if wanted {
+		if _, wanted := expected[observed.Marker]; wanted {
 			actual = append(actual, observed.Marker)
-			if observed.Protected || observed.ParseStatus == filter.ParseStatusOpaque {
-				segment++
-				segments[observed.Marker] = segment
-				segment++
-			} else {
-				segments[observed.Marker] = segment
-			}
-			continue
+			present[observed.Marker] = struct{}{}
 		}
-		if strings.HasPrefix(observed.Marker, "1panel-rule:") &&
-			!observed.Protected && observed.ParseStatus != filter.ParseStatusOpaque {
-			continue
-		}
-		segment++
 	}
-
 	desired := make([]string, 0, len(actual))
 	for _, marker := range desiredMarkers {
-		if _, exists := segments[marker]; exists {
+		if _, exists := present[marker]; exists {
 			desired = append(desired, marker)
 		}
 	}
 	if slices.Equal(actual, desired) {
-		return nil, true
+		return nil
 	}
 	drifted := make(map[string]struct{}, len(desired))
 	for index := range desired {
@@ -58,15 +43,7 @@ func ManagedOrderDrift(snapshot filter.Snapshot, desiredMarkers []string) (map[s
 			drifted[desired[index]] = struct{}{}
 		}
 	}
-	feasible, previousSegment := true, -1
-	for _, marker := range desired {
-		if segments[marker] < previousSegment {
-			feasible = false
-			break
-		}
-		previousSegment = segments[marker]
-	}
-	return drifted, feasible
+	return drifted
 }
 
 func InsertionPosition(snapshot filter.Snapshot, desiredMarkers []string, targetMarker string) (int64, bool) {

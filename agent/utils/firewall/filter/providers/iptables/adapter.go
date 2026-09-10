@@ -457,9 +457,6 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			}
 			targetPosition = int(*normalized.OrderIndex)
 		}
-		if err := validateReorderPath(snapshot, position, targetPosition); err != nil {
-			return filter.NativeRulePlan{}, err
-		}
 		if position != targetPosition {
 			return positionalMutationPlan(snapshot, normalized, target, marker, position, targetPosition, change.Operation), nil
 		}
@@ -479,9 +476,6 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			return filter.NativeRulePlan{}, fmt.Errorf("%w: reorder target is out of range", filter.ErrInvalidRule)
 		}
 		targetPosition := int(*normalized.OrderIndex)
-		if err := validateReorderPath(snapshot, position, targetPosition); err != nil {
-			return filter.NativeRulePlan{}, err
-		}
 		return positionalMutationPlan(snapshot, normalized, target, marker, position, targetPosition, change.Operation), nil
 	default:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
@@ -558,26 +552,6 @@ func pointerToObserved(rule filter.ObservedRule, include bool) *filter.ObservedR
 		return nil
 	}
 	return &rule
-}
-
-func validateReorderPath(snapshot filter.Snapshot, from, to int) error {
-	start, end := from, to
-	if start > end {
-		start, end = end, start
-	}
-	for position := start; position <= end; position++ {
-		if position == from {
-			continue
-		}
-		observed := snapshot.Rules[position-1]
-		if observed.Protected {
-			return filter.ErrProtectedRule
-		}
-		if observed.ParseStatus == filter.ParseStatusOpaque || observed.Marker == "" {
-			return fmt.Errorf("%w: reorder cannot cross external or opaque rules", filter.ErrUnsupportedScope)
-		}
-	}
-	return nil
 }
 
 func compileRuleArgs(rule filter.FirewallRule, marker string) []string {

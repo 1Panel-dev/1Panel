@@ -154,6 +154,13 @@ func CheckCreate(
 		}
 	}
 
+	if err := CheckAdoptDuplicates(snapshot, normalized); err != nil {
+		if err != ErrDuplicateAdoption {
+			return RuleCheckResult{}, err
+		}
+		result.Decision, result.Classification, result.Reason = CheckDecisionBlocked, CheckClassificationExactExternal, "duplicate_rules"
+		return finishCheck(result)
+	}
 	switch {
 	case containsPersistenceDrift(exact):
 		result.Decision = CheckDecisionBlocked
@@ -171,12 +178,6 @@ func CheckCreate(
 		result.Reason = "equivalent_external_rule"
 		result.Candidates = exact
 		result.AllowedActions = []CheckAction{CheckActionAdopt, CheckActionCancel}
-	case len(exact) > 1:
-		result.Decision = CheckDecisionConfirmationRequired
-		result.Classification = CheckClassificationExactExternal
-		result.Reason = "multiple_equivalent_external_rules"
-		result.Candidates = exact
-		result.AllowedActions = []CheckAction{CheckActionSelectAdopt, CheckActionCancel}
 	case equivalentExternal:
 		result.Decision = CheckDecisionNoChange
 		result.Classification = CheckClassificationExactExternal

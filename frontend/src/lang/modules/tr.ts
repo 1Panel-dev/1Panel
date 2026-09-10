@@ -4167,9 +4167,11 @@ const message = {
         ruleTargetRequired: 'En az bir IP adresi veya port girin',
         batchRuleLimit: 'Bir seferde en fazla {0} kural oluşturulabilir',
         resolution_adopt: 'Yönetimi devral',
+        plan_duplicate_rules:
+            'Koşulları ve eylemleri aynı olan yinelenen kurallar yönetime alınamaz. Yinelenen kuralları elle silip yeniden deneyin.',
         adoptRuleConfirm: 'Devraldıktan sonra 1Panel bu mevcut kuralı yönetebilir ve silebilir. Devam edilsin mi?',
         plan_exact_rule_conflict:
-            'Aynı eşleşme koşullarına ve önceliğe sahip, ancak izin verme veya reddetme eylemi zıt olan bir kural zaten var.',
+            'Aynı eşleşme koşullarına sahip, ancak izin verme veya reddetme eylemi zıt olan bir kural zaten var.',
         allRulesAlreadyExist: 'Kontrol edilen {0} kuralın tümü zaten mevcut. Oluşturulacak yeni kural yok.',
         ruleCheckResult: 'Kural kontrol sonuçları',
         ruleCheckStatus_creatable: 'Oluşturulabilir',

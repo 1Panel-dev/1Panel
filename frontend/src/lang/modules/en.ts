@@ -4097,9 +4097,10 @@ const message = {
         ruleTargetRequired: 'Enter at least one IP address or port',
         batchRuleLimit: 'A maximum of {0} rules can be created at a time',
         resolution_adopt: 'Take over management',
+        plan_duplicate_rules:
+            'Rules with identical conditions and actions cannot be adopted. Manually delete duplicate rules and retry.',
         adoptRuleConfirm: 'After takeover, 1Panel can maintain and delete this existing rule. Continue?',
-        plan_exact_rule_conflict:
-            'A rule with identical matching conditions and priority has an opposing allow or deny action.',
+        plan_exact_rule_conflict: 'A rule with identical matching conditions has an opposing allow or deny action.',
         allRulesAlreadyExist: 'All {0} checked rules already exist. There are no new rules to create.',
         ruleCheckResult: 'Rule check results',
         ruleCheckStatus_creatable: 'Creatable',

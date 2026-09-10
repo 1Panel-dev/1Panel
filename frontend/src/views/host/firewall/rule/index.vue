@@ -1161,19 +1161,27 @@ const adoptRule = async (row: RuleRow) => {
     }
     loading.value = true;
     try {
-        const plan = (await checkFirewallRules({ items: [{ rule: row.rule }] })).data.items[0];
+        const plan = (await checkFirewallRules({ items: [{ rule: row.rule, adoptLocator: row.observed.locator }] }))
+            .data.items[0];
+        if (plan.decision === 'no_change' && plan.existingRuleUUID) {
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+            await search();
+            return;
+        }
+        if (plan.reason === 'duplicate_rules') {
+            MsgError(i18n.global.t('firewall.plan_duplicate_rules'));
+            return;
+        }
+        if (plan.decision === 'blocked' && plan.classification === 'exact_managed') {
+            MsgError(i18n.global.t('commons.rule.duplicate'));
+            return;
+        }
         if (plan.decision !== 'confirmation_required' || plan.classification !== 'exact_external') {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
         }
-        const candidate = plan.candidates?.find(
-            (item) =>
-                item.locator.position === row.observed?.locator.position &&
-                item.locator.nativeId === row.observed?.locator.nativeId &&
-                item.locator.canonical === row.observed?.locator.canonical,
-        );
-        const resolution: Firewall.ApplicableCheckAction = plan.candidates?.length === 1 ? 'adopt' : 'select_adopt';
-        if (resolution === 'select_adopt' && !candidate?.instanceKey) {
+        const candidate = plan.candidates?.[0];
+        if (plan.candidates?.length !== 1 || !candidate?.instanceKey) {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
         }
@@ -1182,9 +1190,8 @@ const adoptRule = async (row: RuleRow) => {
                 items: [
                     {
                         checkFlag: plan.checkFlag,
-                        action: resolution,
-                        adoptInstanceKey:
-                            resolution === 'select_adopt' ? candidate?.instanceKey : plan.candidates?.[0]?.instanceKey,
+                        action: 'adopt',
+                        adoptInstanceKey: candidate.instanceKey,
                         rule: plan.requestedRule,
                         sourceKind: 'user',
                     },
@@ -1203,6 +1210,11 @@ const adoptRule = async (row: RuleRow) => {
 };
 
 const removeRule = (row: RuleRow) => removeRules([row]);
+
+const canEditDescription = (row: Firewall.InventoryItem) =>
+    Boolean(row.desired?.uuid) &&
+    (row.desired?.origin === 'created' || row.desired?.origin === 'adopted') &&
+    !row.desired?.protected;
 
 const isEditableManagedRule = (row: Firewall.InventoryItem) =>
     Boolean(row.desired?.uuid) &&
@@ -1238,7 +1250,7 @@ const displayRulePriority = (row: Firewall.InventoryItem) => {
 };
 
 const openEdit = (row: RuleRow) => {
-    if (!isEditableManagedRule(row)) return;
+    if (!isEditableManagedRule(row) && !canEditDescription(row)) return;
     const currentPosition = row.observed?.locator.position || row.rule.orderIndex || 1;
     const range = positionRanges.value[row.rule.scope.family] || { min: currentPosition, max: currentPosition };
     ruleOperateRef.value?.acceptParams(
@@ -1246,6 +1258,7 @@ const openEdit = (row: RuleRow) => {
         row,
         provider.value === 'firewalld' ? positionRanges.value : { [row.rule.scope.family]: range },
         supportsFirewalldPriority.value,
+        !isEditableManagedRule(row),
     );
 };
 
@@ -1268,7 +1281,7 @@ const operationButtons = [
         label: i18n.global.t('commons.button.edit'),
         permission: true,
         nodeAdmin: true,
-        show: (row: RuleRow) => isEditableManagedRule(row),
+        show: (row: RuleRow) => isEditableManagedRule(row) || canEditDescription(row),
         click: openEdit,
     },
     {

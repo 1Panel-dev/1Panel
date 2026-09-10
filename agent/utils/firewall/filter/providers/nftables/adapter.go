@@ -273,18 +273,6 @@ func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filte
 	if target < 1 || target > len(rules)+1 {
 		return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: target position is out of range", filter.ErrInvalidRule)
 	}
-	if change.Operation == filter.ChangeReorder || change.Operation == filter.ChangeUpdate {
-		start, end := position, target
-		if start > end {
-			start, end = end, start
-		}
-		for index := start; index <= end && index <= len(snapshot.Rules); index++ {
-			candidate := snapshot.Rules[index-1]
-			if candidate.Protected || candidate.ParseStatus == filter.ParseStatusOpaque || candidate.Marker == "" {
-				return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: reorder cannot cross external or opaque rules", filter.ErrUnsupportedScope)
-			}
-		}
-	}
 	expected := observedRule(normalized, marker, target, strings.Join(compileExpressionArgs(normalized, marker), " "))
 	rules = append(rules, filter.ObservedRule{})
 	copy(rules[target:], rules[target-1:])

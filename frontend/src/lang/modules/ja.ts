@@ -4081,8 +4081,10 @@ const message = {
         ruleTargetRequired: 'IP アドレスまたはポートを1つ以上入力してください',
         batchRuleLimit: '一度に作成できるルールは最大 {0} 件です',
         resolution_adopt: '管理対象にする',
+        plan_duplicate_rules:
+            '条件とアクションが同じルールが重複しているため、管理対象に追加できません。重複ルールを手動で削除してから再試行してください。',
         adoptRuleConfirm: '管理対象にすると、1Panel がこの既存ルールの保守と削除を行えるようになります。続行しますか？',
-        plan_exact_rule_conflict: '一致条件と優先度が同じで、許可・拒否の動作が逆のルールが存在します。',
+        plan_exact_rule_conflict: '一致条件が同じで、許可・拒否の動作が逆のルールが存在します。',
         allRulesAlreadyExist: '確認した {0} 件のルールはすべて既に存在します。新しく作成するルールはありません。',
         ruleCheckResult: 'ルール確認結果',
         ruleCheckStatus_creatable: '作成可能',

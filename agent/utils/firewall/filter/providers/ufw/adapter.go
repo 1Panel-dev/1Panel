@@ -236,7 +236,7 @@ func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRu
 			return plan.Previous == nil || !containsObservedRule(snapshot, *plan.Previous)
 		}
 		return markerCount > 0
-	case filter.ChangeUpdate:
+	case filter.ChangeUpdate, filter.ChangeReorder:
 		if commandIndex == 0 {
 			return markerCount == 0
 		}
@@ -355,7 +355,7 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 			deleteRuleCommand(normalized, marker),
 		}
-	case filter.ChangeUpdate:
+	case filter.ChangeUpdate, filter.ChangeReorder:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
 		if targetErr != nil {
 			return filter.NativeRulePlan{}, targetErr
@@ -404,8 +404,6 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		plan.RollbackCommands = []filter.NativeCommand{
 			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 		}
-	case filter.ChangeReorder:
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: ufw reorder is not supported", filter.ErrUnsupportedScope)
 	default:
 		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}

@@ -4007,9 +4007,11 @@ const message = {
         ruleTargetRequired: 'IP 주소 또는 포트를 하나 이상 입력하세요',
         batchRuleLimit: '한 번에 최대 {0}개의 규칙을 생성할 수 있습니다',
         resolution_adopt: '관리 대상으로 전환',
+        plan_duplicate_rules:
+            '조건과 동작이 동일한 중복 규칙은 관리 대상으로 추가할 수 없습니다. 중복 규칙을 수동으로 삭제한 후 다시 시도하세요.',
         adoptRuleConfirm:
             '관리 대상으로 전환하면 1Panel이 이 기존 규칙을 유지하고 삭제할 수 있습니다. 계속하시겠습니까?',
-        plan_exact_rule_conflict: '일치 조건과 우선순위가 같지만 허용 또는 거부 동작이 반대인 규칙이 이미 있습니다.',
+        plan_exact_rule_conflict: '일치 조건이 같지만 허용 또는 거부 동작이 반대인 규칙이 이미 있습니다.',
         allRulesAlreadyExist: '확인한 규칙 {0}개가 모두 이미 존재합니다. 새로 생성할 규칙이 없습니다.',
         ruleCheckResult: '규칙 검사 결과',
         ruleCheckStatus_creatable: '생성 가능',
