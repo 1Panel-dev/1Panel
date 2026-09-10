@@ -247,6 +247,7 @@ export namespace Firewall {
     export interface CheckItem {
         uuid?: string;
         rule: Rule;
+        adoptLocator?: Locator;
     }
 
     export interface CheckRequest {
@@ -359,9 +360,11 @@ export namespace Firewall {
         error: string;
     }
 
-    export interface UpdateRequest {
-        rule: Rule;
-    }
+    export type UpdateRequest =
+        | { rule: Rule; description?: never; orderIndex?: never; priority?: never }
+        | { rule?: never; description: string; orderIndex?: never; priority?: never }
+        | { rule?: never; description?: string; orderIndex: number; priority?: never }
+        | { rule?: never; description?: string; orderIndex?: never; priority: number };
 
     export interface DockerGuardBase {
         name: string;

@@ -4184,9 +4184,11 @@ const message = {
         ruleTargetRequired: 'Informe pelo menos um endereço IP ou uma porta',
         batchRuleLimit: 'É possível criar no máximo {0} regras por vez',
         resolution_adopt: 'Assumir gerenciamento',
+        plan_duplicate_rules:
+            'Regras duplicadas com condições e ações idênticas não podem ser gerenciadas. Exclua manualmente as regras duplicadas e tente novamente.',
         adoptRuleConfirm: 'Depois disso, o 1Panel poderá manter e excluir esta regra existente. Continuar?',
         plan_exact_rule_conflict:
-            'Já existe uma regra com as mesmas condições e prioridade, mas com uma ação oposta de permitir ou negar.',
+            'Já existe uma regra com as mesmas condições, mas com uma ação oposta de permitir ou negar.',
         allRulesAlreadyExist: 'Todas as {0} regras verificadas já existem. Não há novas regras para criar.',
         ruleCheckResult: 'Resultados da verificação de regras',
         ruleCheckStatus_creatable: 'Pode ser criada',

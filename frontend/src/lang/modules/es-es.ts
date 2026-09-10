@@ -4145,9 +4145,11 @@ const message = {
         ruleTargetRequired: 'Introduce al menos una dirección IP o un puerto',
         batchRuleLimit: 'Se pueden crear como máximo {0} reglas a la vez',
         resolution_adopt: 'Asumir la gestión',
+        plan_duplicate_rules:
+            'No se pueden gestionar reglas duplicadas con las mismas condiciones y acciones. Elimine manualmente los duplicados y vuelva a intentarlo.',
         adoptRuleConfirm: 'Después de asumirla, 1Panel podrá mantener y eliminar esta regla existente. ¿Continuar?',
         plan_exact_rule_conflict:
-            'Ya existe una regla con las mismas condiciones y prioridad, pero con una acción opuesta de permitir o denegar.',
+            'Ya existe una regla con las mismas condiciones, pero con una acción opuesta de permitir o denegar.',
         allRulesAlreadyExist: 'Las {0} reglas comprobadas ya existen. No hay reglas nuevas que crear.',
         ruleCheckResult: 'Resultados de la comprobación de reglas',
         ruleCheckStatus_creatable: 'Se puede crear',

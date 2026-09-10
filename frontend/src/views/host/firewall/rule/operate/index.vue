@@ -15,7 +15,7 @@
             :rules="rules"
         >
             <el-form-item :label="$t('firewall.action')" prop="action">
-                <el-radio-group v-model="form.action">
+                <el-radio-group v-model="form.action" :disabled="descriptionOnly">
                     <el-radio-button value="accept">
                         {{ $t('firewall.accept') }}
                     </el-radio-button>
@@ -25,7 +25,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
-                <el-select v-model="form.protocol" class="w-full" @change="changeProtocol">
+                <el-select v-model="form.protocol" :disabled="descriptionOnly" class="w-full" @change="changeProtocol">
                     <el-option v-if="mode === 'create' || provider === 'ufw'" label="TCP/UDP" value="tcp/udp" />
                     <el-option label="TCP" value="tcp" />
                     <el-option label="UDP" value="udp" />
@@ -43,6 +43,7 @@
                         ref="sourceAddressRefs"
                         v-model.trim="item.address"
                         class="source-address-select"
+                        :disabled="descriptionOnly"
                         clearable
                         :placeholder="$t('firewall.sourceAddressPlaceholder')"
                         @keyup.enter.prevent="addSourceAddressOnEnter(index)"
@@ -63,7 +64,7 @@
                         v-model.trim="form.destinationPorts[index]"
                         class="destination-port-input"
                         clearable
-                        :disabled="!portProtocol"
+                        :disabled="descriptionOnly || !portProtocol"
                         :placeholder="$t('firewall.destinationPortPlaceholder')"
                         @keyup.enter.prevent="addDestinationPortOnEnter(index)"
                     >
@@ -71,24 +72,30 @@
                             <el-button
                                 v-if="mode === 'create'"
                                 icon="Delete"
-                                :disabled="!portProtocol"
+                                :disabled="descriptionOnly || !portProtocol"
                                 @click="removeRuleRow(index)"
                             />
                         </template>
                     </el-input>
                 </div>
-                <el-button v-if="mode === 'create'" class="mt-2" :disabled="!portProtocol" @click="addRuleRow">
+                <el-button
+                    v-if="mode === 'create'"
+                    class="mt-2"
+                    :disabled="descriptionOnly || !portProtocol"
+                    @click="addRuleRow"
+                >
                     {{ $t('commons.button.add') }}
                 </el-button>
             </el-form-item>
             <el-form-item v-if="showPriorityField" :label="priorityFieldLabel">
                 <el-input-number
                     v-model="form.priority"
+                    :disabled="descriptionOnly"
                     :min="priorityMin"
                     :max="priorityMax"
                     controls-position="right"
                 />
-                <span class="priority-range">{{ priorityMin }} ~ {{ priorityMax }}</span>
+                <span v-if="!descriptionOnly" class="priority-range">{{ priorityMin }} ~ {{ priorityMax }}</span>
             </el-form-item>
             <el-form-item :label="$t('commons.table.description')">
                 <el-input v-model.trim="form.description" clearable />
@@ -172,7 +179,15 @@
                 :disabled="loading || (showingPreview && hasBlockingRules)"
                 @click="onCheckOrSubmit"
             >
-                {{ $t(showingPreview ? 'commons.button.submit' : 'commons.button.check') }}
+                {{
+                    $t(
+                        showingPreview
+                            ? 'commons.button.submit'
+                            : directEdit
+                              ? 'commons.button.save'
+                              : 'commons.button.check',
+                    )
+                }}
             </el-button>
         </template>
     </DrawerPro>
@@ -200,7 +215,9 @@ import {
 const provider = ref<Firewall.Provider>('iptables');
 const mode = ref<'create' | 'edit'>('create');
 const editingUUID = ref('');
+const descriptionOnly = ref(false);
 const editingRule = ref<Firewall.Rule>();
+const originalFormRule = ref<Firewall.Rule>();
 const drawerVisible = ref(false);
 const loading = ref(false);
 const formRef = ref<FormInstance>();
@@ -307,6 +324,7 @@ const priorityMax = computed(() => Math.min(...selectedPositionRanges.value.map(
 const showingPreview = computed(() => previewVisible.value && previewRules.value.length > 0);
 
 const supportedPlanReasons = new Set([
+    'duplicate_rules',
     'exact_rule_conflict',
     'managed_rule_drifted',
     'opaque_rule_in_target_scope',
@@ -452,7 +470,9 @@ const resetForm = () => {
     form.priority = undefined;
     form.description = '';
     editingUUID.value = '';
+    descriptionOnly.value = false;
     editingRule.value = undefined;
+    originalFormRule.value = undefined;
     resetBatch();
     formRef.value?.clearValidate();
 };
@@ -462,14 +482,16 @@ const acceptParams = (
     item?: Firewall.InventoryItem,
     ranges: Partial<Record<Firewall.Family, Firewall.PositionRange>> = {},
     supportsExplicitPriority = true,
+    onlyDescription = false,
 ) => {
     provider.value = value;
     firewalldPrioritySupported.value = supportsExplicitPriority;
     positionRanges.value = ranges;
     mode.value = item?.desired?.uuid ? 'edit' : 'create';
     resetForm();
+    descriptionOnly.value = mode.value === 'edit' && onlyDescription;
     if (mode.value === 'edit' && item?.desired?.uuid) {
-        const rule = item.rule;
+        const rule = descriptionOnly.value ? item.desired.rule : item.rule;
         const currentPosition = item.observed?.locator.position || rule.orderIndex;
         editingUUID.value = item.desired.uuid;
         editingRule.value = {
@@ -492,6 +514,7 @@ const acceptParams = (
         form.action = rule.action === 'reject' ? 'drop' : rule.action;
         form.priority = provider.value === 'firewalld' ? rule.priority : currentPosition || priorityMax.value;
         form.description = rule.description || '';
+        originalFormRule.value = buildRule();
     }
     drawerVisible.value = true;
 };
@@ -546,9 +569,11 @@ const buildRule = (
           ? 'ipv6'
           : protocol === 'icmp'
             ? 'ipv4'
-            : provider.value === 'firewalld'
-              ? 'inet'
-              : source.family;
+            : mode.value === 'edit'
+              ? editingRule.value?.scope.family || source.family
+              : provider.value === 'firewalld'
+                ? 'inet'
+                : source.family;
     const action =
         mode.value === 'edit' && editingRule.value?.action === 'reject' && form.action === 'drop'
             ? 'reject'
@@ -577,7 +602,7 @@ const buildRule = (
                         chain: 'incoming',
                         direction: 'input',
                     },
-        protocol,
+        protocol: mode.value === 'edit' && provider.value === 'ufw' && protocol === 'tcp/udp' ? 'all' : protocol,
         sourceAddress: isWildcardAddress(source.family, source.address) ? '' : source.address,
         sourcePort: form.sourcePort,
         destinationAddress: form.destinationAddress,
@@ -601,10 +626,20 @@ const editableFieldLabels: Array<[keyof Firewall.Rule, string]> = [
     ['description', 'commons.table.description'],
 ];
 
-const changedFieldLabels = (before: Firewall.Rule, after: Firewall.Rule) =>
+const changedRuleFields = (before: Firewall.Rule, after: Firewall.Rule) =>
     editableFieldLabels
         .filter(([field]) => JSON.stringify(before[field] ?? '') !== JSON.stringify(after[field] ?? ''))
-        .map(([, label]) => i18n.global.t(label));
+        .map(([field]) => field);
+
+const canSaveWithoutCheck = (before: Firewall.Rule, after: Firewall.Rule) =>
+    changedRuleFields(before, after).every((field) => ['description', 'orderIndex', 'priority'].includes(field));
+
+const directEdit = computed(
+    () =>
+        mode.value === 'edit' &&
+        (descriptionOnly.value ||
+            Boolean(originalFormRule.value && canSaveWithoutCheck(originalFormRule.value, buildRule()))),
+);
 
 const availableResolutions = (result: Firewall.RuleCheckResult) =>
     (result.allowedActions || []).filter((item): item is Firewall.ApplicableCheckAction => item !== 'cancel');
@@ -732,8 +767,38 @@ const prepareRulesFromForm = async () => {
 };
 
 const checkRules = async () => {
+    if (descriptionOnly.value && editingUUID.value && originalFormRule.value) {
+        previewRules.value = [{ ...originalFormRule.value, description: form.description }];
+        batchPlans.value = [];
+        await executeEdit();
+        return;
+    }
+    if (directEdit.value && editingUUID.value && originalFormRule.value) {
+        const rule = buildRule();
+        const changed = changedRuleFields(originalFormRule.value, rule);
+        if (changed.some((field) => field === 'priority' || field === 'orderIndex')) {
+            const value = previewRulePriority(rule);
+            if (
+                typeof value !== 'number' ||
+                !Number.isInteger(value) ||
+                value < priorityMin.value ||
+                value > priorityMax.value
+            ) {
+                MsgError(i18n.global.t('commons.rule.numberRange', [priorityMin.value, priorityMax.value]));
+                return;
+            }
+        }
+        previewRules.value = [rule];
+        batchPlans.value = [];
+        await executeEdit();
+        return;
+    }
     if (!(await prepareRulesFromForm())) return;
     if (mode.value === 'edit' && editingUUID.value) {
+        if (originalFormRule.value && canSaveWithoutCheck(originalFormRule.value, previewRules.value[0])) {
+            await executeEdit();
+            return;
+        }
         const result = (
             await checkFirewallRules({
                 items: [{ uuid: editingUUID.value, rule: previewRules.value[0] }],
@@ -755,25 +820,42 @@ const executeEdit = async () => {
         return;
     }
     const updatedRule = previewRules.value[0];
-    const changed = editingRule.value ? changedFieldLabels(editingRule.value, updatedRule) : [];
+    const before = originalFormRule.value || editingRule.value;
+    const changed = before ? changedRuleFields(before, updatedRule) : [];
     if (changed.length === 0) {
         drawerVisible.value = false;
         return;
     }
-    try {
-        await ElMessageBox.confirm(
-            i18n.global.t('firewall.editRuleConfirm', [changed.join(', ')]),
-            i18n.global.t('firewall.edit'),
-            {
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                cancelButtonText: i18n.global.t('commons.button.cancel'),
-                type: 'warning',
-            },
-        );
-    } catch {
-        return;
+    if (!before || !canSaveWithoutCheck(before, updatedRule)) {
+        const labels = editableFieldLabels
+            .filter(([field]) => changed.includes(field))
+            .map(([, label]) => i18n.global.t(label));
+        try {
+            await ElMessageBox.confirm(
+                i18n.global.t('firewall.editRuleConfirm', [labels.join(', ')]),
+                i18n.global.t('firewall.edit'),
+                {
+                    confirmButtonText: i18n.global.t('commons.button.confirm'),
+                    cancelButtonText: i18n.global.t('commons.button.cancel'),
+                    type: 'warning',
+                },
+            );
+        } catch {
+            return;
+        }
     }
-    await updateFirewallRule(editingUUID.value, { rule: updatedRule });
+    let request: Firewall.UpdateRequest = { rule: updatedRule };
+    if (before && canSaveWithoutCheck(before, updatedRule)) {
+        const description = changed.includes('description') ? updatedRule.description || '' : undefined;
+        if (changed.includes('priority')) {
+            request = { priority: updatedRule.priority!, description };
+        } else if (changed.includes('orderIndex')) {
+            request = { orderIndex: updatedRule.orderIndex!, description };
+        } else {
+            request = { description: description || '' };
+        }
+    }
+    await updateFirewallRule(editingUUID.value, request);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     emit('search');
     drawerVisible.value = false;

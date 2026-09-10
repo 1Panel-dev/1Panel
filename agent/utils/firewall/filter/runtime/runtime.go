@@ -165,6 +165,9 @@ func (e *Engine) ValidatePosition(
 	rule filter.FirewallRule,
 	target int64,
 ) error {
+	if target < 1 {
+		return fmt.Errorf("%w: target position must be positive", filter.ErrInvalidRule)
+	}
 	if rule.Scope.Provider == filter.ProviderUFW {
 		minimum, maximum := positionBounds(snapshot)
 		if target < minimum || target > maximum {

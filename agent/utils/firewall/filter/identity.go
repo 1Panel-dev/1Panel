@@ -50,15 +50,67 @@ func RuleMatchKey(rule FirewallRule) (string, error) {
 		return "", err
 	}
 	normalized.Action, normalized.NativeKind, normalized.OrderBucket = "", "", ""
-	if normalized.Priority != nil && *normalized.Priority == 0 {
-		normalized.Priority = nil
-	}
+	normalized.Priority = nil
 	return normalizedRuleKey(normalized)
 }
 
 func OppositeActions(left, right Action) bool {
 	return left == ActionAccept && (right == ActionDrop || right == ActionReject) ||
 		right == ActionAccept && (left == ActionDrop || left == ActionReject)
+}
+
+func SameRuleContent(before, after FirewallRule) (bool, error) {
+	before, err := NormalizeRule(before)
+	if err != nil {
+		return false, err
+	}
+	after, err = NormalizeRule(after)
+	if err != nil {
+		return false, err
+	}
+	previous, err := RuleMatchKey(before)
+	if err != nil {
+		return false, err
+	}
+	requested, err := RuleMatchKey(after)
+	return err == nil && previous == requested && before.Action == after.Action, err
+}
+
+type RuleCollisionIndex map[string][]Action
+
+func (index RuleCollisionIndex) Add(rule FirewallRule) error {
+	key, err := RuleMatchKey(rule)
+	if err != nil {
+		return err
+	}
+	index[key] = append(index[key], rule.Action)
+	return nil
+}
+
+func (index RuleCollisionIndex) CheckDuplicate(rule FirewallRule) error {
+	key, err := RuleMatchKey(rule)
+	if err != nil {
+		return err
+	}
+	for _, action := range index[key] {
+		if action == rule.Action {
+			return checkCollisionActions(rule.Action, action)
+		}
+	}
+	return nil
+}
+
+func (index RuleCollisionIndex) Check(rule FirewallRule) error {
+	key, err := RuleMatchKey(rule)
+	if err != nil {
+		return err
+	}
+	for _, action := range index[key] {
+		if err := checkCollisionActions(rule.Action, action); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 func CheckRuleCollision(requested, existing FirewallRule) error {
@@ -73,10 +125,14 @@ func CheckRuleCollision(requested, existing FirewallRule) error {
 	if wanted != actual {
 		return nil
 	}
-	if requested.Action == existing.Action {
+	return checkCollisionActions(requested.Action, existing.Action)
+}
+
+func checkCollisionActions(requested, existing Action) error {
+	if requested == existing {
 		return fmt.Errorf("%w: equivalent rule already exists", ErrRuleOperation)
 	}
-	if OppositeActions(requested.Action, existing.Action) {
+	if OppositeActions(requested, existing) {
 		return ErrRuleConflict
 	}
 	return nil

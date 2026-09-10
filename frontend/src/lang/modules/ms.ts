@@ -4165,10 +4165,12 @@ const message = {
         ruleTargetRequired: 'Masukkan sekurang-kurangnya satu alamat IP atau port',
         batchRuleLimit: 'Maksimum {0} peraturan boleh dibuat pada satu masa',
         resolution_adopt: 'Ambil alih pengurusan',
+        plan_duplicate_rules:
+            'Peraturan pendua dengan syarat dan tindakan yang sama tidak boleh diambil alih untuk diurus. Padam peraturan pendua secara manual dan cuba lagi.',
         adoptRuleConfirm:
             'Selepas diambil alih, 1Panel boleh menyelenggara dan memadam peraturan sedia ada ini. Teruskan?',
         plan_exact_rule_conflict:
-            'Peraturan dengan syarat padanan dan keutamaan yang sama mempunyai tindakan benarkan atau sekat yang bertentangan.',
+            'Peraturan dengan syarat padanan yang sama mempunyai tindakan benarkan atau sekat yang bertentangan.',
         allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
         ruleCheckResult: 'Keputusan semakan peraturan',
         ruleCheckStatus_creatable: 'Boleh dicipta',

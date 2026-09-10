@@ -199,11 +199,6 @@ func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChan
 	if len(changes) != 1 {
 		return filter.BackendPlan{}, fmt.Errorf("%w: firewalld plans currently require exactly one change", filter.ErrInvalidRule)
 	}
-	for _, observed := range snapshot.Rules {
-		if observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged {
-			return filter.BackendPlan{}, fmt.Errorf("%w: firewalld runtime and permanent state differ", filter.ErrRuleStale)
-		}
-	}
 	rulePlan, err := a.compileChange(snapshot, changes[0])
 	if err != nil {
 		return filter.BackendPlan{}, err
@@ -315,7 +310,7 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 	plan := filter.NativeRulePlan{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
 	switch change.Operation {
 	case filter.ChangeCreate:
-		plan.Commands, plan.RollbackCommands = pairedCommands(normalized, "add", "remove")
+		plan.Commands, plan.RollbackCommands = missingRuleCommands(snapshot, normalized)
 	case filter.ChangeAdopt:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, false)
 		if targetErr != nil {
@@ -330,8 +325,11 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 			return filter.NativeRulePlan{}, targetErr
 		}
 		plan.Previous = &target
+		if target.Locator.Canonical == expected.Locator.Canonical {
+			break
+		}
 		removeCommands, restoreCommands := pairedCommands(target.Rule, "remove", "add")
-		addCommands, removeNewCommands := pairedCommands(normalized, "add", "remove")
+		addCommands, removeNewCommands := missingRuleCommands(snapshot, normalized)
 		plan.Commands = append(removeCommands, addCommands...)
 		plan.RollbackCommands = append(restoreCommands, removeNewCommands...)
 	case filter.ChangeDelete:
@@ -399,6 +397,26 @@ func nativeCanonical(rule filter.FirewallRule) string {
 		return "port:" + rule.DestinationPort + "/" + rule.Protocol
 	}
 	return "rich:" + canonicalRichRule(rule)
+}
+
+func missingRuleCommands(snapshot filter.Snapshot, rule filter.FirewallRule) ([]filter.NativeCommand, []filter.NativeCommand) {
+	commands, rollback := pairedCommands(rule, "add", "remove")
+	var runtimeExists, permanentExists bool
+	for _, observed := range snapshot.Rules {
+		if observed.Locator.Canonical != nativeCanonical(rule) {
+			continue
+		}
+		runtimeExists = runtimeExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusRuntimeOnly
+		permanentExists = permanentExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusPermanentOnly
+	}
+	var changes, inverses []filter.NativeCommand
+	for index, exists := range []bool{runtimeExists, permanentExists} {
+		if !exists {
+			changes = append(changes, commands[index])
+			inverses = append(inverses, rollback[index])
+		}
+	}
+	return changes, inverses
 }
 
 func pairedCommands(rule filter.FirewallRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {

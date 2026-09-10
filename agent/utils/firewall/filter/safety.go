@@ -53,10 +53,19 @@ func SameLocator(left, right Locator) bool {
 	if left.ScopeKey != right.ScopeKey {
 		return false
 	}
-	if left.Canonical != "" || right.Canonical != "" {
-		return left.Canonical != "" && left.Canonical == right.Canonical
+	if left.Provider != "" && right.Provider != "" && left.Provider != right.Provider {
+		return false
 	}
-	return left.Position != nil && right.Position != nil && *left.Position == *right.Position
+	if left.Position != nil || right.Position != nil {
+		if left.Position == nil || right.Position == nil || *left.Position != *right.Position {
+			return false
+		}
+		if left.NativeID != "" && right.NativeID != "" && left.NativeID != right.NativeID {
+			return false
+		}
+		return left.Canonical == "" || right.Canonical == "" || left.Canonical == right.Canonical
+	}
+	return left.Canonical != "" && left.Canonical == right.Canonical
 }
 
 func MatchObservedByRuleKey(observed []ObservedRule, rule FirewallRule) ([]ObservedRule, error) {

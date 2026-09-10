@@ -295,7 +295,6 @@ const syncReasonKeys: Record<string, string> = {
     'managed rule order differs from database sequence': 'managedOrderDiffers',
     'managed rule exists only in target backend': 'managedOnlyInTarget',
     'managed runtime rule cannot be safely removed': 'managedRuntimeCannotRemove',
-    'managed rule order cannot cross external, opaque, or protected rules': 'managedOrderBlocked',
     'rule is missing from target backend': 'missingFromTarget',
     'target rule differs from database policy': 'targetDiffers',
     'rule already exists in target backend': 'alreadyExistsInTarget',

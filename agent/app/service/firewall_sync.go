@@ -371,17 +371,12 @@ func planFirewallManagedOrder(
 			desiredMarkers = append(desiredMarkers, entry.desired.Marker)
 		}
 	}
-	drifted, feasible := firewallsync.ManagedOrderDrift(snapshot, desiredMarkers)
+	drifted := firewallsync.ManagedOrderDrift(snapshot, desiredMarkers)
 	for _, marker := range desiredMarkers {
 		if _, exists := drifted[marker]; !exists {
 			continue
 		}
 		entry := byMarker[marker]
-		if !feasible {
-			entry.item.Status = firewallRuleSyncBlocked
-			entry.item.Reason = "managed rule order cannot cross external, opaque, or protected rules"
-			continue
-		}
 		entry.reorder = true
 		if entry.item.Status == firewallRuleSyncExisting {
 			entry.item.Status = firewallRuleSyncReady
