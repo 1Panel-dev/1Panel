@@ -1,6 +1,7 @@
 <template>
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
         <el-alert class="mb-3" type="info" :closable="false" :title="$t('commons.msg.importHelper')" />
+        <el-alert v-if="submitError" class="mb-3" type="error" :closable="false" :title="submitError" />
         <div class="import-file-bar mt-3">
             <el-upload
                 ref="uploadRef"
@@ -60,20 +61,23 @@
 import { Firewall } from '@/api/interface/firewall';
 import { upsertDockerPortGuardPolicies } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 import { dockerGuardEndpointKey, normalizeDockerGuardPolicy } from '@/views/host/firewall/docker/model';
 import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 
-const emit = defineEmits<{ (event: 'search'): void }>();
+const emit = defineEmits<{ (event: 'created', taskID: string): void }>();
 const visible = ref(false);
 const loading = ref(false);
 const policies = ref<Firewall.DockerGuardPolicy[]>([]);
 const selects = ref<Firewall.DockerGuardPolicy[]>([]);
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
+const submitError = ref('');
 const displaySources = (policy: Firewall.DockerGuardPolicy) => formatHostAddressList(policy.sources, policy.family);
 
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -81,6 +85,7 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     loading.value = true;
     policies.value = [];
     selects.value = [];
+    submitError.value = '';
     uploaderFiles.value = uploadFiles;
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -114,44 +119,25 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const onImport = async () => {
+    if (loading.value || selects.value.length === 0) return;
     loading.value = true;
-    let success = 0;
-    let failed = 0;
-    const groups = new Map<string, Firewall.DockerGuardPolicy[]>();
-    for (const policy of selects.value) {
-        const key = JSON.stringify([policy.mode, policy.sources, policy.description]);
-        groups.set(key, [...(groups.get(key) || []), policy]);
-    }
-    for (const group of groups.values()) {
-        const policy = group[0];
-        for (let offset = 0; offset < group.length; offset += 256) {
-            const batch = group.slice(offset, offset + 256);
-            try {
-                await upsertDockerPortGuardPolicies({
-                    endpoints: batch.map(({ family, hostIP, hostPort, protocol }) => ({
-                        family,
-                        hostIP,
-                        hostPort,
-                        protocol,
-                    })),
-                    mode: policy.mode,
-                    sources: policy.sources,
-                    description: policy.description,
-                });
-                success += batch.length;
-            } catch {
-                failed += batch.length;
-            }
+    submitError.value = '';
+    try {
+        const result = (await upsertDockerPortGuardPolicies({ policies: selects.value })).data;
+        if (!result.taskID || !result.queued) {
+            submitError.value = i18n.global.t('commons.msg.operationFailed');
+            return;
         }
-    }
-    loading.value = false;
-    if (failed === 0) {
-        MsgSuccess(i18n.global.t('firewall.importSuccess', [success]));
         visible.value = false;
-    } else {
-        MsgError(i18n.global.t('firewall.importPartialSuccess', [success, failed]));
+        emit('created', result.taskID);
+    } catch (error) {
+        submitError.value =
+            (isAxiosError(error) && error.response?.data?.message) ||
+            (error && getErrorMessage(error)) ||
+            i18n.global.t('commons.res.commonError');
+    } finally {
+        loading.value = false;
     }
-    emit('search');
 };
 
 const modeLabel = (mode: Firewall.DockerGuardPolicy['mode']) => {
@@ -165,6 +151,7 @@ const acceptParams = () => {
     policies.value = [];
     selects.value = [];
     uploaderFiles.value = [];
+    submitError.value = '';
     uploadRef.value?.clearFiles();
     visible.value = true;
 };

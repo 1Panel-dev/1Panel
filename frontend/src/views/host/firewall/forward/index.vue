@@ -124,8 +124,9 @@
                 </el-form>
             </template>
         </OpDialog>
-        <OperateDialog @search="search" ref="dialogRef" />
-        <ImportDialog @search="search" ref="dialogImportRef" />
+        <OperateDialog @created="openRuleTask" ref="dialogRef" />
+        <ImportDialog @created="openRuleTask" ref="dialogImportRef" />
+        <TaskLog ref="taskLogRef" @close="search" />
         <RuleSync ref="ruleSyncRef" @search="refreshAfterSync" />
         <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
     </div>
@@ -138,11 +139,14 @@ import RuleSync from '@/views/host/firewall/sync/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { onMounted, reactive, ref } from 'vue';
 import { operateFirewallBackend, operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { downloadWithContent } from '@/utils/file';
 import { getCurrentDateFormatted } from '@/utils/date';
 import { ElMessageBox } from 'element-plus';
@@ -156,6 +160,8 @@ const fireName = ref();
 const fireStatusRef = ref();
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const taskLogRef = ref<InstanceType<typeof TaskLog>>();
+const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID, true);
 
 const openRuleSync = () => {
     if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
@@ -295,16 +301,24 @@ const onDelete = async (row: Firewall.RuleForward | null) => {
     });
 };
 const onSubmitDelete = async () => {
+    if (loading.value) return;
     loading.value = true;
-    await operateForwardRule({ rules: operateRules.value, forceDelete: forceDelete.value })
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        const result = (await operateForwardRule({ rules: operateRules.value, forceDelete: forceDelete.value })).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
+            return;
+        }
+        openRuleTask(result.taskID);
+    } catch (error) {
+        MsgError(
+            (isAxiosError(error) && error.response?.data?.message) ||
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
+    } finally {
+        loading.value = false;
+    }
 };
 
 const onImport = () => {

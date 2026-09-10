@@ -32,7 +32,6 @@ const (
 
 const (
 	FirewallSystemAcceptedPortSourcePrefix = "accepted-port:"
-	FirewallRuleCheckVersion               = 1
 
 	FirewallRuleOriginCreated = "created"
 	FirewallRuleOriginAdopted = "adopted"

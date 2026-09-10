@@ -62,15 +62,15 @@
 
 <script lang="ts" setup>
 import { Firewall } from '@/api/interface/firewall';
-import { checkFirewallRules, createFirewallRules } from '@/api/modules/firewall';
+import { createFirewallRules } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
 import { formatHostAddress, inferAddressFamily } from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 
-const emit = defineEmits<{ (event: 'search'): void }>();
+const emit = defineEmits<{ (event: 'created', taskID: string): void }>();
 const visible = ref(false);
 const loading = ref(false);
 const provider = ref<Firewall.Provider>('iptables');
@@ -131,36 +131,16 @@ const normalizeLegacyImportedRule = (value: unknown): Firewall.Rule[] | undefine
     if (port && !['tcp', 'udp', 'tcp/udp'].includes(protocol)) return;
     if (!port && protocol && !['all', 'any'].includes(protocol)) return;
 
-    const protocols = port ? (protocol === 'tcp/udp' ? ['tcp', 'udp'] : [protocol]) : ['all'];
-    return protocols.map((item) => ({
-        scope: targetScope(family),
-        protocol: item,
-        sourceAddress: rule.address as string,
-        destinationPort: port || undefined,
-        action: rule.strategy as Firewall.Action,
-        description: (rule.description as string | undefined) || '',
-    }));
-};
-
-const normalizeImportedRule = (rule: Firewall.Rule): Firewall.Rule[] => {
-    const splitInet = rule.scope.family === 'inet' && provider.value !== 'firewalld';
-    const addresses = [rule.sourceAddress, rule.destinationAddress].filter((value): value is string => Boolean(value));
-    const families: Firewall.Family[] = !splitInet
-        ? [rule.scope.family]
-        : addresses.length === 0
-          ? ['ipv4', 'ipv6']
-          : addresses.some((address) => address.includes(':'))
-            ? ['ipv6']
-            : ['ipv4'];
-    return families.map((family) => ({
-        ...rule,
-        uuid: undefined,
-        nativeKind: undefined,
-        priority: provider.value === 'firewalld' && rule.scope.provider === 'firewalld' ? rule.priority : undefined,
-        orderIndex: undefined,
-        orderBucket: undefined,
-        scope: targetScope(family),
-    }));
+    return [
+        {
+            scope: targetScope(family),
+            protocol: port ? protocol : 'all',
+            sourceAddress: rule.address as string,
+            destinationPort: port || undefined,
+            action: rule.strategy as Firewall.Action,
+            description: (rule.description as string | undefined) || '',
+        },
+    ];
 };
 
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -178,7 +158,7 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 return;
             }
             const normalizedGroups = parsed.map((rule) => {
-                if (isRule(rule)) return normalizeImportedRule(rule);
+                if (isRule(rule)) return [rule];
                 return normalizeLegacyImportedRule(rule);
             });
             if (normalizedGroups.some((group) => !group)) {
@@ -208,69 +188,22 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     uploadRef.value?.handleStart(file);
 };
 
-const importedCreateRequest = (plan: Firewall.RuleCheckResult): Firewall.CreateItem | undefined => {
-    if (plan.decision === 'no_change') return;
-    if (plan.decision === 'blocked') throw new Error(plan.reason);
-    const allowed = (plan.allowedActions || []).filter(
-        (value): value is Firewall.ApplicableCheckAction => value !== 'cancel',
-    );
-    let resolution = allowed[0];
-    if (plan.classification === 'exact_external') {
-        if (plan.candidates?.length !== 1 || !allowed.includes('adopt')) throw new Error(plan.reason);
-        resolution = 'adopt';
-    }
-    if (!resolution || resolution === 'select_adopt') throw new Error(plan.reason);
-    return {
-        checkFlag: plan.checkFlag,
-        action: resolution,
-        adoptInstanceKey: resolution === 'adopt' ? plan.candidates?.[0]?.instanceKey : undefined,
-        rule: plan.requestedRule,
-        sourceKind: 'imported',
-    };
-};
-
 const onImport = async () => {
+    if (loading.value || selects.value.length === 0) return;
     loading.value = true;
-    let success = 0;
-    let failed = 0;
     try {
-        const selected = [...selects.value].sort((left, right) =>
-            JSON.stringify(left.scope).localeCompare(JSON.stringify(right.scope)),
-        );
-        for (let offset = 0; offset < selected.length; offset += 256) {
-            const batch = selected.slice(offset, offset + 256);
-            const plans = (await checkFirewallRules({ items: batch.map((rule) => ({ rule })) })).data.items;
-            const items: Firewall.CreateItem[] = [];
-            for (const plan of plans) {
-                try {
-                    const item = importedCreateRequest(plan);
-                    if (item) {
-                        items.push(item);
-                    } else {
-                        success++;
-                    }
-                } catch {
-                    failed++;
-                }
-            }
-            if (items.length > 0) {
-                const result = (await createFirewallRules({ items })).data;
-                success += result.succeeded;
-                failed += result.failed + result.skipped;
-            }
+        const result = (
+            await createFirewallRules({ items: selects.value.map((rule) => ({ rule, sourceKind: 'imported' })) })
+        ).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
+            return;
         }
-    } catch {
-        failed += selects.value.length - success - failed;
+        visible.value = false;
+        emit('created', result.taskID);
     } finally {
         loading.value = false;
     }
-    if (failed === 0) {
-        MsgSuccess(i18n.global.t('firewall.importSuccess', [success]));
-        visible.value = false;
-    } else {
-        MsgError(i18n.global.t('firewall.importPartialSuccess', [success, failed]));
-    }
-    emit('search');
 };
 
 const acceptParams = (value: Firewall.Provider) => {

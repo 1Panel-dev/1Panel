@@ -209,24 +209,6 @@ export namespace Firewall {
         withDockerRestart?: boolean;
     }
 
-    export type CheckDecision = 'ready' | 'confirmation_required' | 'blocked' | 'no_change';
-    export type CheckClassification =
-        'none' | 'exact_managed' | 'exact_external' | 'conflict' | 'unsupported' | 'protected';
-    export type CheckAction = 'create' | 'adopt' | 'select_adopt' | 'cancel';
-    export type ApplicableCheckAction = Exclude<CheckAction, 'cancel'>;
-
-    export interface RuleCheckResult {
-        decision: CheckDecision;
-        classification: CheckClassification;
-        reason: string;
-        requestedRule: Rule;
-        requestedRuleKey: string;
-        existingRuleUUID?: string;
-        candidates?: ObservedRule[];
-        allowedActions?: CheckAction[];
-        checkFlag: string;
-    }
-
     export interface InventoryRequest extends ReqPage {
         scopes: Scope[];
         all?: boolean;
@@ -244,25 +226,13 @@ export namespace Firewall {
         permanent: boolean;
     }
 
-    export interface CheckItem {
-        uuid?: string;
-        rule: Rule;
-        adoptLocator?: Locator;
-    }
-
-    export interface CheckRequest {
-        items: CheckItem[];
-    }
-
-    export interface CheckResponse {
-        items: RuleCheckResult[];
+    export interface AdoptRequest {
+        scope: Scope;
+        instanceKey: string;
     }
 
     export interface CreateItem {
         rule: Rule;
-        checkFlag: string;
-        action: ApplicableCheckAction;
-        adoptInstanceKey?: string;
         sourceKind?: 'user' | 'panel' | 'security' | 'imported';
         sourceID?: string;
     }
@@ -272,6 +242,8 @@ export namespace Firewall {
     }
 
     export interface CreateResponse {
+        taskID?: string;
+        queued?: boolean;
         succeeded: number;
         failed: number;
         skipped: number;
@@ -444,10 +416,7 @@ export namespace Firewall {
         description: string;
     }
     export interface DockerGuardPolicyBatch {
-        endpoints: DockerGuardEndpointIdentity[];
-        mode: 'deny_sources' | 'allow_sources' | 'deny_all';
-        sources: string[];
-        description: string;
+        policies: DockerGuardPolicy[];
     }
     export interface DockerGuardPolicyBatchDelete {
         uuids: string[];

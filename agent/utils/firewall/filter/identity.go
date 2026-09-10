@@ -289,3 +289,20 @@ func hashJSON(value any) (string, error) {
 	sum := sha256.Sum256(payload)
 	return "sha256:" + hex.EncodeToString(sum[:]), nil
 }
+
+func FindCandidate(candidates []ObservedRule, selected string) (ObservedRule, error) {
+	matched := make([]ObservedRule, 0, 1)
+	for _, candidate := range candidates {
+		identity, err := InstanceKey(candidate)
+		if err != nil {
+			continue
+		}
+		if selected != "" && identity == selected {
+			matched = append(matched, candidate)
+		}
+	}
+	if len(matched) != 1 {
+		return ObservedRule{}, ErrRuleOperation
+	}
+	return matched[0], nil
+}

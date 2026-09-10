@@ -4167,7 +4167,6 @@ const message = {
             drifted: 'Farklı',
         },
         ruleTargetRequired: 'En az bir IP adresi veya port girin',
-        batchRuleLimit: 'Bir seferde en fazla {0} kural oluşturulabilir',
         resolution_adopt: 'Yönetimi devral',
         plan_duplicate_rules:
             'Koşulları ve eylemleri aynı olan yinelenen kurallar yönetime alınamaz. Yinelenen kuralları elle silip yeniden deneyin.',
@@ -4175,13 +4174,6 @@ const message = {
         plan_exact_rule_conflict:
             'Aynı eşleşme koşullarına sahip, ancak izin verme veya reddetme eylemi zıt olan bir kural zaten var.',
         allRulesAlreadyExist: 'Kontrol edilen {0} kuralın tümü zaten mevcut. Oluşturulacak yeni kural yok.',
-        ruleCheckResult: 'Kural kontrol sonuçları',
-        ruleCheckStatus_creatable: 'Oluşturulabilir',
-        ruleCheckStatus_existing: 'Zaten mevcut',
-        ruleCheckStatus_error: 'Hata',
-        ruleCheckExistingHelper: 'Aynı kural zaten mevcut ve atlanacak.',
-        ruleCheckReadyHelper: 'Kontrol başarılı. Bu kural oluşturulabilir.',
-        ruleCheckBlockedHelper: 'Hatalı kurallar gönderilemez. Geri dönüp düzenleyin ve yeniden kontrol edin.',
         plan_managed_rule_drifted: 'Yönetilen kural etkin güvenlik duvarıyla eşleşmiyor. Önce farkı giderin.',
         plan_opaque_rule_in_target_scope: 'Hedef kapsamda güvenle ayrıştırılamayan bir kural var. İşlem durduruldu.',
         plan_runtime_permanent_mismatch: 'Etkin ve kalıcı güvenlik duvarı yapılandırmaları farklı. Önce eşitleyin.',
@@ -4243,8 +4235,6 @@ const message = {
             managedOrderDiffers: 'Yönetilen kuralların sırası veritabanı sırasından farklı.',
             managedOnlyInTarget: 'Yönetilen kural yalnızca hedef güvenlik duvarında mevcut.',
             managedRuntimeCannotRemove: 'Yönetilen etkin kural güvenli bir şekilde kaldırılamıyor.',
-            managedOrderBlocked:
-                'Yönetilen kurallar harici, tanınmayan veya korunan kuralların üzerinden yeniden sıralanamaz.',
             missingFromTarget: 'Kural hedef güvenlik duvarında bulunmuyor.',
             targetDiffers: 'Hedef kural veritabanı ilkesinden farklı.',
             alreadyExistsInTarget: 'Kural hedef güvenlik duvarında zaten mevcut.',
@@ -4355,8 +4345,6 @@ const message = {
         forwardPortHelper: 'Port aralıklarını destekler, örn.: 8080-8089',
         forwardInboundInterface: 'İletme Gelen Ağ Arayüzü',
         exportHelper: '{0} güvenlik duvarı kuralını dışa aktarmak üzere. Devam etmek istiyor musunuz?',
-        importSuccess: '{0} kural başarıyla içe aktarıldı',
-        importPartialSuccess: 'İçe aktarma tamamlandı: {0} başarılı, {1} başarısız',
         basicStatus: 'Mevcut güvenlik duvarı bağlı değil. Önce bağlayın.',
         initMsg: '{0} başlatılmak üzere, devam etmek istiyor musunuz?',
         initDirectBackendConflictMsg:
@@ -4390,7 +4378,7 @@ const message = {
             'Bu kural {0} için {1} erişimine izin veriyor. Silinmesi birden fazla hizmete erişimi etkileyebilir. Devam edilsin mi?',
         deleteRiskRulesConfirm:
             '{0} kural silinecek. {1} izin kuralı hizmet erişimini etkileyebilir. Devam edilsin mi?',
-        editRuleConfirm: 'Şu alanlar değiştirilecek: {0}. Kural hemen uygulanıp doğrulanacak. Devam edilsin mi?',
+        editRuleConfirm: 'Bu kuralı değiştirmek istediğinizden emin misiniz?',
     },
     runtime: {
         importEnv: 'Ortam Değişkenlerini İçe Aktar',

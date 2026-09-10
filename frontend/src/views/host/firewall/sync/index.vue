@@ -200,7 +200,7 @@ const syncDisabled = computed(() => {
         );
         return hasUnsupportedBlocker || (preview.value.ready === 0 && preview.value.removed === 0);
     }
-    return preview.value.blocked > 0;
+    return preview.value.blocked > 0 || (preview.value.ready === 0 && preview.value.removed === 0);
 });
 const detailItems = computed(() => {
     if (!preview.value || !detailFilter.value) return [];

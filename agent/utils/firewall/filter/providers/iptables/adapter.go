@@ -158,12 +158,18 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		executed := 0
 		for _, command := range rulePlan.Commands {
 			if err := a.writer.Run(ctx, command); err != nil {
+				if plan.CommandOnly {
+					return filter.ApplyResult{}, err
+				}
 				return filter.ApplyResult{}, a.compensate(ctx, plan, ruleIndex, executed, err)
 			}
 			executed++
 		}
 	}
 	if err := a.writer.Save(ctx, plan.Scope); err != nil {
+		if plan.CommandOnly {
+			return filter.ApplyResult{}, err
+		}
 		return filter.ApplyResult{}, a.compensate(ctx, plan, len(plan.Rules)-1, -1, err)
 	}
 	applied := make([]filter.ObservedRule, 0, len(plan.Rules))
@@ -363,6 +369,11 @@ func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 }
 
 func (a *Adapter) compensate(ctx context.Context, plan filter.BackendPlan, lastRule, lastCommandCount int, cause error) error {
+	if plan.CreatesOnly() {
+		return cause
+	}
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
 	rollbackErr := a.rollback(ctx, plan, lastRule, lastCommandCount)
 	if rollbackErr != nil {
 		return fmt.Errorf("iptables apply failed: %w; compensation failed: %v", cause, rollbackErr)
@@ -641,7 +652,8 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	if wantErr != nil || observedErr != nil || wantKey != observedKey {
 		return 0, filter.ObservedRule{}, filter.ErrRuleStale
 	}
-	if change.Operation != filter.ChangeAdopt && observed.Marker != marker {
+	if change.Operation != filter.ChangeAdopt && observed.Marker != marker &&
+		!(change.Operation == filter.ChangeDelete && change.UnmarkedAdopted && observed.Marker == "") {
 		return 0, filter.ObservedRule{}, filter.ErrRuleStale
 	}
 	return position, observed, nil
@@ -674,18 +686,7 @@ func (systemBackend) CheckMultiport(ctx context.Context, family filter.Family) e
 }
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	var output string
-	var err error
-	if scope.Family == filter.FamilyIPv6 {
-		output, err = native.RunIPv6WithStdContext(ctx, scope.Table, "-S", scope.Chain)
-		if err != nil && !errors.Is(err, filter.ErrFamilyUnavailable) {
-			if table, readErr := native.RunIPv6WithStdContext(ctx, scope.Table, "-S"); readErr == nil && !containsChainDeclaration(table, scope.Chain) {
-				return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
-			}
-		}
-	} else {
-		output, err = native.RunWithStdContext(ctx, scope.Table, "-S", scope.Chain)
-	}
+	output, err := native.ReadTable(ctx, scope.Table, scope.Family == filter.FamilyIPv6)
 	if err != nil {
 		return "", err
 	}

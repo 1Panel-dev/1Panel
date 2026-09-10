@@ -2,6 +2,7 @@ package nftables
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -42,6 +43,16 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 		return filter.Snapshot{}, fmt.Errorf("nftables backend is required")
 	}
 	output, err := a.backend.ListChain(ctx, scope)
+	if errors.Is(err, nftables_helper.ErrChainNotFound) {
+		snapshot, snapshotErr := filter.NewSnapshot(scope, nil)
+		if snapshotErr != nil {
+			return filter.Snapshot{}, snapshotErr
+		}
+		snapshot.Notices = []filter.ScopeNotice{{
+			Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(scope.Family), scope.Chain},
+		}}
+		return snapshot, nil
+	}
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
@@ -111,11 +122,17 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	for _, rulePlan := range plan.Rules {
 		for _, command := range rulePlan.Commands {
 			if err := a.backend.Run(ctx, command); err != nil {
+				if plan.CommandOnly {
+					return filter.ApplyResult{}, err
+				}
 				return filter.ApplyResult{}, a.compensate(ctx, plan, err)
 			}
 		}
 	}
 	if err := a.backend.Save(ctx); err != nil {
+		if plan.CommandOnly {
+			return filter.ApplyResult{}, err
+		}
 		return filter.ApplyResult{}, a.compensate(ctx, plan, err)
 	}
 	applied := make([]filter.ObservedRule, 0, len(plan.Rules))
@@ -178,6 +195,11 @@ func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 }
 
 func (a *Adapter) compensate(ctx context.Context, plan filter.BackendPlan, cause error) error {
+	if plan.CreatesOnly() {
+		return cause
+	}
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
 	if err := a.Rollback(ctx, plan); err != nil {
 		return fmt.Errorf("nftables apply failed: %w; compensation failed: %v", cause, err)
 	}
@@ -378,8 +400,6 @@ func parseChain(scope filter.Scope, output string) []filter.ObservedRule {
 			continue
 		}
 		raw := strings.TrimSpace(line[:handleIndex])
-		// `nft -a list chain` includes a handle on the chain declaration itself.
-		// It is metadata for the chain, not a rule in the chain.
 		if strings.HasPrefix(raw, "chain ") {
 			continue
 		}
@@ -393,7 +413,11 @@ func parseChain(scope filter.Scope, output string) []filter.ObservedRule {
 func parseRule(scope filter.Scope, raw, handle string, position int) filter.ObservedRule {
 	locator := filter.Locator{Provider: filter.ProviderNftables, ScopeKey: scope.Key(), NativeID: handle, Canonical: raw, Position: &position}
 	opaque := func() filter.ObservedRule {
-		return filter.ObservedRule{Rule: filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindOpaque}, Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw}
+		return filter.ObservedRule{
+			Rule:    filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindOpaque},
+			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw,
+			Protected: scope.Chain != filter.IptablesInputChain,
+		}
 	}
 	tokens, err := shellwords.Parse(raw)
 	if err != nil {
@@ -416,10 +440,7 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 					return opaque()
 				}
 			} else if tokens[index+1] == "l4proto" {
-				rule.Protocol = tokens[index+2]
-				if rule.Protocol == "ipv6-icmp" {
-					rule.Protocol = "icmpv6"
-				}
+				rule.Protocol = parseProtocol(tokens[index+2])
 			} else {
 				return opaque()
 			}
@@ -463,26 +484,26 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 				return opaque()
 			}
 			index += 2
-			if tokens[index] != "{" {
-				for _, state := range strings.Split(tokens[index], ",") {
-					if state = strings.TrimSpace(state); state != "" {
-						rule.ConnectionStates = append(rule.ConnectionStates, state)
-					}
-				}
+			values := tokens[index]
+			if values == "{" {
 				index++
-				continue
+				start := index
+				for index < len(tokens) && tokens[index] != "}" {
+					index++
+				}
+				if index == len(tokens) {
+					return opaque()
+				}
+				values = strings.Join(tokens[start:index], " ")
+			}
+			for _, state := range strings.Split(values, ",") {
+				state = strings.TrimSpace(state)
+				if state == "" {
+					return opaque()
+				}
+				rule.ConnectionStates = append(rule.ConnectionStates, parseConnectionState(state))
 			}
 			index++
-			for index < len(tokens) && tokens[index] != "}" {
-				state := strings.Trim(tokens[index], ",")
-				if state != "" {
-					rule.ConnectionStates = append(rule.ConnectionStates, state)
-				}
-				index++
-			}
-			if index < len(tokens) && tokens[index] == "}" {
-				index++
-			}
 		case "accept", "drop", "reject":
 			rule.Action = filter.Action(tokens[index])
 			index++
@@ -515,17 +536,59 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 	return filter.ObservedRule{Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw, Protected: scope.Chain != filter.IptablesInputChain}
 }
 
+func parseProtocol(value string) string {
+	switch numericSymbol(value) {
+	case "1":
+		return "icmp"
+	case "6":
+		return "tcp"
+	case "17":
+		return "udp"
+	case "58", "ipv6-icmp":
+		return "icmpv6"
+	default:
+		return value
+	}
+}
+
+func parseConnectionState(value string) string {
+	switch numericSymbol(value) {
+	case "1":
+		return "invalid"
+	case "2":
+		return "established"
+	case "4":
+		return "related"
+	case "8":
+		return "new"
+	case "64":
+		return "untracked"
+	default:
+		return value
+	}
+}
+
+func numericSymbol(value string) string {
+	base := 10
+	digits := value
+	if strings.HasPrefix(strings.ToLower(value), "0x") {
+		base, digits = 16, value[2:]
+	}
+	if number, err := strconv.ParseUint(digits, base, 32); err == nil {
+		return strconv.FormatUint(number, 10)
+	}
+	return value
+}
+
 type systemBackend struct{}
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	output, err := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
-		"nft", "-n", "-n", "-a", "list", "chain", nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope),
-	)
-	if err != nil && scope.Family == filter.FamilyIPv6 &&
-		(strings.Contains(err.Error(), "Address family not supported") || strings.Contains(err.Error(), "Protocol not supported")) {
-		return output, fmt.Errorf("%w: %v", filter.ErrFamilyUnavailable, err)
+	run := func(args ...string) (string, error) {
+		return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
+			"nft", append([]string{"-n", "-n"}, args...)...,
+		)
 	}
-	return output, err
+	return nftables_helper.ReadChain(run, nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope))
 }
 
 func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {

@@ -192,9 +192,14 @@
                                     <template #default="{ row }">
                                         <span
                                             class="firewall-action"
-                                            :class="row.rule.action === 'accept' ? 'is-accept' : 'is-drop'"
+                                            :class="{
+                                                'is-accept': row.rule.action === 'accept',
+                                                'is-drop': isDenyAction(row.rule.action),
+                                                'is-unknown': !isKnownAction(row.rule.action),
+                                            }"
                                         >
                                             <i
+                                                v-if="isKnownAction(row.rule.action)"
                                                 class="iconfont firewall-action-icon"
                                                 :class="row.rule.action === 'accept' ? 'p-yunxu1' : 'p-a-44tubiao-226'"
                                                 aria-hidden="true"
@@ -364,8 +369,9 @@
                 </LayoutContent>
             </div>
         </div>
-        <RuleOperate ref="ruleOperateRef" @search="search" />
-        <RuleImport ref="ruleImportRef" @search="search" />
+        <RuleOperate ref="ruleOperateRef" @search="search" @created="openCreateTask" />
+        <RuleImport ref="ruleImportRef" @created="openCreateTask" />
+        <TaskLog ref="createTaskLogRef" @close="search" />
         <RuleSync ref="ruleSyncRef" @search="search" />
         <ProcessDetail ref="processDetailRef" />
         <ConfirmDialog ref="resetConfirmRef" @confirm="prepareResetRules" />
@@ -382,8 +388,7 @@
 import { Firewall } from '@/api/interface/firewall';
 import { Process } from '@/api/interface/process';
 import {
-    checkFirewallRules,
-    createFirewallRules,
+    adoptFirewallRule,
     deleteFirewallRules,
     loadDockerPublishedPorts,
     loadFirewallNativeDetail,
@@ -405,6 +410,7 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import ProcessDetail from '@/views/host/process/process/detail/index.vue';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import { computed, onMounted, reactive, ref } from 'vue';
@@ -464,6 +470,8 @@ const cacheFilterValues = (key: string, values: readonly string[]) => {
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
+const createTaskLogRef = ref<InstanceType<typeof TaskLog>>();
+const openCreateTask = (taskID: string) => createTaskLogRef.value?.openWithTaskID(taskID, true);
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const processDetailRef = ref<InstanceType<typeof ProcessDetail>>();
 const resetConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
@@ -889,14 +897,20 @@ const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
     }
 };
 
-const actionLabel = (action: Firewall.Action) => {
+const isDenyAction = (action: string) => action === 'drop' || action === 'reject';
+const isKnownAction = (action: string) => action === 'accept' || isDenyAction(action);
+
+const actionLabel = (action: string) => {
     if (action === 'accept') {
         return i18n.global.t('firewall.accept');
     }
     if (action === 'reject') {
         return i18n.global.t('firewall.reject');
     }
-    return i18n.global.t('firewall.drop');
+    if (action === 'drop') {
+        return i18n.global.t('firewall.drop');
+    }
+    return i18n.global.t('commons.status.unknown');
 };
 
 const ruleSourceLabel = (row: Firewall.InventoryItem) => {
@@ -1063,14 +1077,8 @@ const removeRules = async (selected: RuleRow[]) => {
     loading.value = true;
     const uuids = [...new Set(selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : [])))];
     try {
-        let succeeded = 0;
-        let failed = 0;
-        for (let offset = 0; offset < uuids.length; offset += 256) {
-            const batch = uuids.slice(offset, offset + 256);
-            const result = (await deleteFirewallRules({ uuids: batch })).data;
-            succeeded += result.succeeded;
-            failed += result.failed;
-        }
+        if (uuids.length === 0) return;
+        const { succeeded, failed } = (await deleteFirewallRules({ uuids })).data;
         if (succeeded > 0) {
             MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${succeeded}/${uuids.length})`);
         }
@@ -1161,47 +1169,11 @@ const adoptRule = async (row: RuleRow) => {
     }
     loading.value = true;
     try {
-        const plan = (await checkFirewallRules({ items: [{ rule: row.rule, adoptLocator: row.observed.locator }] }))
-            .data.items[0];
-        if (plan.decision === 'no_change' && plan.existingRuleUUID) {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            await search();
-            return;
-        }
-        if (plan.reason === 'duplicate_rules') {
-            MsgError(i18n.global.t('firewall.plan_duplicate_rules'));
-            return;
-        }
-        if (plan.decision === 'blocked' && plan.classification === 'exact_managed') {
-            MsgError(i18n.global.t('commons.rule.duplicate'));
-            return;
-        }
-        if (plan.decision !== 'confirmation_required' || plan.classification !== 'exact_external') {
+        if (!row.observed.instanceKey) {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
         }
-        const candidate = plan.candidates?.[0];
-        if (plan.candidates?.length !== 1 || !candidate?.instanceKey) {
-            MsgError(i18n.global.t('firewall.plan_blocked'));
-            return;
-        }
-        const result = (
-            await createFirewallRules({
-                items: [
-                    {
-                        checkFlag: plan.checkFlag,
-                        action: 'adopt',
-                        adoptInstanceKey: candidate.instanceKey,
-                        rule: plan.requestedRule,
-                        sourceKind: 'user',
-                    },
-                ],
-            })
-        ).data;
-        if (result.failed > 0 || result.skipped > 0) {
-            MsgError(result.errors?.[0]?.error || i18n.global.t('commons.msg.operationFailed'));
-            return;
-        }
+        await adoptFirewallRule({ scope: row.rule.scope, instanceKey: row.observed.instanceKey });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await search();
     } finally {
@@ -1336,6 +1308,10 @@ onMounted(() => {
 
     &.is-drop .firewall-action-icon {
         color: var(--el-color-info);
+    }
+
+    &.is-unknown {
+        color: var(--el-text-color-secondary);
     }
 }
 

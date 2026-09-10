@@ -6,6 +6,7 @@
                     <div>{{ $t('commons.msg.importHelper') }}</div>
                 </template>
             </el-alert>
+            <el-alert v-if="submitError" class="mb-3" type="error" :closable="false" :title="submitError" />
             <div class="import-file-bar mt-3">
                 <el-upload
                     ref="uploadRef"
@@ -82,7 +83,7 @@
                 <el-button @click="visible = false">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" :disabled="selects.length === 0" @click="onImport">
+                <el-button type="primary" :loading="loading" :disabled="selects.length === 0" @click="onImport">
                     {{ $t('commons.button.import') }}
                 </el-button>
             </span>
@@ -93,8 +94,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
 import i18n from '@/lang';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
@@ -106,10 +109,11 @@ import {
 } from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 
-const emit = defineEmits<{ (e: 'search'): void }>();
+const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
 
 const visible = ref(false);
 const loading = ref(false);
+const submitError = ref('');
 const selects = ref<any>([]);
 const displayData = ref<any>([]);
 const currentRules = ref<Firewall.RuleInfo[]>([]);
@@ -127,6 +131,7 @@ const paginationConfig = reactive({
 
 const acceptParams = async (fireName: string): Promise<void> => {
     loading.value = false;
+    submitError.value = '';
     displayData.value = [];
     selects.value = [];
     currentRules.value = [];
@@ -164,6 +169,7 @@ const search = () => {
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!_uploadFile.raw) return;
     loading.value = true;
+    submitError.value = '';
     displayData.value = [];
     pageData.value = [];
     selects.value = [];
@@ -261,7 +267,9 @@ const compareRules = (importedRules: any[]) => {
 };
 
 const onImport = async () => {
+    if (loading.value || selects.value.length === 0) return;
     loading.value = true;
+    submitError.value = '';
     const rules: Firewall.RuleForward[] = [];
     for (const rule of selects.value) {
         rules.push({
@@ -275,16 +283,22 @@ const onImport = async () => {
         });
     }
 
-    await operateForwardRule({ rules })
-        .then(() => {
-            loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            emit('search');
-            visible.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        const result = (await operateForwardRule({ rules })).data;
+        if (!result.taskID || !result.queued) {
+            submitError.value = i18n.global.t('commons.msg.operationFailed');
+            return;
+        }
+        visible.value = false;
+        emit('created', result.taskID);
+    } catch (error) {
+        submitError.value =
+            (isAxiosError(error) && error.response?.data?.message) ||
+            (error && getErrorMessage(error)) ||
+            i18n.global.t('commons.res.commonError');
+    } finally {
+        loading.value = false;
+    }
 };
 
 defineExpose({

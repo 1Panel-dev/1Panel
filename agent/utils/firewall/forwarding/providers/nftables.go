@@ -34,7 +34,10 @@ func (n *nftablesAdapter) Name() string { return "nftables" }
 func (n *nftablesAdapter) List() ([]forwarding.Rule, error) {
 	rules := make([]forwarding.Rule, 0)
 	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
-		stdout, err := nftRun("-a", "list", "chain", nftTableFamily(family), nftForwardTable, nftForwardChain(forwarding.ChainPreRouting))
+		stdout, err := nftables_helper.ReadChain(nftRun, nftTableFamily(family), nftForwardTable, nftForwardChain(forwarding.ChainPreRouting))
+		if errors.Is(err, nftables_helper.ErrChainNotFound) {
+			continue
+		}
 		if err != nil {
 			return nil, fmt.Errorf("failed to list nftables %s forwarding rules: %w", family, err)
 		}

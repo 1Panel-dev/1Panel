@@ -22,13 +22,15 @@ const (
 )
 
 type DesiredChange struct {
-	Operation      ChangeOperation `json:"operation"`
-	Before         *FirewallRule   `json:"before,omitempty"`
-	After          *FirewallRule   `json:"after,omitempty"`
-	Locator        *Locator        `json:"locator,omitempty"`
-	PreviousMarker string          `json:"previousMarker,omitempty"`
-	Append         bool            `json:"append,omitempty"`
-	RestoreAtEnd   bool            `json:"restoreAtEnd,omitempty"`
+	CommandOnly     bool            `json:"-"`
+	UnmarkedAdopted bool            `json:"-"`
+	Operation       ChangeOperation `json:"operation"`
+	Before          *FirewallRule   `json:"before,omitempty"`
+	After           *FirewallRule   `json:"after,omitempty"`
+	Locator         *Locator        `json:"locator,omitempty"`
+	PreviousMarker  string          `json:"previousMarker,omitempty"`
+	Append          bool            `json:"append,omitempty"`
+	RestoreAtEnd    bool            `json:"restoreAtEnd,omitempty"`
 }
 
 type NativeCommand struct {
@@ -47,10 +49,23 @@ type NativeRulePlan struct {
 }
 
 type BackendPlan struct {
+	CommandOnly      bool             `json:"-"`
 	Provider         Provider         `json:"provider"`
 	Scope            Scope            `json:"scope"`
 	SnapshotRevision string           `json:"snapshotRevision"`
 	Rules            []NativeRulePlan `json:"rules"`
+}
+
+func (p BackendPlan) CreatesOnly() bool {
+	if len(p.Rules) == 0 {
+		return false
+	}
+	for _, rule := range p.Rules {
+		if rule.Operation != ChangeCreate {
+			return false
+		}
+	}
+	return true
 }
 
 type ApplyResult struct {

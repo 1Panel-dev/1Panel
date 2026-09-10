@@ -16,7 +16,9 @@ export const operateFire = (operation: string, withDockerRestart: boolean) =>
     http.post('/hosts/firewall/operate', { operation, withDockerRestart }, TimeoutEnum.T_10M);
 
 export const operateForwardRule = (request: { rules: Firewall.RuleForward[]; forceDelete?: boolean }) =>
-    http.post('/hosts/firewall/forward/operate', request, TimeoutEnum.T_40S);
+    http.postWithConfig<Firewall.FilterChainOperationResult>('/hosts/firewall/forward/operate', request, {
+        skipErrorMessage: true,
+    });
 
 export const enableForwarding = (taskID?: string) =>
     http.post<Firewall.FilterChainOperationResult>(
@@ -44,8 +46,8 @@ export const loadFirewallNativeDetail = (request: Firewall.NativeDetailRequest) 
     return http.post<string>('/hosts/firewall/rules/native/detail', request, TimeoutEnum.T_40S);
 };
 
-export const checkFirewallRules = (request: Firewall.CheckRequest) => {
-    return http.post<Firewall.CheckResponse>('/hosts/firewall/rules/check', request, TimeoutEnum.T_3M);
+export const adoptFirewallRule = (request: Firewall.AdoptRequest) => {
+    return http.post('/hosts/firewall/rules/adopt', request, TimeoutEnum.T_3M);
 };
 
 export const createFirewallRules = (request: Firewall.CreateRequest) => {
@@ -89,13 +91,12 @@ export const operateDockerPortGuard = (operation: 'initialize' | 'bind' | 'unbin
     );
 
 export const upsertDockerPortGuardPolicies = (request: Firewall.DockerGuardPolicyBatch) =>
-    http.postWithConfig('/hosts/firewall/docker/policies/batch', request, {
-        timeout: TimeoutEnum.T_60S,
+    http.postWithConfig<Firewall.FilterChainOperationResult>('/hosts/firewall/docker/policies/batch', request, {
         skipErrorMessage: true,
     });
 
 export const deleteDockerPortGuardPolicies = (request: Firewall.DockerGuardPolicyBatchDelete) =>
-    http.postWithConfig('/hosts/firewall/docker/policies/delete/batch', request, {
+    http.postWithConfig<Firewall.FilterChainOperationResult>('/hosts/firewall/docker/policies/delete/batch', request, {
         timeout: TimeoutEnum.T_60S,
         skipErrorMessage: true,
     });

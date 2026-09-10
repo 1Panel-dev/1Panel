@@ -183,13 +183,23 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 	executed := 0
 	for index, command := range plan.Rules[0].Commands {
 		if err := a.writer.Run(ctx, command); err != nil {
-			if a.failedCommandApplied(ctx, plan.Rules[0], index) {
-				executed = index + 1
+			if plan.CommandOnly {
+				return filter.ApplyResult{}, fmt.Errorf("execute UFW rule: %w", err)
+			}
+			if !plan.CreatesOnly() {
+				probeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+				if a.failedCommandApplied(probeCtx, plan.Rules[0], index) {
+					executed = index + 1
+				}
+				cancel()
 			}
 			cause := ufwApplyError(plan.Rules[0], fmt.Errorf("execute UFW rule: %w", err))
 			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, cause)
 		}
 		executed = index + 1
+	}
+	if plan.CommandOnly || plan.CreatesOnly() {
+		return filter.ApplyResult{Applied: []filter.ObservedRule{plan.Rules[0].Expected}}, nil
 	}
 	verification, err := a.verify(ctx, plan)
 	if err != nil {
@@ -392,7 +402,7 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			deleteRuleCommand(normalized, marker),
 		}
 	case filter.ChangeDelete:
-		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
+		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, !change.UnmarkedAdopted)
 		if targetErr != nil {
 			return filter.NativeRulePlan{}, targetErr
 		}
@@ -628,10 +638,6 @@ func (a *Adapter) verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 		positionMatches := rulePlan.Expected.Locator.Position == nil ||
 			(observed.Locator.Position != nil && *observed.Locator.Position == *rulePlan.Expected.Locator.Position)
 		semanticMatches := filter.ObservedRuleMatchesExpected(observed, rulePlan.Expected.Rule)
-		// A unique generated marker proves that UFW committed this command. Some
-		// UFW versions render otherwise valid rules in a form the numbered-status
-		// parser cannot fully recover. Do not turn that read-side limitation into
-		// a failed write, but keep rejecting fully parsed semantic mismatches.
 		if observed.ParseStatus == filter.ParseStatusOpaque {
 			semanticMatches = true
 		}
@@ -644,6 +650,11 @@ func (a *Adapter) verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 }
 
 func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, executed int, cause error) error {
+	if plan.Operation == filter.ChangeCreate {
+		return cause
+	}
+	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+	defer cancel()
 	rollbackErr := a.rollback(ctx, plan, executed)
 	if rollbackErr != nil {
 		return fmt.Errorf("ufw apply failed: %w; compensation failed: %v", cause, rollbackErr)

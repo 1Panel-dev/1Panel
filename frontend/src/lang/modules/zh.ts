@@ -3873,19 +3873,11 @@ const message = {
             drifted: '异常',
         },
         ruleTargetRequired: '请至少填写一个 IP 地址或端口',
-        batchRuleLimit: '单次最多可创建 {0} 条规则',
         resolution_adopt: '纳管',
         plan_duplicate_rules: '存在匹配条件和动作相同的重复规则，无法纳管。请手动删除重复规则后重试。',
         adoptRuleConfirm: '纳入管理后，1Panel 将负责维护和删除这条现有规则，是否继续？',
         plan_exact_rule_conflict: '已存在匹配条件相同、但允许与拒绝动作相反的规则。',
         allRulesAlreadyExist: '本次检查的 {0} 条规则均已存在，没有需要创建的新规则。',
-        ruleCheckResult: '规则检查结果',
-        ruleCheckStatus_creatable: '可创建',
-        ruleCheckStatus_existing: '已存在',
-        ruleCheckStatus_error: '错误',
-        ruleCheckExistingHelper: '系统中已存在相同规则，本次将自动跳过。',
-        ruleCheckReadyHelper: '检查通过，可以创建该规则。',
-        ruleCheckBlockedHelper: '存在错误规则，不能提交。请返回修改后重新检查。',
         plan_managed_rule_drifted:
             '这条规则在 1Panel 中的记录与防火墙实际状态不一致，请先刷新规则；如仍异常，请重新同步。',
         plan_opaque_rule_in_target_scope:
@@ -3946,8 +3938,6 @@ const message = {
             managedOrderDiffers: '防火墙中的规则顺序与 1Panel 保存的顺序不一致，本次将调整。',
             managedOnlyInTarget: '该规则仍存在于防火墙中，但 1Panel 已不再保存，本次将删除。',
             managedRuntimeCannotRemove: '该规则仅在当前运行中生效，1Panel 无法确认删除后的影响，因此本次不会删除。',
-            managedOrderBlocked:
-                '调整规则顺序时会跨过外部规则、无法识别的规则或系统保护规则，为避免改变现有访问，本次不会调整。',
             missingFromTarget: '防火墙中缺少该规则，本次将补充。',
             targetDiffers: '防火墙中的规则与 1Panel 保存的设置不一致，本次将修复。',
             alreadyExistsInTarget: '防火墙中已存在相同规则，无需重复添加。',
@@ -4043,8 +4033,6 @@ const message = {
         forwardPortHelper: '支持端口范围，如：8080-8089',
         forwardInboundInterface: '转发入站网卡',
         exportHelper: '即将导出 {0} 条防火墙规则，是否继续？',
-        importSuccess: '成功导入 {0} 条规则',
-        importPartialSuccess: '导入完成：成功 {0} 条，失败 {1} 条',
 
         basicStatus: '当前防火墙未绑定，请先绑定！',
         initMsg: '即将初始化 {0}, 是否继续？',
@@ -4074,7 +4062,7 @@ const message = {
         deleteUsedRuleConfirm: '该规则覆盖了由 {0} 提供的监听服务。删除后可能导致相关服务无法访问，是否继续？',
         deleteWildcardRuleConfirm: '该规则允许 {0} 访问 {1}。删除后可能影响多个服务的访问，是否继续？',
         deleteRiskRulesConfirm: '将删除 {0} 条规则，其中 {1} 条放行规则可能影响服务访问，是否继续？',
-        editRuleConfirm: '将修改以下字段：{0}。提交后会立即应用并回读验证，是否继续？',
+        editRuleConfirm: '是否确认修改该规则？',
     },
     runtime: {
         importEnv: '导入环境变量',

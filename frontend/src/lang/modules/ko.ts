@@ -4007,7 +4007,6 @@ const message = {
         protectedHelper: '접속 장애를 방지하기 위해 편집하거나 삭제할 수 없는 중요한 시스템 규칙입니다.',
         stateShort: { managed: '패널', adopted: '관리', external: '외부', protected: '보호', drifted: '불일치' },
         ruleTargetRequired: 'IP 주소 또는 포트를 하나 이상 입력하세요',
-        batchRuleLimit: '한 번에 최대 {0}개의 규칙을 생성할 수 있습니다',
         resolution_adopt: '관리 대상으로 전환',
         plan_duplicate_rules:
             '조건과 동작이 동일한 중복 규칙은 관리 대상으로 추가할 수 없습니다. 중복 규칙을 수동으로 삭제한 후 다시 시도하세요.',
@@ -4015,13 +4014,6 @@ const message = {
             '관리 대상으로 전환하면 1Panel이 이 기존 규칙을 유지하고 삭제할 수 있습니다. 계속하시겠습니까?',
         plan_exact_rule_conflict: '일치 조건이 같지만 허용 또는 거부 동작이 반대인 규칙이 이미 있습니다.',
         allRulesAlreadyExist: '확인한 규칙 {0}개가 모두 이미 존재합니다. 새로 생성할 규칙이 없습니다.',
-        ruleCheckResult: '규칙 검사 결과',
-        ruleCheckStatus_creatable: '생성 가능',
-        ruleCheckStatus_existing: '이미 존재함',
-        ruleCheckStatus_error: '오류',
-        ruleCheckExistingHelper: '동일한 규칙이 이미 존재하므로 이번 작업에서는 건너뜁니다.',
-        ruleCheckReadyHelper: '검사를 통과했습니다. 이 규칙을 생성할 수 있습니다.',
-        ruleCheckBlockedHelper: '오류가 있는 규칙은 제출할 수 없습니다. 돌아가서 수정한 후 다시 검사하세요.',
         plan_managed_rule_drifted: '관리 규칙이 실제 방화벽과 일치하지 않습니다. 먼저 불일치를 해결하세요.',
         plan_opaque_rule_in_target_scope: '대상 범위에 안전하게 분석할 수 없는 규칙이 있어 작업을 중지했습니다.',
         plan_runtime_permanent_mismatch: '실행 중 구성과 영구 방화벽 구성이 다릅니다. 먼저 동기화하세요.',
@@ -4080,7 +4072,6 @@ const message = {
             managedOrderDiffers: '관리 규칙 순서가 데이터베이스 순서와 다릅니다.',
             managedOnlyInTarget: '관리 규칙이 대상 방화벽에만 존재합니다.',
             managedRuntimeCannotRemove: '관리 중인 런타임 규칙을 안전하게 삭제할 수 없습니다.',
-            managedOrderBlocked: '외부, 인식할 수 없거나 보호된 규칙을 넘어 관리 규칙의 순서를 변경할 수 없습니다.',
             missingFromTarget: '대상 방화벽에 이 규칙이 없습니다.',
             targetDiffers: '대상 규칙이 데이터베이스 정책과 다릅니다.',
             alreadyExistsInTarget: '대상 방화벽에 이 규칙이 이미 존재합니다.',
@@ -4189,8 +4180,6 @@ const message = {
         forwardPortHelper: '포트 범위를 지원합니다, 예: 8080-8089',
         forwardInboundInterface: '포워딩 인바운드 네트워크 인터페이스',
         exportHelper: '{0}개의 방화벽 규칙을 내보내려고 합니다. 계속하시겠습니까?',
-        importSuccess: '{0}개의 규칙을 성공적으로 가져왔습니다',
-        importPartialSuccess: '가져오기 완료: 성공 {0}건, 실패 {1}건',
         basicStatus: '현재 방화벽이 바인딩되지 않았습니다. 먼저 바인딩하세요!',
         initMsg: '{0}을(를) 초기화하려고 합니다. 계속하시겠습니까?',
         initDirectBackendConflictMsg:
@@ -4223,7 +4212,7 @@ const message = {
             '이 규칙은 {0}에서 {1}에 접근하도록 허용합니다. 삭제하면 여러 서비스에 대한 접근에 영향을 줄 수 있습니다. 계속하시겠습니까?',
         deleteRiskRulesConfirm:
             '{0}개의 규칙을 삭제합니다. 그중 {1}개의 허용 규칙이 서비스 접근에 영향을 줄 수 있습니다. 계속하시겠습니까?',
-        editRuleConfirm: '다음 필드가 변경됩니다: {0}. 규칙이 즉시 적용되고 다시 검증됩니다. 계속하시겠습니까?',
+        editRuleConfirm: '이 규칙을 수정하시겠습니까?',
     },
     runtime: {
         importEnv: '환경 변수 가져오기',

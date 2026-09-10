@@ -34,7 +34,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/firewall/rules/search", baseApi.SearchFirewallRules)
 		hostRouter.POST("/firewall/rules/reset", baseApi.ResetFirewallRules)
 		hostRouter.POST("/firewall/rules/native/detail", baseApi.LoadFirewallNativeDetail)
-		hostRouter.POST("/firewall/rules/check", baseApi.CheckFirewallRules)
+		hostRouter.POST("/firewall/rules/adopt", baseApi.AdoptFirewallRule)
 		hostRouter.POST("/firewall/rules", baseApi.CreateFirewallRules)
 		hostRouter.POST("/firewall/rules/sync/preview", baseApi.PreviewFirewallRuleSync)
 		hostRouter.GET("/firewall/rules/sync/task", baseApi.LoadFirewallRuleSyncTask)

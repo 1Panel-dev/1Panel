@@ -58,8 +58,10 @@
 import { reactive, ref } from 'vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { ElForm } from 'element-plus';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
 import { Firewall } from '@/api/interface/firewall';
 import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule } from '@/api/modules/firewall';
@@ -92,7 +94,7 @@ const acceptParams = (params: DialogProps): void => {
     title.value = i18n.global.t('firewall.' + dialogData.value.title);
     drawerVisible.value = true;
 };
-const emit = defineEmits<{ (e: 'search'): void }>();
+const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
 
 const handleClose = () => {
     drawerVisible.value = false;
@@ -128,7 +130,7 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
+    if (!formEl || loading.value) return;
     const { rowData } = dialogData.value;
     if (!rowData) return;
     if (!isValidPortRange(rowData.port) || !isValidPortRange(rowData.targetPort)) {
@@ -136,49 +138,40 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         MsgError(i18n.global.t('commons.rule.port'));
         return;
     }
-    formEl.validate(async (valid) => {
-        if (!valid) return;
-        let rules = [];
-        rowData.port = normalizePortRange(rowData.port);
-        rowData.targetPort = normalizePortRange(rowData.targetPort);
-        rowData.operation = 'add';
-        if (rowData.targetIP === '') {
-            rowData.targetIP = rowData.family === 'ipv6' ? '::1' : '127.0.0.1';
-        }
-        if (rowData.interface === 'all') {
-            rowData.interface = '';
-        }
-        rules.push(rowData);
-        loading.value = true;
-        if (dialogData.value.title === 'create') {
-            await operateForwardRule({ rules: rules })
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    drawerVisible.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
+    const valid = await formEl.validate().catch(() => false);
+    if (!valid) return;
+    rowData.port = normalizePortRange(rowData.port);
+    rowData.targetPort = normalizePortRange(rowData.targetPort);
+    rowData.operation = 'add';
+    if (rowData.targetIP === '') {
+        rowData.targetIP = rowData.family === 'ipv6' ? '::1' : '127.0.0.1';
+    }
+    if (rowData.interface === 'all') {
+        rowData.interface = '';
+    }
+    const operations: Firewall.RuleForward[] = [];
+    if (dialogData.value.title !== 'create') {
+        operations.push({ ...oldRule.value, operation: 'remove' });
+    }
+    operations.push(rowData);
+    loading.value = true;
+    try {
+        const result = (await operateForwardRule({ rules: operations })).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
             return;
         }
-        rules = [];
-        oldRule.value.operation = 'remove';
-        dialogData.value.rowData.operation = 'add';
-        rules.push(oldRule.value);
-        rules.push(dialogData.value.rowData);
-        await operateForwardRule({ rules: rules })
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
-                drawerVisible.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
-    });
+        drawerVisible.value = false;
+        emit('created', result.taskID);
+    } catch (error) {
+        MsgError(
+            (isAxiosError(error) && error.response?.data?.message) ||
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
+    } finally {
+        loading.value = false;
+    }
 };
 
 defineExpose({

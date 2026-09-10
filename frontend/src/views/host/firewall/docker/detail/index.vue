@@ -166,7 +166,9 @@
         </el-form>
         <template #footer>
             <el-button @click="policyVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" @click="submitPolicy">{{ $t('commons.button.confirm') }}</el-button>
+            <el-button type="primary" :loading="savingPolicy" @click="submitPolicy">
+                {{ $t('commons.button.confirm') }}
+            </el-button>
         </template>
     </DialogPro>
 </template>
@@ -176,7 +178,9 @@ import { computed, nextTick, reactive, ref } from 'vue';
 import { Firewall } from '@/api/interface/firewall';
 import { deleteDockerPortGuardPolicies, upsertDockerPortGuardPolicies } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { MsgError, MsgWarning } from '@/utils/message';
+import { getErrorMessage } from '@/utils/misc';
+import { isAxiosError } from 'axios';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import {
     dockerGuardEndpointManagementMessage,
@@ -187,18 +191,19 @@ import {
 import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase; containers: Firewall.DockerGuardContainer[] }>();
-const emit = defineEmits<{ search: [] }>();
+const emit = defineEmits<{ search: []; created: [taskID: string] }>();
 
 const drawerVisible = ref(false);
 const policyVisible = ref(false);
+const savingPolicy = ref(false);
 const activeContainerKey = ref('');
 const selectedGroupKeys = ref<string[]>([]);
 const policyEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const familyFilter = ref<'all' | Firewall.DockerGuardEndpoint['family']>('all');
 const formRef = ref<FormInstance>();
 const sourceAddressRefs = ref<Array<{ focus: () => void }>>([]);
-type PolicyMode = Firewall.DockerGuardPolicyBatch['mode'];
-type PolicyForm = Omit<Firewall.DockerGuardPolicyBatch, 'endpoints' | 'mode'> & { mode: PolicyMode | '' };
+type PolicyMode = Firewall.DockerGuardPolicy['mode'];
+type PolicyForm = Pick<Firewall.DockerGuardPolicy, 'sources' | 'description'> & { mode: PolicyMode | '' };
 const form = reactive<PolicyForm>({
     mode: 'deny_sources',
     sources: [''],
@@ -340,30 +345,45 @@ const removeSourceAddress = (index: number) => {
     if (form.sources.length === 0) form.sources.push('');
 };
 const submitPolicy = async () => {
+    if (savingPolicy.value) return;
     const valid = await formRef.value?.validate().catch(() => false);
     if (!valid || !form.mode) return;
-    const sources = splitTagValues(form.sources);
+    const mode = form.mode;
+    const sources = mode === 'deny_all' ? [] : splitTagValues(form.sources);
+    savingPolicy.value = true;
     try {
-        await upsertDockerPortGuardPolicies({
-            endpoints: policyEndpoints.value.map(({ family, hostIP, hostPort, protocol }) => ({
-                family,
-                hostIP,
-                hostPort,
-                protocol,
-            })),
-            mode: form.mode,
-            sources: form.mode === 'deny_all' ? [] : sources,
-            description: form.description,
-        });
-    } catch {
-        emit('search');
-        return;
+        const result = (
+            await upsertDockerPortGuardPolicies({
+                policies: policyEndpoints.value.map(({ family, hostIP, hostPort, protocol }) => ({
+                    family,
+                    hostIP,
+                    hostPort,
+                    protocol,
+                    mode,
+                    sources,
+                    description: form.description,
+                })),
+            })
+        ).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
+            return;
+        }
+        policyVisible.value = false;
+        drawerVisible.value = false;
+        selectedGroupKeys.value = [];
+        emit('created', result.taskID);
+    } catch (error) {
+        MsgError(
+            (isAxiosError(error) && error.response?.data?.message) ||
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
+    } finally {
+        savingPolicy.value = false;
     }
-    policyVisible.value = false;
-    selectedGroupKeys.value = [];
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    emit('search');
 };
+
 const remove = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean) => {
     const uuids = policyUUIDs(endpoints);
     if (!uuids.length) return;
@@ -379,16 +399,21 @@ const remove = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean)
         return;
     }
     try {
-        for (let offset = 0; offset < uuids.length; offset += 256) {
-            await deleteDockerPortGuardPolicies({ uuids: uuids.slice(offset, offset + 256) });
+        const result = (await deleteDockerPortGuardPolicies({ uuids })).data;
+        if (!result.taskID || !result.queued) {
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
+            return;
         }
-    } catch {
-        emit('search');
-        return;
+        selectedGroupKeys.value = [];
+        drawerVisible.value = false;
+        emit('created', result.taskID);
+    } catch (error) {
+        MsgError(
+            (isAxiosError(error) && error.response?.data?.message) ||
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
     }
-    selectedGroupKeys.value = [];
-    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    emit('search');
 };
 const portMappingLabel = (row: Firewall.DockerGuardPortGroup) => {
     const ports = row.endpoints.map((endpoint) => endpoint.containerPort).filter(Boolean) as number[];

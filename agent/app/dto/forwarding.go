@@ -8,8 +8,6 @@ type ForwardRuleSearch struct {
 	Strategy string `json:"strategy"`
 }
 
-// ForwardRule preserves the existing firewall search response shape while
-// keeping forwarding data separate from the filter client model.
 type ForwardRule struct {
 	ID       uint   `json:"id"`
 	Chain    string `json:"chain"`
@@ -34,7 +32,7 @@ type ForwardRule struct {
 
 type ForwardRuleOperate struct {
 	ForceDelete bool                   `json:"forceDelete"`
-	Rules       []ForwardRuleOperation `json:"rules"`
+	Rules       []ForwardRuleOperation `json:"rules" validate:"required,min=1,dive"`
 }
 
 type ForwardRuleOperation struct {

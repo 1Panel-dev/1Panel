@@ -2,7 +2,6 @@ package service
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -12,7 +11,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
 type panelPortWhitelistKey struct{}
@@ -95,32 +93,6 @@ func warnPanelPortCleanupFailure(port uint, err error) {
 	if err != nil && global.LOG != nil {
 		global.LOG.Warnf("clean up old panel firewall port %d failed: %v", port, err)
 	}
-}
-
-func syncPanelRequiredPorts(provider string, ports []firewall.PortWhitelist) error {
-	loadPorts := func() ([]firewall.PortWhitelist, error) { return ports, nil }
-	if provider == constant.FirewallProviderIptables {
-		manager := newIptablesHelperManager()
-		manager.LoadRequiredPorts = loadPorts
-		return manager.SyncRequiredPorts(true)
-	}
-	initialized := false
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		familyInitialized, _, err := nftables_helper.LoadFamilyInitStatus(family, "base")
-		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		initialized = initialized || familyInitialized
-	}
-	if !initialized {
-		return nil
-	}
-	manager := newNftablesHelperManager()
-	manager.LoadRequiredPorts = loadPorts
-	return manager.SyncRequiredPorts()
 }
 
 func panelPortStillRequired(port dto.FirewallSystemPort, protected []firewall.PortWhitelist) bool {

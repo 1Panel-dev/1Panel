@@ -103,6 +103,7 @@ func MergeInventory(input InventoryMergeInput) ([]InventoryItem, error) {
 			byRuleKey[candidate.ruleKey] = append(byRuleKey[candidate.ruleKey], index)
 			if instanceKey, err := instanceKeyWithRuleKey(candidate.rule, candidate.ruleKey); err == nil {
 				candidate.instanceKey = instanceKey
+				candidate.rule.InstanceKey = instanceKey
 				byInstanceKey[instanceKey] = append(byInstanceKey[instanceKey], index)
 			}
 		}

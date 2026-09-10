@@ -6,6 +6,8 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
 const (
@@ -25,12 +27,15 @@ func NewNftablesManager() *NftablesManager { return &NftablesManager{runner: com
 func (m *NftablesManager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
+	if !m.runner.Exists("nft") {
+		return errors.New("nft is not installed")
+	}
+	if err := m.checkForwardPolicy(); err != nil {
+		return err
+	}
 	inventory, err := m.ListPolicies()
 	if err != nil {
 		return err
-	}
-	if !m.runner.Exists("nft") {
-		return errors.New("nft is not installed")
 	}
 	if err := m.ensureFamily(FamilyIPv4, true); err != nil {
 		return err
@@ -70,10 +75,10 @@ func (m *NftablesManager) ListPolicies() (PolicyInventory, error) {
 	inventory := PolicyInventory{Policies: make([]Policy, 0), ManagedRuleOrders: make(map[string][]int64)}
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
-		if !m.objectExists("chain", tableFamily, NftTable, NftChain) {
+		output, err := nftables_helper.ReadChain(m.run, tableFamily, NftTable, NftChain)
+		if errors.Is(err, nftables_helper.ErrChainNotFound) {
 			continue
 		}
-		output, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftChain)
 		if err != nil {
 			return PolicyInventory{}, &FamilyError{Family: family, Err: fmt.Errorf("list %s chain: %w", NftChain, err)}
 		}

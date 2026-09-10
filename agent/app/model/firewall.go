@@ -72,19 +72,6 @@ func FirewallRuleOwner(sourceKind, sourceID string) string {
 	return sourceKind + ":" + sourceID
 }
 
-func FirewallRulesRevision(rules []FirewallRule) (string, error) {
-	ordered := append([]FirewallRule(nil), rules...)
-	sort.Slice(ordered, func(i, j int) bool {
-		return ordered[i].UUID < ordered[j].UUID
-	})
-	payload, err := json.Marshal(ordered)
-	if err != nil {
-		return "", err
-	}
-	sum := sha256.Sum256(payload)
-	return hex.EncodeToString(sum[:]), nil
-}
-
 func FirewallRuleFromDomain(rule filter.FirewallRule) (FirewallRule, error) {
 	normalized, err := filter.NormalizeRule(rule)
 	if err != nil {

@@ -4097,20 +4097,12 @@ const message = {
             drifted: 'Abnormal',
         },
         ruleTargetRequired: 'Enter at least one IP address or port',
-        batchRuleLimit: 'A maximum of {0} rules can be created at a time',
         resolution_adopt: 'Take over management',
         plan_duplicate_rules:
             'Rules with identical conditions and actions cannot be adopted. Manually delete duplicate rules and retry.',
         adoptRuleConfirm: 'After takeover, 1Panel can maintain and delete this existing rule. Continue?',
         plan_exact_rule_conflict: 'A rule with identical matching conditions has an opposing allow or deny action.',
         allRulesAlreadyExist: 'All {0} checked rules already exist. There are no new rules to create.',
-        ruleCheckResult: 'Rule check results',
-        ruleCheckStatus_creatable: 'Creatable',
-        ruleCheckStatus_existing: 'Exists',
-        ruleCheckStatus_error: 'Error',
-        ruleCheckExistingHelper: 'An identical rule already exists and will be skipped.',
-        ruleCheckReadyHelper: 'The check passed. This rule can be created.',
-        ruleCheckBlockedHelper: 'Rules with errors cannot be submitted. Go back, edit them, and check again.',
         plan_managed_rule_drifted:
             'The 1Panel management record differs from the live firewall rule. Check the system rule.',
         plan_opaque_rule_in_target_scope:
@@ -4172,7 +4164,6 @@ const message = {
             managedOrderDiffers: 'The managed rule order differs from the database sequence.',
             managedOnlyInTarget: 'The managed rule exists only in the target firewall.',
             managedRuntimeCannotRemove: 'The managed runtime rule cannot be removed safely.',
-            managedOrderBlocked: 'Managed rules cannot be reordered across external, unrecognized, or protected rules.',
             missingFromTarget: 'The rule is missing from the target firewall.',
             targetDiffers: 'The target rule differs from the database policy.',
             alreadyExistsInTarget: 'The rule already exists in the target firewall.',
@@ -4283,8 +4274,6 @@ const message = {
         forwardPortHelper: 'Supports port ranges, e.g. 8080-8089',
         forwardInboundInterface: 'Forward Inbound Network Interface',
         exportHelper: 'About to export {0} firewall rules. Continue?',
-        importSuccess: 'Successfully imported {0} rules',
-        importPartialSuccess: 'Import completed: {0} succeeded, {1} failed',
         basicStatus: 'The current firewall is unbound. Bind it first.',
         initMsg: 'About to initialize {0}, continue?',
         initDirectBackendConflictMsg:
@@ -4317,8 +4306,7 @@ const message = {
         deleteWildcardRuleConfirm:
             'This rule allows {0} to access {1}. Deleting it may affect access to multiple services. Continue?',
         deleteRiskRulesConfirm: 'Will delete {0} rules. {1} allow rules may affect service access. Continue?',
-        editRuleConfirm:
-            'The following fields will change: {0}. The rule will be applied and verified immediately. Continue?',
+        editRuleConfirm: 'Are you sure you want to modify this rule?',
     },
     runtime: {
         importEnv: 'Import Environment Variables',
