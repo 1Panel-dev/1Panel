@@ -725,6 +725,20 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 		return nil, err
 	}
 	handleMap(envs, params)
+	if install.App.Key == "openlist" {
+		// The upgrade script updates this too late for the pre-pull phase.
+		image := "openlistteam/openlist:v" + strings.TrimPrefix(install.Version, "v")
+		if preInstalled := params["PRE_INSTALLED"]; preInstalled != "" {
+			image += "-" + preInstalled
+		}
+		params["OPENLIST_IMAGE"] = image
+		envs["OPENLIST_IMAGE"] = image
+		content, err := json.Marshal(envs)
+		if err != nil {
+			return nil, err
+		}
+		install.Env = string(content)
+	}
 	if install.App.Key == constant.AppOpenresty {
 		for _, key := range []string{"CONTAINER_PACKAGE_URL", "RESTY_ADD_PACKAGE_BUILDDEPS", "RESTY_CONFIG_OPTIONS_MORE"} {
 			if value, ok := originalEnv[key]; ok {
