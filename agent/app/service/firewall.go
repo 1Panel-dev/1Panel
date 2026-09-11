@@ -1825,7 +1825,7 @@ func (s *FirewallService) prepareManagedUpdate(
 		return preparedManagedUpdate{}, err
 	}
 	if after.Scope.Key() != before.Rule.Scope.Key() {
-		return preparedManagedUpdate{}, fmt.Errorf("%w: managed rule scope cannot be changed", filter.ErrUnsupportedScope)
+		return preparedManagedUpdate{}, filter.ErrManagedScopeChange
 	}
 	if !supportsManagedNativeKindTransition(before.Rule, after) {
 		return preparedManagedUpdate{}, fmt.Errorf("%w: native rule conversion requires an explicit workflow", filter.ErrUnsupportedScope)
@@ -2471,6 +2471,47 @@ func isFirewallPolicyIncompatible(err error) bool {
 		errors.Is(err, filter.ErrInvalidScope) || errors.Is(err, filter.ErrCompositeRule)
 }
 
+func (s *FirewallService) compileRestorableFirewallRules(
+	ctx context.Context,
+	stored model.FirewallRule,
+	provider filter.Provider,
+) (restorable, preserved []filter.DesiredRule, err error) {
+	compiled, err := s.compileStoredFirewallRules(ctx, stored, provider)
+	if err != nil {
+		return nil, nil, err
+	}
+	if !supportsManagedFilterChains(string(provider)) || !isProtectedSystemFirewallRule(stored) {
+		return compiled, nil, nil
+	}
+	loadRequired := s.requiredPorts
+	if loadRequired == nil {
+		loadRequired = LoadRequiredFirewallPortWhiteList
+	}
+	required, err := loadRequired()
+	if err != nil {
+		return nil, nil, err
+	}
+	requiredPorts := systemPorts(required)
+	for _, desired := range compiled {
+		covered := false
+		for _, port := range requiredPorts {
+			covered, err = filter.SameRuleContent(desired.Rule, systemPortRule(provider, port))
+			if err != nil {
+				return nil, nil, err
+			}
+			if covered {
+				break
+			}
+		}
+		if covered {
+			preserved = append(preserved, desired)
+		} else {
+			restorable = append(restorable, desired)
+		}
+	}
+	return restorable, preserved, nil
+}
+
 func (s *FirewallService) desiredFirewallRulesByScope(
 	ctx context.Context,
 	stored []model.FirewallRule,
@@ -2480,7 +2521,7 @@ func (s *FirewallService) desiredFirewallRulesByScope(
 	desired := make(map[string][]filter.DesiredRule)
 	var failures []filter.InventoryItem
 	for _, record := range stored {
-		compiled, err := s.compileStoredFirewallRules(ctx, record, provider)
+		compiled, _, err := s.compileRestorableFirewallRules(ctx, record, provider)
 		if err != nil {
 			rule := filter.FirewallRule{
 				UUID:     record.UUID,
@@ -2646,47 +2687,6 @@ func loadRequiredFirewallPorts(panelPort string) ([]firewall.PortWhitelist, erro
 		ports = append(ports, firewall.PortWhitelist{Port: port, Protocol: "tcp"})
 	}
 	return firewall.NormalizeRequiredPorts(ports)
-}
-
-func (s *FirewallService) updatePortWhitelist(ctx context.Context, value string) error {
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-
-	ports, err := firewall.ParsePortWhitelist(value)
-	if err != nil {
-		return err
-	}
-	oldValue, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		oldValue = constant.FirewallPortWhiteListValue
-	} else if err != nil {
-		return err
-	}
-	oldPorts, err := firewall.ParsePortWhitelist(oldValue)
-	if err != nil {
-		return err
-	}
-	required, err := s.requiredPorts()
-	if err != nil {
-		return err
-	}
-	ctx = context.WithValue(ctx, panelPortWhitelistKey{}, firewall.NormalizePortWhitelist(append(oldPorts, required...)))
-	added := excludeFirewallPorts(excludeFirewallPorts(ports, oldPorts), required)
-	for _, port := range systemPorts(added) {
-		if err := s.ensureSystemPortLocked(ctx, port); err != nil {
-			return err
-		}
-	}
-	removed := excludeFirewallPorts(excludeFirewallPorts(oldPorts, ports), required)
-	return global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		txCtx := context.WithValue(ctx, constant.DB, tx)
-		if err := s.releaseSystemPorts(txCtx, systemPorts(removed)); err != nil {
-			return err
-		}
-		return tx.Where("key = ?", constant.FirewallPortWhiteList).
-			Assign(map[string]interface{}{"value": value}).
-			FirstOrCreate(&model.Setting{Key: constant.FirewallPortWhiteList}).Error
-	})
 }
 
 func (s *FirewallService) releaseSystemPorts(ctx context.Context, ports []dto.FirewallSystemPort) error {

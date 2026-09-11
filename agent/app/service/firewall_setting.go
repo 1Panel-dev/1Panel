@@ -2,11 +2,18 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
@@ -15,14 +22,18 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
+	"gorm.io/gorm"
 )
 
 type IFirewallSettingService interface {
+	QueuePortWhitelist(value string) (dto.FilterChainOperationResponse, error)
 	Load(context.Context) (dto.FirewallSettings, error)
 	Operate(context.Context, dto.FirewallBackendOperation) error
 }
 
 type FirewallSettingService struct{}
+
+var firewallWhitelistTaskMu sync.Mutex
 
 var ErrFirewallBackendCleanupRequired = errors.New("firewall backend cleanup required")
 
@@ -37,6 +48,180 @@ func firewallBackendCleanupRequired(current, target string) error {
 
 func NewIFirewallSettingService() IFirewallSettingService {
 	return &FirewallSettingService{}
+}
+
+func (s *FirewallSettingService) QueuePortWhitelist(value string) (dto.FilterChainOperationResponse, error) {
+	return s.queuePortWhitelist(value, newFirewallService())
+}
+
+func (s *FirewallSettingService) queuePortWhitelist(value string, firewallService *FirewallService) (dto.FilterChainOperationResponse, error) {
+	firewallWhitelistTaskMu.Lock()
+	defer firewallWhitelistTaskMu.Unlock()
+	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+	taskItem, err := task.NewTask(i18n.GetMsgByKey("FirewallWhitelistTask"), task.TaskUpdate, task.TaskScopeFirewall, "", 0)
+	if err != nil {
+		return dto.FilterChainOperationResponse{}, err
+	}
+	taskItem.AddSubTaskWithOps(taskItem.Name, func(t *task.Task) error {
+		succeeded, failed := 0, 0
+		err := s.applyPortWhitelist(t.TaskCtx, value, firewallService, func(status, label string, err error) {
+			switch status {
+			case "applied":
+				succeeded++
+				t.LogSuccess(label)
+			case "failed":
+				failed++
+				t.LogFailedWithErr(label, err)
+			default:
+				t.Log(i18n.GetWithName(status, label))
+			}
+		})
+		t.Log(i18n.GetMsgWithMap("FirewallRuleOperationResult", map[string]interface{}{
+			"succeeded": succeeded, "failed": failed,
+		}))
+		return err
+	}, nil, 0, 0)
+	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+		closeUnstartedFirewallTask(taskItem)
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("save firewall whitelist task: %w", err)
+	}
+	go func() { _ = taskItem.Execute() }()
+	return dto.FilterChainOperationResponse{TaskID: taskItem.TaskID, Queued: true}, nil
+}
+
+type whitelistReporter func(status, label string, err error)
+
+func (s *FirewallSettingService) applyPortWhitelist(ctx context.Context, value string, firewallService *FirewallService, report whitelistReporter) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	ports, err := firewall.ParsePortWhitelist(value)
+	if err != nil {
+		return err
+	}
+	required, err := firewallService.requiredPorts()
+	if err != nil {
+		return err
+	}
+	removed, err := s.savePortWhitelist(ctx, ports, required, firewallService)
+	if err != nil {
+		return err
+	}
+	report("FirewallWhitelistSaved", "", nil)
+	for _, port := range systemPorts(removed) {
+		report("FirewallWhitelistReleased", whitelistPortLabel(port), nil)
+	}
+
+	ctx = context.WithValue(ctx, panelPortWhitelistKey{}, required)
+	provider, providerErr := firewallService.selectedProvider(ctx)
+	ready := s.portWhitelistReadiness(provider, providerErr, firewallService)
+	return syncPortWhitelist(ctx, ports, required, ready, firewallService.ensureSystemPortLocked, report)
+}
+
+func (s *FirewallSettingService) savePortWhitelist(ctx context.Context, ports, required []firewall.PortWhitelist, firewallService *FirewallService) ([]firewall.PortWhitelist, error) {
+	var removed []firewall.PortWhitelist
+	err := global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var setting model.Setting
+		err := tx.Where("key = ?", constant.FirewallPortWhiteList).First(&setting).Error
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			setting.Value = constant.FirewallPortWhiteListValue
+		} else if err != nil {
+			return err
+		}
+		previous, err := firewall.ParsePortWhitelist(setting.Value)
+		if err != nil {
+			return err
+		}
+		removed = excludeFirewallPorts(excludeFirewallPorts(previous, ports), required)
+		txCtx := context.WithValue(ctx, constant.DB, tx)
+		if err := firewallService.releaseSystemPorts(txCtx, systemPorts(removed)); err != nil {
+			return err
+		}
+		value, err := json.Marshal(ports)
+		if err != nil {
+			return err
+		}
+		return tx.Where("key = ?", constant.FirewallPortWhiteList).
+			Assign(map[string]interface{}{"value": string(value)}).
+			FirstOrCreate(&model.Setting{Key: constant.FirewallPortWhiteList}).Error
+	})
+	return removed, err
+}
+
+func (s *FirewallSettingService) portWhitelistReadiness(provider filter.Provider, providerErr error, firewallService *FirewallService) func(dto.FirewallSystemPort) (bool, error) {
+	type state struct {
+		ready bool
+		err   error
+	}
+	states := make(map[string]state)
+	return func(port dto.FirewallSystemPort) (bool, error) {
+		if providerErr != nil {
+			return false, providerErr
+		}
+		key := "service"
+		if isDirectFirewallProvider(provider) {
+			key = port.Family
+		}
+		if cached, ok := states[key]; ok {
+			return cached.ready, cached.err
+		}
+		var result state
+		if isDirectFirewallProvider(provider) {
+			initialized, bound, err := loadSystemFirewallFamilyStatus(string(provider), port.Family)
+			result = state{ready: initialized && bound, err: err}
+		} else {
+			client, err := firewallService.baseClient()
+			result.err = err
+			if err == nil {
+				result.ready, result.err = client.Status()
+			}
+		}
+		states[key] = result
+		return result.ready, result.err
+	}
+}
+
+func syncPortWhitelist(
+	ctx context.Context,
+	ports, required []firewall.PortWhitelist,
+	ready func(dto.FirewallSystemPort) (bool, error),
+	ensure func(context.Context, dto.FirewallSystemPort) error,
+	report whitelistReporter,
+) error {
+	var failures []error
+	for _, port := range systemPorts(ports) {
+		if err := ctx.Err(); err != nil {
+			return errors.Join(append(failures, err)...)
+		}
+		label := whitelistPortLabel(port)
+		if containsFirewallPort(required, firewall.PortWhitelist{Family: port.Family, Port: port.Port, Protocol: port.Protocol}) {
+			report("FirewallWhitelistRequired", label, nil)
+			continue
+		}
+		active, err := ready(port)
+		if err == nil && !active {
+			report("FirewallWhitelistDeferred", label, nil)
+			continue
+		}
+		if err == nil {
+			err = ensure(ctx, port)
+		}
+		if err != nil {
+			report("failed", label, err)
+			failures = append(failures, fmt.Errorf("%s: %w", label, err))
+			continue
+		}
+		report("applied", label, nil)
+	}
+	return errors.Join(failures...)
+}
+
+func whitelistPortLabel(port dto.FirewallSystemPort) string {
+	return fmt.Sprintf("%s %s/%s", port.Family, port.Port, port.Protocol)
 }
 
 func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings, error) {

@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -125,9 +124,6 @@ func (u *SettingService) GetWebsiteDir() string {
 }
 
 func (u *SettingService) Update(key, value string) error {
-	if key == constant.FirewallPortWhiteList {
-		return newFirewallService().updatePortWhitelist(context.Background(), value)
-	}
 	return settingRepo.UpdateOrCreate(key, value)
 }
 

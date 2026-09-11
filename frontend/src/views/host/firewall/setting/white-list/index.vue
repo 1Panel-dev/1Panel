@@ -1,9 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('firewall.portWhiteList')" @close="handleClose" size="large">
         <template #content>
-            <el-alert type="info" :closable="false" :title="$t('firewall.portWhiteListAlter')" />
-
-            <el-button class="mt-5" type="primary" @click="openCreate">
+            <el-button type="primary" @click="openCreate">
                 {{ $t('commons.button.add') }}
             </el-button>
             <ComplexTable :data="data" v-loading="loading">
@@ -61,9 +59,10 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue';
-import { getAgentSettingInfo, updateAgentSetting } from '@/api/modules/setting';
+import { getAgentSettingInfo } from '@/api/modules/setting';
+import { updateFirewallPortWhitelist } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgError } from '@/utils/message';
 import {
     normalizeWhiteListRule,
     parseWhiteList,
@@ -79,7 +78,7 @@ interface WhiteListItem extends WhiteListRule {
     edit: boolean;
     isNew: boolean;
 }
-const emit = defineEmits<{ (e: 'search'): void }>();
+const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
 
 const drawerVisible = ref(false);
 const loading = ref(false);
@@ -186,20 +185,16 @@ const validateRules = (): WhiteListRule[] | undefined => {
 
 const onSubmit = async () => {
     const rules = validateRules();
-    if (!rules) return;
+    if (!rules || loading.value) return;
     loading.value = true;
-    await updateAgentSetting({
-        key: 'FirewallPortWhiteList',
-        value: serializeWhiteList(rules),
-    })
-        .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            emit('search');
-            drawerVisible.value = false;
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    try {
+        const { data: result } = await updateFirewallPortWhitelist(serializeWhiteList(rules));
+        if (!result.taskID || !result.queued) return;
+        drawerVisible.value = false;
+        emit('created', result.taskID);
+    } finally {
+        loading.value = false;
+    }
 };
 
 const handleClose = () => {

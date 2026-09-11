@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "現在のファイアウォールでは、ルールの適用範囲（IPv4/IPv6 アドレスファミリーなど）を変更できません。新しいルールを作成してください。"
+FirewallWhitelistTask: "ファイアウォールのポート許可リストを更新"
+FirewallWhitelistSaved: "許可リストの設定を保存しました"
+FirewallWhitelistDeferred: "{{ .name }}：設定を保存しました。ファイアウォールの有効化後に適用します"
+FirewallWhitelistReleased: "{{ .name }}：許可リストの保護を解除しました。許可ルールは保持されます。ポートを閉じるには、ルール一覧から手動で削除してください"
+FirewallWhitelistRequired: "{{ .name }}：システム必須ポートのルールで保護されています"

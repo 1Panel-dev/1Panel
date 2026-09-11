@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "Tembok api semasa tidak menyokong perubahan skop peraturan (seperti keluarga alamat IPv4/IPv6). Sila cipta peraturan baharu."
+FirewallWhitelistTask: "Kemas kini senarai port dibenarkan tembok api"
+FirewallWhitelistSaved: "Konfigurasi senarai dibenarkan telah disimpan"
+FirewallWhitelistDeferred: "{{ .name }}: konfigurasi disimpan; menunggu pengaktifan tembok api"
+FirewallWhitelistReleased: "{{ .name }}: perlindungan senarai dibenarkan telah dilepaskan; peraturan izin dikekalkan. Untuk menutup port, padamkan peraturan secara manual daripada senarai peraturan"
+FirewallWhitelistRequired: "{{ .name }}: dilindungi oleh peraturan port wajib sistem"

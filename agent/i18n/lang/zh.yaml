@@ -705,3 +705,11 @@ AIProviderBailian: "阿里云百炼"
 AIProviderBailianCodingPlan: "阿里云百炼 Coding Plan"
 AIProviderArk: "火山方舟"
 AIProviderArkCodingPlan: "火山方舟 Coding Plan"
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "当前防火墙不支持修改规则的作用范围（如 IPv4/IPv6 地址族），请新建规则。"
+FirewallWhitelistTask: "更新防火墙端口白名单"
+FirewallWhitelistSaved: "白名单配置已保存"
+FirewallWhitelistDeferred: "{{ .name }}：配置已保存，待防火墙启用后下发"
+FirewallWhitelistReleased: "{{ .name }}：已解除白名单保护，放行规则保留；如需关闭端口，请在规则列表手动删除"
+FirewallWhitelistRequired: "{{ .name }}：由系统必需端口规则保护"

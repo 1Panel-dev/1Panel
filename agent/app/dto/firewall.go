@@ -62,6 +62,10 @@ type FirewallSettings struct {
 	PortWhitelist string               `json:"portWhiteList"`
 }
 
+type FirewallPortWhitelistUpdate struct {
+	Value string `json:"value" validate:"required"`
+}
+
 type FirewallBackendOperation struct {
 	Subsystem string `json:"subsystem" validate:"required,oneof=system forwarding docker"`
 	Backend   string `json:"backend" validate:"required,oneof=firewalld ufw iptables nftables"`

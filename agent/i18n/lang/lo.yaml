@@ -696,3 +696,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "ໄຟວໍປັດຈຸບັນບໍ່ຮອງຮັບການປ່ຽນຂອບເຂດຂອງກົດ (ເຊັ່ນ ຕະກູນທີ່ຢູ່ IPv4/IPv6). ກະລຸນາສ້າງກົດໃໝ່."
+FirewallWhitelistTask: "ອັບເດດລາຍຊື່ພອດທີ່ອະນຸຍາດຂອງໄຟວໍ"
+FirewallWhitelistSaved: "ບັນທຶກການຕັ້ງຄ່າລາຍຊື່ທີ່ອະນຸຍາດແລ້ວ"
+FirewallWhitelistDeferred: "{{ .name }}: ບັນທຶກການຕັ້ງຄ່າແລ້ວ; ລໍຖ້າເປີດໃຊ້ໄຟວໍ"
+FirewallWhitelistReleased: "{{ .name }}: ຍົກເລີກການປ້ອງກັນລາຍຊື່ທີ່ອະນຸຍາດແລ້ວ; ຍັງຄົງກົດອະນຸຍາດໄວ້. ຫາກຕ້ອງການປິດພອດ ໃຫ້ລຶບກົດດ້ວຍຕົນເອງຈາກລາຍການກົດ"
+FirewallWhitelistRequired: "{{ .name }}: ປ້ອງກັນໂດຍກົດພອດທີ່ຈຳເປັນຂອງລະບົບ"

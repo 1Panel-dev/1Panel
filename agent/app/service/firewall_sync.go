@@ -83,13 +83,17 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 	}
 	model.SortFirewallRules(stored, request.TargetProvider)
 	rules := make([]*firewallSyncRule, 0, len(stored))
+	preservedMarkers := make(map[string]bool)
 	compileFailed := false
 	for _, record := range stored {
-		desired, err := s.compileStoredFirewallRules(ctx, record, request.TargetProvider)
+		desired, preserved, err := s.compileRestorableFirewallRules(ctx, record, request.TargetProvider)
 		if err != nil {
 			compileFailed = true
 			rules = append(rules, &firewallSyncRule{FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: record.UUID, Status: firewallsync.StatusBlocked, Reason: err.Error()}})
 			continue
+		}
+		for _, rule := range preserved {
+			preservedMarkers[rule.Marker] = true
 		}
 		for _, native := range desired {
 			rule := native.Rule
@@ -129,7 +133,7 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 		matched := make(map[string]filter.InventoryItem)
 		for _, item := range inventory {
 			if item.Desired == nil {
-				if compileFailed || item.Observed == nil || !strings.HasPrefix(item.Observed.Marker, "1panel-rule:") {
+				if compileFailed || item.Observed == nil || !strings.HasPrefix(item.Observed.Marker, "1panel-rule:") || preservedMarkers[item.Observed.Marker] {
 					continue
 				}
 				observed := item.Observed
