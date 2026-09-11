@@ -1,5 +1,4 @@
 <template>
-    <!-- Right edge handle: open a terminal from any page without leaving it. Hidden on the terminal page itself. -->
     <div v-if="terminalStore.showTerminalButton && !onTerminalPage" class="terminal-dock-handle" @click="show">
         <el-badge
             :value="store.entries.length"
@@ -20,7 +19,6 @@
         :modal="false"
         @opened="claim"
     >
-        <!-- minimize keeps sessions alive; X closes them all (with confirm) -->
         <template #header>
             <div class="flex items-center">
                 <div class="terminal-dock-title flex-1">
@@ -67,62 +65,7 @@
                         </template>
                     </el-tab-pane>
                     <template #add-icon>
-                        <el-popover
-                            v-model:visible="showConnections"
-                            trigger="click"
-                            placement="bottom-start"
-                            width="280px"
-                            @before-enter="loadHosts"
-                        >
-                            <template #reference>
-                                <el-button
-                                    class="terminal-dock-add"
-                                    @click.stop
-                                    @keydown.stop
-                                    icon="Plus"
-                                    text
-                                    :aria-label="$t('terminal.createConn')"
-                                />
-                            </template>
-                            <el-button link class="w-full" @click="connect(0, $t('terminal.localhost'))">
-                                <el-icon class="mr-1"><House /></el-icon>
-                                {{ $t('terminal.localhost') }}
-                            </el-button>
-                            <template v-if="!isNodeAdmin">
-                                <el-divider class="my-1" />
-                                <el-input
-                                    v-model="hostFilter"
-                                    size="small"
-                                    clearable
-                                    :placeholder="$t('commons.button.search')"
-                                    class="mb-1"
-                                />
-                                <el-tree
-                                    ref="treeRef"
-                                    node-key="id"
-                                    default-expand-all
-                                    :expand-on-click-node="false"
-                                    :data="hostTree"
-                                    :filter-node-method="filterHost"
-                                    :empty-text="$t('terminal.noHost')"
-                                    class="terminal-dock-tree"
-                                >
-                                    <template #default="{ node, data }">
-                                        <span v-if="node.level === 1" class="text-xs font-medium">
-                                            {{ node.label === 'Default' ? $t('commons.table.default') : node.label }}
-                                        </span>
-                                        <a
-                                            v-else
-                                            class="text-xs hover:text-[var(--el-color-primary)] truncate"
-                                            :title="node.label"
-                                            @click="connect(data.id, node.label)"
-                                        >
-                                            {{ node.label }}
-                                        </a>
-                                    </template>
-                                </el-tree>
-                            </template>
-                        </el-popover>
+                        <ConnectionMenu v-model="showConnections" :open-session="openConnection" />
                     </template>
                 </el-tabs>
             </div>
@@ -146,18 +89,14 @@
 import { computed, nextTick, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import i18n from '@/lang';
-import { ElTree } from 'element-plus';
 import { TerminalSessionStore, TerminalStore } from '@/store';
 import { getTerminalInfo } from '@/api/modules/setting';
-import { useGlobalStore } from '@/composables/useGlobalStore';
-import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
-import { MsgError } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { Host } from '@/api/interface/host';
+import ConnectionMenu from '@/components/terminal/connection-menu/index.vue';
+import type { TerminalConnectionOptions } from '@/components/terminal/connection-menu/types';
 
 const store = TerminalSessionStore();
 const terminalStore = TerminalStore();
-const { isNodeAdmin } = useGlobalStore();
 const route = useRoute();
 const onTerminalPage = computed(() => route.path.startsWith('/terminal'));
 
@@ -171,6 +110,10 @@ const active = ref('');
 const showConnections = ref(false);
 let timer: ReturnType<typeof setInterval> | null = null;
 
+const openConnection = async (options: TerminalConnectionOptions) => {
+    active.value = await store.open(options);
+};
+
 const show = async () => {
     if (!store.find(active.value)) active.value = store.entries[0]?.key || '';
     open.value = true;
@@ -180,7 +123,6 @@ const show = async () => {
     timer = setInterval(store.sync, 5000);
 };
 
-// park releases every slot so the Terminals go back to the off-screen host.
 const park = () => {
     showConnections.value = false;
     if (timer) clearInterval(timer);
@@ -196,7 +138,6 @@ const onSlot = (key: string, el: HTMLElement | null) => {
     if (el) slotEls[key] = el;
     else delete slotEls[key];
 };
-// Slots not ours (the terminal page's) are left alone.
 const claim = () => {
     for (const item of store.entries) {
         if (open.value && item.key === active.value) {
@@ -214,36 +155,6 @@ watch(
     },
 );
 
-const hostTree = ref<Array<Host.HostTree>>([]);
-const treeRef = ref<InstanceType<typeof ElTree>>();
-const hostFilter = ref('');
-const loadHosts = async () => {
-    if (isNodeAdmin.value) return;
-    const res = await getHostTree({});
-    hostTree.value = res.data;
-};
-watch(hostFilter, (v) => treeRef.value?.filter(v));
-const filterHost = (value: string, data: any) => !value || data.label.toLowerCase().includes(value.toLowerCase());
-
-const connect = async (wsID: number, title: string) => {
-    showConnections.value = false;
-    if (wsID === 0) {
-        const res = await testLocalConn();
-        if (!res.data) {
-            MsgError(i18n.global.t('terminal.connLocalErr'));
-            return;
-        }
-        active.value = await store.open({ title, wsID });
-        return;
-    }
-    const res = await testByID(wsID);
-    active.value = await store.open({
-        title,
-        wsID,
-        error: res.data ? '' : 'Authentication failed. Please check the host information!',
-    });
-};
-
 const closeAll = async () => {
     if (store.entries.length > 0) {
         await ElMessageBox.confirm(
@@ -260,7 +171,6 @@ const closeAll = async () => {
     open.value = false;
 };
 
-// the terminal page claims the slots itself; give ours up when navigating there
 watch(onTerminalPage, (v) => {
     if (v) open.value = false;
 });
@@ -379,19 +289,6 @@ watch(onTerminalPage, (v) => {
     }
 }
 
-.terminal-dock-add {
-    width: 32px;
-    height: 32px;
-    margin: 0 4px;
-    padding: 0;
-    border-radius: 6px;
-    color: var(--el-text-color-regular);
-
-    &:hover {
-        color: var(--el-color-primary);
-    }
-}
-
 .terminal-status-dot {
     width: 7px;
     height: 7px;
@@ -412,11 +309,6 @@ watch(onTerminalPage, (v) => {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-}
-
-.terminal-dock-tree {
-    max-height: 40vh;
-    overflow: auto;
 }
 
 .terminal-dock-slot,
