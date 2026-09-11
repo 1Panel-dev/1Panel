@@ -156,6 +156,22 @@ var catalog = map[string]Meta{
 		},
 		Models: []Model{{ID: "openrouter/free", Name: "openrouter/free"}, {ID: "openrouter/auto", Name: "openrouter/auto"}},
 	},
+	// DaoXE (https://daoxe.com): OpenAI-compatible multi-model gateway; also serves Anthropic Messages.
+	"daoxe": {
+		Key: "daoxe", DisplayName: "DaoXE", Sort: 57, DefaultAPIType: "openai-completions", EnvKey: "DAOXE_API_KEY",
+		APIConfigs: []APIConfig{
+			{
+				APIType: "openai-completions", BaseURL: "https://api.daoxe.com/v1",
+				DiscoverModels: true,
+			},
+			{
+				APIType: "openai-responses", BaseURL: "https://api.daoxe.com/v1",
+				DiscoverModels: true,
+			},
+			{APIType: "openai-embeddings", BaseURL: "https://api.daoxe.com/v1"},
+			anthropicAPIConfig("https://api.daoxe.com", AuthModeXAPIKey, AuthModeBearer),
+		},
+	},
 	"anthropic": {
 		Key: "anthropic", DisplayName: "Anthropic", Sort: 60, DefaultAPIType: "anthropic-messages", EnvKey: "ANTHROPIC_API_KEY",
 		APIConfigs: []APIConfig{anthropicAPIConfig("https://api.anthropic.com", AuthModeXAPIKey)},
@@ -473,6 +489,7 @@ var legacyModelPrefixes = map[string][]string{
 	"kimi-coding":         {"kimi-coding"},
 	"openai":              {"openai"},
 	"anthropic":           {"anthropic"},
+	"daoxe":               {"daoxe"},
 	"gemini":              {"google", "gemini"},
 	"moonshot":            {"moonshot"},
 }
