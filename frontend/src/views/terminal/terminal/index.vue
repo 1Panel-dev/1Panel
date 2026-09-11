@@ -47,7 +47,6 @@
                         </span>
                     </el-tooltip>
                 </template>
-                <!-- The Terminal itself is rendered by components/terminal/host.vue and teleported here. -->
                 <div
                     class="terminal-slot"
                     :ref="(el: any) => onSlot(item.key, el)"
@@ -104,119 +103,7 @@
                 </div>
             </el-tab-pane>
             <template #add-icon>
-                <el-popover
-                    v-model:visible="showConnections"
-                    width="320px"
-                    trigger="click"
-                    placement="bottom-start"
-                    persistent
-                >
-                    <template #reference>
-                        <el-button
-                            class="terminal-action terminal-add"
-                            @click.stop
-                            @keydown.stop
-                            icon="Plus"
-                            text
-                            :aria-label="$t('terminal.createConn')"
-                        />
-                    </template>
-                    <div class="p-2 space-y-2">
-                        <div class="flex gap-2">
-                            <button
-                                v-if="!isNodeAdmin"
-                                @click="onNewSsh"
-                                class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
-                            >
-                                <el-icon
-                                    class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
-                                >
-                                    <Plus />
-                                </el-icon>
-                                <span
-                                    class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
-                                >
-                                    {{ $t('terminal.createConn') }}
-                                </span>
-                            </button>
-                            <button
-                                @click="onNewLocal"
-                                class="flex-1 flex flex-col items-center justify-center px-3 py-2.5 bg-[var(--el-fill-color-light)] hover:bg-[var(--panel-main-bg-color-9)] rounded transition-colors duration-200 cursor-pointer group border-0 outline-none"
-                            >
-                                <el-icon
-                                    class="text-xl mb-1 text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] transition-colors"
-                                >
-                                    <House />
-                                </el-icon>
-                                <span
-                                    class="text-xs text-[var(--el-text-color-primary)] group-hover:text-[var(--el-color-primary)] font-medium truncate w-full text-center transition-colors"
-                                >
-                                    {{ $t('terminal.localhost') }}
-                                </span>
-                            </button>
-                        </div>
-                        <template v-if="!isNodeAdmin">
-                            <el-divider class="my-0" />
-
-                            <div class="search-container px-1 py-1 bg-[var(--el-fill-color-light)] rounded">
-                                <el-input
-                                    v-model="hostFilterInfo"
-                                    class="w-full"
-                                    clearable
-                                    suffix-icon="Search"
-                                    :placeholder="$t('commons.button.search')"
-                                    size="small"
-                                >
-                                    <template #prefix>
-                                        <el-icon class="el-input__icon"><Search /></el-icon>
-                                    </template>
-                                </el-input>
-                            </div>
-                            <el-tree
-                                ref="treeRef"
-                                :expand-on-click-node="false"
-                                node-key="id"
-                                :default-expand-all="true"
-                                :data="hostTree"
-                                :props="defaultProps"
-                                :filter-node-method="filterHost"
-                                :empty-text="$t('terminal.noHost')"
-                                class="host-tree"
-                            >
-                                <template #default="{ node, data }">
-                                    <span class="custom-tree-node w-full">
-                                        <span
-                                            v-if="node.label === 'Default'"
-                                            class="text-xs font-medium text-[var(--el-text-color-primary)]"
-                                        >
-                                            {{ $t('commons.table.default') }}
-                                        </span>
-                                        <div v-else class="w-full min-w-0">
-                                            <span v-if="node.label.length <= 22">
-                                                <a
-                                                    @click="onClickConn(node, data)"
-                                                    class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
-                                                >
-                                                    {{ node.label }}
-                                                </a>
-                                            </span>
-                                            <el-tooltip v-else :content="node.label" placement="right">
-                                                <span>
-                                                    <a
-                                                        @click="onClickConn(node, data)"
-                                                        class="text-xs text-[var(--el-text-color-primary)] hover:text-[var(--el-color-primary)] transition-colors cursor-pointer block truncate"
-                                                    >
-                                                        {{ node.label.substring(0, 30) }}...
-                                                    </a>
-                                                </span>
-                                            </el-tooltip>
-                                        </div>
-                                    </span>
-                                </template>
-                            </el-tree>
-                        </template>
-                    </div>
-                </el-popover>
+                <ConnectionMenu ref="connectionMenuRef" v-model="showConnections" :open-session="openConnection" />
             </template>
             <div v-if="store.entries.length === 0">
                 <el-empty
@@ -236,37 +123,27 @@
                 />
             </el-tooltip>
         </div>
-
-        <HostDialog
-            ref="dialogRef"
-            @on-conn-terminal="onConnTerminal"
-            @on-new-local="onNewLocal"
-            @load-host-tree="loadHostTree"
-        />
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, watch, nextTick, onMounted, onBeforeUnmount, onActivated, onDeactivated } from 'vue';
-import HostDialog from '@/views/terminal/terminal/host-create.vue';
-import type Node from 'element-plus/es/components/tree/src/model/node';
-import { ElTree } from 'element-plus';
 import screenfull from 'screenfull';
 import i18n from '@/lang';
-import { Host } from '@/api/interface/host';
-import { getHostTree, testByID, testLocalConn } from '@/api/modules/terminal';
+import { testByID, testLocalConn } from '@/api/modules/terminal';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import router from '@/routers';
 import { getCommandTree } from '@/api/modules/command';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import AiSetting from '@/views/terminal/setting/ai/index.vue';
-import { MsgWarning } from '@/utils/message';
 import { TerminalSessionStore } from '@/store';
+import ConnectionMenu from '@/components/terminal/connection-menu/index.vue';
+import type { TerminalConnectionOptions } from '@/components/terminal/connection-menu/types';
 
 const { isFullScreen, isMobile, isNodeAdmin, openMenuTabs } = useGlobalStore();
 const store = TerminalSessionStore();
 
-const dialogRef = ref();
+const connectionMenuRef = ref<InstanceType<typeof ConnectionMenu>>();
 
 const toggleFullscreen = () => {
     if (screenfull.isEnabled) {
@@ -288,33 +165,15 @@ let quickCmd = ref();
 let batchVal = ref();
 let isBatch = ref<boolean>(false);
 
-const hostFilterInfo = ref('');
 const showConnections = ref(false);
-const hostTree = ref<Array<Host.HostTree>>();
-const treeRef = ref<InstanceType<typeof ElTree>>();
-const defaultProps = {
-    label: 'label',
-    children: 'children',
-};
-interface Tree {
-    id: number;
-    label: string;
-    children?: Tree[];
-}
 const initCmd = ref('');
 
 const acceptParams = async () => {
     isFullScreen.value = false;
     loadCommandTree();
-    if (!isNodeAdmin.value) {
-        loadHostTree();
-    } else {
-        hostTree.value = [];
-    }
     if (store.entries.length === 0) {
         await openDefaultLocalConn();
     } else {
-        // sessions kept alive while we were away: show them and re-fit to this container
         if (!store.find(terminalValue.value)) {
             terminalValue.value = store.entries[0].key;
         }
@@ -330,27 +189,23 @@ const acceptParams = async () => {
 };
 
 const openDefaultLocalConn = async () => {
+    await nextTick();
     if (isNodeAdmin.value) {
-        onNewLocal();
+        await connectionMenuRef.value?.connectLocal();
         return;
     }
-    await getAgentSettingInfo().then((res) => {
+    await getAgentSettingInfo().then(async (res) => {
         if (res.data?.localSSHConnShow === 'Enable') {
-            onNewLocal();
+            await connectionMenuRef.value?.connectLocal();
         }
     });
 };
 
-// Leaving the page keeps every session connected in the host; only the poll stops.
 const cleanTimer = () => {
     clearInterval(Number(timer));
     timer = null;
 };
 
-// Slots are claimed explicitly, not from the ref callback: under a locked menu tab
-// (keep-alive) the page keeps rendering while detached, and the dock takes the
-// Terminals over meanwhile. Only a visible page owns its slots; release on leave
-// and take them back on return, the same way the dock does.
 const slotEls: Record<string, HTMLElement> = {};
 const onSlot = (key: string, el: HTMLElement | null) => {
     if (el) slotEls[key] = el;
@@ -414,21 +269,6 @@ const handleTabsRemove = async (targetName: string, action: 'remove' | 'add') =>
     store.remove(targetName);
 };
 
-const loadHostTree = async () => {
-    if (isNodeAdmin.value) {
-        hostTree.value = [];
-        return;
-    }
-    const res = await getHostTree({});
-    hostTree.value = res.data;
-};
-watch(hostFilterInfo, (val: any) => {
-    treeRef.value!.filter(val);
-});
-const filterHost = (value: string, data: any) => {
-    if (!value) return true;
-    return data.label.includes(value);
-};
 const loadCommandTree = async () => {
     const res = await getCommandTree('command');
     commandTree.value = res.data || [];
@@ -462,56 +302,21 @@ function batchInput() {
     batchVal.value = '';
 }
 
-const onNewSsh = () => {
-    showConnections.value = false;
-    if (isNodeAdmin.value) {
-        MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
-        return;
-    }
-    dialogRef.value!.acceptParams({ isLocal: false });
-};
-
 const connectionError = 'Failed to set up the connection. Please check the host information';
 
-const openTab = async (title: string, wsID: number, error: string) => {
+const openConnection = async (options: TerminalConnectionOptions) => {
     const cmd = initCmd.value;
     initCmd.value = '';
-    terminalValue.value = await store.open({ title, wsID, initCmd: cmd, error });
-};
-
-const onNewLocal = async () => {
-    showConnections.value = false;
-    const res = await testLocalConn();
-    if (!res.data) {
-        dialogRef.value!.acceptParams({ isLocal: true });
-        return;
-    }
-    await openTab(i18n.global.t('terminal.localhost'), 0, '');
-};
-
-const onClickConn = (node: Node, data: Tree) => {
-    if (node.level === 1) {
-        return;
-    }
-    onConnTerminal(node.label, data.id);
+    terminalValue.value = await store.open({ ...options, initCmd: cmd });
 };
 
 const onReconnect = async (item: any) => {
-    const res = item.wsID === 0 ? await testLocalConn() : await testByID(item.wsID);
+    const nodeName = new URLSearchParams(item.args).get('operateNode') || undefined;
+    const res = item.wsID === 0 ? await testLocalConn(nodeName) : await testByID(item.wsID);
     const cmd = initCmd.value;
     initCmd.value = '';
     await store.reconnect(item.key, res.data ? '' : connectionError, cmd);
     store.sync();
-};
-
-const onConnTerminal = async (title: string, wsID: number) => {
-    showConnections.value = false;
-    if (isNodeAdmin.value) {
-        MsgWarning(i18n.global.t('terminal.nodeAdminLocalOnly'));
-        return;
-    }
-    const res = await testByID(wsID);
-    await openTab(title, wsID, res.data ? '' : 'Authentication failed. Please check the host information!');
 };
 
 const changeFullScreen = () => {
@@ -524,7 +329,6 @@ defineExpose({
 
 onBeforeUnmount(() => {
     document.removeEventListener('fullscreenchange', changeFullScreen);
-    // parent refs are already null in the parent's onUnmounted, so leave-page cleanup lives here
     cleanTimer();
     pageVisible = false;
     claim();
@@ -573,10 +377,6 @@ onMounted(() => {
     &:hover {
         color: var(--el-color-primary);
     }
-}
-
-.terminal-add {
-    margin: 0 4px;
 }
 
 .terminal-tabs {
@@ -697,26 +497,6 @@ onMounted(() => {
 
 .terminal-slot {
     width: 100%;
-}
-
-.host-tree {
-    max-height: 300px;
-    overflow-y: auto;
-}
-
-.search-container {
-    :deep(.el-input__wrapper) {
-        border-radius: 6px;
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-
-        &:hover {
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-        }
-
-        &.is-focus {
-            box-shadow: 0 0 0 2px var(--el-color-primary-light-3);
-        }
-    }
 }
 
 .vertical-tabs > .el-tabs__content {
