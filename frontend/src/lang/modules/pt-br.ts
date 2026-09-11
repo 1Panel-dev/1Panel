@@ -2100,8 +2100,9 @@ const message = {
         profileBlockDesc: 'Mede bloqueios em canais, select e primitivas de sincronização.',
     },
     terminal: {
-        showTerminalButton: 'Mostrar botão do terminal',
-        showTerminalButtonHelper: 'Mostrar o botão de acesso ao terminal no canto inferior direito da página.',
+        showTerminalButton: 'Atalho para o terminal',
+        showTerminalButtonHelper:
+            'Ao ativar esta opção, um botão de atalho para o terminal será exibido no canto inferior direito da página.',
         local: 'Local',
         defaultConn: 'Conexão Padrão',
         defaultConnHelper:
