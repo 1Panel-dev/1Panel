@@ -2081,8 +2081,9 @@ const message = {
         profileBlockDesc: 'Измеряет блокировки на каналах, select и примитивах синхронизации.',
     },
     terminal: {
-        showTerminalButton: 'Показывать кнопку терминала',
-        showTerminalButtonHelper: 'Показывать кнопку быстрого доступа к терминалу в правом нижнем углу страницы.',
+        showTerminalButton: 'Быстрый доступ к терминалу',
+        showTerminalButtonHelper:
+            'При включении в правом нижнем углу страницы отображается кнопка быстрого доступа к терминалу.',
         local: 'Локальный',
         defaultConn: 'Соединение по умолчанию',
         defaultConnHelper:

@@ -2057,8 +2057,8 @@ const message = {
         profileBlockDesc: 'Channel、Select、同期プリミティブでのブロック待機時間を測定します。',
     },
     terminal: {
-        showTerminalButton: 'ターミナルボタンを表示',
-        showTerminalButtonHelper: 'ページの右下にターミナルのショートカットボタンを表示します。',
+        showTerminalButton: 'ターミナルへのショートカット',
+        showTerminalButtonHelper: '有効にすると、ページの右下にターミナルへのショートカットボタンが表示されます。',
         local: 'ローカル',
         defaultConn: 'デフォルト接続',
         defaultConnHelper:

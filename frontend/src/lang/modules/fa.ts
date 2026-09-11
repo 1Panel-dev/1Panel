@@ -2049,8 +2049,9 @@ const message = {
         profileBlockDesc: 'زمان انسداد روی Channel، Select و ابزارهای همگام‌سازی را اندازه‌گیری می‌کند.',
     },
     terminal: {
-        showTerminalButton: 'نمایش دکمه ترمینال',
-        showTerminalButtonHelper: 'نمایش دکمه میانبر ترمینال در گوشه پایین سمت راست صفحه.',
+        showTerminalButton: 'میانبر ترمینال',
+        showTerminalButtonHelper:
+            'با فعال‌سازی این گزینه، دکمه میانبر ترمینال در گوشه پایین سمت راست صفحه نمایش داده می‌شود.',
         local: 'محلی',
         defaultConn: 'اتصال پیش‌فرض',
         defaultConnHelper:
