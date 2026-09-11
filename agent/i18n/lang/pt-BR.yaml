@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "O firewall atual não permite alterar o escopo de uma regra (como a família de endereços IPv4/IPv6). Crie uma nova regra."
+FirewallWhitelistTask: "Atualizar a lista de portas permitidas do firewall"
+FirewallWhitelistSaved: "Configuração da lista de permissões salva"
+FirewallWhitelistDeferred: "{{ .name }}: configuração salva; aguardando a ativação do firewall"
+FirewallWhitelistReleased: "{{ .name }}: proteção da lista de permissões removida; regra de permissão mantida. Para fechar a porta, exclua a regra manualmente da lista"
+FirewallWhitelistRequired: "{{ .name }}: protegido pelas regras de portas obrigatórias do sistema"

@@ -3,6 +3,9 @@ import { ResPage } from '@/api/interface';
 import { Firewall } from '@/api/interface/firewall';
 import { TimeoutEnum } from '@/enums/http-enum';
 
+export const updateFirewallPortWhitelist = (value: string) =>
+    http.post<Firewall.FilterChainOperationResult>('/hosts/firewall/settings/whitelist', { value });
+
 export const loadFireBaseInfo = (tab: string) =>
     http.post<Firewall.FirewallBase>('/hosts/firewall/base', { name: tab }, TimeoutEnum.T_40S);
 

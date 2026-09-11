@@ -19413,6 +19413,54 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/hosts/firewall/settings/whitelist": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns a taskID; configuration save and per-rule results are recorded in the task log.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FirewallPortWhitelistUpdate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Queue firewall port whitelist update",
+				"tags": [
+					"Firewall"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"value"
+					],
+					"formatEN": "update firewall port whitelist [value]",
+					"formatZH": "更新防火墙端口白名单 [value]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/hosts/info": {
 			"post": {
 				"consumes": [
@@ -31901,8 +31949,7 @@ const docTemplate = `{
 					"enum": [
 						"SystemIP",
 						"DockerSockPath",
-						"FileRecycleBin",
-						"FirewallPortWhiteList"
+						"FileRecycleBin"
 					],
 					"type": "string"
 				},
@@ -36402,6 +36449,17 @@ const docTemplate = `{
 			},
 			"required": [
 				"rule"
+			],
+			"type": "object"
+		},
+		"dto.FirewallPortWhitelistUpdate": {
+			"properties": {
+				"value": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"value"
 			],
 			"type": "object"
 		},

@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "فایروال فعلی از تغییر محدودهٔ قانون (مانند خانوادهٔ آدرس IPv4/IPv6) پشتیبانی نمی‌کند. لطفاً یک قانون جدید ایجاد کنید."
+FirewallWhitelistTask: "به‌روزرسانی فهرست پورت‌های مجاز فایروال"
+FirewallWhitelistSaved: "پیکربندی فهرست مجاز ذخیره شد"
+FirewallWhitelistDeferred: "{{ .name }}: پیکربندی ذخیره شد؛ در انتظار فعال‌سازی فایروال"
+FirewallWhitelistReleased: "{{ .name }}: حفاظت فهرست مجاز برداشته شد؛ قانون اجازه حفظ می‌شود. برای بستن پورت، قانون را به‌صورت دستی از فهرست قوانین حذف کنید"
+FirewallWhitelistRequired: "{{ .name }}: توسط قوانین پورت‌های ضروری سیستم محافظت می‌شود"

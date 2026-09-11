@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "현재 방화벽에서는 규칙의 적용 범위(예: IPv4/IPv6 주소 패밀리)를 변경할 수 없습니다. 새 규칙을 생성하세요."
+FirewallWhitelistTask: "방화벽 포트 허용 목록 업데이트"
+FirewallWhitelistSaved: "허용 목록 설정이 저장되었습니다"
+FirewallWhitelistDeferred: "{{ .name }}: 설정이 저장되었으며 방화벽 활성화 후 적용됩니다"
+FirewallWhitelistReleased: "{{ .name }}: 허용 목록 보호가 해제되었으며 허용 규칙은 유지됩니다. 포트를 닫으려면 규칙 목록에서 수동으로 삭제하세요"
+FirewallWhitelistRequired: "{{ .name }}: 시스템 필수 포트 규칙으로 보호됩니다"

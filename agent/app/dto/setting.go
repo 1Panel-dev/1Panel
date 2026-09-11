@@ -35,7 +35,7 @@ type SettingUpdate struct {
 }
 
 type AgentSettingUpdate struct {
-	Key   string `json:"key" validate:"required,oneof=SystemIP DockerSockPath FileRecycleBin FirewallPortWhiteList"`
+	Key   string `json:"key" validate:"required,oneof=SystemIP DockerSockPath FileRecycleBin"`
 	Value string `json:"value"`
 }
 

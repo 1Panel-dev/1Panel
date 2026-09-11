@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "Текущий межсетевой экран не поддерживает изменение области действия правила (например, семейства адресов IPv4/IPv6). Создайте новое правило."
+FirewallWhitelistTask: "Обновить список разрешённых портов межсетевого экрана"
+FirewallWhitelistSaved: "Настройки списка разрешённых портов сохранены"
+FirewallWhitelistDeferred: "{{ .name }}: настройки сохранены; ожидается включение межсетевого экрана"
+FirewallWhitelistReleased: "{{ .name }}: защита списка разрешённых портов снята; разрешающее правило сохранено. Чтобы закрыть порт, удалите правило вручную из списка правил"
+FirewallWhitelistRequired: "{{ .name }}: защищён обязательными правилами системных портов"

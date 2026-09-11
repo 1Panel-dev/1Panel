@@ -705,3 +705,11 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+
+# Firewall whitelist
+ErrFirewallRuleScopeChange: "The current firewall does not support changing a rule's scope (such as its IPv4/IPv6 address family). Please create a new rule."
+FirewallWhitelistTask: "Update firewall port whitelist"
+FirewallWhitelistSaved: "Whitelist configuration saved"
+FirewallWhitelistDeferred: "{{ .name }}: configuration saved; pending firewall activation"
+FirewallWhitelistReleased: "{{ .name }}: whitelist protection released; allow rule retained. To close the port, delete the rule manually from the rule list"
+FirewallWhitelistRequired: "{{ .name }}: protected by mandatory system port rules"

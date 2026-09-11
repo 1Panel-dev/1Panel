@@ -336,7 +336,7 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
 		command := insertCommand(position, normalized, marker)
-		if change.Append {
+		if change.Append || position == maximumObservedPosition(snapshot)+1 {
 			command = commentCommand(normalized, marker)
 			plan.Expected.Locator.NativeID = ""
 			plan.Expected.Locator.Position = nil

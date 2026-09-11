@@ -460,6 +460,8 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_STALE", "ErrInvalidParams", err)
 	case errors.Is(err, repo.ErrFirewallRuleRevisionConflict):
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_REVISION_CONFLICT", "ErrInvalidParams", err)
+	case errors.Is(err, filter.ErrManagedScopeChange):
+		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrFirewallRuleScopeChange", err)
 	case errors.Is(err, filter.ErrUnsupportedScope), errors.Is(err, filter.ErrInvalidScope),
 		errors.Is(err, filter.ErrProviderUnavailable), errors.Is(err, filter.ErrAdapterUnavailable):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrInvalidParams", err)
@@ -486,6 +488,29 @@ func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, data)
+}
+
+// @Tags Firewall
+// @Summary Queue firewall port whitelist update
+// @Description Returns a taskID; configuration save and per-rule results are recorded in the task log.
+// @Accept json
+// @Param request body dto.FirewallPortWhitelistUpdate true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings/whitelist [post]
+// @x-panel-log {"bodyKeys":["value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙端口白名单 [value]","formatEN":"update firewall port whitelist [value]"}
+func (b *BaseApi) UpdateFirewallPortWhitelist(c *gin.Context) {
+	var request dto.FirewallPortWhitelistUpdate
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallSettingService.QueuePortWhitelist(request.Value)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Firewall

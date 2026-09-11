@@ -108,12 +108,13 @@ type ScopeNotice struct {
 }
 
 var (
-	ErrInvalidScope     = errors.New("invalid firewall scope")
-	ErrUnsupportedScope = errors.New("unsupported firewall scope")
-	ErrInvalidRule      = errors.New("invalid firewall rule")
-	ErrProtectedRule    = errors.New("protected firewall rule cannot be modified")
-	ErrCompositeRule    = errors.New("firewall rule must be atomic")
-	ErrExpansionLimit   = errors.New("firewall rule expansion limit exceeded")
+	ErrInvalidScope       = errors.New("invalid firewall scope")
+	ErrUnsupportedScope   = errors.New("unsupported firewall scope")
+	ErrManagedScopeChange = fmt.Errorf("%w: managed rule scope cannot be changed", ErrUnsupportedScope)
+	ErrInvalidRule        = errors.New("invalid firewall rule")
+	ErrProtectedRule      = errors.New("protected firewall rule cannot be modified")
+	ErrCompositeRule      = errors.New("firewall rule must be atomic")
+	ErrExpansionLimit     = errors.New("firewall rule expansion limit exceeded")
 )
 
 type Scope struct {

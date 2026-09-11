@@ -208,7 +208,10 @@ const showPriorityField = computed(() => {
     );
 });
 const selectedPositionRanges = computed(() => {
-    const families = [...new Set(form.sourceAddresses.map((item) => item.family))];
+    const families =
+        mode.value === 'edit' && editingRule.value
+            ? [editingRule.value.scope.family]
+            : [...new Set(form.sourceAddresses.map((item) => item.family))];
     if (families.length === 0) return [{ min: 1, max: 1 }];
     return families.map((family) => positionRanges.value[family] || { min: 1, max: 1 });
 });
