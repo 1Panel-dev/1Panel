@@ -271,8 +271,7 @@ func (s *FirewallService) QueueFilterChainInitialization(
 		return dto.FilterChainOperationResponse{}, err
 	}
 
-	resourceName := fmt.Sprintf("%s filter", provider)
-	taskItem, err := task.NewTaskWithOps(resourceName, task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	taskItem, err := task.NewTask(firewallTaskName(task.TaskExec, firewallTaskHost, provider), task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("create firewall initialization task: %w", err)
 	}
@@ -812,7 +811,7 @@ func (s *FirewallService) Create(
 	ctx context.Context,
 	request dto.FirewallRuleCreate,
 ) (dto.FirewallRuleCreateResponse, error) {
-	taskItem, err := task.NewTaskWithOps("", task.TaskCreate, task.TaskScopeFirewall, "", 0)
+	taskItem, err := task.NewTask(firewallTaskName(task.TaskCreate, firewallTaskHost, ""), task.TaskCreate, task.TaskScopeFirewall, "", 0)
 	if err != nil {
 		return dto.FirewallRuleCreateResponse{}, err
 	}
