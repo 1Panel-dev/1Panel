@@ -1003,6 +1003,15 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 					"target": selected, "rule": describe(item.Rule), "count": len(rules),
 				}))
 			}
+		} else if selected == filter.ProviderUFW && strings.TrimSpace(item.Rule.DestinationPort) != "" {
+			protocol := strings.ToLower(strings.TrimSpace(item.Rule.Protocol))
+			if protocol == "" || protocol == "all" || protocol == "any" {
+				rules, err = filter.ExpandAtomicRules(applySelectedProviderScopeDefaults(item.Rule, selected))
+				if err != nil {
+					record(origin, "failed", err)
+					continue
+				}
+			}
 		}
 		for part, rule := range rules {
 			origin := itemOrigin{index: index, part: part, count: len(rules), rule: rule}
