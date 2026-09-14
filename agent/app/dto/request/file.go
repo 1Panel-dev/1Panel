@@ -122,6 +122,7 @@ type FileWget struct {
 	Name              string `json:"name" validate:"required"`
 	IgnoreCertificate bool   `json:"ignoreCertificate"`
 	UseProxy          bool   `json:"useProxy"`
+	UseServerFilename bool   `json:"useServerFilename"`
 }
 
 type FileMove struct {

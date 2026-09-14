@@ -150,6 +150,14 @@ export const wgetFile = (params: File.FileWget) => {
     return http.post<File.FileWgetRes>('files/wget', params);
 };
 
+export const getFileDownloadPreference = () => {
+    return http.get<{ useServerFilename: boolean }>('core/settings/file/download');
+};
+
+export const updateFileDownloadPreference = (useServerFilename: boolean) => {
+    return http.post('core/settings/file/download', { useServerFilename });
+};
+
 export const stopWgetFile = (key: string, currentNode?: string) => {
     return http.post('files/wget/stop', { key }, undefined, currentNode ? { CurrentNode: currentNode } : undefined);
 };
