@@ -16,12 +16,6 @@ import (
 	gossh "golang.org/x/crypto/ssh"
 )
 
-// Lifetime rules. A session outlives its websocket:
-//   - the client closes its websocket with 1000  -> the shell is closed at once
-//   - the websocket drops any other way (browser tab closed, network) -> the
-//     shell waits graceTimeout for a reattach, then is closed
-//
-// ponytail: all fixed; promote to settings only if someone asks.
 const (
 	graceTimeout       = 30 * time.Minute
 	revalidateInterval = 60 * time.Second
@@ -31,41 +25,37 @@ const (
 	pumpInterval       = 60 * time.Millisecond
 )
 
-// Websocket close codes of the session protocol; the frontend switches on them.
 const (
-	// CloseCodeSessionNotFound: the session is gone or not the caller's; do not retry.
-	CloseCodeSessionNotFound = 4404
-	// CloseCodeAttachedElsewhere: a newer websocket took over the session.
+	CloseCodeSessionNotFound   = 4404
 	CloseCodeAttachedElsewhere = 4409
 	CloseCodeRevalidate        = 4410
 )
 
 var errSessionClosed = errors.New("terminal session is closed")
 
-// SessionOptions describes a session that is about to be created.
 type SessionOptions struct {
-	Identity Identity
-	Kind     string
-	Target   string
-	Title    string
-	HostID   uint // 0 = local shell
-	Cols     int
-	Rows     int
-	InitCmd  string
+	Identity   Identity
+	Kind       string
+	Target     string
+	Title      string
+	Persistent bool
+	HostID     uint // 0 = local shell
+	Cols       int
+	Rows       int
+	InitCmd    string
 }
 
-// Info is the client visible snapshot of a session.
 type Info struct {
 	ID         string    `json:"id"`
 	Kind       string    `json:"kind"`
 	Title      string    `json:"title"`
+	Persistent bool      `json:"persistent"`
 	HostID     uint      `json:"hostId"`
 	Attached   bool      `json:"attached"`
 	CreatedAt  time.Time `json:"createdAt"`
 	DetachedAt time.Time `json:"detachedAt"` // zero while attached
 }
 
-// Session owns one shell; a websocket is only a detachable attachment.
 type Session struct {
 	ID            string
 	UserID        string
@@ -73,6 +63,7 @@ type Session struct {
 	Kind          string
 	Target        string
 	Title         string
+	Persistent    bool
 	HostID        uint
 	CreatedAt     time.Time
 
@@ -104,9 +95,6 @@ type sessionBackend interface {
 	Close() error
 }
 
-// Serve drives ws until it ends: it reattaches to sessionID when given, and
-// otherwise opens a fresh shell on the client that connect returns. A returned
-// error has not been reported to the client yet.
 func Serve(ws *websocket.Conn, sessionID string, opts SessionOptions, connect func() (*gossh.Client, error)) error {
 	return serve(ws, sessionID, opts, func() (*Session, error) {
 		client, err := connect()
@@ -138,7 +126,7 @@ func ServeCommand(ws *websocket.Conn, sessionID string, opts SessionOptions, con
 func serve(ws *websocket.Conn, sessionID string, opts SessionOptions, open func() (*Session, error)) error {
 	if sessionID != "" {
 		sess, ok := Lookup(sessionID, opts.Identity)
-		if ok && sess.Kind == opts.Kind && sess.Target == opts.Target && sess.HostID == opts.HostID {
+		if ok && sess.Kind == opts.Kind && sess.Target == opts.Target && sess.Persistent == opts.Persistent && sess.HostID == opts.HostID {
 			att, err := sess.Attach(ws, opts.Cols, opts.Rows)
 			if err == nil {
 				att.Run()
@@ -154,7 +142,6 @@ func serve(ws *websocket.Conn, sessionID string, opts SessionOptions, open func(
 	if err != nil {
 		return err
 	}
-	// no sess.Close() on return: a dirty disconnect leaves the shell alive for a reattach
 	att, err := sess.Attach(ws, opts.Cols, opts.Rows)
 	if err != nil {
 		sess.Close()
@@ -164,7 +151,6 @@ func serve(ws *websocket.Conn, sessionID string, opts SessionOptions, open func(
 	return nil
 }
 
-// Open starts a shell on client and registers the session.
 func Open(client *gossh.Client, opts SessionOptions) (*Session, error) {
 	if err := validateSessionOptions(opts); err != nil {
 		return nil, err
@@ -197,6 +183,7 @@ func openBackend(backend sessionBackend, ring *ringBuffer, opts SessionOptions) 
 		Kind:          opts.Kind,
 		Target:        opts.Target,
 		Title:         opts.Title,
+		Persistent:    opts.Persistent,
 		HostID:        opts.HostID,
 		CreatedAt:     time.Now(),
 		cols:          opts.Cols,
@@ -229,8 +216,6 @@ func validateSessionOptions(opts SessionOptions) error {
 	return nil
 }
 
-// Attach binds ws to the session, kicking any previous attachment, and replays
-// the retained output tail before any live output.
 func (s *Session) Attach(ws *websocket.Conn, cols, rows int) (*attachment, error) {
 	if ws == nil {
 		return nil, errors.New("nil websocket connection")
@@ -299,7 +284,6 @@ func (s *Session) Attach(ws *websocket.Conn, cols, rows int) (*attachment, error
 	return att, nil
 }
 
-// detach unbinds a. A clean detach closes the shell; a dirty one arms the grace timer.
 func (s *Session) detach(a *attachment, clean, revalidate bool, cursor uint64) {
 	s.mu.Lock()
 	if s.attached != a {
@@ -312,7 +296,8 @@ func (s *Session) detach(a *attachment, clean, revalidate bool, cursor uint64) {
 	if revalidate {
 		s.revalidateCursor = cursor
 	}
-	if !clean {
+	shouldClose := clean || (!s.Persistent && !revalidate)
+	if !shouldClose {
 		timeout := graceTimeout
 		if revalidate {
 			timeout = revalidateGrace
@@ -320,7 +305,7 @@ func (s *Session) detach(a *attachment, clean, revalidate bool, cursor uint64) {
 		s.grace = time.AfterFunc(timeout, s.Close)
 	}
 	s.mu.Unlock()
-	if clean {
+	if shouldClose {
 		s.Close()
 	}
 }
@@ -356,7 +341,6 @@ func (s *Session) doClose() {
 	}
 }
 
-// Info snapshots the session for listing.
 func (s *Session) Info() Info {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -364,6 +348,7 @@ func (s *Session) Info() Info {
 		ID:         s.ID,
 		Kind:       s.Kind,
 		Title:      s.Title,
+		Persistent: s.Persistent,
 		HostID:     s.HostID,
 		Attached:   s.attached != nil,
 		CreatedAt:  s.CreatedAt,
@@ -371,7 +356,6 @@ func (s *Session) Info() Info {
 	}
 }
 
-// resize forwards a window size change to the shell.
 func (s *Session) resize(cols, rows int) {
 	s.mu.Lock()
 	s.cols, s.rows = cols, rows
@@ -381,14 +365,12 @@ func (s *Session) resize(cols, rows int) {
 	}
 }
 
-// writeInput forwards client input to the shell stdin.
 func (s *Session) writeInput(data []byte) {
 	if _, err := s.backend.Write(data); err != nil {
 		global.LOG.Errorf("ws cmd bytes write to ssh.stdin pipe failed, err: %v", err)
 	}
 }
 
-// ensureAIInterceptor rebuilds the interceptor when AI runtime settings change.
 func (s *Session) ensureAIInterceptor() *aiInputInterceptor {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -399,7 +381,6 @@ func (s *Session) ensureAIInterceptor() *aiInputInterceptor {
 	return s.aiInterceptor
 }
 
-// pump forwards new ring output to the current attachment.
 func (s *Session) pump() {
 	defer func() {
 		if r := recover(); r != nil {
@@ -418,8 +399,6 @@ func (s *Session) pump() {
 	}
 }
 
-// flush sends everything the attachment has not seen yet. A client that fell
-// behind the ring skips ahead and is told so; output is never queued unbounded.
 func (s *Session) flush() {
 	s.mu.Lock()
 	att := s.attached
@@ -448,7 +427,6 @@ func (s *Session) flush() {
 	att.cursor = next
 }
 
-// keepaliveLoop probes the shell connection; a failed or stuck probe closes the session.
 func (s *Session) keepaliveLoop() {
 	tick := time.NewTicker(keepaliveInterval)
 	defer tick.Stop()
@@ -477,7 +455,6 @@ func (s *Session) keepaliveLoop() {
 	}
 }
 
-// waitBackend closes the session once the shell exits, after a last flush.
 func (s *Session) waitBackend() {
 	_ = s.backend.Wait()
 	s.flush()
@@ -489,7 +466,6 @@ func cmdMessage(data []byte) []byte {
 	return msg
 }
 
-// sendClose writes a close frame with code and reason, best effort.
 func sendClose(ws *websocket.Conn, code int, reason string) {
 	_ = ws.WriteControl(websocket.CloseMessage, websocket.FormatCloseMessage(code, reason), time.Now().Add(time.Second))
 }

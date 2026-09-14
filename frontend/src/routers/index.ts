@@ -6,7 +6,7 @@ import { hasRouteAccess } from '@/utils/rbac';
 import { loadProductProFromDB } from '@/utils/xpack';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
-import { TerminalSessionStore } from '@/store';
+import { TerminalDockSessionStore, TerminalSessionStore } from '@/store';
 
 const axiosCanceler = new AxiosCanceler();
 
@@ -26,6 +26,7 @@ const clearLoginStatus = () => {
     globalStore.clearAuthInfo();
     clearLicenseStatus();
     TerminalSessionStore().closeAll();
+    TerminalDockSessionStore().closeAll();
 };
 
 router.beforeEach(async (to, from) => {

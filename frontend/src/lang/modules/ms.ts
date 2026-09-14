@@ -2149,9 +2149,11 @@ const message = {
         sessionRuleRevalidate: 'Sesi tamat jika log masuk tidak sah atau pengesahan melebihi had masa.',
         sessionRuleResources:
             'Lebih banyak terminal menggunakan lebih banyak sumber. Tutup terminal yang tidak lagi diperlukan.',
+        sessionRuleDisableShortcut: 'Lumpuhkan pintasan terminal di Terminal - Tetapan.',
         minimize: 'Minimumkan',
         closeAllSessions: 'Tutup semua sesi',
         closeAllConfirm: 'Semua sesi terminal akan diputuskan dan tidak boleh dipulihkan. Teruskan?',
+        disableShortcutConfirm: 'Melumpuhkan pintasan terminal akan memutuskan semua sesi yang berkaitan. Teruskan?',
         lineHeight: 'Ketinggian baris',
         letterSpacing: 'Jarak huruf',
         fontSize: 'Saiz fon',

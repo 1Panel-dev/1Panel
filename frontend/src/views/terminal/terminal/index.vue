@@ -180,12 +180,8 @@ const acceptParams = async () => {
         await claim();
         store.sync();
     }
+    cleanTimer();
     timer = setInterval(store.sync, 1000 * 5);
-    if (!isMobile.value) {
-        screenfull.on('change', () => {
-            isFullScreen.value = screenfull.isFullscreen;
-        });
-    }
 };
 
 const openDefaultLocalConn = async () => {
@@ -332,6 +328,7 @@ onBeforeUnmount(() => {
     cleanTimer();
     pageVisible = false;
     claim();
+    store.closeAll();
 });
 
 onMounted(() => {

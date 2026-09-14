@@ -29,6 +29,7 @@ import (
 // @Summary Ws local terminal
 // @Param command query string false "command"
 // @Param session query string false "session id to reattach"
+// @Param terminalPersistent query boolean false "allow recovery after an unexpected disconnect"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -43,6 +44,7 @@ func (b *BaseApi) WsLocalTerminal(c *gin.Context) {
 // @Param command query string false "command"
 // @Param session query string false "session id to reattach"
 // @Param title query string false "session title shown in the session list"
+// @Param terminalPersistent query boolean false "allow recovery after an unexpected disconnect"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -146,13 +148,14 @@ func (b *BaseApi) runSSHSession(c *gin.Context, kind string, connect func() (*ss
 		hostID, _ = strconv.Atoi(c.DefaultQuery("id", "0"))
 	}
 	opts := terminal.SessionOptions{
-		Identity: identity,
-		Kind:     kind,
-		Title:    sanitizeTerminalTitle(c.Query("title")),
-		HostID:   uint(max(hostID, 0)),
-		Cols:     cols,
-		Rows:     rows,
-		InitCmd:  command,
+		Identity:   identity,
+		Kind:       kind,
+		Title:      sanitizeTerminalTitle(c.Query("title")),
+		Persistent: c.Query("terminalPersistent") == "true",
+		HostID:     uint(max(hostID, 0)),
+		Cols:       cols,
+		Rows:       rows,
+		InitCmd:    command,
 	}
 	err := terminal.Serve(wsConn, strings.TrimSpace(c.Query("session")), opts, func() (*gossh.Client, error) {
 		client, err := connect()

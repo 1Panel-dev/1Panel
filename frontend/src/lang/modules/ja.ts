@@ -2110,9 +2110,12 @@ const message = {
         sessionRuleDisconnect: '再読み込み、ブラウザー終了、通信切断後は30分以内に復元できます。',
         sessionRuleRevalidate: 'ログインが無効、または認証がタイムアウトするとセッションは終了します。',
         sessionRuleResources: '端末が増えるほどリソース消費も増えます。不要な端末は閉じてください。',
+        sessionRuleDisableShortcut: '「ターミナル - 設定」でターミナルショートカットを無効にできます。',
         minimize: '最小化',
         closeAllSessions: 'すべてのセッションを閉じる',
         closeAllConfirm: 'すべてのターミナルセッションが切断され、復元できません。続行しますか？',
+        disableShortcutConfirm:
+            'ターミナルショートカットを無効にすると、そのすべてのセッションが切断されます。続行しますか？',
         lineHeight: '行の高さ',
         letterSpacing: '文字間隔',
         fontSize: 'フォントサイズ',

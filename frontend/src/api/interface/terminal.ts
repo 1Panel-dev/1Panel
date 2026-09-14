@@ -13,6 +13,7 @@ export interface TerminalSession {
     kind: 'local' | 'ssh' | 'container';
     title: string;
     hostId: number;
+    persistent: boolean;
     attached: boolean;
     createdAt: string;
     detachedAt: string;
