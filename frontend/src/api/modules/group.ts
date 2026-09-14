@@ -14,8 +14,13 @@ export const deleteGroup = (id: number) => {
     return http.post(`/core/groups/del`, { id: id });
 };
 
-export const getAgentGroupList = (type: string) => {
-    return http.post<Array<Group.GroupInfo>>(`/groups/search`, { type: type });
+export const getAgentGroupList = (type: string, nodeName?: string) => {
+    return http.post<Array<Group.GroupInfo>>(
+        `/groups/search`,
+        { type: type },
+        undefined,
+        nodeName ? { CurrentNode: nodeName } : undefined,
+    );
 };
 export const createAgentGroup = (params: Group.GroupCreate) => {
     return http.post<Group.GroupCreate>(`/groups`, params);
