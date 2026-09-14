@@ -1,5 +1,9 @@
 <template>
-    <div v-if="terminalStore.showTerminalButton && !onTerminalPage" class="terminal-dock-handle" @click="show">
+    <div
+        v-if="isAdmin && terminalStore.showTerminalButton && !onTerminalPage"
+        class="terminal-dock-handle"
+        @click="show"
+    >
         <el-badge
             :value="store.entries.length"
             :hidden="store.entries.length === 0"
@@ -12,6 +16,7 @@
     </div>
 
     <DialogPro
+        v-if="isAdmin"
         v-model="open"
         :title="$t('menu.terminal')"
         size="w-70"
@@ -86,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onMounted, ref, watch } from 'vue';
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import i18n from '@/lang';
 import { TerminalSessionStore, TerminalStore } from '@/store';
@@ -94,9 +99,11 @@ import { getTerminalInfo } from '@/api/modules/setting';
 import { ElMessageBox } from 'element-plus';
 import ConnectionMenu from '@/components/terminal/connection-menu/index.vue';
 import type { TerminalConnectionOptions } from '@/components/terminal/connection-menu/types';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const store = TerminalSessionStore();
 const terminalStore = TerminalStore();
+const { isAdmin } = useGlobalStore();
 const route = useRoute();
 const onTerminalPage = computed(() => route.path.startsWith('/terminal'));
 
@@ -111,13 +118,16 @@ const showConnections = ref(false);
 let timer: ReturnType<typeof setInterval> | null = null;
 
 const openConnection = async (options: TerminalConnectionOptions) => {
+    if (!isAdmin.value) return;
     active.value = await store.open(options);
 };
 
 const show = async () => {
+    if (!isAdmin.value) return;
     if (!store.find(active.value)) active.value = store.entries[0]?.key || '';
     open.value = true;
     await nextTick();
+    if (!open.value || !isAdmin.value) return;
     claim();
     store.sync();
     timer = setInterval(store.sync, 5000);
@@ -132,11 +142,20 @@ const park = () => {
 watch(open, (value) => {
     if (!value) park();
 });
+watch(isAdmin, (allowed) => {
+    if (!allowed) open.value = false;
+});
+onBeforeUnmount(() => {
+    if (timer) clearInterval(timer);
+});
 
 const slotEls: Record<string, HTMLElement> = {};
 const onSlot = (key: string, el: HTMLElement | null) => {
     if (el) slotEls[key] = el;
-    else delete slotEls[key];
+    else {
+        if (store.slots[key] === slotEls[key]) store.setSlot(key, null);
+        delete slotEls[key];
+    }
 };
 const claim = () => {
     for (const item of store.entries) {
