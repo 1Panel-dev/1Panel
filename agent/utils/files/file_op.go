@@ -840,8 +840,7 @@ func downloadAttempt(ctx context.Context, client *http.Client, rawURL, dst strin
 		}
 	}
 	if len(resolveName) > 0 {
-		dst, err = resolveName[0](resp)
-		if err != nil {
+		if _, err := resolveName[0](resp); err != nil {
 			return false, 0, err
 		}
 	}
