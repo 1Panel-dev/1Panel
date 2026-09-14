@@ -320,7 +320,6 @@ func (s *Session) detach(a *attachment, clean, revalidate bool, cursor uint64) {
 		s.grace = time.AfterFunc(timeout, s.Close)
 	}
 	s.mu.Unlock()
-	global.LOG.Debugf("terminal session %s detached, clean=%v", s.ID, clean)
 	if clean {
 		s.Close()
 	}
