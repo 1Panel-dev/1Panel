@@ -12,8 +12,26 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 )
 
-func queueFirewallRuleTask(name, operation string, labels []string, apply func(context.Context) error) (dto.FilterChainOperationResponse, error) {
-	taskItem, err := task.NewTaskWithOps(name, operation, task.TaskScopeFirewall, "", 0)
+const (
+	firewallTaskHost       = "FirewallTaskHost"
+	firewallTaskForwarding = "FirewallTaskForwarding"
+	firewallTaskDocker     = "FirewallTaskDocker"
+)
+
+func firewallTaskName(operation, subsystem, backend string) string {
+	name := i18n.GetMsgByKey(subsystem)
+	if backend != "" {
+		name += " · " + backend
+	}
+	key := "FirewallRule" + operation
+	if operation == task.TaskExec {
+		key = "FirewallTaskInitialize"
+	}
+	return i18n.GetMsgWithMap(key, map[string]interface{}{"name": name})
+}
+
+func queueFirewallRuleTask(subsystem, operation string, labels []string, apply func(context.Context) error) (dto.FilterChainOperationResponse, error) {
+	taskItem, err := task.NewTask(firewallTaskName(operation, subsystem, ""), operation, task.TaskScopeFirewall, "", 0)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, err
 	}

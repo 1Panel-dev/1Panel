@@ -406,8 +406,7 @@ func (s *FirewallService) syncSystemRules(
 	if firewallSyncSubsystem(request.Subsystem) != "system" {
 		return dto.FirewallRuleSyncResult{}, fmt.Errorf("%w: firewall synchronization tasks are only available for the system firewall", filter.ErrInvalidRule)
 	}
-	resourceName := fmt.Sprintf("database -> %s", request.TargetProvider)
-	taskItem, err := task.NewTaskWithOps(resourceName, task.TaskSync, task.TaskScopeFirewall, "", 0)
+	taskItem, err := task.NewTask(firewallTaskName(task.TaskSync, firewallTaskHost, string(request.TargetProvider)), task.TaskSync, task.TaskScopeFirewall, "", 0)
 	if err != nil {
 		return dto.FirewallRuleSyncResult{}, fmt.Errorf("create firewall sync task: %w", err)
 	}

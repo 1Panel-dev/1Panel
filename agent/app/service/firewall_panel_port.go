@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -44,49 +45,71 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 	if err != nil {
 		return err
 	}
-	if supportsManagedFilterChains(provider) {
+	managedChains := supportsManagedFilterChains(provider)
+	if managedChains {
 		firewallRuleMutationMu.Lock()
 		defer firewallRuleMutationMu.Unlock()
-		prepared := append([]firewall.PortWhitelist{{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"}}, required...)
-		if err := syncPanelRequiredPorts(provider, prepared); err != nil {
-			return err
-		}
-		warnPanelPortCleanupFailure(oldPort, syncPanelRequiredPorts(provider, required))
-		return nil
 	}
 	configured, err := loadConfiguredFirewallPortWhiteList()
 	if err != nil {
 		return err
 	}
 	protected := firewall.NormalizePortWhitelist(append(configured, required...))
+	if managedChains {
+		prepared := append([]firewall.PortWhitelist{{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"}}, required...)
+		if err := syncPanelRequiredPorts(provider, prepared); err != nil {
+			return err
+		}
+		if err := syncPanelRequiredPorts(provider, required); err != nil {
+			warnPanelPortCleanupFailure(oldPort, err)
+			return nil
+		}
+		warnPanelPortCleanupFailure(oldPort, s.cleanupPanelPortLocked(ctx, provider, oldPort, protected))
+		return nil
+	}
 	ports := systemPorts([]firewall.PortWhitelist{{Port: strconv.Itoa(int(port)), Protocol: "tcp"}})
 	for _, port := range ports {
 		if err := s.ensureSystemPort(ctx, port); err != nil {
 			return err
 		}
 	}
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	warnPanelPortCleanupFailure(oldPort, s.cleanupPanelPortLocked(ctx, provider, oldPort, protected))
+	return nil
+}
+
+// cleanupPanelPortLocked removes the old system-owned policy as well as any
+// remaining managed runtime rule. The caller must hold firewallRuleMutationMu.
+func (s *FirewallService) cleanupPanelPortLocked(ctx context.Context, provider string, oldPort uint, protected []firewall.PortWhitelist) error {
 	ctx = context.WithValue(ctx, panelPortWhitelistKey{}, protected)
-	for index := range ports {
-		ports[index].Port = strconv.Itoa(int(oldPort))
-	}
+	ports := systemPorts([]firewall.PortWhitelist{{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"}})
 	if provider == constant.FirewallProviderUFW {
 		for _, port := range ports {
 			port.Protocol = "all"
 			ports = append(ports, port)
 		}
 	}
-	if provider == constant.FirewallProviderFirewalld {
-		ports = append(ports, dto.FirewallSystemPort{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"})
-	}
+	// Include family-neutral records left by firewalld or older versions, even
+	// when the selected backend has since changed.
+	ports = append(ports, dto.FirewallSystemPort{Port: strconv.Itoa(int(oldPort)), Protocol: "tcp"})
+	var cleanupErrors []error
 	for _, port := range ports {
 		if panelPortStillRequired(port, protected) {
 			continue
 		}
-		if err := s.deleteSystemPort(ctx, port); err != nil {
-			warnPanelPortCleanupFailure(oldPort, err)
+		records, err := s.systemPortRecords(ctx, port)
+		if err != nil {
+			cleanupErrors = append(cleanupErrors, err)
+			continue
+		}
+		for _, record := range records {
+			if err := s.deleteRule(ctx, record.UUID, true); err != nil && !errors.Is(err, filter.ErrProtectedRule) {
+				cleanupErrors = append(cleanupErrors, err)
+			}
 		}
 	}
-	return nil
+	return errors.Join(cleanupErrors...)
 }
 
 func warnPanelPortCleanupFailure(port uint, err error) {

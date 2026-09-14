@@ -159,10 +159,6 @@ ErrCustomApps: "存在已安装应用，请先卸载"
 ErrCustomRuntimes: "存在已安装运行环境，请先删除"
 ErrAppVersionDeprecated: "{{ .name }} 应用不适配当前 1Panel 版本，跳过"
 ErrDockerFailed: "Docker 状态异常，请检查服务状态"
-ErrDockerIptablesChainUnavailable: "未检测到 Docker 的 DOCKER-USER 链，请重启 Docker 后重试"
-ErrDockerNftablesChainUnavailable: "未检测到 Docker 的 nftables IPv4 防火墙链，请确认当前 Docker 版本支持 nftables 防火墙后端，重启 Docker 后重试"
-ErrDockerForwardPolicyDrop: '检测到 {{ .family }} FORWARD 默认策略为 DROP，请调整后重试'
-ErrUFWRuleAdopt: "UFW 规则纳管失败：{{ .detail }}。如果当前 UFW 版本低于 0.35，请先升级 UFW 后重试"
 ErrDockerComposeCmdNotFound: "Docker Compose 命令不存在，请先在宿主机安装"
 UseExistImage: "镜像已存在，使用存量镜像"
 UpgradePrepare: "准备应用升级"
@@ -510,29 +506,6 @@ Container: "容器"
 AppLink: "关联应用"
 EnableSSL: "开启 HTTPS"
 AppStore: "应用商店"
-Firewall: "防火墙"
-FirewallCreateRulesStep: '创建防火墙规则'
-FirewallCreateRulesResult: '创建结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
-FirewallRuleOperationResult: '操作结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条'
-FirewallCreateRuleSkipped: '未执行'
-FirewallCreateBatchStep: '向 {{ .backend }} 批量提交 {{ .count }} 条规则'
-FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}：{{ .rule }}；转换为 {{ .count }} 条规则'
-FirewallCreateRuleExecutionFailed: '规则创建失败，未入库，已执行的命令不回滚'
-FirewallCreateRulePersistenceFailed: '规则已创建，但纳管信息保存失败'
-FirewallAdoptRulePersistenceFailed: '规则纳管命令已执行，但纳管信息保存失败'
-FirewallSyncOperationsResult: '同步操作汇总：删除成功 {{ .removed }} 条，创建成功 {{ .created }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
-FirewallSyncStep: "同步规则到 {{ .name }}"
-FirewallSyncFailed: "{{ .failed }} 条防火墙规则同步失败"
-FirewallResetSourceStep: "重置并停用源防火墙 {{ .name }}"
-FirewallResetSourceResult: "源防火墙重置完成，已删除 {{ .removed }} 条数据库规则"
-FirewallInitializeChainsStep: "初始化并绑定 {{ .name }} 基础链"
-FirewallRestoreRulesStep: "恢复数据库规则到 {{ .name }}"
-FirewallSyncWhitelistStep: "同步防火墙端口白名单"
-FirewallEnableForwardingStep: "启用并绑定端口转发链"
-FirewallRestoreForwardingRulesStep: "恢复数据库端口转发规则"
-FirewallInspectDockerGuardStep: "检查 Docker 防火墙后端和防护策略"
-FirewallInitializeDockerGuardStep: "初始化并绑定 {{ .name }} 端口防护链"
-FirewallPersistDockerGuardStep: "保存 Docker 端口防护状态"
 TaskSync: "同步"
 LocalApp: "本地应用"
 SubTask: "子任务"
@@ -706,7 +679,42 @@ AIProviderBailianCodingPlan: "阿里云百炼 Coding Plan"
 AIProviderArk: "火山方舟"
 AIProviderArkCodingPlan: "火山方舟 Coding Plan"
 
-# Firewall whitelist
+# 防火墙
+ErrDockerIptablesChainUnavailable: "未检测到 Docker 的 DOCKER-USER 链，请重启 Docker 后重试"
+ErrDockerNftablesChainUnavailable: "未检测到 Docker 的 nftables IPv4 防火墙链，请确认当前 Docker 版本支持 nftables 防火墙后端，重启 Docker 后重试"
+ErrDockerForwardPolicyDrop: '检测到 {{ .family }} FORWARD 默认策略为 DROP，请调整后重试'
+ErrUFWRuleAdopt: "UFW 规则纳管失败：{{ .detail }}。如果当前 UFW 版本低于 0.35，请先升级 UFW 后重试"
+Firewall: "防火墙"
+FirewallTaskHost: '主机防火墙'
+FirewallTaskForwarding: '端口转发'
+FirewallTaskDocker: '容器端口防护'
+FirewallRuleTaskCreate: '创建防火墙规则[{{ .name }}]'
+FirewallRuleTaskUpdate: '更新防火墙规则[{{ .name }}]'
+FirewallRuleTaskDelete: '删除防火墙规则[{{ .name }}]'
+FirewallRuleTaskSync: '同步防火墙规则[{{ .name }}]'
+FirewallTaskInitialize: '初始化防火墙[{{ .name }}]'
+FirewallCreateRulesStep: '创建防火墙规则'
+FirewallCreateRulesResult: '创建结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
+FirewallRuleOperationResult: '操作结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条'
+FirewallCreateRuleSkipped: '未执行'
+FirewallCreateBatchStep: '向 {{ .backend }} 批量提交 {{ .count }} 条规则'
+FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}：{{ .rule }}；转换为 {{ .count }} 条规则'
+FirewallCreateRuleExecutionFailed: '规则创建失败，未入库，已执行的命令不回滚'
+FirewallCreateRulePersistenceFailed: '规则已创建，但纳管信息保存失败'
+FirewallAdoptRulePersistenceFailed: '规则纳管命令已执行，但纳管信息保存失败'
+FirewallSyncOperationsResult: '同步操作汇总：删除成功 {{ .removed }} 条，创建成功 {{ .created }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
+FirewallSyncStep: "同步规则到 {{ .name }}"
+FirewallSyncFailed: "{{ .failed }} 条防火墙规则同步失败"
+FirewallResetSourceStep: "重置并停用源防火墙 {{ .name }}"
+FirewallResetSourceResult: "源防火墙重置完成，已删除 {{ .removed }} 条数据库规则"
+FirewallInitializeChainsStep: "初始化并绑定 {{ .name }} 基础链"
+FirewallRestoreRulesStep: "恢复数据库规则到 {{ .name }}"
+FirewallSyncWhitelistStep: "同步防火墙端口白名单"
+FirewallEnableForwardingStep: "启用并绑定端口转发链"
+FirewallRestoreForwardingRulesStep: "恢复数据库端口转发规则"
+FirewallInspectDockerGuardStep: "检查 Docker 防火墙后端和防护策略"
+FirewallInitializeDockerGuardStep: "初始化并绑定 {{ .name }} 端口防护链"
+FirewallPersistDockerGuardStep: "保存 Docker 端口防护状态"
 ErrFirewallRuleScopeChange: "当前防火墙不支持修改规则的作用范围（如 IPv4/IPv6 地址族），请新建规则。"
 FirewallWhitelistTask: "更新防火墙端口白名单"
 FirewallWhitelistSaved: "白名单配置已保存"

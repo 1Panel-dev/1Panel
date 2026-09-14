@@ -281,6 +281,8 @@
                                 <el-table-column :label="$t('firewall.used')" min-width="200">
                                     <template #default="{ row }">
                                         <span v-if="isReadOnlyNativeRule(row)">-</span>
+                                        <el-icon v-else-if="usageLoading" class="is-loading"><Loading /></el-icon>
+                                        <span v-else-if="usageFailed">-</span>
                                         <el-tag v-else-if="ruleUsageEntries(row).length === 0" type="info" size="small">
                                             {{ $t('firewall.unUsed') }}
                                         </el-tag>
@@ -413,9 +415,9 @@ import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { loadDockerStatus } from '@/api/modules/container';
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
-import { Expand, Filter, Lock, WarningFilled } from '@element-plus/icons-vue';
+import { Expand, Filter, Loading, Lock, WarningFilled } from '@element-plus/icons-vue';
 
 interface RuleRow extends Firewall.InventoryItem {
     rowKey: string;
@@ -507,6 +509,10 @@ const inventoryTotal = ref(0);
 const managedTotal = ref(0);
 const listeningProcesses = ref<Process.ListeningProcess[]>([]);
 const dockerEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
+const usageLoading = ref(false);
+const usageFailed = ref(false);
+let searchRequestID = 0;
+let usageRequest: Promise<void> = Promise.resolve();
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
@@ -585,6 +591,11 @@ const inventoryRequest = (page = paginationConfig.currentPage, pageSize = pagina
 });
 
 const search = async () => {
+    const requestID = ++searchRequestID;
+    listeningProcesses.value = [];
+    dockerEndpoints.value = [];
+    usageLoading.value = false;
+    usageFailed.value = false;
     if (!isFirewallReady.value) {
         loading.value = false;
         inventoryItems.value = [];
@@ -609,12 +620,13 @@ const search = async () => {
     }
 
     loading.value = true;
+    usageLoading.value = true;
+    usageRequest = Promise.all([loadListeningProcesses(requestID), loadDockerEndpoints(requestID)]).then(() => {
+        if (requestID === searchRequestID) usageLoading.value = false;
+    });
     try {
-        const [response] = await Promise.all([
-            searchFirewallRules(inventoryRequest()),
-            loadListeningProcesses(),
-            loadDockerEndpoints(),
-        ]);
+        const response = await searchFirewallRules(inventoryRequest());
+        if (requestID !== searchRequestID) return;
         const total = response.data.total || 0;
         const lastPage = Math.max(1, Math.ceil(total / paginationConfig.pageSize));
         if (paginationConfig.currentPage > lastPage) {
@@ -634,7 +646,7 @@ const search = async () => {
         managedTotal.value = response.data.managedTotal || 0;
         selects.value = [];
     } finally {
-        loading.value = false;
+        if (requestID === searchRequestID) loading.value = false;
     }
 };
 
@@ -742,21 +754,26 @@ const listeningProtocolNumbers = (protocol: string) => {
             return [];
     }
 };
-const loadListeningProcesses = async () => {
+const loadListeningProcesses = async (requestID: number) => {
     try {
         const response = await getListeningProcess();
+        if (requestID !== searchRequestID) return;
         listeningProcesses.value = response.data || [];
     } catch {
+        if (requestID !== searchRequestID) return;
         listeningProcesses.value = [];
+        usageFailed.value = true;
     }
 };
-const loadDockerEndpoints = async () => {
+const loadDockerEndpoints = async (requestID: number) => {
     try {
-        dockerEndpoints.value = (await loadDockerPublishedPorts()).data.flatMap(
-            (container) => container.endpoints || [],
-        );
+        const response = await loadDockerPublishedPorts();
+        if (requestID !== searchRequestID) return;
+        dockerEndpoints.value = response.data.flatMap((container) => container.endpoints || []);
     } catch {
+        if (requestID !== searchRequestID) return;
         dockerEndpoints.value = [];
+        usageFailed.value = true;
     }
 };
 const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
@@ -1066,6 +1083,9 @@ const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
 
 const removeRules = async (selected: RuleRow[]) => {
     if (selected.length === 0) return;
+    const requestID = searchRequestID;
+    await usageRequest;
+    if (requestID !== searchRequestID) return;
     try {
         await ElMessageBox.confirm(deleteRulesConfirmMessage(selected), i18n.global.t('commons.button.delete'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -1268,6 +1288,10 @@ const operationButtons = [
 onMounted(() => {
     loading.value = true;
     fireStatusRef.value?.acceptParams();
+});
+
+onBeforeUnmount(() => {
+    searchRequestID++;
 });
 </script>
 

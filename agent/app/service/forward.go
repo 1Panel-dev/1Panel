@@ -204,7 +204,7 @@ func (s *ForwardingService) OperateRules(request dto.ForwardRuleOperate) (dto.Fi
 	if forwardingOperationsOnlyRemove(request.Rules) {
 		operation = task.TaskDelete
 	}
-	return queueFirewallRuleTask("Forwarding", operation, labels, func(ctx context.Context) error {
+	return queueFirewallRuleTask(firewallTaskForwarding, operation, labels, func(ctx context.Context) error {
 		return s.operateRules(ctx, request)
 	})
 }
@@ -274,7 +274,7 @@ func (s *ForwardingService) QueueInitialization(
 	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
 		return dto.FilterChainOperationResponse{}, err
 	}
-	taskItem, err := task.NewTaskWithOps("port forwarding", task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	taskItem, err := task.NewTask(firewallTaskName(task.TaskExec, firewallTaskForwarding, ""), task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("create forwarding initialization task: %w", err)
 	}

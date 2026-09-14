@@ -691,7 +691,8 @@ type mergedObject struct {
 
 func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filter.ObservedRule, error) {
 	objects := make(map[string]*mergedObject)
-	add := func(rule filter.ObservedRule, runtimeState bool) {
+	richObjects := make(map[string]*mergedObject)
+	add := func(rule filter.ObservedRule, runtimeState bool) *mergedObject {
 		key := string(rule.Rule.NativeKind) + "\x00" + rule.Locator.Canonical
 		object, exists := objects[key]
 		if !exists {
@@ -704,12 +705,18 @@ func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filt
 		} else {
 			object.permanent = true
 		}
+		return object
 	}
 	parse := func(output zoneOutput, runtimeState bool) error {
 		for _, rule := range parseZonePorts(scope, output.ports) {
 			add(rule, runtimeState)
 		}
 		for _, raw := range nonEmptyLines(output.rich) {
+			if object, exists := richObjects[raw]; exists {
+				object.runtime = object.runtime || runtimeState
+				object.permanent = object.permanent || !runtimeState
+				continue
+			}
 			rule, family, supported := parseRichRule(scope, raw)
 			if !supported {
 				opaqueScope := scope
@@ -718,7 +725,7 @@ func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filt
 				}
 				rule = opaqueRichRule(opaqueScope, raw)
 			}
-			add(rule, runtimeState)
+			richObjects[raw] = add(rule, runtimeState)
 		}
 		for _, service := range strings.Fields(output.services) {
 			if scope.Family == filter.FamilyInet {

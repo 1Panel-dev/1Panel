@@ -42,9 +42,14 @@ func ProtectSnapshot(snapshot Snapshot, ports []PortWhitelist) (Snapshot, error)
 			rules[index].Protected = true
 		}
 	}
-	protected, err := NewSnapshot(snapshot.Scope, rules)
-	if err != nil {
-		return Snapshot{}, err
+	protected := snapshot
+	protected.Rules = rules
+	if protected.Revision == "" {
+		var err error
+		protected, err = NewSnapshot(snapshot.Scope, rules)
+		if err != nil {
+			return Snapshot{}, err
+		}
 	}
 	protected.Notices = append([]ScopeNotice(nil), snapshot.Notices...)
 	return protected, nil

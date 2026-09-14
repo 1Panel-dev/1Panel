@@ -292,7 +292,7 @@ func (s *DockerPortGuardService) QueueInitialization(
 	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeFirewall, 0); err != nil {
 		return dto.FilterChainOperationResponse{}, err
 	}
-	taskItem, err := task.NewTaskWithOps("Docker port guard", task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
+	taskItem, err := task.NewTask(firewallTaskName(task.TaskExec, firewallTaskDocker, ""), task.TaskExec, task.TaskScopeFirewall, request.TaskID, 0)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("create Docker port guard initialization task: %w", err)
 	}
@@ -346,7 +346,7 @@ func (s *DockerPortGuardService) DeletePolicies(request dto.DockerPortGuardPolic
 	for i, id := range uuids {
 		labels[i] = fmt.Sprintf("[%d/%d] %s", i+1, len(uuids), id)
 	}
-	return queueFirewallRuleTask("Docker", task.TaskDelete, labels, func(ctx context.Context) error {
+	return queueFirewallRuleTask(firewallTaskDocker, task.TaskDelete, labels, func(ctx context.Context) error {
 		dockerPortGuardServiceMu.Lock()
 		defer dockerPortGuardServiceMu.Unlock()
 		if err := ctx.Err(); err != nil {
@@ -364,7 +364,7 @@ func (s *DockerPortGuardService) UpsertPolicies(request dto.DockerPortGuardPolic
 	for i, policy := range request.Policies {
 		labels[i] = fmt.Sprintf("[%d/%d] %s %s %s:%d %s", i+1, len(request.Policies), policy.Family, policy.Protocol, policy.HostIP, policy.HostPort, policy.Mode)
 	}
-	return queueFirewallRuleTask("Docker", task.TaskUpdate, labels, func(ctx context.Context) error {
+	return queueFirewallRuleTask(firewallTaskDocker, task.TaskUpdate, labels, func(ctx context.Context) error {
 		dockerPortGuardServiceMu.Lock()
 		defer dockerPortGuardServiceMu.Unlock()
 		policies := make([]model.DockerPortGuardPolicy, 0, len(request.Policies))
