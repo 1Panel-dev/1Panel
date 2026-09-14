@@ -117,6 +117,21 @@ func ExpandAtomicRules(input FirewallRule) ([]FirewallRule, error) {
 		families = []Family{FamilyIPv4, FamilyIPv6}
 	}
 	protocols := splitProtocols(input.Protocol)
+	if input.Scope.Provider == ProviderUFW {
+		protocol, err := normalizeProtocol(input.Protocol)
+		if err != nil {
+			return nil, err
+		}
+		if protocol == "all" {
+			destinationPort, err := normalizePortValue(input.DestinationPort, true)
+			if err != nil {
+				return nil, fmt.Errorf("%w: destination port: %v", ErrInvalidRule, err)
+			}
+			if strings.ContainsAny(destinationPort, ",-") {
+				protocols = []string{"tcp", "udp"}
+			}
+		}
+	}
 	sourceAddresses := splitValues(input.SourceAddress)
 	destinationAddresses := splitValues(input.DestinationAddress)
 	sourcePorts := splitValues(input.SourcePort)
