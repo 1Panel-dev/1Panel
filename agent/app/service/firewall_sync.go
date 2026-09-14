@@ -195,6 +195,7 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 	created, removed, unexecuted := 0, 0, 0
 	stopped := make(map[string]error)
 	failedRemovals := make(map[string]error)
+	var firewalldFinalSnapshot *filter.Snapshot
 	record := func(operation string, rule *firewallSyncRule, cause error, skipped bool) {
 		item := rule.FirewallRuleSyncItem
 		if operation == "TaskDelete" && rule.observed != nil {
@@ -234,13 +235,15 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 		}
 		if skipped {
 			t.Logf("%s %s: %v", label, i18n.GetMsgByKey("FirewallCreateRuleSkipped"), cause)
+		} else if operation == task.TaskSync && cause == nil {
+			t.Logf("%s %s", label, i18n.GetMsgByKey("FirewallSyncRuleUnchanged"))
 		} else {
 			t.LogWithStatus(label, cause)
 		}
 	}
 	defer func() {
 		if t != nil {
-			t.Log(i18n.GetMsgWithMap("FirewallSyncOperationsResult", map[string]interface{}{"created": created, "removed": removed, "failed": result.Failed, "skipped": unexecuted}))
+			t.Log(i18n.GetMsgWithMap("FirewallSyncOperationsResult", map[string]interface{}{"created": created, "removed": removed, "failed": result.Failed, "skipped": unexecuted, "unchanged": result.Skipped - unexecuted}))
 		}
 	}()
 	blocked := false
@@ -287,6 +290,10 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 					return syncObservedPosition(queue[i].observed) > syncObservedPosition(queue[j].observed)
 				})
 			}
+			if scope.Provider == filter.ProviderFirewalld && operation == filter.ChangeCreate && len(failedRemovals) == 0 && stopped[scope.Key()] == nil {
+				firewalldFinalSnapshot = syncFirewalldCreates(ctx, runtime, initial, removed > 0, queue, t, record)
+				continue
+			}
 			for start := 0; start < len(queue); {
 				rule := queue[start]
 				cause := stopped[scope.Key()]
@@ -325,21 +332,21 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 						changes = append(changes, change)
 					} else {
 						after := *entry.Rule
-						markers := make([]string, 0)
-						for _, candidate := range rules {
-							if candidate.Rule != nil && candidate.Rule.Scope.Key() == scope.Key() && candidate.desired.Marker != "" {
-								markers = append(markers, candidate.desired.Marker)
-							}
-						}
 						after.OrderIndex = nil
-						if len(batch) == 1 {
+						if len(batch) == 1 && scope.Provider != filter.ProviderFirewalld {
+							markers := make([]string, 0)
+							for _, candidate := range rules {
+								if candidate.Rule != nil && candidate.Rule.Scope.Key() == scope.Key() && candidate.desired.Marker != "" {
+									markers = append(markers, candidate.desired.Marker)
+								}
+							}
 							after.OrderIndex = firewallsync.InsertionPosition(snapshot, markers, entry.desired.Marker)
 						}
 						changes = append(changes, filter.DesiredChange{Operation: operation, After: &after, Append: scope.Provider == filter.ProviderUFW && after.OrderIndex == nil})
 					}
 				}
 				if err == nil {
-					err = runtime.ExecuteSync(ctx, snapshot, changes)
+					_, err = runtime.ExecuteSync(ctx, snapshot, changes)
 				}
 				for _, entry := range batch {
 					record(name, entry, err, false)
@@ -351,7 +358,139 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 			}
 		}
 	}
+	if firewalldFinalSnapshot != nil && result.Failed == 0 && created > 0 {
+		verifyErr := verifyFirewalldSyncSnapshot(*firewalldFinalSnapshot, rules)
+		if t != nil {
+			t.LogWithStatus(i18n.GetWithName("FirewallSyncStep", string(request.TargetProvider)), verifyErr)
+		}
+		if verifyErr != nil {
+			return result, verifyErr
+		}
+	}
 	return result, nil
+}
+
+func syncFirewalldCreates(
+	ctx context.Context,
+	runtime *filterruntime.Engine,
+	initial filter.Snapshot,
+	refresh bool,
+	queue []*firewallSyncRule,
+	t *task.Task,
+	record func(string, *firewallSyncRule, error, bool),
+) *filter.Snapshot {
+	if len(queue) == 0 {
+		return nil
+	}
+	snapshot := initial
+	snapshot.Rules = append([]filter.ObservedRule(nil), initial.Rules...)
+	indices := make(map[string]int)
+	indexRules := func() {
+		clear(indices)
+		for index, rule := range snapshot.Rules {
+			indices[rule.Locator.Canonical] = index
+		}
+	}
+	indexRules()
+	pending := make([]*firewallSyncRule, 0, len(queue))
+	var readErr error
+	for index, entry := range queue {
+		if refresh {
+			snapshot, readErr = runtime.ObserveMutation(ctx, initial.Scope)
+			if readErr != nil {
+				record(task.TaskCreate, entry, readErr, false)
+				for _, remaining := range queue[index+1:] {
+					record(task.TaskCreate, remaining, readErr, true)
+				}
+				break
+			}
+			indexRules()
+			refresh = false
+		}
+		if t != nil {
+			t.Logf("[%d/%d] %s %s", index+1, len(queue), i18n.GetMsgByKey(task.TaskCreate), entry.SourceUUID)
+		}
+		after := *entry.Rule
+		after.OrderIndex = nil
+		applied, err := runtime.ExecuteSync(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &after}})
+		if err == nil && len(applied.Applied) != 1 {
+			err = filter.ErrVerificationFailed
+		}
+		if err == nil {
+			observed := applied.Applied[0]
+			if position, exists := indices[observed.Locator.Canonical]; exists {
+				snapshot.Rules[position] = observed
+			} else {
+				indices[observed.Locator.Canonical] = len(snapshot.Rules)
+				snapshot.Rules = append(snapshot.Rules, observed)
+			}
+			snapshot, err = filter.NewSnapshot(snapshot.Scope, snapshot.Rules)
+		}
+		if err != nil {
+			record(task.TaskCreate, entry, err, false)
+			if firewallCreateUnavailable(err) {
+				for _, remaining := range queue[index+1:] {
+					record(task.TaskCreate, remaining, err, true)
+				}
+				break
+			}
+			refresh = true
+			continue
+		}
+		pending = append(pending, entry)
+	}
+	var actual filter.Snapshot
+	if readErr == nil {
+		actual, readErr = runtime.ObserveMutation(ctx, initial.Scope)
+	}
+	if readErr != nil {
+		for _, entry := range pending {
+			record(task.TaskCreate, entry, readErr, false)
+		}
+		return nil
+	}
+	states := firewalldRuleStates(actual)
+	for _, entry := range pending {
+		key, err := filter.RuleKey(*entry.Rule)
+		if err == nil && states[key] != 1 {
+			err = filter.ErrVerificationFailed
+		}
+		record(task.TaskCreate, entry, err, false)
+	}
+	return &actual
+}
+
+func firewalldRuleStates(snapshot filter.Snapshot) map[string]int {
+	states := make(map[string]int, len(snapshot.Rules))
+	for _, observed := range snapshot.Rules {
+		if observed.ParseStatus != filter.ParseStatusSupported || observed.Persistence != filter.PersistenceStatusConverged {
+			continue
+		}
+		if key, err := filter.RuleKey(observed.Rule); err == nil {
+			states[key]++
+		}
+	}
+	return states
+}
+
+func verifyFirewalldSyncSnapshot(snapshot filter.Snapshot, rules []*firewallSyncRule) error {
+	states := firewalldRuleStates(snapshot)
+	for _, entry := range rules {
+		if entry.Status == firewallsync.StatusRemove {
+			continue
+		}
+		if entry.Rule == nil {
+			return filter.ErrVerificationFailed
+		}
+		key, err := filter.RuleKey(*entry.Rule)
+		if err != nil {
+			return err
+		}
+		if states[key] != 1 {
+			return fmt.Errorf("%w: %s", filter.ErrVerificationFailed, entry.SourceUUID)
+		}
+	}
+	return nil
 }
 
 func syncObservedPosition(rule *filter.ObservedRule) int {
@@ -361,8 +500,8 @@ func syncObservedPosition(rule *filter.ObservedRule) int {
 	return 0
 }
 
-func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provider filter.Provider) error {
-	result, err := s.syncRules(ctx, "", dto.FirewallRuleSyncRequest{TargetProvider: provider}, nil)
+func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provider filter.Provider, t *task.Task) error {
+	result, err := s.syncRules(ctx, "", dto.FirewallRuleSyncRequest{TargetProvider: provider}, t)
 	if err != nil {
 		return fmt.Errorf("restore database firewall rules: %w", err)
 	}
@@ -393,6 +532,10 @@ func (s *FirewallService) syncSystemRules(
 	clientIP string,
 	request dto.FirewallRuleSyncRequest,
 ) (dto.FirewallRuleSyncResult, error) {
+	if err := lockFirewallLifecycleIdle(); err != nil {
+		return dto.FirewallRuleSyncResult{}, err
+	}
+	defer firewallLifecycleTaskMu.Unlock()
 	firewallRuleSyncTaskMu.Lock()
 	defer firewallRuleSyncTaskMu.Unlock()
 

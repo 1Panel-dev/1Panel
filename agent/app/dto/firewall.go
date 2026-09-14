@@ -18,6 +18,7 @@ type FirewallSubsystemStatus struct {
 	Message         string                      `json:"message,omitempty"`
 	Reason          string                      `json:"reason,omitempty"`
 	SyncError       string                      `json:"syncError,omitempty"`
+	LifecycleTaskID string                      `json:"lifecycleTaskID,omitempty"`
 	IPv4            FirewallBackendFamilyStatus `json:"ipv4"`
 	IPv6            FirewallBackendFamilyStatus `json:"ipv6"`
 }
@@ -25,6 +26,11 @@ type FirewallSubsystemStatus struct {
 type FirewallLifecycleOperation struct {
 	Operation         string `json:"operation" validate:"required,oneof=start stop restart disableBanPing enableBanPing"`
 	WithDockerRestart bool   `json:"withDockerRestart"`
+}
+
+type FirewallLifecycleOperationResponse struct {
+	TaskID string `json:"taskID,omitempty"`
+	Queued bool   `json:"queued"`
 }
 
 type FirewallBackendOption struct {

@@ -249,9 +249,9 @@ func (e *Engine) ExecuteCreate(ctx context.Context, snapshot filter.Snapshot, ch
 	return err
 }
 
-func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) error {
+func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.ApplyResult, error) {
 	if err := ctx.Err(); err != nil {
-		return err
+		return filter.ApplyResult{}, err
 	}
 	changes = append([]filter.DesiredChange(nil), changes...)
 	for index := range changes {
@@ -259,11 +259,10 @@ func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, chan
 	}
 	plan, err := e.adapter.Compile(snapshot, changes)
 	if err != nil {
-		return err
+		return filter.ApplyResult{}, err
 	}
 	plan.CommandOnly = true
-	_, err = e.adapter.Apply(ctx, plan)
-	return err
+	return e.adapter.Apply(ctx, plan)
 }
 
 func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, filter.VerifyResult, error) {

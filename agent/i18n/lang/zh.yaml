@@ -702,7 +702,8 @@ FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ 
 FirewallCreateRuleExecutionFailed: '规则创建失败，未入库，已执行的命令不回滚'
 FirewallCreateRulePersistenceFailed: '规则已创建，但纳管信息保存失败'
 FirewallAdoptRulePersistenceFailed: '规则纳管命令已执行，但纳管信息保存失败'
-FirewallSyncOperationsResult: '同步操作汇总：删除成功 {{ .removed }} 条，创建成功 {{ .created }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
+FirewallSyncOperationsResult: '同步操作汇总：删除成功 {{ .removed }} 条，创建成功 {{ .created }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条，已一致无需变更 {{ .unchanged }} 条'
+FirewallSyncRuleUnchanged: '已一致，无需变更'
 FirewallSyncStep: "同步规则到 {{ .name }}"
 FirewallSyncFailed: "{{ .failed }} 条防火墙规则同步失败"
 FirewallResetSourceStep: "重置并停用源防火墙 {{ .name }}"
