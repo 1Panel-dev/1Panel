@@ -20,7 +20,7 @@ export interface TerminalSessionEntry {
 const localEndpoint = '/api/v2/hosts/terminal/local';
 const sshEndpoint = '/api/v2/hosts/terminal/ssh';
 
-const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
+const createTerminalSessionState = (persistent: boolean) => {
     const entries = ref<TerminalSessionEntry[]>([]);
     const instances = reactive<Record<string, any>>({});
     const slots = shallowReactive<Record<string, HTMLElement | undefined>>({});
@@ -58,7 +58,9 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
             title,
             wsID: init.wsID,
             endpoint: init.wsID === 0 ? localEndpoint : sshEndpoint,
-            args: [init.wsID === 0 ? '' : `id=${init.wsID}`, args, q].filter(Boolean).join('&'),
+            args: [persistent ? 'terminalPersistent=true' : '', init.wsID === 0 ? '' : `id=${init.wsID}`, args, q]
+                .filter(Boolean)
+                .join('&'),
             sessionId: '',
             status: init.status || 'online',
             latency: 0,
@@ -90,6 +92,7 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
     };
 
     const restore = async () => {
+        if (!persistent) return;
         const { currentNode } = useGlobalStore();
         const node = currentNode.value || 'local';
         const results = await Promise.allSettled([
@@ -101,6 +104,7 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
             const fromLocalNode = i === 1 || node === 'local';
             for (const s of r.value.data || []) {
                 if (s.kind !== 'local' && s.kind !== 'ssh') continue;
+                if (!s.persistent) continue;
                 if (s.attached || entries.value.some((e) => e.sessionId === s.id)) continue;
                 if (s.hostId > 0 && !fromLocalNode) continue;
                 const key = add({
@@ -177,6 +181,9 @@ const TerminalSessionStore = defineStore('TerminalSessionStore', () => {
         setSlot,
         sync,
     };
-});
+};
+
+const TerminalSessionStore = defineStore('TerminalSessionStore', () => createTerminalSessionState(false));
+export const TerminalDockSessionStore = defineStore('TerminalDockSessionStore', () => createTerminalSessionState(true));
 
 export default TerminalSessionStore;

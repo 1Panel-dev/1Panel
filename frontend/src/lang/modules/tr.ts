@@ -2142,9 +2142,12 @@ const message = {
             'Yenileme, tarayıcı kapanması veya bağlantı kaybından sonra 30 dakika içinde kurtarılabilir.',
         sessionRuleRevalidate: 'Giriş geçersizse veya doğrulama zaman aşımına uğrarsa oturum sona erer.',
         sessionRuleResources: 'Daha fazla terminal daha fazla kaynak tüketir. Kullanmadığınız terminalleri kapatın.',
+        sessionRuleDisableShortcut: 'Terminal kısayolunu Terminal - Ayarlar bölümünden devre dışı bırakabilirsiniz.',
         minimize: 'Küçült',
         closeAllSessions: 'Tüm oturumları kapat',
         closeAllConfirm: 'Tüm terminal oturumları kesilecek ve geri alınamayacak. Devam edilsin mi?',
+        disableShortcutConfirm:
+            'Terminal kısayolunu devre dışı bırakmak, tüm ilişkili oturumların bağlantısını kesecektir. Devam edilsin mi?',
         lineHeight: 'Satır Yüksekliği',
         letterSpacing: 'Harf Aralığı',
         fontSize: 'Font Boyutu',

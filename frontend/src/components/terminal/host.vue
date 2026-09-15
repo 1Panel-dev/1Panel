@@ -1,16 +1,15 @@
 <template>
-    <!-- Lives in the layout so terminal sessions outlive the terminal route.
-         Each Terminal is teleported into the page's slot while the page is mounted
-         and parked off-screen (still connected, still receiving output) otherwise. -->
     <div class="terminal-host" aria-hidden="true">
-        <template v-for="item in store.entries" :key="item.key + ':' + item.refresh">
-            <Teleport :to="store.slots[item.key] || 'body'" :disabled="!store.slots[item.key]">
-                <Terminal
-                    :ref="(el: any) => store.setInstance(item.key, el)"
-                    @session="(id: string) => store.setSessionId(item.key, id)"
-                    @expired="store.onExpired(item.key)"
-                />
-            </Teleport>
+        <template v-for="store in stores" :key="store.$id">
+            <template v-for="item in store.entries" :key="item.key + ':' + item.refresh">
+                <Teleport :to="store.slots[item.key] || 'body'" :disabled="!store.slots[item.key]">
+                    <Terminal
+                        :ref="(el: any) => store.setInstance(item.key, el)"
+                        @session="(id: string) => store.setSessionId(item.key, id)"
+                        @expired="store.onExpired(item.key)"
+                    />
+                </Teleport>
+            </template>
         </template>
     </div>
 </template>
@@ -18,17 +17,26 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
-import { TerminalSessionStore } from '@/store';
+import { TerminalDockSessionStore, TerminalSessionStore, TerminalStore } from '@/store';
+import { getTerminalInfo } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const store = TerminalSessionStore();
+const pageStore = TerminalSessionStore();
+const dockStore = TerminalDockSessionStore();
+const terminalStore = TerminalStore();
+const stores = [pageStore, dockStore];
+const { isAdmin } = useGlobalStore();
 
-// Sessions the agent still holds (page refresh, closed browser tab) are
-// reattached right away, without waiting for the terminal page.
-onMounted(() => store.restore());
+onMounted(async () => {
+    try {
+        const res = await getTerminalInfo();
+        terminalStore.showTerminalButton = res.data.showTerminalButton !== 'Disable';
+    } catch {}
+    if (isAdmin.value && terminalStore.showTerminalButton) await dockStore.restore();
+});
 </script>
 
 <style scoped>
-/* Off-screen but sized, so xterm can measure and keep rendering while parked. */
 .terminal-host {
     position: fixed;
     left: -10000px;

@@ -161,11 +161,13 @@ import '@xterm/xterm/css/xterm.css';
 import { FitAddon } from '@xterm/addon-fit';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { TerminalStore } from '@/store';
+import { TerminalDockSessionStore, TerminalStore } from '@/store';
 import { loadLocalConn, updateLocalConn } from '@/api/modules/terminal';
+import { ElMessageBox } from 'element-plus';
 
 const loading = ref(false);
 const terminalStore = TerminalStore();
+const dockSessions = TerminalDockSessionStore();
 const dialogRef = ref();
 
 const terminalElement = ref<HTMLDivElement | null>(null);
@@ -289,10 +291,22 @@ const changeTerminalButton = async () => {
     const showTerminalButton = form.showTerminalButton;
     loading.value = true;
     try {
+        if (!showTerminalButton && dockSessions.entries.length > 0) {
+            await ElMessageBox.confirm(
+                i18n.global.t('terminal.disableShortcutConfirm'),
+                i18n.global.t('terminal.showTerminalButton'),
+                {
+                    confirmButtonText: i18n.global.t('commons.button.confirm'),
+                    cancelButtonText: i18n.global.t('commons.button.cancel'),
+                    type: 'warning',
+                },
+            );
+        }
         await UpdateTerminalInfo({
             showTerminalButton: showTerminalButton ? 'Enable' : 'Disable',
         });
         terminalStore.showTerminalButton = showTerminalButton;
+        if (!showTerminalButton) dockSessions.closeAll();
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } catch {
         form.showTerminalButton = !showTerminalButton;

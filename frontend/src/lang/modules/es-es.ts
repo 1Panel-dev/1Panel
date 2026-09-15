@@ -2163,9 +2163,12 @@ const message = {
         sessionRuleRevalidate:
             'La sesión termina si el inicio de sesión no es válido o la verificación tarda demasiado.',
         sessionRuleResources: 'Más terminales consumen más recursos. Cierra los que ya no necesites.',
+        sessionRuleDisableShortcut: 'Desactiva el acceso rápido al terminal en Terminal - Configuración.',
         minimize: 'Minimizar',
         closeAllSessions: 'Cerrar todas las sesiones',
         closeAllConfirm: 'Se desconectarán todas las sesiones de terminal y no se podrán recuperar. ¿Continuar?',
+        disableShortcutConfirm:
+            'Al desactivar el acceso rápido al terminal se desconectarán todas sus sesiones. ¿Continuar?',
         lineHeight: 'Altura de línea',
         letterSpacing: 'Espaciado de letras',
         fontSize: 'Tamaño de fuente',

@@ -1,9 +1,5 @@
 <template>
-    <div
-        v-if="isAdmin && terminalStore.showTerminalButton && !onTerminalPage"
-        class="terminal-dock-handle"
-        @click="show"
-    >
+    <div v-if="isAdmin && terminalStore.showTerminalButton" class="terminal-dock-handle" @click="show">
         <el-badge
             :value="store.entries.length"
             :hidden="store.entries.length === 0"
@@ -38,6 +34,7 @@
                             <li>{{ $t('terminal.sessionRuleDisconnect') }}</li>
                             <li>{{ $t('terminal.sessionRuleRevalidate') }}</li>
                             <li>{{ $t('terminal.sessionRuleResources') }}</li>
+                            <li>{{ $t('terminal.sessionRuleDisableShortcut') }}</li>
                         </ul>
                     </el-popover>
                 </div>
@@ -91,26 +88,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import i18n from '@/lang';
-import { TerminalSessionStore, TerminalStore } from '@/store';
-import { getTerminalInfo } from '@/api/modules/setting';
+import { TerminalDockSessionStore, TerminalStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
 import ConnectionMenu from '@/components/terminal/connection-menu/index.vue';
 import type { TerminalConnectionOptions } from '@/components/terminal/connection-menu/types';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const store = TerminalSessionStore();
+const store = TerminalDockSessionStore();
 const terminalStore = TerminalStore();
 const { isAdmin } = useGlobalStore();
-const route = useRoute();
-const onTerminalPage = computed(() => route.path.startsWith('/terminal'));
-
-onMounted(async () => {
-    const res = await getTerminalInfo();
-    terminalStore.showTerminalButton = res.data.showTerminalButton !== 'Disable';
-});
 
 const open = ref(false);
 const active = ref('');
@@ -130,6 +118,7 @@ const show = async () => {
     if (!open.value || !isAdmin.value) return;
     claim();
     store.sync();
+    if (timer) clearInterval(timer);
     timer = setInterval(store.sync, 5000);
 };
 
@@ -145,6 +134,12 @@ watch(open, (value) => {
 watch(isAdmin, (allowed) => {
     if (!allowed) open.value = false;
 });
+watch(
+    () => terminalStore.showTerminalButton,
+    (visible) => {
+        if (!visible) open.value = false;
+    },
+);
 onBeforeUnmount(() => {
     if (timer) clearInterval(timer);
 });
@@ -189,10 +184,6 @@ const closeAll = async () => {
     }
     open.value = false;
 };
-
-watch(onTerminalPage, (v) => {
-    if (v) open.value = false;
-});
 </script>
 
 <style scoped lang="scss">
