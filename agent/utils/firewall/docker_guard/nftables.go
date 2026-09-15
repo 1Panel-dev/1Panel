@@ -30,6 +30,9 @@ func (m *NftablesManager) Initialize(policies []Policy) error {
 	if !m.runner.Exists("nft") {
 		return errors.New("nft is not installed")
 	}
+	if err := CheckIPv4Forwarding(); err != nil {
+		return err
+	}
 	if err := m.checkForwardPolicy(); err != nil {
 		return err
 	}
