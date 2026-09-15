@@ -426,12 +426,21 @@ export namespace AI {
         accountId: number;
         model: string;
         fallbacks: string[];
+        metadata: AgentModelMetadata[];
     }
 
     export interface AgentModelConfig {
         accountId: number;
         model: string;
         fallbacks: string[];
+        metadata: AgentModelMetadata[];
+    }
+
+    export interface AgentModelMetadata {
+        model: string;
+        inputMode: 'auto' | 'text' | 'image';
+        contextWindow: number;
+        maxTokens: number;
     }
 
     export interface AgentHermesChatSessionItem {

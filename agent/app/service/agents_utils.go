@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"path"
 	"regexp"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -737,9 +738,11 @@ type modelProvider struct {
 }
 
 type modelEntry struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	Input []string `json:"input,omitempty"`
+	ID            string   `json:"id"`
+	Name          string   `json:"name"`
+	Input         []string `json:"input,omitempty"`
+	ContextWindow int      `json:"contextWindow,omitempty"`
+	MaxTokens     int      `json:"maxTokens,omitempty"`
 }
 
 func requiresOpenclawProviderModels(provider string) bool {
@@ -767,7 +770,7 @@ type browserConfig struct {
 	DefaultProfile string `json:"defaultProfile"`
 }
 
-func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName, token string, allowedOrigins []string, fallbacks []string) error {
+func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName, token string, allowedOrigins []string, fallbacks []string, metadata []dto.AgentModelMetadata) error {
 	if strings.TrimSpace(confDir) == "" {
 		return fmt.Errorf("config dir is required")
 	}
@@ -852,6 +855,7 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 		}
 		conf = initial
 	} else {
+		preserveOpenclawModelMetadata(conf, cfg.Models)
 		if err := applyOpenclawModelsConfig(conf, cfg.Models); err != nil {
 			return err
 		}
@@ -906,6 +910,9 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 	if allowedOrigins != nil {
 		setSecurityConfig(conf, dto.AgentSecurityConfig{AllowedOrigins: allowedOrigins})
 	}
+	if err := applyOpenclawModelMetadata(conf, account, metadata); err != nil {
+		return err
+	}
 	if err := writeOpenclawConfigRaw(configPath, conf); err != nil {
 		return err
 	}
@@ -918,6 +925,144 @@ func writeOpenclawConfig(confDir string, account *model.AgentAccount, modelName,
 		order = append(order, envKey)
 	}
 	return writeAgentEnvMap(path.Join(confDir, ".env"), envMap, order)
+}
+
+func readOpenclawModelsConfig(conf map[string]interface{}) *modelsConfig {
+	raw, ok := conf["models"]
+	if !ok {
+		return nil
+	}
+	payload, err := json.Marshal(raw)
+	if err != nil {
+		return nil
+	}
+	var models modelsConfig
+	if err := json.Unmarshal(payload, &models); err != nil {
+		return nil
+	}
+	return &models
+}
+
+func preserveOpenclawModelMetadata(conf map[string]interface{}, next *modelsConfig) {
+	current := readOpenclawModelsConfig(conf)
+	if current == nil || next == nil {
+		return
+	}
+	for providerID, nextProvider := range next.Providers {
+		currentProvider, ok := current.Providers[providerID]
+		if !ok {
+			continue
+		}
+		byID := make(map[string]modelEntry, len(currentProvider.Models))
+		for _, entry := range currentProvider.Models {
+			byID[entry.ID] = entry
+		}
+		for index := range nextProvider.Models {
+			currentEntry, ok := byID[nextProvider.Models[index].ID]
+			if !ok {
+				continue
+			}
+			nextProvider.Models[index].Input = currentEntry.Input
+			nextProvider.Models[index].ContextWindow = currentEntry.ContextWindow
+			nextProvider.Models[index].MaxTokens = currentEntry.MaxTokens
+		}
+		next.Providers[providerID] = nextProvider
+	}
+}
+
+func extractOpenclawModelMetadata(conf map[string]interface{}, account *model.AgentAccount, accountModels []dto.AgentAccountModel) []dto.AgentModelMetadata {
+	result := make([]dto.AgentModelMetadata, 0, len(accountModels))
+	configured := readOpenclawModelsConfig(conf)
+	for _, item := range accountModels {
+		_, inferred, providerID, _, err := buildOpenclawAccountModelConfig(account, item)
+		if err != nil {
+			continue
+		}
+		metadata := dto.AgentModelMetadata{Model: item.ID, InputMode: "auto"}
+		if configured != nil {
+			for _, entry := range configured.Providers[providerID].Models {
+				if entry.ID != inferred.ID {
+					continue
+				}
+				metadata.ContextWindow = entry.ContextWindow
+				metadata.MaxTokens = entry.MaxTokens
+				if len(entry.Input) > 0 && !slices.Equal(entry.Input, inferred.Input) {
+					if slices.Contains(entry.Input, "image") {
+						metadata.InputMode = "image"
+					} else {
+						metadata.InputMode = "text"
+					}
+				}
+				break
+			}
+		}
+		result = append(result, metadata)
+	}
+	return result
+}
+
+func applyOpenclawModelMetadata(conf map[string]interface{}, account *model.AgentAccount, requested []dto.AgentModelMetadata) error {
+	if len(requested) == 0 {
+		return nil
+	}
+	configured := readOpenclawModelsConfig(conf)
+	if configured == nil {
+		return fmt.Errorf("model metadata is not supported for provider %s", account.Provider)
+	}
+	accountModels, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	available := make(map[string]dto.AgentAccountModel, len(accountModels))
+	for _, item := range accountModels {
+		available[item.ID] = item
+	}
+	seen := make(map[string]struct{}, len(requested))
+	for _, metadata := range requested {
+		item, ok := available[metadata.Model]
+		if !ok {
+			return buserr.New("ErrAgentModelNotInAccount")
+		}
+		if _, ok := seen[metadata.Model]; ok {
+			return fmt.Errorf("duplicate model metadata: %s", metadata.Model)
+		}
+		seen[metadata.Model] = struct{}{}
+		_, inferred, providerID, _, err := buildOpenclawAccountModelConfig(account, item)
+		if err != nil {
+			return err
+		}
+		provider := configured.Providers[providerID]
+		found := false
+		for index := range provider.Models {
+			if provider.Models[index].ID != inferred.ID {
+				continue
+			}
+			found = true
+			provider.Models[index].ContextWindow = metadata.ContextWindow
+			provider.Models[index].MaxTokens = metadata.MaxTokens
+			switch metadata.InputMode {
+			case "auto":
+				provider.Models[index].Input = inferred.Input
+			case "text":
+				provider.Models[index].Input = []string{"text"}
+			case "image":
+				provider.Models[index].Input = []string{"text", "image"}
+			default:
+				return fmt.Errorf("unsupported model input mode: %s", metadata.InputMode)
+			}
+			break
+		}
+		if !found {
+			return buserr.New("ErrAgentModelNotInAccount")
+		}
+		configured.Providers[providerID] = provider
+	}
+	modelsMap, err := structToMap(configured)
+	if err != nil {
+		return err
+	}
+	conf["models"] = modelsMap
+	return nil
 }
 
 func resolveOpenclawFallbackModels(account *model.AgentAccount, primaryModel string, fallbackIDs []string) ([]string, error) {
@@ -1041,7 +1186,7 @@ func prepareOpenclawInstallFiles(appInstall *model.AppInstall, account *model.Ag
 		return fmt.Errorf("app install is required")
 	}
 	confDir := path.Join(appInstall.GetPath(), "data", "conf")
-	if err := writeOpenclawConfig(confDir, account, modelName, token, allowedOrigins, nil); err != nil {
+	if err := writeOpenclawConfig(confDir, account, modelName, token, allowedOrigins, nil, nil); err != nil {
 		return err
 	}
 	dataDir := path.Join(appInstall.GetPath(), "data")
