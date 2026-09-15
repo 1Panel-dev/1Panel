@@ -86,12 +86,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('firewall.portWhiteList')">
                                 <div class="flex items-center gap-3">
-                                    <el-button
-                                        v-permission
-                                        v-node-admin
-                                        icon="Setting"
-                                        @click="whiteListRef.acceptParams()"
-                                    >
+                                    <el-button v-permission v-node-admin icon="Setting" @click="openWhitelist">
                                         {{ $t('commons.button.set') }}
                                     </el-button>
                                     <span class="input-help !mt-0">
@@ -104,7 +99,12 @@
                 </el-form>
             </template>
         </LayoutContent>
-        <WhiteList ref="whiteListRef" @created="openWhitelistTask" />
+        <WhiteList
+            ref="whiteListRef"
+            :rules="settings?.portWhiteList"
+            :loading="loading"
+            @created="openWhitelistTask"
+        />
         <TaskLog ref="whitelistTaskRef" @close="load" />
     </div>
 </template>
@@ -116,7 +116,6 @@ import { loadFirewallSettings, operateFire, operateFirewallBackend } from '@/api
 import FireRouter from '@/views/host/firewall/index.vue';
 import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { whiteListRuleCount } from '@/views/host/firewall/setting/white-list/model';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -133,9 +132,13 @@ const savedBackends = ref<Record<Firewall.BackendSubsystem, string>>({
 });
 const pingStatus = ref('Disable');
 const oldPingStatus = ref('Disable');
-const whiteListRef = ref();
+const whiteListRef = ref<InstanceType<typeof WhiteList>>();
 const whitelistTaskRef = ref<InstanceType<typeof TaskLog>>();
 const openWhitelistTask = (taskID: string) => whitelistTaskRef.value?.openWithTaskID(taskID, true);
+const openWhitelist = () => {
+    whiteListRef.value?.acceptParams();
+    load();
+};
 
 const providerOrder: Record<Firewall.Provider, number> = {
     iptables: 0,
@@ -206,7 +209,7 @@ const groups = computed(() => {
     ];
 });
 
-const whiteListCount = computed(() => whiteListRuleCount(settings.value?.portWhiteList || ''));
+const whiteListCount = computed(() => settings.value?.portWhiteList?.length || 0);
 
 const sortedOptions = (group: Firewall.BackendGroup) => {
     return [...group.options].sort((left, right) => providerOrder[left.name] - providerOrder[right.name]);
@@ -224,6 +227,9 @@ const load = async () => {
         };
         pingStatus.value = res.data.pingStatus;
         oldPingStatus.value = pingStatus.value;
+    } catch (error) {
+        settings.value = undefined;
+        throw error;
     } finally {
         loading.value = false;
     }

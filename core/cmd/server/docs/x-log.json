@@ -3770,12 +3770,31 @@
 	},
 	"/hosts/firewall/settings/whitelist": {
 		"bodyKeys": [
-			"value"
+			"rule"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防火墙端口白名单 [value]",
-		"formatEN": "update firewall port whitelist [value]"
+		"formatZH": "创建防火墙端口白名单",
+		"formatEN": "create firewall port whitelist"
+	},
+	"/hosts/firewall/settings/whitelist/delete": {
+		"bodyKeys": [
+			"rules"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除防火墙端口白名单",
+		"formatEN": "delete firewall port whitelist"
+	},
+	"/hosts/firewall/settings/whitelist/update": {
+		"bodyKeys": [
+			"oldRule",
+			"rule"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "编辑防火墙端口白名单",
+		"formatEN": "update firewall port whitelist"
 	},
 	"/hosts/monitor/clean": {
 		"bodyKeys": [],

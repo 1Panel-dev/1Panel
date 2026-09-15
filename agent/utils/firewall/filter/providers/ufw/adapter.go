@@ -366,7 +366,14 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			deleteRuleCommand(normalized, marker),
 		}
 	case filter.ChangeUpdate, filter.ChangeReorder:
-		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, true)
+		if change.Before == nil {
+			return filter.NativeRulePlan{}, fmt.Errorf("%w: previous ufw rule is required", filter.ErrInvalidRule)
+		}
+		before, err := filter.NormalizeRule(*change.Before)
+		if err != nil {
+			return filter.NativeRulePlan{}, err
+		}
+		target, targetErr := validateMutationTarget(snapshot, change, before, marker, true)
 		if targetErr != nil {
 			return filter.NativeRulePlan{}, targetErr
 		}

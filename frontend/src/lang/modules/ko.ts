@@ -4204,9 +4204,8 @@ const message = {
         unbindHelper:
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
         portWhiteList: '포트 화이트리스트',
-        portWhiteListAlter:
-            '변경 사항은 저장 즉시 적용됩니다. 추가한 포트는 자동으로 허용됩니다. 포트를 제거하면 보호만 해제됩니다. 포트를 닫으려면 규칙 목록에서 허용 규칙을 삭제하세요.',
-        portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, 단일 포트 및 8000-8100과 같은 포트 범위를 지원합니다.',
+        portWhiteListHelper:
+            '단일 포트(예: 80) 또는 포트 범위(예: 8000-8100)를 입력하세요. 포트 번호는 1~65535여야 합니다.',
         chain: '체인',
         sourceIP: '소스 IP',
         destIP: '대상 IP',
@@ -4217,6 +4216,13 @@ const message = {
         allPorts: '모든 포트',
         allProtocolHelper: '모든 프로토콜 및 포트',
         sourceAddressPlaceholder: '예: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 또는 2001:db8::/64',
+        systemAccessChangeConfirm:
+            '이 작업을 {0} 허용 목록 규칙에 적용하면 해당 서비스를 통한 원격 접속이 불가능해질 수 있습니다. 계속하시겠습니까?',
+        whitelistServicePortsHelper:
+            '방화벽에서 허용할 포트 하나를 설정합니다. 수신 포트는 해당 서비스 설정에서 변경하세요.',
+        whitelistSourcesHelper:
+            'IP 주소 또는 CIDR 대역을 쉼표나 줄바꿈으로 구분하세요. 비워 두면 모든 IPv4 및 IPv6 출발지를 허용합니다.',
+        systemAccessSourceError: '유효한 {0} 주소 또는 CIDR 대역을 하나 이상 입력하세요.',
         destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:

@@ -3,6 +3,7 @@ package firewall
 import (
 	"encoding/json"
 	"fmt"
+	"net/netip"
 	"sort"
 	"strconv"
 	"strings"
@@ -13,73 +14,69 @@ import (
 
 type PortWhitelist = filter.PortWhitelist
 
-func ParsePortWhitelist(value string) ([]PortWhitelist, error) {
-	value = strings.TrimSpace(value)
-	if value == "" {
-		return []PortWhitelist{}, nil
-	}
-	if strings.HasPrefix(value, "[") {
-		var rules []PortWhitelist
-		if err := json.Unmarshal([]byte(value), &rules); err != nil {
-			return nil, fmt.Errorf("invalid firewall port whitelist JSON: %w", err)
-		}
-		return validatePortWhitelist(rules)
-	}
+const (
+	PortWhitelistTypePanel = "panel"
+	PortWhitelistTypeSSH   = "ssh"
+)
 
-	items := strings.FieldsFunc(value, func(r rune) bool {
-		return r == ',' || r == '\n' || r == ';' || r == ' '
-	})
-	rules := make([]PortWhitelist, 0, len(items))
-	for _, item := range items {
-		item = strings.TrimSpace(item)
-		if item == "" {
-			continue
-		}
-		parts := strings.Split(item, "/")
-		rule := PortWhitelist{Family: constant.FirewallFamilyIPv4, Protocol: "tcp"}
-		switch len(parts) {
-		case 1:
-			rule.Port = parts[0]
-		case 2:
-			rule.Port, rule.Protocol = parts[0], parts[1]
-		case 3:
-			rule.Family, rule.Port, rule.Protocol = parts[0], parts[1], parts[2]
-		default:
-			return nil, fmt.Errorf("invalid firewall port whitelist: %s", item)
-		}
-		rules = append(rules, rule)
+func ParsePortWhitelist(value string) ([]PortWhitelist, error) {
+	var rules []PortWhitelist
+	if err := json.Unmarshal([]byte(value), &rules); err != nil {
+		return nil, err
 	}
-	return validatePortWhitelist(rules)
+	return ValidatePortWhitelist(rules)
 }
 
-func validatePortWhitelist(rules []PortWhitelist) ([]PortWhitelist, error) {
+func ValidatePortWhitelist(rules []PortWhitelist) ([]PortWhitelist, error) {
+	if rules == nil {
+		return nil, fmt.Errorf("firewall port whitelist must be an array")
+	}
 	result := make([]PortWhitelist, 0, len(rules))
-	exists := make(map[string]struct{}, len(rules))
+	seen := make(map[string]bool, len(rules))
 	for _, rule := range rules {
-		rule.Family = strings.ToLower(strings.TrimSpace(rule.Family))
-		if rule.Family == "" {
-			rule.Family = constant.FirewallFamilyIPv4
-		}
-		if rule.Family != constant.FirewallFamilyIPv4 && rule.Family != constant.FirewallFamilyIPv6 {
-			return nil, fmt.Errorf("invalid firewall port whitelist family: %s", rule.Family)
-		}
+		rule.Type = strings.ToLower(strings.TrimSpace(rule.Type))
 		rule.Protocol = strings.ToLower(strings.TrimSpace(rule.Protocol))
-		if rule.Protocol == "" {
+		if rule.Type != "" && rule.Protocol == "" {
 			rule.Protocol = "tcp"
 		}
 		if rule.Protocol != "tcp" && rule.Protocol != "udp" {
 			return nil, fmt.Errorf("invalid firewall port whitelist protocol: %s", rule.Protocol)
 		}
-		port, err := normalizeWhitelistPort(rule.Port)
+		if rule.Type != "" {
+			if rule.Type != PortWhitelistTypePanel && rule.Type != PortWhitelistTypeSSH {
+				return nil, fmt.Errorf("invalid firewall port whitelist type: %s", rule.Type)
+			}
+			if rule.Port != "" {
+				port, err := parseWhitelistPort(rule.Port)
+				if err != nil {
+					return nil, err
+				}
+				rule.Port = strconv.Itoa(port)
+			}
+		} else {
+			var err error
+			rule.Port, err = normalizeWhitelistPort(rule.Port)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if len(rule.Sources) == 0 {
+			return nil, fmt.Errorf("firewall port whitelist requires at least one source")
+		}
+		var err error
+		rule.Sources, err = NormalizeWhitelistSources("", rule.Sources)
 		if err != nil {
 			return nil, err
 		}
-		rule.Port = port
-		key := PortWhitelistKey(rule)
-		if _, ok := exists[key]; ok {
-			continue
+		rule.Family = ""
+		key := rule.Type + "/" + rule.Protocol + "/" + rule.Port
+		if rule.Type != "" {
+			key = rule.Type + "/" + rule.Protocol
 		}
-		exists[key] = struct{}{}
+		if seen[key] {
+			return nil, fmt.Errorf("duplicate firewall port whitelist: %s", key)
+		}
+		seen[key] = true
 		result = append(result, rule)
 	}
 	return result, nil
@@ -132,10 +129,10 @@ func NormalizePortWhitelist(items []PortWhitelist) []PortWhitelist {
 		if item.Port == "" {
 			continue
 		}
-		baseKey := item.Port + "/" + strings.ToLower(strings.TrimSpace(item.Protocol))
+		baseKey := strings.Join([]string{item.Port, item.Protocol, strings.Join(item.Sources, ",")}, "/")
 		duplicate := false
 		for _, current := range ports {
-			currentBaseKey := current.Port + "/" + strings.ToLower(strings.TrimSpace(current.Protocol))
+			currentBaseKey := strings.Join([]string{current.Port, current.Protocol, strings.Join(current.Sources, ",")}, "/")
 			if currentBaseKey == baseKey && (current.Family == "" || current.Family == item.Family) {
 				duplicate = true
 				break
@@ -147,7 +144,7 @@ func NormalizePortWhitelist(items []PortWhitelist) []PortWhitelist {
 		if item.Family == "" {
 			filtered := ports[:0]
 			for _, current := range ports {
-				currentBaseKey := current.Port + "/" + strings.ToLower(strings.TrimSpace(current.Protocol))
+				currentBaseKey := strings.Join([]string{current.Port, current.Protocol, strings.Join(current.Sources, ",")}, "/")
 				if currentBaseKey != baseKey {
 					filtered = append(filtered, current)
 				}
@@ -159,26 +156,75 @@ func NormalizePortWhitelist(items []PortWhitelist) []PortWhitelist {
 	return ports
 }
 
-func PortWhitelistMap(items []PortWhitelist) map[string]struct{} {
-	ports := make(map[string]struct{}, len(items))
-	for _, item := range items {
-		ports[PortWhitelistKey(item)] = struct{}{}
+func NormalizeWhitelistSources(family string, sources []string) ([]string, error) {
+	result := make([]string, 0, len(sources))
+	seen := make(map[string]struct{}, len(sources))
+	for _, source := range sources {
+		source = strings.TrimSpace(source)
+		prefix, err := netip.ParsePrefix(source)
+		if err != nil {
+			address, err := netip.ParseAddr(source)
+			if err != nil {
+				return nil, err
+			}
+			prefix = netip.PrefixFrom(address, address.BitLen())
+		}
+		sourceFamily := family
+		if sourceFamily == "" {
+			sourceFamily = constant.FirewallFamilyIPv6
+			if prefix.Addr().Unmap().Is4() {
+				sourceFamily = constant.FirewallFamilyIPv4
+			}
+		}
+		rule, err := filter.NormalizeRule(RuleForSystemPort(filter.ProviderIptables, SystemPort{
+			Family: sourceFamily, Port: "1", Protocol: "tcp", SourceAddress: source,
+		}))
+		if err != nil {
+			return nil, err
+		}
+		if rule.SourceAddress == "" {
+			rule.SourceAddress = "0.0.0.0/0"
+			if sourceFamily == constant.FirewallFamilyIPv6 {
+				rule.SourceAddress = "::/0"
+			}
+		}
+		if _, exists := seen[rule.SourceAddress]; !exists {
+			seen[rule.SourceAddress] = struct{}{}
+			result = append(result, rule.SourceAddress)
+		}
 	}
-	return ports
-}
-
-func PortWhitelistKey(item PortWhitelist) string {
-	key := item.Port + "/" + strings.ToLower(strings.TrimSpace(item.Protocol))
-	if family := strings.ToLower(strings.TrimSpace(item.Family)); family != "" {
-		return family + "/" + key
-	}
-	return key
+	return result, nil
 }
 
 type SystemPort struct {
-	Family   string
-	Port     string
-	Protocol string
+	Family        string
+	Port          string
+	Protocol      string
+	SourceAddress string
+}
+
+func ExpandPortWhitelist(ports []PortWhitelist) []SystemPort {
+	result := make([]SystemPort, 0, len(ports))
+	for _, port := range ports {
+		sources := port.Sources
+		if len(sources) == 0 {
+			sources = []string{"0.0.0.0/0", "::/0"}
+		}
+		for _, source := range sources {
+			family := constant.FirewallFamilyIPv4
+			if strings.Contains(source, ":") {
+				family = constant.FirewallFamilyIPv6
+			}
+			if port.Family != "" && port.Family != family {
+				continue
+			}
+			if source == "0.0.0.0/0" || source == "::/0" {
+				source = ""
+			}
+			result = append(result, SystemPort{Family: family, Port: port.Port, Protocol: port.Protocol, SourceAddress: source})
+		}
+	}
+	return result
 }
 
 func RuleForSystemPort(provider filter.Provider, port SystemPort) filter.FirewallRule {
@@ -203,7 +249,7 @@ func RuleForSystemPort(provider filter.Provider, port SystemPort) filter.Firewal
 	}
 	return filter.FirewallRule{
 		Scope: scope, Protocol: port.Protocol, DestinationPort: port.Port,
-		Action: filter.ActionAccept,
+		SourceAddress: port.SourceAddress, Action: filter.ActionAccept,
 	}
 }
 
@@ -218,7 +264,10 @@ func NormalizeSystemPorts(ports []SystemPort) (map[string]SystemPort, error) {
 		if family != "" {
 			family = string(normalized.Scope.Family)
 		}
-		item := SystemPort{Family: family, Port: normalized.DestinationPort, Protocol: normalized.Protocol}
+		item := SystemPort{
+			Family: family, Port: normalized.DestinationPort,
+			Protocol: normalized.Protocol, SourceAddress: normalized.SourceAddress,
+		}
 		result[SystemPortKey(item)] = item
 	}
 	return result, nil
@@ -227,7 +276,10 @@ func NormalizeSystemPorts(ports []SystemPort) (map[string]SystemPort, error) {
 func SystemPortKey(port SystemPort) string {
 	key := LegacySystemPortKey(port)
 	if family := strings.ToLower(strings.TrimSpace(port.Family)); family != "" {
-		return family + "/" + key
+		key = family + "/" + key
+	}
+	if source := strings.TrimSpace(port.SourceAddress); source != "" {
+		key += "/" + source
 	}
 	return key
 }
@@ -277,7 +329,31 @@ func NormalizeRequiredPorts(ports []PortWhitelist) ([]PortWhitelist, error) {
 			return nil, fmt.Errorf("invalid required firewall port %q", port.Port)
 		}
 		port.Port = strconv.Itoa(portNumber)
+		if len(port.Sources) > 0 {
+			port.Sources, err = NormalizeWhitelistSources(port.Family, port.Sources)
+			if err != nil {
+				return nil, err
+			}
+		}
 		result = append(result, port)
 	}
 	return NormalizePortWhitelist(result), nil
+}
+
+func RequiredPortWhitelist(entries []PortWhitelist) ([]PortWhitelist, error) {
+	result := make([]PortWhitelist, 0, len(entries))
+	for _, entry := range entries {
+		if entry.Type == "" {
+			continue
+		}
+		if entry.Port == "" {
+			return nil, fmt.Errorf("firewall whitelist %s has no stored port", entry.Type)
+		}
+		protocol := strings.ToLower(strings.TrimSpace(entry.Protocol))
+		if protocol == "" {
+			protocol = "tcp"
+		}
+		result = append(result, PortWhitelist{Family: entry.Family, Port: entry.Port, Protocol: protocol, Sources: entry.Sources})
+	}
+	return NormalizeRequiredPorts(result)
 }

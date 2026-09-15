@@ -26,6 +26,15 @@ func Init() {
 		return
 	}
 	clientName := client.Name()
+	initialize := false
+	defer func() {
+		if err := service.NewIFirewallService().SyncPortWhitelist(ctx); err != nil {
+			global.LOG.Warnf("synchronize firewall whitelist on startup failed, err: %v", err)
+		}
+		if initialize {
+			initDockerPortGuard(ctx)
+		}
+	}()
 	if err := migrationutils.TransferHostFirewall(ctx, clientName); err != nil {
 		global.LOG.Errorf("transfer legacy host firewall records failed, err: %v", err)
 		return
@@ -40,11 +49,11 @@ func Init() {
 	if err := initForwardingRules(ctx); err != nil {
 		global.LOG.Warnf("restore forwarding rules failed, manual synchronization is available, err: %v", err)
 	}
-	if !needInit() {
+	initialize = needInit()
+	if !initialize {
 		repairIptablesBaseChains(clientName)
 		return
 	}
-	defer initDockerPortGuard(ctx)
 	InitPingStatus()
 	global.LOG.Info("initializing firewall settings...")
 	if clientName == "nftables" {
@@ -64,17 +73,12 @@ func Init() {
 		return
 	}
 	settingRepo := repo.NewISettingRepo()
-	panelPort := service.LoadPanelPort()
-	if len(panelPort) == 0 {
-		global.LOG.Errorf("find 1panel service port failed")
-		return
-	}
 	requiredPorts, err := service.LoadRequiredFirewallPortWhiteList()
 	if err != nil {
 		global.LOG.Errorf("load required firewall ports failed, err: %v", err)
 		return
 	}
-	if err := iptables_helper.RestoreBaseChains(panelPort, requiredPorts); err != nil {
+	if err := iptables_helper.RestoreBaseChains(requiredPorts); err != nil {
 		global.LOG.Errorf("restore iptables base chains failed, err: %v", err)
 		return
 	}
@@ -100,7 +104,6 @@ func repairIptablesBaseChains(clientName string) {
 		return
 	}
 	manager := iptables_helper.Manager{
-		PanelPort:         service.LoadPanelPort,
 		LoadRequiredPorts: service.LoadRequiredFirewallPortWhiteList,
 	}
 	if err := manager.RepairBaseChains(); err != nil {

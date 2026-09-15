@@ -4372,9 +4372,8 @@ const message = {
         unbindHelper:
             'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
         portWhiteList: 'Port beyaz listesi',
-        portWhiteListAlter:
-            'Değişiklikler kaydedildiğinde hemen uygulanır. Eklenen portlara otomatik olarak izin verilir. Portu listeden çıkarmak yalnızca korumasını kaldırır. Portu kapatmak için kural listesinden izin kuralını silin.',
-        portWhiteListHelper: 'IPv4/IPv6, TCP/UDP, tek portlar ve 8000-8100 gibi port aralıklarını destekler.',
+        portWhiteListHelper:
+            'Tek bir port (ör. 80) veya port aralığı (ör. 8000-8100) girin. Port numaraları 1 ile 65535 arasında olmalıdır.',
         chain: 'Zincir',
         sourceIP: 'Kaynak IP',
         destIP: 'Hedef IP',
@@ -4385,6 +4384,13 @@ const message = {
         allPorts: 'Tüm Portlar',
         allProtocolHelper: 'Tüm protokoller ve portlar',
         sourceAddressPlaceholder: 'örn. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 veya 2001:db8::/64',
+        systemAccessChangeConfirm:
+            'Bu işlemi {0} izin listesi kurallarına uygulamak, bu hizmetler üzerinden uzaktan erişimi engelleyebilir. Devam edilsin mi?',
+        whitelistServicePortsHelper:
+            'Güvenlik duvarının izin verdiği tek bir port ayarlayın. Dinleme portunu hizmet ayarlarından yönetin.',
+        whitelistSourcesHelper:
+            'IP adreslerini veya CIDR aralıklarını virgül ya da yeni satırla ayırın. Tüm IPv4 ve IPv6 kaynaklarına izin vermek için boş bırakın.',
+        systemAccessSourceError: 'En az bir geçerli {0} adresi veya CIDR aralığı girin.',
         destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:

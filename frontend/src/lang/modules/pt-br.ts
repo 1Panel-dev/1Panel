@@ -4389,9 +4389,8 @@ const message = {
         unbindHelper:
             'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
         portWhiteList: 'Lista branca de portas',
-        portWhiteListAlter:
-            'As alterações entram em vigor ao salvar. As portas adicionadas são liberadas automaticamente; remover uma porta apenas retira sua proteção. Para fechá-la, exclua a regra de permissão na lista de regras.',
-        portWhiteListHelper: 'Suporta IPv4/IPv6, TCP/UDP, portas únicas e intervalos como 8000-8100.',
+        portWhiteListHelper:
+            'Insira uma porta (ex.: 80) ou um intervalo (ex.: 8000-8100). Os números das portas devem estar entre 1 e 65535.',
         chain: 'Cadeia',
         sourceIP: 'IP de Origem',
         destIP: 'IP de Destino',
@@ -4402,6 +4401,13 @@ const message = {
         allPorts: 'Todas as Portas',
         allProtocolHelper: 'Todos os protocolos e portas',
         sourceAddressPlaceholder: 'por exemplo: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 ou 2001:db8::/64',
+        systemAccessChangeConfirm:
+            'Esta operação nas regras da lista de permissões de {0} pode impedir o acesso remoto por esses serviços. Continuar?',
+        whitelistServicePortsHelper:
+            'Defina uma única porta permitida pelo firewall. Gerencie a porta de escuta nas configurações do serviço.',
+        whitelistSourcesHelper:
+            'Insira endereços IP ou intervalos CIDR separados por vírgulas ou quebras de linha. Deixe em branco para permitir todas as origens IPv4 e IPv6.',
+        systemAccessSourceError: 'Informe pelo menos um endereço {0} ou intervalo CIDR válido.',
         destinationPortPlaceholder: 'por exemplo: 80, 80,443 ou 8080-8089',
         deleteRuleConfirm: 'Excluirá {0} regras. Continuar?',
         deleteUsedRuleConfirm:

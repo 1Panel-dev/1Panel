@@ -20,7 +20,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
 	"gorm.io/gorm"
 )
@@ -137,6 +136,9 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 					continue
 				}
 				observed := item.Observed
+				if observed.Rule.Scope.Chain == filter.BasicBeforeChain {
+					continue
+				}
 				rule := &firewallSyncRule{observed: observed, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{
 					SourceUUID: strings.TrimPrefix(observed.Marker, "1panel-rule:"), Rule: &observed.Rule, Status: firewallsync.StatusRemove,
 					ReasonCode: firewallsync.ReasonManagedOnlyInTarget, Reason: firewallsync.ReasonMessage(firewallsync.ReasonManagedOnlyInTarget),
@@ -627,17 +629,34 @@ func runningFirewallRuleSyncResult(request dto.FirewallRuleSyncRequest, taskID s
 	}
 }
 
-func (s *FirewallService) syncConfiguredFirewallPorts(ctx context.Context) error {
-	configured, err := loadConfiguredFirewallPortWhiteList()
+func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
+	ports, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
 	}
-	required, err := LoadRequiredFirewallPortWhiteList()
+	required, err := firewall.RequiredPortWhitelist(ports)
 	if err != nil {
 		return err
 	}
-	ports := excludeFirewallPorts(configured, required)
-	return s.SyncSystemPorts(ctx, nil, systemPorts(ports))
+	provider, err := s.selectedProvider(ctx)
+	if err != nil {
+		return err
+	}
+	ready := (&FirewallSettingService{}).portWhitelistReadiness(provider, nil, s)
+	report := func(status, label string, err error) {
+		if global.LOG == nil {
+			return
+		}
+		if err != nil {
+			global.LOG.Warnf("synchronize firewall whitelist %s: %v", label, err)
+		} else if status == "FirewallWhitelistDeferred" {
+			global.LOG.Debugf("defer firewall whitelist %s: firewall is inactive or uninitialized", label)
+		}
+	}
+	rules := whitelistRules(provider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
+	prepared, prepareErr := s.prepareWhitelistRules(ctx, provider, rules, ready, report)
+	syncErr := syncWhitelistRules(ctx, s, nil, prepared, report)
+	return errors.Join(prepareErr, syncErr)
 }
 
 func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current []dto.FirewallSystemPort) error {
@@ -705,33 +724,7 @@ func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current
 
 func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error {
 	return newFirewallService().
-		SyncSystemPorts(context.Background(), systemPorts(previous), systemPorts(current))
-}
-
-func syncPanelRequiredPorts(provider string, ports []firewall.PortWhitelist) error {
-	loadPorts := func() ([]firewall.PortWhitelist, error) { return ports, nil }
-	if provider == constant.FirewallProviderIptables {
-		manager := newIptablesHelperManager()
-		manager.LoadRequiredPorts = loadPorts
-		return manager.SyncRequiredPorts(true)
-	}
-	initialized := false
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		familyInitialized, _, err := nftables_helper.LoadFamilyInitStatus(family, "base")
-		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		initialized = initialized || familyInitialized
-	}
-	if !initialized {
-		return nil
-	}
-	manager := newNftablesHelperManager()
-	manager.LoadRequiredPorts = loadPorts
-	return manager.SyncRequiredPorts()
+		SyncSystemPorts(context.Background(), firewall.ExpandPortWhitelist(previous), firewall.ExpandPortWhitelist(current))
 }
 
 type forwardingRuleSyncCandidate struct {

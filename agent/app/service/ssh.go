@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"compress/gzip"
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -22,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	csvexport "github.com/1Panel-dev/1Panel/agent/utils/csv_export"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/geo"
 	"github.com/gin-gonic/gin"
 
@@ -217,10 +219,21 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		return err
 	}
 	oldPortValue := strings.Join(loadSSHPortValues(directives), ",")
+	if req.Key == "Port" {
+		if err := checkSSHPortAvailability(splitSSHPorts(oldPortValue), splitSSHPorts(req.NewValue)); err != nil {
+			return err
+		}
+	}
 	if err := updateSSHDirectiveValue(req.Key, req.NewValue, directives); err != nil {
 		return err
 	}
 	if req.Key == "Port" {
+		if err := newFirewallService().syncSystemAccessPortTransition(context.Background(), firewall.PortWhitelistTypeSSH, splitSSHPorts(req.NewValue)); err != nil {
+			if restoreErr := rewriteSSHManagedDirectives(sshPath, "Port", buildSSHDirectiveLines("Port", oldPortValue)); restoreErr != nil {
+				return fmt.Errorf("synchronize SSH whitelist: %w; restore SSH configuration: %v", err, restoreErr)
+			}
+			return err
+		}
 		handleSSHPortUpdate(oldPortValue, req.NewValue)
 	}
 
@@ -320,18 +333,6 @@ func handleSSHPortUpdate(oldValue, newValue string) {
 		}
 	}
 
-	removedPorts, err := parseSSHPortsToInts(diffSSHPorts(oldPorts, newPorts))
-	if err != nil {
-		global.LOG.Errorf("parse removed ssh ports failed, err: %v", err)
-	} else {
-		addedPorts, err := parseSSHPortsToInts(diffSSHPorts(newPorts, oldPorts))
-		if err != nil {
-			global.LOG.Errorf("parse added ssh ports failed, err: %v", err)
-		} else if err := OperateFirewallPort(removedPorts, addedPorts); err != nil {
-			global.LOG.Errorf("reset firewall rules %s -> %s failed, err: %v", oldValue, newValue, err)
-		}
-	}
-
 	primaryPort, err := loadPrimarySSHPort(newValue)
 	if err != nil {
 		global.LOG.Errorf("load primary ssh port from %s failed, err: %v", newValue, err)
@@ -371,24 +372,30 @@ func diffSSHPorts(left, right []string) []string {
 	return diff
 }
 
+func checkSSHPortAvailability(oldPorts, newPorts []string) error {
+	for _, port := range diffSSHPorts(newPorts, oldPorts) {
+		value, err := strconv.Atoi(port)
+		if err != nil || value < 1 || value > 65535 {
+			return fmt.Errorf("invalid SSH port %q", port)
+		}
+		if common.ScanPort(value) {
+			return buserr.WithDetail("ErrPortInUsed", value, nil)
+		}
+		listener, err := net.Listen("tcp4", ":"+strconv.Itoa(value))
+		if err != nil {
+			return buserr.WithDetail("ErrPortInUsed", value, nil)
+		}
+		_ = listener.Close()
+	}
+	return nil
+}
+
 func loadPrimarySSHPort(value string) (int, error) {
 	ports := splitSSHPorts(value)
 	if len(ports) == 0 {
 		return 0, fmt.Errorf("ssh port is empty")
 	}
 	return strconv.Atoi(ports[0])
-}
-
-func parseSSHPortsToInts(ports []string) ([]int, error) {
-	var values []int
-	for _, port := range ports {
-		value, err := strconv.Atoi(port)
-		if err != nil {
-			return nil, err
-		}
-		values = append(values, value)
-	}
-	return values, nil
 }
 
 func runWithOptionalSudo(sudo, name string, args ...string) (string, error) {

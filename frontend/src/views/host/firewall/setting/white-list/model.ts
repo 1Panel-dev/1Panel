@@ -1,72 +1,33 @@
 import { normalizePortRange } from '@/views/host/firewall/utils/validation';
 
-export type WhiteListFamily = 'ipv4' | 'ipv6';
-export type WhiteListProtocol = 'tcp' | 'udp';
+import type { Firewall } from '@/api/interface/firewall';
 
-export interface WhiteListRule {
-    family: WhiteListFamily;
-    protocol: WhiteListProtocol;
-    port: string;
-}
+export type WhiteListProtocol = 'tcp' | 'udp';
+export type WhiteListType = 'panel' | 'ssh';
+export type WhiteListRule = Firewall.PortWhitelist;
 
 export const normalizeWhiteListRule = (rule: WhiteListRule): WhiteListRule => {
-    const family = rule.family?.toLowerCase() as WhiteListFamily;
-    const protocol = rule.protocol?.toLowerCase() as WhiteListProtocol;
-    if (!['ipv4', 'ipv6'].includes(family) || !['tcp', 'udp'].includes(protocol)) {
-        throw new Error('invalid whitelist rule');
+    const { sources } = rule;
+    const protocol = (rule.protocol?.trim().toLowerCase() || (rule.type ? 'tcp' : '')) as WhiteListProtocol;
+    if (!['tcp', 'udp'].includes(protocol)) throw new Error('invalid whitelist rule');
+    if (rule.type) {
+        if (!['panel', 'ssh'].includes(rule.type)) throw new Error('invalid whitelist rule');
+        if (rule.port !== undefined && !/^\d+$/.test(rule.port.trim())) {
+            throw new Error('invalid service port');
+        }
+        return {
+            type: rule.type,
+            protocol,
+            port: rule.port === undefined ? undefined : normalizePortRange(rule.port),
+            sources,
+        };
     }
-    return { family, protocol, port: normalizePortRange(rule.port) };
+    return {
+        protocol,
+        port: normalizePortRange(rule.port || ''),
+        sources,
+    };
 };
 
-export const whiteListRuleKey = (rule: WhiteListRule): string => {
-    const normalized = normalizeWhiteListRule(rule);
-    return `${normalized.family}/${normalized.protocol}/${normalized.port}`;
-};
-
-export const parseWhiteList = (value: string): WhiteListRule[] => {
-    const input = value?.trim();
-    if (!input) return [];
-
-    let rules: WhiteListRule[];
-    if (input.startsWith('[')) {
-        rules = JSON.parse(input) as WhiteListRule[];
-    } else {
-        rules = input
-            .split(/[\s,;]+/)
-            .filter(Boolean)
-            .map((item) => {
-                const parts = item.split('/');
-                if (parts.length === 3) {
-                    return { family: parts[0], port: parts[1], protocol: parts[2] } as WhiteListRule;
-                }
-                return {
-                    family: 'ipv4',
-                    port: parts[0],
-                    protocol: parts[1] || 'tcp',
-                } as WhiteListRule;
-            });
-    }
-
-    const result: WhiteListRule[] = [];
-    const seen = new Set<string>();
-    for (const item of rules) {
-        const rule = normalizeWhiteListRule(item);
-        const key = whiteListRuleKey(rule);
-        if (seen.has(key)) continue;
-        seen.add(key);
-        result.push(rule);
-    }
-    return result;
-};
-
-export const serializeWhiteList = (rules: WhiteListRule[]): string => {
-    return JSON.stringify(rules.map((rule) => normalizeWhiteListRule(rule)));
-};
-
-export const whiteListRuleCount = (value: string): number => {
-    try {
-        return parseWhiteList(value).length;
-    } catch {
-        return 0;
-    }
-};
+export const whiteListRuleKey = (rule: WhiteListRule): string =>
+    rule.type ? `${rule.type}/${rule.protocol || 'tcp'}` : `custom/${rule.protocol}/${rule.port}`;

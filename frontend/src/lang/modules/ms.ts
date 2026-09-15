@@ -4367,9 +4367,8 @@ const message = {
         unbindHelper:
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
         portWhiteList: 'Senarai putih port',
-        portWhiteListAlter:
-            'Perubahan berkuat kuasa serta-merta apabila disimpan. Port baharu dibenarkan secara automatik; mengalih keluar port hanya membuang perlindungannya. Untuk menutupnya, padam peraturan kebenaran dalam senarai peraturan.',
-        portWhiteListHelper: 'Menyokong IPv4/IPv6, TCP/UDP, port tunggal dan julat seperti 8000-8100.',
+        portWhiteListHelper:
+            'Masukkan satu port (cth. 80) atau julat port (cth. 8000-8100). Nombor port mestilah antara 1 hingga 65535.',
         chain: 'Rantai',
         sourceIP: 'IP Sumber',
         destIP: 'IP Destinasi',
@@ -4380,6 +4379,13 @@ const message = {
         allPorts: 'Semua Port',
         allProtocolHelper: 'Semua protokol dan port',
         sourceAddressPlaceholder: 'contoh: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 atau 2001:db8::/64',
+        systemAccessChangeConfirm:
+            'Operasi ini pada peraturan senarai dibenarkan {0} mungkin menghalang akses jauh melalui perkhidmatan tersebut. Teruskan?',
+        whitelistServicePortsHelper:
+            'Tetapkan satu port yang dibenarkan oleh tembok api. Urus port pendengar dalam tetapan perkhidmatan.',
+        whitelistSourcesHelper:
+            'Masukkan alamat IP atau julat CIDR, dipisahkan dengan koma atau baris baharu. Biarkan kosong untuk membenarkan semua sumber IPv4 dan IPv6.',
+        systemAccessSourceError: 'Masukkan sekurang-kurangnya satu alamat {0} atau julat CIDR yang sah.',
         destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:
