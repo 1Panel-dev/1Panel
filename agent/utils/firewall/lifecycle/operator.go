@@ -20,7 +20,8 @@ const (
 )
 
 type Operator struct {
-	client Client
+	client    Client
+	RunAction func(operation, name string, action func() error) error
 }
 
 // DockerRestartError reports that the requested firewall operation completed,
@@ -54,11 +55,18 @@ func NewOperator(client Client) *Operator {
 	return &Operator{client: client}
 }
 
+func (o *Operator) runAction(operation, name string, action func() error) error {
+	if o.RunAction != nil {
+		return o.RunAction(operation, name, action)
+	}
+	return action()
+}
+
 func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareStart func(Client) error) error {
 	var recoveryErrors []error
 	switch operation {
 	case OperationStart:
-		if err := o.client.Start(); err != nil {
+		if err := o.runAction("Start", o.client.Name(), o.client.Start); err != nil {
 			return err
 		}
 		if prepareStart != nil {
@@ -69,7 +77,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 	case OperationStop:
 		return o.StopWithPrepare(withDockerRestart, nil)
 	case OperationRestart:
-		if err := o.client.Restart(); err != nil {
+		if err := o.runAction("TaskRestart", o.client.Name(), o.client.Restart); err != nil {
 			return err
 		}
 		if prepareStart != nil {
@@ -82,12 +90,12 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 	}
 
 	if withDockerRestart {
-		if err := controller.HandleRestart("docker"); err != nil {
+		if err := o.runAction("TaskRestart", "Docker", func() error { return controller.HandleRestart("docker") }); err != nil {
 			recoveryErrors = append(recoveryErrors, &DockerRestartError{Err: err})
 		}
 	}
 	if o.client.Name() == ProviderFirewalld && operation == OperationStart {
-		if err := restoreFail2BanAfterFirewallStart(); err != nil {
+		if err := o.runAction("TaskRecover", "Fail2Ban", restoreFail2BanAfterFirewallStart); err != nil {
 			recoveryErrors = append(recoveryErrors, err)
 		}
 	}

@@ -60,7 +60,7 @@ func (b *BaseApi) LoadFirewallBaseInfo(c *gin.Context) {
 // @Summary Operate firewall
 // @Accept json
 // @Param request body dto.FirewallLifecycleOperation true "request"
-// @Success 200
+// @Success 200 {object} dto.FirewallLifecycleOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/operate [post]
@@ -71,12 +71,13 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 		return
 	}
 
-	if err := firewallService.OperateFirewall(request); err != nil {
+	result, err := firewallService.QueueFirewallOperation(request)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 
-	helper.Success(c)
+	helper.SuccessWithData(c, result)
 }
 
 // @Tags Firewall

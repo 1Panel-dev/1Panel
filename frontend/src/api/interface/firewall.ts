@@ -45,6 +45,7 @@ export namespace Firewall {
         queued?: boolean;
     }
     export interface FirewallBase {
+        lifecycleTaskID?: string;
         name: string;
         backend: string;
         conflictBackend?: string;

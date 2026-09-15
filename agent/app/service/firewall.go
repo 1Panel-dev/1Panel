@@ -9,11 +9,13 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
@@ -55,10 +57,16 @@ type firewallRuleRuntimeResolver interface {
 
 var firewallRuleMutationMu sync.Mutex
 
+var (
+	firewallLifecycleTaskMu  sync.Mutex
+	firewallLifecycleTaskID  string
+	firewallLifecycleRequest dto.FirewallLifecycleOperation
+)
+
 type IFirewallService interface {
 	UpdatePanelPort(context.Context, uint, uint) error
 	LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error)
-	OperateFirewall(request dto.FirewallLifecycleOperation) error
+	QueueFirewallOperation(request dto.FirewallLifecycleOperation) (dto.FirewallLifecycleOperationResponse, error)
 	OperateFilterChain(request dto.FilterChainOperation) error
 	QueueFilterChainInitialization(request dto.FilterChainOperation) (dto.FilterChainOperationResponse, error)
 	Reset(context.Context, dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error)
@@ -103,6 +111,7 @@ func newFirewallService() *FirewallService {
 
 func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error) {
 	status := dto.FirewallSubsystemStatus{Version: "-", Name: "-", Backend: "-"}
+	status.LifecycleTaskID = currentFirewallLifecycleTaskID()
 	if selected := configuredSystemFirewallBackend(); selected != "" {
 		status.Name, status.Backend = selected, selected
 	}
@@ -161,6 +170,157 @@ func (c firewallLifecycleClient) Restart() error {
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
 	return c.Client.Restart()
+}
+
+func currentFirewallLifecycleTaskID() string {
+	firewallLifecycleTaskMu.Lock()
+	defer firewallLifecycleTaskMu.Unlock()
+	return firewallLifecycleTaskID
+}
+
+func lockFirewallLifecycleIdle() error {
+	if !firewallLifecycleTaskMu.TryLock() {
+		return buserr.New("TaskIsExecuting")
+	}
+	if firewallLifecycleTaskID != "" {
+		firewallLifecycleTaskMu.Unlock()
+		return buserr.New("TaskIsExecuting")
+	}
+	return nil
+}
+
+func (s *FirewallService) QueueFirewallOperation(request dto.FirewallLifecycleOperation) (dto.FirewallLifecycleOperationResponse, error) {
+	response := dto.FirewallLifecycleOperationResponse{}
+	if request.Operation == "disableBanPing" || request.Operation == "enableBanPing" {
+		return response, s.OperateFirewall(request)
+	}
+	if !firewallLifecycleTaskMu.TryLock() {
+		return response, buserr.New("TaskIsExecuting")
+	}
+	defer firewallLifecycleTaskMu.Unlock()
+	if firewallLifecycleTaskID != "" {
+		if request == firewallLifecycleRequest {
+			return dto.FirewallLifecycleOperationResponse{TaskID: firewallLifecycleTaskID, Queued: true}, nil
+		}
+		return response, buserr.New("TaskIsExecuting")
+	}
+	running, err := s.CurrentRuleSyncTask()
+	if err != nil {
+		return response, err
+	}
+	if running.Executing {
+		return response, buserr.New("TaskIsExecuting")
+	}
+	loadClient := s.baseClient
+	if loadClient == nil {
+		loadClient = selectedSystemFirewallClient
+	}
+	client, err := loadClient()
+	if err != nil {
+		return response, err
+	}
+	if (client.Name() != lifecycle.ProviderFirewalld && client.Name() != lifecycle.ProviderUFW) ||
+		(request.Operation != string(lifecycle.OperationStart) && request.Operation != string(lifecycle.OperationRestart)) {
+		return response, s.OperateFirewall(request)
+	}
+	operation, label := task.TaskExec, "Start"
+	if request.Operation == string(lifecycle.OperationRestart) {
+		operation, label = task.TaskRestart, task.TaskRestart
+	}
+	name := task.GetTaskName(client.Name(), label, task.TaskScopeFirewall)
+	taskItem, err := task.NewTask(name, operation, task.TaskScopeFirewall, "", 0)
+	if err != nil {
+		return response, err
+	}
+	taskItem.AddSubTaskWithOps(name, func(t *task.Task) error {
+		return s.runFirewallLifecycleTask(t, client, request)
+	}, nil, 0, 0)
+	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+		closeUnstartedFirewallTask(taskItem)
+		return response, err
+	}
+	firewallLifecycleTaskID, firewallLifecycleRequest = taskItem.TaskID, request
+	go func() {
+		defer func() {
+			closeUnstartedFirewallTask(taskItem)
+			firewallLifecycleTaskMu.Lock()
+			defer firewallLifecycleTaskMu.Unlock()
+			if firewallLifecycleTaskID == taskItem.TaskID {
+				firewallLifecycleTaskID = ""
+			}
+		}()
+		if err := taskItem.Execute(); err != nil && taskItem.Task.Status == constant.StatusExecuting {
+			taskItem.LogFailedWithErr(name, err)
+			taskItem.Task.Status = constant.StatusFailed
+			taskItem.Task.ErrorMsg = err.Error()
+			taskItem.Task.EndAt = time.Now()
+			_ = repo.NewITaskRepo().Update(context.Background(), taskItem.Task)
+		}
+	}()
+	return dto.FirewallLifecycleOperationResponse{TaskID: taskItem.TaskID, Queued: true}, nil
+}
+
+func runFirewallLifecycleAction(t *task.Task, name string, action func() error) error {
+	t.Log(i18n.GetWithName("TaskStart", name))
+	started := time.Now()
+	err := t.TaskCtx.Err()
+	if err == nil {
+		err = action()
+	}
+	t.LogWithStatus(fmt.Sprintf("%s (%.2fs)", name, time.Since(started).Seconds()), err)
+	return err
+}
+
+func (s *FirewallService) runFirewallLifecycleTask(t *task.Task, client lifecycle.Client, request dto.FirewallLifecycleOperation) error {
+	ctx := t.TaskCtx
+	provider := filter.Provider(client.Name())
+	operator := lifecycle.NewOperator(firewallLifecycleClient{client})
+	operator.RunAction = func(operation, name string, action func() error) error {
+		return runFirewallLifecycleAction(t, task.GetTaskName(name, operation, ""), action)
+	}
+	operationErr := operator.Operate(lifecycle.Operation(request.Operation), request.WithDockerRestart, func(lifecycle.Client) error {
+		rulesErr := runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", client.Name()), func() error {
+			return s.restoreStoredFirewallRules(ctx, provider, t)
+		})
+		whitelistErr := runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
+			ports, err := loadFirewallPortWhiteList()
+			if err != nil {
+				return err
+			}
+			return s.SyncSystemPorts(ctx, nil, systemPorts(ports))
+		})
+		return errors.Join(rulesErr, whitelistErr)
+	})
+	var recoveryErr *lifecycle.CompletedOperationError
+	if operationErr != nil && !errors.As(operationErr, &recoveryErr) {
+		return operationErr
+	}
+	var forwardingErr error
+	if provider == filter.ProviderFirewalld {
+		forwardingErr = runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallRestoreForwardingRulesStep"), func() error {
+			if s.restoreForwarding != nil {
+				return s.restoreForwarding(ctx)
+			}
+			return newForwardingService().Restore(ctx)
+		})
+	}
+	dockerErr := runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallInspectDockerGuardStep"), func() error {
+		if provider == filter.ProviderFirewalld {
+			active := s.dockerActive
+			if active == nil {
+				active = func() (bool, error) { return controller.CheckActive("docker") }
+			}
+			running, err := active()
+			if err != nil || !running {
+				return err
+			}
+		}
+		if s.restoreDockerGuard != nil {
+			return s.restoreDockerGuard(ctx)
+		}
+		return ReconcileDockerPortGuard(ctx)
+	})
+	return errors.Join(operationErr, forwardingErr, dockerErr)
 }
 
 func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation) error {
@@ -248,7 +408,7 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 		return nil
 	}
 	ctx := context.Background()
-	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider)); err != nil {
+	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider), nil); err != nil {
 		return err
 	}
 	return s.syncConfiguredFirewallPorts(ctx)
@@ -280,7 +440,7 @@ func (s *FirewallService) QueueFilterChainInitialization(
 		return s.operateFilterChainBase(provider, request)
 	}, nil)
 	taskItem.AddSubTask(i18n.GetWithName("FirewallRestoreRulesStep", provider), func(t *task.Task) error {
-		return s.restoreStoredFirewallRules(t.TaskCtx, filter.Provider(provider))
+		return s.restoreStoredFirewallRules(t.TaskCtx, filter.Provider(provider), nil)
 	}, nil)
 	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func(t *task.Task) error {
 		return s.syncConfiguredFirewallPorts(t.TaskCtx)
@@ -318,6 +478,10 @@ func (s *FirewallService) operateFilterChainBaseLocked(provider string, request 
 }
 
 func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleReset) (dto.FirewallRuleResetResponse, error) {
+	if err := lockFirewallLifecycleIdle(); err != nil {
+		return dto.FirewallRuleResetResponse{}, err
+	}
+	defer firewallLifecycleTaskMu.Unlock()
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
 
@@ -2791,7 +2955,7 @@ func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
 			return nil
 		}
 	}
-	if err := s.restoreStoredFirewallRules(ctx, provider); err != nil {
+	if err := s.restoreStoredFirewallRules(ctx, provider, nil); err != nil {
 		recordFailure("restore stored firewall rules", err)
 	}
 	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {

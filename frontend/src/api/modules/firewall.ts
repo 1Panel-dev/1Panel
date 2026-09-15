@@ -16,7 +16,11 @@ export const searchForwardRule = (request: Firewall.ForwardRuleSearch) =>
     http.post<ResPage<Firewall.RuleInfo>>('/hosts/firewall/forward/search', request, TimeoutEnum.T_40S);
 
 export const operateFire = (operation: string, withDockerRestart: boolean) =>
-    http.post('/hosts/firewall/operate', { operation, withDockerRestart }, TimeoutEnum.T_10M);
+    http.post<Firewall.FilterChainOperationResult>(
+        '/hosts/firewall/operate',
+        { operation, withDockerRestart },
+        TimeoutEnum.T_10M,
+    );
 
 export const operateForwardRule = (request: { rules: Firewall.RuleForward[]; forceDelete?: boolean }) =>
     http.postWithConfig<Firewall.FilterChainOperationResult>('/hosts/firewall/forward/operate', request, {

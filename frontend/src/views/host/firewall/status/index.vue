@@ -69,6 +69,7 @@
                                 v-node-admin
                                 type="primary"
                                 v-if="baseInfo.isActive"
+                                :disabled="lifecycleBusy"
                                 @click="onOperate('stop')"
                                 link
                             >
@@ -79,14 +80,35 @@
                                 :content="$t('firewall.firewallNotStart')"
                                 placement="bottom"
                             >
-                                <el-button v-permission v-node-admin type="primary" @click="onOperate('start')" link>
+                                <el-button
+                                    v-permission
+                                    v-node-admin
+                                    type="primary"
+                                    :disabled="lifecycleBusy"
+                                    @click="onOperate('start')"
+                                    link
+                                >
                                     {{ $t('commons.button.start') }}
                                 </el-button>
                             </el-tooltip>
                             <el-divider direction="vertical" />
-                            <el-button v-permission v-node-admin type="primary" @click="onOperate('restart')" link>
+                            <el-button
+                                v-permission
+                                v-node-admin
+                                type="primary"
+                                :disabled="lifecycleBusy"
+                                @click="onOperate('restart')"
+                                link
+                            >
                                 {{ $t('commons.button.restart') }}
                             </el-button>
+                            <template v-if="baseInfo.lifecycleTaskID">
+                                <el-divider direction="vertical" />
+                                <el-button type="primary" link @click="openLifecycleTask">
+                                    {{ $t('commons.status.executing') }}
+                                    <el-icon class="ml-1"><Document /></el-icon>
+                                </el-button>
+                            </template>
                         </template>
                         <template v-if="isDirectManaged">
                             <el-divider v-if="isDirectBase || !anyFamilyBound" direction="vertical" />
@@ -186,9 +208,9 @@ import NoSuchService from '@/components/layout-content/no-such-service.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
-import { computed, nextTick, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
-import { WarningFilled } from '@element-plus/icons-vue';
+import { Document, WarningFilled } from '@element-plus/icons-vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import { newUUID } from '@/utils/id';
@@ -222,6 +244,11 @@ const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const familyRetrying = ref(false);
 const taskLogRef = ref();
+const lifecycleSubmitting = ref(false);
+const lifecycleBusy = computed(() => lifecycleSubmitting.value || !!baseInfo.value.lifecycleTaskID);
+let lifecycleTimer: ReturnType<typeof setTimeout>;
+let disposed = false;
+let baseInfoRequestID = 0;
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
 const backendUnavailable = computed(() => baseInfo.value.reason === 'backend_not_installed' || !baseInfo.value.isExist);
 const isServiceBackend = computed(() => backendName.value === 'firewalld' || backendName.value === 'ufw');
@@ -293,42 +320,50 @@ const emit = defineEmits([
 ]);
 
 const loadBaseInfo = async (search: boolean) => {
-    const loader = props.currentTab === 'forward' ? loadForwardBaseInfo() : loadFireBaseInfo(props.currentTab);
-    await loader
-        .then(async (res) => {
-            baseInfo.value = {
-                ...res.data,
-                ipv4: res.data.ipv4 || { available: true, initialized: res.data.isInit, bound: res.data.isBind },
-                ipv6: res.data.ipv6 || { available: false, initialized: false, bound: false },
-            };
-            if (backendUnavailable.value) {
-                emit('update:name', '-');
-                emit('update:is-active', false);
-                emit('update:is-init', false);
-                emit('update:is-bind', false);
-                emit('update:version', '');
-                emit('update:loading', false);
-                return;
-            }
-            emit('update:name', backendName.value);
-            emit('update:is-active', baseInfo.value.isActive);
-            emit('update:is-init', isDirectManaged.value ? anyFamilyInitialized.value : baseInfo.value.isInit);
-            emit('update:is-bind', isDirectManaged.value ? anyFamilyBound.value : baseInfo.value.isBind);
-            emit('update:version', baseInfo.value.version);
-
-            if (search) {
-                await nextTick();
-                emit('search');
-            } else {
-                emit('update:loading', false);
-            }
-        })
-        .catch(() => {
-            emit('update:loading', false);
-            emit('update:is-init', false);
+    if (disposed) return;
+    const requestID = ++baseInfoRequestID;
+    clearTimeout(lifecycleTimer);
+    try {
+        const res = await (props.currentTab === 'forward' ? loadForwardBaseInfo() : loadFireBaseInfo(props.currentTab));
+        if (disposed || requestID !== baseInfoRequestID) return;
+        const lifecycleCompleted = Boolean(baseInfo.value.lifecycleTaskID) && !res.data.lifecycleTaskID;
+        baseInfo.value = {
+            ...res.data,
+            ipv4: res.data.ipv4 || { available: true, initialized: res.data.isInit, bound: res.data.isBind },
+            ipv6: res.data.ipv6 || { available: false, initialized: false, bound: false },
+        };
+        if (backendUnavailable.value) {
             emit('update:name', '-');
+            emit('update:is-active', false);
+            emit('update:is-init', false);
+            emit('update:is-bind', false);
             emit('update:version', '');
-        });
+            emit('update:loading', false);
+            return;
+        }
+        emit('update:name', backendName.value);
+        emit('update:is-active', baseInfo.value.isActive);
+        emit('update:is-init', isDirectManaged.value ? anyFamilyInitialized.value : baseInfo.value.isInit);
+        emit('update:is-bind', isDirectManaged.value ? anyFamilyBound.value : baseInfo.value.isBind);
+        emit('update:version', baseInfo.value.version);
+
+        if ((search || lifecycleCompleted) && !baseInfo.value.lifecycleTaskID) {
+            await nextTick();
+            emit('search');
+        } else {
+            emit('update:loading', false);
+        }
+    } catch {
+        if (disposed || requestID !== baseInfoRequestID) return;
+        emit('update:loading', false);
+        emit('update:is-init', false);
+        emit('update:name', '-');
+        emit('update:version', '');
+    } finally {
+        if (!disposed && requestID === baseInfoRequestID && baseInfo.value.lifecycleTaskID) {
+            lifecycleTimer = setTimeout(() => loadBaseInfo(false), 3000);
+        }
+    }
 };
 
 const loadDocker = async () => {
@@ -434,33 +469,52 @@ const onUnBind = async () => {
 };
 
 const onOperate = async (op: string) => {
+    if (lifecycleBusy.value) return;
     operation.value = op;
     if (backendName.value === 'iptables' || backendName.value === 'nftables' || !dockerStatus.value) {
-        emit('update:loading', true);
-        await operateFire(operation.value, false)
-            .then(() => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                loadBaseInfo(true);
-            })
-            .catch(() => {
-                loadBaseInfo(true);
-            });
+        await submitLifecycleOperation(false);
     } else {
         dockerRef.value.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
     }
 };
 
 const onSubmit = async () => {
-    emit('update:loading', true);
-    await operateFire(operation.value, withDockerRestart.value)
-        .then(() => {
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            loadBaseInfo(true);
-        })
-        .catch(() => {
-            loadBaseInfo(true);
-        });
+    await submitLifecycleOperation(withDockerRestart.value);
 };
+
+const openLifecycleTask = () => {
+    if (baseInfo.value.lifecycleTaskID) {
+        taskLogRef.value?.openWithTaskID(baseInfo.value.lifecycleTaskID, true);
+    }
+};
+
+const submitLifecycleOperation = async (restartDocker: boolean) => {
+    if (lifecycleBusy.value) return;
+    lifecycleSubmitting.value = true;
+    emit('update:loading', true);
+    try {
+        const result = (await operateFire(operation.value, restartDocker)).data;
+        if (disposed) return;
+        if (result?.queued && result.taskID) {
+            baseInfo.value.lifecycleTaskID = result.taskID;
+            emit('update:loading', false);
+            openLifecycleTask();
+            await loadBaseInfo(false);
+            return;
+        }
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await loadBaseInfo(true);
+    } catch {
+        if (!disposed) await loadBaseInfo(true);
+    } finally {
+        lifecycleSubmitting.value = false;
+    }
+};
+
+onBeforeUnmount(() => {
+    disposed = true;
+    clearTimeout(lifecycleTimer);
+});
 
 defineExpose({
     acceptParams,

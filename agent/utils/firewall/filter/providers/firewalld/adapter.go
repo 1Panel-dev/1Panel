@@ -409,13 +409,17 @@ func nativeCanonical(rule filter.FirewallRule) string {
 
 func missingRuleCommands(snapshot filter.Snapshot, rule filter.FirewallRule) ([]filter.NativeCommand, []filter.NativeCommand) {
 	commands, rollback := pairedCommands(rule, "add", "remove")
+	canonical := nativeCanonical(rule)
 	var runtimeExists, permanentExists bool
 	for _, observed := range snapshot.Rules {
-		if observed.Locator.Canonical != nativeCanonical(rule) {
+		if observed.Locator.Canonical != canonical {
 			continue
 		}
 		runtimeExists = runtimeExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusRuntimeOnly
 		permanentExists = permanentExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusPermanentOnly
+		if runtimeExists && permanentExists {
+			break
+		}
 	}
 	var changes, inverses []filter.NativeCommand
 	for index, exists := range []bool{runtimeExists, permanentExists} {

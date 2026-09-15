@@ -372,6 +372,10 @@ func loadSystemFirewallFamilyInfo(provider, family string) dto.FirewallBackendFa
 }
 
 func (s *FirewallSettingService) Operate(ctx context.Context, request dto.FirewallBackendOperation) error {
+	if err := lockFirewallLifecycleIdle(); err != nil {
+		return err
+	}
+	defer firewallLifecycleTaskMu.Unlock()
 	if request.Subsystem != "system" && request.Backend != constant.FirewallProviderIptables && request.Backend != constant.FirewallProviderNftables {
 		return fmt.Errorf("%s only supports iptables or nftables", request.Subsystem)
 	}
@@ -385,7 +389,7 @@ func (s *FirewallSettingService) Operate(ctx context.Context, request dto.Firewa
 		}
 		if request.Operation == "initialize" {
 			service := newFirewallService()
-			if err := service.restoreStoredFirewallRules(ctx, filter.Provider(request.Backend)); err != nil {
+			if err := service.restoreStoredFirewallRules(ctx, filter.Provider(request.Backend), nil); err != nil {
 				return err
 			}
 			return service.syncConfiguredFirewallPorts(ctx)
