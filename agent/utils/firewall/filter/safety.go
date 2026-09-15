@@ -19,26 +19,7 @@ var ErrVerificationFailed = errors.New("firewall rule verification failed")
 func ProtectSnapshot(snapshot Snapshot, ports []PortWhitelist) (Snapshot, error) {
 	rules := append([]ObservedRule(nil), snapshot.Rules...)
 	for index := range rules {
-		rule := rules[index].Rule
-		if rules[index].ParseStatus != ParseStatusSupported || rule.Action != ActionAccept ||
-			rule.SourceAddress != "" || rule.SourcePort != "" || rule.DestinationAddress != "" || rule.Interface != "" {
-			continue
-		}
-		protected := false
-		for _, protectedPort := range ports {
-			family := strings.ToLower(strings.TrimSpace(protectedPort.Family))
-			if family != "" && rule.Scope.Family != FamilyInet && string(rule.Scope.Family) != family {
-				continue
-			}
-			if rule.Protocol != "all" && rule.Protocol != protectedPort.Protocol {
-				continue
-			}
-			if portCovers(rule.DestinationPort, protectedPort.Port) {
-				protected = true
-				break
-			}
-		}
-		if protected {
+		if rules[index].ParseStatus == ParseStatusSupported && RuleMatchesPortWhitelist(rules[index].Rule, ports) {
 			rules[index].Protected = true
 		}
 	}
@@ -53,6 +34,52 @@ func ProtectSnapshot(snapshot Snapshot, ports []PortWhitelist) (Snapshot, error)
 	}
 	protected.Notices = append([]ScopeNotice(nil), snapshot.Notices...)
 	return protected, nil
+}
+
+func RuleMatchesPortWhitelist(rule FirewallRule, ports []PortWhitelist) bool {
+	rule, err := NormalizeRule(rule)
+	if err != nil || rule.Action != ActionAccept || rule.SourcePort != "" || rule.DestinationAddress != "" || rule.Interface != "" || len(rule.ConnectionStates) != 0 {
+		return false
+	}
+	families := []Family{rule.Scope.Family}
+	if rule.Scope.Family == FamilyInet {
+		families = []Family{FamilyIPv4, FamilyIPv6}
+	}
+	for _, family := range families {
+		matched := false
+		for _, port := range ports {
+			portFamily := Family(strings.ToLower(strings.TrimSpace(port.Family)))
+			if portFamily != "" && !familiesOverlap(family, portFamily) {
+				continue
+			}
+			protocol, err := normalizeProtocol(port.Protocol)
+			if err != nil || rule.Protocol != protocol {
+				continue
+			}
+			portRange, err := normalizePort(port.Port)
+			if err != nil || rule.DestinationPort != portRange {
+				continue
+			}
+			sources := port.Sources
+			if len(sources) == 0 {
+				sources = []string{""}
+			}
+			for _, source := range sources {
+				normalized, err := normalizeAddress(source, family)
+				if err == nil && normalized == rule.SourceAddress {
+					matched = true
+					break
+				}
+			}
+			if matched {
+				break
+			}
+		}
+		if !matched {
+			return false
+		}
+	}
+	return true
 }
 
 func GuardMutation(target ObservedRule) error {
@@ -174,36 +201,6 @@ func addressesOverlap(left, right string) bool {
 		return false
 	}
 	return leftPrefix.Contains(rightPrefix.Addr()) || rightPrefix.Contains(leftPrefix.Addr())
-}
-
-func portCovers(existing, requested string) bool {
-	if existing == "" {
-		return true
-	}
-	if requested == "" {
-		return false
-	}
-	existingIntervals, err := portIntervals(existing)
-	if err != nil {
-		return false
-	}
-	requestedIntervals, err := portIntervals(requested)
-	if err != nil {
-		return false
-	}
-	for _, requestedInterval := range requestedIntervals {
-		covered := false
-		for _, existingInterval := range existingIntervals {
-			if existingInterval[0] <= requestedInterval[0] && existingInterval[1] >= requestedInterval[1] {
-				covered = true
-				break
-			}
-		}
-		if !covered {
-			return false
-		}
-	}
-	return true
 }
 
 func portsOverlap(left, right string) bool {

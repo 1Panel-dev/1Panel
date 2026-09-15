@@ -27,7 +27,7 @@ const (
 	FirewallPingStatusKey            = "BanPing"
 
 	FirewallPortWhiteList      = "FirewallPortWhiteList"
-	FirewallPortWhiteListValue = "80/tcp,443/tcp,443/udp"
+	FirewallPortWhiteListValue = `[{"port":"80","protocol":"tcp","sources":["0.0.0.0/0","::/0"]},{"port":"443","protocol":"tcp","sources":["0.0.0.0/0","::/0"]},{"port":"443","protocol":"udp","sources":["0.0.0.0/0","::/0"]}]`
 )
 
 const (

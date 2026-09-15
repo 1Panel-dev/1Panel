@@ -28,9 +28,11 @@ const (
 )
 
 type PortWhitelist struct {
-	Family   string `json:"family"`
-	Port     string `json:"port"`
-	Protocol string `json:"protocol"`
+	Family   string   `json:"-"`
+	Port     string   `json:"port,omitempty"`
+	Protocol string   `json:"protocol,omitempty"`
+	Type     string   `json:"type,omitempty"`
+	Sources  []string `json:"sources"`
 }
 
 type Direction string

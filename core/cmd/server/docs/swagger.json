@@ -19414,7 +19414,103 @@
 				"consumes": [
 					"application/json"
 				],
-				"description": "Returns a taskID; configuration save and per-rule results are recorded in the task log.",
+				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FirewallPortWhitelistCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create firewall port whitelist rules",
+				"tags": [
+					"Firewall"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"rule"
+					],
+					"formatEN": "create firewall port whitelist",
+					"formatZH": "创建防火墙端口白名单",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/firewall/settings/whitelist/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FirewallPortWhitelistDelete"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.FilterChainOperationResponse"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete firewall port whitelist rules",
+				"tags": [
+					"Firewall"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"rules"
+					],
+					"formatEN": "delete firewall port whitelist",
+					"formatZH": "删除防火墙端口白名单",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/firewall/settings/whitelist/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
 				"parameters": [
 					{
 						"description": "request",
@@ -19442,17 +19538,18 @@
 						"Timestamp": []
 					}
 				],
-				"summary": "Queue firewall port whitelist update",
+				"summary": "Update firewall port whitelist rules",
 				"tags": [
 					"Firewall"
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
 					"bodyKeys": [
-						"value"
+						"oldRule",
+						"rule"
 					],
-					"formatEN": "update firewall port whitelist [value]",
-					"formatZH": "更新防火墙端口白名单 [value]",
+					"formatEN": "update firewall port whitelist",
+					"formatZH": "编辑防火墙端口白名单",
 					"paramKeys": []
 				}
 			}
@@ -36178,6 +36275,43 @@
 			],
 			"type": "object"
 		},
+		"dto.FirewallPortWhitelistCreate": {
+			"properties": {
+				"rule": {
+					"$ref": "#/definitions/filter.PortWhitelist"
+				}
+			},
+			"required": [
+				"rule"
+			],
+			"type": "object"
+		},
+		"dto.FirewallPortWhitelistDelete": {
+			"properties": {
+				"rule": {
+					"$ref": "#/definitions/filter.PortWhitelist"
+				}
+			},
+			"required": [
+				"rule"
+			],
+			"type": "object"
+		},
+		"dto.FirewallPortWhitelistUpdate": {
+			"properties": {
+				"oldRule": {
+					"$ref": "#/definitions/filter.PortWhitelist"
+				},
+				"rule": {
+					"$ref": "#/definitions/filter.PortWhitelist"
+				}
+			},
+			"required": [
+				"oldRule",
+				"rule"
+			],
+			"type": "object"
+		},
 		"dto.FirewallRuleAdopt": {
 			"type": "object",
 			"required": [
@@ -36448,17 +36582,6 @@
 			],
 			"type": "object"
 		},
-		"dto.FirewallPortWhitelistUpdate": {
-			"properties": {
-				"value": {
-					"type": "string"
-				}
-			},
-			"required": [
-				"value"
-			],
-			"type": "object"
-		},
 		"dto.FirewallSettings": {
 			"properties": {
 				"docker": {
@@ -36471,7 +36594,10 @@
 					"type": "string"
 				},
 				"portWhiteList": {
-					"type": "string"
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/filter.PortWhitelist"
+					}
 				},
 				"system": {
 					"$ref": "#/definitions/dto.FirewallBackendGroup"
@@ -41468,6 +41594,26 @@
 				"PersistenceStatusRuntimeOnly",
 				"PersistenceStatusPermanentOnly"
 			]
+		},
+		"filter.PortWhitelist": {
+			"properties": {
+				"port": {
+					"type": "string"
+				},
+				"protocol": {
+					"type": "string"
+				},
+				"sources": {
+					"type": "array",
+					"items": {
+						"type": "string"
+					}
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
 		},
 		"filter.RuntimeUsage": {
 			"properties": {

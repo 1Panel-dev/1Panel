@@ -4300,9 +4300,8 @@ const message = {
         unbindHelper:
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
         portWhiteList: 'Port allowlist',
-        portWhiteListAlter:
-            'Whitelist changes take effect immediately when saved. Added ports are allowed automatically; removing a port only removes whitelist protection. To close it, delete its allow rule from the rule list.',
-        portWhiteListHelper: 'Supports IPv4/IPv6, TCP/UDP, single ports, and port ranges such as 8000-8100.',
+        portWhiteListHelper:
+            'Enter a single port (e.g. 80) or a port range (e.g. 8000-8100). Port numbers must be between 1 and 65535.',
         chain: 'Chain',
         sourceIP: 'Source IP',
         destIP: 'Destination IP',
@@ -4313,6 +4312,13 @@ const message = {
         allPorts: 'All Ports',
         allProtocolHelper: 'All protocols and ports',
         sourceAddressPlaceholder: 'e.g. 172.16.10.11, 172.16.0.0/24, 2001:db8::1, or 2001:db8::/64',
+        systemAccessChangeConfirm:
+            'This operation on the {0} allowlist rules may prevent remote access through these services. Continue?',
+        whitelistServicePortsHelper:
+            'Set one port allowed by the firewall. Manage the listening port in the service settings.',
+        whitelistSourcesHelper:
+            'Enter IP addresses or CIDR ranges, separated by commas or new lines. Leave blank to allow all IPv4 and IPv6 sources.',
+        systemAccessSourceError: 'Enter at least one valid {0} address or CIDR range.',
         destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:

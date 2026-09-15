@@ -1,6 +1,7 @@
 package manager
 
 import (
+	"fmt"
 	"strings"
 )
 
@@ -50,5 +51,5 @@ func (s *Snap) Operate(operate, serviceName string) error {
 	if s.IsExist(serviceName) {
 		return handlerErr(run(s.toolCmd, operate, serviceName))
 	}
-	return nil
+	return fmt.Errorf("snap service %q does not exist", serviceName)
 }

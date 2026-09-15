@@ -492,21 +492,67 @@ func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Queue firewall port whitelist update
-// @Description Returns a taskID; configuration save and per-rule results are recorded in the task log.
+// @Summary Create firewall port whitelist rules
+// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
+// @Accept json
+// @Param request body dto.FirewallPortWhitelistCreate true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings/whitelist [post]
+// @x-panel-log {"bodyKeys":["rule"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建防火墙端口白名单","formatEN":"create firewall port whitelist"}
+func (b *BaseApi) CreateFirewallPortWhitelist(c *gin.Context) {
+	var request dto.FirewallPortWhitelistCreate
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallSettingService.CreatePortWhitelist(c.Request.Context(), request)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Update firewall port whitelist rules
+// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistUpdate true "request"
 // @Success 200 {object} dto.FilterChainOperationResponse
 // @Security ApiKeyAuth
 // @Security Timestamp
-// @Router /hosts/firewall/settings/whitelist [post]
-// @x-panel-log {"bodyKeys":["value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙端口白名单 [value]","formatEN":"update firewall port whitelist [value]"}
+// @Router /hosts/firewall/settings/whitelist/update [post]
+// @x-panel-log {"bodyKeys":["oldRule","rule"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"编辑防火墙端口白名单","formatEN":"update firewall port whitelist"}
 func (b *BaseApi) UpdateFirewallPortWhitelist(c *gin.Context) {
 	var request dto.FirewallPortWhitelistUpdate
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	result, err := firewallSettingService.QueuePortWhitelist(request.Value)
+	result, err := firewallSettingService.UpdatePortWhitelist(c.Request.Context(), request)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Delete firewall port whitelist rules
+// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
+// @Accept json
+// @Param request body dto.FirewallPortWhitelistDelete true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings/whitelist/delete [post]
+// @x-panel-log {"bodyKeys":["rules"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除防火墙端口白名单","formatEN":"delete firewall port whitelist"}
+func (b *BaseApi) DeleteFirewallPortWhitelist(c *gin.Context) {
+	var request dto.FirewallPortWhitelistDelete
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallSettingService.DeletePortWhitelist(c.Request.Context(), request)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

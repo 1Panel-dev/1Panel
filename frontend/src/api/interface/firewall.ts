@@ -33,8 +33,19 @@ export namespace Firewall {
         forwarding: BackendGroup;
         docker: BackendGroup;
         pingStatus: string;
-        portWhiteList: string;
+        portWhiteList: PortWhitelist[];
     }
+    export interface PortWhitelist {
+        port?: string;
+        protocol?: 'tcp' | 'udp';
+        type?: 'panel' | 'ssh';
+        sources: string[];
+    }
+    export interface PortWhitelistUpdate {
+        oldRule: PortWhitelist;
+        rule: PortWhitelist;
+    }
+
     export interface BackendOperateRequest {
         subsystem: BackendSubsystem;
         backend: Provider;

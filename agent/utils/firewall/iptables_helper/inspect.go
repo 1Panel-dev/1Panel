@@ -4,61 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
-
-type FilterRules struct {
-	ID          uint   `json:"id"`
-	Chain       string `json:"chain"`
-	Protocol    string `json:"protocol"`
-	SrcPort     string `json:"srcPort"`
-	DstPort     string `json:"dstPort"`
-	SrcIP       string `json:"srcIP"`
-	DstIP       string `json:"dstIP"`
-	Strategy    string `json:"strategy"`
-	Description string `json:"description"`
-}
-
-func readFilterRulesByChain(chain string, run func(string, ...string) (string, error)) ([]FilterRules, error) {
-	var rules []FilterRules
-	if cmd.CheckIllegal(chain) {
-		return rules, buserr.New("ErrCmdIllegal")
-	}
-	stdout, err := run(FilterTab, "-nL", chain)
-	if err != nil {
-		return rules, fmt.Errorf("load filter fules by chain %s failed, %v", chain, err)
-	}
-	lines := strings.Split(stdout, "\n")
-	for i := 0; i < len(lines); i++ {
-		fields := strings.Fields(lines[i])
-		if len(fields) > 2 && strings.Contains(fields[2], ":") {
-			fields = append(fields, "")
-			copy(fields[3:], fields[2:])
-			fields[2] = "--"
-		}
-		if len(fields) < 5 {
-			continue
-		}
-		strategy := strings.ToLower(fields[0])
-		if strategy != "accept" && strategy != "drop" && strategy != "reject" {
-			continue
-		}
-		itemRule := FilterRules{
-			Chain:    chain,
-			Protocol: loadProtocol(fields[1]),
-			SrcPort:  loadPort("src", fields),
-			DstPort:  loadPort("dst", fields),
-			SrcIP:    loadIP(fields[3]),
-			DstIP:    loadIP(fields[4]),
-			Strategy: strategy,
-		}
-		rules = append(rules, itemRule)
-	}
-	return rules, nil
-}
 
 func LoadInitStatus(tab string) (bool, bool, error) {
 	return loadInitStatus(tab, RunWithStd, true)
@@ -171,48 +119,4 @@ func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, 
 		}
 	}
 	return true, true
-}
-
-func loadPort(position string, portStr []string) string {
-	if len(portStr) < 7 {
-		return ""
-	}
-
-	var portItem string
-	if strings.Contains(portStr[6], "spt:") && position == "src" {
-		portItem = strings.ReplaceAll(portStr[6], "spt:", "")
-	}
-	if strings.Contains(portStr[6], "dpt:") && position == "dst" {
-		portItem = strings.ReplaceAll(portStr[6], "dpt:", "")
-	}
-	if strings.Contains(portStr[6], "spts:") && position == "src" {
-		portItem = strings.ReplaceAll(portStr[6], "spts:", "")
-	}
-	if strings.Contains(portStr[6], "dpts:") && position == "dst" {
-		portItem = strings.ReplaceAll(portStr[6], "dpts:", "")
-	}
-	portItem = strings.ReplaceAll(portItem, ":", "-")
-	return portItem
-}
-
-func loadIP(ipStr string) string {
-	if ipStr == ANYWHERE || ipStr == "0.0.0.0/0" || ipStr == "::/0" {
-		return ""
-	}
-	return ipStr
-}
-
-func loadProtocol(protocol string) string {
-	switch protocol {
-	case "0":
-		return "all"
-	case "1":
-		return "icmp"
-	case "6":
-		return "tcp"
-	case "17":
-		return "udp"
-	default:
-		return protocol
-	}
 }

@@ -39,7 +39,7 @@ func (m *Manager) RepairBaseChains() error {
 			if err != nil {
 				return nil, err
 			}
-			return baseDefaultRules(m.panelPort(), ports, family)
+			return baseDefaultRules(ports, family)
 		})
 		if err != nil {
 			return fmt.Errorf("prepare %s base chain repair: %w", family, err)

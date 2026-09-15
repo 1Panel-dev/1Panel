@@ -4284,9 +4284,8 @@ const message = {
         unbindHelper:
             'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
         portWhiteList: 'ポートホワイトリスト',
-        portWhiteListAlter:
-            '変更は保存時に即座に反映されます。追加したポートは自動的に許可されます。削除したポートは保護のみ解除されるため、閉じるにはルール一覧から許可ルールを削除してください。',
-        portWhiteListHelper: 'IPv4/IPv6、TCP/UDP、単一ポート、8000-8100 のようなポート範囲に対応します。',
+        portWhiteListHelper:
+            '単一ポート（例：80）またはポート範囲（例：8000-8100）を入力してください。ポート番号は 1～65535 です。',
         chain: 'チェーン',
         sourceIP: '送信元 IP',
         destIP: '宛先 IP',
@@ -4297,6 +4296,13 @@ const message = {
         allPorts: 'すべてのポート',
         allProtocolHelper: 'すべてのプロトコルとポート',
         sourceAddressPlaceholder: '例: 172.16.10.11、172.16.0.0/24、2001:db8::1、2001:db8::/64',
+        systemAccessChangeConfirm:
+            'この操作を {0} の許可リストルールに適用すると、これらのサービス経由のリモートアクセスができなくなる可能性があります。続行しますか？',
+        whitelistServicePortsHelper:
+            'ファイアウォールで許可するポートを1つ設定します。待ち受けポートは各サービスの設定で変更してください。',
+        whitelistSourcesHelper:
+            'IP アドレスまたは CIDR をカンマか改行で区切って入力してください。 空欄の場合、すべての IPv4 および IPv6 の接続元を許可します。',
+        systemAccessSourceError: '有効な {0} アドレスまたは CIDR を1つ以上入力してください。',
         destinationPortPlaceholder: '例: 80、80,443、8080-8089',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
         deleteUsedRuleConfirm:

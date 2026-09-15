@@ -4354,9 +4354,8 @@ const message = {
         unbindHelper:
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
         portWhiteList: 'Lista blanca de puertos',
-        portWhiteListAlter:
-            'Los cambios se aplican al guardar. Los puertos añadidos se permiten automáticamente; quitar un puerto solo elimina su protección. Para cerrarlo, elimine su regla de permiso en la lista de reglas.',
-        portWhiteListHelper: 'Admite IPv4/IPv6, TCP/UDP, puertos individuales y rangos como 8000-8100.',
+        portWhiteListHelper:
+            'Introduzca un puerto (p. ej., 80) o un rango (p. ej., 8000-8100). Los puertos deben estar entre 1 y 65535.',
         chain: 'Cadena',
         sourceIP: 'IP de Origen',
         destIP: 'IP de Destino',
@@ -4367,6 +4366,13 @@ const message = {
         allPorts: 'Todos los Puertos',
         allProtocolHelper: 'Todos los protocolos y puertos',
         sourceAddressPlaceholder: 'p. ej. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 o 2001:db8::/64',
+        systemAccessChangeConfirm:
+            'Esta operación en las reglas de la lista de permitidos de {0} puede impedir el acceso remoto mediante estos servicios. ¿Continuar?',
+        whitelistServicePortsHelper:
+            'Configure un único puerto permitido por el cortafuegos. El puerto de escucha se gestiona en la configuración del servicio.',
+        whitelistSourcesHelper:
+            'Introduzca direcciones IP o rangos CIDR separados por comas o saltos de línea. Déjelo en blanco para permitir todos los orígenes IPv4 e IPv6.',
+        systemAccessSourceError: 'Introduzca al menos una dirección o red CIDR {0} válida.',
         destinationPortPlaceholder: 'p. ej. 80, 80,443 o 8080-8089',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:

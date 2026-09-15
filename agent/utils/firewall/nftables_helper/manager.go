@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/netip"
 	"os"
 	"path/filepath"
-	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -111,12 +111,15 @@ func (m *Manager) ensureBaseChains() error {
 	return nil
 }
 
-func requiredPortCommand(tableFamily string, port firewall.PortWhitelist) []string {
-	return []string{
+func requiredPortCommand(tableFamily string, rule firewall.SystemPort) []string {
+	command := []string{
 		"add", "rule", tableFamily, TableName, BasicBeforeChain,
-		"meta", "l4proto", port.Protocol, port.Protocol, "dport", port.Port,
-		"accept", "comment", `"` + requiredPortComment + `"`,
 	}
+	if rule.SourceAddress != "" {
+		command = append(command, tableFamily, "saddr", rule.SourceAddress)
+	}
+	return append(command, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.Port,
+		"accept", "comment", `"`+requiredPortComment+`"`)
 }
 
 func (m *Manager) initPreRules() error {
@@ -128,17 +131,10 @@ func (m *Manager) initPreRules() error {
 	if err != nil {
 		return err
 	}
-	commands := make([][]string, 0, 12+len(ports)*2)
+	rules := firewall.ExpandPortWhitelist(ports)
+	commands := requiredPortCommands(rules)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		commands = append(commands,
-			[]string{"flush", "chain", tableFamily, TableName, BasicBeforeChain},
-			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
-			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
-		)
-		for _, port := range ports {
-			commands = append(commands, requiredPortCommand(tableFamily, port))
-		}
 		commands = append(commands,
 			[]string{"flush", "chain", tableFamily, TableName, BasicAfterChain},
 			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"},
@@ -157,9 +153,31 @@ func (m *Manager) SyncRequiredPorts() error {
 	if err != nil {
 		return err
 	}
-	commands, err := requiredPortSyncCommands(run, ports)
-	if err != nil {
-		return err
+	rules := firewall.ExpandPortWhitelist(ports)
+	var commands [][]string
+	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+		tableFamily := TableFamily(family)
+		output, exists, err := readNftObject(run, "-n", "list", "chain", tableFamily, TableName, BasicBeforeChain)
+		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		if !exists {
+			continue
+		}
+		for _, rule := range rules {
+			if rule.Family != string(family) {
+				continue
+			}
+			command := requiredPortCommand(tableFamily, rule)
+			expression := strings.Join(command[5:], " ")
+			if !containsRequiredPortRule(output, expression) {
+				commands = append(commands, command)
+				output += "\n" + expression
+			}
+		}
 	}
 	if err := runBatch(commands...); err != nil {
 		return err
@@ -167,99 +185,50 @@ func (m *Manager) SyncRequiredPorts() error {
 	return PersistRuleset(context.Background())
 }
 
-func requiredPortSyncCommands(run func(...string) (string, error), ports []firewall.PortWhitelist) ([][]string, error) {
-	commands := make([][]string, 0)
+func containsRequiredPortRule(output, expression string) bool {
+	canonical := func(line string) string {
+		line, _, _ = strings.Cut(line, " comment ")
+		line, _, _ = strings.Cut(line, " # handle ")
+		for _, protocol := range []string{"tcp", "udp"} {
+			line = strings.ReplaceAll(line, "meta l4proto "+protocol+" ", "")
+		}
+		fields := strings.Fields(line)
+		for index, field := range fields {
+			if prefix, err := netip.ParsePrefix(field); err == nil {
+				prefix = prefix.Masked()
+				fields[index] = prefix.String()
+				if prefix.Bits() == prefix.Addr().BitLen() {
+					fields[index] = prefix.Addr().String()
+				}
+			}
+		}
+		return strings.Join(fields, " ")
+	}
+	wanted := canonical(expression)
+	for _, line := range strings.Split(output, "\n") {
+		if canonical(line) == wanted {
+			return true
+		}
+	}
+	return false
+}
+
+func requiredPortCommands(rules []firewall.SystemPort) [][]string {
+	commands := make([][]string, 0, len(rules)+6)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		_, exists, err := readNftObject(run, "list", "table", tableFamily, TableName)
-		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
-			continue
-		}
-		if err != nil {
-			return nil, err
-		}
-		if !exists {
-			continue
-		}
-		stdout, err := run("-n", "-a", "list", "chain", tableFamily, TableName, BasicBeforeChain)
-		if err != nil {
-			return nil, err
-		}
-		existing := requiredPortRules(stdout)
-		missing, staleHandles := requiredPortChanges(existing, ports)
-		for _, port := range missing {
-			commands = append(commands, requiredPortCommand(tableFamily, port))
-		}
-		for _, handle := range staleHandles {
-			commands = append(commands, []string{"delete", "rule", tableFamily, TableName, BasicBeforeChain, "handle", handle})
-		}
-	}
-	return commands, nil
-}
-
-type requiredPortRule struct {
-	Key    string
-	Handle string
-}
-
-func requiredPortChanges(existing []requiredPortRule, desiredPorts []firewall.PortWhitelist) ([]firewall.PortWhitelist, []string) {
-	desired := firewall.PortWhitelistMap(desiredPorts)
-	existingKeys := make(map[string]struct{}, len(existing))
-	for _, rule := range existing {
-		existingKeys[rule.Key] = struct{}{}
-	}
-	missing := make([]firewall.PortWhitelist, 0)
-	for _, port := range desiredPorts {
-		if _, exists := existingKeys[firewall.PortWhitelistKey(port)]; !exists {
-			missing = append(missing, port)
-		}
-	}
-	kept := make(map[string]struct{}, len(existing))
-	staleHandles := make([]string, 0)
-	for _, rule := range existing {
-		if _, wanted := desired[rule.Key]; wanted {
-			if _, alreadyKept := kept[rule.Key]; !alreadyKept {
-				kept[rule.Key] = struct{}{}
-				continue
+		commands = append(commands,
+			[]string{"flush", "chain", tableFamily, TableName, BasicBeforeChain},
+			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
+			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
+		)
+		for _, rule := range rules {
+			if rule.Family == string(family) {
+				commands = append(commands, requiredPortCommand(tableFamily, rule))
 			}
 		}
-		staleHandles = append(staleHandles, rule.Handle)
 	}
-	return missing, staleHandles
-}
-
-func requiredPortRules(output string) []requiredPortRule {
-	rules := make([]requiredPortRule, 0)
-	marker := `comment "` + requiredPortComment + `"`
-	for _, line := range strings.Split(output, "\n") {
-		if !strings.Contains(line, marker) {
-			continue
-		}
-		handleIndex := strings.LastIndex(line, "# handle ")
-		if handleIndex < 0 {
-			continue
-		}
-		handle := strings.TrimSpace(line[handleIndex+len("# handle "):])
-		if _, err := strconv.ParseUint(handle, 10, 64); err != nil {
-			continue
-		}
-		fields := strings.Fields(line[:handleIndex])
-		for index := 0; index+2 < len(fields); index++ {
-			protocol := fields[index]
-			if (protocol != "tcp" && protocol != "udp") || fields[index+1] != "dport" {
-				continue
-			}
-			port, err := strconv.Atoi(fields[index+2])
-			if err != nil || port < 1 || port > 65535 {
-				break
-			}
-			rules = append(rules, requiredPortRule{
-				Key: firewall.PortWhitelistKey(firewall.PortWhitelist{Protocol: protocol, Port: strconv.Itoa(port)}), Handle: handle,
-			})
-			break
-		}
-	}
-	return rules
+	return commands
 }
 
 func (m *Manager) updateSetting(key, value string) error {

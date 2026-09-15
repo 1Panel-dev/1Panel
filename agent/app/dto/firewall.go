@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
 )
@@ -61,15 +62,24 @@ type FirewallBackendGroup struct {
 }
 
 type FirewallSettings struct {
-	System        FirewallBackendGroup `json:"system"`
-	Forwarding    FirewallBackendGroup `json:"forwarding"`
-	Docker        FirewallBackendGroup `json:"docker"`
-	PingStatus    string               `json:"pingStatus"`
-	PortWhitelist string               `json:"portWhiteList"`
+	System        FirewallBackendGroup   `json:"system"`
+	Forwarding    FirewallBackendGroup   `json:"forwarding"`
+	Docker        FirewallBackendGroup   `json:"docker"`
+	PingStatus    string                 `json:"pingStatus"`
+	PortWhitelist []filter.PortWhitelist `json:"portWhiteList"`
+}
+
+type FirewallPortWhitelistCreate struct {
+	Rule filter.PortWhitelist `json:"rule" validate:"required"`
 }
 
 type FirewallPortWhitelistUpdate struct {
-	Value string `json:"value" validate:"required"`
+	OldRule filter.PortWhitelist `json:"oldRule" validate:"required"`
+	Rule    filter.PortWhitelist `json:"rule" validate:"required"`
+}
+
+type FirewallPortWhitelistDelete struct {
+	Rule *filter.PortWhitelist `json:"rule" validate:"required"`
 }
 
 type FirewallBackendOperation struct {
@@ -93,11 +103,7 @@ type FirewallInitializationTask struct {
 	TaskID string `json:"taskID,omitempty" validate:"omitempty,max=64"`
 }
 
-type FirewallSystemPort struct {
-	Family   string
-	Port     string
-	Protocol string
-}
+type FirewallSystemPort = firewall.SystemPort
 
 type FirewallRuleInventoryResponse struct {
 	IPv4Range    filter.PositionRange   `json:"ipv4Range"`

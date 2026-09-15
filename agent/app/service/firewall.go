@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -19,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -64,6 +64,7 @@ var (
 )
 
 type IFirewallService interface {
+	SyncPortWhitelist(context.Context) error
 	UpdatePanelPort(context.Context, uint, uint) error
 	LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error)
 	QueueFirewallOperation(request dto.FirewallLifecycleOperation) (dto.FirewallLifecycleOperationResponse, error)
@@ -98,15 +99,20 @@ func newFirewallService() *FirewallService {
 		cleanupBackend:         cleanupSystemBackend,
 		cleanupInactiveBackend: cleanupInactiveSystemBackend,
 		resetBackend:           resetServiceFirewallBackend,
-		dockerActive: func() (bool, error) {
-			return controller.CheckActive("docker")
-		},
+		dockerActive:           firewallDockerActive,
 		restoreForwarding: func(ctx context.Context) error {
 			return newForwardingService().Restore(ctx)
 		},
 		restoreDockerGuard: ReconcileDockerPortGuard,
 		baseClient:         selectedSystemFirewallClient,
 	}
+}
+
+func firewallDockerActive() (bool, error) {
+	if !cmd.Which("docker") {
+		return false, nil
+	}
+	return controller.CheckActive("docker")
 }
 
 func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error) {
@@ -279,17 +285,13 @@ func (s *FirewallService) runFirewallLifecycleTask(t *task.Task, client lifecycl
 		return runFirewallLifecycleAction(t, task.GetTaskName(name, operation, ""), action)
 	}
 	operationErr := operator.Operate(lifecycle.Operation(request.Operation), request.WithDockerRestart, func(lifecycle.Client) error {
-		rulesErr := runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", client.Name()), func() error {
+		runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", client.Name()), func() error {
 			return s.restoreStoredFirewallRules(ctx, provider, t)
 		})
-		whitelistErr := runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
-			ports, err := loadFirewallPortWhiteList()
-			if err != nil {
-				return err
-			}
-			return s.SyncSystemPorts(ctx, nil, systemPorts(ports))
+		runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
+			return s.SyncPortWhitelist(ctx)
 		})
-		return errors.Join(rulesErr, whitelistErr)
+		return nil
 	})
 	var recoveryErr *lifecycle.CompletedOperationError
 	if operationErr != nil && !errors.As(operationErr, &recoveryErr) {
@@ -308,7 +310,7 @@ func (s *FirewallService) runFirewallLifecycleTask(t *task.Task, client lifecycl
 		if provider == filter.ProviderFirewalld {
 			active := s.dockerActive
 			if active == nil {
-				active = func() (bool, error) { return controller.CheckActive("docker") }
+				active = firewallDockerActive
 			}
 			running, err := active()
 			if err != nil || !running {
@@ -345,7 +347,7 @@ func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation
 		return err
 	}
 	operation := lifecycle.Operation(request.Operation)
-	operationErr := lifecycle.NewOperator(firewallLifecycleClient{client}).Operate(operation, request.WithDockerRestart, s.addPortsBeforeStart)
+	operationErr := lifecycle.NewOperator(firewallLifecycleClient{client}).Operate(operation, request.WithDockerRestart, s.restoreFirewallAfterStart)
 	restoreFirewalld := client.Name() == lifecycle.ProviderFirewalld &&
 		(operation == lifecycle.OperationStart || operation == lifecycle.OperationRestart)
 	if operation != lifecycle.OperationStart && operation != lifecycle.OperationRestart {
@@ -372,6 +374,19 @@ func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation
 	return nil
 }
 
+func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uint) error {
+	if oldPort == 0 || oldPort > 65535 || port == 0 || port > 65535 {
+		return fmt.Errorf("invalid panel port transition %d -> %d", oldPort, port)
+	}
+	if LoadPanelPort() != strconv.Itoa(int(oldPort)) {
+		return fmt.Errorf("panel port changed before firewall update")
+	}
+	if oldPort == port {
+		return nil
+	}
+	return s.syncSystemAccessPortTransition(ctx, firewall.PortWhitelistTypePanel, []string{strconv.Itoa(int(port))})
+}
+
 func (s *FirewallService) restoreFirewalldRuntimeDependents(ctx context.Context, operation lifecycle.Operation) error {
 	restoreForwarding := s.restoreForwarding
 	if restoreForwarding == nil {
@@ -383,7 +398,7 @@ func (s *FirewallService) restoreFirewalldRuntimeDependents(ctx context.Context,
 	}
 	dockerActive := s.dockerActive
 	if dockerActive == nil {
-		dockerActive = func() (bool, error) { return controller.CheckActive("docker") }
+		dockerActive = firewallDockerActive
 	}
 
 	active, err := dockerActive()
@@ -408,10 +423,9 @@ func (s *FirewallService) OperateFilterChain(request dto.FilterChainOperation) e
 		return nil
 	}
 	ctx := context.Background()
-	if err := s.restoreStoredFirewallRules(ctx, filter.Provider(provider), nil); err != nil {
-		return err
-	}
-	return s.syncConfiguredFirewallPorts(ctx)
+	rulesErr := s.restoreStoredFirewallRules(ctx, filter.Provider(provider), nil)
+	whitelistErr := s.SyncPortWhitelist(ctx)
+	return errors.Join(rulesErr, whitelistErr)
 }
 
 func (s *FirewallService) QueueFilterChainInitialization(
@@ -439,11 +453,14 @@ func (s *FirewallService) QueueFilterChainInitialization(
 		t.Logf("backend=%s", provider)
 		return s.operateFilterChainBase(provider, request)
 	}, nil)
-	taskItem.AddSubTask(i18n.GetWithName("FirewallRestoreRulesStep", provider), func(t *task.Task) error {
-		return s.restoreStoredFirewallRules(t.TaskCtx, filter.Provider(provider), nil)
-	}, nil)
-	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func(t *task.Task) error {
-		return s.syncConfiguredFirewallPorts(t.TaskCtx)
+	taskItem.AddSubTask(i18n.GetMsgByKey("TaskSync"), func(t *task.Task) error {
+		rulesErr := runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", provider), func() error {
+			return s.restoreStoredFirewallRules(t.TaskCtx, filter.Provider(provider), t)
+		})
+		whitelistErr := runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
+			return s.SyncPortWhitelist(t.TaskCtx)
+		})
+		return errors.Join(rulesErr, whitelistErr)
 	}, nil)
 	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("save firewall initialization task: %w", err)
@@ -531,7 +548,7 @@ func (s *FirewallService) Reset(ctx context.Context, request dto.FirewallRuleRes
 	if provider == filter.ProviderFirewalld && request.WithDockerRestart {
 		dockerActive := s.dockerActive
 		if dockerActive == nil {
-			dockerActive = func() (bool, error) { return controller.CheckActive("docker") }
+			dockerActive = firewallDockerActive
 		}
 		active, err := dockerActive()
 		if err != nil {
@@ -1725,9 +1742,13 @@ func (s *FirewallService) deleteRule(ctx context.Context, ruleUUID string, allow
 	if err != nil {
 		return err
 	}
-	if ports, ok := ctx.Value(panelPortWhitelistKey{}).([]firewall.PortWhitelist); ok {
+	if ctx.Value(firewallWhitelistOverrideKey{}) != nil {
+		ports, err := firewallWhitelistForProtection(ctx)
+		if err != nil {
+			return err
+		}
 		for _, desired := range desiredRules {
-			if panelRuleStillRequired(desired.Rule, ports) {
+			if filter.RuleMatchesPortWhitelist(desired.Rule, ports) {
 				return filter.ErrProtectedRule
 			}
 		}
@@ -2299,7 +2320,7 @@ func (s *FirewallService) ensureSystemPortLocked(ctx context.Context, port dto.F
 	}
 	source := dto.FirewallRuleCreateItem{
 		Rule: systemPortRule(provider, port), SourceKind: constant.FirewallRuleSourceSecurity,
-		SourceID: constant.FirewallSystemAcceptedPortSourcePrefix + systemPortKey(port),
+		SourceID: systemPortSourceID(port),
 	}
 	prepared, err := s.prepareCreate(ctx, provider, source)
 	if err != nil {
@@ -2379,7 +2400,7 @@ func (s *FirewallService) deleteSystemPort(ctx context.Context, port dto.Firewal
 	}
 	for _, rule := range stored {
 		if err := s.deleteProtectedSystemPortRule(ctx, rule.UUID); err != nil {
-			if errors.Is(err, filter.ErrProtectedRule) && ctx.Value(panelPortWhitelistKey{}) != nil {
+			if errors.Is(err, filter.ErrProtectedRule) && ctx.Value(firewallWhitelistOverrideKey{}) != nil {
 				continue
 			}
 			return err
@@ -2396,7 +2417,7 @@ func (s *FirewallService) deleteProtectedSystemPortRule(ctx context.Context, rul
 
 func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.FirewallSystemPort) ([]model.FirewallRule, error) {
 	records := make([]model.FirewallRule, 0)
-	sourceIDs := []string{constant.FirewallSystemAcceptedPortSourcePrefix + systemPortKey(port)}
+	sourceIDs := []string{systemPortSourceID(port)}
 	if port.Family == constant.FirewallFamilyIPv4 {
 		sourceIDs = append(sourceIDs, constant.FirewallSystemAcceptedPortSourcePrefix+legacySystemPortKey(port))
 	}
@@ -2420,11 +2441,11 @@ func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.Firewa
 }
 
 func isProtectedSystemFirewallRule(rule model.FirewallRule) bool {
-	ownerPrefix := model.FirewallRuleOwner(
+	acceptedPrefix := model.FirewallRuleOwner(
 		constant.FirewallRuleSourceSecurity,
 		constant.FirewallSystemAcceptedPortSourcePrefix,
 	)
-	return strings.HasPrefix(rule.Owner, ownerPrefix)
+	return strings.HasPrefix(rule.Owner, acceptedPrefix)
 }
 
 func systemPortRule(provider filter.Provider, port dto.FirewallSystemPort) filter.FirewallRule {
@@ -2449,6 +2470,10 @@ func normalizeSystemPorts(ports []dto.FirewallSystemPort) (map[string]dto.Firewa
 
 func systemPortKey(port dto.FirewallSystemPort) string {
 	return firewall.SystemPortKey(firewall.SystemPort(port))
+}
+
+func systemPortSourceID(port dto.FirewallSystemPort) string {
+	return constant.FirewallSystemAcceptedPortSourcePrefix + systemPortKey(port)
 }
 
 func legacySystemPortKey(port dto.FirewallSystemPort) string {
@@ -2663,7 +2688,7 @@ func (s *FirewallService) compileRestorableFirewallRules(
 	if err != nil {
 		return nil, nil, err
 	}
-	requiredPorts := systemPorts(required)
+	requiredPorts := firewall.ExpandPortWhitelist(required)
 	for _, desired := range compiled {
 		covered := false
 		for _, port := range requiredPorts {
@@ -2722,14 +2747,27 @@ func (s *FirewallService) desiredFirewallRulesByScope(
 }
 
 func firewallRuleSnapshotPolicy(ctx context.Context, snapshot filter.Snapshot) (filter.Snapshot, error) {
-	if ports, ok := ctx.Value(panelPortWhitelistKey{}).([]firewall.PortWhitelist); ok {
-		return filter.ProtectSnapshot(snapshot, ports)
-	}
-	ports, err := loadFirewallPortWhiteList()
+	ports, err := firewallWhitelistForProtection(ctx)
 	if err != nil {
 		return filter.Snapshot{}, err
 	}
 	return filter.ProtectSnapshot(snapshot, ports)
+}
+
+func firewallWhitelistForProtection(ctx context.Context) ([]firewall.PortWhitelist, error) {
+	ports, overridden := ctx.Value(firewallWhitelistOverrideKey{}).([]firewall.PortWhitelist)
+	if !overridden {
+		var err error
+		ports, err = loadFirewallPortWhiteList()
+		if err != nil {
+			return nil, err
+		}
+	}
+	required, err := firewall.RequiredPortWhitelist(ports)
+	if err != nil {
+		return nil, err
+	}
+	return append(customWhitelist(ports), required...), nil
 }
 
 func firewallRuleSelectedProvider(context.Context) (filter.Provider, error) {
@@ -2788,7 +2826,7 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 	previous := make([]firewall.PortWhitelist, 0, len(oldPorts))
 	for _, port := range oldPorts {
 		item := firewall.PortWhitelist{Port: strconv.Itoa(port), Protocol: "tcp"}
-		if !containsFirewallPort(current, item) {
+		if !firewall.ContainsPort(current, item) {
 			previous = append(previous, item)
 		}
 	}
@@ -2801,13 +2839,9 @@ func OperateFirewallPort(oldPorts, newPorts []int) error {
 		if err != nil {
 			return err
 		}
-		added = excludeFirewallPorts(added, required)
+		added = firewall.ExcludePorts(added, required)
 	}
 	return syncManagedAcceptedPorts(previous, added)
-}
-
-func containsFirewallPort(ports []firewall.PortWhitelist, target firewall.PortWhitelist) bool {
-	return firewall.ContainsPort(ports, target)
 }
 
 func LoadPanelPort() string {
@@ -2819,7 +2853,7 @@ func LoadPanelPort() string {
 	return portSetting.Value
 }
 
-func loadConfiguredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
+func loadFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	value, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
 	if err != nil {
 		value = constant.FirewallPortWhiteListValue
@@ -2830,77 +2864,17 @@ func loadConfiguredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
 	return firewall.ParsePortWhitelist(value)
 }
 
-func loadFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
-	configured, err := loadConfiguredFirewallPortWhiteList()
-	if err != nil {
-		return nil, err
-	}
-	required, err := LoadRequiredFirewallPortWhiteList()
-	if err != nil {
-		return nil, err
-	}
-	return firewall.NormalizePortWhitelist(append(configured, required...)), nil
-}
-
 func LoadRequiredFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
-	return loadRequiredFirewallPorts(LoadPanelPort())
-}
-
-func loadRequiredFirewallPorts(panelPort string) ([]firewall.PortWhitelist, error) {
-	if panelPort == "" {
-		return nil, fmt.Errorf("find 1panel service port failed")
-	}
-	directives, _, err := parseSSHConfigTree(sshPath)
-	if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("load required SSH ports: %w", err)
-	}
-	ports := []firewall.PortWhitelist{{Port: panelPort, Protocol: "tcp"}}
-	for _, port := range loadSSHPortValues(directives) {
-		ports = append(ports, firewall.PortWhitelist{Port: port, Protocol: "tcp"})
-	}
-	return firewall.NormalizeRequiredPorts(ports)
-}
-
-func (s *FirewallService) releaseSystemPorts(ctx context.Context, ports []dto.FirewallSystemPort) error {
-	portSet, err := normalizeSystemPorts(ports)
-	if err != nil || len(portSet) == 0 {
-		return err
-	}
-
-	owners := make(map[string]struct{}, len(portSet)*2)
-	for _, port := range portSet {
-		owners[model.FirewallRuleOwner(
-			constant.FirewallRuleSourceSecurity,
-			constant.FirewallSystemAcceptedPortSourcePrefix+systemPortKey(port),
-		)] = struct{}{}
-		if port.Family == constant.FirewallFamilyIPv4 {
-			owners[model.FirewallRuleOwner(
-				constant.FirewallRuleSourceSecurity,
-				constant.FirewallSystemAcceptedPortSourcePrefix+legacySystemPortKey(port),
-			)] = struct{}{}
-		}
-	}
-	records, err := s.rules.List(ctx)
+	ports, err := loadFirewallPortWhiteList()
 	if err != nil {
-		return err
+		return nil, err
 	}
-	for _, record := range records {
-		if _, exists := owners[record.Owner]; !exists {
-			continue
-		}
-		if err := s.rules.UpdateWithRevision(ctx, record.UUID, record.Revision, map[string]interface{}{
-			"owner": constant.FirewallRuleSourceUser,
-		}); err != nil {
-			return fmt.Errorf("release accepted firewall port rule %q: %w", record.UUID, err)
-		}
-	}
-	return nil
+	return firewall.RequiredPortWhitelist(ports)
 }
 
 func newIptablesHelperManager() *iptables_helper.Manager {
 	return &iptables_helper.Manager{
 		UpdateSetting:     settingRepo.Update,
-		PanelPort:         LoadPanelPort,
 		LoadRequiredPorts: LoadRequiredFirewallPortWhiteList,
 	}
 }
@@ -2931,7 +2905,7 @@ func supportsManagedFilterChains(provider string) bool {
 	return provider == constant.FirewallProviderIptables || provider == constant.FirewallProviderNftables
 }
 
-func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
+func (s *FirewallService) restoreFirewallAfterStart(client lifecycle.Client) error {
 	ctx := context.Background()
 	provider := filter.Provider(client.Name())
 	var recoveryErrors []error
@@ -2958,55 +2932,8 @@ func (s *FirewallService) addPortsBeforeStart(client lifecycle.Client) error {
 	if err := s.restoreStoredFirewallRules(ctx, provider, nil); err != nil {
 		recordFailure("restore stored firewall rules", err)
 	}
-	if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
-		if provider == filter.ProviderIptables {
-			if err := newIptablesHelperManager().SyncRequiredPorts(true); err != nil {
-				recordFailure("synchronize required ports", err)
-			}
-		} else if err := newNftablesHelperManager().SyncRequiredPorts(); err != nil {
-			recordFailure("synchronize required ports", err)
-		}
-		configured, err := loadConfiguredFirewallPortWhiteList()
-		if err != nil {
-			recordFailure("load configured accepted ports", err)
-			return errors.Join(recoveryErrors...)
-		}
-		required, err := LoadRequiredFirewallPortWhiteList()
-		if err != nil {
-			recordFailure("load required accepted ports", err)
-			return errors.Join(recoveryErrors...)
-		}
-		recordFailure(
-			"restore configured accepted ports",
-			s.SyncSystemPorts(ctx, nil, systemPorts(excludeFirewallPorts(configured, required))),
-		)
-		return errors.Join(recoveryErrors...)
-	}
-	portWhitelist, err := loadFirewallPortWhiteList()
-	if err != nil {
-		recordFailure("load accepted ports", err)
-		return errors.Join(recoveryErrors...)
-	}
-	recordFailure("restore accepted ports", s.SyncSystemPorts(ctx, nil, systemPorts(portWhitelist)))
+	recordFailure("restore whitelist allowances", s.SyncPortWhitelist(ctx))
 	return errors.Join(recoveryErrors...)
-}
-
-func systemPorts(ports []firewall.PortWhitelist) []dto.FirewallSystemPort {
-	result := make([]dto.FirewallSystemPort, 0, len(ports))
-	for _, port := range ports {
-		families := []string{port.Family}
-		if port.Family == "" {
-			families = []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6}
-		}
-		for _, family := range families {
-			result = append(result, dto.FirewallSystemPort{Family: family, Port: port.Port, Protocol: port.Protocol})
-		}
-	}
-	return result
-}
-
-func excludeFirewallPorts(ports, excluded []firewall.PortWhitelist) []firewall.PortWhitelist {
-	return firewall.ExcludePorts(ports, excluded)
 }
 
 func AdoptLegacyHostFirewallRuleOwnership(ctx context.Context) error {

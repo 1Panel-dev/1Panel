@@ -65,7 +65,7 @@ func (s *Systemd) Operate(operate, serviceName string) error {
 		if err := NewSnap().Operate(operate, serviceName); err == nil {
 			return nil
 		}
-		return handlerErr(run(s.toolCmd, operate, serviceName))
+		return handlerErr(out, err)
 	}
 	return nil
 }
