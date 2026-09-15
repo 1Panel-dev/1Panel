@@ -22,6 +22,8 @@ func (s *SettingRouter) InitRouter(Router *gin.RouterGroup) {
 		Use(middleware.PasswordExpired())
 	{
 		settingRouter.POST("/search", baseApi.GetSettingInfo)
+		settingRouter.GET("/file/download", baseApi.GetFileDownloadPreference)
+		settingRouter.POST("/file/download", baseApi.UpdateFileDownloadPreference)
 		settingRouter.POST("/terminal/search", baseApi.GetTerminalSettingInfo)
 		settingRouter.GET("/search/available", baseApi.GetSystemAvailable)
 		settingRouter.POST("/update", baseApi.UpdateSetting)

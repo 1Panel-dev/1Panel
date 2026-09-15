@@ -216,6 +216,7 @@ export namespace File {
         url: string;
         ignoreCertificate?: boolean;
         useProxy?: boolean;
+        useServerFilename?: boolean;
     }
 
     export interface FileWgetRes {

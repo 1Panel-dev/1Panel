@@ -9,6 +9,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -38,13 +39,17 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/net/proxy"
+	"gorm.io/gorm"
 )
 
 type SettingService struct{}
 
 var panelPortChangeMu sync.Mutex
+var fileDownloadPreferenceMu sync.Mutex
 
 type ISettingService interface {
+	GetFileDownloadPreference(userID string) (dto.FileDownloadPreference, error)
+	UpdateFileDownloadPreference(userID string, req dto.FileDownloadPreference) error
 	GetSettingInfo() (*dto.SettingInfo, error)
 	GetSettingBaseInfo() (*dto.SettingBaseInfo, error)
 	LoadInterfaceAddr() ([]string, error)
@@ -72,6 +77,37 @@ type ISettingService interface {
 
 func NewISettingService() ISettingService {
 	return &SettingService{}
+}
+
+func (u *SettingService) GetFileDownloadPreference(userID string) (dto.FileDownloadPreference, error) {
+	var preference dto.FileDownloadPreference
+	if userID == "" {
+		return preference, buserr.New("ErrNotLogin")
+	}
+	fileDownloadPreferenceMu.Lock()
+	defer fileDownloadPreferenceMu.Unlock()
+	value, err := settingRepo.GetValueByKey("FileDownloadPreference:" + userID)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return preference, nil
+	}
+	if err != nil {
+		return preference, err
+	}
+	err = json.Unmarshal([]byte(value), &preference)
+	return preference, err
+}
+
+func (u *SettingService) UpdateFileDownloadPreference(userID string, req dto.FileDownloadPreference) error {
+	if userID == "" {
+		return buserr.New("ErrNotLogin")
+	}
+	value, err := json.Marshal(req)
+	if err != nil {
+		return err
+	}
+	fileDownloadPreferenceMu.Lock()
+	defer fileDownloadPreferenceMu.Unlock()
+	return settingRepo.UpdateOrCreate("FileDownloadPreference:"+userID, string(value))
 }
 
 func (u *SettingService) GetSettingInfo() (*dto.SettingInfo, error) {

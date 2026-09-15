@@ -16,6 +16,7 @@ import (
 	"io"
 	"io/fs"
 	"math"
+	"mime"
 	"net"
 	"net/http"
 	"net/url"
@@ -28,6 +29,8 @@ import (
 	"sync"
 	"syscall"
 	"time"
+	"unicode"
+	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 
@@ -386,7 +389,21 @@ type DownloadProxyConfig struct {
 
 type DownloadOptions struct {
 	IgnoreCertificate bool
+	UseServerFilename bool
 	Proxy             *DownloadProxyConfig
+}
+
+func downloadResponseFilename(header string) string {
+	_, params, err := mime.ParseMediaType(header)
+	if err != nil {
+		return ""
+	}
+	name := strings.TrimSpace(params["filename"])
+	if name == "" || name == "." || name == ".." || len(name) > 255 || !utf8.ValidString(name) ||
+		strings.ContainsAny(name, "/\\:") || strings.IndexFunc(name, unicode.IsControl) >= 0 {
+		return ""
+	}
+	return name
 }
 
 func buildDownloadProxyURL(proxy DownloadProxyConfig) (*url.URL, error) {
@@ -455,7 +472,7 @@ type downloadPolicy struct {
 	idleTimeout time.Duration
 }
 
-var remoteDownloadPolicy = downloadPolicy{retries: 3, retryDelay: 2 * time.Second, idleTimeout: 90 * time.Second}
+var remoteDownloadPolicy = downloadPolicy{retries: 3, retryDelay: 5 * time.Second, idleTimeout: 90 * time.Second}
 
 func saveDownloadProcess(process Process) {
 	if process.Total > 0 {
@@ -492,20 +509,27 @@ func (f FileOp) DownloadFileWithProcess(rawURL, dst, key string, options Downloa
 		client.CloseIdleConnections()
 		return err
 	}
-	original, err := os.Lstat(dst)
-	if err != nil && !os.IsNotExist(err) {
-		client.CloseIdleConnections()
-		return err
-	}
-	if original != nil && !original.Mode().IsRegular() {
-		client.CloseIdleConnections()
-		return fmt.Errorf("download target must be a regular file")
+	parent = filepath.Dir(dst)
+	var original os.FileInfo
+	if !options.UseServerFilename {
+		original, err = os.Lstat(dst)
+		if err != nil && !os.IsNotExist(err) {
+			client.CloseIdleConnections()
+			return err
+		}
+		if original != nil && !original.Mode().IsRegular() {
+			client.CloseIdleConnections()
+			return fmt.Errorf("download target must be a regular file")
+		}
 	}
 	ctx, cancel := context.WithCancel(context.Background())
 	task := &downloadTask{cancel: cancel, done: make(chan struct{}), dst: dst}
+	if options.UseServerFilename {
+		task.dst = ""
+	}
 	downloadMu.Lock()
 	for _, active := range downloadTasks {
-		if active.dst == dst {
+		if task.dst != "" && active.dst == task.dst {
 			downloadMu.Unlock()
 			cancel()
 			client.CloseIdleConnections()
@@ -532,6 +556,34 @@ func (f FileOp) DownloadFileWithProcess(rawURL, dst, key string, options Downloa
 			close(task.done)
 		}()
 		process := Process{Key: key, Name: filepath.Base(dst), Status: "Downloading"}
+		nameResolved := !options.UseServerFilename
+		resolveName := func(resp *http.Response) (string, error) {
+			if nameResolved {
+				return dst, nil
+			}
+			name := downloadResponseFilename(resp.Header.Get("Content-Disposition"))
+			if name == "" {
+				name = filepath.Base(dst)
+			}
+			resolved := filepath.Join(parent, name)
+			process.Name = name
+			downloadMu.Lock()
+			defer downloadMu.Unlock()
+			for otherKey, active := range downloadTasks {
+				if otherKey != key && active.dst == resolved {
+					return "", buserr.New("TaskIsExecuting")
+				}
+			}
+			if _, statErr := os.Lstat(resolved); statErr == nil {
+				return "", fmt.Errorf("download target already exists: %s", name)
+			} else if !os.IsNotExist(statErr) {
+				return "", statErr
+			}
+			task.dst = resolved
+			dst = resolved
+			nameResolved = true
+			return dst, nil
+		}
 		update := func(state downloadState, status string, attempt int) {
 			process.Written = uint64(state.written)
 			process.Total = uint64(max(0, state.total))
@@ -553,7 +605,7 @@ func (f FileOp) DownloadFileWithProcess(rawURL, dst, key string, options Downloa
 			record, runErr = recordDownloadPart(out.Name(), partInfo)
 		}
 		if runErr == nil {
-			runErr = runRemoteDownload(ctx, client, rawURL, dst, out, remoteDownloadPolicy, update)
+			runErr = runRemoteDownload(ctx, client, rawURL, dst, out, remoteDownloadPolicy, update, resolveName)
 		}
 		task.mu.Lock()
 		if ctx.Err() != nil {
@@ -685,7 +737,7 @@ func retryDownloadError(err error) bool {
 }
 
 func runRemoteDownload(ctx context.Context, client *http.Client, rawURL, dst string, out *os.File,
-	policy downloadPolicy, update func(downloadState, string, int)) error {
+	policy downloadPolicy, update func(downloadState, string, int), resolveName ...func(*http.Response) (string, error)) error {
 	state := downloadState{total: -1}
 	for attempt := 0; ; attempt++ {
 		if err := ctx.Err(); err != nil {
@@ -693,7 +745,7 @@ func runRemoteDownload(ctx context.Context, client *http.Client, rawURL, dst str
 		}
 		update(state, "Downloading", attempt)
 		retry, retryAfter, err := downloadAttempt(ctx, client, rawURL, dst, out, &state, policy.idleTimeout,
-			func() { update(state, "Downloading", attempt) })
+			func() { update(state, "Downloading", attempt) }, resolveName...)
 		if err == nil {
 			return nil
 		}
@@ -719,7 +771,7 @@ func runRemoteDownload(ctx context.Context, client *http.Client, rawURL, dst str
 }
 
 func downloadAttempt(ctx context.Context, client *http.Client, rawURL, dst string, out *os.File,
-	state *downloadState, idleTimeout time.Duration, progress func()) (bool, time.Duration, error) {
+	state *downloadState, idleTimeout time.Duration, progress func(), resolveName ...func(*http.Response) (string, error)) (bool, time.Duration, error) {
 	attemptCtx, cancel := context.WithCancel(ctx)
 	defer cancel()
 	request, err := http.NewRequestWithContext(attemptCtx, http.MethodGet, rawURL, nil)
@@ -755,12 +807,6 @@ func downloadAttempt(ctx context.Context, client *http.Client, rawURL, dst strin
 	if resp.StatusCode != http.StatusOK && resp.StatusCode != http.StatusPartialContent {
 		return false, 0, fmt.Errorf("remote download returned HTTP %d", resp.StatusCode)
 	}
-	ct := strings.ToLower(resp.Header.Get("Content-Type"))
-	ext := strings.ToLower(filepath.Ext(dst))
-	if (strings.Contains(ct, "text/html") || strings.Contains(ct, "text/xml")) &&
-		ext != ".html" && ext != ".htm" && ext != ".xml" && ext != ".svg" {
-		return false, 0, fmt.Errorf("unexpected download Content-Type: %s", ct)
-	}
 	if encoding := resp.Header.Get("Content-Encoding"); encoding != "" && !strings.EqualFold(encoding, "identity") {
 		return false, 0, fmt.Errorf("unexpected download Content-Encoding: %s", encoding)
 	}
@@ -791,6 +837,11 @@ func downloadAttempt(ctx context.Context, client *http.Client, rawURL, dst strin
 		state.etag = ""
 		if len(etag) >= 2 && strings.HasPrefix(etag, "\"") && strings.HasSuffix(etag, "\"") {
 			state.etag = etag
+		}
+	}
+	if len(resolveName) > 0 {
+		if _, err := resolveName[0](resp); err != nil {
+			return false, 0, err
 		}
 	}
 	progress()

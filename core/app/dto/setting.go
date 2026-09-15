@@ -78,6 +78,10 @@ type SettingBaseInfo struct {
 	DashboardSimpleNodeVisible string `json:"dashboardSimpleNodeVisible"`
 }
 
+type FileDownloadPreference struct {
+	UseServerFilename bool `json:"useServerFilename"`
+}
+
 type SettingUpdate struct {
 	Key   string `json:"key" validate:"required,base_setting_key"`
 	Value string `json:"value"`

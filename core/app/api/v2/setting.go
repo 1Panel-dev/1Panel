@@ -17,9 +17,59 @@ import (
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
+	"github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
+
+// @Tags System Setting
+// @Summary Load current user's file download preference
+// @Success 200 {object} dto.FileDownloadPreference
+// @Router /core/settings/file/download [get]
+func (b *BaseApi) GetFileDownloadPreference(c *gin.Context) {
+	user, ok := fileDownloadPreferenceUser(c)
+	if !ok {
+		return
+	}
+	preference, err := settingService.GetFileDownloadPreference(user.ID)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, preference)
+}
+
+// @Tags System Setting
+// @Summary Update current user's file download preference
+// @Accept json
+// @Param request body dto.FileDownloadPreference true "request"
+// @Success 200
+// @Router /core/settings/file/download [post]
+func (b *BaseApi) UpdateFileDownloadPreference(c *gin.Context) {
+	user, ok := fileDownloadPreferenceUser(c)
+	if !ok {
+		return
+	}
+	var req dto.FileDownloadPreference
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := settingService.UpdateFileDownloadPreference(user.ID, req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func fileDownloadPreferenceUser(c *gin.Context) (psession.SessionUser, bool) {
+	// Preferences always belong to the authenticated session, never a request-supplied user ID.
+	user, err := global.SESSION.Get(c)
+	if err != nil || user.ID == "" {
+		helper.BadAuth(c, "ErrNotLogin", buserr.New("ErrNotLogin"))
+		return psession.SessionUser{}, false
+	}
+	return user, true
+}
 
 // @Tags System Setting
 // @Summary Load system setting info

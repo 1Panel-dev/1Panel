@@ -896,6 +896,7 @@ func (f *FileService) Wget(w request.FileWget) (string, error) {
 	key := "file-wget-" + common.GetUuid()
 	options := files.DownloadOptions{
 		IgnoreCertificate: w.IgnoreCertificate,
+		UseServerFilename: w.UseServerFilename,
 	}
 	if w.UseProxy {
 		systemProxy, err := NewISettingService().GetSystemProxy()

@@ -154,14 +154,22 @@ const onMessage = async (message: any) => {
         const failures = res.value.filter((value) => getStatus(value) === 'Failed' && !reportedFailures.has(value.key));
         if (failures.length > 0) {
             failures.forEach((value) => reportedFailures.add(value.key));
-            MsgError(failures.map((value) => `${value.name}: ${value.error || getStatusText(value)}`).join('\n'));
+            MsgError(
+                failures
+                    .map((value) =>
+                        i18n.global.t(value.error ? 'file.downloadFailureDetail' : 'file.downloadFailed', {
+                            error: value.error,
+                        }),
+                    )
+                    .join('\n'),
+            );
         }
         const successes = res.value.filter(
             (value) => getStatus(value) === 'Success' && !reportedSuccesses.has(value.key),
         );
         if (successes.length > 0) {
             successes.forEach((value) => reportedSuccesses.add(value.key));
-            MsgSuccess(successes.map((value) => `${value.name}: ${getStatusText(value)}`).join('\n'));
+            MsgSuccess(i18n.global.t('file.downloadSuccess'));
         }
         await onRemove(getAutoRemoveKeys());
     }

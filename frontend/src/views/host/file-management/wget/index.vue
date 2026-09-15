@@ -22,6 +22,16 @@
                 <el-input v-model="addForm.name"></el-input>
             </el-form-item>
             <el-form-item>
+                <el-checkbox
+                    v-model="addForm.useServerFilename"
+                    :disabled="!preferenceReady || preferenceLoading || preferenceSaving || loading"
+                    class="!h-auto [&_.el-checkbox__label]:whitespace-normal"
+                    @change="saveServerFilenamePreference"
+                >
+                    {{ $t('file.useServerFilename') }}
+                </el-checkbox>
+            </el-form-item>
+            <el-form-item>
                 <el-checkbox v-model="addForm.useProxy">
                     {{ $t('file.useProxy') }}
                 </el-checkbox>
@@ -44,7 +54,11 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose()" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="submit(fileForm)" :disabled="loading">
+                <el-button
+                    type="primary"
+                    @click="submit(fileForm)"
+                    :disabled="loading || preferenceLoading || preferenceSaving"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -54,7 +68,7 @@
 </template>
 
 <script lang="ts" setup>
-import { wgetFile } from '@/api/modules/files';
+import { getFileDownloadPreference, updateFileDownloadPreference, wgetFile } from '@/api/modules/files';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { FormInstance, FormRules } from 'element-plus';
@@ -70,6 +84,11 @@ interface WgetProps {
 
 const fileForm = ref<FormInstance>();
 const loading = ref(false);
+const preferenceLoading = ref(false);
+const preferenceSaving = ref(false);
+const preferenceReady = ref(false);
+let preferenceToken = 0;
+let savedServerFilename = false;
 const isAppendOnly = ref(false);
 let open = ref(false);
 let submitData = ref(false);
@@ -105,11 +124,13 @@ const addForm = reactive({
     name: '',
     ignoreCertificate: false,
     useProxy: false,
+    useServerFilename: false,
 });
 
 const em = defineEmits(['close']);
 
 const handleClose = () => {
+    preferenceToken++;
     if (fileForm.value) {
         fileForm.value.resetFields();
     }
@@ -122,7 +143,7 @@ const getPath = (path: string) => {
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
+    if (!formEl || preferenceLoading.value || preferenceSaving.value || loading.value) return;
     await formEl.validate((valid) => {
         if (!valid) {
             return;
@@ -147,13 +168,45 @@ const getFileName = (url: string) => {
     addForm.name = getFilenameFromUrl(url);
 };
 
-const acceptParams = (props: WgetProps) => {
+const saveServerFilenamePreference = async () => {
+    if (!preferenceReady.value || preferenceSaving.value) return;
+    const token = preferenceToken;
+    const value = addForm.useServerFilename;
+    preferenceSaving.value = true;
+    try {
+        await updateFileDownloadPreference(value);
+        if (token === preferenceToken) savedServerFilename = value;
+    } catch {
+        if (token === preferenceToken) addForm.useServerFilename = savedServerFilename;
+    } finally {
+        if (token === preferenceToken) preferenceSaving.value = false;
+    }
+};
+
+const acceptParams = async (props: WgetProps) => {
+    const token = ++preferenceToken;
     addForm.path = props.path;
     isAppendOnly.value = Boolean(props.isAppendOnly);
     open.value = true;
     submitData.value = false;
     addForm.ignoreCertificate = false;
     addForm.useProxy = false;
+    addForm.useServerFilename = false;
+    savedServerFilename = false;
+    preferenceReady.value = false;
+    preferenceSaving.value = false;
+    preferenceLoading.value = true;
+    try {
+        const result = await getFileDownloadPreference();
+        if (token !== preferenceToken || !open.value) return;
+        savedServerFilename = result.data?.useServerFilename === true;
+        addForm.useServerFilename = savedServerFilename;
+        preferenceReady.value = true;
+    } catch {
+        // Older Core versions can still use the existing manual-name download flow.
+    } finally {
+        if (token === preferenceToken) preferenceLoading.value = false;
+    }
 };
 
 defineExpose({ acceptParams });
