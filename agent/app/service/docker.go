@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 )
 
 const dockerNftablesMinVersion = "29.0.0"
@@ -81,6 +82,11 @@ func (u *DockerService) UpdateFirewallBackend(backend string) error {
 	version := loadDockerEngineVersion(context.Background())
 	if backend == constant.FirewallProviderNftables && !dockerNftablesSupported(version) {
 		return fmt.Errorf("Docker Engine %s or later is required for the nftables firewall backend", dockerNftablesMinVersion)
+	}
+	if backend == constant.FirewallProviderNftables {
+		if err := docker_guard.CheckIPv4Forwarding(); err != nil {
+			return err
+		}
 	}
 
 	original, readErr := os.ReadFile(constant.DaemonJsonPath)

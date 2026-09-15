@@ -133,6 +133,9 @@ func NewManager() *Manager { return &Manager{runner: commandRunner{}} }
 func (m *Manager) Initialize(policies []Policy) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
+	if err := CheckIPv4Forwarding(); err != nil {
+		return err
+	}
 	inventory, err := m.ListPolicies()
 	if err != nil {
 		return err
