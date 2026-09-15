@@ -61,14 +61,14 @@
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="brotli" prop="brotli">
-                        <el-select v-model="brotliForm.brotli">
+                        <el-select v-model="form.brotli">
                             <el-option :label="'on'" :value="'on'"></el-option>
                             <el-option :label="'off'" :value="'off'"></el-option>
                         </el-select>
                         <span class="input-help">{{ $t('nginx.brotliHelper') }}</span>
                     </el-form-item>
                     <el-form-item label="brotli_min_length" prop="brotli_min_length">
-                        <el-input clearable v-model.number="brotliForm.brotli_min_length">
+                        <el-input clearable v-model.number="form.brotli_min_length">
                             <template #append>{{ unitLabel('brotli_min_length', 'k') }}</template>
                         </el-input>
                         <span class="input-help">{{ $t('nginx.brotliMinLengthHelper') }}</span>
@@ -76,7 +76,7 @@
                 </el-col>
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="brotli_comp_level" prop="brotli_comp_level">
-                        <el-input clearable v-model.number="brotliForm.brotli_comp_level"></el-input>
+                        <el-input clearable v-model.number="form.brotli_comp_level"></el-input>
                         <span class="input-help">{{ $t('nginx.brotliCompLevelHelper') }}</span>
                     </el-form-item>
                 </el-col>
@@ -115,6 +115,9 @@ let form = ref({
     gzip_min_length: 1,
     gzip_comp_level: 2,
     gzip: 'on',
+    brotli: 'on',
+    brotli_comp_level: 5,
+    brotli_min_length: 1,
 });
 let nginxFormRef = ref();
 let loading = ref(false);
@@ -125,11 +128,6 @@ let loading = ref(false);
 const brotliAvailable = ref(false);
 const brotliManagedExternally = ref(false);
 const brotliManagedUnavailable = ref(false);
-const brotliForm = ref({
-    brotli: 'on',
-    brotli_comp_level: 5,
-    brotli_min_length: 1,
-});
 
 const variablesRules = reactive({
     server_names_hash_bucket_size: [checkNumberRange(1, 9999)],
@@ -209,11 +207,11 @@ const getBrotliParams = async () => {
             continue;
         }
         if (param.name === 'brotli') {
-            brotliForm.value.brotli = param.params[0];
+            form.value.brotli = param.params[0];
         } else if (param.name === 'brotli_min_length') {
-            brotliForm.value.brotli_min_length = parseSizeParam(param.name, param.params[0]);
+            form.value.brotli_min_length = parseSizeParam(param.name, param.params[0]);
         } else if (param.name === 'brotli_comp_level') {
-            brotliForm.value.brotli_comp_level = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
+            form.value.brotli_comp_level = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
         }
     }
 };
@@ -246,9 +244,9 @@ const submit = async (formEl: FormInstance | undefined) => {
                     scope: 'brotli',
                     operate: 'update',
                     params: {
-                        brotli: brotliForm.value.brotli,
-                        brotli_comp_level: String(brotliForm.value.brotli_comp_level),
-                        brotli_min_length: withUnit('brotli_min_length', brotliForm.value.brotli_min_length, 'k'),
+                        brotli: form.value.brotli,
+                        brotli_comp_level: String(form.value.brotli_comp_level),
+                        brotli_min_length: withUnit('brotli_min_length', form.value.brotli_min_length, 'k'),
                     },
                 }).catch(() => {
                     // gzip was already saved by the time brotli failed; say so
