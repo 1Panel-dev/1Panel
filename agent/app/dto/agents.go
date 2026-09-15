@@ -162,16 +162,25 @@ type AgentWebsiteBindReq struct {
 }
 
 type AgentModelConfigUpdateReq struct {
-	AgentID   uint     `json:"agentId" validate:"required"`
-	AccountID uint     `json:"accountId" validate:"required"`
-	Model     string   `json:"model" validate:"required"`
-	Fallbacks []string `json:"fallbacks"`
+	AgentID   uint                 `json:"agentId" validate:"required"`
+	AccountID uint                 `json:"accountId" validate:"required"`
+	Model     string               `json:"model" validate:"required"`
+	Fallbacks []string             `json:"fallbacks"`
+	Metadata  []AgentModelMetadata `json:"metadata" validate:"dive"`
 }
 
 type AgentModelConfig struct {
-	AccountID uint     `json:"accountId"`
-	Model     string   `json:"model"`
-	Fallbacks []string `json:"fallbacks"`
+	AccountID uint                 `json:"accountId"`
+	Model     string               `json:"model"`
+	Fallbacks []string             `json:"fallbacks"`
+	Metadata  []AgentModelMetadata `json:"metadata"`
+}
+
+type AgentModelMetadata struct {
+	Model         string `json:"model" validate:"required"`
+	InputMode     string `json:"inputMode" validate:"required,oneof=auto text image"`
+	ContextWindow int    `json:"contextWindow" validate:"min=0"`
+	MaxTokens     int    `json:"maxTokens" validate:"min=0"`
 }
 
 type AgentHermesChatSessionItem struct {

@@ -55,6 +55,46 @@
                 </el-table>
             </div>
         </el-form-item>
+        <template v-if="showMetadata">
+            <el-divider content-position="left">{{ t('aiTools.agents.modelMetadata') }}</el-divider>
+            <span class="input-help metadata-help">{{ t('aiTools.agents.modelMetadataHelper') }}</span>
+            <el-table :data="metadataRows" size="small">
+                <el-table-column :label="t('aiTools.model.model')" min-width="180">
+                    <template #default="{ row }">
+                        {{ modelOptions.find((item) => item.id === row.model)?.name || row.model }}
+                    </template>
+                </el-table-column>
+                <el-table-column :label="t('aiTools.agents.modelInputTypes')" min-width="160">
+                    <template #default="{ row }">
+                        <el-select v-model="row.inputMode">
+                            <el-option :label="t('aiTools.agents.inputModeAuto')" value="auto" />
+                            <el-option :label="t('aiTools.agents.inputModeText')" value="text" />
+                            <el-option :label="t('aiTools.agents.inputModeImage')" value="image" />
+                        </el-select>
+                    </template>
+                </el-table-column>
+                <el-table-column :label="t('aiTools.agents.contextWindow')" min-width="150">
+                    <template #default="{ row }">
+                        <el-input-number
+                            v-model="row.contextWindow"
+                            :min="1"
+                            :controls="false"
+                            :placeholder="t('aiTools.agents.useModelDefault')"
+                        />
+                    </template>
+                </el-table-column>
+                <el-table-column label="Max Tokens" min-width="150">
+                    <template #default="{ row }">
+                        <el-input-number
+                            v-model="row.maxTokens"
+                            :min="1"
+                            :controls="false"
+                            :placeholder="t('aiTools.agents.useModelDefault')"
+                        />
+                    </template>
+                </el-table-column>
+            </el-table>
+        </template>
         <el-form-item>
             <el-button v-permission type="primary" :loading="saving" @click="saveModel">
                 {{ t('commons.button.save') }}
@@ -88,6 +128,16 @@ const agentType = ref<AI.AgentType>('openclaw');
 const accountOptions = ref<AI.AgentAccountItem[]>([]);
 const modelOptions = ref<AI.AgentAccountModel[]>([]);
 const showFallbacks = computed(() => agentType.value === 'openclaw');
+const metadataRows = ref<
+    Array<
+        Omit<AI.AgentModelMetadata, 'contextWindow' | 'maxTokens'> & {
+            contextWindow?: number;
+            maxTokens?: number;
+        }
+    >
+>([]);
+const selectedAccount = computed(() => accountOptions.value.find((item) => item.id === form.accountId));
+const showMetadata = computed(() => agentType.value === 'openclaw' && selectedAccount.value?.provider !== 'gemini');
 
 interface AgentModelLoadParams {
     agentId: number;
@@ -145,11 +195,25 @@ const syncFallbacks = (fallbacks?: string[]) => {
     }
 };
 
+const syncMetadata = (metadata: AI.AgentModelMetadata[] = []) => {
+    const configured = new Map(metadata.map((item) => [item.model, item]));
+    metadataRows.value = modelOptions.value.map((model) => {
+        const item = configured.get(model.id);
+        return {
+            model: model.id,
+            inputMode: item?.inputMode || 'auto',
+            contextWindow: item?.contextWindow || undefined,
+            maxTokens: item?.maxTokens || undefined,
+        };
+    });
+};
+
 const handleAccountChange = () => {
     setModelOptionsByAccount(form.accountId);
     ensureSelectedModel();
     form.fallbacks = [];
     fallbackCandidate.value = '';
+    syncMetadata();
 };
 
 const handleModelChange = () => {
@@ -199,6 +263,7 @@ const load = async (params: AgentModelLoadParams) => {
             form.model = '';
             form.fallbacks = [];
             modelOptions.value = [];
+            metadataRows.value = [];
             return;
         }
         const config = configRes.data;
@@ -208,6 +273,7 @@ const load = async (params: AgentModelLoadParams) => {
         setModelOptionsByAccount(currentAccount.id);
         ensureSelectedModel(config.model);
         syncFallbacks(showFallbacks.value ? config.fallbacks || [] : []);
+        syncMetadata(showMetadata.value ? config.metadata || [] : []);
     } finally {
         loading.value = false;
     }
@@ -225,6 +291,14 @@ const saveModel = async () => {
             accountId: form.accountId,
             model: form.model,
             fallbacks: showFallbacks.value ? form.fallbacks : [],
+            metadata: showMetadata.value
+                ? metadataRows.value.map((item) => ({
+                      model: item.model,
+                      inputMode: item.inputMode,
+                      contextWindow: item.contextWindow || 0,
+                      maxTokens: item.maxTokens || 0,
+                  }))
+                : [],
         });
         MsgSuccess(t('aiTools.agents.switchModelSuccess'));
         emit('updated');
@@ -256,5 +330,14 @@ defineExpose({
 .fallback-empty {
     padding: 12px 0;
     color: var(--el-text-color-secondary);
+}
+
+.metadata-help {
+    display: block;
+    margin: -8px 0 12px;
+}
+
+:deep(.el-input-number) {
+    width: 100%;
 }
 </style>

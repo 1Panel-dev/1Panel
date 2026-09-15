@@ -1354,6 +1354,10 @@ func installOpenclawPlugin(mgr *cmd.CommandHelper, containerName, spec, pluginID
 	} else if slices.Contains(options, "--dangerously-force-unsafe-install") {
 		args = append(args, "--dangerously-force-unsafe-install")
 	}
+	// Source confirmation does not grant the selected channel plugin's capabilities.
+	if slices.Contains(options, "--accept-capabilities") {
+		args = append(args, "--accept-capabilities")
+	}
 	return mgr.Run("docker", args...)
 }
 

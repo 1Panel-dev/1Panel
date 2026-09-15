@@ -936,6 +936,7 @@ func (a AgentService) GetModelConfig(req dto.AgentIDReq) (*dto.AgentModelConfig,
 		AccountID: agent.AccountID,
 		Model:     model,
 		Fallbacks: extractOpenclawFallbackModelIDs(conf, account, models, model),
+		Metadata:  extractOpenclawModelMetadata(conf, account, models),
 	}, nil
 }
 
@@ -967,7 +968,7 @@ func (a AgentService) UpdateModelConfig(req dto.AgentModelConfigUpdateReq) error
 		if agent.AgentType != constant.AppOpenclaw {
 			return fmt.Errorf("%s does not support", agent.AgentType)
 		}
-		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks); err != nil {
+		if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, req.Fallbacks, req.Metadata); err != nil {
 			return err
 		}
 	}
@@ -1684,7 +1685,7 @@ func (a AgentService) syncAgentsByAccount(account *model.AgentAccount) error {
 				return err
 			}
 			fallbacks := extractOpenclawFallbackModelIDs(conf, account, accountModels, selectedAccountModel.ID)
-			if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks); err != nil {
+			if err := writeOpenclawConfig(confDir, account, modelName, agent.Token, nil, fallbacks, nil); err != nil {
 				return err
 			}
 		case constant.AppHermesAgent:
