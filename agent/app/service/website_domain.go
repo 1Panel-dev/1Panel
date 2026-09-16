@@ -32,7 +32,7 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return nil, err
 	}
 	go func() {
-		_ = OperateFirewallPort(nil, addPorts)
+		_ = ensureFirewallPorts(addPorts)
 	}()
 
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)

@@ -427,7 +427,7 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 		return filter.ObservedRule{
 			Rule:    filter.FirewallRule{Scope: scope, NativeKind: filter.NativeKindOpaque},
 			Locator: locator, ParseStatus: filter.ParseStatusOpaque, Raw: raw,
-			Protected: scope.Chain != filter.IptablesInputChain,
+			Protected: scope.Chain == filter.BasicAfterChain,
 		}
 	}
 	tokens, err := shellwords.Parse(raw)
@@ -544,7 +544,7 @@ func parseRule(scope filter.Scope, raw, handle string, position int) filter.Obse
 	if err != nil {
 		return opaque()
 	}
-	return filter.ObservedRule{Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw, Protected: scope.Chain != filter.IptablesInputChain}
+	return filter.ObservedRule{Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw, Protected: filter.IsBuiltinProtectedRule(normalized)}
 }
 
 func parseProtocol(value string) string {

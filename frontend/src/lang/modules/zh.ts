@@ -3876,7 +3876,7 @@ const message = {
         external: '外部规则',
         externalHelper: '尚未纳入 1Panel 管理。',
         protected: '系统保护',
-        protectedHelper: '系统关键规则，不可编辑或删除。',
+        protectedHelper: '系统内置或与白名单完全匹配的规则，不可编辑或删除。',
         stateShort: {
             managed: '面板创建',
             adopted: '外部纳管',
@@ -3955,7 +3955,7 @@ const message = {
             alreadyExistsInTarget: '防火墙中已存在相同规则，无需重复添加。',
             onlyInTarget: '该规则只存在于当前防火墙中。',
             stale: '检查后防火墙状态已发生变化，请刷新后重试。',
-            protectedRule: '这是保证系统正常运行的必要规则，不能修改。',
+            protectedRule: '该防火墙规则受到保护，不能修改。',
             dockerAcceptReadOnly:
                 '该 ACCEPT 规则为只读、不可同步；同步其他规则时会保留该规则。如需移除，请在主机上手动删除。',
             cannotReconcile: '该规则无法自动同步：{0}',
@@ -4056,6 +4056,9 @@ const message = {
         bindHelper: '绑定 仅当状态为绑定时，防火墙规则才能生效，是否确认？',
         unbindHelper: '解绑 解除绑定时，已添加的所有防火墙规则将失效，请谨慎操作，是否确认？',
         portWhiteList: '端口白名单',
+        whitelistConfigHelper:
+            '白名单仅保存配置并保护匹配的放行规则。缺失规则将在启动、重启、初始化或同步时补齐；编辑或删除白名单不会删除已有规则。',
+        whitelistDeleteConfirm: '仅删除这条白名单配置，已有防火墙规则会保留。是否继续？',
         portWhiteListHelper: '支持单个端口（如 80）或端口范围（如 8000-8100），端口取值为 1-65535。',
         chain: '链',
         sourceIP: '源 IP',
@@ -4067,8 +4070,8 @@ const message = {
         allPorts: '所有端口',
         allProtocolHelper: '所有协议和端口',
         sourceAddressPlaceholder: '例如：172.16.10.11、172.16.0.0/24、2001:db8::1 或 2001:db8::/64',
-        systemAccessChangeConfirm: '对 {0} 白名单规则执行此操作后，可能无法通过该服务远程访问。是否继续？',
-        whitelistServicePortsHelper: '设置一个防火墙放行端口，服务监听端口请在对应服务设置中修改。',
+        whitelistServicePortsHelper:
+            '手动填写一个端口（1-65535），不会修改服务监听端口。在服务设置中修改端口时，会同步更新此白名单配置。',
         whitelistSourcesHelper: '支持 IP 或 CIDR，多个以逗号或换行分隔。留空默认允许所有 IPv4 和 IPv6 来源。',
         destinationPortPlaceholder: '例如：80、80,443 或 8080-8089',
         deleteRuleConfirm: '将删除 {0} 条规则，是否继续？',

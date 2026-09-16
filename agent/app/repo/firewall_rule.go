@@ -29,12 +29,6 @@ type FirewallRuleRepo struct {
 	db *gorm.DB
 }
 
-func WithFirewallRuleSource(kind, id string) DBOption {
-	return func(db *gorm.DB) *gorm.DB {
-		return db.Where("owner = ?", model.FirewallRuleOwner(kind, id))
-	}
-}
-
 func NewIFirewallRuleRepo() IFirewallRuleRepo {
 	return &FirewallRuleRepo{}
 }

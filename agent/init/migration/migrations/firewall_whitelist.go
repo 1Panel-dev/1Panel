@@ -69,13 +69,6 @@ var MigrateFirewallPortWhitelistSources = &gormigrate.Migration{
 		if err != nil {
 			return fmt.Errorf("migrate firewall port whitelist: %w", err)
 		}
-		rules, err = service.InitializeFirewallWhitelistPorts(rules)
-		if err != nil {
-			return fmt.Errorf("initialize firewall whitelist ports: %w", err)
-		}
-		if _, err := firewall.RequiredPortWhitelist(rules); err != nil {
-			return err
-		}
 		value, err := json.Marshal(rules)
 		if err != nil {
 			return err
@@ -143,7 +136,7 @@ func migrateFirewallPortWhitelist(value string) ([]firewall.PortWhitelist, error
 		if err != nil {
 			return nil, fmt.Errorf("entry #%d: %w", index+1, err)
 		}
-		normalized, err := firewall.ValidatePortWhitelist([]firewall.PortWhitelist{rule})
+		normalized, err := service.InitializeFirewallWhitelistPorts([]firewall.PortWhitelist{rule})
 		if err != nil {
 			return nil, fmt.Errorf("entry #%d: %w", index+1, err)
 		}
@@ -188,7 +181,7 @@ func migrateFirewallPortWhitelist(value string) ([]firewall.PortWhitelist, error
 			rules[index].Sources = append(rules[index].Sources, "::/0")
 		}
 	}
-	return firewall.ValidatePortWhitelist(rules)
+	return service.InitializeFirewallWhitelistPorts(rules)
 }
 
 func parseLegacyPortWhitelist(value string) ([]legacyPortWhitelist, error) {

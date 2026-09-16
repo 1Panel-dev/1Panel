@@ -368,8 +368,8 @@ func (b *BaseApi) SyncFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Queue managed firewall rule deletion
-// @Description Returns a taskID immediately; per-rule deletion results and failures are written to the task log.
+// @Summary Queue firewall rule deletion
+// @Description Deletes managed rules by UUID or unprotected before-chain rules by instance key. Returns a taskID immediately; results are written to the task log.
 // @Accept json
 // @Param request body dto.FirewallRuleDelete true "request"
 // @Success 200 {object} dto.FirewallRuleDeleteResponse
@@ -494,10 +494,10 @@ func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Create firewall port whitelist rules
-// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
+// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistCreate true "request"
-// @Success 200 {object} dto.FilterChainOperationResponse
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/settings/whitelist [post]
@@ -507,20 +507,19 @@ func (b *BaseApi) CreateFirewallPortWhitelist(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	result, err := firewallSettingService.CreatePortWhitelist(c.Request.Context(), request)
-	if err != nil {
+	if err := firewallSettingService.CreatePortWhitelist(c.Request.Context(), request); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, result)
+	helper.Success(c)
 }
 
 // @Tags Firewall
 // @Summary Update firewall port whitelist rules
-// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
+// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistUpdate true "request"
-// @Success 200 {object} dto.FilterChainOperationResponse
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/settings/whitelist/update [post]
@@ -530,20 +529,19 @@ func (b *BaseApi) UpdateFirewallPortWhitelist(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	result, err := firewallSettingService.UpdatePortWhitelist(c.Request.Context(), request)
-	if err != nil {
+	if err := firewallSettingService.UpdatePortWhitelist(c.Request.Context(), request); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, result)
+	helper.Success(c)
 }
 
 // @Tags Firewall
 // @Summary Delete firewall port whitelist rules
-// @Description Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.
+// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistDelete true "request"
-// @Success 200 {object} dto.FilterChainOperationResponse
+// @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/settings/whitelist/delete [post]
@@ -553,12 +551,11 @@ func (b *BaseApi) DeleteFirewallPortWhitelist(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	result, err := firewallSettingService.DeletePortWhitelist(c.Request.Context(), request)
-	if err != nil {
+	if err := firewallSettingService.DeletePortWhitelist(c.Request.Context(), request); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.SuccessWithData(c, result)
+	helper.Success(c)
 }
 
 // @Tags Firewall

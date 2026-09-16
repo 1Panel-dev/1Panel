@@ -4017,7 +4017,7 @@ const message = {
         externalHelper:
             '시스템에 존재하지만 아직 1Panel에서 관리하지 않는 규칙이며 필요할 때 관리 대상으로 전환할 수 있습니다.',
         protected: '시스템 보호',
-        protectedHelper: '접속 장애를 방지하기 위해 편집하거나 삭제할 수 없는 중요한 시스템 규칙입니다.',
+        protectedHelper: '기본 제공 규칙과 화이트리스트에 정확히 일치하는 규칙은 편집하거나 삭제할 수 없습니다.',
         stateShort: { managed: '패널', adopted: '관리', external: '외부', protected: '보호', drifted: '불일치' },
         ruleTargetRequired: 'IP 주소 또는 포트를 하나 이상 입력하세요',
         resolution_adopt: '관리 대상으로 전환',
@@ -4204,6 +4204,9 @@ const message = {
         unbindHelper:
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
         portWhiteList: '포트 화이트리스트',
+        whitelistConfigHelper:
+            '허용 목록은 설정만 저장하고 일치하는 허용 규칙을 보호합니다. 누락된 규칙은 시작, 재시작, 초기화 또는 동기화 시 추가됩니다. 허용 목록을 편집하거나 삭제해도 기존 규칙은 삭제되지 않습니다.',
+        whitelistDeleteConfirm: '이 화이트리스트 항목만 삭제됩니다. 기존 방화벽 규칙은 유지됩니다. 계속하시겠습니까?',
         portWhiteListHelper:
             '단일 포트(예: 80) 또는 포트 범위(예: 8000-8100)를 입력하세요. 포트 번호는 1~65535여야 합니다.',
         chain: '체인',
@@ -4216,10 +4219,8 @@ const message = {
         allPorts: '모든 포트',
         allProtocolHelper: '모든 프로토콜 및 포트',
         sourceAddressPlaceholder: '예: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 또는 2001:db8::/64',
-        systemAccessChangeConfirm:
-            '이 작업을 {0} 허용 목록 규칙에 적용하면 해당 서비스를 통한 원격 접속이 불가능해질 수 있습니다. 계속하시겠습니까?',
         whitelistServicePortsHelper:
-            '방화벽에서 허용할 포트 하나를 설정합니다. 수신 포트는 해당 서비스 설정에서 변경하세요.',
+            '포트 하나를 입력하세요(1-65535). 서비스의 수신 포트는 변경되지 않습니다. 서비스 설정에서 포트를 변경하면 이 화이트리스트 항목도 업데이트됩니다.',
         whitelistSourcesHelper:
             'IP 주소 또는 CIDR 대역을 쉼표나 줄바꿈으로 구분하세요. 비워 두면 모든 IPv4 및 IPv6 출발지를 허용합니다.',
         destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',

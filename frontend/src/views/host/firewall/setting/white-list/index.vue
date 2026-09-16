@@ -1,6 +1,7 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('firewall.portWhiteList')" size="large">
         <template #content>
+            <p class="input-help mb-3">{{ $t('firewall.whitelistConfigHelper') }}</p>
             <div class="mb-3">
                 <el-button type="primary" :disabled="disabled" @click="openEditor()">
                     {{ $t('commons.button.create') }}
@@ -77,7 +78,7 @@
                     <span class="input-help">{{ $t('firewall.portWhiteListHelper') }}</span>
                 </el-form-item>
             </template>
-            <el-form-item v-else-if="editingRule" :label="$t('commons.table.port')" prop="port">
+            <el-form-item v-else :label="$t('commons.table.port')" prop="port">
                 <el-input v-model.trim="form.port" :placeholder="form.type === 'ssh' ? '2222' : '18443'" clearable />
                 <span class="input-help">{{ $t('firewall.whitelistServicePortsHelper') }}</span>
             </el-form-item>
@@ -108,7 +109,7 @@ import {
     updateFirewallPortWhitelist,
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
-import { MsgError } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import {
     formatHostAddressList,
     isValidIPOrCIDR,
@@ -124,7 +125,7 @@ const props = defineProps<{
     sshPort?: string;
     loading: boolean;
 }>();
-const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
+const emit = defineEmits<{ (e: 'saved'): void }>();
 const drawerVisible = ref(false);
 const dialogVisible = ref(false);
 const saving = ref(false);
@@ -207,7 +208,7 @@ const saveRule = async () => {
         rule = normalizeWhiteListRule({
             ...form.value,
             type: form.value.type === 'custom' ? undefined : form.value.type,
-            port: form.value.type === 'custom' || editingRule.value ? form.value.port : undefined,
+            port: form.value.port,
             sources,
         });
     } catch {
@@ -220,56 +221,33 @@ const saveRule = async () => {
         return;
     }
     const oldRule = editingRule.value;
-    await submit(
-        () => (oldRule ? updateFirewallPortWhitelist({ oldRule, rule }) : createFirewallPortWhitelist(rule)),
-        oldRule ? { operation: 'edit', rule: oldRule } : undefined,
-    );
+    await submit(() => (oldRule ? updateFirewallPortWhitelist({ oldRule, rule }) : createFirewallPortWhitelist(rule)));
 };
 
 const removeRule = async (rule: WhiteListRule) => {
-    await submit(() => deleteFirewallPortWhitelist(rule), { operation: 'delete', rule });
+    if (disabled.value) return;
+    const confirmed = await ElMessageBox.confirm(
+        i18n.global.t('firewall.whitelistDeleteConfirm'),
+        i18n.global.t('commons.button.delete'),
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'warning',
+        },
+    )
+        .then(() => true)
+        .catch(() => false);
+    if (confirmed) await submit(() => deleteFirewallPortWhitelist(rule));
 };
 
-const submit = async (
-    request: () => ReturnType<typeof createFirewallPortWhitelist>,
-    change?: { operation: 'edit' | 'delete'; rule: WhiteListRule },
-) => {
+const submit = async (request: () => ReturnType<typeof createFirewallPortWhitelist>) => {
     if (disabled.value) return;
     saving.value = true;
     try {
-        if (change && (change.operation === 'delete' || change.rule.type)) {
-            const messages: string[] = [];
-            if (change.operation !== 'delete' || !change.rule.type) {
-                messages.push(
-                    change.operation === 'delete'
-                        ? i18n.global.t('commons.msg.delete')
-                        : i18n.global.t('firewall.editRuleConfirm'),
-                );
-            }
-            if (change.rule.type) {
-                const service = `${serviceLabel(change.rule.type)} (${change.rule.port || servicePortLabel(change.rule.type)} / ${(change.rule.protocol || 'tcp').toUpperCase()})`;
-                messages.push(i18n.global.t('firewall.systemAccessChangeConfirm', [service]));
-            }
-            const confirmed = await ElMessageBox.confirm(
-                messages.join('\n'),
-                i18n.global.t(`commons.button.${change.operation}`),
-                {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                    type: 'warning',
-                },
-            )
-                .then(() => true)
-                .catch(() => false);
-            if (!confirmed) return;
-        }
-        const { data: result } = await request();
-        if (!result.taskID || !result.queued) {
-            MsgError(i18n.global.t('commons.msg.operationFailed'));
-            return;
-        }
+        await request();
         dialogVisible.value = false;
-        emit('created', result.taskID);
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        emit('saved');
     } catch {
     } finally {
         saving.value = false;

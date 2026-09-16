@@ -132,9 +132,29 @@ func (m *Manager) initPreRules() error {
 		return err
 	}
 	rules := firewall.ExpandPortWhitelist(ports)
-	commands := requiredPortCommands(rules)
+	var commands [][]string
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
+		output, _, err := readNftObject(run, "-n", "list", "chain", tableFamily, TableName, BasicBeforeChain)
+		if err != nil {
+			return err
+		}
+		candidates := [][]string{
+			{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
+			{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
+		}
+		for _, rule := range rules {
+			if rule.Family == string(family) {
+				candidates = append(candidates, requiredPortCommand(tableFamily, rule))
+			}
+		}
+		for _, command := range candidates {
+			expression := strings.Join(command[5:], " ")
+			if !containsRequiredPortRule(output, expression) {
+				commands = append(commands, command)
+				output += "\n" + expression
+			}
+		}
 		commands = append(commands,
 			[]string{"flush", "chain", tableFamily, TableName, BasicAfterChain},
 			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"},
@@ -144,47 +164,6 @@ func (m *Manager) initPreRules() error {
 	return runBatch(commands...)
 }
 
-func (m *Manager) SyncRequiredPorts() error {
-	ports, err := m.loadRequiredPorts()
-	if err != nil {
-		return err
-	}
-	ports, err = firewall.NormalizeRequiredPorts(ports)
-	if err != nil {
-		return err
-	}
-	rules := firewall.ExpandPortWhitelist(ports)
-	var commands [][]string
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		tableFamily := TableFamily(family)
-		output, exists, err := readNftObject(run, "-n", "list", "chain", tableFamily, TableName, BasicBeforeChain)
-		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		if !exists {
-			continue
-		}
-		for _, rule := range rules {
-			if rule.Family != string(family) {
-				continue
-			}
-			command := requiredPortCommand(tableFamily, rule)
-			expression := strings.Join(command[5:], " ")
-			if !containsRequiredPortRule(output, expression) {
-				commands = append(commands, command)
-				output += "\n" + expression
-			}
-		}
-	}
-	if err := runBatch(commands...); err != nil {
-		return err
-	}
-	return PersistRuleset(context.Background())
-}
-
 func containsRequiredPortRule(output, expression string) bool {
 	canonical := func(line string) string {
 		line, _, _ = strings.Cut(line, " comment ")
@@ -192,6 +171,7 @@ func containsRequiredPortRule(output, expression string) bool {
 		for _, protocol := range []string{"tcp", "udp"} {
 			line = strings.ReplaceAll(line, "meta l4proto "+protocol+" ", "")
 		}
+		line = strings.NewReplacer("{", "", "}", "", ", ", ",", " ,", ",").Replace(line)
 		fields := strings.Fields(line)
 		for index, field := range fields {
 			if prefix, err := netip.ParsePrefix(field); err == nil {
@@ -211,24 +191,6 @@ func containsRequiredPortRule(output, expression string) bool {
 		}
 	}
 	return false
-}
-
-func requiredPortCommands(rules []firewall.SystemPort) [][]string {
-	commands := make([][]string, 0, len(rules)+6)
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
-		tableFamily := TableFamily(family)
-		commands = append(commands,
-			[]string{"flush", "chain", tableFamily, TableName, BasicBeforeChain},
-			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
-			[]string{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
-		)
-		for _, rule := range rules {
-			if rule.Family == string(family) {
-				commands = append(commands, requiredPortCommand(tableFamily, rule))
-			}
-		}
-	}
-	return commands
 }
 
 func (m *Manager) updateSetting(key, value string) error {

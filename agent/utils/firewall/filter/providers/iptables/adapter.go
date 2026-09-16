@@ -917,7 +917,7 @@ func parseRule(scope filter.Scope, raw string, position int) filter.ObservedRule
 	}
 	return filter.ObservedRule{
 		Rule: normalized, Locator: locator, Marker: marker, ParseStatus: filter.ParseStatusSupported, Raw: raw,
-		Protected: isProtectedRule(scope, normalized, comment),
+		Protected: filter.IsBuiltinProtectedRule(normalized),
 	}
 }
 
@@ -926,29 +926,6 @@ func isDefaultRejectWith(family filter.Family, value string) bool {
 		return value == "icmp6-port-unreachable"
 	}
 	return value == "icmp-port-unreachable"
-}
-
-func isProtectedRule(scope filter.Scope, rule filter.FirewallRule, comment string) bool {
-	if scope.Chain == native.BasicBeforeChain || scope.Chain == native.BasicAfterChain {
-		return true
-	}
-	if rule.Action == filter.ActionAccept && rule.Interface == "lo" {
-		return true
-	}
-	if rule.Action == filter.ActionAccept {
-		states := make(map[string]struct{}, len(rule.ConnectionStates))
-		for _, state := range rule.ConnectionStates {
-			states[state] = struct{}{}
-		}
-		if _, established := states["established"]; established {
-			return true
-		}
-	}
-	if scope.Chain == native.BasicAfterChain && rule.Action == filter.ActionDrop &&
-		rule.SourceAddress == "" && rule.DestinationAddress == "" && rule.SourcePort == "" && rule.DestinationPort == "" {
-		return true
-	}
-	return strings.Contains(strings.ToLower(comment), "whitelist")
 }
 
 func takeValue(args []string, index *int, target *string) bool {

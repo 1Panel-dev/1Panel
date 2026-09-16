@@ -3830,7 +3830,7 @@ const message = {
         external: '外部規則',
         externalHelper: '尚未納入 1Panel 管理。',
         protected: '系統保護',
-        protectedHelper: '系統關鍵規則，不可編輯或刪除。',
+        protectedHelper: '系統內建或與白名單完全相符的規則，不可編輯或刪除。',
         stateShort: {
             managed: '面板建立',
             adopted: '外部納管',
@@ -4008,6 +4008,9 @@ const message = {
         bindHelper: '綁定 僅當狀態為綁定時，防火牆規則才能生效，是否確認？',
         unbindHelper: '解除綁定 解除綁定時，已新增的所有防火牆規則將失效，請謹慎操作，是否確認？',
         portWhiteList: '埠白名單',
+        whitelistConfigHelper:
+            '白名單僅儲存設定並保護相符的放行規則。缺少的規則將於啟動、重新啟動、初始化或同步時補齊；編輯或刪除白名單不會刪除現有規則。',
+        whitelistDeleteConfirm: '僅刪除此白名單設定，現有防火牆規則會保留。是否繼續？',
         portWhiteListHelper: '支援單一連接埠（如 80）或連接埠範圍（如 8000-8100），連接埠取值為 1-65535。',
         chain: '鏈',
         sourceIP: '來源 IP',
@@ -4019,8 +4022,8 @@ const message = {
         allPorts: '所有埠',
         allProtocolHelper: '所有協定和連接埠',
         sourceAddressPlaceholder: '例如：172.16.10.11、172.16.0.0/24、2001:db8::1 或 2001:db8::/64',
-        systemAccessChangeConfirm: '對 {0} 白名單規則執行此操作後，可能無法透過該服務遠端存取。是否繼續？',
-        whitelistServicePortsHelper: '設定一個防火牆放行連接埠，服務監聽連接埠請在對應服務設定中修改。',
+        whitelistServicePortsHelper:
+            '手動填寫一個連接埠（1-65535），不會修改服務監聽連接埠。在服務設定中修改連接埠時，會同步更新此白名單設定。',
         whitelistSourcesHelper: '支援 IP 或 CIDR，多個以逗號或換行分隔。留空預設允許所有 IPv4 和 IPv6 來源。',
         destinationPortPlaceholder: '例如：80、80,443 或 8080-8089',
         deleteRuleConfirm: '將刪除 {0} 條規則，是否繼續？',

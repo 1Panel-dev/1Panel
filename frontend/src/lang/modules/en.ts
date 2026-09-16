@@ -4102,7 +4102,7 @@ const message = {
         external: 'External rule',
         externalHelper: 'Not managed by 1Panel.',
         protected: 'System-protected',
-        protectedHelper: 'A critical system rule that cannot be edited or deleted.',
+        protectedHelper: 'Built-in rules and rules that exactly match the whitelist cannot be edited or deleted.',
         stateShort: {
             managed: 'Panel-created',
             adopted: 'Externally managed',
@@ -4300,6 +4300,10 @@ const message = {
         unbindHelper:
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
         portWhiteList: 'Port allowlist',
+        whitelistConfigHelper:
+            'The allowlist only saves configuration and protects matching allow rules. Missing rules are added on start, restart, initialization, or synchronization. Editing or deleting allowlist entries does not remove existing rules.',
+        whitelistDeleteConfirm:
+            'Only this whitelist entry will be deleted. Existing firewall rules will remain. Continue?',
         portWhiteListHelper:
             'Enter a single port (e.g. 80) or a port range (e.g. 8000-8100). Port numbers must be between 1 and 65535.',
         chain: 'Chain',
@@ -4312,10 +4316,8 @@ const message = {
         allPorts: 'All Ports',
         allProtocolHelper: 'All protocols and ports',
         sourceAddressPlaceholder: 'e.g. 172.16.10.11, 172.16.0.0/24, 2001:db8::1, or 2001:db8::/64',
-        systemAccessChangeConfirm:
-            'This operation on the {0} allowlist rules may prevent remote access through these services. Continue?',
         whitelistServicePortsHelper:
-            'Set one port allowed by the firewall. Manage the listening port in the service settings.',
+            'Enter a single port (1-65535). This does not change the service listening port. Changing the port in the service settings also updates this whitelist entry.',
         whitelistSourcesHelper:
             'Enter IP addresses or CIDR ranges, separated by commas or new lines. Leave blank to allow all IPv4 and IPv6 sources.',
         destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',

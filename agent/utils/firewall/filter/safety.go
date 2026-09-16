@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/netip"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -80,6 +81,28 @@ func RuleMatchesPortWhitelist(rule FirewallRule, ports []PortWhitelist) bool {
 		}
 	}
 	return true
+}
+
+func IsBuiltinProtectedRule(rule FirewallRule) bool {
+	if rule.Scope.Provider != ProviderIptables && rule.Scope.Provider != ProviderNftables {
+		return false
+	}
+	rule, err := NormalizeRule(rule)
+	if err != nil || rule.SourceAddress != "" || rule.DestinationAddress != "" || rule.SourcePort != "" || rule.DestinationPort != "" {
+		return false
+	}
+	switch rule.Scope.Chain {
+	case BasicBeforeChain:
+		if rule.Action != ActionAccept || rule.Protocol != "all" {
+			return false
+		}
+		return rule.Interface == "lo" && len(rule.ConnectionStates) == 0 ||
+			rule.Interface == "" && slices.Equal(rule.ConnectionStates, []string{"established", "related"})
+	case BasicAfterChain:
+		return rule.Action == ActionDrop && (rule.Protocol == "tcp" || rule.Protocol == "udp") &&
+			rule.Interface == "" && len(rule.ConnectionStates) == 0
+	}
+	return false
 }
 
 func GuardMutation(target ObservedRule) error {

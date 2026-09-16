@@ -717,8 +717,5 @@ FirewallInspectDockerGuardStep: 'Docker güvenlik duvarı arka ucunu ve ilkeleri
 FirewallInitializeDockerGuardStep: '{{ .name }} bağlantı noktası koruma zincirlerini başlat ve bağla'
 FirewallPersistDockerGuardStep: 'Docker bağlantı noktası koruma durumunu kaydet'
 ErrFirewallRuleScopeChange: "Mevcut güvenlik duvarı, kuralın kapsamını (IPv4/IPv6 adres ailesi gibi) değiştirmeyi desteklemiyor. Lütfen yeni bir kural oluşturun."
-FirewallWhitelistTask: "Güvenlik duvarı izin verilen port listesini güncelle"
-FirewallWhitelistSaved: "İzin verilenler listesi yapılandırması kaydedildi"
-FirewallWhitelistDeferred: "{{ .name }}: yapılandırma kaydedildi; güvenlik duvarının etkinleştirilmesi bekleniyor"
 FirewallWhitelistReleased: "{{ .name }}: izin listesi koruması kaldırıldı; izin kuralı korundu. Portu kapatmak için kuralı kural listesinden elle silin"
 FirewallWhitelistRequired: "{{ .name }}: zorunlu sistem portu kuralları tarafından korunuyor"

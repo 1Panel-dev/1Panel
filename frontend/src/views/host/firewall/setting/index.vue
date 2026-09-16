@@ -105,9 +105,8 @@
             :panel-port="settings?.panelPort"
             :ssh-port="settings?.sshPort"
             :loading="loading"
-            @created="openWhitelistTask"
+            @saved="load"
         />
-        <TaskLog ref="whitelistTaskRef" @close="load" />
     </div>
 </template>
 
@@ -117,7 +116,6 @@ import { Firewall } from '@/api/interface/firewall';
 import { loadFirewallSettings, operateFire, operateFirewallBackend } from '@/api/modules/firewall';
 import FireRouter from '@/views/host/firewall/index.vue';
 import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
-import TaskLog from '@/components/log/task/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -135,8 +133,6 @@ const savedBackends = ref<Record<Firewall.BackendSubsystem, string>>({
 const pingStatus = ref('Disable');
 const oldPingStatus = ref('Disable');
 const whiteListRef = ref<InstanceType<typeof WhiteList>>();
-const whitelistTaskRef = ref<InstanceType<typeof TaskLog>>();
-const openWhitelistTask = (taskID: string) => whitelistTaskRef.value?.openWithTaskID(taskID, true);
 const openWhitelist = () => {
     whiteListRef.value?.acceptParams();
     load();
