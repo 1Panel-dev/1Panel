@@ -4022,7 +4022,6 @@ const message = {
         systemAccessChangeConfirm: '對 {0} 白名單規則執行此操作後，可能無法透過該服務遠端存取。是否繼續？',
         whitelistServicePortsHelper: '設定一個防火牆放行連接埠，服務監聽連接埠請在對應服務設定中修改。',
         whitelistSourcesHelper: '支援 IP 或 CIDR，多個以逗號或換行分隔。留空預設允許所有 IPv4 和 IPv6 來源。',
-        systemAccessSourceError: '請至少填寫一個有效的 {0} 位址或 CIDR 網段。',
         destinationPortPlaceholder: '例如：80、80,443 或 8080-8089',
         deleteRuleConfirm: '將刪除 {0} 條規則，是否繼續？',
         deleteUsedRuleConfirm: '該規則涵蓋由 {0} 提供的監聽服務。刪除後可能導致相關服務無法存取，是否繼續？',

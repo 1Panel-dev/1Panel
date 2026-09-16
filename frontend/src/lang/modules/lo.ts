@@ -4185,7 +4185,6 @@ const message = {
         whitelistServicePortsHelper: 'ຕັ້ງຄ່າໜຶ່ງພອດທີ່ໄຟວໍອະນຸຍາດ. ປ່ຽນພອດຮັບຟັງໃນການຕັ້ງຄ່າບໍລິການ.',
         whitelistSourcesHelper:
             'ປ້ອນທີ່ຢູ່ IP ຫຼື CIDR ໂດຍແຍກດ້ວຍຈຸດຈ້ຳ ຫຼື ຂຶ້ນແຖວໃໝ່. ຖ້າປະໄວ້ຫວ່າງ ຈະອະນຸຍາດທຸກແຫຼ່ງທີ່ມາ IPv4 ແລະ IPv6.',
-        systemAccessSourceError: 'ປ້ອນທີ່ຢູ່ {0} ຫຼື CIDR ທີ່ຖືກຕ້ອງຢ່າງໜ້ອຍໜຶ່ງລາຍການ.',
         destinationPortPlaceholder: 'ຕົວຢ່າງ: 80, 80,443 ຫຼື 8080-8089',
         deleteRuleConfirm: 'ຈະລຶບ {0} ກົດລະບຽບ. ຕ້ອງການຕໍ່ຫຼືບໍ່?',
         deleteUsedRuleConfirm:

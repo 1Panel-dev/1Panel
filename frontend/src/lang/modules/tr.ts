@@ -4389,7 +4389,6 @@ const message = {
             'Güvenlik duvarının izin verdiği tek bir port ayarlayın. Dinleme portunu hizmet ayarlarından yönetin.',
         whitelistSourcesHelper:
             'IP adreslerini veya CIDR aralıklarını virgül ya da yeni satırla ayırın. Tüm IPv4 ve IPv6 kaynaklarına izin vermek için boş bırakın.',
-        systemAccessSourceError: 'En az bir geçerli {0} adresi veya CIDR aralığı girin.',
         destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:

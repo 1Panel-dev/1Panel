@@ -4222,7 +4222,6 @@ const message = {
             '방화벽에서 허용할 포트 하나를 설정합니다. 수신 포트는 해당 서비스 설정에서 변경하세요.',
         whitelistSourcesHelper:
             'IP 주소 또는 CIDR 대역을 쉼표나 줄바꿈으로 구분하세요. 비워 두면 모든 IPv4 및 IPv6 출발지를 허용합니다.',
-        systemAccessSourceError: '유효한 {0} 주소 또는 CIDR 대역을 하나 이상 입력하세요.',
         destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:

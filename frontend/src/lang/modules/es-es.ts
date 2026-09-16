@@ -4371,7 +4371,6 @@ const message = {
             'Configure un único puerto permitido por el cortafuegos. El puerto de escucha se gestiona en la configuración del servicio.',
         whitelistSourcesHelper:
             'Introduzca direcciones IP o rangos CIDR separados por comas o saltos de línea. Déjelo en blanco para permitir todos los orígenes IPv4 e IPv6.',
-        systemAccessSourceError: 'Introduzca al menos una dirección o red CIDR {0} válida.',
         destinationPortPlaceholder: 'p. ej. 80, 80,443 o 8080-8089',
         deleteRuleConfirm: 'Se eliminarán {0} reglas. ¿Continuar?',
         deleteUsedRuleConfirm:
