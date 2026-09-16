@@ -27,7 +27,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -144,7 +143,7 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 		return status, err
 	}
 	status.Name, status.Backend = runtimeStatus.Name, runtimeStatus.Name
-	status.Version, status.PingStatus = runtimeStatus.Version, ping.LoadStatus()
+	status.Version, status.PingStatus = runtimeStatus.Version, firewall.LoadPingStatus()
 	status.IsActive = runtimeStatus.IsActive
 	if supportsManagedFilterChains(runtimeStatus.Name) {
 		initialized, bound, err := loadFirewallInitStatus(runtimeStatus.Name, chainGroup)
@@ -341,12 +340,12 @@ func (s *FirewallService) runFirewallLifecycleTask(t *task.Task, client lifecycl
 func (s *FirewallService) OperateFirewall(request dto.FirewallLifecycleOperation) error {
 	switch request.Operation {
 	case "disableBanPing":
-		if err := ping.UpdateStatus("0"); err != nil {
+		if err := firewall.UpdatePingStatus("0"); err != nil {
 			return err
 		}
 		return settingRepo.Update(constant.FirewallPingStatusKey, constant.StatusDisable)
 	case "enableBanPing":
-		if err := ping.UpdateStatus("1"); err != nil {
+		if err := firewall.UpdatePingStatus("1"); err != nil {
 			return err
 		}
 		return settingRepo.Update(constant.FirewallPingStatusKey, constant.StatusEnable)

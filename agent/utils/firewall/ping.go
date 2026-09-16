@@ -1,4 +1,4 @@
-package ping
+package firewall
 
 import (
 	"fmt"
@@ -10,7 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
-func LoadStatus() string {
+func LoadPingStatus() string {
 	data, err := os.ReadFile("/proc/sys/net/ipv4/icmp_echo_ignore_all")
 	if err != nil {
 		return constant.StatusNone
@@ -28,7 +28,7 @@ func LoadStatus() string {
 	return constant.StatusDisable
 }
 
-func UpdateStatus(enable string) error {
+func UpdatePingStatus(enable string) error {
 	const confPath = "/etc/sysctl.conf"
 	const panelSysctlPath = "/etc/sysctl.d/98-onepanel.conf"
 

@@ -1,4 +1,4 @@
-package providers
+package forwarding
 
 import (
 	"encoding/base64"
@@ -12,7 +12,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
@@ -31,10 +30,10 @@ func newNftablesAdapter() *nftablesAdapter {
 
 func (n *nftablesAdapter) Name() string { return "nftables" }
 
-func (n *nftablesAdapter) List() ([]forwarding.Rule, error) {
-	rules := make([]forwarding.Rule, 0)
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
-		stdout, err := nftables_helper.ReadChain(nftRun, nftTableFamily(family), nftForwardTable, nftForwardChain(forwarding.ChainPreRouting))
+func (n *nftablesAdapter) List() ([]Rule, error) {
+	rules := make([]Rule, 0)
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+		stdout, err := nftables_helper.ReadChain(nftRun, nftTableFamily(family), nftForwardTable, nftForwardChain(ChainPreRouting))
 		if errors.Is(err, nftables_helper.ErrChainNotFound) {
 			continue
 		}
@@ -46,7 +45,7 @@ func (n *nftablesAdapter) List() ([]forwarding.Rule, error) {
 	return rules, nil
 }
 
-func (n *nftablesAdapter) Reconcile(rules []forwarding.Rule) error {
+func (n *nftablesAdapter) Reconcile(rules []Rule) error {
 	if err := ensureNftForwardTables(); err != nil {
 		return fmt.Errorf("initialize nftables forwarding table: %w", err)
 	}
@@ -69,7 +68,7 @@ func (n *nftablesAdapter) Enable() error {
 
 func (n *nftablesAdapter) Cleanup() error {
 	commands := make([][]string, 0, 2)
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
 			continue
@@ -89,7 +88,7 @@ func (n *nftablesAdapter) Cleanup() error {
 }
 
 func (n *nftablesAdapter) InitStatus() (bool, bool, error) {
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		initialized, bound, err := n.FamilyStatus(family)
 		if err != nil || !initialized || !bound {
 			return initialized, bound, err
@@ -100,14 +99,14 @@ func (n *nftablesAdapter) InitStatus() (bool, bool, error) {
 
 func (n *nftablesAdapter) FamilyStatus(family string) (bool, bool, error) {
 	sysctlPath := "/proc/sys/net/ipv4/ip_forward"
-	if family == forwarding.FamilyIPv6 {
+	if family == FamilyIPv6 {
 		sysctlPath = "/proc/sys/net/ipv6/conf/all/forwarding"
 	}
 	data, err := n.system.ReadFile(sysctlPath)
 	if err != nil {
 		return false, false, fmt.Errorf("read %s forwarding status: %w", family, err)
 	}
-	for _, chain := range []string{forwarding.ChainPreRouting, forwarding.ChainPostRouting, forwarding.ChainForward} {
+	for _, chain := range []string{ChainPreRouting, ChainPostRouting, ChainForward} {
 		if _, err := nftRun("list", "chain", nftTableFamily(family), nftForwardTable, nftForwardChain(chain)); err != nil {
 			return false, false, nil
 		}
@@ -123,7 +122,7 @@ func (n *nftablesAdapter) Replay() error {
 		return err
 	}
 	allPresent := true
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		if _, err := nftRun("list", "table", nftTableFamily(family), nftForwardTable); err != nil {
 			allPresent = false
 		}
@@ -136,7 +135,7 @@ func (n *nftablesAdapter) Replay() error {
 
 func ensureNftForwardTables() error {
 	commands := make([][]string, 0, 8)
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		tableExists := true
 		if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
@@ -146,9 +145,9 @@ func ensureNftForwardTables() error {
 		chains := []struct {
 			name, chainType, hook, priority string
 		}{
-			{nftForwardChain(forwarding.ChainPreRouting), "nat", "prerouting", "-100"},
-			{nftForwardChain(forwarding.ChainPostRouting), "nat", "postrouting", "100"},
-			{nftForwardChain(forwarding.ChainForward), "filter", "forward", "0"},
+			{nftForwardChain(ChainPreRouting), "nat", "prerouting", "-100"},
+			{nftForwardChain(ChainPostRouting), "nat", "postrouting", "100"},
+			{nftForwardChain(ChainForward), "filter", "forward", "0"},
 		}
 		for _, chain := range chains {
 			if tableExists {
@@ -168,15 +167,15 @@ func ensureNftForwardTables() error {
 	return nftRunCommands(commands)
 }
 
-func rebuildNftForwardCommands(rules []forwarding.Rule) ([][]string, error) {
+func rebuildNftForwardCommands(rules []Rule) ([][]string, error) {
 	commands := make([][]string, 0, 6+len(rules)*4)
-	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
-		for _, chain := range []string{forwarding.ChainPreRouting, forwarding.ChainPostRouting, forwarding.ChainForward} {
+	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+		for _, chain := range []string{ChainPreRouting, ChainPostRouting, ChainForward} {
 			commands = append(commands, []string{"flush", "chain", nftTableFamily(family), nftForwardTable, nftForwardChain(chain)})
 		}
 	}
 	for _, rule := range rules {
-		normalized, err := forwarding.NormalizeRule(rule)
+		normalized, err := NormalizeRule(rule)
 		if err != nil {
 			return nil, err
 		}
@@ -189,18 +188,18 @@ func rebuildNftForwardCommands(rules []forwarding.Rule) ([][]string, error) {
 			interfaceMatch = append(interfaceMatch, "iifname", strconv.Quote(rule.Interface))
 		}
 		if isRemoteTarget(rule.Family, rule.TargetIP) {
-			preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(forwarding.ChainPreRouting)}
+			preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPreRouting)}
 			preRouting = append(preRouting, interfaceMatch...)
 			preRouting = append(preRouting, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.Port, "dnat", "to", forwardingTarget(rule), "comment", comment)
 			commands = append(commands,
 				preRouting,
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(forwarding.ChainPostRouting), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "masquerade", "comment", comment},
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(forwarding.ChainForward), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "accept", "comment", comment},
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(forwarding.ChainForward), addressKeyword, "saddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "sport", rule.TargetPort, "accept", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPostRouting), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "masquerade", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainForward), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "accept", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainForward), addressKeyword, "saddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "sport", rule.TargetPort, "accept", "comment", comment},
 			)
 			continue
 		}
-		preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(forwarding.ChainPreRouting)}
+		preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPreRouting)}
 		preRouting = append(preRouting, interfaceMatch...)
 		preRouting = append(preRouting, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.Port, "redirect", "to", ":"+rule.TargetPort, "comment", comment)
 		commands = append(commands, preRouting)
@@ -209,22 +208,22 @@ func rebuildNftForwardCommands(rules []forwarding.Rule) ([][]string, error) {
 }
 
 func nftTableFamily(family string) string {
-	if family == forwarding.FamilyIPv6 {
+	if family == FamilyIPv6 {
 		return "ip6"
 	}
 	return nftForwardFamily
 }
 
 func nftAddressKeyword(family string) string {
-	if family == forwarding.FamilyIPv6 {
+	if family == FamilyIPv6 {
 		return "ip6"
 	}
 	return "ip"
 }
 
-func encodeNftForwardRule(rule forwarding.Rule) string {
+func encodeNftForwardRule(rule Rule) string {
 	family, protocol := "4", "t"
-	if rule.Family == forwarding.FamilyIPv6 {
+	if rule.Family == FamilyIPv6 {
 		family = "6"
 	}
 	if rule.Protocol == "udp" {
@@ -236,9 +235,9 @@ func encodeNftForwardRule(rule forwarding.Rule) string {
 	)
 }
 
-func decodeNftForwardRule(value string) (forwarding.Rule, bool) {
+func decodeNftForwardRule(value string) (Rule, bool) {
 	if !strings.HasPrefix(value, nftForwardMarker) {
-		return forwarding.Rule{}, false
+		return Rule{}, false
 	}
 	value = strings.TrimPrefix(value, nftForwardMarker)
 	if strings.HasPrefix(value, "v2|") {
@@ -247,19 +246,19 @@ func decodeNftForwardRule(value string) (forwarding.Rule, bool) {
 	return decodeLegacyNftForwardRule(value)
 }
 
-func decodeCompactNftForwardRule(value string) (forwarding.Rule, bool) {
+func decodeCompactNftForwardRule(value string) (Rule, bool) {
 	parts := strings.Split(value, "|")
 	if len(parts) != 7 || parts[0] != "v2" {
-		return forwarding.Rule{}, false
+		return Rule{}, false
 	}
 	family, protocol := "", ""
 	switch parts[1] {
 	case "4":
-		family = forwarding.FamilyIPv4
+		family = FamilyIPv4
 	case "6":
-		family = forwarding.FamilyIPv6
+		family = FamilyIPv6
 	default:
-		return forwarding.Rule{}, false
+		return Rule{}, false
 	}
 	switch parts[2] {
 	case "t":
@@ -267,31 +266,31 @@ func decodeCompactNftForwardRule(value string) (forwarding.Rule, bool) {
 	case "u":
 		protocol = "udp"
 	default:
-		return forwarding.Rule{}, false
+		return Rule{}, false
 	}
-	return forwarding.Rule{
+	return Rule{
 		Family: family, Protocol: protocol, Port: parts[3], TargetIP: parts[4], TargetPort: parts[5], Interface: parts[6],
 	}, true
 }
 
-func decodeLegacyNftForwardRule(value string) (forwarding.Rule, bool) {
+func decodeLegacyNftForwardRule(value string) (Rule, bool) {
 	parts := strings.Split(value, ".")
 	if len(parts) != 6 {
-		return forwarding.Rule{}, false
+		return Rule{}, false
 	}
 	decoded := make([]string, len(parts))
 	for index, part := range parts {
 		data, err := base64.RawURLEncoding.DecodeString(part)
 		if err != nil {
-			return forwarding.Rule{}, false
+			return Rule{}, false
 		}
 		decoded[index] = string(data)
 	}
-	return forwarding.Rule{Family: decoded[0], Protocol: decoded[1], Port: decoded[2], TargetIP: decoded[3], TargetPort: decoded[4], Interface: decoded[5]}, true
+	return Rule{Family: decoded[0], Protocol: decoded[1], Port: decoded[2], TargetIP: decoded[3], TargetPort: decoded[4], Interface: decoded[5]}, true
 }
 
-func parseNftForwardRules(stdout string) []forwarding.Rule {
-	result := make([]forwarding.Rule, 0)
+func parseNftForwardRules(stdout string) []Rule {
+	result := make([]Rule, 0)
 	for _, line := range strings.Split(stdout, "\n") {
 		commentStart := strings.Index(line, `comment "`+nftForwardMarker)
 		handleStart := strings.LastIndex(line, "# handle ")

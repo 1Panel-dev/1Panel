@@ -16,10 +16,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
-	forwardingproviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding/providers"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 )
 
 type IForwardingService interface {
@@ -91,7 +90,7 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) 
 	baseInfo.IsExist = true
 	baseInfo.Name, baseInfo.Backend = forwardingDisplayName(status.Name), status.Name
 	baseInfo.Version = status.Version
-	baseInfo.PingStatus = ping.LoadStatus()
+	baseInfo.PingStatus = firewall.LoadPingStatus()
 	baseInfo.IsInit, baseInfo.IsBind = status.IsInit, status.IsBind
 	baseInfo.IPv4 = loadForwardingFamilyInfo(manager, status.Name, constant.FirewallFamilyIPv4)
 	baseInfo.IPv6 = loadForwardingFamilyInfo(manager, status.Name, constant.FirewallFamilyIPv6)
@@ -574,7 +573,7 @@ func newForwardingManagerFor(backend string) (*forwarding.Manager, error) {
 			errForwardingBackendUnavailable, backend, err,
 		)
 	}
-	adapter, err := forwardingproviders.New(client.Name())
+	adapter, err := forwarding.New(client.Name())
 	if err != nil {
 		return nil, err
 	}

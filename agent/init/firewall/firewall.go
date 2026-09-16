@@ -16,7 +16,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 )
 
 func Init() {
@@ -154,7 +153,7 @@ func needInit() bool {
 
 func InitPingStatus() {
 	global.LOG.Info("initializing ban ping status from settings...")
-	status := ping.LoadStatus()
+	status := firewall.LoadPingStatus()
 	statusInDB, _ := repo.NewISettingRepo().GetValueByKey("BanPing")
 	if statusInDB == status {
 		return
@@ -164,7 +163,7 @@ func InitPingStatus() {
 	if statusInDB == constant.StatusDisable {
 		enable = "0"
 	}
-	if err := ping.UpdateStatus(enable); err != nil {
+	if err := firewall.UpdatePingStatus(enable); err != nil {
 		global.LOG.Errorf("initialize ping status failed: %v", err)
 	}
 }

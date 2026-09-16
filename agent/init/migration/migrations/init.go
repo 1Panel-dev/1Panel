@@ -23,7 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
@@ -1131,7 +1131,7 @@ var AddisIPtoWebsiteSSL = &gormigrate.Migration{
 var InitPingStatus = &gormigrate.Migration{
 	ID: "20251201-init-ping-status",
 	Migrate: func(tx *gorm.DB) error {
-		status := ping.LoadStatus()
+		status := firewall.LoadPingStatus()
 		if err := tx.Create(&model.Setting{Key: "BanPing", Value: status}).Error; err != nil {
 			return err
 		}
