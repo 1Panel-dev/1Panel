@@ -11,6 +11,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
 
 type Firewalld struct{}
@@ -64,6 +65,21 @@ func (f *Firewalld) Version() (string, error) {
 func (f *Firewalld) Start() error {
 	if err := controller.HandleStart("firewalld"); err != nil {
 		return fmt.Errorf("enable the firewall failed, err: %v", err)
+	}
+	return nil
+}
+
+func RemoveFirewalldSSHService() error {
+	for _, permanent := range []bool{true, false} {
+		args := []string{"--zone=" + filter.FirewalldInputZone, "--remove-service=ssh"}
+		configuration := "runtime"
+		if permanent {
+			args = append(args, "--permanent")
+			configuration = "permanent"
+		}
+		if _, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", args...); err != nil {
+			return fmt.Errorf("remove firewalld SSH service from %s configuration: %w", configuration, err)
+		}
 	}
 	return nil
 }

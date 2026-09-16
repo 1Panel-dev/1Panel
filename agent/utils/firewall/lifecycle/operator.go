@@ -7,6 +7,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle/providers"
 )
 
 const fail2BanRestoreWithFirewallMarker = "/run/1panel_fail2ban_restore_with_firewall"
@@ -70,7 +71,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 			return err
 		}
 		if prepareStart != nil {
-			if err := prepareStart(o.client); err != nil {
+			if err := o.prepareAfterStart(prepareStart); err != nil {
 				recoveryErrors = append(recoveryErrors, fmt.Errorf("prepare firewall after start: %w", err))
 			}
 		}
@@ -81,7 +82,7 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 			return err
 		}
 		if prepareStart != nil {
-			if err := prepareStart(o.client); err != nil {
+			if err := o.prepareAfterStart(prepareStart); err != nil {
 				recoveryErrors = append(recoveryErrors, fmt.Errorf("prepare firewall after restart: %w", err))
 			}
 		}
@@ -105,6 +106,16 @@ func (o *Operator) Operate(operation Operation, withDockerRestart bool, prepareS
 	return nil
 }
 
+func (o *Operator) prepareAfterStart(prepare func(Client) error) error {
+	if err := prepare(o.client); err != nil {
+		return err
+	}
+	if o.client.Name() == ProviderFirewalld {
+		return providers.RemoveFirewalldSSHService()
+	}
+	return nil
+}
+
 // StopWithPrepare records dependent service state, runs preparation, stops the
 // firewall, and optionally restarts Docker in that order.
 func (o *Operator) StopWithPrepare(withDockerRestart bool, prepareStop func() error) error {
@@ -118,11 +129,11 @@ func (o *Operator) StopWithPrepare(withDockerRestart bool, prepareStop func() er
 			return err
 		}
 	}
-	if err := o.client.Stop(); err != nil {
+	if err := o.runAction("Stop", o.client.Name(), o.client.Stop); err != nil {
 		return err
 	}
 	if withDockerRestart {
-		if err := controller.HandleRestart("docker"); err != nil {
+		if err := o.runAction("TaskRestart", "Docker", func() error { return controller.HandleRestart("docker") }); err != nil {
 			return &DockerRestartError{Err: err}
 		}
 	}
