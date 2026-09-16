@@ -93,7 +93,6 @@ function initChart() {
 
                     color: textColor,
                     lineHeight: 25,
-                    // fontSize: 20,
                     fontWeight: 500,
                 },
                 left: '49%',

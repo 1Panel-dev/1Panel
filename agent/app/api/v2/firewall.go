@@ -368,7 +368,8 @@ func (b *BaseApi) SyncFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Delete managed unified firewall v2 rules
+// @Summary Queue managed firewall rule deletion
+// @Description Returns a taskID immediately; per-rule deletion results and failures are written to the task log.
 // @Accept json
 // @Param request body dto.FirewallRuleDelete true "request"
 // @Success 200 {object} dto.FirewallRuleDeleteResponse

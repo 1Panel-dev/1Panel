@@ -102,6 +102,8 @@
         <WhiteList
             ref="whiteListRef"
             :rules="settings?.portWhiteList"
+            :panel-port="settings?.panelPort"
+            :ssh-port="settings?.sshPort"
             :loading="loading"
             @created="openWhitelistTask"
         />

@@ -185,7 +185,7 @@
                                 :data="allRows"
                                 :heightDiff="320"
                                 row-key="rowKey"
-                                @search="search"
+                                @search="searchPage"
                             >
                                 <el-table-column type="selection" :selectable="isDeletableManagedRule" width="48" fix />
                                 <el-table-column :label="$t('firewall.action')" width="76">
@@ -371,9 +371,9 @@
                 </LayoutContent>
             </div>
         </div>
-        <RuleOperate ref="ruleOperateRef" @search="search" @created="openCreateTask" />
-        <RuleImport ref="ruleImportRef" @created="openCreateTask" />
-        <TaskLog ref="createTaskLogRef" @close="search" />
+        <RuleOperate ref="ruleOperateRef" @search="search" @created="openRuleTask" />
+        <RuleImport ref="ruleImportRef" @created="openRuleTask" />
+        <TaskLog ref="ruleTaskLogRef" @close="search" />
         <RuleSync ref="ruleSyncRef" @search="search" />
         <ProcessDetail ref="processDetailRef" />
         <ConfirmDialog ref="resetConfirmRef" @confirm="prepareResetRules" />
@@ -472,8 +472,8 @@ const cacheFilterValues = (key: string, values: readonly string[]) => {
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
-const createTaskLogRef = ref<InstanceType<typeof TaskLog>>();
-const openCreateTask = (taskID: string) => createTaskLogRef.value?.openWithTaskID(taskID, true);
+const ruleTaskLogRef = ref<InstanceType<typeof TaskLog>>();
+const openRuleTask = (taskID: string) => ruleTaskLogRef.value?.openWithTaskID(taskID, true);
 const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
 const processDetailRef = ref<InstanceType<typeof ProcessDetail>>();
 const resetConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
@@ -513,6 +513,9 @@ const usageLoading = ref(false);
 const usageFailed = ref(false);
 let searchRequestID = 0;
 let usageRequest: Promise<void> = Promise.resolve();
+let usageRequestID = 0;
+let usageLoadedAt = 0;
+let usageInFlight = false;
 const selects = ref<RuleRow[]>([]);
 const scopeNotices = ref<Firewall.ScopeNotice[]>([]);
 
@@ -590,13 +593,12 @@ const inventoryRequest = (page = paginationConfig.currentPage, pageSize = pagina
     ...inventoryFilters(),
 });
 
-const search = async () => {
+const search = () => loadRules(true);
+const searchPage = () => loadRules(false);
+const loadRules = async (refreshUsage: boolean) => {
     const requestID = ++searchRequestID;
-    listeningProcesses.value = [];
-    dockerEndpoints.value = [];
-    usageLoading.value = false;
-    usageFailed.value = false;
     if (!isFirewallReady.value) {
+        clearUsage();
         loading.value = false;
         inventoryItems.value = [];
         positionRanges.value = {};
@@ -609,6 +611,7 @@ const search = async () => {
 
     const scopes = providerScopes();
     if (scopes.length === 0) {
+        clearUsage();
         loading.value = false;
         inventoryItems.value = [];
         positionRanges.value = {};
@@ -620,18 +623,17 @@ const search = async () => {
     }
 
     loading.value = true;
-    usageLoading.value = true;
-    usageRequest = Promise.all([loadListeningProcesses(requestID), loadDockerEndpoints(requestID)]).then(() => {
-        if (requestID === searchRequestID) usageLoading.value = false;
-    });
+    if (refreshUsage || (!usageInFlight && (usageFailed.value || Date.now() - usageLoadedAt >= 10_000))) {
+        usageRequest = loadUsage();
+    }
     try {
-        const response = await searchFirewallRules(inventoryRequest());
+        const response = await searchFirewallRules({ ...inventoryRequest(), refresh: refreshUsage });
         if (requestID !== searchRequestID) return;
         const total = response.data.total || 0;
         const lastPage = Math.max(1, Math.ceil(total / paginationConfig.pageSize));
         if (paginationConfig.currentPage > lastPage) {
             paginationConfig.currentPage = lastPage;
-            await search();
+            await searchPage();
             return;
         }
         inventoryItems.value = response.data.items || [];
@@ -754,27 +756,32 @@ const listeningProtocolNumbers = (protocol: string) => {
             return [];
     }
 };
-const loadListeningProcesses = async (requestID: number) => {
-    try {
-        const response = await getListeningProcess();
-        if (requestID !== searchRequestID) return;
-        listeningProcesses.value = response.data || [];
-    } catch {
-        if (requestID !== searchRequestID) return;
-        listeningProcesses.value = [];
-        usageFailed.value = true;
-    }
+const clearUsage = () => {
+    usageRequestID++;
+    usageLoadedAt = 0;
+    usageInFlight = false;
+    usageLoading.value = false;
+    usageFailed.value = false;
+    listeningProcesses.value = [];
+    dockerEndpoints.value = [];
+    usageRequest = Promise.resolve();
 };
-const loadDockerEndpoints = async (requestID: number) => {
-    try {
-        const response = await loadDockerPublishedPorts();
-        if (requestID !== searchRequestID) return;
-        dockerEndpoints.value = response.data.flatMap((container) => container.endpoints || []);
-    } catch {
-        if (requestID !== searchRequestID) return;
-        dockerEndpoints.value = [];
-        usageFailed.value = true;
-    }
+const loadUsage = async () => {
+    const requestID = ++usageRequestID;
+    usageInFlight = true;
+    usageLoading.value = true;
+    usageFailed.value = false;
+    const [processes, containers] = await Promise.allSettled([getListeningProcess(), loadDockerPublishedPorts()]);
+    if (requestID !== usageRequestID) return;
+    listeningProcesses.value = processes.status === 'fulfilled' ? processes.value.data || [] : [];
+    dockerEndpoints.value =
+        containers.status === 'fulfilled'
+            ? (containers.value.data || []).flatMap((container) => container.endpoints || [])
+            : [];
+    usageFailed.value = processes.status === 'rejected' || containers.status === 'rejected';
+    usageLoadedAt = Date.now();
+    usageInFlight = false;
+    usageLoading.value = false;
 };
 const ruleUsageEntries = (row: RuleRow): UsageEntry[] => {
     if (row.rule.scope.direction !== 'input' || isReadOnlyNativeRule(row)) return [];
@@ -867,7 +874,7 @@ const resetPagination = () => {
 
 const searchWithReset = () => {
     resetPagination();
-    return search();
+    return searchPage();
 };
 
 const changeIptablesChainFilter = () => {
@@ -884,6 +891,12 @@ const changeRuleFilter = () => {
 
 const notices = computed<DisplayNotice[]>(() => {
     const unique = new Map<string, DisplayNotice>();
+    if (inventoryTotal.value > 200 && isServiceBackend.value) {
+        unique.set('largeRuleSet', {
+            key: 'largeRuleSet',
+            text: i18n.global.t('firewall.largeRuleSet', [200]),
+        });
+    }
     scopeNotices.value.forEach((notice) => {
         if (notice.code === 'managed_scope_missing') return;
         const text = scopeNoticeText(notice);
@@ -907,8 +920,6 @@ const scopeNoticeText = (notice: Firewall.ScopeNotice) => {
             return i18n.global.t('firewall.scopeMissing', [value]);
         case 'unmanaged_active_scopes':
             return i18n.global.t('firewall.scopeUnmanagedActive', [value]);
-        case 'runtime_permanent_mismatch':
-            return i18n.global.t('firewall.scopeRuntimeMismatch');
         default:
             return '';
     }
@@ -1084,6 +1095,7 @@ const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
 const removeRules = async (selected: RuleRow[]) => {
     if (selected.length === 0) return;
     const requestID = searchRequestID;
+    if (!usageInFlight) usageRequest = loadUsage();
     await usageRequest;
     if (requestID !== searchRequestID) return;
     try {
@@ -1098,19 +1110,21 @@ const removeRules = async (selected: RuleRow[]) => {
     const uuids = [...new Set(selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : [])))];
     try {
         if (uuids.length === 0) return;
-        const { succeeded, failed } = (await deleteFirewallRules({ uuids })).data;
+        const { taskID, queued, succeeded, failed } = (await deleteFirewallRules({ uuids })).data;
+        if (queued && taskID) {
+            selects.value = [];
+            openRuleTask(taskID);
+            return;
+        }
         if (succeeded > 0) {
             MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${succeeded}/${uuids.length})`);
         }
         if (failed > 0) {
             MsgError(`${i18n.global.t('commons.msg.operationFailed')} (${failed}/${uuids.length})`);
         }
+        await search();
     } finally {
-        try {
-            await search();
-        } finally {
-            loading.value = false;
-        }
+        loading.value = false;
     }
 };
 
@@ -1292,6 +1306,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     searchRequestID++;
+    usageRequestID++;
 });
 </script>
 

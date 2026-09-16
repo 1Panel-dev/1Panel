@@ -2,6 +2,7 @@ package sync
 
 import (
 	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
@@ -14,13 +15,20 @@ func RuleOrder(snapshot filter.Snapshot, ordered []filter.InventoryItem) map[str
 	}
 	markers := make([]string, 0, len(ordered))
 	projected := append([]filter.ObservedRule(nil), snapshot.Rules...)
+	markerSet := make(map[string]bool, len(ordered))
+	locations := make(map[string][]int, len(projected))
+	for index, rule := range projected {
+		key := locatorBucket(rule.Locator)
+		locations[key] = append(locations[key], index)
+	}
 	for _, item := range ordered {
 		if item.Desired == nil || item.Desired.Marker == "" {
 			continue
 		}
 		markers = append(markers, item.Desired.Marker)
+		markerSet[item.Desired.Marker] = true
 		if item.Observed != nil {
-			for index := range projected {
+			for _, index := range locations[locatorBucket(item.Observed.Locator)] {
 				if filter.SameLocator(projected[index].Locator, item.Observed.Locator) {
 					projected[index].Marker = item.Desired.Marker
 					break
@@ -31,7 +39,7 @@ func RuleOrder(snapshot filter.Snapshot, ordered []filter.InventoryItem) map[str
 	actual := make([]string, 0, len(markers))
 	presentMarkers := make(map[string]bool, len(markers))
 	for _, rule := range projected {
-		if slices.Contains(markers, rule.Marker) {
+		if markerSet[rule.Marker] {
 			actual = append(actual, rule.Marker)
 			presentMarkers[rule.Marker] = true
 		}
@@ -55,22 +63,24 @@ func InsertionPosition(snapshot filter.Snapshot, markers []string, target string
 	if snapshot.Scope.Provider == filter.ProviderFirewalld {
 		return nil
 	}
+	positions := make(map[string]int, len(snapshot.Rules))
+	for _, rule := range snapshot.Rules {
+		if _, exists := positions[rule.Marker]; !exists && rule.Locator.Position != nil {
+			positions[rule.Marker] = *rule.Locator.Position
+		}
+	}
 	targetIndex := slices.Index(markers, target)
 	for index := targetIndex - 1; index >= 0; index-- {
-		for _, rule := range snapshot.Rules {
-			if rule.Marker == markers[index] && rule.Locator.Position != nil {
-				position := int64(*rule.Locator.Position + 1)
-				return &position
-			}
+		if previous, ok := positions[markers[index]]; ok {
+			position := int64(previous + 1)
+			return &position
 		}
 	}
 	if targetIndex >= 0 {
 		for _, marker := range markers[targetIndex+1:] {
-			for _, rule := range snapshot.Rules {
-				if rule.Marker == marker && rule.Locator.Position != nil {
-					position := int64(*rule.Locator.Position)
-					return &position
-				}
+			if next, ok := positions[marker]; ok {
+				position := int64(next)
+				return &position
 			}
 		}
 	}
@@ -116,4 +126,11 @@ func ObservedRule(observed filter.ObservedRule) filter.FirewallRule {
 		rule.UUID = strings.TrimSpace(strings.TrimPrefix(observed.Marker, "1panel-rule:"))
 	}
 	return rule
+}
+
+func locatorBucket(locator filter.Locator) string {
+	if locator.Position != nil {
+		return locator.ScopeKey + "\x00position:" + strconv.Itoa(*locator.Position)
+	}
+	return locator.ScopeKey + "\x00canonical:" + locator.Canonical
 }

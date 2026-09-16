@@ -19102,6 +19102,7 @@
 		},
 		"/hosts/firewall/rules/delete": {
 			"post": {
+				"description": "Returns a taskID immediately; per-rule deletion results and failures are written to the task log.",
 				"consumes": [
 					"application/json"
 				],
@@ -19138,7 +19139,7 @@
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete managed unified firewall v2 rules",
+				"summary": "Queue managed firewall rule deletion",
 				"tags": [
 					"Firewall"
 				],
@@ -36447,8 +36448,14 @@
 				"failed": {
 					"type": "integer"
 				},
+				"queued": {
+					"type": "boolean"
+				},
 				"succeeded": {
 					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
 				}
 			},
 			"type": "object"
@@ -36590,6 +36597,9 @@
 				"forwarding": {
 					"$ref": "#/definitions/dto.FirewallBackendGroup"
 				},
+				"panelPort": {
+					"type": "string"
+				},
 				"pingStatus": {
 					"type": "string"
 				},
@@ -36598,6 +36608,9 @@
 					"items": {
 						"$ref": "#/definitions/filter.PortWhitelist"
 					}
+				},
+				"sshPort": {
+					"type": "string"
 				},
 				"system": {
 					"$ref": "#/definitions/dto.FirewallBackendGroup"

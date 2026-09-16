@@ -16,8 +16,9 @@ import (
 type SnapshotPolicy func(context.Context, filter.Snapshot) (filter.Snapshot, error)
 
 type Engine struct {
-	adapter filter.Adapter
-	policy  SnapshotPolicy
+	adapter   filter.Adapter
+	policy    SnapshotPolicy
+	inventory inventoryCache
 }
 
 type Registry map[filter.Provider]*Engine
@@ -67,6 +68,13 @@ func (e *Engine) Observe(ctx context.Context, scope filter.Scope) (filter.Snapsh
 		return snapshot, nil
 	}
 	return e.policy(ctx, snapshot)
+}
+
+func (e *Engine) NewObservationSession() *Engine {
+	if factory, ok := e.adapter.(filter.ObservationSessionFactory); ok {
+		return New(factory.NewObservationSession(), e.policy)
+	}
+	return e
 }
 
 func (e *Engine) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]filter.Snapshot, error) {
@@ -120,6 +128,8 @@ func (e *Engine) CheckRule(ctx context.Context, rule filter.FirewallRule) error 
 }
 
 func (e *Engine) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
+	InvalidateInventory()
+	defer InvalidateInventory()
 	appender, ok := e.adapter.(filter.UnverifiedRuleAppender)
 	if !ok {
 		return fmt.Errorf("%w: %s does not support unverified rule appends", filter.ErrAdapterUnavailable, e.Provider())
@@ -238,6 +248,8 @@ func (e *Engine) Capabilities(ctx context.Context) (filter.Capabilities, error) 
 }
 
 func (e *Engine) ExecuteCreate(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) error {
+	InvalidateInventory()
+	defer InvalidateInventory()
 	plan, err := e.adapter.Compile(snapshot, changes)
 	if err != nil {
 		return err
@@ -250,6 +262,8 @@ func (e *Engine) ExecuteCreate(ctx context.Context, snapshot filter.Snapshot, ch
 }
 
 func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.ApplyResult, error) {
+	InvalidateInventory()
+	defer InvalidateInventory()
 	if err := ctx.Err(); err != nil {
 		return filter.ApplyResult{}, err
 	}
@@ -266,6 +280,8 @@ func (e *Engine) ExecuteSync(ctx context.Context, snapshot filter.Snapshot, chan
 }
 
 func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, filter.VerifyResult, error) {
+	InvalidateInventory()
+	defer InvalidateInventory()
 	plan, err := e.adapter.Compile(snapshot, changes)
 	if err != nil {
 		return filter.BackendPlan{}, filter.VerifyResult{}, err
@@ -298,6 +314,8 @@ func (e *Engine) Execute(ctx context.Context, snapshot filter.Snapshot, changes 
 }
 
 func (e *Engine) Rollback(ctx context.Context, plan filter.BackendPlan) error {
+	InvalidateInventory()
+	defer InvalidateInventory()
 	rollbacker, ok := e.adapter.(filter.PlanRollbacker)
 	if !ok {
 		return fmt.Errorf("%w: provider %s does not support applied-plan rollback", filter.ErrAdapterUnavailable, e.adapter.Provider())

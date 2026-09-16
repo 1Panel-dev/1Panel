@@ -75,6 +75,8 @@ func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChan
 
 	operation := changes[0].Operation
 	current := snapshot
+	current.Rules = make([]filter.ObservedRule, len(snapshot.Rules), len(snapshot.Rules)+len(changes))
+	copy(current.Rules, snapshot.Rules)
 	plan := filter.BackendPlan{
 		Provider: filter.ProviderNftables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
 		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
@@ -90,10 +92,10 @@ func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChan
 		plan.Rules = append(plan.Rules, filter.NativeRulePlan{
 			RuleUUID: ruleUUID(change), Operation: change.Operation, Previous: previous, Expected: expected,
 		})
-		current, err = filter.NewSnapshot(snapshot.Scope, rules)
-		if err != nil {
-			return filter.BackendPlan{}, err
-		}
+		current.Rules = rules
+	}
+	if _, err := filter.NewSnapshot(snapshot.Scope, current.Rules); err != nil {
+		return filter.BackendPlan{}, err
 	}
 	applyCommand, err := rebuildCommand(snapshot.Scope, current.Rules)
 	if err != nil {
@@ -150,9 +152,14 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 	if err != nil {
 		return filter.VerifyResult{}, err
 	}
+	byMarker := make(map[string][]int, len(snapshot.Rules))
+	for index, observed := range snapshot.Rules {
+		byMarker[observed.Marker] = append(byMarker[observed.Marker], index)
+	}
 	for _, expected := range plan.Rules {
 		matches := 0
-		for _, observed := range snapshot.Rules {
+		for _, index := range byMarker[expected.Expected.Marker] {
+			observed := snapshot.Rules[index]
 			if observed.Marker == expected.Expected.Marker {
 				if expected.Operation == filter.ChangeDelete {
 					matches++
@@ -245,7 +252,7 @@ func validateNativeCommand(command filter.NativeCommand) error {
 }
 
 func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filter.ObservedRule, filter.ObservedRule, *filter.ObservedRule, error) {
-	rules := append([]filter.ObservedRule(nil), snapshot.Rules...)
+	rules := snapshot.Rules
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
@@ -290,6 +297,10 @@ func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filte
 	}
 	if change.Operation == filter.ChangeDelete {
 		expected := observedRule(normalized, marker, position, "")
+		for index := position - 1; index < len(rules); index++ {
+			position := index + 1
+			rules[index].Locator.Position = &position
+		}
 		return rules, expected, previous, nil
 	}
 	if target < 1 || target > len(rules)+1 {
@@ -299,7 +310,7 @@ func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filte
 	rules = append(rules, filter.ObservedRule{})
 	copy(rules[target:], rules[target-1:])
 	rules[target-1] = expected
-	for index := range rules {
+	for index := min(position, target) - 1; index < len(rules); index++ {
 		position := index + 1
 		rules[index].Locator.Position = &position
 	}

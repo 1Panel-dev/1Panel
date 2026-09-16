@@ -4172,11 +4172,10 @@ const message = {
         plan_runtime_permanent_mismatch: 'Las configuraciones activa y permanente difieren. Sincronízalas primero.',
         plan_protected_rule: 'Esta regla está protegida y no se puede asumir, modificar ni eliminar.',
         plan_blocked: 'La regla no puede aplicarse de forma segura. Actualiza la lista e inténtalo de nuevo.',
+        largeRuleSet: 'Hay más de {0} reglas de cortafuegos. Se recomienda usar iptables o nftables.',
         scopeDefaultMismatch: 'La zona predeterminada es {0}; esta página solo gestiona la zona public.',
         scopeMissing: 'Falta el ámbito gestionado {0}; se creará de forma segura al aplicar la primera regla.',
         scopeUnmanagedActive: 'Se detectaron otros ámbitos activos: {0}. 1Panel no modificará sus reglas.',
-        scopeRuntimeMismatch:
-            'Las configuraciones activa y permanente de firewalld no coinciden. Reinicie el firewall.',
         dockerRestart: 'Las operaciones del firewall requieren reiniciar el servicio de Docker',
         firewallHelper: 'Firewall del sistema {0}',
         firewallNotStart: 'El firewall del sistema no está habilitado actualmente. Actívalo primero.',
