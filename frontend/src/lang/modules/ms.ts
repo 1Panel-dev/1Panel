@@ -4385,7 +4385,6 @@ const message = {
             'Tetapkan satu port yang dibenarkan oleh tembok api. Urus port pendengar dalam tetapan perkhidmatan.',
         whitelistSourcesHelper:
             'Masukkan alamat IP atau julat CIDR, dipisahkan dengan koma atau baris baharu. Biarkan kosong untuk membenarkan semua sumber IPv4 dan IPv6.',
-        systemAccessSourceError: 'Masukkan sekurang-kurangnya satu alamat {0} atau julat CIDR yang sah.',
         destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:

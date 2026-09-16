@@ -4318,7 +4318,6 @@ const message = {
             'Set one port allowed by the firewall. Manage the listening port in the service settings.',
         whitelistSourcesHelper:
             'Enter IP addresses or CIDR ranges, separated by commas or new lines. Leave blank to allow all IPv4 and IPv6 sources.',
-        systemAccessSourceError: 'Enter at least one valid {0} address or CIDR range.',
         destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:

@@ -46,7 +46,14 @@
         :title="$t(editingRule ? 'commons.button.edit' : 'commons.button.create')"
         :show-close="!saving"
     >
-        <el-form label-position="top" :disabled="saving" @submit.prevent="saveRule">
+        <el-form
+            ref="formRef"
+            :model="form"
+            :rules="rules"
+            label-position="top"
+            :disabled="saving"
+            @submit.prevent="saveRule"
+        >
             <el-form-item :label="$t('commons.table.type')">
                 <el-select v-model="form.type" :disabled="!!editingRule">
                     <el-option value="custom" :label="$t('website.other')" />
@@ -65,16 +72,16 @@
                 </el-select>
             </el-form-item>
             <template v-if="form.type === 'custom'">
-                <el-form-item :label="$t('firewall.portOrRange')" required>
+                <el-form-item :label="$t('firewall.portOrRange')" prop="port">
                     <el-input v-model.trim="form.port" placeholder="80 / 8000-8100" clearable />
                     <span class="input-help">{{ $t('firewall.portWhiteListHelper') }}</span>
                 </el-form-item>
             </template>
-            <el-form-item v-else-if="editingRule" :label="$t('commons.table.port')" required>
+            <el-form-item v-else-if="editingRule" :label="$t('commons.table.port')" prop="port">
                 <el-input v-model.trim="form.port" :placeholder="form.type === 'ssh' ? '2222' : '18443'" clearable />
                 <span class="input-help">{{ $t('firewall.whitelistServicePortsHelper') }}</span>
             </el-form-item>
-            <el-form-item :label="$t('firewall.allowedSources')">
+            <el-form-item :label="$t('firewall.allowedSources')" prop="sourceInput">
                 <el-input
                     v-model.trim="form.sourceInput"
                     type="textarea"
@@ -102,8 +109,13 @@ import {
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
-import { formatHostAddressList, isValidIPOrCIDR, splitTagValues } from '@/views/host/firewall/utils/validation';
-import { ElMessageBox } from 'element-plus';
+import {
+    formatHostAddressList,
+    isValidIPOrCIDR,
+    isValidPortRange,
+    splitTagValues,
+} from '@/views/host/firewall/utils/validation';
+import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import { normalizeWhiteListRule, WhiteListProtocol, WhiteListRule, WhiteListType, whiteListRuleKey } from './model';
 
 const props = defineProps<{
@@ -120,12 +132,45 @@ const busy = computed(() => props.loading || saving.value);
 const disabled = computed(() => busy.value || !props.rules);
 const data = computed(() => props.rules || []);
 const editingRule = ref<WhiteListRule>();
+const formRef = ref<FormInstance>();
 const form = ref({
     type: 'custom' as WhiteListType | 'custom',
     protocol: 'tcp' as WhiteListProtocol,
     port: '',
     sourceInput: '',
 });
+const rules: FormRules = {
+    port: [
+        {
+            required: true,
+            validator: (_rule, value: string, callback) => {
+                if (!value) {
+                    callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+                    return;
+                }
+                if (!isValidPortRange(value) || (form.value.type !== 'custom' && !/^\d+$/.test(value))) {
+                    const message = form.value.type === 'custom' ? 'firewall.portFormatError' : 'commons.rule.port';
+                    callback(new Error(i18n.global.t(message)));
+                    return;
+                }
+                callback();
+            },
+            trigger: ['blur', 'change'],
+        },
+    ],
+    sourceInput: [
+        {
+            validator: (_rule, value: string, callback) => {
+                if (splitTagValues([value]).some((source) => !isValidIPOrCIDR(source))) {
+                    callback(new Error(i18n.global.t('commons.rule.ip')));
+                    return;
+                }
+                callback();
+            },
+            trigger: ['blur', 'change'],
+        },
+    ],
+};
 const serviceTypes: WhiteListType[] = ['ssh', 'panel'];
 const serviceLabel = (type: WhiteListType) => (type === 'panel' ? '1Panel' : 'SSH');
 const servicePortLabel = (type: WhiteListType) =>
@@ -145,18 +190,17 @@ const openEditor = (rule?: WhiteListRule) => {
         port: rule?.port || '',
         sourceInput: formatHostAddressList(rule ? rule.sources || [] : ['0.0.0.0/0', '::/0']),
     };
+    formRef.value?.clearValidate();
     dialogVisible.value = true;
 };
 
 const saveRule = async () => {
-    if (disabled.value) return;
+    if (disabled.value || !formRef.value) return;
+    const valid = await formRef.value.validate().catch(() => false);
+    if (!valid) return;
     const sources = splitTagValues([form.value.sourceInput]);
     if (!sources.length) {
         sources.push('0.0.0.0/0', '::/0');
-    }
-    if (sources.some((source) => !isValidIPOrCIDR(source))) {
-        MsgError(i18n.global.t('firewall.systemAccessSourceError', ['IPv4 / IPv6']));
-        return;
     }
     let rule: WhiteListRule;
     try {

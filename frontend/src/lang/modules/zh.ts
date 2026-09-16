@@ -4070,7 +4070,6 @@ const message = {
         systemAccessChangeConfirm: '对 {0} 白名单规则执行此操作后，可能无法通过该服务远程访问。是否继续？',
         whitelistServicePortsHelper: '设置一个防火墙放行端口，服务监听端口请在对应服务设置中修改。',
         whitelistSourcesHelper: '支持 IP 或 CIDR，多个以逗号或换行分隔。留空默认允许所有 IPv4 和 IPv6 来源。',
-        systemAccessSourceError: '请至少填写一个有效的 {0} 地址或 CIDR 网段。',
         destinationPortPlaceholder: '例如：80、80,443 或 8080-8089',
         deleteRuleConfirm: '将删除 {0} 条规则，是否继续？',
         deleteUsedRuleConfirm: '该规则覆盖了由 {0} 提供的监听服务。删除后可能导致相关服务无法访问，是否继续？',

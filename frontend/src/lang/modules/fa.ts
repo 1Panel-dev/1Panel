@@ -4275,7 +4275,6 @@ const message = {
             'یک درگاه مجاز برای دیواره آتش تنظیم کنید. درگاه شنود را در تنظیمات سرویس تغییر دهید.',
         whitelistSourcesHelper:
             'آدرس‌های IP یا محدوده‌های CIDR را با ویرگول یا خط جدید جدا کنید. برای مجاز کردن همه مبدأهای IPv4 و IPv6، این قسمت را خالی بگذارید.',
-        systemAccessSourceError: 'حداقل یک نشانی {0} یا بازه CIDR معتبر وارد کنید.',
         destinationPortPlaceholder: 'مثلاً: 80، 80,443 یا 8080-8089',
         deleteRuleConfirm: '{0} قانون حذف خواهند شد. ادامه می‌دهید؟',
         deleteUsedRuleConfirm:
