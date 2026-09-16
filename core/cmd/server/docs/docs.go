@@ -19106,7 +19106,7 @@ const docTemplate = `{
 		},
 		"/hosts/firewall/rules/delete": {
 			"post": {
-				"description": "Returns a taskID immediately; per-rule deletion results and failures are written to the task log.",
+				"description": "Deletes managed rules by UUID or unprotected before-chain rules by instance key. Returns a taskID immediately; results are written to the task log.",
 				"consumes": [
 					"application/json"
 				],
@@ -19143,7 +19143,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Queue managed firewall rule deletion",
+				"summary": "Queue firewall rule deletion",
 				"tags": [
 					"Firewall"
 				],
@@ -19419,7 +19419,7 @@ const docTemplate = `{
 				"consumes": [
 					"application/json"
 				],
-				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
+				"description": "Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.",
 				"parameters": [
 					{
 						"description": "request",
@@ -19433,10 +19433,7 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FilterChainOperationResponse"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -19467,7 +19464,7 @@ const docTemplate = `{
 				"consumes": [
 					"application/json"
 				],
-				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
+				"description": "Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.",
 				"parameters": [
 					{
 						"description": "request",
@@ -19481,10 +19478,7 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FilterChainOperationResponse"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -19515,7 +19509,7 @@ const docTemplate = `{
 				"consumes": [
 					"application/json"
 				],
-				"description": "Returns a synchronization taskID. The whitelist configuration is saved only after synchronization succeeds.",
+				"description": "Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.",
 				"parameters": [
 					{
 						"description": "request",
@@ -19529,10 +19523,7 @@ const docTemplate = `{
 				],
 				"responses": {
 					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.FilterChainOperationResponse"
-						}
+						"description": "OK"
 					}
 				},
 				"security": [
@@ -36413,17 +36404,36 @@ const docTemplate = `{
 			"type": "object"
 		},
 		"dto.FirewallRuleDelete": {
+			"description": "Provide managed rule UUIDs, before-chain rule targets, or both.",
 			"properties": {
+				"beforeRules": {
+					"items": {
+						"$ref": "#/definitions/dto.FirewallRuleDeleteTarget"
+					},
+					"type": "array"
+				},
 				"uuids": {
 					"items": {
 						"type": "string"
 					},
-					"minItems": 1,
 					"type": "array"
 				}
 			},
+			"type": "object"
+		},
+		"dto.FirewallRuleDeleteTarget": {
+			"properties": {
+				"instanceKey": {
+					"maxLength": 128,
+					"type": "string"
+				},
+				"scope": {
+					"$ref": "#/definitions/filter.Scope"
+				}
+			},
 			"required": [
-				"uuids"
+				"scope",
+				"instanceKey"
 			],
 			"type": "object"
 		},

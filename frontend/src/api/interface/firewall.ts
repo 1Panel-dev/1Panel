@@ -333,6 +333,7 @@ export namespace Firewall {
 
     export interface DeleteRequest {
         uuids: string[];
+        beforeRules?: { scope: Scope; instanceKey: string }[];
     }
 
     export interface DeleteResponse {

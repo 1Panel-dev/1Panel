@@ -75,7 +75,10 @@
                             </el-button>
                             <el-button
                                 v-permission
-                                :disabled="loading || managedTotal === 0"
+                                :disabled="
+                                    loading ||
+                                    (selects.length > 0 ? !selects.some(isDeletableManagedRule) : managedTotal === 0)
+                                "
                                 @click="exportRulesBySelection"
                             >
                                 {{ $t('commons.button.export') }}
@@ -187,7 +190,7 @@
                                 row-key="rowKey"
                                 @search="searchPage"
                             >
-                                <el-table-column type="selection" :selectable="isDeletableManagedRule" width="48" fix />
+                                <el-table-column type="selection" :selectable="isDeletableRule" width="48" fix />
                                 <el-table-column :label="$t('firewall.action')" width="76">
                                     <template #default="{ row }">
                                         <span
@@ -1047,7 +1050,7 @@ const exportRules = async (rows: RuleRow[]) => {
 
 const exportRulesBySelection = async () => {
     const selected = selects.value.filter((row) => isDeletableManagedRule(row));
-    if (selected.length > 0) return exportRules(selected);
+    if (selects.value.length > 0) return exportRules(selected);
     const allManagedRules = toRuleRows(await loadAllInventoryItems()).filter((row) => isDeletableManagedRule(row));
     return exportRules(allManagedRules);
 };
@@ -1067,13 +1070,13 @@ const usageOwnersSummary = (owners: string[]) => {
 };
 
 const deleteRulesConfirmMessage = (selected: RuleRow[]) => {
-    const count = new Set(selected.map((row) => row.desired?.uuid)).size;
+    const count = new Set(selected.map((row) => row.desired?.uuid || row.observed?.instanceKey)).size;
     const accepted = selected.filter((row) => row.rule.action === 'accept' && Boolean(row.observed));
     const risky = accepted.filter((row) => isWildcardDestinationPort(row.rule) || ruleUsageEntries(row).length > 0);
     if (selected.length > 1 && risky.length > 0) {
         return i18n.global.t('firewall.deleteRiskRulesConfirm', [
             count,
-            new Set(risky.map((row) => row.desired?.uuid)).size,
+            new Set(risky.map((row) => row.desired?.uuid || row.observed?.instanceKey)).size,
         ]);
     }
     if (selected.length === 1 && accepted.length === 1) {
@@ -1108,19 +1111,24 @@ const removeRules = async (selected: RuleRow[]) => {
     }
     loading.value = true;
     const uuids = [...new Set(selected.flatMap((row) => (row.desired?.uuid ? [row.desired.uuid] : [])))];
+    const beforeRules = selected.filter(isDeletableBeforeRule).map((row) => ({
+        scope: row.rule.scope,
+        instanceKey: row.observed.instanceKey,
+    }));
+    const count = uuids.length + beforeRules.length;
     try {
-        if (uuids.length === 0) return;
-        const { taskID, queued, succeeded, failed } = (await deleteFirewallRules({ uuids })).data;
+        if (count === 0) return;
+        const { taskID, queued, succeeded, failed } = (await deleteFirewallRules({ uuids, beforeRules })).data;
         if (queued && taskID) {
             selects.value = [];
             openRuleTask(taskID);
             return;
         }
         if (succeeded > 0) {
-            MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${succeeded}/${uuids.length})`);
+            MsgSuccess(`${i18n.global.t('commons.msg.operationSuccess')} (${succeeded}/${count})`);
         }
         if (failed > 0) {
-            MsgError(`${i18n.global.t('commons.msg.operationFailed')} (${failed}/${uuids.length})`);
+            MsgError(`${i18n.global.t('commons.msg.operationFailed')} (${failed}/${count})`);
         }
         await search();
     } finally {
@@ -1128,7 +1136,7 @@ const removeRules = async (selected: RuleRow[]) => {
     }
 };
 
-const removeSelectedRules = () => removeRules(selects.value.filter((row) => isDeletableManagedRule(row)));
+const removeSelectedRules = () => removeRules(selects.value.filter((row) => isDeletableRule(row)));
 
 const resetRules = () => {
     withDockerRestart.value = false;
@@ -1242,6 +1250,19 @@ const isDeletableManagedRule = (row: Firewall.InventoryItem) =>
     row.state !== 'protected' &&
     (row.state !== 'drifted' || isMissingManagedRule(row));
 
+const isDeletableBeforeRule = (
+    row: Firewall.InventoryItem,
+): row is Firewall.InventoryItem & { observed: Firewall.ObservedRule & { instanceKey: string } } =>
+    (row.rule.scope.provider === 'iptables' || row.rule.scope.provider === 'nftables') &&
+    row.rule.scope.chain === '1PANEL_BASIC_BEFORE' &&
+    !row.desired &&
+    row.state !== 'protected' &&
+    row.observed?.parseStatus === 'supported' &&
+    !row.observed.protected &&
+    Boolean(row.observed.instanceKey);
+
+const isDeletableRule = (row: Firewall.InventoryItem) => isDeletableManagedRule(row) || isDeletableBeforeRule(row);
+
 const displayRulePriority = (row: Firewall.InventoryItem) => {
     if (row.rule.scope.provider === 'firewalld') {
         if (!supportsFirewalldPriority.value || row.rule.nativeKind !== 'rich_rule') return '-';
@@ -1280,7 +1301,10 @@ const operationButtons = [
         label: i18n.global.t('firewall.resolution_adopt'),
         permission: true,
         nodeAdmin: true,
-        show: (row: RuleRow) => row.state === 'external' && row.observed?.parseStatus === 'supported',
+        show: (row: RuleRow) =>
+            row.state === 'external' &&
+            row.observed?.parseStatus === 'supported' &&
+            !isIptablesSystemPresetScope(row.rule.scope),
         click: adoptRule,
     },
     {
@@ -1294,7 +1318,7 @@ const operationButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         nodeAdmin: true,
-        show: (row: RuleRow) => isDeletableManagedRule(row),
+        show: (row: RuleRow) => isDeletableRule(row),
         click: removeRule,
     },
 ];

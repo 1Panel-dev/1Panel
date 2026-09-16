@@ -4092,7 +4092,7 @@ const message = {
         externalHelper:
             'システムに存在しますが、まだ 1Panel の管理対象ではありません。必要に応じて管理対象にできます。',
         protected: 'システム保護',
-        protectedHelper: 'アクセスへの影響を防ぐため、編集や削除ができない重要なシステムルールです。',
+        protectedHelper: '組み込みルールとホワイトリストに完全一致するルールは編集・削除できません。',
         stateShort: { managed: 'パネル', adopted: '管理済', external: '外部', protected: '保護', drifted: '差異' },
         ruleTargetRequired: 'IP アドレスまたはポートを1つ以上入力してください',
         resolution_adopt: '管理対象にする',
@@ -4283,6 +4283,10 @@ const message = {
         unbindHelper:
             'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
         portWhiteList: 'ポートホワイトリスト',
+        whitelistConfigHelper:
+            '許可リストは設定の保存と一致する許可ルールの保護のみを行います。不足するルールは起動、再起動、初期化、同期時に追加されます。許可リストを編集・削除しても既存のルールは削除されません。',
+        whitelistDeleteConfirm:
+            'このホワイトリスト項目のみを削除します。既存のファイアウォールルールは保持されます。続行しますか？',
         portWhiteListHelper:
             '単一ポート（例：80）またはポート範囲（例：8000-8100）を入力してください。ポート番号は 1～65535 です。',
         chain: 'チェーン',
@@ -4295,10 +4299,8 @@ const message = {
         allPorts: 'すべてのポート',
         allProtocolHelper: 'すべてのプロトコルとポート',
         sourceAddressPlaceholder: '例: 172.16.10.11、172.16.0.0/24、2001:db8::1、2001:db8::/64',
-        systemAccessChangeConfirm:
-            'この操作を {0} の許可リストルールに適用すると、これらのサービス経由のリモートアクセスができなくなる可能性があります。続行しますか？',
         whitelistServicePortsHelper:
-            'ファイアウォールで許可するポートを1つ設定します。待ち受けポートは各サービスの設定で変更してください。',
+            'ポートを1つ入力してください（1-65535）。サービスの待受ポートは変更されません。サービス設定でポートを変更すると、このホワイトリスト項目も更新されます。',
         whitelistSourcesHelper:
             'IP アドレスまたは CIDR をカンマか改行で区切って入力してください。 空欄の場合、すべての IPv4 および IPv6 の接続元を許可します。',
         destinationPortPlaceholder: '例: 80、80,443、8080-8089',

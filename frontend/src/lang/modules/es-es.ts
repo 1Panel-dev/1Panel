@@ -4149,7 +4149,7 @@ const message = {
             'Regla existente del sistema que aún no gestiona 1Panel. Se puede adoptar cuando sea necesario.',
         protected: 'Protegida por el sistema',
         protectedHelper:
-            'Regla crítica del sistema que no se puede editar ni eliminar para evitar interrumpir el acceso.',
+            'Las reglas integradas y las que coinciden exactamente con la lista blanca no se pueden editar ni eliminar.',
         stateShort: {
             managed: 'Panel',
             adopted: 'Gestionada',
@@ -4353,6 +4353,10 @@ const message = {
         unbindHelper:
             'Desvincular: al desvincular, todas las reglas de firewall agregadas se volverán inválidas. Proceda con precaución. ¿Confirmar?',
         portWhiteList: 'Lista blanca de puertos',
+        whitelistConfigHelper:
+            'La lista de permitidos solo guarda la configuración y protege las reglas de acceso coincidentes. Las reglas que falten se añaden al iniciar, reiniciar, inicializar o sincronizar. Editar o eliminar entradas no elimina las reglas existentes.',
+        whitelistDeleteConfirm:
+            'Solo se eliminará esta entrada de la lista blanca. Se conservarán las reglas existentes del firewall. ¿Continuar?',
         portWhiteListHelper:
             'Introduzca un puerto (p. ej., 80) o un rango (p. ej., 8000-8100). Los puertos deben estar entre 1 y 65535.',
         chain: 'Cadena',
@@ -4365,10 +4369,8 @@ const message = {
         allPorts: 'Todos los Puertos',
         allProtocolHelper: 'Todos los protocolos y puertos',
         sourceAddressPlaceholder: 'p. ej. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 o 2001:db8::/64',
-        systemAccessChangeConfirm:
-            'Esta operación en las reglas de la lista de permitidos de {0} puede impedir el acceso remoto mediante estos servicios. ¿Continuar?',
         whitelistServicePortsHelper:
-            'Configure un único puerto permitido por el cortafuegos. El puerto de escucha se gestiona en la configuración del servicio.',
+            'Introduzca un único puerto (1-65535). Esto no cambia el puerto de escucha del servicio. Al cambiar el puerto en los ajustes del servicio, también se actualiza esta entrada de la lista blanca.',
         whitelistSourcesHelper:
             'Introduzca direcciones IP o rangos CIDR separados por comas o saltos de línea. Déjelo en blanco para permitir todos los orígenes IPv4 e IPv6.',
         destinationPortPlaceholder: 'p. ej. 80, 80,443 o 8080-8089',

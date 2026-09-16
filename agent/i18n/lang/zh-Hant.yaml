@@ -717,8 +717,5 @@ FirewallInspectDockerGuardStep: '檢查 Docker 防火牆後端與防護策略'
 FirewallInitializeDockerGuardStep: '初始化並綁定 {{ .name }} 連接埠防護鏈'
 FirewallPersistDockerGuardStep: '儲存 Docker 連接埠防護狀態'
 ErrFirewallRuleScopeChange: "目前的防火牆不支援修改規則的作用範圍（如 IPv4/IPv6 位址族），請建立新規則。"
-FirewallWhitelistTask: "更新防火牆連接埠白名單"
-FirewallWhitelistSaved: "白名單設定已儲存"
-FirewallWhitelistDeferred: "{{ .name }}：設定已儲存，待防火牆啟用後套用"
 FirewallWhitelistReleased: "{{ .name }}：已解除白名單保護，放行規則保留；如需關閉連接埠，請在規則清單手動刪除"
 FirewallWhitelistRequired: "{{ .name }}：由系統必要連接埠規則保護"

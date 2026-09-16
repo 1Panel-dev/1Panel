@@ -4172,8 +4172,7 @@ const message = {
         externalHelper:
             'Sistemde bulunan ancak henüz 1Panel tarafından yönetilmeyen bir kuraldır. Gerektiğinde yönetime alınabilir.',
         protected: 'Sistem korumalı',
-        protectedHelper:
-            'Erişimin kesilmesini önlemek için düzenlenemeyen veya silinemeyen kritik bir sistem kuralıdır.',
+        protectedHelper: 'Yerleşik kurallar ve beyaz listeyle tam olarak eşleşen kurallar düzenlenemez veya silinemez.',
         stateShort: {
             managed: 'Panel',
             adopted: 'Yönetilen',
@@ -4371,6 +4370,10 @@ const message = {
         unbindHelper:
             'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
         portWhiteList: 'Port beyaz listesi',
+        whitelistConfigHelper:
+            'İzin listesi yalnızca yapılandırmayı kaydeder ve eşleşen izin kurallarını korur. Eksik kurallar başlatma, yeniden başlatma, ilk yapılandırma veya eşitleme sırasında eklenir. İzin listesi girdilerini düzenlemek veya silmek mevcut kuralları kaldırmaz.',
+        whitelistDeleteConfirm:
+            'Yalnızca bu beyaz liste kaydı silinecek. Mevcut güvenlik duvarı kuralları korunacak. Devam edilsin mi?',
         portWhiteListHelper:
             'Tek bir port (ör. 80) veya port aralığı (ör. 8000-8100) girin. Port numaraları 1 ile 65535 arasında olmalıdır.',
         chain: 'Zincir',
@@ -4383,10 +4386,8 @@ const message = {
         allPorts: 'Tüm Portlar',
         allProtocolHelper: 'Tüm protokoller ve portlar',
         sourceAddressPlaceholder: 'örn. 172.16.10.11, 172.16.0.0/24, 2001:db8::1 veya 2001:db8::/64',
-        systemAccessChangeConfirm:
-            'Bu işlemi {0} izin listesi kurallarına uygulamak, bu hizmetler üzerinden uzaktan erişimi engelleyebilir. Devam edilsin mi?',
         whitelistServicePortsHelper:
-            'Güvenlik duvarının izin verdiği tek bir port ayarlayın. Dinleme portunu hizmet ayarlarından yönetin.',
+            'Tek bir port girin (1-65535). Bu işlem hizmetin dinleme portunu değiştirmez. Hizmet ayarlarında port değiştirildiğinde bu beyaz liste kaydı da güncellenir.',
         whitelistSourcesHelper:
             'IP adreslerini veya CIDR aralıklarını virgül ya da yeni satırla ayırın. Tüm IPv4 ve IPv6 kaynaklarına izin vermek için boş bırakın.',
         destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',

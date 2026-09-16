@@ -717,8 +717,5 @@ FirewallInspectDockerGuardStep: 'Periksa backend firewall Docker dan polisi'
 FirewallInitializeDockerGuardStep: 'Mulakan dan ikat rantai perlindungan port {{ .name }}'
 FirewallPersistDockerGuardStep: 'Simpan status perlindungan port Docker'
 ErrFirewallRuleScopeChange: "Tembok api semasa tidak menyokong perubahan skop peraturan (seperti keluarga alamat IPv4/IPv6). Sila cipta peraturan baharu."
-FirewallWhitelistTask: "Kemas kini senarai port dibenarkan tembok api"
-FirewallWhitelistSaved: "Konfigurasi senarai dibenarkan telah disimpan"
-FirewallWhitelistDeferred: "{{ .name }}: konfigurasi disimpan; menunggu pengaktifan tembok api"
 FirewallWhitelistReleased: "{{ .name }}: perlindungan senarai dibenarkan telah dilepaskan; peraturan izin dikekalkan. Untuk menutup port, padamkan peraturan secara manual daripada senarai peraturan"
 FirewallWhitelistRequired: "{{ .name }}: dilindungi oleh peraturan port wajib sistem"

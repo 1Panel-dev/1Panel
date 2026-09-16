@@ -4168,7 +4168,7 @@ const message = {
             'Peraturan sistem sedia ada yang belum diurus oleh 1Panel. Ia boleh diambil alih apabila diperlukan.',
         protected: 'Dilindungi sistem',
         protectedHelper:
-            'Peraturan sistem kritikal yang tidak boleh diedit atau dipadam untuk mengelakkan gangguan akses.',
+            'Peraturan terbina dalam dan peraturan yang sepadan tepat dengan senarai putih tidak boleh diedit atau dipadam.',
         stateShort: {
             managed: 'Panel',
             adopted: 'Terurus',
@@ -4367,6 +4367,10 @@ const message = {
         unbindHelper:
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
         portWhiteList: 'Senarai putih port',
+        whitelistConfigHelper:
+            'Senarai dibenarkan hanya menyimpan konfigurasi dan melindungi peraturan kebenaran yang sepadan. Peraturan yang tiada ditambah semasa mula, mula semula, pemulaan atau penyegerakan. Mengedit atau memadam entri tidak membuang peraturan sedia ada.',
+        whitelistDeleteConfirm:
+            'Hanya entri senarai putih ini akan dipadam. Peraturan tembok api sedia ada akan dikekalkan. Teruskan?',
         portWhiteListHelper:
             'Masukkan satu port (cth. 80) atau julat port (cth. 8000-8100). Nombor port mestilah antara 1 hingga 65535.',
         chain: 'Rantai',
@@ -4379,10 +4383,8 @@ const message = {
         allPorts: 'Semua Port',
         allProtocolHelper: 'Semua protokol dan port',
         sourceAddressPlaceholder: 'contoh: 172.16.10.11, 172.16.0.0/24, 2001:db8::1 atau 2001:db8::/64',
-        systemAccessChangeConfirm:
-            'Operasi ini pada peraturan senarai dibenarkan {0} mungkin menghalang akses jauh melalui perkhidmatan tersebut. Teruskan?',
         whitelistServicePortsHelper:
-            'Tetapkan satu port yang dibenarkan oleh tembok api. Urus port pendengar dalam tetapan perkhidmatan.',
+            'Masukkan satu port (1-65535). Ini tidak mengubah port pendengaran perkhidmatan. Menukar port dalam tetapan perkhidmatan turut mengemas kini entri senarai putih ini.',
         whitelistSourcesHelper:
             'Masukkan alamat IP atau julat CIDR, dipisahkan dengan koma atau baris baharu. Biarkan kosong untuk membenarkan semua sumber IPv4 dan IPv6.',
         destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',

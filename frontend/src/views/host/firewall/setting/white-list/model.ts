@@ -12,13 +12,13 @@ export const normalizeWhiteListRule = (rule: WhiteListRule): WhiteListRule => {
     if (!['tcp', 'udp'].includes(protocol)) throw new Error('invalid whitelist rule');
     if (rule.type) {
         if (!['panel', 'ssh'].includes(rule.type)) throw new Error('invalid whitelist rule');
-        if (rule.port !== undefined && !/^\d+$/.test(rule.port.trim())) {
+        if (!/^\d+$/.test(rule.port?.trim() || '')) {
             throw new Error('invalid service port');
         }
         return {
             type: rule.type,
             protocol,
-            port: rule.port === undefined ? undefined : normalizePortRange(rule.port),
+            port: normalizePortRange(rule.port || ''),
             sources,
         };
     }

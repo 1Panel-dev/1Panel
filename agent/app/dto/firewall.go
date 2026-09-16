@@ -328,7 +328,13 @@ type FirewallRuleSyncFailure struct {
 }
 
 type FirewallRuleDelete struct {
-	UUIDs []string `json:"uuids" validate:"required,min=1,dive,required,max=64"`
+	UUIDs       []string                   `json:"uuids" validate:"omitempty,dive,required,max=64"`
+	BeforeRules []FirewallRuleDeleteTarget `json:"beforeRules,omitempty" validate:"omitempty,dive"`
+}
+
+type FirewallRuleDeleteTarget struct {
+	Scope       filter.Scope `json:"scope" validate:"required"`
+	InstanceKey string       `json:"instanceKey" validate:"required,max=128"`
 }
 
 type FirewallRuleDeleteResponse struct {

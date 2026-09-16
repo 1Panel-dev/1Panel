@@ -228,9 +228,9 @@ func (u *SSHService) Update(req dto.SSHUpdate) error {
 		return err
 	}
 	if req.Key == "Port" {
-		if err := newFirewallService().syncSystemAccessPortTransition(context.Background(), firewall.PortWhitelistTypeSSH, splitSSHPorts(req.NewValue)); err != nil {
+		if err := updateSystemAccessPortWhitelist(context.Background(), firewall.PortWhitelistTypeSSH, splitSSHPorts(req.NewValue)); err != nil {
 			if restoreErr := rewriteSSHManagedDirectives(sshPath, "Port", buildSSHDirectiveLines("Port", oldPortValue)); restoreErr != nil {
-				return fmt.Errorf("synchronize SSH whitelist: %w; restore SSH configuration: %v", err, restoreErr)
+				return fmt.Errorf("save SSH whitelist: %w; restore SSH configuration: %v", err, restoreErr)
 			}
 			return err
 		}

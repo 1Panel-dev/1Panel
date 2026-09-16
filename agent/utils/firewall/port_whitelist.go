@@ -1,7 +1,6 @@
 package firewall
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/netip"
 	"sort"
@@ -18,14 +17,6 @@ const (
 	PortWhitelistTypePanel = "panel"
 	PortWhitelistTypeSSH   = "ssh"
 )
-
-func ParsePortWhitelist(value string) ([]PortWhitelist, error) {
-	var rules []PortWhitelist
-	if err := json.Unmarshal([]byte(value), &rules); err != nil {
-		return nil, err
-	}
-	return ValidatePortWhitelist(rules)
-}
 
 func ValidatePortWhitelist(rules []PortWhitelist) ([]PortWhitelist, error) {
 	if rules == nil {
@@ -46,13 +37,11 @@ func ValidatePortWhitelist(rules []PortWhitelist) ([]PortWhitelist, error) {
 			if rule.Type != PortWhitelistTypePanel && rule.Type != PortWhitelistTypeSSH {
 				return nil, fmt.Errorf("invalid firewall port whitelist type: %s", rule.Type)
 			}
-			if rule.Port != "" {
-				port, err := parseWhitelistPort(rule.Port)
-				if err != nil {
-					return nil, err
-				}
-				rule.Port = strconv.Itoa(port)
+			port, err := parseWhitelistPort(rule.Port)
+			if err != nil {
+				return nil, err
 			}
+			rule.Port = strconv.Itoa(port)
 		} else {
 			var err error
 			rule.Port, err = normalizeWhitelistPort(rule.Port)
@@ -295,26 +284,6 @@ func SortedSystemPortKeys(ports map[string]SystemPort) []string {
 	}
 	sort.Strings(keys)
 	return keys
-}
-
-func ContainsPort(ports []PortWhitelist, target PortWhitelist) bool {
-	for _, port := range ports {
-		familyMatches := port.Family == "" || target.Family == "" || port.Family == target.Family
-		if familyMatches && port.Port == target.Port && port.Protocol == target.Protocol {
-			return true
-		}
-	}
-	return false
-}
-
-func ExcludePorts(ports, excluded []PortWhitelist) []PortWhitelist {
-	result := make([]PortWhitelist, 0, len(ports))
-	for _, port := range ports {
-		if !ContainsPort(excluded, port) {
-			result = append(result, port)
-		}
-	}
-	return result
 }
 
 func NormalizeRequiredPorts(ports []PortWhitelist) ([]PortWhitelist, error) {
