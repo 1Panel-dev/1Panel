@@ -49,7 +49,7 @@ func (s *Snap) IsEnable(serviceName string) bool {
 
 func (s *Snap) Operate(operate, serviceName string) error {
 	if s.IsExist(serviceName) {
-		return handlerErr(run(s.toolCmd, operate, serviceName))
+		return handlerErr(runWithTimeout(serviceOperationTimeout(operate, serviceName), s.toolCmd, operate, serviceName))
 	}
 	return fmt.Errorf("snap service %q does not exist", serviceName)
 }

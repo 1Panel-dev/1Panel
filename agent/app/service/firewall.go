@@ -232,11 +232,15 @@ func (s *FirewallService) QueueFirewallOperation(request dto.FirewallLifecycleOp
 		return response, err
 	}
 	if (client.Name() != lifecycle.ProviderFirewalld && client.Name() != lifecycle.ProviderUFW) ||
-		(request.Operation != string(lifecycle.OperationStart) && request.Operation != string(lifecycle.OperationRestart)) {
+		(request.Operation != string(lifecycle.OperationStart) && request.Operation != string(lifecycle.OperationStop) &&
+			request.Operation != string(lifecycle.OperationRestart)) {
 		return response, s.OperateFirewall(request)
 	}
 	operation, label := task.TaskExec, "Start"
-	if request.Operation == string(lifecycle.OperationRestart) {
+	switch lifecycle.Operation(request.Operation) {
+	case lifecycle.OperationStop:
+		label = "Stop"
+	case lifecycle.OperationRestart:
 		operation, label = task.TaskRestart, task.TaskRestart
 	}
 	name := task.GetTaskName(client.Name(), label, task.TaskScopeFirewall)
@@ -291,14 +295,17 @@ func (s *FirewallService) runFirewallLifecycleTask(t *task.Task, client lifecycl
 		return runFirewallLifecycleAction(t, task.GetTaskName(name, operation, ""), action)
 	}
 	operationErr := operator.Operate(lifecycle.Operation(request.Operation), request.WithDockerRestart, func(lifecycle.Client) error {
-		runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", client.Name()), func() error {
+		rulesErr := runFirewallLifecycleAction(t, i18n.GetWithName("FirewallRestoreRulesStep", client.Name()), func() error {
 			return s.restoreStoredFirewallRules(ctx, provider, t)
 		})
-		runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
+		whitelistErr := runFirewallLifecycleAction(t, i18n.GetMsgByKey("FirewallSyncWhitelistStep"), func() error {
 			return s.SyncPortWhitelist(ctx)
 		})
-		return nil
+		return errors.Join(rulesErr, whitelistErr)
 	})
+	if request.Operation == string(lifecycle.OperationStop) {
+		return operationErr
+	}
 	var recoveryErr *lifecycle.CompletedOperationError
 	if operationErr != nil && !errors.As(operationErr, &recoveryErr) {
 		return operationErr

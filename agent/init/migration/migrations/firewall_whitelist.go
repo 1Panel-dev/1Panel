@@ -1,6 +1,7 @@
 package migrations
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -10,10 +11,51 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle/providers"
 	"github.com/go-gormigrate/gormigrate/v2"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
+
+const firewalldSSHServiceMigrationID = "20260916-remove-firewalld-ssh-service"
+
+func TransferFirewalldSSHService(ctx context.Context, client lifecycle.Client, syncWhitelist func(context.Context) error) error {
+	return transferFirewalldSSHService(ctx, global.DB, client, syncWhitelist)
+}
+
+func transferFirewalldSSHService(ctx context.Context, db *gorm.DB, client lifecycle.Client, syncWhitelist func(context.Context) error) error {
+	if err := syncWhitelist(ctx); err != nil {
+		return err
+	}
+	if client.Name() != lifecycle.ProviderFirewalld {
+		return nil
+	}
+	var count int64
+	if err := db.WithContext(ctx).Table("migrations").Where("id = ?", firewalldSSHServiceMigrationID).Count(&count).Error; err != nil {
+		return fmt.Errorf("check firewalld SSH service migration: %w", err)
+	}
+	if count > 0 {
+		return nil
+	}
+	active, err := client.Status()
+	if err != nil || !active {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if err := providers.RemoveFirewalldSSHService(); err != nil {
+		return fmt.Errorf("transfer firewalld SSH access to whitelist: %w", err)
+	}
+	if err := db.WithContext(ctx).Table("migrations").Clauses(clause.OnConflict{DoNothing: true}).
+		Create(map[string]interface{}{"id": firewalldSSHServiceMigrationID}).Error; err != nil {
+		return fmt.Errorf("record firewalld SSH service migration: %w", err)
+	}
+	return nil
+}
 
 var MigrateFirewallPortWhitelistSources = &gormigrate.Migration{
 	ID: "20260915-migrate-firewall-port-whitelist-sources",

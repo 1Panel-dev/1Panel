@@ -11,6 +11,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/init/migration/migrations"
 	migrationutils "github.com/1Panel-dev/1Panel/agent/init/migration/migrations/utils"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
@@ -28,7 +29,7 @@ func Init() {
 	clientName := client.Name()
 	initialize := false
 	defer func() {
-		if err := service.NewIFirewallService().SyncPortWhitelist(ctx); err != nil {
+		if err := migrations.TransferFirewalldSSHService(ctx, client, service.NewIFirewallService().SyncPortWhitelist); err != nil {
 			global.LOG.Warnf("synchronize firewall whitelist on startup failed, err: %v", err)
 		}
 		if initialize {

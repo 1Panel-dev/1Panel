@@ -39,7 +39,7 @@ func (s *Sysvinit) Status(serviceName string) (string, error) {
 }
 
 func (s *Sysvinit) Operate(operate, serviceName string) error {
-	return handlerErr(run(s.toolCmd, serviceName, operate))
+	return handlerErr(runWithTimeout(serviceOperationTimeout(operate, serviceName), s.toolCmd, serviceName, operate))
 }
 
 func (s *Sysvinit) Reload() error {

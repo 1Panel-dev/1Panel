@@ -46,7 +46,7 @@ func (s *Openrc) Operate(operate, serviceName string) error {
 	case "disable":
 		return handlerErr(run("rc-update", "del", serviceName, "default"))
 	default:
-		return handlerErr(run(s.toolCmd, serviceName, operate))
+		return handlerErr(runWithTimeout(serviceOperationTimeout(operate, serviceName), s.toolCmd, serviceName, operate))
 	}
 }
 
