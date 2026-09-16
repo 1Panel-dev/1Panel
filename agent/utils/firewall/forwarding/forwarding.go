@@ -75,6 +75,17 @@ type Manager struct {
 	runtime RuntimeClient
 }
 
+func New(provider string) (Adapter, error) {
+	switch provider {
+	case "iptables":
+		return newIptablesNATAdapter(provider), nil
+	case "nftables":
+		return newNftablesAdapter(), nil
+	default:
+		return nil, errors.New("unsupported forwarding provider: " + provider)
+	}
+}
+
 func NewManager(adapter Adapter, runtime RuntimeClient) *Manager {
 	return &Manager{adapter: adapter, runtime: runtime}
 }

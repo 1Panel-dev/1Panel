@@ -26,7 +26,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/ping"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
@@ -874,7 +873,7 @@ func (service *FirewallService) syncSystemAccessPortTransition(ctx context.Conte
 }
 
 func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings, error) {
-	result := dto.FirewallSettings{PingStatus: ping.LoadStatus()}
+	result := dto.FirewallSettings{PingStatus: firewall.LoadPingStatus()}
 
 	installed := make(map[string]bool)
 	for _, name := range lifecycle.InstalledProviders() {
