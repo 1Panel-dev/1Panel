@@ -34,18 +34,6 @@ func (s *lexer) scan() flag.Flag {
 	return s.Latest
 }
 
-//func (s *lexer) all() flag.Flags {
-//	tokens := make([]flag.Flag, 0)
-//	for {
-//		v := s.scan()
-//		if v.Type == flag.EOF || v.Type == -1 {
-//			break
-//		}
-//		tokens = append(tokens, v)
-//	}
-//	return tokens
-//}
-
 func (s *lexer) getNextFlag() flag.Flag {
 	if s.inLuaBlock {
 		s.inLuaBlock = false

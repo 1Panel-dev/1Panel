@@ -2470,10 +2470,19 @@
 	},
 	"/core/xpack/vms/del": {
 		"bodyKeys": [
-			"name"
+			"id"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "virtual_machines",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
 		"formatZH": "删除虚拟机 [name]",
 		"formatEN": "delete VM [name]"
 	},

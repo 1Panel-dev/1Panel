@@ -91,6 +91,19 @@ type MultiScopeObserver interface {
 	ObserveScopes(context.Context, []Scope) ([]Snapshot, error)
 }
 
+type ObservationSessionFactory interface {
+	NewObservationSession() Adapter
+}
+
+type CreatePlanner interface {
+	Compile(DesiredChange) (BackendPlan, error)
+	Applied(ObservedRule)
+}
+
+type CreatePlannerFactory interface {
+	NewCreatePlanner(Snapshot) CreatePlanner
+}
+
 type RulePreparer interface {
 	PrepareRule(FirewallRule) (FirewallRule, error)
 }

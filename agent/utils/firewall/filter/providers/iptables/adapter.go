@@ -185,6 +185,8 @@ func compileBatch(snapshot filter.Snapshot, changes []filter.DesiredChange) (fil
 		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
 	}
 	current := snapshot
+	current.Rules = make([]filter.ObservedRule, len(snapshot.Rules), len(snapshot.Rules)+len(changes))
+	copy(current.Rules, snapshot.Rules)
 	for _, change := range changes {
 		rulePlan, err := compileChange(current, change)
 		if err != nil {
@@ -199,6 +201,9 @@ func compileBatch(snapshot filter.Snapshot, changes []filter.DesiredChange) (fil
 		}
 	}
 
+	if _, err := filter.NewSnapshot(snapshot.Scope, current.Rules); err != nil {
+		return filter.BackendPlan{}, err
+	}
 	applyScript, err := buildRestoreScript(snapshot.Scope, current.Rules)
 	if err != nil {
 		return filter.BackendPlan{}, err
@@ -225,7 +230,8 @@ func applyRestoreRulePlan(snapshot filter.Snapshot, plan filter.NativeRulePlan) 
 		return filter.Snapshot{}, fmt.Errorf("%w: batch rule has no target position", filter.ErrInvalidRule)
 	}
 	nativePosition := *position
-	rules := append([]filter.ObservedRule(nil), snapshot.Rules...)
+	rules := snapshot.Rules
+	firstChanged := nativePosition - 1
 	switch plan.Operation {
 	case filter.ChangeCreate:
 		if nativePosition < 1 || nativePosition > len(rules)+1 {
@@ -246,6 +252,7 @@ func applyRestoreRulePlan(snapshot filter.Snapshot, plan filter.NativeRulePlan) 
 			return filter.Snapshot{}, fmt.Errorf("%w: mutation has no previous position", filter.ErrInvalidRule)
 		}
 		previousPosition := *plan.Previous.Locator.Position
+		firstChanged = min(firstChanged, previousPosition-1)
 		if previousPosition < 1 || previousPosition > len(rules) || nativePosition < 1 || nativePosition > len(rules) {
 			return filter.Snapshot{}, fmt.Errorf("%w: mutation position is out of range", filter.ErrRuleStale)
 		}
@@ -262,11 +269,12 @@ func applyRestoreRulePlan(snapshot filter.Snapshot, plan filter.NativeRulePlan) 
 	default:
 		return filter.Snapshot{}, fmt.Errorf("%w: unsupported batch operation %s", filter.ErrInvalidRule, plan.Operation)
 	}
-	for index := range rules {
+	for index := firstChanged; index < len(rules); index++ {
 		position := index + 1
 		rules[index].Locator.Position = &position
 	}
-	return filter.NewSnapshot(snapshot.Scope, rules)
+	snapshot.Rules = rules
+	return snapshot, nil
 }
 
 func buildRestoreScript(scope filter.Scope, rules []filter.ObservedRule) (string, error) {
@@ -317,10 +325,15 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 	if err != nil {
 		return filter.VerifyResult{}, err
 	}
+	byMarker := make(map[string][]int, len(snapshot.Rules))
+	for index, observed := range snapshot.Rules {
+		byMarker[observed.Marker] = append(byMarker[observed.Marker], index)
+	}
 	for _, expected := range plan.Rules {
 		markerMatches := 0
 		semanticMatches := 0
-		for _, observed := range snapshot.Rules {
+		for _, index := range byMarker[expected.Expected.Marker] {
+			observed := snapshot.Rules[index]
 			if observed.Marker != "" && observed.Marker == expected.Expected.Marker {
 				markerMatches++
 				want, wantErr := filter.RuleKey(expected.Expected.Rule)
@@ -335,7 +348,8 @@ func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.V
 		positionMatches := true
 		if requiresPositionMatch {
 			positionMatches = false
-			for _, observed := range snapshot.Rules {
+			for _, index := range byMarker[expected.Expected.Marker] {
+				observed := snapshot.Rules[index]
 				if observed.Marker == expected.Expected.Marker && observed.Locator.Position != nil &&
 					expected.Expected.Locator.Position != nil && *observed.Locator.Position == *expected.Expected.Locator.Position {
 					positionMatches = true
@@ -686,14 +700,8 @@ func (systemBackend) CheckMultiport(ctx context.Context, family filter.Family) e
 }
 
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	output, err := native.ReadTable(ctx, scope.Table, scope.Family == filter.FamilyIPv6)
-	if err != nil {
-		return "", err
-	}
-	if !containsChainDeclaration(output, scope.Chain) {
-		return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
-	}
-	return output, nil
+	output, err := (systemBackend{}).ListTable(ctx, scope)
+	return chainOutput(scope, output, err)
 }
 
 func containsChainDeclaration(output, chain string) bool {

@@ -67,6 +67,8 @@ type FirewallSettings struct {
 	Docker        FirewallBackendGroup   `json:"docker"`
 	PingStatus    string                 `json:"pingStatus"`
 	PortWhitelist []filter.PortWhitelist `json:"portWhiteList"`
+	PanelPort     string                 `json:"panelPort"`
+	SSHPort       string                 `json:"sshPort"`
 }
 
 type FirewallPortWhitelistCreate struct {
@@ -126,6 +128,7 @@ type FirewallRuleReset struct {
 }
 
 type FirewallRuleInventory struct {
+	Refresh bool `json:"refresh,omitempty"`
 	PageInfo
 	Scope         filter.Scope            `json:"scope,omitempty"`
 	Scopes        []filter.Scope          `json:"scopes,omitempty" validate:"max=16"`
@@ -329,6 +332,8 @@ type FirewallRuleDelete struct {
 }
 
 type FirewallRuleDeleteResponse struct {
+	TaskID    string                      `json:"taskID,omitempty"`
+	Queued    bool                        `json:"queued,omitempty"`
 	Succeeded int                         `json:"succeeded"`
 	Failed    int                         `json:"failed"`
 	Errors    []FirewallRuleDeleteFailure `json:"errors,omitempty"`

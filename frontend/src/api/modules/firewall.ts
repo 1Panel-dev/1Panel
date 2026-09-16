@@ -80,7 +80,7 @@ export const syncFirewallRules = (request: Firewall.RuleSyncRequest) => {
 };
 
 export const deleteFirewallRules = (request: Firewall.DeleteRequest) => {
-    return http.post<Firewall.DeleteResponse>('/hosts/firewall/rules/delete', request, TimeoutEnum.T_10M);
+    return http.post<Firewall.DeleteResponse>('/hosts/firewall/rules/delete', request);
 };
 
 export const updateFirewallRule = (uuid: string, request: Firewall.UpdateRequest) => {

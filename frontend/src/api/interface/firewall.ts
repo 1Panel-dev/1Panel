@@ -34,6 +34,8 @@ export namespace Firewall {
         docker: BackendGroup;
         pingStatus: string;
         portWhiteList: PortWhitelist[];
+        panelPort: string;
+        sshPort: string;
     }
     export interface PortWhitelist {
         port?: string;
@@ -222,6 +224,7 @@ export namespace Firewall {
     }
 
     export interface InventoryRequest extends ReqPage {
+        refresh?: boolean;
         scopes: Scope[];
         all?: boolean;
         info: string;
@@ -333,6 +336,8 @@ export namespace Firewall {
     }
 
     export interface DeleteResponse {
+        taskID?: string;
+        queued?: boolean;
         succeeded: number;
         failed: number;
         errors?: DeleteFailure[];

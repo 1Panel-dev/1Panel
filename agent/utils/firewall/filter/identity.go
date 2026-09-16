@@ -150,6 +150,19 @@ func CheckObservedRuleCollisions(snapshot Snapshot, requested FirewallRule, excl
 	return nil
 }
 
+func ObservedRuleCollisionIndex(snapshot Snapshot) (RuleCollisionIndex, error) {
+	index := make(RuleCollisionIndex, len(snapshot.Rules))
+	for _, observed := range snapshot.Rules {
+		if observed.ParseStatus != ParseStatusSupported {
+			continue
+		}
+		if err := index.Add(observed.Rule); err != nil {
+			return nil, err
+		}
+	}
+	return index, nil
+}
+
 func normalizedRuleKey(normalized FirewallRule) (string, error) {
 	identity := ruleIdentity{
 		Scope:              normalized.Scope.Key(),

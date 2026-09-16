@@ -106,7 +106,12 @@ import { formatHostAddressList, isValidIPOrCIDR, splitTagValues } from '@/views/
 import { ElMessageBox } from 'element-plus';
 import { normalizeWhiteListRule, WhiteListProtocol, WhiteListRule, WhiteListType, whiteListRuleKey } from './model';
 
-const props = defineProps<{ rules?: WhiteListRule[]; loading: boolean }>();
+const props = defineProps<{
+    rules?: WhiteListRule[];
+    panelPort?: string;
+    sshPort?: string;
+    loading: boolean;
+}>();
 const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
 const drawerVisible = ref(false);
 const dialogVisible = ref(false);
@@ -122,12 +127,9 @@ const form = ref({
     sourceInput: '',
 });
 const serviceTypes: WhiteListType[] = ['ssh', 'panel'];
-const servicePorts = computed<Record<WhiteListType, string>>(() => ({
-    panel: data.value.find((rule) => rule.type === 'panel')?.port || '',
-    ssh: data.value.find((rule) => rule.type === 'ssh')?.port || '',
-}));
 const serviceLabel = (type: WhiteListType) => (type === 'panel' ? '1Panel' : 'SSH');
-const servicePortLabel = (type: WhiteListType) => servicePorts.value[type] || i18n.global.t('commons.status.unknown');
+const servicePortLabel = (type: WhiteListType) =>
+    (type === 'panel' ? props.panelPort : props.sshPort) || i18n.global.t('commons.status.unknown');
 
 const acceptParams = () => {
     drawerVisible.value = true;

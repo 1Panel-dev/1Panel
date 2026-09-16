@@ -296,6 +296,12 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 				firewalldFinalSnapshot = syncFirewalldCreates(ctx, runtime, initial, removed > 0, queue, t, record)
 				continue
 			}
+			markers := make([]string, 0)
+			for _, candidate := range rules {
+				if candidate.Rule != nil && candidate.Rule.Scope.Key() == scope.Key() && candidate.desired.Marker != "" {
+					markers = append(markers, candidate.desired.Marker)
+				}
+			}
 			for start := 0; start < len(queue); {
 				rule := queue[start]
 				cause := stopped[scope.Key()]
@@ -336,12 +342,6 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 						after := *entry.Rule
 						after.OrderIndex = nil
 						if len(batch) == 1 && scope.Provider != filter.ProviderFirewalld {
-							markers := make([]string, 0)
-							for _, candidate := range rules {
-								if candidate.Rule != nil && candidate.Rule.Scope.Key() == scope.Key() && candidate.desired.Marker != "" {
-									markers = append(markers, candidate.desired.Marker)
-								}
-							}
 							after.OrderIndex = firewallsync.InsertionPosition(snapshot, markers, entry.desired.Marker)
 						}
 						changes = append(changes, filter.DesiredChange{Operation: operation, After: &after, Append: scope.Provider == filter.ProviderUFW && after.OrderIndex == nil})
@@ -384,21 +384,21 @@ func syncFirewalldCreates(
 	if len(queue) == 0 {
 		return nil
 	}
-	snapshot := initial
-	snapshot.Rules = append([]filter.ObservedRule(nil), initial.Rules...)
-	indices := make(map[string]int)
-	indexRules := func() {
-		clear(indices)
-		for index, rule := range snapshot.Rules {
-			indices[rule.Locator.Canonical] = index
+	planner, readErr := runtime.NewCreatePlanner(initial)
+	if readErr != nil {
+		for _, entry := range queue {
+			record(task.TaskCreate, entry, readErr, false)
 		}
+		return nil
 	}
-	indexRules()
 	pending := make([]*firewallSyncRule, 0, len(queue))
-	var readErr error
 	for index, entry := range queue {
 		if refresh {
+			var snapshot filter.Snapshot
 			snapshot, readErr = runtime.ObserveMutation(ctx, initial.Scope)
+			if readErr == nil {
+				planner, readErr = runtime.NewCreatePlanner(snapshot)
+			}
 			if readErr != nil {
 				record(task.TaskCreate, entry, readErr, false)
 				for _, remaining := range queue[index+1:] {
@@ -406,7 +406,6 @@ func syncFirewalldCreates(
 				}
 				break
 			}
-			indexRules()
 			refresh = false
 		}
 		if t != nil {
@@ -414,20 +413,9 @@ func syncFirewalldCreates(
 		}
 		after := *entry.Rule
 		after.OrderIndex = nil
-		applied, err := runtime.ExecuteSync(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &after}})
-		if err == nil && len(applied.Applied) != 1 {
-			err = filter.ErrVerificationFailed
-		}
-		if err == nil {
-			observed := applied.Applied[0]
-			if position, exists := indices[observed.Locator.Canonical]; exists {
-				snapshot.Rules[position] = observed
-			} else {
-				indices[observed.Locator.Canonical] = len(snapshot.Rules)
-				snapshot.Rules = append(snapshot.Rules, observed)
-			}
-			snapshot, err = filter.NewSnapshot(snapshot.Scope, snapshot.Rules)
-		}
+		_, err := runtime.ExecutePlannedCreate(ctx, planner, filter.DesiredChange{
+			Operation: filter.ChangeCreate, After: &after, CommandOnly: true,
+		})
 		if err != nil {
 			record(task.TaskCreate, entry, err, false)
 			if firewallCreateUnavailable(err) {
@@ -630,6 +618,8 @@ func runningFirewallRuleSyncResult(request dto.FirewallRuleSyncRequest, taskID s
 }
 
 func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
+	filterruntime.InvalidateInventory()
+	defer filterruntime.InvalidateInventory()
 	ports, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
@@ -723,6 +713,8 @@ func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current
 }
 
 func syncManagedAcceptedPorts(previous, current []firewall.PortWhitelist) error {
+	filterruntime.InvalidateInventory()
+	defer filterruntime.InvalidateInventory()
 	return newFirewallService().
 		SyncSystemPorts(context.Background(), firewall.ExpandPortWhitelist(previous), firewall.ExpandPortWhitelist(current))
 }

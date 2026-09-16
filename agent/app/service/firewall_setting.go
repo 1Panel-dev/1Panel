@@ -68,7 +68,7 @@ type firewallWhitelistOverrideKey struct{}
 
 func (s *FirewallSettingService) CreatePortWhitelist(ctx context.Context, request dto.FirewallPortWhitelistCreate) (dto.FilterChainOperationResponse, error) {
 	return s.queuePortWhitelist(ctx, func(current []firewall.PortWhitelist) ([]firewall.PortWhitelist, error) {
-		rule, err := initializeRequestedWhitelistRule(current, request.Rule)
+		rule, err := initializeRequestedWhitelistRule(request.Rule)
 		if err != nil {
 			return nil, err
 		}
@@ -78,7 +78,7 @@ func (s *FirewallSettingService) CreatePortWhitelist(ctx context.Context, reques
 
 func (s *FirewallSettingService) UpdatePortWhitelist(ctx context.Context, request dto.FirewallPortWhitelistUpdate) (dto.FilterChainOperationResponse, error) {
 	return s.queuePortWhitelist(ctx, func(current []firewall.PortWhitelist) ([]firewall.PortWhitelist, error) {
-		rule, err := initializeRequestedWhitelistRule(current, request.Rule)
+		rule, err := initializeRequestedWhitelistRule(request.Rule)
 		if err != nil {
 			return nil, err
 		}
@@ -704,16 +704,8 @@ func InitializeFirewallWhitelistPorts(entries []firewall.PortWhitelist) ([]firew
 	return firewall.ValidatePortWhitelist(entries)
 }
 
-func initializeRequestedWhitelistRule(current []firewall.PortWhitelist, rule firewall.PortWhitelist) (firewall.PortWhitelist, error) {
+func initializeRequestedWhitelistRule(rule firewall.PortWhitelist) (firewall.PortWhitelist, error) {
 	rule.Type = strings.ToLower(strings.TrimSpace(rule.Type))
-	if rule.Port == "" {
-		for _, existing := range current {
-			if rule.Type != "" && existing.Type == rule.Type {
-				rule.Port = existing.Port
-				break
-			}
-		}
-	}
 	rules, err := InitializeFirewallWhitelistPorts([]firewall.PortWhitelist{rule})
 	if err != nil {
 		return rule, err
@@ -864,6 +856,16 @@ func (s *FirewallSettingService) Load(ctx context.Context) (dto.FirewallSettings
 	}
 	var err error
 	result.PortWhitelist, err = loadPortWhitelistSetting(global.DB.WithContext(ctx))
+	if err != nil {
+		return result, err
+	}
+	result.PanelPort = LoadPanelPort()
+	sshPort, sshErr := loadSSHWhitelistPortFrom(sshPath)
+	if sshErr != nil {
+		global.LOG.Warnf("load SSH port for firewall settings: %v", sshErr)
+	} else {
+		result.SSHPort = sshPort
+	}
 	return result, err
 }
 
