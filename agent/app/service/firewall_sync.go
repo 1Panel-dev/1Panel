@@ -21,6 +21,7 @@ import (
 	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
 	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -36,9 +37,10 @@ type firewallDatabaseSyncAdapter interface {
 
 type firewallSyncRule struct {
 	dto.FirewallRuleSyncItem
-	desired  filter.DesiredRule
-	observed *filter.ObservedRule
-	done     bool
+	desired          filter.DesiredRule
+	observed         *filter.ObservedRule
+	done             bool
+	whitelistCleanup bool
 }
 
 func firewallSyncSubsystem(value string) string {
@@ -81,7 +83,26 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 		return nil, nil, nil, err
 	}
 	model.SortFirewallRules(stored, request.TargetProvider)
+	var whitelist []firewall.PortWhitelist
+	var whitelistDesired []filter.FirewallRule
+	if isDirectFirewallProvider(request.TargetProvider) {
+		ports, overridden := ctx.Value(firewallWhitelistOverrideKey{}).([]firewall.PortWhitelist)
+		if !overridden {
+			ports, err = loadFirewallPortWhiteList()
+			if err != nil {
+				return nil, nil, nil, err
+			}
+		}
+		required, err := firewall.RequiredPortWhitelist(ports)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		custom := customWhitelist(ports)
+		whitelist = append(custom, required...)
+		whitelistDesired = whitelistRules(request.TargetProvider, firewall.ExpandPortWhitelist(custom), firewall.ExpandPortWhitelist(required))
+	}
 	rules := make([]*firewallSyncRule, 0, len(stored))
+	var whitelistCleanup []*firewallSyncRule
 	preservedMarkers := make(map[string]bool)
 	compileFailed := false
 	for _, record := range stored {
@@ -95,9 +116,44 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 			preservedMarkers[rule.Marker] = true
 		}
 		for _, native := range desired {
+			if isDirectFirewallProvider(request.TargetProvider) && hasSystemFirewallRuleOwner(record) &&
+				isWhitelistPortAllowance(native.Rule) && !filter.RuleMatchesPortWhitelist(native.Rule, whitelist) {
+				stale := native.Rule
+				whitelistCleanup = append(whitelistCleanup, &firewallSyncRule{whitelistCleanup: true, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{
+					SourceUUID: record.UUID, Rule: &stale, Status: firewallsync.StatusRemove, Reason: "port allowance is no longer in the whitelist",
+				}})
+				preservedMarkers[native.Marker] = true
+				continue
+			}
 			rule := native.Rule
 			rules = append(rules, &firewallSyncRule{desired: native, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: record.UUID, Rule: &rule}})
 		}
+	}
+	for _, candidate := range whitelistDesired {
+		prepared, err := s.prepareCreate(ctx, request.TargetProvider, dto.FirewallRuleCreateItem{Rule: candidate})
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		rule := prepared.request.Rule
+		duplicate := false
+		for _, existing := range rules {
+			if existing.Rule != nil && whitelistContainsRule([]filter.FirewallRule{*existing.Rule}, rule) {
+				duplicate = true
+				break
+			}
+		}
+		if duplicate {
+			continue
+		}
+		key, err := filter.RuleKey(rule)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+		rule.UUID = uuid.NewSHA1(uuid.NameSpaceOID, []byte(key)).String()
+		rules = append(rules, &firewallSyncRule{
+			desired:              filter.DesiredRule{UUID: rule.UUID, Rule: rule, RuleKey: key, Origin: filter.RuleOriginCreated, Protected: true},
+			FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: rule.UUID, Rule: &rule},
+		})
 	}
 	snapshots := make([]filter.Snapshot, 0)
 	for _, scope := range filter.ManagedInputScopes(request.TargetProvider) {
@@ -125,6 +181,16 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 			return nil, nil, nil, err
 		}
 		snapshots = append(snapshots, snapshot)
+		if isDirectFirewallProvider(request.TargetProvider) && scope.Chain == filter.BasicBeforeChain {
+			for _, observed := range snapshot.Rules {
+				if observed.ParseStatus == filter.ParseStatusSupported && isWhitelistPortAllowance(observed.Rule) && !filter.RuleMatchesPortWhitelist(observed.Rule, whitelist) {
+					stale := observed.Rule
+					whitelistCleanup = append(whitelistCleanup, &firewallSyncRule{whitelistCleanup: true, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{
+						SourceUUID: strings.TrimPrefix(observed.Marker, "1panel-rule:"), Rule: &stale, Status: firewallsync.StatusRemove, Reason: "port allowance is no longer in the whitelist",
+					}})
+				}
+			}
+		}
 		inventory, err := filter.MergeInventory(filter.InventoryMergeInput{Observed: snapshot.Rules, Desired: desired})
 		if err != nil {
 			return nil, nil, nil, err
@@ -180,10 +246,25 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 			}
 		}
 	}
-	return runtime, rules, snapshots, nil
+	return runtime, append(rules, whitelistCleanup...), snapshots, nil
 }
 
 func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.FirewallRuleSyncRequest, t *task.Task) (result dto.FirewallRuleSyncResult, err error) {
+	if isDirectFirewallProvider(request.TargetProvider) {
+		if request.SourceProvider != "" || request.ResetSource {
+			return result, fmt.Errorf("%w: system synchronization reads rules from the database", filter.ErrInvalidRule)
+		}
+		if err := s.checkSelectedProvider(ctx, request.TargetProvider); err != nil {
+			return result, err
+		}
+		whitelistErr := s.SyncPortWhitelist(ctx)
+		if t != nil {
+			t.LogWithStatus(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), whitelistErr)
+		}
+		if whitelistErr != nil {
+			return result, whitelistErr
+		}
+	}
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
 	result = dto.FirewallRuleSyncResult{Subsystem: "system", TargetProvider: request.TargetProvider}
@@ -193,6 +274,11 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 	runtime, rules, snapshots, err := s.loadFirewallSyncRules(ctx, request)
 	if err != nil {
 		return result, err
+	}
+	for _, rule := range rules {
+		if rule.whitelistCleanup {
+			return result, fmt.Errorf("%w: whitelist cleanup is incomplete; check that the firewall family is initialized and active", filter.ErrRuleOperation)
+		}
 	}
 	created, removed, unexecuted := 0, 0, 0
 	stopped := make(map[string]error)
@@ -618,6 +704,8 @@ func runningFirewallRuleSyncResult(request dto.FirewallRuleSyncRequest, taskID s
 }
 
 func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
+	firewallWhitelistTaskMu.Lock()
+	defer firewallWhitelistTaskMu.Unlock()
 	filterruntime.InvalidateInventory()
 	defer filterruntime.InvalidateInventory()
 	ports, err := loadFirewallPortWhiteList()
@@ -645,8 +733,13 @@ func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
 	}
 	rules := whitelistRules(provider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
 	prepared, prepareErr := s.prepareWhitelistRules(ctx, provider, rules, ready, report)
-	syncErr := syncWhitelistRules(ctx, s, nil, prepared, report)
-	return errors.Join(prepareErr, syncErr)
+	if prepareErr != nil {
+		return prepareErr
+	}
+	if err := syncWhitelistRules(ctx, s, nil, prepared, report); err != nil {
+		return err
+	}
+	return s.reconcilePortWhitelist(ctx, provider, ready, report)
 }
 
 func (s *FirewallService) SyncSystemPorts(ctx context.Context, previous, current []dto.FirewallSystemPort) error {

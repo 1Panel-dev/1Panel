@@ -22,6 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
+	filterruntime "github.com/1Panel-dev/1Panel/agent/utils/firewall/filter/runtime"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
@@ -233,7 +234,10 @@ func (s *FirewallSettingService) applyPortWhitelist(ctx context.Context, plan po
 		return err
 	}
 	return s.executePortWhitelist(ctx, plan, func() error {
-		return syncWhitelistRules(ctx, firewallService, previous, current, report)
+		if err := syncWhitelistRules(ctx, firewallService, previous, current, report); err != nil {
+			return err
+		}
+		return firewallService.reconcilePortWhitelist(ctx, provider, ready, report)
 	}, report)
 }
 
@@ -408,6 +412,70 @@ func (s *FirewallService) deleteWhitelistRule(ctx context.Context, prepared prep
 	defer firewallRuleMutationMu.Unlock()
 	rule, runtime := prepared.request.Rule, prepared.runtime
 	provider := rule.Scope.Provider
+	ports, err := firewallWhitelistForProtection(ctx)
+	if err != nil {
+		return err
+	}
+	if rule.Scope.Chain != filter.BasicBeforeChain && filter.RuleMatchesPortWhitelist(rule, ports) {
+		return nil
+	}
+	stored, err := s.rules.List(ctx)
+	if err != nil {
+		return err
+	}
+	cleanup, _ := ctx.Value(firewallWhitelistCleanupKey{}).(bool)
+	if !cleanup || rule.Scope.Chain == filter.BasicBeforeChain {
+		if err := deleteNativeWhitelistRule(ctx, runtime, rule); err != nil {
+			return err
+		}
+	}
+	for _, record := range stored {
+		if cleanup && !hasSystemFirewallRuleOwner(record) {
+			continue
+		}
+		compiled, err := s.compileStoredFirewallRules(ctx, record, provider)
+		if err != nil {
+			continue
+		}
+		remaining := make([]filter.FirewallRule, 0, len(compiled))
+		for _, candidate := range compiled {
+			if !matchesWhitelistRemoval(rule, candidate.Rule, record) || filter.RuleMatchesPortWhitelist(candidate.Rule, ports) {
+				remaining = append(remaining, candidate.Rule)
+				continue
+			}
+			if candidate.Rule.Scope.Key() != rule.Scope.Key() || cleanup && rule.Scope.Chain != filter.BasicBeforeChain {
+				if err := deleteNativeWhitelistRule(ctx, runtime, candidate.Rule, candidate.Marker); err != nil {
+					return err
+				}
+			}
+		}
+		if len(remaining) == len(compiled) {
+			continue
+		}
+		if err := global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+			ctx := context.WithValue(ctx, constant.DB, tx)
+			if err := s.rules.DeleteWithRevision(ctx, record.UUID, record.Revision); err != nil {
+				return err
+			}
+			for _, rule := range remaining {
+				kept, err := model.FirewallRuleFromDomain(rule)
+				if err != nil {
+					return err
+				}
+				kept.UUID, kept.Origin, kept.Owner, kept.Sequence = rule.UUID, record.Origin, record.Owner, record.Sequence
+				if err := s.rules.Create(ctx, &kept); err != nil {
+					return err
+				}
+			}
+			return nil
+		}); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func deleteNativeWhitelistRule(ctx context.Context, runtime *filterruntime.Engine, rule filter.FirewallRule, markers ...string) error {
 	for {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -418,6 +486,9 @@ func (s *FirewallService) deleteWhitelistRule(ctx context.Context, prepared prep
 		}
 		matched := -1
 		for index, observed := range snapshot.Rules {
+			if len(markers) > 0 && observed.Marker != markers[0] {
+				continue
+			}
 			if observed.ParseStatus == filter.ParseStatusSupported {
 				if same, err := filter.SameRuleContent(rule, observed.Rule); err == nil && same {
 					matched = index
@@ -445,45 +516,105 @@ func (s *FirewallService) deleteWhitelistRule(ctx context.Context, prepared prep
 			return filter.ErrVerificationFailed
 		}
 	}
+	return nil
+}
+
+type firewallWhitelistCleanupKey struct{}
+
+func checkFirewallRuleWhitelistProtection(ctx context.Context, record model.FirewallRule) error {
+	ports, err := firewallWhitelistForProtection(ctx)
+	if err != nil {
+		return err
+	}
+	rules, err := record.RulesForProvider(filter.ProviderIptables)
+	if err != nil {
+		return err
+	}
+	for _, rule := range rules {
+		if filter.RuleMatchesPortWhitelist(rule, ports) {
+			return filter.ErrProtectedRule
+		}
+	}
+	return nil
+}
+
+func matchesWhitelistRemoval(requested, candidate filter.FirewallRule, record model.FirewallRule) bool {
+	if isDirectFirewallProvider(requested.Scope.Provider) && requested.Scope.Chain == filter.BasicBeforeChain && hasSystemFirewallRuleOwner(record) {
+		candidate.Scope.Chain = filter.BasicBeforeChain
+	}
+	return whitelistContainsRule([]filter.FirewallRule{requested}, candidate)
+}
+
+func isWhitelistPortAllowance(rule filter.FirewallRule) bool {
+	normalized, err := filter.NormalizeRule(rule)
+	return err == nil && normalized.Action == filter.ActionAccept &&
+		(normalized.Protocol == "tcp" || normalized.Protocol == "udp") && normalized.DestinationPort != "" &&
+		normalized.SourcePort == "" && normalized.DestinationAddress == "" && normalized.Interface == "" && len(normalized.ConnectionStates) == 0
+}
+
+func (s *FirewallService) reconcilePortWhitelist(ctx context.Context, provider filter.Provider,
+	ready func(dto.FirewallSystemPort) (bool, error), report whitelistReporter,
+) error {
+	if !isDirectFirewallProvider(provider) {
+		return nil
+	}
+	ports, err := firewallWhitelistForProtection(ctx)
+	if err != nil {
+		return err
+	}
+	runtime, err := s.adapters.Resolve(provider)
+	if err != nil {
+		return err
+	}
+	var obsolete []filter.FirewallRule
+	for _, scope := range filter.ManagedInputScopes(provider) {
+		if scope.Chain != filter.BasicBeforeChain {
+			continue
+		}
+		active, err := ready(dto.FirewallSystemPort{Family: string(scope.Family)})
+		if err != nil {
+			return err
+		}
+		if !active {
+			continue
+		}
+		snapshot, err := runtime.ObserveMutation(ctx, scope)
+		if errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		for _, observed := range snapshot.Rules {
+			if observed.ParseStatus == filter.ParseStatusSupported && isWhitelistPortAllowance(observed.Rule) &&
+				!filter.RuleMatchesPortWhitelist(observed.Rule, ports) {
+				obsolete = append(obsolete, observed.Rule)
+			}
+		}
+	}
 	stored, err := s.rules.List(ctx)
 	if err != nil {
 		return err
 	}
 	for _, record := range stored {
+		if !hasSystemFirewallRuleOwner(record) {
+			continue
+		}
 		compiled, err := s.compileStoredFirewallRules(ctx, record, provider)
 		if err != nil {
-			continue
-		}
-		remaining := make([]filter.FirewallRule, 0, len(compiled))
-		for _, candidate := range compiled {
-			if !whitelistContainsRule([]filter.FirewallRule{rule}, candidate.Rule) {
-				remaining = append(remaining, candidate.Rule)
-			}
-		}
-		if len(remaining) == len(compiled) {
-			continue
-		}
-		if err := global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-			ctx := context.WithValue(ctx, constant.DB, tx)
-			if err := s.rules.DeleteWithRevision(ctx, record.UUID, record.Revision); err != nil {
-				return err
-			}
-			for _, rule := range remaining {
-				kept, err := model.FirewallRuleFromDomain(rule)
-				if err != nil {
-					return err
-				}
-				kept.UUID, kept.Origin, kept.Owner, kept.Sequence = rule.UUID, record.Origin, record.Owner, record.Sequence
-				if err := s.rules.Create(ctx, &kept); err != nil {
-					return err
-				}
-			}
-			return nil
-		}); err != nil {
 			return err
 		}
+		for _, candidate := range compiled {
+			if isWhitelistPortAllowance(candidate.Rule) && !filter.RuleMatchesPortWhitelist(candidate.Rule, ports) {
+				obsolete = append(obsolete, candidate.Rule)
+			}
+		}
 	}
-	return nil
+	prepared, err := s.prepareWhitelistRules(ctx, provider, obsolete, ready, report)
+	if err != nil {
+		return err
+	}
+	return syncWhitelistRules(context.WithValue(ctx, firewallWhitelistCleanupKey{}, true), s, prepared, nil, report)
 }
 
 func (s *FirewallSettingService) preparePortWhitelist(ctx context.Context, change portWhitelistChange) (portWhitelistPlan, error) {

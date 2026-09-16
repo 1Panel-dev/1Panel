@@ -1546,8 +1546,8 @@ func (s *FirewallService) prepareDelete(
 		}
 		return preparedFirewallRuleDelete{}, err
 	}
-	if isProtectedSystemFirewallRule(stored) {
-		return preparedFirewallRuleDelete{}, filter.ErrProtectedRule
+	if err := checkFirewallRuleWhitelistProtection(ctx, stored); err != nil {
+		return preparedFirewallRuleDelete{}, err
 	}
 	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
 		return preparedFirewallRuleDelete{}, fmt.Errorf("%w: only created or adopted rules can be deleted", filter.ErrInvalidRule)
@@ -1681,8 +1681,8 @@ func (s *FirewallService) updateRuleDescription(ctx context.Context, ruleUUID, d
 	if err != nil {
 		return err
 	}
-	if isProtectedSystemFirewallRule(stored) {
-		return filter.ErrProtectedRule
+	if err := checkFirewallRuleWhitelistProtection(ctx, stored); err != nil {
+		return err
 	}
 	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
 		return fmt.Errorf("%w: only created or adopted rules can be changed", filter.ErrInvalidRule)
@@ -2152,9 +2152,8 @@ func (s *FirewallService) loadManagedMutation(
 	if err != nil {
 		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil, err
 	}
-	if isProtectedSystemFirewallRule(stored) {
-		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil,
-			filter.ErrProtectedRule
+	if err := checkFirewallRuleWhitelistProtection(ctx, stored); err != nil {
+		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil, err
 	}
 	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
 		return model.FirewallRule{}, filter.DesiredRule{}, filter.Snapshot{}, filter.ObservedRule{}, nil,
@@ -2522,7 +2521,7 @@ func (s *FirewallService) systemPortRecords(ctx context.Context, port dto.Firewa
 	return records, nil
 }
 
-func isProtectedSystemFirewallRule(rule model.FirewallRule) bool {
+func hasSystemFirewallRuleOwner(rule model.FirewallRule) bool {
 	acceptedPrefix := model.FirewallRuleOwner(
 		constant.FirewallRuleSourceSecurity,
 		constant.FirewallSystemAcceptedPortSourcePrefix,
@@ -2759,7 +2758,7 @@ func (s *FirewallService) compileRestorableFirewallRules(
 	if err != nil {
 		return nil, nil, err
 	}
-	if !supportsManagedFilterChains(string(provider)) || !isProtectedSystemFirewallRule(stored) {
+	if !supportsManagedFilterChains(string(provider)) || !hasSystemFirewallRuleOwner(stored) {
 		return compiled, nil, nil
 	}
 	loadRequired := s.requiredPorts
@@ -2799,8 +2798,12 @@ func (s *FirewallService) desiredFirewallRulesByScope(
 	model.SortFirewallRules(stored, provider)
 	desired := make(map[string][]filter.DesiredRule)
 	var failures []filter.InventoryItem
+	ports, protectionErr := firewallWhitelistForProtection(ctx)
 	for _, record := range stored {
 		compiled, _, err := s.compileRestorableFirewallRules(ctx, record, provider)
+		if err == nil {
+			err = protectionErr
+		}
 		if err != nil {
 			rule := filter.FirewallRule{
 				UUID:     record.UUID,
@@ -2813,13 +2816,13 @@ func (s *FirewallService) desiredFirewallRulesByScope(
 			failures = append(failures, filter.InventoryItem{
 				Incompatible: isFirewallPolicyIncompatible(err),
 				Rule:         rule, State: filter.InventoryStateDrifted, Match: filter.InventoryMatchNone,
-				Desired: &filter.DesiredRule{UUID: record.UUID, Rule: rule, Origin: filter.RuleOrigin(record.Origin), Protected: isProtectedSystemFirewallRule(record)},
+				Desired: &filter.DesiredRule{UUID: record.UUID, Rule: rule, Origin: filter.RuleOrigin(record.Origin), Protected: protectionErr != nil || filter.RuleMatchesPortWhitelist(rule, ports)},
 				Error:   fmt.Sprintf("policy %s: %v", record.UUID, err),
 			})
 			continue
 		}
 		for _, rule := range compiled {
-			rule.Protected = isProtectedSystemFirewallRule(record)
+			rule.Protected = filter.RuleMatchesPortWhitelist(rule.Rule, ports)
 			rule.Expanded = len(compiled) > 1
 			key := rule.Rule.Scope.Key()
 			desired[key] = append(desired[key], rule)
