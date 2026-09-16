@@ -1,7 +1,7 @@
 <template>
     <div>
-        <el-form :model="form" :rules="variablesRules" ref="nginxFormRef" label-position="top">
-            <el-row v-loading="loading" :gutter="20">
+        <el-form v-loading="loading" :model="form" :rules="variablesRules" ref="nginxFormRef" label-position="top">
+            <el-row :gutter="20">
                 <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
                     <el-form-item label="server_names_hash_bucket_size" prop="server_names_hash_bucket_size">
                         <el-input
@@ -48,7 +48,7 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-row v-if="brotliAvailable" v-loading="loading" :gutter="20">
+            <el-row v-if="brotliAvailable" :gutter="20">
                 <el-col :span="24" v-if="brotliManagedExternally">
                     <el-alert type="info" :closable="false" class="mb-2">
                         {{ $t('nginx.brotliManagedExternallyHelper') }}
