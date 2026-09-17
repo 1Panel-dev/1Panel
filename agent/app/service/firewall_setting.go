@@ -137,12 +137,12 @@ func savePortWhitelist(ctx context.Context, change func([]firewall.PortWhitelist
 	})
 }
 
-func checkFirewallRuleWhitelistProtection(ctx context.Context, record model.FirewallRule) error {
+func checkFirewallRuleWhitelistProtection(provider filter.Provider, record model.FirewallRule) error {
 	ports, err := loadFirewallPortWhiteList()
 	if err != nil {
 		return err
 	}
-	rules, err := record.RulesForProvider(filter.ProviderIptables)
+	rules, err := record.RulesForProvider(provider)
 	if err != nil {
 		return err
 	}

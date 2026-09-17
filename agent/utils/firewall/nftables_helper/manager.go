@@ -7,6 +7,8 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"slices"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -113,7 +115,7 @@ func (m *Manager) ensureBaseChains() error {
 
 func requiredPortCommand(tableFamily string, rule firewall.SystemPort) []string {
 	command := []string{
-		"add", "rule", tableFamily, TableName, BasicBeforeChain,
+		"insert", "rule", tableFamily, TableName, BasicBeforeChain,
 	}
 	if rule.SourceAddress != "" {
 		command = append(command, tableFamily, "saddr", rule.SourceAddress)
@@ -174,6 +176,29 @@ func containsRequiredPortRule(output, expression string) bool {
 		line = strings.NewReplacer("{", "", "}", "", ", ", ",", " ,", ",").Replace(line)
 		fields := strings.Fields(line)
 		for index, field := range fields {
+			if index >= 2 && fields[index-2] == "ct" && fields[index-1] == "state" {
+				states := strings.Split(field, ",")
+				for i, state := range states {
+					value, err := strconv.ParseUint(state, 0, 64)
+					if err != nil {
+						continue
+					}
+					switch value {
+					case 1:
+						states[i] = "invalid"
+					case 2:
+						states[i] = "established"
+					case 4:
+						states[i] = "related"
+					case 8:
+						states[i] = "new"
+					case 64:
+						states[i] = "untracked"
+					}
+				}
+				slices.Sort(states)
+				fields[index] = strings.Join(states, ",")
+			}
 			if prefix, err := netip.ParsePrefix(field); err == nil {
 				prefix = prefix.Masked()
 				fields[index] = prefix.String()

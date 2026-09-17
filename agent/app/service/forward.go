@@ -75,7 +75,7 @@ func (s *ForwardingService) LoadBaseInfo() (dto.FirewallSubsystemStatus, error) 
 	baseInfo := dto.FirewallSubsystemStatus{
 		Version: "-", Name: forwardingDisplayName(selected), Backend: selected, SyncError: lastForwardingSyncError(),
 	}
-	manager, err := s.manager()
+	manager, err := s.managerFactory()
 	if err != nil {
 		if errors.Is(err, errForwardingBackendUnavailable) {
 			baseInfo.Reason = constant.FirewallBackendNotInstalled
@@ -124,7 +124,7 @@ func (s *ForwardingService) SearchRules(request dto.ForwardRuleSearch) (int64, [
 	if err != nil {
 		return 0, nil, err
 	}
-	manager, err := s.manager()
+	manager, err := s.managerFactory()
 	if err != nil {
 		return 0, nil, err
 	}
@@ -244,7 +244,7 @@ func (s *ForwardingService) operateRules(ctx context.Context, request dto.Forwar
 func (s *ForwardingService) Enable() error {
 	forwardingMutationMu.Lock()
 	defer forwardingMutationMu.Unlock()
-	manager, err := s.manager()
+	manager, err := s.managerFactory()
 	if err != nil {
 		recordForwardingSyncError(err)
 		return err
@@ -283,7 +283,7 @@ func (s *ForwardingService) QueueInitialization(
 		forwardingMutationMu.Lock()
 		defer forwardingMutationMu.Unlock()
 		var err error
-		manager, err = s.manager()
+		manager, err = s.managerFactory()
 		if err != nil {
 			recordForwardingSyncError(err)
 			return err
@@ -329,7 +329,7 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 		}
 		return err
 	}
-	manager, err := s.manager()
+	manager, err := s.managerFactory()
 	if err != nil {
 		recordForwardingSyncError(err)
 		return err
@@ -349,7 +349,7 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 }
 
 func (s *ForwardingService) reconcile(rules []forwarding.Rule) error {
-	manager, err := s.manager()
+	manager, err := s.managerFactory()
 	if err != nil {
 		return err
 	}
@@ -546,10 +546,6 @@ func forwardingOperationsOnlyRemove(operations []dto.ForwardRuleOperation) bool 
 		}
 	}
 	return true
-}
-
-func (s *ForwardingService) manager() (*forwarding.Manager, error) {
-	return s.managerFactory()
 }
 
 func newForwardingManager() (*forwarding.Manager, error) {

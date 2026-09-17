@@ -42,6 +42,10 @@ func RuleMatchesPortWhitelist(rule FirewallRule, ports []PortWhitelist) bool {
 	if err != nil || rule.Action != ActionAccept || rule.SourcePort != "" || rule.DestinationAddress != "" || rule.Interface != "" || len(rule.ConnectionStates) != 0 {
 		return false
 	}
+	if rule.Scope.Provider == ProviderFirewalld && (rule.NativeKind == NativeKindZonePort ||
+		(rule.NativeKind == NativeKindRule && rule.Scope.Family == FamilyInet && rule.Priority == nil)) {
+		return false
+	}
 	families := []Family{rule.Scope.Family}
 	if rule.Scope.Family == FamilyInet {
 		families = []Family{FamilyIPv4, FamilyIPv6}
