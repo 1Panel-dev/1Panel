@@ -3,6 +3,7 @@ package components
 import (
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -526,7 +527,61 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 	}
 
 	newDir.Block = block
-	s.UpdateDirectiveBySecondKey("if", "($scheme", newDir)
+	directives := make([]IDirective, 0, len(s.Directives)+1)
+	insertAt := -1
+	for _, dir := range s.Directives {
+		params := dir.GetParameters()
+		isHTTPRedirect := isHTTP2HTTPSRedirect(dir)
+		isRedirectInclude := dir.GetName() == "include" && len(params) > 0 &&
+			strings.HasSuffix(strings.Trim(params[0], "\"'"), "/redirect/*.conf")
+		if insertAt == -1 && (isHTTPRedirect || isRedirectInclude) {
+			insertAt = len(directives)
+		}
+		if !isHTTPRedirect {
+			directives = append(directives, dir)
+		}
+	}
+	if insertAt == -1 {
+		insertAt = len(directives)
+	}
+	directives = append(directives, nil)
+	copy(directives[insertAt+1:], directives[insertAt:])
+	directives[insertAt] = &newDir
+	s.Directives = directives
+}
+
+func isHTTP2HTTPSRedirect(dir IDirective) bool {
+	condition := strings.Join(dir.GetParameters(), " ")
+	normalizedCondition := strings.Join(strings.Fields(condition), "")
+	if dir.GetName() != "if" || normalizedCondition != "($scheme=http)" || dir.GetBlock() == nil {
+		return false
+	}
+	var returnDirective IDirective
+	for _, child := range dir.GetBlock().GetDirectives() {
+		if _, ok := child.(*Comment); ok {
+			continue
+		}
+		if returnDirective != nil || child.GetName() != "return" || child.GetBlock() != nil {
+			return false
+		}
+		returnDirective = child
+	}
+	if returnDirective == nil {
+		return false
+	}
+	params := returnDirective.GetParameters()
+	if len(params) != 2 || params[0] != "301" {
+		return false
+	}
+	if params[1] == "https://$host$request_uri" {
+		return true
+	}
+	port, ok := strings.CutPrefix(params[1], "https://$host:")
+	if !ok || !strings.HasSuffix(port, "$request_uri") {
+		return false
+	}
+	value, err := strconv.ParseUint(strings.TrimSuffix(port, "$request_uri"), 10, 16)
+	return err == nil && value > 0
 }
 
 func (s *Server) UpdateAllowIPs(ips []string) {
