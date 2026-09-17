@@ -218,13 +218,16 @@ const columns = ref([
                 ),
             ];
 
-            if (rowData.name === '1panel-agent') {
+            if (
+                rowData.name === '1panel-agent' ||
+                (rowData.name === '1panel-core' && (!currentNode.value || currentNode.value === 'local'))
+            ) {
                 buttons.push(
                     h(
                         ElButton,
                         {
                             type: 'text',
-                            onClick: openRuntimeDiagnostics,
+                            onClick: () => openRuntimeDiagnostics(rowData.name),
                         },
                         () => i18n.global.t('monitor.runtimeDiagnostics'),
                     ),
@@ -275,8 +278,8 @@ const openDetail = (row: any) => {
     detailRef.value.acceptParams(row.PID);
 };
 
-const openRuntimeDiagnostics = () => {
-    runtimeDiagnosticsRef.value?.acceptParams();
+const openRuntimeDiagnostics = (name: string) => {
+    runtimeDiagnosticsRef.value?.acceptParams(name === '1panel-core' ? 'core' : 'agent');
 };
 
 const changeSort = ({ key, order }) => {
