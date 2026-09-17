@@ -41,16 +41,18 @@ export const loadMonitorSetting = (currentNode?: string) => {
 export const updateMonitorSetting = (key: string, value: string) => {
     return http.post(`/hosts/monitor/setting/update`, { key: key, value: value });
 };
-export const loadRuntimeDiagnosticsSummary = (currentNode?: string) => {
+export type RuntimeDiagnosticsTarget = 'agent' | 'core';
+
+export const loadRuntimeDiagnosticsSummary = (currentNode?: string, target: RuntimeDiagnosticsTarget = 'agent') => {
     return http.get<Host.RuntimeDiagnosticsSummary>(
-        `/hosts/diagnostics/summary`,
+        `${target === 'core' ? '/core' : ''}/hosts/diagnostics/summary`,
         {},
         currentNode ? { headers: { CurrentNode: currentNode } } : {},
     );
 };
-export const loadRuntimeGoroutines = (currentNode?: string) => {
+export const loadRuntimeGoroutines = (currentNode?: string, target: RuntimeDiagnosticsTarget = 'agent') => {
     return http.get<Host.RuntimeGoroutineSnapshot>(
-        `/hosts/diagnostics/goroutines`,
+        `${target === 'core' ? '/core' : ''}/hosts/diagnostics/goroutines`,
         {},
         currentNode ? { headers: { CurrentNode: currentNode } } : {},
     );
@@ -72,13 +74,21 @@ const parseRuntimeProfileError = async (data: unknown) => {
         return new RuntimeProfileDownloadError();
     }
 };
-export const createRuntimeProfile = async (params: Host.RuntimeProfileCreate, currentNode?: string) => {
+export const createRuntimeProfile = async (
+    params: Host.RuntimeProfileCreate,
+    currentNode?: string,
+    target: RuntimeDiagnosticsTarget = 'agent',
+) => {
     try {
-        const data = await http.download<Blob>(`/hosts/diagnostics/profiles`, params, {
-            responseType: 'blob',
-            timeout: TimeoutEnum.T_60S,
-            headers: currentNode ? { CurrentNode: currentNode } : undefined,
-        });
+        const data = await http.download<Blob>(
+            `${target === 'core' ? '/core' : ''}/hosts/diagnostics/profiles`,
+            params,
+            {
+                responseType: 'blob',
+                timeout: TimeoutEnum.T_60S,
+                headers: currentNode ? { CurrentNode: currentNode } : undefined,
+            },
+        );
         const profileError = await parseRuntimeProfileError(data);
         if (profileError) {
             throw profileError;

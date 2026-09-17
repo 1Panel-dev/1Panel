@@ -10697,6 +10697,89 @@
 				}
 			}
 		},
+		"/core/hosts/diagnostics/goroutines": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeGoroutineSnapshot"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load Core grouped goroutine snapshot",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
+		"/core/hosts/diagnostics/profiles": {
+			"post": {
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeProfileCreate"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"type": "file"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Capture Core runtime profile",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
+		"/core/hosts/diagnostics/summary": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RuntimeDiagnosticsSummary"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load Core runtime diagnostics summary",
+				"tags": [
+					"RuntimeDiagnostics"
+				]
+			}
+		},
 		"/core/logs/clean": {
 			"post": {
 				"consumes": [
