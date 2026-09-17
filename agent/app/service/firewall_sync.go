@@ -106,6 +106,7 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 		}
 		for _, native := range desired {
 			rule := native.Rule
+			native.Protected = filter.RuleMatchesPortWhitelist(rule, ports)
 			rules = append(rules, &firewallSyncRule{desired: native, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: record.UUID, Rule: &rule}})
 		}
 	}
@@ -210,7 +211,7 @@ func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto
 		}
 		drifted := firewallsync.RuleOrder(snapshot, ordered)
 		for _, rule := range scoped {
-			if !drifted[rule.desired.Marker] {
+			if rule.desired.Protected || !drifted[rule.desired.Marker] {
 				continue
 			}
 			if rule.Status == firewallsync.StatusExisting {
@@ -586,7 +587,12 @@ func (s *FirewallService) syncSystemRules(
 		return dto.FirewallRuleSyncResult{}, err
 	}
 	if running.Executing {
-		return runningFirewallRuleSyncResult(request, running.TaskID), nil
+		return dto.FirewallRuleSyncResult{
+			Subsystem:      firewallSyncSubsystem(request.Subsystem),
+			TargetProvider: request.TargetProvider,
+			TaskID:         running.TaskID,
+			Queued:         true,
+		}, nil
 	}
 	if firewallSyncSubsystem(request.Subsystem) != "system" {
 		return dto.FirewallRuleSyncResult{}, fmt.Errorf("%w: firewall synchronization tasks are only available for the system firewall", filter.ErrInvalidRule)
@@ -658,15 +664,6 @@ func currentFirewallRuleSyncTaskLocked() (dto.FirewallRuleSyncTask, error) {
 		return dto.FirewallRuleSyncTask{}, err
 	}
 	return dto.FirewallRuleSyncTask{TaskID: record.ID, Executing: true}, nil
-}
-
-func runningFirewallRuleSyncResult(request dto.FirewallRuleSyncRequest, taskID string) dto.FirewallRuleSyncResult {
-	return dto.FirewallRuleSyncResult{
-		Subsystem:      firewallSyncSubsystem(request.Subsystem),
-		TargetProvider: request.TargetProvider,
-		TaskID:         taskID,
-		Queued:         true,
-	}
 }
 
 func whitelistRules(provider filter.Provider, ports, required []firewall.SystemPort) []filter.FirewallRule {
@@ -747,6 +744,10 @@ func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
 	if len(failures) > 0 {
 		return errors.Join(failures...)
 	}
+	if provider == filter.ProviderUFW && len(prepared) > 0 {
+		return s.syncUFWPortWhitelist(ctx, prepared)
+	}
+
 	for _, item := range prepared {
 		if err := ctx.Err(); err != nil {
 			return err
@@ -757,6 +758,55 @@ func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
 		}
 	}
 	return errors.Join(failures...)
+}
+
+func (s *FirewallService) syncUFWPortWhitelist(ctx context.Context, prepared []preparedFirewallRuleCreate) error {
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	runtime := prepared[0].runtime
+	snapshots, err := runtime.ObserveScopes(ctx, filter.ManagedInputScopes(filter.ProviderUFW))
+	if err != nil {
+		return err
+	}
+	for itemIndex, item := range prepared {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		rule := item.request.Rule
+		var snapshot *filter.Snapshot
+		for index := range snapshots {
+			if snapshots[index].Scope.Key() == rule.Scope.Key() {
+				snapshot = &snapshots[index]
+				break
+			}
+		}
+		if snapshot == nil {
+			return fmt.Errorf("%w: missing UFW whitelist scope %s", filter.ErrInventoryUnavailable, rule.Scope.Key())
+		}
+		for _, notice := range snapshot.Notices {
+			if notice.Code == filter.ScopeNoticeManagedScopeInactive || notice.Code == filter.ScopeNoticeManagedScopeMissing {
+				return filter.ErrProviderUnavailable
+			}
+		}
+		added, err := s.addWhitelistRuleFromSnapshot(ctx, item, *snapshot)
+		if err != nil {
+			return fmt.Errorf("add whitelist rule %s %s/%s [%s]: %w", rule.Scope.Family, rule.DestinationPort, rule.Protocol, rule.SourceAddress, err)
+		}
+		if !added {
+			continue
+		}
+
+		if itemIndex+1 < len(prepared) {
+			if err := ctx.Err(); err != nil {
+				return err
+			}
+			snapshots, err = runtime.ObserveScopes(ctx, filter.ManagedInputScopes(filter.ProviderUFW))
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func (s *FirewallService) addWhitelistRule(ctx context.Context, prepared preparedFirewallRuleCreate) error {
@@ -770,38 +820,85 @@ func (s *FirewallService) addWhitelistRule(ctx context.Context, prepared prepare
 	if err != nil {
 		return err
 	}
+	_, err = s.addWhitelistRuleFromSnapshot(ctx, prepared, snapshot)
+	return err
+}
+
+func (s *FirewallService) addWhitelistRuleFromSnapshot(ctx context.Context, prepared preparedFirewallRuleCreate, snapshot filter.Snapshot) (bool, error) {
+	rule, runtime := prepared.request.Rule, prepared.runtime
 	for _, observed := range snapshot.Rules {
 		if observed.ParseStatus == filter.ParseStatusSupported {
 			if same, err := filter.SameRuleContent(rule, observed.Rule); err == nil && same {
-				return nil
+				return false, nil
 			}
 		}
 	}
 	if err := filter.CheckObservedRuleCollisions(snapshot, rule, nil); err != nil {
-		return err
+		return false, err
 	}
 	if rule.Scope.Chain == filter.BasicBeforeChain {
+		position := int64(1)
+		rule.OrderIndex = &position
 		rule.UUID = uuid.NewString()
-		return runtime.ExecuteCreate(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
+		return true, runtime.ExecuteCreate(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}})
 	}
 	stored, err := s.rules.List(ctx)
 	if err != nil {
-		return err
+		return false, err
 	}
+	model.SortFirewallRules(stored, rule.Scope.Provider)
+	markers := make([]string, 0, len(stored))
+	var existing *filter.DesiredRule
+	var firstSequence *int64
 	for _, record := range stored {
 		compiled, err := s.compileStoredFirewallRules(ctx, record, rule.Scope.Provider)
 		if err != nil {
-			continue
+			if isFirewallPolicyIncompatible(err) {
+				continue
+			}
+			return false, err
 		}
 		for _, candidate := range compiled {
+			if candidate.Rule.Scope.Key() == rule.Scope.Key() && candidate.Marker != "" {
+				markers = append(markers, candidate.Marker)
+				if firstSequence == nil && record.Sequence != nil {
+					firstSequence = record.Sequence
+				}
+			}
 			if err := filter.CheckRuleCollision(rule, candidate.Rule); errors.Is(err, filter.ErrRuleOperation) {
-				return runtime.ExecuteCreate(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &candidate.Rule}})
+				copy := candidate
+				existing = &copy
 			} else if err != nil {
-				return err
+				return false, err
 			}
 		}
 	}
-	return s.applyCreateRules(ctx, runtime, snapshot, stored, []preparedFirewallRuleCreate{prepared})[0]
+	if existing != nil {
+		existing.Rule.OrderIndex = firewallsync.InsertionPosition(snapshot, markers, existing.Marker)
+		return true, runtime.ExecuteCreate(ctx, snapshot, []filter.DesiredChange{{
+			Operation: filter.ChangeCreate, After: &existing.Rule,
+			Append: rule.Scope.Provider == filter.ProviderUFW && existing.Rule.OrderIndex == nil,
+		}})
+	}
+	if rule.Scope.Provider != filter.ProviderFirewalld {
+		position := int64(1)
+		rule.OrderIndex = &position
+		record, err := firewallRuleModelForCreate(rule, prepared.request, constant.FirewallRuleOriginCreated)
+		if err != nil {
+			return false, err
+		}
+		sequence := model.FirewallRuleSequenceStep
+		if firstSequence != nil {
+			sequence = *firstSequence - model.FirewallRuleSequenceStep
+		}
+		record.UUID, record.Sequence = uuid.NewString(), &sequence
+		rule.UUID = record.UUID
+		if err := runtime.ExecuteCreate(ctx, snapshot, []filter.DesiredChange{{Operation: filter.ChangeCreate, After: &rule}}); err != nil {
+			return false, firewallCreateExecutionError(err)
+		}
+		return true, s.saveFirewallRule(ctx, &record)
+	}
+	return true, s.applyCreateRules(ctx, runtime, snapshot, stored, []preparedFirewallRuleCreate{prepared})[0]
 }
 
 type forwardingRuleSyncCandidate struct {
@@ -813,7 +910,7 @@ func (s *ForwardingService) loadRuleSyncCandidates(
 	ctx context.Context,
 	targetProvider filter.Provider,
 ) (*forwarding.Manager, []forwardingRuleSyncCandidate, []forwarding.Rule, bool, error) {
-	target, err := s.manager()
+	target, err := s.managerFactory()
 	if err != nil {
 		return nil, nil, nil, false, err
 	}

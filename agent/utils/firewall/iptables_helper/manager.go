@@ -61,7 +61,7 @@ func (m *Manager) Operate(operation firewall.BaseOperation) error {
 
 func (m *Manager) enableBase(prepare bool) error {
 	if prepare {
-		if err := ensureBaseChains(); err != nil {
+		if err := ensureBaseChainsFamily(false); err != nil {
 			return err
 		}
 		if err := m.initPreRules(); err != nil {
@@ -71,7 +71,7 @@ func (m *Manager) enableBase(prepare bool) error {
 			return err
 		}
 	}
-	if err := bindBaseChains(); err != nil {
+	if err := setBaseChainBindings(false, true); err != nil {
 		return err
 	}
 	if prepare {
@@ -95,10 +95,6 @@ func (m *Manager) disableBase() error {
 		return err
 	}
 	return m.updateSetting("IptablesStatus", constant.StatusDisable)
-}
-
-func ensureBaseChains() error {
-	return ensureBaseChainsFamily(false)
 }
 
 func ensureBaseChainsFamily(ipv6 bool) error {
@@ -167,10 +163,6 @@ func cleanupBaseChains(ipv6 bool) error {
 		return fmt.Errorf("batch delete base chains: %w", err)
 	}
 	return nil
-}
-
-func bindBaseChains() error {
-	return setBaseChainBindings(false, true)
 }
 
 func setBaseChainBindings(ipv6, bind bool) error {
@@ -250,7 +242,7 @@ func RestoreBaseChains(requiredPorts []firewall.PortWhitelist) error {
 	if err != nil {
 		return err
 	}
-	if err := ensureBaseChains(); err != nil {
+	if err := ensureBaseChainsFamily(false); err != nil {
 		return err
 	}
 	input, err := buildBaseChainsRestoreScript(global.Dir.FirewallDir, false, requiredPorts...)
@@ -320,6 +312,9 @@ func buildBaseChainsRestoreScript(firewallDir string, ipv6 bool, requiredPorts .
 	}
 	for _, rule := range defaults {
 		if !containsIptablesRule(script.String(), rule) {
+			if strings.HasPrefix(rule, "-A "+BasicBeforeChain+" ") && strings.Contains(rule, " --dport ") {
+				rule = strings.Replace(rule, "-A "+BasicBeforeChain+" ", "-I "+BasicBeforeChain+" 1 ", 1)
+			}
 			script.WriteString(rule + "\n")
 		}
 	}
@@ -442,7 +437,7 @@ func buildRequiredPortsRestoreScript(
 	for _, rule := range desired {
 		line := iptablesSystemPortRuleLine(rule)
 		if rule.Family == family && !containsIptablesRule(beforeRaw, line) {
-			commands = append(commands, line)
+			commands = append(commands, strings.Replace(line, "-A "+BasicBeforeChain+" ", "-I "+BasicBeforeChain+" 1 ", 1))
 			beforeRaw += "\n" + line
 		}
 	}

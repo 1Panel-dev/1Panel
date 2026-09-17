@@ -336,8 +336,12 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
 		command := insertCommand(position, normalized, marker)
-		if change.Append || position == maximumObservedPosition(snapshot)+1 {
+		if !change.Append && normalized.OrderIndex != nil && position == 1 {
+			command = filter.NativeCommand{Executable: "ufw", Args: append([]string{"prepend"}, compileRuleArgs(normalized, marker)...)}
+		} else if change.Append || position == maximumObservedPosition(snapshot)+1 {
 			command = commentCommand(normalized, marker)
+		}
+		if command.Args[0] != "insert" {
 			plan.Expected.Locator.NativeID = ""
 			plan.Expected.Locator.Position = nil
 		}
@@ -740,7 +744,7 @@ func validateCommand(command filter.NativeCommand) error {
 		return nil
 	}
 	switch first {
-	case "insert", "allow", "deny", "reject":
+	case "insert", "prepend", "allow", "deny", "reject":
 		return nil
 	default:
 		return fmt.Errorf("%w: unsupported ufw command %q", filter.ErrInvalidRule, first)

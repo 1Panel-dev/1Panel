@@ -246,7 +246,6 @@ const familyRetrying = ref(false);
 const taskLogRef = ref();
 const lifecycleSubmitting = ref(false);
 const lifecycleBusy = computed(() => lifecycleSubmitting.value || !!baseInfo.value.lifecycleTaskID);
-let lifecycleTimer: ReturnType<typeof setTimeout>;
 let disposed = false;
 let baseInfoRequestID = 0;
 const backendName = computed(() => baseInfo.value.backend || baseInfo.value.name);
@@ -306,7 +305,7 @@ const initActionHelper = computed(() => {
 });
 
 const acceptParams = (): void => {
-    loadBaseInfo(true);
+    loadBaseInfo();
     loadDocker();
 };
 const emit = defineEmits([
@@ -319,14 +318,12 @@ const emit = defineEmits([
     'update:version',
 ]);
 
-const loadBaseInfo = async (search: boolean) => {
+const loadBaseInfo = async () => {
     if (disposed) return;
     const requestID = ++baseInfoRequestID;
-    clearTimeout(lifecycleTimer);
     try {
         const res = await (props.currentTab === 'forward' ? loadForwardBaseInfo() : loadFireBaseInfo(props.currentTab));
         if (disposed || requestID !== baseInfoRequestID) return;
-        const lifecycleCompleted = Boolean(baseInfo.value.lifecycleTaskID) && !res.data.lifecycleTaskID;
         baseInfo.value = {
             ...res.data,
             ipv4: res.data.ipv4 || { available: true, initialized: res.data.isInit, bound: res.data.isBind },
@@ -347,7 +344,7 @@ const loadBaseInfo = async (search: boolean) => {
         emit('update:is-bind', isDirectManaged.value ? anyFamilyBound.value : baseInfo.value.isBind);
         emit('update:version', baseInfo.value.version);
 
-        if ((search || lifecycleCompleted) && !baseInfo.value.lifecycleTaskID) {
+        if (!baseInfo.value.lifecycleTaskID) {
             await nextTick();
             emit('search');
         } else {
@@ -359,10 +356,6 @@ const loadBaseInfo = async (search: boolean) => {
         emit('update:is-init', false);
         emit('update:name', '-');
         emit('update:version', '');
-    } finally {
-        if (!disposed && requestID === baseInfoRequestID && baseInfo.value.lifecycleTaskID) {
-            lifecycleTimer = setTimeout(() => loadBaseInfo(false), 3000);
-        }
     }
 };
 
@@ -413,11 +406,11 @@ const onInit = async () => {
         }
     }
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    await loadBaseInfo(true);
+    await loadBaseInfo();
 };
 
 const handleInitializationTaskClose = () => {
-    loadBaseInfo(true);
+    loadBaseInfo();
 };
 
 const onBind = async () => {
@@ -431,7 +424,7 @@ const onBind = async () => {
     }
     await operateFilterChain('1PANEL_BASIC', 'bind-base');
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    await loadBaseInfo(true);
+    await loadBaseInfo();
 };
 
 const onRetryFamilyIssues = async () => {
@@ -448,7 +441,7 @@ const onRetryFamilyIssues = async () => {
             await operateFilterChain('1PANEL_BASIC', 'bind-base');
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await loadBaseInfo(true);
+        await loadBaseInfo();
     } finally {
         familyRetrying.value = false;
     }
@@ -465,7 +458,7 @@ const onUnBind = async () => {
     }
     await operateFilterChain('1PANEL_BASIC', 'unbind-base');
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-    await loadBaseInfo(true);
+    await loadBaseInfo();
 };
 
 const onOperate = async (op: string) => {
@@ -499,13 +492,12 @@ const submitLifecycleOperation = async (restartDocker: boolean) => {
             baseInfo.value.lifecycleTaskID = result.taskID;
             emit('update:loading', false);
             openLifecycleTask();
-            await loadBaseInfo(false);
             return;
         }
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await loadBaseInfo(true);
+        await loadBaseInfo();
     } catch {
-        if (!disposed) await loadBaseInfo(true);
+        if (!disposed) await loadBaseInfo();
     } finally {
         lifecycleSubmitting.value = false;
     }
@@ -513,7 +505,6 @@ const submitLifecycleOperation = async (restartDocker: boolean) => {
 
 onBeforeUnmount(() => {
     disposed = true;
-    clearTimeout(lifecycleTimer);
 });
 
 defineExpose({

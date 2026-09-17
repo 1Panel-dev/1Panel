@@ -871,12 +871,8 @@ const loadAllInventoryItems = async () => {
     return response.data.items || [];
 };
 
-const resetPagination = () => {
-    paginationConfig.currentPage = 1;
-};
-
 const searchWithReset = () => {
-    resetPagination();
+    paginationConfig.currentPage = 1;
     return searchPage();
 };
 
