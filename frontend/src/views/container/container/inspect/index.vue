@@ -63,16 +63,18 @@
                 </el-descriptions>
 
                 <span class="envTitle">{{ $t('container.env') }}</span>
-                <el-collapse accordion :title="$t('container.env')">
+                <el-collapse v-if="inspectData?.Config?.Env?.length" class="env-list" accordion>
                     <el-collapse-item v-for="(env, index) in inspectData?.Config?.Env" :key="index" :name="index">
                         <template #title>
-                            <el-text class="text-sm">{{ getEnvKey(env) }}</el-text>
+                            <el-text class="env-key text-sm">{{ getEnvKey(env) }}</el-text>
                         </template>
-                        <el-text class="text-xs break-all">{{ getEnvValue(env) }}</el-text>
-                        <CopyButton :content="getEnvValue(env)" />
+                        <div class="env-value">
+                            <el-text class="text-xs">{{ getEnvValue(env) }}</el-text>
+                            <CopyButton :content="getEnvValue(env)" />
+                        </div>
                     </el-collapse-item>
                 </el-collapse>
-                <el-empty v-if="!inspectData?.Config?.Env?.length" :description="$t('commons.msg.noneData')" />
+                <el-empty v-else :description="$t('commons.msg.noneData')" />
             </el-tab-pane>
 
             <el-tab-pane :label="$t('container.network')" name="network">
@@ -279,28 +281,89 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.break-all {
-    word-break: break-all;
-}
-
 :deep(.el-descriptions__label) {
     width: 180px;
-    background-color: transparent !important;
+    background-color: var(--el-fill-color-lighter);
+}
+
+:deep(.el-descriptions__content) {
+    overflow-wrap: anywhere;
 }
 
 .envTitle {
     font-size: 16px;
+    font-weight: 700;
     color: var(--el-text-color-primary);
     margin-top: 20px;
     margin-bottom: 16px;
     display: block;
 }
 
+.env-list {
+    border: 1px solid var(--el-border-color-light);
+    border-radius: var(--el-border-radius-base);
+    overflow: hidden;
+
+    :deep(.el-collapse-item + .el-collapse-item) {
+        border-top: 1px solid var(--el-border-color-light);
+    }
+
+    :deep(.el-collapse-item__header) {
+        height: auto;
+        min-height: 48px;
+        padding: 8px 12px;
+        border: none;
+        line-height: 1.5;
+    }
+
+    :deep(.el-collapse-item__wrap) {
+        border-bottom: none;
+    }
+
+    :deep(.el-collapse-item__content) {
+        padding: 0 12px 12px;
+    }
+}
+
+.env-key {
+    overflow-wrap: anywhere;
+    text-align: left;
+}
+
+.env-value {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 12px;
+    background-color: var(--el-fill-color-lighter);
+    border-radius: var(--el-border-radius-base);
+
+    .el-text {
+        flex: 1;
+        min-width: 0;
+        align-self: flex-start;
+        overflow-wrap: anywhere;
+        white-space: pre-wrap;
+    }
+
+    .el-button {
+        flex-shrink: 0;
+        margin-left: 0;
+    }
+}
+
 .tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+
     .el-tag {
-        & ~ .el-tag {
-            margin-left: 5px;
-        }
+        max-width: 100%;
+        height: auto;
+        padding: 4px 8px;
+        line-height: 20px;
+        white-space: normal;
+        overflow-wrap: anywhere;
     }
 }
 </style>
