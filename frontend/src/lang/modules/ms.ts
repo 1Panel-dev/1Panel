@@ -7129,7 +7129,8 @@ const message = {
                 partial_file: 'Fail tidak lengkap',
             },
             diskSize: 'Saiz Cakera',
-            isoHelper: 'ISO digunakan untuk memulakan mesin maya buat kali pertama dan memasang sistem pengendalian.',
+            isoHelper:
+                'Pasang berbilang ISO. Pilih pemasang sistem pengendalian dahulu, kemudian imej pemacu seperti VirtIO. Setiap imej menggunakan pemacu CD-ROM yang berasingan.',
             osType: 'Jenis sistem pengendalian',
             osOther: 'Lain-lain',
             diskBus: 'Bas cakera',

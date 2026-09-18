@@ -6596,7 +6596,7 @@ const message = {
                 partial_file: '未完成文件',
             },
             diskSize: '磁盘容量',
-            isoHelper: '镜像用于虚拟机首次启动并安装操作系统。',
+            isoHelper: '支持挂载多个 ISO。请先选择系统安装镜像，再选择 VirtIO 等驱动镜像；每个镜像使用独立光驱。',
             osType: '操作系统类型',
             osOther: '其他',
             diskBus: '磁盘总线',

@@ -6871,7 +6871,8 @@ const message = {
                 partial_file: '미완료 파일',
             },
             diskSize: '디스크 용량',
-            isoHelper: 'ISO는 가상 머신을 처음 부팅하고 운영 체제를 설치하는 데 사용됩니다.',
+            isoHelper:
+                '여러 ISO를 연결할 수 있습니다. 운영 체제 설치 이미지를 먼저 선택한 다음 VirtIO 등의 드라이버 이미지를 선택하세요. 각 이미지는 별도의 CD-ROM 드라이브를 사용합니다.',
             osType: '운영 체제 유형',
             osOther: '기타',
             diskBus: '디스크 버스',
