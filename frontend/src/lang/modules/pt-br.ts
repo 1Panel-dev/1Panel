@@ -7171,7 +7171,7 @@ const message = {
             },
             diskSize: 'Tamanho do Disco',
             isoHelper:
-                'A ISO é usada para iniciar a máquina virtual pela primeira vez e instalar um sistema operacional.',
+                'Monte vários ISOs. Selecione primeiro o instalador do sistema operacional e depois as imagens de drivers, como VirtIO. Cada imagem usa uma unidade de CD-ROM separada.',
             osType: 'Tipo de sistema operacional',
             osOther: 'Outro',
             diskBus: 'Barramento de disco',

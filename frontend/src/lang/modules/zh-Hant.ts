@@ -6533,7 +6533,7 @@ const message = {
                 partial_file: '未完成檔案',
             },
             diskSize: '磁碟容量',
-            isoHelper: '鏡像用於虛擬機首次啟動並安裝作業系統。',
+            isoHelper: '支援掛載多個 ISO。請先選擇系統安裝映像，再選擇 VirtIO 等驅動程式映像；每個映像使用獨立光碟機。',
             osType: '作業系統類型',
             osOther: '其他',
             diskBus: '磁碟匯流排',

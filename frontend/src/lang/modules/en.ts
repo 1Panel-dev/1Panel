@@ -7019,7 +7019,8 @@ const message = {
                 partial_file: 'Incomplete File',
             },
             diskSize: 'Disk Size',
-            isoHelper: 'The ISO is used to boot the VM for the first time and install an operating system.',
+            isoHelper:
+                'Mount multiple ISOs. Select the operating system installer first, then driver images such as VirtIO. Each image uses a separate CD-ROM drive.',
             osType: 'Operating System Type',
             osOther: 'Other',
             diskBus: 'Disk Bus',

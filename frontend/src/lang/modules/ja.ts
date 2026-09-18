@@ -7009,7 +7009,8 @@ const message = {
                 partial_file: '未完了ファイル',
             },
             diskSize: 'ディスク容量',
-            isoHelper: 'ISO は仮想マシンの初回起動と OS のインストールに使用します。',
+            isoHelper:
+                '複数の ISO をマウントできます。OS のインストールイメージを先に選択し、次に VirtIO などのドライバーイメージを選択してください。各イメージは個別の CD-ROM ドライブを使用します。',
             osType: 'OS タイプ',
             osOther: 'その他',
             diskBus: 'ディスクバス',

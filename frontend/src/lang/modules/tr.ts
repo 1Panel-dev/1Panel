@@ -7132,7 +7132,8 @@ const message = {
                 partial_file: 'Tamamlanmamış dosya',
             },
             diskSize: 'Disk Boyutu',
-            isoHelper: 'ISO, sanal makineyi ilk kez başlatmak ve bir işletim sistemi kurmak için kullanılır.',
+            isoHelper:
+                'Birden fazla ISO bağlayabilirsiniz. Önce işletim sistemi kurulum imajını, ardından VirtIO gibi sürücü imajlarını seçin. Her imaj ayrı bir CD-ROM sürücüsü kullanır.',
             osType: 'İşletim sistemi türü',
             osOther: 'Diğer',
             diskBus: 'Disk veri yolu',
