@@ -63,7 +63,7 @@ const buttons = computed<Array<{ label: string; value: LocalTab }>>(() => {
 
 const currentTab = computed<LocalTab>(() => {
     const tab = route.query.tab;
-    if (tab === 'vllm' || tab === 'downloader' || (tab === 'tensorrt' && isFxplay.value)) {
+    if (tab === 'ollama' || tab === 'vllm' || tab === 'downloader' || (tab === 'tensorrt' && isFxplay.value)) {
         return tab;
     }
     if (tab === 'tensorrt') {
