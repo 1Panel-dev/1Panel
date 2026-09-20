@@ -469,7 +469,7 @@ func loadDiskInfo() []dto.DiskInfo {
 			cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
 			cmd.PipeCommand{Name: "awk", Args: []string{format}},
 		)
-		if err != nil {
+		if err != nil && strings.TrimSpace(stdout) == "" {
 			return datas
 		}
 	}

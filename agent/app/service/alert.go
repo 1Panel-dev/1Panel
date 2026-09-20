@@ -382,7 +382,7 @@ func executeDiskCommand() (string, error) {
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
 		stdout, err = cmdMgr2.RunWithStdout("df", "-lhT", "-P")
 	}
-	if err != nil {
+	if err != nil && strings.TrimSpace(stdout) == "" {
 		return stdout, err
 	}
 	var lines []string
