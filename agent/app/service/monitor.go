@@ -49,6 +49,8 @@ type IMonitorService interface {
 	UpdateSetting(key, value string) error
 	CleanData() error
 
+	LoadIOOptions() []string
+	LoadNetworkOptions() []string
 	LoadGPUOptions() dto.MonitorGPUOptions
 	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 
@@ -85,7 +87,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 				base.TopCPUItems = processes
 				base.TopCPU = ""
 			}
-			if req.Param == "all" || req.Param == "mem" {
+			if req.Param == "all" || req.Param == "memory" {
 				var processes []dto.Process
 				_ = json.Unmarshal([]byte(base.TopMem), &processes)
 				base.TopMemItems = processes
@@ -96,7 +98,11 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "io" {
-		bases, err := monitorRepo.GetIO(repo.WithByName(req.IO), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		ioOpts := []repo.DBOption{repo.WithByCreatedAt(req.StartTime, req.EndTime)}
+		if len(req.IO) != 0 {
+			ioOpts = append(ioOpts, repo.WithByName(req.IO))
+		}
+		bases, err := monitorRepo.GetIO(ioOpts...)
 		if err != nil {
 			return nil, err
 		}
@@ -110,7 +116,11 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "network" {
-		bases, err := monitorRepo.GetNetwork(repo.WithByName(req.Network), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		netOpts := []repo.DBOption{repo.WithByCreatedAt(req.StartTime, req.EndTime)}
+		if len(req.Network) != 0 {
+			netOpts = append(netOpts, repo.WithByName(req.Network))
+		}
+		bases, err := monitorRepo.GetNetwork(netOpts...)
 		if err != nil {
 			return nil, err
 		}
@@ -126,21 +136,78 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 	return data, nil
 }
 
+func (m *MonitorService) LoadIOOptions() []string {
+	optionSet := make(map[string]struct{})
+	if diskStat, err := disk.IOCounters(); err == nil {
+		for _, item := range diskStat {
+			optionSet[item.Name] = struct{}{}
+		}
+	}
+	// union with names recorded in the monitor db so removed devices stay selectable
+	if names, err := monitorRepo.GetIONames(); err == nil {
+		for _, name := range names {
+			optionSet[name] = struct{}{}
+		}
+	}
+	return sortedMonitorOptions(optionSet)
+}
+
+func (m *MonitorService) LoadNetworkOptions() []string {
+	optionSet := make(map[string]struct{})
+	if netStat, err := net.IOCounters(true); err == nil {
+		for _, item := range netStat {
+			optionSet[item.Name] = struct{}{}
+		}
+	}
+	if names, err := monitorRepo.GetNetworkNames(); err == nil {
+		for _, name := range names {
+			optionSet[name] = struct{}{}
+		}
+	}
+	return sortedMonitorOptions(optionSet)
+}
+
+func sortedMonitorOptions(optionSet map[string]struct{}) []string {
+	options := make([]string, 0, len(optionSet))
+	for name := range optionSet {
+		if len(name) != 0 && name != "all" {
+			options = append(options, name)
+		}
+	}
+	sort.Strings(options)
+	return append([]string{"all"}, options...)
+}
+
 func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 	var data dto.MonitorGPUOptions
 	exist, client := accelerator.New()
-	if !exist {
-		return data
+	if exist {
+		snapshot, err := client.Collect(context.Background())
+		if err != nil {
+			global.LOG.Errorf("Load accelerator info failed, err: %v", err)
+		} else {
+			if warning := snapshot.Warning(); warning != nil {
+				global.LOG.Warnf("Load accelerator info partially failed, err: %v", warning)
+			}
+			data = loadGPUOptions(snapshot)
+		}
 	}
-	snapshot, err := client.Collect(context.Background())
-	if err != nil {
-		global.LOG.Errorf("Load accelerator info failed, err: %v", err)
-		return data
+	// union with product names recorded in the monitor db so removed accelerators stay selectable
+	if names, err := monitorRepo.GetGPUProductNames(); err == nil {
+		present := make(map[string]struct{}, len(data.Options))
+		for _, name := range data.Options {
+			present[name] = struct{}{}
+		}
+		var extra []string
+		for _, name := range names {
+			if _, ok := present[name]; !ok && len(name) != 0 {
+				extra = append(extra, name)
+			}
+		}
+		sort.Strings(extra)
+		data.Options = append(data.Options, extra...)
 	}
-	if warning := snapshot.Warning(); warning != nil {
-		global.LOG.Warnf("Load accelerator info partially failed, err: %v", warning)
-	}
-	return loadGPUOptions(snapshot)
+	return data
 }
 
 func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
