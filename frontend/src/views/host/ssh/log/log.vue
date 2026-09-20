@@ -51,7 +51,7 @@
                     <el-table-column
                         prop="date"
                         :label="$t('commons.table.date')"
-                        :formatter="dateFormat"
+                        :formatter="dateFormatServerTimezone"
                         show-overflow-tooltip
                     />
                 </ComplexTable>
@@ -94,7 +94,7 @@
 
 <script setup lang="ts">
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
-import { dateFormat } from '@/utils/date';
+import { dateFormatServerTimezone } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
 import { onMounted, reactive, ref } from 'vue';
 import { cleanSSHLogs, exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
