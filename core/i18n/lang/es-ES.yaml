@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'Clave API inválida: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP no permitida: {{ .detail }}'
 ErrApiConfigDisable: 'API no permitida: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrApiConfigKeyExpired: "La clave API ha caducado. Ajusta su fecha de caducidad o reemplázala en la gestión de claves API del panel."
 ErrPasskeyDisabled: "Passkey requiere que HTTPS esté habilitado"
 ErrPasskeyNotConfigured: "No hay Passkey configurado"
 ErrPasskeyLimit: "Límite de Passkey alcanzado (máximo 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "La solicitud de cierre de sesión SAML2 ha caducado."
 ErrSAML2LogoutInvalid: "El mensaje de cierre de sesión SAML2 no es válido."
 ErrSAML2LocalCredentialsReadonly: "Los nombres de usuario y las contraseñas SAML2 los gestiona el proveedor de identidad y no pueden modificarse localmente."
 ErrSAML2PasswordExpirationUnsupported: "Los usuarios SAML2 no utilizan la política local de caducidad de contraseñas."
+
+# API key management
+ErrAPIKeyLimit: "Se alcanzó el límite de 20 claves API no revocadas por usuario"
+ErrAPIKeyConflict: "La clave API cambió. Actualice y reintente; al repetir la creación, use los parámetros originales"
+ErrAPIKeyNameExists: "Ya existe una clave API no revocada con este nombre"
+ErrAPIKeyNotFound: "La clave API no existe o no pertenece al usuario actual"
+ErrAPIKeyAppBindingDisabled: "Esta clave API no permite vincular la APP mediante código QR"
+ErrAPIKeyTerminalUpgradeRequired: "No se pudo verificar la autorización de terminal con clave API. Compruebe la conexión del nodo y actualice su Agent antes de reintentar."

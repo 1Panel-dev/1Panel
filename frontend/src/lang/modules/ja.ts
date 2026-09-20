@@ -1,6 +1,60 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: 'パネル API',
+        manage: 'API Key を管理',
+        personalEntry: '設定で自分のキー、アクセス条件、APP の QR 連携を管理します。',
+        create: 'API Key を作成',
+        legacy: '旧版キー',
+        identifier: 'キー識別子',
+        details: 'API Key の詳細',
+        quota: '新規キー {0} / {1}（無効・期限切れも含む。旧版キーは除く）',
+        statusEnable: '有効',
+        statusDisable: '無効',
+        statusRevoked: '失効済み',
+        statusExpired: '期限切れ',
+        specifiedIPs: '指定 IP',
+        anyIP: 'すべての IP',
+        ipHelp: '1 行に 1 つの IP または CIDR を入力します。すべての接続元を許可する場合は明示的に選択してください。',
+        signatureWindow: 'リクエスト署名の有効期間',
+        expiresAt: 'キーの有効期限',
+        never: '無期限',
+        futureExpiry: '現在より後の有効期限を選択してください。',
+        allowAppBinding: 'APP の QR 連携を許可',
+        bindingException:
+            'ログイン中のパネルで生成した使い捨て QR コードを通じて、このキーを再び携帯端末に渡すことを許可します。',
+        bindingDisableHelp:
+            'オフにすると今後の QR 配布のみ停止します。既存の接続はキーの無効化、失効、期限切れまで利用できます。',
+        saveSecret: '今すぐキーをコピーして保存してください。閉じると通常のキー管理から完全なキーを再表示できません。',
+        saved: 'キーを保存しました',
+        alreadyCreated:
+            'このキーは作成済みで、再表示できません。最初の応答を受け取れなかった場合は失効させて再作成するか、許可されていれば QR を使用してください。',
+        uncertain: 'リクエスト結果が不明です。重複を避けるため同じ設定で再試行するか、閉じて一覧を確認してください。',
+        legacyHelp: '旧版キーは既存接続との互換性を保ちます。切り替えとリセットはこのキーだけに影響します。',
+        showLegacy: '旧版キーを表示',
+        revoke: '失効させる',
+        revokeConfirm:
+            '「{0}」を失効させますか？新しいリクエストを拒否し、対応するターミナルを閉じます。元に戻せません。実行中のバックグラウンド処理は中止されません。',
+        disableConfirm:
+            '「{0}」を無効にしますか？新しいリクエストを拒否し、対応するターミナルを閉じます。実行中のバックグラウンド処理は中止されません。',
+        enableConfirm: '現在のアクセス条件で「{0}」を有効にしますか？',
+        bindingKey: 'APP 連携用キー',
+        selectKey: '自分のキーを選択',
+        noBindableKey: 'QR 連携できるキーがありません。新規作成するか、有効なキーの QR 連携を許可してください。',
+        appKeyExpired: '選択した API Key の有効期限が切れています。有効期限を延長するか、別のキーを選択してください。',
+        appSecurityHelp:
+            'モバイルアプリは、選択した API Key を使用して、そのキーを所有するアカウントと同じ権限でパネルにアクセスします。連携済みの端末は適切に管理してください。',
+        mobileIPHelp:
+            '携帯端末の送信元 IP が許可リストに一致する必要があります。ネットワークの切り替えで接続できなくなる場合があります。自動で許可範囲は広がりません。',
+        qrUnavailable: 'この QR は利用できません。更新して再生成してください。',
+        showQR: 'QR を表示',
+        hideQR: 'QR を非表示',
+        bindingNotAllowed: 'QR 連携は無効',
+        sameKeyDevices:
+            '複数端末で同じキーを共有すると同時に失効します。個別に管理する場合は端末ごとにキーを作成してください。',
+        closePending: 'キーの変更を保存しました。一部のリモートターミナルの終了は保留中で、再試行されます。',
+    },
     commons: {
         true: 'はい',
         false: 'いいえ',

@@ -1,6 +1,62 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: 'Panel API',
+        manage: 'Manage API Keys',
+        personalEntry: 'Manage your keys, access conditions, and APP binding in Settings.',
+        create: 'Create API Key',
+        legacy: 'Legacy Key',
+        identifier: 'Key identifier',
+        details: 'API Key details',
+        quota: '{0} / {1} new keys (disabled and expired keys count; the legacy key is excluded)',
+        statusEnable: 'Enabled',
+        statusDisable: 'Disabled',
+        statusRevoked: 'Revoked',
+        statusExpired: 'Expired',
+        specifiedIPs: 'Specified IPs',
+        anyIP: 'Any IP',
+        ipHelp: 'Enter one IP or CIDR per line. Select Any IP explicitly to allow all sources.',
+        signatureWindow: 'Signature validity window',
+        expiresAt: 'Key expiration',
+        never: 'Never expires',
+        futureExpiry: 'Select an expiration time in the future.',
+        allowAppBinding: 'Allow APP QR binding',
+        bindingException:
+            'Allow this key to be delivered again to a phone through a one-time QR code generated in your signed-in panel session.',
+        bindingDisableHelp:
+            'Turning off QR binding blocks future delivery. Existing connections remain valid until the key is disabled, revoked, or expires.',
+        saveSecret: 'Copy and save this secret now. After closing, ordinary key management cannot display it again.',
+        saved: 'I have saved the secret',
+        alreadyCreated:
+            'This key was already created. Its secret will not be shown again. If the original response was lost, revoke and recreate it, or use QR binding if allowed.',
+        uncertain:
+            'The request result is uncertain. Retry with the same details to avoid duplicate keys, or close and check the list before creating another.',
+        legacyHelp: 'The legacy key keeps existing connections compatible. Its switch and reset affect only that key.',
+        showLegacy: 'Show legacy secret',
+        revoke: 'Revoke',
+        revokeConfirm:
+            'Revoke “{0}”? New requests will be rejected and its terminal connections will be closed. This cannot be undone; running background jobs are not cancelled.',
+        disableConfirm:
+            'Disable “{0}”? New requests will be rejected and its terminal connections will be closed. Running background jobs are not cancelled.',
+        enableConfirm: 'Enable “{0}” with its current access conditions?',
+        bindingKey: 'Key for APP binding',
+        selectKey: 'Select your key',
+        noBindableKey:
+            'No key is available for QR binding. Create one or enable QR binding for an existing active key.',
+        appKeyExpired: 'The selected API Key has expired. Extend its expiration date or select another key.',
+        appSecurityHelp:
+            'The mobile app accesses the panel using the selected API Key and has the same permissions as the account that owns the key. Keep your bound devices secure.',
+        mobileIPHelp:
+            'The phone’s outgoing IP must match the key whitelist. Switching Wi-Fi or mobile networks may block access; the whitelist is never expanded automatically.',
+        qrUnavailable: 'This QR code is unavailable. Refresh to generate a new one.',
+        showQR: 'Show QR code',
+        hideQR: 'Hide QR code',
+        bindingNotAllowed: 'QR binding is off',
+        sameKeyDevices:
+            'Multiple devices may share this key and its revocation. Use a separate key for each device if you need independent control.',
+        closePending: 'The key change was saved. Closing remote terminal connections is pending and will be retried.',
+    },
     commons: {
         true: 'True',
         false: 'False',

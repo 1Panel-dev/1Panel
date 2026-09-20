@@ -341,12 +341,17 @@ func UpdateCurrentUserInfo(c *gin.Context, req dto.CurrentUserUpdate) error {
 
 func GenerateApiKey() (string, error) {
 	apiKey := common.RandStr(32)
-	if err := repo.NewISettingRepo().Update("ApiKey", apiKey); err != nil {
+	if err := WithLegacyAPIKeyMutation(func() error { return repo.NewISettingRepo().Update("ApiKey", apiKey) }); err != nil {
 		return "", err
 	}
 	return apiKey, nil
 }
+
 func UpdateApiConfig(req dto.ApiInterfaceConfig) error {
+	return WithLegacyAPIKeyMutation(func() error { return StoreLegacyAPIConfig(req) })
+}
+
+func StoreLegacyAPIConfig(req dto.ApiInterfaceConfig) error {
 	settingRepo := repo.NewISettingRepo()
 	trustedProxies, err := NormalizeAPITrustedProxies(req.ApiTrustedProxies)
 	if err != nil {

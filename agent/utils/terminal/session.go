@@ -73,6 +73,10 @@ type Session struct {
 	grace             *time.Timer
 	revalidateCursor  uint64
 	revalidatePending bool
+	authLeaseUntil    time.Time
+	authLeaseTimer    *time.Timer
+	authLeaseVersion  uint64
+	authLeaseExpired  bool
 	cols              int
 	rows              int
 
@@ -127,6 +131,11 @@ func serve(ws *websocket.Conn, sessionID string, opts SessionOptions, open func(
 	if sessionID != "" {
 		sess, ok := Lookup(sessionID, opts.Identity)
 		if ok && sess.Kind == opts.Kind && sess.Target == opts.Target && sess.Persistent == opts.Persistent && sess.HostID == opts.HostID {
+			if !sess.renewAuthLease(opts.Identity.AuthLeaseUntil) {
+				sess.Close()
+				sendClose(ws, CloseCodeRevalidate, "terminal authorization expired")
+				return nil
+			}
 			att, err := sess.Attach(ws, opts.Cols, opts.Rows)
 			if err == nil {
 				att.Run()
@@ -197,6 +206,10 @@ func openBackend(backend sessionBackend, ring *ringBuffer, opts SessionOptions) 
 	}
 	s.closeFn = sync.OnceFunc(s.doClose)
 	registerSession(s)
+	if !s.renewAuthLease(opts.Identity.AuthLeaseUntil) {
+		s.Close()
+		return s
+	}
 	go s.pump()
 	go s.keepaliveLoop()
 	go s.waitBackend()
@@ -330,6 +343,9 @@ func (s *Session) doClose() {
 	s.attached = nil
 	if s.grace != nil {
 		s.grace.Stop()
+	}
+	if s.authLeaseTimer != nil {
+		s.authLeaseTimer.Stop()
 	}
 	s.mu.Unlock()
 	if att != nil {

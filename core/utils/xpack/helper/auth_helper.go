@@ -19,7 +19,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type authHelper struct{}
+type authHelper struct{ auth.PanelAPIKeyOwnerProvider }
 
 func NewIAuthProvider() providers.AuthProvider {
 	return &authHelper{}
@@ -73,7 +73,7 @@ func (a *authHelper) CoreAPIAuthMiddleware() gin.HandlerFunc {
 		c.Set(psession.GinContextSessionUserKey, psession.SessionUser{
 			ID: psession.SuperAdminSessionUserID, Name: name, Role: "ADMIN",
 		})
-	})
+	}, a)
 }
 
 func (a *authHelper) CoreRBACMiddlewares() []gin.HandlerFunc { return nil }
@@ -93,7 +93,7 @@ func (a *authHelper) GenerateApiKey(_ *gin.Context) (string, error) {
 		return "", err
 	}
 	userID := psession.SuperAdminSessionUserID
-	if err := a.RevokeTerminalSessions("auth_session", userID, terminalsession.APIAuthSessionID(userID)); err != nil {
+	if err := terminalsession.RevokeWithRetry("auth_session", userID, terminalsession.APIAuthSessionID(userID), a.RevokeTerminalSessions); err != nil {
 		global.LOG.Warnf("revoke API terminal sessions after API key generation failed, err: %v", err)
 	}
 	return apiKey, nil
@@ -103,14 +103,18 @@ func (a *authHelper) UpdateApiConfig(c *gin.Context, req baseDto.ApiInterfaceCon
 		return err
 	}
 	userID := psession.SuperAdminSessionUserID
-	if err := a.RevokeTerminalSessions("auth_session", userID, terminalsession.APIAuthSessionID(userID)); err != nil {
+	if err := terminalsession.RevokeWithRetry("auth_session", userID, terminalsession.APIAuthSessionID(userID), a.RevokeTerminalSessions); err != nil {
 		global.LOG.Warnf("revoke API terminal sessions after API config update failed, err: %v", err)
 	}
 	return nil
 }
 
-func (a *authHelper) GetCurrentUserInfo(_ *gin.Context) (*baseDto.CurrentUserInfo, error) {
-	return auth.GetCurrentUserInfo()
+func (a *authHelper) GetCurrentUserInfo(c *gin.Context) (*baseDto.CurrentUserInfo, error) {
+	info, err := auth.GetCurrentUserInfo()
+	if info != nil && c != nil && (c.GetBool("API_AUTH") || auth.HasAPICredentials(c)) {
+		info.ApiKey = ""
+	}
+	return info, err
 }
 func (a *authHelper) ShouldCheckPasswordExpiration(_ *gin.Context) (bool, error) {
 	return true, nil
@@ -127,7 +131,7 @@ func (a *authHelper) UpdateCurrentUserInfo(c *gin.Context, req baseDto.CurrentUs
 		return err
 	}
 	if identity.UserID != "" {
-		if err := a.RevokeTerminalSessions("user", identity.UserID, ""); err != nil {
+		if err := terminalsession.RevokeWithRetry("user", identity.UserID, "", a.RevokeTerminalSessions); err != nil {
 			global.LOG.Warnf("revoke terminal sessions after user update failed, err: %v", err)
 		}
 	}
@@ -139,7 +143,7 @@ func (a *authHelper) HandlePasswordExpired(c *gin.Context, old, new string) erro
 		return err
 	}
 	if identity.UserID != "" {
-		if err := a.RevokeTerminalSessions("user", identity.UserID, ""); err != nil {
+		if err := terminalsession.RevokeWithRetry("user", identity.UserID, "", a.RevokeTerminalSessions); err != nil {
 			global.LOG.Warnf("revoke terminal sessions after password change failed, err: %v", err)
 		}
 	}

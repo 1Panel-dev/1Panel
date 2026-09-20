@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: "ຄີ API ບໍ່ຖືກຕ້ອງ: {{ .detail }
 ErrApiConfigIPInvalid: "IP ຂອງຄຳຮ້ອງຂໍ API ບໍ່ຢູ່ໃນລາຍຊື່ອະນຸຍາດ: {{ .detail }}"
 ErrApiConfigDisable: "ອິນເຕີເຟດນີ້ຫ້າມການເອີ້ນໃຊ້ API: {{ .detail }}"
 ErrApiConfigKeyTimeInvalid: "ເວລາປະທັບ API ບໍ່ຖືກຕ້ອງ: {{ .detail }}"
+ErrApiConfigKeyExpired: "API Key ໝົດອາຍຸແລ້ວ. ກະລຸນາປັບວັນໝົດອາຍຸ ຫຼື ປ່ຽນກະແຈໃນສ່ວນຈັດການ API Key ຂອງແຜງ."
 ErrPasskeyDisabled: "Passkey ຕ້ອງເປີດໃຊ້ງານ HTTPS"
 ErrPasskeyNotConfigured: "ຍັງບໍ່ໄດ້ຕັ້ງຄ່າ Passkey"
 ErrPasskeyLimit: "ຈຳນວນ Passkey ຮອດຂີດຈຳກັດແລ້ວ (ສູງສຸດ 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "ຄຳຮ້ອງຂໍອອກລະບົບ SAML2 �
 ErrSAML2LogoutInvalid: "ຂໍ້ຄວາມອອກລະບົບ SAML2 ບໍ່ຖືກຕ້ອງ."
 ErrSAML2LocalCredentialsReadonly: "ຊື່ຜູ້ໃຊ້ ແລະລະຫັດຜ່ານ SAML2 ຖືກຈັດການໂດຍຜູ້ໃຫ້ບໍລິການຕົວຕົນ ແລະບໍ່ສາມາດປ່ຽນໃນເຄື່ອງໄດ້."
 ErrSAML2PasswordExpirationUnsupported: "ຜູ້ໃຊ້ SAML2 ບໍ່ໄດ້ໃຊ້ນະໂຍບາຍການໝົດອາຍຸລະຫັດຜ່ານທ້ອງຖິ່ນ."
+
+# API key management
+ErrAPIKeyLimit: "ຮອດຂີດຈຳກັດ 20 API Key ທີ່ຍັງບໍ່ຖືກຖອນຕໍ່ຜູ້ໃຊ້ແລ້ວ"
+ErrAPIKeyConflict: "API Key ມີການປ່ຽນແປງ. ໂຫຼດໃໝ່ແລ້ວລອງອີກ; ໃຊ້ພາລາມິເຕີເດີມເມື່ອສົ່ງຄຳຂໍສ້າງຊ້ຳ"
+ErrAPIKeyNameExists: "ມີ API Key ທີ່ຍັງບໍ່ຖືກຖອນທີ່ໃຊ້ຊື່ນີ້ແລ້ວ"
+ErrAPIKeyNotFound: "ບໍ່ພົບ API Key ຫຼືບໍ່ແມ່ນຂອງຜູ້ໃຊ້ປັດຈຸບັນ"
+ErrAPIKeyAppBindingDisabled: "API Key ນີ້ບໍ່ອະນຸຍາດໃຫ້ຜູກ APP ຜ່ານລະຫັດ QR"
+ErrAPIKeyTerminalUpgradeRequired: "ບໍ່ສາມາດຢືນຢັນການຮອງຮັບການອະນຸຍາດເທີມິນອນດ້ວຍ API Key. ກວດສອບການເຊື່ອມຕໍ່ໂນດ ແລະອັບເກຣດ Agent ກ່ອນລອງອີກ."

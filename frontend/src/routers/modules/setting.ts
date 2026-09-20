@@ -1,8 +1,6 @@
 import { Layout } from '@/routers/constant';
 import { GlobalStore } from '@/store';
 
-const settingPermissions = ['alert_view', 'backup_view'];
-
 const redirectToAvailableSetting = () => {
     const globalStore = GlobalStore();
     if (globalStore.isAdmin) {
@@ -14,7 +12,7 @@ const redirectToAvailableSetting = () => {
     if (globalStore.hasPermission('backup_view')) {
         return '/settings/backupaccount';
     }
-    return '/settings/panel';
+    return '/settings/apikeys';
 };
 
 const settingRouter = {
@@ -26,7 +24,6 @@ const settingRouter = {
     meta: {
         title: 'menu.settings',
         icon: 'p-config',
-        permission: settingPermissions,
     },
     children: [
         {
@@ -34,10 +31,18 @@ const settingRouter = {
             name: 'Setting',
             redirect: redirectToAvailableSetting,
             component: () => import('@/views/setting/index.vue'),
-            meta: {
-                permission: settingPermissions,
-            },
             children: [
+                {
+                    path: 'apikeys',
+                    name: 'APIKeys',
+                    component: () => import('@/views/setting/api-keys/index.vue'),
+                    hidden: true,
+                    meta: {
+                        parent: 'menu.settings',
+                        title: 'apiKeyManagement.title',
+                        activeMenu: '/settings',
+                    },
+                },
                 {
                     path: 'panel',
                     name: 'Panel',

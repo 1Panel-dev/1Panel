@@ -23,6 +23,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -220,6 +221,9 @@ func sortShowMenus(menus []dto.ShowMenu) {
 }
 
 func (u *SettingService) Update(c *gin.Context, key, value string) error {
+	if auth.IsAPICredentialSetting(key) {
+		return buserr.New("ErrInvalidParams")
+	}
 	oldVal, err := settingRepo.Get(repo.WithByKey(key))
 	if err != nil {
 		return err

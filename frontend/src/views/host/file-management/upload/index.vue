@@ -106,7 +106,7 @@
 
         <template #footer>
             <span class="dialog-footer">
-                <el-button :type="upLoading ? 'danger' : 'default'" :loading="canceling" @click="requestClose()">
+                <el-button type="default" :loading="canceling" @click="requestClose()">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="submit()" :disabled="uploadLocked || uploaderFiles.length == 0">

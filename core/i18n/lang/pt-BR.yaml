@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'Chave API inválida: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP sem permissão: {{ .detail }}'
 ErrApiConfigDisable: 'API bloqueada: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Timestamp inválido: {{ .detail }}'
+ErrApiConfigKeyExpired: "A chave API expirou. Ajuste sua data de expiração ou substitua a chave no gerenciamento de chaves API do painel."
 ErrPasskeyDisabled: "Passkey requer HTTPS habilitado"
 ErrPasskeyNotConfigured: "Nenhum Passkey configurado"
 ErrPasskeyLimit: "Limite de Passkeys atingido (máximo 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "A solicitação de logout do SAML2 expirou."
 ErrSAML2LogoutInvalid: "A mensagem de logout do SAML2 é inválida."
 ErrSAML2LocalCredentialsReadonly: "Os nomes de usuário e as senhas SAML2 são gerenciados pelo provedor de identidade e não podem ser alterados localmente."
 ErrSAML2PasswordExpirationUnsupported: "Os usuários SAML2 não usam a política local de expiração de senha."
+
+# API key management
+ErrAPIKeyLimit: "O limite de 20 chaves API não revogadas por usuário foi atingido"
+ErrAPIKeyConflict: "A chave API foi alterada. Atualize e tente novamente; ao repetir a criação, use os parâmetros originais"
+ErrAPIKeyNameExists: "Já existe uma chave API não revogada com esse nome"
+ErrAPIKeyNotFound: "A chave API não existe ou não pertence ao usuário atual"
+ErrAPIKeyAppBindingDisabled: "Esta chave API não permite vincular o APP por código QR"
+ErrAPIKeyTerminalUpgradeRequired: "Não foi possível verificar o suporte à autorização de terminal por chave API. Verifique a conexão do nó e atualize o Agent antes de tentar novamente."
