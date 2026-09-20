@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'Geçersiz API anahtarı: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP izinli değil: {{ .detail }}'
 ErrApiConfigDisable: 'API erişimi kapalı: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Zaman damgası hatalı: {{ .detail }}'
+ErrApiConfigKeyExpired: "API anahtarının süresi doldu. Panelin API anahtarı yönetiminde sona erme tarihini değiştirin veya anahtarı yenisiyle değiştirin."
 ErrPasskeyDisabled: "Passkey kullanmak için HTTPS etkinleştirilmelidir"
 ErrPasskeyNotConfigured: "Passkey yapılandırılmamış"
 ErrPasskeyLimit: "Passkey sınırına ulaşıldı (en fazla 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "SAML2 oturum kapatma isteğinin süresi doldu."
 ErrSAML2LogoutInvalid: "SAML2 oturum kapatma mesajı geçersiz."
 ErrSAML2LocalCredentialsReadonly: "SAML2 kullanıcı adları ve parolaları kimlik sağlayıcı tarafından yönetilir ve yerel olarak değiştirilemez."
 ErrSAML2PasswordExpirationUnsupported: "SAML2 kullanıcıları yerel parola süresi dolma ilkesini kullanmaz."
+
+# API key management
+ErrAPIKeyLimit: "Kullanıcı başına iptal edilmemiş 20 API anahtarı sınırına ulaşıldı"
+ErrAPIKeyConflict: "API anahtarı değişti. Yenileyip tekrar deneyin; oluşturma isteğini tekrarlarken ilk parametreleri kullanın"
+ErrAPIKeyNameExists: "Bu adda iptal edilmemiş bir API anahtarı zaten var"
+ErrAPIKeyNotFound: "API anahtarı mevcut değil veya geçerli kullanıcıya ait değil"
+ErrAPIKeyAppBindingDisabled: "Bu API anahtarı için QR koduyla APP bağlantısına izin verilmiyor"
+ErrAPIKeyTerminalUpgradeRequired: "API anahtarıyla terminal yetkilendirme desteği doğrulanamadı. Düğüm bağlantısını kontrol edip Agent sürümünü yükselttikten sonra tekrar deneyin."

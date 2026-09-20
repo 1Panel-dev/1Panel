@@ -1,6 +1,62 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: 'API del panel',
+        manage: 'Gestionar claves API',
+        personalEntry: 'Gestiona tus claves, condiciones de acceso y vinculación de la APP en Ajustes.',
+        create: 'Crear clave API',
+        legacy: 'Clave anterior',
+        identifier: 'Identificador de clave',
+        details: 'Detalles de la clave API',
+        quota: '{0} / {1} claves nuevas (incluye desactivadas y caducadas; excluye la clave anterior)',
+        statusEnable: 'Activada',
+        statusDisable: 'Desactivada',
+        statusRevoked: 'Revocada',
+        statusExpired: 'Caducada',
+        specifiedIPs: 'IP específicas',
+        anyIP: 'Cualquier IP',
+        ipHelp: 'Introduce una IP o CIDR por línea. Selecciona Cualquier IP explícitamente para permitir todos los orígenes.',
+        signatureWindow: 'Ventana de validez de firma',
+        expiresAt: 'Caducidad de la clave',
+        never: 'Nunca caduca',
+        futureExpiry: 'Selecciona una fecha de caducidad futura.',
+        allowAppBinding: 'Permitir vinculación de APP por QR',
+        bindingException:
+            'Permite volver a entregar esta clave al teléfono mediante un QR de un solo uso generado desde tu sesión del panel.',
+        bindingDisableHelp:
+            'Desactivar la vinculación impide nuevas entregas. Las conexiones existentes siguen siendo válidas hasta desactivar, revocar o caducar la clave.',
+        saveSecret: 'Copia y guarda la clave ahora. Tras cerrar, la gestión normal no podrá mostrarla de nuevo.',
+        saved: 'He guardado la clave',
+        alreadyCreated:
+            'La clave ya se creó y no se mostrará de nuevo. Si se perdió la respuesta original, revócala y crea otra, o usa QR si está permitido.',
+        uncertain:
+            'El resultado es incierto. Reintenta con los mismos datos para evitar duplicados, o cierra y revisa la lista antes de crear otra.',
+        legacyHelp:
+            'La clave anterior mantiene la compatibilidad con las conexiones existentes. Su interruptor y restablecimiento solo afectan a esa clave.',
+        showLegacy: 'Mostrar clave anterior',
+        revoke: 'Revocar',
+        revokeConfirm:
+            '¿Revocar «{0}»? Se rechazarán nuevas solicitudes y se cerrarán sus terminales. Es irreversible; las tareas en curso no se cancelan.',
+        disableConfirm:
+            '¿Desactivar «{0}»? Se rechazarán nuevas solicitudes y se cerrarán sus terminales. Las tareas en curso no se cancelan.',
+        enableConfirm: '¿Activar «{0}» con sus condiciones de acceso actuales?',
+        bindingKey: 'Clave para vincular la APP',
+        selectKey: 'Selecciona tu clave',
+        noBindableKey: 'No hay claves disponibles para QR. Crea una o permite QR en una clave activa.',
+        appKeyExpired: 'La clave API seleccionada ha caducado. Amplía su fecha de caducidad o selecciona otra clave.',
+        appSecurityHelp:
+            'La aplicación móvil utiliza la clave API seleccionada para acceder al panel con los mismos permisos que la cuenta propietaria de la clave. Protege los dispositivos vinculados.',
+        mobileIPHelp:
+            'La IP de salida del teléfono debe coincidir con la lista permitida. Cambiar de red puede bloquear el acceso; la lista no se amplía automáticamente.',
+        qrUnavailable: 'Este QR no está disponible. Actualiza para generar otro.',
+        showQR: 'Mostrar QR',
+        hideQR: 'Ocultar QR',
+        bindingNotAllowed: 'Vinculación QR desactivada',
+        sameKeyDevices:
+            'Varios dispositivos pueden compartir la clave y su revocación. Usa una clave distinta por dispositivo para controlarlos por separado.',
+        closePending: 'El cambio se guardó. El cierre de terminales remotos está pendiente y se reintentará.',
+    },
     commons: {
         true: 'Verdadero',
         false: 'Falso',

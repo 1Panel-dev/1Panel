@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'Kunci API tidak sah: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP tidak dibenarkan: {{ .detail }}'
 ErrApiConfigDisable: 'API tidak dibenarkan: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Cap masa tidak sah: {{ .detail }}'
+ErrApiConfigKeyExpired: "Kunci API telah tamat tempoh. Laraskan tarikh luput atau gantikan kunci dalam pengurusan kunci API pada panel."
 ErrPasskeyDisabled: "Passkey memerlukan HTTPS diaktifkan"
 ErrPasskeyNotConfigured: "Tiada Passkey dikonfigurasikan"
 ErrPasskeyLimit: "Had Passkey telah dicapai (maksimum 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "Permintaan log keluar SAML2 telah tamat tempoh."
 ErrSAML2LogoutInvalid: "Mesej log keluar SAML2 tidak sah."
 ErrSAML2LocalCredentialsReadonly: "Nama pengguna dan kata laluan SAML2 diurus oleh penyedia identiti dan tidak boleh diubah secara setempat."
 ErrSAML2PasswordExpirationUnsupported: "Pengguna SAML2 tidak menggunakan dasar tamat tempoh kata laluan setempat."
+
+# API key management
+ErrAPIKeyLimit: "Had 20 kunci API yang belum dibatalkan bagi setiap pengguna telah dicapai"
+ErrAPIKeyConflict: "Kunci API telah berubah. Muat semula dan cuba lagi; gunakan parameter asal untuk mengulangi penciptaan"
+ErrAPIKeyNameExists: "Kunci API yang belum dibatalkan dengan nama ini sudah wujud"
+ErrAPIKeyNotFound: "Kunci API tidak wujud atau bukan milik pengguna semasa"
+ErrAPIKeyAppBindingDisabled: "Pemautan APP melalui kod QR tidak dibenarkan untuk kunci API ini"
+ErrAPIKeyTerminalUpgradeRequired: "Sokongan pengesahan terminal melalui kunci API tidak dapat disahkan. Semak sambungan nod dan naik taraf Agent sebelum mencuba lagi."

@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'APIキーが無効です: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IPが許可されていません: {{ .detail }}'
 ErrApiConfigDisable: 'APIは無効です: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'タイムスタンプが無効です: {{ .detail }}'
+ErrApiConfigKeyExpired: "API Key の有効期限が切れています。パネルの API Key 管理で有効期限を変更するか、キーを交換してください。"
 ErrPasskeyDisabled: "Passkeyを使用するにはHTTPSを有効にする必要があります"
 ErrPasskeyNotConfigured: "Passkeyが設定されていません"
 ErrPasskeyLimit: "Passkeyの上限に達しました（最大5個）"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "SAML2 ログアウト要求の有効期限が切れま�
 ErrSAML2LogoutInvalid: "SAML2 ログアウトメッセージが無効です。"
 ErrSAML2LocalCredentialsReadonly: "SAML2 のユーザー名とパスワードは IdP によって管理されるため、ローカルでは変更できません。"
 ErrSAML2PasswordExpirationUnsupported: "SAML2 ユーザーにはローカルのパスワード有効期限ポリシーが適用されません。"
+
+# API key management
+ErrAPIKeyLimit: "ユーザーあたりの未失効 API キー数の上限（20 個）に達しました"
+ErrAPIKeyConflict: "API キーが変更されました。更新して再試行してください。作成の再送には元のパラメーターを使用してください"
+ErrAPIKeyNameExists: "同じ名前の未失効 API キーが既に存在します"
+ErrAPIKeyNotFound: "API キーが存在しないか、現在のユーザーに属していません"
+ErrAPIKeyAppBindingDisabled: "この API キーでは APP の QR コード連携が許可されていません"
+ErrAPIKeyTerminalUpgradeRequired: "API キーによるターミナル認証への対応を確認できません。ノードの接続を確認し、Agent を更新して再試行してください。"

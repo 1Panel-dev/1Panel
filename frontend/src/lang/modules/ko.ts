@@ -1,6 +1,59 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: '패널 API',
+        manage: 'API Key 관리',
+        personalEntry: '설정에서 내 키, 접근 조건 및 APP QR 연결을 관리합니다.',
+        create: 'API Key 만들기',
+        legacy: '기존 키',
+        identifier: '키 식별자',
+        details: 'API Key 상세 정보',
+        quota: '새 키 {0} / {1} (비활성 및 만료 키 포함, 기존 키 제외)',
+        statusEnable: '활성',
+        statusDisable: '비활성',
+        statusRevoked: '폐기됨',
+        statusExpired: '만료됨',
+        specifiedIPs: '지정 IP',
+        anyIP: '모든 IP',
+        ipHelp: '한 줄에 IP 또는 CIDR 하나를 입력하세요. 모든 출처를 허용하려면 모든 IP를 명시적으로 선택하세요.',
+        signatureWindow: '요청 서명 유효 시간',
+        expiresAt: '키 만료 시간',
+        never: '만료 없음',
+        futureExpiry: '현재 이후의 만료 시간을 선택하세요.',
+        allowAppBinding: 'APP QR 연결 허용',
+        bindingException: '로그인한 패널 세션에서 만든 일회용 QR 코드를 통해 이 키를 휴대폰에 다시 전달할 수 있습니다.',
+        bindingDisableHelp:
+            'QR 연결을 끄면 이후 전달만 차단됩니다. 기존 연결은 키를 비활성화하거나 폐기하거나 만료될 때까지 유효합니다.',
+        saveSecret: '지금 키를 복사하여 저장하세요. 닫으면 일반 키 관리에서 전체 키를 다시 표시할 수 없습니다.',
+        saved: '키를 저장했습니다',
+        alreadyCreated:
+            '이 키는 이미 생성되어 다시 표시할 수 없습니다. 원래 응답을 잃었다면 폐기 후 다시 만들거나 허용된 QR 연결을 사용하세요.',
+        uncertain:
+            '요청 결과를 확인할 수 없습니다. 중복 생성을 피하려면 같은 설정으로 재시도하거나 닫고 목록을 확인하세요.',
+        legacyHelp: '기존 키는 기존 연결의 호환성을 유지합니다. 스위치와 재설정은 이 키에만 적용됩니다.',
+        showLegacy: '기존 키 표시',
+        revoke: '폐기',
+        revokeConfirm:
+            '“{0}” 키를 폐기할까요? 새 요청이 거부되고 해당 터미널이 닫힙니다. 되돌릴 수 없으며 실행 중인 백그라운드 작업은 취소되지 않습니다.',
+        disableConfirm:
+            '“{0}” 키를 비활성화할까요? 새 요청이 거부되고 해당 터미널이 닫힙니다. 실행 중인 백그라운드 작업은 취소되지 않습니다.',
+        enableConfirm: '현재 접근 조건으로 “{0}” 키를 활성화할까요?',
+        bindingKey: 'APP 연결에 사용할 키',
+        selectKey: '내 키 선택',
+        noBindableKey: 'QR 연결 가능한 키가 없습니다. 키를 만들거나 유효한 키의 QR 연결을 허용하세요.',
+        appKeyExpired: '선택한 API Key가 만료되었습니다. 만료일을 연장하거나 다른 키를 선택하세요.',
+        appSecurityHelp:
+            '모바일 앱은 선택한 API Key를 사용하여 해당 키 소유 계정과 동일한 권한으로 패널에 접근합니다. 연결된 기기를 안전하게 관리하세요.',
+        mobileIPHelp:
+            '휴대폰의 외부 IP는 허용 목록과 일치해야 합니다. 네트워크 전환으로 접근이 차단될 수 있으며 허용 목록은 자동으로 확대되지 않습니다.',
+        qrUnavailable: '이 QR 코드를 사용할 수 없습니다. 새로 고침하여 다시 만드세요.',
+        showQR: 'QR 코드 표시',
+        hideQR: 'QR 코드 숨기기',
+        bindingNotAllowed: 'QR 연결 꺼짐',
+        sameKeyDevices: '여러 기기가 같은 키를 공유하면 함께 폐기됩니다. 개별 제어가 필요하면 기기별 키를 만드세요.',
+        closePending: '키 변경을 저장했습니다. 일부 원격 터미널 종료가 대기 중이며 재시도됩니다.',
+    },
     commons: {
         true: '참',
         false: '거짓',

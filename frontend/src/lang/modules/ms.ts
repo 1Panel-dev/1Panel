@@ -1,6 +1,63 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: 'API Panel',
+        manage: 'Urus kunci API',
+        personalEntry: 'Urus kunci, syarat akses dan pautan APP anda dalam Tetapan.',
+        create: 'Cipta kunci API',
+        legacy: 'Kunci lama',
+        identifier: 'Pengecam kunci',
+        details: 'Butiran kunci API',
+        quota: '{0} / {1} kunci baharu (termasuk kunci dinyahdayakan dan tamat tempoh; tidak termasuk kunci lama)',
+        statusEnable: 'Didayakan',
+        statusDisable: 'Dinyahdayakan',
+        statusRevoked: 'Dibatalkan',
+        statusExpired: 'Tamat tempoh',
+        specifiedIPs: 'IP tertentu',
+        anyIP: 'Sebarang IP',
+        ipHelp: 'Masukkan satu IP atau CIDR setiap baris. Pilih Sebarang IP secara nyata untuk membenarkan semua sumber.',
+        signatureWindow: 'Tempoh sah tandatangan permintaan',
+        expiresAt: 'Tarikh luput kunci',
+        never: 'Tidak tamat tempoh',
+        futureExpiry: 'Pilih masa luput pada masa hadapan.',
+        allowAppBinding: 'Benarkan pautan APP melalui QR',
+        bindingException:
+            'Benarkan kunci ini dihantar semula ke telefon melalui kod QR sekali guna yang dijana dalam sesi panel anda yang telah log masuk.',
+        bindingDisableHelp:
+            'Mematikan pautan QR menyekat penghantaran baharu sahaja. Sambungan sedia ada kekal sah sehingga kunci dinyahdayakan, dibatalkan atau tamat tempoh.',
+        saveSecret:
+            'Salin dan simpan kunci sekarang. Selepas ditutup, pengurusan biasa tidak dapat memaparkan kunci penuh lagi.',
+        saved: 'Saya telah menyimpan kunci',
+        alreadyCreated:
+            'Kunci ini telah dicipta dan tidak akan dipaparkan semula. Jika respons asal hilang, batalkan dan cipta semula atau gunakan QR jika dibenarkan.',
+        uncertain:
+            'Hasil permintaan belum pasti. Cuba semula dengan butiran sama untuk mengelakkan pendua, atau tutup dan semak senarai sebelum mencipta lagi.',
+        legacyHelp:
+            'Kunci lama mengekalkan keserasian sambungan sedia ada. Suis dan tetapan semulanya hanya mempengaruhi kunci itu.',
+        showLegacy: 'Tunjukkan kunci lama',
+        revoke: 'Batalkan',
+        revokeConfirm:
+            'Batalkan “{0}”? Permintaan baharu akan ditolak dan terminalnya ditutup. Tidak boleh diundur; tugas latar yang sedang berjalan tidak dibatalkan.',
+        disableConfirm:
+            'Nyahdayakan “{0}”? Permintaan baharu akan ditolak dan terminalnya ditutup. Tugas latar yang sedang berjalan tidak dibatalkan.',
+        enableConfirm: 'Dayakan “{0}” dengan syarat akses semasa?',
+        bindingKey: 'Kunci untuk pautan APP',
+        selectKey: 'Pilih kunci anda',
+        noBindableKey: 'Tiada kunci tersedia untuk pautan QR. Cipta kunci atau benarkan QR pada kunci yang aktif.',
+        appKeyExpired: 'Kunci API yang dipilih telah tamat tempoh. Lanjutkan tarikh luputnya atau pilih kunci lain.',
+        appSecurityHelp:
+            'Aplikasi mudah alih menggunakan kunci API yang dipilih untuk mengakses panel dengan kebenaran yang sama seperti akaun pemilik kunci tersebut. Pastikan peranti yang dipautkan disimpan dengan selamat.',
+        mobileIPHelp:
+            'IP keluar telefon mesti sepadan dengan senarai dibenarkan. Menukar rangkaian boleh menyekat akses; senarai tidak diperluas secara automatik.',
+        qrUnavailable: 'Kod QR ini tidak tersedia. Segar semula untuk menjana kod baharu.',
+        showQR: 'Tunjukkan kod QR',
+        hideQR: 'Sembunyikan kod QR',
+        bindingNotAllowed: 'Pautan QR dimatikan',
+        sameKeyDevices:
+            'Beberapa peranti boleh berkongsi kunci dan pembatalannya. Gunakan kunci berasingan bagi setiap peranti untuk kawalan bebas.',
+        closePending: 'Perubahan kunci disimpan. Penutupan terminal jauh masih menunggu dan akan dicuba semula.',
+    },
     commons: {
         true: 'Benar',
         false: 'Palsu',

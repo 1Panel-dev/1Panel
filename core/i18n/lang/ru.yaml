@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'Неверный API-ключ: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP не в списке: {{ .detail }}'
 ErrApiConfigDisable: 'Доступ по API запрещён: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: 'Неверная метка времени: {{ .detail }}'
+ErrApiConfigKeyExpired: "Срок действия API-ключа истёк. Измените срок действия или замените ключ в разделе управления API-ключами панели."
 ErrPasskeyDisabled: "Для Passkey требуется включить HTTPS"
 ErrPasskeyNotConfigured: "Passkey не настроен"
 ErrPasskeyLimit: "Достигнут лимит Passkey (максимум 5)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "Срок действия запроса на выход
 ErrSAML2LogoutInvalid: "Сообщение выхода SAML2 недействительно."
 ErrSAML2LocalCredentialsReadonly: "Имена пользователей и пароли SAML2 управляются поставщиком удостоверений и не могут быть изменены локально."
 ErrSAML2PasswordExpirationUnsupported: "Для пользователей SAML2 не применяется локальная политика срока действия паролей."
+
+# API key management
+ErrAPIKeyLimit: "Достигнут лимит в 20 неотозванных ключей API на пользователя"
+ErrAPIKeyConflict: "Ключ API изменён. Обновите данные и повторите попытку; при повторном создании используйте исходные параметры"
+ErrAPIKeyNameExists: "Неотозванный ключ API с таким именем уже существует"
+ErrAPIKeyNotFound: "Ключ API не существует или не принадлежит текущему пользователю"
+ErrAPIKeyAppBindingDisabled: "Для этого ключа API привязка приложения через QR-код запрещена"
+ErrAPIKeyTerminalUpgradeRequired: "Не удалось проверить поддержку авторизации терминала по ключу API. Проверьте подключение узла, обновите его Agent и повторите попытку."

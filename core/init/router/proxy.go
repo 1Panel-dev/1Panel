@@ -1,12 +1,14 @@
 package router
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/url"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	baseRepo "github.com/1Panel-dev/1Panel/core/app/repo"
@@ -16,12 +18,17 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/middleware"
+	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	terminalsession "github.com/1Panel-dev/1Panel/core/utils/terminal_session"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-gonic/gin"
 )
 
 var errInternalOnlyAgentEndpoint = errors.New("internal agent endpoint cannot be proxied")
+
+var loadLocalTerminalCapabilities = func(ctx context.Context) (interface{}, error) {
+	return proxy_local.NewLocalClientWithContext(ctx, terminalsession.CapabilityPath, http.MethodGet, nil, nil, 5*time.Second)
+}
 
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -94,10 +101,17 @@ func isInternalOnlyAgentEndpoint(reqPath string) bool {
 	return normalizedPath == "/api/v2/xpack/alert/offline/email" ||
 		normalizedPath == "/api/v2/xpack/alert/offline/webhook" ||
 		normalizedPath == "/api/v2/hosts/firewall/port" ||
-		normalizedPath == "/api/v2/internal/terminal/sessions/revoke"
+		normalizedPath == "/api/v2/internal/terminal/sessions/revoke" ||
+		normalizedPath == terminalsession.CapabilityPath
 }
 
 func proxyLocalAgent(c *gin.Context) {
+	if terminalsession.RequiresLeaseCapability(c) {
+		if err := terminalsession.CheckLeaseCapability(func() (interface{}, error) { return loadLocalTerminalCapabilities(c.Request.Context()) }); err != nil {
+			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrAPIKeyTerminalUpgradeRequired", nil)
+			return
+		}
+	}
 	defer func() {
 		if err := recover(); err != nil && err != http.ErrAbortHandler {
 			global.LOG.Debug(err)

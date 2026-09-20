@@ -36,6 +36,7 @@ ErrApiConfigKeyInvalid: 'API 키가 잘못됨: {{ .detail }}'
 ErrApiConfigIPInvalid: 'IP 허용되지 않음: {{ .detail }}'
 ErrApiConfigDisable: 'API 접근 금지: {{ .detail }}'
 ErrApiConfigKeyTimeInvalid: '타임스탬프 오류: {{ .detail }}'
+ErrApiConfigKeyExpired: "API Key가 만료되었습니다. 패널의 API Key 관리에서 만료일을 조정하거나 키를 교체하세요."
 ErrPasskeyDisabled: "Passkey를 사용하려면 HTTPS를 활성화해야 합니다"
 ErrPasskeyNotConfigured: "Passkey가 구성되지 않았습니다"
 ErrPasskeyLimit: "Passkey 개수가 한도에 도달했습니다(최대 5개)"
@@ -528,3 +529,11 @@ ErrSAML2LogoutExpired: "SAML2 로그아웃 요청이 만료되었습니다."
 ErrSAML2LogoutInvalid: "SAML2 로그아웃 메시지가 올바르지 않습니다."
 ErrSAML2LocalCredentialsReadonly: "SAML2 사용자 이름과 비밀번호는 ID 공급자가 관리하므로 로컬에서 변경할 수 없습니다."
 ErrSAML2PasswordExpirationUnsupported: "SAML2 사용자는 로컬 비밀번호 만료 정책을 사용하지 않습니다."
+
+# API key management
+ErrAPIKeyLimit: "사용자당 폐기되지 않은 API Key 최대 개수(20개)에 도달했습니다"
+ErrAPIKeyConflict: "API Key가 변경되었습니다. 새로 고친 후 다시 시도하세요. 생성 요청을 재전송할 때는 원래 매개변수를 사용하세요"
+ErrAPIKeyNameExists: "같은 이름의 폐기되지 않은 API Key가 이미 있습니다"
+ErrAPIKeyNotFound: "API Key가 없거나 현재 사용자 소유가 아닙니다"
+ErrAPIKeyAppBindingDisabled: "이 API Key는 APP QR 코드 연결을 허용하지 않습니다"
+ErrAPIKeyTerminalUpgradeRequired: "API Key 터미널 인증 지원 여부를 확인할 수 없습니다. 노드 연결을 확인하고 Agent를 업그레이드한 후 다시 시도하세요."

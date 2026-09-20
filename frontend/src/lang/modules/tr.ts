@@ -1,6 +1,64 @@
 import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
+    apiKeyManagement: {
+        title: 'Panel API',
+        manage: 'API anahtarlarını yönet',
+        personalEntry: 'Ayarlar bölümünde anahtarlarınızı, erişim koşullarını ve uygulama QR bağlantısını yönetin.',
+        create: 'API anahtarı oluştur',
+        legacy: 'Eski anahtar',
+        identifier: 'Anahtar kimliği',
+        details: 'API anahtarı ayrıntıları',
+        quota: '{0} / {1} yeni anahtar (devre dışı ve süresi dolmuş anahtarlar dahil, eski anahtar hariç)',
+        statusEnable: 'Etkin',
+        statusDisable: 'Devre dışı',
+        statusRevoked: 'İptal edildi',
+        statusExpired: 'Süresi doldu',
+        specifiedIPs: 'Belirtilen IP’ler',
+        anyIP: 'Herhangi bir IP',
+        ipHelp: 'Her satıra bir IP veya CIDR girin. Tüm kaynaklara izin vermek için açıkça Herhangi bir IP seçeneğini seçin.',
+        signatureWindow: 'İstek imzasının geçerlilik süresi',
+        expiresAt: 'Anahtarın sona erme zamanı',
+        never: 'Süresiz',
+        futureExpiry: 'Gelecekte bir sona erme zamanı seçin.',
+        allowAppBinding: 'Uygulama QR bağlantısına izin ver',
+        bindingException:
+            'Oturum açılmış panelinizde oluşturulan tek kullanımlık QR koduyla bu anahtarın telefona yeniden iletilmesine izin verir.',
+        bindingDisableHelp:
+            'QR bağlantısını kapatmak gelecekteki iletimi engeller. Mevcut bağlantılar anahtar devre dışı bırakılana, iptal edilene veya süresi dolana kadar geçerlidir.',
+        saveSecret:
+            'Anahtarı şimdi kopyalayıp kaydedin. Kapattıktan sonra normal anahtar yönetimi tam anahtarı yeniden gösteremez.',
+        saved: 'Anahtarı kaydettim',
+        alreadyCreated:
+            'Bu anahtar zaten oluşturuldu ve yeniden gösterilmez. İlk yanıt kaybolduysa iptal edip yeniden oluşturun veya izin veriliyorsa QR bağlantısını kullanın.',
+        uncertain:
+            'İstek sonucu belirsiz. Tekrarları önlemek için aynı bilgilerle yeniden deneyin veya kapatıp yeni anahtar oluşturmadan listeyi kontrol edin.',
+        legacyHelp:
+            'Eski anahtar mevcut bağlantıların uyumluluğunu korur. Anahtarı açma, kapatma ve sıfırlama yalnızca onu etkiler.',
+        showLegacy: 'Eski anahtarı göster',
+        revoke: 'İptal et',
+        revokeConfirm:
+            '“{0}” iptal edilsin mi? Yeni istekler reddedilir ve ilgili terminaller kapatılır. Geri alınamaz; çalışan arka plan işleri iptal edilmez.',
+        disableConfirm:
+            '“{0}” devre dışı bırakılsın mı? Yeni istekler reddedilir ve ilgili terminaller kapatılır. Çalışan arka plan işleri iptal edilmez.',
+        enableConfirm: '“{0}” mevcut erişim koşullarıyla etkinleştirilsin mi?',
+        bindingKey: 'Uygulama bağlantısı için anahtar',
+        selectKey: 'Anahtarınızı seçin',
+        noBindableKey:
+            'QR bağlantısı için uygun anahtar yok. Yeni anahtar oluşturun veya etkin bir anahtarda QR bağlantısını açın.',
+        appKeyExpired: 'Seçilen API anahtarının süresi doldu. Geçerlilik süresini uzatın veya başka bir anahtar seçin.',
+        appSecurityHelp:
+            'Mobil uygulama, seçilen API anahtarını kullanarak panele anahtarın sahibi olan hesapla aynı yetkilerle erişir. Bağlı cihazlarınızı güvende tutun.',
+        mobileIPHelp:
+            'Telefonun çıkış IP’si izin listesiyle eşleşmelidir. Ağ değiştirmek erişimi engelleyebilir; liste otomatik genişletilmez.',
+        qrUnavailable: 'Bu QR kodu kullanılamıyor. Yenisini oluşturmak için yenileyin.',
+        showQR: 'QR kodunu göster',
+        hideQR: 'QR kodunu gizle',
+        bindingNotAllowed: 'QR bağlantısı kapalı',
+        sameKeyDevices:
+            'Birden fazla cihaz aynı anahtarı ve iptal durumunu paylaşabilir. Bağımsız yönetim için her cihaza ayrı anahtar kullanın.',
+        closePending: 'Anahtar değişikliği kaydedildi. Uzak terminallerin kapatılması bekleniyor ve yeniden denenecek.',
+    },
     commons: {
         true: 'Doğru',
         false: 'Yanlış',
