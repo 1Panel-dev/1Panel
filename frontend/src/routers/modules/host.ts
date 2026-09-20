@@ -33,6 +33,18 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/monitor/export',
+            name: 'HostMonitorExport',
+            component: () => import('@/views/host/monitor/export/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/hosts/monitor/monitor',
+                title: 'menu.monitor',
+                detail: 'commons.button.export',
+                permission: 'host_monitor_view',
+            },
+        },
+        {
             path: '/hosts/monitor/setting',
             name: 'HostMonitorSetting',
             component: () => import('@/views/host/monitor/setting/index.vue'),
