@@ -55,7 +55,13 @@
                 <TableRefresh @search="search" />
             </template>
             <template #main>
-                <ComplexTable v-model:selects="selects" :data="containerRows" :heightDiff="320" row-key="key">
+                <ComplexTable
+                    v-model:selects="selects"
+                    :data="containerPageRows"
+                    :pagination-config="paginationConfig"
+                    :heightDiff="320"
+                    row-key="key"
+                >
                     <el-table-column type="selection" :selectable="hasProtectedEndpoint" width="48" fix />
                     <el-table-column :label="$t('commons.table.name')" min-width="180">
                         <template #default="{ row }">{{ row.name }}</template>
@@ -73,6 +79,7 @@
                                     trigger="hover"
                                     :width="360"
                                     :show-after="200"
+                                    :persistent="false"
                                 >
                                     <template #reference>
                                         <el-tag :type="endpointStatusType(group.endpoint)" effect="plain">
@@ -166,7 +173,8 @@
                     </el-button>
                 </div>
                 <ComplexTable
-                    :data="orphanRows"
+                    :data="orphanPageRows"
+                    :pagination-config="orphanPaginationConfig"
                     row-key="policyUUID"
                     max-height="calc(100vh - 220px)"
                     class="mt-3"
@@ -224,7 +232,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
 import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
@@ -352,6 +360,34 @@ const orphanRows = computed(() => {
             .filter((item) => item !== undefined)
             .some((item) => String(item).toLowerCase().includes(keyword));
     });
+});
+
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: computed(() => containerRows.value.length),
+});
+const orphanPaginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: computed(() => orphanRows.value.length),
+});
+const containerPageRows = computed(() => {
+    const start = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
+    return containerRows.value.slice(start, start + paginationConfig.pageSize);
+});
+const orphanPageRows = computed(() => {
+    const start = (orphanPaginationConfig.currentPage - 1) * orphanPaginationConfig.pageSize;
+    return orphanRows.value.slice(start, start + orphanPaginationConfig.pageSize);
+});
+watch(searchName, () => {
+    paginationConfig.currentPage = 1;
+    orphanPaginationConfig.currentPage = 1;
+});
+watch([() => paginationConfig.total, () => orphanPaginationConfig.total], () => {
+    for (const config of [paginationConfig, orphanPaginationConfig]) {
+        config.currentPage = Math.min(config.currentPage, Math.max(1, Math.ceil(config.total / config.pageSize)));
+    }
 });
 
 const policies = computed<Firewall.DockerGuardPolicy[]>(() => {

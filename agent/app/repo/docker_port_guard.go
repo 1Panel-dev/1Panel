@@ -11,10 +11,8 @@ import (
 
 type IDockerPortGuardRepo interface {
 	ListManaged(context.Context) ([]model.DockerPortGuardPolicy, error)
-	ListRuntimeReadOnly(context.Context) ([]model.DockerPortGuardPolicy, error)
 	DeleteBatch(context.Context, []string) error
 	UpsertBatch(context.Context, []model.DockerPortGuardPolicy) error
-	ReplaceRuntimeReadOnly(context.Context, []model.DockerPortGuardPolicy) error
 }
 
 type DockerPortGuardRepo struct{}
@@ -26,15 +24,6 @@ func (r *DockerPortGuardRepo) ListManaged(ctx context.Context) ([]model.DockerPo
 	err := global.DB.WithContext(ctx).
 		Where("read_only = ?", false).
 		Order("family, host_ip, host_port, protocol").
-		Find(&policies).Error
-	return policies, err
-}
-
-func (r *DockerPortGuardRepo) ListRuntimeReadOnly(ctx context.Context) ([]model.DockerPortGuardPolicy, error) {
-	var policies []model.DockerPortGuardPolicy
-	err := global.DB.WithContext(ctx).
-		Where("read_only = ?", true).
-		Order("family, sequence, host_ip, host_port, protocol").
 		Find(&policies).Error
 	return policies, err
 }
@@ -57,21 +46,5 @@ func (r *DockerPortGuardRepo) UpsertBatch(ctx context.Context, policies []model.
 			}
 		}
 		return nil
-	})
-}
-
-func (r *DockerPortGuardRepo) ReplaceRuntimeReadOnly(ctx context.Context, policies []model.DockerPortGuardPolicy) error {
-	return global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Where("read_only = ?", true).
-			Delete(&model.DockerPortGuardPolicy{}).Error; err != nil {
-			return err
-		}
-		if len(policies) == 0 {
-			return nil
-		}
-		for i := range policies {
-			policies[i].ReadOnly = true
-		}
-		return tx.Create(&policies).Error
 	})
 }

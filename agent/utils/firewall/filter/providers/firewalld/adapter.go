@@ -15,6 +15,8 @@ import (
 	"github.com/mattn/go-shellwords"
 )
 
+var ErrAlreadyEnabled = errors.New("firewalld rule already exists")
+
 type CommandReader interface {
 	Read(context.Context, ...string) (string, error)
 }
@@ -114,17 +116,17 @@ func parseFirewalldVersion(output string) (int, int, error) {
 	return major, minor, nil
 }
 
-func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
+func (a *Adapter) ListRules(ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
 	scope = scope.Normalize()
 	if err := scope.ValidateMVP(); err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
 	if scope.Provider != filter.ProviderFirewalld {
-		return filter.Snapshot{}, fmt.Errorf("%w: %s", filter.ErrUnsupportedScope, scope.Key())
+		return filter.RuleSet{}, fmt.Errorf("%w: %s", filter.ErrUnsupportedScope, scope.Key())
 	}
 	scope.Family = filter.FamilyInet
 	if a.reader == nil {
-		return filter.Snapshot{}, errors.New("firewalld reader is required")
+		return filter.RuleSet{}, errors.New("firewalld reader is required")
 	}
 
 	var runtime, permanent zoneOutput
@@ -141,15 +143,15 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 	}()
 	reads.Wait()
 	if err := errors.Join(runtimeErr, permanentErr); err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
 	rules, err := mergeZoneObjects(scope, runtime, permanent)
 	if err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
-	snapshot, err := filter.NewSnapshot(scope, rules)
+	snapshot, err := filter.NewRuleSet(scope, rules)
 	if err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
 	snapshot.Notices = publicZoneNotices(runtime, permanent)
 	return snapshot, nil
@@ -186,135 +188,144 @@ func (a *Adapter) PrepareRule(rule filter.FirewallRule) (filter.FirewallRule, er
 	return normalized, nil
 }
 
-func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
-	if snapshot.Revision == "" {
-		return filter.BackendPlan{}, filter.ErrRuleStale
-	}
+func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
 	if err := validateFirewalldScope(snapshot.Scope); err != nil {
-		return filter.BackendPlan{}, err
+		return filter.CommandBatch{}, err
 	}
-	if len(changes) != 1 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: firewalld plans currently require exactly one change", filter.ErrInvalidRule)
+	if len(changes) == 0 || len(changes) > filter.MaxAtomicExpansion {
+		return filter.CommandBatch{}, fmt.Errorf("%w: invalid firewalld batch size", filter.ErrInvalidRule)
 	}
-	rulePlan, err := a.compileChange(snapshot, changes[0])
-	if err != nil {
-		return filter.BackendPlan{}, err
+	plan := filter.CommandBatch{Provider: filter.ProviderFirewalld, Scope: snapshot.Scope}
+	for _, change := range changes {
+		rulePlan, err := a.compileChange(snapshot, change)
+		if err != nil {
+			return filter.CommandBatch{}, err
+		}
+		plan.Rules = append(plan.Rules, rulePlan)
 	}
-	return filter.BackendPlan{
-		Provider: filter.ProviderFirewalld, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
-		Rules: []filter.NativeRulePlan{rulePlan},
-	}, nil
+	return plan, nil
 }
 
-func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
-	if plan.Provider != filter.ProviderFirewalld || len(plan.Rules) != 1 {
-		return filter.ApplyResult{}, fmt.Errorf("%w: invalid firewalld backend plan", filter.ErrInvalidRule)
+func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) error {
+	commands, err := batchCommands(plan)
+	if err != nil {
+		return err
 	}
-	if err := validateFirewalldScope(plan.Scope); err != nil {
-		return filter.ApplyResult{}, err
+	if len(commands.Commands) != 0 && a.writer == nil {
+		return errors.New("firewalld writer is required")
 	}
-	rulePlan := plan.Rules[0]
-	if len(rulePlan.Commands) != 0 && a.writer == nil {
-		return filter.ApplyResult{}, errors.New("firewalld writer is required")
-	}
-	if len(rulePlan.Commands) != len(rulePlan.RollbackCommands) {
-		return filter.ApplyResult{}, fmt.Errorf("%w: incomplete firewalld rollback plan", filter.ErrInvalidRule)
-	}
-	for _, command := range append(append([]filter.NativeCommand(nil), rulePlan.Commands...), rulePlan.RollbackCommands...) {
-		if err := validateScopeCommand(plan.Scope, command); err != nil {
-			return filter.ApplyResult{}, err
+	executed, alreadyEnabled := 0, 0
+	for index, command := range commands.Commands {
+		err := a.writer.Run(ctx, command)
+		if errors.Is(err, ErrAlreadyEnabled) {
+			alreadyEnabled++
+			err = nil
 		}
-	}
-	executed := 0
-	for index, command := range rulePlan.Commands {
-		if err := a.writer.Run(ctx, command); err != nil {
+		if err != nil {
 			if plan.CommandOnly {
-				return filter.ApplyResult{}, err
+				return err
 			}
-			return filter.ApplyResult{}, a.compensate(ctx, rulePlan, executed, err)
+			return a.compensate(ctx, commands, executed, err)
 		}
 		executed = index + 1
 	}
-	return filter.ApplyResult{Applied: []filter.ObservedRule{rulePlan.Expected}}, nil
+	if commands.Operation == filter.ChangeCreate && alreadyEnabled > 0 && alreadyEnabled == len(commands.Commands) {
+		return ErrAlreadyEnabled
+	}
+	return nil
 }
 
-func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	if plan.Provider != filter.ProviderFirewalld || len(plan.Rules) != 1 {
-		return filter.VerifyResult{}, fmt.Errorf("%w: invalid firewalld backend plan", filter.ErrInvalidRule)
-	}
-	snapshot, err := a.Observe(ctx, plan.Scope)
+func (a *Adapter) Rollback(ctx context.Context, plan filter.CommandBatch) error {
+	commands, err := batchCommands(plan)
 	if err != nil {
-		return filter.VerifyResult{}, err
-	}
-	rulePlan := plan.Rules[0]
-	if rulePlan.Operation == filter.ChangeDelete {
-		return filter.VerifyResult{Snapshot: snapshot, Matched: countCanonical(snapshot, rulePlan.Previous) == 0}, nil
-	}
-	if rulePlan.Operation == filter.ChangeUpdate && rulePlan.Previous != nil &&
-		rulePlan.Previous.Locator.Canonical != rulePlan.Expected.Locator.Canonical && countCanonical(snapshot, rulePlan.Previous) != 0 {
-		return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-	}
-	matches := 0
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Canonical != rulePlan.Expected.Locator.Canonical || observed.Persistence != filter.PersistenceStatusConverged {
-			continue
-		}
-		want, wantErr := filter.RuleKey(rulePlan.Expected.Rule)
-		got, gotErr := filter.RuleKey(observed.Rule)
-		if wantErr == nil && gotErr == nil && want == got {
-			matches++
-		}
-	}
-	return filter.VerifyResult{Snapshot: snapshot, Matched: matches == 1}, nil
-}
-
-func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
-	if plan.Provider != filter.ProviderFirewalld {
-		return fmt.Errorf("%w: invalid firewalld backend plan", filter.ErrInvalidRule)
-	}
-	if err := validateFirewalldScope(plan.Scope); err != nil {
 		return err
 	}
 	if a.writer == nil {
 		return errors.New("firewalld writer is required")
 	}
-	for ruleIndex := len(plan.Rules) - 1; ruleIndex >= 0; ruleIndex-- {
-		rulePlan := plan.Rules[ruleIndex]
-		if err := a.rollback(ctx, plan.Scope, rulePlan, len(rulePlan.RollbackCommands)); err != nil {
-			return err
-		}
-	}
-	return nil
+	return a.rollback(ctx, plan.Scope, commands, len(commands.RollbackCommands))
 }
 
-func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filter.NativeRulePlan, error) {
+func batchCommands(plan filter.CommandBatch) (filter.RuleCommands, error) {
+	if plan.Provider != filter.ProviderFirewalld || len(plan.Rules) == 0 || len(plan.Rules) > filter.MaxAtomicExpansion {
+		return filter.RuleCommands{}, fmt.Errorf("%w: invalid firewalld backend plan", filter.ErrInvalidRule)
+	}
+	if err := validateFirewalldScope(plan.Scope); err != nil {
+		return filter.RuleCommands{}, err
+	}
+	result := filter.RuleCommands{Expected: filter.ObservedRule{Rule: filter.FirewallRule{Scope: plan.Scope}}}
+	if plan.CreatesOnly() {
+		result.Operation = filter.ChangeCreate
+	}
+	for _, rule := range plan.Rules {
+		if len(rule.Commands) != len(rule.RollbackCommands) {
+			return filter.RuleCommands{}, fmt.Errorf("%w: incomplete firewalld rollback plan", filter.ErrInvalidRule)
+		}
+		for _, commands := range [][]filter.NativeCommand{rule.Commands, rule.RollbackCommands} {
+			for _, command := range commands {
+				if len(command.Args) != 2 || command.Args[0] != "--zone="+filter.FirewalldInputZone {
+					return filter.RuleCommands{}, fmt.Errorf("%w: expected one firewalld rule option", filter.ErrInvalidRule)
+				}
+				if err := validateScopeCommand(plan.Scope, command); err != nil {
+					return filter.RuleCommands{}, err
+				}
+			}
+		}
+	}
+	for _, permanent := range []bool{false, true} {
+		previousOperation, commandBytes := "", 0
+		for _, rule := range plan.Rules {
+			for index, command := range rule.Commands {
+				option := command.Args[len(command.Args)-1]
+				rollback := rule.RollbackCommands[index].Args[len(rule.RollbackCommands[index].Args)-1]
+				operation := strings.SplitN(strings.TrimPrefix(option, "--"), "-", 2)[0]
+				if operation != previousOperation || commandBytes+max(len(option), len(rollback))+1 > 64*1024 {
+					args := []string{"--zone=" + filter.FirewalldInputZone}
+					if permanent {
+						args = append(args, "--permanent")
+					}
+					result.Commands = append(result.Commands, filter.NativeCommand{Executable: "firewall-cmd", Args: append([]string(nil), args...)})
+					result.RollbackCommands = append(result.RollbackCommands, filter.NativeCommand{Executable: "firewall-cmd", Args: append([]string(nil), args...)})
+					previousOperation, commandBytes = operation, 0
+				}
+				last := len(result.Commands) - 1
+				result.Commands[last].Args = append(result.Commands[last].Args, option)
+				result.RollbackCommands[last].Args = append(result.RollbackCommands[last].Args, rollback)
+				commandBytes += max(len(option), len(rollback)) + 1
+			}
+		}
+	}
+	return result, nil
+}
+
+func (a *Adapter) compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.RuleCommands, error) {
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
 	}
 	if rule == nil {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
 	}
 	normalized, err := a.PrepareRule(*rule)
 	if err != nil {
-		return filter.NativeRulePlan{}, err
+		return filter.RuleCommands{}, err
 	}
 	if normalized.Scope.Key() != snapshot.Scope.Key() {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
+		return filter.RuleCommands{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
 	}
 	if normalized.UUID == "" {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
+		return filter.RuleCommands{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
 	}
 
 	expected := observedForRule(normalized)
-	plan := filter.NativeRulePlan{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
+	plan := filter.RuleCommands{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
 	switch change.Operation {
 	case filter.ChangeCreate:
-		plan.Commands, plan.RollbackCommands = missingRuleCommands(snapshot, normalized)
+		plan.Commands, plan.RollbackCommands = ruleCommands(nativeOption(normalized, "add"), nativeOption(normalized, "remove"))
 	case filter.ChangeAdopt:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, false)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		plan.Previous = &target
 		plan.Expected = target
@@ -322,35 +333,31 @@ func (a *Adapter) compileChange(snapshot filter.Snapshot, change filter.DesiredC
 	case filter.ChangeUpdate:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, true)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		plan.Previous = &target
 		if target.Locator.Canonical == expected.Locator.Canonical {
 			break
 		}
-		removeCommands, restoreCommands := observedPairedCommands(target, "remove", "add")
-		addCommands, removeNewCommands := missingRuleCommands(snapshot, normalized)
+		removeCommands, restoreCommands := observedRuleCommands(target, "remove", "add")
+		addCommands, removeNewCommands := ruleCommands(nativeOption(normalized, "add"), nativeOption(normalized, "remove"))
 		plan.Commands = append(removeCommands, addCommands...)
 		plan.RollbackCommands = append(restoreCommands, removeNewCommands...)
 	case filter.ChangeDelete:
+		if change.CommandOnly && change.Locator == nil {
+			plan.Commands, plan.RollbackCommands = ruleCommands(nativeOption(normalized, "remove"), nativeOption(normalized, "add"))
+			break
+		}
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, true)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		plan.Previous = &target
 		plan.Expected = target
 		plan.Expected.Rule.UUID = normalized.UUID
-		plan.Commands, plan.RollbackCommands = observedPairedCommands(target, "remove", "add")
-		if change.CommandOnly {
-			switch target.Persistence {
-			case filter.PersistenceStatusRuntimeOnly:
-				plan.Commands, plan.RollbackCommands = plan.Commands[:1], plan.RollbackCommands[:1]
-			case filter.PersistenceStatusPermanentOnly:
-				plan.Commands, plan.RollbackCommands = plan.Commands[1:], plan.RollbackCommands[1:]
-			}
-		}
+		plan.Commands, plan.RollbackCommands = observedRuleCommands(target, "remove", "add")
 	default:
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
 	return plan, nil
 }
@@ -407,52 +414,22 @@ func nativeCanonical(rule filter.FirewallRule) string {
 	return "rich:" + canonicalRichRule(rule)
 }
 
-func missingRuleCommands(snapshot filter.Snapshot, rule filter.FirewallRule) ([]filter.NativeCommand, []filter.NativeCommand) {
-	commands, rollback := pairedCommands(rule, "add", "remove")
-	canonical := nativeCanonical(rule)
-	var runtimeExists, permanentExists bool
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Canonical != canonical {
-			continue
-		}
-		runtimeExists = runtimeExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusRuntimeOnly
-		permanentExists = permanentExists || observed.Persistence == filter.PersistenceStatusConverged || observed.Persistence == filter.PersistenceStatusPermanentOnly
-		if runtimeExists && permanentExists {
-			break
-		}
-	}
-	var changes, inverses []filter.NativeCommand
-	for index, exists := range []bool{runtimeExists, permanentExists} {
-		if !exists {
-			changes = append(changes, commands[index])
-			inverses = append(inverses, rollback[index])
-		}
-	}
-	return changes, inverses
-}
-
-func pairedCommands(rule filter.FirewallRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {
-	return pairedNativeCommands(rule.Scope, nativeOption(rule, operation), nativeOption(rule, inverse))
-}
-
-func observedPairedCommands(observed filter.ObservedRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {
+func observedRuleCommands(observed filter.ObservedRule, operation, inverse string) ([]filter.NativeCommand, []filter.NativeCommand) {
 	if observed.Rule.NativeKind != filter.NativeKindRichRule || observed.Raw == "" {
-		return pairedCommands(observed.Rule, operation, inverse)
+		return ruleCommands(nativeOption(observed.Rule, operation), nativeOption(observed.Rule, inverse))
 	}
-	return pairedNativeCommands(observed.Rule.Scope,
+	return ruleCommands(
 		"--"+operation+"-rich-rule="+observed.Raw,
 		"--"+inverse+"-rich-rule="+observed.Raw)
 }
 
-func pairedNativeCommands(scope filter.Scope, option, rollback string) ([]filter.NativeCommand, []filter.NativeCommand) {
-	selector := scopeSelector(scope)
+func ruleCommands(option, rollback string) ([]filter.NativeCommand, []filter.NativeCommand) {
+	selector := "--zone=" + filter.FirewalldInputZone
 	commands := []filter.NativeCommand{
 		{Executable: "firewall-cmd", Args: []string{selector, option}},
-		{Executable: "firewall-cmd", Args: []string{"--permanent", selector, option}},
 	}
 	rollbackCommands := []filter.NativeCommand{
 		{Executable: "firewall-cmd", Args: []string{selector, rollback}},
-		{Executable: "firewall-cmd", Args: []string{"--permanent", selector, rollback}},
 	}
 	return commands, rollbackCommands
 }
@@ -464,7 +441,7 @@ func nativeOption(rule filter.FirewallRule, operation string) string {
 	return "--" + operation + "-rich-rule=" + canonicalRichRule(rule)
 }
 
-func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChange, normalized filter.FirewallRule, requireOwned bool) (filter.ObservedRule, error) {
+func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange, normalized filter.FirewallRule, requireOwned bool) (filter.ObservedRule, error) {
 	if change.Locator == nil || change.Locator.Canonical == "" {
 		return filter.ObservedRule{}, fmt.Errorf("%w: firewalld mutation requires canonical locator", filter.ErrInvalidRule)
 	}
@@ -487,8 +464,7 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	if target.Protected {
 		return filter.ObservedRule{}, filter.ErrProtectedRule
 	}
-	if target.ParseStatus != filter.ParseStatusSupported ||
-		(target.Persistence != filter.PersistenceStatusConverged && !(change.CommandOnly && change.Operation == filter.ChangeDelete)) {
+	if target.ParseStatus != filter.ParseStatusSupported {
 		return filter.ObservedRule{}, filter.ErrRuleStale
 	}
 	want := normalized
@@ -511,30 +487,37 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 }
 
 func validateScopeCommand(scope filter.Scope, command filter.NativeCommand) error {
-	if command.Executable != "firewall-cmd" {
-		return fmt.Errorf("%w: unexpected firewalld executable %q", filter.ErrInvalidRule, command.Executable)
+	if err := validateFirewalldScope(scope); err != nil {
+		return err
 	}
-	expected := scopeSelector(scope)
-	foundSelector := false
+	if command.Executable != "firewall-cmd" || command.Stdin != "" {
+		return fmt.Errorf("%w: invalid firewalld command", filter.ErrInvalidRule)
+	}
+	expected := "--zone=" + filter.FirewalldInputZone
+	foundSelector, options := false, 0
 	for _, arg := range command.Args {
-		if arg == expected {
+		switch {
+		case arg == expected:
 			foundSelector = true
-		}
-		if (strings.HasPrefix(arg, "--zone=") || strings.HasPrefix(arg, "--policy=")) && arg != expected {
-			return fmt.Errorf("%w: firewalld command targets another scope", filter.ErrUnsupportedScope)
+		case arg == "--permanent":
+		case strings.HasPrefix(arg, "--add-port="), strings.HasPrefix(arg, "--remove-port="),
+			strings.HasPrefix(arg, "--add-rich-rule="), strings.HasPrefix(arg, "--remove-rich-rule="),
+			strings.HasPrefix(arg, "--add-service="), strings.HasPrefix(arg, "--remove-service="):
+			options++
+		default:
+			return fmt.Errorf("%w: unexpected firewalld argument %q", filter.ErrInvalidRule, arg)
 		}
 	}
 	if !foundSelector {
 		return fmt.Errorf("%w: firewalld command must explicitly target %s", filter.ErrUnsupportedScope, expected)
 	}
+	if options == 0 {
+		return fmt.Errorf("%w: firewalld command requires rule options", filter.ErrInvalidRule)
+	}
 	return nil
 }
 
-func scopeSelector(scope filter.Scope) string {
-	return "--zone=" + filter.FirewalldInputZone
-}
-
-func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, executed int, cause error) error {
+func (a *Adapter) compensate(ctx context.Context, plan filter.RuleCommands, executed int, cause error) error {
 	if plan.Operation == filter.ChangeCreate {
 		return cause
 	}
@@ -547,7 +530,7 @@ func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, ex
 	return cause
 }
 
-func (a *Adapter) rollback(ctx context.Context, scope filter.Scope, plan filter.NativeRulePlan, executed int) error {
+func (a *Adapter) rollback(ctx context.Context, scope filter.Scope, plan filter.RuleCommands, executed int) error {
 	var rollbackErr error
 	for index := executed - 1; index >= 0; index-- {
 		if index >= len(plan.RollbackCommands) {
@@ -563,24 +546,11 @@ func (a *Adapter) rollback(ctx context.Context, scope filter.Scope, plan filter.
 			}
 			continue
 		}
-		if err := a.writer.Run(ctx, command); err != nil && rollbackErr == nil {
+		if err := a.writer.Run(ctx, command); err != nil && !errors.Is(err, ErrAlreadyEnabled) && rollbackErr == nil {
 			rollbackErr = err
 		}
 	}
 	return rollbackErr
-}
-
-func countCanonical(snapshot filter.Snapshot, expected *filter.ObservedRule) int {
-	if expected == nil {
-		return 0
-	}
-	count := 0
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Canonical == expected.Locator.Canonical {
-			count++
-		}
-	}
-	return count
 }
 
 type zoneOutput struct {
@@ -594,7 +564,7 @@ func (a *Adapter) readScope(ctx context.Context, scope filter.Scope, permanent b
 	if permanent {
 		args = append(args, "--permanent")
 	}
-	args = append(args, scopeSelector(scope), "--list-all")
+	args = append(args, "--zone="+filter.FirewalldInputZone, "--list-all")
 	output, err := a.reader.Read(ctx, args...)
 	if err != nil {
 		return zoneOutput{}, err
@@ -1079,9 +1049,46 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if err := validateSystemCommand(command); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(
-		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
+	options, removals, alreadyEnabled := 0, 0, 0
+	for _, arg := range command.Args {
+		if strings.HasPrefix(arg, "--add-") || strings.HasPrefix(arg, "--remove-") {
+			options++
+		}
+		if strings.HasPrefix(arg, "--remove-") {
+			removals++
+		}
+	}
+	timeout := 60 * time.Second
+	if options > 1 {
+		timeout = 5 * time.Minute
+	}
+	var stderr strings.Builder
+	err := cmd.NewCommandMgr(
+		cmd.WithContext(ctx), cmd.WithTimeout(timeout), cmd.WithEnv("LC_ALL=C", "LANGUAGE=en_US:en"), cmd.WithStderr(&stderr),
 	).RunWithOptionalSudo(command.Executable, command.Args...)
+	if err != nil {
+		return err
+	}
+	for _, line := range strings.Split(stderr.String(), "\n") {
+		line = strings.TrimSpace(line)
+		if line == "" {
+			continue
+		}
+		switch {
+		case strings.HasPrefix(line, "Warning: ALREADY_ENABLED:"):
+			alreadyEnabled++
+		case strings.HasPrefix(line, "Warning: NOT_ENABLED:"):
+			if removals != options {
+				return fmt.Errorf("%w: %s", filter.ErrRuleStale, stderr.String())
+			}
+		default:
+			return fmt.Errorf("firewalld rule batch failed: %s", stderr.String())
+		}
+	}
+	if alreadyEnabled > 0 && alreadyEnabled == options {
+		return ErrAlreadyEnabled
+	}
+	return nil
 }
 
 func validateSystemCommand(command filter.NativeCommand) error {
@@ -1092,36 +1099,4 @@ func validateSystemCommand(command filter.NativeCommand) error {
 		}
 	}
 	return fmt.Errorf("%w: firewalld command must target the managed input zone", filter.ErrUnsupportedScope)
-}
-
-type createPlanner struct {
-	adapter     *Adapter
-	snapshot    filter.Snapshot
-	byCanonical map[string][]filter.ObservedRule
-}
-
-func (a *Adapter) NewCreatePlanner(snapshot filter.Snapshot) filter.CreatePlanner {
-	byCanonical := make(map[string][]filter.ObservedRule, len(snapshot.Rules))
-	for _, observed := range snapshot.Rules {
-		byCanonical[observed.Locator.Canonical] = append(byCanonical[observed.Locator.Canonical], observed)
-	}
-	snapshot.Rules = nil
-	return &createPlanner{adapter: a, snapshot: snapshot, byCanonical: byCanonical}
-}
-
-func (p *createPlanner) Compile(change filter.DesiredChange) (filter.BackendPlan, error) {
-	if change.Operation != filter.ChangeCreate || change.After == nil {
-		return filter.BackendPlan{}, filter.ErrInvalidRule
-	}
-	rule, err := p.adapter.PrepareRule(*change.After)
-	if err != nil {
-		return filter.BackendPlan{}, err
-	}
-	snapshot := p.snapshot
-	snapshot.Rules = p.byCanonical[nativeCanonical(rule)]
-	return p.adapter.Compile(snapshot, []filter.DesiredChange{change})
-}
-
-func (p *createPlanner) Applied(rule filter.ObservedRule) {
-	p.byCanonical[rule.Locator.Canonical] = []filter.ObservedRule{rule}
 }

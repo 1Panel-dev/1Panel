@@ -4109,6 +4109,8 @@ const message = {
         dockerGuard: '컨테이너 포트 보호',
         systemFirewall: '호스트 방화벽',
         systemFirewallHelper: '호스트 포트 접근과 인바운드 규칙을 관리합니다.',
+        forwardPolicyDropWarning:
+            '{0}의 FORWARD 기본 정책은 DROP입니다. iptables/ip6tables 규칙에서 명시적으로 허용하지 않은 다른 호스트로의 전달 트래픽은 차단될 수 있습니다. 해당 IP 버전의 허용 규칙을 확인하세요.',
         forwardingHelper: '포트 포워딩 규칙을 관리합니다.',
         dockerFirewallHelper: '1Panel 컨테이너 포트 보호 관리 방식을 선택합니다.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, 실험적',
@@ -4116,7 +4118,8 @@ const message = {
         configuredRules: '{0}개 규칙 설정됨',
         addressFamily: 'IP 버전',
         portOrRange: '포트 / 범위',
-        importBackendHelper: '가져온 규칙은 현재 {0} 백엔드에 맞게 변환됩니다. 원본 백엔드의 규칙은 변경되지 않습니다.',
+        batchLimit: '한 번에 생성하거나 가져올 수 있는 규칙은 확장 후 기준으로 최대 {0}개입니다.',
+        importLimit: '최대 {0}개의 규칙(확장 후 기준)을 가져올 수 있으며, 파일 크기는 {1} KB를 초과할 수 없습니다.',
         ruleSyncTitle: '규칙 동기화',
         ruleSyncAction: '규칙 동기화',
         ruleSyncDatabase: '1Panel 데이터베이스',

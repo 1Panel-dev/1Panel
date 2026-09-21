@@ -1,3 +1,6 @@
+export const FIREWALL_BATCH_LIMIT = 500;
+export const FIREWALL_IMPORT_MAX_SIZE = 256 * 1024;
+
 export type FirewallAddressFamily = 'ipv4' | 'ipv6' | 'inet';
 
 export const splitTagValues = (values: string[]): string[] => [

@@ -710,3 +710,7 @@ FirewallPersistDockerGuardStep: 'ບັນທຶກສະຖານະປ້ອ�
 ErrFirewallRuleScopeChange: "ໄຟວໍປັດຈຸບັນບໍ່ຮອງຮັບການປ່ຽນຂອບເຂດຂອງກົດ (ເຊັ່ນ ຕະກູນທີ່ຢູ່ IPv4/IPv6). ກະລຸນາສ້າງກົດໃໝ່."
 FirewallWhitelistReleased: "{{ .name }}: ຍົກເລີກການປ້ອງກັນລາຍຊື່ທີ່ອະນຸຍາດແລ້ວ; ຍັງຄົງກົດອະນຸຍາດໄວ້. ຫາກຕ້ອງການປິດພອດ ໃຫ້ລຶບກົດດ້ວຍຕົນເອງຈາກລາຍການກົດ"
 FirewallWhitelistRequired: "{{ .name }}: ປ້ອງກັນໂດຍກົດພອດທີ່ຈຳເປັນຂອງລະບົບ"
+
+ErrFirewallBackendCleanupRequired: "ແບັກເອນປັດຈຸບັນ {{ .current }} ຍັງມີກົດຂອງ 1Panel. ກະລຸນາລຶບອອກກ່ອນປ່ຽນໄປ {{ .target }}."
+ErrDockerIPv4ForwardingDisabled: "ການສົ່ງຕໍ່ IPv4 ຖືກປິດ. ກະລຸນາຕັ້ງ net.ipv4.ip_forward=1 ກ່ອນໃຊ້ແບັກເອນໄຟວໍຂອງ Docker."
+ErrFirewallRuleSavedApplyFailed: "ບັນທຶກການຕັ້ງຄ່າກົດໃໝ່ແລ້ວ ແຕ່ນຳໃຊ້ກັບໄຟວໍບໍ່ສຳເລັດ. ລອງອີກຄັ້ງດ້ວຍການຊິງຂໍ້ມູນ: {{ .detail }}"

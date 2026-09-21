@@ -4076,6 +4076,8 @@ const message = {
         dockerGuard: 'ການປ້ອງກັນພອດຄອນເທນເນີ',
         systemFirewall: 'ໄຟວໍໂຮສ',
         systemFirewallHelper: 'ຄວບຄຸມການເຂົ້າເຖິງພອດໂຮສ ແລະ ກົດຂາເຂົ້າ.',
+        forwardPolicyDropWarning:
+            'ນະໂຍບາຍ FORWARD ເລີ່ມຕົ້ນສຳລັບ {0} ແມ່ນ DROP. ການຈະລາຈອນທີ່ສົ່ງຕໍ່ໄປຍັງໂຮສອື່ນອາດຖືກບລັອກ ຖ້າບໍ່ມີກົດ iptables/ip6tables ອະນຸຍາດຢ່າງຊັດເຈນ. ກະລຸນາກວດສອບກົດອະນຸຍາດສຳລັບເວີຊັນ IP ທີ່ກ່ຽວຂ້ອງ.',
         forwardingHelper: 'ຈັດການກົດການສົ່ງຕໍ່ພອດ.',
         dockerFirewallHelper: 'ເລືອກວິທີທີ່ 1Panel ຈັດການການປ້ອງກັນພອດຄອນເທນເນີ.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, ທົດລອງ',
@@ -4083,7 +4085,8 @@ const message = {
         configuredRules: 'ຕັ້ງຄ່າແລ້ວ {0} ກົດ',
         addressFamily: 'ລຸ້ນ IP',
         portOrRange: 'ພອດ / ຊ່ວງ',
-        importBackendHelper: 'ກົດທີ່ນຳເຂົ້າຈະຖືກປ່ຽນໃຫ້ເໝາະກັບແບັກເອນ {0} ປັດຈຸບັນ. ກົດຕົ້ນທາງຈະບໍ່ຖືກປ່ຽນ.',
+        batchLimit: 'ແຕ່ລະຄັ້ງສາມາດສ້າງ ຫຼື ນຳເຂົ້າໄດ້ສູງສຸດ {0} ກົດ ໂດຍນັບຫຼັງຈາກຂະຫຍາຍແລ້ວ.',
+        importLimit: 'ນຳເຂົ້າໄດ້ສູງສຸດ {0} ກົດ (ນັບຫຼັງຈາກຂະຫຍາຍແລ້ວ), ຂະໜາດໄຟລ໌ບໍ່ເກີນ {1} KB.',
         ruleSyncTitle: 'ຊິງກົດ',
         ruleSyncAction: 'ຊິງກົດ',
         ruleSyncDatabase: 'ຖານຂໍ້ມູນ 1Panel',

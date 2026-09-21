@@ -4159,6 +4159,8 @@ const message = {
         dockerGuard: 'محافظت از پورت کانتینر',
         systemFirewall: 'فایروال میزبان',
         systemFirewallHelper: 'دسترسی پورت‌های میزبان و قوانین ورودی را کنترل می‌کند.',
+        forwardPolicyDropWarning:
+            'سیاست پیش‌فرض FORWARD برای {0} برابر DROP است. ترافیک هدایت‌شده به میزبان‌های دیگر ممکن است مسدود شود، مگر اینکه قواعد iptables/ip6tables صریحاً آن را مجاز کنند. قواعد مجازکننده نسخه IP مربوطه را بررسی کنید.',
         forwardingHelper: 'قوانین انتقال پورت را مدیریت می‌کند.',
         dockerFirewallHelper: 'روش مدیریت محافظت از پورت کانتینر در 1Panel را انتخاب می‌کند.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0، آزمایشی',
@@ -4166,7 +4168,8 @@ const message = {
         configuredRules: '{0} قانون پیکربندی شده',
         addressFamily: 'نسخه IP',
         portOrRange: 'پورت / بازه',
-        importBackendHelper: 'قوانین واردشده برای بک‌اند فعلی {0} تبدیل می‌شوند. قوانین مبدأ تغییر نمی‌کنند.',
+        batchLimit: 'در هر نوبت حداکثر {0} قانون پس از گسترش ایجاد یا وارد کنید.',
+        importLimit: 'حداکثر {0} قانون (پس از گسترش) وارد کنید؛ حجم فایل نباید از {1} کیلوبایت بیشتر باشد.',
         ruleSyncTitle: 'همگام‌سازی قوانین',
         ruleSyncAction: 'همگام‌سازی قوانین',
         ruleSyncDatabase: 'پایگاه داده 1Panel',

@@ -719,3 +719,7 @@ FirewallPersistDockerGuardStep: 'ذخیره وضعیت محافظت پورت Doc
 ErrFirewallRuleScopeChange: "فایروال فعلی از تغییر محدودهٔ قانون (مانند خانوادهٔ آدرس IPv4/IPv6) پشتیبانی نمی‌کند. لطفاً یک قانون جدید ایجاد کنید."
 FirewallWhitelistReleased: "{{ .name }}: حفاظت فهرست مجاز برداشته شد؛ قانون اجازه حفظ می‌شود. برای بستن پورت، قانون را به‌صورت دستی از فهرست قوانین حذف کنید"
 FirewallWhitelistRequired: "{{ .name }}: توسط قوانین پورت‌های ضروری سیستم محافظت می‌شود"
+
+ErrFirewallBackendCleanupRequired: "بک‌اند فعلی {{ .current }} هنوز شامل قوانین 1Panel است. پیش از تغییر به {{ .target }} آن‌ها را پاک کنید."
+ErrDockerIPv4ForwardingDisabled: "ارسال IPv4 غیرفعال است. پیش از استفاده از بک‌اند فایروال Docker، مقدار net.ipv4.ip_forward=1 را تنظیم کنید."
+ErrFirewallRuleSavedApplyFailed: "پیکربندی قانون جدید ذخیره شد، اما اعمال آن در دیوار آتش ناموفق بود. با همگام‌سازی دوباره تلاش کنید: {{ .detail }}"

@@ -48,14 +48,14 @@
                     v-for="group in filteredPortGroups"
                     :key="group.key"
                     class="port-detail-card"
-                    :class="{ 'is-selected': selectedGroupKeys.includes(group.key) }"
+                    :class="{ 'is-selected': selectedGroupKeys.has(group.key) }"
                     shadow="never"
                     @click="toggleSelection(group.key)"
                 >
                     <div class="port-card-header">
                         <div class="port-card-title">
                             <el-checkbox
-                                :model-value="selectedGroupKeys.includes(group.key)"
+                                :model-value="selectedGroupKeys.has(group.key)"
                                 @click.stop
                                 @change="(checked: boolean) => changeSelection(group.key, checked)"
                             />
@@ -188,7 +188,12 @@ import {
     dockerGuardManagementTarget,
     isValidDockerGuardSource,
 } from '@/views/host/firewall/docker/model';
-import { formatHostAddress, formatHostAddressList, splitTagValues } from '@/views/host/firewall/utils/validation';
+import {
+    FIREWALL_BATCH_LIMIT,
+    formatHostAddress,
+    formatHostAddressList,
+    splitTagValues,
+} from '@/views/host/firewall/utils/validation';
 
 const props = defineProps<{ base: Firewall.DockerGuardBase; containers: Firewall.DockerGuardContainer[] }>();
 const emit = defineEmits<{ search: []; created: [taskID: string] }>();
@@ -197,7 +202,7 @@ const drawerVisible = ref(false);
 const policyVisible = ref(false);
 const savingPolicy = ref(false);
 const activeContainerKey = ref('');
-const selectedGroupKeys = ref<string[]>([]);
+const selectedGroupKeys = ref(new Set<string>());
 const policyEndpoints = ref<Firewall.DockerGuardEndpoint[]>([]);
 const familyFilter = ref<'all' | Firewall.DockerGuardEndpoint['family']>('all');
 const formRef = ref<FormInstance>();
@@ -219,14 +224,14 @@ const filteredPortGroups = computed(() =>
 );
 const selectedEndpoints = computed(() =>
     filteredPortGroups.value
-        .filter((group) => selectedGroupKeys.value.includes(group.key))
+        .filter((group) => selectedGroupKeys.value.has(group.key))
         .flatMap((group) => group.endpoints),
 );
 const allSelected = computed(
-    () => filteredPortGroups.value.length > 0 && selectedGroupKeys.value.length === filteredPortGroups.value.length,
+    () => filteredPortGroups.value.length > 0 && selectedGroupKeys.value.size === filteredPortGroups.value.length,
 );
 const selectionIndeterminate = computed(
-    () => selectedGroupKeys.value.length > 0 && selectedGroupKeys.value.length < filteredPortGroups.value.length,
+    () => selectedGroupKeys.value.size > 0 && selectedGroupKeys.value.size < filteredPortGroups.value.length,
 );
 const hasMixedFamilies = computed(() => new Set(policyEndpoints.value.map((endpoint) => endpoint.family)).size > 1);
 const normalizeSources = (sources: string[]) =>
@@ -281,22 +286,24 @@ const rules = reactive<FormRules>({
 const acceptParams = (container: Firewall.DockerGuardContainer) => {
     activeContainerKey.value = container.key;
     familyFilter.value = 'all';
-    selectedGroupKeys.value = [];
+    selectedGroupKeys.value.clear();
     drawerVisible.value = true;
 };
 const changeFamilyFilter = () => {
-    selectedGroupKeys.value = [];
+    selectedGroupKeys.value.clear();
 };
 const changeAllSelection = (checked: boolean) => {
-    selectedGroupKeys.value = checked ? filteredPortGroups.value.map((group) => group.key) : [];
+    selectedGroupKeys.value = new Set(checked ? filteredPortGroups.value.map((group) => group.key) : []);
 };
 const changeSelection = (key: string, checked: boolean) => {
-    selectedGroupKeys.value = checked
-        ? [...selectedGroupKeys.value, key]
-        : selectedGroupKeys.value.filter((item) => item !== key);
+    if (checked) {
+        selectedGroupKeys.value.add(key);
+    } else {
+        selectedGroupKeys.value.delete(key);
+    }
 };
 const toggleSelection = (key: string) => {
-    changeSelection(key, !selectedGroupKeys.value.includes(key));
+    changeSelection(key, !selectedGroupKeys.value.has(key));
 };
 const openPolicy = (endpoints: Firewall.DockerGuardEndpoint[]) => {
     if (!endpoints.length) return;
@@ -350,6 +357,10 @@ const submitPolicy = async () => {
     if (!valid || !form.mode) return;
     const mode = form.mode;
     const sources = mode === 'deny_all' ? [] : splitTagValues(form.sources);
+    if (policyEndpoints.value.length > FIREWALL_BATCH_LIMIT) {
+        MsgError(i18n.global.t('firewall.batchLimit', [FIREWALL_BATCH_LIMIT]));
+        return;
+    }
     savingPolicy.value = true;
     try {
         const result = (
@@ -371,7 +382,7 @@ const submitPolicy = async () => {
         }
         policyVisible.value = false;
         drawerVisible.value = false;
-        selectedGroupKeys.value = [];
+        selectedGroupKeys.value.clear();
         emit('created', result.taskID);
     } catch (error) {
         MsgError(
@@ -404,7 +415,7 @@ const remove = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean)
             MsgError(i18n.global.t('commons.msg.operationFailed'));
             return;
         }
-        selectedGroupKeys.value = [];
+        selectedGroupKeys.value.clear();
         drawerVisible.value = false;
         emit('created', result.taskID);
     } catch (error) {

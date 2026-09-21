@@ -4273,6 +4273,8 @@ const message = {
         dockerGuard: 'Perlindungan port bekas',
         systemFirewall: 'Tembok api hos',
         systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
+        forwardPolicyDropWarning:
+            'Dasar FORWARD lalai untuk {0} ialah DROP. Trafik yang dimajukan ke hos lain mungkin disekat melainkan dibenarkan secara jelas oleh peraturan iptables/ip6tables. Semak peraturan kebenaran untuk versi IP yang berkenaan.',
         forwardingHelper: 'Mengurus peraturan pemajuan port.',
         dockerFirewallHelper: 'Memilih cara 1Panel mengurus perlindungan port bekas.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, percubaan',
@@ -4280,8 +4282,9 @@ const message = {
         configuredRules: '{0} peraturan dikonfigurasi',
         addressFamily: 'Versi IP',
         portOrRange: 'Port / julat',
-        importBackendHelper:
-            'Peraturan yang diimport ditukar untuk bahagian belakang semasa {0}. Peraturan sumber tidak diubah.',
+        batchLimit: 'Cipta atau import maksimum {0} peraturan setiap kelompok selepas pengembangan.',
+        importLimit:
+            'Import sehingga {0} peraturan (dikira selepas pengembangan), dengan saiz fail tidak melebihi {1} KB.',
         ruleSyncTitle: 'Segerakkan peraturan',
         ruleSyncAction: 'Segerakkan peraturan',
         ruleSyncDatabase: 'Pangkalan data 1Panel',

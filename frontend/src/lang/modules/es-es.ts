@@ -4251,6 +4251,8 @@ const message = {
         dockerGuard: 'Protección de puertos de contenedores',
         systemFirewall: 'Firewall del host',
         systemFirewallHelper: 'Controla el acceso a los puertos del host y las reglas de entrada.',
+        forwardPolicyDropWarning:
+            'La política predeterminada de FORWARD para {0} es DROP. El tráfico reenviado a otros hosts puede bloquearse si las reglas de iptables/ip6tables no lo permiten explícitamente. Revise las reglas de permiso de la versión IP correspondiente.',
         forwardingHelper: 'Gestiona las reglas de reenvío de puertos.',
         dockerFirewallHelper: 'Selecciona cómo gestiona 1Panel la protección de puertos de contenedores.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4258,8 +4260,8 @@ const message = {
         configuredRules: '{0} reglas configuradas',
         addressFamily: 'Versión de IP',
         portOrRange: 'Puerto / rango',
-        importBackendHelper:
-            'Las reglas importadas se convierten para el backend actual {0}. Las reglas de origen no se modifican.',
+        batchLimit: 'Puede crear o importar hasta {0} reglas por lote, después de expandirlas.',
+        importLimit: 'Importe hasta {0} reglas (contadas después de expandirlas), con un archivo de hasta {1} KB.',
         ruleSyncTitle: 'Sincronizar reglas',
         ruleSyncAction: 'Sincronizar reglas',
         ruleSyncDatabase: 'Base de datos de 1Panel',

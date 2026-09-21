@@ -10,6 +10,14 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle/providers"
 )
 
+type Operation string
+
+const (
+	OperationStart   Operation = "start"
+	OperationStop    Operation = "stop"
+	OperationRestart Operation = "restart"
+)
+
 const (
 	ProviderFirewalld = constant.FirewallProviderFirewalld
 	ProviderUFW       = constant.FirewallProviderUFW
@@ -109,15 +117,14 @@ type PreStopResetter interface {
 	ResetBeforeStop() error
 }
 
-func NewClient() (Client, error) {
-	runtime, err := DetectRuntime()
-	if err != nil {
-		return nil, err
+func NewClient(provider string) (Client, error) {
+	if provider == "" {
+		runtime, err := DetectRuntime()
+		if err != nil {
+			return nil, err
+		}
+		provider = runtime.Provider
 	}
-	return NewClientFor(runtime.Provider)
-}
-
-func NewClientFor(provider string) (Client, error) {
 	switch provider {
 	case "firewalld":
 		if !which("firewalld") {

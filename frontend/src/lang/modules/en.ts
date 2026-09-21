@@ -4204,6 +4204,8 @@ const message = {
         dockerGuard: 'Container Port Guard',
         systemFirewall: 'Host firewall',
         systemFirewallHelper: 'Controls host port access and inbound firewall rules.',
+        forwardPolicyDropWarning:
+            'The default FORWARD policy for {0} is DROP. Traffic forwarded to other hosts may be blocked unless explicitly allowed by iptables/ip6tables rules. Check the allow rules for the corresponding IP version.',
         forwardingHelper: 'Manages port-forwarding rules.',
         dockerFirewallHelper: 'Selects how 1Panel manages container port protection.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4211,7 +4213,8 @@ const message = {
         configuredRules: '{0} rules configured',
         addressFamily: 'IP version',
         portOrRange: 'Port / range',
-        importBackendHelper: 'Imported rules are converted for the current {0} backend. Source rules are not changed.',
+        batchLimit: 'Create or import at most {0} rules per batch (after expansion).',
+        importLimit: 'Import up to {0} rules (counted after expansion), with a file size of at most {1} KB.',
         ruleSyncTitle: 'Synchronize rules',
         ruleSyncAction: 'Sync rules',
         ruleSyncDatabase: '1Panel database',

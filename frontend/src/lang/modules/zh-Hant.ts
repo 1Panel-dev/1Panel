@@ -3921,6 +3921,8 @@ const message = {
         dockerGuard: '容器連接埠防護',
         systemFirewall: '主機防火牆',
         systemFirewallHelper: '用於管理主機連接埠存取和入站規則。',
+        forwardPolicyDropWarning:
+            '{0} 的 FORWARD 預設策略為 DROP，未被 iptables/ip6tables 規則明確允許的跨主機轉送流量可能遭到阻擋，請檢查對應位址族的允許規則。',
         forwardingHelper: '用於管理連接埠轉發規則。',
         dockerFirewallHelper: '用於選擇 1Panel 容器連接埠防護的管理方式。',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0，實驗性',
@@ -3928,7 +3930,8 @@ const message = {
         configuredRules: '已設定 {0} 條規則',
         addressFamily: 'IP 版本',
         portOrRange: '連接埠 / 範圍',
-        importBackendHelper: '匯入規則會轉換並寫入目前後端 {0}，來源後端規則不會被修改。',
+        batchLimit: '每次最多建立或匯入 {0} 條規則（依展開後的數量計算）。',
+        importLimit: '最多匯入 {0} 條規則（依展開後的數量計算），檔案大小不得超過 {1} KB。',
         ruleSyncTitle: '同步規則',
         ruleSyncAction: '同步規則',
         ruleSyncDatabase: '1Panel 資料庫',

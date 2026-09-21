@@ -4186,6 +4186,8 @@ const message = {
         dockerGuard: 'コンテナポート保護',
         systemFirewall: 'ホストファイアウォール',
         systemFirewallHelper: 'ホストのポートアクセスと受信ルールを管理します。',
+        forwardPolicyDropWarning:
+            '{0} の FORWARD のデフォルトポリシーは DROP です。iptables/ip6tables のルールで明示的に許可されていない他のホストへの転送トラフィックは、遮断される可能性があります。該当する IP バージョンの許可ルールを確認してください。',
         forwardingHelper: 'ポート転送ルールを管理します。',
         dockerFirewallHelper: '1Panel のコンテナポート保護の管理方法を選択します。',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0、実験的',
@@ -4193,8 +4195,8 @@ const message = {
         configuredRules: '{0} 件設定済み',
         addressFamily: 'IP バージョン',
         portOrRange: 'ポート / 範囲',
-        importBackendHelper:
-            'インポートしたルールは現在の {0} バックエンド向けに変換されます。移行元のルールは変更されません。',
+        batchLimit: '一度に作成またはインポートできるルールは、展開後の件数で最大 {0} 件です。',
+        importLimit: '最大 {0} 件のルール（展開後の件数）をインポートできます。ファイルサイズの上限は {1} KB です。',
         ruleSyncTitle: 'ルールを同期',
         ruleSyncAction: 'ルールを同期',
         ruleSyncDatabase: '1Panel データベース',

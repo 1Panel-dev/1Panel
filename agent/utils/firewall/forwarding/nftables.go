@@ -1,6 +1,7 @@
 package forwarding
 
 import (
+	"context"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
@@ -22,18 +24,18 @@ const (
 	nftForwardMarker = "1panel-forward:"
 )
 
-type nftablesAdapter struct{ system forwardingSystem }
+type Nftables struct{ system forwardingSystem }
 
-func newNftablesAdapter() *nftablesAdapter {
-	return &nftablesAdapter{system: defaultForwardingSystem{}}
+func NewNftables() *Nftables {
+	return &Nftables{system: defaultForwardingSystem{}}
 }
 
-func (n *nftablesAdapter) Name() string { return "nftables" }
+func (n *Nftables) Name() string { return "nftables" }
 
-func (n *nftablesAdapter) List() ([]Rule, error) {
+func (n *Nftables) List() ([]Rule, error) {
 	rules := make([]Rule, 0)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
-		stdout, err := nftables_helper.ReadChain(nftRun, nftTableFamily(family), nftForwardTable, nftForwardChain(ChainPreRouting))
+		stdout, err := nftables_helper.ReadChain(nftRun, nftTableFamily(family), nftForwardTable, "NFT_"+ChainPreRouting)
 		if errors.Is(err, nftables_helper.ErrChainNotFound) {
 			continue
 		}
@@ -45,7 +47,7 @@ func (n *nftablesAdapter) List() ([]Rule, error) {
 	return rules, nil
 }
 
-func (n *nftablesAdapter) Reconcile(rules []Rule) error {
+func (n *Nftables) ReplaceRules(rules []Rule) error {
 	if err := ensureNftForwardTables(); err != nil {
 		return fmt.Errorf("initialize nftables forwarding table: %w", err)
 	}
@@ -53,10 +55,64 @@ func (n *nftablesAdapter) Reconcile(rules []Rule) error {
 	if err != nil {
 		return err
 	}
-	return nftRunCommands(commands)
+	return nftRunCommands(context.Background(), commands)
 }
 
-func (n *nftablesAdapter) Enable() error {
+func (n *Nftables) CreateRules(ctx context.Context, rules []Rule) error {
+	if len(rules) == 0 {
+		return nil
+	}
+	commands, err := createNftForwardCommands(rules)
+	if err != nil {
+		return err
+	}
+	return nftRunCommands(ctx, commands)
+}
+
+func (n *Nftables) DeleteRules(ctx context.Context, rules []Rule) error {
+	wanted := make(map[string]map[string]bool)
+	for _, rule := range rules {
+		normalized, err := NormalizeRule(rule)
+		if err != nil {
+			return err
+		}
+		family := nftTableFamily(normalized.Family)
+		if wanted[family] == nil {
+			wanted[family] = make(map[string]bool)
+		}
+		wanted[family][normalized.Identity()] = true
+	}
+	var commands [][]string
+	for _, family := range []string{"ip", "ip6"} {
+		if len(wanted[family]) == 0 {
+			continue
+		}
+		output, _, err := nftables_helper.ReadTable(func(args ...string) (string, error) {
+			return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
+		}, family, nftForwardTable)
+		if err != nil {
+			return err
+		}
+		chains := nftables_helper.ParseTableChains(output)
+		for _, chain := range []string{ChainPreRouting, ChainPostRouting, ChainForward} {
+			for _, rule := range parseNftForwardRules(chains["NFT_"+chain]) {
+				if !wanted[family][rule.Identity()] {
+					continue
+				}
+				if _, err := strconv.ParseUint(rule.Num, 10, 64); err != nil {
+					return fmt.Errorf("invalid nftables forwarding handle %q", rule.Num)
+				}
+				commands = append(commands, []string{"delete", "rule", family, nftForwardTable, "NFT_" + chain, "handle", rule.Num})
+			}
+		}
+	}
+	if len(commands) == 0 {
+		return nil
+	}
+	return nftRunCommands(ctx, commands)
+}
+
+func (n *Nftables) Enable() error {
 	if err := ensureForwardingSysctls(n.system, true); err != nil {
 		return err
 	}
@@ -66,7 +122,7 @@ func (n *nftablesAdapter) Enable() error {
 	return nil
 }
 
-func (n *nftablesAdapter) Cleanup() error {
+func (n *Nftables) Cleanup() error {
 	commands := make([][]string, 0, 2)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
@@ -76,7 +132,7 @@ func (n *nftablesAdapter) Cleanup() error {
 		commands = append(commands, []string{"delete", "table", tableFamily, nftForwardTable})
 	}
 	if len(commands) > 0 {
-		if err := nftRunCommands(commands); err != nil {
+		if err := nftRunCommands(context.Background(), commands); err != nil {
 			return err
 		}
 	}
@@ -87,7 +143,7 @@ func (n *nftablesAdapter) Cleanup() error {
 	return nil
 }
 
-func (n *nftablesAdapter) InitStatus() (bool, bool, error) {
+func (n *Nftables) InitStatus() (bool, bool, error) {
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		initialized, bound, err := n.FamilyStatus(family)
 		if err != nil || !initialized || !bound {
@@ -97,7 +153,7 @@ func (n *nftablesAdapter) InitStatus() (bool, bool, error) {
 	return true, true, nil
 }
 
-func (n *nftablesAdapter) FamilyStatus(family string) (bool, bool, error) {
+func (n *Nftables) FamilyStatus(family string) (bool, bool, error) {
 	sysctlPath := "/proc/sys/net/ipv4/ip_forward"
 	if family == FamilyIPv6 {
 		sysctlPath = "/proc/sys/net/ipv6/conf/all/forwarding"
@@ -106,15 +162,23 @@ func (n *nftablesAdapter) FamilyStatus(family string) (bool, bool, error) {
 	if err != nil {
 		return false, false, fmt.Errorf("read %s forwarding status: %w", family, err)
 	}
+	output, exists, err := nftables_helper.ReadTable(nftRun, nftTableFamily(family), nftForwardTable)
+	if err != nil {
+		return false, false, err
+	}
+	if !exists {
+		return false, false, nil
+	}
+	chains := nftables_helper.ParseTableChains(output)
 	for _, chain := range []string{ChainPreRouting, ChainPostRouting, ChainForward} {
-		if _, err := nftRun("list", "chain", nftTableFamily(family), nftForwardTable, nftForwardChain(chain)); err != nil {
+		if _, exists := chains["NFT_"+chain]; !exists {
 			return false, false, nil
 		}
 	}
 	return true, strings.TrimSpace(string(data)) != "0", nil
 }
 
-func (n *nftablesAdapter) Replay() error {
+func (n *Nftables) Replay() error {
 	file := filepath.Join(global.Dir.FirewallDir, nftForwardFile)
 	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
 		return nil
@@ -137,23 +201,24 @@ func ensureNftForwardTables() error {
 	commands := make([][]string, 0, 8)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
-		tableExists := true
-		if _, err := nftRun("list", "table", tableFamily, nftForwardTable); err != nil {
-			tableExists = false
+		output, tableExists, err := nftables_helper.ReadTable(nftRun, tableFamily, nftForwardTable)
+		if err != nil {
+			return err
+		}
+		existingChains := nftables_helper.ParseTableChains(output)
+		if !tableExists {
 			commands = append(commands, []string{"add", "table", tableFamily, nftForwardTable})
 		}
 		chains := []struct {
 			name, chainType, hook, priority string
 		}{
-			{nftForwardChain(ChainPreRouting), "nat", "prerouting", "-100"},
-			{nftForwardChain(ChainPostRouting), "nat", "postrouting", "100"},
-			{nftForwardChain(ChainForward), "filter", "forward", "0"},
+			{"NFT_" + ChainPreRouting, "nat", "prerouting", "-100"},
+			{"NFT_" + ChainPostRouting, "nat", "postrouting", "100"},
+			{"NFT_" + ChainForward, "filter", "forward", "0"},
 		}
 		for _, chain := range chains {
-			if tableExists {
-				if _, err := nftRun("list", "chain", tableFamily, nftForwardTable, chain.name); err == nil {
-					continue
-				}
+			if _, exists := existingChains[chain.name]; exists {
+				continue
 			}
 			commands = append(commands, []string{
 				"add", "chain", tableFamily, nftForwardTable, chain.name,
@@ -164,16 +229,22 @@ func ensureNftForwardTables() error {
 	if len(commands) == 0 {
 		return nil
 	}
-	return nftRunCommands(commands)
+	return nftRunCommands(context.Background(), commands)
 }
 
 func rebuildNftForwardCommands(rules []Rule) ([][]string, error) {
 	commands := make([][]string, 0, 6+len(rules)*4)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		for _, chain := range []string{ChainPreRouting, ChainPostRouting, ChainForward} {
-			commands = append(commands, []string{"flush", "chain", nftTableFamily(family), nftForwardTable, nftForwardChain(chain)})
+			commands = append(commands, []string{"flush", "chain", nftTableFamily(family), nftForwardTable, "NFT_" + chain})
 		}
 	}
+	additions, err := createNftForwardCommands(rules)
+	return append(commands, additions...), err
+}
+
+func createNftForwardCommands(rules []Rule) ([][]string, error) {
+	commands := make([][]string, 0, len(rules)*4)
 	for _, rule := range rules {
 		normalized, err := NormalizeRule(rule)
 		if err != nil {
@@ -181,25 +252,25 @@ func rebuildNftForwardCommands(rules []Rule) ([][]string, error) {
 		}
 		rule = normalized
 		tableFamily := nftTableFamily(rule.Family)
-		addressKeyword := nftAddressKeyword(rule.Family)
+		addressKeyword := tableFamily
 		comment := strconv.Quote(encodeNftForwardRule(rule))
 		interfaceMatch := make([]string, 0, 2)
 		if rule.Interface != "" {
 			interfaceMatch = append(interfaceMatch, "iifname", strconv.Quote(rule.Interface))
 		}
 		if isRemoteTarget(rule.Family, rule.TargetIP) {
-			preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPreRouting)}
+			preRouting := []string{"add", "rule", tableFamily, nftForwardTable, "NFT_" + ChainPreRouting}
 			preRouting = append(preRouting, interfaceMatch...)
 			preRouting = append(preRouting, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.Port, "dnat", "to", forwardingTarget(rule), "comment", comment)
 			commands = append(commands,
 				preRouting,
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPostRouting), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "masquerade", "comment", comment},
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainForward), addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "accept", "comment", comment},
-				[]string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainForward), addressKeyword, "saddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "sport", rule.TargetPort, "accept", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, "NFT_" + ChainPostRouting, addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "masquerade", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, "NFT_" + ChainForward, addressKeyword, "daddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.TargetPort, "accept", "comment", comment},
+				[]string{"add", "rule", tableFamily, nftForwardTable, "NFT_" + ChainForward, addressKeyword, "saddr", rule.TargetIP, "meta", "l4proto", rule.Protocol, rule.Protocol, "sport", rule.TargetPort, "accept", "comment", comment},
 			)
 			continue
 		}
-		preRouting := []string{"add", "rule", tableFamily, nftForwardTable, nftForwardChain(ChainPreRouting)}
+		preRouting := []string{"add", "rule", tableFamily, nftForwardTable, "NFT_" + ChainPreRouting}
 		preRouting = append(preRouting, interfaceMatch...)
 		preRouting = append(preRouting, "meta", "l4proto", rule.Protocol, rule.Protocol, "dport", rule.Port, "redirect", "to", ":"+rule.TargetPort, "comment", comment)
 		commands = append(commands, preRouting)
@@ -212,13 +283,6 @@ func nftTableFamily(family string) string {
 		return "ip6"
 	}
 	return nftForwardFamily
-}
-
-func nftAddressKeyword(family string) string {
-	if family == FamilyIPv6 {
-		return "ip6"
-	}
-	return "ip"
 }
 
 func encodeNftForwardRule(rule Rule) string {
@@ -312,10 +376,6 @@ func parseNftForwardRules(stdout string) []Rule {
 	return result
 }
 
-func nftForwardChain(logical string) string {
-	return "NFT_" + logical
-}
-
 func nftRun(args ...string) (string, error) {
 	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", args...)
 	if err != nil {
@@ -332,12 +392,17 @@ func nftRunCommand(args ...string) error {
 	return nil
 }
 
-func nftRunCommands(commands [][]string) error {
+func nftRunCommands(ctx context.Context, commands [][]string) error {
 	script, err := nftCommandsScript(commands)
 	if err != nil {
 		return err
 	}
-	return nftables_helper.RunScript(script)
+	var stderr strings.Builder
+	err = cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithStdin(strings.NewReader(script)), cmd.WithStderr(&stderr)).RunWithOptionalSudo("nft", "-f", "-")
+	if err == nil && strings.TrimSpace(stderr.String()) != "" {
+		err = fmt.Errorf("firewall command warning: %s", strings.TrimSpace(stderr.String()))
+	}
+	return firewallutil.WrapBatchCommandError("nft -f -", script, err)
 }
 
 func nftCommandsScript(commands [][]string) (string, error) {

@@ -27,6 +27,7 @@ type CommandHelper struct {
 	outputFile   string
 	scriptPath   string
 	stdin        io.Reader
+	stderr       io.Writer
 	env          []string
 	timeout      time.Duration
 	taskItem     *task.Task
@@ -360,6 +361,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		cmd.Stdout = &stdout
 		cmd.Stderr = &stderr
 	}
+	if c.stderr != nil {
+		cmd.Stderr = io.MultiWriter(cmd.Stderr, c.stderr)
+	}
 	env := os.Environ()
 	env = append(env, c.env...)
 	cmd.Env = env
@@ -479,6 +483,11 @@ func WithScriptPath(scriptPath string) Option {
 func WithStdin(stdin io.Reader) Option {
 	return func(s *CommandHelper) {
 		s.stdin = stdin
+	}
+}
+func WithStderr(stderr io.Writer) Option {
+	return func(s *CommandHelper) {
+		s.stderr = stderr
 	}
 }
 func WithEnv(env ...string) Option {
