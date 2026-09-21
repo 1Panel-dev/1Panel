@@ -3969,6 +3969,8 @@ const message = {
         dockerGuard: '容器端口防护',
         systemFirewall: '主机防火墙',
         systemFirewallHelper: '用于管理主机端口访问和入站规则。',
+        forwardPolicyDropWarning:
+            '{0} 的 FORWARD 默认策略为 DROP，未被 iptables/ip6tables 规则明确放行的跨主机转发流量可能被阻断，请检查对应地址族的放行规则。',
         forwardingHelper: '用于管理端口转发规则。',
         dockerFirewallHelper: '用于选择 1Panel 容器端口防护的管理方式。',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0，实验性',
@@ -3976,7 +3978,8 @@ const message = {
         configuredRules: '已配置 {0} 条规则',
         addressFamily: 'IP 版本',
         portOrRange: '端口 / 范围',
-        importBackendHelper: '导入规则会转换并写入当前后端 {0}，源后端规则不会被修改。',
+        batchLimit: '每次最多创建或导入 {0} 条规则（按展开后的数量计算）。',
+        importLimit: '最多导入 {0} 条规则（按展开后的数量计算），文件大小不超过 {1} KB。',
         ruleSyncTitle: '同步规则',
         ruleSyncAction: '同步规则',
         ruleSyncDatabase: '1Panel 数据库',

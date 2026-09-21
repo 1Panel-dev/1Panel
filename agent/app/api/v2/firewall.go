@@ -2,14 +2,16 @@ package v2
 
 import (
 	"errors"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"net/http"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/app/service"
+
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/gin-gonic/gin"
 )
@@ -455,6 +457,8 @@ func normalizeFirewallRuleUUID(c *gin.Context, value *string) bool {
 }
 
 func handleFirewallRuleError(c *gin.Context, err error) {
+	var businessErr buserr.BusinessError
+	isBusinessError := errors.As(err, &businessErr)
 	switch {
 	case errors.Is(err, filter.ErrProtectedRule):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_LOCKOUT_RISK", "ErrInvalidParams", err)
@@ -462,7 +466,7 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_STALE", "ErrInvalidParams", err)
 	case errors.Is(err, repo.ErrFirewallRuleRevisionConflict):
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_REVISION_CONFLICT", "ErrInvalidParams", err)
-	case errors.Is(err, filter.ErrManagedScopeChange):
+	case isBusinessError && businessErr.Msg == "ErrFirewallRuleScopeChange":
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrFirewallRuleScopeChange", err)
 	case errors.Is(err, filter.ErrUnsupportedScope), errors.Is(err, filter.ErrInvalidScope),
 		errors.Is(err, filter.ErrProviderUnavailable), errors.Is(err, filter.ErrAdapterUnavailable):
@@ -470,6 +474,9 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 	case errors.Is(err, filter.ErrInvalidRule), errors.Is(err, filter.ErrRuleOperation), errors.Is(err, filter.ErrRuleConflict),
 		errors.Is(err, repo.ErrFirewallPersistenceInvalid):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_RULE_UNSUPPORTED", "ErrInvalidParams", err)
+	case isBusinessError && businessErr.Msg == "ErrInvalidParams":
+		c.JSON(http.StatusOK, dto.Response{Code: http.StatusBadRequest, ErrorCode: "FW_RULE_UNSUPPORTED", Message: err.Error()})
+		c.Abort()
 	case errors.Is(err, filter.ErrVerificationFailed):
 		helper.ErrorWithBusinessCode(c, http.StatusInternalServerError, "FW_VERIFY_FAILED", "ErrInternalServer", err)
 	default:
@@ -573,14 +580,10 @@ func (b *BaseApi) OperateFirewallBackend(c *gin.Context) {
 		return
 	}
 	if err := firewallSettingService.Operate(c.Request.Context(), request); err != nil {
-		if errors.Is(err, service.ErrFirewallBackendCleanupRequired) {
-			helper.ErrorWithBusinessCode(
-				c,
-				http.StatusConflict,
-				"FW_BACKEND_CLEANUP_REQUIRED",
-				"ErrInvalidParams",
-				err,
-			)
+		var businessErr buserr.BusinessError
+		if errors.As(err, &businessErr) && businessErr.Msg == "ErrFirewallBackendCleanupRequired" {
+			c.JSON(http.StatusOK, dto.Response{Code: http.StatusConflict, ErrorCode: "FW_BACKEND_CLEANUP_REQUIRED", Message: err.Error()})
+			c.Abort()
 			return
 		}
 		helper.InternalServer(c, err)
@@ -709,19 +712,26 @@ func (b *BaseApi) UpsertDockerPortGuardPolicies(c *gin.Context) {
 }
 
 func handleDockerPortGuardError(c *gin.Context, err error) {
-	if errors.Is(err, service.ErrDockerIptablesChainUnavailable) {
-		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_IPTABLES_CHAIN_UNAVAILABLE", "ErrDockerIptablesChainUnavailable", err)
-		return
+	var businessErr buserr.BusinessError
+	if errors.As(err, &businessErr) {
+		code, errorCode := http.StatusInternalServerError, ""
+		switch businessErr.Msg {
+		case "ErrDockerIptablesChainUnavailable":
+			code, errorCode = http.StatusServiceUnavailable, "FW_DOCKER_IPTABLES_CHAIN_UNAVAILABLE"
+		case "ErrDockerNftablesChainUnavailable":
+			code, errorCode = http.StatusServiceUnavailable, "FW_DOCKER_NFTABLES_CHAIN_UNAVAILABLE"
+		case "ErrInvalidParams":
+			code, errorCode = http.StatusBadRequest, "FW_DOCKER_GUARD_INVALID"
+		case "ErrDockerFailed":
+			code, errorCode = http.StatusServiceUnavailable, "FW_DOCKER_UNAVAILABLE"
+		}
+		if errorCode != "" {
+			c.JSON(http.StatusOK, dto.Response{Code: code, ErrorCode: errorCode, Message: err.Error()})
+			c.Abort()
+			return
+		}
 	}
-	if errors.Is(err, service.ErrDockerNftablesChainUnavailable) {
-		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_NFTABLES_CHAIN_UNAVAILABLE", "ErrDockerNftablesChainUnavailable", err)
-		return
-	}
-	if errors.Is(err, service.ErrDockerGuardInvalid) {
-		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_DOCKER_GUARD_INVALID", "ErrInvalidParams", err)
-		return
-	}
-	if errors.Is(err, service.ErrDockerUnavailable) {
+	if errors.Is(err, docker.ErrUnavailable) {
 		helper.ErrorWithBusinessCode(c, http.StatusServiceUnavailable, "FW_DOCKER_UNAVAILABLE", "ErrDockerFailed", err)
 		return
 	}

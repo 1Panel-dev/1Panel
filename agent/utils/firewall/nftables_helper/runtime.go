@@ -169,21 +169,51 @@ func hasBaseChainBinding(output string) bool {
 }
 
 func loadFamilyInitStatus(family filter.Family) (bool, bool, error) {
-	for _, chain := range BasicChains() {
-		if _, exists, err := readNftObject(run, "list", "chain", TableFamily(family), TableName, chain); err != nil || !exists {
-			return false, false, err
-		}
-	}
-	stdout, exists, err := readNftObject(run, "list", "chain", TableFamily(family), TableName, InputChain)
+	output, exists, err := ReadTable(run, TableFamily(family), TableName)
 	if err != nil || !exists {
 		return false, false, err
 	}
+	chains := ParseTableChains(output)
 	for _, chain := range BasicChains() {
-		if !strings.Contains(stdout, "jump "+chain) {
+		if _, exists := chains[chain]; !exists {
+			return false, false, nil
+		}
+	}
+	input, exists := chains[InputChain]
+	if !exists {
+		return false, false, nil
+	}
+	for _, chain := range BasicChains() {
+		if !strings.Contains(input, "jump "+chain) {
 			return true, false, nil
 		}
 	}
 	return true, true, nil
+}
+
+func ReadTable(run func(...string) (string, error), family, table string) (string, bool, error) {
+	return readNftObject(run, "-a", "list", "table", family, table)
+}
+
+func ParseTableChains(output string) map[string]string {
+	chains := make(map[string]string)
+	lines := strings.Split(output, "\n")
+	name, indent, start := "", "", 0
+	for index, line := range lines {
+		trimmed := strings.TrimSpace(line)
+		if name == "" {
+			fields := strings.Fields(trimmed)
+			if len(fields) >= 3 && fields[0] == "chain" && fields[2] == "{" {
+				name, indent, start = fields[1], line[:len(line)-len(strings.TrimLeft(line, " \t"))], index
+			}
+			continue
+		}
+		if strings.HasPrefix(line, indent+"}") {
+			chains[name] = strings.Join(lines[start:index+1], "\n")
+			name = ""
+		}
+	}
+	return chains
 }
 
 var ErrChainNotFound = errors.New("nftables chain is not initialized")

@@ -4,27 +4,20 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"net/netip"
 	"os"
 	"path/filepath"
 	"slices"
 	"strconv"
 	"strings"
-
-	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 )
 
 const requiredPortComment = "1Panel Port Whitelist"
 
-type Manager struct {
-	UpdateSetting     func(key, value string) error
-	LoadRequiredPorts func() ([]firewall.PortWhitelist, error)
-}
-
-func (m *Manager) Cleanup() error {
+func Cleanup() error {
 	commands := make([][]string, 0, 2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
@@ -40,69 +33,58 @@ func (m *Manager) Cleanup() error {
 	if err := os.Remove(file); err != nil && !errors.Is(err, os.ErrNotExist) {
 		return err
 	}
-	return m.updateSetting("IptablesStatus", constant.StatusDisable)
+	return nil
 }
 
-func (m *Manager) Operate(operation firewall.BaseOperation) error {
+func Operate(operation firewall.BaseOperation, requiredPorts []firewall.PortWhitelist) error {
 	switch operation {
 	case firewall.BaseOperationInit, firewall.BaseOperationBind:
-		return m.enableBase(true)
+		return enableBase(true, requiredPorts)
 	case firewall.BaseOperationBindWithoutInit:
-		return m.enableBase(false)
+		return enableBase(false, requiredPorts)
 	case firewall.BaseOperationUnbind:
-		return m.disableBase()
+		return Unbind()
 	default:
 		return fmt.Errorf("unsupported nftables base operation %q", operation)
 	}
 }
 
-func (m *Manager) enableBase(prepare bool) error {
+func enableBase(prepare bool, requiredPorts []firewall.PortWhitelist) error {
 	if prepare {
-		if err := m.ensureBaseChains(); err != nil {
+		if err := ensureBaseChains(); err != nil {
 			return err
 		}
-		if err := m.initPreRules(); err != nil {
+		if err := initPreRules(requiredPorts); err != nil {
 			return err
 		}
 	}
 	if err := Bind(); err != nil {
 		return err
 	}
-	return m.updateSetting("IptablesStatus", constant.StatusEnable)
+	return nil
 }
 
-func (m *Manager) disableBase() error {
-	if err := Unbind(); err != nil {
-		return err
-	}
-	return m.updateSetting("IptablesStatus", constant.StatusDisable)
-}
-
-func (m *Manager) ensureBaseChains() error {
+func ensureBaseChains() error {
 	commands := make([][]string, 0, 10)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		tableExists := true
-		if _, err := run("list", "table", tableFamily, TableName); err != nil {
-			tableExists = false
+		output, tableExists, err := ReadTable(run, tableFamily, TableName)
+		if err != nil {
+			return err
+		}
+		chains := ParseTableChains(output)
+		if !tableExists {
 			commands = append(commands, []string{"add", "table", tableFamily, TableName})
 		}
-		if !tableExists {
-			commands = append(commands, []string{
-				"add", "chain", tableFamily, TableName, InputChain,
-				"{", "type", "filter", "hook", "input", "priority", "0", ";", "policy", "accept", ";", "}",
-			})
-		} else if _, err := run("list", "chain", tableFamily, TableName, InputChain); err != nil {
+		if _, exists := chains[InputChain]; !exists {
 			commands = append(commands, []string{
 				"add", "chain", tableFamily, TableName, InputChain,
 				"{", "type", "filter", "hook", "input", "priority", "0", ";", "policy", "accept", ";", "}",
 			})
 		}
 		for _, nativeChain := range BasicChains() {
-			if tableExists {
-				if _, err := run("list", "chain", tableFamily, TableName, nativeChain); err == nil {
-					continue
-				}
+			if _, exists := chains[nativeChain]; exists {
+				continue
 			}
 			commands = append(commands, []string{"add", "chain", tableFamily, TableName, nativeChain})
 		}
@@ -124,12 +106,8 @@ func requiredPortCommand(tableFamily string, rule firewall.SystemPort) []string 
 		"accept", "comment", `"`+requiredPortComment+`"`)
 }
 
-func (m *Manager) initPreRules() error {
-	ports, err := m.loadRequiredPorts()
-	if err != nil {
-		return err
-	}
-	ports, err = firewall.NormalizeRequiredPorts(ports)
+func initPreRules(requiredPorts []firewall.PortWhitelist) error {
+	ports, err := firewall.NormalizeRequiredPorts(requiredPorts)
 	if err != nil {
 		return err
 	}
@@ -216,20 +194,6 @@ func containsRequiredPortRule(output, expression string) bool {
 		}
 	}
 	return false
-}
-
-func (m *Manager) updateSetting(key, value string) error {
-	if m != nil && m.UpdateSetting != nil {
-		return m.UpdateSetting(key, value)
-	}
-	return nil
-}
-
-func (m *Manager) loadRequiredPorts() ([]firewall.PortWhitelist, error) {
-	if m != nil && m.LoadRequiredPorts != nil {
-		return m.LoadRequiredPorts()
-	}
-	return nil, fmt.Errorf("load required firewall ports is not configured")
 }
 
 func Bind() error {

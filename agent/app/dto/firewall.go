@@ -49,10 +49,11 @@ type FirewallBackendOption struct {
 }
 
 type FirewallBackendFamilyStatus struct {
-	Available   bool   `json:"available"`
-	Initialized bool   `json:"initialized"`
-	Bound       bool   `json:"bound"`
-	Reason      string `json:"reason,omitempty"`
+	Available     bool   `json:"available"`
+	Initialized   bool   `json:"initialized"`
+	Bound         bool   `json:"bound"`
+	Reason        string `json:"reason,omitempty"`
+	ForwardPolicy string `json:"forwardPolicy,omitempty"`
 }
 
 type FirewallBackendGroup struct {
@@ -240,8 +241,10 @@ type DockerPortGuardOperation struct {
 }
 
 type FirewallRuleAdopt struct {
-	Scope       filter.Scope `json:"scope" validate:"required"`
-	InstanceKey string       `json:"instanceKey" validate:"required,max=128"`
+	Scope       filter.Scope         `json:"scope" validate:"required"`
+	InstanceKey string               `json:"instanceKey,omitempty" validate:"omitempty,max=128"`
+	Rule        *filter.FirewallRule `json:"rule,omitempty"`
+	Marker      string               `json:"marker,omitempty" validate:"max=256"`
 }
 
 type FirewallRuleCreateItem struct {

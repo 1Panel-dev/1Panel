@@ -178,7 +178,7 @@
                         </div>
                         <TableSearch v-model:searchName="searchName" @search="searchWithReset" />
                         <TableRefresh @search="search" />
-                        <TableSetting title="firewall-rule-refresh" @search="search" />
+                        <TableSetting title="firewall-rule-refresh" @search="!loading && !usageInFlight && search()" />
                     </template>
                     <template #main>
                         <div v-loading="loading">
@@ -286,12 +286,16 @@
                                         <span v-if="isReadOnlyNativeRule(row)">-</span>
                                         <el-icon v-else-if="usageLoading" class="is-loading"><Loading /></el-icon>
                                         <span v-else-if="usageFailed">-</span>
-                                        <el-tag v-else-if="ruleUsageEntries(row).length === 0" type="info" size="small">
+                                        <el-tag
+                                            v-else-if="usageEntriesByRow[row.rowKey].length === 0"
+                                            type="info"
+                                            size="small"
+                                        >
                                             {{ $t('firewall.unUsed') }}
                                         </el-tag>
                                         <div v-else class="firewall-used-cell">
                                             <el-tooltip
-                                                :content="usageEntryLabel(ruleUsageEntries(row)[0])"
+                                                :content="usageEntryLabel(usageEntriesByRow[row.rowKey][0])"
                                                 placement="top"
                                             >
                                                 <el-tag
@@ -299,22 +303,23 @@
                                                     type="info"
                                                     effect="plain"
                                                     size="small"
-                                                    @click.stop="openUsageDetail(ruleUsageEntries(row)[0])"
+                                                    @click.stop="openUsageDetail(usageEntriesByRow[row.rowKey][0])"
                                                 >
                                                     <span class="firewall-used-entry-owner">
-                                                        {{ ruleUsageEntries(row)[0].owner }}
+                                                        {{ usageEntriesByRow[row.rowKey][0].owner }}
                                                     </span>
                                                     <span class="firewall-used-entry-port">
-                                                        ({{ usageEntryPortText(ruleUsageEntries(row)[0]) }})
+                                                        ({{ usageEntryPortText(usageEntriesByRow[row.rowKey][0]) }})
                                                     </span>
                                                     <el-icon class="firewall-used-entry-icon"><Expand /></el-icon>
                                                 </el-tag>
                                             </el-tooltip>
                                             <el-popover
-                                                v-if="ruleUsageEntries(row).length > 1"
+                                                v-if="usageEntriesByRow[row.rowKey].length > 1"
                                                 placement="right"
                                                 trigger="click"
                                                 :width="340"
+                                                :persistent="false"
                                             >
                                                 <template #reference>
                                                     <el-tag
@@ -323,12 +328,12 @@
                                                         effect="plain"
                                                         size="small"
                                                     >
-                                                        +{{ ruleUsageEntries(row).length - 1 }}
+                                                        +{{ usageEntriesByRow[row.rowKey].length - 1 }}
                                                     </el-tag>
                                                 </template>
                                                 <div class="firewall-used-popover-list">
                                                     <el-tooltip
-                                                        v-for="entry in ruleUsageEntries(row)"
+                                                        v-for="entry in usageEntriesByRow[row.rowKey]"
                                                         :key="`${row.rowKey}:${entry.key}`"
                                                         :content="usageEntryLabel(entry)"
                                                         placement="top"
@@ -626,7 +631,7 @@ const loadRules = async (refreshUsage: boolean) => {
     }
 
     loading.value = true;
-    if (refreshUsage || (!usageInFlight && (usageFailed.value || Date.now() - usageLoadedAt >= 10_000))) {
+    if (!usageInFlight && (refreshUsage || usageFailed.value || Date.now() - usageLoadedAt >= 10_000)) {
         usageRequest = loadUsage();
     }
     try {
@@ -856,6 +861,9 @@ const toRuleRows = (items: Firewall.InventoryItem[]): RuleRow[] =>
     });
 
 const allRows = computed<RuleRow[]>(() => toRuleRows(inventoryItems.value));
+const usageEntriesByRow = computed<Record<string, UsageEntry[]>>(() =>
+    Object.fromEntries(allRows.value.map((row) => [row.rowKey, ruleUsageEntries(row)])),
+);
 
 const loadAllInventoryItems = async () => {
     if (inventoryTotal.value === 0) return [];
@@ -1207,11 +1215,16 @@ const adoptRule = async (row: RuleRow) => {
     }
     loading.value = true;
     try {
-        if (!row.observed.instanceKey) {
+        if (provider.value === 'nftables' && !row.observed.instanceKey) {
             MsgError(i18n.global.t('firewall.plan_blocked'));
             return;
         }
-        await adoptFirewallRule({ scope: row.rule.scope, instanceKey: row.observed.instanceKey });
+        await adoptFirewallRule({
+            scope: row.rule.scope,
+            instanceKey: row.observed.instanceKey,
+            rule: { ...row.observed.rule, orderIndex: row.observed.locator.position },
+            marker: row.observed.marker,
+        });
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await search();
     } finally {

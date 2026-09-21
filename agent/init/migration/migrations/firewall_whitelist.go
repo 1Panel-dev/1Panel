@@ -162,6 +162,9 @@ func migrateFirewallPortWhitelist(value string) ([]firewall.PortWhitelist, error
 	for _, rule := range defaults {
 		index, found := indexes[key(rule)]
 		if !found {
+			if rule.Type == "" {
+				continue
+			}
 			index = len(rules)
 			indexes[key(rule)] = index
 			rules = append(rules, rule)

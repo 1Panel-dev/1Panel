@@ -1,11 +1,12 @@
 <template>
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
+        <el-alert
+            class="mb-3"
+            type="info"
+            :closable="false"
+            :title="$t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024])"
+        />
         <div>
-            <el-alert :closable="false" show-icon type="info">
-                <template #default>
-                    <div>{{ $t('commons.msg.importHelper') }}</div>
-                </template>
-            </el-alert>
             <el-alert v-if="submitError" class="mb-3" type="error" :closable="false" :title="submitError" />
             <div class="import-file-bar mt-3">
                 <el-upload
@@ -37,13 +38,7 @@
                         </el-tag>
                     </div>
                 </template>
-                <ComplexTable
-                    :pagination-config="paginationConfig"
-                    @search="search"
-                    v-model:selects="selects"
-                    :data="pageData"
-                    :height="300"
-                >
+                <ComplexTable v-model:selects="selects" :data="displayData" :height="300">
                     <el-table-column type="selection" fix />
                     <el-table-column label="IP" :min-width="60" prop="family">
                         <template #default="{ row }">
@@ -92,7 +87,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { MsgError } from '@/utils/message';
 import i18n from '@/lang';
@@ -102,6 +97,8 @@ import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
 import {
+    FIREWALL_BATCH_LIMIT,
+    FIREWALL_IMPORT_MAX_SIZE,
     inferAddressFamily,
     isValidAddressForFamily,
     isValidPortRange,
@@ -122,13 +119,6 @@ const availableInterfaces = ref<string[]>([]);
 
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
-const pageData = ref<any[]>([]);
-const paginationConfig = reactive({
-    currentPage: 1,
-    pageSize: 10,
-    total: 0,
-});
-
 const acceptParams = async (fireName: string): Promise<void> => {
     loading.value = false;
     submitError.value = '';
@@ -137,9 +127,7 @@ const acceptParams = async (fireName: string): Promise<void> => {
     currentRules.value = [];
     availableInterfaces.value = [];
     uploaderFiles.value = [];
-    pageData.value = [];
-    paginationConfig.currentPage = 1;
-    paginationConfig.total = 0;
+
     uploadRef.value?.clearFiles();
     currentFireName.value = fireName;
     visible.value = true;
@@ -160,23 +148,23 @@ const loadCurrentData = async (fireName: string) => {
     }
 };
 
-const search = () => {
-    const startIndex = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
-    const endIndex = startIndex + paginationConfig.pageSize;
-    pageData.value = displayData.value.slice(startIndex, endIndex);
-};
-
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!_uploadFile.raw) return;
     loading.value = true;
     submitError.value = '';
     displayData.value = [];
-    pageData.value = [];
+
     selects.value = [];
-    paginationConfig.currentPage = 1;
-    paginationConfig.total = 0;
+
     uploaderFiles.value = uploadFiles;
 
+    if (_uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
+        uploadRef.value?.clearFiles();
+        uploaderFiles.value = [];
+        loading.value = false;
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     const reader = new FileReader();
     reader.onload = (e) => {
         try {
@@ -189,6 +177,13 @@ const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 return;
             }
 
+            if (parsed.length > FIREWALL_BATCH_LIMIT) {
+                MsgError(
+                    i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]),
+                );
+                loading.value = false;
+                return;
+            }
             for (const item of parsed) {
                 if (!item.family && typeof item.targetIP === 'string') {
                     item.family = inferAddressFamily(item.targetIP);
@@ -262,12 +257,19 @@ const compareRules = (importedRules: any[]) => {
     }
 
     displayData.value = [...newRules, ...duplicateRules];
-    paginationConfig.total = displayData.value.length;
-    search();
 };
 
 const onImport = async () => {
     if (loading.value || selects.value.length === 0) return;
+    if (
+        selects.value.reduce(
+            (total: number, rule: Firewall.RuleForward) => total + rule.protocol.split('/').length,
+            0,
+        ) > FIREWALL_BATCH_LIMIT
+    ) {
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     loading.value = true;
     submitError.value = '';
     const rules: Firewall.RuleForward[] = [];

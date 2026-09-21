@@ -1,6 +1,11 @@
 <template>
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
-        <el-alert class="mb-3" type="info" :closable="false" :title="$t('firewall.importBackendHelper', [provider])" />
+        <el-alert
+            class="mb-3"
+            type="info"
+            :closable="false"
+            :title="$t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024])"
+        />
         <div class="import-file-bar mt-3">
             <el-upload
                 ref="uploadRef"
@@ -30,8 +35,22 @@
                     </el-tag>
                 </div>
             </template>
-            <ComplexTable v-model:selects="selects" :data="rules" :height="300">
-                <el-table-column type="selection" fix />
+            <ComplexTable :data="rules" :height="300">
+                <el-table-column width="48" fixed>
+                    <template #header>
+                        <el-checkbox
+                            :model-value="rules.length > 0 && selects.size === rules.length"
+                            :indeterminate="selects.size > 0 && selects.size < rules.length"
+                            @change="selects = $event ? new Set(rules) : new Set()"
+                        />
+                    </template>
+                    <template #default="{ row }">
+                        <el-checkbox
+                            :model-value="selects.has(row)"
+                            @change="$event ? selects.add(row) : selects.delete(row)"
+                        />
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('commons.table.protocol')" prop="protocol" min-width="90" />
                 <el-table-column :label="$t('firewall.sourceIP')" min-width="150">
                     <template #default="{ row }">{{ displayAddress(row, row.sourceAddress) }}</template>
@@ -53,7 +72,7 @@
         </el-card>
         <template #footer>
             <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :loading="loading" :disabled="selects.length === 0" @click="onImport">
+            <el-button type="primary" :loading="loading" :disabled="selects.size === 0" @click="onImport">
                 {{ $t('commons.button.import') }}
             </el-button>
         </template>
@@ -65,7 +84,12 @@ import { Firewall } from '@/api/interface/firewall';
 import { createFirewallRules } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
-import { formatHostAddress, inferAddressFamily } from '@/views/host/firewall/utils/validation';
+import {
+    FIREWALL_BATCH_LIMIT,
+    FIREWALL_IMPORT_MAX_SIZE,
+    formatHostAddress,
+    inferAddressFamily,
+} from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
@@ -75,7 +99,7 @@ const visible = ref(false);
 const loading = ref(false);
 const provider = ref<Firewall.Provider>('iptables');
 const rules = ref<Firewall.Rule[]>([]);
-const selects = ref<Firewall.Rule[]>([]);
+const selects = ref(new Set<Firewall.Rule>());
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
 
@@ -146,15 +170,29 @@ const normalizeLegacyImportedRule = (value: unknown): Firewall.Rule[] | undefine
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!uploadFile.raw) return;
     loading.value = true;
+
     rules.value = [];
-    selects.value = [];
+    selects.value = new Set();
     uploaderFiles.value = uploadFiles;
+    if (uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
+        uploadRef.value?.clearFiles();
+        uploaderFiles.value = [];
+        loading.value = false;
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     const reader = new FileReader();
     reader.onload = (event) => {
         try {
             const parsed: unknown = JSON.parse(String(event.target?.result || ''));
             if (!Array.isArray(parsed)) {
                 MsgError(i18n.global.t('commons.msg.errImportFormat'));
+                return;
+            }
+            if (parsed.length > FIREWALL_BATCH_LIMIT) {
+                MsgError(
+                    i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]),
+                );
                 return;
             }
             const normalizedGroups = parsed.map((rule) => {
@@ -171,7 +209,7 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 return;
             }
             rules.value = normalized;
-            selects.value = [...rules.value];
+            selects.value = new Set(rules.value);
         } catch (error) {
             MsgError(i18n.global.t('commons.msg.errImport') + String(error));
         } finally {
@@ -189,11 +227,19 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const onImport = async () => {
-    if (loading.value || selects.value.length === 0) return;
+    if (loading.value || selects.value.size === 0) return;
+    if (selects.value.size > FIREWALL_BATCH_LIMIT) {
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     loading.value = true;
     try {
         const result = (
-            await createFirewallRules({ items: selects.value.map((rule) => ({ rule, sourceKind: 'imported' })) })
+            await createFirewallRules({
+                items: rules.value
+                    .filter((rule) => selects.value.has(rule))
+                    .map((rule) => ({ rule, sourceKind: 'imported' })),
+            })
         ).data;
         if (!result.taskID || !result.queued) {
             MsgError(i18n.global.t('commons.msg.operationFailed'));
@@ -209,8 +255,9 @@ const onImport = async () => {
 const acceptParams = (value: Firewall.Provider) => {
     loading.value = false;
     provider.value = value;
+
     rules.value = [];
-    selects.value = [];
+    selects.value = new Set();
     uploaderFiles.value = [];
     uploadRef.value?.clearFiles();
     visible.value = true;

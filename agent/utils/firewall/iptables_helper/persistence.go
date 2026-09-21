@@ -53,8 +53,6 @@ func IPv6FileName(fileName string) string {
 }
 
 func saveRulesToFile(ctx context.Context, executable, tab, chain, fileName string) error {
-	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
-
 	var stdout string
 	var err error
 	if strings.HasPrefix(path.Base(executable), "ip6tables") {
@@ -65,11 +63,16 @@ func saveRulesToFile(ctx context.Context, executable, tab, chain, fileName strin
 	if err != nil {
 		return fmt.Errorf("failed to list %s rules: %w", chain, err)
 	}
+	return writeChainRules(stdout, chain, fileName)
+}
+
+func writeChainRules(stdout, chain, fileName string) error {
+	rulesFile := path.Join(global.Dir.FirewallDir, fileName)
 	var rules []string
 	lines := strings.Split(stdout, "\n")
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, fmt.Sprintf("-A %s", chain)) {
+		if strings.HasPrefix(line, "-A "+chain+" ") {
 			rules = append(rules, line)
 		}
 	}

@@ -719,3 +719,7 @@ FirewallPersistDockerGuardStep: 'Docker ポート保護状態を保存'
 ErrFirewallRuleScopeChange: "現在のファイアウォールでは、ルールの適用範囲（IPv4/IPv6 アドレスファミリーなど）を変更できません。新しいルールを作成してください。"
 FirewallWhitelistReleased: "{{ .name }}：許可リストの保護を解除しました。許可ルールは保持されます。ポートを閉じるには、ルール一覧から手動で削除してください"
 FirewallWhitelistRequired: "{{ .name }}：システム必須ポートのルールで保護されています"
+
+ErrFirewallBackendCleanupRequired: "現在のバックエンド {{ .current }} に 1Panel ルールが残っています。{{ .target }} に切り替える前に削除してください。"
+ErrDockerIPv4ForwardingDisabled: "IPv4 転送が無効です。Docker のファイアウォールバックエンドを使用する前に net.ipv4.ip_forward=1 を設定してください。"
+ErrFirewallRuleSavedApplyFailed: "新しいルール設定は保存されましたが、ファイアウォールへの適用に失敗しました。同期で再試行してください：{{ .detail }}"

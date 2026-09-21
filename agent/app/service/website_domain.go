@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"path"
 	"strconv"
@@ -32,7 +33,9 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 		return nil, err
 	}
 	go func() {
-		_ = ensureFirewallPorts(addPorts)
+		if err := ensureFirewallPorts(addPorts); err != nil {
+			global.LOG.Errorf("allow website firewall ports failed: %v", err)
+		}
 	}()
 
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)

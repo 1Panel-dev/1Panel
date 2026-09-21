@@ -4274,6 +4274,8 @@ const message = {
         dockerGuard: 'Konteyner portu koruması',
         systemFirewall: 'Ana makine güvenlik duvarı',
         systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
+        forwardPolicyDropWarning:
+            '{0} için varsayılan FORWARD ilkesi DROP olarak ayarlanmış. Diğer ana bilgisayarlara yönlendirilen trafik, iptables/ip6tables kurallarıyla açıkça izin verilmediği sürece engellenebilir. İlgili IP sürümünün izin kurallarını kontrol edin.',
         forwardingHelper: 'Port yönlendirme kurallarını yönetir.',
         dockerFirewallHelper: '1Panel konteyner portu korumasının nasıl yönetileceğini seçer.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, deneysel',
@@ -4281,8 +4283,9 @@ const message = {
         configuredRules: '{0} kural yapılandırıldı',
         addressFamily: 'IP sürümü',
         portOrRange: 'Port / aralık',
-        importBackendHelper:
-            'İçe aktarılan kurallar geçerli {0} arka ucu için dönüştürülür. Kaynak kurallar değiştirilmez.',
+        batchLimit: 'Genişletme sonrasında bir defada en fazla {0} kural oluşturabilir veya içe aktarabilirsiniz.',
+        importLimit:
+            'En fazla {0} kural (genişletme sonrası sayıya göre) içe aktarılabilir; dosya boyutu {1} KB değerini aşmamalıdır.',
         ruleSyncTitle: 'Kuralları eşitle',
         ruleSyncAction: 'Kuralları eşitle',
         ruleSyncDatabase: '1Panel veritabanı',

@@ -37,8 +37,9 @@ var (
 	clamRepo    = repo.NewIClamRepo()
 	monitorRepo = repo.NewIMonitorRepo()
 
-	settingRepo = repo.NewISettingRepo()
-	backupRepo  = repo.NewIBackupRepo()
+	settingRepo        = repo.NewISettingRepo()
+	forwardingRuleRepo = repo.NewIForwardingRuleRepo()
+	backupRepo         = repo.NewIBackupRepo()
 
 	websiteRepo               = repo.NewIWebsiteRepo()
 	websiteDomainRepo         = repo.NewIWebsiteDomainRepo()

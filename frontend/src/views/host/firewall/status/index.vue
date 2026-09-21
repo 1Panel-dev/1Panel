@@ -169,6 +169,14 @@
                 :closable="false"
                 :title="baseInfo.syncError"
             />
+            <el-alert
+                v-if="props.currentTab === 'forward' && forwardDropFamilies"
+                class="mt-3"
+                type="warning"
+                show-icon
+                :closable="false"
+                :title="$t('firewall.forwardPolicyDropWarning', [forwardDropFamilies])"
+            />
         </div>
         <el-alert v-else-if="baseInfo.isExist" class="card-interval" type="error" show-icon :closable="false">
             <template #title>
@@ -266,6 +274,12 @@ const familyStatuses = computed(
         ] as const,
 );
 const availableFamilies = computed(() => familyStatuses.value.filter((item) => item.status.available));
+const forwardDropFamilies = computed(() =>
+    familyStatuses.value
+        .filter((item) => item.status.forwardPolicy === 'DROP')
+        .map((item) => item.family)
+        .join(', '),
+);
 const anyFamilyInitialized = computed(() => availableFamilies.value.some((item) => item.status.initialized));
 const allAvailableFamiliesInitialized = computed(
     () => availableFamilies.value.length > 0 && availableFamilies.value.every((item) => item.status.initialized),

@@ -719,3 +719,7 @@ FirewallPersistDockerGuardStep: 'Docker bağlantı noktası koruma durumunu kayd
 ErrFirewallRuleScopeChange: "Mevcut güvenlik duvarı, kuralın kapsamını (IPv4/IPv6 adres ailesi gibi) değiştirmeyi desteklemiyor. Lütfen yeni bir kural oluşturun."
 FirewallWhitelistReleased: "{{ .name }}: izin listesi koruması kaldırıldı; izin kuralı korundu. Portu kapatmak için kuralı kural listesinden elle silin"
 FirewallWhitelistRequired: "{{ .name }}: zorunlu sistem portu kuralları tarafından korunuyor"
+
+ErrFirewallBackendCleanupRequired: "Mevcut {{ .current }} arka ucunda hâlâ 1Panel kuralları var. {{ .target }} arka ucuna geçmeden önce bunları temizleyin."
+ErrDockerIPv4ForwardingDisabled: "IPv4 yönlendirmesi devre dışı. Docker güvenlik duvarı arka ucunu kullanmadan önce net.ipv4.ip_forward=1 ayarını yapın."
+ErrFirewallRuleSavedApplyFailed: "Yeni kural yapılandırması kaydedildi, ancak güvenlik duvarına uygulanamadı. Eşitleme yaparak yeniden deneyin: {{ .detail }}"

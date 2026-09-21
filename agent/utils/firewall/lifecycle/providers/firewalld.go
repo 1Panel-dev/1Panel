@@ -38,20 +38,13 @@ func (f *Firewalld) Name() string {
 func (f *Firewalld) Status() (bool, error) {
 	stdout, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", "--state")
 	if err != nil {
-		if firewalldStopped(stdout, err) {
+		message := strings.ToLower(strings.TrimSpace(stdout)) + " " + strings.ToLower(err.Error())
+		if strings.Contains(message, "not running") {
 			return false, nil
 		}
 		return false, fmt.Errorf("load firewall status failed: %w", err)
 	}
 	return strings.TrimSpace(stdout) == "running", nil
-}
-
-func firewalldStopped(stdout string, err error) bool {
-	message := strings.ToLower(strings.TrimSpace(stdout))
-	if err != nil {
-		message += " " + strings.ToLower(err.Error())
-	}
-	return strings.Contains(message, "not running")
 }
 
 func (f *Firewalld) Version() (string, error) {
@@ -70,15 +63,13 @@ func (f *Firewalld) Start() error {
 }
 
 func RemoveFirewalldSSHService() error {
-	for _, permanent := range []bool{true, false} {
-		args := []string{"--zone=" + filter.FirewalldInputZone, "--remove-service=ssh"}
-		configuration := "runtime"
-		if permanent {
-			args = append(args, "--permanent")
-			configuration = "permanent"
-		}
-		if _, err := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en")).RunWithStdout("firewall-cmd", args...); err != nil {
-			return fmt.Errorf("remove firewalld SSH service from %s configuration: %w", configuration, err)
+	manager := cmd.NewCommandMgr(cmd.WithEnv("LANGUAGE=en_US:en"))
+	for _, args := range [][]string{
+		{"--zone=" + filter.FirewalldInputZone, "--remove-service=ssh"},
+		{"--permanent", "--zone=" + filter.FirewalldInputZone, "--remove-service=ssh"},
+	} {
+		if err := manager.RunWithOptionalSudo("firewall-cmd", args...); err != nil {
+			return fmt.Errorf("remove firewalld SSH service: %w", err)
 		}
 	}
 	return nil
@@ -121,12 +112,7 @@ func (f *Firewalld) ResetBeforeStop() error {
 	return nil
 }
 
-func replaceFirewalldConfig(
-	configDir string,
-	backupDir string,
-	prepare func(string) error,
-	validate func() error,
-) (func() error, error) {
+func replaceFirewalldConfig(configDir string, backupDir string, prepare func(string) error, validate func() error) (func() error, error) {
 	info, err := os.Lstat(configDir)
 	hadConfig := err == nil
 	if err != nil && !os.IsNotExist(err) {

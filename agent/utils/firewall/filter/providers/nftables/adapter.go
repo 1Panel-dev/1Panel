@@ -15,9 +15,14 @@ import (
 )
 
 type Backend interface {
+	filter.CommentRuleReader
 	ListChain(context.Context, filter.Scope) (string, error)
 	Run(context.Context, filter.NativeCommand) error
 	Save(context.Context) error
+}
+
+type TableReader interface {
+	ListTable(context.Context, filter.Scope) (string, bool, error)
 }
 
 type Adapter struct{ backend Backend }
@@ -34,19 +39,47 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	}, nil
 }
 
-func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
+func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
+	rule, err := filter.NormalizeRule(rule)
+	if err != nil {
+		return err
+	}
+	if err := validateScope(rule.Scope); err != nil {
+		return err
+	}
+	script := fmt.Sprintf("add rule %s %s %s %s\n", nftables_helper.TableFamily(rule.Scope.Family), nftables_helper.TableName, nativeChainName(rule.Scope), strings.Join(compileExpressionArgs(rule, comment), " "))
+	return a.backend.Run(ctx, filter.NativeCommand{Executable: "nft", Stdin: script})
+}
+
+func (a *Adapter) ListRulesByComment(ctx context.Context, scopes []filter.Scope, comment string) ([]filter.ObservedRule, error) {
+	var rules []filter.ObservedRule
+	for _, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateScope(scope); err != nil {
+			return nil, err
+		}
+		output, err := a.backend.ReadRulesByComment(ctx, scope, comment)
+		if err != nil {
+			return nil, err
+		}
+		rules = append(rules, parseChain(scope, output)...)
+	}
+	return rules, nil
+}
+
+func (a *Adapter) ListRules(ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
 	scope = scope.Normalize()
 	if err := validateScope(scope); err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
 	if a.backend == nil {
-		return filter.Snapshot{}, fmt.Errorf("nftables backend is required")
+		return filter.RuleSet{}, fmt.Errorf("nftables backend is required")
 	}
 	output, err := a.backend.ListChain(ctx, scope)
 	if errors.Is(err, nftables_helper.ErrChainNotFound) {
-		snapshot, snapshotErr := filter.NewSnapshot(scope, nil)
+		snapshot, snapshotErr := filter.NewRuleSet(scope, nil)
 		if snapshotErr != nil {
-			return filter.Snapshot{}, snapshotErr
+			return filter.RuleSet{}, snapshotErr
 		}
 		snapshot.Notices = []filter.ScopeNotice{{
 			Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(scope.Family), scope.Chain},
@@ -54,70 +87,189 @@ func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snaps
 		return snapshot, nil
 	}
 	if err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
-	return filter.NewSnapshot(scope, parseChain(scope, output))
+	return filter.NewRuleSet(scope, parseChain(scope, output))
 }
 
-func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
-	if snapshot.Revision == "" {
-		return filter.BackendPlan{}, filter.ErrRuleStale
+func (a *Adapter) ListRuleScopes(ctx context.Context, scopes []filter.Scope) ([]filter.RuleSet, error) {
+	normalized := make([]filter.Scope, len(scopes))
+	for index, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateScope(scope); err != nil {
+			return nil, err
+		}
+		normalized[index] = scope
 	}
+	if a.backend == nil {
+		return nil, fmt.Errorf("nftables backend is required")
+	}
+	snapshots := make([]filter.RuleSet, len(scopes))
+	reader, readsTable := a.backend.(TableReader)
+	for index, scope := range normalized {
+		if snapshots[index].Scope.Provider != "" {
+			continue
+		}
+		if !readsTable {
+			snapshot, err := a.ListRules(ctx, scope)
+			if err != nil {
+				return nil, err
+			}
+			snapshots[index] = snapshot
+			continue
+		}
+		output, _, err := reader.ListTable(ctx, scope)
+		if err != nil {
+			return nil, err
+		}
+		chains := nftables_helper.ParseTableChains(output)
+		for target := index; target < len(normalized); target++ {
+			current := normalized[target]
+			if current.Family != scope.Family || current.Table != scope.Table {
+				continue
+			}
+			chain, exists := chains[nativeChainName(current)]
+			snapshot, err := filter.NewRuleSet(current, parseChain(current, chain))
+			if err != nil {
+				return nil, err
+			}
+			if !exists {
+				snapshot.Notices = []filter.ScopeNotice{{Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(current.Family), current.Chain}}}
+			}
+			snapshots[target] = snapshot
+		}
+	}
+	return snapshots, nil
+}
+
+func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
 	if err := validateScope(snapshot.Scope); err != nil {
-		return filter.BackendPlan{}, err
+		return filter.CommandBatch{}, err
 	}
 	if len(changes) == 0 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: nftables plan requires at least one change", filter.ErrInvalidRule)
+		return filter.CommandBatch{}, fmt.Errorf("%w: nftables plan requires at least one change", filter.ErrInvalidRule)
 	}
-	if len(changes) > 1 && changes[0].Operation != filter.ChangeCreate && changes[0].Operation != filter.ChangeDelete {
-		return filter.BackendPlan{}, fmt.Errorf("%w: nftables batch plans only support create or delete operations", filter.ErrInvalidRule)
-	}
-
-	operation := changes[0].Operation
-	current := snapshot
-	current.Rules = make([]filter.ObservedRule, len(snapshot.Rules), len(snapshot.Rules)+len(changes))
-	copy(current.Rules, snapshot.Rules)
-	plan := filter.BackendPlan{
-		Provider: filter.ProviderNftables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
-		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
-	}
+	createOnly, deleteOnly := true, true
 	for _, change := range changes {
-		if len(changes) > 1 && change.Operation != operation {
-			return filter.BackendPlan{}, fmt.Errorf("%w: nftables batch plan operations must be homogeneous", filter.ErrInvalidRule)
+		createOnly = createOnly && change.Operation == filter.ChangeCreate && change.CommandOnly
+		deleteOnly = deleteOnly && change.Operation == filter.ChangeDelete && change.CommandOnly
+	}
+	if createOnly {
+		return compileCreateBatch(snapshot, changes)
+	}
+	if deleteOnly {
+		return compileDeleteBatch(snapshot, changes)
+	}
+	if len(changes) != 1 {
+		return filter.CommandBatch{}, fmt.Errorf("%w: nftables mutation requires exactly one change", filter.ErrInvalidRule)
+	}
+	change := changes[0]
+	if change.Operation != filter.ChangeUpdate && change.Operation != filter.ChangeAdopt && change.Operation != filter.ChangeReorder {
+		return filter.CommandBatch{}, fmt.Errorf("%w: unsupported nftables mutation %s", filter.ErrInvalidRule, change.Operation)
+	}
+	expected, previous, err := compileChange(snapshot, change)
+	if err != nil {
+		return filter.CommandBatch{}, err
+	}
+	handle := previous.Locator.NativeID
+	if _, err := strconv.ParseUint(handle, 10, 64); err != nil || handle != change.Locator.NativeID {
+		return filter.CommandBatch{}, filter.ErrRuleStale
+	}
+	chain := strings.Join([]string{nftables_helper.TableFamily(snapshot.Scope.Family), nftables_helper.TableName, nativeChainName(snapshot.Scope)}, " ")
+	rulePlan := filter.RuleCommands{RuleUUID: ruleUUID(change), Operation: change.Operation, Previous: previous, Expected: expected}
+	target := *expected.Locator.Position
+	var script string
+	if target == *previous.Locator.Position {
+		if change.Operation != filter.ChangeReorder {
+			script = fmt.Sprintf("replace rule %s handle %s %s\n", chain, handle, expected.Raw)
+			if strings.ContainsAny(previous.Raw, "\r\n") || previous.Raw == "" {
+				return filter.CommandBatch{}, fmt.Errorf("%w: invalid native nftables rule", filter.ErrInvalidRule)
+			}
+			rulePlan.RollbackCommands = []filter.NativeCommand{{Executable: "nft", Stdin: fmt.Sprintf("replace rule %s handle %s %s\n", chain, handle, previous.Raw)}}
 		}
-		rules, expected, previous, err := applyChange(current, change)
+	} else {
+		script = fmt.Sprintf("delete rule %s handle %s\n", chain, handle)
+		if target == len(snapshot.Rules) {
+			script += fmt.Sprintf("add rule %s %s\n", chain, expected.Raw)
+		} else {
+			anchorIndex := target - 1
+			if target > *previous.Locator.Position {
+				anchorIndex++
+			}
+			anchor := snapshot.Rules[anchorIndex].Locator.NativeID
+			if _, err := strconv.ParseUint(anchor, 10, 64); err != nil {
+				return filter.CommandBatch{}, filter.ErrRuleStale
+			}
+			script += fmt.Sprintf("insert rule %s position %s %s\n", chain, anchor, expected.Raw)
+		}
+	}
+	if script != "" {
+		rulePlan.Commands = []filter.NativeCommand{{Executable: "nft", Stdin: script}}
+	}
+	return filter.CommandBatch{Provider: filter.ProviderNftables, Scope: snapshot.Scope, CommandOnly: change.CommandOnly, Rules: []filter.RuleCommands{rulePlan}}, nil
+}
+
+func compileDeleteBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
+	plan := filter.CommandBatch{Provider: filter.ProviderNftables, Scope: snapshot.Scope, CommandOnly: true}
+	var script strings.Builder
+	for _, change := range changes {
+		expected, previous, err := compileChange(snapshot, change)
 		if err != nil {
-			return filter.BackendPlan{}, err
+			return filter.CommandBatch{}, err
 		}
-		plan.Rules = append(plan.Rules, filter.NativeRulePlan{
-			RuleUUID: ruleUUID(change), Operation: change.Operation, Previous: previous, Expected: expected,
+		handle := previous.Locator.NativeID
+		if _, err := strconv.ParseUint(handle, 10, 64); err != nil || change.Locator.NativeID != handle {
+			return filter.CommandBatch{}, filter.ErrRuleStale
+		}
+		fmt.Fprintf(&script, "delete rule %s %s %s handle %s\n", nftables_helper.TableFamily(snapshot.Scope.Family), nftables_helper.TableName, nativeChainName(snapshot.Scope), handle)
+		plan.Rules = append(plan.Rules, filter.RuleCommands{
+			RuleUUID: ruleUUID(change), Operation: filter.ChangeDelete, Previous: previous, Expected: expected,
 		})
-		current.Rules = rules
 	}
-	if _, err := filter.NewSnapshot(snapshot.Scope, current.Rules); err != nil {
-		return filter.BackendPlan{}, err
-	}
-	applyCommand, err := rebuildCommand(snapshot.Scope, current.Rules)
-	if err != nil {
-		return filter.BackendPlan{}, err
-	}
-	rollbackCommand, err := rebuildCommand(snapshot.Scope, snapshot.Rules)
-	if err != nil {
-		return filter.BackendPlan{}, err
-	}
-	plan.Rules[0].Commands = []filter.NativeCommand{applyCommand}
-	plan.Rules[0].RollbackCommands = []filter.NativeCommand{rollbackCommand}
+	plan.Rules[0].Commands = []filter.NativeCommand{{Executable: "nft", Stdin: script.String()}}
 	return plan, nil
 }
 
-func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
+func compileCreateBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
+	plan := filter.CommandBatch{Provider: filter.ProviderNftables, Scope: snapshot.Scope, CommandOnly: true}
+	var script strings.Builder
+	for _, change := range changes {
+		if change.After == nil {
+			return filter.CommandBatch{}, fmt.Errorf("%w: create rule is required", filter.ErrInvalidRule)
+		}
+		rule, err := filter.NormalizeRule(*change.After)
+		if err != nil {
+			return filter.CommandBatch{}, err
+		}
+		if rule.Scope.Key() != snapshot.Scope.Key() || rule.UUID == "" {
+			return filter.CommandBatch{}, fmt.Errorf("%w: invalid nftables creation rule", filter.ErrInvalidRule)
+		}
+		marker := "1panel-rule:" + rule.UUID
+		verb := "add"
+		if !change.Append {
+			if rule.OrderIndex == nil || *rule.OrderIndex != 1 {
+				return filter.CommandBatch{}, fmt.Errorf("%w: batch insertion requires the first position", filter.ErrInvalidRule)
+			}
+			verb = "insert"
+		}
+		fmt.Fprintf(&script, "%s rule %s %s %s %s\n", verb, nftables_helper.TableFamily(rule.Scope.Family), nftables_helper.TableName, nativeChainName(rule.Scope), strings.Join(compileExpressionArgs(rule, marker), " "))
+		plan.Rules = append(plan.Rules, filter.RuleCommands{
+			RuleUUID: rule.UUID, Operation: filter.ChangeCreate,
+			Expected: filter.ObservedRule{Rule: rule, Marker: marker, ParseStatus: filter.ParseStatusSupported},
+		})
+	}
+	plan.Rules[0].Commands = []filter.NativeCommand{{Executable: "nft", Stdin: script.String()}}
+	return plan, nil
+}
+
+func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) error {
 	if err := validatePlan(plan); err != nil {
-		return filter.ApplyResult{}, err
+		return err
 	}
 	for _, rulePlan := range plan.Rules {
 		for _, command := range rulePlan.Commands {
 			if err := validateNativeCommand(command); err != nil {
-				return filter.ApplyResult{}, err
+				return err
 			}
 		}
 	}
@@ -125,62 +277,17 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		for _, command := range rulePlan.Commands {
 			if err := a.backend.Run(ctx, command); err != nil {
 				if plan.CommandOnly {
-					return filter.ApplyResult{}, err
+					return err
 				}
-				return filter.ApplyResult{}, a.compensate(ctx, plan, err)
+				return a.compensate(ctx, plan, err)
 			}
 		}
 	}
-	if err := a.backend.Save(ctx); err != nil {
-		if plan.CommandOnly {
-			return filter.ApplyResult{}, err
-		}
-		return filter.ApplyResult{}, a.compensate(ctx, plan, err)
-	}
-	applied := make([]filter.ObservedRule, 0, len(plan.Rules))
-	for _, rulePlan := range plan.Rules {
-		applied = append(applied, rulePlan.Expected)
-	}
-	return filter.ApplyResult{Applied: applied}, nil
+
+	return nil
 }
 
-func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	if err := validatePlan(plan); err != nil {
-		return filter.VerifyResult{}, err
-	}
-	snapshot, err := a.Observe(ctx, plan.Scope)
-	if err != nil {
-		return filter.VerifyResult{}, err
-	}
-	byMarker := make(map[string][]int, len(snapshot.Rules))
-	for index, observed := range snapshot.Rules {
-		byMarker[observed.Marker] = append(byMarker[observed.Marker], index)
-	}
-	for _, expected := range plan.Rules {
-		matches := 0
-		for _, index := range byMarker[expected.Expected.Marker] {
-			observed := snapshot.Rules[index]
-			if observed.Marker == expected.Expected.Marker {
-				if expected.Operation == filter.ChangeDelete {
-					matches++
-					continue
-				}
-				want, wantErr := filter.RuleKey(expected.Expected.Rule)
-				got, gotErr := filter.RuleKey(observed.Rule)
-				if wantErr == nil && gotErr == nil && want == got {
-					matches++
-				}
-			}
-		}
-		if (expected.Operation == filter.ChangeDelete && matches != 0) ||
-			(expected.Operation != filter.ChangeDelete && matches != 1) {
-			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-		}
-	}
-	return filter.VerifyResult{Snapshot: snapshot, Matched: true}, nil
-}
-
-func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
+func (a *Adapter) Rollback(ctx context.Context, plan filter.CommandBatch) error {
 	if err := validatePlan(plan); err != nil {
 		return err
 	}
@@ -201,7 +308,7 @@ func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 	return a.backend.Save(ctx)
 }
 
-func (a *Adapter) compensate(ctx context.Context, plan filter.BackendPlan, cause error) error {
+func (a *Adapter) compensate(ctx context.Context, plan filter.CommandBatch, cause error) error {
 	if plan.CreatesOnly() {
 		return cause
 	}
@@ -237,7 +344,7 @@ func nativeChainName(scope filter.Scope) string {
 	}
 }
 
-func validatePlan(plan filter.BackendPlan) error {
+func validatePlan(plan filter.CommandBatch) error {
 	if plan.Provider != filter.ProviderNftables || len(plan.Rules) == 0 {
 		return fmt.Errorf("%w: invalid nftables plan", filter.ErrInvalidRule)
 	}
@@ -251,70 +358,42 @@ func validateNativeCommand(command filter.NativeCommand) error {
 	return nil
 }
 
-func applyChange(snapshot filter.Snapshot, change filter.DesiredChange) ([]filter.ObservedRule, filter.ObservedRule, *filter.ObservedRule, error) {
-	rules := snapshot.Rules
+func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.ObservedRule, *filter.ObservedRule, error) {
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
 	}
 	if rule == nil {
-		return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
+		return filter.ObservedRule{}, nil, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
 	}
 	normalized, err := filter.NormalizeRule(*rule)
 	if err != nil {
-		return nil, filter.ObservedRule{}, nil, err
+		return filter.ObservedRule{}, nil, err
 	}
 	if normalized.Scope.Key() != snapshot.Scope.Key() || normalized.UUID == "" {
-		return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: invalid nftables mutation rule", filter.ErrInvalidRule)
+		return filter.ObservedRule{}, nil, fmt.Errorf("%w: invalid nftables mutation rule", filter.ErrInvalidRule)
 	}
-	position := len(rules) + 1
-	marker := "1panel-rule:" + normalized.UUID
-	var previous *filter.ObservedRule
-
-	if change.Operation != filter.ChangeCreate {
-		if change.Locator == nil || change.Locator.Position == nil {
-			return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: mutation requires a position locator", filter.ErrInvalidRule)
-		}
-		position = *change.Locator.Position
-		if position < 1 || position > len(rules) {
-			return nil, filter.ObservedRule{}, nil, filter.ErrRuleStale
-		}
-		selected := rules[position-1]
-		if selected.Protected {
-			return nil, filter.ObservedRule{}, nil, filter.ErrProtectedRule
-		}
-		previousCopy := selected
-		previous = &previousCopy
-		rules = append(rules[:position-1], rules[position:]...)
+	if change.Locator == nil || change.Locator.Position == nil {
+		return filter.ObservedRule{}, nil, fmt.Errorf("%w: mutation requires a position locator", filter.ErrInvalidRule)
 	}
-
+	position := *change.Locator.Position
+	if position < 1 || position > len(snapshot.Rules) {
+		return filter.ObservedRule{}, nil, filter.ErrRuleStale
+	}
+	previous := snapshot.Rules[position-1]
+	if previous.Protected {
+		return filter.ObservedRule{}, nil, filter.ErrProtectedRule
+	}
 	target := position
-	if normalized.OrderIndex != nil {
+	if normalized.OrderIndex != nil && (change.Operation == filter.ChangeUpdate || change.Operation == filter.ChangeReorder) {
 		target = int(*normalized.OrderIndex)
 	}
-	if change.Operation == filter.ChangeCreate && normalized.OrderIndex == nil {
-		target = len(rules) + 1
+	if target < 1 || target > len(snapshot.Rules) {
+		return filter.ObservedRule{}, nil, fmt.Errorf("%w: target position is out of range", filter.ErrInvalidRule)
 	}
-	if change.Operation == filter.ChangeDelete {
-		expected := observedRule(normalized, marker, position, "")
-		for index := position - 1; index < len(rules); index++ {
-			position := index + 1
-			rules[index].Locator.Position = &position
-		}
-		return rules, expected, previous, nil
-	}
-	if target < 1 || target > len(rules)+1 {
-		return nil, filter.ObservedRule{}, nil, fmt.Errorf("%w: target position is out of range", filter.ErrInvalidRule)
-	}
+	marker := "1panel-rule:" + normalized.UUID
 	expected := observedRule(normalized, marker, target, strings.Join(compileExpressionArgs(normalized, marker), " "))
-	rules = append(rules, filter.ObservedRule{})
-	copy(rules[target:], rules[target-1:])
-	rules[target-1] = expected
-	for index := min(position, target) - 1; index < len(rules); index++ {
-		position := index + 1
-		rules[index].Locator.Position = &position
-	}
-	return rules, expected, previous, nil
+	return expected, &previous, nil
 }
 
 func observedRule(rule filter.FirewallRule, marker string, position int, raw string) filter.ObservedRule {
@@ -324,7 +403,7 @@ func observedRule(rule filter.FirewallRule, marker string, position int, raw str
 	}
 }
 
-func ruleUUID(change filter.DesiredChange) string {
+func ruleUUID(change filter.RuleChange) string {
 	if change.After != nil {
 		return change.After.UUID
 	}
@@ -332,39 +411,6 @@ func ruleUUID(change filter.DesiredChange) string {
 		return change.Before.UUID
 	}
 	return ""
-}
-
-func rebuildCommand(scope filter.Scope, rules []filter.ObservedRule) (filter.NativeCommand, error) {
-	tableFamily := nftables_helper.TableFamily(scope.Family)
-	chain := nativeChainName(scope)
-	var script strings.Builder
-	script.WriteString("flush chain ")
-	script.WriteString(tableFamily)
-	script.WriteByte(' ')
-	script.WriteString(nftables_helper.TableName)
-	script.WriteByte(' ')
-	script.WriteString(chain)
-	script.WriteByte('\n')
-	for _, rule := range rules {
-		raw := strings.TrimSpace(rule.Raw)
-		if rule.ParseStatus == filter.ParseStatusSupported && rule.Marker != "" {
-			script.WriteString(strings.Join([]string{"add", "rule", tableFamily, nftables_helper.TableName, chain}, " "))
-			script.WriteByte(' ')
-			script.WriteString(strings.Join(compileExpressionArgs(rule.Rule, rule.Marker), " "))
-			script.WriteByte('\n')
-			continue
-		}
-		if raw != "" {
-			if strings.ContainsAny(raw, "\r\n") {
-				return filter.NativeCommand{}, fmt.Errorf("%w: invalid newline in native nftables rule", filter.ErrInvalidRule)
-			}
-			script.WriteString(strings.Join([]string{"add", "rule", tableFamily, nftables_helper.TableName, chain}, " "))
-			script.WriteByte(' ')
-			script.WriteString(raw)
-			script.WriteByte('\n')
-		}
-	}
-	return filter.NativeCommand{Executable: "nft", Stdin: script.String()}, nil
 }
 
 func compileExpressionArgs(rule filter.FirewallRule, marker string) []string {
@@ -593,6 +639,10 @@ func numericSymbol(value string) string {
 
 type systemBackend struct{}
 
+func (systemBackend) ReadRulesByComment(ctx context.Context, scope filter.Scope, comment string) (string, error) {
+	return filter.ReadRulesByComment(ctx, "nft", []string{"-a", "-n", "-n", "list", "chain", nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope)}, comment)
+}
+
 func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
 	run := func(args ...string) (string, error) {
 		return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout(
@@ -600,6 +650,13 @@ func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string,
 		)
 	}
 	return nftables_helper.ReadChain(run, nftables_helper.TableFamily(scope.Family), nftables_helper.TableName, nativeChainName(scope))
+}
+
+func (systemBackend) ListTable(ctx context.Context, scope filter.Scope) (string, bool, error) {
+	run := func(args ...string) (string, error) {
+		return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).RunWithOptionalSudoAndStdout("nft", append([]string{"-n", "-n"}, args...)...)
+	}
+	return nftables_helper.ReadTable(run, nftables_helper.TableFamily(scope.Family), nftables_helper.TableName)
 }
 
 func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) error {
@@ -615,4 +672,8 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 
 func (systemBackend) Save(ctx context.Context) error {
 	return nftables_helper.PersistRuleset(ctx)
+}
+
+func (a *Adapter) SaveRules(ctx context.Context, scope filter.Scope) error {
+	return a.backend.Save(ctx)
 }

@@ -22,6 +22,7 @@ export namespace Firewall {
         initialized: boolean;
         bound: boolean;
         reason?: string;
+        forwardPolicy?: 'ACCEPT' | 'DROP';
     }
     export interface BackendGroup {
         selected: string;
@@ -243,7 +244,9 @@ export namespace Firewall {
 
     export interface AdoptRequest {
         scope: Scope;
-        instanceKey: string;
+        instanceKey?: string;
+        rule?: Rule;
+        marker?: string;
     }
 
     export interface CreateItem {

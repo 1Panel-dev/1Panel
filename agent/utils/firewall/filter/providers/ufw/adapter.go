@@ -16,6 +16,7 @@ import (
 )
 
 type CommandReader interface {
+	filter.CommentRuleReader
 	Read(context.Context, ...string) (string, error)
 }
 
@@ -69,7 +70,7 @@ func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule
 	}
 	comment = strings.TrimSpace(comment)
 	if comment == "" || strings.ContainsAny(comment, "\r\n\x00") {
-		return fmt.Errorf("%w: invalid UFW fallback comment", filter.ErrInvalidRule)
+		return fmt.Errorf("%w: invalid UFW external rule comment", filter.ErrInvalidRule)
 	}
 	command := commentCommand(normalized, comment)
 	if err := validateCommand(command); err != nil {
@@ -85,15 +86,35 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	}, nil
 }
 
-func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
-	snapshots, err := a.ObserveScopes(ctx, []filter.Scope{scope})
+func (a *Adapter) ListRulesByComment(ctx context.Context, scopes []filter.Scope, comment string) ([]filter.ObservedRule, error) {
+	var rules []filter.ObservedRule
+	var output string
+	for index, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateScope(scope); err != nil {
+			return nil, err
+		}
+		if index == 0 {
+			var err error
+			output, err = a.reader.ReadRulesByComment(ctx, scope, comment)
+			if err != nil {
+				return nil, err
+			}
+		}
+		rules = append(rules, parseNumberedRules(scope, output)...)
+	}
+	return rules, nil
+}
+
+func (a *Adapter) ListRules(ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
+	snapshots, err := a.ListRuleScopes(ctx, []filter.Scope{scope})
 	if err != nil {
-		return filter.Snapshot{}, err
+		return filter.RuleSet{}, err
 	}
 	return snapshots[0], nil
 }
 
-func (a *Adapter) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]filter.Snapshot, error) {
+func (a *Adapter) ListRuleScopes(ctx context.Context, scopes []filter.Scope) ([]filter.RuleSet, error) {
 	if len(scopes) == 0 {
 		return nil, fmt.Errorf("%w: UFW observation requires at least one scope", filter.ErrInvalidScope)
 	}
@@ -113,14 +134,28 @@ func (a *Adapter) ObserveScopes(ctx context.Context, scopes []filter.Scope) ([]f
 		return nil, fmt.Errorf("%w: read UFW numbered status: %w", filter.ErrInventoryUnavailable, err)
 	}
 
+	lastPositions := make(map[filter.Family]int)
+	for _, line := range strings.Split(numbered, "\n") {
+		matches := re.UFWNumberedRuleRegex.FindStringSubmatch(strings.TrimSpace(line))
+		if len(matches) != 0 {
+			position, err := strconv.Atoi(matches[1])
+			if err == nil {
+				family := familyForNumberedRule(matches[2], matches[5])
+				lastPositions[family] = max(lastPositions[family], position)
+			}
+		} else if observed, family, _, ok := parseUnrecognizedNumberedRule(normalizedScopes[0], strings.TrimSpace(line)); ok && observed.Locator.Position != nil {
+			lastPositions[family] = max(lastPositions[family], *observed.Locator.Position)
+		}
+	}
 	notices := statusNotices(numbered)
-	snapshots := make([]filter.Snapshot, 0, len(normalizedScopes))
+	snapshots := make([]filter.RuleSet, 0, len(normalizedScopes))
 	for _, scope := range normalizedScopes {
-		snapshot, err := filter.NewSnapshot(scope, parseNumberedRules(scope, numbered))
+		snapshot, err := filter.NewRuleSet(scope, parseNumberedRules(scope, numbered))
 		if err != nil {
 			return nil, err
 		}
 		snapshot.Notices = append([]filter.ScopeNotice(nil), notices...)
+		snapshot.LastPosition = lastPositions[scope.Family]
 		snapshots = append(snapshots, snapshot)
 	}
 	return snapshots, nil
@@ -145,46 +180,61 @@ func (a *Adapter) NativeDetail(ctx context.Context, profile string, _ bool) (str
 	return info, nil
 }
 
-func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
-	if snapshot.Revision == "" {
-		return filter.BackendPlan{}, filter.ErrRuleStale
-	}
+func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
 	if err := validateScope(snapshot.Scope); err != nil {
-		return filter.BackendPlan{}, err
+		return filter.CommandBatch{}, err
 	}
 	if hasScopeNotice(snapshot.Notices, filter.ScopeNoticeManagedScopeInactive) {
-		return filter.BackendPlan{}, fmt.Errorf("%w: ufw is inactive", filter.ErrProviderUnavailable)
+		return filter.CommandBatch{}, fmt.Errorf("%w: ufw is inactive", filter.ErrProviderUnavailable)
 	}
 	if len(changes) != 1 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: ufw plans currently require exactly one change", filter.ErrInvalidRule)
+		return filter.CommandBatch{}, fmt.Errorf("%w: ufw plans currently require exactly one change", filter.ErrInvalidRule)
 	}
 	rulePlan, err := compileChange(snapshot, changes[0])
 	if err != nil {
-		return filter.BackendPlan{}, err
+		return filter.CommandBatch{}, err
 	}
-	return filter.BackendPlan{
-		Provider: filter.ProviderUFW, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
-		Rules: []filter.NativeRulePlan{rulePlan},
+	return filter.CommandBatch{
+		Provider: filter.ProviderUFW, Scope: snapshot.Scope,
+		Rules: []filter.RuleCommands{rulePlan},
 	}, nil
 }
 
-func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
+func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) error {
 	if err := validateBackendPlan(plan); err != nil {
-		return filter.ApplyResult{}, err
+		return err
 	}
 	if a.writer == nil {
-		return filter.ApplyResult{}, errors.New("ufw writer is required")
+		return errors.New("ufw writer is required")
 	}
 	for _, command := range append(append([]filter.NativeCommand(nil), plan.Rules[0].Commands...), plan.Rules[0].RollbackCommands...) {
 		if err := validateCommand(command); err != nil {
-			return filter.ApplyResult{}, err
+			return err
 		}
 	}
 	executed := 0
 	for index, command := range plan.Rules[0].Commands {
-		if err := a.writer.Run(ctx, command); err != nil {
+		err := a.writer.Run(ctx, command)
+		if err != nil && plan.CommandOnly && plan.CreatesOnly() && command.Args[0] == "insert" &&
+			(strings.Contains(err.Error(), "Invalid position") || strings.Contains(err.Error(), "Cannot insert rule at position")) {
+			ipv4, ipv6 := plan.Scope, plan.Scope
+			ipv4.Family, ipv6.Family = filter.FamilyIPv4, filter.FamilyIPv6
+			snapshots, readErr := a.ListRuleScopes(ctx, []filter.Scope{ipv4, ipv6})
+			if readErr != nil {
+				return errors.Join(err, readErr)
+			}
+			lastPosition := maximumObservedPosition(snapshots[0])
+			if plan.Scope.Family == filter.FamilyIPv6 {
+				lastPosition = max(lastPosition, maximumObservedPosition(snapshots[1]))
+			}
+			position, _ := strconv.Atoi(command.Args[1])
+			if position == lastPosition+1 && !hasScopeNotice(snapshots[0].Notices, filter.ScopeNoticeManagedScopeInactive) {
+				err = a.writer.Run(ctx, commentCommand(plan.Rules[0].Expected.Rule, plan.Rules[0].Expected.Marker))
+			}
+		}
+		if err != nil {
 			if plan.CommandOnly {
-				return filter.ApplyResult{}, fmt.Errorf("execute UFW rule: %w", err)
+				return fmt.Errorf("execute UFW rule: %w", err)
 			}
 			if !plan.CreatesOnly() {
 				probeCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
@@ -194,46 +244,22 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 				cancel()
 			}
 			cause := ufwApplyError(plan.Rules[0], fmt.Errorf("execute UFW rule: %w", err))
-			return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, cause)
+			return a.compensate(ctx, plan.Rules[0], executed, cause)
 		}
 		executed = index + 1
 	}
-	if plan.CommandOnly || plan.CreatesOnly() {
-		return filter.ApplyResult{Applied: []filter.ObservedRule{plan.Rules[0].Expected}}, nil
-	}
-	verification, err := a.verify(ctx, plan)
-	if err != nil {
-		cause := ufwApplyError(plan.Rules[0], fmt.Errorf("verify UFW rule: %w", err))
-		return filter.ApplyResult{}, a.compensate(ctx, plan.Rules[0], executed, cause)
-	}
-	if !verification.Matched {
-		cause := ufwApplyError(plan.Rules[0], fmt.Errorf(
-			"ufw write verification failed for marker %q in scope %s",
-			plan.Rules[0].Expected.Marker,
-			plan.Scope.Key(),
-		))
-		return filter.ApplyResult{}, a.compensate(
-			ctx,
-			plan.Rules[0],
-			executed,
-			cause,
-		)
-	}
-	return filter.ApplyResult{
-		Applied:      []filter.ObservedRule{plan.Rules[0].Expected},
-		Verification: &verification,
-	}, nil
+	return nil
 }
 
-func ufwApplyError(plan filter.NativeRulePlan, cause error) error {
+func ufwApplyError(plan filter.RuleCommands, cause error) error {
 	if plan.Operation == filter.ChangeAdopt {
 		return buserr.WithDetail("ErrUFWRuleAdopt", cause.Error(), cause)
 	}
 	return cause
 }
 
-func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRulePlan, commandIndex int) bool {
-	snapshot, err := a.Observe(ctx, plan.Expected.Rule.Scope)
+func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.RuleCommands, commandIndex int) bool {
+	snapshot, err := a.ListRules(ctx, plan.Expected.Rule.Scope)
 	if err != nil {
 		return true
 	}
@@ -258,14 +284,7 @@ func (a *Adapter) failedCommandApplied(ctx context.Context, plan filter.NativeRu
 	}
 }
 
-func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	if err := validateBackendPlan(plan); err != nil {
-		return filter.VerifyResult{}, err
-	}
-	return a.verify(ctx, plan)
-}
-
-func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
+func (a *Adapter) Rollback(ctx context.Context, plan filter.CommandBatch) error {
 	if err := validateBackendPlan(plan); err != nil {
 		return err
 	}
@@ -291,8 +310,8 @@ func validateScope(scope filter.Scope) error {
 	return nil
 }
 
-func validateBackendPlan(plan filter.BackendPlan) error {
-	if plan.Provider != filter.ProviderUFW || len(plan.Rules) != 1 || plan.SnapshotRevision == "" {
+func validateBackendPlan(plan filter.CommandBatch) error {
+	if plan.Provider != filter.ProviderUFW || len(plan.Rules) != 1 {
 		return fmt.Errorf("%w: invalid ufw backend plan", filter.ErrInvalidRule)
 	}
 	if err := validateScope(plan.Scope); err != nil {
@@ -304,41 +323,53 @@ func validateBackendPlan(plan filter.BackendPlan) error {
 	return nil
 }
 
-func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filter.NativeRulePlan, error) {
+func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.RuleCommands, error) {
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
 	}
 	if rule == nil {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
 	}
 	normalized, err := filter.NormalizeRule(*rule)
 	if err != nil {
-		return filter.NativeRulePlan{}, err
+		return filter.RuleCommands{}, err
 	}
 	if normalized.Scope.Key() != snapshot.Scope.Key() {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
+		return filter.RuleCommands{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
 	}
 	if err := validateWritableRule(normalized); err != nil {
-		return filter.NativeRulePlan{}, err
+		return filter.RuleCommands{}, err
 	}
 	if normalized.UUID == "" {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
+		return filter.RuleCommands{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
 	}
 	marker := "1panel-rule:" + normalized.UUID
+	if change.Operation == filter.ChangeDelete && change.CommandOnly && change.Locator == nil {
+		if change.UnmarkedAdopted || change.PreviousMarker != "" {
+			marker = observedComment(filter.ObservedRule{Rule: normalized, Marker: change.PreviousMarker})
+		}
+		return filter.RuleCommands{
+			RuleUUID: normalized.UUID, Operation: change.Operation,
+			Expected:         filter.ObservedRule{Rule: normalized, Marker: marker, ParseStatus: filter.ParseStatusSupported},
+			Commands:         []filter.NativeCommand{deleteRuleCommand(normalized, marker)},
+			RollbackCommands: []filter.NativeCommand{commentCommand(normalized, marker)},
+		}, nil
+	}
 	position := insertionPosition(snapshot, normalized)
 	expected := observedForRule(normalized, marker, position)
-	plan := filter.NativeRulePlan{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
+	plan := filter.RuleCommands{RuleUUID: normalized.UUID, Operation: change.Operation, Expected: expected}
 
 	switch change.Operation {
 	case filter.ChangeCreate:
 		if normalized.OrderIndex != nil && *normalized.OrderIndex < 1 {
-			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
+			return filter.RuleCommands{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
 		command := insertCommand(position, normalized, marker)
-		if !change.Append && normalized.OrderIndex != nil && position == 1 {
+		hasSnapshot := !change.CommandOnly || snapshot.Rules != nil
+		if !change.Append && normalized.OrderIndex != nil && position == 1 && hasSnapshot {
 			command = filter.NativeCommand{Executable: "ufw", Args: append([]string{"prepend"}, compileRuleArgs(normalized, marker)...)}
-		} else if change.Append || position == maximumObservedPosition(snapshot)+1 {
+		} else if change.Append || normalized.OrderIndex == nil || hasSnapshot && position == maximumObservedPosition(snapshot)+1 {
 			command = commentCommand(normalized, marker)
 		}
 		if command.Args[0] != "insert" {
@@ -350,7 +381,7 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 	case filter.ChangeAdopt:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, false)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		position = *target.Locator.Position
 		appendAtEnd := position == maximumObservedPosition(snapshot)
@@ -371,27 +402,27 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		}
 	case filter.ChangeUpdate, filter.ChangeReorder:
 		if change.Before == nil {
-			return filter.NativeRulePlan{}, fmt.Errorf("%w: previous ufw rule is required", filter.ErrInvalidRule)
+			return filter.RuleCommands{}, fmt.Errorf("%w: previous ufw rule is required", filter.ErrInvalidRule)
 		}
 		before, err := filter.NormalizeRule(*change.Before)
 		if err != nil {
-			return filter.NativeRulePlan{}, err
+			return filter.RuleCommands{}, err
 		}
 		target, targetErr := validateMutationTarget(snapshot, change, before, marker, true)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		position = *target.Locator.Position
 		targetPosition := position
 		if normalized.OrderIndex != nil {
 			if *normalized.OrderIndex < 1 {
-				return filter.NativeRulePlan{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
+				return filter.RuleCommands{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
 			}
 			targetPosition = int(*normalized.OrderIndex)
 		}
 		maximumPosition := maximumObservedPosition(snapshot)
 		if targetPosition > maximumPosition {
-			return filter.NativeRulePlan{}, fmt.Errorf(
+			return filter.RuleCommands{}, fmt.Errorf(
 				"%w: update target position %d is out of range 1-%d",
 				filter.ErrInvalidRule, targetPosition, maximumPosition,
 			)
@@ -415,18 +446,18 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 	case filter.ChangeDelete:
 		target, targetErr := validateMutationTarget(snapshot, change, normalized, marker, !change.UnmarkedAdopted)
 		if targetErr != nil {
-			return filter.NativeRulePlan{}, targetErr
+			return filter.RuleCommands{}, targetErr
 		}
 		position = *target.Locator.Position
 		plan.Previous = &target
 		plan.Expected = target
-		plan.Commands = []filter.NativeCommand{deletePositionCommand(position)}
+		plan.Commands = []filter.NativeCommand{deleteRuleCommand(target.Rule, observedComment(target))}
 		restoreAtEnd := change.RestoreAtEnd || position == maximumObservedPosition(snapshot)
 		plan.RollbackCommands = []filter.NativeCommand{
 			positionedCommand(position, target.Rule, observedComment(target), restoreAtEnd),
 		}
 	default:
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
 	return plan, nil
 }
@@ -445,7 +476,7 @@ func validateWritableRule(rule filter.FirewallRule) error {
 	return nil
 }
 
-func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChange, desired filter.FirewallRule, marker string, requireOwned bool) (filter.ObservedRule, error) {
+func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange, desired filter.FirewallRule, marker string, requireOwned bool) (filter.ObservedRule, error) {
 	if change.Locator == nil || change.Locator.Position == nil {
 		return filter.ObservedRule{}, fmt.Errorf("%w: ufw mutation requires a numbered locator", filter.ErrInvalidRule)
 	}
@@ -515,7 +546,7 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	return target, nil
 }
 
-func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
+func insertionPosition(snapshot filter.RuleSet, rule filter.FirewallRule) int {
 	if rule.OrderIndex != nil && *rule.OrderIndex > 0 {
 		return int(*rule.OrderIndex)
 	}
@@ -523,8 +554,8 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 	return position
 }
 
-func maximumObservedPosition(snapshot filter.Snapshot) int {
-	maximum := 0
+func maximumObservedPosition(snapshot filter.RuleSet) int {
+	maximum := snapshot.LastPosition
 	for _, observed := range snapshot.Rules {
 		if observed.Locator.Position != nil && *observed.Locator.Position > maximum {
 			maximum = *observed.Locator.Position
@@ -620,47 +651,7 @@ func observedComment(observed filter.ObservedRule) string {
 	return observed.Rule.Description
 }
 
-func (a *Adapter) verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	scopes := append([]filter.Scope{plan.Scope}, relatedScopes(plan.Scope)...)
-	snapshots, err := a.ObserveScopes(ctx, scopes)
-	if err != nil {
-		return filter.VerifyResult{}, err
-	}
-	if len(snapshots) != len(scopes) {
-		return filter.VerifyResult{}, errors.New("ufw observation returned an incomplete scope set")
-	}
-	snapshot := snapshots[0]
-	rulePlan := plan.Rules[0]
-	marker := rulePlan.Expected.Marker
-	count := 0
-	for _, observedSnapshot := range snapshots {
-		count += countMarker(observedSnapshot, marker)
-	}
-	if rulePlan.Operation == filter.ChangeDelete {
-		return filter.VerifyResult{Snapshot: snapshot, Matched: count == 0}, nil
-	}
-	if count != 1 {
-		return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-	}
-	for _, observed := range snapshot.Rules {
-		if observed.Marker != marker {
-			continue
-		}
-		positionMatches := rulePlan.Expected.Locator.Position == nil ||
-			(observed.Locator.Position != nil && *observed.Locator.Position == *rulePlan.Expected.Locator.Position)
-		semanticMatches := filter.ObservedRuleMatchesExpected(observed, rulePlan.Expected.Rule)
-		if observed.ParseStatus == filter.ParseStatusOpaque {
-			semanticMatches = true
-		}
-		if !semanticMatches || !positionMatches {
-			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-		}
-		return filter.VerifyResult{Snapshot: snapshot, Matched: true}, nil
-	}
-	return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-}
-
-func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, executed int, cause error) error {
+func (a *Adapter) compensate(ctx context.Context, plan filter.RuleCommands, executed int, cause error) error {
 	if plan.Operation == filter.ChangeCreate {
 		return cause
 	}
@@ -673,7 +664,7 @@ func (a *Adapter) compensate(ctx context.Context, plan filter.NativeRulePlan, ex
 	return cause
 }
 
-func (a *Adapter) rollback(ctx context.Context, plan filter.NativeRulePlan, executed int) error {
+func (a *Adapter) rollback(ctx context.Context, plan filter.RuleCommands, executed int) error {
 	var rollbackErr error
 	for index := executed - 1; index >= 0; index-- {
 		if index >= len(plan.RollbackCommands) {
@@ -689,18 +680,7 @@ func (a *Adapter) rollback(ctx context.Context, plan filter.NativeRulePlan, exec
 	return rollbackErr
 }
 
-func relatedScopes(scope filter.Scope) []filter.Scope {
-	scope = scope.Normalize()
-	other := scope
-	if other.Family == filter.FamilyIPv4 {
-		other.Family = filter.FamilyIPv6
-	} else {
-		other.Family = filter.FamilyIPv4
-	}
-	return []filter.Scope{other}
-}
-
-func countMarker(snapshot filter.Snapshot, marker string) int {
+func countMarker(snapshot filter.RuleSet, marker string) int {
 	count := 0
 	for _, observed := range snapshot.Rules {
 		if observed.Marker == marker {
@@ -710,7 +690,7 @@ func countMarker(snapshot filter.Snapshot, marker string) int {
 	return count
 }
 
-func containsObservedRule(snapshot filter.Snapshot, expected filter.ObservedRule) bool {
+func containsObservedRule(snapshot filter.RuleSet, expected filter.ObservedRule) bool {
 	for _, observed := range snapshot.Rules {
 		if expected.Locator.Position != nil &&
 			(observed.Locator.Position == nil || *observed.Locator.Position != *expected.Locator.Position) {
@@ -767,7 +747,7 @@ func parseNumberedRules(scope filter.Scope, output string) []filter.ObservedRule
 		if err != nil || position < 1 {
 			continue
 		}
-		if !isInboundNumberedRule(matches[4], matches[5]) {
+		if matches[4] == "OUT" || matches[4] == "FWD" || strings.Contains(matches[5], "(out)") {
 			continue
 		}
 		family := familyForNumberedRule(matches[2], matches[5])
@@ -785,7 +765,7 @@ func parseNumberedRule(scope filter.Scope, position int, destination, action, di
 	positionCopy := position
 	locator := filter.Locator{
 		Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
-		Canonical: normalizedDisplay(raw), Position: &positionCopy,
+		Canonical: strings.Join(strings.Fields(raw), " "), Position: &positionCopy,
 	}
 	ruleAction := map[string]filter.Action{
 		"ALLOW":  filter.ActionAccept,
@@ -922,7 +902,7 @@ func looksLikeAddressedService(value string) bool {
 	if len(tokens) < 2 {
 		return false
 	}
-	if isAnywhere(tokens[0]) {
+	if strings.EqualFold(strings.TrimSpace(tokens[0]), "Anywhere") {
 		return true
 	}
 	_, ok := parseAddress(tokens[0])
@@ -992,7 +972,7 @@ func parseUnrecognizedNumberedRule(scope filter.Scope, raw string) (filter.Obser
 		},
 		Locator: filter.Locator{
 			Provider: filter.ProviderUFW, ScopeKey: scope.Key(), NativeID: strconv.Itoa(position),
-			Canonical: normalizedDisplay(raw), Position: &positionCopy,
+			Canonical: strings.Join(strings.Fields(raw), " "), Position: &positionCopy,
 		},
 		Marker: marker, ParseStatus: filter.ParseStatusOpaque, Raw: raw, Persistence: filter.PersistenceStatusConverged,
 	}, family, inbound, true
@@ -1036,7 +1016,7 @@ func parseDestination(value string) (address, port, protocol, iface, annotation 
 	tokens := strings.Fields(value)
 	switch len(tokens) {
 	case 1:
-		if isAnywhere(tokens[0]) {
+		if strings.EqualFold(strings.TrimSpace(tokens[0]), "Anywhere") {
 			return "", "", "all", iface, annotation, true
 		}
 		if parsedAddress, parsedProtocol, endpointOK := parseAddressProtocol(tokens[0]); endpointOK {
@@ -1068,7 +1048,7 @@ func parseAddressProtocol(value string) (string, string, bool) {
 		return "", "", false
 	}
 	endpoint := strings.TrimSpace(value[:separator])
-	if isAnywhere(endpoint) {
+	if strings.EqualFold(strings.TrimSpace(endpoint), "Anywhere") {
 		return "", protocol, true
 	}
 	address, ok := parseAddress(endpoint)
@@ -1101,17 +1081,13 @@ func splitDestinationAnnotation(value string) (string, string) {
 }
 
 func parseSource(value string) (string, bool) {
-	if isAnywhere(value) {
+	if strings.EqualFold(strings.TrimSpace(value), "Anywhere") {
 		return "", true
 	}
 	if strings.Contains(value, " on ") || len(strings.Fields(value)) != 1 {
 		return "", false
 	}
 	return parseAddress(value)
-}
-
-func isInboundNumberedRule(direction, source string) bool {
-	return direction != "OUT" && direction != "FWD" && !strings.Contains(source, "(out)")
 }
 
 func splitInterface(value string) (endpoint, iface string, ok bool) {
@@ -1168,7 +1144,7 @@ func parsePortProtocol(value string) (string, string, bool) {
 }
 
 func parseAddress(value string) (string, bool) {
-	if isAnywhere(value) {
+	if strings.EqualFold(strings.TrimSpace(value), "Anywhere") {
 		return "", true
 	}
 	if prefix, err := netip.ParsePrefix(value); err == nil {
@@ -1180,19 +1156,11 @@ func parseAddress(value string) (string, bool) {
 	return "", false
 }
 
-func isAnywhere(value string) bool {
-	return strings.EqualFold(strings.TrimSpace(value), "Anywhere")
-}
-
 func canonicalRule(rule filter.FirewallRule) string {
 	return strings.Join([]string{
 		string(rule.Action), rule.Protocol, rule.SourceAddress, rule.DestinationAddress,
 		rule.DestinationPort, rule.Interface,
 	}, "|")
-}
-
-func normalizedDisplay(raw string) string {
-	return strings.Join(strings.Fields(raw), " ")
 }
 
 func statusNotices(numbered string) []filter.ScopeNotice {
@@ -1240,6 +1208,10 @@ func IsIPv6Unavailable(err error) bool {
 
 type systemBackend struct{}
 
+func (systemBackend) ReadRulesByComment(ctx context.Context, _ filter.Scope, comment string) (string, error) {
+	return filter.ReadRulesByComment(ctx, "ufw", []string{"status", "numbered"}, comment)
+}
+
 func (systemBackend) Read(ctx context.Context, args ...string) (string, error) {
 	return cmd.NewCommandMgr(
 		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
@@ -1250,7 +1222,14 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if err := validateCommand(command); err != nil {
 		return err
 	}
-	return cmd.NewCommandMgr(
+	output, err := cmd.NewCommandMgr(
 		cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second), cmd.WithEnv("LANGUAGE=en_US:en"),
-	).RunWithOptionalSudo(command.Executable, command.Args...)
+	).RunWithOptionalSudoAndStdout(command.Executable, command.Args...)
+	if err != nil {
+		return err
+	}
+	if strings.Contains(output, "Could not delete non-existent rule") {
+		return fmt.Errorf("%w: %s", filter.ErrRuleStale, strings.TrimSpace(output))
+	}
+	return nil
 }

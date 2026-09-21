@@ -85,7 +85,13 @@
                 </button>
             </div>
 
-            <ComplexTable v-if="detailFilter" class="sync-rule-table" :data="detailItems" :height="360">
+            <ComplexTable
+                v-if="detailFilter"
+                class="sync-rule-table"
+                :data="detailPageItems"
+                :pagination-config="paginationConfig"
+                :height="360"
+            >
                 <el-table-column :label="$t('commons.table.status')" width="105">
                     <template #default="{ row }">
                         <el-tag :type="statusType(row.status)" effect="plain">
@@ -177,7 +183,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { formatHostAddress, formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { Coin, Lock, Right } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'search'): void }>();
 const { currentNode } = useGlobalStore();
@@ -211,8 +217,19 @@ const detailItems = computed(() => {
     return items.filter((item) => item.status === detailFilter.value);
 });
 
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: computed(() => detailItems.value.length),
+});
+const detailPageItems = computed(() => {
+    const start = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
+    return detailItems.value.slice(start, start + paginationConfig.pageSize);
+});
+
 const toggleDetail = (filter: RuleDetailFilter, count: number) => {
     if (count === 0) return;
+    paginationConfig.currentPage = 1;
     detailFilter.value = detailFilter.value === filter ? undefined : filter;
 };
 
