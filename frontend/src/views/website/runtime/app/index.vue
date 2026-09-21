@@ -1,5 +1,5 @@
 <template>
-    <el-form-item  ref="appFormItem"  :label="$t('app.app')" prop="appDetailID" :rules="Rules.requiredSelect">
+    <el-form-item ref="appFormItem" :label="$t('app.app')" prop="appDetailID" :rules="Rules.requiredSelect">
         <el-row :gutter="20" class="w-[calc(100%+20px)] gap-y-3 lg:w-auto lg:gap-y-0">
             <el-col :span="12" :xs="24" :sm="24" :md="12" class="min-w-0">
                 <el-select

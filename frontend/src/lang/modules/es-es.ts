@@ -38,7 +38,7 @@ const message = {
         disableConfirm:
             '¿Desactivar «{0}»? Se rechazarán nuevas solicitudes y se cerrarán sus terminales. Las tareas en curso no se cancelan.',
         enableConfirm: '¿Activar «{0}» con sus condiciones de acceso actuales?',
-        bindingKey: 'Clave para vincular la APP',
+        bindingKey: 'Clave de vinculación',
         selectKey: 'Selecciona tu clave',
         noBindableKey: 'No hay claves disponibles para QR. Crea una o permite QR en una clave activa.',
         appKeyExpired: 'La clave API seleccionada ha caducado. Amplía su fecha de caducidad o selecciona otra clave.',

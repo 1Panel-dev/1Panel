@@ -34,7 +34,7 @@ const message = {
             '確認撤銷「{0}」？新請求將被拒絕，並關閉對應終端連線。撤銷無法復原；已開始的背景工作不會自動取消。',
         disableConfirm: '確認停用「{0}」？新請求將被拒絕，並關閉對應終端連線。已開始的背景工作不會自動取消。',
         enableConfirm: '確認依目前存取條件啟用「{0}」？',
-        bindingKey: '用於 APP 綁定的 Key',
+        bindingKey: '綁定 Key',
         selectKey: '選擇自己的 Key',
         noBindableKey: '暫無可掃碼綁定的 Key。請先建立，或為已有且有效的 Key 開啟掃碼綁定。',
         appKeyExpired: '所選 API Key 已到期，請調整有效期限或選擇其他 Key。',

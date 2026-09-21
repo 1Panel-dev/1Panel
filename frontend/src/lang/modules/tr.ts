@@ -39,7 +39,7 @@ const message = {
         disableConfirm:
             '“{0}” devre dışı bırakılsın mı? Yeni istekler reddedilir ve ilgili terminaller kapatılır. Çalışan arka plan işleri iptal edilmez.',
         enableConfirm: '“{0}” mevcut erişim koşullarıyla etkinleştirilsin mi?',
-        bindingKey: 'Uygulama bağlantısı için anahtar',
+        bindingKey: 'Bağlantı anahtarı',
         selectKey: 'Anahtarınızı seçin',
         noBindableKey:
             'QR bağlantısı için uygun anahtar yok. Yeni anahtar oluşturun veya etkin bir anahtarda QR bağlantısını açın.',
