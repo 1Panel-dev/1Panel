@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "نام‌های کاربری و گذرواژ�
 ErrSAML2PasswordExpirationUnsupported: "کاربران SAML2 از سیاست محلی انقضای گذرواژه استفاده نمی‌کنند."
 
 # API key management
-ErrAPIKeyLimit: "به سقف ۲۰ کلید API لغونشده برای هر کاربر رسیده‌اید"
 ErrAPIKeyConflict: "کلید API تغییر کرده است. صفحه را تازه‌سازی و دوباره تلاش کنید؛ برای تکرار ایجاد، از پارامترهای اصلی استفاده کنید"
 ErrAPIKeyNameExists: "یک کلید API لغونشده با این نام از قبل وجود دارد"
 ErrAPIKeyNotFound: "کلید API وجود ندارد یا متعلق به کاربر فعلی نیست"

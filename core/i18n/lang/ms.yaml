@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "Nama pengguna dan kata laluan SAML2 diurus ol
 ErrSAML2PasswordExpirationUnsupported: "Pengguna SAML2 tidak menggunakan dasar tamat tempoh kata laluan setempat."
 
 # API key management
-ErrAPIKeyLimit: "Had 20 kunci API yang belum dibatalkan bagi setiap pengguna telah dicapai"
 ErrAPIKeyConflict: "Kunci API telah berubah. Muat semula dan cuba lagi; gunakan parameter asal untuk mengulangi penciptaan"
 ErrAPIKeyNameExists: "Kunci API yang belum dibatalkan dengan nama ini sudah wujud"
 ErrAPIKeyNotFound: "Kunci API tidak wujud atau bukan milik pengguna semasa"

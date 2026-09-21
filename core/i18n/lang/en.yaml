@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "SAML2 usernames and passwords are managed by 
 ErrSAML2PasswordExpirationUnsupported: "SAML2 users do not use the local password expiration policy."
 
 # API key management
-ErrAPIKeyLimit: "The limit of 20 unrevoked API keys per user has been reached"
 ErrAPIKeyConflict: "The API key changed. Refresh and retry; repeated creation must use the original request parameters"
 ErrAPIKeyNameExists: "An unrevoked API key with this name already exists"
 ErrAPIKeyNotFound: "The API key does not exist or does not belong to the current user"

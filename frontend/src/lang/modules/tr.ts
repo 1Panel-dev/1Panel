@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'Panel API',
+        title: 'API Key',
         manage: 'API anahtarlarını yönet',
         personalEntry: 'Ayarlar bölümünde anahtarlarınızı, erişim koşullarını ve uygulama QR bağlantısını yönetin.',
         create: 'API anahtarı oluştur',
         legacy: 'Eski anahtar',
         identifier: 'Anahtar kimliği',
         details: 'API anahtarı ayrıntıları',
-        quota: '{0} / {1} yeni anahtar (devre dışı ve süresi dolmuş anahtarlar dahil, eski anahtar hariç)',
         statusEnable: 'Etkin',
         statusDisable: 'Devre dışı',
         statusRevoked: 'İptal edildi',
@@ -22,10 +21,8 @@ const message = {
         never: 'Süresiz',
         futureExpiry: 'Gelecekte bir sona erme zamanı seçin.',
         allowAppBinding: 'Uygulama QR bağlantısına izin ver',
-        bindingException:
-            'Oturum açılmış panelinizde oluşturulan tek kullanımlık QR koduyla bu anahtarın telefona yeniden iletilmesine izin verir.',
         bindingDisableHelp:
-            'QR bağlantısını kapatmak gelecekteki iletimi engeller. Mevcut bağlantılar anahtar devre dışı bırakılana, iptal edilene veya süresi dolana kadar geçerlidir.',
+            'QR eşleştirmesini devre dışı bırakmak yeni eşleştirmeleri engeller. Eşleştirilmiş cihazlar, anahtar devre dışı bırakılana, iptal edilene veya süresi dolana kadar kullanılmaya devam edebilir.',
         saveSecret:
             'Anahtarı şimdi kopyalayıp kaydedin. Kapattıktan sonra normal anahtar yönetimi tam anahtarı yeniden gösteremez.',
         saved: 'Anahtarı kaydettim',
@@ -34,7 +31,7 @@ const message = {
         uncertain:
             'İstek sonucu belirsiz. Tekrarları önlemek için aynı bilgilerle yeniden deneyin veya kapatıp yeni anahtar oluşturmadan listeyi kontrol edin.',
         legacyHelp:
-            'Eski anahtar mevcut bağlantıların uyumluluğunu korur. Anahtarı açma, kapatma ve sıfırlama yalnızca onu etkiler.',
+            'Eski anahtar, önceki API bağlantılarıyla uyumluluğu korur. Etkinleştirme, devre dışı bırakma ve sıfırlama işlemleri yalnızca bu anahtarı etkiler.',
         showLegacy: 'Eski anahtarı göster',
         revoke: 'İptal et',
         revokeConfirm:
@@ -2962,7 +2959,7 @@ const message = {
         apiKeyValidityTime: 'Arayüz anahtarının geçerlilik süresi',
         apiKeyValidityTimeEgs: 'Arayüz anahtarının geçerlilik süresi (dakika cinsinden)',
         apiKeyValidityTimeHelper:
-            'Arayüz zaman damgası, mevcut zaman damgasıyla farkı (dakika cinsinden) izin verilen aralıktaysa geçerlidir. 0 değeri doğrulamayı devre dışı bırakır.',
+            'İstek imzasının, istek zaman damgasından itibaren hesaplanan geçerlilik süresidir; birimi dakikadır. 0 olarak ayarlandığında zaman damgası doğrulanmaz.',
         apiKeyReset: 'Arayüz anahtarı sıfırlama',
         apiKeyResetHelper: 'İlişkili anahtar servisi geçersiz hale gelecektir. Lütfen servise yeni bir anahtar ekleyin',
         confDockerProxy: 'Docker vekilini yapılandır',

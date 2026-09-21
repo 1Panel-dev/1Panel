@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "Los nombres de usuario y las contraseñas SAM
 ErrSAML2PasswordExpirationUnsupported: "Los usuarios SAML2 no utilizan la política local de caducidad de contraseñas."
 
 # API key management
-ErrAPIKeyLimit: "Se alcanzó el límite de 20 claves API no revocadas por usuario"
 ErrAPIKeyConflict: "La clave API cambió. Actualice y reintente; al repetir la creación, use los parámetros originales"
 ErrAPIKeyNameExists: "Ya existe una clave API no revocada con este nombre"
 ErrAPIKeyNotFound: "La clave API no existe o no pertenece al usuario actual"

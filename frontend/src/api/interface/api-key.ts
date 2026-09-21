@@ -20,8 +20,6 @@ export namespace APIKey {
     export interface Search {
         items: Item[];
         total: number;
-        used: number;
-        limit: number;
     }
     export interface Created {
         item: Item;

@@ -29,8 +29,6 @@ type APIKeySearch struct {
 type APIKeyPage struct {
 	Items []APIKeyItem `json:"items"`
 	Total int          `json:"total"`
-	Used  int          `json:"used"`
-	Limit int          `json:"limit"`
 }
 type APIKeyFields struct {
 	Name               string          `json:"name"`

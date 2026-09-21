@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'API del panel',
+        title: 'API Key',
         manage: 'Gestionar claves API',
         personalEntry: 'Gestiona tus claves, condiciones de acceso y vinculación de la APP en Ajustes.',
         create: 'Crear clave API',
         legacy: 'Clave anterior',
         identifier: 'Identificador de clave',
         details: 'Detalles de la clave API',
-        quota: '{0} / {1} claves nuevas (incluye desactivadas y caducadas; excluye la clave anterior)',
         statusEnable: 'Activada',
         statusDisable: 'Desactivada',
         statusRevoked: 'Revocada',
@@ -22,10 +21,8 @@ const message = {
         never: 'Nunca caduca',
         futureExpiry: 'Selecciona una fecha de caducidad futura.',
         allowAppBinding: 'Permitir vinculación de APP por QR',
-        bindingException:
-            'Permite volver a entregar esta clave al teléfono mediante un QR de un solo uso generado desde tu sesión del panel.',
         bindingDisableHelp:
-            'Desactivar la vinculación impide nuevas entregas. Las conexiones existentes siguen siendo válidas hasta desactivar, revocar o caducar la clave.',
+            'Desactivar la vinculación por QR impide nuevas vinculaciones. Los dispositivos ya vinculados pueden seguir usando la clave hasta que se desactive, se revoque o caduque.',
         saveSecret: 'Copia y guarda la clave ahora. Tras cerrar, la gestión normal no podrá mostrarla de nuevo.',
         saved: 'He guardado la clave',
         alreadyCreated:
@@ -33,7 +30,7 @@ const message = {
         uncertain:
             'El resultado es incierto. Reintenta con los mismos datos para evitar duplicados, o cierra y revisa la lista antes de crear otra.',
         legacyHelp:
-            'La clave anterior mantiene la compatibilidad con las conexiones existentes. Su interruptor y restablecimiento solo afectan a esa clave.',
+            'La clave anterior mantiene la compatibilidad con las conexiones API heredadas. Activarla, desactivarla o restablecerla solo afecta a esta clave.',
         showLegacy: 'Mostrar clave anterior',
         revoke: 'Revocar',
         revokeConfirm:
@@ -2976,7 +2973,7 @@ const message = {
         apiKeyValidityTime: 'Periodo de validez de la clave de interfaz',
         apiKeyValidityTimeEgs: 'Periodo de validez de la clave de interfaz (en minutos)',
         apiKeyValidityTimeHelper:
-            'La marca de tiempo de la interfaz es válida si la diferencia con la actual (en minutos) está dentro del rango permitido. Un valor 0 desactiva la verificación.',
+            'Periodo de validez de la firma de la solicitud, en minutos, contado desde la marca de tiempo de la solicitud. El valor 0 desactiva la validación de la marca de tiempo.',
         apiKeyReset: 'Restablecer clave de interfaz',
         apiKeyResetHelper:
             'El servicio asociado con la clave quedará inválido. Por favor añade una nueva clave al servicio',

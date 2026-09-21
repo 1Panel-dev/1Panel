@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'API do painel',
+        title: 'API Key',
         manage: 'Gerenciar chaves API',
         personalEntry: 'Gerencie suas chaves, condições de acesso e vínculo do APP nas Configurações.',
         create: 'Criar chave API',
         legacy: 'Chave legada',
         identifier: 'Identificador da chave',
         details: 'Detalhes da chave API',
-        quota: '{0} / {1} novas chaves (inclui desativadas e expiradas; exclui a chave legada)',
         statusEnable: 'Ativada',
         statusDisable: 'Desativada',
         statusRevoked: 'Revogada',
@@ -22,10 +21,8 @@ const message = {
         never: 'Nunca expira',
         futureExpiry: 'Selecione uma data de expiração futura.',
         allowAppBinding: 'Permitir vínculo do APP por QR',
-        bindingException:
-            'Permite entregar esta chave novamente ao celular por um QR de uso único gerado na sua sessão autenticada do painel.',
         bindingDisableHelp:
-            'Desativar o vínculo impede novas entregas. Conexões existentes continuam válidas até a chave ser desativada, revogada ou expirar.',
+            'Desativar a vinculação por QR impede novas vinculações. Os dispositivos já vinculados podem continuar usando a chave até que ela seja desativada, revogada ou expire.',
         saveSecret: 'Copie e salve a chave agora. Após fechar, o gerenciamento normal não poderá exibi-la novamente.',
         saved: 'Salvei a chave',
         alreadyCreated:
@@ -33,7 +30,7 @@ const message = {
         uncertain:
             'O resultado é incerto. Tente novamente com os mesmos dados para evitar duplicações ou feche e verifique a lista antes de criar outra.',
         legacyHelp:
-            'A chave legada mantém conexões existentes compatíveis. Ativar, desativar ou redefinir afeta somente essa chave.',
+            'A chave legada mantém a compatibilidade com as conexões API legadas. Ativar, desativar ou redefinir afeta somente esta chave.',
         showLegacy: 'Mostrar chave legada',
         revoke: 'Revogar',
         revokeConfirm:
@@ -3330,7 +3327,7 @@ const message = {
         apiKeyValidityTime: 'Período de validade da chave da API',
         apiKeyValidityTimeEgs: 'Período de validade da chave da API (em minutos)',
         apiKeyValidityTimeHelper:
-            'O timestamp da interface é válido se a diferença para o timestamp atual (em minutos) estiver no intervalo permitido. Valor 0 desativa a verificação.',
+            'Período de validade da assinatura da solicitação, em minutos, contado a partir do timestamp da solicitação. Defina como 0 para desativar a validação do timestamp.',
         scope: 'Escopo',
         public: 'Público',
         publicHelper: 'Contas de backup públicas serão sincronizadas para cada subnó e podem ser usadas em conjunto',

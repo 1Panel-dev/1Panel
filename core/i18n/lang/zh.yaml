@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "SAML2 用户名和密码由身份提供商管
 ErrSAML2PasswordExpirationUnsupported: "SAML2 用户不使用本地密码过期策略。"
 
 # API key management
-ErrAPIKeyLimit: "已达到每个用户 20 把未撤销 API Key 的上限"
 ErrAPIKeyConflict: "API Key 已发生变化，请刷新后重试；重复创建请使用原请求参数"
 ErrAPIKeyNameExists: "已存在同名的未撤销 API Key"
 ErrAPIKeyNotFound: "API Key 不存在或不属于当前用户"

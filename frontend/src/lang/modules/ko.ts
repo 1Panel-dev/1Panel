@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: '패널 API',
+        title: 'API Key',
         manage: 'API Key 관리',
         personalEntry: '설정에서 내 키, 접근 조건 및 APP QR 연결을 관리합니다.',
         create: 'API Key 만들기',
         legacy: '기존 키',
         identifier: '키 식별자',
         details: 'API Key 상세 정보',
-        quota: '새 키 {0} / {1} (비활성 및 만료 키 포함, 기존 키 제외)',
         statusEnable: '활성',
         statusDisable: '비활성',
         statusRevoked: '폐기됨',
@@ -22,16 +21,16 @@ const message = {
         never: '만료 없음',
         futureExpiry: '현재 이후의 만료 시간을 선택하세요.',
         allowAppBinding: 'APP QR 연결 허용',
-        bindingException: '로그인한 패널 세션에서 만든 일회용 QR 코드를 통해 이 키를 휴대폰에 다시 전달할 수 있습니다.',
         bindingDisableHelp:
-            'QR 연결을 끄면 이후 전달만 차단됩니다. 기존 연결은 키를 비활성화하거나 폐기하거나 만료될 때까지 유효합니다.',
+            'QR 연결을 비활성화하면 새로운 기기를 연결할 수 없습니다. 이미 연결된 기기는 키가 비활성화, 폐기 또는 만료될 때까지 계속 사용할 수 있습니다.',
         saveSecret: '지금 키를 복사하여 저장하세요. 닫으면 일반 키 관리에서 전체 키를 다시 표시할 수 없습니다.',
         saved: '키를 저장했습니다',
         alreadyCreated:
             '이 키는 이미 생성되어 다시 표시할 수 없습니다. 원래 응답을 잃었다면 폐기 후 다시 만들거나 허용된 QR 연결을 사용하세요.',
         uncertain:
             '요청 결과를 확인할 수 없습니다. 중복 생성을 피하려면 같은 설정으로 재시도하거나 닫고 목록을 확인하세요.',
-        legacyHelp: '기존 키는 기존 연결의 호환성을 유지합니다. 스위치와 재설정은 이 키에만 적용됩니다.',
+        legacyHelp:
+            '기존 키는 이전에 설정한 API 연결과의 호환성을 유지합니다. 활성화, 비활성화 및 재설정은 이 키에만 적용됩니다.',
         showLegacy: '기존 키 표시',
         revoke: '폐기',
         revokeConfirm:
@@ -2860,7 +2859,7 @@ const message = {
         apiKeyValidityTime: '인터페이스 키 유효 기간',
         apiKeyValidityTimeEgs: '인터페이스 키 유효 기간 (분 단위)',
         apiKeyValidityTimeHelper:
-            '인터페이스 타임스탬프가 현재 타임스탬프와의 차이가 허용 범위 내에 있을 경우 유효합니다. 값이 0이면 검증이 비활성화됩니다.',
+            '요청 타임스탬프부터 계산되는 요청 서명의 유효 기간이며, 단위는 분입니다. 0으로 설정하면 타임스탬프를 검사하지 않습니다.',
         apiKeyReset: '인터페이스 키 재설정',
         apiKeyResetHelper: '연관된 키 서비스가 무효화됩니다. 서비스에 새 키를 추가하십시오.',
         confDockerProxy: 'Docker 프록시 구성',

@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "ຊື່ຜູ້ໃຊ້ ແລະລະ�
 ErrSAML2PasswordExpirationUnsupported: "ຜູ້ໃຊ້ SAML2 ບໍ່ໄດ້ໃຊ້ນະໂຍບາຍການໝົດອາຍຸລະຫັດຜ່ານທ້ອງຖິ່ນ."
 
 # API key management
-ErrAPIKeyLimit: "ຮອດຂີດຈຳກັດ 20 API Key ທີ່ຍັງບໍ່ຖືກຖອນຕໍ່ຜູ້ໃຊ້ແລ້ວ"
 ErrAPIKeyConflict: "API Key ມີການປ່ຽນແປງ. ໂຫຼດໃໝ່ແລ້ວລອງອີກ; ໃຊ້ພາລາມິເຕີເດີມເມື່ອສົ່ງຄຳຂໍສ້າງຊ້ຳ"
 ErrAPIKeyNameExists: "ມີ API Key ທີ່ຍັງບໍ່ຖືກຖອນທີ່ໃຊ້ຊື່ນີ້ແລ້ວ"
 ErrAPIKeyNotFound: "ບໍ່ພົບ API Key ຫຼືບໍ່ແມ່ນຂອງຜູ້ໃຊ້ປັດຈຸບັນ"

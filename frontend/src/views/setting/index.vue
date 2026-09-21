@@ -27,10 +27,6 @@ const buttons = computed<RouterButton[]>(() => {
                   },
               ]
             : []),
-        {
-            label: i18n.global.t('apiKeyManagement.title'),
-            path: '/settings/apikeys',
-        },
         ...(globalStore.hasPermission('alert_view')
             ? [
                   {
@@ -65,6 +61,10 @@ const buttons = computed<RouterButton[]>(() => {
                       path: isEnterprise.value ? '/enterprise/license' : '/settings/license',
                   },
               ]),
+        {
+            label: i18n.global.t('apiKeyManagement.title'),
+            path: '/settings/apikeys',
+        },
         ...(isFxplay.value || !isAdmin.value
             ? []
             : [

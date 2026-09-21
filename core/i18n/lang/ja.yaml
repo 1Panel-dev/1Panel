@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "SAML2 のユーザー名とパスワードは
 ErrSAML2PasswordExpirationUnsupported: "SAML2 ユーザーにはローカルのパスワード有効期限ポリシーが適用されません。"
 
 # API key management
-ErrAPIKeyLimit: "ユーザーあたりの未失効 API キー数の上限（20 個）に達しました"
 ErrAPIKeyConflict: "API キーが変更されました。更新して再試行してください。作成の再送には元のパラメーターを使用してください"
 ErrAPIKeyNameExists: "同じ名前の未失効 API キーが既に存在します"
 ErrAPIKeyNotFound: "API キーが存在しないか、現在のユーザーに属していません"

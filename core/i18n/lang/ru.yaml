@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "Имена пользователей и па
 ErrSAML2PasswordExpirationUnsupported: "Для пользователей SAML2 не применяется локальная политика срока действия паролей."
 
 # API key management
-ErrAPIKeyLimit: "Достигнут лимит в 20 неотозванных ключей API на пользователя"
 ErrAPIKeyConflict: "Ключ API изменён. Обновите данные и повторите попытку; при повторном создании используйте исходные параметры"
 ErrAPIKeyNameExists: "Неотозванный ключ API с таким именем уже существует"
 ErrAPIKeyNotFound: "Ключ API не существует или не принадлежит текущему пользователю"
