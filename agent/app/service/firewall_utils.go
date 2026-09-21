@@ -2413,18 +2413,23 @@ func firewallDeleteChange(current filter.ObservedRule, desired filter.DesiredRul
 func loadForwardingFirewallOverview(manager forwarding.Adapter) (dto.FirewallSubsystemStatus, error) {
 	ipv4, ipv4Err := loadForwardingFamilyInfo(manager, manager.Name(), constant.FirewallFamilyIPv4)
 	ipv6, ipv6Err := loadForwardingFamilyInfo(manager, manager.Name(), constant.FirewallFamilyIPv6)
-	initialized, bound, statusErr := ipv4.Initialized, ipv4.Bound, ipv4Err
-	if manager.Name() == constant.FirewallProviderNftables {
-		if statusErr == nil && initialized && bound {
-			initialized, bound, statusErr = ipv6.Initialized, ipv6.Bound, ipv6Err
-		}
-	} else {
-		statusErr = errors.Join(statusErr, ipv6Err)
-		if ipv6.Available {
-			initialized, bound = initialized && ipv6.Initialized, bound && ipv6.Bound
+	if ipv6.Available {
+		interfaces, err := forwarding.IPv6RAInterfaces(os.ReadFile)
+		var pathError *os.PathError
+		switch {
+		case errors.As(err, &pathError) && errors.Is(err, os.ErrNotExist) && pathError.Path == "/proc/net/if_inet6":
+			ipv6.Available, ipv6.Initialized, ipv6.Bound = false, false, false
+		case err != nil:
+			ipv6.Reason = "ipv6_ra_check_failed"
+			ipv6.Bound = false
+		case len(interfaces) > 0:
+			ipv6.Reason, ipv6.RAInterfaces = "ipv6_ra_required", interfaces
+			ipv6.Bound = false
+		case !ipv6.Bound:
+			ipv6.Reason = "ipv6_forwarding_not_enabled"
 		}
 	}
-	return dto.FirewallSubsystemStatus{IsInit: initialized, IsBind: bound, IPv4: ipv4, IPv6: ipv6}, statusErr
+	return dto.FirewallSubsystemStatus{IsInit: ipv4.Initialized || ipv6.Initialized, IsBind: ipv4.Bound || ipv6.Bound, IPv4: ipv4, IPv6: ipv6}, errors.Join(ipv4Err, ipv6Err)
 }
 
 func loadForwardingFamilyInfo(manager forwarding.Adapter, backend, family string) (dto.FirewallBackendFamilyStatus, error) {

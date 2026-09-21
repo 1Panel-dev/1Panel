@@ -90,7 +90,6 @@ func (systemIptablesBackend) LoadIPv6RulesFromFile(table, chain, fileName string
 type forwardingSystem interface {
 	ReadFile(name string) ([]byte, error)
 	WriteFile(name string, data []byte, perm os.FileMode) error
-	RunWithOptionalSudo(name string, args ...string) error
 }
 
 type defaultForwardingSystem struct{}
@@ -101,10 +100,6 @@ func (defaultForwardingSystem) ReadFile(name string) ([]byte, error) {
 
 func (defaultForwardingSystem) WriteFile(name string, data []byte, perm os.FileMode) error {
 	return cmd.WriteFileWithOptionalSudo(name, data, perm)
-}
-
-func (defaultForwardingSystem) RunWithOptionalSudo(name string, args ...string) error {
-	return cmd.NewCommandMgr().RunWithOptionalSudo(name, args...)
 }
 
 type Iptables struct {
@@ -151,14 +146,32 @@ func (l *Iptables) ReplaceRules(rules []Rule) error {
 		if err != nil {
 			return err
 		}
-		if normalized.Family == FamilyIPv6 && !l.backend.IPv6Available() {
-			return fmt.Errorf("ip6tables command family is unavailable")
-		}
 		byFamily[normalized.Family] = append(byFamily[normalized.Family], normalized)
 	}
+	var failures []error
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		if family == FamilyIPv6 && !l.backend.IPv6Available() {
+			if len(byFamily[family]) > 0 {
+				failures = append(failures, fmt.Errorf("ip6tables command family is unavailable"))
+			}
 			continue
+		}
+		if family == FamilyIPv6 {
+			if len(byFamily[family]) > 0 {
+				if err := ensureForwardingSysctls(l.system, true); err != nil {
+					failures = append(failures, err)
+					continue
+				}
+			} else {
+				initialized, _, err := l.familyInitStatus(family)
+				if err != nil {
+					failures = append(failures, err)
+					continue
+				}
+				if !initialized {
+					continue
+				}
+			}
 		}
 		if err := l.batchEnsureChains(family); err != nil {
 			return err
@@ -171,7 +184,7 @@ func (l *Iptables) ReplaceRules(rules []Rule) error {
 			return fmt.Errorf("restore %s forwarding rules: %w", family, err)
 		}
 	}
-	return nil
+	return errors.Join(failures...)
 }
 
 func (l *Iptables) CreateRules(ctx context.Context, rules []Rule) error {
@@ -185,6 +198,17 @@ func (l *Iptables) CreateRules(ctx context.Context, rules []Rule) error {
 	family := rules[0].Family
 	if family == "" {
 		family = FamilyIPv4
+	}
+	if family == FamilyIPv6 {
+		if !l.backend.IPv6Available() {
+			return fmt.Errorf("ip6tables command family is unavailable")
+		}
+		if err := ensureForwardingSysctls(l.system, true); err != nil {
+			return err
+		}
+		if err := l.batchEnsureChains(family); err != nil {
+			return err
+		}
 	}
 	return l.backend.Restore(ctx, family, script)
 }
@@ -287,19 +311,10 @@ func isRemoteTarget(family, target string) bool {
 }
 
 func (l *Iptables) Enable() error {
-	if err := ensureForwardingSysctls(l.system, l.backend.IPv6Available()); err != nil {
+	if err := ensureForwardingSysctls(l.system, false); err != nil {
 		return err
 	}
-
-	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
-		if family == FamilyIPv6 && !l.backend.IPv6Available() {
-			continue
-		}
-		if err := l.batchEnsureChains(family); err != nil {
-			return err
-		}
-	}
-	return nil
+	return l.batchEnsureChains(FamilyIPv4)
 }
 
 func (l *Iptables) batchEnsureChains(family string) error {
@@ -506,7 +521,7 @@ func (l *Iptables) InitStatus() (bool, bool, error) {
 	if err != nil {
 		return false, false, err
 	}
-	return ipv4Init && ipv6Init, ipv4Bind && ipv6Bind, nil
+	return ipv4Init || ipv6Init, ipv4Bind || ipv6Bind, nil
 }
 
 func (l *Iptables) familyInitStatus(family string) (bool, bool, error) {
@@ -519,6 +534,9 @@ func (l *Iptables) familyInitStatus(family string) (bool, bool, error) {
 		list = l.backend.RunIPv6WithStd
 	}
 	data, err := l.system.ReadFile(sysctlPath)
+	if family == FamilyIPv6 && errors.Is(err, os.ErrNotExist) {
+		return false, false, nil
+	}
 	if err != nil {
 		return false, false, fmt.Errorf("read %s forwarding status: %w", label, err)
 	}

@@ -285,15 +285,17 @@ const allAvailableFamiliesInitialized = computed(
     () => availableFamilies.value.length > 0 && availableFamilies.value.every((item) => item.status.initialized),
 );
 const anyFamilyBound = computed(() => availableFamilies.value.some((item) => item.status.bound));
-interface FamilyIssue {
+interface FamilyIssue extends Firewall.BackendFamilyStatus {
     family: 'IPv4' | 'IPv6';
-    available: boolean;
-    initialized: boolean;
-    bound: boolean;
 }
 const managedChainName = computed(() => (props.currentTab === 'forward' ? '1PANEL_FORWARD' : '1PANEL_BASIC'));
 const familyIssues = computed<FamilyIssue[]>(() => {
-    if (!isDirectManaged.value || !anyFamilyBound.value) return [];
+    if (!isDirectManaged.value) return [];
+    if (isDirectForward.value) {
+        if (familyStatuses.value.every((item) => item.status.bound && !item.status.reason)) return [];
+        return familyStatuses.value.map((item) => ({ family: item.family, ...item.status }));
+    }
+    if (!anyFamilyBound.value) return [];
     return familyStatuses.value
         .filter((item) => !item.status.available || !item.status.initialized || !item.status.bound)
         .map((item) => ({
@@ -303,9 +305,21 @@ const familyIssues = computed<FamilyIssue[]>(() => {
             bound: item.status.bound,
         }));
 });
-const retryableFamilyIssues = computed(() => familyIssues.value.filter((item) => item.available));
+const retryableFamilyIssues = computed(() =>
+    familyIssues.value.filter(
+        (item) =>
+            item.available &&
+            !item.bound &&
+            (!item.reason || (isDirectForward.value && item.reason === 'ipv6_forwarding_not_enabled')),
+    ),
+);
 const familyIssueText = (issue: FamilyIssue) => {
     if (!issue.available) return i18n.global.t('firewall.familyUnsupported', [issue.family]);
+    if (issue.reason === 'ipv6_ra_required') {
+        return i18n.global.t('firewall.ipv6RARisk', [issue.raInterfaces?.join(', ') || '-']);
+    }
+    if (issue.reason === 'ipv6_ra_check_failed') return i18n.global.t('firewall.ipv6RACheckFailed');
+    if (issue.reason === 'ipv6_forwarding_not_enabled') return i18n.global.t('firewall.ipv6ForwardingOnDemand');
     const status = i18n.global.t(
         !issue.initialized ? 'firewall.notInitialized' : issue.bound ? 'commons.status.bound' : 'commons.status.unbind',
     );

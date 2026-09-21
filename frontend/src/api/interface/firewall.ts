@@ -23,6 +23,7 @@ export namespace Firewall {
         bound: boolean;
         reason?: string;
         forwardPolicy?: 'ACCEPT' | 'DROP';
+        raInterfaces?: string[];
     }
     export interface BackendGroup {
         selected: string;

@@ -4341,6 +4341,12 @@ const message = {
         dockerInputNotProtected:
             'Las reglas INPUT del host no protegen directamente este puerto publicado por Docker. Haz clic para abrir la protección de puertos de contenedores.',
         notInitialized: 'No inicializado',
+        ipv6RARisk:
+            'El reenvío IPv6 está bloqueado: las interfaces {0} tienen accept_ra=1 y pueden depender de RA/SLAAC. Revise la configuración de red, configure accept_ra=2 de forma persistente en las interfaces que necesitan RA y vuelva a intentarlo.',
+        ipv6RACheckFailed:
+            'No se puede comprobar la configuración RA de IPv6. Se ha bloqueado la activación del reenvío IPv6. Revise la configuración de red y vuelva a intentarlo.',
+        ipv6ForwardingOnDemand:
+            'El reenvío IPv6 no está habilitado. Se comprobará y habilitará al añadir o restaurar reglas IPv6.',
         familyUnsupported: 'El sistema no admite {0}',
         familyChainIssue: '{0} · cadena {1} · {2}',
         dockerGuardUnbindConfirm:

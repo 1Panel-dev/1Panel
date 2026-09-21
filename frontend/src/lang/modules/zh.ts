@@ -4052,6 +4052,10 @@ const message = {
         dockerInputUseHostFirewall: '该端口需要通过主机防火墙设置访问规则，请前往主机防火墙进行配置。',
         dockerInputNotProtected: '宿主机 INPUT 规则不能直接保护此 Docker 发布端口，点击前往容器端口防护。',
         notInitialized: '未初始化',
+        ipv6RARisk:
+            'IPv6 转发已阻止：网卡 {0} 的 accept_ra=1，可能依赖 RA/SLAAC。请确认网络配置，为需要接收 RA 的网卡持久化设置 accept_ra=2 后重试。',
+        ipv6RACheckFailed: '无法检查 IPv6 RA 配置，已阻止启用 IPv6 转发。请检查系统网络配置后重试。',
+        ipv6ForwardingOnDemand: 'IPv6 转发尚未启用，将在添加或恢复 IPv6 规则时检查并启用。',
         familyUnsupported: '系统不支持 {0}',
         familyChainIssue: '{0} · {1} 链 · {2}',
         dockerGuardUnbindConfirm: '解绑后，所有容器端口将暂时恢复 Docker 默认访问方式，现有防护设置会保留。是否继续？',

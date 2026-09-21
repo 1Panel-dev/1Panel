@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -458,6 +459,19 @@ func (s *ForwardingService) operateRules(ctx context.Context, request dto.Forwar
 				}
 			}
 			return nil
+		}
+		for _, rule := range groups[1].rules {
+			if rule.Family != forwarding.FamilyIPv6 {
+				continue
+			}
+			interfaces, err := forwarding.IPv6RAInterfaces(os.ReadFile)
+			if err != nil {
+				return fmt.Errorf("check IPv6 Router Advertisement: %w", err)
+			}
+			if len(interfaces) > 0 {
+				return fmt.Errorf("IPv6 forwarding blocked: interfaces %s may depend on RA/SLAAC with accept_ra=1; persist accept_ra=2 on interfaces that require RA before retrying", strings.Join(interfaces, ", "))
+			}
+			break
 		}
 	}
 	var client forwarding.Adapter
