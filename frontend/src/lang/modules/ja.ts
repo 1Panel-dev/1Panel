@@ -4160,7 +4160,8 @@ const message = {
         plan_runtime_permanent_mismatch: '実行中と永続設定のファイアウォール構成が異なります。先に同期してください。',
         plan_protected_rule: 'このルールは保護されており、管理対象化、変更、削除はできません。',
         plan_blocked: 'このルールは安全に適用できません。ルールを更新して再試行してください。',
-        largeRuleSet: 'ファイアウォールルールが {0} 件を超えています。iptables または nftables の使用を推奨します。',
+        largeRuleSet:
+            'ファイアウォールルールが多すぎると操作が遅くなる可能性があります。iptables または nftables の使用を推奨します。',
         scopeDefaultMismatch: 'システムの既定 zone は {0} です。このページでは public zone のみ管理します。',
         scopeMissing: '管理対象スコープ {0} がありません。最初のルール適用時に安全に作成されます。',
         scopeUnmanagedActive: '他の有効な範囲が見つかりました：{0}。1Panel はそのルールを変更しません。',

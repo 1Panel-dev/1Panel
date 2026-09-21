@@ -4246,7 +4246,8 @@ const message = {
         plan_runtime_permanent_mismatch: 'Konfigurasi tembok api aktif dan kekal berbeza. Segerakkan dahulu.',
         plan_protected_rule: 'Peraturan ini dilindungi dan tidak boleh diambil alih, diubah atau dipadam.',
         plan_blocked: 'Peraturan ini tidak dapat digunakan dengan selamat. Muat semula senarai dan cuba lagi.',
-        largeRuleSet: 'Terdapat lebih daripada {0} peraturan tembok api. Penggunaan iptables atau nftables disyorkan.',
+        largeRuleSet:
+            'Terlalu banyak peraturan tembok api boleh melambatkan operasi. Penggunaan iptables atau nftables disyorkan.',
         scopeDefaultMismatch: 'Zon lalai sistem ialah {0}; halaman ini hanya mengurus zon public.',
         scopeMissing: 'Skop terurus {0} tiada dan akan dicipta dengan selamat apabila peraturan pertama digunakan.',
         scopeUnmanagedActive: 'Skop aktif lain dikesan: {0}. 1Panel tidak akan mengubah peraturannya.',

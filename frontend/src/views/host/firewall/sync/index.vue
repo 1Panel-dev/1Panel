@@ -108,7 +108,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.port')" min-width="120">
                         <template #default="{ row }">
-                            {{ row.rule?.destinationPort || $t('firewall.allPorts') }}
+                            {{ row.rule ? row.rule.destinationPort || '*' : '-' }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('firewall.action')" width="90">
@@ -347,10 +347,16 @@ const reasonText = (reasonCode?: string, reason?: string) => {
 const actionText = (action?: Firewall.Action) => (action ? i18n.global.t(`firewall.${action}`) : '-');
 
 const displayAddress = (rule: Firewall.Rule) => {
-    const values = [rule.sourceAddress, rule.destinationAddress]
-        .filter((value): value is string => Boolean(value))
-        .map((value) => formatHostAddress(value, rule.scope.family));
-    return values.length > 0 ? values.join(' → ') : i18n.global.t('firewall.anyWhere');
+    const wildcard =
+        rule.scope.family === 'ipv6' ? '::/0' : rule.scope.family === 'inet' ? '0.0.0.0/0, ::/0' : '0.0.0.0/0';
+    const addresses = rule.destinationAddress ? [rule.sourceAddress, rule.destinationAddress] : [rule.sourceAddress];
+    return addresses
+        .map((address) =>
+            address && address !== wildcard
+                ? formatHostAddress(address, rule.scope.family)
+                : `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`,
+        )
+        .join(' → ');
 };
 
 const dockerAddress = (rule?: Firewall.DockerGuardEndpoint) => {

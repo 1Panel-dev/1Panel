@@ -4263,7 +4263,8 @@ const message = {
         plan_runtime_permanent_mismatch: 'As configurações ativa e permanente são diferentes. Sincronize-as primeiro.',
         plan_protected_rule: 'Esta regra está protegida e não pode ser assumida, alterada ou excluída.',
         plan_blocked: 'A regra não pode ser aplicada com segurança. Atualize a lista e tente novamente.',
-        largeRuleSet: 'Há mais de {0} regras de firewall. Recomendamos usar iptables ou nftables.',
+        largeRuleSet:
+            'Regras de firewall em excesso podem tornar as operações lentas. Recomendamos usar iptables ou nftables.',
         scopeDefaultMismatch: 'A zona padrão do sistema é {0}; esta página gerencia apenas a zona public.',
         scopeMissing: 'O escopo gerenciado {0} não existe e será criado com segurança ao aplicar a primeira regra.',
         scopeUnmanagedActive: 'Outros escopos ativos foram detectados: {0}. O 1Panel não modificará suas regras.',

@@ -4225,7 +4225,8 @@ const message = {
         plan_runtime_permanent_mismatch: 'Las configuraciones activa y permanente difieren. Sincronízalas primero.',
         plan_protected_rule: 'Esta regla está protegida y no se puede asumir, modificar ni eliminar.',
         plan_blocked: 'La regla no puede aplicarse de forma segura. Actualiza la lista e inténtalo de nuevo.',
-        largeRuleSet: 'Hay más de {0} reglas de cortafuegos. Se recomienda usar iptables o nftables.',
+        largeRuleSet:
+            'Demasiadas reglas de cortafuegos pueden ralentizar las operaciones. Se recomienda usar iptables o nftables.',
         scopeDefaultMismatch: 'La zona predeterminada es {0}; esta página solo gestiona la zona public.',
         scopeMissing: 'Falta el ámbito gestionado {0}; se creará de forma segura al aplicar la primera regla.',
         scopeUnmanagedActive: 'Se detectaron otros ámbitos activos: {0}. 1Panel no modificará sus reglas.',

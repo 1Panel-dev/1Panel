@@ -4084,7 +4084,7 @@ const message = {
         plan_runtime_permanent_mismatch: '실행 중 구성과 영구 방화벽 구성이 다릅니다. 먼저 동기화하세요.',
         plan_protected_rule: '이 규칙은 보호되어 관리 전환, 변경 또는 삭제할 수 없습니다.',
         plan_blocked: '이 규칙을 안전하게 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요.',
-        largeRuleSet: '방화벽 규칙이 {0}개를 초과했습니다. iptables 또는 nftables 사용을 권장합니다.',
+        largeRuleSet: '방화벽 규칙이 너무 많으면 작업이 느려질 수 있습니다. iptables 또는 nftables 사용을 권장합니다.',
         scopeDefaultMismatch: '시스템 기본 zone은 {0}이며 이 페이지는 public zone만 관리합니다.',
         scopeMissing: '관리 범위 {0}이(가) 없으며 첫 규칙을 적용할 때 안전하게 생성됩니다.',
         scopeUnmanagedActive: '다른 활성 범위가 감지되었습니다: {0}. 1Panel은 해당 규칙을 변경하지 않습니다.',
