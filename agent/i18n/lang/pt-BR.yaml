@@ -719,6 +719,13 @@ FirewallPersistDockerGuardStep: 'Salvar o status da proteção de portas do Dock
 ErrFirewallRuleScopeChange: "O firewall atual não permite alterar o escopo de uma regra (como a família de endereços IPv4/IPv6). Crie uma nova regra."
 FirewallWhitelistReleased: "{{ .name }}: proteção da lista de permissões removida; regra de permissão mantida. Para fechar a porta, exclua a regra manualmente da lista"
 FirewallWhitelistRequired: "{{ .name }}: protegido pelas regras de portas obrigatórias do sistema"
+FileTaskCopy: 'Copiar arquivos para {{ .dst }}'
+FileTaskMove: 'Mover arquivos para {{ .dst }}'
+FileTaskCompress: 'Compactar arquivos em {{ .dst }}'
+FileTaskDecompress: 'Extrair arquivos para {{ .dst }}'
+FileTaskSource: 'Caminho de origem: {{ .path }}'
+FileTaskFormat: 'Formato do arquivo: {{ .format }}'
+FileTaskRename: 'Nome do arquivo de destino: {{ .name }}'
 
 ErrFirewallBackendCleanupRequired: "O backend atual {{ .current }} ainda contém regras do 1Panel. Remova-as antes de mudar para {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "O encaminhamento IPv4 está desativado. Defina net.ipv4.ip_forward=1 antes de usar o backend de firewall do Docker."

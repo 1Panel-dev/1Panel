@@ -719,6 +719,13 @@ FirewallPersistDockerGuardStep: "保存 Docker 端口防护状态"
 ErrFirewallRuleScopeChange: "当前防火墙不支持修改规则的作用范围（如 IPv4/IPv6 地址族），请新建规则。"
 FirewallWhitelistReleased: "{{ .name }}：已解除白名单保护，放行规则保留；如需关闭端口，请在规则列表手动删除"
 FirewallWhitelistRequired: "{{ .name }}：由系统必需端口规则保护"
+FileTaskCopy: '复制文件到 {{ .dst }}'
+FileTaskMove: '移动文件到 {{ .dst }}'
+FileTaskCompress: '压缩文件到 {{ .dst }}'
+FileTaskDecompress: '解压文件到 {{ .dst }}'
+FileTaskSource: '源路径：{{ .path }}'
+FileTaskFormat: '压缩格式：{{ .format }}'
+FileTaskRename: '目标文件名：{{ .name }}'
 
 ErrFirewallBackendCleanupRequired: "当前后端 {{ .current }} 中仍有 1Panel 规则，请先清理后再切换到 {{ .target }}。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 转发未开启，请先设置 net.ipv4.ip_forward=1，再使用 Docker 防火墙后端。"

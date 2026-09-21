@@ -719,6 +719,13 @@ FirewallPersistDockerGuardStep: 'Simpan status perlindungan port Docker'
 ErrFirewallRuleScopeChange: "Tembok api semasa tidak menyokong perubahan skop peraturan (seperti keluarga alamat IPv4/IPv6). Sila cipta peraturan baharu."
 FirewallWhitelistReleased: "{{ .name }}: perlindungan senarai dibenarkan telah dilepaskan; peraturan izin dikekalkan. Untuk menutup port, padamkan peraturan secara manual daripada senarai peraturan"
 FirewallWhitelistRequired: "{{ .name }}: dilindungi oleh peraturan port wajib sistem"
+FileTaskCopy: 'Salin fail ke {{ .dst }}'
+FileTaskMove: 'Pindahkan fail ke {{ .dst }}'
+FileTaskCompress: 'Mampatkan fail ke {{ .dst }}'
+FileTaskDecompress: 'Ekstrak fail ke {{ .dst }}'
+FileTaskSource: 'Laluan sumber: {{ .path }}'
+FileTaskFormat: 'Format arkib: {{ .format }}'
+FileTaskRename: 'Nama fail sasaran: {{ .name }}'
 
 ErrFirewallBackendCleanupRequired: "Bahagian belakang semasa {{ .current }} masih mengandungi peraturan 1Panel. Buangkannya sebelum beralih kepada {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "Pemajuan IPv4 dilumpuhkan. Tetapkan net.ipv4.ip_forward=1 sebelum menggunakan bahagian belakang tembok api Docker."
