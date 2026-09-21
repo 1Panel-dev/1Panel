@@ -49,11 +49,12 @@ type FirewallBackendOption struct {
 }
 
 type FirewallBackendFamilyStatus struct {
-	Available     bool   `json:"available"`
-	Initialized   bool   `json:"initialized"`
-	Bound         bool   `json:"bound"`
-	Reason        string `json:"reason,omitempty"`
-	ForwardPolicy string `json:"forwardPolicy,omitempty"`
+	Available     bool     `json:"available"`
+	Initialized   bool     `json:"initialized"`
+	Bound         bool     `json:"bound"`
+	Reason        string   `json:"reason,omitempty"`
+	ForwardPolicy string   `json:"forwardPolicy,omitempty"`
+	RAInterfaces  []string `json:"raInterfaces,omitempty"`
 }
 
 type FirewallBackendGroup struct {

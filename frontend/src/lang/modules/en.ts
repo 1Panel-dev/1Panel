@@ -4294,6 +4294,12 @@ const message = {
         dockerInputNotProtected:
             'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
         notInitialized: 'Not initialized',
+        ipv6RARisk:
+            'IPv6 forwarding is blocked: interfaces {0} have accept_ra=1 and may rely on RA/SLAAC. Review the network configuration, persist accept_ra=2 on interfaces that need RA, then retry.',
+        ipv6RACheckFailed:
+            'Cannot check IPv6 RA configuration. Enabling IPv6 forwarding is blocked. Check the system network configuration and retry.',
+        ipv6ForwardingOnDemand:
+            'IPv6 forwarding is not enabled. It will be checked and enabled when IPv6 rules are added or restored.',
         familyUnsupported: 'The system does not support {0}',
         familyChainIssue: '{0} · {1} chain · {2}',
         dockerGuardUnbindConfirm:

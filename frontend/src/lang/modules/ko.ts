@@ -4199,6 +4199,12 @@ const message = {
         dockerInputNotProtected:
             '호스트 INPUT 규칙은 이 Docker 게시 포트를 직접 보호하지 않습니다. 클릭하여 컨테이너 포트 보호를 여세요.',
         notInitialized: '초기화되지 않음',
+        ipv6RARisk:
+            'IPv6 전달이 차단되었습니다. 인터페이스 {0}의 accept_ra=1 설정으로 인해 RA/SLAAC에 의존할 수 있습니다. 네트워크 설정을 확인하고 RA가 필요한 인터페이스에 accept_ra=2를 영구 설정한 후 다시 시도하세요.',
+        ipv6RACheckFailed:
+            'IPv6 RA 설정을 확인할 수 없어 IPv6 전달 활성화를 차단했습니다. 시스템 네트워크 설정을 확인한 후 다시 시도하세요.',
+        ipv6ForwardingOnDemand:
+            'IPv6 전달이 활성화되지 않았습니다. IPv6 규칙을 추가하거나 복원할 때 확인 후 활성화됩니다.',
         familyUnsupported: '시스템에서 {0}을 지원하지 않습니다',
         familyChainIssue: '{0} · {1} 체인 · {2}',
         dockerGuardUnbindConfirm:

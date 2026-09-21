@@ -4380,6 +4380,12 @@ const message = {
         dockerInputNotProtected:
             'As regras INPUT do host não protegem diretamente esta porta publicada pelo Docker. Clique para abrir a proteção de portas de contêineres.',
         notInitialized: 'Não inicializado',
+        ipv6RARisk:
+            'O encaminhamento IPv6 foi bloqueado: as interfaces {0} têm accept_ra=1 e podem depender de RA/SLAAC. Verifique a configuração de rede, configure accept_ra=2 de forma persistente nas interfaces que precisam de RA e tente novamente.',
+        ipv6RACheckFailed:
+            'Não foi possível verificar a configuração RA do IPv6. A ativação do encaminhamento IPv6 foi bloqueada. Verifique a configuração de rede e tente novamente.',
+        ipv6ForwardingOnDemand:
+            'O encaminhamento IPv6 não está ativado. Ele será verificado e ativado ao adicionar ou restaurar regras IPv6.',
         familyUnsupported: 'O sistema não oferece suporte a {0}',
         familyChainIssue: '{0} · cadeia {1} · {2}',
         dockerGuardUnbindConfirm:

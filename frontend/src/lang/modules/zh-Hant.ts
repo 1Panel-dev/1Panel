@@ -4004,6 +4004,10 @@ const message = {
         dockerInputUseHostFirewall: '此連接埠需要透過主機防火牆設定存取規則，請前往主機防火牆進行設定。',
         dockerInputNotProtected: '主機 INPUT 規則無法直接保護此 Docker 發佈連接埠，點擊前往容器連接埠防護。',
         notInitialized: '未初始化',
+        ipv6RARisk:
+            'IPv6 轉送已阻止：網路介面 {0} 的 accept_ra=1，可能依賴 RA/SLAAC。請確認網路設定，為需要接收 RA 的介面持久化設定 accept_ra=2 後重試。',
+        ipv6RACheckFailed: '無法檢查 IPv6 RA 設定，已阻止啟用 IPv6 轉送。請檢查系統網路設定後重試。',
+        ipv6ForwardingOnDemand: 'IPv6 轉送尚未啟用，將在新增或還原 IPv6 規則時檢查並啟用。',
         familyUnsupported: '系統不支援 {0}',
         familyChainIssue: '{0} · {1} 鏈 · {2}',
         dockerGuardUnbindConfirm:

@@ -4163,6 +4163,11 @@ const message = {
         dockerInputNotProtected:
             'ກົດ INPUT ຂອງໂຮສບໍ່ໄດ້ປ້ອງກັນພອດ Docker ນີ້ໂດຍກົງ. ຄລິກເພື່ອເປີດການປ້ອງກັນພອດຄອນເທນເນີ.',
         notInitialized: 'ຍັງບໍ່ໄດ້ເລີ່ມຕົ້ນ',
+        ipv6RARisk:
+            'ການສົ່ງຕໍ່ IPv6 ຖືກບລັອກ: ອິນເຕີເຟດ {0} ມີ accept_ra=1 ແລະອາດອາໄສ RA/SLAAC. ກວດສອບການຕັ້ງຄ່າເຄືອຂ່າຍ, ຕັ້ງ accept_ra=2 ແບບຖາວອນໃຫ້ອິນເຕີເຟດທີ່ຕ້ອງການ RA ແລ້ວລອງໃໝ່.',
+        ipv6RACheckFailed:
+            'ບໍ່ສາມາດກວດສອບການຕັ້ງຄ່າ IPv6 RA ໄດ້. ການເປີດໃຊ້ການສົ່ງຕໍ່ IPv6 ຖືກບລັອກ. ກວດສອບການຕັ້ງຄ່າເຄືອຂ່າຍແລ້ວລອງໃໝ່.',
+        ipv6ForwardingOnDemand: 'ຍັງບໍ່ໄດ້ເປີດໃຊ້ການສົ່ງຕໍ່ IPv6. ລະບົບຈະກວດສອບແລະເປີດໃຊ້ເມື່ອເພີ່ມຫຼືກູ້ຄືນກົດ IPv6.',
         familyUnsupported: 'ລະບົບບໍ່ຮອງຮັບ {0}',
         familyChainIssue: '{0} · chain {1} · {2}',
         dockerGuardUnbindConfirm:
