@@ -719,6 +719,13 @@ FirewallPersistDockerGuardStep: 'Сохранить состояние защи�
 ErrFirewallRuleScopeChange: "Текущий межсетевой экран не поддерживает изменение области действия правила (например, семейства адресов IPv4/IPv6). Создайте новое правило."
 FirewallWhitelistReleased: "{{ .name }}: защита списка разрешённых портов снята; разрешающее правило сохранено. Чтобы закрыть порт, удалите правило вручную из списка правил"
 FirewallWhitelistRequired: "{{ .name }}: защищён обязательными правилами системных портов"
+FileTaskCopy: 'Копирование файлов в {{ .dst }}'
+FileTaskMove: 'Перемещение файлов в {{ .dst }}'
+FileTaskCompress: 'Сжатие файлов в {{ .dst }}'
+FileTaskDecompress: 'Распаковка файлов в {{ .dst }}'
+FileTaskSource: 'Исходный путь: {{ .path }}'
+FileTaskFormat: 'Формат архива: {{ .format }}'
+FileTaskRename: 'Имя целевого файла: {{ .name }}'
 
 ErrFirewallBackendCleanupRequired: "В текущем бэкенде {{ .current }} остались правила 1Panel. Удалите их перед переключением на {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "Пересылка IPv4 отключена. Перед использованием бэкенда межсетевого экрана Docker установите net.ipv4.ip_forward=1."

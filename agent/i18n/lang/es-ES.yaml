@@ -719,6 +719,13 @@ FirewallPersistDockerGuardStep: 'Guardar el estado de protección de puertos de 
 ErrFirewallRuleScopeChange: "El cortafuegos actual no permite cambiar el ámbito de una regla (como su familia de direcciones IPv4/IPv6). Cree una regla nueva."
 FirewallWhitelistReleased: "{{ .name }}: protección de la lista de permitidos retirada; se conserva la regla de permiso. Para cerrar el puerto, elimine la regla manualmente de la lista"
 FirewallWhitelistRequired: "{{ .name }}: protegido por las reglas de puertos obligatorios del sistema"
+FileTaskCopy: 'Copiar archivos a {{ .dst }}'
+FileTaskMove: 'Mover archivos a {{ .dst }}'
+FileTaskCompress: 'Comprimir archivos en {{ .dst }}'
+FileTaskDecompress: 'Extraer archivos a {{ .dst }}'
+FileTaskSource: 'Ruta de origen: {{ .path }}'
+FileTaskFormat: 'Formato del archivo: {{ .format }}'
+FileTaskRename: 'Nombre del archivo de destino: {{ .name }}'
 
 ErrFirewallBackendCleanupRequired: "El backend actual {{ .current }} aún contiene reglas de 1Panel. Elimínelas antes de cambiar a {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "El reenvío IPv4 está desactivado. Configure net.ipv4.ip_forward=1 antes de usar el backend de cortafuegos de Docker."
