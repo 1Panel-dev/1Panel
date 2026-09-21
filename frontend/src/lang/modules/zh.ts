@@ -34,7 +34,7 @@ const message = {
             '确认撤销“{0}”？新的请求将被拒绝，并关闭对应终端连接。撤销不可恢复；已经开始的后台任务不会自动取消。',
         disableConfirm: '确认停用“{0}”？新的请求将被拒绝，并关闭对应终端连接。已经开始的后台任务不会自动取消。',
         enableConfirm: '确认按当前访问条件启用“{0}”？',
-        bindingKey: '用于 APP 绑定的 Key',
+        bindingKey: '绑定 Key',
         selectKey: '选择自己的 Key',
         noBindableKey: '暂无可扫码绑定的 Key。请先创建，或为已有且有效的 Key 开启扫码绑定。',
         appKeyExpired: '所选 API Key 已到期，请调整有效期或选择其他 Key。',

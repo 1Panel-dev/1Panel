@@ -38,7 +38,7 @@ const message = {
         disableConfirm:
             'Disable “{0}”? New requests will be rejected and its terminal connections will be closed. Running background jobs are not cancelled.',
         enableConfirm: 'Enable “{0}” with its current access conditions?',
-        bindingKey: 'Key for APP binding',
+        bindingKey: 'Binding key',
         selectKey: 'Select your key',
         noBindableKey:
             'No key is available for QR binding. Create one or enable QR binding for an existing active key.',

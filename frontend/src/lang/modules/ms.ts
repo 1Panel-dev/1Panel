@@ -39,7 +39,7 @@ const message = {
         disableConfirm:
             'Nyahdayakan “{0}”? Permintaan baharu akan ditolak dan terminalnya ditutup. Tugas latar yang sedang berjalan tidak dibatalkan.',
         enableConfirm: 'Dayakan “{0}” dengan syarat akses semasa?',
-        bindingKey: 'Kunci untuk pautan APP',
+        bindingKey: 'Kunci pautan',
         selectKey: 'Pilih kunci anda',
         noBindableKey: 'Tiada kunci tersedia untuk pautan QR. Cipta kunci atau benarkan QR pada kunci yang aktif.',
         appKeyExpired: 'Kunci API yang dipilih telah tamat tempoh. Lanjutkan tarikh luputnya atau pilih kunci lain.',

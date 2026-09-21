@@ -38,7 +38,7 @@ const message = {
         disableConfirm:
             '“{0}” 키를 비활성화할까요? 새 요청이 거부되고 해당 터미널이 닫힙니다. 실행 중인 백그라운드 작업은 취소되지 않습니다.',
         enableConfirm: '현재 접근 조건으로 “{0}” 키를 활성화할까요?',
-        bindingKey: 'APP 연결에 사용할 키',
+        bindingKey: '연결 키',
         selectKey: '내 키 선택',
         noBindableKey: 'QR 연결 가능한 키가 없습니다. 키를 만들거나 유효한 키의 QR 연결을 허용하세요.',
         appKeyExpired: '선택한 API Key가 만료되었습니다. 만료일을 연장하거나 다른 키를 선택하세요.',

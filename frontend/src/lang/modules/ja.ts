@@ -37,7 +37,7 @@ const message = {
         disableConfirm:
             '「{0}」を無効にしますか？新しいリクエストを拒否し、対応するターミナルを閉じます。実行中のバックグラウンド処理は中止されません。',
         enableConfirm: '現在のアクセス条件で「{0}」を有効にしますか？',
-        bindingKey: 'APP 連携用キー',
+        bindingKey: '連携キー',
         selectKey: '自分のキーを選択',
         noBindableKey: 'QR 連携できるキーがありません。新規作成するか、有効なキーの QR 連携を許可してください。',
         appKeyExpired: '選択した API Key の有効期限が切れています。有効期限を延長するか、別のキーを選択してください。',
