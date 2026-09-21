@@ -30,8 +30,6 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-const APIKeyLimit = 20
-
 var apiKeyMutationMu sync.Mutex
 
 type APIKeyService struct {
@@ -96,14 +94,10 @@ func (s *APIKeyService) Search(c *gin.Context, req dto.APIKeySearch) (*dto.APIKe
 	if config.ApiKey != "" {
 		items = append(items, legacy)
 	}
-	used := 0
 	for _, key := range keys {
 		items = append(items, apiKeyItem(key))
-		if key.Status != "Revoked" {
-			used++
-		}
 	}
-	result := &dto.APIKeyPage{Items: []dto.APIKeyItem{}, Total: len(items), Used: used, Limit: APIKeyLimit}
+	result := &dto.APIKeyPage{Items: []dto.APIKeyItem{}, Total: len(items)}
 	start := (req.Page - 1) * req.PageSize
 	if start >= 0 && start < len(items) {
 		result.Items = items[start:min(start+req.PageSize, len(items))]
@@ -186,13 +180,6 @@ func (s *APIKeyService) Create(c *gin.Context, req dto.APIKeyCreate) (*dto.APIKe
 		}
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
-		}
-		var count int64
-		if err = repo.APIKeyOwnerQuery(tx.Model(&model.APIKey{}), owner.Type, owner.ID).Where("status <> ?", "Revoked").Count(&count).Error; err != nil {
-			return err
-		}
-		if count >= APIKeyLimit {
-			return buserr.New("ErrAPIKeyLimit")
 		}
 		if err = ensureAPIKeyName(tx, owner, req.Name, ""); err != nil {
 			return err

@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'Panel API',
+        title: 'API Key',
         manage: 'Manage API Keys',
         personalEntry: 'Manage your keys, access conditions, and APP binding in Settings.',
         create: 'Create API Key',
         legacy: 'Legacy Key',
         identifier: 'Key identifier',
         details: 'API Key details',
-        quota: '{0} / {1} new keys (disabled and expired keys count; the legacy key is excluded)',
         statusEnable: 'Enabled',
         statusDisable: 'Disabled',
         statusRevoked: 'Revoked',
@@ -22,17 +21,16 @@ const message = {
         never: 'Never expires',
         futureExpiry: 'Select an expiration time in the future.',
         allowAppBinding: 'Allow APP QR binding',
-        bindingException:
-            'Allow this key to be delivered again to a phone through a one-time QR code generated in your signed-in panel session.',
         bindingDisableHelp:
-            'Turning off QR binding blocks future delivery. Existing connections remain valid until the key is disabled, revoked, or expires.',
+            'Disabling QR binding prevents new device bindings. Devices already bound can continue to use the key until it is disabled, revoked, or expires.',
         saveSecret: 'Copy and save this secret now. After closing, ordinary key management cannot display it again.',
         saved: 'I have saved the secret',
         alreadyCreated:
             'This key was already created. Its secret will not be shown again. If the original response was lost, revoke and recreate it, or use QR binding if allowed.',
         uncertain:
             'The request result is uncertain. Retry with the same details to avoid duplicate keys, or close and check the list before creating another.',
-        legacyHelp: 'The legacy key keeps existing connections compatible. Its switch and reset affect only that key.',
+        legacyHelp:
+            'The legacy key supports legacy API connections. Enabling, disabling, or resetting it affects only this key.',
         showLegacy: 'Show legacy secret',
         revoke: 'Revoke',
         revokeConfirm:
@@ -2925,7 +2923,7 @@ const message = {
         apiKeyValidityTime: 'Validity period of interface key',
         apiKeyValidityTimeEgs: 'Validity period of interface key (in minutes)',
         apiKeyValidityTimeHelper:
-            'The interface timestamp is valid if its difference from the current timestamp (in minutes) is within the allowed range. A value of 0 disables verification.',
+            'The request signature validity period, in minutes, measured from the request timestamp. Set to 0 to disable timestamp validation.',
         apiKeyReset: 'Interface key reset',
         apiKeyResetHelper: 'the associated key service will become invalid. Please add a new key to the service',
         confDockerProxy: 'Configure docker proxy',

@@ -788,7 +788,7 @@ const handleMFA = async () => {
 
 const openApiManagement = () => {
     open.value = false;
-    router.push('/settings/apikeys');
+    router.push({ path: '/settings/apikeys', query: { uncached: 'true' } });
 };
 
 defineExpose({

@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'パネル API',
+        title: 'API Key',
         manage: 'API Key を管理',
         personalEntry: '設定で自分のキー、アクセス条件、APP の QR 連携を管理します。',
         create: 'API Key を作成',
         legacy: '旧版キー',
         identifier: 'キー識別子',
         details: 'API Key の詳細',
-        quota: '新規キー {0} / {1}（無効・期限切れも含む。旧版キーは除く）',
         statusEnable: '有効',
         statusDisable: '無効',
         statusRevoked: '失効済み',
@@ -22,16 +21,15 @@ const message = {
         never: '無期限',
         futureExpiry: '現在より後の有効期限を選択してください。',
         allowAppBinding: 'APP の QR 連携を許可',
-        bindingException:
-            'ログイン中のパネルで生成した使い捨て QR コードを通じて、このキーを再び携帯端末に渡すことを許可します。',
         bindingDisableHelp:
-            'オフにすると今後の QR 配布のみ停止します。既存の接続はキーの無効化、失効、期限切れまで利用できます。',
+            'QR 連携を無効にすると、新規の連携を受け付けなくなります。連携済みの端末は、キーが無効化、失効、または期限切れになるまで引き続き利用できます。',
         saveSecret: '今すぐキーをコピーして保存してください。閉じると通常のキー管理から完全なキーを再表示できません。',
         saved: 'キーを保存しました',
         alreadyCreated:
             'このキーは作成済みで、再表示できません。最初の応答を受け取れなかった場合は失効させて再作成するか、許可されていれば QR を使用してください。',
         uncertain: 'リクエスト結果が不明です。重複を避けるため同じ設定で再試行するか、閉じて一覧を確認してください。',
-        legacyHelp: '旧版キーは既存接続との互換性を保ちます。切り替えとリセットはこのキーだけに影響します。',
+        legacyHelp:
+            '旧版キーは従来の API 接続との互換性を維持します。有効化、無効化、リセットはこのキーにのみ適用されます。',
         showLegacy: '旧版キーを表示',
         revoke: '失効させる',
         revokeConfirm:
@@ -3249,7 +3247,8 @@ const message = {
         componentSize: 'コンポーネントサイズ',
         apiKeyValidityTime: 'インターフェースキー有効期間',
         apiKeyValidityTimeEgs: 'インターフェースキー有効期間（分）',
-        apiKeyValidityTimeHelper: '現在時刻との差（分）が許容範囲内なら有効です。0 は検証無効。',
+        apiKeyValidityTimeHelper:
+            'リクエストのタイムスタンプから計算する署名の有効期間を分単位で指定します。0 に設定すると、タイムスタンプの検証を行いません。',
         scope: '範囲',
         public: 'パブリック',
         publicHelper: 'パブリック型バックアップアカウントは各子ノードへ同期され共同利用できます',

@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: '面板 API',
+        title: 'API Key',
         manage: '管理 API Key',
         personalEntry: '前往設定管理自己的金鑰、存取條件與 APP 掃碼綁定。',
         create: '建立 API Key',
         legacy: '舊版 Key',
         identifier: '金鑰識別',
         details: 'API Key 詳情',
-        quota: '新 Key {0} / {1}（停用、到期的仍計數，舊版 Key 不計入）',
         statusEnable: '已啟用',
         statusDisable: '已停用',
         statusRevoked: '已撤銷',
@@ -22,14 +21,13 @@ const message = {
         never: '永不到期',
         futureExpiry: '請選擇晚於目前時間的到期時間。',
         allowAppBinding: '允許 APP 掃碼綁定',
-        bindingException: '允許在目前帳號的面板登入工作階段中產生一次性 QR Code，再次向手機交付這把金鑰。',
-        bindingDisableHelp: '關閉掃碼綁定後，已綁定裝置仍可使用，直到金鑰停用、撤銷或到期。',
+        bindingDisableHelp: '關閉掃碼綁定後，將停止接受新的綁定；已綁定裝置可繼續使用，直至金鑰被停用、撤銷或到期。',
         saveSecret: '請立即複製並儲存金鑰。關閉後，一般金鑰管理無法再次顯示完整金鑰。',
         saved: '我已儲存金鑰',
         alreadyCreated:
             '這把金鑰已建立，無法再次顯示明文。若原回應遺失，請撤銷後重新建立；允許掃碼綁定時，也可透過掃碼交付。',
         uncertain: '請求結果尚不確定。請保持原設定重試，避免重複建立；或關閉並檢查清單後再建立其他金鑰。',
-        legacyHelp: '舊版 Key 用於相容已有連線，其開關與重設只影響這把 Key。',
+        legacyHelp: '舊版 Key 用於相容歷史 API 連線，啟用、停用及重設操作僅對該 Key 生效。',
         showLegacy: '檢視舊版金鑰',
         revoke: '撤銷',
         revokeConfirm:
@@ -2748,7 +2746,7 @@ const message = {
             '使用反向代理時，請填寫代理伺服器的 IP 或網段；留空時不信任任何代理，並使用請求的直接來源 IP。不支援 0.0.0.0/0 和 ::/0。',
         apiKeyValidityTime: '介面金鑰有效期',
         apiKeyValidityTimeEgs: '介面金鑰有效期（組織分）',
-        apiKeyValidityTimeHelper: '介面時間戳記到請求時的目前時間戳之間有效（組織分），設定為0時，不做時間戳記校驗',
+        apiKeyValidityTimeHelper: '請求簽章的有效時長，單位為分鐘，自請求時間戳記起計算。設為 0 時不驗證時間戳記。',
         apiKeyReset: '介面金鑰重設',
         apiKeyResetHelper: '重設金鑰後，已關聯金鑰服務將失效，請重新新增新金鑰至服務。',
         confDockerProxy: '設定 Docker 代理',

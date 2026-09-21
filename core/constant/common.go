@@ -134,6 +134,7 @@ var WebUrlMap = map[string]struct{}{
 
 	"/settings":               {},
 	"/settings/panel":         {},
+	"/settings/apikeys":       {},
 	"/settings/backupaccount": {},
 	"/settings/license":       {},
 	"/settings/about":         {},

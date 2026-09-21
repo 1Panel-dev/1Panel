@@ -3,7 +3,6 @@
         v-model="visible"
         :header="item ? $t('commons.button.edit') : $t('apiKeyManagement.create')"
         size="min(640px, 100vw)"
-        :auto-close="false"
         :confirm-before-close="true"
         @before-close="beforeClose"
     >
@@ -25,9 +24,6 @@
                     </el-input>
                 </el-form-item>
             </el-form>
-            <p v-if="created.allowAppBinding" class="input-help mb-4 leading-5">
-                {{ $t('apiKeyManagement.bindingException') }}
-            </p>
             <el-checkbox v-if="secret" v-model="saved">{{ $t('apiKeyManagement.saved') }}</el-checkbox>
         </template>
         <el-form v-else ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
@@ -131,6 +127,7 @@
                     type="datetime"
                     :disabled="busy || uncertain"
                     :clearable="false"
+                    :show-now="false"
                     class="!w-full"
                 />
             </el-form-item>
@@ -138,7 +135,6 @@
                 <el-checkbox v-model="form.allowAppBinding" :disabled="busy || uncertain">
                     {{ $t('apiKeyManagement.allowAppBinding') }}
                 </el-checkbox>
-                <span class="input-help mt-2 leading-5">{{ $t('apiKeyManagement.bindingException') }}</span>
                 <span class="input-help mt-2 leading-5">{{ $t('apiKeyManagement.bindingDisableHelp') }}</span>
             </el-form-item>
         </el-form>
@@ -328,6 +324,15 @@ const submit = async () => {
         if (ticket === editorVersion) busy.value = false;
     }
 };
+watch(
+    ipMode,
+    async () => {
+        // Clear after the hidden input's pending blur validation has settled.
+        await nextTick();
+        formRef.value?.clearValidate('ipWhiteList');
+    },
+    { flush: 'post' },
+);
 watch(
     () => globalStore.isLogin,
     (loggedIn) => {

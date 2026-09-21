@@ -531,7 +531,6 @@ ErrSAML2LocalCredentialsReadonly: "SAML2 kullanıcı adları ve parolaları kiml
 ErrSAML2PasswordExpirationUnsupported: "SAML2 kullanıcıları yerel parola süresi dolma ilkesini kullanmaz."
 
 # API key management
-ErrAPIKeyLimit: "Kullanıcı başına iptal edilmemiş 20 API anahtarı sınırına ulaşıldı"
 ErrAPIKeyConflict: "API anahtarı değişti. Yenileyip tekrar deneyin; oluşturma isteğini tekrarlarken ilk parametreleri kullanın"
 ErrAPIKeyNameExists: "Bu adda iptal edilmemiş bir API anahtarı zaten var"
 ErrAPIKeyNotFound: "API anahtarı mevcut değil veya geçerli kullanıcıya ait değil"

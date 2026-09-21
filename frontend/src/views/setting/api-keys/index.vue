@@ -2,14 +2,9 @@
     <div>
         <LayoutContent :title="$t('apiKeyManagement.title')" v-loading="loading">
             <template #leftToolBar>
-                <div class="flex flex-wrap items-center gap-3">
-                    <el-button type="primary" :disabled="used >= limit" @click="editor?.open()">
-                        {{ $t('apiKeyManagement.create') }}
-                    </el-button>
-                    <el-tooltip :content="$t('apiKeyManagement.quota', [used, limit])" placement="top" trigger="click">
-                        <el-button link type="info" class="whitespace-nowrap">{{ used }} / {{ limit }}</el-button>
-                    </el-tooltip>
-                </div>
+                <el-button type="primary" @click="editor?.open()">
+                    {{ $t('apiKeyManagement.create') }}
+                </el-button>
             </template>
             <template #rightToolBar><TableRefresh @search="search" /></template>
             <template #main>
@@ -61,14 +56,57 @@
                             </el-tag>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        v-if="!isMobile"
-                        :label="$t('setting.ipWhiteList')"
-                        min-width="180"
-                        show-overflow-tooltip
-                    >
+                    <el-table-column v-if="!isMobile" :label="$t('setting.ipWhiteList')" min-width="180">
                         <template #default="{ row }">
-                            {{ isAnyAPIKeyIP(row.ipWhiteList) ? $t('apiKeyManagement.anyIP') : row.ipWhiteList || '—' }}
+                            <span v-if="isAnyAPIKeyIP(row.ipWhiteList)">{{ $t('apiKeyManagement.anyIP') }}</span>
+                            <div
+                                v-else-if="whitelistEntries(row.ipWhiteList).length"
+                                class="flex min-w-0 items-center gap-2"
+                            >
+                                <div class="min-w-0">
+                                    <div
+                                        v-for="(ip, index) in whitelistEntries(row.ipWhiteList).slice(0, 2)"
+                                        :key="index"
+                                        class="break-all"
+                                    >
+                                        {{ ip }}
+                                    </div>
+                                </div>
+                                <el-popover
+                                    v-if="whitelistEntries(row.ipWhiteList).length > 2"
+                                    placement="top"
+                                    trigger="click"
+                                    :width="360"
+                                    :title="$t('setting.ipWhiteList')"
+                                    :popper-style="{ maxWidth: 'calc(100vw - 32px)' }"
+                                >
+                                    <template #reference>
+                                        <el-button
+                                            link
+                                            type="primary"
+                                            size="small"
+                                            class="shrink-0"
+                                            :aria-label="
+                                                $t('setting.ipWhiteList') +
+                                                ': ' +
+                                                $t('commons.table.total', [whitelistEntries(row.ipWhiteList).length])
+                                            "
+                                        >
+                                            +{{ whitelistEntries(row.ipWhiteList).length - 2 }}
+                                        </el-button>
+                                    </template>
+                                    <ul class="m-0 max-h-64 list-none overflow-y-auto p-0">
+                                        <li
+                                            v-for="(ip, index) in whitelistEntries(row.ipWhiteList)"
+                                            :key="index"
+                                            class="break-all py-1"
+                                        >
+                                            {{ ip }}
+                                        </li>
+                                    </ul>
+                                </el-popover>
+                            </div>
+                            <span v-else>—</span>
                         </template>
                     </el-table-column>
                     <el-table-column v-if="!isMobile" :label="$t('apiKeyManagement.expiresAt')" min-width="170">
@@ -136,7 +174,7 @@ import APIKeyEditor from '@/components/api-key-management/editor.vue';
 import APIKeySummary from '@/components/api-key-management/summary.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import type { FuTableOperationButton } from '@/components/table/shared';
-import { isAnyAPIKeyIP } from '@/utils/api-key';
+import { isAnyAPIKeyIP, normalizeAPIKeyIPs } from '@/utils/api-key';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -145,8 +183,6 @@ const { isMobile } = useGlobalStore();
 
 const items = ref<APIKey.Item[]>([]);
 const loading = ref(false);
-const used = ref(0);
-const limit = ref(20);
 const editor = ref<InstanceType<typeof APIKeyEditor>>();
 const detail = ref<APIKey.Item>();
 const detailVisible = ref(false);
@@ -156,6 +192,11 @@ const pagination = reactive({ currentPage: 1, pageSize: 20, total: 0 });
 let searchVersion = 0;
 let secretRequestVersion = 0;
 let active = false;
+
+const whitelistEntries = (value: string) =>
+    normalizeAPIKeyIPs(value || '')
+        .split('\n')
+        .filter(Boolean);
 
 const clearLegacySecret = () => {
     secretRequestVersion++;
@@ -177,8 +218,6 @@ const search = async (preserveLegacyRequest?: number) => {
         }
         items.value = response.data.items || [];
         pagination.total = response.data.total;
-        used.value = response.data.used;
-        limit.value = response.data.limit;
         if (detail.value) {
             const previousRevision = detail.value.revision;
             detail.value = items.value.find((entry) => entry.id === detail.value?.id);

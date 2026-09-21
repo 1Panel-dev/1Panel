@@ -2,14 +2,13 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
-        title: 'API Panel',
+        title: 'API Key',
         manage: 'Urus kunci API',
         personalEntry: 'Urus kunci, syarat akses dan pautan APP anda dalam Tetapan.',
         create: 'Cipta kunci API',
         legacy: 'Kunci lama',
         identifier: 'Pengecam kunci',
         details: 'Butiran kunci API',
-        quota: '{0} / {1} kunci baharu (termasuk kunci dinyahdayakan dan tamat tempoh; tidak termasuk kunci lama)',
         statusEnable: 'Didayakan',
         statusDisable: 'Dinyahdayakan',
         statusRevoked: 'Dibatalkan',
@@ -22,10 +21,8 @@ const message = {
         never: 'Tidak tamat tempoh',
         futureExpiry: 'Pilih masa luput pada masa hadapan.',
         allowAppBinding: 'Benarkan pautan APP melalui QR',
-        bindingException:
-            'Benarkan kunci ini dihantar semula ke telefon melalui kod QR sekali guna yang dijana dalam sesi panel anda yang telah log masuk.',
         bindingDisableHelp:
-            'Mematikan pautan QR menyekat penghantaran baharu sahaja. Sambungan sedia ada kekal sah sehingga kunci dinyahdayakan, dibatalkan atau tamat tempoh.',
+            'Menyahdayakan pautan QR menghalang pautan peranti baharu. Peranti yang telah dipautkan boleh terus digunakan sehingga kunci dinyahdayakan, dibatalkan atau tamat tempoh.',
         saveSecret:
             'Salin dan simpan kunci sekarang. Selepas ditutup, pengurusan biasa tidak dapat memaparkan kunci penuh lagi.',
         saved: 'Saya telah menyimpan kunci',
@@ -34,7 +31,7 @@ const message = {
         uncertain:
             'Hasil permintaan belum pasti. Cuba semula dengan butiran sama untuk mengelakkan pendua, atau tutup dan semak senarai sebelum mencipta lagi.',
         legacyHelp:
-            'Kunci lama mengekalkan keserasian sambungan sedia ada. Suis dan tetapan semulanya hanya mempengaruhi kunci itu.',
+            'Kunci lama mengekalkan keserasian dengan sambungan API terdahulu. Mendayakan, menyahdayakan atau menetapkan semula hanya mempengaruhi kunci ini.',
         showLegacy: 'Tunjukkan kunci lama',
         revoke: 'Batalkan',
         revokeConfirm:
@@ -2972,7 +2969,7 @@ const message = {
         apiKeyValidityTime: 'Tempoh sah kunci antara muka',
         apiKeyValidityTimeEgs: 'Tempoh sah kunci antara muka (dalam minit)',
         apiKeyValidityTimeHelper:
-            'Cap waktu antara muka sah jika perbezaannya dengan cap waktu semasa (dalam minit) berada dalam julat yang dibenarkan. Nilai 0 melumpuhkan pengesahan.',
+            'Tempoh sah tandatangan permintaan, dalam minit, dikira dari cap masa permintaan. Tetapkan kepada 0 untuk menyahdayakan pengesahan cap masa.',
         apiKeyReset: 'Tetapkan semula kunci antara muka',
         apiKeyResetHelper:
             'Perkhidmatan kunci yang berkaitan akan menjadi tidak sah. Sila tambah kunci baru pada perkhidmatan',
