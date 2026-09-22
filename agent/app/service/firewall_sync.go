@@ -42,8 +42,10 @@ func (s *FirewallService) SyncPortWhitelist(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	_, err = s.syncPortWhitelist(ctx, provider, ports)
-	return err
+	if _, err := s.syncPortWhitelist(ctx, provider, ports); err != nil {
+		return err
+	}
+	return s.removeTransferredSystemPortRules(ctx, provider, ports)
 }
 
 func (s *FirewallService) PreviewRuleSync(ctx context.Context, clientIP string, request dto.FirewallRuleSyncRequest) (dto.FirewallRuleSyncPreview, error) {
