@@ -56,13 +56,13 @@
                     <template #default="{ row }">{{ displayAddress(row, row.sourceAddress) }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.sourcePort')" min-width="110">
-                    <template #default="{ row }">{{ row.sourcePort || $t('firewall.allPorts') }}</template>
+                    <template #default="{ row }">{{ row.sourcePort || '*' }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.destIP')" min-width="150">
                     <template #default="{ row }">{{ displayAddress(row, row.destinationAddress) }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.destPort')" min-width="110">
-                    <template #default="{ row }">{{ row.destinationPort || $t('firewall.allPorts') }}</template>
+                    <template #default="{ row }">{{ row.destinationPort || '*' }}</template>
                 </el-table-column>
                 <el-table-column :label="$t('firewall.action')" prop="action" min-width="90">
                     <template #default="{ row }">{{ actionLabel(row.action) }}</template>

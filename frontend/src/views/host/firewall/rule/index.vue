@@ -898,10 +898,10 @@ const changeRuleFilter = () => {
 
 const notices = computed<DisplayNotice[]>(() => {
     const unique = new Map<string, DisplayNotice>();
-    if (inventoryTotal.value > 200 && isServiceBackend.value) {
+    if (inventoryTotal.value > 1000 && isServiceBackend.value) {
         unique.set('largeRuleSet', {
             key: 'largeRuleSet',
-            text: i18n.global.t('firewall.largeRuleSet', [200]),
+            text: i18n.global.t('firewall.largeRuleSet'),
         });
     }
     scopeNotices.value.forEach((notice) => {

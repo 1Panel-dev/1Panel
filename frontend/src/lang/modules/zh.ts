@@ -3944,7 +3944,7 @@ const message = {
         plan_runtime_permanent_mismatch: '当前生效的防火墙规则与重启后保留的规则不一致，请先同步后重试。',
         plan_protected_rule: '该规则受到保护，不能认领、修改或删除。',
         plan_blocked: '暂时无法处理这条规则，本次操作未生效。请刷新后重试；如仍失败，请检查规则状态。',
-        largeRuleSet: '当前防火墙规则超过 {0} 条，建议使用 iptables 或 nftables。',
+        largeRuleSet: '防火墙规则过多可能导致操作卡顿，建议使用 iptables 或 nftables。',
         scopeDefaultMismatch: '系统默认 zone 为 {0}，当前页面仅管理 public zone。',
         scopeMissing: '托管范围 {0} 尚未创建，应用首条规则时将以安全方式创建。',
         scopeUnmanagedActive: '检测到其他活动范围：{0}，1Panel 不会修改其中的规则。',

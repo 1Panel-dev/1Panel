@@ -3896,7 +3896,7 @@ const message = {
         plan_runtime_permanent_mismatch: '防火牆執行設定與永久設定不一致，請先完成同步。',
         plan_protected_rule: '此規則受到保護，不能認領、修改或刪除。',
         plan_blocked: '目前規則無法安全套用，請重新整理規則後再試。',
-        largeRuleSet: '目前防火牆規則超過 {0} 條，建議使用 iptables 或 nftables。',
+        largeRuleSet: '防火牆規則過多可能導致操作卡頓，建議使用 iptables 或 nftables。',
         scopeDefaultMismatch: '系統預設 zone 為 {0}，目前頁面僅管理 public zone。',
         scopeMissing: '託管範圍 {0} 尚未建立，套用第一條規則時將以安全方式建立。',
         scopeUnmanagedActive: '偵測到其他使用中範圍：{0}，1Panel 不會修改其中的規則。',

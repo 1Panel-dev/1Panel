@@ -18,7 +18,7 @@ var (
 var ErrVerificationFailed = errors.New("firewall rule verification failed")
 
 func ProtectRuleSet(snapshot RuleSet, ports []PortWhitelist) (RuleSet, error) {
-	rules := append([]ObservedRule(nil), snapshot.Rules...)
+	rules := slices.Clone(snapshot.Rules)
 	whitelist := NewPortWhitelistIndex(ports)
 	for index := range rules {
 		if rules[index].ParseStatus == ParseStatusSupported && whitelist.Matches(rules[index].Rule) {

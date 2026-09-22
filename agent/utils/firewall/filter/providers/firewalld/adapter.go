@@ -1060,7 +1060,7 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	}
 	timeout := 60 * time.Second
 	if options > 1 {
-		timeout = 5 * time.Minute
+		timeout = 15 * time.Minute
 	}
 	var stderr strings.Builder
 	err := cmd.NewCommandMgr(

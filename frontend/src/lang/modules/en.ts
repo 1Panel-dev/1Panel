@@ -4179,7 +4179,7 @@ const message = {
             'The runtime and permanent firewall configurations differ. Synchronize them first.',
         plan_protected_rule: 'This rule is protected and cannot be taken over, changed, or deleted.',
         plan_blocked: 'This rule cannot be applied safely. Refresh the rules and try again.',
-        largeRuleSet: 'There are more than {0} firewall rules. We recommend using iptables or nftables.',
+        largeRuleSet: 'Too many firewall rules may slow down operations. We recommend using iptables or nftables.',
         scopeDefaultMismatch: 'The system default zone is {0}; this page manages only the public zone.',
         scopeMissing: 'Managed scope {0} is missing and will be created safely when the first rule is applied.',
         scopeUnmanagedActive: 'Other active scopes were detected: {0}. 1Panel will not modify their rules.',
