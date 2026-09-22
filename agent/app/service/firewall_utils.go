@@ -371,39 +371,56 @@ func (s *FirewallService) syncPortWhitelist(ctx context.Context, provider filter
 	return created, errors.Join(failures...)
 }
 
-func updateSystemAccessPortWhitelist(ctx context.Context, serviceType string, ports []string) error {
+func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, serviceType string, ports []string) error {
+	if len(ports) == 0 {
+		return fmt.Errorf("firewall whitelist %s requires a port", serviceType)
+	}
 	firewallWhitelistMu.Lock()
 	defer firewallWhitelistMu.Unlock()
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-	return global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		entries, err := loadPortWhitelistSetting(tx)
-		if err != nil {
-			return err
+	entries, err := loadFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	servicePorts := make([]firewall.PortWhitelist, 0)
+	for index := range entries {
+		if entries[index].Type != serviceType {
+			continue
 		}
-		for index := range entries {
-			if entries[index].Type != serviceType {
-				continue
+		entries[index].Port = ports[0]
+		servicePorts = append(servicePorts, entries[index])
+	}
+	if len(servicePorts) == 0 {
+		servicePorts = append(servicePorts, firewall.PortWhitelist{
+			Type: serviceType, Port: ports[0], Protocol: "tcp",
+			Sources: []string{"0.0.0.0/0", "::/0"},
+		})
+		entries = append(entries, servicePorts...)
+	}
+	entries, err = firewall.ValidatePortWhitelist(entries)
+	if err != nil {
+		return err
+	}
+	value, err := json.Marshal(entries)
+	if err != nil {
+		return err
+	}
+	client, err := s.baseClient()
+	if err != nil && !errors.Is(err, lifecycle.ErrNotInstalled) {
+		return err
+	}
+	if err == nil {
+		allowances := make([]firewall.PortWhitelist, 0, len(servicePorts)*len(ports))
+		for _, rule := range servicePorts {
+			for _, port := range ports {
+				rule.Port = port
+				allowances = append(allowances, rule)
 			}
-			if len(ports) == 0 {
-				return fmt.Errorf("firewall whitelist %s requires a port", serviceType)
-			}
-			entries[index].Port = ports[0]
 		}
-		entries, err = firewall.ValidatePortWhitelist(entries)
-		if err != nil {
+		if _, err := s.syncPortWhitelist(ctx, filter.Provider(client.Name()), allowances); err != nil {
 			return err
 		}
-		value, err := json.Marshal(entries)
-		if err != nil {
-			return err
-		}
-		err = tx.Where("key = ?", constant.FirewallPortWhiteList).Assign(map[string]interface{}{"value": string(value)}).FirstOrCreate(&model.Setting{Key: constant.FirewallPortWhiteList}).Error
-		if err != nil {
-			return err
-		}
-		return nil
-	})
+	}
+	return settingRepo.UpdateOrCreate(constant.FirewallPortWhiteList, string(value))
 }
 
 func loadPortWhitelistSetting(db *gorm.DB) ([]firewall.PortWhitelist, error) {
