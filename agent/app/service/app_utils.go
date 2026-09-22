@@ -352,22 +352,34 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		if dir != nil {
 			logStr := i18n.GetMsgByKey("Stop") + i18n.GetMsgByKey("App")
 			t.Log(logStr)
+			cleanupFailed := false
 
 			if deleteReq.UseLifecycleScripts {
-				if err = runScript(t, &install, "uninstall"); err != nil {
-					return err
+				if scriptErr := runScript(t, &install, "uninstall"); scriptErr != nil {
+					cleanupFailed = true
+					if !deleteReq.ForceDelete {
+						return scriptErr
+					}
 				}
 			} else {
-				out, err := compose.Down(install.GetComposePath())
-				if err != nil && !deleteReq.ForceDelete {
-					return handleErr(install, err, out)
+				out, downErr := compose.Down(install.GetComposePath())
+				if downErr != nil {
+					cleanupFailed = true
+					if !deleteReq.ForceDelete {
+						return handleErr(install, downErr, out)
+					}
 				}
-				if err = runScript(t, &install, "uninstall"); err != nil {
-					_, _ = compose.Up(install.GetComposePath())
-					return err
+				if scriptErr := runScript(t, &install, "uninstall"); scriptErr != nil {
+					cleanupFailed = true
+					if !deleteReq.ForceDelete {
+						_, _ = compose.Up(install.GetComposePath())
+						return scriptErr
+					}
 				}
 			}
-			t.LogSuccess(logStr)
+			if !cleanupFailed {
+				t.LogSuccess(logStr)
+			}
 			if deleteReq.DeleteImage {
 				content, err := op.GetContent(install.GetEnvPath())
 				if err != nil {
@@ -466,8 +478,9 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	}
 	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
 	go func() {
-		if err := uninstallTask.Execute(); err != nil && !deleteReq.ForceDelete {
+		if err := uninstallTask.Execute(); err != nil {
 			install.Status = constant.StatusError
+			install.Message = err.Error()
 			_ = appInstallRepo.Save(context.Background(), &install)
 		}
 	}()
