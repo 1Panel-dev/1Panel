@@ -464,12 +464,14 @@ func loadDiskInfo() []dto.DiskInfo {
 		cmd.PipeCommand{Name: "awk", Args: []string{format}},
 	)
 	if err != nil {
+		global.LOG.Errorf("load disk info with df -hT -P failed, err: %v", err)
 		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
 		stdout, err = cmdMgr2.RunPipe(
 			cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
 			cmd.PipeCommand{Name: "awk", Args: []string{format}},
 		)
 		if err != nil {
+			global.LOG.Errorf("load disk info with df -lhT -P failed, err: %v", err)
 			return datas
 		}
 	}
