@@ -39,14 +39,16 @@
 
                 <LayoutContent :title="$t('menu.firewall')" :class="{ mask: !isFirewallReady }">
                     <template #prompt>
-                        <el-alert
-                            v-for="notice in notices"
-                            :key="notice.key"
-                            class="mb-2"
-                            type="warning"
-                            :closable="false"
-                            :title="notice.text"
-                        />
+                        <div ref="noticeRef" class="flow-root">
+                            <el-alert
+                                v-for="notice in notices"
+                                :key="notice.key"
+                                class="mb-2"
+                                type="warning"
+                                :closable="false"
+                                :title="notice.text"
+                            />
+                        </div>
                     </template>
                     <template #leftToolBar>
                         <el-button v-permission v-node-admin type="primary" :disabled="loading" @click="openCreate">
@@ -186,7 +188,7 @@
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
                                 :data="allRows"
-                                :heightDiff="320"
+                                :heightDiff="320 + noticeHeight"
                                 row-key="rowKey"
                                 @search="searchPage"
                             >
@@ -424,6 +426,7 @@ import TaskLog from '@/components/log/task/index.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { loadDockerStatus } from '@/api/modules/container';
 import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { useElementSize } from '@vueuse/core';
 import { ElMessageBox } from 'element-plus';
 import { Expand, Filter, Loading, Lock, WarningFilled } from '@element-plus/icons-vue';
 
@@ -478,6 +481,8 @@ const cacheFilterValues = (key: string, values: readonly string[]) => {
 };
 
 const fireStatusRef = ref<InstanceType<typeof FireStatus>>();
+const noticeRef = ref<HTMLElement>();
+const { height: noticeHeight } = useElementSize(noticeRef);
 const ruleOperateRef = ref<InstanceType<typeof RuleOperate>>();
 const ruleImportRef = ref<InstanceType<typeof RuleImport>>();
 const ruleTaskLogRef = ref<InstanceType<typeof TaskLog>>();

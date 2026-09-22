@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"slices"
@@ -98,7 +99,45 @@ func (s *FirewallService) UpdatePanelPort(ctx context.Context, oldPort, port uin
 	if oldPort == port {
 		return nil
 	}
-	return updateSystemAccessPortWhitelist(ctx, firewall.PortWhitelistTypePanel, []string{strconv.Itoa(int(port))})
+	firewallWhitelistMu.Lock()
+	defer firewallWhitelistMu.Unlock()
+	entries, err := loadFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	panelPorts := make([]firewall.PortWhitelist, 0)
+	for index := range entries {
+		if entries[index].Type != firewall.PortWhitelistTypePanel {
+			continue
+		}
+		entries[index].Port = strconv.Itoa(int(port))
+		panelPorts = append(panelPorts, entries[index])
+	}
+	if len(panelPorts) == 0 {
+		panelPorts = append(panelPorts, firewall.PortWhitelist{
+			Type: firewall.PortWhitelistTypePanel, Port: strconv.Itoa(int(port)), Protocol: "tcp",
+			Sources: []string{"0.0.0.0/0", "::/0"},
+		})
+		entries = append(entries, panelPorts...)
+	}
+	entries, err = firewall.ValidatePortWhitelist(entries)
+	if err != nil {
+		return err
+	}
+	value, err := json.Marshal(entries)
+	if err != nil {
+		return err
+	}
+	client, err := s.baseClient()
+	if err != nil && !errors.Is(err, lifecycle.ErrNotInstalled) {
+		return err
+	}
+	if err == nil {
+		if _, err := s.syncPortWhitelist(ctx, filter.Provider(client.Name()), panelPorts); err != nil {
+			return err
+		}
+	}
+	return settingRepo.UpdateOrCreate(constant.FirewallPortWhiteList, string(value))
 }
 
 func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystemStatus, error) {

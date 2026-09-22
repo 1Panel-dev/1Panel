@@ -128,6 +128,249 @@ func LoadPanelPort() string {
 	return portSetting.Value
 }
 
+func (s *FirewallService) syncPortWhitelist(ctx context.Context, provider filter.Provider, ports []firewall.PortWhitelist) ([]filter.FirewallRule, error) {
+	required, err := firewall.RequiredPortWhitelist(ports)
+	if err != nil {
+		return nil, err
+	}
+	rules := whitelistRules(provider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
+	if provider != filter.ProviderIptables && provider != filter.ProviderNftables && len(rules) > 0 {
+		client, err := s.baseClient()
+		if err != nil {
+			return nil, err
+		}
+		active, err := client.Status()
+		if err != nil || !active {
+			return nil, err
+		}
+	}
+	client, err := s.firewallAdapter(provider)
+	if err != nil {
+		return nil, err
+	}
+	prepared := make([]dto.FirewallRuleCreateItem, 0, len(rules))
+	var failures []error
+	activeFamilies := make(map[filter.Family]bool)
+	for _, rule := range rules {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
+			active, inspected := activeFamilies[rule.Scope.Family]
+			if !inspected {
+				initialized, bound, err := loadSystemFirewallFamilyStatus(string(provider), string(rule.Scope.Family))
+				if err != nil {
+					return nil, err
+				}
+				active = initialized && bound
+				activeFamilies[rule.Scope.Family] = active
+			}
+			if !active {
+				continue
+			}
+		}
+		port := firewall.SystemPort{Family: string(rule.Scope.Family), Port: rule.DestinationPort, Protocol: rule.Protocol, SourceAddress: rule.SourceAddress}
+		item, err := prepareFirewallCreateRule(ctx, client, dto.FirewallRuleCreateItem{
+			Rule: rule, SourceKind: constant.FirewallRuleSourceSecurity, SourceID: constant.FirewallSystemAcceptedPortSourcePrefix + firewall.SystemPortKey(firewall.SystemPort(port)),
+		})
+		if err != nil {
+			failures = append(failures, fmt.Errorf("prepare whitelist rule %s: %w", firewall.SystemPortKey(port), err))
+			continue
+		}
+		prepared = append(prepared, item)
+	}
+	if len(failures) > 0 {
+		return nil, errors.Join(failures...)
+	}
+	if len(prepared) == 0 {
+		return nil, nil
+	}
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+
+	scopes := make([]filter.Scope, 0, len(prepared))
+	for _, item := range prepared {
+		scopes = append(scopes, item.Rule.Scope)
+	}
+	snapshots, err := readMutableFirewallRuleScopes(client, ctx, scopes)
+	if err != nil {
+		return nil, err
+	}
+	byScope := make(map[string]filter.RuleSet, len(snapshots))
+	byScopeIdentity := make(map[string]firewallRuleCollisionIndex, len(snapshots))
+	for _, snapshot := range snapshots {
+		identities, err := observedFirewallRuleCollisionIndex(snapshot)
+		if err != nil {
+			return nil, err
+		}
+		byScope[snapshot.Scope.Key()] = snapshot
+		byScopeIdentity[snapshot.Scope.Key()] = identities
+	}
+	var byMatch map[string][]filter.DesiredRule
+	type whitelistBatch struct {
+		snapshot filter.RuleSet
+		changes  []filter.RuleChange
+		records  []*model.FirewallRule
+	}
+	batches := make([]whitelistBatch, 0)
+	batchByScope := make(map[string]int)
+	for _, item := range prepared {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		rule := item.Rule
+		scope := rule.Scope
+		identities := byScopeIdentity[scope.Key()]
+		if err := identities.CheckDuplicate(rule); errors.Is(err, filter.ErrRuleOperation) {
+			continue
+		} else if err != nil {
+			return nil, err
+		}
+		if err := identities.Check(rule); err != nil {
+			return nil, err
+		}
+		key, err := filter.RuleMatchKey(rule)
+		if err != nil {
+			return nil, err
+		}
+		if byMatch == nil {
+			stored, err := s.rules.List(ctx)
+			if err != nil {
+				return nil, err
+			}
+			byMatch = make(map[string][]filter.DesiredRule)
+			for _, record := range stored {
+				rules, err := compileStoredFirewallRules(ctx, record, client)
+				if isFirewallPolicyIncompatible(err) {
+					continue
+				}
+				if err != nil {
+					return nil, err
+				}
+				for _, candidate := range rules {
+					key, err := filter.RuleMatchKey(candidate.Rule)
+					if err != nil {
+						return nil, err
+					}
+					byMatch[key] = append(byMatch[key], candidate)
+				}
+			}
+		}
+		var existing *filter.DesiredRule
+		for _, candidate := range byMatch[key] {
+			if collision := checkCollisionActions(rule.Action, candidate.Rule.Action); errors.Is(collision, filter.ErrRuleOperation) {
+				existing = &candidate
+			} else if collision != nil {
+				return nil, collision
+			}
+		}
+		var record *model.FirewallRule
+		if existing != nil && scope.Chain != filter.BasicBeforeChain {
+			rule = existing.Rule
+		} else {
+			rule.UUID = uuid.NewString()
+			if scope.Chain != filter.BasicBeforeChain {
+				created, err := firewallRuleModelForCreate(rule, item, constant.FirewallRuleOriginCreated)
+				if err != nil {
+					return nil, err
+				}
+				created.UUID = rule.UUID
+				record = &created
+			}
+		}
+		if provider != filter.ProviderFirewalld {
+			position := int64(1)
+			rule.OrderIndex = &position
+		}
+		index, exists := batchByScope[scope.Key()]
+		if !exists || provider != filter.ProviderIptables && provider != filter.ProviderNftables {
+			index = len(batches)
+			batchByScope[scope.Key()] = index
+			batches = append(batches, whitelistBatch{snapshot: byScope[scope.Key()]})
+		}
+		batches[index].changes = append(batches[index].changes, filter.RuleChange{Operation: filter.ChangeCreate, After: &rule, CommandOnly: true})
+		batches[index].records = append(batches[index].records, record)
+		if err := identities.Add(rule); err != nil {
+			return nil, err
+		}
+	}
+	saveRecords := func(batch whitelistBatch) {
+		saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
+		for _, record := range batch.records {
+			if record == nil {
+				continue
+			}
+			if err := s.saveFirewallRule(saveCtx, record); err != nil {
+				failures = append(failures, err)
+				if global.LOG != nil {
+					global.LOG.Errorf("save firewall whitelist rule %s failed: %v", record.UUID, err)
+				}
+			}
+		}
+		cancel()
+	}
+	_, savesRules := client.(filter.RuleSaver)
+	plans := make([]filter.CommandBatch, 0, len(batches))
+	completed := make([]int, 0, len(batches))
+	for batchIndex, batch := range batches {
+		if err := ctx.Err(); err != nil {
+			failures = append(failures, err)
+			break
+		}
+		commands, err := client.BuildCommands(batch.snapshot, batch.changes)
+		commands.CommandOnly = true
+		if err == nil {
+			err = client.RunCommands(ctx, commands)
+		}
+		if err != nil {
+			failures = append(failures, err)
+			if global.LOG != nil {
+				global.LOG.Errorf("create firewall whitelist rules for %s failed: %v", batch.snapshot.Scope.Key(), err)
+			}
+			continue
+		}
+		verification := filter.CommandBatch{Provider: commands.Provider, Scope: commands.Scope}
+		for _, command := range commands.Rules {
+			expected := command.Expected
+			expected.Locator.Position = nil
+			verification.Rules = append(verification.Rules, filter.RuleCommands{Operation: filter.ChangeCreate, Expected: expected})
+		}
+		plans = append(plans, verification)
+		completed = append(completed, batchIndex)
+		if !savesRules {
+			saveRecords(batch)
+		}
+	}
+	persistenceErrors := persistFirewallRuleBatches(ctx, client, plans)
+	for index, batchIndex := range completed {
+		if err := persistenceErrors[index]; err != nil {
+			failures = append(failures, err)
+			continue
+		}
+		if savesRules {
+			saveRecords(batches[batchIndex])
+		}
+	}
+
+	verification, err := verifyFirewallCommands(ctx, client, plans...)
+	if err != nil {
+		return nil, errors.Join(append(failures, err)...)
+	}
+	if !verification.Matched {
+		return nil, errors.Join(append(failures, filter.ErrVerificationFailed)...)
+	}
+	created := make([]filter.FirewallRule, 0)
+	for index, plan := range plans {
+		if persistenceErrors[index] != nil {
+			continue
+		}
+		for _, command := range plan.Rules {
+			created = append(created, command.Expected.Rule)
+		}
+	}
+	return created, errors.Join(failures...)
+}
+
 func updateSystemAccessPortWhitelist(ctx context.Context, serviceType string, ports []string) error {
 	firewallWhitelistMu.Lock()
 	defer firewallWhitelistMu.Unlock()
@@ -1289,23 +1532,7 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 	if err := s.checkSelectedProvider(ctx, request.TargetProvider); err != nil {
 		return result, err
 	}
-	whitelistErr := s.SyncPortWhitelist(ctx)
-	if t != nil {
-		t.LogWithStatus(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), whitelistErr)
-	}
-	if whitelistErr != nil {
-		return result, whitelistErr
-	}
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
 	result = dto.FirewallRuleSyncResult{Subsystem: "system", TargetProvider: request.TargetProvider}
-	if err := ctx.Err(); err != nil {
-		return result, err
-	}
-	runtime, rules, snapshots, err := s.loadFirewallSyncRules(ctx, request)
-	if err != nil {
-		return result, err
-	}
 
 	created, removed, unexecuted := 0, 0, 0
 	failedRemovals := make(map[string]error)
@@ -1354,12 +1581,55 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 			t.LogWithStatus(label, cause)
 		}
 	}
+	firewallWhitelistMu.Lock()
+	ports, whitelistErr := loadFirewallPortWhiteList()
+	var whitelistCreated []filter.FirewallRule
+	if whitelistErr == nil {
+		whitelistCreated, whitelistErr = s.syncPortWhitelist(ctx, request.TargetProvider, ports)
+	}
+	firewallWhitelistMu.Unlock()
+	createdWhitelistKeys := make(map[string]bool, len(whitelistCreated))
+	for _, rule := range whitelistCreated {
+		key, err := filter.RuleMatchKey(rule)
+		if err != nil {
+			return result, err
+		}
+		createdWhitelistKeys[key] = true
+		result.Total++
+		record("TaskCreate", &firewallSyncRule{FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: rule.UUID, Rule: &rule}}, nil, false)
+	}
+	if t != nil {
+		t.LogWithStatus(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), whitelistErr)
+	}
+	if whitelistErr != nil {
+		return result, whitelistErr
+	}
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	if err := ctx.Err(); err != nil {
+		return result, err
+	}
+	runtime, rules, snapshots, err := s.loadFirewallSyncRules(ctx, request)
+	if err != nil {
+		return result, err
+	}
+
 	defer func() {
 		if t != nil {
 			t.Log(i18n.GetMsgWithMap("FirewallSyncOperationsResult", map[string]interface{}{"created": created, "removed": removed, "failed": result.Failed, "skipped": unexecuted, "unchanged": result.Skipped - unexecuted}))
 		}
 	}()
 	for _, rule := range rules {
+		if rule.Status == firewallsync.StatusExisting && rule.Rule != nil {
+			key, err := filter.RuleMatchKey(*rule.Rule)
+			if err != nil {
+				return result, err
+			}
+			if createdWhitelistKeys[key] {
+				rule.done = true
+				continue
+			}
+		}
 		if rule.Status != firewallsync.StatusRemove {
 			result.Total++
 		}
@@ -1368,7 +1638,7 @@ func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.F
 		}
 	}
 	for _, rule := range rules {
-		if rule.Status == firewallsync.StatusExisting {
+		if !rule.done && rule.Status == firewallsync.StatusExisting {
 			record("TaskSync", rule, nil, false)
 		}
 	}
