@@ -30,10 +30,11 @@ import (
 )
 
 const (
-	ResourceAlertInterval = 30
-	CheckIntervalSec      = 3
-	LoadCheckIntervalMin  = 5
-	sshIPLoginWindow      = 30 * time.Minute
+	ResourceAlertInterval     = 30
+	CheckIntervalSec          = 3
+	LoadCheckIntervalMin      = 5
+	sshIPLoginWindow          = 30 * time.Minute
+	sslAutoRenewAlertSkipDays = 31
 )
 
 type AlertTaskHelper struct {
@@ -864,12 +865,16 @@ func calculateSSLExpiryDays(sslList []model.WebsiteSSL, cycle uint) (map[int][]s
 		daysDiff := int(math.Ceil(
 			ssl.ExpireDate.Sub(currentDate).Hours() / 24,
 		))
-		if daysDiff > 0 && int(cycle) >= daysDiff {
+		if daysDiff > 0 && int(cycle) >= daysDiff && !shouldSuppressSSLExpiryAlert(ssl, daysDiff) {
 			daysDiffMap[daysDiff] = append(daysDiffMap[daysDiff], ssl.PrimaryDomain)
 			projectMap[ssl.ID] = append(projectMap[ssl.ID], ssl.ExpireDate)
 		}
 	}
 	return daysDiffMap, projectMap
+}
+
+func shouldSuppressSSLExpiryAlert(ssl model.WebsiteSSL, remainingDays int) bool {
+	return ssl.AutoRenew && remainingDays < sslAutoRenewAlertSkipDays
 }
 
 func calculateWebsiteExpiryDays(websites []model.Website, cycle uint) (map[int][]string, map[uint][]time.Time) {
