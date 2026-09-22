@@ -2365,6 +2365,86 @@ func (s *FirewallService) compileRestorableFirewallRules(ctx context.Context, st
 	return restorable, preserved, nil
 }
 
+func (s *FirewallService) removeTransferredSystemPortRules(ctx context.Context, provider filter.Provider, ports []firewall.PortWhitelist) error {
+	if provider != filter.ProviderIptables && provider != filter.ProviderNftables {
+		return nil
+	}
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	required, err := firewall.RequiredPortWhitelist(ports)
+	if err != nil {
+		return err
+	}
+	runtime, err := s.firewallAdapter(provider)
+	if err != nil {
+		return err
+	}
+	stored, err := s.rules.List(ctx)
+	if err != nil {
+		return err
+	}
+	custom := filter.NewPortWhitelistIndex(customWhitelist(ports))
+	candidates := make([]model.FirewallRule, 0)
+	keysByUUID := make(map[string][]string)
+	scopes := make([]filter.Scope, 0)
+	for _, record := range stored {
+		if record.Origin != constant.FirewallRuleOriginCreated || !strings.HasPrefix(record.Owner, constant.FirewallRuleSourceSecurity+":"+constant.FirewallSystemAcceptedPortSourcePrefix) {
+			continue
+		}
+		restorable, preserved, err := s.compileRestorableFirewallRules(ctx, record, runtime, required)
+		if isFirewallPolicyIncompatible(err) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		if len(restorable) != 0 || len(preserved) == 0 || slices.ContainsFunc(preserved, func(rule filter.DesiredRule) bool { return custom.Matches(rule.Rule) }) {
+			continue
+		}
+		for _, desired := range preserved {
+			rule := desired.Rule
+			rule.Scope.Chain = filter.BasicBeforeChain
+			key, err := filter.RuleMatchKey(rule)
+			if err != nil {
+				return err
+			}
+			keysByUUID[record.UUID] = append(keysByUUID[record.UUID], key)
+			scopes = append(scopes, rule.Scope)
+		}
+		candidates = append(candidates, record)
+	}
+	present := make(map[string]bool)
+	for _, group := range firewallScopeReadGroups(scopes) {
+		snapshots, err := readMutableFirewallRuleScopes(runtime, ctx, group)
+		if errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		for _, snapshot := range snapshots {
+			for _, observed := range snapshot.Rules {
+				if observed.ParseStatus != filter.ParseStatusSupported || observed.Rule.Action != filter.ActionAccept || (observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged) {
+					continue
+				}
+				key, err := filter.RuleMatchKey(observed.Rule)
+				if err != nil {
+					return err
+				}
+				present[key] = true
+			}
+		}
+	}
+	candidates = slices.DeleteFunc(candidates, func(record model.FirewallRule) bool {
+		return slices.ContainsFunc(keysByUUID[record.UUID], func(key string) bool { return !present[key] })
+	})
+	var failures []error
+	for ruleUUID, err := range s.rules.DeleteBatchWithRevision(ctx, candidates) {
+		failures = append(failures, fmt.Errorf("remove transferred system port rule %s: %w", ruleUUID, err))
+	}
+	return errors.Join(failures...)
+}
+
 func firewallInventoryRuleKey(rule filter.FirewallRule) (string, error) {
 	if rule.Scope.Provider == filter.ProviderFirewalld {
 		key, err := filter.RuleMatchKey(rule)

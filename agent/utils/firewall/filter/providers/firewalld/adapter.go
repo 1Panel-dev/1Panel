@@ -278,7 +278,7 @@ func batchCommands(plan filter.CommandBatch) (filter.RuleCommands, error) {
 			for index, command := range rule.Commands {
 				option := command.Args[len(command.Args)-1]
 				rollback := rule.RollbackCommands[index].Args[len(rule.RollbackCommands[index].Args)-1]
-				operation := strings.SplitN(strings.TrimPrefix(option, "--"), "-", 2)[0]
+				operation, _, _ := strings.Cut(option, "=")
 				if operation != previousOperation || commandBytes+max(len(option), len(rollback))+1 > 64*1024 {
 					args := []string{"--zone=" + filter.FirewalldInputZone}
 					if permanent {
