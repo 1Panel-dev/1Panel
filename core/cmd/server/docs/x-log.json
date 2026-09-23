@@ -644,6 +644,13 @@
 		"formatZH": "创建容器网络 name",
 		"formatEN": "create container network [name]"
 	},
+	"/containers/network/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理未使用的容器网络",
+		"formatEN": "Clean unused container networks"
+	},
 	"/containers/network/del": {
 		"bodyKeys": [
 			"names"

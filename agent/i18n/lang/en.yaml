@@ -730,3 +730,13 @@ FileTaskRename: 'Target filename: {{ .name }}'
 ErrFirewallBackendCleanupRequired: "The current backend {{ .current }} still contains 1Panel rules. Clean it up before switching to {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "IPv4 forwarding is disabled. Set net.ipv4.ip_forward=1 before using Docker's firewall backend."
 ErrFirewallRuleSavedApplyFailed: "The new rule configuration was saved, but applying it to the firewall failed. Retry by synchronizing: {{ .detail }}"
+
+NetworkCleanupDeleted: "Deleted network [{{ .name }}] ({{ .id }})"
+NetworkCleanupProtected: "Skipped network [{{ .name }}] ({{ .id }}): reserved network"
+NetworkCleanupConnected: "Skipped network [{{ .name }}] ({{ .id }}): containers connected or network in use; not deleted"
+NetworkCleanupUnsupported: "Skipped network [{{ .name }}] ({{ .id }}): special network"
+NetworkCleanupGone: "Skipped network [{{ .name }}] ({{ .id }}): already removed"
+NetworkCleanupInspectFailed: "Failed to inspect network [{{ .name }}] ({{ .id }}); not deleted"
+NetworkCleanupRemoveFailed: "Failed to remove network [{{ .name }}] ({{ .id }})"
+NetworkCleanupSummary: "Network cleanup finished: deleted {{ .deleted }}, skipped {{ .skipped }}, failed {{ .failed }}"
+NetworkCleanupPartialFailure: "Some networks could not be cleaned; see the task log"

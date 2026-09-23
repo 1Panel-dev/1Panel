@@ -730,3 +730,13 @@ FileTaskRename: '目标文件名：{{ .name }}'
 ErrFirewallBackendCleanupRequired: "当前后端 {{ .current }} 中仍有 1Panel 规则，请先清理后再切换到 {{ .target }}。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 转发未开启，请先设置 net.ipv4.ip_forward=1，再使用 Docker 防火墙后端。"
 ErrFirewallRuleSavedApplyFailed: "新规则配置已保存，但应用到防火墙失败。可通过同步重试：{{ .detail }}"
+
+NetworkCleanupDeleted: "网络 [{{ .name }}] ({{ .id }}) 已删除"
+NetworkCleanupProtected: "跳过网络 [{{ .name }}] ({{ .id }})：默认保留网络，未删除"
+NetworkCleanupConnected: "跳过网络 [{{ .name }}] ({{ .id }})：仍有容器连接或正在使用，未删除"
+NetworkCleanupUnsupported: "跳过网络 [{{ .name }}] ({{ .id }})：特殊网络，未删除"
+NetworkCleanupGone: "跳过网络 [{{ .name }}] ({{ .id }})：网络已不存在"
+NetworkCleanupInspectFailed: "网络 [{{ .name }}] ({{ .id }}) 检查失败，未删除"
+NetworkCleanupRemoveFailed: "网络 [{{ .name }}] ({{ .id }}) 删除失败"
+NetworkCleanupSummary: "网络清理完成：已删除 {{ .deleted }}，已跳过 {{ .skipped }}，失败 {{ .failed }}"
+NetworkCleanupPartialFailure: "部分网络清理失败，请查看任务日志"

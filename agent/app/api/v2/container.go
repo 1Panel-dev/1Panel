@@ -964,3 +964,12 @@ func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
 
 	containerService.StreamLogs(c, streamLog)
 }
+
+func (b *BaseApi) CleanNetworks(c *gin.Context) {
+	result, err := containerService.CleanNetworks()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
