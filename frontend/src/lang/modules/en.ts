@@ -3268,7 +3268,6 @@ const message = {
         versionItem: 'Current Version',
         backupCopies: 'Backup Copies',
         backupCopiesHelper: 'Set the number of upgrade backup copies to keep for version rollback. 0 means keep all.',
-        backupCopiesRule: 'Please keep at least 3 upgrade backup records',
         release: 'Release Notes',
         releaseHelper:
             'Failed to fetch release notes for the current environment. You can manually check the official documentation.',

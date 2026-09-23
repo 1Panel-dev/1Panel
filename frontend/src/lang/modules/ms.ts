@@ -3302,7 +3302,6 @@ const message = {
         backupCopies: 'Salinan Sandaran',
         backupCopiesHelper:
             'Tetapkan bilangan salinan sandaran naik taraf untuk disimpan untuk pemulihan versi. 0 bermakna simpan semua.',
-        backupCopiesRule: 'Sila simpan sekurang-kurangnya 3 rekod sandaran naik taraf',
         release: 'Log Kemaskini Versi',
         releaseHelper:
             'Log kemas kini untuk persekitaran semasa gagal diperoleh. Anda boleh menyemak dokumentasi rasmi secara manual.',

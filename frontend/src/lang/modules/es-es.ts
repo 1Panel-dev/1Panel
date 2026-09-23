@@ -3330,7 +3330,6 @@ const message = {
         backupCopies: 'Copias de Respaldo',
         backupCopiesHelper:
             'Establezca el número de copias de respaldo de actualización para conservar para la reversión de versión. 0 significa conservar todas.',
-        backupCopiesRule: 'Conserve al menos 3 registros de respaldo de actualización',
         release: 'Notas de lanzamiento',
         releaseHelper:
             'No se pudieron obtener las notas de lanzamiento para el entorno actual. Puedes consultarlas manualmente en la documentación oficial.',
