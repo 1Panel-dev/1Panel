@@ -10,7 +10,6 @@ import (
 	"github.com/docker/docker/errdefs"
 )
 
-// NetworkCleanupClient deliberately exposes no disconnect or force operation.
 type NetworkCleanupClient interface {
 	NetworkList(context.Context, network.ListOptions) ([]network.Inspect, error)
 	ContainerList(context.Context, container.ListOptions) ([]container.Summary, error)
@@ -18,8 +17,6 @@ type NetworkCleanupClient interface {
 	NetworkRemove(context.Context, string) error
 }
 
-// CleanUnusedNetworks lists networks and all containers before deleting anything.
-// Docker remains the final arbiter for connections racing this scan.
 func CleanUnusedNetworks(ctx context.Context, cli NetworkCleanupClient, onResult ...func(string, dto.NetworkCleanupItem)) (*dto.NetworkCleanupReport, error) {
 	networks, err := cli.NetworkList(ctx, network.ListOptions{})
 	if err != nil {

@@ -1,6 +1,5 @@
 package dto
 
-// NetworkCleanupReport records partial success; failed entries were not deleted.
 type NetworkCleanupReport struct {
 	Deleted []NetworkCleanupItem `json:"deleted"`
 	Skipped []NetworkCleanupItem `json:"skipped"`
@@ -13,7 +12,6 @@ type NetworkCleanupItem struct {
 	Reason string `json:"reason,omitempty"`
 }
 
-// NetworkCleanupTask identifies an asynchronous task and its log.
 type NetworkCleanupTask struct {
 	TaskID string `json:"taskID"`
 }

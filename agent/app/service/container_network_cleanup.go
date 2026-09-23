@@ -13,7 +13,6 @@ import (
 
 var networkCleanupMu sync.Mutex
 
-// CleanNetworks submits a task independent of the HTTP request lifetime.
 func (u *ContainerService) CleanNetworks() (*dto.NetworkCleanupTask, error) {
 	taskItem, err := task.NewTaskWithOps(i18n.GetMsgByKey("Network"), task.TaskClean, task.TaskScopeContainer, "", 0)
 	if err != nil {
