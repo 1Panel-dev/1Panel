@@ -749,3 +749,13 @@ NetworkCleanupPartialFailure: "Some networks could not be cleaned; see the task 
 ErrSSHPublicKey: "Enter a valid SSH public key"
 ErrSSHPrivateKey: "Invalid SSH private key or incorrect passphrase; encrypted keys require the original passphrase"
 ErrSSHKeyMismatch: "The SSH public and private keys do not match"
+
+NetworkCleanupDeleted: "Deleted network [{{ .name }}] ({{ .id }})"
+NetworkCleanupProtected: "Skipped network [{{ .name }}] ({{ .id }}): reserved network"
+NetworkCleanupConnected: "Skipped network [{{ .name }}] ({{ .id }}): containers connected or network in use; not deleted"
+NetworkCleanupUnsupported: "Skipped network [{{ .name }}] ({{ .id }}): special network"
+NetworkCleanupGone: "Skipped network [{{ .name }}] ({{ .id }}): already removed"
+NetworkCleanupInspectFailed: "Failed to inspect network [{{ .name }}] ({{ .id }}); not deleted"
+NetworkCleanupRemoveFailed: "Failed to remove network [{{ .name }}] ({{ .id }})"
+NetworkCleanupSummary: "Network cleanup finished: deleted {{ .deleted }}, skipped {{ .skipped }}, failed {{ .failed }}"
+NetworkCleanupPartialFailure: "Some networks could not be cleaned; see the task log"
