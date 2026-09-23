@@ -164,6 +164,9 @@ export const searchNetwork = (params: SearchWithPage) => {
 export const listNetwork = () => {
     return http.get<Array<Container.Options>>(`/containers/network`);
 };
+export const cleanNetworks = () => {
+    return http.post<{ taskID: string }>(`/containers/network/clean`, {});
+};
 export const deleteNetwork = (params: Container.BatchDelete) => {
     return http.post(`/containers/network/del`, params);
 };
