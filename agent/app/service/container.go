@@ -92,6 +92,7 @@ type IContainerService interface {
 
 	Inspect(req dto.InspectReq) (string, error)
 	DeleteNetwork(req dto.BatchDelete) error
+	CleanNetworks() (*dto.NetworkCleanupTask, error)
 	CreateNetwork(req dto.NetworkCreate) error
 	DeleteVolume(req dto.BatchDelete) error
 	CreateVolume(req dto.VolumeCreate) error
