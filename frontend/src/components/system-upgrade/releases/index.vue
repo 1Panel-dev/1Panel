@@ -88,7 +88,7 @@ const form = reactive({
 });
 const rules = reactive({
     version: [Rules.requiredInput],
-    backupCopies: [{ validator: checkBackupCopies, trigger: 'blur', required: true }],
+    backupCopies: [Rules.integerNumberWith0],
 });
 
 const acceptParams = (): void => {
@@ -102,16 +102,6 @@ const loadInfo = async () => {
     form.version = res.data.systemVersion;
     form.backupCopies = Number(res.data.upgradeBackupCopies) || 0;
 };
-
-function checkBackupCopies(rule: any, value: any, callback: any) {
-    if (value === 0) {
-        return callback();
-    }
-    if (value < 3) {
-        return callback(new Error(i18n.global.t('setting.backupCopiesRule')));
-    }
-    callback();
-}
 
 const onSave = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
