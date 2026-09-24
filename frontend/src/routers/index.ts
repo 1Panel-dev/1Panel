@@ -30,7 +30,8 @@ const clearLoginStatus = () => {
 };
 
 router.beforeEach(async (to, from) => {
-    const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin } = useGlobalStore();
+    const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin, isOnRestart } =
+        useGlobalStore();
     NProgress.start();
     axiosCanceler.removeAllPending();
 
@@ -88,7 +89,7 @@ router.beforeEach(async (to, from) => {
                 params: to.params,
             };
         }
-        if (!isEnterprise.value || isEnterpriseLicensed.value) {
+        if (!isEnterprise.value || (isEnterpriseLicensed.value && !isOnRestart.value)) {
             NProgress.done();
             return { name: 'home' };
         }
