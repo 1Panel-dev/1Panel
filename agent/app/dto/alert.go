@@ -21,6 +21,7 @@ type AlertBase struct {
 }
 
 type PushAlert struct {
+	Result    string `json:"result,omitempty"`
 	TaskName  string `json:"taskName"`
 	AlertType string `json:"alertType"`
 	EntryID   uint   `json:"entryID"`
@@ -53,6 +54,7 @@ type AlertDTO struct {
 	Method         string    `json:"method"`
 	Title          string    `json:"title"`
 	Project        string    `json:"project"`
+	TaskName       string    `json:"taskName,omitempty"`
 	Status         string    `json:"status"`
 	SendCount      uint      `json:"sendCount"`
 	AdvancedParams string    `json:"advancedParams"`

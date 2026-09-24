@@ -649,6 +649,7 @@ CommonAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .msg }}。자세한 내�
 NodeExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 LicenseExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 라이센스에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 SSHAndPanelLoginAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .loginIp }}에서의 {{ .name }} 로그인에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
+CronJobSuccessAlert: '패널 {{ .node }}{{ .ip }}: 예약 작업 {{ .name }}이(가) 성공적으로 완료되었습니다. 로그인하여 자세한 내용을 확인하십시오.'
 
 # 디스크
 DeviceNotFound: '장치 {{ .name }} 을(를) 찾을 수 없습니다'

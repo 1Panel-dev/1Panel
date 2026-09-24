@@ -649,6 +649,8 @@ CommonAlert: "پنل {{ .node }}{{ .ip }}: {{ .msg }}. برای مشاهده ج�
 NodeExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} گره غیرعادی هستند. برای مشاهده جزئیات وارد شوید."
 LicenseExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} مجوز غیرعادی است. برای مشاهده جزئیات وارد شوید."
 SSHAndPanelLoginAlert: "پنل {{ .node }}{{ .ip }}: ورود غیرعادی {{ .name }} از {{ .loginIp }}. برای مشاهده جزئیات وارد شوید."
+CronJobSuccessAlert: "پنل {{ .node }}{{ .ip }}: وظیفه زمان‌بندی‌شده {{ .name }} با موفقیت تکمیل شد. برای مشاهده جزئیات وارد شوید."
+
 
 # دیسک
 DeviceNotFound: "دستگاه {{ .name }} یافت نشد"

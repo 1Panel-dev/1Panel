@@ -84,6 +84,7 @@
                     <el-table-column
                         :label="$t('commons.table.title')"
                         prop="title"
+                        :formatter="formatTitle"
                         min-width="300px"
                         show-overflow-tooltip
                     ></el-table-column>
@@ -167,6 +168,12 @@ import { ElMessageBox } from 'element-plus';
 import AddTask from '@/views/setting/alert/dash/task/index.vue';
 import { Alert } from '@/api/interface/alert';
 import { UpdateAlertStatus, SearchAlerts, DeleteAlert, PageAlertConfigs } from '@/api/modules/alert';
+import {
+    cronjobAlertTypes,
+    getCronjobAlertMode,
+    getCronjobAlertModeLabel,
+    getCronjobAlertTitle,
+} from '@/utils/cronjob-alert';
 
 const { isMobile, isMaster, isProductPro, isEE } = useGlobalStore();
 
@@ -238,7 +245,21 @@ const changeSort = ({ prop, order }) => {
     search();
 };
 
+const formatTitle = (row: Alert.AlertInfo) => {
+    return getCronjobAlertTitle(row, (type, taskName) =>
+        t('xpack.alert.notificationTitle', [t('cronjob.' + type), taskName]),
+    );
+};
+
 const formatRule = (row: Alert.AlertInfo) => {
+    const type = row.type === 'cronJob' ? row.subType : row.type;
+    if (cronjobAlertTypes.includes(type)) {
+        return t('xpack.alert.notificationRule', [
+            t('cronjob.' + type),
+            t(getCronjobAlertModeLabel(getCronjobAlertMode(row.advancedParams))),
+            row.sendCount,
+        ]);
+    }
     const ruleTemplates = {
         ssl: () => t('xpack.alert.timeRule', [row.cycle, row.sendCount]),
         siteEndTime: () => t('xpack.alert.timeRule', [row.cycle, row.sendCount]),
@@ -253,17 +274,6 @@ const formatRule = (row: Alert.AlertInfo) => {
                 : t('xpack.alert.diskRule', [row.project, row.count, row.cycle === 1 ? 'G' : '%', row.sendCount]);
         },
         clams: () => t('xpack.alert.clamsRule', [row.sendCount]),
-        app: () => t('xpack.alert.cronJobAppRule', [row.sendCount]),
-        website: () => t('xpack.alert.cronJobWebsiteRule', [row.sendCount]),
-        database: () => t('xpack.alert.cronJobDatabaseRule', [row.sendCount]),
-        directory: () => t('xpack.alert.cronJobDirectoryRule', [row.sendCount]),
-        log: () => t('xpack.alert.cronJobLogRule', [row.sendCount]),
-        snapshot: () => t('xpack.alert.cronJobSnapshotRule', [row.sendCount]),
-        shell: () => t('xpack.alert.cronJobShellRule', [row.sendCount]),
-        curl: () => t('xpack.alert.cronJobCurlRule', [row.sendCount]),
-        cutWebsiteLog: () => t('xpack.alert.cronJobCutWebsiteLogRule', [row.sendCount]),
-        clean: () => t('xpack.alert.cronJobCleanRule', [row.sendCount]),
-        ntp: () => t('xpack.alert.cronJobNtpRule', [row.sendCount]),
         nodeException: () => t('xpack.alert.nodeExceptionRule', [row.sendCount]),
         licenseException: () => t('xpack.alert.licenseExceptionRule', [row.sendCount]),
         panelLogin: () => t('xpack.alert.panelLoginRule', [row.sendCount]),

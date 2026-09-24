@@ -649,6 +649,7 @@ CommonAlert: 'Paneliniz {{ .node }}{{ .ip }}, {{ .msg }}. Detaylar için panelin
 NodeExceptionAlert: 'Paneliniz {{ .node }}{{ .ip }}, {{ .num }} düğüm anormal durumda. Detaylar için paneline giriş yapın.'
 LicenseExceptionAlert: 'Paneliniz {{ .node }}{{ .ip }}, {{ .num }} lisans anormal durumda. Detaylar için paneline giriş yapın.'
 SSHAndPanelLoginAlert: 'Paneliniz {{ .node }}{{ .ip }}, {{ .loginIp }} adresinden {{ .name }} girişi anormal. Detaylar için paneline giriş yapın.'
+CronJobSuccessAlert: 'Panel {{ .node }}{{ .ip }}: zamanlanmış görev {{ .name }} başarıyla tamamlandı. Ayrıntıları görmek için giriş yapın.'
 
 # disk
 DeviceNotFound: 'Cihaz {{ .name }} bulunamadı'

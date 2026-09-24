@@ -649,6 +649,7 @@ CommonAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .msg }}. Faça login no painel
 NodeExceptionAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .num }} nós estão anormais. Faça login no painel para obter detalhes.'
 LicenseExceptionAlert: 'Seu Painel {{ .node }}{{ .ip }}, {{ .num }} licenças estão anormais. Faça login no painel para obter detalhes.'
 SSHAndPanelLoginAlert: 'Seu Painel {{ .node }}{{ .ip }}, o login {{ .name }} a partir de {{ .loginIp }} é anormal. Faça login no painel para obter detalhes.'
+CronJobSuccessAlert: 'Painel {{ .node }}{{ .ip }}: a tarefa agendada {{ .name }} foi concluída com sucesso. Faça login para ver os detalhes.'
 
 # disco
 DeviceNotFound: 'Dispositivo {{ .name }} não encontrado'

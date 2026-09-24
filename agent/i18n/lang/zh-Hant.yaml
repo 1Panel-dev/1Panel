@@ -649,6 +649,7 @@ CommonAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .msg }}，詳情請登入�
 NodeExceptionAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 個節點出現異常，詳情請登入面板檢視。'
 LicenseExceptionAlert: '您的 {{ .node }}{{ .ip }} 面板，{{ .num }} 個授權出現異常，詳情請登入面板檢視。'
 SSHAndPanelLoginAlert: '您的 {{ .node }}{{ .ip }} 面板，來自 {{ .loginIp }} 的 {{ .name }} 登入出現異常，詳情請登入面板檢視。'
+CronJobSuccessAlert: '您的 {{ .node }}{{ .ip }} 面板，排程任務 {{ .name }} 執行成功，詳情請登入面板檢視。'
 
 # 磁碟
 DeviceNotFound: '裝置 {{ .name }} 未找到'

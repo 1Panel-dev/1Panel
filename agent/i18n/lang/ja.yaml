@@ -649,6 +649,7 @@ CommonAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .msg }}。詳細�
 NodeExceptionAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .num }} 個のノードに異常が発生しています。詳細はパネルにログインして'
 LicenseExceptionAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .num }} 個のライセンスに異常が発生しています。詳細はパネルにログインして'
 SSHAndPanelLoginAlert: 'あなたの {{ .node }}{{ .ip }} パネル、{{ .loginIp }} からの {{ .name }} ログインに異常があります。詳細はパネルにログインして'
+CronJobSuccessAlert: 'パネル {{ .node }}{{ .ip }}: スケジュールタスク {{ .name }} が正常に完了しました。詳細はパネルにログインして確認してください。'
 
 # ディスク
 DeviceNotFound: 'デバイス {{ .name }} が見つかりません'
