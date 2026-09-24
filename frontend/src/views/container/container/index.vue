@@ -488,7 +488,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { computed, reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -700,46 +700,86 @@ const dialogContainerLogRef = ref();
 const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
-const search = async (column?: any) => {
-    if (!isActive.value || !isExist.value) {
+let requestController: AbortController | undefined;
+let requestVersion = 0;
+let refreshPending = false;
+
+onBeforeUnmount(() => {
+    requestVersion++;
+    requestController?.abort();
+});
+
+const loadContainers = async (background = false, column?: any) => {
+    if (!isActive.value || !isExist.value || (background && refreshPending)) {
         return;
     }
+    requestController?.abort();
+    const controller = new AbortController();
+    requestController = controller;
+    const version = ++requestVersion;
+    const isCurrent = () => version === requestVersion && !controller.signal.aborted;
+    refreshPending = true;
+    loading.value = !background;
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
-    let filterItem = (router.currentRoute.value.query?.filters as string) || '';
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
     paginationConfig.order = column?.order ? column.order : paginationConfig.order;
-    let params = {
+    const params = {
         name: searchName.value,
         state: paginationConfig.state || 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        filters: filterItem,
+        filters: props.filters || (router.currentRoute.value.query?.filters as string) || '',
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
         excludeAppStore: !includeAppStore.value,
     };
-    loading.value = true;
-    const [containerResult, statsResult, statusResult] = await Promise.allSettled([
-        searchContainer(params),
-        containerListStats(),
-        loadContainerStatus(),
-    ]);
-    loading.value = false;
-
-    if (containerResult.status === 'fulfilled') {
-        const containers = containerResult.value.data.items || [];
+    // Counts and resource samples must never hold up the table itself.
+    const statusRequest = loadContainerStatus(undefined, true, controller.signal)
+        .then((res) => {
+            if (isCurrent()) {
+                updateTags(res.data || {});
+            }
+        })
+        .catch(() => {});
+    try {
+        const res = await searchContainer(params, undefined, controller.signal);
+        if (!isCurrent()) {
+            return;
+        }
+        const containers = res.data.items || [];
         syncContainerRows(containers);
-        paginationConfig.total = containerResult.value.data.total;
-    }
-
-    if (statsResult.status === 'fulfilled') {
-        applyStatsToRows(statsResult.value.data || []);
-    }
-
-    if (statusResult.status === 'fulfilled') {
-        updateTags(statusResult.value.data || {});
+        paginationConfig.total = res.data.total;
+        loading.value = false;
+        // Clear old usage when a previously running container has stopped.
+        applyStatsToRows(
+            containers
+                .filter((item) => item.state !== 'running')
+                .map((item) => ({
+                    containerID: item.containerID,
+                    ...Object.fromEntries(statFields.map((field) => [field, 0])),
+                })),
+        );
+        const ids = containers.filter((item) => item.state === 'running').map((item) => item.containerID);
+        if (ids.length > 0) {
+            const stats = await containerListStats(undefined, ids, controller.signal);
+            if (isCurrent()) {
+                applyStatsToRows(stats.data || []);
+            }
+        }
+    } catch {
+        // The HTTP layer reports failures; keep the last successful rows visible.
+    } finally {
+        if (isCurrent()) {
+            loading.value = false;
+        }
+        await statusRequest;
+        if (isCurrent()) {
+            refreshPending = false;
+        }
     }
 };
+
+const search = (column?: any) => loadContainers(false, column);
 
 const searchWithStatus = (item: string) => {
     activeTag.value = item;
@@ -769,21 +809,7 @@ const changePinned = (row: any, isPinned: boolean) => {
     });
 };
 
-const refresh = async () => {
-    let filterItem = props.filters ? props.filters : '';
-    let params = {
-        name: searchName.value,
-        state: paginationConfig.state || 'all',
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-        filters: filterItem,
-        orderBy: paginationConfig.orderBy,
-        order: paginationConfig.order,
-    };
-    const [containerResult, statsResult] = await Promise.all([searchContainer(params), containerListStats()]);
-    syncContainerRows(containerResult.data.items || []);
-    applyStatsToRows(statsResult.data || []);
-};
+const refresh = () => loadContainers(true);
 
 const loadSize = async (row: any) => {
     containerItemStats(row.containerID).then((res) => {
