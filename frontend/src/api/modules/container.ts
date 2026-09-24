@@ -3,13 +3,12 @@ import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const searchContainer = (params: Container.ContainerSearch, currentNode?: string) => {
-    return http.post<ResPage<Container.ContainerInfo>>(
-        `/containers/search`,
-        params,
-        TimeoutEnum.T_40S,
-        currentNode ? { CurrentNode: currentNode } : undefined,
-    );
+export const searchContainer = (params: Container.ContainerSearch, currentNode?: string, signal?: AbortSignal) => {
+    return http.postWithConfig<ResPage<Container.ContainerInfo>>(`/containers/search`, params, {
+        timeout: TimeoutEnum.T_40S,
+        headers: currentNode ? { CurrentNode: currentNode } : undefined,
+        signal,
+    });
 };
 export const listContainer = () => {
     return http.post<Array<Container.ContainerOption>>(`/containers/list`, {});
@@ -44,12 +43,11 @@ export const downloadContainerFile = (params: { containerID: string; path: strin
         timeout: TimeoutEnum.T_40S,
     });
 };
-export const loadContainerStatus = (currentNode?: string) => {
-    return http.get<Container.ContainerStatus>(
-        `/containers/status`,
-        {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
-    );
+export const loadContainerStatus = (currentNode?: string, containersOnly = false, signal?: AbortSignal) => {
+    return http.get<Container.ContainerStatus>(`/containers/status`, containersOnly ? { containersOnly: true } : {}, {
+        headers: currentNode ? { CurrentNode: currentNode } : undefined,
+        signal,
+    });
 };
 export const loadResourceLimit = () => {
     return http.get<Container.ResourceLimit>(`/containers/limit`);
@@ -90,12 +88,11 @@ export const containerItemStats = (containerID: string, currentNode?: string) =>
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
-export const containerListStats = (currentNode?: string) => {
-    return http.get<Array<Container.ContainerListStats>>(
-        `/containers/list/stats`,
-        {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
-    );
+export const containerListStats = (currentNode?: string, ids?: string[], signal?: AbortSignal) => {
+    return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`, ids ? { ids: ids.join(',') } : {}, {
+        headers: currentNode ? { CurrentNode: currentNode } : undefined,
+        signal,
+    });
 };
 export const containerStats = (id: string) => {
     return http.get<Container.ContainerStats>(`/containers/stats/${id}`);
