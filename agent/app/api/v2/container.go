@@ -249,6 +249,7 @@ func (b *BaseApi) ListContainerByImage(c *gin.Context) {
 // @Success 200 {object} dto.ContainerStatus
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param containersOnly query boolean false "Only count containers"
 // @Router /containers/status [get]
 func (b *BaseApi) LoadContainerStatus(c *gin.Context) {
 	data, err := containerService.LoadStatus(c.Request.Context(), c.Query("containersOnly") == "true")
@@ -415,6 +416,7 @@ func (b *BaseApi) LoadResourceLimit(c *gin.Context) {
 // @Success 200 {array} dto.ContainerListStats
 // @Security ApiKeyAuth
 // @Security Timestamp
+// @Param ids query string false "Comma-separated container IDs; omitted selects all containers"
 // @Router /containers/list/stats [get]
 func (b *BaseApi) ContainerListStats(c *gin.Context) {
 	var ids []string
