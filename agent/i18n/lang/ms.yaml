@@ -649,6 +649,7 @@ CommonAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .msg }}. Sila log masuk ke pan
 NodeExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} nod tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 LicenseExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} lesen tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 SSHAndPanelLoginAlert: 'Panel {{ .node }}{{ .ip }} Anda, log masuk {{ .name }} dari {{ .loginIp }} tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+CronJobSuccessAlert: 'Panel {{ .node }}{{ .ip }}: tugas berjadual {{ .name }} berjaya diselesaikan. Log masuk untuk melihat butiran.'
 
 # cakera
 DeviceNotFound: 'Peranti {{ .name }} tidak ditemui'

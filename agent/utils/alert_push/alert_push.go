@@ -26,6 +26,9 @@ func PushAlert(pushAlert dto.PushAlert) error {
 	}
 	var alert dto.AlertDTO
 	_ = copier.Copy(&alert, &alertInfo)
+	if alertUtil.GetCronJobType(pushAlert.AlertType) == "cronJob" && !alertUtil.MatchCronJobAlertResult(alert.AdvancedParams, pushAlert.Result) {
+		return nil
+	}
 
 	methods := strings.Split(alert.Method, ",")
 	for _, m := range methods {
@@ -126,7 +129,7 @@ func sendAlert(alertRepo repo.IAlertRepo, alert dto.AlertDTO, pushAlert dto.Push
 		}
 		transport := xpack.MultiNodeProvider.LoadRequestTransport()
 		agentInfo, _ := xpack.MultiNodeProvider.GetAgentInfo()
-		params := alertUtil.CreateAlertParams(alertUtil.GetCronJobTypeName(pushAlert.Param))
+		params := alertUtil.CreateTaskAlertParams(pushAlert)
 		alertDetail := alertUtil.ProcessAlertDetail(alert, pushAlert.TaskName, params, constant.Bark)
 		alertRule := alertUtil.ProcessAlertRule(alert)
 		create.AlertRule = alertRule

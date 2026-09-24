@@ -689,10 +689,10 @@
 
                         <el-card class="mt-5">
                             <el-row :gutter="20">
-                                <LayoutCol :span="8">
+                                <LayoutCol :span="20">
                                     <el-form-item prop="hasAlert">
                                         <el-checkbox v-model="form.hasAlert" :label="$t('xpack.alert.isAlert')" />
-                                        <span class="input-help">{{ $t('xpack.alert.cronJobHelper') }}</span>
+                                        <span class="input-help">{{ $t('xpack.alert.alertNotificationHelper') }}</span>
 
                                         <span class="input-help logText" v-if="form.hasAlert && !isProductPro">
                                             {{ $t('xpack.alert.licenseHelper') }}
@@ -700,6 +700,20 @@
                                                 {{ $t('license.levelUpPro') }}
                                             </el-link>
                                         </span>
+                                    </el-form-item>
+                                </LayoutCol>
+                            </el-row>
+                            <el-row :gutter="20" v-if="form.hasAlert">
+                                <LayoutCol>
+                                    <el-form-item :label="$t('xpack.alert.alertTriggerMode')" prop="alertTriggerMode">
+                                        <el-select class="selectClass" v-model="form.alertTriggerMode">
+                                            <el-option
+                                                v-for="item in cronjobAlertModes"
+                                                :key="item.value"
+                                                :value="item.value"
+                                                :label="$t(item.label)"
+                                            />
+                                        </el-select>
                                     </el-form-item>
                                 </LayoutCol>
                             </el-row>
@@ -871,6 +885,7 @@ import { getGroupList } from '@/api/modules/group';
 import { routerToName, routerToPath } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
 import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
+import { cronjobAlertModes, normalizeCronjobAlertMode } from '@/utils/cronjob-alert';
 const router = useRouter();
 
 const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
@@ -1034,6 +1049,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     secret: '',
     hasAlert: false,
     alertCount: 3,
+    alertTriggerMode: 'failed',
     alertTitle: '',
     alertMethod: '',
     alertMethodItems: [],
@@ -1133,6 +1149,7 @@ const search = async () => {
                 form.secret = res.data.secret;
                 form.hasAlert = res.data.alertCount > 0;
                 form.alertCount = res.data.alertCount || 3;
+                form.alertTriggerMode = normalizeCronjobAlertMode(res.data.alertTriggerMode);
                 form.alertTitle = res.data.alertTitle;
                 if (res.data.alertMethod) {
                     form.alertMethodItems = normalizeAlertMethodItems(res.data.alertMethod.split(',') || []);
@@ -1671,7 +1688,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         form.alertCount = form.hasAlert ? form.alertCount : 0;
         form.alertMethod = form.alertMethodItems.join(',');
         form.alertTitle = form.hasAlert
-            ? i18n.global.t('cronjob.alertTitle', [i18n.global.t('cronjob.' + form.type), form.name])
+            ? i18n.global.t('xpack.alert.notificationTitle', [i18n.global.t('cronjob.' + form.type), form.name])
             : '';
         if (!form) return;
 

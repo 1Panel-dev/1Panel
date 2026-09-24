@@ -78,7 +78,6 @@
                     <template v-else-if="form.type === 'sms'">
                         <el-form-item :label="$t('xpack.alert.displayName')" prop="smsDisplayName">
                             <el-input v-model.trim="form.smsDisplayName" />
-                            <span class="input-help">{{ $t('xpack.alert.displayNameHelper') }}</span>
                         </el-form-item>
                         <el-form-item :label="$t('xpack.alert.phone')" prop="smsPhone">
                             <el-input clearable v-model.trim="form.smsPhone" />

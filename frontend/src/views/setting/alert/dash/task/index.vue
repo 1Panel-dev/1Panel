@@ -60,6 +60,8 @@
                             <el-option value="clean" :label="$t('setting.diskClean')" />
                             <el-option value="snapshot" :label="$t('cronjob.snapshot')" />
                             <el-option value="ntp" :label="$t('cronjob.ntp')" />
+                            <el-option value="syncIpGroup" :label="$t('cronjob.syncIpGroup')" />
+                            <el-option value="cleanLog" :label="$t('cronjob.cleanLog')" />
                         </el-select>
                     </el-form-item>
 
@@ -305,6 +307,22 @@
                         <span class="input-help">{{ $t('xpack.alert.ipWhiteListHelper') }}</span>
                     </el-form-item>
 
+                    <el-form-item
+                        v-if="dialogData.rowData!.type === 'cronJob'"
+                        :label="$t('xpack.alert.alertTriggerMode')"
+                        prop="alertTriggerMode"
+                    >
+                        <el-select class="selectClass" v-model="dialogData.rowData!.alertTriggerMode">
+                            <el-option
+                                v-for="item in cronjobAlertModes"
+                                :key="item.value"
+                                :value="item.value"
+                                :label="$t(item.label)"
+                            />
+                        </el-select>
+                        <span class="input-help">{{ $t('xpack.alert.alertNotificationHelper') }}</span>
+                    </el-form-item>
+
                     <el-form-item :label="$t('xpack.alert.sendCount')" prop="sendCount">
                         <el-input v-model.number="dialogData.rowData!.sendCount" />
                         <span class="input-help">
@@ -398,6 +416,7 @@ import { routerToName } from '@/utils/router';
 import { checkCidr, checkCidrV6, checkIpV4V6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
+import { cronjobAlertTypes, cronjobAlertModes, getCronjobAlertMode, setCronjobAlertMode } from '@/utils/cronjob-alert';
 
 const { isMaster, isProductPro, isEE, isIntl } = useGlobalStore();
 
@@ -524,19 +543,7 @@ const noParamTypes = ['panelUpdate'];
 const intervalTypes = ['cpu', 'memory', 'load', 'disk', 'sshLogin', 'panelLogin', 'nodeException', 'licenseException'];
 
 const diskTypes = ['disk'];
-const cronjobTypes = [
-    'shell',
-    'app',
-    'website',
-    'database',
-    'directory',
-    'log',
-    'snapshot',
-    'curl',
-    'cutWebsiteLog',
-    'clean',
-    'ntp',
-];
+const cronjobTypes = cronjobAlertTypes;
 
 const acceptParams = (params: DialogProps): void => {
     dialogData.value = params;
@@ -556,6 +563,7 @@ const acceptParams = (params: DialogProps): void => {
         dialogData.value.rowData.subType = dialogData.value.rowData.type;
         dialogData.value.rowData.type = 'cronJob';
     }
+    dialogData.value.rowData.alertTriggerMode = getCronjobAlertMode(dialogData.value.rowData.advancedParams);
     initOptions(dialogData.value.rowData.type, dialogData.value.rowData.subType);
     visible.value = true;
 };
@@ -655,6 +663,7 @@ function checkSendCount(rule: any, value: any, callback: any) {
 }
 
 function checkIPs(rule: any, value: any, callback: any) {
+    if (!ipTypes.includes(dialogData.value.rowData.type)) return callback();
     if (typeof value === 'string' && value.trim() !== '') {
         let addr = value.split('\n');
         for (const item of addr) {
@@ -793,6 +802,12 @@ const changeType = () => {
             type = subType;
             rowData.subType = subType;
         }
+        if (cronjobTypes.includes(type)) {
+            rowData.project = '';
+            rowData.cycle = 0;
+            rowData.count = 0;
+            rowData.alertTriggerMode = rowData.alertTriggerMode || 'failed';
+        }
         rowData.project = typeof typeToProjectMap[type] !== 'undefined' ? typeToProjectMap[type] : rowData.project;
         rowData.cycle = typeof typeToCycleMap[type] !== 'undefined' ? typeToCycleMap[type] : rowData.cycle;
         rowData.count = typeof typeToCountMap[type] !== 'undefined' ? typeToCountMap[type] : rowData.count;
@@ -838,12 +853,13 @@ const loadCronJob = async (jobType: string) => {
         status: '',
     });
     cronJobOptions.value = res.data || [];
-    dialogData.value.rowData.project = dialogData.value.rowData.project || String(cronJobOptions.value[0].id);
+    dialogData.value.rowData.project = dialogData.value.rowData.project || String(cronJobOptions.value[0]?.id || '');
 };
 
 const formatTitle = (row: Alert.AlertInfo) => {
-    if (row.type === 'cronJob') {
-        row.type = row.subType;
+    const type = row.type === 'cronJob' ? row.subType : row.type;
+    if (cronjobTypes.includes(type)) {
+        return t('xpack.alert.notificationTitle', [t('cronjob.' + type), formatCronJobName(Number(row.project))]);
     }
     const titleTemplates = {
         ssl: () => {
@@ -865,17 +881,6 @@ const formatTitle = (row: Alert.AlertInfo) => {
             return row.project === 'all' ? t('xpack.alert.allDiskTitle') : t('xpack.alert.diskTitle', [row.project]);
         },
         clams: () => t('xpack.alert.clamsTitle', [formatClamName(Number(row.project))]),
-        app: () => t('xpack.alert.cronJobAppTitle', [formatCronJobName(Number(row.project))]),
-        website: () => t('xpack.alert.cronJobWebsiteTitle', [formatCronJobName(Number(row.project))]),
-        database: () => t('xpack.alert.cronJobDatabaseTitle', [formatCronJobName(Number(row.project))]),
-        directory: () => t('xpack.alert.cronJobDirectoryTitle', [formatCronJobName(Number(row.project))]),
-        log: () => t('xpack.alert.cronJobLogTitle', [formatCronJobName(Number(row.project))]),
-        snapshot: () => t('xpack.alert.cronJobSnapshotTitle', [formatCronJobName(Number(row.project))]),
-        shell: () => t('xpack.alert.cronJobShellTitle', [formatCronJobName(Number(row.project))]),
-        curl: () => t('xpack.alert.cronJobCurlTitle', [formatCronJobName(Number(row.project))]),
-        cutWebsiteLog: () => t('xpack.alert.cronJobCutWebsiteLogTitle', [formatCronJobName(Number(row.project))]),
-        clean: () => t('xpack.alert.cronJobCleanTitle', [formatCronJobName(Number(row.project))]),
-        ntp: () => t('xpack.alert.cronJobNtpTitle', [formatCronJobName(Number(row.project))]),
         nodeException: () => t('xpack.alert.nodeException'),
         licenseException: () => t('xpack.alert.licenseException'),
         panelLogin: () => t('xpack.alert.panelLogin'),
@@ -909,25 +914,31 @@ const emit = defineEmits<{ (e: 'search'): void }>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (loading.value) return;
-    loading.value = true;
     if (!formEl) return;
+    loading.value = true;
     await formEl.validate(async (valid) => {
-        if (!valid) return;
-        if (!dialogData.value.rowData) return;
+        if (!valid || !dialogData.value.rowData) {
+            loading.value = false;
+            return;
+        }
         const sendMethods = dialogData.value.rowData.sendMethod.includes(ALL_SEND_METHOD)
             ? allConfigValues.value
             : dialogData.value.rowData.sendMethod;
-        dialogData.value.rowData.method = sendMethods.join(',');
-        dialogData.value.rowData.title = formatTitle(dialogData.value.rowData);
-        if (dialogData.value.rowData.type === 'cronJob') {
-            dialogData.value.rowData.type = dialogData.value.rowData.subType;
+        const payload = {
+            ...dialogData.value.rowData,
+            method: sendMethods.join(','),
+            title: formatTitle(dialogData.value.rowData),
+        };
+        if (payload.type === 'cronJob') {
+            payload.type = payload.subType;
+            payload.advancedParams = setCronjobAlertMode(payload.advancedParams, payload.alertTriggerMode || 'failed');
         }
         try {
             if (dialogData.value.title === 'create') {
-                await CreateAlert(dialogData.value.rowData);
+                await CreateAlert(payload);
                 MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
             } else if (dialogData.value.title === 'edit') {
-                await UpdateAlert(dialogData.value.rowData);
+                await UpdateAlert(payload);
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
             }
             emit('search');

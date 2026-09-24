@@ -1,4 +1,5 @@
 import { ReqPage } from '.';
+import type { CronjobAlertTriggerMode } from '@/utils/cronjob-alert';
 
 export namespace Cronjob {
     export interface Search extends ReqPage {
@@ -62,6 +63,7 @@ export namespace Cronjob {
         secret: string;
         hasAlert: boolean;
         alertCount: number;
+        alertTriggerMode?: CronjobAlertTriggerMode;
         alertTitle: string;
         alertMethod: string;
         alertMethodItems: Array<string>;
@@ -111,6 +113,7 @@ export namespace Cronjob {
         secret: string;
 
         alertCount: number;
+        alertTriggerMode?: CronjobAlertTriggerMode;
         alertTitle: string;
         alertMethod: string;
 
@@ -154,6 +157,7 @@ export namespace Cronjob {
         downloadAccount: string;
 
         alertCount: number;
+        alertTriggerMode?: CronjobAlertTriggerMode;
     }
     export interface TransHelper {
         name: string;

@@ -1,4 +1,5 @@
 import { CommonModel, ReqPage } from '@/api/interface';
+import type { CronjobAlertTriggerMode } from '@/utils/cronjob-alert';
 
 export namespace Alert {
     export interface AlertInfo extends CommonModel {
@@ -9,22 +10,25 @@ export namespace Alert {
         interval: number;
         method: string;
         title: string;
+        taskName?: string;
         project: string;
         status: string;
         sendCount: number;
         sendMethod: string[];
         advancedParams: string;
+        alertTriggerMode?: CronjobAlertTriggerMode;
         createUser?: string;
         updateUser?: string;
     }
 
     export interface AlertDetail {
         type: string;
+        subType?: string;
         licenseId: string;
         title: string;
         project: string;
         method: string;
-        params: string;
+        params: { index: string; key: string; value: string }[] | string;
     }
 
     export interface AlertUpdateStatusReq {
@@ -74,6 +78,7 @@ export namespace Alert {
         project: string;
         status: string;
         sendCount: number;
+        advancedParams?: string;
     }
 
     export interface AlertUpdateReq extends CommonModel {
@@ -86,6 +91,7 @@ export namespace Alert {
         project: string;
         status: string;
         sendCount: number;
+        advancedParams?: string;
     }
 
     export interface DelReq {
