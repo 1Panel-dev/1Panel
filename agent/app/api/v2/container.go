@@ -965,6 +965,24 @@ func (b *BaseApi) ContainerStreamLogs(c *gin.Context) {
 	containerService.StreamLogs(c, streamLog)
 }
 
+// CleanNetworks submits a network cleanup task.
+// @Tags Container Network
+// @Summary Submit unused network cleanup task
+// @Produce json
+// @Success 200 {object} dto.NetworkCleanupTask
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/network/clean [post]
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清理未使用的容器网络","formatEN":"Clean unused container networks"}
+func (b *BaseApi) CleanNetworks(c *gin.Context) {
+	result, err := containerService.CleanNetworks()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
 func (b *BaseApi) CleanNetworks(c *gin.Context) {
 	result, err := containerService.CleanNetworks()
 	if err != nil {
