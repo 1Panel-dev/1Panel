@@ -1,13 +1,9 @@
 package v2
 
 import (
-	"sort"
-
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/gin-gonic/gin"
-	"github.com/shirou/gopsutil/v4/disk"
-	"github.com/shirou/gopsutil/v4/net"
 )
 
 // @Tags Monitor
@@ -91,14 +87,7 @@ func (b *BaseApi) UpdateMonitorSetting(c *gin.Context) {
 // @Security Timestamp
 // @Router /hosts/monitor/netoptions [get]
 func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
-	netStat, _ := net.IOCounters(true)
-	var options []string
-	options = append(options, "all")
-	for _, net := range netStat {
-		options = append(options, net.Name)
-	}
-	sort.Strings(options)
-	helper.SuccessWithData(c, options)
+	helper.SuccessWithData(c, monitorService.LoadNetworkOptions())
 }
 
 // @Tags Monitor
@@ -108,12 +97,5 @@ func (b *BaseApi) GetNetworkOptions(c *gin.Context) {
 // @Security Timestamp
 // @Router /hosts/monitor/iooptions [get]
 func (b *BaseApi) GetIOOptions(c *gin.Context) {
-	diskStat, _ := disk.IOCounters()
-	var options []string
-	options = append(options, "all")
-	for _, net := range diskStat {
-		options = append(options, net.Name)
-	}
-	sort.Strings(options)
-	helper.SuccessWithData(c, options)
+	helper.SuccessWithData(c, monitorService.LoadIOOptions())
 }

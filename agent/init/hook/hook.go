@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -13,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/alert_push"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"gorm.io/gorm"
 )
 
 func Init() {
@@ -174,6 +176,36 @@ func initAlertTask() {
 }
 
 func initMonitorDB() {
-	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, &model.MonitorNetwork{}, &model.MonitorGPU{}, &model.MonitorIO{})
+	_ = global.MonitorDB.AutoMigrate(&model.MonitorBase{}, &model.MonitorNetwork{}, &model.MonitorIO{})
+	_ = global.GPUMonitorDB.AutoMigrate(&model.MonitorGPU{})
 	_ = global.TaskDB.AutoMigrate(&model.Task{})
+	// building indexes on large monitor tables can take seconds, keep it off the startup path;
+	// WAL mode leaves readers unblocked and busy_timeout covers the collector's inserts meanwhile
+	go ensureMonitorIndexes()
+}
+
+func ensureMonitorIndexes() {
+	indexes := []struct {
+		db   *gorm.DB
+		stmt string
+	}{
+		// created_at alone serves unfiltered range queries and retention cleanup
+		{global.MonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_bases_created ON monitor_bases(created_at)"},
+		{global.MonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_ios_created ON monitor_ios(created_at)"},
+		{global.MonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_networks_created ON monitor_networks(created_at)"},
+		{global.GPUMonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_gpus_created ON monitor_gpus(created_at)"},
+		// (name, created_at) serves per-device range queries and distinct name lookups
+		{global.MonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_ios_name_created ON monitor_ios(name, created_at)"},
+		{global.MonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_networks_name_created ON monitor_networks(name, created_at)"},
+		{global.GPUMonitorDB, "CREATE INDEX IF NOT EXISTS idx_monitor_gpus_product_created ON monitor_gpus(product_name, created_at)"},
+	}
+	start := time.Now()
+	for _, index := range indexes {
+		if err := index.db.Exec(index.stmt).Error; err != nil {
+			global.LOG.Warnf("create monitor index failed, stmt: %s, err: %v", index.stmt, err)
+		}
+	}
+	if elapsed := time.Since(start); elapsed > time.Second {
+		global.LOG.Infof("monitor indexes ready, took %s", elapsed)
+	}
 }

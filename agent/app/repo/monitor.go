@@ -15,6 +15,9 @@ type IMonitorRepo interface {
 	GetGPU(opts ...DBOption) ([]model.MonitorGPU, error)
 	GetIO(opts ...DBOption) ([]model.MonitorIO, error)
 	GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, error)
+	GetIONames() ([]string, error)
+	GetNetworkNames() ([]string, error)
+	GetGPUProductNames() ([]string, error)
 
 	CreateMonitorBase(model model.MonitorBase) error
 	BatchCreateMonitorGPU(list []model.MonitorGPU) error
@@ -67,6 +70,24 @@ func (u *MonitorRepo) GetGPU(opts ...DBOption) ([]model.MonitorGPU, error) {
 	}
 	err := db.Find(&data).Error
 	return data, err
+}
+
+func (u *MonitorRepo) GetIONames() ([]string, error) {
+	var names []string
+	err := global.MonitorDB.Model(&model.MonitorIO{}).Distinct().Pluck("name", &names).Error
+	return names, err
+}
+
+func (u *MonitorRepo) GetNetworkNames() ([]string, error) {
+	var names []string
+	err := global.MonitorDB.Model(&model.MonitorNetwork{}).Distinct().Pluck("name", &names).Error
+	return names, err
+}
+
+func (u *MonitorRepo) GetGPUProductNames() ([]string, error) {
+	var names []string
+	err := global.GPUMonitorDB.Model(&model.MonitorGPU{}).Distinct().Pluck("product_name", &names).Error
+	return names, err
 }
 
 func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {

@@ -138,6 +138,7 @@ function initChart() {
                 areaStyle: seriesStyle[index],
                 data: item?.data,
                 showSymbol: false,
+                sampling: 'lttb',
                 yAxisIndex: item.yAxisIndex ? 1 : null,
             });
         });
@@ -226,6 +227,7 @@ function initChart() {
     };
     const tooltip = props.option.tooltip || defaultTooltip;
     const option = {
+        animation: (props.option.xData?.length ?? 0) <= 3000,
         title: [
             {
                 left: 'center',
