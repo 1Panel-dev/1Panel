@@ -41,11 +41,20 @@ export const updateBindDomain = (req: AI.BindDomain) => {
 export const loadGPUInfo = () => {
     return http.get<AI.Info>(`/ai/gpu/load`);
 };
-export const getGPUOptions = () => {
-    return http.get<AI.MonitorGPUOptions>(`/ai/gpu/options`);
+export const getGPUOptions = (currentNode?: string) => {
+    return http.get<AI.MonitorGPUOptions>(
+        `/ai/gpu/options`,
+        {},
+        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+    );
 };
-export const loadGPUMonitor = (param: AI.MonitorGPUSearch) => {
-    return http.post<AI.MonitorGPUData>(`/ai/gpu/search`, param);
+export const loadGPUMonitor = (param: AI.MonitorGPUSearch, currentNode?: string) => {
+    return http.post<AI.MonitorGPUData>(
+        `/ai/gpu/search`,
+        param,
+        TimeoutEnum.T_60S,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const pageMcpServer = (req: AI.McpServerSearch) => {
