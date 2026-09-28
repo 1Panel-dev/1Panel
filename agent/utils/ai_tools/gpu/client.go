@@ -64,6 +64,7 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 		if result.info == nil {
 			continue
 		}
+		merged.Warnings = append(merged.Warnings, result.info.Warnings...)
 		if result.info.Type != "" {
 			types = append(types, result.info.Type)
 		}
@@ -85,6 +86,9 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 	merged.DriverVersion = mergeDriverVersions(driverVersions)
 	if len(merged.Devices) == 0 && len(errs) > 0 {
 		return nil, fmt.Errorf("calling GPU monitoring tools failed: %w", errors.Join(errs...))
+	}
+	for _, err := range errs {
+		merged.Warnings = append(merged.Warnings, err.Error())
 	}
 	return merged, nil
 }

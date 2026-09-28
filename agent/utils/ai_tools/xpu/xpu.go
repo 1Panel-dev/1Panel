@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 	"sync"
@@ -51,12 +52,15 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 
 	processData, err := cmdMgr.RunWithStdout(xpuSMICommand, "ps", "-j")
 	if err != nil {
-		global.LOG.Warnf("calling xpu-smi ps failed, process information will be omitted: %v", err)
+		res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi ps: %v", err))
 	} else {
 		var psList DeviceUtilByProcList
 		if err := json.Unmarshal([]byte(processData), &psList); err != nil {
-			global.LOG.Warnf("processData json unmarshal failed, process information will be omitted: %v", err)
+			res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi ps output: %v", err))
 		} else {
+			for i := range res.Devices {
+				res.Devices[i].ProcessStatus = "ok"
+			}
 			for _, ps := range psList.DeviceUtilByProcList {
 				process := Process{
 					PID:     ps.ProcessID,
@@ -87,7 +91,9 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 	defer wg.Done()
 
 	xpu := Device{
+		ProcessStatus: "unavailable",
 		Basic: Basic{
+			UUID:          device.UUID,
 			DeviceID:      device.DeviceID,
 			DeviceName:    device.DeviceName,
 			VendorName:    device.VendorName,
@@ -115,13 +121,19 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 	wgCmd.Wait()
 
 	if xpuErr != nil {
-		global.LOG.Errorf("calling xpu-smi discovery failed for device %d, %v", device.DeviceID, xpuErr)
+		mu.Lock()
+		res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi device %d: %v", device.DeviceID, xpuErr))
+		res.Devices = append(res.Devices, xpu)
+		mu.Unlock()
 		return
 	}
 
 	var info discoveryDevice
 	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
-		global.LOG.Errorf("xpuData json unmarshal failed for device %d, err: %v", device.DeviceID, err)
+		mu.Lock()
+		res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi device %d output: %v", device.DeviceID, err))
+		res.Devices = append(res.Devices, xpu)
+		mu.Unlock()
 		return
 	}
 
@@ -142,13 +154,22 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 	}
 
 	if statsErr != nil {
-		global.LOG.Warnf("calling xpu-smi stats failed for device %d, metrics will be omitted: %v", device.DeviceID, statsErr)
+		mu.Lock()
+		res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi stats %d: %v", device.DeviceID, statsErr))
+		mu.Unlock()
 	} else {
 		var stats DeviceStats
 		if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-			global.LOG.Warnf("statsData json unmarshal failed for device %d, metrics will be omitted: %v", device.DeviceID, err)
+			mu.Lock()
+			res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi stats %d output: %v", device.DeviceID, err))
+			mu.Unlock()
 		} else {
 			loadStats(&xpu.Stats, stats.DeviceLevel)
+			for _, tile := range stats.TileLevel {
+				item := TileStats{TileID: tile.TileID}
+				loadStats(&item.Stats, tile.DataList)
+				xpu.Tiles = append(xpu.Tiles, item)
+			}
 		}
 	}
 
@@ -162,19 +183,38 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 
 func loadStats(stats *Stats, metrics []DeviceLevelMetric) {
 	for _, stat := range metrics {
+		if stat.Value == nil || math.IsNaN(*stat.Value) || math.IsInf(*stat.Value, 0) {
+			continue
+		}
+		value := *stat.Value
+		if value < 0 && stat.MetricsType != "XPUM_STATS_GPU_CORE_TEMPERATURE" && stat.MetricsType != "XPUM_STATS_MEMORY_TEMPERATURE" {
+			continue
+		}
 		switch stat.MetricsType {
+		case "XPUM_STATS_MEMORY_TEMPERATURE":
+			stats.MemoryTemperature = fmt.Sprintf("%.1f°C", value)
+		case "XPUM_STATS_ENGINE_GROUP_COMPUTE_ALL_UTILIZATION":
+			stats.ComputeUtil = fmt.Sprintf("%.1f%%", value)
+		case "XPUM_STATS_ENGINE_GROUP_MEDIA_ALL_UTILIZATION":
+			stats.MediaUtil = fmt.Sprintf("%.1f%%", value)
+		case "XPUM_STATS_ENGINE_GROUP_COPY_ALL_UTILIZATION":
+			stats.CopyUtil = fmt.Sprintf("%.1f%%", value)
+		case "XPUM_STATS_MEDIA_ENGINE_FREQUENCY":
+			stats.MediaFrequency = fmt.Sprintf("%.1fMHz", value)
 		case "XPUM_STATS_POWER":
-			stats.Power = fmt.Sprintf("%.1fW", stat.Value)
+			stats.Power = fmt.Sprintf("%.1fW", value)
 		case "XPUM_STATS_GPU_UTILIZATION":
-			stats.GPUUtil = fmt.Sprintf("%.1f%%", stat.Value)
+			stats.GPUUtil = fmt.Sprintf("%.1f%%", value)
 		case "XPUM_STATS_GPU_FREQUENCY":
-			stats.Frequency = fmt.Sprintf("%.1fMHz", stat.Value)
+			stats.Frequency = fmt.Sprintf("%.1fMHz", value)
 		case "XPUM_STATS_GPU_CORE_TEMPERATURE":
-			stats.Temperature = fmt.Sprintf("%.1f°C", stat.Value)
+			stats.Temperature = fmt.Sprintf("%.1f°C", value)
 		case "XPUM_STATS_MEMORY_USED":
-			stats.MemoryUsed = fmt.Sprintf("%.1f MiB", stat.Value)
-		case "XPUM_STATS_MEMORY_UTILIZATION", "XPUM_STATS_MEMORY_BANDWIDTH", "XPUM_STATS_MEMORY_BANDWIDTH_UTILIZATION":
-			stats.MemoryUtil = fmt.Sprintf("%.1f%%", stat.Value)
+			stats.MemoryUsed = fmt.Sprintf("%.1f MiB", value)
+		case "XPUM_STATS_MEMORY_UTILIZATION":
+			stats.MemoryUtil = fmt.Sprintf("%.1f%%", value)
+		case "XPUM_STATS_MEMORY_BANDWIDTH", "XPUM_STATS_MEMORY_BANDWIDTH_UTILIZATION":
+			stats.MemoryBandwidthUtil = fmt.Sprintf("%.1f%%", value)
 		}
 	}
 }

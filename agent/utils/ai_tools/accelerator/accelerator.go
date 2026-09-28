@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/npu"
@@ -52,6 +53,11 @@ func (c Client) LoadInfo() (*Info, error) {
 }
 
 func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	defer cancel()
 	results := make([]providerResult, len(c.providers))
 	var wg sync.WaitGroup
 	for index, item := range c.providers {
@@ -66,8 +72,11 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		}()
 	}
 	wg.Wait()
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 
-	snapshot := &Snapshot{DriverVersions: make(map[string]string)}
+	snapshot := &Snapshot{}
 	var (
 		errs       []error
 		active     []*ProviderSnapshot
@@ -77,6 +86,11 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		if result.err != nil {
 			errs = append(errs, result.err)
 			continue
+		}
+		if result.snapshot != nil {
+			for _, warning := range result.snapshot.Warnings {
+				errs = append(errs, errors.New(warning))
+			}
 		}
 		if result.snapshot == nil || len(result.snapshot.Devices) == 0 {
 			continue
@@ -90,11 +104,8 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		if item.CudaVersion != "" {
 			snapshot.Info.CudaVersion = item.CudaVersion
 		}
-		if item.DriverVersion != "" {
-			snapshot.DriverVersions[item.Type] = item.DriverVersion
-			if item.Type == "xpu" {
-				xpuVersion = item.DriverVersion
-			}
+		if item.Type == "xpu" {
+			xpuVersion = item.DriverVersion
 		}
 	}
 	snapshot.Warnings = append(snapshot.Warnings, errs...)
@@ -102,6 +113,10 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		return nil, fmt.Errorf("calling accelerator monitoring tools failed: %w", errors.Join(errs...))
 	}
 
+	snapshot.Info.CollectedAt = time.Now()
+	for _, err := range errs {
+		snapshot.Info.Warnings = append(snapshot.Info.Warnings, err.Error())
+	}
 	snapshot.Info.XPUDriverVersion = xpuVersion
 	snapshot.Info.Type, snapshot.Info.DriverVersion = mergeProviderMetadata(active)
 	return snapshot, nil
