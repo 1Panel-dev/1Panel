@@ -1908,3 +1908,10 @@ var AddDockerPortGuardReadOnly = &gormigrate.Migration{
 		return tx.Migrator().CreateIndex(&model.DockerPortGuardPolicy{}, "idx_docker_port_guard_endpoint")
 	},
 }
+
+var AddAcceleratorMetrics = &gormigrate.Migration{
+	ID: "20260928-accelerator-vendor-metrics",
+	Migrate: func(tx *gorm.DB) error {
+		return global.GPUMonitorDB.AutoMigrate(&model.MonitorGPU{})
+	},
+}

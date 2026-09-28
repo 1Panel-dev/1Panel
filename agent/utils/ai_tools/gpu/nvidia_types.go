@@ -1,9 +1,12 @@
 package gpu
 
+import "encoding/xml"
+
 type nvidiaSMIResponse struct {
-	AttachedGpus  string `xml:"attached_gpus"`
-	CudaVersion   string `xml:"cuda_version"`
-	DriverVersion string `xml:"driver_version"`
+	XMLName       xml.Name `xml:"nvidia_smi_log"`
+	AttachedGpus  string   `xml:"attached_gpus"`
+	CudaVersion   string   `xml:"cuda_version"`
+	DriverVersion string   `xml:"driver_version"`
 	Gpu           []struct {
 		ID                       string   `xml:"id,attr"`
 		AccountedProcesses       struct{} `xml:"accounted_processes"`
@@ -37,16 +40,17 @@ type nvidiaSMIResponse struct {
 			VideoClock    string `xml:"video_clock"`
 		} `xml:"clocks"`
 		ClocksEventReasons struct {
-			ClocksEventReasonApplicationsClocksSetting string `xml:"clocks_event_reason_applications_clocks_setting"`
-			ClocksEventReasonDisplayClocksSetting      string `xml:"clocks_event_reason_display_clocks_setting"`
-			ClocksEventReasonGpuIdle                   string `xml:"clocks_event_reason_gpu_idle"`
-			ClocksEventReasonHwPowerBrakeSlowdown      string `xml:"clocks_event_reason_hw_power_brake_slowdown"`
-			ClocksEventReasonHwSlowdown                string `xml:"clocks_event_reason_hw_slowdown"`
-			ClocksEventReasonHwThermalSlowdown         string `xml:"clocks_event_reason_hw_thermal_slowdown"`
-			ClocksEventReasonSwPowerCap                string `xml:"clocks_event_reason_sw_power_cap"`
-			ClocksEventReasonSwThermalSlowdown         string `xml:"clocks_event_reason_sw_thermal_slowdown"`
-			ClocksEventReasonSyncBoost                 string `xml:"clocks_event_reason_sync_boost"`
+			Reasons []struct {
+				XMLName xml.Name
+				Value   string `xml:",chardata"`
+			} `xml:",any"`
 		} `xml:"clocks_event_reasons"`
+		ClocksThrottleReasons struct {
+			Reasons []struct {
+				XMLName xml.Name
+				Value   string `xml:",chardata"`
+			} `xml:",any"`
+		} `xml:"clocks_throttle_reasons"`
 		ComputeMode               string `xml:"compute_mode"`
 		DefaultApplicationsClocks struct {
 			GraphicsClock string `xml:"graphics_clock"`
@@ -63,12 +67,24 @@ type nvidiaSMIResponse struct {
 		} `xml:"driver_model"`
 		EccErrors struct {
 			Aggregate struct {
+				SingleBit struct {
+					Total string `xml:"total"`
+				} `xml:"single_bit"`
+				DoubleBit struct {
+					Total string `xml:"total"`
+				} `xml:"double_bit"`
 				DramCorrectable   string `xml:"dram_correctable"`
 				DramUncorrectable string `xml:"dram_uncorrectable"`
 				SramCorrectable   string `xml:"sram_correctable"`
 				SramUncorrectable string `xml:"sram_uncorrectable"`
 			} `xml:"aggregate"`
 			Volatile struct {
+				SingleBit struct {
+					Total string `xml:"total"`
+				} `xml:"single_bit"`
+				DoubleBit struct {
+					Total string `xml:"total"`
+				} `xml:"double_bit"`
 				DramCorrectable   string `xml:"dram_correctable"`
 				DramUncorrectable string `xml:"dram_uncorrectable"`
 				SramCorrectable   string `xml:"sram_correctable"`
@@ -226,7 +242,8 @@ type nvidiaSMIResponse struct {
 			MinPowerLimit      string `xml:"min_power_limit"`
 			MaxPowerLimit      string `xml:"max_power_limit"`
 		} `xml:"power_readings"`
-		Processes struct {
+		Processes *struct {
+			Text        string `xml:",chardata"`
 			ProcessInfo []struct {
 				Pid         string `xml:"pid"`
 				Type        string `xml:"type"`
