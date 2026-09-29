@@ -52,6 +52,8 @@ type IMonitorService interface {
 	UpdateSetting(key, value string) error
 	CleanData(monitorType string) error
 
+	LoadIOOptions() []string
+	LoadNetworkOptions() []string
 	LoadVLLMMonitorData(req dto.MonitorVLLMSearch) (dto.MonitorVLLMData, error)
 	LoadVLLMCurrent(ctx context.Context, req dto.MonitorVLLMCurrent) (model.MonitorVLLM, error)
 	CleanVLLMMonitor(req dto.MonitorVLLMClean) error
@@ -92,7 +94,7 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 				base.TopCPUItems = processes
 				base.TopCPU = ""
 			}
-			if req.Param == "all" || req.Param == "mem" {
+			if req.Param == "all" || req.Param == "memory" {
 				var processes []dto.Process
 				_ = json.Unmarshal([]byte(base.TopMem), &processes)
 				base.TopMemItems = processes
@@ -103,7 +105,11 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "io" {
-		bases, err := monitorRepo.GetIO(repo.WithByName(req.IO), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		ioOpts := []repo.DBOption{repo.WithByCreatedAt(req.StartTime, req.EndTime)}
+		if len(req.IO) != 0 {
+			ioOpts = append(ioOpts, repo.WithByName(req.IO))
+		}
+		bases, err := monitorRepo.GetIO(ioOpts...)
 		if err != nil {
 			return nil, err
 		}
@@ -117,7 +123,11 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	if req.Param == "all" || req.Param == "network" {
-		bases, err := monitorRepo.GetNetwork(repo.WithByName(req.Network), repo.WithByCreatedAt(req.StartTime, req.EndTime))
+		netOpts := []repo.DBOption{repo.WithByCreatedAt(req.StartTime, req.EndTime)}
+		if len(req.Network) != 0 {
+			netOpts = append(netOpts, repo.WithByName(req.Network))
+		}
+		bases, err := monitorRepo.GetNetwork(netOpts...)
 		if err != nil {
 			return nil, err
 		}
@@ -131,6 +141,37 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 		data = append(data, itemData)
 	}
 	return data, nil
+}
+
+func (m *MonitorService) LoadIOOptions() []string {
+	optionSet := make(map[string]struct{})
+	if diskStat, err := disk.IOCounters(); err == nil {
+		for _, item := range diskStat {
+			optionSet[item.Name] = struct{}{}
+		}
+	}
+	// union with names recorded in the monitor db so removed devices stay selectable
+	if names, err := monitorRepo.GetIONames(); err == nil {
+		for _, name := range names {
+			optionSet[name] = struct{}{}
+		}
+	}
+	return sortedMonitorOptions(optionSet)
+}
+
+func (m *MonitorService) LoadNetworkOptions() []string {
+	optionSet := make(map[string]struct{})
+	if netStat, err := net.IOCounters(true); err == nil {
+		for _, item := range netStat {
+			optionSet[item.Name] = struct{}{}
+		}
+	}
+	if names, err := monitorRepo.GetNetworkNames(); err == nil {
+		for _, name := range names {
+			optionSet[name] = struct{}{}
+		}
+	}
+	return sortedMonitorOptions(optionSet)
 }
 
 func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
@@ -941,4 +982,15 @@ func loadHostSysPath() string {
 		return "/sys"
 	}
 	return hostSys
+}
+
+func sortedMonitorOptions(optionSet map[string]struct{}) []string {
+	options := make([]string, 0, len(optionSet))
+	for name := range optionSet {
+		if len(name) != 0 && name != "all" {
+			options = append(options, name)
+		}
+	}
+	sort.Strings(options)
+	return append([]string{"all"}, options...)
 }

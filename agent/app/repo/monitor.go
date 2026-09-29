@@ -29,6 +29,8 @@ type IMonitorRepo interface {
 	GetGPUDevices() ([]model.MonitorGPU, error)
 	GetIO(opts ...DBOption) ([]model.MonitorIO, error)
 	GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, error)
+	GetIONames() ([]string, error)
+	GetNetworkNames() ([]string, error)
 
 	CreateMonitorBase(model model.MonitorBase) error
 	BatchCreateMonitorGPU(list []model.MonitorGPU) error
@@ -86,6 +88,18 @@ func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, erro
 	err := db.Find(&data).Error
 	return data, err
 }
+func (u *MonitorRepo) GetIONames() ([]string, error) {
+	var names []string
+	err := global.MonitorDB.Model(&model.MonitorIO{}).Distinct().Pluck("name", &names).Error
+	return names, err
+}
+
+func (u *MonitorRepo) GetNetworkNames() ([]string, error) {
+	var names []string
+	err := global.MonitorDB.Model(&model.MonitorNetwork{}).Distinct().Pluck("name", &names).Error
+	return names, err
+}
+
 func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
 }

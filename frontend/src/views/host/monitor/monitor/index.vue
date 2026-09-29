@@ -327,11 +327,7 @@ const searchGlobal = () => {
     timeRangeMemory.value = timeRangeGlobal.value;
     timeRangeIO.value = timeRangeGlobal.value;
     timeRangeNetwork.value = timeRangeGlobal.value;
-    search('load');
-    search('cpu');
-    search('memory');
-    search('io');
-    search('network');
+    search('all');
 };
 
 const search = async (param: string) => {
@@ -355,7 +351,7 @@ const search = async (param: string) => {
             searchInfo.network = networkChoose.value || 'all';
             break;
         case 'all':
-            searchTime.value = timeRangeNetwork.value;
+            searchTime.value = timeRangeGlobal.value;
             searchInfo.io = ioChoose.value || 'all';
             searchInfo.network = networkChoose.value || 'all';
             break;
