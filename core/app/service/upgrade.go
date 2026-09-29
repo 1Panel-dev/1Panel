@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"syscall"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -25,6 +26,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper"
 	upgradeUtil "github.com/1Panel-dev/1Panel/core/utils/upgrade"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
+	"golang.org/x/net/html"
 )
 
 type serviceInfo struct {
@@ -299,7 +301,7 @@ func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 	docSource, _ := settingRepo.GetValueByKey("DocSource")
 	lang, _ := settingRepo.GetValueByKey("Language")
 	var notes []dto.ReleasesNotes
-	url := "https://1panel.cn/docs/v2/search/search_index.json"
+	url := "https://docs.fit2cloud.com/1panel/changelog/"
 	useIntlDocs := false
 	lang = strings.ToLower(strings.TrimSpace(lang))
 	if docSource == "withByRegion" {
@@ -315,6 +317,12 @@ func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 		return notes, err
 	}
 	defer resp.Body.Close()
+	if !useIntlDocs {
+		if resp.StatusCode != http.StatusOK {
+			return notes, fmt.Errorf("load release notes failed: HTTP %d", resp.StatusCode)
+		}
+		return parseReleaseHTML(resp.Body)
+	}
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return notes, err
@@ -333,6 +341,89 @@ func (u *UpgradeService) LoadRelease() ([]dto.ReleasesNotes, error) {
 		}
 	}
 
+	return notes, nil
+}
+
+func parseReleaseHTML(reader io.Reader) ([]dto.ReleasesNotes, error) {
+	doc, err := html.Parse(reader)
+	if err != nil {
+		return nil, err
+	}
+	var article *html.Node
+	for node := range doc.Descendants() {
+		if node.Type == html.ElementNode && node.Data == "article" {
+			article = node
+			break
+		}
+	}
+	if article == nil {
+		return nil, fmt.Errorf("release notes article not found")
+	}
+	textContent := func(node *html.Node) string {
+		var text strings.Builder
+		for child := range node.Descendants() {
+			if child.Type == html.TextNode {
+				text.WriteString(child.Data)
+			}
+		}
+		return strings.TrimSpace(strings.ReplaceAll(text.String(), "\u200b", ""))
+	}
+	var notes []dto.ReleasesNotes
+	for heading := range article.Descendants() {
+		if heading.Type != html.ElementNode || heading.Data != "h3" {
+			continue
+		}
+		version := textContent(heading)
+		if !strings.HasPrefix(version, "v") {
+			continue
+		}
+		item := dto.ReleasesNotes{Version: version}
+		var content strings.Builder
+		section := ""
+		for node := heading.NextSibling; node != nil; node = node.NextSibling {
+			if node.Type != html.ElementNode {
+				continue
+			}
+			if node.Data == "h1" || node.Data == "h2" || node.Data == "h3" {
+				break
+			}
+			if item.CreatedAt == "" {
+				date := textContent(node)
+				if _, err := time.Parse("2006年1月2日", date); node.Data != "p" || err != nil {
+					return nil, fmt.Errorf("release date not found for %s", version)
+				}
+				item.CreatedAt = date
+				continue
+			}
+			if node.Data == "p" {
+				section = textContent(node)
+			}
+			for child := range node.Descendants() {
+				if child.Type != html.ElementNode || child.Data != "li" {
+					continue
+				}
+				switch section {
+				case "新增功能":
+					item.NewCount++
+				case "功能优化":
+					item.OptimizationCount++
+				case "问题修复":
+					item.FixCount++
+				}
+			}
+			if err := html.Render(&content, node); err != nil {
+				return nil, err
+			}
+		}
+		if item.CreatedAt == "" || content.Len() == 0 {
+			return nil, fmt.Errorf("release notes content not found for %s", version)
+		}
+		item.Content = content.String()
+		notes = append(notes, item)
+	}
+	if len(notes) == 0 {
+		return nil, fmt.Errorf("release notes versions not found")
+	}
 	return notes, nil
 }
 
