@@ -85,7 +85,13 @@
                 </button>
             </div>
 
-            <ComplexTable v-if="detailFilter" class="sync-rule-table" :data="detailItems" :height="360">
+            <ComplexTable
+                v-if="detailFilter"
+                class="sync-rule-table"
+                :data="detailPageItems"
+                :pagination-config="paginationConfig"
+                :height="360"
+            >
                 <el-table-column :label="$t('commons.table.status')" width="105">
                     <template #default="{ row }">
                         <el-tag :type="statusType(row.status)" effect="plain">
@@ -102,7 +108,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.port')" min-width="120">
                         <template #default="{ row }">
-                            {{ row.rule?.destinationPort || $t('firewall.allPorts') }}
+                            {{ row.rule ? row.rule.destinationPort || '*' : '-' }}
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('firewall.action')" width="90">
@@ -177,7 +183,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { formatHostAddress, formatHostAddressList } from '@/views/host/firewall/utils/validation';
 import { Coin, Lock, Right } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
-import { computed, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 
 const emit = defineEmits<{ (event: 'search'): void }>();
 const { currentNode } = useGlobalStore();
@@ -211,8 +217,19 @@ const detailItems = computed(() => {
     return items.filter((item) => item.status === detailFilter.value);
 });
 
+const paginationConfig = reactive({
+    currentPage: 1,
+    pageSize: 20,
+    total: computed(() => detailItems.value.length),
+});
+const detailPageItems = computed(() => {
+    const start = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
+    return detailItems.value.slice(start, start + paginationConfig.pageSize);
+});
+
 const toggleDetail = (filter: RuleDetailFilter, count: number) => {
     if (count === 0) return;
+    paginationConfig.currentPage = 1;
     detailFilter.value = detailFilter.value === filter ? undefined : filter;
 };
 
@@ -330,10 +347,16 @@ const reasonText = (reasonCode?: string, reason?: string) => {
 const actionText = (action?: Firewall.Action) => (action ? i18n.global.t(`firewall.${action}`) : '-');
 
 const displayAddress = (rule: Firewall.Rule) => {
-    const values = [rule.sourceAddress, rule.destinationAddress]
-        .filter((value): value is string => Boolean(value))
-        .map((value) => formatHostAddress(value, rule.scope.family));
-    return values.length > 0 ? values.join(' → ') : i18n.global.t('firewall.anyWhere');
+    const wildcard =
+        rule.scope.family === 'ipv6' ? '::/0' : rule.scope.family === 'inet' ? '0.0.0.0/0, ::/0' : '0.0.0.0/0';
+    const addresses = rule.destinationAddress ? [rule.sourceAddress, rule.destinationAddress] : [rule.sourceAddress];
+    return addresses
+        .map((address) =>
+            address && address !== wildcard
+                ? formatHostAddress(address, rule.scope.family)
+                : `${wildcard}（${i18n.global.t('firewall.anyWhere')}）`,
+        )
+        .join(' → ');
 };
 
 const dockerAddress = (rule?: Firewall.DockerGuardEndpoint) => {

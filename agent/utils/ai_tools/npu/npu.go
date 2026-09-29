@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -34,7 +35,31 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 	if err != nil {
 		return nil, fmt.Errorf("calling %s failed: %w", ascendSMICommand, err)
 	}
-	return parseAscendSMI(itemData), nil
+
+	info := parseAscendSMI(itemData)
+	var wg sync.WaitGroup
+	warnings := make([]string, len(info.Devices))
+	for i := range info.Devices {
+		wg.Add(1)
+		go func(index int) {
+			defer wg.Done()
+			device := &info.Devices[index]
+			mgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
+			data, err := mgr.RunWithStdout(ascendSMICommand, "info", "-t", "usages", "-i", strconv.FormatUint(uint64(device.NPUIndex), 10), "-c", strconv.FormatUint(uint64(device.ChipIndex), 10))
+			if err != nil {
+				warnings[index] = fmt.Sprintf("npu-smi usages %d/%d: %v", device.NPUIndex, device.ChipIndex, err)
+				return
+			}
+			applyAscendUsages(device, data)
+		}(i)
+	}
+	wg.Wait()
+	for _, warning := range warnings {
+		if warning != "" {
+			info.Warnings = append(info.Warnings, warning)
+		}
+	}
+	return info, nil
 }
 
 func parseAscendSMI(data string) *Info {
@@ -158,6 +183,12 @@ func parseAscendSMI(data string) *Info {
 		pending = nil
 	}
 
+	for i := range info.Devices {
+		info.Devices[i].ProcessStatus = "unavailable"
+		if processSection {
+			info.Devices[i].ProcessStatus = "ok"
+		}
+	}
 	return info
 }
 
@@ -208,6 +239,9 @@ func ascendMemoryPools(value, header string) (string, string, string, string) {
 	}
 
 	hbm := usage[len(usage)-1]
+	if !strings.Contains(normalizedHeader, "MEMORYUSAGE") {
+		memoryUsed, memoryTotal = "", ""
+	}
 	return memoryUsed, memoryTotal, hbm[0] + " MB", hbm[1] + " MB"
 }
 
@@ -232,4 +266,30 @@ func ascendValueWithUnit(value, unit string) string {
 		return value
 	}
 	return value + " " + unit
+}
+
+func applyAscendUsages(device *Device, data string) {
+	for _, line := range strings.Split(data, "\n") {
+		key, value, ok := strings.Cut(line, ":")
+		if !ok {
+			continue
+		}
+		key = strings.ToLower(strings.Join(strings.Fields(key), ""))
+		value = strings.TrimSpace(value)
+		switch key {
+		case "aicoreusagerate(%)":
+			usage, err := strconv.ParseFloat(strings.TrimSpace(strings.TrimSuffix(value, "%")), 64)
+			if err == nil && usage >= 0 && usage <= 100 {
+				device.AICore = ascendValueWithUnit(value, "%")
+			}
+		case "aicpuusagerate(%)":
+			device.AICPUUtil = ascendValueWithUnit(value, "%")
+		case "ctrlcpuusagerate(%)":
+			device.CtrlCPUUtil = ascendValueWithUnit(value, "%")
+		case "ddrbandwidthusagerate(%)", "memorybandwidthusagerate(%)":
+			device.DDRBandwidth = ascendValueWithUnit(value, "%")
+		case "hbmbandwidthusagerate(%)":
+			device.HBMBandwidth = ascendValueWithUnit(value, "%")
+		}
+	}
 }

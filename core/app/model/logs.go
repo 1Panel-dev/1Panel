@@ -6,13 +6,16 @@ import (
 
 type OperationLog struct {
 	BaseModel
-	Source    string `json:"source"`
-	User      string `json:"user"`
-	IP        string `json:"ip"`
-	Node      string `json:"node"`
-	Path      string `json:"path"`
-	Method    string `json:"method"`
-	UserAgent string `json:"userAgent"`
+	Source     string `json:"source"`
+	User       string `json:"user"`
+	APIKeyID   string `json:"apiKeyID"`
+	APIKeyName string `json:"apiKeyName"`
+	AuthMethod string `json:"authMethod"`
+	IP         string `json:"ip"`
+	Node       string `json:"node"`
+	Path       string `json:"path"`
+	Method     string `json:"method"`
+	UserAgent  string `json:"userAgent"`
 
 	Latency time.Duration `json:"latency"`
 	Status  string        `json:"status"`

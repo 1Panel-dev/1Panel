@@ -5,14 +5,10 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/netip"
 	"os"
-	"path/filepath"
 	"sort"
-	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -20,17 +16,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	agenti18n "github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
-	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
-	containertypes "github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/system"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	dockerfirewall "github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/docker/docker/client"
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 const (
@@ -48,41 +38,15 @@ const (
 	dockerReasonNoMatchingPath      = "no_matching_path"
 )
 
-type dockerProxyEndpoint struct {
-	protocol string
-	hostIP   string
-	hostPort uint16
-}
-
-type dockerForwardRules struct {
-	output    string
-	inspected bool
-}
-
-type dockerProxyEndpoints struct {
-	items     []dockerProxyEndpoint
-	inspected bool
-}
-
-type dockerGuardRuntime = docker_guard.Runtime
-
 type DockerPortGuardService struct {
 	policies          repo.IDockerPortGuardRepo
-	runtime           dockerGuardRuntime
-	runtimeForBackend func(string) dockerGuardRuntime
+	runtime           dockerfirewall.Runtime
+	runtimeForBackend func(string) dockerfirewall.Runtime
 	client            func() (*client.Client, error)
 	version           func(string) string
 }
 
-var (
-	dockerPortGuardServiceMu          sync.Mutex
-	dockerPortGuardSyncMu             sync.RWMutex
-	dockerPortGuardSyncErr            error
-	ErrDockerGuardInvalid             = docker_guard.ErrInvalidPolicy
-	ErrDockerUnavailable              = docker.ErrUnavailable
-	ErrDockerIptablesChainUnavailable = docker_guard.ErrDockerIptablesChainUnavailable
-	ErrDockerNftablesChainUnavailable = docker_guard.ErrDockerNftablesChainUnavailable
-)
+var dockerPortGuardServiceMu sync.Mutex
 
 type IDockerPortGuardService interface {
 	LoadOverview(context.Context) (dto.DockerPortGuardList, error)
@@ -94,35 +58,48 @@ type IDockerPortGuardService interface {
 	Reconcile(context.Context) error
 }
 
-func NewIDockerPortGuardService() IDockerPortGuardService {
-	return newDockerPortGuardService()
-}
-
-func newDockerPortGuardService() *DockerPortGuardService {
-	return &DockerPortGuardService{
-		policies: repo.NewIDockerPortGuardRepo(),
-		client:   docker.NewDockerClient,
-		version:  dockerFirewallVersion,
+func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {
+	policies, err := s.policies.ListManaged(ctx)
+	if err != nil {
+		return dto.DockerPortGuardList{}, err
 	}
-}
-
-func ReconcileDockerPortGuard(ctx context.Context) error {
-	if global.DB == nil {
-		return nil
+	unavailable := func() dto.DockerPortGuardList {
+		backend := selectedDockerFirewallBackend("")
+		base := s.runtimeStatus(s.guardRuntime(backend), backend)
+		base.Message = i18n.Get("ErrDockerFailed")
+		return dto.DockerPortGuardList{Base: base, Containers: []dto.DockerPortGuardContainer{}, OrphanPolicies: dockerGuardPolicyEndpoints(policies)}
 	}
-	return NewIDockerPortGuardService().Reconcile(ctx)
-}
-
-func ReconcileDockerPortGuardBestEffort(ctx context.Context) {
-	if err := ReconcileDockerPortGuard(ctx); err != nil {
-		global.LOG.Warnf("reconcile Docker port guard failed, err: %v", err)
+	cli, err := s.client()
+	if err != nil {
+		return unavailable(), nil
 	}
+	defer cli.Close()
+	info, err := cli.Info(ctx)
+	if err != nil {
+		return unavailable(), nil
+	}
+	detectedBackend := dockerFirewallBackend(info)
+	backend := selectedDockerFirewallBackend(detectedBackend)
+	base := s.runtimeStatus(s.guardRuntime(backend), backend)
+	endpoints, err := discoverDockerEndpoints(ctx, cli, true)
+	if err != nil {
+		return dto.DockerPortGuardList{}, err
+	}
+	annotateDockerEndpointManagement(endpoints, detectedBackend)
+	endpoints, orphanPolicies := matchDockerGuardPolicies(base, policies, endpoints)
+	sort.Slice(endpoints, func(i, j int) bool {
+		return fmt.Sprintf("%s|%s|%d|%s", endpoints[i].Family, endpoints[i].HostIP, endpoints[i].HostPort, endpoints[i].Protocol) < fmt.Sprintf("%s|%s|%d|%s", endpoints[j].Family, endpoints[j].HostIP, endpoints[j].HostPort, endpoints[j].Protocol)
+	})
+	sort.Slice(orphanPolicies, func(i, j int) bool {
+		return fmt.Sprintf("%s|%s|%d|%s", orphanPolicies[i].Family, orphanPolicies[i].HostIP, orphanPolicies[i].HostPort, orphanPolicies[i].Protocol) < fmt.Sprintf("%s|%s|%d|%s", orphanPolicies[j].Family, orphanPolicies[j].HostIP, orphanPolicies[j].HostPort, orphanPolicies[j].Protocol)
+	})
+	return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(endpoints), OrphanPolicies: orphanPolicies}, nil
 }
 
 func (s *DockerPortGuardService) LoadPublishedPorts(ctx context.Context) ([]dto.DockerPortGuardContainer, error) {
 	cli, err := s.client()
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
+		return nil, buserr.WithDetail("ErrDockerFailed", err.Error(), err)
 	}
 	defer cli.Close()
 
@@ -144,95 +121,6 @@ func (s *DockerPortGuardService) LoadPublishedPorts(ctx context.Context) ([]dto.
 	return groupDockerGuardContainers(endpoints), nil
 }
 
-func (s *DockerPortGuardService) LoadOverview(ctx context.Context) (dto.DockerPortGuardList, error) {
-	policies, err := s.policies.ListManaged(ctx)
-	if err != nil {
-		return dto.DockerPortGuardList{}, err
-	}
-	unavailable := func() dto.DockerPortGuardList {
-		backend := selectedDockerFirewallBackend("")
-		base := s.runtimeStatus(s.guardRuntime(backend), backend)
-		base.Version = s.loadFirewallVersion(backend)
-		base.Message = agenti18n.Get("ErrDockerFailed")
-		return dto.DockerPortGuardList{Base: base, Containers: []dto.DockerPortGuardContainer{}, OrphanPolicies: dockerGuardPolicyEndpoints(policies)}
-	}
-	cli, err := s.client()
-	if err != nil {
-		return unavailable(), nil
-	}
-	defer cli.Close()
-	info, err := cli.Info(ctx)
-	if err != nil {
-		return unavailable(), nil
-	}
-	detectedBackend := dockerFirewallBackend(info)
-	backend := selectedDockerFirewallBackend(detectedBackend)
-	base := s.runtimeStatus(s.guardRuntime(backend), backend)
-	base.Version = s.loadFirewallVersion(backend)
-	if reconcileErr := lastDockerPortGuardReconcileError(); reconcileErr != nil {
-		markDockerGuardReconcileFailure(&base, reconcileErr)
-	}
-	endpoints, err := discoverDockerEndpoints(ctx, cli, true)
-	if err != nil {
-		return dto.DockerPortGuardList{}, err
-	}
-	annotateDockerEndpointManagement(endpoints, detectedBackend)
-	endpoints, orphanPolicies := matchDockerGuardPolicies(base, policies, endpoints)
-	sort.Slice(endpoints, func(i, j int) bool {
-		return guardEndpointKey(endpoints[i].Family, endpoints[i].HostIP, endpoints[i].HostPort, endpoints[i].Protocol) < guardEndpointKey(endpoints[j].Family, endpoints[j].HostIP, endpoints[j].HostPort, endpoints[j].Protocol)
-	})
-	sort.Slice(orphanPolicies, func(i, j int) bool {
-		return guardEndpointKey(orphanPolicies[i].Family, orphanPolicies[i].HostIP, orphanPolicies[i].HostPort, orphanPolicies[i].Protocol) < guardEndpointKey(orphanPolicies[j].Family, orphanPolicies[j].HostIP, orphanPolicies[j].HostPort, orphanPolicies[j].Protocol)
-	})
-	return dto.DockerPortGuardList{Base: base, Containers: groupDockerGuardContainers(endpoints), OrphanPolicies: orphanPolicies}, nil
-}
-
-func matchDockerGuardPolicies(
-	base dto.DockerPortGuardBase,
-	policies []model.DockerPortGuardPolicy,
-	endpoints []dto.DockerPortGuardEndpoint,
-) ([]dto.DockerPortGuardEndpoint, []dto.DockerPortGuardEndpoint) {
-	byEndpoint := make(map[string]model.DockerPortGuardPolicy, len(policies))
-	for _, policy := range policies {
-		byEndpoint[guardEndpointKey(policy.Family, policy.HostIP, policy.HostPort, policy.Protocol)] = policy
-	}
-	for i := range endpoints {
-		key := guardEndpointKey(endpoints[i].Family, endpoints[i].HostIP, endpoints[i].HostPort, endpoints[i].Protocol)
-		policy, ok := byEndpoint[key]
-		if !ok {
-			continue
-		}
-		endpoints[i].PolicyUUID, endpoints[i].Mode, endpoints[i].Sources = policy.UUID, policy.Mode, docker_guard.DecodeSources(policy.Sources)
-		endpoints[i].Description = policy.Description
-		endpoints[i].Effective = endpoints[i].ManagementTarget == dockerManagementContainerGuard &&
-			((policy.Family == docker_guard.FamilyIPv4 && base.IPv4.Effective) || (policy.Family == docker_guard.FamilyIPv6 && base.IPv6.Effective))
-		delete(byEndpoint, key)
-	}
-	orphanPolicies := make([]dto.DockerPortGuardEndpoint, 0, len(byEndpoint))
-	for _, policy := range byEndpoint {
-		orphanPolicies = append(orphanPolicies, dto.DockerPortGuardEndpoint{
-			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources), Description: policy.Description,
-			TrafficPath: dockerTrafficPathUnknown, ManagementTarget: dockerManagementNeedsDiagnosis,
-			ManagementReason: dockerReasonNoMatchingPath,
-		})
-	}
-	return endpoints, orphanPolicies
-}
-
-func initializeDockerGuardRuntime(runtime dockerGuardRuntime, policies []docker_guard.Policy) error {
-	err := runtime.Initialize(policies)
-	if errors.Is(err, docker_guard.ErrDockerForwardPolicyDrop) {
-		family := "IPv4"
-		var familyErr *docker_guard.FamilyError
-		if errors.As(err, &familyErr) && familyErr.Family == docker_guard.FamilyIPv6 {
-			family = "IPv6"
-		}
-		return buserr.WithMap("ErrDockerForwardPolicyDrop", map[string]interface{}{"family": family}, err)
-	}
-	return err
-}
-
 func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.DockerPortGuardOperation) error {
 	dockerPortGuardServiceMu.Lock()
 	defer dockerPortGuardServiceMu.Unlock()
@@ -246,8 +134,11 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 		if err != nil {
 			return err
 		}
-		if err := initializeDockerGuardRuntime(runtime, policies); err != nil {
-			recordDockerPortGuardReconcileError(err)
+		inventory, err := runtime.ListPolicies()
+		if err != nil {
+			return err
+		}
+		if err := runtime.Initialize(policies, inventory); err != nil {
 			return err
 		}
 		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, backend); err != nil {
@@ -256,7 +147,6 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
 			return err
 		}
-		recordDockerPortGuardReconcileError(nil)
 		return nil
 	case "bind":
 		runtime, _, err := s.runtimeForDocker(ctx)
@@ -272,7 +162,7 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 		if s.runtime != nil {
 			err = s.runtime.Unbind()
 		} else {
-			err = errors.Join(docker_guard.NewManager().Unbind(), docker_guard.NewNftablesManager().Unbind())
+			err = errors.Join(dockerfirewall.NewIptables().Unbind(), dockerfirewall.NewNftables().Unbind())
 		}
 		if err != nil {
 			return err
@@ -283,9 +173,7 @@ func (s *DockerPortGuardService) Operate(ctx context.Context, request dto.Docker
 	}
 }
 
-func (s *DockerPortGuardService) QueueInitialization(
-	request dto.DockerPortGuardOperation,
-) (dto.FilterChainOperationResponse, error) {
+func (s *DockerPortGuardService) QueueInitialization(request dto.DockerPortGuardOperation) (dto.FilterChainOperationResponse, error) {
 	if request.Operation != "initialize" {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("only Docker port guard initialization can be queued")
 	}
@@ -296,38 +184,38 @@ func (s *DockerPortGuardService) QueueInitialization(
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("create Docker port guard initialization task: %w", err)
 	}
-	var runtime dockerGuardRuntime
+	var runtime dockerfirewall.Runtime
 	var backend string
-	var policies []docker_guard.Policy
-	taskItem.AddSubTask(agenti18n.GetMsgByKey("FirewallInspectDockerGuardStep"), func(t *task.Task) error {
+	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallInspectDockerGuardStep"), func(t *task.Task) error {
 		var err error
 		runtime, backend, err = s.runtimeForDocker(t.TaskCtx)
-		if err != nil {
-			return err
-		}
-		policies, err = s.runtimePolicies(t.TaskCtx)
 		if err != nil {
 			return err
 		}
 		t.Logf("backend=%s", backend)
 		return nil
 	}, nil)
-	taskItem.AddSubTask(agenti18n.GetWithName("FirewallInitializeDockerGuardStep", "Docker"), func(t *task.Task) error {
+	taskItem.AddSubTask(i18n.GetWithName("FirewallInitializeDockerGuardStep", "Docker"), func(t *task.Task) error {
 		dockerPortGuardServiceMu.Lock()
 		defer dockerPortGuardServiceMu.Unlock()
+		policies, err := s.runtimePolicies(t.TaskCtx)
+		if err != nil {
+			return err
+		}
 		t.Logf("backend=%s", backend)
-		err := initializeDockerGuardRuntime(runtime, policies)
-		recordDockerPortGuardReconcileError(err)
-		return err
+		inventory, err := runtime.ListPolicies()
+		if err != nil {
+			return err
+		}
+		return runtime.Initialize(policies, inventory)
 	}, nil)
-	taskItem.AddSubTask(agenti18n.GetMsgByKey("FirewallPersistDockerGuardStep"), func(t *task.Task) error {
+	taskItem.AddSubTask(i18n.GetMsgByKey("FirewallPersistDockerGuardStep"), func(t *task.Task) error {
 		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, backend); err != nil {
 			return err
 		}
 		if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
 			return err
 		}
-		recordDockerPortGuardReconcileError(nil)
 		return nil
 	}, nil)
 	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
@@ -338,7 +226,7 @@ func (s *DockerPortGuardService) QueueInitialization(
 }
 
 func (s *DockerPortGuardService) DeletePolicies(request dto.DockerPortGuardPolicyBatchDelete) (dto.FilterChainOperationResponse, error) {
-	uuids, err := docker_guard.NormalizePolicyUUIDs(request.UUIDs)
+	uuids, err := normalizeDockerFirewallUUIDs(request.UUIDs)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, err
 	}
@@ -360,36 +248,51 @@ func (s *DockerPortGuardService) DeletePolicies(request dto.DockerPortGuardPolic
 }
 
 func (s *DockerPortGuardService) UpsertPolicies(request dto.DockerPortGuardPolicyBatch) (dto.FilterChainOperationResponse, error) {
+	if len(request.Policies) > filter.MaxAtomicExpansion {
+		return dto.FilterChainOperationResponse{}, fmt.Errorf("create or import at most %d rules per batch (after expansion)", filter.MaxAtomicExpansion)
+	}
 	labels := make([]string, len(request.Policies))
+	policies := make([]model.DockerPortGuardPolicy, 0, len(request.Policies))
+	endpoints := make([]dto.DockerPortGuardEndpointIdentity, 0, len(request.Policies))
+	count := 0
 	for i, policy := range request.Policies {
 		labels[i] = fmt.Sprintf("[%d/%d] %s %s %s:%d %s", i+1, len(request.Policies), policy.Family, policy.Protocol, policy.HostIP, policy.HostPort, policy.Mode)
+		normalized, err := normalizeDockerFirewallPolicy(dockerfirewall.Policy{
+			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort,
+			Protocol: policy.Protocol, Mode: policy.Mode, Sources: policy.Sources,
+		})
+		if err != nil {
+			return dto.FilterChainOperationResponse{}, fmt.Errorf("%s: %w", labels[i], err)
+		}
+		if normalized.Mode == dockerfirewall.ModeAll {
+			count++
+		} else {
+			count += len(normalized.Sources)
+			if normalized.Mode == dockerfirewall.ModeAllow {
+				count++
+			}
+		}
+		if count > filter.MaxAtomicExpansion {
+			return dto.FilterChainOperationResponse{}, fmt.Errorf("create or import at most %d rules per batch (after expansion)", filter.MaxAtomicExpansion)
+		}
+		encoded, err := json.Marshal(normalized.Sources)
+		if err != nil {
+			return dto.FilterChainOperationResponse{}, fmt.Errorf("%s: %w", labels[i], err)
+		}
+		policies = append(policies, model.DockerPortGuardPolicy{
+			UUID: uuid.NewString(), Family: normalized.Family, HostIP: normalized.HostIP,
+			HostPort: normalized.HostPort, Protocol: normalized.Protocol, Mode: normalized.Mode,
+			Sources: string(encoded), Description: strings.TrimSpace(policy.Description),
+		})
+		endpoints = append(endpoints, dto.DockerPortGuardEndpointIdentity{
+			Family: normalized.Family, HostIP: normalized.HostIP, HostPort: normalized.HostPort, Protocol: normalized.Protocol,
+		})
 	}
 	return queueFirewallRuleTask(firewallTaskDocker, task.TaskUpdate, labels, func(ctx context.Context) error {
 		dockerPortGuardServiceMu.Lock()
 		defer dockerPortGuardServiceMu.Unlock()
-		policies := make([]model.DockerPortGuardPolicy, 0, len(request.Policies))
-		endpoints := make([]dto.DockerPortGuardEndpointIdentity, 0, len(request.Policies))
-		for i, policy := range request.Policies {
-			if err := ctx.Err(); err != nil {
-				return err
-			}
-			normalized, err := docker_guard.NormalizePolicy(docker_guard.Policy{
-				Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort,
-				Protocol: policy.Protocol, Mode: policy.Mode, Sources: policy.Sources,
-			})
-			if err != nil {
-				return fmt.Errorf("%s: %w", labels[i], err)
-			}
-			encoded, err := json.Marshal(normalized.Sources)
-			if err != nil {
-				return fmt.Errorf("%s: %w", labels[i], err)
-			}
-			policies = append(policies, model.DockerPortGuardPolicy{
-				UUID: uuid.NewString(), Family: normalized.Family, HostIP: normalized.HostIP,
-				HostPort: normalized.HostPort, Protocol: normalized.Protocol, Mode: normalized.Mode,
-				Sources: string(encoded), Description: strings.TrimSpace(policy.Description),
-			})
-			endpoints = append(endpoints, policy.DockerPortGuardEndpointIdentity)
+		if err := ctx.Err(); err != nil {
+			return err
 		}
 		if err := s.rejectHostInputDockerGuardEndpoints(ctx, endpoints); err != nil {
 			return err
@@ -401,10 +304,82 @@ func (s *DockerPortGuardService) UpsertPolicies(request dto.DockerPortGuardPolic
 	})
 }
 
-func (s *DockerPortGuardService) rejectHostInputDockerGuardEndpoints(
-	ctx context.Context,
-	requested []dto.DockerPortGuardEndpointIdentity,
-) error {
+func NewIDockerPortGuardService() IDockerPortGuardService {
+	return newDockerPortGuardService()
+}
+
+func (s *DockerPortGuardService) runtimeStatus(runtime dockerfirewall.Runtime, backend string) dto.DockerPortGuardBase {
+	ipv4 := runtime.Status(dockerfirewall.FamilyIPv4)
+	ipv6 := runtime.Status(dockerfirewall.FamilyIPv6)
+	version := "-"
+	if s.version != nil {
+		version = s.version(backend)
+	}
+	name := "iptables-docker"
+	if strings.EqualFold(strings.TrimSpace(backend), constant.FirewallProviderNftables) {
+		name = "nftables-docker"
+	}
+	return dto.DockerPortGuardBase{
+		Name:        name,
+		Version:     version,
+		Backend:     backend,
+		IsExist:     ipv4.Reason != dockerfirewall.ReasonCommandMissing || ipv6.Reason != dockerfirewall.ReasonCommandMissing,
+		Initialized: ipv4.Initialized || ipv6.Initialized,
+		Bound:       ipv4.Bound || ipv6.Bound,
+		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
+		IPv6:        dto.DockerPortGuardFamilyStatus{State: ipv6.State, Reason: ipv6.Reason, Initialized: ipv6.Initialized, Bound: ipv6.Bound, Effective: ipv6.Effective},
+	}
+}
+
+func dockerGuardPolicyEndpoints(policies []model.DockerPortGuardPolicy) []dto.DockerPortGuardEndpoint {
+	endpoints := make([]dto.DockerPortGuardEndpoint, 0, len(policies))
+	for _, policy := range policies {
+		sources := []string{}
+		_ = json.Unmarshal([]byte(policy.Sources), &sources)
+		endpoints = append(endpoints, dto.DockerPortGuardEndpoint{
+			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
+			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: sources,
+			Description: policy.Description, TrafficPath: dockerTrafficPathUnknown,
+			ManagementTarget: dockerManagementNeedsDiagnosis, ManagementReason: dockerReasonNoMatchingPath,
+		})
+	}
+	return endpoints
+}
+
+func matchDockerGuardPolicies(base dto.DockerPortGuardBase, policies []model.DockerPortGuardPolicy, endpoints []dto.DockerPortGuardEndpoint) ([]dto.DockerPortGuardEndpoint, []dto.DockerPortGuardEndpoint) {
+	byEndpoint := make(map[string]model.DockerPortGuardPolicy, len(policies))
+	for _, policy := range policies {
+		byEndpoint[fmt.Sprintf("%s|%s|%d|%s", policy.Family, policy.HostIP, policy.HostPort, policy.Protocol)] = policy
+	}
+	for i := range endpoints {
+		key := fmt.Sprintf("%s|%s|%d|%s", endpoints[i].Family, endpoints[i].HostIP, endpoints[i].HostPort, endpoints[i].Protocol)
+		policy, ok := byEndpoint[key]
+		if !ok {
+			continue
+		}
+		sources := []string{}
+		_ = json.Unmarshal([]byte(policy.Sources), &sources)
+		endpoints[i].PolicyUUID, endpoints[i].Mode, endpoints[i].Sources = policy.UUID, policy.Mode, sources
+		endpoints[i].Description = policy.Description
+		endpoints[i].Effective = endpoints[i].ManagementTarget == dockerManagementContainerGuard &&
+			((policy.Family == dockerfirewall.FamilyIPv4 && base.IPv4.Effective) || (policy.Family == dockerfirewall.FamilyIPv6 && base.IPv6.Effective))
+		delete(byEndpoint, key)
+	}
+	orphanPolicies := make([]dto.DockerPortGuardEndpoint, 0, len(byEndpoint))
+	for _, policy := range byEndpoint {
+		sources := []string{}
+		_ = json.Unmarshal([]byte(policy.Sources), &sources)
+		orphanPolicies = append(orphanPolicies, dto.DockerPortGuardEndpoint{
+			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
+			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: sources, Description: policy.Description,
+			TrafficPath: dockerTrafficPathUnknown, ManagementTarget: dockerManagementNeedsDiagnosis,
+			ManagementReason: dockerReasonNoMatchingPath,
+		})
+	}
+	return endpoints, orphanPolicies
+}
+
+func (s *DockerPortGuardService) rejectHostInputDockerGuardEndpoints(ctx context.Context, requested []dto.DockerPortGuardEndpointIdentity) error {
 	if s.client == nil || len(requested) == 0 {
 		return nil
 	}
@@ -424,644 +399,16 @@ func (s *DockerPortGuardService) rejectHostInputDockerGuardEndpoints(
 	annotateDockerEndpointManagement(endpoints, dockerFirewallBackend(info))
 	targets := make(map[string]string, len(endpoints))
 	for _, endpoint := range endpoints {
-		targets[guardEndpointKey(endpoint.Family, endpoint.HostIP, endpoint.HostPort, endpoint.Protocol)] = endpoint.ManagementTarget
+		targets[fmt.Sprintf("%s|%s|%d|%s", endpoint.Family, endpoint.HostIP, endpoint.HostPort, endpoint.Protocol)] = endpoint.ManagementTarget
 	}
 	for _, endpoint := range requested {
-		target := targets[guardEndpointKey(endpoint.Family, endpoint.HostIP, endpoint.HostPort, endpoint.Protocol)]
+		target := targets[fmt.Sprintf("%s|%s|%d|%s", endpoint.Family, endpoint.HostIP, endpoint.HostPort, endpoint.Protocol)]
 		if target == dockerManagementHostFirewall {
-			return fmt.Errorf("%w: endpoint traffic is handled by the host input firewall", ErrDockerGuardInvalid)
+			return buserr.WithDetail("ErrInvalidParams", "endpoint traffic is handled by the host input firewall", nil)
 		}
 		if target == dockerManagementNeedsDiagnosis {
-			return fmt.Errorf("%w: endpoint traffic management target requires diagnosis", ErrDockerGuardInvalid)
+			return buserr.WithDetail("ErrInvalidParams", "endpoint traffic management target requires diagnosis", nil)
 		}
 	}
 	return nil
-}
-
-func (s *DockerPortGuardService) Reconcile(ctx context.Context) error {
-	dockerPortGuardServiceMu.Lock()
-	defer dockerPortGuardServiceMu.Unlock()
-	return s.reconcileLocked(ctx)
-}
-
-func dockerGuardPolicyFromModel(policy model.DockerPortGuardPolicy) docker_guard.Policy {
-	return docker_guard.Policy{
-		UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort,
-		Protocol: policy.Protocol, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources),
-	}
-}
-
-func dockerGuardReadOnlyPolicyUUID(policy docker_guard.ReadOnlyPolicy) string {
-	nativeRules, _ := json.Marshal(policy.NativeRules)
-	fingerprint := strings.Join([]string{
-		policy.Policy.Family, policy.Policy.HostIP, strconv.Itoa(int(policy.Policy.HostPort)),
-		policy.Policy.Protocol, policy.Action, string(nativeRules),
-	}, "\x00")
-	return uuid.NewSHA1(uuid.NameSpaceOID, []byte(fingerprint)).String()
-}
-
-func dockerGuardRuntimeReadOnlyModels(policies []docker_guard.ReadOnlyPolicy) ([]model.DockerPortGuardPolicy, error) {
-	result := make([]model.DockerPortGuardPolicy, 0, len(policies))
-	for _, policy := range policies {
-		sources, err := json.Marshal(policy.Policy.Sources)
-		if err != nil {
-			return nil, err
-		}
-		nativeRules, err := json.Marshal(policy.NativeRules)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, model.DockerPortGuardPolicy{
-			UUID:     dockerGuardReadOnlyPolicyUUID(policy),
-			ReadOnly: true,
-			Family:   policy.Policy.Family, HostIP: policy.Policy.HostIP, HostPort: policy.Policy.HostPort,
-			Protocol: policy.Policy.Protocol, Sources: string(sources), NativeAction: policy.Action,
-			NativeRules: string(nativeRules), Sequence: policy.Sequence,
-		})
-	}
-	return result, nil
-}
-
-func (s *DockerPortGuardService) replaceRuntimeReadOnlyPolicies(
-	ctx context.Context,
-	policies []docker_guard.ReadOnlyPolicy,
-) error {
-	stored, err := dockerGuardRuntimeReadOnlyModels(policies)
-	if err != nil {
-		return err
-	}
-	return s.policies.ReplaceRuntimeReadOnly(ctx, stored)
-}
-
-func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) (err error) {
-	defer func() { recordDockerPortGuardReconcileError(err) }()
-	persistedEnabled, err := dockerPortGuardPersistedEnabled()
-	if err != nil {
-		return fmt.Errorf("load Docker port guard persisted status: %w", err)
-	}
-	initialized, err := s.anyRuntimeInitialized()
-	if err != nil {
-		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
-	}
-	if !initialized && !persistedEnabled {
-		return nil
-	}
-	runtime, _, err := s.runtimeForDocker(ctx)
-	if err != nil {
-		return err
-	}
-	initialized, err = runtime.Initialized(docker_guard.FamilyIPv4)
-	if err != nil {
-		return &docker_guard.FamilyError{Family: docker_guard.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
-	}
-	if !initialized && !persistedEnabled {
-		return nil
-	}
-	policies, err := s.runtimePolicies(ctx)
-	if err != nil {
-		return err
-	}
-	inventory, err := runtime.ListPolicies()
-	if err != nil {
-		return err
-	}
-	if err := s.replaceRuntimeReadOnlyPolicies(ctx, inventory.ReadOnly); err != nil {
-		return err
-	}
-	if !initialized {
-		err = initializeDockerGuardRuntime(runtime, policies)
-	} else {
-		err = runtime.Reconcile(policies)
-	}
-	if err != nil {
-		return err
-	}
-	return docker_guard.Verify(runtime, policies, inventory.ReadOnly)
-}
-
-func dockerPortGuardPersistedEnabled() (bool, error) {
-	status, err := settingRepo.GetValueByKey(constant.FirewallDockerPortGuardStatusKey)
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return false, nil
-	}
-	return status == constant.StatusEnable, err
-}
-
-func (s *DockerPortGuardService) anyRuntimeInitialized() (bool, error) {
-	if s.runtime != nil {
-		return s.runtime.Initialized(docker_guard.FamilyIPv4)
-	}
-	for _, runtime := range []dockerGuardRuntime{docker_guard.NewManager(), docker_guard.NewNftablesManager()} {
-		initialized, err := runtime.Initialized(docker_guard.FamilyIPv4)
-		if err != nil || initialized {
-			return initialized, err
-		}
-	}
-	return false, nil
-}
-
-func recordDockerPortGuardReconcileError(err error) {
-	dockerPortGuardSyncMu.Lock()
-	dockerPortGuardSyncErr = err
-	dockerPortGuardSyncMu.Unlock()
-}
-
-func lastDockerPortGuardReconcileError() error {
-	dockerPortGuardSyncMu.RLock()
-	defer dockerPortGuardSyncMu.RUnlock()
-	return dockerPortGuardSyncErr
-}
-
-func markDockerGuardReconcileFailure(base *dto.DockerPortGuardBase, err error) {
-	var familyErr *docker_guard.FamilyError
-	if errors.As(err, &familyErr) {
-		markDockerGuardFamilyNotEffective(base, familyErr.Family)
-		if familyErr.Family == docker_guard.FamilyIPv4 {
-			markDockerGuardFamilyNotEffective(base, docker_guard.FamilyIPv6)
-		}
-		return
-	}
-	markDockerGuardFamilyNotEffective(base, docker_guard.FamilyIPv4)
-	markDockerGuardFamilyNotEffective(base, docker_guard.FamilyIPv6)
-}
-
-func markDockerGuardFamilyNotEffective(base *dto.DockerPortGuardBase, family string) {
-	var status *dto.DockerPortGuardFamilyStatus
-	switch family {
-	case docker_guard.FamilyIPv4:
-		status = &base.IPv4
-	case docker_guard.FamilyIPv6:
-		status = &base.IPv6
-	default:
-		return
-	}
-	if !status.Initialized {
-		return
-	}
-	status.State = docker_guard.StatusNotEffective
-	status.Reason = docker_guard.ReasonInspectFailed
-	status.Effective = false
-}
-
-func (s *DockerPortGuardService) runtimePolicies(ctx context.Context) ([]docker_guard.Policy, error) {
-	stored, err := s.policies.ListManaged(ctx)
-	if err != nil {
-		return nil, err
-	}
-	policies := make([]docker_guard.Policy, 0, len(stored))
-	for _, policy := range stored {
-		policies = append(policies, docker_guard.Policy{UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources)})
-	}
-	return policies, nil
-}
-
-func (s *DockerPortGuardService) runtimeStatus(runtime dockerGuardRuntime, backend string) dto.DockerPortGuardBase {
-	ipv4 := runtime.Status(docker_guard.FamilyIPv4)
-	ipv6 := runtime.Status(docker_guard.FamilyIPv6)
-	return dto.DockerPortGuardBase{
-		Name:        dockerFirewallDisplayName(backend),
-		Backend:     backend,
-		IsExist:     ipv4.Reason != docker_guard.ReasonCommandMissing || ipv6.Reason != docker_guard.ReasonCommandMissing,
-		Initialized: ipv4.Initialized || ipv6.Initialized,
-		Bound:       ipv4.Bound || ipv6.Bound,
-		IPv4:        dto.DockerPortGuardFamilyStatus{State: ipv4.State, Reason: ipv4.Reason, Initialized: ipv4.Initialized, Bound: ipv4.Bound, Effective: ipv4.Effective},
-		IPv6:        dto.DockerPortGuardFamilyStatus{State: ipv6.State, Reason: ipv6.Reason, Initialized: ipv6.Initialized, Bound: ipv6.Bound, Effective: ipv6.Effective},
-	}
-}
-
-func (s *DockerPortGuardService) guardRuntime(backend string) dockerGuardRuntime {
-	if s.runtimeForBackend != nil {
-		return s.runtimeForBackend(backend)
-	}
-	if s.runtime != nil {
-		return s.runtime
-	}
-	return docker_guard.NewRuntime(backend)
-}
-
-func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerGuardRuntime, string, error) {
-	if s.runtime != nil {
-		return s.runtime, selectedDockerFirewallBackend(constant.FirewallProviderIptables), nil
-	}
-	cli, err := s.client()
-	if err != nil {
-		return nil, "", fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
-	}
-	defer cli.Close()
-	info, err := cli.Info(ctx)
-	if err != nil {
-		return nil, "", fmt.Errorf("%w: %v", ErrDockerUnavailable, err)
-	}
-	backend := selectedDockerFirewallBackend(dockerFirewallBackend(info))
-	if backend != constant.FirewallProviderIptables && backend != constant.FirewallProviderNftables {
-		return nil, backend, fmt.Errorf("Docker firewall backend %q is not supported", backend)
-	}
-	return s.guardRuntime(backend), backend, nil
-}
-
-func dockerFirewallBackend(info system.Info) string {
-	if info.FirewallBackend == nil || info.FirewallBackend.Driver == "" {
-		return constant.FirewallProviderIptables
-	}
-	return strings.ToLower(info.FirewallBackend.Driver)
-}
-
-func dockerFirewallDisplayName(backend string) string {
-	switch strings.ToLower(strings.TrimSpace(backend)) {
-	case constant.FirewallProviderNftables:
-		return "nftables-docker"
-	default:
-		return "iptables-docker"
-	}
-}
-
-func (s *DockerPortGuardService) loadFirewallVersion(backend string) string {
-	if s.version == nil {
-		return "-"
-	}
-	return s.version(backend)
-}
-
-func dockerFirewallVersion(backend string) string {
-	client, err := lifecycle.NewClientFor(backend)
-	if err != nil {
-		return "-"
-	}
-	version, err := client.Version()
-	if err != nil || strings.TrimSpace(version) == "" {
-		return "-"
-	}
-	return version
-}
-
-func discoverDockerEndpoints(ctx context.Context, cli *client.Client, all bool) ([]dto.DockerPortGuardEndpoint, error) {
-	containers, err := cli.ContainerList(ctx, containertypes.ListOptions{All: all})
-	if err != nil {
-		return nil, err
-	}
-	endpoints := make([]dto.DockerPortGuardEndpoint, 0)
-	for _, item := range containers {
-		name := strings.TrimPrefix(firstGuardString(item.Names), "/")
-		compose := item.Labels[dockerGuardComposeProjectLabel]
-		application := ""
-		if created, ok := item.Labels[dockerGuardComposeCreatedBy]; ok && created == "Apps" {
-			application = compose
-		}
-		for _, port := range item.Ports {
-			if port.PublicPort == 0 || (port.Type != "tcp" && port.Type != "udp") {
-				continue
-			}
-			family := docker_guard.FamilyIPv4
-			hostIP := port.IP
-			if addr, err := netip.ParseAddr(hostIP); err == nil && addr.Is6() {
-				family = docker_guard.FamilyIPv6
-			} else if hostIP == "" {
-				hostIP = "0.0.0.0"
-			}
-			endpoints = append(endpoints, dto.DockerPortGuardEndpoint{Family: family, HostIP: hostIP, HostPort: port.PublicPort, Protocol: port.Type, ContainerID: item.ID, ContainerName: name, ContainerState: item.State, ContainerPort: port.PrivatePort, Compose: compose, Application: application, Sources: []string{}})
-		}
-	}
-	return endpoints, nil
-}
-
-func dockerGuardPolicyEndpoints(policies []model.DockerPortGuardPolicy) []dto.DockerPortGuardEndpoint {
-	endpoints := make([]dto.DockerPortGuardEndpoint, 0, len(policies))
-	for _, policy := range policies {
-		endpoints = append(endpoints, dto.DockerPortGuardEndpoint{
-			Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-			PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: docker_guard.DecodeSources(policy.Sources),
-			Description: policy.Description, TrafficPath: dockerTrafficPathUnknown,
-			ManagementTarget: dockerManagementNeedsDiagnosis, ManagementReason: dockerReasonNoMatchingPath,
-		})
-	}
-	return endpoints
-}
-
-func groupDockerGuardContainers(endpoints []dto.DockerPortGuardEndpoint) []dto.DockerPortGuardContainer {
-	containers := make(map[string]*dto.DockerPortGuardContainer)
-	order := make([]string, 0)
-	for _, endpoint := range endpoints {
-		key := endpoint.ContainerID
-		if key == "" {
-			key = "__orphan__"
-		}
-		container, ok := containers[key]
-		if !ok {
-			container = &dto.DockerPortGuardContainer{
-				Key: key, Name: endpoint.ContainerName, Compose: endpoint.Compose,
-				Application: endpoint.Application, Endpoints: []dto.DockerPortGuardEndpoint{},
-			}
-			containers[key] = container
-			order = append(order, key)
-		}
-		container.Endpoints = append(container.Endpoints, endpoint)
-	}
-	sort.Slice(order, func(i, j int) bool {
-		return containers[order[i]].Name < containers[order[j]].Name
-	})
-
-	result := make([]dto.DockerPortGuardContainer, 0, len(order))
-	for _, key := range order {
-		container := containers[key]
-		items := make([]docker.PortRangeItem, 0, len(container.Endpoints))
-		for i, endpoint := range container.Endpoints {
-			sources := append([]string(nil), endpoint.Sources...)
-			sort.Strings(sources)
-			policyKey := fmt.Sprintf("%t|%s|%s|%t|%s|%s|%s", endpoint.PolicyUUID != "", endpoint.Mode, strings.Join(sources, ","), endpoint.Effective, endpoint.Description, endpoint.ManagementTarget, endpoint.ManagementReason)
-			items = append(items, docker.PortRangeItem{
-				Key:        endpoint.Family + "|" + endpoint.HostIP + "|" + endpoint.Protocol + "|" + policyKey,
-				PublicPort: endpoint.HostPort, PrivatePort: endpoint.ContainerPort,
-				HasPrivatePort: endpoint.ContainerPort != 0, Position: i,
-			})
-		}
-		container.PortGroups = make([]dto.DockerPortGuardPortGroup, 0, len(items))
-		for _, portRange := range docker.MergePortRanges(items) {
-			start := container.Endpoints[portRange.Start.Position]
-			address := start.HostIP
-			if strings.Contains(address, ":") {
-				address = "[" + address + "]"
-			}
-			ports := fmt.Sprintf("%d", portRange.Start.PublicPort)
-			if portRange.Start.PublicPort != portRange.End.PublicPort {
-				ports = fmt.Sprintf("%d-%d", portRange.Start.PublicPort, portRange.End.PublicPort)
-			}
-			container.PortGroups = append(container.PortGroups, dto.DockerPortGuardPortGroup{
-				Key:   fmt.Sprintf("%s|%d-%d", portRange.Start.Key, portRange.Start.PublicPort, portRange.End.PublicPort),
-				Label: fmt.Sprintf("%s:%s/%s", address, ports, start.Protocol), Endpoint: start,
-				Endpoints: func() []dto.DockerPortGuardEndpoint {
-					members := make([]dto.DockerPortGuardEndpoint, 0, len(portRange.Items))
-					for _, item := range portRange.Items {
-						members = append(members, container.Endpoints[item.Position])
-					}
-					return members
-				}(),
-			})
-		}
-		result = append(result, *container)
-	}
-	return result
-}
-
-func guardEndpointKey(family, hostIP string, hostPort uint16, protocol string) string {
-	return fmt.Sprintf("%s|%s|%d|%s", family, hostIP, hostPort, protocol)
-}
-
-func firstGuardString(values []string) string {
-	if len(values) == 0 {
-		return ""
-	}
-	return values[0]
-}
-
-func annotateDockerEndpointManagement(endpoints []dto.DockerPortGuardEndpoint, backend string) {
-	rules := map[string]dockerForwardRules{
-		constant.FirewallFamilyIPv4: loadDockerDNATRules(backend, constant.FirewallFamilyIPv4),
-		constant.FirewallFamilyIPv6: loadDockerDNATRules(backend, constant.FirewallFamilyIPv6),
-	}
-	proxies := loadDockerProxyEndpoints()
-	for i := range endpoints {
-		familyRules := rules[endpoints[i].Family]
-		endpoints[i].TrafficPath, endpoints[i].ManagementTarget, endpoints[i].ManagementReason =
-			dockerEndpointManagement(backend, familyRules, proxies, endpoints[i])
-	}
-}
-
-func dockerEndpointManagement(
-	backend string,
-	rules dockerForwardRules,
-	proxies dockerProxyEndpoints,
-	endpoint dto.DockerPortGuardEndpoint,
-) (string, string, string) {
-	if !rules.inspected {
-		return dockerTrafficPathUnknown, dockerManagementNeedsDiagnosis, dockerReasonNATInspectFailed
-	}
-	dnatMatched := dockerDNATRuleMatches(backend, rules.output, endpoint)
-	if dnatMatched && dockerDNATIngressReachable(backend, rules.output) {
-		return dockerTrafficPathForward, dockerManagementContainerGuard, ""
-	}
-	if !proxies.inspected {
-		return dockerTrafficPathUnknown, dockerManagementNeedsDiagnosis, dockerReasonProxyInspectFailed
-	}
-	if dockerProxyEndpointMatches(proxies.items, endpoint) {
-		return dockerTrafficPathInput, dockerManagementHostFirewall, ""
-	}
-	if dnatMatched {
-		return dockerTrafficPathUnknown, dockerManagementNeedsDiagnosis, dockerReasonNATChainUnreachable
-	}
-	return dockerTrafficPathUnknown, dockerManagementNeedsDiagnosis, dockerReasonNoMatchingPath
-}
-
-func loadDockerDNATRules(backend, family string) dockerForwardRules {
-	manager := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
-	if backend == constant.FirewallProviderNftables {
-		tableFamily := "ip"
-		if family == constant.FirewallFamilyIPv6 {
-			tableFamily = "ip6"
-		}
-		tables, err := manager.RunWithOptionalSudoAndStdout("nft", "list", "tables")
-		if err != nil {
-			return dockerForwardRules{}
-		}
-		if !strings.Contains(tables, "table "+tableFamily+" docker-bridges") {
-			return dockerForwardRules{inspected: true}
-		}
-		output, err := manager.RunWithOptionalSudoAndStdout("nft", "list", "table", tableFamily, "docker-bridges")
-		return dockerForwardRules{output: output, inspected: err == nil}
-	}
-	commands, err := lifecycle.ResolveIptablesCommands()
-	if err != nil {
-		return dockerForwardRules{}
-	}
-	executable := commands.IPv4
-	if family == constant.FirewallFamilyIPv6 {
-		executable = commands.IPv6
-	}
-	if executable == "" {
-		return dockerForwardRules{}
-	}
-	output, err := manager.RunWithOptionalSudoAndStdout(executable, "-w", "-t", "nat", "-S")
-	return dockerForwardRules{output: output, inspected: err == nil}
-}
-
-func loadDockerProxyEndpoints() dockerProxyEndpoints {
-	manager := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
-	output, err := manager.RunWithStdout("ps", "-ww", "-eo", "args=")
-	if err != nil {
-		return dockerProxyEndpoints{}
-	}
-	return dockerProxyEndpoints{items: parseDockerProxyEndpoints(output), inspected: true}
-}
-
-func parseDockerProxyEndpoints(output string) []dockerProxyEndpoint {
-	result := make([]dockerProxyEndpoint, 0)
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(line)
-		if len(fields) == 0 || !dockerProxyCommand(fields) {
-			continue
-		}
-		protocol := commandFlagValue(fields, "-proto")
-		hostIP := commandFlagValue(fields, "-host-ip")
-		hostPortValue := commandFlagValue(fields, "-host-port")
-		hostPort, err := strconv.ParseUint(hostPortValue, 10, 16)
-		if err != nil || (protocol != "tcp" && protocol != "udp") || hostIP == "" {
-			continue
-		}
-		result = append(result, dockerProxyEndpoint{protocol: protocol, hostIP: canonicalAddress(hostIP), hostPort: uint16(hostPort)})
-	}
-	return result
-}
-
-func dockerProxyCommand(fields []string) bool {
-	for _, field := range fields {
-		if filepath.Base(field) == "docker-proxy" {
-			return true
-		}
-	}
-	return false
-}
-
-func commandFlagValue(fields []string, name string) string {
-	for i := 0; i < len(fields); i++ {
-		if fields[i] == name && i+1 < len(fields) {
-			return fields[i+1]
-		}
-		if strings.HasPrefix(fields[i], name+"=") {
-			return strings.TrimPrefix(fields[i], name+"=")
-		}
-	}
-	return ""
-}
-
-func dockerProxyEndpointMatches(proxies []dockerProxyEndpoint, endpoint dto.DockerPortGuardEndpoint) bool {
-	for _, proxy := range proxies {
-		if proxy.protocol == endpoint.Protocol && proxy.hostPort == endpoint.HostPort && hostAddressMatches(proxy.hostIP, endpoint.HostIP, endpoint.Family) {
-			return true
-		}
-	}
-	return false
-}
-
-func dockerDNATRuleMatches(backend, output string, endpoint dto.DockerPortGuardEndpoint) bool {
-	if strings.TrimSpace(output) == "" {
-		return false
-	}
-	if backend == constant.FirewallProviderNftables {
-		return nftDNATRuleMatches(output, endpoint)
-	}
-	return iptablesDNATRuleMatches(output, endpoint)
-}
-
-func dockerDNATIngressReachable(backend, output string) bool {
-	if backend == constant.FirewallProviderNftables {
-		return strings.Contains(output, "hook prerouting")
-	}
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(line)
-		if len(fields) >= 4 && fields[0] == "-A" && fields[1] == "PREROUTING" && commandFlagValue(fields, "-j") == "DOCKER" {
-			return true
-		}
-	}
-	return false
-}
-
-func iptablesDNATRuleMatches(output string, endpoint dto.DockerPortGuardEndpoint) bool {
-	port := strconv.Itoa(int(endpoint.HostPort))
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(line)
-		if commandFlagValue(fields, "-p") != endpoint.Protocol || commandFlagValue(fields, "--dport") != port || commandFlagValue(fields, "-j") != "DNAT" {
-			continue
-		}
-		if destinationAddressMatches(commandFlagValue(fields, "-d"), endpoint) {
-			return true
-		}
-	}
-	return false
-}
-
-func nftDNATRuleMatches(output string, endpoint dto.DockerPortGuardEndpoint) bool {
-	port := strconv.Itoa(int(endpoint.HostPort))
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(strings.NewReplacer("{", " ", "}", " ", ",", " ", ";", " ").Replace(line))
-		if !containsToken(fields, "dnat") || !nftProtocolPortMatches(fields, endpoint.Protocol, port) {
-			continue
-		}
-		destination := nftDestinationAddress(fields, endpoint.Family)
-		if destinationAddressMatches(destination, endpoint) {
-			return true
-		}
-	}
-	return false
-}
-
-func nftProtocolPortMatches(fields []string, protocol, port string) bool {
-	for i := 0; i+2 < len(fields); i++ {
-		if fields[i] == protocol && fields[i+1] == "dport" && fields[i+2] == port {
-			return true
-		}
-		if fields[i] == "th" && fields[i+1] == "dport" && fields[i+2] == port && nftMetaProtocolMatches(fields, protocol) {
-			return true
-		}
-	}
-	return false
-}
-
-func nftMetaProtocolMatches(fields []string, protocol string) bool {
-	for i := 0; i+2 < len(fields); i++ {
-		if fields[i] == "meta" && fields[i+1] == "l4proto" && fields[i+2] == protocol {
-			return true
-		}
-	}
-	return false
-}
-
-func nftDestinationAddress(fields []string, family string) string {
-	token := "ip"
-	if family == constant.FirewallFamilyIPv6 {
-		token = "ip6"
-	}
-	for i := 0; i+2 < len(fields); i++ {
-		if fields[i] == token && fields[i+1] == "daddr" {
-			return fields[i+2]
-		}
-	}
-	return ""
-}
-
-func destinationAddressMatches(ruleAddress string, endpoint dto.DockerPortGuardEndpoint) bool {
-	ruleAddress = strings.TrimSpace(strings.Split(ruleAddress, "/")[0])
-	if isWildcardHostAddress(endpoint.HostIP, endpoint.Family) {
-		return ruleAddress == ""
-	}
-	return ruleAddress == "" || canonicalAddress(ruleAddress) == canonicalAddress(endpoint.HostIP)
-}
-
-func hostAddressMatches(left, right, family string) bool {
-	if isWildcardHostAddress(left, family) && isWildcardHostAddress(right, family) {
-		return true
-	}
-	return canonicalAddress(left) == canonicalAddress(right)
-}
-
-func isWildcardHostAddress(value, family string) bool {
-	value = strings.TrimSpace(value)
-	if family == constant.FirewallFamilyIPv6 {
-		return value == "" || value == "::"
-	}
-	return value == "" || value == "0.0.0.0"
-}
-
-func canonicalAddress(value string) string {
-	if address, err := netip.ParseAddr(strings.TrimSpace(value)); err == nil {
-		return address.String()
-	}
-	return strings.TrimSpace(value)
-}
-
-func containsToken(fields []string, value string) bool {
-	for _, field := range fields {
-		if field == value {
-			return true
-		}
-	}
-	return false
 }

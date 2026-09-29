@@ -5,14 +5,17 @@ import (
 )
 
 type OperationLog struct {
-	ID        uint   `json:"id"`
-	Source    string `json:"source"`
-	User      string `json:"user"`
-	Node      string `json:"node"`
-	IP        string `json:"ip"`
-	Path      string `json:"path"`
-	Method    string `json:"method"`
-	UserAgent string `json:"userAgent"`
+	ID         uint   `json:"id"`
+	Source     string `json:"source"`
+	User       string `json:"user"`
+	APIKeyID   string `json:"apiKeyID"`
+	APIKeyName string `json:"apiKeyName"`
+	AuthMethod string `json:"authMethod"`
+	Node       string `json:"node"`
+	IP         string `json:"ip"`
+	Path       string `json:"path"`
+	Method     string `json:"method"`
+	UserAgent  string `json:"userAgent"`
 
 	Latency time.Duration `json:"latency"`
 	Status  string        `json:"status"`

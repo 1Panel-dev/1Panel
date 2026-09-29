@@ -649,6 +649,8 @@ CommonAlert: "پنل {{ .node }}{{ .ip }}: {{ .msg }}. برای مشاهده ج�
 NodeExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} گره غیرعادی هستند. برای مشاهده جزئیات وارد شوید."
 LicenseExceptionAlert: "پنل {{ .node }}{{ .ip }}: {{ .num }} مجوز غیرعادی است. برای مشاهده جزئیات وارد شوید."
 SSHAndPanelLoginAlert: "پنل {{ .node }}{{ .ip }}: ورود غیرعادی {{ .name }} از {{ .loginIp }}. برای مشاهده جزئیات وارد شوید."
+CronJobSuccessAlert: "پنل {{ .node }}{{ .ip }}: وظیفه زمان‌بندی‌شده {{ .name }} با موفقیت تکمیل شد. برای مشاهده جزئیات وارد شوید."
+
 
 # دیسک
 DeviceNotFound: "دستگاه {{ .name }} یافت نشد"
@@ -719,3 +721,14 @@ FirewallPersistDockerGuardStep: 'ذخیره وضعیت محافظت پورت Doc
 ErrFirewallRuleScopeChange: "فایروال فعلی از تغییر محدودهٔ قانون (مانند خانوادهٔ آدرس IPv4/IPv6) پشتیبانی نمی‌کند. لطفاً یک قانون جدید ایجاد کنید."
 FirewallWhitelistReleased: "{{ .name }}: حفاظت فهرست مجاز برداشته شد؛ قانون اجازه حفظ می‌شود. برای بستن پورت، قانون را به‌صورت دستی از فهرست قوانین حذف کنید"
 FirewallWhitelistRequired: "{{ .name }}: توسط قوانین پورت‌های ضروری سیستم محافظت می‌شود"
+FileTaskCopy: 'کپی فایل‌ها به {{ .dst }}'
+FileTaskMove: 'انتقال فایل‌ها به {{ .dst }}'
+FileTaskCompress: 'فشرده‌سازی فایل‌ها در {{ .dst }}'
+FileTaskDecompress: 'استخراج فایل‌ها در {{ .dst }}'
+FileTaskSource: 'مسیر مبدأ: {{ .path }}'
+FileTaskFormat: 'قالب بایگانی: {{ .format }}'
+FileTaskRename: 'نام فایل مقصد: {{ .name }}'
+
+ErrFirewallBackendCleanupRequired: "بک‌اند فعلی {{ .current }} هنوز شامل قوانین 1Panel است. پیش از تغییر به {{ .target }} آن‌ها را پاک کنید."
+ErrDockerIPv4ForwardingDisabled: "ارسال IPv4 غیرفعال است. پیش از استفاده از بک‌اند فایروال Docker، مقدار net.ipv4.ip_forward=1 را تنظیم کنید."
+ErrFirewallRuleSavedApplyFailed: "پیکربندی قانون جدید ذخیره شد، اما اعمال آن در دیوار آتش ناموفق بود. با همگام‌سازی دوباره تلاش کنید: {{ .detail }}"

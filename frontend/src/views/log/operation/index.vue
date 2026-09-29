@@ -73,7 +73,25 @@
                             <span v-else>{{ $t('logs.detail.' + row.source.replace('-', '_')) }}</span>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.user')" prop="user" show-overflow-tooltip />
+                    <el-table-column
+                        :label="$t('commons.table.user')"
+                        prop="user"
+                        min-width="140"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            <div>{{ row.user }}</div>
+                            <el-tooltip
+                                v-if="row.authMethod === 'api_key' && row.apiKeyID"
+                                :content="row.apiKeyID"
+                                placement="top"
+                            >
+                                <el-text type="info" size="small">
+                                    API Key · {{ row.apiKeyName || row.apiKeyID }}
+                                </el-text>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('commons.table.operate')" min-width="150px" prop="detailZH">
                         <template #default="{ row }">
                             <span v-if="language === 'zh' || language === 'zh-Hant'">
@@ -278,6 +296,13 @@ const exactReplacements: Record<string, string> = {
     OpsReportAutoExport: 'xpack.opsReport.page.autoExport',
     ComplexityVerification: 'setting.complexity',
     MFAStatus: 'setting.mfa',
+    GPUMonitorStatus: 'monitor.enableMonitor',
+    GPUMonitorStoreDays: 'monitor.storeDays',
+    GPUMonitorInterval: 'monitor.interval',
+    VLLMMonitorStatus: 'monitor.enableMonitor',
+    VLLMMonitorStoreDays: 'monitor.storeDays',
+    VLLMMonitorInterval: 'monitor.interval',
+    MonitorInterval: 'monitor.interval',
     MonitorStatus: 'monitor.enableMonitor',
     MonitorStoreDays: 'monitor.storeDays',
     ApiInterfaceStatus: 'setting.apiInterface',

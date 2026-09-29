@@ -1,12 +1,20 @@
 package npu
 
 type Info struct {
+	Warnings      []string `json:"warnings"`
 	Type          string   `json:"type"`
 	DriverVersion string   `json:"driverVersion"`
 	Devices       []Device `json:"npu"`
 }
 
 type Device struct {
+	AICPUUtil    string `json:"aiCPUUtil"`
+	CtrlCPUUtil  string `json:"ctrlCPUUtil"`
+	DDRBandwidth string `json:"ddrBandwidth"`
+	HBMBandwidth string `json:"hbmBandwidth"`
+
+	ProcessStatus string `json:"processStatus"`
+
 	Type        string `json:"type"`
 	Index       uint   `json:"index"`
 	NPUIndex    uint   `json:"npuIndex"`

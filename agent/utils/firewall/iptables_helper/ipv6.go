@@ -10,14 +10,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
-func (m *Manager) EnsureIPv6BaseChains() error {
-	ports, err := m.loadRequiredPorts()
-	if err != nil {
-		return err
-	}
-	return EnsureIPv6BaseChains(ports)
-}
-
 func EnsureIPv6BaseChains(ports []firewall.PortWhitelist) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil || !commands.IPv6Available() {
@@ -40,16 +32,7 @@ func EnsureIPv6BaseChains(ports []firewall.PortWhitelist) error {
 	if err := setBaseChainBindings(true, true); err != nil {
 		return err
 	}
-	for _, chain := range []struct{ name, file string }{
-		{BasicBeforeChain, IPv6FileName(BasicBeforeFileName)},
-		{BasicChain, IPv6FileName(BasicFileName)},
-		{BasicAfterChain, IPv6FileName(BasicAfterFileName)},
-	} {
-		if err := SaveIPv6RulesToFile(FilterTab, chain.name, chain.file); err != nil {
-			return err
-		}
-	}
-	return nil
+	return saveBaseChainsFamily(true)
 }
 
 func UnbindIPv6BaseChains() error {

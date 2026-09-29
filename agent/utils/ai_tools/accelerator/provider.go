@@ -2,6 +2,7 @@ package accelerator
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/npu"
@@ -26,6 +27,7 @@ func (p gpuProvider) Collect(ctx context.Context) (*ProviderSnapshot, error) {
 	}
 	result := &ProviderSnapshot{
 		Type:          info.Type,
+		Warnings:      info.Warnings,
 		DriverVersion: info.DriverVersion,
 		CudaVersion:   info.CudaVersion,
 		GPUs:          info.Devices,
@@ -49,6 +51,7 @@ func (p npuProvider) Collect(ctx context.Context) (*ProviderSnapshot, error) {
 	}
 	result := &ProviderSnapshot{
 		Type:          info.Type,
+		Warnings:      info.Warnings,
 		DriverVersion: info.DriverVersion,
 		NPUs:          info.Devices,
 	}
@@ -71,11 +74,24 @@ func (p xpuProvider) Collect(ctx context.Context) (*ProviderSnapshot, error) {
 	}
 	result := &ProviderSnapshot{
 		Type:          info.Type,
+		Warnings:      info.Warnings,
 		DriverVersion: info.DriverVersion,
 		XPUs:          info.Devices,
 	}
 	for index := range result.XPUs {
-		result.Devices = append(result.Devices, normalizeXPU(&result.XPUs[index]))
+
+		parent := normalizeXPU(&result.XPUs[index])
+		result.Devices = append(result.Devices, parent)
+		for _, tile := range result.XPUs[index].Tiles {
+			raw := xpu.Device{Basic: result.XPUs[index].Basic, Stats: tile.Stats, ProcessStatus: "unavailable"}
+			raw.Basic.Memory = ""
+			raw.Basic.FreeMemory = ""
+			device := normalizeXPU(&raw)
+			device.ParentID = parent.ID
+			device.ID = fmt.Sprintf("%s:tile:%d", parent.ID, tile.TileID)
+			device.Label = fmt.Sprintf("%s / Tile %d", parent.Label, tile.TileID)
+			result.Devices = append(result.Devices, device)
+		}
 	}
 	return result, nil
 }

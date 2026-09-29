@@ -34,9 +34,11 @@ import { transferTimeToSecond } from '@/utils/validate';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
+    key: 'MonitorInterval' | 'GPUMonitorInterval' | 'VLLMMonitorInterval';
     timeItem: number;
     timeUnit: string;
 }
+const settingKey = ref<DialogProps['key']>('MonitorInterval');
 const drawerVisible = ref();
 const loading = ref();
 
@@ -60,8 +62,10 @@ const rules = reactive({
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
+    settingKey.value = params.key;
     form.timeItem = params.timeItem;
     form.timeUnit = params.timeUnit;
+    loadInterval();
     drawerVisible.value = true;
 };
 
@@ -74,7 +78,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateMonitorSetting('MonitorInterval', form.monitorInterval + '')
+        await updateMonitorSetting(settingKey.value, form.monitorInterval + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

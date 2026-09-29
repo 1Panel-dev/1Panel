@@ -80,9 +80,10 @@ func seedMonitorRows(t *testing.T) time.Time {
 	if err := global.MonitorDB.CreateInBatches(netRows, len(netRows)).Error; err != nil {
 		t.Fatalf("seed network: %v", err)
 	}
+	gpuUtil := []float64{10, 20}
 	gpuRows := []model.MonitorGPU{
-		{BaseModel: model.BaseModel{CreatedAt: base}, ProductName: "NVIDIA RTX 4090", GPUUtil: 10},
-		{BaseModel: model.BaseModel{CreatedAt: base}, ProductName: "NVIDIA RTX 3090", GPUUtil: 20},
+		{BaseModel: model.BaseModel{CreatedAt: base}, ProductName: "NVIDIA RTX 4090", GPUUtil: &gpuUtil[0]},
+		{BaseModel: model.BaseModel{CreatedAt: base}, ProductName: "NVIDIA RTX 3090", GPUUtil: &gpuUtil[1]},
 	}
 	if err := global.GPUMonitorDB.CreateInBatches(gpuRows, len(gpuRows)).Error; err != nil {
 		t.Fatalf("seed gpu: %v", err)
@@ -216,7 +217,24 @@ func TestMonitorOptionsIncludeRemovedDevices(t *testing.T) {
 	if netOpts[0] != "all" || !contains(netOpts, "veth-old") {
 		t.Fatalf("network options should keep historical interfaces, got %v", netOpts)
 	}
+	devices, err := monitorRepo.GetGPUDevices()
+	if err != nil {
+		t.Fatalf("load historical GPUs: %v", err)
+	}
+	var names []string
+	for _, device := range devices {
+		names = append(names, device.ProductName)
+	}
+	if !contains(names, "NVIDIA RTX 4090") || !contains(names, "NVIDIA RTX 3090") {
+		t.Fatalf("historical GPUs should remain available, got %v", names)
+	}
 	gpuOpts := svc.LoadGPUOptions()
+	if !gpuOpts.Supported {
+		if len(gpuOpts.Options) != 0 || len(gpuOpts.ChartHide) != 0 {
+			t.Fatalf("unsupported GPU host should return no options, got %+v", gpuOpts)
+		}
+		return
+	}
 	if !contains(gpuOpts.Options, "NVIDIA RTX 4090") || !contains(gpuOpts.Options, "NVIDIA RTX 3090") {
 		t.Fatalf("gpu options should keep historical products, got %v", gpuOpts.Options)
 	}

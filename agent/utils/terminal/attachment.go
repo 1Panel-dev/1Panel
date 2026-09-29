@@ -19,7 +19,7 @@ import (
 const (
 	pingInterval = 30 * time.Second
 	pongWait     = 75 * time.Second
-	writeWait    = 5 * time.Second
+	writeWait    = 30 * time.Second
 )
 
 var errAttachmentClosed = errors.New("terminal attachment is closed")

@@ -24,10 +24,10 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp"}
+var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp", "syncIpGroup", "cleanLog"}
 
 func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo, emailConfig model.AlertConfig) error {
-	params := CreateAlertParams(GetCronJobTypeName(pushAlert.Param))
+	params := CreateTaskAlertParams(pushAlert)
 	alertDetail := ProcessAlertDetail(alert, pushAlert.TaskName, params, method)
 	alertRule := ProcessAlertRule(alert)
 	create.AlertRule = alertRule
@@ -76,14 +76,14 @@ func CreateEmailAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params [
 			Encryption: emailInfo.Encryption,
 			Recipient:  emailInfo.Recipient,
 		}
-		content := GetSendContent(alert.Type, params, agentInfo)
+		content := GetAlertLogContent(create, alert, params, agentInfo)
 		if content == "" {
 			content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
 		}
 		msg := email.EmailMessage{
 			Subject: i18n.GetMsgByKey("PanelAlertTitle"),
 			Body:    content,
-			IsHTML:  true,
+			IsHTML:  GetCronJobType(alert.Type) != "cronJob",
 		}
 
 		if err = email.SendMail(smtpConfig, msg, transport); err != nil {
@@ -110,7 +110,7 @@ func CreateBarkAlertLog(create dto.AlertLogCreate, alert dto.AlertDTO, params []
 		return SaveAlertLog(create, &alertLog)
 	}
 
-	content := GetSendContent(alert.Type, params, agentInfo)
+	content := GetAlertLogContent(create, alert, params, agentInfo)
 	if content == "" {
 		content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": alert.Title})
 	}
@@ -268,7 +268,7 @@ func ProcessAlertDetail(alert dto.AlertDTO, project string, params []dto.Param, 
 	alertDetail := dto.AlertDetail{
 		Type:    GetCronJobType(alert.Type),
 		SubType: alert.Type,
-		Title:   alert.Title,
+		Title:   TaskAlertTitle(alert.Type, alert.Title, project, params),
 		Method:  method,
 		Project: project,
 		Params:  params,
@@ -279,6 +279,14 @@ func ProcessAlertDetail(alert dto.AlertDTO, project string, params []dto.Param, 
 		return ""
 	}
 	return string(marshal)
+}
+
+func TaskAlertTitle(alertType, title, project string, params []dto.Param) string {
+	if GetCronJobType(alertType) != "cronJob" || CronJobAlertResultFromParams(params) != CronJobAlertSuccess {
+		return title
+	}
+	name := cronJobTaskName(project, params)
+	return i18n.GetMsgWithMap("TaskSuccess", map[string]interface{}{"name": name})
 }
 
 func ProcessAlertRule(alert dto.AlertDTO) string {
@@ -324,6 +332,10 @@ func GetCronJobTypeName(cronJobType string) string {
 		module = "系统快照"
 	case "ntp":
 		module = "同步服务器时间"
+	case "syncIpGroup":
+		module = "同步 IP 组"
+	case "cleanLog":
+		module = "清理日志"
 	default:
 	}
 	return module
@@ -444,6 +456,30 @@ func isWithinTimeRange(savedTimeString string) bool {
 }
 
 func GetSendContent(alertType string, params []dto.Param, agentInfo *dto.AgentInfo) string {
+	return GetAlertDetailContent(dto.AlertDetail{Type: alertType, Params: params}, agentInfo)
+}
+
+func GetAlertLogContent(create dto.AlertLogCreate, alert dto.AlertDTO, params []dto.Param, agentInfo *dto.AgentInfo) string {
+	detail := dto.AlertDetail{Type: alert.Type, Params: params}
+	var stored dto.AlertDetail
+	if json.Unmarshal([]byte(create.AlertDetail), &stored) == nil {
+		detail = stored
+		if detail.Type == "" {
+			detail.Type = alert.Type
+		}
+		if detail.Params == nil {
+			detail.Params = params
+		}
+	}
+	return GetAlertDetailContent(detail, agentInfo)
+}
+
+func GetAlertDetailContent(detail dto.AlertDetail, agentInfo *dto.AgentInfo) string {
+	alertType := detail.SubType
+	if alertType == "" {
+		alertType = detail.Type
+	}
+	params := detail.Params
 	switch GetCronJobType(alertType) {
 	case "ssl":
 		return i18n.GetMsgWithMap("SSLAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "day": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
@@ -464,7 +500,12 @@ func GetSendContent(alertType string, params []dto.Param, agentInfo *dto.AgentIn
 	case "disk":
 		return i18n.GetMsgWithMap("DiskUsedAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "used": getValueByIndex(params, "2"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "cronJob":
-		return i18n.GetMsgWithMap("CronJobFailedAlert", map[string]interface{}{"name": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
+		messageKey := "CronJobFailedAlert"
+		if CronJobAlertResultFromParams(params) == CronJobAlertSuccess {
+			messageKey = "CronJobSuccessAlert"
+		}
+		name := cronJobTaskName(detail.Project, params)
+		return i18n.GetMsgWithMap(messageKey, map[string]interface{}{"name": name, "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "clams":
 		return i18n.GetMsgWithMap("ClamAlert", map[string]interface{}{"num": getValueByIndex(params, "1"), "node": getNodeName(agentInfo), "ip": getNodeIp(agentInfo)})
 	case "panelLogin":

@@ -33,16 +33,29 @@ type discoveryInfo struct {
 }
 
 type DeviceLevelMetric struct {
-	MetricsType string  `json:"metrics_type"`
-	Value       float64 `json:"value"`
+	MetricsType string   `json:"metrics_type"`
+	Value       *float64 `json:"value"`
+}
+
+type TileMetrics struct {
+	TileID   int                 `json:"tile_id"`
+	DataList []DeviceLevelMetric `json:"data_list"`
+}
+
+type TileStats struct {
+	TileID int   `json:"tileID"`
+	Stats  Stats `json:"stats"`
 }
 
 type DeviceStats struct {
+	TileLevel   []TileMetrics       `json:"tile_level"`
 	DeviceID    int                 `json:"device_id"`
 	DeviceLevel []DeviceLevelMetric `json:"device_level"`
 }
 
 type Info struct {
+	Warnings []string `json:"warnings"`
+
 	Type          string `json:"type"`
 	DriverVersion string `json:"driverVersion"`
 
@@ -50,12 +63,17 @@ type Info struct {
 }
 
 type Device struct {
+	Tiles         []TileStats `json:"tiles"`
+	ProcessStatus string      `json:"processStatus"`
+
 	Basic     Basic     `json:"basic"`
 	Stats     Stats     `json:"stats"`
 	Processes []Process `json:"processes"`
 }
 
 type Basic struct {
+	UUID string `json:"uuid"`
+
 	DeviceID      int    `json:"deviceID"`
 	DeviceName    string `json:"deviceName"`
 	VendorName    string `json:"vendorName"`
@@ -66,6 +84,14 @@ type Basic struct {
 }
 
 type Stats struct {
+	MediaUtil         string `json:"mediaUtil"`
+	ComputeUtil       string `json:"computeUtil"`
+	CopyUtil          string `json:"copyUtil"`
+	MediaFrequency    string `json:"mediaFrequency"`
+	MemoryTemperature string `json:"memoryTemperature"`
+
+	MemoryBandwidthUtil string `json:"memoryBandwidthUtil"`
+
 	Power       string `json:"power"`
 	GPUUtil     string `json:"gpuUtil"`
 	Frequency   string `json:"frequency"`

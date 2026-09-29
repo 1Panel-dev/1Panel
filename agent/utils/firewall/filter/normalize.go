@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-const MaxAtomicExpansion = 256
+const MaxAtomicExpansion = 500
 
 func NormalizeRule(rule FirewallRule) (FirewallRule, error) {
 	rule.Scope = rule.Scope.Normalize()
@@ -16,9 +16,9 @@ func NormalizeRule(rule FirewallRule) (FirewallRule, error) {
 		return FirewallRule{}, err
 	}
 
-	if hasCompositeValue(rule.SourceAddress) || hasCompositeValue(rule.DestinationAddress) ||
-		hasCompositeValue(rule.SourcePort) ||
-		(hasCompositeValue(rule.DestinationPort) && !supportsNativeDestinationPortSet(rule.Scope.Provider)) ||
+	if strings.Contains(rule.SourceAddress, ",") || strings.Contains(rule.DestinationAddress, ",") ||
+		strings.Contains(rule.SourcePort, ",") ||
+		(strings.Contains(rule.DestinationPort, ",") && rule.Scope.Provider != ProviderIptables && rule.Scope.Provider != ProviderUFW) ||
 		isCompositeProtocol(rule.Protocol) {
 		return FirewallRule{}, fmt.Errorf("%w: expand addresses, ports and protocols before normalization", ErrCompositeRule)
 	}
@@ -37,11 +37,11 @@ func NormalizeRule(rule FirewallRule) (FirewallRule, error) {
 	if err != nil {
 		return FirewallRule{}, fmt.Errorf("%w: destination address: %v", ErrInvalidRule, err)
 	}
-	rule.SourcePort, err = normalizePort(rule.SourcePort)
+	rule.SourcePort, err = normalizePortValue(rule.SourcePort, false)
 	if err != nil {
 		return FirewallRule{}, fmt.Errorf("%w: source port: %v", ErrInvalidRule, err)
 	}
-	rule.DestinationPort, err = normalizePortValue(rule.DestinationPort, supportsNativeDestinationPortSet(rule.Scope.Provider))
+	rule.DestinationPort, err = normalizePortValue(rule.DestinationPort, rule.Scope.Provider == ProviderIptables || rule.Scope.Provider == ProviderUFW)
 	if err != nil {
 		return FirewallRule{}, fmt.Errorf("%w: destination port: %v", ErrInvalidRule, err)
 	}
@@ -136,7 +136,7 @@ func ExpandAtomicRules(input FirewallRule) ([]FirewallRule, error) {
 	destinationAddresses := splitValues(input.DestinationAddress)
 	sourcePorts := splitValues(input.SourcePort)
 	destinationPorts := splitValues(input.DestinationPort)
-	if supportsNativeDestinationPortSet(input.Scope.Provider) {
+	if input.Scope.Provider == ProviderIptables || input.Scope.Provider == ProviderUFW {
 		destinationPorts = []string{input.DestinationPort}
 	}
 
@@ -272,10 +272,6 @@ func validateAddressFamily(address netip.Addr, family Family) error {
 	return nil
 }
 
-func normalizePort(value string) (string, error) {
-	return normalizePortValue(value, false)
-}
-
 func normalizePortValue(value string, allowSet bool) (string, error) {
 	value = strings.TrimSpace(value)
 	if value == "" || strings.EqualFold(value, "any") || strings.EqualFold(value, "anywhere") {
@@ -348,10 +344,6 @@ func normalizePortValue(value string, allowSet bool) (string, error) {
 	return fmt.Sprintf("%d-%d", start, end), nil
 }
 
-func supportsNativeDestinationPortSet(provider Provider) bool {
-	return provider == ProviderIptables || provider == ProviderUFW
-}
-
 func parsePort(value string) (int, error) {
 	port, err := strconv.Atoi(strings.TrimSpace(value))
 	if err != nil || port < 1 || port > 65535 {
@@ -402,10 +394,6 @@ func normalizeConnectionStates(values []string, provider Provider) ([]string, er
 		}
 	}
 	return states, nil
-}
-
-func hasCompositeValue(value string) bool {
-	return strings.Contains(value, ",")
 }
 
 func isCompositeProtocol(value string) bool {

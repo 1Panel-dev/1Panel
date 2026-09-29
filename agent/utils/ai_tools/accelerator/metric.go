@@ -1,6 +1,7 @@
 package accelerator
 
 import (
+	"math"
 	"strconv"
 	"strings"
 
@@ -18,11 +19,11 @@ func metric(display, unit string) Metric {
 		return result
 	}
 	parsed, err := strconv.ParseFloat(matched[1], 64)
-	if err != nil {
+	if err != nil || math.IsNaN(parsed) || math.IsInf(parsed, 0) || (parsed < 0 && unit != "°C") {
 		return result
 	}
 	normalized, ok := convertMetricUnit(parsed, matched[2], unit)
-	if !ok {
+	if !ok || math.IsNaN(normalized) || math.IsInf(normalized, 0) || (unit == "%" && normalized > 100) {
 		return result
 	}
 	result.Value = &normalized

@@ -1,14 +1,76 @@
 package docker_guard
 
 import (
-	"errors"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+
 	"fmt"
 	"os"
-	"slices"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
+
+const (
+	Chain                    = "1PANEL_DOCKER"
+	DockerChain              = "DOCKER-USER"
+	FamilyIPv4               = constant.FirewallFamilyIPv4
+	FamilyIPv6               = constant.FirewallFamilyIPv6
+	ModeSources              = "deny_sources"
+	ModeAllow                = "allow_sources"
+	ModeAll                  = "deny_all"
+	StatusEffective          = "effective"
+	StatusDisabled           = "disabled"
+	StatusNotEffective       = "not_effective"
+	ReasonCommandMissing     = "command_missing"
+	ReasonDockerChainMissing = "docker_chain_missing"
+	ReasonGuardChainMissing  = "guard_chain_missing"
+	ReasonJumpMissing        = "jump_missing"
+	ReasonJumpNotFirst       = "jump_not_first"
+	ReasonJumpDuplicate      = "jump_duplicate"
+	ReasonInspectFailed      = "inspect_failed"
+)
+
+type FamilyError struct {
+	Family string
+	Err    error
+}
+
+func (e *FamilyError) Error() string { return fmt.Sprintf("%s Docker port guard: %v", e.Family, e.Err) }
+func (e *FamilyError) Unwrap() error { return e.Err }
+
+type ProxyEndpoint struct {
+	Protocol string
+	HostIP   string
+	HostPort uint16
+}
+
+type ProxyEndpoints struct {
+	Items     []ProxyEndpoint
+	Inspected bool
+}
+
+type DNATRules struct {
+	Output    string
+	Inspected bool
+}
+
+type Policy struct {
+	UUID     string
+	Family   string
+	HostIP   string
+	HostPort uint16
+	Protocol string
+	Mode     string
+	Sources  []string
+}
+
+type FamilyStatus struct {
+	State       string
+	Reason      string
+	Initialized bool
+	Bound       bool
+	Effective   bool
+}
 
 type NativeRule struct {
 	Family string   `json:"family"`
@@ -30,9 +92,9 @@ type PolicyInventory struct {
 }
 
 type Runtime interface {
-	Initialize([]Policy) error
+	Initialize([]Policy, PolicyInventory) error
 	Bind() error
-	Reconcile([]Policy) error
+	ReplacePolicies([]Policy, PolicyInventory) error
 	Unbind() error
 	Cleanup() error
 	Initialized(string) (bool, error)
@@ -40,117 +102,7 @@ type Runtime interface {
 	ListPolicies() (PolicyInventory, error)
 }
 
-func NewRuntime(provider string) Runtime {
-	if provider == constant.FirewallProviderNftables {
-		return NewNftablesManager()
-	}
-	return NewManager()
-}
-
-func Verify(runtime Runtime, desired []Policy, preserved []ReadOnlyPolicy) error {
-	inventory, err := runtime.ListPolicies()
-	if err != nil {
-		return fmt.Errorf("verify synchronized Docker firewall policies: %w", err)
-	}
-	if !PolicyStatesEqual(inventory.Policies, desired) {
-		return fmt.Errorf("verify synchronized Docker firewall policies: target policies do not match the database")
-	}
-	if !readOnlyStatesEqual(inventory.ReadOnly, preserved) {
-		return fmt.Errorf("verify synchronized Docker firewall policies: read-only runtime rules changed")
-	}
-	return nil
-}
-
-func readOnlyStatesEqual(left, right []ReadOnlyPolicy) bool {
-	if len(left) != len(right) {
-		return false
-	}
-	leftRules := flattenNativeRules(left)
-	rightRules := flattenNativeRules(right)
-	if len(leftRules) != len(rightRules) {
-		return false
-	}
-	for index := range leftRules {
-		if leftRules[index].Family != rightRules[index].Family || !slices.Equal(leftRules[index].Tokens, rightRules[index].Tokens) {
-			return false
-		}
-	}
-	return true
-}
-
-func flattenNativeRules(policies []ReadOnlyPolicy) []NativeRule {
-	rules := make([]NativeRule, 0)
-	for _, policy := range policies {
-		rules = append(rules, policy.NativeRules...)
-	}
-	slices.SortStableFunc(rules, func(left, right NativeRule) int {
-		if left.Family < right.Family {
-			return -1
-		}
-		if left.Family > right.Family {
-			return 1
-		}
-		if left.Order < right.Order {
-			return -1
-		}
-		if left.Order > right.Order {
-			return 1
-		}
-		return 0
-	})
-	return rules
-}
-
-func ReconcileTarget(backend string, policies []Policy, runtime Runtime) error {
-	families := make(map[string]struct{}, len(policies))
-	needsInitialize, needsBind := false, false
-	for _, policy := range policies {
-		families[policy.Family] = struct{}{}
-	}
-	if len(families) == 0 {
-		initialized := false
-		for _, family := range []string{FamilyIPv4, FamilyIPv6} {
-			status := runtime.Status(family)
-			if status.Reason == ReasonInspectFailed {
-				return fmt.Errorf("inspect Docker firewall target %s for %s failed", backend, family)
-			}
-			initialized = initialized || status.Initialized
-		}
-		if initialized {
-			return runtime.Reconcile(nil)
-		}
-		return nil
-	}
-	for family := range families {
-		status := runtime.Status(family)
-		needsInitialize = needsInitialize || !status.Initialized
-		needsBind = needsBind || !status.Bound || !status.Effective
-	}
-	var err error
-	if needsInitialize {
-		err = runtime.Initialize(policies)
-	} else {
-		if needsBind {
-			err = runtime.Bind()
-		}
-		if err == nil {
-			err = runtime.Reconcile(policies)
-		}
-	}
-	if err != nil {
-		return err
-	}
-	for family := range families {
-		if !runtime.Status(family).Effective {
-			return fmt.Errorf("Docker firewall target %s is not effective for %s", backend, family)
-		}
-	}
-	return nil
-}
-
 const ipv4ForwardingPath = "/proc/sys/net/ipv4/ip_forward"
-
-var ErrIPv4ForwardingDisabled = errors.New("IPv4 forwarding is disabled; set net.ipv4.ip_forward=1 before using Docker's firewall backend")
 
 func CheckIPv4Forwarding() error {
 	return checkIPv4Forwarding(os.ReadFile)
@@ -162,7 +114,7 @@ func checkIPv4Forwarding(readFile func(string) ([]byte, error)) error {
 		return fmt.Errorf("inspect IPv4 forwarding: %w", err)
 	}
 	if strings.TrimSpace(string(value)) != "1" {
-		return ErrIPv4ForwardingDisabled
+		return buserr.New("ErrDockerIPv4ForwardingDisabled")
 	}
 	return nil
 }

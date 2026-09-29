@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/jinzhu/copier"
 	"github.com/pkg/errors"
@@ -75,6 +76,7 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 			EntryID:   cronjob.ID,
 		}
 		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), repo.WithByStatus(constant.AlertEnable))
+		item.AlertTriggerMode, _ = alertUtil.CronJobAlertTriggerMode(alertInfo.AdvancedParams)
 		if alertInfo.SendCount != 0 {
 			item.AlertCount = alertInfo.SendCount
 		} else {
@@ -98,9 +100,11 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 		AlertType: cronjob.Type,
 		EntryID:   cronjob.ID,
 	}
-	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))), repo.WithByStatus(constant.AlertEnable))
+	alertInfo, _ := alertRepo.Get(alertRepo.WithByType(alertBase.AlertType), alertRepo.WithByProject(strconv.Itoa(int(alertBase.EntryID))))
 	item.AlertMethod = alertInfo.Method
-	if alertInfo.SendCount != 0 {
+	item.AlertTitle = alertInfo.Title
+	item.AlertTriggerMode, _ = alertUtil.CronJobAlertTriggerMode(alertInfo.AdvancedParams)
+	if alertInfo.Status == constant.AlertEnable {
 		item.AlertCount = alertInfo.SendCount
 	} else {
 		item.AlertCount = 0
@@ -195,11 +199,12 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			}
 		}
 		item.SourceAccounts, item.DownloadAccount, _ = loadBackupNamesByID(cronjob.SourceAccountIDs, cronjob.DownloadAccountID)
-		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(cronjob.Type), alertRepo.WithByProject(strconv.Itoa(int(cronjob.ID))), repo.WithByStatus(constant.AlertEnable))
-		if alertInfo.SendCount != 0 {
+		alertInfo, _ := alertRepo.Get(alertRepo.WithByType(cronjob.Type), alertRepo.WithByProject(strconv.Itoa(int(cronjob.ID))))
+		item.AlertTitle = alertInfo.Title
+		item.AlertMethod = alertInfo.Method
+		item.AlertTriggerMode, _ = alertUtil.CronJobAlertTriggerMode(alertInfo.AdvancedParams)
+		if alertInfo.Status == constant.AlertEnable {
 			item.AlertCount = alertInfo.SendCount
-			item.AlertTitle = alertInfo.Title
-			item.AlertMethod = alertInfo.Method
 		} else {
 			item.AlertCount = 0
 		}
@@ -213,6 +218,17 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 }
 
 func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
+	for _, item := range req {
+		advanced, err := cronJobAlertAdvancedParams(item.AlertTriggerMode)
+		if err != nil {
+			return err
+		}
+		if item.AlertCount != 0 {
+			if err := (AlertService{}).validateCronJobAlertChannels(item.Type, advanced, item.AlertMethod); err != nil {
+				return err
+			}
+		}
+	}
 	for _, item := range req {
 		cronjobItem, _ := cronjobRepo.Get(repo.WithByName(item.Name))
 		if cronjobItem.ID != 0 {
@@ -395,17 +411,27 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 		} else {
 			cronjob.Status = constant.StatusDisable
 		}
-		_ = cronjobRepo.Create(&cronjob)
-		if item.AlertCount != 0 && item.AlertTitle != "" && item.AlertMethod != "" {
-			createAlert := dto.AlertCreate{
-				Title:     item.AlertTitle,
-				SendCount: item.AlertCount,
-				Method:    item.AlertMethod,
-				Type:      cronjob.Type,
-				Project:   strconv.Itoa(int(cronjob.ID)),
-				Status:    constant.AlertEnable,
+		if err := cronjobRepo.Create(&cronjob); err != nil {
+			return err
+		}
+		if item.AlertTitle != "" && item.AlertMethod != "" {
+			advanced, _ := cronJobAlertAdvancedParams(item.AlertTriggerMode)
+			status := constant.AlertEnable
+			if item.AlertCount == 0 {
+				status = constant.AlertDisable
 			}
-			_ = NewIAlertService().CreateAlert(createAlert, operator)
+			createAlert := dto.AlertCreate{
+				Title:          item.AlertTitle,
+				SendCount:      item.AlertCount,
+				Method:         item.AlertMethod,
+				Type:           cronjob.Type,
+				Project:        strconv.Itoa(int(cronjob.ID)),
+				Status:         status,
+				AdvancedParams: advanced,
+			}
+			if err := NewIAlertService().CreateAlert(createAlert, operator); err != nil {
+				return err
+			}
 		}
 	}
 	return nil
@@ -562,6 +588,15 @@ func (u *CronjobService) HandleOnce(id uint) error {
 }
 
 func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
+	advanced, err := cronJobAlertAdvancedParams(req.AlertTriggerMode)
+	if err != nil {
+		return err
+	}
+	if req.AlertCount != 0 {
+		if err := (AlertService{}).validateCronJobAlertChannels(req.Type, advanced, req.AlertMethod); err != nil {
+			return err
+		}
+	}
 	cronjob, _ := cronjobRepo.Get(repo.WithByName(req.Name))
 	if cronjob.ID != 0 {
 		return buserr.New("ErrRecordExist")
@@ -603,12 +638,13 @@ func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
 	}
 	if req.AlertCount != 0 && req.AlertTitle != "" && req.AlertMethod != "" {
 		createAlert := dto.AlertCreate{
-			Title:     req.AlertTitle,
-			SendCount: req.AlertCount,
-			Method:    req.AlertMethod,
-			Type:      cronjob.Type,
-			Project:   strconv.Itoa(int(cronjob.ID)),
-			Status:    constant.AlertEnable,
+			Title:          req.AlertTitle,
+			SendCount:      req.AlertCount,
+			Method:         req.AlertMethod,
+			Type:           cronjob.Type,
+			Project:        strconv.Itoa(int(cronjob.ID)),
+			Status:         constant.AlertEnable,
+			AdvancedParams: advanced,
 		}
 		err := NewIAlertService().CreateAlert(createAlert, operator)
 		if err != nil {
@@ -682,6 +718,10 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 }
 
 func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string) error {
+	advanced, err := cronJobAlertAdvancedParams(req.AlertTriggerMode)
+	if err != nil {
+		return err
+	}
 	var cronjob model.Cronjob
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
@@ -696,6 +736,20 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string
 	cronModel, err := cronjobRepo.Get(repo.WithByID(id))
 	if err != nil {
 		return buserr.New("ErrRecordNotFound")
+	}
+	if req.AlertCount != 0 {
+		previous, _ := alertRepo.Get(alertRepo.WithByType(cronModel.Type), alertRepo.WithByProject(strconv.Itoa(int(id))))
+		merged, err := prepareCronJobAlertParams(cronModel.Type, previous.AdvancedParams, advanced)
+		if err != nil {
+			return err
+		}
+		method := req.AlertMethod
+		if method == "" {
+			method = previous.Method
+		}
+		if err := (AlertService{}).validateCronJobAlertChannels(cronModel.Type, merged, method); err != nil {
+			return err
+		}
 	}
 	upMap := make(map[string]interface{})
 	cronjob.EntryIDs = cronModel.EntryIDs
@@ -753,17 +807,29 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string
 		return err
 	}
 	updateAlert := dto.AlertCreate{
-		Title:     req.AlertTitle,
-		SendCount: req.AlertCount,
-		Method:    req.AlertMethod,
-		Type:      cronjob.Type,
-		Project:   strconv.Itoa(int(cronModel.ID)),
+		Title:          req.AlertTitle,
+		SendCount:      req.AlertCount,
+		Method:         req.AlertMethod,
+		Type:           cronjob.Type,
+		Project:        strconv.Itoa(int(cronModel.ID)),
+		AdvancedParams: advanced,
 	}
 	err = NewIAlertService().ExternalUpdateAlert(updateAlert, operator)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func cronJobAlertAdvancedParams(mode string) (string, error) {
+	if mode == "" {
+		return "", nil
+	}
+	data, err := json.Marshal(map[string]string{"alertTriggerMode": mode})
+	if err != nil {
+		return "", err
+	}
+	return alertUtil.MergeCronJobAlertParams("", string(data))
 }
 
 func (u *CronjobService) UpdateStatus(id uint, status string) error {

@@ -103,10 +103,12 @@ func repairIptablesBaseChains(clientName string) {
 	if status != constant.StatusEnable {
 		return
 	}
-	manager := iptables_helper.Manager{
-		LoadRequiredPorts: service.LoadRequiredFirewallPortWhiteList,
+	ports, err := service.LoadRequiredFirewallPortWhiteList()
+	if err != nil {
+		global.LOG.Warnf("load required firewall ports for base chain repair failed, err: %v", err)
+		return
 	}
-	if err := manager.RepairBaseChains(); err != nil {
+	if err := iptables_helper.RepairBaseChains(ports); err != nil {
 		global.LOG.Warnf("repair iptables base chains failed, err: %v", err)
 	}
 }

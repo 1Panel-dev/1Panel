@@ -46,7 +46,7 @@ func CreateTaskScanCustomWebhookAlertLog(
 	transport *http.Transport,
 	agentInfo *dto.AgentInfo,
 ) error {
-	params := CreateAlertParams(GetCronJobTypeName(pushAlert.Param))
+	params := CreateTaskAlertParams(pushAlert)
 	alertInfo := info
 	alertInfo.Type = alertType
 	create.Type = GetCronJobType(alertType)
@@ -99,7 +99,7 @@ func customWebhookTemplateData(rawDetail string, agentInfo *dto.AgentInfo, occur
 	if businessType == "" {
 		return webhook_sender.TemplateData{}, errors.New("resolve custom webhook alert detail failed")
 	}
-	content := GetSendContent(businessType, detail.Params, agentInfo)
+	content := GetAlertDetailContent(detail, agentInfo)
 	if content == "" {
 		content = i18n.GetMsgWithMap("CommonAlert", map[string]interface{}{"msg": detail.Title})
 	}

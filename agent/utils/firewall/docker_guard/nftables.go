@@ -3,6 +3,7 @@ package docker_guard
 import (
 	"errors"
 	"fmt"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"sort"
 	"strconv"
 	"strings"
@@ -18,13 +19,13 @@ const (
 	dockerNftTable = "docker-bridges"
 )
 
-type NftablesManager struct {
+type Nftables struct {
 	runner Runner
 }
 
-func NewNftablesManager() *NftablesManager { return &NftablesManager{runner: commandRunner{}} }
+func NewNftables() *Nftables { return &Nftables{runner: commandRunner{}} }
 
-func (m *NftablesManager) Initialize(policies []Policy) error {
+func (m *Nftables) Initialize(policies []Policy, inventory PolicyInventory) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if !m.runner.Exists("nft") {
@@ -36,10 +37,6 @@ func (m *NftablesManager) Initialize(policies []Policy) error {
 	if err := m.checkForwardPolicy(); err != nil {
 		return err
 	}
-	inventory, err := m.ListPolicies()
-	if err != nil {
-		return err
-	}
 	if err := m.ensureFamily(FamilyIPv4, true); err != nil {
 		return err
 	}
@@ -49,7 +46,7 @@ func (m *NftablesManager) Initialize(policies []Policy) error {
 	return m.rebuildLocked(policies, inventory)
 }
 
-func (m *NftablesManager) Bind() error {
+func (m *Nftables) Bind() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if err := m.bindExistingFamily(FamilyIPv4, true); err != nil {
@@ -61,17 +58,13 @@ func (m *NftablesManager) Bind() error {
 	return nil
 }
 
-func (m *NftablesManager) Reconcile(policies []Policy) error {
+func (m *Nftables) ReplacePolicies(policies []Policy, inventory PolicyInventory) error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
-	inventory, err := m.ListPolicies()
-	if err != nil {
-		return err
-	}
 	return m.rebuildLocked(policies, inventory)
 }
 
-func (m *NftablesManager) ListPolicies() (PolicyInventory, error) {
+func (m *Nftables) ListPolicies() (PolicyInventory, error) {
 	if !m.runner.Exists("nft") {
 		return PolicyInventory{}, nil
 	}
@@ -98,7 +91,7 @@ func (m *NftablesManager) ListPolicies() (PolicyInventory, error) {
 	return inventory, nil
 }
 
-func (m *NftablesManager) Unbind() error {
+func (m *Nftables) Unbind() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
@@ -109,7 +102,7 @@ func (m *NftablesManager) Unbind() error {
 	return nil
 }
 
-func (m *NftablesManager) Cleanup() error {
+func (m *Nftables) Cleanup() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if !m.runner.Exists("nft") {
@@ -126,7 +119,7 @@ func (m *NftablesManager) Cleanup() error {
 	return m.runBatch(commands)
 }
 
-func (m *NftablesManager) Initialized(family string) (bool, error) {
+func (m *Nftables) Initialized(family string) (bool, error) {
 	if nftTableFamily(family) == "" || !m.runner.Exists("nft") {
 		return false, nil
 	}
@@ -137,7 +130,7 @@ func (m *NftablesManager) Initialized(family string) (bool, error) {
 	return m.objectExists("chain", tableFamily, NftTable, NftChain), nil
 }
 
-func (m *NftablesManager) Status(family string) FamilyStatus {
+func (m *Nftables) Status(family string) FamilyStatus {
 	tableFamily := nftTableFamily(family)
 	if tableFamily == "" || !m.runner.Exists("nft") {
 		return FamilyStatus{State: StatusDisabled, Reason: ReasonCommandMissing}
@@ -145,16 +138,32 @@ func (m *NftablesManager) Status(family string) FamilyStatus {
 	if !m.objectExists("table", tableFamily, dockerNftTable) {
 		return FamilyStatus{State: StatusDisabled, Reason: ReasonDockerChainMissing}
 	}
-	if !m.objectExists("chain", tableFamily, NftTable, NftBaseChain) ||
-		!m.objectExists("chain", tableFamily, NftTable, NftChain) {
+	output, err := m.run("-a", "list", "table", tableFamily, NftTable)
+	if err != nil {
+		return FamilyStatus{State: StatusDisabled, Reason: ReasonGuardChainMissing}
+	}
+	baseExists, guardExists := false, false
+	currentChain := ""
+	var baseRules strings.Builder
+	for _, line := range strings.Split(output, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) >= 3 && fields[0] == "chain" && fields[2] == "{" {
+			currentChain = fields[1]
+			baseExists = baseExists || currentChain == NftBaseChain
+			guardExists = guardExists || currentChain == NftChain
+		} else if strings.TrimSpace(line) == "}" {
+			currentChain = ""
+		}
+		if currentChain == NftBaseChain {
+			baseRules.WriteString(line)
+			baseRules.WriteByte('\n')
+		}
+	}
+	if !baseExists || !guardExists {
 		return FamilyStatus{State: StatusDisabled, Reason: ReasonGuardChainMissing}
 	}
 	status := FamilyStatus{State: StatusNotEffective, Initialized: true}
-	rules, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftBaseChain)
-	if err != nil {
-		status.Reason = ReasonInspectFailed
-		return status
-	}
+	rules := baseRules.String()
 	jumps := nftJumpHandles(rules)
 	if len(jumps) == 0 {
 		status.Reason = ReasonJumpMissing
@@ -174,14 +183,14 @@ func (m *NftablesManager) Status(family string) FamilyStatus {
 	return status
 }
 
-func (m *NftablesManager) ensureFamily(family string, required bool) error {
+func (m *Nftables) ensureFamily(family string, required bool) error {
 	tableFamily := nftTableFamily(family)
 	if tableFamily == "" {
 		return fmt.Errorf("unsupported address family %q", family)
 	}
 	if !m.objectExists("table", tableFamily, dockerNftTable) {
 		if required {
-			return fmt.Errorf("%w %s", ErrDockerNftablesChainUnavailable, family)
+			return fmt.Errorf("%w %s", buserr.New("ErrDockerNftablesChainUnavailable"), family)
 		}
 		return nil
 	}
@@ -213,7 +222,7 @@ func (m *NftablesManager) ensureFamily(family string, required bool) error {
 	return m.runBatch(commands)
 }
 
-func (m *NftablesManager) bindExistingFamily(family string, required bool) error {
+func (m *Nftables) bindExistingFamily(family string, required bool) error {
 	tableFamily := nftTableFamily(family)
 	if !m.runner.Exists("nft") {
 		if required {
@@ -223,7 +232,7 @@ func (m *NftablesManager) bindExistingFamily(family string, required bool) error
 	}
 	if !m.objectExists("table", tableFamily, dockerNftTable) {
 		if required {
-			return fmt.Errorf("%w %s", ErrDockerNftablesChainUnavailable, family)
+			return fmt.Errorf("%w %s", buserr.New("ErrDockerNftablesChainUnavailable"), family)
 		}
 		return nil
 	}
@@ -237,7 +246,7 @@ func (m *NftablesManager) bindExistingFamily(family string, required bool) error
 	return m.ensureJump(family)
 }
 
-func (m *NftablesManager) ensureJump(family string) error {
+func (m *Nftables) ensureJump(family string) error {
 	tableFamily := nftTableFamily(family)
 	output, err := m.run("-a", "list", "chain", tableFamily, NftTable, NftBaseChain)
 	if err != nil {
@@ -251,7 +260,7 @@ func (m *NftablesManager) ensureJump(family string) error {
 	return m.runBatch(commands)
 }
 
-func (m *NftablesManager) rebuildLocked(policies []Policy, inventory PolicyInventory) error {
+func (m *Nftables) rebuildLocked(policies []Policy, inventory PolicyInventory) error {
 	if !m.runner.Exists("nft") {
 		return nil
 	}
@@ -312,7 +321,7 @@ func orderedNftRules(family string, policies []Policy, inventory PolicyInventory
 			continue
 		}
 		compiled := compileNftPolicy(policy)
-		orders := inventory.ManagedRuleOrders[managedOrderKey(policy.Family, policy.UUID)]
+		orders := inventory.ManagedRuleOrders[policy.Family+"\x00"+policy.UUID]
 		for ruleIndex, rule := range compiled {
 			order := int64(0)
 			if ruleIndex < len(orders) {
@@ -408,7 +417,7 @@ func validNftToken(token string) bool {
 	return !strings.ContainsAny(token, " \t\\\"'")
 }
 
-func (m *NftablesManager) unbindFamily(family string) error {
+func (m *Nftables) unbindFamily(family string) error {
 	if !m.runner.Exists("nft") {
 		return nil
 	}
@@ -427,7 +436,7 @@ func (m *NftablesManager) unbindFamily(family string) error {
 	return m.runBatch(commands)
 }
 
-func (m *NftablesManager) runBatch(commands [][]string) error {
+func (m *Nftables) runBatch(commands [][]string) error {
 	if len(commands) == 0 {
 		return nil
 	}
@@ -441,13 +450,13 @@ func (m *NftablesManager) runBatch(commands [][]string) error {
 	return nil
 }
 
-func (m *NftablesManager) objectExists(kind string, args ...string) bool {
+func (m *Nftables) objectExists(kind string, args ...string) bool {
 	command := append([]string{"list", kind}, args...)
 	_, err := m.run(command...)
 	return err == nil
 }
 
-func (m *NftablesManager) run(args ...string) (string, error) {
+func (m *Nftables) run(args ...string) (string, error) {
 	return m.runner.Run("nft", args...)
 }
 
@@ -497,9 +506,7 @@ func nftHasFirstUniqueJump(output string) bool {
 	return false
 }
 
-var ErrDockerForwardPolicyDrop = errors.New("iptables FORWARD default policy is DROP")
-
-func (m *NftablesManager) checkForwardPolicy() error {
+func (m *Nftables) checkForwardPolicy() error {
 	for _, family := range []struct{ command, name string }{
 		{"iptables", FamilyIPv4},
 		{"ip6tables", FamilyIPv6},
@@ -519,7 +526,11 @@ func (m *NftablesManager) checkForwardPolicy() error {
 			}
 			found = true
 			if fields[2] == "DROP" {
-				return &FamilyError{Family: family.name, Err: ErrDockerForwardPolicyDrop}
+				label := "IPv4"
+				if family.name == FamilyIPv6 {
+					label = "IPv6"
+				}
+				return &FamilyError{Family: family.name, Err: buserr.WithMap("ErrDockerForwardPolicyDrop", map[string]interface{}{"family": label}, nil)}
 			}
 			if fields[2] != "ACCEPT" {
 				return &FamilyError{Family: family.name, Err: fmt.Errorf("unexpected iptables FORWARD policy: %s", fields[2])}
