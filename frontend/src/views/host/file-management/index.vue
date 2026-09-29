@@ -739,7 +739,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { toRef, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
     batchGetFileRemarks,
@@ -852,6 +853,7 @@ const initData = () => ({
     sortOrder: 'ascending',
 });
 let req = reactive(initData());
+useSearchPersistence('host/file-management/index', { search: toRef(req, 'search') });
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
 const breadcrumbVisiblePaths = ref<FilePaths[]>([]);

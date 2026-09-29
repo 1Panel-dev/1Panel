@@ -521,6 +521,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { computed, h, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import ContainerLog from '@/components/log/container/index.vue';
@@ -575,6 +576,7 @@ const dialogBackupRef = ref();
 const uploadRef = ref();
 
 const searchName = ref('');
+useSearchPersistence('container/compose/index', { search: searchName });
 const includeAppStore = ref(localStorage.getItem('includeAppStore') !== 'false');
 const showType = ref('compose');
 const containerStats = ref<any[]>([]);

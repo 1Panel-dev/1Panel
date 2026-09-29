@@ -344,6 +344,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
@@ -358,7 +359,7 @@ import BatchSetGroup from '@/views/website/website/batch-op/group.vue';
 import BatchSetHttps from '@/views/website/website/batch-op/https.vue';
 
 import i18n from '@/lang';
-import { onMounted, reactive, ref, computed } from 'vue';
+import { toRef, onMounted, reactive, ref, computed } from 'vue';
 import { batchOperate, opWebsite, searchWebsites, updateWebsite } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { App } from '@/api/interface/app';
@@ -448,6 +449,7 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const req = pageState.req;
+useSearchPersistence('website/website/index', { search: toRef(req, 'name') });
 const tableSort = pageState.tableSort;
 
 const goRouter = async (key: string) => {

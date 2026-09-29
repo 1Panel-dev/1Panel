@@ -1,5 +1,6 @@
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { defineStore } from 'pinia';
-import { ref, reactive } from 'vue';
+import { ref, reactive, toRef } from 'vue';
 import { MsgError } from '@/utils/message';
 import { checkStreamAuth } from '@/utils/stream-auth';
 
@@ -44,6 +45,17 @@ export const ProcessStore = defineStore('ProcessStore', () => {
         processID: undefined,
         processName: '',
         port: undefined,
+    });
+
+    useSearchPersistence('host/process/process', {
+        pid: toRef(psSearch, 'pid'),
+        name: toRef(psSearch, 'name'),
+        username: toRef(psSearch, 'username'),
+    });
+    useSearchPersistence('host/process/network', {
+        processID: toRef(netSearch, 'processID'),
+        processName: toRef(netSearch, 'processName'),
+        port: toRef(netSearch, 'port'),
     });
 
     let pendingRequestType: 'ps' | 'net' | null = null;

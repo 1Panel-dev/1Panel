@@ -188,6 +188,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -215,6 +216,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('toolbox/clam/index', { search: searchName });
 
 const opRef = ref();
 const dialogRef = ref();

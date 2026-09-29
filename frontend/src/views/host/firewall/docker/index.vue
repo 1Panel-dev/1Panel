@@ -232,6 +232,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { computed, reactive, ref, watch } from 'vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
@@ -274,6 +275,7 @@ const taskLogRef = ref<InstanceType<typeof TaskLog>>();
 const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID, true);
 const orphanDrawerVisible = ref(false);
 const searchName = ref('');
+useSearchPersistence('host/firewall/docker/index', { search: searchName });
 const selects = ref<Firewall.DockerGuardContainer[]>([]);
 const orphanSelects = ref<Firewall.DockerGuardEndpoint[]>([]);
 const data = reactive<Firewall.DockerGuardList>({

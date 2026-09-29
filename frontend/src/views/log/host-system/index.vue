@@ -101,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Log } from '@/api/interface/log';
 import { getSystemLogStatus, listRunningServices, readSystemLogs } from '@/api/modules/log';
@@ -113,6 +114,7 @@ const logs = ref<Log.SystemLogItem[]>([]);
 const loading = ref(false);
 const watching = ref(false);
 const keyword = ref('');
+useSearchPersistence('log/host-system/index', { keyword });
 const priority = ref('');
 const service = ref('');
 const services = ref<string[]>([]);

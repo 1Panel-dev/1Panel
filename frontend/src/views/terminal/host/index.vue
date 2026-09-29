@@ -79,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import GroupDialog from '@/components/agent-group/index.vue';
 import OperateDialog from '@/views/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/terminal';
@@ -99,6 +100,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
+useSearchPersistence('terminal/host/index', { search: info });
 const group = ref<string>('');
 
 const opRef = ref();

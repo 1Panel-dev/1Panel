@@ -93,6 +93,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormatServerTimezone } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
@@ -119,6 +120,7 @@ const exportConfig = reactive({
     status: 'All',
 });
 const searchInfo = ref();
+useSearchPersistence('host/ssh/log/log', { search: searchInfo });
 const searchStatus = ref('All');
 
 const search = async () => {

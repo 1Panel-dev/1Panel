@@ -157,7 +157,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed } from 'vue';
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { toRef, reactive, ref, computed } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { computeSize2 } from '@/utils/size';
@@ -199,6 +200,7 @@ const paginationConfig = reactive({
     orderBy: 'createdAt',
     order: 'null',
 });
+useSearchPersistence('container/image/index', { search: toRef(paginationConfig, 'name') });
 const columns = ref([]);
 
 const isActive = ref(false);

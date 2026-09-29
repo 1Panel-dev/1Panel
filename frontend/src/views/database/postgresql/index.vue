@@ -241,6 +241,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
@@ -312,6 +313,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('database/postgresql/index', { search: searchName });
 
 const postgresqlContainer = ref();
 const postgresqlStatus = ref();
