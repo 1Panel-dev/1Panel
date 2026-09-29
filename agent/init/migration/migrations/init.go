@@ -1915,3 +1915,28 @@ var AddAcceleratorMetrics = &gormigrate.Migration{
 		return global.GPUMonitorDB.AutoMigrate(&model.MonitorGPU{})
 	},
 }
+
+var AddVLLMMonitor = &gormigrate.Migration{
+	ID: "20260928-vllm-monitor",
+	Migrate: func(tx *gorm.DB) error {
+		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
+	},
+}
+
+var AddMonitorSettings = &gormigrate.Migration{
+	ID: "20260929-monitor-settings",
+	Migrate: func(tx *gorm.DB) error {
+		for _, key := range []string{"MonitorStatus", "MonitorInterval", "MonitorStoreDays"} {
+			var setting model.Setting
+			if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
+				return err
+			}
+			for _, prefix := range []string{"GPU", "VLLM"} {
+				if err := tx.Where("key = ?", prefix+key).FirstOrCreate(&model.Setting{Key: prefix + key, Value: setting.Value}).Error; err != nil {
+					return err
+				}
+			}
+		}
+		return nil
+	},
+}

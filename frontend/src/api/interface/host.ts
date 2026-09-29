@@ -65,6 +65,12 @@ export namespace Host {
     }
 
     export interface MonitorSetting {
+        gpuMonitorStatus: string;
+        gpuMonitorStoreDays: string;
+        gpuMonitorInterval: string;
+        vllmMonitorStatus: string;
+        vllmMonitorStoreDays: string;
+        vllmMonitorInterval: string;
         defaultNetwork: string;
         defaultIO: string;
         monitorStatus: string;

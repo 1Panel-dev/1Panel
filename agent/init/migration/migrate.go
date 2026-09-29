@@ -112,6 +112,8 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddDockerPortGuardReadOnly,
 		migrations.MigrateFirewallPortWhitelistSources,
 		migrations.AddAcceleratorMetrics,
+		migrations.AddVLLMMonitor,
+		migrations.AddMonitorSettings,
 	}
 }
 

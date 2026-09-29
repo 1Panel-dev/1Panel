@@ -23,14 +23,6 @@ type providerResult struct {
 }
 
 func New() (bool, Client) {
-	return newClient()
-}
-
-func NewAll() (bool, Client) {
-	return New()
-}
-
-func newClient() (bool, Client) {
 	client := Client{}
 	if available, gpuClient := gpu.New(); available {
 		client.providers = append(client.providers, gpuProvider{client: gpuClient})

@@ -21,8 +21,9 @@ type GPUHistoryPoint struct {
 }
 
 type IMonitorRepo interface {
+	CleanHost() error
+	CleanGPU() error
 	GetBase(opts ...DBOption) ([]model.MonitorBase, error)
-	GetGPU(opts ...DBOption) ([]model.MonitorGPU, error)
 	CountGPU(opts ...DBOption) (int64, error)
 	GetGPUHistory(start time.Time, bucketSeconds int64, aggregation string, opts ...DBOption) ([]GPUHistoryPoint, error)
 	GetGPUDevices() ([]model.MonitorGPU, error)
@@ -38,12 +39,24 @@ type IMonitorRepo interface {
 	DelMonitorIO(timeForDelete time.Time) error
 	DelMonitorNet(timeForDelete time.Time) error
 
-	WithByProductName(name string) DBOption
 	WithByGPUDevice(deviceID, name string, legacy bool) DBOption
 }
 
 func NewIMonitorRepo() IMonitorRepo {
 	return &MonitorRepo{}
+}
+
+func (s *MonitorRepo) CleanHost() error {
+	for _, item := range []interface{}{&model.MonitorBase{}, &model.MonitorIO{}, &model.MonitorNetwork{}} {
+		if err := global.MonitorDB.Where("1 = 1").Delete(item).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *MonitorRepo) CleanGPU() error {
+	return global.GPUMonitorDB.Where("1 = 1").Delete(&model.MonitorGPU{}).Error
 }
 
 func (u *MonitorRepo) GetBase(opts ...DBOption) ([]model.MonitorBase, error) {
@@ -73,16 +86,6 @@ func (u *MonitorRepo) GetNetwork(opts ...DBOption) ([]model.MonitorNetwork, erro
 	err := db.Find(&data).Error
 	return data, err
 }
-func (u *MonitorRepo) GetGPU(opts ...DBOption) ([]model.MonitorGPU, error) {
-	var data []model.MonitorGPU
-	db := global.GPUMonitorDB
-	for _, opt := range opts {
-		db = opt(db)
-	}
-	err := db.Find(&data).Error
-	return data, err
-}
-
 func (u *MonitorRepo) CreateMonitorBase(model model.MonitorBase) error {
 	return global.MonitorDB.Create(&model).Error
 }
@@ -109,12 +112,6 @@ func (u *MonitorRepo) DelMonitorNet(timeForDelete time.Time) error {
 }
 func (s *MonitorRepo) DelMonitorGPU(timeForDelete time.Time) error {
 	return global.GPUMonitorDB.Where("created_at < ?", timeForDelete).Delete(&model.MonitorGPU{}).Error
-}
-
-func (s *MonitorRepo) WithByProductName(name string) DBOption {
-	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("product_name = ?", name)
-	}
 }
 
 func (u *MonitorRepo) GetGPUDevices() ([]model.MonitorGPU, error) {

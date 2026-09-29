@@ -1,66 +1,96 @@
 <template>
     <div v-loading="loading">
         <RouterMenu />
-        <el-card class="history-toolbar">
-            <div class="flex flex-wrap gap-3 items-center">
-                <el-date-picker
-                    v-model="timeRangeGlobal"
-                    type="datetimerange"
-                    style="max-width: 100%; width: 360px; flex-grow: 0"
-                    range-separator="-"
-                    :start-placeholder="$t('commons.search.timeStart')"
-                    :end-placeholder="$t('commons.search.timeEnd')"
-                    :shortcuts="shortcuts"
-                    :clearable="false"
-                    :size="isMobile ? 'small' : 'default'"
-                    @change="changeTimeRange"
-                />
-                <el-select style="max-width: 100%" class="p-w-300" v-model="selectedDevice" @change="search">
-                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
-                </el-select>
-                <el-radio-group v-if="history && history.bucketSeconds > 0" v-model="aggregation" @change="search">
-                    <el-radio-button value="avg">{{ $t('aiTools.gpu.historyAverage') }}</el-radio-button>
-                    <el-radio-button value="max">{{ $t('aiTools.gpu.historyPeak') }}</el-radio-button>
-                </el-radio-group>
+        <template v-if="supported">
+            <el-card class="history-toolbar">
+                <div class="flex flex-wrap gap-3 items-center">
+                    <el-date-picker
+                        v-model="timeRangeGlobal"
+                        type="datetimerange"
+                        style="max-width: 100%; width: 360px; flex-grow: 0"
+                        range-separator="-"
+                        :start-placeholder="$t('commons.search.timeStart')"
+                        :end-placeholder="$t('commons.search.timeEnd')"
+                        :shortcuts="shortcuts"
+                        :clearable="false"
+                        :size="isMobile ? 'small' : 'default'"
+                        @change="changeTimeRange"
+                    />
+                    <el-select style="max-width: 100%" class="p-w-300" v-model="selectedDevice" @change="search">
+                        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                    </el-select>
+                    <el-radio-group v-if="history && history.bucketSeconds > 0" v-model="aggregation" @change="search">
+                        <el-radio-button value="avg">{{ $t('aiTools.gpu.historyAverage') }}</el-radio-button>
+                        <el-radio-button value="max">{{ $t('aiTools.gpu.historyPeak') }}</el-radio-button>
+                    </el-radio-group>
+                    <TableRefresh @search="refresh" />
+                </div>
+                <div v-if="history?.sampleCount" class="history-summary">
+                    {{
+                        history.bucketSeconds > 0
+                            ? $t('aiTools.gpu.historyAggregated', {
+                                  seconds: history.bucketSeconds,
+                                  count: history.sampleCount,
+                              })
+                            : $t('aiTools.gpu.historyRaw', { count: history.sampleCount })
+                    }}
+                </div>
+            </el-card>
+            <el-alert
+                v-if="currentDevice?.legacy"
+                :title="$t('aiTools.gpu.legacyHistory')"
+                type="info"
+                :closable="false"
+                show-icon
+            />
+            <el-alert
+                v-if="failed"
+                :title="$t('aiTools.gpu.historyLoadFailed')"
+                type="error"
+                :closable="false"
+                show-icon
+            />
+            <el-empty v-else-if="!loading && !history?.sampleCount" :description="$t('commons.msg.noneData')" />
+            <el-empty
+                v-else-if="history?.sampleCount && !charts.length"
+                :description="$t('aiTools.gpu.historyMetricEmpty')"
+            />
+            <el-row v-else-if="history?.sampleCount" :gutter="12">
+                <el-col v-for="chart in charts" :key="chart.id" :xs="24" :md="12">
+                    <el-card class="card-interval">
+                        <template #header>{{ chart.title }}</template>
+                        <v-charts :id="chart.id" height="320px" type="line" :option="chart.option" :dataZoom="true" />
+                    </el-card>
+                </el-col>
+            </el-row>
+        </template>
+        <LayoutContent v-else-if="!loading" :title="$t('aiTools.gpu.gpu')" :divider="true">
+            <template #rightToolBar>
                 <TableRefresh @search="refresh" />
-            </div>
-            <div v-if="history?.sampleCount" class="history-summary">
-                {{
-                    history.bucketSeconds > 0
-                        ? $t('aiTools.gpu.historyAggregated', {
-                              seconds: history.bucketSeconds,
-                              count: history.sampleCount,
-                          })
-                        : $t('aiTools.gpu.historyRaw', { count: history.sampleCount })
-                }}
-            </div>
-        </el-card>
-        <el-alert
-            v-if="currentDevice?.legacy"
-            :title="$t('aiTools.gpu.legacyHistory')"
-            type="info"
-            :closable="false"
-            show-icon
-        />
-        <el-alert v-if="failed" :title="$t('aiTools.gpu.historyLoadFailed')" type="error" :closable="false" show-icon />
-        <el-empty v-else-if="!loading && !history?.sampleCount" :description="$t('commons.msg.noneData')" />
-        <el-empty
-            v-else-if="history?.sampleCount && !charts.length"
-            :description="$t('aiTools.gpu.historyMetricEmpty')"
-        />
-        <el-row v-else-if="history?.sampleCount" :gutter="12">
-            <el-col v-for="chart in charts" :key="chart.id" :xs="24" :md="12">
-                <el-card class="card-interval">
-                    <template #header>{{ chart.title }}</template>
-                    <v-charts :id="chart.id" height="320px" type="line" :option="chart.option" :dataZoom="true" />
-                </el-card>
-            </el-col>
-        </el-row>
+            </template>
+            <template #main>
+                <el-alert
+                    v-if="failed"
+                    :title="$t('aiTools.gpu.historyLoadFailed')"
+                    type="error"
+                    :closable="false"
+                    show-icon
+                />
+                <div v-else class="app-warn">
+                    <div class="flx-center">
+                        <span>{{ $t('aiTools.gpu.gpuHelper') }}</span>
+                    </div>
+                    <div>
+                        <img src="@/assets/images/no_app.svg" />
+                    </div>
+                </div>
+            </template>
+        </LayoutContent>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { loadGPUMonitor, getGPUOptions } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { shortcuts } from '@/utils/shortcuts';
@@ -71,6 +101,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const failed = ref(false);
+const supported = ref(false);
 const options = ref<(AI.ChartHide & { value: string; label: string })[]>([]);
 const selectedDevice = ref('');
 const aggregation = ref<'avg' | 'max'>('avg');
@@ -273,7 +304,10 @@ const search = async () => {
     history.value = undefined;
     failed.value = false;
     const device = currentDevice.value;
-    if (!device || !timeRangeGlobal.value) return;
+    if (!device || !timeRangeGlobal.value) {
+        loading.value = false;
+        return;
+    }
     loading.value = true;
     try {
         const response = await loadGPUMonitor({
@@ -296,11 +330,15 @@ const changeTimeRange = () => {
     void search();
 };
 const loadOptions = async () => {
+    const id = ++requestID;
+    history.value = undefined;
     loading.value = true;
     failed.value = false;
     try {
         const response = await getGPUOptions();
-        options.value = (response.data.chartHide || []).map((item) => ({
+        if (id !== requestID) return;
+        supported.value = response.data.supported;
+        options.value = (supported.value ? response.data.chartHide || [] : []).map((item) => ({
             ...item,
             value: item.deviceID || `legacy:${item.productName}`,
             label: `${item.productName} · ${item.deviceID || i18n.global.t('aiTools.gpu.legacyDevice')}`,
@@ -308,9 +346,9 @@ const loadOptions = async () => {
         if (!currentDevice.value) selectedDevice.value = options.value[0]?.value || '';
         await search();
     } catch {
-        failed.value = true;
+        if (id === requestID) failed.value = true;
     } finally {
-        loading.value = false;
+        if (id === requestID) loading.value = false;
     }
 };
 const refresh = () => {
@@ -364,6 +402,9 @@ const loadProcessType = (val: string) => {
 };
 
 onMounted(loadOptions);
+onBeforeUnmount(() => {
+    requestID++;
+});
 </script>
 
 <style scoped lang="scss">
