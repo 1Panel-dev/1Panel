@@ -1,500 +1,322 @@
 <template>
     <div v-loading="loading">
         <RouterMenu />
-
-        <div class="content-container__search" v-if="options.length !== 0">
-            <el-card>
-                <div>
-                    <el-date-picker
-                        @change="search()"
-                        v-model="timeRangeGlobal"
-                        type="datetimerange"
-                        range-separator="-"
-                        :start-placeholder="$t('commons.search.timeStart')"
-                        :end-placeholder="$t('commons.search.timeEnd')"
-                        :shortcuts="shortcuts"
-                        style="max-width: 360px; width: 100%"
-                        :size="isMobile ? 'small' : 'default'"
-                    ></el-date-picker>
-                    <el-select class="p-w-300 ml-2" v-model="searchInfo.productName" @change="search()">
-                        <el-option v-for="item in options" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <TableRefresh class="float-right" @search="search()" />
-                    <el-button icon="Setting" class="float-right mr-2" @click="quickJump()" />
-                </div>
-            </el-card>
-        </div>
-        <el-row :gutter="7" v-if="options.length !== 0">
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('aiTools.gpu.memoryUsage') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.memory">
-                        <v-charts
-                            height="400px"
-                            id="loadMemoryChart"
-                            type="line"
-                            :option="chartsOption['loadMemoryChart']"
-                            v-if="chartsOption['loadMemoryChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('aiTools.gpu.gpuUtil') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.gpu">
-                        <v-charts
-                            height="400px"
-                            id="loadGPUChart"
-                            type="line"
-                            :option="chartsOption['loadGPUChart']"
-                            v-if="chartsOption['loadGPUChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('aiTools.gpu.process') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.process">
-                        <v-charts
-                            height="400px"
-                            id="loadProcessChart"
-                            type="line"
-                            :option="chartsOption['loadProcessChart']"
-                            v-if="chartsOption['loadProcessChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('aiTools.gpu.powerUsage') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.power">
-                        <v-charts
-                            height="400px"
-                            id="loadPowerChart"
-                            type="line"
-                            :option="chartsOption['loadPowerChart']"
-                            v-if="chartsOption['loadPowerChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div>
-                            {{ $t('aiTools.gpu.temperature') }}
-                            <el-tooltip placement="top" :content="$t('aiTools.gpu.temperatureHelper')">
-                                <el-icon size="15"><InfoFilled /></el-icon>
-                            </el-tooltip>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.temperature">
-                        <v-charts
-                            height="400px"
-                            id="loadTemperatureChart"
-                            type="line"
-                            :option="chartsOption['loadTemperatureChart']"
-                            v-if="chartsOption['loadTemperatureChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
-                </el-card>
-            </el-col>
-            <el-col :xs="24" :sm="24" :md="12" :lg="12" :xl="12">
-                <el-card class="card-interval" style="overflow: inherit">
-                    <template #header>
-                        <div :class="isMobile ? 'flx-wrap' : 'flex justify-between'">
-                            <span class="title">{{ $t('aiTools.gpu.fanSpeed') }}</span>
-                        </div>
-                    </template>
-                    <div class="chart" v-if="!currentHide?.speed">
-                        <v-charts
-                            height="400px"
-                            id="loadSpeedChart"
-                            type="line"
-                            :option="chartsOption['loadSpeedChart']"
-                            v-if="chartsOption['loadSpeedChart']"
-                            :dataZoom="true"
-                        />
-                    </div>
-                    <el-empty class="chart" v-else :description="$t('aiTools.gpu.notSupport')" />
+        <el-card class="history-toolbar">
+            <div class="flex flex-wrap gap-3 items-center">
+                <el-date-picker
+                    v-model="timeRangeGlobal"
+                    type="datetimerange"
+                    style="max-width: 100%; width: 360px; flex-grow: 0"
+                    range-separator="-"
+                    :start-placeholder="$t('commons.search.timeStart')"
+                    :end-placeholder="$t('commons.search.timeEnd')"
+                    :shortcuts="shortcuts"
+                    :clearable="false"
+                    :size="isMobile ? 'small' : 'default'"
+                    @change="changeTimeRange"
+                />
+                <el-select style="max-width: 100%" class="p-w-300" v-model="selectedDevice" @change="search">
+                    <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value" />
+                </el-select>
+                <el-radio-group v-if="history && history.bucketSeconds > 0" v-model="aggregation" @change="search">
+                    <el-radio-button value="avg">{{ $t('aiTools.gpu.historyAverage') }}</el-radio-button>
+                    <el-radio-button value="max">{{ $t('aiTools.gpu.historyPeak') }}</el-radio-button>
+                </el-radio-group>
+                <TableRefresh @search="refresh" />
+            </div>
+            <div v-if="history?.sampleCount" class="history-summary">
+                {{
+                    history.bucketSeconds > 0
+                        ? $t('aiTools.gpu.historyAggregated', {
+                              seconds: history.bucketSeconds,
+                              count: history.sampleCount,
+                          })
+                        : $t('aiTools.gpu.historyRaw', { count: history.sampleCount })
+                }}
+            </div>
+        </el-card>
+        <el-alert
+            v-if="currentDevice?.legacy"
+            :title="$t('aiTools.gpu.legacyHistory')"
+            type="info"
+            :closable="false"
+            show-icon
+        />
+        <el-alert v-if="failed" :title="$t('aiTools.gpu.historyLoadFailed')" type="error" :closable="false" show-icon />
+        <el-empty v-else-if="!loading && !history?.sampleCount" :description="$t('commons.msg.noneData')" />
+        <el-empty
+            v-else-if="history?.sampleCount && !charts.length"
+            :description="$t('aiTools.gpu.historyMetricEmpty')"
+        />
+        <el-row v-else-if="history?.sampleCount" :gutter="12">
+            <el-col v-for="chart in charts" :key="chart.id" :xs="24" :md="12">
+                <el-card class="card-interval">
+                    <template #header>{{ chart.title }}</template>
+                    <v-charts :id="chart.id" height="320px" type="line" :option="chart.option" :dataZoom="true" />
                 </el-card>
             </el-col>
         </el-row>
-
-        <LayoutContent :title="$t('aiTools.gpu.gpu')" :divider="true" v-else>
-            <template #main>
-                <div class="app-warn">
-                    <div class="flx-center">
-                        <span>{{ $t('aiTools.gpu.gpuHelper') }}</span>
-                    </div>
-                    <div>
-                        <img src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
-            </template>
-        </LayoutContent>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { loadGPUMonitor, getGPUOptions } from '@/api/modules/ai';
-import { dateFormatWithoutYear } from '@/utils/date';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { shortcuts } from '@/utils/shortcuts';
 import i18n from '@/lang';
-import { routerToName } from '@/utils/router';
 import { AI } from '@/api/interface/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const { isMobile } = useGlobalStore();
-
 const loading = ref(false);
-const options = ref<string[]>([]);
-const gpuType = ref('gpu');
+const failed = ref(false);
+const options = ref<(AI.ChartHide & { value: string; label: string })[]>([]);
+const selectedDevice = ref('');
+const aggregation = ref<'avg' | 'max'>('avg');
+const history = ref<AI.MonitorGPUData>();
+const currentDevice = computed(() => options.value.find((item) => item.value === selectedDevice.value));
 const timeRangeGlobal = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
-const chartsOption = ref({
-    loadPowerChart: null,
-    loadGPUChart: null,
-    loadMemoryChart: null,
-    loadTemperatureChart: null,
-    loadSpeedChart: null,
+let followNow = true;
+let requestID = 0;
+
+type MetricKey = Exclude<keyof AI.MonitorGPUData, 'date' | 'gpuProcesses' | 'sampleCount' | 'bucketSeconds'>;
+type Series = { key: MetricKey; label: string; unit: string; percent?: boolean };
+const charts = computed(() => {
+    const data = history.value;
+    if (!data) return [];
+    const definitions: { id: string; title: string; series: Series[] }[] = [
+        {
+            id: 'gpu-util',
+            title: currentDevice.value?.type === 'npu' ? 'aiCore' : 'gpuUtil',
+            series: [{ key: 'gpuValue', label: currentDevice.value?.type === 'npu' ? 'aiCore' : 'gpuUtil', unit: '%' }],
+        },
+        {
+            id: 'gpu-memory',
+            title: 'memory',
+            series: [
+                { key: 'memoryUsed', label: 'memoryUsed', unit: 'MiB' },
+                { key: 'memoryTotal', label: 'memoryTotal', unit: 'MiB' },
+                { key: 'memoryPercent', label: 'percent', unit: '%', percent: true },
+            ],
+        },
+        {
+            id: 'gpu-power',
+            title: 'powerUsage',
+            series: [
+                { key: 'powerUsed', label: 'powerCurrent', unit: 'W' },
+                { key: 'powerTotal', label: 'powerLimit', unit: 'W' },
+                { key: 'powerPercent', label: 'percent', unit: '%', percent: true },
+            ],
+        },
+        {
+            id: 'gpu-temperature',
+            title: 'temperature',
+            series: [
+                { key: 'temperatureValue', label: 'temperature', unit: '°C' },
+                { key: 'memoryTemperatureValue', label: 'memoryTemperature', unit: '°C' },
+                { key: 'hotspotTemperature', label: 'hotspotTemperature', unit: '°C' },
+            ],
+        },
+        {
+            id: 'gpu-frequency',
+            title: 'frequency',
+            series: [
+                { key: 'frequencyValue', label: 'frequency', unit: 'MHz' },
+                { key: 'memoryFrequencyValue', label: 'memoryFrequency', unit: 'MHz' },
+                { key: 'mediaFrequency', label: 'mediaFrequency', unit: 'MHz' },
+            ],
+        },
+        { id: 'gpu-fan', title: 'fanSpeed', series: [{ key: 'speedValue', label: 'fanSpeed', unit: '%' }] },
+        {
+            id: 'gpu-process',
+            title: 'processCount',
+            series: [{ key: 'processCount', label: 'processCount', unit: '' }],
+        },
+        {
+            id: 'memory-activity',
+            title: 'memoryActivity',
+            series: [{ key: 'memoryActivity', label: 'memoryActivity', unit: '%' }],
+        },
+        {
+            id: 'engine-util',
+            title: 'engineUtil',
+            series: [
+                { key: 'encoderUtil', label: 'encoderUtil', unit: '%' },
+                { key: 'decoderUtil', label: 'decoderUtil', unit: '%' },
+                { key: 'jpegUtil', label: 'jpegUtil', unit: '%' },
+                { key: 'ofaUtil', label: 'ofaUtil', unit: '%' },
+                { key: 'mediaUtil', label: 'mediaUtil', unit: '%' },
+                { key: 'computeUtil', label: 'computeUtil', unit: '%' },
+                { key: 'copyUtil', label: 'copyUtil', unit: '%' },
+            ],
+        },
+        {
+            id: 'memory-bandwidth',
+            title: 'memoryBandwidth',
+            series: [
+                { key: 'memoryBandwidth', label: 'memoryBandwidth', unit: '%' },
+                { key: 'ddrBandwidth', label: 'ddrBandwidth', unit: '%' },
+                { key: 'hbmBandwidth', label: 'hbmBandwidth', unit: '%' },
+            ],
+        },
+        {
+            id: 'npu-cpu',
+            title: 'cpuUtil',
+            series: [
+                { key: 'aiCPUUtil', label: 'aiCPUUtil', unit: '%' },
+                { key: 'ctrlCPUUtil', label: 'ctrlCPUUtil', unit: '%' },
+            ],
+        },
+        {
+            id: 'npu-ddr',
+            title: 'ddrUsage',
+            series: [
+                { key: 'ddrUsed', label: 'ddrUsed', unit: 'MiB' },
+                { key: 'ddrTotal', label: 'ddrTotal', unit: 'MiB' },
+            ],
+        },
+        {
+            id: 'npu-hbm',
+            title: 'hbmUsage',
+            series: [
+                { key: 'hbmUsed', label: 'hbmUsed', unit: 'MiB' },
+                { key: 'hbmTotal', label: 'hbmTotal', unit: 'MiB' },
+            ],
+        },
+        {
+            id: 'npu-hugepages',
+            title: 'hugepagesUsage',
+            series: [
+                { key: 'hugepagesUsed', label: 'hugepagesUsed', unit: 'pages' },
+                { key: 'hugepagesTotal', label: 'hugepagesTotal', unit: 'pages' },
+            ],
+        },
+        { id: 'fan-rpm', title: 'fanRPM', series: [{ key: 'fanRPM', label: 'fanRPM', unit: 'RPM' }] },
+    ];
+    const dates = (data.date || []).map((date) => new Date(date).getTime());
+    return definitions.flatMap((chart) => {
+        const series = chart.series.filter((item) => data[item.key]?.some((value) => value != null));
+        if (!series.length) return [];
+        const hasPercent = series.some((item) => item.percent) && series.some((item) => !item.percent);
+        const primaryUnit = (series.find((item) => !item.percent) || series[0]).unit;
+        return [
+            {
+                id: chart.id,
+                title: i18n.global.t('aiTools.gpu.' + chart.title),
+                option: {
+                    xData: dates,
+                    xAxis: {
+                        type: 'time',
+                        splitNumber: isMobile.value ? 3 : 6,
+                        axisLabel: { hideOverlap: true },
+                        min: timeRangeGlobal.value[0].getTime(),
+                        max: timeRangeGlobal.value[1].getTime(),
+                    },
+                    yData: series.map((item, index) => ({
+                        itemStyle: {
+                            color: ['#409eff', '#67c23a', '#e6a23c', '#f56c6c', '#8b5cf6', '#0891b2', '#db2777'][
+                                index % 7
+                            ],
+                        },
+                        areaStyle: { opacity: 0 },
+                        name: i18n.global.t('aiTools.gpu.' + item.label),
+                        data: dates.map((date, index) => [date, data[item.key]?.[index] ?? null]),
+                        yAxisIndex: item.percent && hasPercent ? 1 : 0,
+                        showSymbol: true,
+                        symbolSize: 3,
+                    })),
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: primaryUnit,
+                            ...(primaryUnit === '°C' ? {} : { min: 0 }),
+                            ...(primaryUnit === '%' ? { max: 100 } : {}),
+                        },
+                        ...(hasPercent ? [{ type: 'value', name: '%', position: 'right', min: 0 }] : []),
+                    ],
+                    grid: { left: isMobile.value ? 55 : 65, right: hasPercent ? 55 : 25, bottom: 80, top: 55 },
+                    legend: { type: 'scroll', top: 0, bottom: 'auto' },
+                    tooltip: {
+                        trigger: 'axis',
+                        formatter: (items: any[]) => {
+                            const tooltip = document.createElement('div');
+                            const title = document.createElement('div');
+                            title.textContent = items.length ? new Date(items[0].value[0]).toLocaleString() : '';
+                            tooltip.appendChild(title);
+                            for (const item of items) {
+                                const line = document.createElement('div');
+                                const value = item.value[1];
+                                line.textContent = `${item.seriesName}: ${value == null ? 'N/A' : Number(value.toFixed(2))} ${series[item.seriesIndex]?.unit || ''}`;
+                                tooltip.appendChild(line);
+                            }
+                            if (chart.id === 'gpu-process' && data.bucketSeconds === 0 && items.length) {
+                                const processes = data.gpuProcesses?.[items[0].dataIndex];
+                                if (processes?.length) {
+                                    const typeTitle = i18n.global.t(
+                                        currentDevice.value?.type === 'xpu' ? 'aiTools.gpu.shr' : 'aiTools.gpu.type',
+                                    );
+                                    appendProcessTable(tooltip, processes, typeTitle);
+                                }
+                            }
+                            return tooltip;
+                        },
+                    },
+                },
+            },
+        ];
+    });
 });
-const chartHide = ref<AI.ChartHide[]>([]);
-const currentHide = ref<AI.ChartHide>();
-
-const searchInfo = reactive<AI.MonitorGPUSearch>({
-    productName: '',
-    startTime: new Date(new Date().setHours(0, 0, 0, 0)),
-    endTime: new Date(),
-});
-
-const loadOptions = async () => {
-    loading.value = true;
-    await getGPUOptions()
-        .then((res) => {
-            gpuType.value = res.data.gpuType || 'gpu';
-            options.value = res.data.options || [];
-            chartHide.value = res.data.chartHide || [];
-            searchInfo.productName = options.value.length > 0 ? options.value[0] : '';
-            search();
-        })
-        .catch(() => {
-            loading.value = false;
-            options.value = [];
-        });
-};
-
-const loadCurrentHide = () => {
-    currentHide.value = undefined;
-    for (const item of chartHide.value) {
-        if (item.productName === searchInfo.productName) {
-            currentHide.value = item;
-            break;
-        }
-    }
-};
 
 const search = async () => {
-    if (timeRangeGlobal.value && timeRangeGlobal.value.length === 2) {
-        searchInfo.startTime = timeRangeGlobal.value[0];
-        searchInfo.endTime = timeRangeGlobal.value[1];
-    }
+    const id = ++requestID;
+    history.value = undefined;
+    failed.value = false;
+    const device = currentDevice.value;
+    if (!device || !timeRangeGlobal.value) return;
     loading.value = true;
-    loadCurrentHide();
-    await loadGPUMonitor(searchInfo)
-        .then((res) => {
-            loading.value = false;
-            let baseDate = res.data.date || [];
-            if (baseDate.length === 0) {
-                baseDate = loadEmptyDate(timeRangeGlobal.value);
-            }
-            let date = baseDate.map(function (item: any) {
-                return dateFormatWithoutYear(item);
-            });
-            if (!currentHide.value || !currentHide.value.gpu) {
-                initCPUCharts(date, res.data.gpuValue || []);
-            }
-            if (!currentHide.value || !currentHide.value.memory) {
-                initMemoryCharts(date, res.data);
-            }
-            if (!currentHide.value || !currentHide.value.power) {
-                initPowerCharts(date, res.data);
-            }
-            if (!currentHide.value || !currentHide.value.speed) {
-                initSpeedCharts(date, res.data.speedValue || []);
-            }
-            if (!currentHide.value || !currentHide.value.temperature) {
-                initTemperatureCharts(date, res.data.temperatureValue || []);
-            }
-            if (!currentHide.value || !currentHide.value.process) {
-                initProcessCharts(date, res.data);
-            }
-        })
-        .catch(() => {
-            loading.value = false;
+    try {
+        const response = await loadGPUMonitor({
+            deviceID: device.deviceID,
+            productName: device.productName,
+            legacy: device.legacy,
+            startTime: timeRangeGlobal.value[0],
+            endTime: timeRangeGlobal.value[1],
+            aggregation: aggregation.value,
         });
+        if (id === requestID) history.value = response.data;
+    } catch {
+        if (id === requestID) failed.value = true;
+    } finally {
+        if (id === requestID) loading.value = false;
+    }
 };
-
-function initCPUCharts(baseDate: any, items: any) {
-    let percents = items.map(function (item: any) {
-        return Number(item.toFixed(2));
-    });
-    let data = percents.length === 0 ? loadEmptyData() : percents;
-    chartsOption.value['loadGPUChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.gpuUtil'),
-                data: data,
-            },
-        ],
-        formatStr: '%',
-    };
-}
-function initMemoryCharts(baseDate: any, data: any) {
-    chartsOption.value['loadMemoryChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.memoryUsed'),
-                data: data.memoryUsed,
-            },
-            {
-                name: i18n.global.t('aiTools.gpu.memoryTotal'),
-                data: data.memoryTotal,
-            },
-            {
-                name: i18n.global.t('aiTools.gpu.percent'),
-                data: data.memoryPercent,
-                yAxisIndex: 1,
-            },
-        ],
-        yAxis: [
-            { type: 'value', name: i18n.global.t('aiTools.gpu.memory') },
-            {
-                type: 'value',
-                name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
-                position: 'right',
-                alignTicks: true,
-            },
-        ],
-        grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (list: any) {
-                return withMemoryProcess(list);
-            },
-        },
-        formatStr: '%',
-    };
-}
-
-function initPowerCharts(baseDate: any, data: any) {
-    const yData: any[] = [
-        {
-            name: i18n.global.t('aiTools.gpu.powerCurrent'),
-            data: data.powerUsed,
-        },
-    ];
-    const yAxis: any[] = [{ type: 'value', name: i18n.global.t('aiTools.gpu.power') }];
-    if (!currentHide.value?.powerLimit) {
-        yData.push(
-            {
-                name: i18n.global.t('aiTools.gpu.powerLimit'),
-                data: data.powerTotal,
-            },
-            {
-                name: i18n.global.t('aiTools.gpu.percent'),
-                data: data.powerPercent,
-                yAxisIndex: 1,
-            },
-        );
-        yAxis.push({
-            type: 'value',
-            name: i18n.global.t('aiTools.gpu.percent') + ' ( % )',
-            position: 'right',
-            alignTicks: true,
-        });
-    }
-    chartsOption.value['loadPowerChart'] = {
-        xData: baseDate,
-        yData,
-        yAxis,
-        grid: isMobile.value ? { left: '15%', right: '15%', bottom: '20%' } : null,
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (list: any) {
-                const tooltip = createTooltip(list[0].name);
-                for (const item of list) {
-                    if (
-                        item.seriesName === i18n.global.t('aiTools.gpu.powerCurrent') ||
-                        item.seriesName === i18n.global.t('aiTools.gpu.powerLimit')
-                    ) {
-                        appendSeries(tooltip, item, item.data, 'W');
-                    } else {
-                        appendSeries(tooltip, item, Number(item.data.toFixed(2)), '%');
-                    }
-                }
-                return tooltip;
-            },
-        },
-        formatStr: currentHide.value?.powerLimit ? 'W' : '%',
-    };
-}
-
-const quickJump = () => {
-    routerToName('HostMonitorSetting');
+const changeTimeRange = () => {
+    followNow = false;
+    void search();
 };
-
-function initTemperatureCharts(baseDate: any, items: any) {
-    let temperatures = items.map(function (item: any) {
-        return Number(item);
-    });
-    temperatures = temperatures.length === 0 ? loadEmptyData() : temperatures;
-    chartsOption.value['loadTemperatureChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.temperature'),
-                data: temperatures,
-            },
-        ],
-        formatStr: '°C',
-    };
-}
-function initProcessCharts(baseDate: any, data: any) {
-    let process = data.processCount.map(function (item: any) {
-        return Number(item);
-    });
-    process = process.length === 0 ? loadEmptyData() : process;
-    chartsOption.value['loadProcessChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.processCount'),
-                data: process,
-            },
-        ],
-        tooltip: {
-            trigger: 'axis',
-            formatter: function (list: any) {
-                const param = list[0];
-                const index = param.dataIndex;
-                let process = data.gpuProcesses?.length > index ? data.gpuProcesses[index] : [];
-                return withProcess(list, process);
-            },
-        },
-        formatStr: '-',
-    };
-}
-function initSpeedCharts(baseDate: any, items: any) {
-    let speeds = items.map(function (item: any) {
-        return Number(item);
-    });
-    speeds = speeds.length === 0 ? loadEmptyData() : speeds;
-    chartsOption.value['loadSpeedChart'] = {
-        xData: baseDate,
-        yData: [
-            {
-                name: i18n.global.t('aiTools.gpu.fanSpeed'),
-                data: speeds,
-            },
-        ],
-        formatStr: '%',
-    };
-}
-
-function loadEmptyDate(timeRange: any) {
-    if (timeRange.length != 2) {
-        return;
+const loadOptions = async () => {
+    loading.value = true;
+    failed.value = false;
+    try {
+        const response = await getGPUOptions();
+        options.value = (response.data.chartHide || []).map((item) => ({
+            ...item,
+            value: item.deviceID || `legacy:${item.productName}`,
+            label: `${item.productName} · ${item.deviceID || i18n.global.t('aiTools.gpu.legacyDevice')}`,
+        }));
+        if (!currentDevice.value) selectedDevice.value = options.value[0]?.value || '';
+        await search();
+    } catch {
+        failed.value = true;
+    } finally {
+        loading.value = false;
     }
-    let date1 = new Date(timeRange[0]);
-    let date2 = new Date(timeRange[1]);
-    return [date1, date2];
-}
-function loadEmptyData() {
-    return [0, 0];
-}
-
-function withMemoryProcess(list: any) {
-    const tooltip = createTooltip(list[0].name);
-    for (const item of list) {
-        if (
-            item.seriesName === i18n.global.t('aiTools.gpu.memoryUsed') ||
-            item.seriesName === i18n.global.t('aiTools.gpu.memoryTotal')
-        ) {
-            appendSeries(tooltip, item, item.data, 'MiB');
-        } else {
-            appendSeries(tooltip, item, Number(item.data.toFixed(2)), '%');
-        }
-    }
-    return tooltip;
-}
-
-function withProcess(list: any, process: any) {
-    const tooltip = createTooltip(list[0].name);
-    for (const item of list) {
-        appendSeries(tooltip, item, item.data, '');
-    }
-    const type = currentHide.value?.type || gpuType.value;
-    const title = type === 'xpu' ? i18n.global.t('aiTools.gpu.shr') : i18n.global.t('aiTools.gpu.type');
-    appendProcessTable(tooltip, process || [], title);
-    return tooltip;
-}
-
-function createTooltip(name: unknown): HTMLDivElement {
-    const tooltip = document.createElement('div');
-    const date = document.createElement('div');
-    date.style.display = 'inline-block';
-    date.style.width = '100%';
-    date.style.paddingBottom = '10px';
-    date.textContent = `${i18n.global.t('commons.search.date')}: ${String(name ?? '').replaceAll('\n', ' ')}`;
-    tooltip.appendChild(date);
-    return tooltip;
-}
-
-function appendSeries(tooltip: HTMLElement, item: any, data: unknown, unit: string) {
-    const line = document.createElement('div');
-    line.style.width = '100%';
-    const marker = document.createElement('span');
-    marker.textContent = '●';
-    if (typeof item.color === 'string') {
-        marker.style.color = item.color;
-    }
-    line.appendChild(marker);
-    line.appendChild(document.createTextNode(` ${String(item.seriesName ?? '')}: ${String(data ?? '')} ${unit}`));
-    tooltip.appendChild(line);
-}
+};
+const refresh = () => {
+    if (followNow) timeRangeGlobal.value = [timeRangeGlobal.value[0], new Date()];
+    void loadOptions();
+};
 
 function appendProcessTable(tooltip: HTMLElement, process: AI.GPUProcess[], typeTitle: string) {
     const separator = document.createElement('div');
@@ -541,24 +363,17 @@ const loadProcessType = (val: string) => {
     return val;
 };
 
-onMounted(() => {
-    loadOptions();
-});
+onMounted(loadOptions);
 </script>
 
 <style scoped lang="scss">
-.content-container__search {
-    margin-top: 7px;
-    .el-card {
-        --el-card-padding: 12px;
-    }
+.history-toolbar {
+    margin: 7px 0 12px;
+    --el-card-padding: 12px;
 }
-.title {
-    font-size: 16px;
-    font-weight: 500;
-}
-.chart {
-    width: 100%;
-    height: 400px;
+.history-summary {
+    margin-top: 12px;
+    color: var(--el-text-color-secondary);
+    font-size: 13px;
 }
 </style>

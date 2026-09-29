@@ -134,10 +134,11 @@ function initChart() {
             series.push({
                 name: item?.name,
                 type: 'line',
-                itemStyle: seriesStyle[index + 2],
-                areaStyle: seriesStyle[index],
+                itemStyle: item.itemStyle ?? seriesStyle[index + 2],
+                areaStyle: item.areaStyle ?? seriesStyle[index],
                 data: item?.data,
-                showSymbol: false,
+                showSymbol: item.showSymbol ?? false,
+                symbolSize: item.symbolSize,
                 yAxisIndex: item.yAxisIndex ? 1 : null,
             });
         });
@@ -307,7 +308,9 @@ function initChart() {
         series: series,
         dataZoom: [
             {
-                ...(props.option.xData?.[0] ? { startValue: props.option.xData[0] } : {}),
+                ...((props.option.xAxis?.min ?? props.option.xData?.[0]) != null
+                    ? { startValue: props.option.xAxis?.min ?? props.option.xData[0] }
+                    : {}),
                 left: grid.left,
                 right: grid.right,
                 show: props.dataZoom,

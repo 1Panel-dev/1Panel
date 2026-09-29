@@ -2,12 +2,7 @@
     <div>
         <RouterMenu />
         <div>
-            <LayoutContent
-                v-loading="loading"
-                :title="$t('aiTools.gpu.gpu')"
-                :divider="true"
-                v-if="hasAccelerators && !loading"
-            >
+            <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.gpu')" v-if="hasAccelerators">
                 <template #rightToolBar>
                     <TableSetting title="gpu-refresh" @search="refresh()" />
                     <TableRefresh @search="refresh()" />
@@ -21,6 +16,10 @@
                         <div v-if="gpuInfo.cudaVersion" class="overview-item">
                             <span>{{ $t('aiTools.gpu.cudaVersion') }}</span>
                             <strong>{{ gpuInfo.cudaVersion }}</strong>
+                        </div>
+                        <div v-if="gpuInfo.collectedAt" class="overview-item">
+                            <span>{{ $t('aiTools.gpu.collectedAt') }}</span>
+                            <strong>{{ new Date(gpuInfo.collectedAt).toLocaleString() }}</strong>
                         </div>
                         <div class="overview-count">{{ deviceCountText }}</div>
                     </div>
@@ -46,30 +45,50 @@
                                                 <span
                                                     v-if="item.type === 'ascend'"
                                                     class="status-dot"
-                                                    :class="item.health === 'OK' ? 'status-ok' : 'status-error'"
+                                                    :class="
+                                                        item.health === 'OK'
+                                                            ? 'status-ok'
+                                                            : isAvailable(item.health)
+                                                              ? 'status-error'
+                                                              : ''
+                                                    "
                                                 ></span>
                                                 <strong>{{ deviceTitle(item) }}</strong>
                                                 <span class="card-product-name">· {{ item.productName }}</span>
                                             </div>
-                                            <el-button
-                                                type="primary"
-                                                plain
-                                                round
-                                                size="small"
-                                                class="process-count"
-                                                @click.stop="openGPUProcesses(item)"
-                                            >
-                                                {{ $t('aiTools.gpu.processCount') }}: {{ item.processes?.length || 0 }}
-                                            </el-button>
+                                            <div class="device-actions">
+                                                <el-button
+                                                    type="primary"
+                                                    plain
+                                                    round
+                                                    size="small"
+                                                    class="process-count"
+                                                    @click.stop="openGPUProcesses(item)"
+                                                >
+                                                    {{ $t('aiTools.gpu.processCount') }}:
+                                                    {{
+                                                        item.processStatus === 'unavailable'
+                                                            ? 'N/A'
+                                                            : item.processes?.length || 0
+                                                    }}
+                                                </el-button>
+                                                <el-button
+                                                    type="primary"
+                                                    link
+                                                    @click="detailDeviceKey = deviceKey(item)"
+                                                >
+                                                    {{ $t('commons.button.view') }}
+                                                </el-button>
+                                            </div>
                                         </div>
                                     </template>
 
                                     <div class="device-metrics">
-                                        <div v-if="hasUtilField(item)" class="metric-item metric-primary">
+                                        <div class="metric-item metric-primary">
                                             <span>
                                                 {{ item.type === 'ascend' ? 'AICore(%)' : $t('aiTools.gpu.gpuUtil') }}
                                             </span>
-                                            <strong>{{ deviceUtil(item) }}</strong>
+                                            <strong>{{ deviceUtil(item) || 'N/A' }}</strong>
                                             <el-progress
                                                 v-if="isAvailable(deviceUtil(item))"
                                                 :percentage="percentage(deviceUtil(item))"
@@ -92,174 +111,40 @@
                                             <strong>{{ formatTemperature(item.temperature) }}</strong>
                                         </div>
                                     </div>
-                                    <div v-if="hasDeviceDetails(item)" class="card-detail">
-                                        <div v-if="item.type !== 'ascend'" class="detail-sections">
-                                            <section v-if="hasGPURuntimeDetails(item)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.runtimeInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div v-if="isAvailable(item.fanSpeed)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.fanSpeed') }}
-                                                        </span>
-                                                        <strong>{{ item.fanSpeed }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.performanceState)" class="detail-item">
-                                                        <span class="detail-label cell-item">
-                                                            {{ $t('aiTools.gpu.performanceState') }}
-                                                            <el-tooltip
-                                                                placement="top"
-                                                                :content="$t('aiTools.gpu.performanceStateHelper')"
-                                                            >
-                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                            </el-tooltip>
-                                                        </span>
-                                                        <strong>{{ item.performanceState }}</strong>
-                                                    </div>
-                                                    <div v-if="hasPowerField(item)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.powerUsage') }}
-                                                        </span>
-                                                        <strong>{{ formatPower(item) }}</strong>
-                                                    </div>
-                                                </div>
-                                            </section>
-                                            <section v-if="hasGPUDeviceDetails(item)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.deviceInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div v-if="isAvailable(item.persistenceMode)" class="detail-item">
-                                                        <span class="detail-label cell-item">
-                                                            {{ $t('aiTools.gpu.persistenceMode') }}
-                                                            <el-tooltip
-                                                                placement="top"
-                                                                :content="$t('aiTools.gpu.persistenceModeHelper')"
-                                                            >
-                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                            </el-tooltip>
-                                                        </span>
-                                                        <strong>
-                                                            {{
-                                                                $t('aiTools.gpu.' + item.persistenceMode.toLowerCase())
-                                                            }}
-                                                        </strong>
-                                                    </div>
-                                                    <div v-if="hasField(item.busID)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.busID') }}
-                                                        </span>
-                                                        <strong>{{ item.busID }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.displayActive)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.displayActive') }}
-                                                        </span>
-                                                        <strong>
-                                                            {{
-                                                                lowerCase(item.displayActive) === 'disabled'
-                                                                    ? $t('aiTools.gpu.displayActiveF')
-                                                                    : $t('aiTools.gpu.displayActiveT')
-                                                            }}
-                                                        </strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.ecc)" class="detail-item">
-                                                        <span class="detail-label cell-item">
-                                                            Uncorr. ECC
-                                                            <el-tooltip
-                                                                placement="top"
-                                                                :content="$t('aiTools.gpu.ecc')"
-                                                            >
-                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                            </el-tooltip>
-                                                        </span>
-                                                        <strong>{{ loadEcc(item.ecc) }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.computeMode)" class="detail-item">
-                                                        <span class="detail-label cell-item">
-                                                            {{ $t('aiTools.gpu.computeMode') }}
-                                                            <el-tooltip placement="top">
-                                                                <template #content>
-                                                                    {{ $t('aiTools.gpu.defaultHelper') }}
-                                                                    <br />
-                                                                    {{ $t('aiTools.gpu.exclusiveProcessHelper') }}
-                                                                    <br />
-                                                                    {{ $t('aiTools.gpu.exclusiveThreadHelper') }}
-                                                                    <br />
-                                                                    {{ $t('aiTools.gpu.prohibitedHelper') }}
-                                                                </template>
-                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                            </el-tooltip>
-                                                        </span>
-                                                        <strong>{{ loadComputeMode(item.computeMode) }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.migMode)" class="detail-item">
-                                                        <span class="detail-label cell-item">
-                                                            MIG M.
-                                                            <el-tooltip
-                                                                placement="top"
-                                                                :content="$t('aiTools.gpu.migModeHelper')"
-                                                            >
-                                                                <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                            </el-tooltip>
-                                                        </span>
-                                                        <strong>
-                                                            {{
-                                                                item.migMode === 'N/A'
-                                                                    ? $t('aiTools.gpu.migModeNA')
-                                                                    : $t('aiTools.gpu.' + lowerCase(item.migMode))
-                                                            }}
-                                                        </strong>
-                                                    </div>
-                                                </div>
-                                            </section>
+                                    <div class="device-secondary-metrics">
+                                        <div class="metric-item">
+                                            <span>{{ $t('aiTools.gpu.powerUsage') }}</span>
+                                            <strong>{{ formatPower(item) || 'N/A' }}</strong>
                                         </div>
-                                        <div v-else class="detail-sections">
-                                            <section v-if="hasNPURuntimeDetails(item)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.runtimeInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div v-if="hasPowerField(item)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.powerUsage') }}
-                                                        </span>
-                                                        <strong>{{ formatPower(item) }}</strong>
-                                                    </div>
-                                                    <div
-                                                        v-if="hasUsage(item.hugepagesUsed, item.hugepagesTotal)"
-                                                        class="detail-item"
-                                                    >
-                                                        <span class="detail-label">Hugepages-Usage(page)</span>
-                                                        <strong>
-                                                            {{ formatUsage(item.hugepagesUsed, item.hugepagesTotal) }}
-                                                        </strong>
-                                                    </div>
-                                                    <div
-                                                        v-if="hasUsage(item.hbmUsed, item.hbmTotal)"
-                                                        class="detail-item"
-                                                    >
-                                                        <span class="detail-label">HBM-Usage</span>
-                                                        <strong>
-                                                            {{ formatMemory(item.hbmUsed, item.hbmTotal) }}
-                                                        </strong>
-                                                    </div>
-                                                </div>
-                                            </section>
-                                            <section v-if="hasField(item.busID)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.deviceInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.busID') }}
-                                                        </span>
-                                                        <strong>{{ item.busID }}</strong>
-                                                    </div>
-                                                </div>
-                                            </section>
+                                        <div class="metric-item">
+                                            <span>
+                                                {{
+                                                    item.type === 'ascend'
+                                                        ? $t('aiTools.gpu.aiCPUUtil')
+                                                        : $t('aiTools.gpu.frequency')
+                                                }}
+                                            </span>
+                                            <strong>
+                                                {{
+                                                    (item.type === 'ascend' ? item.aiCPUUtil : item.frequency) || 'N/A'
+                                                }}
+                                            </strong>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span>
+                                                {{
+                                                    item.type === 'ascend'
+                                                        ? $t('commons.table.status')
+                                                        : $t('aiTools.gpu.fanSpeed')
+                                                }}
+                                            </span>
+                                            <strong v-if="item.type === 'ascend'">{{ item.health || 'N/A' }}</strong>
+                                            <strong v-else>
+                                                {{
+                                                    [item.fanSpeed, item.fanRPM].filter(isAvailable).join(' / ') ||
+                                                    'N/A'
+                                                }}
+                                            </strong>
                                         </div>
                                     </div>
                                 </el-card>
@@ -283,16 +168,30 @@
                                                 <strong>XPU {{ item.basic.deviceID }}</strong>
                                                 <span class="card-product-name">· {{ item.basic.deviceName }}</span>
                                             </div>
-                                            <el-button
-                                                type="primary"
-                                                size="small"
-                                                plain
-                                                round
-                                                class="process-count"
-                                                @click.stop="openXPUProcesses(item.basic.deviceID)"
-                                            >
-                                                {{ $t('aiTools.gpu.processCount') }}: {{ item.processes?.length || 0 }}
-                                            </el-button>
+                                            <div class="device-actions">
+                                                <el-button
+                                                    type="primary"
+                                                    size="small"
+                                                    plain
+                                                    round
+                                                    class="process-count"
+                                                    @click.stop="openXPUProcesses(item.basic.deviceID)"
+                                                >
+                                                    {{ $t('aiTools.gpu.processCount') }}:
+                                                    {{
+                                                        item.processStatus === 'unavailable'
+                                                            ? 'N/A'
+                                                            : item.processes?.length || 0
+                                                    }}
+                                                </el-button>
+                                                <el-button
+                                                    type="primary"
+                                                    link
+                                                    @click="detailDeviceKey = `xpu-${item.basic.deviceID}`"
+                                                >
+                                                    {{ $t('commons.button.view') }}
+                                                </el-button>
+                                            </div>
                                         </div>
                                     </template>
 
@@ -330,52 +229,18 @@
                                             <strong>{{ formatTemperature(item.stats.temperature) }}</strong>
                                         </div>
                                     </div>
-                                    <div v-if="hasXPUDetails(item)" class="card-detail">
-                                        <div class="detail-sections">
-                                            <section v-if="hasXPURuntimeDetails(item)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.runtimeInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div v-if="isAvailable(item.basic.freeMemory)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.freeMemory') }}
-                                                        </span>
-                                                        <strong>{{ item.basic.freeMemory }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.stats.power)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.powerUsage') }}
-                                                        </span>
-                                                        <strong>{{ item.stats.power }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.stats.frequency)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.frequency') }}
-                                                        </span>
-                                                        <strong>{{ item.stats.frequency }}</strong>
-                                                    </div>
-                                                    <div v-if="isAvailable(item.stats.memoryUtil)" class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.memoryUsage') }}
-                                                        </span>
-                                                        <strong>{{ item.stats.memoryUtil }}</strong>
-                                                    </div>
-                                                </div>
-                                            </section>
-                                            <section v-if="hasField(item.basic.pciBdfAddress)" class="detail-section">
-                                                <div class="detail-section-title">
-                                                    {{ $t('aiTools.gpu.deviceInfo') }}
-                                                </div>
-                                                <div class="detail-grid">
-                                                    <div class="detail-item">
-                                                        <span class="detail-label">
-                                                            {{ $t('aiTools.gpu.busID') }}
-                                                        </span>
-                                                        <strong>{{ item.basic.pciBdfAddress }}</strong>
-                                                    </div>
-                                                </div>
-                                            </section>
+                                    <div class="device-secondary-metrics">
+                                        <div class="metric-item">
+                                            <span>{{ $t('aiTools.gpu.powerUsage') }}</span>
+                                            <strong>{{ item.stats.power || 'N/A' }}</strong>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span>{{ $t('aiTools.gpu.frequency') }}</span>
+                                            <strong>{{ item.stats.frequency || 'N/A' }}</strong>
+                                        </div>
+                                        <div class="metric-item">
+                                            <span>{{ $t('aiTools.gpu.memoryTemperature') }}</span>
+                                            <strong>{{ formatTemperature(item.stats.memoryTemperature || '') }}</strong>
                                         </div>
                                     </div>
                                 </el-card>
@@ -385,26 +250,61 @@
                 </template>
             </LayoutContent>
         </div>
+        <DrawerPro
+            :model-value="Boolean(detailDeviceKey)"
+            :header="$t('commons.button.view')"
+            :resource="deviceDetail?.title || ''"
+            size="large"
+            @close="detailDeviceKey = ''"
+        >
+            <DeviceDetails
+                v-if="deviceDetail?.sections.length"
+                :key="detailDeviceKey"
+                :sections="deviceDetail.sections"
+            />
+            <el-empty v-else :description="$t('commons.msg.noneData')" />
+        </DrawerPro>
         <DialogPro v-model="processDrawerVisible" :title="processDrawerTitle" size="large">
             <template v-if="processGPU">
+                <el-alert
+                    v-if="processGPU.processStatus === 'unavailable'"
+                    :title="$t('aiTools.gpu.processUnavailable')"
+                    type="warning"
+                    :closable="false"
+                />
                 <el-table v-if="processGPU.processes?.length" :data="processGPU.processes">
                     <el-table-column label="PID" prop="pid" />
                     <el-table-column :label="$t('aiTools.gpu.processName')" prop="processName" />
                     <el-table-column :label="$t('aiTools.gpu.processMemoryUsage')" prop="usedMemory" />
                 </el-table>
-                <el-empty v-else :description="$t('commons.msg.noneData')" />
+                <el-empty
+                    v-else-if="processGPU.processStatus !== 'unavailable'"
+                    :description="$t('commons.msg.noneData')"
+                />
             </template>
             <template v-else-if="processXPU">
+                <el-alert
+                    v-if="processXPU.processStatus === 'unavailable'"
+                    :title="$t('aiTools.gpu.processUnavailable')"
+                    type="warning"
+                    :closable="false"
+                />
                 <el-table v-if="processXPU.processes?.length" :data="processXPU.processes">
                     <el-table-column label="PID" prop="pid" />
                     <el-table-column :label="$t('aiTools.gpu.processName')" prop="command" />
                     <el-table-column :label="$t('aiTools.gpu.shr')" prop="shr" />
                     <el-table-column :label="$t('aiTools.gpu.processMemoryUsage')" prop="memory" />
                 </el-table>
-                <el-empty v-else :description="$t('commons.msg.noneData')" />
+                <el-empty
+                    v-else-if="processXPU.processStatus !== 'unavailable'"
+                    :description="$t('commons.msg.noneData')"
+                />
             </template>
         </DialogPro>
         <LayoutContent :title="$t('aiTools.gpu.gpu')" :divider="true" v-if="!hasAccelerators && !loading">
+            <template #rightToolBar>
+                <TableRefresh @search="refresh()" />
+            </template>
             <template #main>
                 <div class="app-warn">
                     <div class="flx-center">
@@ -425,10 +325,13 @@ import { loadGPUInfo } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
+import { MsgWarning } from '@/utils/message';
+import DeviceDetails, { type DetailSection } from './components/DeviceDetails.vue';
 
 const loading = ref();
 const processDrawerVisible = ref(false);
 const processDeviceKey = ref('');
+const detailDeviceKey = ref('');
 const processXPUId = ref<number | null>(null);
 const gpuInfo = ref<AI.Info>({
     cudaVersion: '',
@@ -454,7 +357,9 @@ interface GPUGroup {
 }
 
 const deviceKey = (item: AcceleratorDevice) => {
-    return item.type === 'ascend' ? `ascend-${item.npuIndex}-${item.chipIndex}` : `${item.type}-${item.index}`;
+    return item.type === 'ascend'
+        ? `ascend-${item.busID || item.npuIndex}-${item.chipIndex}`
+        : `${item.type}-${item.uuid || item.busID || item.index}`;
 };
 
 const groupKey = (item: AcceleratorDevice) => {
@@ -476,6 +381,25 @@ const gpuGroups = computed<GPUGroup[]>(() => {
         group.devices.push(item);
     }
     return Array.from(groups.values());
+});
+
+const deviceDetail = computed(() => {
+    const device = [...gpuInfo.value.gpu, ...gpuInfo.value.npu].find(
+        (item) => deviceKey(item) === detailDeviceKey.value,
+    );
+    if (device) {
+        const title =
+            device.type === 'ascend' ? `NPU ${device.npuIndex} · ${deviceTitle(device)}` : deviceTitle(device);
+        return { title: `${title} · ${device.productName}`, sections: deviceDetailSections(device) };
+    }
+    const xpu = xpuInfo.value.xpu.find((item) => `xpu-${item.basic.deviceID}` === detailDeviceKey.value);
+    if (xpu) {
+        return {
+            title: `XPU ${xpu.basic.deviceID} · ${xpu.basic.deviceName}`,
+            sections: xpuDetailSections(xpu),
+        };
+    }
+    return null;
 });
 
 const processGPU = computed(() => {
@@ -549,20 +473,252 @@ const applyAcceleratorInfo = (data: AI.Info) => {
 };
 
 const search = async () => {
+    if (loading.value) return;
     loading.value = true;
-    await loadGPUInfo()
-        .then((res) => {
-            loading.value = false;
-            applyAcceleratorInfo(res.data);
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        const res = await loadGPUInfo();
+        applyAcceleratorInfo(res.data);
+        if (res.data.warnings?.length) {
+            MsgWarning(res.data.warnings.join('; '));
+        }
+    } catch {
+    } finally {
+        loading.value = false;
+    }
 };
 
-const refresh = async () => {
-    const res = await loadGPUInfo();
-    applyAcceleratorInfo(res.data);
+const refresh = search;
+
+const visibleSections = (sections: DetailSection[]) => {
+    return sections
+        .map((section) => ({
+            ...section,
+            items: section.items.filter((item) => isAvailable(item.value)),
+        }))
+        .filter((section) => section.items.length);
+};
+
+const deviceDetailSections = (item: AcceleratorDevice): DetailSection[] => {
+    const t = i18n.global.t;
+    if (item.type === 'ascend') {
+        return visibleSections([
+            {
+                id: 'runtime',
+                title: t('aiTools.gpu.runtimeInfo'),
+                items: [
+                    { label: t('aiTools.gpu.powerUsage'), value: item.powerDraw },
+                    { label: t('commons.table.status'), value: item.health },
+                ],
+            },
+            {
+                id: 'memory',
+                title: t('aiTools.gpu.memory'),
+                items: [
+                    {
+                        label: t('aiTools.gpu.ddrUsage'),
+                        value: hasUsage(item.memoryUsed, item.memoryTotal)
+                            ? formatMemory(item.memoryUsed || 'N/A', item.memoryTotal || 'N/A')
+                            : '',
+                    },
+                    {
+                        label: t('aiTools.gpu.hbmUsage'),
+                        value: hasUsage(item.hbmUsed, item.hbmTotal)
+                            ? formatMemory(item.hbmUsed || 'N/A', item.hbmTotal || 'N/A')
+                            : '',
+                    },
+                    {
+                        label: t('aiTools.gpu.hugepagesUsage'),
+                        value: hasUsage(item.hugepagesUsed, item.hugepagesTotal)
+                            ? formatUsage(item.hugepagesUsed, item.hugepagesTotal)
+                            : '',
+                    },
+                    { label: t('aiTools.gpu.ddrBandwidth'), value: item.ddrBandwidth },
+                    { label: t('aiTools.gpu.hbmBandwidth'), value: item.hbmBandwidth },
+                ],
+            },
+            {
+                id: 'engines',
+                title: t('aiTools.gpu.cpuUtil'),
+                items: [
+                    { label: t('aiTools.gpu.aiCPUUtil'), value: item.aiCPUUtil },
+                    { label: t('aiTools.gpu.ctrlCPUUtil'), value: item.ctrlCPUUtil },
+                ],
+            },
+            {
+                id: 'device',
+                title: t('aiTools.gpu.deviceInfo'),
+                items: [{ label: t('aiTools.gpu.busID'), value: item.busID }],
+            },
+        ]);
+    }
+    return visibleSections([
+        {
+            id: 'runtime',
+            title: t('aiTools.gpu.runtimeInfo'),
+            items: [
+                { label: t('aiTools.gpu.powerUsage'), value: formatPower(item) },
+                { label: t('aiTools.gpu.frequency'), value: item.frequency },
+                { label: t('aiTools.gpu.memoryFrequency'), value: item.memoryFrequency },
+                { label: t('aiTools.gpu.mediaFrequency'), value: item.mediaFrequency },
+                { label: t('aiTools.gpu.fanSpeed') + ' (%)', value: item.fanSpeed },
+                { label: t('aiTools.gpu.fanRPM'), value: item.fanRPM },
+                { label: t('aiTools.gpu.hotspotTemperature'), value: item.hotspotTemperature },
+                { label: t('aiTools.gpu.memoryTemperature'), value: item.memoryTemperature },
+                {
+                    label: t('aiTools.gpu.performanceState'),
+                    value: item.performanceState,
+                    help: t('aiTools.gpu.performanceStateHelper'),
+                },
+                { label: t('aiTools.gpu.clockEvents'), value: item.clockEvents?.join(', ') },
+            ],
+        },
+        {
+            id: 'memory',
+            title: t('aiTools.gpu.memory'),
+            items: [
+                { label: t('aiTools.gpu.memoryActivity'), value: item.memoryActivity },
+                { label: t('aiTools.gpu.freeMemory'), value: item.memoryFree },
+                { label: t('aiTools.gpu.memoryReserved'), value: item.memoryReserved },
+            ],
+        },
+        {
+            id: 'engines',
+            title: t('aiTools.gpu.engineUtil'),
+            items: [
+                { label: t('aiTools.gpu.encoderUtil'), value: item.encoderUtil },
+                { label: t('aiTools.gpu.decoderUtil'), value: item.decoderUtil },
+                { label: t('aiTools.gpu.jpegUtil'), value: item.jpegUtil },
+                { label: t('aiTools.gpu.ofaUtil'), value: item.ofaUtil },
+                { label: t('aiTools.gpu.mediaUtil'), value: item.mediaUtil },
+            ],
+        },
+        {
+            id: 'ecc',
+            title: 'ECC',
+            items: [
+                { label: 'ECC', value: isAvailable(item.ecc) ? loadEcc(item.ecc) : '', help: t('aiTools.gpu.ecc') },
+                {
+                    label: t('aiTools.gpu.eccPending'),
+                    value: isAvailable(item.eccPending) ? loadEcc(item.eccPending!) : '',
+                },
+                ...(item.eccErrors || []).flatMap((error) => [
+                    { label: `${error.scope} · ${t('aiTools.gpu.eccCorrectable')}`, value: error.correctable },
+                    { label: `${error.scope} · ${t('aiTools.gpu.eccUncorrectable')}`, value: error.uncorrectable },
+                ]),
+            ],
+        },
+        {
+            id: 'device',
+            title: t('aiTools.gpu.deviceInfo'),
+            items: [
+                { label: 'UUID', value: item.uuid, ellipsis: true },
+                { label: t('aiTools.gpu.busID'), value: item.busID },
+                { label: t('aiTools.gpu.driverVersion'), value: item.driverVersion },
+                { label: t('aiTools.gpu.architecture'), value: item.architecture },
+                { label: t('aiTools.gpu.powerDefaultLimit'), value: item.defaultPowerLimit },
+                { label: t('aiTools.gpu.powerMaxLimit'), value: item.maxPowerLimit },
+                {
+                    label: t('aiTools.gpu.pcieGeneration'),
+                    value: isAvailable(item.pcieGeneration)
+                        ? `${item.pcieGeneration} / ${item.pcieMaxGeneration || 'N/A'}`
+                        : '',
+                },
+                {
+                    label: t('aiTools.gpu.pcieWidth'),
+                    value: isAvailable(item.pcieWidth) ? `${item.pcieWidth} / ${item.pcieMaxWidth || 'N/A'}` : '',
+                },
+                {
+                    label: t('aiTools.gpu.persistenceMode'),
+                    value: isAvailable(item.persistenceMode) ? loadEcc(item.persistenceMode) : '',
+                    help: t('aiTools.gpu.persistenceModeHelper'),
+                },
+                {
+                    label: t('aiTools.gpu.displayActive'),
+                    value: isAvailable(item.displayActive)
+                        ? t(
+                              'aiTools.gpu.' +
+                                  (item.displayActive.toLowerCase() === 'disabled'
+                                      ? 'displayActiveF'
+                                      : 'displayActiveT'),
+                          )
+                        : '',
+                },
+                {
+                    label: t('aiTools.gpu.computeMode'),
+                    value: isAvailable(item.computeMode) ? loadComputeMode(item.computeMode) : '',
+                    help: ['defaultHelper', 'exclusiveProcessHelper', 'exclusiveThreadHelper', 'prohibitedHelper']
+                        .map((key) => t('aiTools.gpu.' + key))
+                        .join('\n'),
+                },
+                {
+                    label: 'MIG',
+                    value: isAvailable(item.migMode) ? loadEcc(item.migMode) : '',
+                    help: t('aiTools.gpu.migModeHelper'),
+                },
+            ],
+        },
+    ]);
+};
+
+const xpuDetailSections = (item: AI.XpuInfo['xpu'][number]): DetailSection[] => {
+    const t = i18n.global.t;
+    return visibleSections([
+        {
+            id: 'runtime',
+            title: t('aiTools.gpu.runtimeInfo'),
+            items: [
+                { label: t('aiTools.gpu.powerUsage'), value: item.stats.power },
+                { label: t('aiTools.gpu.frequency'), value: item.stats.frequency },
+                { label: t('aiTools.gpu.mediaFrequency'), value: item.stats.mediaFrequency },
+                { label: t('aiTools.gpu.memoryTemperature'), value: item.stats.memoryTemperature },
+            ],
+        },
+        {
+            id: 'memory',
+            title: t('aiTools.gpu.memory'),
+            items: [
+                { label: t('aiTools.gpu.freeMemory'), value: item.basic.freeMemory },
+                { label: t('aiTools.gpu.memoryUsage'), value: item.stats.memoryUtil },
+                { label: t('aiTools.gpu.memoryBandwidth'), value: item.stats.memoryBandwidthUtil },
+            ],
+        },
+        {
+            id: 'engines',
+            title: t('aiTools.gpu.engineUtil'),
+            items: [
+                { label: t('aiTools.gpu.computeUtil'), value: item.stats.computeUtil },
+                { label: t('aiTools.gpu.mediaUtil'), value: item.stats.mediaUtil },
+                { label: t('aiTools.gpu.copyUtil'), value: item.stats.copyUtil },
+            ],
+        },
+        ...(item.tiles || []).map((tile) => ({
+            id: `tile-${tile.tileID}`,
+            title: `Tile ${tile.tileID}`,
+            items: [
+                { label: t('aiTools.gpu.gpuUtil'), value: tile.stats.gpuUtil },
+                { label: t('aiTools.gpu.powerCurrent'), value: tile.stats.power },
+                { label: t('aiTools.gpu.frequency'), value: tile.stats.frequency },
+                { label: t('aiTools.gpu.mediaFrequency'), value: tile.stats.mediaFrequency },
+                { label: t('aiTools.gpu.temperature'), value: tile.stats.temperature },
+                { label: t('aiTools.gpu.memoryTemperature'), value: tile.stats.memoryTemperature },
+                { label: t('aiTools.gpu.memoryUsed'), value: tile.stats.memoryUsed },
+                { label: t('aiTools.gpu.memoryUsage'), value: tile.stats.memoryUtil },
+                { label: t('aiTools.gpu.memoryBandwidth'), value: tile.stats.memoryBandwidthUtil },
+                { label: t('aiTools.gpu.computeUtil'), value: tile.stats.computeUtil },
+                { label: t('aiTools.gpu.mediaUtil'), value: tile.stats.mediaUtil },
+                { label: t('aiTools.gpu.copyUtil'), value: tile.stats.copyUtil },
+            ],
+        })),
+        {
+            id: 'device',
+            title: t('aiTools.gpu.deviceInfo'),
+            items: [
+                { label: 'UUID', value: item.basic.uuid, ellipsis: true },
+                { label: t('aiTools.gpu.busID'), value: item.basic.pciBdfAddress },
+                { label: t('aiTools.gpu.driverVersion'), value: item.basic.driverVersion },
+            ],
+        },
+    ]);
 };
 
 const openGPUProcesses = (item: AcceleratorDevice) => {
@@ -582,11 +738,11 @@ const deviceTitle = (item: AcceleratorDevice) => {
 };
 
 const isAvailable = (value?: string) => {
-    return Boolean(value && value.trim() !== '' && value.trim().toUpperCase() !== 'N/A');
-};
-
-const hasField = (value?: string) => {
-    return typeof value === 'string' && value.trim() !== '';
+    return Boolean(
+        value &&
+        value.trim() !== '' &&
+        !['N/A', 'NA', 'NOT SUPPORTED', '[NOT SUPPORTED]', 'NAN', 'INF'].includes(value.trim().toUpperCase()),
+    );
 };
 
 interface Quantity {
@@ -676,81 +832,15 @@ const formatUsage = (usedValue?: string, totalValue?: string) => {
     return `${usedValue || 'N/A'} / ${totalValue || 'N/A'}`;
 };
 
-const hasDeviceDetails = (item: AcceleratorDevice) => {
-    if (item.type !== 'ascend') {
-        return hasGPURuntimeDetails(item) || hasGPUDeviceDetails(item);
-    }
-    return (
-        hasField(item.powerDraw) ||
-        hasField(item.busID) ||
-        hasUsage(item.hugepagesUsed, item.hugepagesTotal) ||
-        hasUsage(item.hbmUsed, item.hbmTotal)
-    );
-};
-
-const hasGPURuntimeDetails = (item: AI.GPU) => {
-    return isAvailable(item.fanSpeed) || isAvailable(item.performanceState) || hasPowerField(item);
-};
-
-const hasGPUDeviceDetails = (item: AI.GPU) => {
-    return (
-        isAvailable(item.persistenceMode) ||
-        hasField(item.busID) ||
-        isAvailable(item.displayActive) ||
-        isAvailable(item.ecc) ||
-        isAvailable(item.computeMode) ||
-        isAvailable(item.migMode)
-    );
-};
-
-const hasXPUDetails = (item: AI.XpuInfo['xpu'][number]) => {
-    return (
-        hasField(item.basic.pciBdfAddress) ||
-        isAvailable(item.basic.freeMemory) ||
-        isAvailable(item.stats.power) ||
-        isAvailable(item.stats.frequency) ||
-        isAvailable(item.stats.memoryUtil)
-    );
-};
-
-const hasNPURuntimeDetails = (item: AI.NPU) => {
-    return (
-        hasPowerField(item) ||
-        hasUsage(item.hugepagesUsed, item.hugepagesTotal) ||
-        hasUsage(item.hbmUsed, item.hbmTotal)
-    );
-};
-
-const hasXPURuntimeDetails = (item: AI.XpuInfo['xpu'][number]) => {
-    return (
-        isAvailable(item.basic.freeMemory) ||
-        isAvailable(item.stats.power) ||
-        isAvailable(item.stats.frequency) ||
-        isAvailable(item.stats.memoryUtil)
-    );
-};
-
 const deviceUtil = (item: AcceleratorDevice) => {
     return item.type === 'ascend' ? item.aiCore : item.gpuUtil;
-};
-
-const hasUtilField = (item: AcceleratorDevice) => {
-    return item.type === 'ascend' ? hasField(item.aiCore) : true;
-};
-
-const hasPowerField = (item: AcceleratorDevice) => {
-    return item.type === 'ascend' ? hasField(item.powerDraw) : isAvailable(item.powerDraw);
 };
 
 const formatPower = (item: AcceleratorDevice) => {
     if (item.type === 'ascend') {
         return item.powerDraw;
     }
-    return isAvailable(item.maxPowerLimit) ? `${item.powerDraw} / ${item.maxPowerLimit}` : item.powerDraw;
-};
-
-const lowerCase = (val: string) => {
-    return val.toLowerCase();
+    return isAvailable(item.powerLimit) ? `${item.powerDraw || 'N/A'} / ${item.powerLimit}` : item.powerDraw;
 };
 
 const loadComputeMode = (val: string) => {
@@ -776,7 +866,7 @@ const loadEcc = (val: string) => {
     if (val === 'Enabled') {
         return i18n.global.t('aiTools.gpu.enabled');
     }
-    return val || 0;
+    return val || 'N/A';
 };
 
 onMounted(() => {
@@ -789,6 +879,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     gap: 0;
+    flex-wrap: wrap;
     min-height: 44px;
     padding: 9px 14px;
     border: 1px solid var(--el-border-color-lighter);
@@ -888,6 +979,7 @@ onMounted(() => {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
+    align-items: stretch;
 }
 .device-card {
     box-sizing: border-box;
@@ -933,10 +1025,17 @@ onMounted(() => {
     text-overflow: ellipsis;
     white-space: nowrap;
 }
-.process-count {
-    flex: 0 0 auto;
-    align-self: center;
+.device-actions {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: 12px;
     margin-left: 12px;
+    .el-button + .el-button {
+        margin-left: 0;
+    }
+}
+.process-count {
     font-size: 12px;
     white-space: nowrap;
 }
@@ -969,7 +1068,16 @@ onMounted(() => {
         margin-top: 8px;
     }
 }
+.device-secondary-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px 20px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--el-border-color-lighter);
+}
 .metric-primary {
+    min-height: 67px;
     strong {
         font-size: 20px;
         font-weight: 600;
@@ -1001,73 +1109,6 @@ onMounted(() => {
 .xpu-metrics {
     grid-template-columns: repeat(3, minmax(0, 1fr));
 }
-.card-detail {
-    margin-top: 16px;
-    padding-top: 14px;
-    border-top: 1px solid var(--el-border-color-lighter);
-}
-.detail-section + .detail-section {
-    margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid var(--el-border-color-lighter);
-}
-.detail-section-title {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    margin-bottom: 10px;
-    color: var(--el-text-color-regular);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 18px;
-    &::before {
-        width: 3px;
-        height: 12px;
-        border-radius: 2px;
-        background: var(--el-color-primary);
-        content: '';
-    }
-}
-.detail-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 14px 20px;
-}
-.detail-item {
-    min-width: 0;
-    .detail-label {
-        display: block;
-        margin-bottom: 5px;
-        overflow: hidden;
-        color: var(--el-text-color-secondary);
-        font-size: 12px;
-        line-height: 18px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-    strong {
-        display: block;
-        overflow: hidden;
-        color: var(--el-text-color-primary);
-        font-size: 13px;
-        font-weight: 500;
-        line-height: 20px;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-    }
-}
-.cell-item {
-    display: flex;
-    align-items: center;
-    .icon-item {
-        margin-left: 4px;
-        margin-top: -1px;
-    }
-}
-.detail-item .detail-label.cell-item {
-    display: flex;
-}
-
 @media (max-width: 1200px) {
     .device-card-grid {
         grid-template-columns: 1fr;
@@ -1086,6 +1127,12 @@ onMounted(() => {
     .device-metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .device-secondary-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        .metric-item:last-child {
+            grid-column: 1 / -1;
+        }
+    }
     .metric-temperature {
         grid-column: 1 / -1;
         padding-top: 12px;
@@ -1093,15 +1140,6 @@ onMounted(() => {
         &::before {
             display: none;
         }
-    }
-    .detail-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (max-width: 480px) {
-    .detail-grid {
-        grid-template-columns: 1fr;
     }
 }
 </style>

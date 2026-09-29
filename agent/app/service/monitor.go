@@ -128,115 +128,135 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 
 func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 	var data dto.MonitorGPUOptions
-	exist, client := accelerator.New()
-	if !exist {
-		return data
-	}
-	snapshot, err := client.Collect(context.Background())
-	if err != nil {
-		global.LOG.Errorf("Load accelerator info failed, err: %v", err)
-		return data
-	}
-	if warning := snapshot.Warning(); warning != nil {
-		global.LOG.Warnf("Load accelerator info partially failed, err: %v", warning)
-	}
-	return loadGPUOptions(snapshot)
-}
-
-func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
-	var data dto.MonitorGPUOptions
-	hasGPUOrNPU := false
-	hasXPU := false
-	for _, item := range snapshot.Devices {
-		if item.Kind == accelerator.KindXPU {
-			hasXPU = true
+	seen := make(map[string]bool)
+	if exist, client := accelerator.New(); exist {
+		snapshot, err := client.Collect(context.Background())
+		if err != nil {
+			global.LOG.Warnf("Load accelerator options failed: %v", err)
 		} else {
-			hasGPUOrNPU = true
+			data = loadGPUOptions(snapshot)
+			for _, item := range data.ChartHide {
+				seen[item.DeviceID] = true
+			}
 		}
 	}
-	switch {
-	case hasGPUOrNPU && hasXPU:
-		data.GPUType = "mixed"
-	case hasXPU:
-		data.GPUType = "xpu"
-	case hasGPUOrNPU:
-		data.GPUType = "gpu"
+	devices, err := monitorRepo.GetGPUDevices()
+	if err != nil {
+		global.LOG.Warnf("Load accelerator history options failed: %v", err)
+		return data
 	}
-
-	sort.Slice(snapshot.Devices, func(i, j int) bool {
-		if snapshot.Devices[i].Kind != snapshot.Devices[j].Kind {
-			return snapshot.Devices[i].Kind < snapshot.Devices[j].Kind
+	for _, device := range devices {
+		key := device.DeviceID
+		if key == "" {
+			key = "legacy:" + device.ProductName
 		}
-		if snapshot.Devices[i].Vendor != snapshot.Devices[j].Vendor {
-			return snapshot.Devices[i].Vendor < snapshot.Devices[j].Vendor
+		if seen[key] {
+			continue
 		}
-		if snapshot.Devices[i].NPUIndex != snapshot.Devices[j].NPUIndex {
-			return snapshot.Devices[i].NPUIndex < snapshot.Devices[j].NPUIndex
-		}
-		if snapshot.Devices[i].ChipIndex != snapshot.Devices[j].ChipIndex {
-			return snapshot.Devices[i].ChipIndex < snapshot.Devices[j].ChipIndex
-		}
-		return snapshot.Devices[i].Index < snapshot.Devices[j].Index
-	})
-	for _, item := range snapshot.Devices {
-		optionType := "gpu"
-		if item.Kind == accelerator.KindXPU {
-			optionType = "xpu"
-		}
-		chartHide := dto.GPUChartHide{
-			ProductName: item.Label,
-			Type:        optionType,
-			GPU:         !item.Capabilities.Utilization,
-			Memory:      !item.Capabilities.Memory,
-			Power:       !item.Capabilities.Power,
-			PowerLimit:  !item.Capabilities.PowerLimit,
-			Temperature: !item.Capabilities.Temperature,
-			Speed:       !item.Capabilities.FanSpeed,
-		}
-		data.ChartHide = append(data.ChartHide, chartHide)
-		data.Options = append(data.Options, chartHide.ProductName)
+		seen[key] = true
+		data.ChartHide = append(data.ChartHide, dto.GPUChartHide{DeviceID: device.DeviceID, ProductName: device.ProductName, Type: device.DeviceType, Legacy: device.DeviceID == ""})
+		data.Options = append(data.Options, device.ProductName)
 	}
 	return data
 }
 
 func (m *MonitorService) LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error) {
-	loc, _ := time.LoadLocation(common.LoadTimeZoneByCmd())
-	req.StartTime = req.StartTime.In(loc)
-	req.EndTime = req.EndTime.In(loc)
 	var data dto.MonitorGPUData
-	gpuList, err := monitorRepo.GetGPU(repo.WithByCreatedAt(req.StartTime, req.EndTime), monitorRepo.WithByProductName(req.ProductName))
+	if req.StartTime.IsZero() || req.EndTime.IsZero() || !req.EndTime.After(req.StartTime) {
+		return data, fmt.Errorf("invalid GPU history time range")
+	}
+	if req.DeviceID == "" && req.ProductName == "" {
+		return data, fmt.Errorf("GPU history requires a device")
+	}
+	if req.Aggregation != "" && req.Aggregation != "avg" && req.Aggregation != "max" {
+		return data, fmt.Errorf("invalid GPU history aggregation")
+	}
+	loc, err := time.LoadLocation(common.LoadTimeZoneByCmd())
 	if err != nil {
 		return data, err
 	}
-
-	for _, gpu := range gpuList {
-		data.Date = append(data.Date, gpu.CreatedAt)
-		data.GPUValue = append(data.GPUValue, gpu.GPUUtil)
-		data.TemperatureValue = append(data.TemperatureValue, gpu.Temperature)
-		data.PowerUsed = append(data.PowerUsed, gpu.PowerDraw)
-		data.PowerTotal = append(data.PowerTotal, gpu.MaxPowerLimit)
-		if gpu.MaxPowerLimit != 0 {
-			data.PowerPercent = append(data.PowerPercent, gpu.PowerDraw/gpu.MaxPowerLimit*100)
-		} else {
-			data.PowerPercent = append(data.PowerPercent, float64(0))
+	req.StartTime, req.EndTime = req.StartTime.In(loc), req.EndTime.In(loc)
+	opts := []repo.DBOption{repo.WithByCreatedAt(req.StartTime, req.EndTime), monitorRepo.WithByGPUDevice(req.DeviceID, req.ProductName, req.Legacy)}
+	data.SampleCount, err = monitorRepo.CountGPU(opts...)
+	if err != nil || data.SampleCount == 0 {
+		return data, err
+	}
+	if data.SampleCount > 1200 {
+		seconds := req.EndTime.Unix() - req.StartTime.Unix() + 1
+		data.BucketSeconds = (seconds + 599) / 600
+	}
+	points, err := monitorRepo.GetGPUHistory(req.StartTime, data.BucketSeconds, req.Aggregation, opts...)
+	if err != nil {
+		return data, err
+	}
+	samples := make([]repo.GPUHistoryPoint, 0, len(points))
+	if data.BucketSeconds > 0 {
+		next := 0
+		for bucket := int64(0); bucket <= (req.EndTime.Unix()-req.StartTime.Unix())/data.BucketSeconds; bucket++ {
+			point := repo.GPUHistoryPoint{}
+			if next < len(points) && points[next].Bucket == bucket {
+				point = points[next]
+				next++
+			}
+			point.CreatedAt = time.Unix(req.StartTime.Unix()+bucket*data.BucketSeconds, 0).In(loc)
+			if bucket == 0 {
+				point.CreatedAt = req.StartTime
+			}
+			samples = append(samples, point)
 		}
-
-		data.MemoryTotal = append(data.MemoryTotal, gpu.MemTotal)
-		data.MemoryUsed = append(data.MemoryUsed, gpu.MemUsed)
-		if gpu.MemTotal != 0 {
-			data.MemoryPercent = append(data.MemoryPercent, gpu.MemUsed/gpu.MemTotal*100)
-		} else {
-			data.MemoryPercent = append(data.MemoryPercent, float64(0))
+	} else {
+		for i, point := range points {
+			if i > 0 && points[i-1].IntervalSeconds > 0 {
+				interval := time.Duration(points[i-1].IntervalSeconds) * time.Second
+				if point.CreatedAt.Sub(points[i-1].CreatedAt) > 2*interval {
+					samples = append(samples, repo.GPUHistoryPoint{MonitorGPU: model.MonitorGPU{BaseModel: model.BaseModel{CreatedAt: points[i-1].CreatedAt.Add(interval)}}})
+				}
+			}
+			samples = append(samples, point)
 		}
-		var process []dto.GPUProcess
-		if err := json.Unmarshal([]byte(gpu.Processes), &process); err == nil {
-			data.ProcessCount = append(data.ProcessCount, len(process))
-			data.GPUProcesses = append(data.GPUProcesses, process)
-		} else {
-			data.ProcessCount = append(data.ProcessCount, 0)
-			data.GPUProcesses = append(data.GPUProcesses, []dto.GPUProcess{})
+	}
+	for _, point := range samples {
+		data.Date = append(data.Date, point.CreatedAt)
+		data.MemoryActivity = append(data.MemoryActivity, point.MemoryActivity)
+		data.EncoderUtil = append(data.EncoderUtil, point.EncoderUtil)
+		data.DecoderUtil = append(data.DecoderUtil, point.DecoderUtil)
+		data.JPEGUtil = append(data.JPEGUtil, point.JPEGUtil)
+		data.OFAUtil = append(data.OFAUtil, point.OFAUtil)
+		data.MediaUtil = append(data.MediaUtil, point.MediaUtil)
+		data.ComputeUtil = append(data.ComputeUtil, point.ComputeUtil)
+		data.CopyUtil = append(data.CopyUtil, point.CopyUtil)
+		data.HotspotTemperature = append(data.HotspotTemperature, point.HotspotTemperature)
+		data.FanRPM = append(data.FanRPM, point.FanRPM)
+		data.AICPUUtil = append(data.AICPUUtil, point.AICPUUtil)
+		data.CtrlCPUUtil = append(data.CtrlCPUUtil, point.CtrlCPUUtil)
+		data.DDRUsed = append(data.DDRUsed, point.DDRUsed)
+		data.DDRTotal = append(data.DDRTotal, point.DDRTotal)
+		data.HBMUsed = append(data.HBMUsed, point.HBMUsed)
+		data.HBMTotal = append(data.HBMTotal, point.HBMTotal)
+		data.DDRBandwidth = append(data.DDRBandwidth, point.DDRBandwidth)
+		data.HBMBandwidth = append(data.HBMBandwidth, point.HBMBandwidth)
+		data.MemoryBandwidth = append(data.MemoryBandwidth, point.MemoryBandwidth)
+		data.MediaFrequency = append(data.MediaFrequency, point.MediaFrequency)
+		data.HugepagesUsed = append(data.HugepagesUsed, point.HugepagesUsed)
+		data.HugepagesTotal = append(data.HugepagesTotal, point.HugepagesTotal)
+		data.GPUValue = append(data.GPUValue, point.GPUUtil)
+		data.TemperatureValue = append(data.TemperatureValue, point.Temperature)
+		data.MemoryTemperatureValue = append(data.MemoryTemperatureValue, point.MemoryTemperature)
+		data.PowerUsed = append(data.PowerUsed, point.PowerDraw)
+		data.PowerTotal = append(data.PowerTotal, point.MaxPowerLimit)
+		data.PowerPercent = append(data.PowerPercent, point.PowerPercent)
+		data.MemoryPercent = append(data.MemoryPercent, point.MemoryPercent)
+		data.MemoryTotal = append(data.MemoryTotal, point.MemTotal)
+		data.MemoryUsed = append(data.MemoryUsed, point.MemUsed)
+		data.SpeedValue = append(data.SpeedValue, point.FanSpeed)
+		data.FrequencyValue = append(data.FrequencyValue, point.Frequency)
+		data.MemoryFrequencyValue = append(data.MemoryFrequencyValue, point.MemoryFrequency)
+		data.ProcessCount = append(data.ProcessCount, point.ProcessCount)
+		var processes []dto.GPUProcess
+		if data.BucketSeconds == 0 && point.ProcessCount != nil {
+			_ = json.Unmarshal([]byte(point.Processes), &processes)
 		}
-		data.SpeedValue = append(data.SpeedValue, gpu.FanSpeed)
+		data.GPUProcesses = append(data.GPUProcesses, processes)
 	}
 	return data, nil
 }
@@ -307,7 +327,6 @@ func (m *MonitorService) CleanData() error {
 }
 
 func (m *MonitorService) Run() {
-	saveAcceleratorDataToDB()
 	var itemModel model.MonitorBase
 	totalPercent, _ := cpu.Percent(3*time.Second, false)
 	if len(totalPercent) == 1 {
@@ -343,6 +362,7 @@ func (m *MonitorService) Run() {
 
 	m.loadDiskIO()
 	m.loadNetIO()
+	m.saveGPUData()
 
 	MonitorStoreDays, err := settingRepo.Get(settingRepo.WithByKey("MonitorStoreDays"))
 	if err != nil {
@@ -602,7 +622,62 @@ func StartMonitor(removeBefore bool, interval string) error {
 	return nil
 }
 
-func saveAcceleratorDataToDB() {
+func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
+	var data dto.MonitorGPUOptions
+	hasGPUOrNPU := false
+	hasXPU := false
+	for _, item := range snapshot.Devices {
+		if item.Kind == accelerator.KindXPU {
+			hasXPU = true
+		} else {
+			hasGPUOrNPU = true
+		}
+	}
+	switch {
+	case hasGPUOrNPU && hasXPU:
+		data.GPUType = "mixed"
+	case hasXPU:
+		data.GPUType = "xpu"
+	case hasGPUOrNPU:
+		data.GPUType = "gpu"
+	}
+
+	sort.Slice(snapshot.Devices, func(i, j int) bool {
+		if snapshot.Devices[i].Kind != snapshot.Devices[j].Kind {
+			return snapshot.Devices[i].Kind < snapshot.Devices[j].Kind
+		}
+		if snapshot.Devices[i].Vendor != snapshot.Devices[j].Vendor {
+			return snapshot.Devices[i].Vendor < snapshot.Devices[j].Vendor
+		}
+		if snapshot.Devices[i].NPUIndex != snapshot.Devices[j].NPUIndex {
+			return snapshot.Devices[i].NPUIndex < snapshot.Devices[j].NPUIndex
+		}
+		if snapshot.Devices[i].ChipIndex != snapshot.Devices[j].ChipIndex {
+			return snapshot.Devices[i].ChipIndex < snapshot.Devices[j].ChipIndex
+		}
+		return snapshot.Devices[i].Index < snapshot.Devices[j].Index
+	})
+	for _, item := range snapshot.Devices {
+		chartHide := dto.GPUChartHide{
+			DeviceID:    item.ID,
+			ProductName: item.Label,
+			Type:        string(item.Kind),
+		}
+		data.ChartHide = append(data.ChartHide, chartHide)
+		data.Options = append(data.Options, chartHide.ProductName)
+	}
+	return data
+}
+
+func (m *MonitorService) saveGPUData() {
+	status, err := settingRepo.GetValueByKey("MonitorStatus")
+	if err != nil {
+		global.LOG.Errorf("load monitor status failed: %v", err)
+		return
+	}
+	if status != constant.StatusEnable {
+		return
+	}
 	exist, client := accelerator.New()
 	if !exist {
 		return
@@ -615,27 +690,64 @@ func saveAcceleratorDataToDB() {
 	if warning := snapshot.Warning(); warning != nil {
 		global.LOG.Warnf("load accelerator monitor data partially failed, err: %v", warning)
 	}
+	intervalSeconds := 0
+	if setting, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval")); err == nil {
+		intervalSeconds, _ = strconv.Atoi(setting.Value)
+	}
 	list := make([]model.MonitorGPU, 0, len(snapshot.Devices))
 	for _, device := range snapshot.Devices {
-		list = append(list, newMonitorGPU(device))
+		item := newMonitorGPU(device)
+		item.CreatedAt = snapshot.Info.CollectedAt
+		item.IntervalSeconds = intervalSeconds
+		list = append(list, item)
 	}
-	if err := repo.NewIMonitorRepo().BatchCreateMonitorGPU(list); err != nil {
+	if err := monitorRepo.BatchCreateMonitorGPU(list); err != nil {
 		global.LOG.Errorf("batch create accelerator monitor data failed, err: %v", err)
 	}
 }
 
 func newMonitorGPU(device accelerator.Device) model.MonitorGPU {
 	item := model.MonitorGPU{
-		ProductName:   device.Label,
-		GPUUtil:       device.Metrics.Utilization.ValueOrZero(),
-		Temperature:   device.Metrics.Temperature.ValueOrZero(),
-		PowerDraw:     device.Metrics.Power.ValueOrZero(),
-		MaxPowerLimit: device.Metrics.PowerLimit.ValueOrZero(),
-		MemUsed:       device.Metrics.MemoryUsed.ValueOrZero(),
-		MemTotal:      device.Metrics.MemoryTotal.ValueOrZero(),
-		FanSpeed:      int(device.Metrics.FanSpeed.ValueOrZero()),
+		MemoryUtil:         device.Metrics.MemoryUtil.Value,
+		MemoryActivity:     device.Metrics.MemoryActivity.Value,
+		EncoderUtil:        device.Metrics.EncoderUtil.Value,
+		DecoderUtil:        device.Metrics.DecoderUtil.Value,
+		JPEGUtil:           device.Metrics.JPEGUtil.Value,
+		OFAUtil:            device.Metrics.OFAUtil.Value,
+		MediaUtil:          device.Metrics.MediaUtil.Value,
+		ComputeUtil:        device.Metrics.ComputeUtil.Value,
+		CopyUtil:           device.Metrics.CopyUtil.Value,
+		HotspotTemperature: device.Metrics.HotspotTemperature.Value,
+		FanRPM:             device.Metrics.FanRPM.Value,
+		AICPUUtil:          device.Metrics.AICPUUtil.Value,
+		CtrlCPUUtil:        device.Metrics.CtrlCPUUtil.Value,
+		DDRUsed:            device.Metrics.DDRUsed.Value,
+		DDRTotal:           device.Metrics.DDRTotal.Value,
+		HBMUsed:            device.Metrics.HBMUsed.Value,
+		HBMTotal:           device.Metrics.HBMTotal.Value,
+		DDRBandwidth:       device.Metrics.DDRBandwidth.Value,
+		HBMBandwidth:       device.Metrics.HBMBandwidth.Value,
+		MemoryBandwidth:    device.Metrics.MemoryBandwidth.Value,
+		MediaFrequency:     device.Metrics.MediaFrequency.Value,
+		HugepagesUsed:      device.Metrics.HugepagesUsed.Value,
+		HugepagesTotal:     device.Metrics.HugepagesTotal.Value,
+
+		ProductName:       device.Label,
+		DeviceID:          device.ID,
+		DeviceType:        string(device.Kind),
+		ProcessStatus:     device.ProcessStatus,
+		Frequency:         device.Metrics.Frequency.Value,
+		MemoryFrequency:   device.Metrics.MemoryFrequency.Value,
+		MemoryTemperature: device.Metrics.MemoryTemperature.Value,
+		GPUUtil:           device.Metrics.Utilization.Value,
+		Temperature:       device.Metrics.Temperature.Value,
+		PowerDraw:         device.Metrics.Power.Value,
+		MaxPowerLimit:     device.Metrics.PowerLimit.Value,
+		MemUsed:           device.Metrics.MemoryUsed.Value,
+		MemTotal:          device.Metrics.MemoryTotal.Value,
+		FanSpeed:          device.Metrics.FanSpeed.Value,
 	}
-	if len(device.Processes) == 0 {
+	if device.ProcessStatus != "ok" {
 		return item
 	}
 	processes := make([]dto.GPUProcess, 0, len(device.Processes))

@@ -588,6 +588,9 @@ func loadAcceleratorInfo() ([]dto.GPUInfo, []dto.NPUInfo, []dto.XPUInfo) {
 		xpuData []dto.XPUInfo
 	)
 	for _, device := range snapshot.Devices {
+		if device.ParentID != "" {
+			continue
+		}
 		switch device.Kind {
 		case accelerator.KindGPU:
 			if device.GPU == nil {
@@ -597,7 +600,11 @@ func loadAcceleratorInfo() ([]dto.GPUInfo, []dto.NPUInfo, []dto.XPUInfo) {
 			if err := copier.Copy(&dataItem, device.GPU); err != nil {
 				continue
 			}
-			dataItem.PowerUsage = dataItem.PowerDraw + " / " + dataItem.MaxPowerLimit
+			dataItem.MaxPowerLimit = device.GPU.PowerLimit
+			dataItem.PowerUsage = dataItem.PowerDraw
+			if dataItem.MaxPowerLimit != "" {
+				dataItem.PowerUsage += " / " + dataItem.MaxPowerLimit
+			}
 			dataItem.MemoryUsage = dataItem.MemUsed + " / " + dataItem.MemTotal
 			gpuData = append(gpuData, dataItem)
 		case accelerator.KindNPU:
