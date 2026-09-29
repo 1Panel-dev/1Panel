@@ -60,6 +60,8 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :selection-context="() => [searchName, searchGroupID]"
+                    row-key="id"
                     :pagination-config="paginationConfig"
                     :default-sort="
                         paginationConfig.order !== 'null'

@@ -66,6 +66,8 @@
             </template>
             <template v-if="!openNginxConfig" #main>
                 <ComplexTable
+                    :selection-context="() => [req.name, req.type, req.websiteGroupId]"
+                    row-key="id"
                     :pagination-config="paginationConfig"
                     :default-sort="tableSort.order ? tableSort : undefined"
                     v-model:view-mode="viewMode"
@@ -498,7 +500,6 @@ const search = async () => {
     req.pageSize = paginationConfig.pageSize;
 
     loading.value = true;
-    data.value = [];
     await searchWebsites(req)
         .then((res) => {
             data.value = res.data.items;

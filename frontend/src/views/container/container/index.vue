@@ -56,6 +56,7 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :selection-context="() => [searchName, activeTag, includeAppStore, props.filters]"
                     :pagination-config="paginationConfig"
                     v-model:view-mode="viewMode"
                     v-model:selects="selects"
