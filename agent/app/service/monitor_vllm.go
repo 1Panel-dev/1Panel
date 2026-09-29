@@ -110,9 +110,17 @@ func (m *MonitorService) LoadVLLMCurrent(ctx context.Context, req dto.MonitorVLL
 	if install.App.Key != "vllm" {
 		return model.MonitorVLLM{}, fmt.Errorf("not a vLLM installation")
 	}
-	previous, err := vllmMonitorRepo.Latest(req.AppInstallID)
+	previous, err := collectVLLMMetrics(ctx, install, model.MonitorVLLM{})
 	if err != nil {
-		return model.MonitorVLLM{}, err
+		global.LOG.Debugf("Collect vLLM metrics on port %d failed: %v", install.HttpPort, err)
+		return previous, nil
+	}
+	timer := time.NewTimer(time.Second)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return model.MonitorVLLM{}, ctx.Err()
+	case <-timer.C:
 	}
 	point, err := collectVLLMMetrics(ctx, install, previous)
 	if err != nil {
