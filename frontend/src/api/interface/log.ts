@@ -6,6 +6,9 @@ export namespace Log {
         id: number;
         source: string;
         user: string;
+        apiKeyID?: string;
+        apiKeyName?: string;
+        authMethod?: string;
         node: string;
         ip: string;
         path: string;

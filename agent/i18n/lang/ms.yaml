@@ -649,6 +649,7 @@ CommonAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .msg }}. Sila log masuk ke pan
 NodeExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} nod tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 LicenseExceptionAlert: 'Panel {{ .node }}{{ .ip }} Anda, {{ .num }} lesen tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
 SSHAndPanelLoginAlert: 'Panel {{ .node }}{{ .ip }} Anda, log masuk {{ .name }} dari {{ .loginIp }} tidak normal. Sila log masuk ke panel untuk butiran lanjut.'
+CronJobSuccessAlert: 'Panel {{ .node }}{{ .ip }}: tugas berjadual {{ .name }} berjaya diselesaikan. Log masuk untuk melihat butiran.'
 
 # cakera
 DeviceNotFound: 'Peranti {{ .name }} tidak ditemui'
@@ -719,3 +720,14 @@ FirewallPersistDockerGuardStep: 'Simpan status perlindungan port Docker'
 ErrFirewallRuleScopeChange: "Tembok api semasa tidak menyokong perubahan skop peraturan (seperti keluarga alamat IPv4/IPv6). Sila cipta peraturan baharu."
 FirewallWhitelistReleased: "{{ .name }}: perlindungan senarai dibenarkan telah dilepaskan; peraturan izin dikekalkan. Untuk menutup port, padamkan peraturan secara manual daripada senarai peraturan"
 FirewallWhitelistRequired: "{{ .name }}: dilindungi oleh peraturan port wajib sistem"
+FileTaskCopy: 'Salin fail ke {{ .dst }}'
+FileTaskMove: 'Pindahkan fail ke {{ .dst }}'
+FileTaskCompress: 'Mampatkan fail ke {{ .dst }}'
+FileTaskDecompress: 'Ekstrak fail ke {{ .dst }}'
+FileTaskSource: 'Laluan sumber: {{ .path }}'
+FileTaskFormat: 'Format arkib: {{ .format }}'
+FileTaskRename: 'Nama fail sasaran: {{ .name }}'
+
+ErrFirewallBackendCleanupRequired: "Bahagian belakang semasa {{ .current }} masih mengandungi peraturan 1Panel. Buangkannya sebelum beralih kepada {{ .target }}."
+ErrDockerIPv4ForwardingDisabled: "Pemajuan IPv4 dilumpuhkan. Tetapkan net.ipv4.ip_forward=1 sebelum menggunakan bahagian belakang tembok api Docker."
+ErrFirewallRuleSavedApplyFailed: "Konfigurasi peraturan baharu telah disimpan, tetapi gagal digunakan pada tembok api. Cuba lagi melalui penyegerakan: {{ .detail }}"

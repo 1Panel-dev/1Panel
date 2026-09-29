@@ -62,7 +62,6 @@ func (b *BaseApi) UpdateFileDownloadPreference(c *gin.Context) {
 }
 
 func fileDownloadPreferenceUser(c *gin.Context) (psession.SessionUser, bool) {
-	// Preferences always belong to the authenticated session, never a request-supplied user ID.
 	user, err := global.SESSION.Get(c)
 	if err != nil || user.ID == "" {
 		helper.BadAuth(c, "ErrNotLogin", buserr.New("ErrNotLogin"))
@@ -137,7 +136,16 @@ func (b *BaseApi) GetSystemAvailable(c *gin.Context) {
 // @x-panel-log {"bodyKeys":["key","value"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"修改系统配置 [key] => [value]","formatEN":"update system setting [key] => [value]"}
 func (b *BaseApi) UpdateSetting(c *gin.Context) {
 	var req dto.SettingUpdate
-	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	if appauth.IsAPICredentialSetting(req.Key) {
+		helper.BadRequest(c, buserr.New("ErrInvalidParams"))
+		return
+	}
+	if err := global.VALID.Struct(&req); err != nil {
+		helper.BadRequest(c, err)
 		return
 	}
 	if req.Key == "SecurityEntrance" {

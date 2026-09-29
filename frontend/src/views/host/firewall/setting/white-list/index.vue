@@ -56,7 +56,7 @@
             @submit.prevent="saveRule"
         >
             <el-form-item :label="$t('commons.table.type')">
-                <el-select v-model="form.type" :disabled="!!editingRule">
+                <el-select v-model="form.type" :disabled="!!editingRule" @change="changeType">
                     <el-option value="custom" :label="$t('website.other')" />
                     <el-option
                         v-for="type in serviceTypes"
@@ -176,6 +176,12 @@ const serviceTypes: WhiteListType[] = ['ssh', 'panel'];
 const serviceLabel = (type: WhiteListType) => (type === 'panel' ? '1Panel' : 'SSH');
 const servicePortLabel = (type: WhiteListType) =>
     (type === 'panel' ? props.panelPort : props.sshPort) || i18n.global.t('commons.status.unknown');
+
+const changeType = () => {
+    if (form.value.type === 'custom') return;
+    form.value.port = (form.value.type === 'panel' ? props.panelPort : props.sshPort) || '';
+    formRef.value?.clearValidate('port');
+};
 
 const acceptParams = () => {
     drawerVisible.value = true;

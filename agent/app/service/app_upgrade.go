@@ -40,13 +40,12 @@ const (
 	appUpgradeDown
 	appUpgradeMutated
 	appUpgradeStarted
-	appUpgradeReady
 	appUpgradeCommitted
 )
 
-const composeServiceLabel = "com.docker.compose.service"
-
 var appUpgradeLocks sync.Map
+
+const composeServiceLabel = "com.docker.compose.service"
 
 type appUpgradeSnapshot interface {
 	Restore() error
@@ -439,15 +438,14 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 	t.LogSuccess(logStr)
 	u.phase = appUpgradeStarted
 
-	t.LogStart(i18n.GetMsgByKey("UpgradeWaitReady"))
-	containerNames, err := waitAppContainersReady(context.Background(), u.candidate)
-	if err != nil {
-		t.LogFailedWithErr(i18n.GetMsgByKey("UpgradeWaitReady"), err)
-		return err
+	containerNames, discoverErr := discoverUpgradeContainerNames(u.candidate, u.envContent)
+	if discoverErr != nil {
+		t.Logf("WARNING: discover upgraded application containers failed: %v", discoverErr)
+	} else if len(containerNames) > 0 {
+		u.candidate.ContainerName = strings.Join(containerNames, ",")
+	} else {
+		t.Log("WARNING: no containers found for the upgraded application")
 	}
-	t.LogSuccess(i18n.GetMsgByKey("UpgradeWaitReady"))
-	u.phase = appUpgradeReady
-	u.candidate.ContainerName = strings.Join(containerNames, ",")
 	u.candidate.Status = constant.StatusRunning
 	u.candidate.Message = ""
 
@@ -471,6 +469,11 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 		}
 	} else if err = appInstallRepo.Save(context.Background(), &u.candidate); err != nil {
 		return err
+	}
+	if discoverErr == nil && len(containerNames) > 0 {
+		if syncErr := syncAppInstallStatus(&u.candidate, true); syncErr != nil {
+			t.Logf("WARNING: sync upgraded application status failed: %v", syncErr)
+		}
 	}
 	u.phase = appUpgradeCommitted
 	u.deleteOldImages(t)
@@ -591,9 +594,6 @@ func (u *appUpgradeContext) rollback(t *task.Task) (rollbackErr error) {
 }
 
 func (u *appUpgradeContext) finishRollback() error {
-	if _, err := waitAppContainersReady(context.Background(), u.original); err != nil {
-		return err
-	}
 	restored := u.original
 	if err := appInstallRepo.Save(context.Background(), &restored); err != nil {
 		return err
@@ -881,28 +881,7 @@ func (s *upgradeFileSnapshot) Cleanup() {
 	}
 }
 
-type appContainerReadinessClient interface {
-	ContainerList(context.Context, container.ListOptions) ([]container.Summary, error)
-	ContainerInspect(context.Context, string) (container.InspectResponse, error)
-}
-
-func waitAppContainersReady(ctx context.Context, install model.AppInstall) ([]string, error) {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return nil, err
-	}
-	defer client.Close()
-	return waitAppContainersReadyWithClient(ctx, client, install)
-}
-
-func waitAppContainersReadyWithClient(ctx context.Context, client appContainerReadinessClient, install model.AppInstall) ([]string, error) {
-	envContent, err := os.ReadFile(install.GetEnvPath())
-	if err != nil {
-		envContent, err = renderUpgradeEnv(&install, nil)
-		if err != nil {
-			return nil, err
-		}
-	}
+func discoverUpgradeContainerNames(install model.AppInstall, envContent []byte) ([]string, error) {
 	project, err := docker.GetComposeProject(install.Name, install.GetPath(), []byte(install.DockerCompose), envContent, false)
 	if err != nil {
 		return nil, err
@@ -916,34 +895,22 @@ func waitAppContainersReadyWithClient(ctx context.Context, client appContainerRe
 	if len(expectedServices) == 0 {
 		return strings.Split(install.ContainerName, ","), nil
 	}
-	options := container.ListOptions{
-		All: true,
-		Filters: filters.NewArgs(
-			filters.Arg("label", composeWorkdirLabel+"="+install.GetPath()),
-		),
-	}
-	containers, err := client.ContainerList(ctx, options)
+	client, err := docker.NewDockerClient()
 	if err != nil {
 		return nil, err
 	}
-	foundServices := make(map[string]bool, len(expectedServices))
+	defer client.Close()
+	containers, err := client.ContainerList(context.Background(), container.ListOptions{
+		All:     true,
+		Filters: filters.NewArgs(filters.Arg("label", composeWorkdirLabel+"="+install.GetPath())),
+	})
+	if err != nil {
+		return nil, err
+	}
 	containerNames := make([]string, 0, len(containers))
 	for _, item := range containers {
-		serviceName := item.Labels[composeServiceLabel]
-		if _, ok := expectedServices[serviceName]; !ok {
-			continue
-		}
-		if err = waitContainerReady(ctx, client, item.ID); err != nil {
-			return nil, fmt.Errorf("container %s is not ready: %w", serviceName, err)
-		}
-		foundServices[serviceName] = true
-		if len(item.Names) > 0 {
+		if _, ok := expectedServices[item.Labels[composeServiceLabel]]; ok && len(item.Names) > 0 {
 			containerNames = append(containerNames, strings.TrimPrefix(item.Names[0], "/"))
-		}
-	}
-	for serviceName := range expectedServices {
-		if !foundServices[serviceName] {
-			return nil, fmt.Errorf("container for service %s was not created", serviceName)
 		}
 	}
 	sort.Strings(containerNames)

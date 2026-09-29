@@ -3,27 +3,35 @@ package terminal
 import (
 	"errors"
 	"sort"
+	"strings"
 	"sync"
+	"time"
 )
 
-// sessions is the process wide registry of live sessions, keyed by id.
-// Open stores, Close deletes.
 var sessions sync.Map
 
 var errSessionNotFound = errors.New("terminal session not found")
 
 const (
-	HeaderUserID        = "X-Panel-User-ID"
-	HeaderAuthSessionID = "X-Panel-Auth-Session-ID"
+	HeaderUserID         = "X-Panel-User-ID"
+	HeaderAuthSessionID  = "X-Panel-Auth-Session-ID"
+	HeaderAuthLeaseUntil = "X-Panel-Auth-Lease-Until"
 )
 
 type Identity struct {
-	UserID        string
-	AuthSessionID string
+	UserID         string
+	AuthSessionID  string
+	AuthLeaseUntil time.Time
 }
 
 func (i Identity) Valid() bool {
-	return i.UserID != "" && i.AuthSessionID != ""
+	if i.UserID == "" || i.AuthSessionID == "" {
+		return false
+	}
+	if strings.HasPrefix(i.AuthSessionID, "api-key:") && i.AuthLeaseUntil.IsZero() {
+		return false
+	}
+	return i.AuthLeaseUntil.IsZero() || time.Now().Before(i.AuthLeaseUntil)
 }
 
 func registerSession(s *Session) {

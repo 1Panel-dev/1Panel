@@ -267,6 +267,7 @@ const getContent = async (pre: boolean) => {
     }
     isLoading.value = true;
     emit('update:isReading', true);
+    const requestedPage = readReq.page;
 
     let res;
     try {
@@ -290,7 +291,6 @@ const getContent = async (pre: boolean) => {
 
     if (res.data.taskStatus && res.data.taskStatus !== 'Executing') {
         isTailDisabled.value = true;
-        tailLog.value = false;
     }
 
     logPath.value = res.data.path;
@@ -396,6 +396,14 @@ const getContent = async (pre: boolean) => {
         }
     }
     isLoading.value = false;
+    if (readReq.type === 'task' && res.data.taskStatus && res.data.taskStatus !== 'Executing') {
+        if (!pre && !res.data.end && res.data.scope !== 'tail' && requestedPage < res.data.total) {
+            readReq.page = requestedPage + 1;
+            await getContent(false);
+        } else {
+            onCloseLog();
+        }
+    }
 };
 
 const onCloseLog = async () => {

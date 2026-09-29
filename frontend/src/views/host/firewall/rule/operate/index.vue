@@ -115,6 +115,7 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance, type FormRules } from 'element-plus';
 import {
+    FIREWALL_BATCH_LIMIT,
     formatHostAddress,
     inferAddressFamily,
     isValidIPOrCIDR,
@@ -458,7 +459,17 @@ const buildPreviewRules = () => {
     const addresses =
         form.sourceAddresses.length > 0 ? form.sourceAddresses : [{ family: 'ipv4' as const, address: '' }];
     const ports = form.destinationPorts.length > 0 ? form.destinationPorts : [''];
-    const orderOffsets = new Map<string, number>();
+    const protocolCount = (port: string) => {
+        if (form.protocol === 'tcp/udp') {
+            return provider.value === 'ufw' && port && !/[,-]/.test(port) ? 1 : 2;
+        }
+        return provider.value === 'ufw' && form.protocol === 'all' && /[,-]/.test(port) ? 2 : 1;
+    };
+    const count = addresses.length * ports.reduce((total, port) => total + protocolCount(port), 0);
+    if (count > FIREWALL_BATCH_LIMIT) {
+        MsgError(i18n.global.t('firewall.batchLimit', [FIREWALL_BATCH_LIMIT]));
+        return false;
+    }
     const rules = addresses.flatMap((address) =>
         ports.flatMap((port) =>
             (form.protocol === 'tcp/udp'
@@ -466,15 +477,7 @@ const buildPreviewRules = () => {
                     ? ['all']
                     : ['tcp', 'udp']
                 : [form.protocol]
-            ).map((protocol) => {
-                const rule = buildRule(address, port, protocol);
-                if (provider.value === 'firewalld' || rule.orderIndex === undefined) return rule;
-                const scopeKey = provider.value === 'ufw' ? 'ufw' : JSON.stringify(rule.scope);
-                const offset = orderOffsets.get(scopeKey) || 0;
-                orderOffsets.set(scopeKey, offset + 1);
-                rule.orderIndex += offset;
-                return rule;
-            }),
+            ).map((protocol) => buildRule(address, port, protocol)),
         ),
     );
     if (mode.value === 'edit' && rules.length !== 1) {

@@ -28,8 +28,8 @@ export const getIOOptions = (currentNode?: string) => {
         currentNode ? { headers: { CurrentNode: currentNode } } : {},
     );
 };
-export const cleanMonitors = () => {
-    return http.post(`/hosts/monitor/clean`, {});
+export const cleanMonitors = (type: 'host' | 'gpu') => {
+    return http.post(`/hosts/monitor/clean`, { type });
 };
 export const loadMonitorSetting = (currentNode?: string) => {
     return http.get<Host.MonitorSetting>(

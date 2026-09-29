@@ -243,6 +243,16 @@ func loadTerminalIdentity(c *gin.Context) (terminal.Identity, bool) {
 		UserID:        strings.TrimSpace(c.GetHeader(terminal.HeaderUserID)),
 		AuthSessionID: strings.TrimSpace(c.GetHeader(terminal.HeaderAuthSessionID)),
 	}
+	if value := c.GetHeader(terminal.HeaderAuthLeaseUntil); value != "" {
+		millis, err := strconv.ParseInt(value, 10, 64)
+		if err != nil || millis <= 0 {
+			return terminal.Identity{}, false
+		}
+		identity.AuthLeaseUntil = time.UnixMilli(millis)
+		if maximum := time.Now().Add(90 * time.Second); identity.AuthLeaseUntil.After(maximum) {
+			identity.AuthLeaseUntil = maximum
+		}
+	}
 	return identity, identity.Valid()
 }
 

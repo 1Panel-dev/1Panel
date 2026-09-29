@@ -16,6 +16,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/model"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/cmd/server/docs"
@@ -92,6 +93,7 @@ func OperationLog() gin.HandlerFunc {
 					formatMap[key] = bodyMap[key]
 				}
 			}
+			redactCredentialSetting(record.Path, bodyMap, formatMap)
 		}
 		needAgentResolve := len(operationDic.BeforeFunctions) != 0 && len(currentNode) != 0 && currentNode != "local" && !strings.HasPrefix(record.Path, "/core")
 		allowCoreFallback := strings.HasPrefix(record.Path, "/core/xpack") || !ShouldProxyToAgent(c.Request.URL.Path) || len(currentNode) == 0 || currentNode == "local"
@@ -112,7 +114,24 @@ func OperationLog() gin.HandlerFunc {
 
 		c.Next()
 
+		if c.GetBool("API_KEY_AUDIT_RECORDED") {
+			return
+		}
+
 		record.User = LoadOperationUser(c)
+		if c.GetBool("API_AUTH") {
+			if clientIP := c.GetString("API_AUTH_CLIENT_IP"); clientIP != "" {
+				record.IP = clientIP
+			}
+			record.AuthMethod = "api_key"
+			record.APIKeyID = c.GetString("API_AUTH_KEY_ID")
+			record.APIKeyName = c.GetString("API_AUTH_KEY_NAME")
+			if c.GetString("API_AUTH_KEY_KIND") == "legacy" {
+				record.APIKeyID = "legacy:" + c.GetString("API_AUTH_OWNER_TYPE") + ":" + c.GetString("API_AUTH_OWNER_ID")
+			}
+		} else if record.User != "" {
+			record.AuthMethod = "session"
+		}
 
 		if len(operationDic.BeforeFunctions) != 0 {
 			if needAgentResolve {
@@ -177,6 +196,13 @@ func OperationLog() gin.HandlerFunc {
 		if err := logRepo.CreateOperationLog(record); err != nil {
 			global.LOG.Errorf("create operation record failed, err: %v", err)
 		}
+	}
+}
+
+func redactCredentialSetting(operationPath string, body, values map[string]interface{}) {
+	key, _ := body["key"].(string)
+	if operationPath == "/core/settings/update" && auth.IsAPICredentialSetting(key) {
+		values["value"] = "[REDACTED]"
 	}
 }
 

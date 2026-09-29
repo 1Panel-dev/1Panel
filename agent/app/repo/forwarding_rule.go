@@ -5,12 +5,12 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"gorm.io/gorm"
 )
 
 type IForwardingRuleRepo interface {
 	List(context.Context) ([]model.ForwardingRule, error)
-	ReplaceAll(context.Context, []model.ForwardingRule) error
+	CreateBatch(context.Context, []model.ForwardingRule) error
+	DeleteBatch(context.Context, []uint) error
 }
 
 type ForwardingRuleRepo struct{}
@@ -23,14 +23,16 @@ func (r *ForwardingRuleRepo) List(ctx context.Context) ([]model.ForwardingRule, 
 	return rules, err
 }
 
-func (r *ForwardingRuleRepo) ReplaceAll(ctx context.Context, rules []model.ForwardingRule) error {
-	return global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
-		if err := tx.Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(&model.ForwardingRule{}).Error; err != nil {
-			return err
-		}
-		if len(rules) == 0 {
-			return nil
-		}
-		return tx.Create(&rules).Error
-	})
+func (r *ForwardingRuleRepo) CreateBatch(ctx context.Context, rules []model.ForwardingRule) error {
+	if len(rules) == 0 {
+		return nil
+	}
+	return global.DB.WithContext(ctx).CreateInBatches(&rules, 500).Error
+}
+
+func (r *ForwardingRuleRepo) DeleteBatch(ctx context.Context, ids []uint) error {
+	if len(ids) == 0 {
+		return nil
+	}
+	return global.DB.WithContext(ctx).Where("id IN ?", ids).Delete(&model.ForwardingRule{}).Error
 }

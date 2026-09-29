@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -17,7 +16,12 @@ import (
 )
 
 type RuleReader interface {
+	filter.CommentRuleReader
 	ListChain(context.Context, filter.Scope) (string, error)
+}
+
+type TableReader interface {
+	ListTable(context.Context, filter.Scope) (string, error)
 }
 
 type RuleWriter interface {
@@ -25,65 +29,25 @@ type RuleWriter interface {
 	Save(context.Context, filter.Scope) error
 }
 
-type MultiportChecker interface {
-	CheckMultiport(context.Context, filter.Family) error
-}
-
 type Adapter struct {
-	reader      RuleReader
-	writer      RuleWriter
-	checker     MultiportChecker
-	multiportMu sync.Mutex
-	multiportOK map[filter.Family]bool
+	reader RuleReader
+	writer RuleWriter
 }
 
 func NewAdapter() *Adapter {
 	backend := systemBackend{}
-	return &Adapter{reader: backend, writer: backend, checker: backend}
+	return &Adapter{reader: backend, writer: backend}
 }
 
 func NewAdapterWithReader(reader RuleReader) *Adapter {
-	adapter := &Adapter{reader: reader}
-	adapter.checker, _ = reader.(MultiportChecker)
-	return adapter
+	return &Adapter{reader: reader}
 }
 
 func NewAdapterWithBackend(reader RuleReader, writer RuleWriter) *Adapter {
-	adapter := &Adapter{reader: reader, writer: writer}
-	if checker, ok := reader.(MultiportChecker); ok {
-		adapter.checker = checker
-	} else if checker, ok := writer.(MultiportChecker); ok {
-		adapter.checker = checker
-	}
-	return adapter
+	return &Adapter{reader: reader, writer: writer}
 }
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderIptables }
-
-func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error {
-	if !strings.Contains(rule.DestinationPort, ",") && !strings.Contains(rule.SourcePort, ",") {
-		return nil
-	}
-	if rule.Protocol != "tcp" && rule.Protocol != "udp" {
-		return fmt.Errorf("%w: iptables multiport requires tcp or udp", filter.ErrInvalidRule)
-	}
-	if a.checker == nil {
-		return nil
-	}
-	a.multiportMu.Lock()
-	defer a.multiportMu.Unlock()
-	if a.multiportOK[rule.Scope.Family] {
-		return nil
-	}
-	if err := a.checker.CheckMultiport(ctx, rule.Scope.Family); err != nil {
-		return fmt.Errorf("inspect iptables multiport for %s: %w", rule.Scope.Family, err)
-	}
-	if a.multiportOK == nil {
-		a.multiportOK = make(map[filter.Family]bool, 2)
-	}
-	a.multiportOK[rule.Scope.Family] = true
-	return nil
-}
 
 func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	return filter.Capabilities{
@@ -91,66 +55,148 @@ func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
 	}, nil
 }
 
-func (a *Adapter) Observe(ctx context.Context, scope filter.Scope) (filter.Snapshot, error) {
-	scope = scope.Normalize()
-	if err := scope.ValidateMVP(); err != nil {
-		return filter.Snapshot{}, err
+func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
+	rule, err := filter.NormalizeRule(rule)
+	if err != nil {
+		return err
 	}
-	if scope.Provider != filter.ProviderIptables {
-		return filter.Snapshot{}, fmt.Errorf("%w: %s", filter.ErrUnsupportedScope, scope.Key())
+	if err := validateAdapterScope(rule.Scope); err != nil {
+		return err
+	}
+	args := []string{"-w", "-t", rule.Scope.Table, "-A", rule.Scope.Chain}
+	args = append(args, compileRuleArgs(rule, comment)...)
+	return a.writer.Run(ctx, filter.NativeCommand{Executable: executableForFamily(rule.Scope.Family), Args: args})
+}
+
+func (a *Adapter) ListRulesByComment(ctx context.Context, scopes []filter.Scope, comment string) ([]filter.ObservedRule, error) {
+	var rules []filter.ObservedRule
+	for _, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateAdapterScope(scope); err != nil {
+			return nil, err
+		}
+		output, err := a.reader.ReadRulesByComment(ctx, scope, comment)
+		if err != nil {
+			return nil, err
+		}
+		rules = append(rules, parseChainRules(scope, output)...)
+	}
+	return rules, nil
+}
+
+func (a *Adapter) ListRules(ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
+	snapshots, err := a.ListRuleScopes(ctx, []filter.Scope{scope})
+	if err != nil {
+		return filter.RuleSet{}, err
+	}
+	return snapshots[0], nil
+}
+
+func (a *Adapter) ListRuleScopes(ctx context.Context, scopes []filter.Scope) ([]filter.RuleSet, error) {
+	normalized := make([]filter.Scope, len(scopes))
+	for index, scope := range scopes {
+		scope = scope.Normalize()
+		if err := validateAdapterScope(scope); err != nil {
+			return nil, err
+		}
+		normalized[index] = scope
 	}
 	if a.reader == nil {
-		return filter.Snapshot{}, fmt.Errorf("iptables reader is required")
+		return nil, fmt.Errorf("iptables reader is required")
 	}
-	output, err := a.reader.ListChain(ctx, scope)
-	if err != nil {
-		if errors.Is(err, filter.ErrProviderUnavailable) {
-			snapshot, snapshotErr := filter.NewSnapshot(scope, nil)
-			if snapshotErr != nil {
-				return filter.Snapshot{}, snapshotErr
-			}
-			snapshot.Notices = []filter.ScopeNotice{{
-				Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(scope.Family), scope.Chain},
-			}}
-			return snapshot, nil
+	tableReader, readsTable := a.reader.(TableReader)
+	snapshots := make([]filter.RuleSet, len(scopes))
+	for index, scope := range normalized {
+		if snapshots[index].Scope.Provider != "" {
+			continue
 		}
-		return filter.Snapshot{}, err
+		var output string
+		var err error
+		if readsTable {
+			output, err = tableReader.ListTable(ctx, scope)
+		} else {
+			output, err = a.reader.ListChain(ctx, scope)
+		}
+		if err != nil && (readsTable || !errors.Is(err, filter.ErrProviderUnavailable)) {
+			return nil, err
+		}
+		for target := index; target < len(normalized); target++ {
+			current := normalized[target]
+			if readsTable {
+				if current.Family != scope.Family || current.Table != scope.Table {
+					continue
+				}
+			} else if target != index {
+				continue
+			}
+			missing := errors.Is(err, filter.ErrProviderUnavailable) || readsTable && !containsChainDeclaration(output, current.Chain)
+			var rules []filter.ObservedRule
+			if !missing {
+				rules = parseChainRules(current, output)
+			}
+			snapshot, buildErr := filter.NewRuleSet(current, rules)
+			if buildErr != nil {
+				return nil, buildErr
+			}
+			if missing {
+				snapshot.Notices = []filter.ScopeNotice{{Code: filter.ScopeNoticeManagedScopeMissing, Values: []string{string(current.Family), current.Chain}}}
+			}
+			snapshots[target] = snapshot
+		}
 	}
-	rules := parseChainRules(scope, output)
-	return filter.NewSnapshot(scope, rules)
+	return snapshots, nil
 }
 
-func (a *Adapter) Compile(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
-	if snapshot.Revision == "" {
-		return filter.BackendPlan{}, filter.ErrRuleStale
-	}
+func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
 	snapshot.Scope = snapshot.Scope.Normalize()
 	if err := validateAdapterScope(snapshot.Scope); err != nil {
-		return filter.BackendPlan{}, err
+		return filter.CommandBatch{}, err
 	}
 	if len(changes) == 0 {
-		return filter.BackendPlan{}, fmt.Errorf("%w: iptables plan requires at least one change", filter.ErrInvalidRule)
+		return filter.CommandBatch{}, fmt.Errorf("%w: iptables plan requires at least one change", filter.ErrInvalidRule)
 	}
-	return compileBatch(snapshot, changes)
+	createOnly, deleteOnly := true, true
+	for _, change := range changes {
+		createOnly = createOnly && change.Operation == filter.ChangeCreate && change.CommandOnly
+		deleteOnly = deleteOnly && change.Operation == filter.ChangeDelete && change.CommandOnly
+	}
+	if createOnly {
+		return compileCreateBatch(snapshot, changes)
+	}
+	externalDelete := len(changes) == 1 && changes[0].Locator == nil && (changes[0].UnmarkedAdopted || changes[0].PreviousMarker != "")
+	if deleteOnly && !externalDelete {
+		return compileDeleteBatch(snapshot, changes)
+	}
+	if len(changes) != 1 {
+		return filter.CommandBatch{}, fmt.Errorf("%w: iptables mutation requires exactly one change", filter.ErrInvalidRule)
+	}
+	rulePlan, err := compileChange(snapshot, changes[0])
+	if err != nil {
+		return filter.CommandBatch{}, err
+	}
+	return filter.CommandBatch{
+		Provider: filter.ProviderIptables, Scope: snapshot.Scope, CommandOnly: changes[0].CommandOnly,
+		Rules: []filter.RuleCommands{rulePlan},
+	}, nil
 }
 
-func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.ApplyResult, error) {
+func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) error {
 	if a.writer == nil {
-		return filter.ApplyResult{}, fmt.Errorf("iptables writer is required")
+		return fmt.Errorf("iptables writer is required")
 	}
 	if plan.Provider != filter.ProviderIptables {
-		return filter.ApplyResult{}, fmt.Errorf("%w: backend plan provider %q", filter.ErrUnsupportedScope, plan.Provider)
+		return fmt.Errorf("%w: backend plan provider %q", filter.ErrUnsupportedScope, plan.Provider)
 	}
 	if err := validateAdapterScope(plan.Scope); err != nil {
-		return filter.ApplyResult{}, err
+		return err
 	}
 	if len(plan.Rules) == 0 {
-		return filter.ApplyResult{}, fmt.Errorf("%w: iptables plan requires at least one rule", filter.ErrInvalidRule)
+		return fmt.Errorf("%w: iptables plan requires at least one rule", filter.ErrInvalidRule)
 	}
 	for _, rulePlan := range plan.Rules {
 		for _, command := range rulePlan.Commands {
 			if err := validateNativeCommand(plan.Scope, command); err != nil {
-				return filter.ApplyResult{}, err
+				return err
 			}
 		}
 	}
@@ -159,142 +205,69 @@ func (a *Adapter) Apply(ctx context.Context, plan filter.BackendPlan) (filter.Ap
 		for _, command := range rulePlan.Commands {
 			if err := a.writer.Run(ctx, command); err != nil {
 				if plan.CommandOnly {
-					return filter.ApplyResult{}, err
+					return err
 				}
-				return filter.ApplyResult{}, a.compensate(ctx, plan, ruleIndex, executed, err)
+				return a.compensate(ctx, plan, ruleIndex, executed, err)
 			}
 			executed++
 		}
 	}
-	if err := a.writer.Save(ctx, plan.Scope); err != nil {
-		if plan.CommandOnly {
-			return filter.ApplyResult{}, err
-		}
-		return filter.ApplyResult{}, a.compensate(ctx, plan, len(plan.Rules)-1, -1, err)
-	}
-	applied := make([]filter.ObservedRule, 0, len(plan.Rules))
-	for _, rulePlan := range plan.Rules {
-		applied = append(applied, rulePlan.Expected)
-	}
-	return filter.ApplyResult{Applied: applied}, nil
+
+	return nil
 }
 
-func compileBatch(snapshot filter.Snapshot, changes []filter.DesiredChange) (filter.BackendPlan, error) {
-	plan := filter.BackendPlan{
-		Provider: filter.ProviderIptables, Scope: snapshot.Scope, SnapshotRevision: snapshot.Revision,
-		Rules: make([]filter.NativeRulePlan, 0, len(changes)),
-	}
-	current := snapshot
-	current.Rules = make([]filter.ObservedRule, len(snapshot.Rules), len(snapshot.Rules)+len(changes))
-	copy(current.Rules, snapshot.Rules)
+func compileDeleteBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
+	plan := filter.CommandBatch{Provider: filter.ProviderIptables, Scope: snapshot.Scope, CommandOnly: true}
+	var script strings.Builder
+	fmt.Fprintf(&script, "*%s\n", snapshot.Scope.Table)
 	for _, change := range changes {
-		rulePlan, err := compileChange(current, change)
+		rulePlan, err := compileChange(snapshot, change)
 		if err != nil {
-			return filter.BackendPlan{}, err
+			return filter.CommandBatch{}, err
 		}
-		rulePlan.Commands = nil
-		rulePlan.RollbackCommands = nil
+		line, err := restoreRuleLine(snapshot.Scope, *rulePlan.Previous)
+		if err != nil {
+			return filter.CommandBatch{}, err
+		}
+		script.WriteString(strings.Replace(line, "-A ", "-D ", 1))
+		script.WriteByte('\n')
+		rulePlan.Commands, rulePlan.RollbackCommands = nil, nil
 		plan.Rules = append(plan.Rules, rulePlan)
-		current, err = applyRestoreRulePlan(current, rulePlan)
-		if err != nil {
-			return filter.BackendPlan{}, err
-		}
 	}
-
-	if _, err := filter.NewSnapshot(snapshot.Scope, current.Rules); err != nil {
-		return filter.BackendPlan{}, err
-	}
-	applyScript, err := buildRestoreScript(snapshot.Scope, current.Rules)
-	if err != nil {
-		return filter.BackendPlan{}, err
-	}
-	rollbackScript, err := buildRestoreScript(snapshot.Scope, snapshot.Rules)
-	if err != nil {
-		return filter.BackendPlan{}, err
-	}
+	script.WriteString("COMMIT\n")
 	plan.Rules[0].Commands = []filter.NativeCommand{{
-		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: applyScript,
-	}}
-	plan.Rules[0].RollbackCommands = []filter.NativeCommand{{
-		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: rollbackScript,
+		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: script.String(),
 	}}
 	return plan, nil
 }
 
-func applyRestoreRulePlan(snapshot filter.Snapshot, plan filter.NativeRulePlan) (filter.Snapshot, error) {
-	position := plan.Expected.Locator.Position
-	if plan.Operation == filter.ChangeDelete && plan.Previous != nil {
-		position = plan.Previous.Locator.Position
-	}
-	if position == nil {
-		return filter.Snapshot{}, fmt.Errorf("%w: batch rule has no target position", filter.ErrInvalidRule)
-	}
-	nativePosition := *position
-	rules := snapshot.Rules
-	firstChanged := nativePosition - 1
-	switch plan.Operation {
-	case filter.ChangeCreate:
-		if nativePosition < 1 || nativePosition > len(rules)+1 {
-			return filter.Snapshot{}, fmt.Errorf("%w: batch target position %d is out of range", filter.ErrInvalidRule, nativePosition)
-		}
-		expected := plan.Expected
-		expected.Raw = ""
-		rules = append(rules, filter.ObservedRule{})
-		copy(rules[nativePosition:], rules[nativePosition-1:])
-		rules[nativePosition-1] = expected
-	case filter.ChangeDelete:
-		if nativePosition < 1 || nativePosition > len(rules) {
-			return filter.Snapshot{}, fmt.Errorf("%w: batch target position %d is out of range", filter.ErrRuleStale, nativePosition)
-		}
-		rules = append(rules[:nativePosition-1], rules[nativePosition:]...)
-	case filter.ChangeAdopt, filter.ChangeUpdate, filter.ChangeReorder:
-		if plan.Previous == nil || plan.Previous.Locator.Position == nil {
-			return filter.Snapshot{}, fmt.Errorf("%w: mutation has no previous position", filter.ErrInvalidRule)
-		}
-		previousPosition := *plan.Previous.Locator.Position
-		firstChanged = min(firstChanged, previousPosition-1)
-		if previousPosition < 1 || previousPosition > len(rules) || nativePosition < 1 || nativePosition > len(rules) {
-			return filter.Snapshot{}, fmt.Errorf("%w: mutation position is out of range", filter.ErrRuleStale)
-		}
-		expected := plan.Expected
-		expected.Raw = ""
-		if previousPosition == nativePosition {
-			rules[previousPosition-1] = expected
-			break
-		}
-		rules = append(rules[:previousPosition-1], rules[previousPosition:]...)
-		rules = append(rules, filter.ObservedRule{})
-		copy(rules[nativePosition:], rules[nativePosition-1:])
-		rules[nativePosition-1] = expected
-	default:
-		return filter.Snapshot{}, fmt.Errorf("%w: unsupported batch operation %s", filter.ErrInvalidRule, plan.Operation)
-	}
-	for index := firstChanged; index < len(rules); index++ {
-		position := index + 1
-		rules[index].Locator.Position = &position
-	}
-	snapshot.Rules = rules
-	return snapshot, nil
-}
-
-func buildRestoreScript(scope filter.Scope, rules []filter.ObservedRule) (string, error) {
+func compileCreateBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
+	plan := filter.CommandBatch{Provider: filter.ProviderIptables, Scope: snapshot.Scope, CommandOnly: true}
 	var script strings.Builder
-	script.WriteByte('*')
-	script.WriteString(scope.Table)
-	script.WriteByte('\n')
-	script.WriteString("-F ")
-	script.WriteString(scope.Chain)
-	script.WriteByte('\n')
-	for _, observed := range rules {
-		line, err := restoreRuleLine(scope, observed)
+	fmt.Fprintf(&script, "*%s\n", snapshot.Scope.Table)
+	for _, change := range changes {
+		rulePlan, err := compileChange(snapshot, change)
 		if err != nil {
-			return "", err
+			return filter.CommandBatch{}, err
 		}
+		line, err := restoreRuleLine(snapshot.Scope, rulePlan.Expected)
+		if err != nil {
+			return filter.CommandBatch{}, err
+		}
+		if !change.Append {
+			line = strings.Replace(line, "-A "+snapshot.Scope.Chain+" ", fmt.Sprintf("-I %s %d ", snapshot.Scope.Chain, *rulePlan.Expected.Locator.Position), 1)
+		}
+		rulePlan.Expected.Locator.Position = nil
 		script.WriteString(line)
 		script.WriteByte('\n')
+		rulePlan.Commands, rulePlan.RollbackCommands = nil, nil
+		plan.Rules = append(plan.Rules, rulePlan)
 	}
 	script.WriteString("COMMIT\n")
-	return script.String(), nil
+	plan.Rules[0].Commands = []filter.NativeCommand{{
+		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: script.String(),
+	}}
+	return plan, nil
 }
 
 func restoreRuleLine(scope filter.Scope, observed filter.ObservedRule) (string, error) {
@@ -317,56 +290,7 @@ func restoreRuleLine(scope filter.Scope, observed filter.ObservedRule) (string, 
 	return strings.Join(tokens, " "), nil
 }
 
-func (a *Adapter) Verify(ctx context.Context, plan filter.BackendPlan) (filter.VerifyResult, error) {
-	if plan.Provider != filter.ProviderIptables {
-		return filter.VerifyResult{}, fmt.Errorf("%w: backend plan provider %q", filter.ErrUnsupportedScope, plan.Provider)
-	}
-	snapshot, err := a.Observe(ctx, plan.Scope)
-	if err != nil {
-		return filter.VerifyResult{}, err
-	}
-	byMarker := make(map[string][]int, len(snapshot.Rules))
-	for index, observed := range snapshot.Rules {
-		byMarker[observed.Marker] = append(byMarker[observed.Marker], index)
-	}
-	for _, expected := range plan.Rules {
-		markerMatches := 0
-		semanticMatches := 0
-		for _, index := range byMarker[expected.Expected.Marker] {
-			observed := snapshot.Rules[index]
-			if observed.Marker != "" && observed.Marker == expected.Expected.Marker {
-				markerMatches++
-				want, wantErr := filter.RuleKey(expected.Expected.Rule)
-				got, gotErr := filter.RuleKey(observed.Rule)
-				if wantErr == nil && gotErr == nil && want == got {
-					semanticMatches++
-				}
-			}
-		}
-		requiresPositionMatch := expected.Operation == filter.ChangeReorder ||
-			(expected.Operation == filter.ChangeUpdate && expected.Expected.Rule.OrderIndex != nil)
-		positionMatches := true
-		if requiresPositionMatch {
-			positionMatches = false
-			for _, index := range byMarker[expected.Expected.Marker] {
-				observed := snapshot.Rules[index]
-				if observed.Marker == expected.Expected.Marker && observed.Locator.Position != nil &&
-					expected.Expected.Locator.Position != nil && *observed.Locator.Position == *expected.Expected.Locator.Position {
-					positionMatches = true
-					break
-				}
-			}
-		}
-		if (expected.Operation == filter.ChangeDelete && markerMatches != 0) ||
-			(requiresPositionMatch && !positionMatches) ||
-			(expected.Operation != filter.ChangeDelete && (markerMatches != 1 || semanticMatches != 1)) {
-			return filter.VerifyResult{Snapshot: snapshot, Matched: false}, nil
-		}
-	}
-	return filter.VerifyResult{Snapshot: snapshot, Matched: true}, nil
-}
-
-func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
+func (a *Adapter) Rollback(ctx context.Context, plan filter.CommandBatch) error {
 	if a.writer == nil {
 		return fmt.Errorf("iptables writer is required")
 	}
@@ -382,7 +306,7 @@ func (a *Adapter) Rollback(ctx context.Context, plan filter.BackendPlan) error {
 	return a.rollback(ctx, plan, len(plan.Rules)-1, -1)
 }
 
-func (a *Adapter) compensate(ctx context.Context, plan filter.BackendPlan, lastRule, lastCommandCount int, cause error) error {
+func (a *Adapter) compensate(ctx context.Context, plan filter.CommandBatch, lastRule, lastCommandCount int, cause error) error {
 	if plan.CreatesOnly() {
 		return cause
 	}
@@ -395,7 +319,7 @@ func (a *Adapter) compensate(ctx context.Context, plan filter.BackendPlan, lastR
 	return cause
 }
 
-func (a *Adapter) rollback(ctx context.Context, plan filter.BackendPlan, lastRule, lastCommandCount int) error {
+func (a *Adapter) rollback(ctx context.Context, plan filter.CommandBatch, lastRule, lastCommandCount int) error {
 	var rollbackErr error
 	for index := lastRule; index >= 0; index-- {
 		commands := plan.Rules[index].RollbackCommands
@@ -432,53 +356,65 @@ func validateAdapterScope(scope filter.Scope) error {
 	return nil
 }
 
-func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filter.NativeRulePlan, error) {
+func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.RuleCommands, error) {
 	rule := change.After
 	if change.Operation == filter.ChangeDelete {
 		rule = change.Before
 	}
 	if rule == nil {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
 	}
 	normalized, err := filter.NormalizeRule(*rule)
 	if err != nil {
-		return filter.NativeRulePlan{}, err
+		return filter.RuleCommands{}, err
 	}
 	if normalized.Scope.Key() != snapshot.Scope.Key() {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
+		return filter.RuleCommands{}, fmt.Errorf("%w: change scope %s", filter.ErrUnsupportedScope, normalized.Scope.Key())
 	}
 	if normalized.UUID == "" {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
+		return filter.RuleCommands{}, fmt.Errorf("%w: rule UUID is required", filter.ErrInvalidRule)
 	}
 	if (normalized.Scope.Family == filter.FamilyIPv4 && normalized.Protocol == "icmpv6") ||
 		(normalized.Scope.Family == filter.FamilyIPv6 && normalized.Protocol == "icmp") {
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: protocol %q does not match %s", filter.ErrInvalidRule, normalized.Protocol, normalized.Scope.Family)
+		return filter.RuleCommands{}, fmt.Errorf("%w: protocol %q does not match %s", filter.ErrInvalidRule, normalized.Protocol, normalized.Scope.Family)
 	}
 	marker := "1panel-rule:" + normalized.UUID
+	if change.Operation == filter.ChangeDelete && change.CommandOnly && change.Locator == nil {
+		previous := filter.ObservedRule{Rule: normalized, Marker: marker, ParseStatus: filter.ParseStatusSupported}
+		var commands []filter.NativeCommand
+		if change.UnmarkedAdopted || change.PreviousMarker != "" {
+			previous.Marker = change.PreviousMarker
+			args := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}
+			args = append(args, compileObservedRuleArgs(previous)...)
+			commands = []filter.NativeCommand{{Executable: executableForFamily(snapshot.Scope.Family), Args: args}}
+		}
+		return filter.RuleCommands{RuleUUID: normalized.UUID, Operation: change.Operation, Previous: &previous, Expected: previous, Commands: commands}, nil
+	}
 	position := len(snapshot.Rules) + 1
 	verb := "-I"
 	var target filter.ObservedRule
 	switch change.Operation {
 	case filter.ChangeCreate:
-		if normalized.OrderIndex != nil && (*normalized.OrderIndex < 1 || *normalized.OrderIndex > int64(len(snapshot.Rules)+1)) {
-			return filter.NativeRulePlan{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
+		hasSnapshot := !change.CommandOnly || snapshot.Rules != nil
+		if normalized.OrderIndex != nil && (*normalized.OrderIndex < 1 || hasSnapshot && *normalized.OrderIndex > int64(len(snapshot.Rules)+1)) {
+			return filter.RuleCommands{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
 		position = insertionPosition(snapshot, normalized)
 	case filter.ChangeAdopt:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
-			return filter.NativeRulePlan{}, err
+			return filter.RuleCommands{}, err
 		}
 		verb = "-R"
 	case filter.ChangeUpdate:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
-			return filter.NativeRulePlan{}, err
+			return filter.RuleCommands{}, err
 		}
 		targetPosition := position
 		if normalized.OrderIndex != nil {
 			if *normalized.OrderIndex < 1 || *normalized.OrderIndex > int64(len(snapshot.Rules)) {
-				return filter.NativeRulePlan{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
+				return filter.RuleCommands{}, fmt.Errorf("%w: update target is out of range", filter.ErrInvalidRule)
 			}
 			targetPosition = int(*normalized.OrderIndex)
 		}
@@ -489,21 +425,21 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 	case filter.ChangeDelete:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
-			return filter.NativeRulePlan{}, err
+			return filter.RuleCommands{}, err
 		}
 		verb = "-D"
 	case filter.ChangeReorder:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
-			return filter.NativeRulePlan{}, err
+			return filter.RuleCommands{}, err
 		}
 		if normalized.OrderIndex == nil || *normalized.OrderIndex < 1 || *normalized.OrderIndex > int64(len(snapshot.Rules)) {
-			return filter.NativeRulePlan{}, fmt.Errorf("%w: reorder target is out of range", filter.ErrInvalidRule)
+			return filter.RuleCommands{}, fmt.Errorf("%w: reorder target is out of range", filter.ErrInvalidRule)
 		}
 		targetPosition := int(*normalized.OrderIndex)
 		return positionalMutationPlan(snapshot, normalized, target, marker, position, targetPosition, change.Operation), nil
 	default:
-		return filter.NativeRulePlan{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
+		return filter.RuleCommands{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
 	args := []string{"-w", "-t", snapshot.Scope.Table, verb, snapshot.Scope.Chain, strconv.Itoa(position)}
 	if change.Operation != filter.ChangeDelete {
@@ -525,36 +461,32 @@ func compileChange(snapshot filter.Snapshot, change filter.DesiredChange) (filte
 		Rule: normalized, Marker: marker, ParseStatus: filter.ParseStatusSupported,
 		Locator: filter.Locator{Provider: filter.ProviderIptables, ScopeKey: snapshot.Scope.Key(), Position: &position},
 	}
-	return filter.NativeRulePlan{
+	var previous *filter.ObservedRule
+	if change.Operation != filter.ChangeCreate {
+		previous = &target
+	}
+	return filter.RuleCommands{
 		RuleUUID: normalized.UUID, Operation: change.Operation,
 		Commands:         []filter.NativeCommand{{Executable: executableForFamily(snapshot.Scope.Family), Args: args}},
 		RollbackCommands: []filter.NativeCommand{{Executable: executableForFamily(snapshot.Scope.Family), Args: rollbackArgs}},
-		Previous:         pointerToObserved(target, change.Operation != filter.ChangeCreate),
+		Previous:         previous,
 		Expected:         expected,
 	}, nil
 }
 
-func positionalMutationPlan(
-	snapshot filter.Snapshot,
-	rule filter.FirewallRule,
-	previous filter.ObservedRule,
-	marker string,
-	position int,
-	targetPosition int,
-	operation filter.ChangeOperation,
-) filter.NativeRulePlan {
+func positionalMutationPlan(snapshot filter.RuleSet, rule filter.FirewallRule, previous filter.ObservedRule, marker string, position int, targetPosition int, operation filter.ChangeOperation) filter.RuleCommands {
 	expected := filter.ObservedRule{
 		Rule: rule, Marker: marker, ParseStatus: filter.ParseStatusSupported,
 		Locator: filter.Locator{Provider: filter.ProviderIptables, ScopeKey: snapshot.Scope.Key(), Position: &targetPosition},
 	}
-	plan := filter.NativeRulePlan{
+	plan := filter.RuleCommands{
 		RuleUUID: rule.UUID, Operation: operation, Previous: &previous, Expected: expected,
 	}
 	if position == targetPosition {
 		return plan
 	}
 	executable := executableForFamily(snapshot.Scope.Family)
-	deleteArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain, strconv.Itoa(position)}
+	deleteArgs := append([]string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}, compileObservedRuleArgs(previous)...)
 	insertArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(targetPosition)}
 	insertArgs = append(insertArgs, compileRuleArgs(rule, marker)...)
 	restoreArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(position)}
@@ -570,13 +502,6 @@ func positionalMutationPlan(
 		{Executable: executable, Args: deleteInsertedArgs},
 	}
 	return plan
-}
-
-func pointerToObserved(rule filter.ObservedRule, include bool) *filter.ObservedRule {
-	if !include {
-		return nil
-	}
-	return &rule
 }
 
 func compileRuleArgs(rule filter.FirewallRule, marker string) []string {
@@ -599,16 +524,16 @@ func compileRuleArgs(rule filter.FirewallRule, marker string) []string {
 	}
 	if rule.SourcePort != "" {
 		if strings.Contains(rule.SourcePort, ",") {
-			args = append(args, "-m", "multiport", "--sports", nativePort(rule.SourcePort))
+			args = append(args, "-m", "multiport", "--sports", strings.ReplaceAll(rule.SourcePort, "-", ":"))
 		} else {
-			args = append(args, "--sport", nativePort(rule.SourcePort))
+			args = append(args, "--sport", strings.ReplaceAll(rule.SourcePort, "-", ":"))
 		}
 	}
 	if rule.DestinationPort != "" {
 		if strings.Contains(rule.DestinationPort, ",") {
-			args = append(args, "-m", "multiport", "--dports", nativePort(rule.DestinationPort))
+			args = append(args, "-m", "multiport", "--dports", strings.ReplaceAll(rule.DestinationPort, "-", ":"))
 		} else {
-			args = append(args, "--dport", nativePort(rule.DestinationPort))
+			args = append(args, "--dport", strings.ReplaceAll(rule.DestinationPort, "-", ":"))
 		}
 	}
 	if len(rule.ConnectionStates) != 0 {
@@ -629,11 +554,7 @@ func compileObservedRuleArgs(observed filter.ObservedRule) []string {
 	return compileRuleArgs(observed.Rule, comment)
 }
 
-func nativePort(port string) string {
-	return strings.ReplaceAll(port, "-", ":")
-}
-
-func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChange, after filter.FirewallRule, marker string) (int, filter.ObservedRule, error) {
+func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange, after filter.FirewallRule, marker string) (int, filter.ObservedRule, error) {
 	if change.Locator == nil || change.Locator.Position == nil {
 		return 0, filter.ObservedRule{}, fmt.Errorf("%w: mutation requires a position locator", filter.ErrInvalidRule)
 	}
@@ -673,7 +594,7 @@ func validateMutationTarget(snapshot filter.Snapshot, change filter.DesiredChang
 	return position, observed, nil
 }
 
-func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
+func insertionPosition(snapshot filter.RuleSet, rule filter.FirewallRule) int {
 	if rule.OrderIndex != nil {
 		return int(*rule.OrderIndex)
 	}
@@ -691,17 +612,27 @@ func insertionPosition(snapshot filter.Snapshot, rule filter.FirewallRule) int {
 
 type systemBackend struct{}
 
-func (systemBackend) CheckMultiport(ctx context.Context, family filter.Family) error {
-	executable, err := runtimeExecutableForFamily(family)
+func (systemBackend) ReadRulesByComment(ctx context.Context, scope filter.Scope, comment string) (string, error) {
+	executable, err := runtimeExecutable(executableForFamily(scope.Family))
 	if err != nil {
-		return err
+		return "", err
 	}
-	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(20*time.Second)).RunWithOptionalSudo(executable, "-m", "multiport", "--help")
+	return filter.ReadRulesByComment(ctx, executable, []string{"-w", "-t", scope.Table, "-S", scope.Chain}, comment)
 }
 
-func (systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	output, err := (systemBackend{}).ListTable(ctx, scope)
-	return chainOutput(scope, output, err)
+func (systemBackend) ListTable(ctx context.Context, scope filter.Scope) (string, error) {
+	return native.ReadTable(ctx, scope.Table, scope.Family == filter.FamilyIPv6)
+}
+
+func (b systemBackend) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
+	output, err := b.ListTable(ctx, scope)
+	if err != nil {
+		return "", err
+	}
+	if !containsChainDeclaration(output, scope.Chain) {
+		return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
+	}
+	return output, nil
 }
 
 func containsChainDeclaration(output, chain string) bool {
@@ -758,10 +689,6 @@ func restoreExecutableForFamily(family filter.Family) string {
 		return "ip6tables-restore"
 	}
 	return "iptables-restore"
-}
-
-func runtimeExecutableForFamily(family filter.Family) (string, error) {
-	return runtimeExecutable(executableForFamily(family))
 }
 
 func runtimeExecutable(logical string) (string, error) {
@@ -937,54 +864,6 @@ func takeValue(args []string, index *int, target *string) bool {
 	return true
 }
 
-type tableReader interface {
-	ListTable(context.Context, filter.Scope) (string, error)
-}
-
-type tableRead struct {
-	output string
-	err    error
-}
-
-type tableObservationReader struct {
-	reader tableReader
-	tables map[string]tableRead
-}
-
-func (r *tableObservationReader) ListChain(ctx context.Context, scope filter.Scope) (string, error) {
-	if err := ctx.Err(); err != nil {
-		return "", err
-	}
-	key := string(scope.Family) + ":" + scope.Table
-	read, exists := r.tables[key]
-	if !exists {
-		read.output, read.err = r.reader.ListTable(ctx, scope)
-		r.tables[key] = read
-	}
-	return chainOutput(scope, read.output, read.err)
-}
-
-func (a *Adapter) NewObservationSession() filter.Adapter {
-	reader, ok := a.reader.(tableReader)
-	if !ok {
-		return a
-	}
-	return &Adapter{
-		reader: &tableObservationReader{reader: reader, tables: make(map[string]tableRead)},
-		writer: a.writer, checker: a.checker,
-	}
-}
-
-func (systemBackend) ListTable(ctx context.Context, scope filter.Scope) (string, error) {
-	return native.ReadTable(ctx, scope.Table, scope.Family == filter.FamilyIPv6)
-}
-
-func chainOutput(scope filter.Scope, output string, err error) (string, error) {
-	if err != nil {
-		return "", err
-	}
-	if !containsChainDeclaration(output, scope.Chain) {
-		return "", fmt.Errorf("%w: iptables %s chain %s is not initialized", filter.ErrProviderUnavailable, scope.Family, scope.Chain)
-	}
-	return output, nil
+func (a *Adapter) SaveRules(ctx context.Context, scope filter.Scope) error {
+	return a.writer.Save(ctx, scope)
 }

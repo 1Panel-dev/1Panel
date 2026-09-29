@@ -649,6 +649,7 @@ CommonAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .msg }}。자세한 내�
 NodeExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 노드에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 LicenseExceptionAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .num }}개의 라이센스에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
 SSHAndPanelLoginAlert: '귀하의 {{ .node }}{{ .ip }} 패널, {{ .loginIp }}에서의 {{ .name }} 로그인에 이상이 있습니다. 자세한 내용은 패널에 로그인하십시오.'
+CronJobSuccessAlert: '패널 {{ .node }}{{ .ip }}: 예약 작업 {{ .name }}이(가) 성공적으로 완료되었습니다. 로그인하여 자세한 내용을 확인하십시오.'
 
 # 디스크
 DeviceNotFound: '장치 {{ .name }} 을(를) 찾을 수 없습니다'
@@ -719,3 +720,14 @@ FirewallPersistDockerGuardStep: 'Docker 포트 보호 상태 저장'
 ErrFirewallRuleScopeChange: "현재 방화벽에서는 규칙의 적용 범위(예: IPv4/IPv6 주소 패밀리)를 변경할 수 없습니다. 새 규칙을 생성하세요."
 FirewallWhitelistReleased: "{{ .name }}: 허용 목록 보호가 해제되었으며 허용 규칙은 유지됩니다. 포트를 닫으려면 규칙 목록에서 수동으로 삭제하세요"
 FirewallWhitelistRequired: "{{ .name }}: 시스템 필수 포트 규칙으로 보호됩니다"
+FileTaskCopy: '{{ .dst }}에 파일 복사'
+FileTaskMove: '{{ .dst }}로 파일 이동'
+FileTaskCompress: '{{ .dst }}에 파일 압축'
+FileTaskDecompress: '{{ .dst }}에 압축 해제'
+FileTaskSource: '원본 경로: {{ .path }}'
+FileTaskFormat: '압축 형식: {{ .format }}'
+FileTaskRename: '대상 파일 이름: {{ .name }}'
+
+ErrFirewallBackendCleanupRequired: "현재 백엔드 {{ .current }}에 1Panel 규칙이 남아 있습니다. {{ .target }}로 전환하기 전에 정리하세요."
+ErrDockerIPv4ForwardingDisabled: "IPv4 전달이 비활성화되어 있습니다. Docker 방화벽 백엔드를 사용하기 전에 net.ipv4.ip_forward=1을 설정하세요."
+ErrFirewallRuleSavedApplyFailed: "새 규칙 설정이 저장되었지만 방화벽에 적용하지 못했습니다. 동기화하여 다시 시도하세요: {{ .detail }}"

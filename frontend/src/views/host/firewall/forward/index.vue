@@ -52,8 +52,8 @@
                     </template>
                     <template #rightToolBar>
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                        <TableRefresh @search="search()" />
-                        <TableSetting title="firewall-forward-refresh" @search="search()" />
+                        <TableRefresh @search="refreshAfterSync" />
+                        <TableSetting title="firewall-forward-refresh" @search="refreshAfterSync" />
                     </template>
                     <template #main>
                         <ComplexTable
@@ -126,7 +126,7 @@
         </OpDialog>
         <OperateDialog @created="openRuleTask" ref="dialogRef" />
         <ImportDialog @created="openRuleTask" ref="dialogImportRef" />
-        <TaskLog ref="taskLogRef" @close="search" />
+        <TaskLog ref="taskLogRef" @close="refreshAfterSync" />
         <RuleSync ref="ruleSyncRef" @search="refreshAfterSync" />
         <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
     </div>

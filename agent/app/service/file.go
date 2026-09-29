@@ -439,13 +439,15 @@ func (f *FileService) Compress(c request.FileCompress) error {
 	if err := preflightCompressTool(files.CompressType(c.Type)); err != nil {
 		return err
 	}
-	taskItem, err := task.NewTask(c.Name, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
+	taskName := i18n.GetMsgWithMap("FileTaskCompress", map[string]interface{}{"dst": strconv.Quote(filepath.Join(c.Dst, c.Name))})
+	taskItem, err := task.NewTask(taskName, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
 	if err != nil {
 		return err
 	}
 	go func() {
-		taskItem.AddSubTask(c.Name, func(t *task.Task) error {
-			t.LogStart(c.Name)
+		taskItem.AddSubTask(taskName, func(t *task.Task) error {
+			logFileTaskSources(t, c.Files)
+			t.Log(i18n.GetMsgWithMap("FileTaskFormat", map[string]interface{}{"format": strconv.Quote(c.Type)}))
 			compressType := files.CompressType(c.Type)
 			dstFile := filepath.Join(c.Dst, c.Name)
 			success := false
@@ -516,13 +518,15 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	if err := preflightDecompressTool(files.CompressType(c.Type)); err != nil {
 		return err
 	}
-	taskItem, err := task.NewTask(c.Path, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
+	taskName := i18n.GetMsgWithMap("FileTaskDecompress", map[string]interface{}{"dst": strconv.Quote(c.Dst)})
+	taskItem, err := task.NewTask(taskName, task.TaskExec, task.TaskScopeTask, c.TaskID, 1)
 	if err != nil {
 		return err
 	}
 	go func() {
-		taskItem.AddSubTask(c.Path, func(t *task.Task) error {
-			t.LogStart(c.Path)
+		taskItem.AddSubTask(taskName, func(t *task.Task) error {
+			logFileTaskSources(t, []string{c.Path})
+			t.Log(i18n.GetMsgWithMap("FileTaskFormat", map[string]interface{}{"format": strconv.Quote(c.Type)}))
 			dstExisted := fo.Stat(c.Dst)
 			parentDir := filepath.Dir(c.Dst)
 			if !fo.Stat(parentDir) {
@@ -914,6 +918,12 @@ func (f *FileService) Wget(w request.FileWget) (string, error) {
 	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key, options)
 }
 
+func logFileTaskSources(t *task.Task, sources []string) {
+	for _, source := range sources {
+		t.Log(i18n.GetMsgWithMap("FileTaskSource", map[string]interface{}{"path": strconv.Quote(source)}))
+	}
+}
+
 func (f *FileService) MvFile(m request.FileMove) error {
 	fo := files.NewFileOp()
 	if err := validateFileMove(fo, m); err != nil {
@@ -925,15 +935,24 @@ func (f *FileService) MvFile(m request.FileMove) error {
 	if !fileTransferLocks.Acquire(m.TaskID, getFileTransferPaths(m)) {
 		return buserr.New("TaskIsExecuting")
 	}
-	taskItem, err := task.NewTask(m.NewPath, task.TaskExec, task.TaskScopeTask, m.TaskID, 1)
+	nameKey := "FileTaskCopy"
+	if m.Type == "cut" {
+		nameKey = "FileTaskMove"
+	}
+	taskName := i18n.GetMsgWithMap(nameKey, map[string]interface{}{"dst": strconv.Quote(m.NewPath)})
+	taskItem, err := task.NewTask(taskName, task.TaskExec, task.TaskScopeTask, m.TaskID, 1)
 	if err != nil {
 		fileTransferLocks.Release(m.TaskID)
 		return err
 	}
 	go func() {
 		defer fileTransferLocks.Release(m.TaskID)
-		taskItem.AddSubTaskWithOps(m.NewPath, func(t *task.Task) error {
-			t.LogStart(m.NewPath)
+		taskItem.AddSubTaskWithOps(taskName, func(t *task.Task) error {
+			logFileTaskSources(t, m.OldPaths)
+			logFileTaskSources(t, m.CoverPaths)
+			if m.Name != "" {
+				t.Log(i18n.GetMsgWithMap("FileTaskRename", map[string]interface{}{"name": strconv.Quote(m.Name)}))
+			}
 			err := f.moveFileWithContext(t.TaskCtx, m)
 			if err != nil && t.TaskCtx.Err() != nil {
 				return t.TaskCtx.Err()

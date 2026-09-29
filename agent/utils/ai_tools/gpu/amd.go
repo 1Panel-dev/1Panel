@@ -3,12 +3,13 @@ package gpu
 import (
 	"context"
 	"fmt"
+	"math"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 )
 
@@ -32,16 +33,22 @@ func findAMDSMI() (string, bool) {
 
 func (a amdSMI) LoadInfo(ctx context.Context) (*Info, error) {
 	var (
-		staticData  string
-		metricData  string
-		processData string
-		staticErr   error
-		metricErr   error
-		processErr  error
-		wg          sync.WaitGroup
+		staticData   string
+		metricData   string
+		extendedData string
+		extendedErr  error
+		processData  string
+		staticErr    error
+		metricErr    error
+		processErr   error
+		wg           sync.WaitGroup
 	)
 
-	wg.Add(3)
+	wg.Add(4)
+	go func() {
+		defer wg.Done()
+		extendedData, extendedErr = runAMDSMI(ctx, a.command, "metric", "--clock", "--ecc", "--json")
+	}()
 	go func() {
 		defer wg.Done()
 		staticData, staticErr = runAMDSMI(ctx, a.command, "static", "--asic", "--bus", "--driver", "--limit", "--json")
@@ -64,16 +71,25 @@ func (a amdSMI) LoadInfo(ctx context.Context) (*Info, error) {
 		return nil, fmt.Errorf("parsing %s static output failed: %w", a.command, err)
 	}
 
+	if metricErr == nil {
+		metricErr = applyAMDMetrics(info, metricData)
+	}
 	if metricErr != nil {
-		global.LOG.Warnf("calling %s metric failed, metrics will be omitted: %v", a.command, metricErr)
-	} else if err := applyAMDMetrics(info, metricData); err != nil {
-		global.LOG.Warnf("parsing %s metric output failed, metrics will be omitted: %v", a.command, err)
+		info.Warnings = append(info.Warnings, fmt.Sprintf("%s metrics: %v", a.command, metricErr))
+	}
+	if extendedErr == nil {
+		extendedErr = applyAMDMetrics(info, extendedData)
+	}
+	if extendedErr != nil {
+		info.Warnings = append(info.Warnings, fmt.Sprintf("%s extended metrics: %v", a.command, extendedErr))
+	}
+	if processErr == nil {
+		processErr = applyAMDProcesses(info, processData)
 	}
 	if processErr != nil {
-		global.LOG.Warnf("calling %s process failed, process information will be omitted: %v", a.command, processErr)
-	} else if err := applyAMDProcesses(info, processData); err != nil {
-		global.LOG.Warnf("parsing %s process output failed, process information will be omitted: %v", a.command, err)
+		info.Warnings = append(info.Warnings, fmt.Sprintf("%s processes: %v", a.command, processErr))
 	}
+
 	return info, nil
 }
 
@@ -96,6 +112,9 @@ func parseAMDStatic(data string) (*Info, error) {
 		}
 		device := Device{
 			Type:             "amd",
+			UUID:             amdStringAt(row, "uuid", "asic.uuid"),
+			DriverVersion:    amdStringAt(row, "driver.version", "driver_version", "amdgpu_version"),
+			ProcessStatus:    "unavailable",
 			Index:            index,
 			ProductName:      amdStringAt(row, "asic.market_name", "market_name", "gpu_name"),
 			PersistenceMode:  "N/A",
@@ -111,6 +130,7 @@ func parseAMDStatic(data string) (*Info, error) {
 				"limit.max_power_limit",
 				"limit.max_power",
 			),
+			PowerLimit:  amdMetricAt(row, "W", "limit.ppt0.socket_power_limit", "limit.socket_power_limit"),
 			MemUsed:     "N/A",
 			MemTotal:    "N/A",
 			GPUUtil:     "N/A",
@@ -150,11 +170,31 @@ func applyAMDMetrics(info *Info, data string) error {
 			continue
 		}
 		setAMDMetric(&device.GPUUtil, row, "%", "usage.gfx_activity", "usage.gfx", "gfx_activity", "gfx_usage")
-		setAMDMetric(&device.Temperature, row, "°C", "temperature.hotspot", "temperature.edge", "hotspot_temperature", "gpu_temperature", "gpu_temp")
+		setAMDMetric(&device.Temperature, row, "°C", "temperature.edge", "gpu_temperature", "gpu_temp")
 		setAMDMetric(&device.PowerDraw, row, "W", "power.socket_power", "socket_power", "power_usage")
 		setAMDMetric(&device.MemUsed, row, "MB", "mem_usage.used_vram", "vram.used", "used_vram", "vram_used")
 		setAMDMetric(&device.MemTotal, row, "MB", "mem_usage.total_vram", "vram.total", "total_vram", "vram_total")
-		setAMDMetric(&device.FanSpeed, row, "%", "fan.speed", "fan_speed")
+
+		setAMDMetric(&device.FanSpeed, row, "%", "fan.usage")
+		if amdMetricAt(row, "%", "fan.usage") == "" {
+			speed, speedErr := strconv.ParseFloat(amdStringAt(row, "fan.speed"), 64)
+			maximum, maxErr := strconv.ParseFloat(amdStringAt(row, "fan.max"), 64)
+			if speedErr == nil && maxErr == nil && !math.IsNaN(speed) && !math.IsInf(speed, 0) && maximum > 0 && !math.IsInf(maximum, 0) && speed >= 0 && speed <= maximum {
+				device.FanSpeed = fmt.Sprintf("%.2f %%", speed/maximum*100)
+			}
+		}
+		setAMDMetric(&device.FanRPM, row, "RPM", "fan.rpm")
+		setAMDMetric(&device.HotspotTemperature, row, "°C", "temperature.hotspot", "hotspot_temperature")
+		setAMDMetric(&device.MemoryTemperature, row, "°C", "temperature.mem")
+		setAMDMetric(&device.MemoryActivity, row, "%", "usage.umc_activity")
+		setAMDMetric(&device.MediaUtil, row, "%", "usage.mm_activity")
+		setAMDMetric(&device.Frequency, row, "MHz", "clock.gfx_0.clk")
+		setAMDMetric(&device.MemoryFrequency, row, "MHz", "clock.mem_0.clk")
+		correctable := amdStringAt(row, "ecc.total_correctable_count", "ecc.correctable_count")
+		uncorrectable := amdStringAt(row, "ecc.total_uncorrectable_count", "ecc.uncorrectable_count")
+		if correctable != "" || uncorrectable != "" {
+			device.ECCErrors = []ECCError{{Scope: "Total", Correctable: correctable, Uncorrectable: uncorrectable}}
+		}
 		if value := amdStringAt(row, "perf_level", "performance_level"); value != "" {
 			device.PerformanceState = value
 		}
@@ -177,6 +217,7 @@ func applyAMDProcesses(info *Info, data string) error {
 		if !ok {
 			continue
 		}
+		device.ProcessStatus = "ok"
 		processList, _ := amdValueAt(row, "process_list")
 		items := amdObjectList(processList)
 		if len(items) == 0 {

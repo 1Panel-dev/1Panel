@@ -98,12 +98,16 @@ const getType = (status: string) => {
         case 'disable':
         case 'unhealthy':
         case 'failed':
+        case 'crashed':
         case 'lost':
         case 'exited':
         case 'notfound':
         case 'inaccessible':
             return 'danger';
         case 'paused':
+        case 'blocked':
+        case 'shutdown':
+        case 'pmsuspended':
         case 'dead':
         case 'removing':
         case 'deleted':
@@ -131,6 +135,7 @@ const loadingStatus = [
     'recreating',
     'creating',
     'starting',
+    'shutdown',
     'removing',
     'applying',
     'uninstalling',

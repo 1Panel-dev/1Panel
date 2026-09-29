@@ -1,6 +1,11 @@
 <template>
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="w-70">
-        <el-alert class="mb-3" type="info" :closable="false" :title="$t('commons.msg.importHelper')" />
+        <el-alert
+            class="mb-3"
+            type="info"
+            :closable="false"
+            :title="$t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024])"
+        />
         <el-alert v-if="submitError" class="mb-3" type="error" :closable="false" :title="submitError" />
         <div class="import-file-bar mt-3">
             <el-upload
@@ -31,8 +36,22 @@
                     </el-tag>
                 </div>
             </template>
-            <ComplexTable v-model:selects="selects" :data="policies" :height="300">
-                <el-table-column type="selection" fix />
+            <ComplexTable :data="policies" :height="300">
+                <el-table-column width="48" fixed>
+                    <template #header>
+                        <el-checkbox
+                            :model-value="policies.length > 0 && selects.size === policies.length"
+                            :indeterminate="selects.size > 0 && selects.size < policies.length"
+                            @change="selects = $event ? new Set(policies) : new Set()"
+                        />
+                    </template>
+                    <template #default="{ row }">
+                        <el-checkbox
+                            :model-value="selects.has(row)"
+                            @change="$event ? selects.add(row) : selects.delete(row)"
+                        />
+                    </template>
+                </el-table-column>
                 <el-table-column label="IP" prop="family" min-width="65">
                     <template #default="{ row }">{{ row.family === 'ipv6' ? 'IPv6' : 'IPv4' }}</template>
                 </el-table-column>
@@ -50,7 +69,7 @@
         </el-card>
         <template #footer>
             <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :loading="loading" :disabled="selects.length === 0" @click="onImport">
+            <el-button type="primary" :loading="loading" :disabled="selects.size === 0" @click="onImport">
                 {{ $t('commons.button.import') }}
             </el-button>
         </template>
@@ -67,14 +86,18 @@ import { isAxiosError } from 'axios';
 import { genFileId, type UploadFile, type UploadFiles, type UploadProps, type UploadRawFile } from 'element-plus';
 import { ref } from 'vue';
 import { dockerGuardEndpointKey, normalizeDockerGuardPolicy } from '@/views/host/firewall/docker/model';
-import { formatHostAddressList } from '@/views/host/firewall/utils/validation';
+import {
+    FIREWALL_BATCH_LIMIT,
+    FIREWALL_IMPORT_MAX_SIZE,
+    formatHostAddressList,
+} from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{ (event: 'created', taskID: string): void }>();
 const visible = ref(false);
 const loading = ref(false);
 const policies = ref<Firewall.DockerGuardPolicy[]>([]);
-const selects = ref<Firewall.DockerGuardPolicy[]>([]);
+const selects = ref(new Set<Firewall.DockerGuardPolicy>());
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
 const submitError = ref('');
@@ -83,15 +106,29 @@ const displaySources = (policy: Firewall.DockerGuardPolicy) => formatHostAddress
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     if (!uploadFile.raw) return;
     loading.value = true;
+
     policies.value = [];
-    selects.value = [];
+    selects.value = new Set();
     submitError.value = '';
     uploaderFiles.value = uploadFiles;
+    if (uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
+        uploadRef.value?.clearFiles();
+        uploaderFiles.value = [];
+        loading.value = false;
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     const reader = new FileReader();
     reader.onload = (event) => {
         try {
             const parsed: unknown = JSON.parse(String(event.target?.result || ''));
             if (!Array.isArray(parsed)) throw new Error();
+            if (parsed.length > FIREWALL_BATCH_LIMIT) {
+                MsgError(
+                    i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]),
+                );
+                return;
+            }
             const normalized = parsed.map(normalizeDockerGuardPolicy);
             if (normalized.some((policy) => !policy)) throw new Error();
             const byEndpoint = new Map<string, Firewall.DockerGuardPolicy>();
@@ -99,10 +136,10 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
                 byEndpoint.set(dockerGuardEndpointKey(policy), policy);
             }
             policies.value = [...byEndpoint.values()];
-            selects.value = [...policies.value];
+            selects.value = new Set(policies.value);
         } catch {
             policies.value = [];
-            selects.value = [];
+            selects.value = new Set();
             MsgError(i18n.global.t('commons.msg.errImportFormat'));
         } finally {
             loading.value = false;
@@ -119,11 +156,19 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const onImport = async () => {
-    if (loading.value || selects.value.length === 0) return;
+    if (loading.value || selects.value.size === 0) return;
+    if (selects.value.size > FIREWALL_BATCH_LIMIT) {
+        MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+        return;
+    }
     loading.value = true;
     submitError.value = '';
     try {
-        const result = (await upsertDockerPortGuardPolicies({ policies: selects.value })).data;
+        const result = (
+            await upsertDockerPortGuardPolicies({
+                policies: policies.value.filter((policy) => selects.value.has(policy)),
+            })
+        ).data;
         if (!result.taskID || !result.queued) {
             submitError.value = i18n.global.t('commons.msg.operationFailed');
             return;
@@ -148,8 +193,9 @@ const modeLabel = (mode: Firewall.DockerGuardPolicy['mode']) => {
 
 const acceptParams = () => {
     loading.value = false;
+
     policies.value = [];
-    selects.value = [];
+    selects.value = new Set();
     uploaderFiles.value = [];
     submitError.value = '';
     uploadRef.value?.clearFiles();

@@ -22,6 +22,8 @@ export namespace AI {
     }
 
     export interface Info {
+        collectedAt?: string;
+        warnings?: string[];
         cudaVersion: string;
         driverVersion: string;
         type: string;
@@ -31,6 +33,34 @@ export namespace AI {
         xpu: XpuInfo['xpu'];
     }
     export interface GPU {
+        eccPending?: string;
+        eccErrors?: { scope: string; correctable: string; uncorrectable: string }[];
+        memoryActivity?: string;
+        encoderUtil?: string;
+        decoderUtil?: string;
+        jpegUtil?: string;
+        ofaUtil?: string;
+        mediaUtil?: string;
+        hotspotTemperature?: string;
+        fanRPM?: string;
+        mediaFrequency?: string;
+
+        uuid?: string;
+        driverVersion?: string;
+        architecture?: string;
+        frequency?: string;
+        memoryFrequency?: string;
+        memoryTemperature?: string;
+        memoryFree?: string;
+        memoryReserved?: string;
+        powerLimit?: string;
+        defaultPowerLimit?: string;
+        pcieGeneration?: string;
+        pcieMaxGeneration?: string;
+        pcieWidth?: string;
+        pcieMaxWidth?: string;
+        clockEvents?: string[];
+        processStatus?: string;
         type: 'nvidia' | 'amd';
         index: number;
         productName: string;
@@ -52,6 +82,12 @@ export namespace AI {
         processes: Process[];
     }
     export interface NPU {
+        aiCPUUtil?: string;
+        ctrlCPUUtil?: string;
+        ddrBandwidth?: string;
+        hbmBandwidth?: string;
+
+        processStatus?: string;
         type: 'ascend';
         index: number;
         npuIndex: number;
@@ -73,18 +109,24 @@ export namespace AI {
         processes: NPUProcess[];
     }
     export interface MonitorGPUSearch {
+        aggregation?: 'avg' | 'max';
+        deviceID?: string;
+        legacy?: boolean;
         productName: string;
         startTime: Date;
         endTime: Date;
     }
     export interface MonitorGPUOptions {
+        supported: boolean;
         gpuType: string;
         options: Array<string>;
         chartHide: Array<ChartHide>;
     }
     export interface ChartHide {
+        deviceID?: string;
+        legacy?: boolean;
         productName: string;
-        type?: 'gpu' | 'xpu';
+        type?: 'gpu' | 'npu' | 'xpu';
         process: boolean;
         gpu: boolean;
         memory: boolean;
@@ -94,17 +136,45 @@ export namespace AI {
         speed: boolean;
     }
     export interface MonitorGPUData {
+        memoryActivity: Array<number | null>;
+        encoderUtil: Array<number | null>;
+        decoderUtil: Array<number | null>;
+        jpegUtil: Array<number | null>;
+        ofaUtil: Array<number | null>;
+        mediaUtil: Array<number | null>;
+        computeUtil: Array<number | null>;
+        copyUtil: Array<number | null>;
+        hotspotTemperature: Array<number | null>;
+        fanRPM: Array<number | null>;
+        aiCPUUtil: Array<number | null>;
+        ctrlCPUUtil: Array<number | null>;
+        ddrUsed: Array<number | null>;
+        ddrTotal: Array<number | null>;
+        hbmUsed: Array<number | null>;
+        hbmTotal: Array<number | null>;
+        ddrBandwidth: Array<number | null>;
+        hbmBandwidth: Array<number | null>;
+        memoryBandwidth: Array<number | null>;
+        mediaFrequency: Array<number | null>;
+        hugepagesUsed: Array<number | null>;
+        hugepagesTotal: Array<number | null>;
+
+        bucketSeconds: number;
+        sampleCount: number;
+        memoryTemperatureValue: Array<number | null>;
+        frequencyValue: Array<number | null>;
+        memoryFrequencyValue: Array<number | null>;
         date: Array<Date>;
-        gpuValue: Array<number>;
-        temperatureValue: Array<number>;
-        powerTotal: Array<number>;
-        powerUsed: Array<number>;
-        powerPercent: Array<number>;
-        memoryTotal: Array<number>;
-        memoryUsed: Array<number>;
-        memoryPercent: Array<number>;
-        speedValue: Array<number>;
-        processCount: Array<number>;
+        gpuValue: Array<number | null>;
+        temperatureValue: Array<number | null>;
+        powerTotal: Array<number | null>;
+        powerUsed: Array<number | null>;
+        powerPercent: Array<number | null>;
+        memoryTotal: Array<number | null>;
+        memoryUsed: Array<number | null>;
+        memoryPercent: Array<number | null>;
+        speedValue: Array<number | null>;
+        processCount: Array<number | null>;
         gpuProcesses: Array<Array<GPUProcess>>;
     }
     export interface GPUProcess {
@@ -132,12 +202,15 @@ export namespace AI {
     }
 
     interface Xpu {
+        tiles?: { tileID: number; stats: Stats }[];
+        processStatus?: string;
         basic: Basic;
         stats: Stats;
         processes: XpuProcess[];
     }
 
     interface Basic {
+        uuid?: string;
         deviceID: number;
         deviceName: string;
         vendorName: string;
@@ -148,6 +221,13 @@ export namespace AI {
     }
 
     interface Stats {
+        mediaUtil?: string;
+        computeUtil?: string;
+        copyUtil?: string;
+        mediaFrequency?: string;
+        memoryTemperature?: string;
+
+        memoryBandwidthUtil?: string;
         power: string;
         gpuUtil: string;
         frequency: string;

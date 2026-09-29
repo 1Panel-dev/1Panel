@@ -74,6 +74,15 @@ export function dateFormat(row: any, col: any, dataStr: any) {
     return `${String(y)}-${String(m)}-${String(d)}   ${String(h)}:${String(minute)}:${String(second)}`;
 }
 
+export function dateFormatServerTimezone(row: any, col: any, dataStr: any) {
+    const text = String(dataStr || '');
+    const matched = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/.exec(text);
+    if (!matched) {
+        return text;
+    }
+    return `${matched[1]}   ${matched[2]}`;
+}
+
 export function dateFormatSimple(dataStr: any) {
     const date = new Date(dataStr);
     const y = date.getFullYear();

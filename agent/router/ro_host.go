@@ -11,6 +11,7 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 	hostRouter := Router.Group("hosts")
 	baseApi := v2.ApiGroupApp.BaseApi
 	Router.POST("/internal/terminal/sessions/revoke", baseApi.RevokeTerminalSessions)
+	Router.GET("/internal/terminal/capabilities", baseApi.TerminalCapabilities)
 	{
 		hostRouter.POST("", baseApi.CreateHost)
 		hostRouter.POST("/info", baseApi.GetHostByID)

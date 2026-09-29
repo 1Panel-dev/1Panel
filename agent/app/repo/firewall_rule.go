@@ -10,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/google/uuid"
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
 
 var (
@@ -23,6 +24,8 @@ type IFirewallRuleRepo interface {
 	List(context.Context, ...DBOption) ([]model.FirewallRule, error)
 	UpdateWithRevision(context.Context, string, uint, map[string]interface{}) error
 	DeleteWithRevision(context.Context, string, uint) error
+	DeleteBatchWithRevision(context.Context, []model.FirewallRule) map[string]error
+	SaveResetOrder(context.Context, []model.FirewallRule) error
 }
 
 type FirewallRuleRepo struct {
@@ -87,6 +90,51 @@ func (r *FirewallRuleRepo) DeleteWithRevision(ctx context.Context, ruleUUID stri
 	return nil
 }
 
+func (r *FirewallRuleRepo) DeleteBatchWithRevision(ctx context.Context, rules []model.FirewallRule) map[string]error {
+	failures := make(map[string]error)
+	for start := 0; start < len(rules); start += 500 {
+		batch := rules[start:min(start+500, len(rules))]
+		ids := make([][]interface{}, 0, len(batch))
+		for _, rule := range batch {
+			ids = append(ids, []interface{}{rule.UUID, rule.Revision})
+			failures[rule.UUID] = ErrFirewallRuleRevisionConflict
+		}
+		var deleted []model.FirewallRule
+		err := r.dbFor(ctx).Clauses(clause.Returning{Columns: []clause.Column{{Name: "uuid"}}}).
+			Where("(uuid, revision) IN ?", ids).Delete(&deleted).Error
+		if err != nil {
+			for _, rule := range batch {
+				failures[rule.UUID] = err
+			}
+			continue
+		}
+		for _, rule := range deleted {
+			delete(failures, rule.UUID)
+		}
+	}
+	return failures
+}
+
+func (r *FirewallRuleRepo) SaveResetOrder(ctx context.Context, rules []model.FirewallRule) error {
+	if len(rules) == 0 {
+		return nil
+	}
+	return r.dbFor(ctx).Transaction(func(tx *gorm.DB) error {
+		for _, rule := range rules {
+			result := tx.Model(&model.FirewallRule{}).
+				Where("uuid = ? AND revision = ?", rule.UUID, rule.Revision).
+				Updates(map[string]interface{}{"sequence": rule.Sequence, "priority": rule.Priority, "revision": gorm.Expr("revision + 1")})
+			if result.Error != nil {
+				return result.Error
+			}
+			if result.RowsAffected == 0 {
+				return ErrFirewallRuleRevisionConflict
+			}
+		}
+		return nil
+	})
+}
+
 func (r *FirewallRuleRepo) dbFor(ctx context.Context) *gorm.DB {
 	return firewallDB(ctx, r.db)
 }
@@ -127,18 +175,13 @@ func prepareFirewallRule(rule *model.FirewallRule) error {
 }
 
 func sanitizeRuleUpdates(updates map[string]interface{}) map[string]interface{} {
-	result := cloneUpdates(updates)
-	delete(result, "id")
-	delete(result, "uuid")
-	delete(result, "revision")
-	delete(result, "created_at")
-	return result
-}
-
-func cloneUpdates(updates map[string]interface{}) map[string]interface{} {
 	result := make(map[string]interface{}, len(updates)+1)
 	for key, value := range updates {
 		result[key] = value
 	}
+	delete(result, "id")
+	delete(result, "uuid")
+	delete(result, "revision")
+	delete(result, "created_at")
 	return result
 }

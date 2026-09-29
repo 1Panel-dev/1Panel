@@ -61,7 +61,11 @@ const buttons = computed<RouterButton[]>(() => {
                       path: isEnterprise.value ? '/enterprise/license' : '/settings/license',
                   },
               ]),
-        ...(isFxplay.value
+        {
+            label: i18n.global.t('apiKeyManagement.title'),
+            path: '/settings/apikeys',
+        },
+        ...(isFxplay.value || !isAdmin.value
             ? []
             : [
                   {

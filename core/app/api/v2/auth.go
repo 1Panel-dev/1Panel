@@ -10,6 +10,7 @@ import (
 	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/service"
 	"github.com/1Panel-dev/1Panel/core/buserr"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
@@ -423,8 +424,7 @@ func (b *BaseApi) MFAClose(c *gin.Context) {
 // @Router /core/auth/api/generate [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
 func (b *BaseApi) GenerateApiKey(c *gin.Context) {
-	panelToken := c.GetHeader("1Panel-Token")
-	if panelToken != "" {
+	if _, err := appauth.RequireAPIKeySession(c); err != nil {
 		helper.BadAuth(c, "ErrApiConfigDisable", nil)
 		return
 	}
@@ -433,6 +433,8 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
+	service.NewAPIKeyService().AuditLegacyChange(c)
+	c.Header("Cache-Control", "no-store")
 	helper.SuccessWithData(c, apiKey)
 }
 
@@ -446,8 +448,7 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 // @Router /core/auth/api/update [post]
 // @x-panel-log {"bodyKeys":["ipWhiteList","apiTrustedProxies"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]","formatEN":"update api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"}
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
-	panelToken := c.GetHeader("1Panel-Token")
-	if panelToken != "" {
+	if _, err := appauth.RequireAPIKeySession(c); err != nil {
 		helper.BadAuth(c, "ErrApiConfigDisable", nil)
 		return
 	}
@@ -466,6 +467,7 @@ func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
+	service.NewAPIKeyService().AuditLegacyChange(c)
 	helper.Success(c)
 }
 
@@ -481,6 +483,10 @@ func (b *BaseApi) GetCurrentUser(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
+	if c.GetBool("API_AUTH") || appauth.HasAPICredentials(c) {
+		userInfo.ApiKey = ""
+	}
+	c.Header("Cache-Control", "no-store")
 	helper.SuccessWithData(c, userInfo)
 }
 

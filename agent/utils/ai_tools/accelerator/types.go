@@ -2,6 +2,7 @@ package accelerator
 
 import (
 	"errors"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/npu"
@@ -17,6 +18,9 @@ const (
 )
 
 type Info struct {
+	CollectedAt time.Time `json:"collectedAt"`
+	Warnings    []string  `json:"warnings"`
+
 	Type             string       `json:"type"`
 	CudaVersion      string       `json:"cudaVersion"`
 	DriverVersion    string       `json:"driverVersion"`
@@ -44,25 +48,40 @@ func (m Metric) ValueOrZero() float64 {
 }
 
 type Metrics struct {
-	Utilization Metric
-	Temperature Metric
-	Power       Metric
-	PowerLimit  Metric
-	MemoryUsed  Metric
-	MemoryTotal Metric
-	MemoryUtil  Metric
-	FanSpeed    Metric
-	Frequency   Metric
-}
+	MemoryActivity     Metric
+	EncoderUtil        Metric
+	DecoderUtil        Metric
+	JPEGUtil           Metric
+	OFAUtil            Metric
+	MediaUtil          Metric
+	ComputeUtil        Metric
+	CopyUtil           Metric
+	HotspotTemperature Metric
+	FanRPM             Metric
+	AICPUUtil          Metric
+	CtrlCPUUtil        Metric
+	DDRUsed            Metric
+	DDRTotal           Metric
+	HBMUsed            Metric
+	HBMTotal           Metric
+	DDRBandwidth       Metric
+	HBMBandwidth       Metric
+	MemoryBandwidth    Metric
+	MediaFrequency     Metric
+	HugepagesUsed      Metric
+	HugepagesTotal     Metric
 
-type Capabilities struct {
-	Utilization bool
-	Temperature bool
-	Power       bool
-	PowerLimit  bool
-	Memory      bool
-	FanSpeed    bool
-	Frequency   bool
+	MemoryTemperature Metric
+	Utilization       Metric
+	Temperature       Metric
+	Power             Metric
+	PowerLimit        Metric
+	MemoryUsed        Metric
+	MemoryTotal       Metric
+	MemoryUtil        Metric
+	FanSpeed          Metric
+	Frequency         Metric
+	MemoryFrequency   Metric
 }
 
 type Process struct {
@@ -74,18 +93,19 @@ type Process struct {
 }
 
 type Device struct {
-	ID           string
-	Kind         Kind
-	Vendor       string
-	Index        int
-	NPUIndex     int
-	ChipIndex    int
-	Name         string
-	Label        string
-	BusID        string
-	Metrics      Metrics
-	Capabilities Capabilities
-	Processes    []Process
+	ParentID      string
+	ProcessStatus string
+	ID            string
+	Kind          Kind
+	Vendor        string
+	Index         int
+	NPUIndex      int
+	ChipIndex     int
+	Name          string
+	Label         string
+	BusID         string
+	Metrics       Metrics
+	Processes     []Process
 
 	GPU *gpu.Device `json:"-"`
 	NPU *npu.Device `json:"-"`
@@ -93,10 +113,9 @@ type Device struct {
 }
 
 type Snapshot struct {
-	Info           Info
-	Devices        []Device
-	DriverVersions map[string]string
-	Warnings       []error
+	Info     Info
+	Devices  []Device
+	Warnings []error
 }
 
 func (s Snapshot) Warning() error {
@@ -104,6 +123,7 @@ func (s Snapshot) Warning() error {
 }
 
 type ProviderSnapshot struct {
+	Warnings      []string
 	Type          string
 	DriverVersion string
 	CudaVersion   string

@@ -60,9 +60,14 @@
                                 </el-select>
                             </el-form-item>
                             <el-form-item v-if="form.params.includes('gpu')" label="GPU">
-                                <el-select v-model="form.productName" class="w-full">
-                                    <el-option :label="$t('monitor.exportAllGPUs')" value="*" />
-                                    <el-option v-for="item in gpuOptions" :key="item" :label="item" :value="item" />
+                                <el-select v-model="form.gpuDevice" class="w-full">
+                                    <el-option :label="$t('monitor.exportAllDevices')" value="*" />
+                                    <el-option
+                                        v-for="item in gpuOptions"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value"
+                                    />
                                 </el-select>
                             </el-form-item>
                             <el-form-item :label="$t('monitor.exportFormat')">
@@ -114,7 +119,7 @@ const loading = ref(false);
 const timeRange = ref<[Date, Date]>([new Date(new Date().setHours(0, 0, 0, 0)), new Date()]);
 const ioOptions = ref<Array<string>>([]);
 const netOptions = ref<Array<string>>([]);
-const gpuOptions = ref<Array<string>>([]);
+const gpuOptions = ref<(AI.ChartHide & { value: string; label: string })[]>([]);
 const ioOptionsFailed = ref(false);
 const netOptionsFailed = ref(false);
 const gpuOptionsFailed = ref(false);
@@ -126,7 +131,7 @@ const form = reactive({
     params: ['cpu', 'memory', 'load'] as Array<string>,
     io: ALL_DEVICES,
     network: ALL_DEVICES,
-    productName: ALL_DEVICES,
+    gpuDevice: ALL_DEVICES,
     format: 'csv',
 });
 
@@ -235,12 +240,14 @@ const buildNetworkTable = (datasets: Array<Host.MonitorData>): MonitorExportTabl
     };
 };
 
-const buildGPUTable = (datasets: Array<{ product: string; data: AI.MonitorGPUData }>): MonitorExportTable => {
+const buildGPUTable = (datasets: Array<{ device: AI.ChartHide; data: AI.MonitorGPUData }>): MonitorExportTable => {
     const rows = datasets
-        .flatMap(({ product, data }) =>
+        .flatMap(({ device, data }) =>
             (data.date || []).map((date, i) => [
                 new Date(date),
-                product,
+                device.productName,
+                device.deviceID || '',
+                !!device.legacy,
                 data.gpuValue?.[i],
                 data.temperatureValue?.[i],
                 data.powerUsed?.[i],
@@ -256,6 +263,8 @@ const buildGPUTable = (datasets: Array<{ product: string; data: AI.MonitorGPUDat
         fields: [
             'time',
             'productName',
+            'deviceID',
+            'legacy',
             'gpuUtil',
             'temperature',
             'powerDraw',
@@ -267,6 +276,8 @@ const buildGPUTable = (datasets: Array<{ product: string; data: AI.MonitorGPUDat
         headers: [
             t('commons.table.date'),
             'GPU',
+            'GPU ID',
+            t('aiTools.gpu.legacyDevice'),
             `${t('aiTools.gpu.gpuUtil')} (%)`,
             `${t('aiTools.gpu.temperature')} (°C)`,
             `${t('aiTools.gpu.powerUsage')} (W)`,
@@ -283,7 +294,7 @@ const collectTables = async (): Promise<MonitorExportTable[]> => {
     const [startTime, endTime] = timeRange.value;
     const jobs: Promise<void>[] = [];
     const datasets: Array<Host.MonitorData> = [];
-    const gpuDatasets: Array<{ product: string; data: AI.MonitorGPUData }> = [];
+    const gpuDatasets: Array<{ device: AI.ChartHide; data: AI.MonitorGPUData }> = [];
 
     const search = (param: string, io = 'all', network = 'all') =>
         loadMonitor({ param, io, network, startTime, endTime }, currentNode.value).then((res) => {
@@ -301,10 +312,22 @@ const collectTables = async (): Promise<MonitorExportTable[]> => {
         jobs.push(search('network', 'all', form.network === ALL_DEVICES ? '' : form.network));
     }
     if (form.params.includes('gpu')) {
-        for (const product of form.productName === ALL_DEVICES ? gpuOptions.value : [form.productName]) {
+        const devices = gpuOptions.value.filter(
+            (device) => form.gpuDevice === ALL_DEVICES || device.value === form.gpuDevice,
+        );
+        for (const device of devices) {
             jobs.push(
-                loadGPUMonitor({ productName: product, startTime, endTime }, currentNode.value).then((res) => {
-                    gpuDatasets.push({ product, data: res.data });
+                loadGPUMonitor(
+                    {
+                        deviceID: device.deviceID,
+                        productName: device.productName,
+                        legacy: device.legacy,
+                        startTime,
+                        endTime,
+                    },
+                    currentNode.value,
+                ).then((res) => {
+                    gpuDatasets.push({ device, data: res.data });
                 }),
             );
         }
@@ -343,7 +366,7 @@ const onExport = async () => {
         await loadOptions(true);
         if (
             form.params.includes('gpu') &&
-            form.productName === ALL_DEVICES &&
+            form.gpuDevice === ALL_DEVICES &&
             gpuOptionsFailed.value &&
             gpuOptions.value.length === 0
         ) {
@@ -397,7 +420,11 @@ const loadNetOptions = async () => {
 const loadGPUOptions = async () => {
     try {
         const res = await getGPUOptions(currentNode.value);
-        gpuOptions.value = res.data?.options || [];
+        gpuOptions.value = (res.data?.supported ? res.data.chartHide || [] : []).map((device) => ({
+            ...device,
+            value: device.deviceID || `legacy:${device.productName}`,
+            label: `${device.productName} · ${device.deviceID || t('aiTools.gpu.legacyDevice')}`,
+        }));
         gpuOptionsFailed.value = false;
     } catch {
         gpuOptionsFailed.value = true;

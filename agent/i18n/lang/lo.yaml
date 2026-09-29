@@ -639,6 +639,7 @@ CommonAlert: "ແຜງຄວບຄຸມ {{ .node }}{{ .ip }}: {{ .msg }}. ເ�
 NodeExceptionAlert: "ແຜງຄວບຄຸມ {{ .node }}{{ .ip }}: ໂນດ {{ .num }} ແຫ່ງຜິດປົກກະຕິ. ເຂົ້າສູ່ລະບົບເພື່ອເບິ່ງລາຍລະອຽດ."
 LicenseExceptionAlert: "ແຜງຄວບຄຸມ {{ .node }}{{ .ip }}: ໃບອະນຸຍາດ {{ .num }} ສະບັບຜິດປົກກະຕິ. ເຂົ້າສູ່ລະບົບເພື່ອເບິ່ງລາຍລະອຽດ."
 SSHAndPanelLoginAlert: "ແຜງຄວບຄຸມ {{ .node }}{{ .ip }}: ມີການເຂົ້າສູ່ລະບົບ {{ .name }} ທີ່ຜິດປົກກະຕິຈາກ {{ .loginIp }}. ເຂົ້າສູ່ລະບົບເພື່ອເບິ່ງລາຍລະອຽດ."
+CronJobSuccessAlert: "ແຜງຄວບຄຸມ {{ .node }}{{ .ip }}: ວຽກທີ່ຕັ້ງເວລາ {{ .name }} ສຳເລັດແລ້ວ. ເຂົ້າສູ່ລະບົບເພື່ອເບິ່ງລາຍລະອຽດ."
 
 #disk
 DeviceNotFound: "ບໍ່ພົບອຸປະກອນ {{ .name }}"
@@ -710,3 +711,14 @@ FirewallPersistDockerGuardStep: 'ບັນທຶກສະຖານະປ້ອ�
 ErrFirewallRuleScopeChange: "ໄຟວໍປັດຈຸບັນບໍ່ຮອງຮັບການປ່ຽນຂອບເຂດຂອງກົດ (ເຊັ່ນ ຕະກູນທີ່ຢູ່ IPv4/IPv6). ກະລຸນາສ້າງກົດໃໝ່."
 FirewallWhitelistReleased: "{{ .name }}: ຍົກເລີກການປ້ອງກັນລາຍຊື່ທີ່ອະນຸຍາດແລ້ວ; ຍັງຄົງກົດອະນຸຍາດໄວ້. ຫາກຕ້ອງການປິດພອດ ໃຫ້ລຶບກົດດ້ວຍຕົນເອງຈາກລາຍການກົດ"
 FirewallWhitelistRequired: "{{ .name }}: ປ້ອງກັນໂດຍກົດພອດທີ່ຈຳເປັນຂອງລະບົບ"
+FileTaskCopy: 'ສຳເນົາໄຟລ໌ໄປທີ່ {{ .dst }}'
+FileTaskMove: 'ຍ້າຍໄຟລ໌ໄປທີ່ {{ .dst }}'
+FileTaskCompress: 'ບີບອັດໄຟລ໌ໄປທີ່ {{ .dst }}'
+FileTaskDecompress: 'ແຕກໄຟລ໌ໄປທີ່ {{ .dst }}'
+FileTaskSource: 'ເສັ້ນທາງຕົ້ນທາງ: {{ .path }}'
+FileTaskFormat: 'ຮູບແບບໄຟລ໌ບີບອັດ: {{ .format }}'
+FileTaskRename: 'ຊື່ໄຟລ໌ປາຍທາງ: {{ .name }}'
+
+ErrFirewallBackendCleanupRequired: "ແບັກເອນປັດຈຸບັນ {{ .current }} ຍັງມີກົດຂອງ 1Panel. ກະລຸນາລຶບອອກກ່ອນປ່ຽນໄປ {{ .target }}."
+ErrDockerIPv4ForwardingDisabled: "ການສົ່ງຕໍ່ IPv4 ຖືກປິດ. ກະລຸນາຕັ້ງ net.ipv4.ip_forward=1 ກ່ອນໃຊ້ແບັກເອນໄຟວໍຂອງ Docker."
+ErrFirewallRuleSavedApplyFailed: "ບັນທຶກການຕັ້ງຄ່າກົດໃໝ່ແລ້ວ ແຕ່ນຳໃຊ້ກັບໄຟວໍບໍ່ສຳເລັດ. ລອງອີກຄັ້ງດ້ວຍການຊິງຂໍ້ມູນ: {{ .detail }}"

@@ -9,11 +9,12 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
-func (m *Manager) RepairBaseChains() error {
+func RepairBaseChains(ports []firewall.PortWhitelist) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil {
 		return err
@@ -35,10 +36,6 @@ func (m *Manager) RepairBaseChains() error {
 			return err
 		}
 		script, err := buildBaseChainsRepairScript(global.Dir.FirewallDir, output, ipv6, func() ([]string, error) {
-			ports, err := m.loadRequiredPorts()
-			if err != nil {
-				return nil, err
-			}
 			return baseDefaultRules(ports, family)
 		})
 		if err != nil {

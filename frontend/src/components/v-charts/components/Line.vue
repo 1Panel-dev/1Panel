@@ -134,10 +134,12 @@ function initChart() {
             series.push({
                 name: item?.name,
                 type: 'line',
-                itemStyle: seriesStyle[index + 2],
-                areaStyle: seriesStyle[index],
+                itemStyle: item.itemStyle ?? seriesStyle[index + 2],
+                areaStyle: item.areaStyle ?? seriesStyle[index],
                 data: item?.data,
-                showSymbol: false,
+                showSymbol: item.showSymbol ?? false,
+                symbolSize: item.symbolSize,
+                sampling: 'lttb',
                 yAxisIndex: item.yAxisIndex ? 1 : null,
             });
         });
@@ -226,9 +228,10 @@ function initChart() {
     };
     const tooltip = props.option.tooltip || defaultTooltip;
     const option = {
+        animation: (props.option.xData?.length ?? 0) <= 3000,
         title: [
             {
-                left: 'center',
+                left: props.option.titleLeft ?? 'center',
                 text: props.option.title,
                 show: props.option.title,
                 textStyle: {
@@ -256,6 +259,7 @@ function initChart() {
             itemWidth: 8,
             icon: 'circle',
             ...props.option.legend,
+            selected: { ...props.option.legend?.selected, ...itemSelect?.selected },
             textStyle: {
                 ...itemSelect?.textStyle,
                 ...props.option.legend?.textStyle,
@@ -307,7 +311,9 @@ function initChart() {
         series: series,
         dataZoom: [
             {
-                ...(props.option.xData?.[0] ? { startValue: props.option.xData[0] } : {}),
+                ...((props.option.xAxis?.min ?? props.option.xData?.[0]) != null
+                    ? { startValue: props.option.xAxis?.min ?? props.option.xData[0] }
+                    : {}),
                 left: grid.left,
                 right: grid.right,
                 show: props.dataZoom,

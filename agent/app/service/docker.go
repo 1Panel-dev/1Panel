@@ -18,7 +18,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
+
+	dockerfirewall "github.com/1Panel-dev/1Panel/agent/utils/firewall/docker_guard"
 )
 
 const dockerNftablesMinVersion = "29.0.0"
@@ -84,7 +85,7 @@ func (u *DockerService) UpdateFirewallBackend(backend string) error {
 		return fmt.Errorf("Docker Engine %s or later is required for the nftables firewall backend", dockerNftablesMinVersion)
 	}
 	if backend == constant.FirewallProviderNftables {
-		if err := docker_guard.CheckIPv4Forwarding(); err != nil {
+		if err := dockerfirewall.CheckIPv4Forwarding(); err != nil {
 			return err
 		}
 	}
@@ -282,7 +283,8 @@ func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) erro
 			delete(daemonMap, "ipv6")
 			delete(daemonMap, "fixed-cidr-v6")
 			delete(daemonMap, "ip6tables")
-			if configuredDockerFirewallBackend() != constant.FirewallProviderNftables {
+			backend, _ := settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
+			if !strings.EqualFold(strings.TrimSpace(backend), constant.FirewallProviderNftables) {
 				delete(daemonMap, "experimental")
 			}
 		}

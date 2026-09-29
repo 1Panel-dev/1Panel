@@ -2,6 +2,9 @@ package utils
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/netip"
@@ -142,7 +145,7 @@ func convertLegacyHostFirewallRecords(records []legacyHostFirewallRecord, provid
 				}
 				continue
 			}
-			identity := item.PolicyKey()
+			identity := hostFirewallPolicyKey(item)
 			if index, exists := byIdentity[identity]; exists {
 				if item.Description != "" {
 					converted[index].Description = item.Description
@@ -336,15 +339,56 @@ func legacyIPOrPrefix(value string) bool {
 }
 
 func hostFirewallRuleModel(rule filter.FirewallRule) (model.FirewallRule, error) {
-	record, err := model.FirewallRuleFromDomain(rule)
+	normalized, err := filter.NormalizeRule(rule)
 	if err != nil {
 		return model.FirewallRule{}, err
+	}
+	switch normalized.NativeKind {
+	case "", filter.NativeKindRule, filter.NativeKindZonePort, filter.NativeKindRichRule, filter.NativeKindUFWRule:
+	default:
+		return model.FirewallRule{}, fmt.Errorf("%w: native rule %q cannot be stored as a provider-neutral policy", filter.ErrUnsupportedScope, normalized.NativeKind)
+	}
+	record := model.FirewallRule{
+		Family:             string(normalized.Scope.Family),
+		Protocol:           normalized.Protocol,
+		SourceAddress:      normalized.SourceAddress,
+		SourcePort:         normalized.SourcePort,
+		DestinationAddress: normalized.DestinationAddress,
+		DestinationPort:    normalized.DestinationPort,
+		Interface:          normalized.Interface,
+		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
+		Action:             string(normalized.Action),
+		Description:        normalized.Description,
+	}
+	if normalized.Scope.Provider == filter.ProviderFirewalld {
+		record.Priority = normalized.Priority
 	}
 	record.UUID = uuid.NewString()
 	record.Origin = constant.FirewallRuleOriginAdopted
 	record.Owner = constant.FirewallRuleSourceUser
 	record.Revision = 1
 	return record, nil
+}
+
+func hostFirewallPolicyKey(rule model.FirewallRule) string {
+	payload, _ := json.Marshal(struct {
+		Family             string `json:"family"`
+		Protocol           string `json:"protocol"`
+		SourceAddress      string `json:"sourceAddress,omitempty"`
+		SourcePort         string `json:"sourcePort,omitempty"`
+		DestinationAddress string `json:"destinationAddress,omitempty"`
+		DestinationPort    string `json:"destinationPort,omitempty"`
+		Interface          string `json:"interface,omitempty"`
+		ConnectionStates   string `json:"connectionStates,omitempty"`
+		Action             string `json:"action"`
+	}{
+		Family: rule.Family, Protocol: rule.Protocol,
+		SourceAddress: rule.SourceAddress, SourcePort: rule.SourcePort,
+		DestinationAddress: rule.DestinationAddress, DestinationPort: rule.DestinationPort,
+		Interface: rule.Interface, ConnectionStates: rule.ConnectionStates, Action: rule.Action,
+	})
+	sum := sha256.Sum256(payload)
+	return hex.EncodeToString(sum[:])
 }
 
 func importLegacyHostFirewallRules(tx *gorm.DB, rules []model.FirewallRule) error {
@@ -354,10 +398,10 @@ func importLegacyHostFirewallRules(tx *gorm.DB, rules []model.FirewallRule) erro
 	}
 	byIdentity := make(map[string]model.FirewallRule, len(existing))
 	for _, item := range existing {
-		byIdentity[item.PolicyKey()] = item
+		byIdentity[hostFirewallPolicyKey(item)] = item
 	}
 	for _, item := range rules {
-		identity := item.PolicyKey()
+		identity := hostFirewallPolicyKey(item)
 		if current, exists := byIdentity[identity]; exists {
 			if current.Description == "" && item.Description != "" {
 				if err := tx.Model(&model.FirewallRule{}).Where("uuid = ?", current.UUID).
