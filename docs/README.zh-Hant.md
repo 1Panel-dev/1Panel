@@ -55,11 +55,11 @@
 curl -sSL https://resource.fit2cloud.com/1panel/package/quick_start.sh -o quick_start.sh && sudo bash quick_start.sh
 ```
 
-如果是用於離線環境，推薦使用 [安裝包方式](https://1panel.cn/docs/installation/package_installation/) 進行安裝部署。
+如果是用於離線環境，推薦使用 [安裝包方式](https://docs.fit2cloud.com/1panel/installation/enterprise-installation/) 進行安裝部署。
 
 **學習資料**
 
-- [線上文件](https://1panel.cn/docs/)
+- [線上文件](https://docs.fit2cloud.com/1panel/)
 - [社區論壇](https://bbs.fit2cloud.com/c/1p/7)
 - [如何加入微信交流群?](https://bbs.fit2cloud.com/t/topic/2147)
 

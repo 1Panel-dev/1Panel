@@ -53,11 +53,11 @@
 
 $ bash -c "$(curl -sSL https://resource.fit2cloud.com/1panel/package/v2/quick_start.sh)"
 
-如果是用于离线环境，推荐使用 [安装包方式](https://1panel.cn/docs/v2/installation/enterprise_installation/) 进行安装部署。
+如果是用于离线环境，推荐使用 [安装包方式](https://docs.fit2cloud.com/1panel/installation/enterprise-installation/) 进行安装部署。
 
 **学习资料**
 
-- [在线文档](https://1panel.cn/docs/)
+- [在线文档](https://docs.fit2cloud.com/1panel/)
 - [社区论坛](https://bbs.fit2cloud.com/c/1p/7)
 
 ## 版本对比
