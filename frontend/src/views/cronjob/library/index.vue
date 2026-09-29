@@ -60,6 +60,8 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :selection-context="() => [searchInfo, group]"
+                    row-key="id"
                     v-model:selects="selects"
                     :pagination-config="paginationConfig"
                     :data="data"

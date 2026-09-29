@@ -49,6 +49,8 @@
             </el-card>
             <template #main v-if="clamStatus.isExist">
                 <ComplexTable
+                    :selection-context="() => [searchName]"
+                    row-key="id"
                     :class="{ mask: !clamStatus.isRunning }"
                     v-if="!isSettingShow"
                     :pagination-config="paginationConfig"

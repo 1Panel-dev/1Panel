@@ -1,4 +1,4 @@
-import { shallowRef, ref, toRaw, type Ref } from 'vue';
+import { shallowRef, ref, toRaw, watch, type Ref } from 'vue';
 
 type TableRef = { refElTable?: any } | undefined;
 
@@ -7,6 +7,7 @@ export const useTableSelection = (
     getTableData: () => any[],
     onSelectionChange: (rows: any[]) => void,
     isRowSelectable: (row: any) => boolean = () => true,
+    getRowKey: (row: any) => unknown = (row) => row?.id,
 ) => {
     const selectedRows = shallowRef<any[]>([]);
     const shiftPressed = ref(false);
@@ -15,8 +16,13 @@ export const useTableSelection = (
     let isSyncingTableSelection = false;
     let skipNextSelectionChange = false;
 
-    // Element Plus can return reactive proxies for rows supplied as plain objects.
-    const sameRow = (left: any, right: any) => toRaw(left) === toRaw(right);
+    let isRefreshingData = false;
+    const sameRow = (left: any, right: any) => {
+        if (left == null || right == null) return left === right;
+        const leftKey = getRowKey(left);
+        const rightKey = getRowKey(right);
+        return leftKey != null && rightKey != null ? leftKey === rightKey : toRaw(left) === toRaw(right);
+    };
     const hasRow = (rows: any[], row: any) => rows.some((item) => sameRow(item, row));
     const isRowSelected = (row: any) => hasRow(selectedRows.value, row);
     const getTable = () => tableRef.value?.refElTable;
@@ -39,8 +45,12 @@ export const useTableSelection = (
             const tableData = getTableData();
             const nextRows = selectedRows.value.filter((row) => hasRow(tableData, row) && isRowSelectable(row));
             const currentRows = table.getSelectionRows();
-            currentRows.filter((row) => !hasRow(nextRows, row)).forEach((row) => table.toggleRowSelection(row, false));
-            nextRows.filter((row) => !hasRow(currentRows, row)).forEach((row) => table.toggleRowSelection(row, true));
+            currentRows
+                .filter((row) => !nextRows.some((item) => toRaw(item) === toRaw(row)))
+                .forEach((row) => table.toggleRowSelection(row, false));
+            nextRows
+                .filter((row) => !currentRows.some((item) => toRaw(item) === toRaw(row)))
+                .forEach((row) => table.toggleRowSelection(row, true));
         } finally {
             isSyncingTableSelection = false;
         }
@@ -73,7 +83,7 @@ export const useTableSelection = (
         return true;
     };
     const handleSelectionChange = (rows: any[]) => {
-        if (isSyncingTableSelection) {
+        if (isSyncingTableSelection || isRefreshingData) {
             return;
         }
         if (skipNextSelectionChange) {
@@ -104,16 +114,35 @@ export const useTableSelection = (
         rangeBaseRows.value = [];
     };
     const pruneSelection = () => {
-        const nextRows = selectedRows.value.filter((row) => hasRow(getTableData(), row));
-        if (nextRows.length !== selectedRows.value.length) {
+        const data = getTableData();
+        const nextRows = data.filter((row) => hasRow(selectedRows.value, row) && isRowSelectable(row));
+        if (nextRows.length !== selectedRows.value.length || nextRows.some((row, i) => row !== selectedRows.value[i])) {
             setSelectedRows(nextRows);
         }
-        if (lastSelectedRow.value && !hasRow(nextRows, lastSelectedRow.value)) {
-            lastSelectedRow.value = null;
-            rangeBaseRows.value = [];
-        }
-        syncTableSelection();
+        lastSelectedRow.value = nextRows.find((row) => sameRow(row, lastSelectedRow.value)) ?? null;
+        rangeBaseRows.value = lastSelectedRow.value ? nextRows.filter((row) => hasRow(rangeBaseRows.value, row)) : [];
     };
+    // Guard before the child table reacts to replacement data and emits an empty selection.
+    watch(
+        getTableData,
+        () => {
+            isRefreshingData = true;
+            skipNextSelectionChange = false;
+            pruneSelection();
+        },
+        { flush: 'sync' },
+    );
+    watch(
+        getTableData,
+        () => {
+            try {
+                syncTableSelection();
+            } finally {
+                isRefreshingData = false;
+            }
+        },
+        { flush: 'post' },
+    );
     const toggleSelection = () => {
         const selectableRows = getTableData().filter(isRowSelectable);
         const allSelected = selectableRows.length > 0 && selectableRows.every(isRowSelected);
