@@ -16,6 +16,10 @@ const buttons = [
         path: '/hosts/monitor/monitor',
     },
     {
+        label: i18n.global.t('commons.button.export'),
+        path: '/hosts/monitor/export',
+    },
+    {
         label: i18n.global.t('file.setting'),
         path: '/hosts/monitor/setting',
     },
