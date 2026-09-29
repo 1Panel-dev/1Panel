@@ -473,6 +473,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
@@ -534,6 +535,7 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const searchName = ref();
+useSearchPersistence('container/container/index', { search: searchName });
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();

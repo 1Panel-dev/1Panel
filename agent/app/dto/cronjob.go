@@ -51,9 +51,10 @@ type CronjobOperate struct {
 	Secret            string `json:"secret"`
 	Args              string `json:"args"`
 
-	AlertCount  uint   `json:"alertCount"`
-	AlertTitle  string `json:"alertTitle"`
-	AlertMethod string `json:"alertMethod"`
+	AlertCount       uint   `json:"alertCount"`
+	AlertTitle       string `json:"alertTitle"`
+	AlertMethod      string `json:"alertMethod"`
+	AlertTriggerMode string `json:"alertTriggerMode" validate:"omitempty,oneof=failed success both"`
 
 	CleanLogConfig
 }
@@ -126,7 +127,8 @@ type CronjobInfo struct {
 	Secret           string `json:"secret"`
 	Args             string `json:"args"`
 
-	AlertCount uint `json:"alertCount"`
+	AlertCount       uint   `json:"alertCount"`
+	AlertTriggerMode string `json:"alertTriggerMode"`
 }
 
 type CronjobImport struct {
@@ -169,9 +171,10 @@ type CronjobTrans struct {
 	SourceAccounts  []string `json:"sourceAccounts"`
 	DownloadAccount string   `json:"downloadAccount"`
 
-	AlertCount  uint   `json:"alertCount"`
-	AlertTitle  string `json:"alertTitle"`
-	AlertMethod string `json:"alertMethod"`
+	AlertCount       uint   `json:"alertCount"`
+	AlertTitle       string `json:"alertTitle"`
+	AlertMethod      string `json:"alertMethod"`
+	AlertTriggerMode string `json:"alertTriggerMode" validate:"omitempty,oneof=failed success both"`
 }
 type TransHelper struct {
 	Name       string `json:"name"`

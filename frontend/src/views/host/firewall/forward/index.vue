@@ -133,6 +133,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
 import RuleSync from '@/views/host/firewall/sync/index.vue';
@@ -153,6 +154,7 @@ import { ElMessageBox } from 'element-plus';
 const loading = ref();
 const selects = ref<any>([]);
 const searchName = ref();
+useSearchPersistence('host/firewall/forward/index', { search: searchName });
 
 const isInit = ref(false);
 const isBind = ref(false);

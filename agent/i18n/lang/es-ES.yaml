@@ -649,6 +649,7 @@ CommonAlert: 'Su Panel {{ .node }}{{ .ip }}, {{ .msg }}. Inicie sesión en el pa
 NodeExceptionAlert: 'Su Panel {{ .node }}{{ .ip }}, {{ .num }} nodos son anómalos. Inicie sesión en el panel para ver los detalles.'
 LicenseExceptionAlert: 'Su Panel {{ .node }}{{ .ip }}, {{ .num }} licencias son anómalas. Inicie sesión en el panel para ver los detalles.'
 SSHAndPanelLoginAlert: 'Su Panel {{ .node }}{{ .ip }}, el inicio de sesión {{ .name }} desde {{ .loginIp }} es anómalo. Inicie sesión en el panel para ver los detalles.'
+CronJobSuccessAlert: 'Panel {{ .node }}{{ .ip }}: la tarea programada {{ .name }} se completó correctamente. Inicie sesión para ver los detalles.'
 
 # disco
 DeviceNotFound: 'Dispositivo {{ .name }} no encontrado'

@@ -100,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/terminal/command/operate/index.vue';
@@ -123,6 +124,7 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const info = ref();
+useSearchPersistence('terminal/command/index', { search: info });
 const group = ref<string>('');
 const dialogRef = ref();
 const opRef = ref();

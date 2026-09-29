@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -23,6 +24,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/ntp"
@@ -56,10 +58,11 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 					_ = taskRepo.Save(context.Background(), taskItem.Task)
 				}
 				cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-				handleCronJobAlert(cronjob)
+				handleCronJobAlert(cronjob, cronJobAlertResult(taskItem, err))
 				return
 			}
 			cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+			handleCronJobAlert(cronjob, cronJobAlertResult(taskItem, nil))
 		}()
 		return
 	}
@@ -70,19 +73,20 @@ func (u *CronjobService) HandleJob(cronjob *model.Cronjob) {
 			record.TaskID = ""
 		}
 		cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-		handleCronJobAlert(cronjob)
+		handleCronJobAlert(cronjob, cronJobAlertResult(taskItem, err))
 		return
 	}
 	go func() {
 		if err := taskItem.Execute(); err != nil {
-			taskItem, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
-			if len(taskItem.ID) == 0 {
+			storedTask, _ := taskRepo.GetFirst(taskRepo.WithByID(record.TaskID))
+			if len(storedTask.ID) == 0 {
 				record.TaskID = ""
 			}
 			cronjobRepo.EndRecords(record, constant.StatusFailed, err.Error(), record.Records)
-			handleCronJobAlert(cronjob)
+			handleCronJobAlert(cronjob, cronJobAlertResult(taskItem, err))
 		} else {
 			cronjobRepo.EndRecords(record, constant.StatusSuccess, "", record.Records)
+			handleCronJobAlert(cronjob, cronJobAlertResult(taskItem, nil))
 		}
 	}()
 }
@@ -482,8 +486,33 @@ func hasBackup(cronjobType string) bool {
 	return cronjobType == "app" || cronjobType == "database" || cronjobType == "website" || cronjobType == "directory" || cronjobType == "snapshot" || cronjobType == "log" || cronjobType == "cutWebsiteLog"
 }
 
-func handleCronJobAlert(cronjob *model.Cronjob) {
+const cronJobSkippedStep = "cronjob-skipped"
+
+func cronJobAlertResult(taskItem *task.Task, err error) string {
+	if errors.Is(err, context.Canceled) || taskItem.Task.Status == constant.StatusCanceled ||
+		(taskItem.TaskCtx != nil && taskItem.TaskCtx.Err() != nil) {
+		return ""
+	}
+	if err != nil {
+		return alertUtil.CronJobAlertFailed
+	}
+	if taskItem.Task.Status != constant.StatusSuccess {
+		return ""
+	}
+	for _, subTask := range taskItem.SubTasks {
+		if subTask.StepAlias != cronJobSkippedStep {
+			return alertUtil.CronJobAlertSuccess
+		}
+	}
+	return ""
+}
+
+func handleCronJobAlert(cronjob *model.Cronjob, result string) {
+	if result == "" {
+		return
+	}
 	pushAlert := dto.PushAlert{
+		Result:    result,
 		TaskName:  cronjob.Name,
 		AlertType: cronjob.Type,
 		EntryID:   cronjob.ID,

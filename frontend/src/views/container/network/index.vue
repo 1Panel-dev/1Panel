@@ -93,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
@@ -117,6 +118,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+useSearchPersistence('container/network/index', { search: searchName });
 
 const opRef = ref();
 const isActive = ref(false);

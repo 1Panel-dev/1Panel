@@ -45,6 +45,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/date';
@@ -66,6 +67,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchInfo = ref<string>('');
+useSearchPersistence('log/login/index', { search: searchInfo });
 const searchStatus = ref<string>('');
 
 const search = async () => {

@@ -530,11 +530,15 @@ func loadSSHLogin(alert dto.AlertDTO) {
 	if err != nil {
 		global.LOG.Errorf("Failed to load ssh login logs: %v", err)
 	}
+	interfaceAddrs, err := net.InterfaceAddrs()
+	if err != nil {
+		global.LOG.Warnf("Failed to load local IP addresses for ssh login alert: %v", err)
+	}
 	count, records := summarizeSSHLoginHistories(
 		histories,
 		now,
 		failedWindow,
-		strings.Split(strings.TrimSpace(alert.AdvancedParams), "\n"),
+		sshSuccessLoginWhitelist(alert.AdvancedParams, interfaceAddrs),
 	)
 	isAlert := count >= int(alert.Count)
 	if isAlert {
@@ -568,6 +572,19 @@ func loadSSHLogin(alert dto.AlertDTO) {
 		}
 		sendAlerts(alert, "sshIpLogin", quota, "sshIpLogin", params)
 	}
+}
+
+func sshSuccessLoginWhitelist(configured string, interfaceAddrs []net.Addr) []string {
+	whitelist := strings.Split(strings.TrimSpace(configured), "\n")
+	whitelist = append(whitelist, "127.0.0.0/8", "::1")
+	for _, addr := range interfaceAddrs {
+		ipNet, ok := addr.(*net.IPNet)
+		if !ok || ipNet.IP == nil || ipNet.IP.IsUnspecified() {
+			continue
+		}
+		whitelist = append(whitelist, ipNet.IP.String())
+	}
+	return whitelist
 }
 
 func filterLoginLogsNotInWhitelist(records []model.LoginLog, whitelist []string) []model.LoginLog {

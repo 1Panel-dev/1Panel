@@ -412,6 +412,7 @@ func addSkipTask(source string, taskItem *task.Task) {
 		taskItem.Log(i18n.GetMsgByKey("NoSuchResource"))
 		return nil
 	}, nil)
+	taskItem.SubTasks[len(taskItem.SubTasks)-1].StepAlias = cronJobSkippedStep
 }
 
 func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {

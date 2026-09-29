@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	alertconfig "github.com/1Panel-dev/1Panel/agent/utils/alert_config"
 	alertwebhook "github.com/1Panel-dev/1Panel/agent/utils/alert_webhook"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -109,7 +110,38 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 		return 0, nil, err
 	}
 
+	cronjobProjects := make(map[string]uint)
+	var cronjobIDs []uint
 	for _, item := range alerts {
+		if alertUtil.GetCronJobType(item.Type) != "cronJob" {
+			continue
+		}
+		if _, exists := cronjobProjects[item.Project]; exists {
+			continue
+		}
+		id, parseErr := strconv.ParseUint(item.Project, 10, strconv.IntSize)
+		if parseErr != nil || id == 0 {
+			continue
+		}
+		cronjobProjects[item.Project] = uint(id)
+		cronjobIDs = append(cronjobIDs, uint(id))
+	}
+	cronjobsByID := make(map[uint]model.Cronjob)
+	if len(cronjobIDs) > 0 {
+		cronjobs, err := cronjobRepo.List(repo.WithByIDs(cronjobIDs))
+		if err != nil {
+			return 0, nil, err
+		}
+		for _, cronjob := range cronjobs {
+			cronjobsByID[cronjob.ID] = cronjob
+		}
+	}
+
+	for _, item := range alerts {
+		var taskName string
+		if cronjob, exists := cronjobsByID[cronjobProjects[item.Project]]; exists && cronjob.Type == item.Type {
+			taskName = cronjob.Name
+		}
 
 		result = append(result, dto.AlertDTO{
 			ID:             item.ID,
@@ -119,6 +151,7 @@ func (a AlertService) PageAlert(search dto.AlertSearch) (int64, []dto.AlertDTO, 
 			Method:         item.Method,
 			Title:          item.Title,
 			Project:        item.Project,
+			TaskName:       taskName,
 			Status:         item.Status,
 			SendCount:      item.SendCount,
 			AdvancedParams: item.AdvancedParams,
@@ -190,6 +223,16 @@ func (a AlertService) CreateAlert(create dto.AlertCreate, operator string) error
 			return err
 		}
 	} else {
+		advanced, err := prepareCronJobAlertParams(create.Type, "", create.AdvancedParams)
+		if err != nil {
+			return err
+		}
+		create.AdvancedParams = advanced
+		if create.Status != constant.AlertDisable {
+			if err := a.validateCronJobAlertChannels(create.Type, advanced, create.Method); err != nil {
+				return err
+			}
+		}
 		alertInfo.Status = constant.AlertEnable
 		if err := copier.Copy(&alertInfo, &create); err != nil {
 			return buserr.WithErr("ErrStructTransform", err)
@@ -207,11 +250,24 @@ func (a AlertService) CreateAlert(create dto.AlertCreate, operator string) error
 }
 
 func (a AlertService) UpdateAlert(req dto.AlertUpdate, operator string) error {
+	if alertUtil.GetCronJobType(req.Type) == "cronJob" {
+		previous, err := alertRepo.Get(repo.WithByID(req.ID))
+		if err != nil {
+			return err
+		}
+		req.AdvancedParams, err = prepareCronJobAlertParams(req.Type, previous.AdvancedParams, req.AdvancedParams)
+		if err != nil {
+			return err
+		}
+	}
 	methodTypes, err := a.validateAlertMethodReferences(req.Method)
 	if err != nil {
 		return err
 	}
 	if req.Status != constant.AlertDisable {
+		if err := a.validateCronJobAlertChannels(req.Type, req.AdvancedParams, req.Method); err != nil {
+			return err
+		}
 		if err := a.validateAlertMethodEntitlement(methodTypes); err != nil {
 			return err
 		}
@@ -278,6 +334,9 @@ func (a AlertService) UpdateStatus(id uint, status string) error {
 		return err
 	}
 	if status == constant.AlertEnable {
+		if err := a.validateCronJobAlertChannels(alertInfo.Type, alertInfo.AdvancedParams, alertInfo.Method); err != nil {
+			return err
+		}
 		if err := a.validateAlertMethodEntitlement(methodTypes); err != nil {
 			return err
 		}
@@ -1021,6 +1080,23 @@ func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator 
 		alertRepo.WithByType(updateAlert.Type),
 		alertRepo.WithByProject(updateAlert.Project),
 	)
+	advanced, err := prepareCronJobAlertParams(updateAlert.Type, alertInfo.AdvancedParams, updateAlert.AdvancedParams)
+	if err != nil {
+		return err
+	}
+	updateAlert.AdvancedParams = advanced
+	if alertUtil.GetCronJobType(updateAlert.Type) == "cronJob" {
+		upMap["advanced_params"] = advanced
+	}
+	if newStatus == constant.AlertEnable {
+		method := updateAlert.Method
+		if method == "" {
+			method = alertInfo.Method
+		}
+		if err := a.validateCronJobAlertChannels(updateAlert.Type, advanced, method); err != nil {
+			return err
+		}
+	}
 
 	if alertInfo.ID > 0 {
 		shouldUpdate := false
@@ -1032,6 +1108,9 @@ func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator 
 			shouldUpdate = true
 		}
 		if val, ok := upMap["method"]; ok && val != "" && val != alertInfo.Method {
+			shouldUpdate = true
+		}
+		if val, ok := upMap["advanced_params"]; ok && val != alertInfo.AdvancedParams {
 			shouldUpdate = true
 		}
 
@@ -1054,4 +1133,23 @@ func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator 
 	}
 
 	return nil
+}
+
+func prepareCronJobAlertParams(alertType, previous, incoming string) (string, error) {
+	if alertUtil.GetCronJobType(alertType) != "cronJob" {
+		return incoming, nil
+	}
+	return alertUtil.MergeCronJobAlertParams(previous, incoming)
+}
+
+func (a AlertService) validateCronJobAlertChannels(alertType, advanced, method string) error {
+	if alertUtil.GetCronJobType(alertType) != "cronJob" {
+		return nil
+	}
+	mode, err := alertUtil.CronJobAlertTriggerMode(advanced)
+	if err != nil || mode != alertUtil.CronJobAlertSuccess {
+		return err
+	}
+	_, err = a.validateAlertMethodReferences(method)
+	return err
 }

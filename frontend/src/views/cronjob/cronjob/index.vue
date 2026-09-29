@@ -270,6 +270,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
@@ -329,6 +330,7 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
+useSearchPersistence('cronjob/cronjob/index', { search: searchName });
 
 const search = async (column?: any) => {
     if (column) {

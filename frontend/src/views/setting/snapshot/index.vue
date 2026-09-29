@@ -223,6 +223,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import {
     searchSnapshotPage,
     snapshotDelete,
@@ -258,6 +259,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('setting/snapshot/index', { search: searchName });
 
 const opRef = ref();
 

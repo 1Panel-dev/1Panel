@@ -649,6 +649,7 @@ CommonAlert: "Panel {{ .node }}{{ .ip }}: {{ .msg }}. Log in to view details."
 NodeExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} nodes are abnormal. Log in to view details."
 LicenseExceptionAlert: "Panel {{ .node }}{{ .ip }}: {{ .num }} licenses are abnormal. Log in to view details."
 SSHAndPanelLoginAlert: "Panel {{ .node }}{{ .ip }}: abnormal {{ .name }} login from {{ .loginIp }}. Log in to view details."
+CronJobSuccessAlert: "Panel {{ .node }}{{ .ip }}: scheduled task {{ .name }} completed successfully. Log in to view details."
 
 # disk
 DeviceNotFound: "Device {{ .name }} not found"

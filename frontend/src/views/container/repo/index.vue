@@ -59,6 +59,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
@@ -77,6 +78,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+useSearchPersistence('container/repo/index', { search: searchName });
 
 const opRef = ref();
 const confirmDialog = ref();
