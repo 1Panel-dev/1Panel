@@ -229,7 +229,7 @@ function initChart() {
     const option = {
         title: [
             {
-                left: 'center',
+                left: props.option.titleLeft ?? 'center',
                 text: props.option.title,
                 show: props.option.title,
                 textStyle: {
@@ -257,6 +257,7 @@ function initChart() {
             itemWidth: 8,
             icon: 'circle',
             ...props.option.legend,
+            selected: { ...props.option.legend?.selected, ...itemSelect?.selected },
             textStyle: {
                 ...itemSelect?.textStyle,
                 ...props.option.legend?.textStyle,

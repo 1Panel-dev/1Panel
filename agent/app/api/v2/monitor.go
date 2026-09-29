@@ -32,14 +32,19 @@ func (b *BaseApi) LoadMonitor(c *gin.Context) {
 }
 
 // @Tags Monitor
-// @Summary Clean monitor data
+// @Summary Clean host or GPU monitor data
+// @Param request body dto.MonitorClean true "request"
 // @Success 200
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/monitor/clean [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空监控数据","formatEN":"clean monitor datas"}
+// @x-panel-log {"bodyKeys":["type"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"清空 [type] 监控数据","formatEN":"clean [type] monitoring data"}
 func (b *BaseApi) CleanMonitor(c *gin.Context) {
-	if err := monitorService.CleanData(); err != nil {
+	var req dto.MonitorClean
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := monitorService.CleanData(req.Type); err != nil {
 		helper.InternalServer(c, err)
 		return
 	}

@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 type MonitorBase struct {
 	BaseModel
 	Cpu         float64     `json:"cpu"`
@@ -74,4 +76,37 @@ type MonitorGPU struct {
 	MemTotal      *float64 `json:"memTotal"`
 	FanSpeed      *float64 `json:"fanSpeed"`
 	Processes     string   `json:"processes"`
+}
+
+type MonitorVLLM struct {
+	ID              uint      `json:"-" gorm:"primarykey;autoIncrement"`
+	CreatedAt       time.Time `json:"createdAt"`
+	AppInstallID    uint      `json:"appInstallID"`
+	Status          string    `json:"status"`
+	RawMetrics      string    `json:"-"`
+	HistogramDeltas string    `json:"-"`
+
+	Running               *float64 `json:"running"`
+	Waiting               *float64 `json:"waiting"`
+	CacheUsage            *float64 `json:"cacheUsage"`
+	PromptThroughput      *float64 `json:"promptThroughput"`
+	GenerationThroughput  *float64 `json:"generationThroughput"`
+	RequestThroughput     *float64 `json:"requestThroughput"`
+	TimeToFirstToken      *float64 `json:"timeToFirstToken"`
+	TimePerOutputToken    *float64 `json:"timePerOutputToken"`
+	RequestLatency        *float64 `json:"requestLatency"`
+	PrefillTime           *float64 `json:"prefillTime"`
+	DecodeTime            *float64 `json:"decodeTime"`
+	TimeToFirstTokenP50   *float64 `json:"timeToFirstTokenP50"`
+	TimeToFirstTokenP90   *float64 `json:"timeToFirstTokenP90"`
+	TimeToFirstTokenP95   *float64 `json:"timeToFirstTokenP95"`
+	TimeToFirstTokenP99   *float64 `json:"timeToFirstTokenP99"`
+	TimePerOutputTokenP50 *float64 `json:"timePerOutputTokenP50"`
+	TimePerOutputTokenP90 *float64 `json:"timePerOutputTokenP90"`
+	TimePerOutputTokenP95 *float64 `json:"timePerOutputTokenP95"`
+	TimePerOutputTokenP99 *float64 `json:"timePerOutputTokenP99"`
+	RequestLatencyP50     *float64 `json:"requestLatencyP50"`
+	RequestLatencyP90     *float64 `json:"requestLatencyP90"`
+	RequestLatencyP95     *float64 `json:"requestLatencyP95"`
+	RequestLatencyP99     *float64 `json:"requestLatencyP99"`
 }

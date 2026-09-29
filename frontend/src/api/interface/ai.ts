@@ -117,6 +117,7 @@ export namespace AI {
         endTime: Date;
     }
     export interface MonitorGPUOptions {
+        supported: boolean;
         gpuType: string;
         options: Array<string>;
         chartHide: Array<ChartHide>;

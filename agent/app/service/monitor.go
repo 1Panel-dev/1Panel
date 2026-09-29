@@ -33,11 +33,14 @@ import (
 type MonitorService struct {
 	DiskIO chan ([]disk.IOCountersStat)
 	NetIO  chan ([]net.IOCountersStat)
+	ctx    context.Context
 }
 
 var (
-	monitorCancel context.CancelFunc
-	hostSysPath   = loadHostSysPath()
+	monitorSettingMutex sync.Mutex
+	gpuMonitorMutex     sync.Mutex
+	monitorCancel       context.CancelFunc
+	hostSysPath         = loadHostSysPath()
 
 	blockDevicePartitionCache sync.Map
 )
@@ -47,8 +50,11 @@ type IMonitorService interface {
 	LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorData, error)
 	LoadSetting() (*dto.MonitorSetting, error)
 	UpdateSetting(key, value string) error
-	CleanData() error
+	CleanData(monitorType string) error
 
+	LoadVLLMMonitorData(req dto.MonitorVLLMSearch) (dto.MonitorVLLMData, error)
+	LoadVLLMCurrent(ctx context.Context, req dto.MonitorVLLMCurrent) (model.MonitorVLLM, error)
+	CleanVLLMMonitor(req dto.MonitorVLLMClean) error
 	LoadGPUOptions() dto.MonitorGPUOptions
 	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 
@@ -60,6 +66,7 @@ func NewIMonitorService() IMonitorService {
 	return &MonitorService{
 		DiskIO: make(chan []disk.IOCountersStat, 2),
 		NetIO:  make(chan []net.IOCountersStat, 2),
+		ctx:    context.Background(),
 	}
 }
 
@@ -128,18 +135,21 @@ func (m *MonitorService) LoadMonitorData(req dto.MonitorSearch) ([]dto.MonitorDa
 
 func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 	var data dto.MonitorGPUOptions
+	exist, client := accelerator.New()
+	if !exist {
+		return data
+	}
 	seen := make(map[string]bool)
-	if exist, client := accelerator.New(); exist {
-		snapshot, err := client.Collect(context.Background())
-		if err != nil {
-			global.LOG.Warnf("Load accelerator options failed: %v", err)
-		} else {
-			data = loadGPUOptions(snapshot)
-			for _, item := range data.ChartHide {
-				seen[item.DeviceID] = true
-			}
+	snapshot, err := client.Collect(context.Background())
+	if err != nil {
+		global.LOG.Warnf("Load accelerator options failed: %v", err)
+	} else {
+		data = loadGPUOptions(snapshot)
+		for _, item := range data.ChartHide {
+			seen[item.DeviceID] = true
 		}
 	}
+	data.Supported = true
 	devices, err := monitorRepo.GetGPUDevices()
 	if err != nil {
 		global.LOG.Warnf("Load accelerator history options failed: %v", err)
@@ -282,9 +292,27 @@ func (m *MonitorService) LoadSetting() (*dto.MonitorSetting, error) {
 }
 
 func (m *MonitorService) UpdateSetting(key, value string) error {
+	monitorSettingMutex.Lock()
+	defer monitorSettingMutex.Unlock()
+	switch key {
+	case "MonitorStatus", "GPUMonitorStatus", "VLLMMonitorStatus":
+		if value != constant.StatusEnable && value != constant.StatusDisable {
+			return fmt.Errorf("invalid monitoring status")
+		}
+	case "MonitorInterval", "GPUMonitorInterval", "VLLMMonitorInterval":
+		interval, err := strconv.Atoi(value)
+		if err != nil || interval < 10 || interval > 43200 {
+			return fmt.Errorf("monitoring interval must be between 10 and 43200 seconds")
+		}
+	case "MonitorStoreDays", "GPUMonitorStoreDays", "VLLMMonitorStoreDays":
+		days, err := strconv.Atoi(value)
+		if err != nil || days < 1 {
+			return fmt.Errorf("monitoring retention must be a positive integer")
+		}
+	}
 	switch key {
 	case "MonitorStatus":
-		if value == constant.StatusEnable && global.MonitorCronID == 0 {
+		if value == constant.StatusEnable && monitorCancel == nil {
 			interval, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval"))
 			if err != nil {
 				return err
@@ -293,8 +321,9 @@ func (m *MonitorService) UpdateSetting(key, value string) error {
 				return err
 			}
 		}
-		if value == constant.StatusDisable && global.MonitorCronID != 0 {
+		if value == constant.StatusDisable && monitorCancel != nil {
 			monitorCancel()
+			monitorCancel = nil
 			global.Cron.Remove(cron.EntryID(global.MonitorCronID))
 			global.MonitorCronID = 0
 		}
@@ -303,8 +332,56 @@ func (m *MonitorService) UpdateSetting(key, value string) error {
 		if err != nil {
 			return err
 		}
-		if status.Value == constant.StatusEnable && global.MonitorCronID != 0 {
+		if status.Value == constant.StatusEnable && monitorCancel != nil {
 			if err := StartMonitor(true, value); err != nil {
+				return err
+			}
+		}
+	case "GPUMonitorStatus":
+		if value == constant.StatusEnable && global.GPUMonitorCronID == 0 {
+			interval, err := settingRepo.GetValueByKey("GPUMonitorInterval")
+			if err != nil {
+				return err
+			}
+			if err := StartGPUMonitor(interval); err != nil {
+				return err
+			}
+		}
+		if value == constant.StatusDisable && global.GPUMonitorCronID != 0 {
+			global.Cron.Remove(global.GPUMonitorCronID)
+			global.GPUMonitorCronID = 0
+		}
+	case "GPUMonitorInterval":
+		status, err := settingRepo.GetValueByKey("GPUMonitorStatus")
+		if err != nil {
+			return err
+		}
+		if status == constant.StatusEnable {
+			if err := StartGPUMonitor(value); err != nil {
+				return err
+			}
+		}
+	case "VLLMMonitorStatus":
+		if value == constant.StatusEnable && global.VLLMMonitorCronID == 0 {
+			interval, err := settingRepo.GetValueByKey("VLLMMonitorInterval")
+			if err != nil {
+				return err
+			}
+			if err := StartVLLMMonitor(interval); err != nil {
+				return err
+			}
+		}
+		if value == constant.StatusDisable && global.VLLMMonitorCronID != 0 {
+			global.Cron.Remove(global.VLLMMonitorCronID)
+			global.VLLMMonitorCronID = 0
+		}
+	case "VLLMMonitorInterval":
+		status, err := settingRepo.GetValueByKey("VLLMMonitorStatus")
+		if err != nil {
+			return err
+		}
+		if status == constant.StatusEnable {
+			if err := StartVLLMMonitor(value); err != nil {
 				return err
 			}
 		}
@@ -312,21 +389,23 @@ func (m *MonitorService) UpdateSetting(key, value string) error {
 	return settingRepo.Update(key, value)
 }
 
-func (m *MonitorService) CleanData() error {
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_bases").Error; err != nil {
-		return err
+func (m *MonitorService) CleanData(monitorType string) error {
+	switch monitorType {
+	case "host":
+		return monitorRepo.CleanHost()
+	case "gpu":
+		gpuMonitorMutex.Lock()
+		defer gpuMonitorMutex.Unlock()
+		return monitorRepo.CleanGPU()
+	default:
+		return fmt.Errorf("unsupported monitoring cleanup type: %s", monitorType)
 	}
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_ios").Error; err != nil {
-		return err
-	}
-	if err := global.MonitorDB.Exec("DELETE FROM monitor_networks").Error; err != nil {
-		return err
-	}
-	_ = global.GPUMonitorDB.Exec("DELETE FROM monitor_gpus").Error
-	return nil
 }
 
 func (m *MonitorService) Run() {
+	if m.ctx.Err() != nil {
+		return
+	}
 	var itemModel model.MonitorBase
 	totalPercent, _ := cpu.Percent(3*time.Second, false)
 	if len(totalPercent) == 1 {
@@ -362,7 +441,6 @@ func (m *MonitorService) Run() {
 
 	m.loadDiskIO()
 	m.loadNetIO()
-	m.saveGPUData()
 
 	MonitorStoreDays, err := settingRepo.Get(settingRepo.WithByKey("MonitorStoreDays"))
 	if err != nil {
@@ -373,30 +451,34 @@ func (m *MonitorService) Run() {
 	_ = monitorRepo.DelMonitorBase(timeForDelete)
 	_ = monitorRepo.DelMonitorIO(timeForDelete)
 	_ = monitorRepo.DelMonitorNet(timeForDelete)
-	_ = monitorRepo.DelMonitorGPU(timeForDelete)
 }
 
 func (m *MonitorService) loadDiskIO() {
-	ioStat, _ := disk.IOCounters()
+	ioStat, _ := disk.IOCountersWithContext(m.ctx)
 	var diskIOList []disk.IOCountersStat
 	for _, io := range ioStat {
 		diskIOList = append(diskIOList, io)
 	}
 	diskIOList = append(diskIOList, sumDiskIOCounters(ioStat))
-	m.DiskIO <- diskIOList
+	select {
+	case <-m.ctx.Done():
+	case m.DiskIO <- diskIOList:
+	}
 }
 
 func (m *MonitorService) loadNetIO() {
-	netStat, _ := net.IOCounters(true)
-	netStatAll, _ := net.IOCounters(false)
+	netStat, _ := net.IOCountersWithContext(m.ctx, true)
+	netStatAll, _ := net.IOCountersWithContext(m.ctx, false)
 	var netList []net.IOCountersStat
 	netList = append(netList, netStat...)
 	netList = append(netList, netStatAll...)
-	m.NetIO <- netList
+	select {
+	case <-m.ctx.Done():
+	case m.NetIO <- netList:
+	}
 }
 
 func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
-	defer close(m.DiskIO)
 	for {
 		select {
 		case <-ctx.Done():
@@ -446,14 +528,17 @@ func (m *MonitorService) saveIODataToDB(ctx context.Context, interval float64) {
 					}
 				}
 				_ = monitorRepo.BatchCreateMonitorIO(ioList)
-				m.DiskIO <- ioStat2
+				select {
+				case <-ctx.Done():
+					return
+				case m.DiskIO <- ioStat2:
+				}
 			}
 		}
 	}
 }
 
 func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) {
-	defer close(m.NetIO)
 	for {
 		select {
 		case <-ctx.Done():
@@ -483,7 +568,11 @@ func (m *MonitorService) saveNetDataToDB(ctx context.Context, interval float64) 
 				}
 
 				_ = monitorRepo.BatchCreateMonitorNet(netList)
-				m.NetIO <- netStat2
+				select {
+				case <-ctx.Done():
+					return
+				case m.NetIO <- netStat2:
+				}
 			}
 		}
 	}
@@ -592,27 +681,38 @@ func loadTopMem() []dto.Process {
 }
 
 func StartMonitor(removeBefore bool, interval string) error {
+	intervalItem, err := strconv.Atoi(interval)
+	if err != nil || intervalItem < 10 || intervalItem > 43200 {
+		return fmt.Errorf("invalid host monitoring interval: %s", interval)
+	}
 	if removeBefore {
 		monitorCancel()
 		global.Cron.Remove(cron.EntryID(global.MonitorCronID))
 	}
-	intervalItem, err := strconv.Atoi(interval)
-	if err != nil {
-		return err
-	}
-
-	service := NewIMonitorService()
 	ctx, cancel := context.WithCancel(context.Background())
-	monitorCancel = cancel
+	service := &MonitorService{
+		DiskIO: make(chan []disk.IOCountersStat, 2),
+		NetIO:  make(chan []net.IOCountersStat, 2),
+		ctx:    ctx,
+	}
 	now := time.Now()
 	nextMinute := now.Truncate(time.Minute).Add(time.Minute)
-	time.AfterFunc(time.Until(nextMinute), func() {
+	timer := time.AfterFunc(time.Until(nextMinute), func() {
+		monitorSettingMutex.Lock()
+		defer monitorSettingMutex.Unlock()
+		if ctx.Err() != nil {
+			return
+		}
 		monitorID, err := global.Cron.AddJob(fmt.Sprintf("@every %ss", interval), service)
 		if err != nil {
 			return
 		}
 		global.MonitorCronID = monitorID
 	})
+	monitorCancel = func() {
+		cancel()
+		timer.Stop()
+	}
 
 	service.Run()
 
@@ -669,14 +769,49 @@ func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
 	return data
 }
 
-func (m *MonitorService) saveGPUData() {
-	status, err := settingRepo.GetValueByKey("MonitorStatus")
+func StartGPUMonitor(interval string) error {
+	seconds, err := strconv.Atoi(interval)
+	if err != nil || seconds < 10 || seconds > 43200 {
+		return fmt.Errorf("invalid GPU monitoring interval: %s", interval)
+	}
+	service := &MonitorService{}
+	job := cron.NewChain(cron.Recover(cron.DefaultLogger)).Then(cron.FuncJob(service.saveGPUData))
+	id, err := global.Cron.AddFunc(fmt.Sprintf("@every %ds", seconds), func() { go job.Run() })
 	if err != nil {
-		global.LOG.Errorf("load monitor status failed: %v", err)
+		return err
+	}
+	if global.GPUMonitorCronID != 0 {
+		global.Cron.Remove(global.GPUMonitorCronID)
+	}
+	global.GPUMonitorCronID = id
+	return nil
+}
+
+func (m *MonitorService) saveGPUData() {
+	if !gpuMonitorMutex.TryLock() {
+		return
+	}
+	defer gpuMonitorMutex.Unlock()
+	status, err := settingRepo.GetValueByKey("GPUMonitorStatus")
+	if err != nil {
+		global.LOG.Errorf("Load GPU monitoring status failed: %v", err)
 		return
 	}
 	if status != constant.StatusEnable {
 		return
+	}
+	retention, err := settingRepo.GetValueByKey("GPUMonitorStoreDays")
+	if err != nil {
+		global.LOG.Errorf("Load GPU monitoring retention failed: %v", err)
+		return
+	}
+	days, err := strconv.Atoi(retention)
+	if err != nil || days < 1 {
+		global.LOG.Errorf("Invalid GPU monitoring retention: %s", retention)
+		return
+	}
+	if err := monitorRepo.DelMonitorGPU(time.Now().AddDate(0, 0, -days)); err != nil {
+		global.LOG.Errorf("Clean GPU monitoring data failed: %v", err)
 	}
 	exist, client := accelerator.New()
 	if !exist {
@@ -691,7 +826,7 @@ func (m *MonitorService) saveGPUData() {
 		global.LOG.Warnf("load accelerator monitor data partially failed, err: %v", warning)
 	}
 	intervalSeconds := 0
-	if setting, err := settingRepo.Get(settingRepo.WithByKey("MonitorInterval")); err == nil {
+	if setting, err := settingRepo.Get(settingRepo.WithByKey("GPUMonitorInterval")); err == nil {
 		intervalSeconds, _ = strconv.Atoi(setting.Value)
 	}
 	list := make([]model.MonitorGPU, 0, len(snapshot.Devices))

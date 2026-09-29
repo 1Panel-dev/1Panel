@@ -26,8 +26,10 @@ import { updateMonitorSetting } from '@/api/modules/host';
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
+    key: 'MonitorStoreDays' | 'GPUMonitorStoreDays' | 'VLLMMonitorStoreDays';
     monitorStoreDays: number;
 }
+const settingKey = ref<DialogProps['key']>('MonitorStoreDays');
 const drawerVisible = ref();
 const loading = ref();
 
@@ -38,6 +40,7 @@ const form = reactive({
 const formRef = ref<FormInstance>();
 
 const acceptParams = (params: DialogProps): void => {
+    settingKey.value = params.key;
     form.monitorStoreDays = params.monitorStoreDays;
     drawerVisible.value = true;
 };
@@ -47,7 +50,7 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateMonitorSetting('MonitorStoreDays', form.monitorStoreDays + '')
+        await updateMonitorSetting(settingKey.value, form.monitorStoreDays + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

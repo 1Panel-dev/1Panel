@@ -14,12 +14,13 @@ import (
 )
 
 var (
-	DB           *gorm.DB
-	MonitorDB    *gorm.DB
-	GPUMonitorDB *gorm.DB
-	TaskDB       *gorm.DB
-	CoreDB       *gorm.DB
-	AlertDB      *gorm.DB
+	DB            *gorm.DB
+	MonitorDB     *gorm.DB
+	GPUMonitorDB  *gorm.DB
+	VLLMMonitorDB *gorm.DB
+	TaskDB        *gorm.DB
+	CoreDB        *gorm.DB
+	AlertDB       *gorm.DB
 
 	LOG   *logrus.Logger
 	CONF  ServerConfig
@@ -29,8 +30,10 @@ var (
 
 	Dir SystemDir
 
-	Cron          *cron.Cron
-	MonitorCronID cron.EntryID
+	Cron              *cron.Cron
+	MonitorCronID     cron.EntryID
+	VLLMMonitorCronID cron.EntryID
+	GPUMonitorCronID  cron.EntryID
 
 	IsMaster bool
 

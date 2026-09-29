@@ -32,10 +32,11 @@ var (
 	scriptRepo  = repo.NewIScriptRepo()
 	cronjobRepo = repo.NewICronjobRepo()
 
-	hostRepo    = repo.NewIHostRepo()
-	ftpRepo     = repo.NewIFtpRepo()
-	clamRepo    = repo.NewIClamRepo()
-	monitorRepo = repo.NewIMonitorRepo()
+	hostRepo        = repo.NewIHostRepo()
+	ftpRepo         = repo.NewIFtpRepo()
+	clamRepo        = repo.NewIClamRepo()
+	monitorRepo     = repo.NewIMonitorRepo()
+	vllmMonitorRepo = &repo.VLLMMonitorRepo{}
 
 	settingRepo        = repo.NewISettingRepo()
 	forwardingRuleRepo = repo.NewIForwardingRuleRepo()
