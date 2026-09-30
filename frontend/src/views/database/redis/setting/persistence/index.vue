@@ -44,38 +44,40 @@
                         </div>
                     </template>
                     <table style="width: 100%" class="tab-table">
-                        <tr v-for="(row, index) in form.saves" :key="index">
-                            <td width="32%">
-                                <el-input type="number" v-model="row.second"></el-input>
-                            </td>
-                            <td width="80px">
-                                {{ $t('database.rdbHelper1') }}
-                            </td>
-                            <td width="32%">
-                                <el-input type="number" v-model="row.count"></el-input>
-                            </td>
-                            <td width="10%">
-                                {{ $t('database.rdbHelper2') }}
-                            </td>
-                            <td>
-                                <el-button
-                                    link
-                                    type="primary"
-                                    style="font-size: 10px"
-                                    v-permission
-                                    @click="handleDelete(index)"
-                                >
-                                    {{ $t('commons.button.delete') }}
-                                </el-button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td align="left">
-                                <el-button v-permission @click="handleAdd()">
-                                    {{ $t('commons.button.add') }}
-                                </el-button>
-                            </td>
-                        </tr>
+                        <tbody>
+                            <tr v-for="(row, index) in form.saves" :key="index">
+                                <td width="32%">
+                                    <el-input type="number" v-model="row.second"></el-input>
+                                </td>
+                                <td width="80px">
+                                    {{ $t('database.rdbHelper1') }}
+                                </td>
+                                <td width="32%">
+                                    <el-input type="number" v-model="row.count"></el-input>
+                                </td>
+                                <td width="10%">
+                                    {{ $t('database.rdbHelper2') }}
+                                </td>
+                                <td>
+                                    <el-button
+                                        link
+                                        type="primary"
+                                        style="font-size: 10px"
+                                        v-permission
+                                        @click="handleDelete(index)"
+                                    >
+                                        {{ $t('commons.button.delete') }}
+                                    </el-button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td align="left">
+                                    <el-button v-permission @click="handleAdd()">
+                                        {{ $t('commons.button.add') }}
+                                    </el-button>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                     <div>
                         <span style="margin-left: 2px; margin-top: 5px">{{ $t('database.rdbHelper3') }}</span>

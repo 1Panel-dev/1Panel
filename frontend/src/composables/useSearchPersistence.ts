@@ -1,63 +1,14 @@
 import { storeToRefs } from 'pinia';
-import { watch, type Ref } from 'vue';
 import GlobalStore from '@/store/modules/global';
+import router from '@/routers/router';
+import { bindSearchReset } from '@/utils/search-reset';
 
-type SearchValue = string | number | undefined;
-type SearchFields = Record<string, Ref<SearchValue>>;
-
-export const useSearchPersistence = (page: string, fields: SearchFields, scope?: () => SearchValue) => {
+/** Kept as a compatible entry point; searches now reset on tab, node or resource changes. */
+export const useSearchPersistence = (
+    page: string,
+    fields: Parameters<typeof bindSearchReset>[1],
+    scope?: () => string | number | undefined,
+) => {
     const { currentNode } = storeToRefs(GlobalStore());
-    const defaults = Object.fromEntries(Object.entries(fields).map(([name, field]) => [name, field.value]));
-    let initialized = false;
-    let restoring = false;
-    let activeKey: string | undefined;
-
-    watch(
-        () => {
-            const context = scope?.();
-            if (scope && context === undefined) return undefined;
-            return `1panel:search:v1:${JSON.stringify([currentNode.value, page, context ?? ''])}`;
-        },
-        (key) => {
-            activeKey = key;
-            let saved: Record<string, unknown> = {};
-            try {
-                const parsed = activeKey ? JSON.parse(localStorage.getItem(activeKey) || '{}') : {};
-                if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) saved = parsed;
-            } catch {}
-            restoring = true;
-            for (const [name, field] of Object.entries(fields)) {
-                const value = saved[name];
-                const initial = defaults[name];
-                let fallback = initial;
-                if (initialized) {
-                    fallback = typeof initial === 'string' ? '' : undefined;
-                }
-                const valid =
-                    (typeof value === 'string' || (typeof value === 'number' && Number.isFinite(value))) &&
-                    (fallback === undefined || typeof value === typeof fallback);
-                if (value === null) {
-                    field.value = typeof initial === 'string' ? '' : undefined;
-                } else if (valid) {
-                    field.value = value as SearchValue;
-                } else {
-                    field.value = fallback;
-                }
-            }
-            restoring = false;
-            initialized = true;
-        },
-        { immediate: true, flush: 'sync' },
-    );
-
-    watch(
-        () => Object.fromEntries(Object.entries(fields).map(([name, field]) => [name, field.value ?? null])),
-        (value) => {
-            if (restoring || !activeKey) return;
-            try {
-                localStorage.setItem(activeKey, JSON.stringify(value));
-            } catch {}
-        },
-        { flush: 'sync' },
-    );
+    return bindSearchReset(() => [router.currentRoute.value.path, currentNode.value, page, scope?.()], fields);
 };
