@@ -167,7 +167,8 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from 'vue';
+import { computed, onActivated, onMounted, ref, useAttrs } from 'vue';
+import { useRoute } from 'vue-router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { flattenVNodes, type FuTableOperationButton } from '@/components/table/shared';
 import { useCardColumns } from './useCardColumns';
@@ -177,6 +178,7 @@ import { useTableSelection } from './useTableSelection';
 import { useTablePageState } from './useTablePageState';
 const slots = useSlots();
 const attrs = useAttrs();
+const route = useRoute();
 const { isMobile, openMenuTabs, currentNode } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
@@ -465,11 +467,19 @@ watch([currentViewMode, tableData, () => props.syncCardContentHeight], scheduleC
 useTablePageState(
     () => props.paginationConfig,
     () => [
+        route.path,
         currentNode.value,
         typeof props.selectionContext === 'function' ? props.selectionContext() : props.selectionContext,
     ],
     clearSelects,
 );
+
+// Kept-alive tabs do not mount again. Reload their reset query on subsequent visits.
+let hasActivated = false;
+onActivated(() => {
+    if (hasActivated) emit('search');
+    hasActivated = true;
+});
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', calcHeight);

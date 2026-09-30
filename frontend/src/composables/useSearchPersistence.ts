@@ -1,17 +1,14 @@
 import { storeToRefs } from 'pinia';
 import GlobalStore from '@/store/modules/global';
-import { bindSearchPersistence } from '@/utils/search-persistence';
+import router from '@/routers/router';
+import { bindSearchReset } from '@/utils/search-reset';
 
-/** Restore the parent's search fields synchronously, before its initial request. */
+/** Kept as a compatible entry point; searches now reset on tab, node or resource changes. */
 export const useSearchPersistence = (
     page: string,
-    fields: Parameters<typeof bindSearchPersistence>[1],
+    fields: Parameters<typeof bindSearchReset>[1],
     scope?: () => string | number | undefined,
 ) => {
     const { currentNode } = storeToRefs(GlobalStore());
-    return bindSearchPersistence(() => {
-        const context = scope?.();
-        if (scope && context === undefined) return undefined;
-        return JSON.stringify([currentNode.value, page, context ?? '']);
-    }, fields);
+    return bindSearchReset(() => [router.currentRoute.value.path, currentNode.value, page, scope?.()], fields);
 };

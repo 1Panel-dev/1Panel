@@ -16,10 +16,12 @@
 
 <script setup lang="ts">
 import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 defineOptions({ name: 'TableSearch' });
 
 const emit = defineEmits(['search', 'update:searchName']);
 const searchInfo = ref();
+const route = useRoute();
 const props = defineProps({
     placeholder: String,
     disabled: {
@@ -40,6 +42,16 @@ watch(
         }
     },
     { immediate: true },
+);
+
+// Also discard text typed without pressing Enter when leaving a cached tab.
+watch(
+    () => route.path,
+    () => {
+        searchInfo.value = '';
+        emit('update:searchName', '');
+    },
+    { flush: 'sync' },
 );
 
 const search = () => {

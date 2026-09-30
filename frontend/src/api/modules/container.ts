@@ -141,8 +141,13 @@ export const imagePull = (params: Container.ImagePull) => {
 export const imagePush = (params: Container.ImagePush) => {
     return http.post<string>(`/containers/image/push`, params);
 };
-export const imageLoad = (params: Container.ImageLoad) => {
-    return http.post(`/containers/image/load`, params, TimeoutEnum.T_10M);
+export const imageLoad = (params: Container.ImageLoad, currentNode?: string) => {
+    return http.post(
+        `/containers/image/load`,
+        params,
+        TimeoutEnum.T_10M,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 export const imageSave = (params: Container.ImageSave) => {
     return http.post(`/containers/image/save`, params, TimeoutEnum.T_10M);
