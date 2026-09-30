@@ -88,6 +88,13 @@ export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => 
                     target: 'http://localhost:9999/',
                     changeOrigin: true,
                     ws: true,
+                    configure(proxy) {
+                        proxy.on('proxyReqWs', (proxyReq, req) => {
+                            if (req.headers.host) {
+                                proxyReq.setHeader('Host', req.headers.host);
+                            }
+                        });
+                    },
                 },
             },
         },
