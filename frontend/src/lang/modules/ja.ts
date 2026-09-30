@@ -7233,6 +7233,10 @@ const message = {
             rx: 'RX',
             tx: 'TX',
             console: 'コンソール',
+            consoleShortcutKeys: 'ショートカットキー',
+            consoleCustomKeys: 'カスタムキーの組み合わせ',
+            consoleMainKey: 'メインキーを選択',
+            consoleSendKeys: '送信',
             consoleNotReady: 'VNC コンソールを使用できません。VM を起動し、VNC グラフィック設定を確認してください。',
             consoleDisconnected: 'VNC コンソールの接続が切断されました。',
             consoleConnectFailed:

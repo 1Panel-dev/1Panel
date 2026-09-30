@@ -7362,6 +7362,10 @@ const message = {
             rx: 'RX',
             tx: 'TX',
             console: 'Consola',
+            consoleShortcutKeys: 'Atajos de teclado',
+            consoleCustomKeys: 'Combinación personalizada',
+            consoleMainKey: 'Seleccionar tecla',
+            consoleSendKeys: 'Enviar',
             consoleNotReady:
                 'La consola VNC no está disponible. Inicie la VM y compruebe su configuración gráfica VNC.',
             consoleDisconnected: 'La consola VNC se ha desconectado.',
