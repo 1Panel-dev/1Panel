@@ -7179,9 +7179,34 @@ const message = {
                 orphan_snapshot: '孤立スナップショット',
                 partial_file: '未完了ファイル',
             },
+            disks: 'ディスク管理',
+            resizeDisk: '拡張',
+            diskTarget: 'デバイス',
+            diskCapacityAfterResize: '拡張後の合計容量',
+            diskResizeHelper:
+                '拡張されるのは仮想ディスクの容量のみです。その後、仮想マシン内でパーティションとファイルシステムを拡張してください。',
+            diskResizeLimit:
+                '停止中の仮想マシンに接続された、スナップショットやバッキングチェーンのない独立した書き込み可能な qcow2 ディスクのみ拡張できます。縮小はできません。',
+            diskResizeReason: {
+                referenceCheck:
+                    '仮想ディスクの参照を確認できないため拡張できません。他の仮想マシンのディスク状態を確認してください。',
+                referenced:
+                    'この仮想ディスクは他の仮想マシンまたはデバイスで使用されているため、現在は拡張できません。',
+                running: '仮想マシンを停止してからディスクを拡張してください。',
+                saved: '仮想マシンを再開し、正常にシャットダウンしてから拡張してください。',
+                snapshots: 'スナップショットの復元に影響するため、スナップショットがある場合は拡張できません。',
+                backing: '他のイメージに依存するディスクの拡張には未対応です。',
+                shared: '共有設定のディスクは他の利用者に影響するため拡張できません。',
+                unsupported: 'ディスクの形式、保存場所、またはアクセス権限が拡張に対応していません。',
+                unavailable: 'ディスクの状態を確認できません。確認後に更新してください。',
+            },
             diskSize: 'ディスク容量',
             isoHelper:
                 '複数の ISO をマウントできます。OS のインストールイメージを先に選択し、次に VirtIO などのドライバーイメージを選択してください。各イメージは個別の CD-ROM ドライブを使用します。',
+            windowsDriverHelper:
+                'Windows イメージに VirtIO ネットワークドライバー（NetKVM）が含まれていない場合があります。VirtIO ドライバー ISO もマウントし、Windows 内でドライバーをインストールしてください。すでに含まれている場合は不要です。',
+            windowsDiskDriverHelper:
+                'VirtIO ディスクを使用する場合、ディスクドライバー（viostor）の読み込みも必要になることがあります。読み込まないと、Windows セットアップでディスクが認識されない場合があります。',
             osType: 'OS タイプ',
             osOther: 'その他',
             diskBus: 'ディスクバス',
@@ -7233,6 +7258,10 @@ const message = {
             rx: 'RX',
             tx: 'TX',
             console: 'コンソール',
+            consoleShortcutKeys: 'ショートカットキー',
+            consoleCustomKeys: 'カスタムキーの組み合わせ',
+            consoleMainKey: 'メインキーを選択',
+            consoleSendKeys: '送信',
             consoleNotReady: 'VNC コンソールを使用できません。VM を起動し、VNC グラフィック設定を確認してください。',
             consoleDisconnected: 'VNC コンソールの接続が切断されました。',
             consoleConnectFailed:

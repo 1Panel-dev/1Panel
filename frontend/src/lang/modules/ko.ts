@@ -7041,9 +7041,33 @@ const message = {
                 orphan_snapshot: '고아 스냅샷',
                 partial_file: '미완료 파일',
             },
+            disks: '디스크 관리',
+            resizeDisk: '확장',
+            diskTarget: '장치',
+            diskCapacityAfterResize: '확장 후 전체 용량',
+            diskResizeHelper:
+                '확장은 가상 디스크 용량만 늘립니다. 완료 후 가상 머신 내에서 파티션과 파일 시스템을 확장해야 합니다.',
+            diskResizeLimit:
+                '가상 머신이 종료된 상태에서 스냅샷이나 백킹 체인이 없는 독립적인 쓰기 가능한 qcow2 디스크만 확장할 수 있습니다. 축소는 지원하지 않습니다.',
+            diskResizeReason: {
+                referenceCheck:
+                    '가상 디스크 참조를 확인할 수 없어 확장할 수 없습니다. 다른 가상 머신의 디스크 상태를 확인하세요.',
+                referenced: '다른 가상 머신 또는 장치가 이 가상 디스크를 사용 중이므로 현재 확장할 수 없습니다.',
+                running: '가상 머신을 종료한 후 디스크를 확장하세요.',
+                saved: '가상 머신을 재개하고 정상 종료한 후 확장하세요.',
+                snapshots: '스냅샷 복원에 영향을 줄 수 있어 스냅샷이 있으면 확장할 수 없습니다.',
+                backing: '다른 이미지에 의존하는 디스크는 아직 확장을 지원하지 않습니다.',
+                shared: '공유로 설정된 디스크는 다른 사용자에게 영향을 줄 수 있어 확장할 수 없습니다.',
+                unsupported: '디스크 형식, 위치 또는 접근 권한이 확장을 지원하지 않습니다.',
+                unavailable: '디스크 상태를 확인할 수 없습니다. 확인 후 새로 고치세요.',
+            },
             diskSize: '디스크 용량',
             isoHelper:
                 '여러 ISO를 연결할 수 있습니다. 운영 체제 설치 이미지를 먼저 선택한 다음 VirtIO 등의 드라이버 이미지를 선택하세요. 각 이미지는 별도의 CD-ROM 드라이브를 사용합니다.',
+            windowsDriverHelper:
+                'Windows 이미지에 VirtIO 네트워크 드라이버(NetKVM)가 포함되어 있지 않을 수 있습니다. VirtIO 드라이버 ISO도 마운트하고 Windows에서 드라이버를 설치하세요. 이미 포함된 경우에는 무시해도 됩니다.',
+            windowsDiskDriverHelper:
+                'VirtIO 디스크를 사용하면 디스크 드라이버(viostor)도 로드해야 할 수 있습니다. 그렇지 않으면 Windows 설치 프로그램이 디스크를 인식하지 못할 수 있습니다.',
             osType: '운영 체제 유형',
             osOther: '기타',
             diskBus: '디스크 버스',
@@ -7095,6 +7119,10 @@ const message = {
             rx: 'RX',
             tx: 'TX',
             console: '콘솔',
+            consoleShortcutKeys: '단축키',
+            consoleCustomKeys: '사용자 지정 키 조합',
+            consoleMainKey: '기본 키 선택',
+            consoleSendKeys: '전송',
             consoleNotReady: 'VNC 콘솔을 사용할 수 없습니다. VM을 시작하고 VNC 그래픽 구성을 확인하세요.',
             consoleDisconnected: 'VNC 콘솔 연결이 끊어졌습니다.',
             consoleConnectFailed: 'VNC 콘솔 연결에 실패했습니다. 콘솔 프록시 서비스를 확인하세요.',
