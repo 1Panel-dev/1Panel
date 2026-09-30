@@ -7310,6 +7310,10 @@ const message = {
             diskSize: 'Tamaño del disco',
             isoHelper:
                 'Puede montar varios ISO. Seleccione primero el instalador del sistema operativo y después las imágenes de controladores, como VirtIO. Cada imagen usa una unidad de CD-ROM independiente.',
+            windowsDriverHelper:
+                'Es posible que la imagen de Windows no incluya el controlador de red VirtIO (NetKVM). Monte una ISO de controladores VirtIO e instale el controlador en Windows. Omita este aviso si la imagen ya incluye el controlador.',
+            windowsDiskDriverHelper:
+                'Los discos VirtIO también pueden requerir que se cargue el controlador de disco (viostor); de lo contrario, el instalador de Windows podría no detectar el disco.',
             osType: 'Tipo de sistema operativo',
             osOther: 'Otro',
             diskBus: 'Bus de disco',

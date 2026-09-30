@@ -6697,6 +6697,10 @@ const message = {
             },
             diskSize: '磁碟容量',
             isoHelper: '支援掛載多個 ISO。請先選擇系統安裝映像，再選擇 VirtIO 等驅動程式映像；每個映像使用獨立光碟機。',
+            windowsDriverHelper:
+                'Windows 映像可能未整合 VirtIO 網路卡驅動程式（NetKVM），建議同時掛載 VirtIO 驅動程式 ISO 並在系統中安裝；已整合驅動程式的映像可忽略。',
+            windowsDiskDriverHelper:
+                '使用 VirtIO 磁碟時，還可能需要載入磁碟驅動程式（viostor），否則安裝程式可能無法辨識磁碟。',
             osType: '作業系統類型',
             osOther: '其他',
             diskBus: '磁碟匯流排',

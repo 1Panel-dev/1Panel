@@ -7311,6 +7311,10 @@ const message = {
             diskSize: 'Disk Boyutu',
             isoHelper:
                 'Birden fazla ISO bağlayabilirsiniz. Önce işletim sistemi kurulum imajını, ardından VirtIO gibi sürücü imajlarını seçin. Her imaj ayrı bir CD-ROM sürücüsü kullanır.',
+            windowsDriverHelper:
+                'Windows kalıbı VirtIO ağ sürücüsünü (NetKVM) içermeyebilir. Bir VirtIO sürücü ISO dosyası da bağlayın ve sürücüyü Windows içinde yükleyin. Kalıp sürücüyü zaten içeriyorsa bu bildirimi yok sayın.',
+            windowsDiskDriverHelper:
+                'VirtIO diskleri için disk sürücüsünün (viostor) yüklenmesi de gerekebilir; aksi takdirde Windows Kurulumu diski algılamayabilir.',
             osType: 'İşletim sistemi türü',
             osOther: 'Diğer',
             diskBus: 'Disk veri yolu',

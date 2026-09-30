@@ -7044,6 +7044,10 @@ const message = {
             diskSize: '디스크 용량',
             isoHelper:
                 '여러 ISO를 연결할 수 있습니다. 운영 체제 설치 이미지를 먼저 선택한 다음 VirtIO 등의 드라이버 이미지를 선택하세요. 각 이미지는 별도의 CD-ROM 드라이브를 사용합니다.',
+            windowsDriverHelper:
+                'Windows 이미지에 VirtIO 네트워크 드라이버(NetKVM)가 포함되어 있지 않을 수 있습니다. VirtIO 드라이버 ISO도 마운트하고 Windows에서 드라이버를 설치하세요. 이미 포함된 경우에는 무시해도 됩니다.',
+            windowsDiskDriverHelper:
+                'VirtIO 디스크를 사용하면 디스크 드라이버(viostor)도 로드해야 할 수 있습니다. 그렇지 않으면 Windows 설치 프로그램이 디스크를 인식하지 못할 수 있습니다.',
             osType: '운영 체제 유형',
             osOther: '기타',
             diskBus: '디스크 버스',

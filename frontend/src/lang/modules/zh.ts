@@ -6760,6 +6760,10 @@ const message = {
             },
             diskSize: '磁盘容量',
             isoHelper: '支持挂载多个 ISO。请先选择系统安装镜像，再选择 VirtIO 等驱动镜像；每个镜像使用独立光驱。',
+            windowsDriverHelper:
+                'Windows 镜像可能未集成 VirtIO 网卡驱动（NetKVM），建议同时挂载 VirtIO 驱动 ISO 并在系统中安装；已集成驱动的镜像可忽略。',
+            windowsDiskDriverHelper:
+                '使用 VirtIO 磁盘时，还可能需要加载磁盘驱动（viostor），否则安装程序可能无法识别磁盘。',
             osType: '操作系统类型',
             osOther: '其他',
             diskBus: '磁盘总线',

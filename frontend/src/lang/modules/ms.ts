@@ -7307,6 +7307,10 @@ const message = {
             diskSize: 'Saiz Cakera',
             isoHelper:
                 'Pasang berbilang ISO. Pilih pemasang sistem pengendalian dahulu, kemudian imej pemacu seperti VirtIO. Setiap imej menggunakan pemacu CD-ROM yang berasingan.',
+            windowsDriverHelper:
+                'Imej Windows mungkin tidak menyertakan pemacu rangkaian VirtIO (NetKVM). Lekapkan ISO pemacu VirtIO dan pasang pemacu dalam Windows. Abaikan jika imej sudah menyertakan pemacu tersebut.',
+            windowsDiskDriverHelper:
+                'Cakera VirtIO juga mungkin memerlukan pemacu cakera (viostor) dimuatkan; jika tidak, pemasang Windows mungkin tidak dapat mengesan cakera.',
             osType: 'Jenis sistem pengendalian',
             osOther: 'Lain-lain',
             diskBus: 'Bas cakera',

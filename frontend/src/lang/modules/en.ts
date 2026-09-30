@@ -7196,6 +7196,10 @@ const message = {
             diskSize: 'Disk Size',
             isoHelper:
                 'Mount multiple ISOs. Select the operating system installer first, then driver images such as VirtIO. Each image uses a separate CD-ROM drive.',
+            windowsDriverHelper:
+                'The Windows image may not include the VirtIO network driver (NetKVM). Mount a VirtIO driver ISO and install the driver in Windows. Ignore this if the image already includes the driver.',
+            windowsDiskDriverHelper:
+                'VirtIO disks may also require loading the disk driver (viostor); otherwise, Windows Setup may not detect the disk.',
             osType: 'Operating System Type',
             osOther: 'Other',
             diskBus: 'Disk Bus',

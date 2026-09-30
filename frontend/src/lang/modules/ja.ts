@@ -7182,6 +7182,10 @@ const message = {
             diskSize: 'ディスク容量',
             isoHelper:
                 '複数の ISO をマウントできます。OS のインストールイメージを先に選択し、次に VirtIO などのドライバーイメージを選択してください。各イメージは個別の CD-ROM ドライブを使用します。',
+            windowsDriverHelper:
+                'Windows イメージに VirtIO ネットワークドライバー（NetKVM）が含まれていない場合があります。VirtIO ドライバー ISO もマウントし、Windows 内でドライバーをインストールしてください。すでに含まれている場合は不要です。',
+            windowsDiskDriverHelper:
+                'VirtIO ディスクを使用する場合、ディスクドライバー（viostor）の読み込みも必要になることがあります。読み込まないと、Windows セットアップでディスクが認識されない場合があります。',
             osType: 'OS タイプ',
             osOther: 'その他',
             diskBus: 'ディスクバス',
