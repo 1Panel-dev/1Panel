@@ -87,6 +87,7 @@ func Routers() *gin.Engine {
 	}
 
 	Router.Use(middleware.FrontendFallback())
+	Router.Use(middleware.WebSocketOriginGuard())
 	Router.Use(middleware.OperationLog())
 	Router.Use(middleware.GlobalLoading())
 	Router.Use(xpack.AuthProvider.CoreAPIAuthMiddleware())
