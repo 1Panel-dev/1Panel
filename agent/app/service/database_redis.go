@@ -8,6 +8,12 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -23,6 +29,11 @@ import (
 
 type RedisService struct{}
 
+const redisCliTaskName = "RedisCliEnable"
+
+// The CLI container is shared by all remote Redis databases on this node.
+var redisCliInstallMutex sync.Mutex
+
 type IRedisService interface {
 	UpdateConf(req dto.RedisConfUpdate) error
 	UpdatePersistenceConf(req dto.RedisConfPersistenceUpdate) error
@@ -33,7 +44,8 @@ type IRedisService interface {
 	LoadPersistenceConf(req dto.LoadRedisStatus) (*dto.RedisPersistence, error)
 
 	CheckHasCli() bool
-	InstallCli() error
+	InstallCli(req dto.RedisCliInstall) (*dto.RedisCliStatus, error)
+	LoadCliStatus() (*dto.RedisCliStatus, error)
 }
 
 func NewIRedisService() IRedisService {
@@ -71,20 +83,62 @@ func (u *RedisService) CheckHasCli() bool {
 		return false
 	}
 	for _, item := range containerLists {
-		if strings.ReplaceAll(item.Names[0], "/", "") == "1Panel-redis-cli-tools" {
+		if len(item.Names) > 0 && strings.TrimPrefix(item.Names[0], "/") == "1Panel-redis-cli-tools" {
 			return true
 		}
 	}
 	return false
 }
 
-func (u *RedisService) InstallCli() error {
+func (u *RedisService) LoadCliStatus() (*dto.RedisCliStatus, error) {
+	result := &dto.RedisCliStatus{}
+	latest, err := taskRepo.GetFirst(repo.WithByName(redisCliTaskName), repo.WithByType(task.TaskScopeContainer), repo.WithOrderDesc("created_at"))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		result.Installed = u.CheckHasCli()
+		return result, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	result.TaskID = latest.ID
+	result.Status = latest.Status
+	result.ErrorMsg = latest.ErrorMsg
+	result.Installed = u.CheckHasCli()
+	return result, nil
+}
+
+func (u *RedisService) InstallCli(req dto.RedisCliInstall) (*dto.RedisCliStatus, error) {
+	if !redisCliInstallMutex.TryLock() {
+		return nil, buserr.New("TaskIsExecuting")
+	}
+	defer redisCliInstallMutex.Unlock()
+	status, err := u.LoadCliStatus()
+	if err != nil {
+		return nil, err
+	}
+	if status.Status == constant.StatusExecuting || status.Installed {
+		return status, nil
+	}
+	if req.TaskID == "" {
+		req.TaskID = uuid.NewString()
+	}
+	// Never reuse an existing task ID: doing so would truncate its log.
+	if _, err := taskRepo.GetFirst(taskRepo.WithByID(req.TaskID)); !errors.Is(err, gorm.ErrRecordNotFound) {
+		if err != nil {
+			return nil, err
+		}
+		return nil, buserr.New("TaskIsExecuting")
+	}
 	item := dto.ContainerOperate{
+		TaskID:   req.TaskID,
 		Name:     "1Panel-redis-cli-tools",
 		Image:    "redis:7.4.4",
 		Networks: []dto.ContainerNetwork{{Network: "1panel-network"}},
 	}
-	return NewIContainerService().ContainerCreate(item, false)
+	if err := (&ContainerService{}).containerCreate(item, true, redisCliTaskName); err != nil {
+		return nil, err
+	}
+	return &dto.RedisCliStatus{TaskID: req.TaskID, Status: constant.StatusExecuting}, nil
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {

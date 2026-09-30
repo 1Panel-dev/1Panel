@@ -1,6 +1,13 @@
 import { ReqPage } from '.';
 
 export namespace Database {
+    export interface RedisCliStatus {
+        installed: boolean;
+        taskID: string;
+        status: string;
+        errorMsg: string;
+    }
+
     export interface SearchDBWithPage {
         info: string;
         database: string;

@@ -11,6 +11,7 @@
             <fu-table
                 v-if="currentViewMode === 'table'"
                 v-bind="$attrs"
+                :data="props.data"
                 ref="tableRef"
                 @select="handleSelect"
                 @selection-change="handleSelectionChange"
@@ -166,16 +167,19 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from 'vue';
+import { computed, onActivated, onMounted, ref, useAttrs } from 'vue';
+import { useRoute } from 'vue-router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { flattenVNodes, type FuTableOperationButton } from '@/components/table/shared';
 import { useCardColumns } from './useCardColumns';
 import { useContextMenu } from './useContextMenu';
 import { useResponsivePagination } from './useResponsivePagination';
 import { useTableSelection } from './useTableSelection';
+import { useTablePageState } from './useTablePageState';
 const slots = useSlots();
 const attrs = useAttrs();
-const { isMobile, openMenuTabs } = useGlobalStore();
+const route = useRoute();
+const { isMobile, openMenuTabs, currentNode } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
 export type DropdownProps = FuTableOperationButton;
@@ -184,6 +188,8 @@ type ViewMode = 'table' | 'card';
 
 const props = defineProps({
     header: String,
+    data: { type: Array as PropType<any[]>, default: () => [] },
+    selectionContext: { type: [String, Number, Array, Object, Function], default: undefined },
     paginationConfig: {
         type: Object,
         required: false,
@@ -239,7 +245,7 @@ const selectionColumn = computed(() =>
     columnNodes.value.find((column) => (column.props as Record<string, any> | null)?.type === 'selection'),
 );
 const tableData = computed(() => {
-    const data = attrs.data;
+    const data = props.data;
     return Array.isArray(data) ? data : [];
 });
 const cardContentStyle = computed(() => {
@@ -295,7 +301,7 @@ const {
     isDisabled: isRightButtonDisabled,
     click: rightButtonClick,
 } = useContextMenu(() => props.rightButtons);
-const getTableData = () => (Array.isArray(attrs.data) ? attrs.data : []);
+const getTableData = () => props.data || [];
 const isRowSelectable = (row: any) => {
     const selectable = (selectionColumn.value?.props as Record<string, any> | null)?.selectable;
     return typeof selectable === 'function' ? selectable(row) : true;
@@ -313,7 +319,18 @@ const {
     handleRowClick,
     handleKeyDown: handleSelectionKeyDown,
     handleKeyUp,
-} = useTableSelection(tableRef, getTableData, (rows) => emit('update:selects', rows), isRowSelectable);
+} = useTableSelection(
+    tableRef,
+    getTableData,
+    (rows) => emit('update:selects', rows),
+    isRowSelectable,
+    (row) => {
+        const key = attrs.rowKey ?? attrs['row-key'];
+        if (typeof key === 'function') return row == null ? undefined : key(row);
+        if (typeof key === 'string') return key.split('.').reduce((value, part) => value?.[part], row);
+        return row?.id;
+    },
+);
 const toggleCardSelection = (row: any, selected: boolean) => {
     selectRow(row, selected);
 };
@@ -329,10 +346,12 @@ const handleRightClick = (row, column, event) => {
 };
 
 function currentChange() {
+    clearSelects();
     emit('search');
 }
 
 function sizeChange() {
+    clearSelects();
     props.paginationConfig.currentPage = 1;
     localStorage.setItem(props.paginationConfig.cacheSizeKey, props.paginationConfig.pageSize);
     emit('search');
@@ -446,7 +465,22 @@ watch([currentViewMode, tableData, () => props.syncCardContentHeight], scheduleC
     flush: 'post',
 });
 
-watch(tableData, pruneSelection);
+useTablePageState(
+    () => props.paginationConfig,
+    () => [
+        route.path,
+        currentNode.value,
+        typeof props.selectionContext === 'function' ? props.selectionContext() : props.selectionContext,
+    ],
+    clearSelects,
+);
+
+// Kept-alive tabs do not mount again. Reload their reset query on subsequent visits.
+let hasActivated = false;
+onActivated(() => {
+    if (hasActivated) emit('search');
+    hasActivated = true;
+});
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', calcHeight);

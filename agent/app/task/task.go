@@ -283,8 +283,18 @@ func (t *Task) updateTask(task *model.Task) {
 	_ = t.taskRepo.Update(context.Background(), task)
 }
 
-func (t *Task) Execute() error {
+// Prepare makes a task visible before dispatching it to a background worker.
+func (t *Task) Prepare() error {
 	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
+		_ = t.logFile.Close()
+		global.RemoveTaskCancel(t.TaskID)
+		return err
+	}
+	return nil
+}
+
+func (t *Task) Execute() error {
+	if err := t.Prepare(); err != nil {
 		return err
 	}
 	var err error
