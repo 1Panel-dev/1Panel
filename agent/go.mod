@@ -40,7 +40,7 @@ require (
 	github.com/pkg/sftp v1.13.11
 	github.com/qiniu/go-sdk/v7 v7.27.0
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/shirou/gopsutil/v4 v4.26.7
+	github.com/shirou/gopsutil/v4 v4.26.8
 	github.com/sirupsen/logrus v1.10.2
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/spf13/afero v1.15.0
