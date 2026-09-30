@@ -7345,6 +7345,27 @@ const message = {
                 orphan_snapshot: 'Snapshot órfão',
                 partial_file: 'Arquivo incompleto',
             },
+            disks: 'Discos',
+            resizeDisk: 'Expandir',
+            diskTarget: 'Dispositivo',
+            diskCapacityAfterResize: 'Capacidade total após a expansão',
+            diskResizeHelper:
+                'A expansão aumenta apenas a capacidade do disco virtual. Depois, expanda as partições e os sistemas de arquivos dentro da máquina virtual.',
+            diskResizeLimit:
+                'A máquina virtual deve estar desligada e o disco qcow2 deve ser independente e gravável, sem snapshots ou cadeia de imagens base. A redução não é suportada.',
+            diskResizeReason: {
+                referenceCheck:
+                    'Não foi possível verificar as referências ao disco virtual. A expansão está indisponível; verifique os discos das outras máquinas virtuais.',
+                referenced:
+                    'Este disco virtual é usado por outra máquina virtual ou dispositivo e ainda não pode ser expandido.',
+                running: 'Desligue a máquina virtual antes de expandir o disco.',
+                saved: 'Retome a máquina virtual e desligue-a normalmente antes de expandir.',
+                snapshots: 'A expansão não está disponível com snapshots para não afetar a restauração.',
+                backing: 'O disco depende de outra imagem; a expansão ainda não é suportada.',
+                shared: 'O disco está marcado como compartilhado; a expansão não está disponível para não afetar outros usuários.',
+                unsupported: 'O formato, local ou as permissões do disco não permitem expansão.',
+                unavailable: 'Não foi possível verificar o estado do disco. Verifique e atualize.',
+            },
             diskSize: 'Tamanho do Disco',
             isoHelper:
                 'Monte vários ISOs. Selecione primeiro o instalador do sistema operacional e depois as imagens de drivers, como VirtIO. Cada imagem usa uma unidade de CD-ROM separada.',

@@ -2486,6 +2486,17 @@
 		"formatZH": "删除虚拟机 [name]",
 		"formatEN": "delete VM [name]"
 	},
+	"/core/xpack/vms/disks/resize": {
+		"bodyKeys": [
+			"name",
+			"target",
+			"sizeGiB"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
+		"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB"
+	},
 	"/core/xpack/vms/environment/enable": {
 		"bodyKeys": [],
 		"paramKeys": [],

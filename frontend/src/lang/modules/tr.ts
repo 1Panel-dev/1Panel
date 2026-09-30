@@ -7308,6 +7308,27 @@ const message = {
                 orphan_snapshot: 'Sahipsiz anlık görüntü',
                 partial_file: 'Tamamlanmamış dosya',
             },
+            disks: 'Diskler',
+            resizeDisk: 'Genişlet',
+            diskTarget: 'Aygıt',
+            diskCapacityAfterResize: 'Genişletme sonrası toplam kapasite',
+            diskResizeHelper:
+                'Bu işlem yalnızca sanal disk kapasitesini artırır. Ardından sanal makine içindeki bölümleri ve dosya sistemlerini genişletin.',
+            diskResizeLimit:
+                'Sanal makine kapalı olmalı ve qcow2 diski bağımsız, yazılabilir, anlık görüntüsüz ve temel imaj zinciri olmadan kullanılmalıdır. Küçültme desteklenmez.',
+            diskResizeReason: {
+                referenceCheck:
+                    'Sanal disk başvuruları doğrulanamadı. Genişletme kullanılamıyor; diğer sanal makinelerin disklerini kontrol edin.',
+                referenced:
+                    'Bu sanal disk başka bir sanal makine veya aygıt tarafından kullanılıyor; genişletme henüz desteklenmiyor.',
+                running: 'Diski genişletmeden önce sanal makineyi kapatın.',
+                saved: 'Genişletmeden önce sanal makineyi sürdürün ve normal şekilde kapatın.',
+                snapshots: 'Geri yüklemeyi etkilememek için anlık görüntüler varken genişletme desteklenmiyor.',
+                backing: 'Disk başka bir imaja bağlı; genişletme henüz desteklenmiyor.',
+                shared: 'Disk paylaşımlı olarak işaretlenmiş; diğer kullanıcıları etkilememek için genişletme desteklenmiyor.',
+                unsupported: 'Disk biçimi, konumu veya erişim izinleri genişletmeyi desteklemiyor.',
+                unavailable: 'Disk durumu doğrulanamıyor. Kontrol edip yenileyin.',
+            },
             diskSize: 'Disk Boyutu',
             isoHelper:
                 'Birden fazla ISO bağlayabilirsiniz. Önce işletim sistemi kurulum imajını, ardından VirtIO gibi sürücü imajlarını seçin. Her imaj ayrı bir CD-ROM sürücüsü kullanır.',

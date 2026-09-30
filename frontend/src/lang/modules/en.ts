@@ -7193,6 +7193,27 @@ const message = {
                 orphan_snapshot: 'Orphaned Snapshot',
                 partial_file: 'Incomplete File',
             },
+            disks: 'Disks',
+            resizeDisk: 'Expand',
+            diskTarget: 'Device',
+            diskCapacityAfterResize: 'Total capacity after expansion',
+            diskResizeHelper:
+                'Expansion only increases the virtual disk capacity. Afterwards, extend the partitions and filesystems inside the virtual machine.',
+            diskResizeLimit:
+                'Expansion requires a shut-off VM and an independent, writable qcow2 disk without snapshots or a backing chain. Shrinking is not supported.',
+            diskResizeReason: {
+                referenceCheck:
+                    'Cannot complete virtual disk reference checks. Expansion is unavailable; check the disks of other virtual machines.',
+                referenced:
+                    'This virtual disk is used by another virtual machine or device and cannot be expanded yet.',
+                running: 'Shut down the virtual machine before expanding the disk.',
+                saved: 'Resume the virtual machine, then shut it down normally before expanding.',
+                snapshots: 'Expansion is unavailable while snapshots exist to avoid affecting snapshot recovery.',
+                backing: 'The disk depends on another image; expansion is not supported yet.',
+                shared: 'The disk is marked as shared; expansion is unavailable to avoid affecting other users.',
+                unsupported: 'The disk format, location or access permissions do not support expansion.',
+                unavailable: 'Cannot verify disk status. Check it and refresh.',
+            },
             diskSize: 'Disk Size',
             isoHelper:
                 'Mount multiple ISOs. Select the operating system installer first, then driver images such as VirtIO. Each image uses a separate CD-ROM drive.',

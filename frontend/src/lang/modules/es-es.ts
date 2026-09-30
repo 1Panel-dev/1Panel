@@ -7307,6 +7307,27 @@ const message = {
                 orphan_snapshot: 'Instantánea huérfana',
                 partial_file: 'Archivo incompleto',
             },
+            disks: 'Discos',
+            resizeDisk: 'Ampliar',
+            diskTarget: 'Dispositivo',
+            diskCapacityAfterResize: 'Capacidad total tras la ampliación',
+            diskResizeHelper:
+                'La ampliación solo aumenta la capacidad del disco virtual. Después, amplíe las particiones y los sistemas de archivos dentro de la máquina virtual.',
+            diskResizeLimit:
+                'La máquina virtual debe estar apagada y el disco qcow2 debe ser independiente y escribible, sin instantáneas ni cadena de imágenes de respaldo. No se admite reducir el tamaño.',
+            diskResizeReason: {
+                referenceCheck:
+                    'No se pueden comprobar las referencias al disco virtual. La ampliación no está disponible; revise los discos de otras máquinas virtuales.',
+                referenced:
+                    'Otro equipo virtual o dispositivo utiliza este disco virtual; la ampliación aún no se admite.',
+                running: 'Apague la máquina virtual antes de ampliar el disco.',
+                saved: 'Reanude la máquina virtual y apáguela normalmente antes de ampliar.',
+                snapshots: 'No se admite la ampliación con instantáneas para no afectar a su restauración.',
+                backing: 'El disco depende de otra imagen; la ampliación aún no se admite.',
+                shared: 'El disco está marcado como compartido; no se permite ampliarlo para no afectar a otros usuarios.',
+                unsupported: 'El formato, la ubicación o los permisos del disco no permiten ampliarlo.',
+                unavailable: 'No se puede verificar el estado del disco. Revise y actualice.',
+            },
             diskSize: 'Tamaño del disco',
             isoHelper:
                 'Puede montar varios ISO. Seleccione primero el instalador del sistema operativo y después las imágenes de controladores, como VirtIO. Cada imagen usa una unidad de CD-ROM independiente.',

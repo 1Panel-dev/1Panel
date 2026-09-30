@@ -7304,6 +7304,26 @@ const message = {
                 orphan_snapshot: 'Syot kilat yatim',
                 partial_file: 'Fail tidak lengkap',
             },
+            disks: 'Cakera',
+            resizeDisk: 'Besarkan',
+            diskTarget: 'Peranti',
+            diskCapacityAfterResize: 'Jumlah kapasiti selepas pembesaran',
+            diskResizeHelper:
+                'Pembesaran hanya menambah kapasiti cakera maya. Selepas itu, besarkan partition dan sistem fail dalam mesin maya.',
+            diskResizeLimit:
+                'Mesin maya mesti dimatikan dan cakera qcow2 mestilah bebas serta boleh ditulis, tanpa syot kilat atau rantaian imej asas. Pengecilan tidak disokong.',
+            diskResizeReason: {
+                referenceCheck:
+                    'Rujukan cakera maya tidak dapat disahkan. Pembesaran tidak tersedia; semak cakera mesin maya lain.',
+                referenced: 'Cakera maya ini digunakan oleh mesin maya atau peranti lain; pembesaran belum disokong.',
+                running: 'Matikan mesin maya sebelum membesarkan cakera.',
+                saved: 'Sambung semula mesin maya, kemudian matikannya secara biasa sebelum pembesaran.',
+                snapshots: 'Pembesaran tidak disokong jika terdapat syot kilat supaya pemulihan tidak terjejas.',
+                backing: 'Cakera bergantung pada imej lain; pembesaran belum disokong.',
+                shared: 'Cakera ditandakan sebagai dikongsi; pembesaran tidak disokong supaya pengguna lain tidak terjejas.',
+                unsupported: 'Format, lokasi atau kebenaran akses cakera tidak menyokong pembesaran.',
+                unavailable: 'Status cakera tidak dapat disahkan. Semak dan muat semula.',
+            },
             diskSize: 'Saiz Cakera',
             isoHelper:
                 'Pasang berbilang ISO. Pilih pemasang sistem pengendalian dahulu, kemudian imej pemacu seperti VirtIO. Setiap imej menggunakan pemacu CD-ROM yang berasingan.',
