@@ -73,7 +73,10 @@ func (u *DeviceService) LoadBaseInfo() (dto.DeviceBaseInfo, error) {
 	if baseInfo.SwapMemoryTotal != 0 {
 		baseInfo.SwapDetails = loadSwap()
 	}
-	disks := loadDiskInfo()
+	disks, err := loadDiskInfo()
+	if err != nil {
+		return baseInfo, err
+	}
 	for _, item := range disks {
 		baseInfo.MaxSize += item.Free
 	}

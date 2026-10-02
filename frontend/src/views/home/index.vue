@@ -32,6 +32,22 @@
             </template>
         </el-alert>
 
+        <el-alert
+            v-if="showDiskFailed"
+            class="card-interval dashboard-disk-alert"
+            type="warning"
+            @close="hideDiskFailed"
+        >
+            <template #title>
+                <span v-if="currentInfo.diskError" class="dashboard-disk-alert-line">
+                    {{ $t('home.diskListFailed', [currentInfo.diskError]) }}
+                </span>
+                <span v-if="diskFailed.length" class="dashboard-disk-alert-line">
+                    {{ $t('home.diskLoadFailed', [diskFailedText]) }}
+                </span>
+            </template>
+        </el-alert>
+
         <el-row :gutter="7" class="card-interval">
             <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
                 <CardWithHeader :header="$t('menu.home')" height="166px">
@@ -479,11 +495,13 @@ import {
     setDashboardCache,
 } from '@/utils/dashboardCache';
 import { MsgSuccess } from '@/utils/message';
+import { diskErrorDetail, isDiskFailed } from '@/utils/disk';
 import { useCan } from '@/composables/useMenuManagePermission';
 const router = useRouter();
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const {
     showEntranceWarn,
+    currentNode,
     defaultNetwork,
     defaultIO,
     isAdmin,
@@ -700,12 +718,65 @@ const chartsOption = ref({
     networkChart: loadNetworkChartOption(),
 });
 
+const DISK_FAILED_DISMISSED_KEY = 'dashboardDiskFailedDismissed';
+
+const loadDismissedDiskFailed = (): Record<string, string> => {
+    try {
+        const dismissed = JSON.parse(sessionStorage.getItem(DISK_FAILED_DISMISSED_KEY) || '{}');
+        return dismissed && typeof dismissed === 'object' ? dismissed : {};
+    } catch {
+        return {};
+    }
+};
+
+// Disk errors stay listed in an alert until they are gone: mounts whose usage could not be
+// loaded, each with its reason, and a mount table the agent could not read. Closing the alert
+// hides that exact set of errors on that node for the rest of the browser session.
+const dismissedDiskFailed = ref<Record<string, string>>(loadDismissedDiskFailed());
+const diskFailed = computed(() => (currentInfo.value.diskData || []).filter(isDiskFailed));
+const diskFailedText = computed(() =>
+    diskFailed.value.map((disk) => `${disk.path} (${diskErrorDetail(disk)})`).join('; '),
+);
+const diskFailedKey = computed(() => {
+    const parts = diskFailed.value.map((disk) => `${disk.path}\t${disk.errorType || ''}`);
+    if (currentInfo.value.diskError) {
+        parts.unshift(currentInfo.value.diskError);
+    }
+    return parts.join('\n');
+});
+const showDiskFailed = computed(
+    () => diskFailedKey.value !== '' && dismissedDiskFailed.value[currentNode.value] !== diskFailedKey.value,
+);
+
+const setDismissedDiskFailed = (key: string) => {
+    const dismissed = { ...dismissedDiskFailed.value };
+    if (key) {
+        dismissed[currentNode.value] = key;
+    } else {
+        delete dismissed[currentNode.value];
+    }
+    dismissedDiskFailed.value = dismissed;
+    try {
+        sessionStorage.setItem(DISK_FAILED_DISMISSED_KEY, JSON.stringify(dismissed));
+    } catch {}
+};
+
+const hideDiskFailed = () => {
+    setDismissedDiskFailed(diskFailedKey.value);
+};
+
 const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
     currentInfo.value = {
         ...data,
         topCPUItems: currentInfo.value.topCPUItems || [],
         topMemItems: currentInfo.value.topMemItems || [],
     };
+    // Errors that go away and come back later are a new incident, so they are shown again.
+    // A response without a disk list (an older agent that could not sample the host) proves nothing.
+    const cleared = Array.isArray(data.diskData) && diskFailedKey.value === '';
+    if (cleared && dismissedDiskFailed.value[currentNode.value]) {
+        setDismissedDiskFailed('');
+    }
 };
 
 const changeOption = async () => {
@@ -1181,6 +1252,16 @@ onBeforeUnmount(() => {
     font-size: 12px;
 }
 
+.dashboard-disk-alert {
+    :deep(.el-alert__title) {
+        overflow-wrap: anywhere;
+    }
+}
+
+.dashboard-disk-alert-line {
+    display: block;
+}
+
 .monitor-chart-content {
     position: relative;
     margin-top: 60px;
@@ -1191,7 +1272,8 @@ onBeforeUnmount(() => {
 }
 
 @media only screen and (max-width: 767px) {
-    .dashboard-entrance-alert {
+    .dashboard-entrance-alert,
+    .dashboard-disk-alert {
         padding-right: 40px;
 
         :deep(.el-alert__content),
