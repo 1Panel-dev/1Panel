@@ -1068,7 +1068,13 @@ func processAllDisks(alert dto.AlertDTO) error {
 	}
 	var errMsgs []string
 	for _, item := range diskList {
-		err := checkAndCreateDiskAlert(alert, item.Path)
+		var err error
+		if item.Error != "" {
+			// Already known to be unreadable; a stat of our own would only fail again.
+			err = errors.New(item.Error)
+		} else {
+			err = checkAndCreateDiskAlert(alert, item.Path)
+		}
 		if err != nil {
 			errMsg := fmt.Sprintf("disk path %s process failed: %v", item.Path, err)
 			errMsgs = append(errMsgs, errMsg)
@@ -1092,13 +1098,18 @@ func processSingleDisk(alert dto.AlertDTO) error {
 }
 
 func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) error {
-	usageStat, err := psutil.DISK.GetUsage(path, false)
+	mount, err := lookupDiskMount(path)
+	if err != nil {
+		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
+		return err
+	}
+	stat, err := diskStats.stat(mount)
 	if err != nil {
 		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
 		return err
 	}
 
-	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
+	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, stat.Usage)
 	commonTotal := float64(alert.Count)
 	if alert.Cycle == 1 {
 		commonTotal *= 1024 * 1024 * 1024

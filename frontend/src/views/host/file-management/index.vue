@@ -383,13 +383,16 @@
                                         <template #dropdown>
                                             <el-dropdown-menu>
                                                 <template v-for="(mount, index) in hostMount" :key="mount.path">
-                                                    <el-dropdown-item v-if="index == 0" @click.stop="jump(mount.path)">
-                                                        {{ mount.path }} ({{ $t('file.root') }})
-                                                        {{ formatFileSize(mount.free) }}
-                                                    </el-dropdown-item>
-                                                    <el-dropdown-item v-if="index != 0" @click.stop="jump(mount.path)">
-                                                        {{ mount.path }} ({{ $t('home.mount') }})
-                                                        {{ formatFileSize(mount.free) }}
+                                                    <el-dropdown-item
+                                                        :disabled="isDiskFailed(mount)"
+                                                        @click.stop="jumpMount(mount)"
+                                                    >
+                                                        {{ mount.path }}
+                                                        ({{ index == 0 ? $t('file.root') : $t('home.mount') }})
+                                                        <span v-if="isDiskFailed(mount)" class="mount-failed">
+                                                            {{ diskErrorLabel(mount) }}
+                                                        </span>
+                                                        <template v-else>{{ formatFileSize(mount.free) }}</template>
                                                     </el-dropdown-item>
                                                 </template>
                                             </el-dropdown-menu>
@@ -801,6 +804,7 @@ import FileShare from './share/index.vue';
 import { debounce } from 'lodash-es';
 import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
+import { diskErrorLabel, isDiskFailed } from '@/utils/disk';
 import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
 import { getComponentInfo } from '@/api/modules/host';
@@ -1314,6 +1318,13 @@ const top = () => {
             url = paths.value[paths.value.length - 2].url;
         }
         jump(url);
+    }
+};
+
+// A mount that does not answer is listed with its reason but not opened: listing it would hang.
+const jumpMount = (mount: Dashboard.DiskInfo) => {
+    if (!isDiskFailed(mount)) {
+        jump(mount.path);
     }
 };
 
@@ -2573,6 +2584,10 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped lang="scss">
+.mount-failed {
+    color: var(--el-color-warning);
+}
+
 .file-management-page {
     position: relative;
 

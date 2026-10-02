@@ -21,6 +21,13 @@ import (
 
 const maxStreamOutputCapture = 64 * 1024
 
+// killWaitTimeout bounds how long a timed-out command waits for its killed
+// process to be reaped. A process in uninterruptible sleep (e.g. statfs on a
+// stale NFS mount) can't be reaped until its syscall returns, and
+// exec.Cmd.Wait blocks until then regardless of WaitDelay, so the caller
+// stops waiting and leaves Wait to finish in the background.
+var killWaitTimeout = 5 * time.Second
+
 type CommandHelper struct {
 	context      context.Context
 	workDir      string
@@ -43,6 +50,46 @@ type PipeCommand struct {
 	Env   []string
 	Dir   string
 	Stdin io.Reader
+}
+
+// detachableWriter forwards to w until detached. exec copies command output
+// in goroutines that outlive a timed-out command whose process can't be
+// reaped or whose pipe a grandchild still holds; once the caller has
+// returned they must no longer touch the writers it owns.
+type detachableWriter struct {
+	mu sync.Mutex
+	w  io.Writer
+}
+
+func (d *detachableWriter) Write(p []byte) (int, error) {
+	d.mu.Lock()
+	defer d.mu.Unlock()
+	if d.w == nil {
+		return len(p), nil
+	}
+	return d.w.Write(p)
+}
+
+// detachWriters wraps the given writers and returns the func that detaches
+// them. An *os.File is left alone: the child writes to it directly, without a
+// copy goroutine.
+func detachWriters(writers ...*io.Writer) func() {
+	var wrapped []*detachableWriter
+	for _, w := range writers {
+		if _, isFile := (*w).(*os.File); isFile || *w == nil {
+			continue
+		}
+		d := &detachableWriter{w: *w}
+		*w = d
+		wrapped = append(wrapped, d)
+	}
+	return func() {
+		for _, d := range wrapped {
+			d.mu.Lock()
+			d.w = nil
+			d.mu.Unlock()
+		}
+	}
 }
 
 type lockedBuffer struct {
@@ -163,6 +210,7 @@ func (c *CommandHelper) RunPipe(commands ...PipeCommand) (string, error) {
 			_ = outputFile.Close()
 		}
 	}()
+	defer detachWriters(&lastStdout, &lastStderr, &pipeStderr)()
 	if err := connectPipeCommands(cmds, lastStdout, lastStderr, pipeStderr); err != nil {
 		return "", err
 	}
@@ -300,7 +348,12 @@ func waitPipeCommands(ctx context.Context, cmds []*exec.Cmd) error {
 		return runErr
 	case <-ctx.Done():
 		killProcessGroups(cmds)
-		return <-done
+		select {
+		case runErr := <-done:
+			return runErr
+		case <-time.After(killWaitTimeout):
+			return ctx.Err()
+		}
 	}
 }
 
@@ -364,6 +417,7 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	if c.stderr != nil {
 		cmd.Stderr = io.MultiWriter(cmd.Stderr, c.stderr)
 	}
+	detach := detachWriters(&cmd.Stdout, &cmd.Stderr)
 	env := os.Environ()
 	env = append(env, c.env...)
 	cmd.Env = env
@@ -391,6 +445,7 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	if c.taskItem != nil {
 		defer customWriter.Flush()
 	}
+	defer detach()
 
 	done := make(chan error, 1)
 	go func() {
@@ -416,7 +471,10 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 		default:
 			err = newContext.Err()
 		}
-		<-done
+		select {
+		case <-done:
+		case <-time.After(killWaitTimeout):
+		}
 		return "", err
 	}
 }
