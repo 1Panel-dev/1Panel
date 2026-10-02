@@ -92,16 +92,16 @@ func TestParseDiskMountInfo(t *testing.T) {
 31 22 0:51 / /mnt/noopts rw - ext4 /dev/sdb1
 `
 	want := []diskMount{
-		{Path: "/", Type: "ext4", Device: "/dev/sda1", Root: "/"},
-		{Path: "/proc", Type: "proc", Device: "proc", Root: "/"},
-		{Path: "/home", Type: "xfs", Device: "/dev/mapper/vg-home", Root: "/"},
-		{Path: "/mnt/nas share", Type: "cifs", Device: "//nas/My Share", Root: "/"},
-		{Path: "/mnt/c", Type: "9p", Device: `C:\`, Root: "/"},
-		{Path: "/mnt/photo", Type: "nfs4", Device: "nas:/volume1/photo", Root: "/"},
-		{Path: "/mnt/video", Type: "nfs4", Device: "nas:/volume1/video", Root: "/"},
-		{Path: "/www", Type: "ext4", Device: "/dev/sda1", Root: "/data/www"},
-		{Path: "/mnt/empty", Type: "tmpfs", Device: "", Root: "/"},
-		{Path: "/mnt/noopts", Type: "ext4", Device: "/dev/sdb1", Root: "/"},
+		{ID: 22, ParentID: 1, Path: "/", Type: "ext4", Device: "/dev/sda1", Root: "/"},
+		{ID: 23, ParentID: 22, Path: "/proc", Type: "proc", Device: "proc", Root: "/"},
+		{ID: 24, ParentID: 22, Path: "/home", Type: "xfs", Device: "/dev/mapper/vg-home", Root: "/"},
+		{ID: 25, ParentID: 22, Path: "/mnt/nas share", Type: "cifs", Device: "//nas/My Share", Root: "/"},
+		{ID: 26, ParentID: 22, Path: "/mnt/c", Type: "9p", Device: `C:\`, Root: "/"},
+		{ID: 27, ParentID: 22, Path: "/mnt/photo", Type: "nfs4", Device: "nas:/volume1/photo", Root: "/"},
+		{ID: 28, ParentID: 22, Path: "/mnt/video", Type: "nfs4", Device: "nas:/volume1/video", Root: "/"},
+		{ID: 29, ParentID: 22, Path: "/www", Type: "ext4", Device: "/dev/sda1", Root: "/data/www"},
+		{ID: 30, ParentID: 22, Path: "/mnt/empty", Type: "tmpfs", Device: "", Root: "/"},
+		{ID: 31, ParentID: 22, Path: "/mnt/noopts", Type: "ext4", Device: "/dev/sdb1", Root: "/"},
 	}
 	got, err := parseDiskMountInfo(data)
 	if err != nil {
@@ -116,6 +116,9 @@ func TestParseDiskMountInfo(t *testing.T) {
 func TestParseDiskMountInfoRejectsUnknownFormat(t *testing.T) {
 	good := "22 1 8:1 / / rw,relatime shared:1 - ext4 /dev/sda1 rw\n"
 	cases := map[string]string{
+		"invalid mount ID":  good + "x 22 0:21 / /proc rw - proc proc rw\n",
+		"zero mount ID":     good + "0 22 0:21 / /proc rw - proc proc rw\n",
+		"invalid parent ID": good + "23 x 0:21 / /proc rw - proc proc rw\n",
 		"no separator":      good + "/dev/sdb1 /data ext4 rw 0 0\n",
 		"too few fields":    good + "23 22 0:21 / - proc proc rw\n",
 		"no source":         good + "24 22 0:22 / /sys rw - sysfs\n",
@@ -172,28 +175,28 @@ func TestDiskMountRemote(t *testing.T) {
 
 func TestFilterDiskMounts(t *testing.T) {
 	mounts := []diskMount{
-		{Path: "/", Type: "ext4", Device: "/dev/sda1"},
-		{Path: "/run", Type: "tmpfs", Device: "tmpfs"},
-		{Path: "/boot", Type: "ext4", Device: "/dev/sda2"},
-		{Path: "/var/lib/docker/overlay2/abc/merged", Type: "overlay", Device: "overlay"},
-		{Path: "/var/lib/docker", Type: "ext4", Device: "/dev/sdb1"},
-		{Path: "/snap/core/123", Type: "squashfs", Device: "/dev/loop0"},
-		{Path: "/run/user/1000/gvfs", Type: "fuse.gvfsd-fuse", Device: "gvfsd-fuse"},
-		{Path: "/run/user/1000/doc", Type: "fuse.portal", Device: "portal"},
-		{Path: "/run/user/1000/media", Type: "ext4", Device: "/dev/sdc1"},
-		{Path: "/var/lib/lxcfs", Type: "fuse.lxcfs", Device: "lxcfs"},
-		{Path: "/mnt/nas", Type: "nfs4", Device: "nas:/export"},
-		{Path: "/mnt/ssh", Type: "fuse.sshfs", Device: "user@host:/"},
-		{Path: "/data", Type: "ext4", Device: "/dev/sdd1"},
-		{Path: "/data", Type: "nfs", Device: "nas:/data"},
-		{Path: "/a/b/c/d/e/f/g/h/i/j", Type: "ext4", Device: "/dev/sde1"},
-		{Path: "/merged", Type: "overlay", Device: "overlay"},
+		{ID: 1, ParentID: 0, Path: "/", Type: "ext4", Device: "/dev/sda1"},
+		{ID: 2, ParentID: 1, Path: "/run", Type: "tmpfs", Device: "tmpfs"},
+		{ID: 3, ParentID: 1, Path: "/boot", Type: "ext4", Device: "/dev/sda2"},
+		{ID: 4, ParentID: 1, Path: "/var/lib/docker/overlay2/abc/merged", Type: "overlay", Device: "overlay"},
+		{ID: 5, ParentID: 1, Path: "/var/lib/docker", Type: "ext4", Device: "/dev/sdb1"},
+		{ID: 6, ParentID: 1, Path: "/snap/core/123", Type: "squashfs", Device: "/dev/loop0"},
+		{ID: 7, ParentID: 1, Path: "/run/user/1000/gvfs", Type: "fuse.gvfsd-fuse", Device: "gvfsd-fuse"},
+		{ID: 8, ParentID: 1, Path: "/run/user/1000/doc", Type: "fuse.portal", Device: "portal"},
+		{ID: 9, ParentID: 1, Path: "/run/user/1000/media", Type: "ext4", Device: "/dev/sdc1"},
+		{ID: 10, ParentID: 1, Path: "/var/lib/lxcfs", Type: "fuse.lxcfs", Device: "lxcfs"},
+		{ID: 11, ParentID: 1, Path: "/mnt/nas", Type: "nfs4", Device: "nas:/export"},
+		{ID: 12, ParentID: 1, Path: "/mnt/ssh", Type: "fuse.sshfs", Device: "user@host:/"},
+		{ID: 13, ParentID: 1, Path: "/data", Type: "ext4", Device: "/dev/sdd1"},
+		{ID: 14, ParentID: 13, Path: "/data", Type: "nfs", Device: "nas:/data"},
+		{ID: 15, ParentID: 1, Path: "/a/b/c/d/e/f/g/h/i/j", Type: "ext4", Device: "/dev/sde1"},
+		{ID: 16, ParentID: 1, Path: "/merged", Type: "overlay", Device: "overlay"},
 	}
 	want := []diskMount{
-		{Path: "/", Type: "ext4", Device: "/dev/sda1"},
-		{Path: "/mnt/nas", Type: "nfs4", Device: "nas:/export"},
-		{Path: "/mnt/ssh", Type: "fuse.sshfs", Device: "user@host:/"},
-		{Path: "/data", Type: "nfs", Device: "nas:/data"},
+		{ID: 1, ParentID: 0, Path: "/", Type: "ext4", Device: "/dev/sda1"},
+		{ID: 11, ParentID: 1, Path: "/mnt/nas", Type: "nfs4", Device: "nas:/export"},
+		{ID: 12, ParentID: 1, Path: "/mnt/ssh", Type: "fuse.sshfs", Device: "user@host:/"},
+		{ID: 14, ParentID: 13, Path: "/data", Type: "nfs", Device: "nas:/data"},
 	}
 	for _, keepRootOverlay := range []bool{false, true} {
 		if got := filterDiskMounts(mounts, keepRootOverlay); !reflect.DeepEqual(got, want) {
@@ -204,15 +207,15 @@ func TestFilterDiskMounts(t *testing.T) {
 
 func TestFilterDiskMountsRootOverlay(t *testing.T) {
 	mounts := []diskMount{
-		{Path: "/", Type: "overlay", Device: "overlayroot"},
-		{Path: "/merged", Type: "overlay", Device: "overlay"},
-		{Path: "/data", Type: "ext4", Device: "/dev/sdb1"},
+		{ID: 1, ParentID: 0, Path: "/", Type: "overlay", Device: "overlayroot"},
+		{ID: 2, ParentID: 1, Path: "/merged", Type: "overlay", Device: "overlay"},
+		{ID: 3, ParentID: 1, Path: "/data", Type: "ext4", Device: "/dev/sdb1"},
 	}
-	data := diskMount{Path: "/data", Type: "ext4", Device: "/dev/sdb1"}
+	data := diskMount{ID: 3, ParentID: 1, Path: "/data", Type: "ext4", Device: "/dev/sdb1"}
 	if got, want := filterDiskMounts(mounts, false), []diskMount{data}; !reflect.DeepEqual(got, want) {
 		t.Fatalf("filterDiskMounts(keepRootOverlay=false) = %+v, want %+v", got, want)
 	}
-	want := []diskMount{{Path: "/", Type: "overlay", Device: "overlayroot"}, data}
+	want := []diskMount{{ID: 1, ParentID: 0, Path: "/", Type: "overlay", Device: "overlayroot"}, data}
 	if got := filterDiskMounts(mounts, true); !reflect.DeepEqual(got, want) {
 		t.Fatalf("filterDiskMounts(keepRootOverlay=true) = %+v, want %+v", got, want)
 	}
@@ -220,11 +223,125 @@ func TestFilterDiskMountsRootOverlay(t *testing.T) {
 
 func TestFilterDiskMountsSkipsPseudoFsMountedOver(t *testing.T) {
 	mounts := []diskMount{
-		{Path: "/data", Type: "ext4", Device: "/dev/sdb1"},
-		{Path: "/data", Type: "tmpfs", Device: "tmpfs"},
+		{ID: 1, ParentID: 0, Path: "/data", Type: "ext4", Device: "/dev/sdb1"},
+		{ID: 2, ParentID: 1, Path: "/data", Type: "tmpfs", Device: "tmpfs"},
 	}
 	if got := filterDiskMounts(mounts, false); len(got) != 0 {
 		t.Fatalf("filterDiskMounts() = %+v, want none", got)
+	}
+}
+
+// The parent relationships, not line order, determine which mounts are reachable.
+func TestTopDiskMountsVisibility(t *testing.T) {
+	cases := []struct {
+		name  string
+		table string
+		want  []uint64
+	}{
+		{
+			name: "stack hides old children but keeps new children",
+			table: "1 1 8:1 / / rw - ext4 /dev/sda1 rw\n" +
+				"20 1 8:2 / /data rw - ext4 /dev/sdb1 rw\n" +
+				"21 20 8:3 / /data/old rw - ext4 /dev/sdc1 rw\n" +
+				"22 21 8:4 / /data/old/deep rw - ext4 /dev/sdd1 rw\n" +
+				"30 20 0:30 / /data rw - nfs4 nas:/data rw\n" +
+				"31 30 8:5 / /data/live rw - ext4 /dev/sde1 rw\n" +
+				"32 31 0:32 / /data/live rw - tmpfs tmpfs rw\n" +
+				"33 32 8:6 / /data/live/nested rw - ext4 /dev/sdf1 rw\n",
+			want: []uint64{1, 30, 32, 33},
+		},
+		{
+			name: "later ancestor hides descendants attached to the underlying root",
+			table: "1 1 8:1 / / rw - ext4 /dev/sda1 rw\n" +
+				"10 1 8:2 / /data/old rw - ext4 /dev/sdb1 rw\n" +
+				"11 10 8:3 / /data/old/deep rw - ext4 /dev/sdc1 rw\n" +
+				"20 1 0:20 / /data rw - nfs4 nas:/data rw\n" +
+				"21 1 8:4 / /database rw - ext4 /dev/sdd1 rw\n",
+			want: []uint64{1, 20, 21},
+		},
+		{
+			name: "same path on the visible parent replaces a hidden descendant",
+			table: "1 1 8:1 / / rw - ext4 /dev/sda1 rw\n" +
+				"10 1 8:2 / /data/child rw - ext4 /dev/sdb1 rw\n" +
+				"20 1 0:20 / /data rw - nfs4 nas:/data rw\n" +
+				"30 20 8:3 / /data/child rw - ext4 /dev/sdc1 rw\n",
+			want: []uint64{1, 20, 30},
+		},
+		{
+			name: "stacked namespace root",
+			table: "1 1 8:1 / / rw - ext4 /dev/sda1 rw\n" +
+				"2 1 8:2 / /old rw - ext4 /dev/sdb1 rw\n" +
+				"3 1 0:3 / / rw - overlay overlay rw\n" +
+				"4 3 8:3 / /new rw - ext4 /dev/sdc1 rw\n",
+			want: []uint64{3, 4},
+		},
+		{
+			name: "parent outside a chroot is absent from the table",
+			table: "10 999 8:1 /jail / rw - ext4 /dev/sda1 rw\n" +
+				"11 10 8:2 / /data rw - ext4 /dev/sdb1 rw\n",
+			want: []uint64{10, 11},
+		},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mounts, err := parseDiskMountInfo(tc.table)
+			if err != nil {
+				t.Fatal(err)
+			}
+			// Rotating and reversing also place older hidden entries after their replacements.
+			for order := 0; order < 2*len(mounts); order++ {
+				if order == len(mounts) {
+					for i, j := 0, len(mounts)-1; i < j; i, j = i+1, j-1 {
+						mounts[i], mounts[j] = mounts[j], mounts[i]
+					}
+				}
+				mounts = append(mounts[1:], mounts[0])
+				var want []diskMount
+				for _, mount := range mounts {
+					for _, id := range tc.want {
+						if mount.ID == id {
+							want = append(want, mount)
+						}
+					}
+				}
+				if got := topDiskMounts(mounts); !reflect.DeepEqual(got, want) {
+					t.Fatalf("order %d: visible mounts = %+v, want %+v", order, got, want)
+				}
+			}
+		})
+	}
+}
+
+func TestDiskStatGuardSameSourceRemount(t *testing.T) {
+	before, err := parseDiskMountInfo("71 22 0:71 / /mnt/nas rw - fuse.rclone remote: rw\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	// The source, filesystem type, path and root are unchanged; only the kernel identity is new.
+	after, err := parseDiskMountInfo("99 22 0:99 / /mnt/nas rw - fuse.rclone remote: rw\n")
+	if err != nil {
+		t.Fatal(err)
+	}
+	release := make(chan struct{})
+	defer close(release)
+	var calls atomic.Int32
+	g := newDiskStatGuard(50*time.Millisecond, func(path string) (diskStat, error) {
+		if calls.Add(1) == 1 {
+			<-release
+		}
+		return diskStat{Dev: 99, Usage: &disk.UsageStat{Total: testDiskTotal}}, nil
+	})
+	if _, err := g.stat(before[0]); !errors.Is(err, errDiskStatTimeout) {
+		t.Fatalf("old mount: %v, want timeout", err)
+	}
+	if stat, err := g.stat(after[0]); err != nil || stat.Dev != 99 {
+		t.Fatalf("replacement mount: %+v, %v, want a fresh successful stat", stat, err)
+	}
+	if _, err := g.stat(before[0]); !errors.Is(err, errDiskStatTimeout) {
+		t.Fatalf("old mount after replacement: %v, want timeout", err)
+	}
+	if n := calls.Load(); n != 2 {
+		t.Fatalf("statFn called %d times, want one per mount instance", n)
 	}
 }
 
@@ -565,9 +682,9 @@ func TestDiskStatGuardLogsTableErrorOnce(t *testing.T) {
 }
 
 func TestDropUnmounted(t *testing.T) {
-	gone := diskMount{Path: "/mnt/gone", Type: "nfs4", Device: "nas:/gone"}
-	shadowed := diskMount{Path: "/mnt/shadowed", Type: "ext4", Device: "/dev/sdb1"}
-	stale := diskMount{Path: "/mnt/stale", Type: "nfs4", Device: "nas:/stale"}
+	gone := diskMount{ID: 1, Path: "/mnt/gone", Type: "nfs4", Device: "nas:/gone"}
+	shadowed := diskMount{ID: 2, Path: "/mnt/shadowed", Type: "ext4", Device: "/dev/sdb1"}
+	stale := diskMount{ID: 3, Path: "/mnt/stale", Type: "nfs4", Device: "nas:/stale"}
 	failures := []diskFailure{
 		{diskMount: gone, Err: &fs.PathError{Op: "stat", Path: gone.Path, Err: syscall.ENOENT}},
 		{diskMount: shadowed, Err: syscall.ENOTDIR},

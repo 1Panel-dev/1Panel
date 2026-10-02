@@ -69,10 +69,12 @@ var smbDiskFsTypes = map[string]struct{}{"cifs": {}, "smb3": {}, "smbfs": {}}
 // diskMount is one entry of the mount table. It is also the key in-flight stat
 // calls are tracked by, so it must stay comparable.
 type diskMount struct {
-	Path   string // mount point
-	Type   string // filesystem type
-	Device string // mount source, as df prints it
-	Root   string // directory of the filesystem mounted here; "/" unless a bind mount or subvolume
+	ID       uint64 // kernel mount identity, included in the in-flight stat key
+	ParentID uint64 // parent mount ID, including the lower mount of a stack
+	Path     string // mount point
+	Type     string // filesystem type
+	Device   string // mount source, as df prints it
+	Root     string // directory of the filesystem mounted here; "/" unless a bind mount or subvolume
 }
 
 // remote reports whether the mount is served over the network, roughly as df
@@ -135,11 +137,18 @@ func parseDiskMountInfo(data string) ([]diskMount, error) {
 		if !ok || len(fields) < 5 || len(source) < 2 {
 			return nil, fmt.Errorf("unrecognized line %d in mount table %s: %q", i+1, diskMountInfoFile, line)
 		}
+		id, idErr := strconv.ParseUint(fields[0], 10, 64)
+		parentID, parentErr := strconv.ParseUint(fields[1], 10, 64)
+		if idErr != nil || parentErr != nil || id == 0 {
+			return nil, fmt.Errorf("invalid mount IDs on line %d in mount table %s: %q", i+1, diskMountInfoFile, line)
+		}
 		mounts = append(mounts, diskMount{
-			Path:   unescapeMountField(fields[4]),
-			Type:   source[0],
-			Device: unescapeMountField(source[1]),
-			Root:   unescapeMountField(fields[3]),
+			ID:       id,
+			ParentID: parentID,
+			Path:     unescapeMountField(fields[4]),
+			Type:     source[0],
+			Device:   unescapeMountField(source[1]),
+			Root:     unescapeMountField(fields[3]),
 		})
 	}
 	return mounts, nil
@@ -165,18 +174,63 @@ func unescapeMountField(field string) string {
 	return b.String()
 }
 
-// topDiskMounts keeps one entry per mount point. When a path is mounted over,
-// the last entry is the filesystem stat reaches.
+// topDiskMounts keeps only mounts reachable through the current mount tree.
+// A mount stacked at the same path hides its parent and that parent's children.
+// A later mount at an ancestor path also hides older descendants attached to
+// the underlying filesystem. Neither case depends on the mount table's order.
 func topDiskMounts(mounts []diskMount) []diskMount {
-	var tops []diskMount
-	index := make(map[string]int, len(mounts))
+	byID := make(map[uint64]diskMount, len(mounts))
 	for _, mount := range mounts {
-		if i, ok := index[mount.Path]; ok {
-			tops[i] = mount
+		byID[mount.ID] = mount
+	}
+	covered := make(map[uint64]bool)
+	for _, mount := range mounts {
+		if parent, ok := byID[mount.ParentID]; ok && parent.ID != mount.ID && parent.Path == mount.Path {
+			covered[parent.ID] = true
+		}
+	}
+
+	// Resolve ancestors before their descendants, then preserve the input order
+	// in the result. Mount IDs describe stack order even when the input is shuffled.
+	ordered := append([]diskMount(nil), mounts...)
+	sort.SliceStable(ordered, func(i, j int) bool { return len(ordered[i].Path) < len(ordered[j].Path) })
+	visible := make(map[string]diskMount, len(mounts))
+	for _, mount := range ordered {
+		if covered[mount.ID] {
 			continue
 		}
-		index[mount.Path] = len(tops)
-		tops = append(tops, mount)
+		parentID := mount.ParentID
+		for steps := 0; steps < len(mounts); steps++ {
+			parent, ok := byID[parentID]
+			if !ok || parent.Path != mount.Path || parent.ID == parent.ParentID {
+				break
+			}
+			parentID = parent.ParentID
+		}
+		// The bottom of this stack must be attached to the filesystem currently
+		// visible at the nearest ancestor mount point, not to a hidden one.
+		parent, parentKnown := byID[parentID]
+		reachable := !parentKnown || (mount.Path == "/" && parent.ID == parent.ParentID)
+		if mount.Path != "/" {
+			for path := filepath.Dir(mount.Path); ; path = filepath.Dir(path) {
+				if ancestor, ok := visible[path]; ok {
+					reachable = ancestor.ID == parentID
+					break
+				}
+				if path == filepath.Dir(path) {
+					break
+				}
+			}
+		}
+		if reachable {
+			visible[mount.Path] = mount
+		}
+	}
+	var tops []diskMount
+	for _, mount := range mounts {
+		if top, ok := visible[mount.Path]; ok && top.ID == mount.ID {
+			tops = append(tops, mount)
+		}
 	}
 	return tops
 }
@@ -298,8 +352,8 @@ func preferDiskMount(mount, cur diskMount) bool {
 // has outlived the timeout, later callers fail immediately instead of piling up
 // more stuck threads. The call is forgotten when it finally returns, so a
 // recovered mount is stat-ed normally on the next request. Calls are keyed by
-// the whole mount entry rather than the path, so a different filesystem
-// mounted at the same path isn't blamed for a call stuck on the old one.
+// the whole mount entry, including its kernel ID, so even the same source
+// mounted again at the same path isn't blamed for a call stuck on the old one.
 type diskStatGuard struct {
 	timeout time.Duration
 	statFn  func(path string) (diskStat, error)
