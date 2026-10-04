@@ -97,7 +97,7 @@ func (s sftpClient) Upload(ctx context.Context, src, target string) (bool, error
 	}()
 	defer close(done)
 
-	client, err := sftp.NewClient(sshClient)
+	client, err := sftp.NewClient(sshClient, sftp.UseConcurrentWrites(true))
 	if err != nil {
 		return false, err
 	}
@@ -127,7 +127,15 @@ func (s sftpClient) Upload(ctx context.Context, src, target string) (bool, error
 	}
 	defer dstFile.Close()
 
-	if _, err := io.Copy(dstFile, srcFile); err != nil {
+	// ReadFrom uses the pipelined write path of pkg/sftp. A plain io.Copy would
+	// pick os.File.WriteTo (the source is an *os.File), which issues one
+	// synchronous SFTP WRITE per packet and waits for the reply every time, so
+	// the throughput is bounded by packetSize/RTT.
+	written, err := dstFile.ReadFrom(srcFile)
+	if err != nil {
+		// A failed concurrent write may leave holes in the remote file, so cut
+		// it back to the number of bytes actually written.
+		_ = dstFile.Truncate(written)
 		if ctxErr := ctx.Err(); ctxErr != nil {
 			return false, ctxErr
 		}
