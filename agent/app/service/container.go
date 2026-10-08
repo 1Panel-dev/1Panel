@@ -114,8 +114,6 @@ func NewIContainerService() IContainerService {
 }
 
 func (u *ContainerService) Page(ctx context.Context, req dto.PageContainer) (int64, interface{}, error) {
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return 0, nil, err
@@ -216,22 +214,20 @@ func (u *ContainerService) LoadStatus(ctx context.Context, containersOnly bool) 
 		return data, err
 	}
 	defer client.Close()
-	c, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
 	if !containersOnly {
-		images, _ := client.ImageList(c, image.ListOptions{All: true})
+		images, _ := client.ImageList(ctx, image.ListOptions{All: true})
 		data.ImageCount = len(images)
 		repo, _ := imageRepoRepo.List()
 		data.RepoCount = len(repo)
 		templates, _ := composeRepo.List()
 		data.ComposeTemplateCount = len(templates)
-		networks, _ := client.NetworkList(c, network.ListOptions{})
+		networks, _ := client.NetworkList(ctx, network.ListOptions{})
 		data.NetworkCount = len(networks)
-		volumes, _ := client.VolumeList(c, volume.ListOptions{})
+		volumes, _ := client.VolumeList(ctx, volume.ListOptions{})
 		data.VolumeCount = len(volumes.Volumes)
-		data.ComposeCount = loadComposeCount(c, client)
+		data.ComposeCount = loadComposeCount(ctx, client)
 	}
-	containers, err := client.ContainerList(c, container.ListOptions{All: true})
+	containers, err := client.ContainerList(ctx, container.ListOptions{All: true})
 	if err != nil {
 		return data, err
 	}
@@ -306,8 +302,6 @@ func (u *ContainerService) ContainerListStats(ctx context.Context, ids []string)
 		return nil, err
 	}
 	defer client.Close()
-	ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
-	defer cancel()
 	options := container.ListOptions{All: true}
 	if ids != nil {
 		if len(ids) == 0 {
