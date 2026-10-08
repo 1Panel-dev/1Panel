@@ -169,7 +169,7 @@ func (b *BaseApi) GetNodePackageRunScript(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /runtimes/operate [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"操作运行环境 [id]","formatEN":"Operate runtime [id]"}
+// @x-panel-log {"bodyKeys":["ID"],"paramKeys":[],"BeforeFunctions":[{"input_column":"id","input_value":"ID","isList":false,"db":"runtimes","output_column":"name","output_value":"name"}],"formatZH":"操作运行环境 [name]","formatEN":"Operate runtime [name]"}
 func (b *BaseApi) OperateRuntime(c *gin.Context) {
 	var req request.RuntimeOperate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
