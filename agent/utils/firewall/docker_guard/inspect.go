@@ -1,6 +1,7 @@
 package docker_guard
 
 import (
+	"context"
 	"net/netip"
 	"path/filepath"
 	"slices"
@@ -13,8 +14,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
-func ReadDNATRules(backend, family string) DNATRules {
-	manager := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
+func ReadDNATRules(ctx context.Context, backend, family string) DNATRules {
+	manager := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
 	if backend == constant.FirewallProviderNftables {
 		tableFamily := "ip"
 		if family == constant.FirewallFamilyIPv6 {
@@ -45,8 +46,8 @@ func ReadDNATRules(backend, family string) DNATRules {
 	return DNATRules{Output: output, Inspected: err == nil}
 }
 
-func ReadProxyEndpoints() ProxyEndpoints {
-	manager := cmd.NewCommandMgr(cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
+func ReadProxyEndpoints(ctx context.Context) ProxyEndpoints {
+	manager := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(10*time.Second), cmd.WithEnv("LC_ALL=C"))
 	output, err := manager.RunWithStdout("ps", "-ww", "-eo", "args=")
 	if err != nil {
 		return ProxyEndpoints{}

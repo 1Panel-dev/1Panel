@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Docker DOCKER-USER zinciri bulunamadı. Docker’ı yeniden başlatıp tekrar deneyin'
 ErrDockerNftablesChainUnavailable: 'Docker nftables IPv4 güvenlik duvarı zinciri bulunamadı. Geçerli Docker sürümünün nftables güvenlik duvarı arka ucunu desteklediğini doğrulayın, Docker’ı yeniden başlatıp tekrar deneyin'
-ErrDockerForwardPolicyDrop: '{{ .family }} FORWARD varsayılan ilkesi DROP. İlkeyi düzenleyip tekrar deneyin'
-ErrUFWRuleAdopt: 'UFW kuralı yönetilemedi: {{ .detail }}. Geçerli UFW sürümü 0.35’ten eskiyse UFW’yi yükseltip tekrar deneyin'
+ErrDockerForwardPolicyDrop: 'Bu sunucu ağ yönlendirmesini kısıtlıyor. Konteyner port koruması şu anda etkinleştirilemiyor.'
 Firewall: 'Güvenlik duvarı'
 FirewallTaskHost: 'Ana makine güvenlik duvarı'
 FirewallTaskForwarding: 'Port yönlendirme'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'Güvenlik duvarı kuralları oluştur'
 FirewallCreateRulesResult: 'Oluşturma sonucu: {{ .succeeded }} başarılı, {{ .failed }} başarısız, {{ .skipped }} yürütülmedi'
 FirewallRuleOperationResult: 'İşlem sonucu: {{ .succeeded }} başarılı, {{ .failed }} başarısız'
 FirewallCreateRuleSkipped: 'Yürütülmedi'
-FirewallCreateBatchStep: '{{ .backend }} için {{ .count }} kuralı toplu gönder'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; {{ .count }} kurala dönüştürüldü'
-FirewallCreateRuleExecutionFailed: 'Kural oluşturma başarısız. Veritabanına kayıt yazılmadı ve yürütülen komutlar geri alınmadı'
-FirewallCreateRulePersistenceFailed: 'Kural oluşturuldu ancak yönetim kaydı kaydedilemedi'
-FirewallAdoptRulePersistenceFailed: 'Kuralı yönetime alma komutu yürütüldü, ancak yönetim kaydı kaydedilemedi'
-FirewallSyncOperationsResult: 'Eşitleme işlemleri: {{ .removed }} silindi, {{ .created }} oluşturuldu, {{ .failed }} başarısız, {{ .skipped }} yürütülmedi, {{ .unchanged }} zaten eşleşiyor (değişiklik gerekmiyor)'
-FirewallSyncRuleUnchanged: 'Zaten eşleşiyor; değişiklik gerekmiyor'
-FirewallSyncStep: 'Kuralları {{ .name }} ile eşitle'
-FirewallSyncFailed: '{{ .failed }} güvenlik duvarı kuralı eşitlenemedi'
-FirewallResetSourceStep: 'Kaynak güvenlik duvarı {{ .name }} sıfırla ve devre dışı bırak'
-FirewallResetSourceResult: 'Kaynak güvenlik duvarı sıfırlandı; {{ .removed }} veritabanı kuralı silindi'
+FirewallCreateRuleExecutionFailed: 'Kural oluşturma başarısız. Yürütülen komutlar geri alınmadı'
 FirewallInitializeChainsStep: '{{ .name }} temel zincirlerini başlat ve bağla'
-FirewallRestoreRulesStep: 'Veritabanı kurallarını {{ .name }} üzerine geri yükle'
 FirewallSyncWhitelistStep: 'Güvenlik duvarı bağlantı noktası izin listesini eşitle'
 FirewallEnableForwardingStep: 'Bağlantı noktası yönlendirme zincirlerini etkinleştir ve bağla'
 FirewallRestoreForwardingRulesStep: 'Veritabanı bağlantı noktası yönlendirme kurallarını geri yükle'
 FirewallInspectDockerGuardStep: 'Docker güvenlik duvarı arka ucunu ve ilkelerini denetle'
 FirewallInitializeDockerGuardStep: '{{ .name }} bağlantı noktası koruma zincirlerini başlat ve bağla'
 FirewallPersistDockerGuardStep: 'Docker bağlantı noktası koruma durumunu kaydet'
-ErrFirewallRuleScopeChange: "Mevcut güvenlik duvarı, kuralın kapsamını (IPv4/IPv6 adres ailesi gibi) değiştirmeyi desteklemiyor. Lütfen yeni bir kural oluşturun."
-FirewallWhitelistReleased: "{{ .name }}: izin listesi koruması kaldırıldı; izin kuralı korundu. Portu kapatmak için kuralı kural listesinden elle silin"
-FirewallWhitelistRequired: "{{ .name }}: zorunlu sistem portu kuralları tarafından korunuyor"
 FileTaskCopy: 'Dosyaları {{ .dst }} konumuna kopyala'
 FileTaskMove: 'Dosyaları {{ .dst }} konumuna taşı'
 FileTaskCompress: 'Dosyaları {{ .dst }} konumuna sıkıştır'
@@ -727,11 +713,13 @@ FileTaskDecompress: 'Dosyaları {{ .dst }} konumuna çıkar'
 FileTaskSource: 'Kaynak yol: {{ .path }}'
 FileTaskFormat: 'Arşiv biçimi: {{ .format }}'
 FileTaskRename: 'Hedef dosya adı: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "Mevcut {{ .current }} arka ucunda hâlâ 1Panel kuralları var. {{ .target }} arka ucuna geçmeden önce bunları temizleyin."
 ErrDockerIPv4ForwardingDisabled: "IPv4 yönlendirmesi devre dışı. Docker güvenlik duvarı arka ucunu kullanmadan önce net.ipv4.ip_forward=1 ayarını yapın."
 ErrFirewallRuleSavedApplyFailed: "Yeni kural yapılandırması kaydedildi, ancak güvenlik duvarına uygulanamadı. Eşitleme yaparak yeniden deneyin: {{ .detail }}"
+ErrFirewallRuleConflict: "UFW içinde aynı eşleşme koşullarına sahip, farklı bir eylem uygulayan bir kural zaten var. Mevcut kuralı düzenleyin."
+ErrForwardInterfaceNotFound: "Yönlendirme kuralında belirtilen {{ .name }} ağ arayüzü mevcut değil. Arayüz adını kontrol edip yeniden deneyin."
 
 ErrSSHPublicKey: "Geçerli bir SSH açık anahtarı girin"
 ErrSSHPrivateKey: "SSH özel anahtarı geçersiz veya parola yanlış; şifreli anahtarlar mevcut parolayı gerektirir"
 ErrSSHKeyMismatch: "SSH açık ve özel anahtarları eşleşmiyor"
+

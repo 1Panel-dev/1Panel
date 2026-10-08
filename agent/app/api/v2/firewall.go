@@ -4,11 +4,9 @@ import (
 	"errors"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"net/http"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
-	"github.com/1Panel-dev/1Panel/agent/app/repo"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
@@ -90,7 +88,7 @@ func (b *BaseApi) OperateFirewall(c *gin.Context) {
 // @Security Timestamp
 // @Router /hosts/firewall/forward/base [post]
 func (b *BaseApi) LoadForwardingBaseInfo(c *gin.Context) {
-	data, err := forwardingService.LoadBaseInfo()
+	data, err := forwardingService.LoadBaseInfo(c.Request.Context())
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -111,7 +109,7 @@ func (b *BaseApi) SearchForwardingRules(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	total, items, err := forwardingService.SearchRules(request)
+	total, items, err := forwardingService.SearchRules(c.Request.Context(), request)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -263,28 +261,6 @@ func (b *BaseApi) LoadFirewallNativeDetail(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Adopt an external firewall rule
-// @Accept json
-// @Param request body dto.FirewallRuleAdopt true "request"
-// @Success 200
-// @Failure 400 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/adopt [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"纳管防火墙规则","formatEN":"adopt firewall rule"}
-func (b *BaseApi) AdoptFirewallRule(c *gin.Context) {
-	var request dto.FirewallRuleAdopt
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	if err := firewallService.Adopt(c.Request.Context(), request); err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.Success(c)
-}
-
-// @Tags Firewall
 // @Summary Queue firewall rule creation
 // @Description Creation and import return a taskID immediately; validation and execution results are written to the task log.
 // @Accept json
@@ -310,68 +286,8 @@ func (b *BaseApi) CreateFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Preview firewall rule synchronization
-// @Accept json
-// @Param request body dto.FirewallRuleSyncRequest true "request"
-// @Success 200 {object} dto.FirewallRuleSyncPreview
-// @Failure 400 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/sync/preview [post]
-func (b *BaseApi) PreviewFirewallRuleSync(c *gin.Context) {
-	var request dto.FirewallRuleSyncRequest
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	result, err := firewallService.PreviewRuleSync(c.Request.Context(), c.ClientIP(), request)
-	if err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.SuccessWithData(c, result)
-}
-
-// @Tags Firewall
-// @Summary Load the currently executing firewall rule synchronization task
-// @Success 200 {object} dto.FirewallRuleSyncTask
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/sync/task [get]
-func (b *BaseApi) LoadFirewallRuleSyncTask(c *gin.Context) {
-	result, err := firewallService.CurrentRuleSyncTask()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
-	helper.SuccessWithData(c, result)
-}
-
-// @Tags Firewall
-// @Summary Synchronize firewall rules to a target backend
-// @Accept json
-// @Param request body dto.FirewallRuleSyncRequest true "request"
-// @Success 200 {object} dto.FirewallRuleSyncResult
-// @Failure 400 {object} dto.Response
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/rules/sync [post]
-// @x-panel-log {"bodyKeys":["subsystem","sourceProvider","targetProvider"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 [subsystem] 防火墙规则到 [targetProvider]","formatEN":"sync [subsystem] firewall rules to [targetProvider]"}
-func (b *BaseApi) SyncFirewallRules(c *gin.Context) {
-	var request dto.FirewallRuleSyncRequest
-	if err := helper.CheckBindAndValidate(&request, c); err != nil {
-		return
-	}
-	result, err := firewallService.SyncRules(c.Request.Context(), c.ClientIP(), request)
-	if err != nil {
-		handleFirewallRuleError(c, err)
-		return
-	}
-	helper.SuccessWithData(c, result)
-}
-
-// @Tags Firewall
 // @Summary Queue firewall rule deletion
-// @Description Deletes managed rules by UUID or unprotected before-chain rules by instance key. Returns a taskID immediately; results are written to the task log.
+// @Description Deletes non-whitelist rules by scope and instance key. Returns a taskID immediately; results are written to the task log.
 // @Accept json
 // @Param request body dto.FirewallRuleDelete true "request"
 // @Success 200 {object} dto.FirewallRuleDeleteResponse
@@ -394,7 +310,7 @@ func (b *BaseApi) DeleteFirewallRules(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Update a managed unified firewall v2 rule
+// @Summary Update a firewall rule
 // @Accept json
 // @Param request body dto.FirewallRuleUpdate true "request"
 // @Success 200
@@ -402,16 +318,13 @@ func (b *BaseApi) DeleteFirewallRules(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/update [post]
-// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙规则 [uuid]","formatEN":"update firewall rule [uuid]"}
+// @x-panel-log {"bodyKeys":["instanceKey"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙规则 [instanceKey]","formatEN":"update firewall rule [instanceKey]"}
 func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleUpdate
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	if !normalizeFirewallRuleUUID(c, &request.UUID) {
-		return
-	}
-	if err := firewallService.Update(c.Request.Context(), c.ClientIP(), request); err != nil {
+	if err := firewallService.Update(c.Request.Context(), request); err != nil {
 		handleFirewallRuleError(c, err)
 		return
 	}
@@ -419,7 +332,7 @@ func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 }
 
 // @Tags Firewall
-// @Summary Reorder a managed unified firewall v2 rule
+// @Summary Reorder a firewall rule
 // @Accept json
 // @Param request body dto.FirewallRuleReorder true "request"
 // @Success 200
@@ -427,33 +340,17 @@ func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/reorder [post]
-// @x-panel-log {"bodyKeys":["uuid"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序 [uuid]","formatEN":"reorder firewall rule [uuid]"}
+// @x-panel-log {"bodyKeys":["instanceKey"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序 [instanceKey]","formatEN":"reorder firewall rule [instanceKey]"}
 func (b *BaseApi) ReorderFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleReorder
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
 		return
 	}
-	if !normalizeFirewallRuleUUID(c, &request.UUID) {
-		return
-	}
-	if err := firewallService.Reorder(c.Request.Context(), c.ClientIP(), request); err != nil {
+	if err := firewallService.Reorder(c.Request.Context(), request); err != nil {
 		handleFirewallRuleError(c, err)
 		return
 	}
 	helper.Success(c)
-}
-
-func normalizeFirewallRuleUUID(c *gin.Context, value *string) bool {
-	if value == nil {
-		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
-		return false
-	}
-	*value = strings.TrimSpace(*value)
-	if *value == "" {
-		helper.BadRequest(c, repo.ErrFirewallPersistenceInvalid)
-		return false
-	}
-	return true
 }
 
 func handleFirewallRuleError(c *gin.Context, err error) {
@@ -464,21 +361,20 @@ func handleFirewallRuleError(c *gin.Context, err error) {
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_LOCKOUT_RISK", "ErrInvalidParams", err)
 	case errors.Is(err, filter.ErrRuleStale):
 		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_STALE", "ErrInvalidParams", err)
-	case errors.Is(err, repo.ErrFirewallRuleRevisionConflict):
-		helper.ErrorWithBusinessCode(c, http.StatusConflict, "FW_RULE_REVISION_CONFLICT", "ErrInvalidParams", err)
-	case isBusinessError && businessErr.Msg == "ErrFirewallRuleScopeChange":
-		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrFirewallRuleScopeChange", err)
 	case errors.Is(err, filter.ErrUnsupportedScope), errors.Is(err, filter.ErrInvalidScope),
 		errors.Is(err, filter.ErrProviderUnavailable), errors.Is(err, filter.ErrAdapterUnavailable):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_SCOPE_UNSUPPORTED", "ErrInvalidParams", err)
-	case errors.Is(err, filter.ErrInvalidRule), errors.Is(err, filter.ErrRuleOperation), errors.Is(err, filter.ErrRuleConflict),
-		errors.Is(err, repo.ErrFirewallPersistenceInvalid):
+	case errors.Is(err, filter.ErrInvalidRule), errors.Is(err, filter.ErrRuleOperation):
 		helper.ErrorWithBusinessCode(c, http.StatusBadRequest, "FW_RULE_UNSUPPORTED", "ErrInvalidParams", err)
+	case isBusinessError && businessErr.Msg == "ErrRecordExist":
+		c.JSON(http.StatusOK, dto.Response{Code: http.StatusConflict, ErrorCode: "FW_RULE_DUPLICATE", Message: err.Error()})
+		c.Abort()
+	case isBusinessError && businessErr.Msg == "ErrFirewallRuleConflict":
+		c.JSON(http.StatusOK, dto.Response{Code: http.StatusConflict, ErrorCode: "FW_RULE_CONFLICT", Message: err.Error()})
+		c.Abort()
 	case isBusinessError && businessErr.Msg == "ErrInvalidParams":
 		c.JSON(http.StatusOK, dto.Response{Code: http.StatusBadRequest, ErrorCode: "FW_RULE_UNSUPPORTED", Message: err.Error()})
 		c.Abort()
-	case errors.Is(err, filter.ErrVerificationFailed):
-		helper.ErrorWithBusinessCode(c, http.StatusInternalServerError, "FW_VERIFY_FAILED", "ErrInternalServer", err)
 	default:
 		helper.ErrorWithBusinessCode(c, http.StatusInternalServerError, "FW_APPLY_FAILED", "ErrInternalServer", err)
 	}
@@ -501,7 +397,7 @@ func (b *BaseApi) LoadFirewallSettings(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Create firewall port whitelist rules
-// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
+// @Description Saves whitelist configuration and applies missing allowances; existing rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistCreate true "request"
 // @Success 200
@@ -523,7 +419,7 @@ func (b *BaseApi) CreateFirewallPortWhitelist(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Update firewall port whitelist rules
-// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
+// @Description Saves whitelist configuration and applies missing allowances; existing rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistUpdate true "request"
 // @Success 200
@@ -545,7 +441,7 @@ func (b *BaseApi) UpdateFirewallPortWhitelist(c *gin.Context) {
 
 // @Tags Firewall
 // @Summary Delete firewall port whitelist rules
-// @Description Saves whitelist configuration only. Missing rules are added on startup, restart, initialization, or synchronization; existing rules are not removed.
+// @Description Removes whitelist configuration; existing firewall rules are not removed.
 // @Accept json
 // @Param request body dto.FirewallPortWhitelistDelete true "request"
 // @Success 200
@@ -620,21 +516,6 @@ func (b *BaseApi) ListDockerPublishedPorts(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, data)
-}
-
-// @Tags Firewall
-// @Summary Sync Docker port guard rules
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /hosts/firewall/docker/sync [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 Docker 端口防护规则","formatEN":"sync Docker port guard rules"}
-func (b *BaseApi) SyncDockerPortGuard(c *gin.Context) {
-	if err := dockerPortGuardService.Reconcile(c.Request.Context()); err != nil {
-		handleDockerPortGuardError(c, err)
-		return
-	}
-	helper.Success(c)
 }
 
 // @Tags Firewall
@@ -736,4 +617,64 @@ func handleDockerPortGuardError(c *gin.Context, err error) {
 		return
 	}
 	helper.ErrorWithBusinessCode(c, http.StatusInternalServerError, "FW_DOCKER_GUARD_FAILED", "ErrInternalServer", err)
+}
+
+// @Tags Firewall
+// @Summary List firewall rule backups
+// @Param subsystem query string false "Firewall subsystem" Enums(system,forwarding,docker) default(system)
+// @Success 200 {object} dto.FirewallRuleBackups
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/rules/backups [get]
+func (b *BaseApi) ListFirewallRuleBackups(c *gin.Context) {
+	result, err := firewallService.ListRuleBackups(c.Request.Context(), c.DefaultQuery("subsystem", "system"))
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Initialize, repair or bind one firewall address family
+// @Accept json
+// @Param request body dto.FirewallFamilyOperation true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/family/operate [post]
+// @x-panel-log {"bodyKeys":["subsystem","family","operation"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"[operation] [subsystem] [family] 防火墙链","formatEN":"[operation] [subsystem] [family] firewall chains"}
+func (b *BaseApi) OperateFirewallFamily(c *gin.Context) {
+	var request dto.FirewallFamilyOperation
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallSettingService.OperateFamily(request)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Tags Firewall
+// @Summary Update firewall IPv6 support
+// @Accept json
+// @Param request body dto.FirewallIPv6Operation true "request"
+// @Success 200 {object} dto.FilterChainOperationResponse
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /hosts/firewall/settings/ipv6 [post]
+// @x-panel-log {"bodyKeys":["status"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"设置防火墙 IPv6 支持为 [status]","formatEN":"Set firewall IPv6 support to [status]"}
+func (b *BaseApi) OperateFirewallIPv6(c *gin.Context) {
+	var request dto.FirewallIPv6Operation
+	if err := helper.CheckBindAndValidate(&request, c); err != nil {
+		return
+	}
+	result, err := firewallSettingService.OperateIPv6(request)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
 }

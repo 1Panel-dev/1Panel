@@ -6,8 +6,10 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net"
 	"net/netip"
 	"os"
+	"path/filepath"
 	"reflect"
 	"slices"
 	"sort"
@@ -38,7 +40,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	lifecycleproviders "github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle/providers"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
-	firewallsync "github.com/1Panel-dev/1Panel/agent/utils/firewall/sync"
 	containertypes "github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/client"
@@ -56,16 +57,6 @@ const fail2BanRestoreWithFirewallMarker = "/run/1panel_fail2ban_restore_with_fir
 
 type firewallLifecycleClient struct{ lifecycle.Client }
 
-type managedMutationRequest struct {
-	Stored           model.FirewallRule
-	Before           filter.FirewallRule
-	After            filter.FirewallRule
-	RuleSet          filter.RuleSet
-	Locator          filter.Locator
-	AdapterOperation filter.ChangeOperation
-	Runtime          filter.Adapter
-}
-
 type firewallDockerRestartError struct {
 	Err error
 }
@@ -75,48 +66,9 @@ type firewallCompletedOperationError struct {
 	Err       error
 }
 
-type firewallVerification struct {
-	RuleSet filter.RuleSet
-	Matched bool
-}
-
 type firewallRuleBatchItem struct {
 	snapshot filter.RuleSet
 	change   filter.RuleChange
-}
-
-type firewallSyncRule struct {
-	dto.FirewallRuleSyncItem
-	desired  filter.DesiredRule
-	observed *filter.ObservedRule
-	done     bool
-}
-
-type forwardingRuleSyncCandidate struct {
-	rule forwarding.Rule
-	err  error
-}
-
-type forwardingInventoryItem struct {
-	ID        uint
-	Rule      forwarding.Rule
-	IsDesired bool
-	IsRuntime bool
-}
-
-type observedInventoryCandidate struct {
-	rule        filter.ObservedRule
-	ruleKey     string
-	instanceKey string
-	claimed     bool
-}
-
-type firewallRuleCollisionIndex map[string][]filter.Action
-
-type firewallSyncDesired[T any] struct {
-	Value   T
-	Payload dto.FirewallRuleSyncItem
-	Err     error
 }
 
 func LoadPanelPort() string {
@@ -126,249 +78,6 @@ func LoadPanelPort() string {
 	var portSetting model.Setting
 	_ = global.CoreDB.Where("key = ?", "ServerPort").First(&portSetting).Error
 	return portSetting.Value
-}
-
-func (s *FirewallService) syncPortWhitelist(ctx context.Context, provider filter.Provider, ports []firewall.PortWhitelist) ([]filter.FirewallRule, error) {
-	required, err := firewall.RequiredPortWhitelist(ports)
-	if err != nil {
-		return nil, err
-	}
-	rules := whitelistRules(provider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
-	if provider != filter.ProviderIptables && provider != filter.ProviderNftables && len(rules) > 0 {
-		client, err := s.baseClient()
-		if err != nil {
-			return nil, err
-		}
-		active, err := client.Status()
-		if err != nil || !active {
-			return nil, err
-		}
-	}
-	client, err := s.firewallAdapter(provider)
-	if err != nil {
-		return nil, err
-	}
-	prepared := make([]dto.FirewallRuleCreateItem, 0, len(rules))
-	var failures []error
-	activeFamilies := make(map[filter.Family]bool)
-	for _, rule := range rules {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-		if provider == filter.ProviderIptables || provider == filter.ProviderNftables {
-			active, inspected := activeFamilies[rule.Scope.Family]
-			if !inspected {
-				initialized, bound, err := loadSystemFirewallFamilyStatus(string(provider), string(rule.Scope.Family))
-				if err != nil {
-					return nil, err
-				}
-				active = initialized && bound
-				activeFamilies[rule.Scope.Family] = active
-			}
-			if !active {
-				continue
-			}
-		}
-		port := firewall.SystemPort{Family: string(rule.Scope.Family), Port: rule.DestinationPort, Protocol: rule.Protocol, SourceAddress: rule.SourceAddress}
-		item, err := prepareFirewallCreateRule(ctx, client, dto.FirewallRuleCreateItem{
-			Rule: rule, SourceKind: constant.FirewallRuleSourceSecurity, SourceID: constant.FirewallSystemAcceptedPortSourcePrefix + firewall.SystemPortKey(firewall.SystemPort(port)),
-		})
-		if err != nil {
-			failures = append(failures, fmt.Errorf("prepare whitelist rule %s: %w", firewall.SystemPortKey(port), err))
-			continue
-		}
-		prepared = append(prepared, item)
-	}
-	if len(failures) > 0 {
-		return nil, errors.Join(failures...)
-	}
-	if len(prepared) == 0 {
-		return nil, nil
-	}
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-
-	scopes := make([]filter.Scope, 0, len(prepared))
-	for _, item := range prepared {
-		scopes = append(scopes, item.Rule.Scope)
-	}
-	snapshots, err := readMutableFirewallRuleScopes(client, ctx, scopes)
-	if err != nil {
-		return nil, err
-	}
-	byScope := make(map[string]filter.RuleSet, len(snapshots))
-	byScopeIdentity := make(map[string]firewallRuleCollisionIndex, len(snapshots))
-	for _, snapshot := range snapshots {
-		identities, err := observedFirewallRuleCollisionIndex(snapshot)
-		if err != nil {
-			return nil, err
-		}
-		byScope[snapshot.Scope.Key()] = snapshot
-		byScopeIdentity[snapshot.Scope.Key()] = identities
-	}
-	var byMatch map[string][]filter.DesiredRule
-	type whitelistBatch struct {
-		snapshot filter.RuleSet
-		changes  []filter.RuleChange
-		records  []*model.FirewallRule
-	}
-	batches := make([]whitelistBatch, 0)
-	batchByScope := make(map[string]int)
-	for _, item := range prepared {
-		if err := ctx.Err(); err != nil {
-			return nil, err
-		}
-		rule := item.Rule
-		scope := rule.Scope
-		identities := byScopeIdentity[scope.Key()]
-		if err := identities.CheckDuplicate(rule); errors.Is(err, filter.ErrRuleOperation) {
-			continue
-		} else if err != nil {
-			return nil, err
-		}
-		if err := identities.Check(rule); err != nil {
-			return nil, err
-		}
-		key, err := filter.RuleMatchKey(rule)
-		if err != nil {
-			return nil, err
-		}
-		if byMatch == nil {
-			stored, err := s.rules.List(ctx)
-			if err != nil {
-				return nil, err
-			}
-			byMatch = make(map[string][]filter.DesiredRule)
-			for _, record := range stored {
-				rules, err := compileStoredFirewallRules(ctx, record, client)
-				if isFirewallPolicyIncompatible(err) {
-					continue
-				}
-				if err != nil {
-					return nil, err
-				}
-				for _, candidate := range rules {
-					key, err := filter.RuleMatchKey(candidate.Rule)
-					if err != nil {
-						return nil, err
-					}
-					byMatch[key] = append(byMatch[key], candidate)
-				}
-			}
-		}
-		var existing *filter.DesiredRule
-		for _, candidate := range byMatch[key] {
-			if collision := checkCollisionActions(rule.Action, candidate.Rule.Action); errors.Is(collision, filter.ErrRuleOperation) {
-				existing = &candidate
-			} else if collision != nil {
-				return nil, collision
-			}
-		}
-		var record *model.FirewallRule
-		if existing != nil && scope.Chain != filter.BasicBeforeChain {
-			rule = existing.Rule
-		} else {
-			rule.UUID = uuid.NewString()
-			if scope.Chain != filter.BasicBeforeChain {
-				created, err := firewallRuleModelForCreate(rule, item, constant.FirewallRuleOriginCreated)
-				if err != nil {
-					return nil, err
-				}
-				created.UUID = rule.UUID
-				record = &created
-			}
-		}
-		if provider != filter.ProviderFirewalld {
-			position := int64(1)
-			rule.OrderIndex = &position
-		}
-		index, exists := batchByScope[scope.Key()]
-		if !exists || provider != filter.ProviderIptables && provider != filter.ProviderNftables {
-			index = len(batches)
-			batchByScope[scope.Key()] = index
-			batches = append(batches, whitelistBatch{snapshot: byScope[scope.Key()]})
-		}
-		batches[index].changes = append(batches[index].changes, filter.RuleChange{Operation: filter.ChangeCreate, After: &rule, CommandOnly: true})
-		batches[index].records = append(batches[index].records, record)
-		if err := identities.Add(rule); err != nil {
-			return nil, err
-		}
-	}
-	saveRecords := func(batch whitelistBatch) {
-		saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-		for _, record := range batch.records {
-			if record == nil {
-				continue
-			}
-			if err := s.saveFirewallRule(saveCtx, record); err != nil {
-				failures = append(failures, err)
-				if global.LOG != nil {
-					global.LOG.Errorf("save firewall whitelist rule %s failed: %v", record.UUID, err)
-				}
-			}
-		}
-		cancel()
-	}
-	_, savesRules := client.(filter.RuleSaver)
-	plans := make([]filter.CommandBatch, 0, len(batches))
-	completed := make([]int, 0, len(batches))
-	for batchIndex, batch := range batches {
-		if err := ctx.Err(); err != nil {
-			failures = append(failures, err)
-			break
-		}
-		commands, err := client.BuildCommands(batch.snapshot, batch.changes)
-		commands.CommandOnly = true
-		if err == nil {
-			err = client.RunCommands(ctx, commands)
-		}
-		if err != nil {
-			failures = append(failures, err)
-			if global.LOG != nil {
-				global.LOG.Errorf("create firewall whitelist rules for %s failed: %v", batch.snapshot.Scope.Key(), err)
-			}
-			continue
-		}
-		verification := filter.CommandBatch{Provider: commands.Provider, Scope: commands.Scope}
-		for _, command := range commands.Rules {
-			expected := command.Expected
-			expected.Locator.Position = nil
-			verification.Rules = append(verification.Rules, filter.RuleCommands{Operation: filter.ChangeCreate, Expected: expected})
-		}
-		plans = append(plans, verification)
-		completed = append(completed, batchIndex)
-		if !savesRules {
-			saveRecords(batch)
-		}
-	}
-	persistenceErrors := persistFirewallRuleBatches(ctx, client, plans)
-	for index, batchIndex := range completed {
-		if err := persistenceErrors[index]; err != nil {
-			failures = append(failures, err)
-			continue
-		}
-		if savesRules {
-			saveRecords(batches[batchIndex])
-		}
-	}
-
-	verification, err := verifyFirewallCommands(ctx, client, plans...)
-	if err != nil {
-		return nil, errors.Join(append(failures, err)...)
-	}
-	if !verification.Matched {
-		return nil, errors.Join(append(failures, filter.ErrVerificationFailed)...)
-	}
-	created := make([]filter.FirewallRule, 0)
-	for index, plan := range plans {
-		if persistenceErrors[index] != nil {
-			continue
-		}
-		for _, command := range plan.Rules {
-			created = append(created, command.Expected.Rule)
-		}
-	}
-	return created, errors.Join(failures...)
 }
 
 func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, serviceType string, ports []string) error {
@@ -390,9 +99,17 @@ func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, s
 		servicePorts = append(servicePorts, entries[index])
 	}
 	if len(servicePorts) == 0 {
+		families, err := loadFirewallFamilies()
+		if err != nil {
+			return err
+		}
+		sources := []string{"0.0.0.0/0"}
+		if slices.Contains(families, constant.FirewallFamilyIPv6) {
+			sources = append(sources, "::/0")
+		}
 		servicePorts = append(servicePorts, firewall.PortWhitelist{
 			Type: serviceType, Port: ports[0], Protocol: "tcp",
-			Sources: []string{"0.0.0.0/0", "::/0"},
+			Sources: sources,
 		})
 		entries = append(entries, servicePorts...)
 	}
@@ -404,7 +121,7 @@ func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, s
 	if err != nil {
 		return err
 	}
-	client, err := s.baseClient()
+	_, err = s.baseClient()
 	if err != nil && !errors.Is(err, lifecycle.ErrNotInstalled) {
 		return err
 	}
@@ -416,23 +133,32 @@ func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, s
 				allowances = append(allowances, rule)
 			}
 		}
-		if _, err := s.syncPortWhitelist(ctx, filter.Provider(client.Name()), allowances); err != nil {
+		if err := s.applyPortWhitelist(ctx, allowances, nil); err != nil {
 			return err
 		}
 	}
 	return settingRepo.UpdateOrCreate(constant.FirewallPortWhiteList, string(value))
 }
 
-func loadPortWhitelistSetting(db *gorm.DB) ([]firewall.PortWhitelist, error) {
-	var setting model.Setting
-	if err := db.Where("key = ?", constant.FirewallPortWhiteList).First(&setting).Error; errors.Is(err, gorm.ErrRecordNotFound) {
+func loadPortWhitelistSetting() ([]firewall.PortWhitelist, error) {
+	setting, err := settingRepo.Get(settingRepo.WithByKey(constant.FirewallPortWhiteList))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
 		setting.Value = constant.FirewallPortWhiteListValue
 	} else if err != nil {
 		return nil, err
 	}
 	var rules []firewall.PortWhitelist
-	err := json.Unmarshal([]byte(setting.Value), &rules)
-	return rules, err
+	if err = json.Unmarshal([]byte(setting.Value), &rules); err != nil {
+		return nil, err
+	}
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return nil, err
+	}
+	if !slices.Contains(families, constant.FirewallFamilyIPv6) {
+		rules = ipv4PortWhitelist(rules)
+	}
+	return rules, nil
 }
 
 func NewSelectedSystemFirewallClient() (lifecycle.Client, error) {
@@ -449,6 +175,13 @@ func NewSelectedSystemFirewallClient() (lifecycle.Client, error) {
 }
 
 func loadFirewallInitStatus(provider, tab string) (bool, bool, error) {
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return false, false, err
+	}
+	if tab == "base" && len(families) == 1 {
+		return loadSystemFirewallFamilyStatus(provider, constant.FirewallFamilyIPv4)
+	}
 	switch provider {
 	case constant.FirewallProviderNftables:
 		return nftables_helper.LoadInitStatus(tab)
@@ -459,18 +192,20 @@ func loadFirewallInitStatus(provider, tab string) (bool, bool, error) {
 	}
 }
 
-func loadSystemFirewallOverview(provider, chainGroup string) (dto.FirewallSubsystemStatus, error) {
-	var status dto.FirewallSubsystemStatus
+func loadSystemFirewallOverview(provider, chainGroup string, families []string) (dto.FirewallSubsystemStatus, error) {
+	status := dto.FirewallSubsystemStatus{IPv6Enabled: len(families) > 1}
 	var ipv4Err, ipv6Err error
 	status.IPv4, ipv4Err = loadSystemFirewallFamilyInfo(provider, constant.FirewallFamilyIPv4)
-	status.IPv6, ipv6Err = loadSystemFirewallFamilyInfo(provider, constant.FirewallFamilyIPv6)
+	if status.IPv6Enabled {
+		status.IPv6, ipv6Err = loadSystemFirewallFamilyInfo(provider, constant.FirewallFamilyIPv6)
+	}
 	if chainGroup != "base" {
 		return status, nil
 	}
 	if ipv4Err != nil {
 		return status, ipv4Err
 	}
-	if provider == constant.FirewallProviderIptables {
+	if provider == constant.FirewallProviderIptables || !status.IPv6Enabled {
 		status.IsInit, status.IsBind = status.IPv4.Initialized, status.IPv4.Bound
 		return status, nil
 	}
@@ -497,9 +232,16 @@ func loadSystemFirewallFamilyInfo(provider, family string) (dto.FirewallBackendF
 			return dto.FirewallBackendFamilyStatus{Reason: dockerfirewall.ReasonCommandMissing}, nil
 		}
 	}
-	initialized, bound, err := loadSystemFirewallFamilyStatus(provider, family)
+	var initialized, bound, partial bool
+	var err error
+	if provider == constant.FirewallProviderIptables {
+		initialized, bound, partial, err = iptables_helper.LoadFamilyState(family, "base")
+	} else {
+		initialized, bound, partial, err = nftables_helper.LoadFamilyState(filter.Family(family))
+	}
 	return dto.FirewallBackendFamilyStatus{
 		Available:   err == nil,
+		Partial:     partial,
 		Initialized: initialized,
 		Bound:       bound,
 	}, err
@@ -514,131 +256,6 @@ func loadSystemFirewallFamilyStatus(provider, family string) (bool, bool, error)
 	default:
 		return false, false, fmt.Errorf("unsupported firewall provider %q", provider)
 	}
-}
-
-func (s *FirewallService) updateRuleOrder(ctx context.Context, ruleUUID string, targetPosition *int64, priority *int, description *string) error {
-	if (targetPosition == nil) == (priority == nil) {
-		return fmt.Errorf("%w: provide either position or priority", filter.ErrInvalidRule)
-	}
-	if ruleUUID == "" {
-		return fmt.Errorf("%w: rule UUID is required", repo.ErrFirewallPersistenceInvalid)
-	}
-	stored, before, runtime, err := s.loadManagedRule(ctx, ruleUUID)
-	if err != nil {
-		return err
-	}
-	var snapshot filter.RuleSet
-	var observed filter.ObservedRule
-	if runtime.Provider() == filter.ProviderNftables {
-		snapshot, err = readMutableFirewallRules(runtime, ctx, before.Rule.Scope)
-		if err != nil {
-			return err
-		}
-		observed, err = managedFirewallObserved(snapshot, before)
-		if err != nil {
-			return err
-		}
-	}
-	capabilities, err := runtime.Capabilities(ctx)
-	if err != nil {
-		return err
-	}
-	after := before.Rule
-	adapterOperation := filter.ChangeReorder
-	switch {
-	case capabilities.ExplicitPosition || capabilities.OwnedChains:
-		if targetPosition == nil || *targetPosition < 1 {
-			return fmt.Errorf("%w: target position is required", filter.ErrInvalidRule)
-		}
-		if runtime.Provider() == filter.ProviderNftables {
-			if err := validateFirewallRulePosition(snapshot, before.Rule, *targetPosition); err != nil {
-				return err
-			}
-		}
-		after.OrderIndex = targetPosition
-	case capabilities.ExplicitPriority:
-		if before.Rule.NativeKind != filter.NativeKindRichRule {
-			return fmt.Errorf("%w: only rich rules support explicit priority", filter.ErrUnsupportedScope)
-		}
-		if priority == nil {
-			return fmt.Errorf("%w: priority is required", filter.ErrInvalidRule)
-		}
-		after.Priority = priority
-		adapterOperation = filter.ChangeUpdate
-	default:
-		return fmt.Errorf("%w: provider does not support rule reordering", filter.ErrUnsupportedScope)
-	}
-	if description != nil {
-		after.Description = strings.TrimSpace(*description)
-	}
-	after, err = prepareFirewallBackendRule(ctx, runtime, after)
-	if err != nil {
-		return err
-	}
-	metadataOnly, err := isFirewallMetadataOnlyUpdate(before.Rule, after, observed.Locator)
-	if err != nil {
-		return err
-	}
-	if metadataOnly {
-		return s.updateRuleDescription(ctx, stored.UUID, after.Description)
-	}
-	if runtime.Provider() != filter.ProviderNftables {
-		return s.replaceManagedRule(ctx, preparedManagedUpdate{Stored: stored, Before: before, After: after, Runtime: runtime})
-	}
-	if err := filter.GuardMutation(observed); err != nil {
-		return err
-	}
-	return s.executeManagedMutation(ctx, managedMutationRequest{
-		Stored: stored, Before: before.Rule, After: after, RuleSet: snapshot, Locator: observed.Locator,
-		AdapterOperation: adapterOperation, Runtime: runtime,
-	})
-}
-
-func (s *FirewallService) loadManagedRule(ctx context.Context, ruleUUID string) (model.FirewallRule, filter.DesiredRule, filter.Adapter, error) {
-	stored, err := s.rules.GetByUUID(ctx, ruleUUID)
-	if err != nil {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil, err
-	}
-	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil,
-			fmt.Errorf("%w: only created or adopted rules can be changed", filter.ErrInvalidRule)
-	}
-	selected, err := s.selectedProviderForStoredRule(ctx, stored)
-	if err != nil {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil, err
-	}
-	if err := checkFirewallRuleWhitelistProtection(selected, stored); err != nil {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil, err
-	}
-	runtime, err := s.resolveRuntime(ctx, selected)
-	if err != nil {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil, err
-	}
-	desiredRules, err := compileStoredFirewallRules(ctx, stored, runtime)
-	if err != nil {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil, err
-	}
-	if len(desiredRules) != 1 {
-		return model.FirewallRule{}, filter.DesiredRule{}, nil,
-			fmt.Errorf("%w: policy %q expands to %d target rules and cannot be edited atomically", filter.ErrUnsupportedScope, ruleUUID, len(desiredRules))
-	}
-	return stored, desiredRules[0], runtime, nil
-}
-
-func (s *FirewallService) selectedProviderForStoredRule(ctx context.Context, _ model.FirewallRule) (filter.Provider, error) {
-	if s.selectedProvider != nil {
-		return s.selectedProvider(ctx)
-	}
-	if s.adapters != nil {
-		providers := make([]filter.Provider, 0, len(s.adapters))
-		for provider := range s.adapters {
-			providers = append(providers, provider)
-		}
-		if len(providers) == 1 {
-			return providers[0], nil
-		}
-	}
-	return "", fmt.Errorf("%w: selected provider is unavailable", filter.ErrProviderUnavailable)
 }
 
 func (s *FirewallService) resolveRuntime(ctx context.Context, provider filter.Provider) (filter.Adapter, error) {
@@ -675,135 +292,12 @@ func (s *FirewallService) firewallAdapter(provider filter.Provider) (filter.Adap
 	}
 }
 
-func checkFirewallRuleWhitelistProtection(provider filter.Provider, record model.FirewallRule) error {
-	ports, err := loadFirewallPortWhiteList()
-	if err != nil {
-		return err
-	}
-	rules, err := expandStoredFirewallRule(record, provider)
-	if err != nil {
-		return err
-	}
-	whitelist := filter.NewPortWhitelistIndex(ports)
-	for _, rule := range rules {
-		if whitelist.Matches(rule) {
-			return filter.ErrProtectedRule
-		}
-	}
-	return nil
-}
-
 func loadFirewallPortWhiteList() ([]firewall.PortWhitelist, error) {
-	ports, err := loadPortWhitelistSetting(global.DB)
+	ports, err := loadPortWhitelistSetting()
 	if err != nil {
 		return nil, err
 	}
 	return firewall.ValidatePortWhitelist(ports)
-}
-
-func expandStoredFirewallRule(rule model.FirewallRule, provider filter.Provider) ([]filter.FirewallRule, error) {
-	if rule.CompatibilityError != "" {
-		return nil, fmt.Errorf("%w: %s", filter.ErrUnsupportedScope, rule.CompatibilityError)
-	}
-	connectionStates := make([]string, 0)
-	if rule.ConnectionStates != "" {
-		connectionStates = strings.Split(rule.ConnectionStates, ",")
-	}
-	base := filter.FirewallRule{
-		Protocol: rule.Protocol, SourceAddress: rule.SourceAddress, SourcePort: rule.SourcePort,
-		DestinationAddress: rule.DestinationAddress, DestinationPort: rule.DestinationPort,
-		Interface: rule.Interface, ConnectionStates: connectionStates,
-		Action: filter.Action(rule.Action), Description: rule.Description,
-	}
-	if provider != filter.ProviderUFW && strings.EqualFold(strings.TrimSpace(base.Protocol), "all") &&
-		strings.TrimSpace(base.SourcePort) == "" && strings.TrimSpace(base.DestinationPort) != "" {
-		base.Protocol = "tcp/udp"
-	}
-	if provider == filter.ProviderFirewalld {
-		base.Priority = rule.Priority
-	}
-	families := []filter.Family{filter.Family(rule.Family)}
-	if provider != filter.ProviderFirewalld && families[0] == filter.FamilyInet {
-		hasIPv4, hasIPv6 := false, false
-		for _, address := range []string{base.SourceAddress, base.DestinationAddress} {
-			address = strings.TrimSpace(address)
-			if address == "" {
-				continue
-			}
-			if strings.Contains(address, ":") {
-				hasIPv6 = true
-			} else {
-				hasIPv4 = true
-			}
-		}
-		switch {
-		case hasIPv4 && hasIPv6:
-			return nil, fmt.Errorf("%w: inet policy contains both IPv4 and IPv6 addresses", filter.ErrUnsupportedScope)
-		case hasIPv6 || strings.EqualFold(base.Protocol, "icmpv6"):
-			families = []filter.Family{filter.FamilyIPv6}
-		case hasIPv4:
-			families = []filter.Family{filter.FamilyIPv4}
-		default:
-			families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
-		}
-	}
-	result := make([]filter.FirewallRule, 0, len(families))
-	for _, family := range families {
-		compiled := base
-		compiled.Scope = filter.Scope{Provider: provider, Family: family, Direction: filter.DirectionInput}
-		switch provider {
-		case filter.ProviderIptables, filter.ProviderNftables:
-			compiled.Scope.Table, compiled.Scope.Chain = "filter", filter.IptablesInputChain
-		case filter.ProviderFirewalld:
-			compiled.Scope.Zone = filter.FirewalldInputZone
-		case filter.ProviderUFW:
-			compiled.Scope.Chain = filter.UFWInputChain
-		default:
-			return nil, fmt.Errorf("%w: unsupported firewall provider %q", filter.ErrProviderUnavailable, provider)
-		}
-		expanded, err := filter.ExpandAtomicRules(compiled)
-		if err != nil {
-			return nil, err
-		}
-		result = append(result, expanded...)
-	}
-	return result, nil
-}
-
-func compileStoredFirewallRules(ctx context.Context, stored model.FirewallRule, client filter.Adapter) ([]filter.DesiredRule, error) {
-	rules, err := expandStoredFirewallRule(stored, client.Provider())
-	if err != nil {
-		return nil, err
-	}
-	capabilities, err := client.Capabilities(ctx)
-	if err != nil {
-		return nil, err
-	}
-	result := make([]filter.DesiredRule, 0, len(rules))
-	for ordinal, rule := range rules {
-		prepared, err := prepareFirewallBackendRule(ctx, client, rule)
-		if err != nil {
-			return nil, err
-		}
-		ruleKey, err := filter.RuleKey(prepared)
-		if err != nil {
-			return nil, err
-		}
-		prepared.UUID = stored.UUID
-		if ordinal > 0 {
-			suffix := ruleKey
-			if len(suffix) > 12 {
-				suffix = suffix[:12]
-			}
-			prepared.UUID = fmt.Sprintf("%s-%d-%s", stored.UUID, ordinal+1, suffix)
-		}
-		desired := filter.DesiredRule{UUID: stored.UUID, Rule: prepared, RuleKey: ruleKey, Origin: filter.RuleOrigin(stored.Origin)}
-		if capabilities.Marker {
-			desired.Marker = "1panel-rule:" + prepared.UUID
-		}
-		result = append(result, desired)
-	}
-	return result, nil
 }
 
 func prepareFirewallBackendRule(ctx context.Context, client filter.Adapter, rule filter.FirewallRule) (filter.FirewallRule, error) {
@@ -823,11 +317,17 @@ func prepareFirewallBackendRule(ctx context.Context, client filter.Adapter, rule
 }
 
 func readMutableFirewallRules(client filter.Adapter, ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
-	snapshots, err := readMutableFirewallRuleScopes(client, ctx, []filter.Scope{scope})
+	snapshots, err := listFirewallRuleScopes(client, ctx, []filter.Scope{scope})
 	if err != nil {
 		return filter.RuleSet{}, err
 	}
-	return snapshots[0], nil
+	snapshot := snapshots[0]
+	for _, notice := range snapshot.Notices {
+		if notice.Code == filter.ScopeNoticeManagedScopeInactive || notice.Code == filter.ScopeNoticeManagedScopeMissing {
+			return filter.RuleSet{}, fmt.Errorf("%w: managed firewall scope is unavailable", filter.ErrProviderUnavailable)
+		}
+	}
+	return snapshot, nil
 }
 
 func firewallScopeReadGroups(scopes []filter.Scope) [][]filter.Scope {
@@ -889,277 +389,18 @@ func listFirewallRuleScopes(client filter.Adapter, ctx context.Context, scopes [
 	return snapshots, nil
 }
 
-func readMutableFirewallRuleScopes(client filter.Adapter, ctx context.Context, scopes []filter.Scope) ([]filter.RuleSet, error) {
-	snapshots, err := readFirewallRuleScopes(client, ctx, scopes)
-	if err != nil {
-		return nil, err
-	}
-	for _, snapshot := range snapshots {
-		for _, notice := range snapshot.Notices {
-			if notice.Code == filter.ScopeNoticeManagedScopeInactive || notice.Code == filter.ScopeNoticeManagedScopeMissing {
-				return nil, fmt.Errorf("%w: managed firewall scope is unavailable", filter.ErrProviderUnavailable)
-			}
-		}
-	}
-	return snapshots, nil
-}
-
-func readFirewallRules(client filter.Adapter, ctx context.Context, scope filter.Scope) (filter.RuleSet, error) {
-	snapshot, err := client.ListRules(ctx, scope)
-	if err != nil {
-		return filter.RuleSet{}, err
-	}
-	ports, err := loadFirewallPortWhiteList()
-	if err != nil {
-		return filter.RuleSet{}, err
-	}
-	return filter.ProtectRuleSet(snapshot, ports)
-}
-
-func firewallRulesByMarker(rules []filter.ObservedRule) map[string][]filter.ObservedRule {
-	index := make(map[string][]filter.ObservedRule)
-	for _, rule := range rules {
-		if rule.Marker != "" {
-			index[rule.Marker] = append(index[rule.Marker], rule)
-		}
-	}
-	return index
-}
-
-func managedFirewallObserved(snapshot filter.RuleSet, desired filter.DesiredRule) (filter.ObservedRule, error) {
-	matches := make([]filter.ObservedRule, 0, 1)
-	for _, observed := range snapshot.Rules {
-		if desired.Marker != "" {
-			if observed.Marker != desired.Marker {
-				continue
-			}
-		} else if desired.ObservedInstanceKey != "" {
-			key, err := filter.InstanceKey(observed)
-			if err != nil || key != desired.ObservedInstanceKey {
-				continue
-			}
-		} else {
-			key, err := firewallInventoryRuleKey(observed.Rule)
-			wanted, wantErr := firewallInventoryRuleKey(desired.Rule)
-			if err != nil || wantErr != nil || key != wanted {
-				continue
-			}
-		}
-		matches = append(matches, observed)
-	}
-	if len(matches) != 1 {
-		return filter.ObservedRule{}, filter.ErrRuleStale
-	}
-	observed := matches[0]
-	if observed.Protected || desired.Protected {
-		return filter.ObservedRule{}, filter.ErrProtectedRule
-	}
-	if observed.Rule.Scope.Provider != filter.ProviderFirewalld && observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged {
-		return filter.ObservedRule{}, filter.ErrRuleStale
-	}
-	if desired.Marker != "" && observed.ParseStatus == filter.ParseStatusOpaque {
-		position := observed.Rule.OrderIndex
-		observed.Rule = desired.Rule
-		observed.Rule.OrderIndex = position
-		observed.ParseStatus = filter.ParseStatusSupported
-		observed.UncertainFields = nil
-	} else {
-		expected := desired.Rule
-		if expected.Scope.Provider == filter.ProviderFirewalld {
-			expected.Priority = observed.Rule.Priority
-			expected.NativeKind = observed.Rule.NativeKind
-			expected.OrderBucket = observed.Rule.OrderBucket
-		}
-		if !filter.ObservedRuleMatchesExpected(observed, expected) {
-			return filter.ObservedRule{}, filter.ErrRuleStale
-		}
-	}
-	return observed, nil
-}
-
-func (s *FirewallService) updateRuleDescription(ctx context.Context, ruleUUID, description string) error {
-	stored, err := s.rules.GetByUUID(ctx, ruleUUID)
-	if err != nil {
-		return err
-	}
-	selected, err := s.selectedProviderForStoredRule(ctx, stored)
-	if err != nil {
-		return err
-	}
-	if err := checkFirewallRuleWhitelistProtection(selected, stored); err != nil {
-		return err
-	}
-	if stored.Origin != constant.FirewallRuleOriginCreated && stored.Origin != constant.FirewallRuleOriginAdopted {
-		return fmt.Errorf("%w: only created or adopted rules can be changed", filter.ErrInvalidRule)
-	}
-	description = strings.TrimSpace(description)
-	if stored.Description == description {
-		return nil
-	}
-	return s.rules.UpdateWithRevision(ctx, stored.UUID, stored.Revision, map[string]interface{}{"description": description})
-}
-
-func (s *FirewallService) replaceManagedRule(ctx context.Context, prepared preparedManagedUpdate) error {
-	runtime := prepared.Runtime
-	snapshot := filter.RuleSet{Scope: prepared.Before.Rule.Scope}
-	remove, err := runtime.BuildCommands(snapshot, []filter.RuleChange{{
-		Operation: filter.ChangeDelete, Before: &prepared.Before.Rule, CommandOnly: true,
-	}})
-	if err != nil {
-		return err
-	}
-	create, err := runtime.BuildCommands(snapshot, []filter.RuleChange{{
-		Operation: filter.ChangeCreate, After: &prepared.After, CommandOnly: true, Append: prepared.After.OrderIndex == nil,
-	}})
-	if err != nil {
-		return err
-	}
-	updates, err := firewallRuleSemanticUpdates(prepared.After)
-	if err != nil {
-		return err
-	}
-	if runtime.Provider() == filter.ProviderFirewalld {
-		updates["priority"] = prepared.After.Priority
-	}
-	remove.CommandOnly, create.CommandOnly = true, true
-	if err := runtime.RunCommands(ctx, remove); err != nil {
-		return err
-	}
-	saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-	err = s.rules.UpdateWithRevision(saveCtx, prepared.Stored.UUID, prepared.Stored.Revision, updates)
-	cancel()
-	if err != nil {
-		return err
-	}
-	runErr := runtime.RunCommands(ctx, create)
-	if err := errors.Join(runErr, persistFirewallRules(ctx, runtime, create)); err != nil {
-		return buserr.WithDetail("ErrFirewallRuleSavedApplyFailed", err.Error(), err)
-	}
-	return nil
-}
-
-func (s *FirewallService) executeManagedMutation(ctx context.Context, request managedMutationRequest) (err error) {
-	defer func() {
-		if err != nil && global.LOG != nil {
-			global.LOG.Errorf("update firewall rule %s failed: %v", request.Stored.UUID, err)
-		}
-	}()
-	before, after := request.Before, request.After
-	appendRule := after.Scope.Provider == filter.ProviderUFW && after.OrderIndex != nil && *after.OrderIndex == maxObservedFirewallPosition(request.RuleSet)
-	backendPlan, err := request.Runtime.BuildCommands(request.RuleSet, []filter.RuleChange{{
-		Operation: request.AdapterOperation, Before: &before, After: &after,
-		Locator: &request.Locator, Append: appendRule, CommandOnly: true,
-	}})
-	if err != nil {
-		return err
-	}
-	backendPlan.CommandOnly = true
-	updates, err := firewallRuleSemanticUpdates(request.After)
-	if err != nil {
-		return err
-	}
-	if len(backendPlan.Rules) == 1 && len(backendPlan.Rules[0].Commands) == 2 {
-		commands := backendPlan.Rules[0]
-		backendPlan.Rules[0].Commands = commands.Commands[:1]
-		backendPlan.Rules[0].RollbackCommands = commands.RollbackCommands[:1]
-		if err := request.Runtime.RunCommands(ctx, backendPlan); err != nil {
-			return err
-		}
-		if after.Scope.Provider == filter.ProviderFirewalld {
-			updates["priority"] = after.Priority
-		}
-		saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-		err = s.rules.UpdateWithRevision(saveCtx, request.Stored.UUID, request.Stored.Revision, updates)
-		cancel()
-		if err != nil {
-			return err
-		}
-		backendPlan.Rules[0].Commands = commands.Commands[1:]
-		backendPlan.Rules[0].RollbackCommands = commands.RollbackCommands[1:]
-		runErr := request.Runtime.RunCommands(ctx, backendPlan)
-		if err := errors.Join(runErr, persistFirewallRules(ctx, request.Runtime, backendPlan)); err != nil {
-			return buserr.WithDetail("ErrFirewallRuleSavedApplyFailed", err.Error(), err)
-		}
-		return nil
-	}
-	runErr := request.Runtime.RunCommands(ctx, backendPlan)
-	if runErr != nil && request.Runtime.Provider() != filter.ProviderFirewalld {
-		return runErr
-	}
-	if err := errors.Join(runErr, persistFirewallRules(ctx, request.Runtime, backendPlan)); err != nil {
-		return err
-	}
-	sameContent, err := filter.SameRuleContent(request.Before, request.After)
-	if err != nil {
-		return err
-	}
-	if sameContent && request.Stored.Description == request.After.Description {
-		return nil
-	}
-	return s.rules.UpdateWithRevision(ctx, request.Stored.UUID, request.Stored.Revision, updates)
-}
-
-func isFirewallPolicyIncompatible(err error) bool {
-	return errors.Is(err, filter.ErrInvalidRule) || errors.Is(err, filter.ErrUnsupportedScope) ||
-		errors.Is(err, filter.ErrInvalidScope) || errors.Is(err, filter.ErrCompositeRule)
-}
-
-func maxObservedFirewallPosition(snapshot filter.RuleSet) int64 {
-	maximum := int64(snapshot.LastPosition)
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Position != nil && int64(*observed.Locator.Position) > maximum {
-			maximum = int64(*observed.Locator.Position)
-		}
-	}
-	return maximum
-}
-
-func applyFirewallChanges(client filter.Adapter, ctx context.Context, snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, firewallVerification, error) {
+func applyFirewallChanges(client filter.Adapter, ctx context.Context, snapshot filter.RuleSet, changes []filter.RuleChange) (filter.CommandBatch, error) {
 	plan, err := client.BuildCommands(snapshot, changes)
 	if err != nil {
-		return filter.CommandBatch{}, firewallVerification{}, err
+		return filter.CommandBatch{}, err
 	}
-	err = client.RunCommands(ctx, plan)
-	if err == nil {
-		err = persistFirewallRules(ctx, client, plan)
+	if err := client.RunCommands(ctx, plan); err != nil {
+		return plan, err
 	}
-	if err != nil {
-		return plan, firewallVerification{}, err
+	if saver, ok := client.(filter.RuleSaver); ok {
+		return plan, saver.SaveRules(ctx, plan.Scope)
 	}
-	verification, err := verifyFirewallCommands(ctx, client, plan)
-	if plan.Provider == filter.ProviderUFW && len(plan.Rules) == 1 && plan.Rules[0].Operation == filter.ChangeAdopt && (err != nil || !verification.Matched) {
-		if err == nil {
-			err = filter.ErrVerificationFailed
-		}
-		err = buserr.WithDetail("ErrUFWRuleAdopt", err.Error(), err)
-	}
-	if err != nil {
-		if plan.CreatesOnly() {
-			return plan, verification, err
-		}
-		return plan, verification, rollbackFirewallPlan(ctx, client, plan, err)
-	}
-	if !verification.Matched && !plan.CreatesOnly() {
-		if rollbackErr := restoreFirewallCommands(client, ctx, plan); rollbackErr != nil {
-			return plan, verification, errors.Join(filter.ErrVerificationFailed, rollbackErr)
-		}
-	}
-	return plan, verification, nil
-}
-
-func persistFirewallRules(ctx context.Context, client filter.Adapter, commands filter.CommandBatch) error {
-	saver, ok := client.(filter.RuleSaver)
-	if !ok {
-		return nil
-	}
-	err := saver.SaveRules(ctx, commands.Scope)
-	if err == nil || commands.CreatesOnly() || commands.CommandOnly {
-		return err
-	}
-	if rollbackErr := restoreFirewallCommands(client, ctx, commands); rollbackErr != nil {
-		return errors.Join(err, rollbackErr)
-	}
-	return err
+	return plan, nil
 }
 
 func persistFirewallRuleBatches(ctx context.Context, client filter.Adapter, plans []filter.CommandBatch) []error {
@@ -1186,319 +427,31 @@ func persistFirewallRuleBatches(ctx context.Context, client filter.Adapter, plan
 	return failures
 }
 
-func restoreFirewallCommands(client filter.Adapter, ctx context.Context, plan filter.CommandBatch) error {
-	ctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-	defer cancel()
-	return client.Rollback(ctx, plan)
-}
-
-func readFirewallCommandResults(ctx context.Context, client filter.Adapter, plans ...filter.CommandBatch) ([]filter.RuleSet, map[string]map[string][]filter.ObservedRule, error) {
-	scopes := make([]filter.Scope, 0, len(plans))
-	for _, plan := range plans {
-		scopes = append(scopes, plan.Scope)
-		if plan.Provider == filter.ProviderUFW {
-			related := plan.Scope
-			if related.Family == filter.FamilyIPv4 {
-				related.Family = filter.FamilyIPv6
-			} else {
-				related.Family = filter.FamilyIPv4
-			}
-			scopes = append(scopes, related)
-		}
-	}
-	snapshots, err := listFirewallRuleScopes(client, ctx, scopes)
-	if err != nil {
-		return nil, nil, err
-	}
-	byIdentity := make(map[string]map[string][]filter.ObservedRule, len(snapshots))
-	for _, snapshot := range snapshots {
-		if snapshot.Scope.Provider == filter.ProviderFirewalld {
-			canonical := make(map[string][]filter.ObservedRule)
-			for _, observed := range snapshot.Rules {
-				canonical[observed.Locator.Canonical] = append(canonical[observed.Locator.Canonical], observed)
-			}
-			byIdentity[snapshot.Scope.Key()] = canonical
-		} else {
-			byIdentity[snapshot.Scope.Key()] = firewallRulesByMarker(snapshot.Rules)
-		}
-	}
-	return snapshots, byIdentity, nil
-}
-
-func verifyFirewallCommands(ctx context.Context, client filter.Adapter, plans ...filter.CommandBatch) (firewallVerification, error) {
-	snapshots, byIdentity, err := readFirewallCommandResults(ctx, client, plans...)
-	if err != nil {
-		return firewallVerification{}, err
-	}
-	result := firewallVerification{Matched: true}
-	for _, plan := range plans {
-		result.Matched = false
-		for _, snapshot := range snapshots {
-			if snapshot.Scope.Key() != plan.Scope.Key() {
-				continue
-			}
-			result.RuleSet = snapshot
-			result.Matched = firewallCommandsMatch(plan, snapshot, snapshots, byIdentity)
-			break
-		}
-		if !result.Matched {
-			return result, nil
-		}
-	}
-	return result, nil
-}
-
-func firewallCommandsMatch(commands filter.CommandBatch, current filter.RuleSet, all []filter.RuleSet, byIdentity map[string]map[string][]filter.ObservedRule) bool {
-	for _, command := range commands.Rules {
-		if commands.Provider == filter.ProviderFirewalld {
-			previous, matched := 0, 0
-			canonical := byIdentity[current.Scope.Key()]
-			if command.Previous != nil {
-				previous = len(canonical[command.Previous.Locator.Canonical])
-			}
-			for _, observed := range canonical[command.Expected.Locator.Canonical] {
-				if observed.Persistence == filter.PersistenceStatusConverged {
-					want, wantErr := filter.RuleKey(command.Expected.Rule)
-					got, gotErr := filter.RuleKey(observed.Rule)
-					if wantErr == nil && gotErr == nil && want == got {
-						matched++
-					}
-				}
-			}
-			if command.Operation == filter.ChangeDelete {
-				if previous != 0 {
-					return false
-				}
-				continue
-			}
-			if command.Operation == filter.ChangeUpdate && command.Previous != nil && command.Previous.Locator.Canonical != command.Expected.Locator.Canonical && previous != 0 {
-				return false
-			}
-			if matched != 1 {
-				return false
-			}
-			continue
-		}
-		markerMatches, semanticMatches := 0, 0
-		positionMatches := true
-		requiresPosition := command.Expected.Locator.Position != nil && (commands.Provider == filter.ProviderUFW || command.Operation == filter.ChangeCreate || commands.Provider == filter.ProviderIptables && (command.Operation == filter.ChangeReorder || command.Operation == filter.ChangeUpdate && command.Expected.Rule.OrderIndex != nil))
-		if requiresPosition {
-			positionMatches = false
-		}
-		for _, rules := range all {
-			if commands.Provider != filter.ProviderUFW && rules.Scope.Key() != commands.Scope.Key() {
-				continue
-			}
-			candidates := byIdentity[rules.Scope.Key()][command.Expected.Marker]
-			if command.Expected.Marker == "" {
-				candidates = rules.Rules
-			}
-			for _, observed := range candidates {
-				if observed.Marker != command.Expected.Marker {
-					continue
-				}
-				markerMatches++
-				if rules.Scope.Key() != commands.Scope.Key() {
-					continue
-				}
-				same := false
-				if commands.Provider == filter.ProviderUFW {
-					same = observed.ParseStatus == filter.ParseStatusOpaque || filter.ObservedRuleMatchesExpected(observed, command.Expected.Rule)
-				} else {
-					want, wantErr := filter.RuleKey(command.Expected.Rule)
-					got, gotErr := filter.RuleKey(observed.Rule)
-					same = wantErr == nil && gotErr == nil && want == got
-				}
-				if same {
-					semanticMatches++
-				}
-				if observed.Locator.Position != nil && command.Expected.Locator.Position != nil && *observed.Locator.Position == *command.Expected.Locator.Position {
-					positionMatches = true
-				}
-			}
-		}
-		if command.Operation == filter.ChangeDelete {
-			if markerMatches != 0 {
-				return false
-			}
-			continue
-		}
-		if markerMatches != 1 || semanticMatches != 1 || !positionMatches {
-			return false
-		}
-	}
-	return true
-}
-
-func rollbackFirewallPlan(ctx context.Context, runtime filter.Adapter, plan filter.CommandBatch, cause error) error {
-	if runtime == nil {
-		return cause
-	}
-	if err := restoreFirewallCommands(runtime, ctx, plan); err != nil {
-		return errors.Join(cause, fmt.Errorf("rollback applied firewall plan: %w", err))
-	}
-	return cause
-}
-
-func firewallRuleSemanticUpdates(rule filter.FirewallRule) (map[string]interface{}, error) {
-	record, err := firewallRuleFromDomain(rule)
-	if err != nil {
-		return nil, err
-	}
-	return map[string]interface{}{
-		"family": record.Family, "protocol": record.Protocol,
-		"source_address": record.SourceAddress, "source_port": record.SourcePort,
-		"destination_address": record.DestinationAddress, "destination_port": record.DestinationPort,
-		"interface": record.Interface, "connection_states": record.ConnectionStates, "action": record.Action,
-		"description": record.Description, "compatibility_error": "",
-	}, nil
-}
-
-func validateFirewallRulePosition(snapshot filter.RuleSet, rule filter.FirewallRule, target int64) error {
-	if target < 1 {
-		return fmt.Errorf("%w: target position must be positive", filter.ErrInvalidRule)
-	}
-	if rule.Scope.Provider == filter.ProviderUFW {
-		minimum, maximum := positionBounds(snapshot)
-		if target < minimum || target > maximum {
-			return fmt.Errorf(
-				"%w: target position %d is outside the %s range %d-%d",
-				filter.ErrInvalidRule, target, rule.Scope.Family, minimum, maximum,
-			)
-		}
-		return nil
-	}
-	maximum := maxObservedFirewallPosition(snapshot)
-	if target > maximum {
-		return fmt.Errorf("%w: target position %d is out of range 1-%d", filter.ErrInvalidRule, target, maximum)
-	}
-	return nil
-}
-
-func positionBounds(snapshot filter.RuleSet) (int64, int64) {
-	minimum, maximum := int64(0), int64(0)
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Position == nil {
-			continue
-		}
-		position := int64(*observed.Locator.Position)
-		if minimum == 0 || position < minimum {
-			minimum = position
-		}
-		if position > maximum {
-			maximum = position
-		}
-	}
-	return minimum, maximum
-}
-
-func isFirewallMetadataOnlyUpdate(before, after filter.FirewallRule, locator filter.Locator) (bool, error) {
-	beforeKey, err := filter.RuleKey(before)
-	if err != nil {
-		return false, err
-	}
-	afterKey, err := filter.RuleKey(after)
-	if err != nil {
-		return false, err
-	}
-	if beforeKey != afterKey {
-		return false, nil
-	}
-	if after.Scope.Provider == filter.ProviderFirewalld {
-		return true, nil
-	}
-	return locator.Position != nil && after.OrderIndex != nil && *after.OrderIndex == int64(*locator.Position), nil
-}
-
-func (index firewallRuleCollisionIndex) Check(rule filter.FirewallRule) error {
-	key, err := filter.RuleMatchKey(rule)
-	if err != nil {
-		return err
-	}
-	for _, action := range index[key] {
-		if err := checkCollisionActions(rule.Action, action); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func checkCollisionActions(requested, existing filter.Action) error {
-	if requested == existing {
-		return fmt.Errorf("%w: equivalent rule already exists", filter.ErrRuleOperation)
-	}
-	if filter.OppositeActions(requested, existing) {
-		return filter.ErrRuleConflict
-	}
-	return nil
-}
-
-func firewallRuleCollisions(stored []model.FirewallRule, provider filter.Provider) (firewallRuleCollisionIndex, error) {
-	identities := make(firewallRuleCollisionIndex, len(stored))
-	for _, candidate := range stored {
-		rules, err := expandStoredFirewallRule(candidate, provider)
-		if err != nil {
-			continue
-		}
-		for _, rule := range rules {
-			if err := identities.Add(rule); err != nil {
-				return nil, err
-			}
-		}
-	}
-	return identities, nil
-}
-
-func (index firewallRuleCollisionIndex) Add(rule filter.FirewallRule) error {
-	key, err := filter.RuleMatchKey(rule)
-	if err != nil {
-		return err
-	}
-	index[key] = append(index[key], rule.Action)
-	return nil
-}
-
-func (s *FirewallService) restoreStoredFirewallRules(ctx context.Context, provider filter.Provider, t *task.Task) error {
-	result, err := s.syncRules(ctx, "", dto.FirewallRuleSyncRequest{TargetProvider: provider}, t)
-	if err != nil {
-		return fmt.Errorf("restore database firewall rules: %w", err)
-	}
-	failures := make([]error, 0, len(result.Errors))
-	for _, failure := range result.Errors {
-		failures = append(failures, fmt.Errorf("rule %s: %s", failure.SourceUUID, failure.Error))
-	}
-	return errors.Join(failures...)
-}
-
-func executeFirewallRuleBatches(ctx context.Context, runtime filter.Adapter, items []firewallRuleBatchItem, t *task.Task, record func(int, error)) {
+func executeFirewallRuleBatches(ctx context.Context, runtime filter.Adapter, items []firewallRuleBatchItem) []error {
 	groups := make([][]int, 0)
-	byScope := make(map[string]int)
+	groupIndexes := make(map[string]int)
 	for index, item := range items {
 		key := string(item.change.Operation) + ":" + item.snapshot.Scope.Key()
-		if runtime.Provider() == filter.ProviderUFW && item.change.Operation == filter.ChangeDelete {
+		if runtime.Provider() == filter.ProviderUFW {
 			key = string(item.change.Operation)
+		} else if runtime.Provider() == filter.ProviderFirewalld {
+			key += ":" + string(item.change.After.NativeKind)
 		}
-		group, exists := byScope[key]
+		group, exists := groupIndexes[key]
 		if !exists {
 			group = len(groups)
-			byScope[key] = group
+			groupIndexes[key] = group
 			groups = append(groups, nil)
 		}
 		groups[group] = append(groups[group], index)
 	}
-	var plans []filter.CommandBatch
-	var completed [][]int
-	_, savesRules := runtime.(filter.RuleSaver)
+	failures := make([]error, len(items))
+	type appliedBatch struct {
+		plan          filter.CommandBatch
+		sourceIndexes []int
+	}
+	var applied []appliedBatch
 	for _, group := range groups {
-		if items[group[0]].change.Operation == filter.ChangeDelete {
-			sort.SliceStable(group, func(i, j int) bool {
-				left, right := items[group[i]].change.Locator, items[group[j]].change.Locator
-				if left == nil || right == nil || left.Position == nil || right.Position == nil {
-					return false
-				}
-				return *left.Position > *right.Position
-			})
-		}
 		for start := 0; start < len(group); {
 			end := start + 1
 			if runtime.Provider() != filter.ProviderUFW {
@@ -1512,208 +465,38 @@ func executeFirewallRuleBatches(ctx context.Context, runtime filter.Adapter, ite
 				change.CommandOnly = true
 				changes = append(changes, change)
 			}
+			var plan filter.CommandBatch
 			err := ctx.Err()
 			if err == nil {
-				var plan filter.CommandBatch
 				plan, err = runtime.BuildCommands(items[batch[0]].snapshot, changes)
-				if err == nil {
-					if len(batch) > 1 && changes[0].Operation == filter.ChangeCreate && t != nil {
-						t.Log(i18n.GetMsgWithMap("FirewallCreateBatchStep", map[string]interface{}{"backend": runtime.Provider(), "count": len(batch)}))
-					}
-					plan.CommandOnly = true
-					err = runtime.RunCommands(ctx, plan)
-					if err == nil && savesRules {
-						plans = append(plans, plan)
-						completed = append(completed, batch)
-						continue
-					}
-				}
 			}
-			for _, index := range batch {
-				record(index, err)
+			if err == nil {
+				plan.CommandOnly = true
+				err = runtime.RunCommands(ctx, plan)
 			}
-		}
-	}
-	failures := persistFirewallRuleBatches(ctx, runtime, plans)
-	for index, batch := range completed {
-		for _, item := range batch {
-			record(item, failures[index])
-		}
-	}
-}
-
-func (s *FirewallService) syncRules(ctx context.Context, _ string, request dto.FirewallRuleSyncRequest, t *task.Task) (result dto.FirewallRuleSyncResult, err error) {
-	if request.SourceProvider != "" || request.ResetSource {
-		return result, fmt.Errorf("%w: system synchronization reads rules from the database", filter.ErrInvalidRule)
-	}
-	if err := s.checkSelectedProvider(ctx, request.TargetProvider); err != nil {
-		return result, err
-	}
-	result = dto.FirewallRuleSyncResult{Subsystem: "system", TargetProvider: request.TargetProvider}
-
-	created, removed, unexecuted := 0, 0, 0
-	failedRemovals := make(map[string]error)
-	record := func(operation string, rule *firewallSyncRule, cause error, skipped bool) {
-		item := rule.FirewallRuleSyncItem
-		if operation == "TaskDelete" && rule.observed != nil {
-			item.Rule = &rule.observed.Rule
-		}
-		switch {
-		case skipped:
-			result.Skipped++
-			unexecuted++
-			rule.done = true
-		case cause != nil:
-			appendDatabaseSyncFailure(&result, item, cause)
-			rule.done = true
-			if operation == "TaskDelete" {
-				failedRemovals[rule.SourceUUID] = cause
-			}
-		case operation == "TaskDelete":
-			removed++
-			if rule.Status == firewallsync.StatusRemove {
-				result.Removed++
-				rule.done = true
-			}
-		case operation == "TaskCreate":
-			created++
-			result.Succeeded++
-			rule.done = true
-		default:
-			result.Skipped++
-			rule.done = true
-		}
-		if t == nil {
-			return
-		}
-		label := fmt.Sprintf("%s %s", i18n.GetMsgByKey(operation), item.SourceUUID)
-		if r := item.Rule; r != nil {
-			label += fmt.Sprintf(" [%s] %s %s:%s -> %s:%s %s", r.Scope.Key(), r.Protocol, r.SourceAddress, r.SourcePort, r.DestinationAddress, r.DestinationPort, r.Action)
-		}
-		if skipped {
-			t.Logf("%s %s: %v", label, i18n.GetMsgByKey("FirewallCreateRuleSkipped"), cause)
-		} else if operation == task.TaskSync && cause == nil {
-			t.Logf("%s %s", label, i18n.GetMsgByKey("FirewallSyncRuleUnchanged"))
-		} else {
-			t.LogWithStatus(label, cause)
-		}
-	}
-	firewallWhitelistMu.Lock()
-	ports, whitelistErr := loadFirewallPortWhiteList()
-	var whitelistCreated []filter.FirewallRule
-	if whitelistErr == nil {
-		whitelistCreated, whitelistErr = s.syncPortWhitelist(ctx, request.TargetProvider, ports)
-	}
-	firewallWhitelistMu.Unlock()
-	createdWhitelistKeys := make(map[string]bool, len(whitelistCreated))
-	for _, rule := range whitelistCreated {
-		key, err := filter.RuleMatchKey(rule)
-		if err != nil {
-			return result, err
-		}
-		createdWhitelistKeys[key] = true
-		result.Total++
-		record("TaskCreate", &firewallSyncRule{FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: rule.UUID, Rule: &rule}}, nil, false)
-	}
-	if t != nil {
-		t.LogWithStatus(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), whitelistErr)
-	}
-	if whitelistErr != nil {
-		return result, whitelistErr
-	}
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-	if err := ctx.Err(); err != nil {
-		return result, err
-	}
-	runtime, rules, snapshots, err := s.loadFirewallSyncRules(ctx, request)
-	if err != nil {
-		return result, err
-	}
-
-	defer func() {
-		if t != nil {
-			t.Log(i18n.GetMsgWithMap("FirewallSyncOperationsResult", map[string]interface{}{"created": created, "removed": removed, "failed": result.Failed, "skipped": unexecuted, "unchanged": result.Skipped - unexecuted}))
-		}
-	}()
-	for _, rule := range rules {
-		if rule.Status == firewallsync.StatusExisting && rule.Rule != nil {
-			key, err := filter.RuleMatchKey(*rule.Rule)
 			if err != nil {
-				return result, err
-			}
-			if createdWhitelistKeys[key] {
-				rule.done = true
+				for _, index := range batch {
+					failures[index] = err
+				}
 				continue
 			}
-		}
-		if rule.Status != firewallsync.StatusRemove {
-			result.Total++
-		}
-		if rule.Status == firewallsync.StatusBlocked {
-			record("TaskSync", rule, errors.New(rule.Reason), false)
+			applied = append(applied, appliedBatch{plan: plan, sourceIndexes: batch})
 		}
 	}
-	for _, rule := range rules {
-		if !rule.done && rule.Status == firewallsync.StatusExisting {
-			record("TaskSync", rule, nil, false)
+	if len(applied) == 0 {
+		return failures
+	}
+	plans := make([]filter.CommandBatch, len(applied))
+	for index, batch := range applied {
+		plans[index] = batch.plan
+	}
+	saved := persistFirewallRuleBatches(ctx, runtime, plans)
+	for index, batch := range applied {
+		for _, item := range batch.sourceIndexes {
+			failures[item] = saved[index]
 		}
 	}
-	byScope := make(map[string]filter.RuleSet, len(snapshots))
-	for _, snapshot := range snapshots {
-		byScope[snapshot.Scope.Key()] = snapshot
-	}
-	for _, operation := range []filter.ChangeOperation{filter.ChangeDelete, filter.ChangeCreate} {
-		name := "TaskCreate"
-		if operation == filter.ChangeDelete {
-			name = "TaskDelete"
-		}
-		pending := make([]*firewallSyncRule, 0)
-		items := make([]firewallRuleBatchItem, 0)
-		for _, rule := range rules {
-			if rule.done {
-				continue
-			}
-			if operation == filter.ChangeDelete && rule.observed == nil || operation == filter.ChangeCreate && rule.Status != firewallsync.StatusReady {
-				continue
-			}
-			if operation == filter.ChangeCreate {
-				var cause error
-				for id, err := range failedRemovals {
-					if id == rule.SourceUUID || strings.HasPrefix(id, rule.SourceUUID+"-") {
-						cause = err
-						break
-					}
-				}
-				if cause != nil {
-					record(name, rule, cause, true)
-					continue
-				}
-			}
-			item := firewallRuleBatchItem{snapshot: filter.RuleSet{Scope: rule.Rule.Scope}}
-			if operation == filter.ChangeDelete {
-				item.snapshot = byScope[rule.Rule.Scope.Key()]
-				item.change, err = firewallDeleteChange(*rule.observed, rule.desired)
-				if err != nil {
-					record(name, rule, err, false)
-					continue
-				}
-				if runtime.Provider() == filter.ProviderUFW {
-					item.snapshot.Rules = []filter.ObservedRule{*rule.observed}
-				}
-			} else {
-				after := *rule.Rule
-				after.OrderIndex = nil
-				item.change = filter.RuleChange{Operation: operation, After: &after, Append: true}
-			}
-			pending = append(pending, rule)
-			items = append(items, item)
-		}
-		executeFirewallRuleBatches(ctx, runtime, items, t, func(index int, failure error) {
-			record(name, pending[index], failure, false)
-		})
-	}
-	return result, nil
+	return failures
 }
 
 func (s *FirewallService) checkSelectedProvider(ctx context.Context, requested filter.Provider) error {
@@ -1727,33 +510,22 @@ func (s *FirewallService) checkSelectedProvider(ctx context.Context, requested f
 	return nil
 }
 
-func (s *FirewallService) saveFirewallRule(ctx context.Context, record *model.FirewallRule) error {
-	if err := s.rules.Create(ctx, record); err != nil {
-		message := "FirewallCreateRulePersistenceFailed"
-		if record.Origin == constant.FirewallRuleOriginAdopted {
-			message = "FirewallAdoptRulePersistenceFailed"
-		}
-		return fmt.Errorf("%s: %w", i18n.GetMsgByKey(message), err)
-	}
-	return nil
-}
-
-func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallRuleCreate, t *task.Task) (result dto.FirewallRuleCreateResponse, taskErr error) {
+func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallRuleCreate, t *task.Task, ruleState map[string]filter.RuleSet) (result dto.FirewallRuleCreateResponse, taskErr error) {
 	var firstFailure error
 	defer func() {
+		summary := i18n.GetMsgWithMap("FirewallCreateRulesResult", map[string]interface{}{
+			"succeeded": result.Succeeded, "failed": result.Failed, "skipped": result.Skipped,
+		})
 		if t != nil {
-			t.Log(i18n.GetMsgWithMap("FirewallCreateRulesResult", map[string]interface{}{
-				"succeeded": result.Succeeded, "failed": result.Failed, "skipped": result.Skipped,
-			}))
+			t.Log(summary)
 		}
-		if taskErr == nil {
-			taskErr = firstFailure
+		if result.Failed > 0 {
+			taskErr = errors.Join(errors.New(summary), taskErr, firstFailure)
 		}
 	}()
 	type createItem struct {
 		index, part, count int
 		request            dto.FirewallRuleCreateItem
-		stored             model.FirewallRule
 	}
 	describe := func(rule filter.FirewallRule) string {
 		return fmt.Sprintf("%s %s %s:%s -> %s:%s %s", rule.Scope.Family, rule.Protocol,
@@ -1806,7 +578,11 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 		}
 		return result, err
 	}
-	items := make([]createItem, 0, len(request.Items))
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return result, err
+	}
+	preparedItems := make([]*createItem, 0, len(request.Items))
 	var stop error
 	for index, item := range request.Items {
 		if stop == nil {
@@ -1819,7 +595,11 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 		item.Rule.OrderIndex = nil
 		rules, err := expandFirewallCreateRule(item, selected)
 		if err != nil {
-			record(createItem{index: index, request: item}, "failed", err)
+			status := "failed"
+			if item.SourceKind == constant.FirewallRuleSourceImported && errors.Is(err, filter.ErrUnsupportedScope) {
+				status = "skipped"
+			}
+			record(createItem{index: index, request: item}, status, err)
 			continue
 		}
 		if item.SourceKind == constant.FirewallRuleSourceImported && t != nil {
@@ -1832,139 +612,284 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 			child := item
 			child.Rule = rule
 			entry := createItem{index: index, part: part, count: len(rules), request: child}
+			if (request.Initialize || item.SourceKind == constant.FirewallRuleSourceImported) && rule.Scope.Family == filter.FamilyIPv6 && !slices.Contains(families, constant.FirewallFamilyIPv6) {
+				record(entry, "skipped", fmt.Errorf("IPv6 firewall support is disabled"))
+				continue
+			}
 			prepared, err := prepareFirewallCreateRule(ctx, runtime, child)
 			if err != nil {
-				record(entry, "failed", err)
+				status := "failed"
+				if item.SourceKind == constant.FirewallRuleSourceImported && (errors.Is(err, filter.ErrUnsupportedScope) || errors.Is(err, filter.ErrInvalidRule)) {
+					status = "skipped"
+				}
+				record(entry, status, err)
 				continue
 			}
 			entry.request = prepared
-			items = append(items, entry)
+			if child.ParseStatus == "" || child.ParseStatus == filter.ParseStatusSupported {
+				entry.request.Raw = ""
+			}
+			preparedItems = append(preparedItems, &entry)
 		}
 	}
-	stored, err := s.rules.List(ctx)
-	if err != nil {
-		for _, item := range items {
-			record(item, "failed", err)
-		}
-		return result, err
+	if len(preparedItems) == 0 {
+		return result, stop
 	}
-	identities, err := firewallRuleCollisions(stored, selected)
-	if err != nil {
-		return result, err
+	if ruleState == nil {
+		ruleState = make(map[string]filter.RuleSet)
 	}
-	valid := items[:0]
-	for _, item := range items {
-		if stop == nil {
-			stop = ctx.Err()
+	if len(ruleState) == 0 {
+		if err := loadFirewallRuleState(ctx, runtime, ruleState); err != nil {
+			return result, err
 		}
-		if stop != nil {
-			record(item, "skipped", stop)
-			continue
+	}
+	existing := make(map[string]bool)
+	ufwActions := make(map[string]map[filter.Action]bool)
+	for _, snapshot := range ruleState {
+		for _, observed := range snapshot.Rules {
+			key, err := firewallRuleDuplicateKey(observed, false)
+			if err != nil {
+				return result, err
+			}
+			existing[key] = true
+			if selected == filter.ProviderUFW && observed.ParseStatus == filter.ParseStatusSupported {
+				matchKey, err := filter.RuleMatchKey(observed.Rule)
+				if err != nil {
+					return result, err
+				}
+				if ufwActions[matchKey] == nil {
+					ufwActions[matchKey] = make(map[filter.Action]bool)
+				}
+				ufwActions[matchKey][observed.Rule.Action] = true
+			}
+			if selected == filter.ProviderFirewalld && observed.ParseStatus == filter.ParseStatusSupported {
+				families := []filter.Family{observed.Rule.Scope.Family}
+				if families[0] == filter.FamilyInet {
+					families = append(families, filter.FamilyIPv4, filter.FamilyIPv6)
+				}
+				for _, family := range families {
+					candidate := observed
+					candidate.Rule.Scope.Family = family
+					key, err := firewallRuleDuplicateKey(candidate, true)
+					if err != nil {
+						return result, err
+					}
+					existing[key] = true
+				}
+			}
 		}
-		rule := item.request.Rule
-		if err := identities.CheckDuplicate(rule); errors.Is(err, filter.ErrRuleOperation) {
-			record(item, "skipped", err)
-			continue
-		} else if err != nil {
-			record(item, "failed", err)
-			continue
-		}
-		item.stored, err = firewallRuleModelForCreate(rule, item.request, constant.FirewallRuleOriginCreated)
+	}
+	mergedItems := make([]*createItem, 0, len(preparedItems))
+	pending := make(map[string]bool)
+	priority := 0
+	for _, item := range preparedItems {
+		converted := item.request.SourceKind == constant.FirewallRuleSourceImported && selected == filter.ProviderFirewalld && request.Items[item.index].Rule.Scope.Provider != selected
+		observed := filter.ObservedRule{Rule: item.request.Rule, Raw: item.request.Raw, ParseStatus: item.request.ParseStatus}
+		key, err := firewallRuleDuplicateKey(observed, converted)
 		if err != nil {
-			record(item, "failed", err)
+			return result, err
+		}
+		if pending[key] {
+			record(*item, "skipped", buserr.New("ErrRecordExist"))
 			continue
 		}
-		item.stored.UUID = uuid.NewString()
-		rule.UUID = item.stored.UUID
-		item.request.Rule = rule
-		if err := identities.Add(rule); err != nil {
-			record(item, "failed", err)
+		if converted {
+			priority++
+		}
+		if existing[key] {
+			pending[key] = true
+			record(*item, "skipped", buserr.New("ErrRecordExist"))
 			continue
 		}
-		valid = append(valid, item)
+		if selected == filter.ProviderUFW && item.request.ParseStatus == filter.ParseStatusSupported {
+			matchKey, err := filter.RuleMatchKey(item.request.Rule)
+			if err != nil {
+				return result, err
+			}
+			actions := ufwActions[matchKey]
+			if len(actions) > 1 || len(actions) == 1 && !actions[item.request.Rule.Action] {
+				record(*item, "failed", buserr.New("ErrFirewallRuleConflict"))
+				continue
+			}
+			ufwActions[matchKey] = map[filter.Action]bool{item.request.Rule.Action: true}
+		}
+		if converted {
+			if priority > 32767 {
+				return result, fmt.Errorf("%w: firewalld import order exceeds the priority range", filter.ErrExpansionLimit)
+			}
+			value := priority
+			item.request.Rule.Priority = &value
+			prepared, err := prepareFirewallCreateRule(ctx, runtime, item.request)
+			if err != nil {
+				status := "failed"
+				if errors.Is(err, filter.ErrUnsupportedScope) || errors.Is(err, filter.ErrInvalidRule) {
+					status = "skipped"
+				}
+				record(*item, status, err)
+				continue
+			}
+			item.request = prepared
+			actualKey, err := firewallRuleDuplicateKey(filter.ObservedRule{Rule: prepared.Rule, ParseStatus: prepared.ParseStatus}, false)
+			if err != nil {
+				return result, err
+			}
+			pending[key] = true
+			if existing[actualKey] || pending[actualKey] {
+				record(*item, "skipped", buserr.New("ErrRecordExist"))
+				continue
+			}
+			pending[actualKey] = true
+		}
+		pending[key] = true
+		mergedItems = append(mergedItems, item)
 	}
-	changes := make([]firewallRuleBatchItem, 0, len(valid))
-	for index := range valid {
-		rule := &valid[index].request.Rule
+	for _, item := range mergedItems {
+		item.request.Rule.UUID = uuid.NewString()
+	}
+	creates := mergedItems
+	rawScopes := make([]filter.Scope, 0)
+	rawByScope := make(map[string]filter.RuleSet)
+	for _, item := range creates {
+		if item.request.Raw != "" {
+			scope := item.request.Rule.Scope
+			if snapshot, exists := ruleState[scope.Key()]; exists {
+				rawByScope[scope.Key()] = snapshot
+			} else {
+				rawScopes = append(rawScopes, scope)
+			}
+		}
+	}
+	rawSnapshots, err := listFirewallRuleScopes(runtime, ctx, rawScopes)
+	if err != nil {
+		return result, err
+	}
+	for _, snapshot := range rawSnapshots {
+		rawByScope[snapshot.Scope.Key()] = snapshot
+	}
+	changes := make([]firewallRuleBatchItem, 0, len(creates))
+	for _, item := range creates {
+		rule := &item.request.Rule
+		snapshot := filter.RuleSet{Scope: rule.Scope}
+		if current, exists := rawByScope[rule.Scope.Key()]; exists {
+			snapshot = current
+		}
 		changes = append(changes, firewallRuleBatchItem{
-			snapshot: filter.RuleSet{Scope: rule.Scope},
-			change:   filter.RuleChange{Operation: filter.ChangeCreate, After: rule, Append: true},
+			snapshot: snapshot,
+			change:   filter.RuleChange{Operation: filter.ChangeCreate, After: rule, Append: true, Raw: item.request.Raw},
 		})
 	}
-	executeFirewallRuleBatches(ctx, runtime, changes, t, func(index int, err error) {
-		item := valid[index]
+	descriptions := make([]model.CommonDescription, 0, len(creates))
+	for index, err := range executeFirewallRuleBatches(ctx, runtime, changes) {
+		item := creates[index]
 		if err != nil {
-			if errors.Is(err, filterfirewalld.ErrAlreadyEnabled) {
-				record(item, "skipped", err)
+			if errors.Is(err, filterfirewalld.ErrAlreadyEnabled) || errors.Is(err, filterufw.ErrAlreadyEnabled) {
+				record(*item, "skipped", err)
 			} else if errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
-				record(item, "skipped", err)
+				record(*item, "skipped", err)
 				stop = err
 			} else {
-				record(item, "failed", fmt.Errorf("%s: %w", i18n.GetMsgByKey("FirewallCreateRuleExecutionFailed"), err))
+				record(*item, "failed", fmt.Errorf("%s: %w", i18n.GetMsgByKey("FirewallCreateRuleExecutionFailed"), err))
 			}
-			return
+			continue
 		}
+		scope := item.request.Rule.Scope
+		snapshot := ruleState[scope.Key()]
+		snapshot.Scope = scope
+		snapshot.Rules = append(snapshot.Rules, filter.ObservedRule{Rule: item.request.Rule, Raw: item.request.Raw, ParseStatus: item.request.ParseStatus})
+		ruleState[scope.Key()] = snapshot
+		if item.request.Rule.Description != "" {
+			observed := filter.ObservedRule{Rule: item.request.Rule, Raw: item.request.Raw, ParseStatus: item.request.ParseStatus}
+			id, err := filter.DescriptionID(observed)
+			if err != nil {
+				return result, err
+			}
+			descriptions = append(descriptions, model.CommonDescription{ID: id, Type: "firewall", Description: item.request.Rule.Description})
+		}
+		record(*item, "succeeded", nil)
+	}
+	if len(descriptions) > 0 {
 		persistCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-		defer cancel()
-		if err := s.saveFirewallRule(persistCtx, &item.stored); err != nil {
-			record(item, "failed", err)
-		} else {
-			record(item, "succeeded", nil)
+		err := settingRepo.SaveDescriptions(persistCtx, descriptions)
+		cancel()
+		if err != nil {
+			if t != nil {
+				t.Logf("save firewall rule descriptions: %v", err)
+			}
+			global.LOG.Warnf("save firewall rule descriptions: %v", err)
 		}
-	})
+	}
 	return result, stop
 }
 
 func validateFirewallCreateBatch(request dto.FirewallRuleCreate, provider filter.Provider) error {
-	count := 0
-	if len(request.Items) > filter.MaxAtomicExpansion {
-		return fmt.Errorf("create or import at most %d rules per batch (after expansion)", filter.MaxAtomicExpansion)
+	if len(request.Items) == 0 && !request.Initialize {
+		return filter.ErrInvalidRule
 	}
+	count := 0
+	importing := true
 	for _, item := range request.Items {
-		rules, expandErr := expandFirewallCreateRule(item, provider)
-		if errors.Is(expandErr, filter.ErrExpansionLimit) {
-			return fmt.Errorf("create or import at most %d rules per batch (after expansion)", filter.MaxAtomicExpansion)
+		importing = importing && item.SourceKind == constant.FirewallRuleSourceImported
+		rules, err := expandFirewallCreateRule(item, provider)
+		if errors.Is(err, filter.ErrExpansionLimit) {
+			return err
 		}
 		count += len(rules)
-		if count > filter.MaxAtomicExpansion {
-			return fmt.Errorf("create or import at most %d rules per batch (after expansion)", filter.MaxAtomicExpansion)
-		}
+	}
+	if !importing && count > filter.MaxAtomicExpansion {
+		return filter.ErrExpansionLimit
 	}
 	return nil
 }
 
 func expandFirewallCreateRule(item dto.FirewallRuleCreateItem, provider filter.Provider) ([]filter.FirewallRule, error) {
-	if item.SourceKind == constant.FirewallRuleSourceImported {
-		source := item.Rule.Scope.Normalize().Provider
-		if source == "" {
-			source = provider
+	rule := item.Rule
+	if item.Raw != "" && item.ParseStatus != "" && item.ParseStatus != filter.ParseStatusSupported {
+		if item.SourceKind != constant.FirewallRuleSourceImported || rule.Scope.Provider != provider {
+			return nil, fmt.Errorf("%w: native rule can only be imported into its original backend", filter.ErrUnsupportedScope)
 		}
-		rules, err := filter.ExpandAtomicRules(applySelectedProviderScopeDefaults(item.Rule, source))
+		return []filter.FirewallRule{rule}, rule.Scope.ValidateMVP()
+	}
+	source := rule.Scope.Provider
+	if item.SourceKind != constant.FirewallRuleSourceImported || source == "" || source == provider {
+		return filter.ExpandAtomicRules(applySelectedProviderScopeDefaults(rule, provider))
+	}
+	if rule.NativeKind == filter.NativeKindOpaque || rule.NativeKind == filter.NativeKindZoneService || rule.NativeKind == filter.NativeKindUFWApplication {
+		return nil, fmt.Errorf("%w: native rule cannot be converted to %s", filter.ErrUnsupportedScope, provider)
+	}
+	if provider == filter.ProviderFirewalld {
+		priority := 0
+		rule.Priority = &priority
+	}
+	families := []filter.Family{rule.Scope.Family}
+	if families[0] == filter.FamilyInet && provider != filter.ProviderFirewalld {
+		switch {
+		case strings.Contains(rule.SourceAddress, ":") || strings.Contains(rule.DestinationAddress, ":") || rule.Protocol == "icmpv6":
+			families = []filter.Family{filter.FamilyIPv6}
+		case rule.SourceAddress != "" || rule.DestinationAddress != "":
+			families = []filter.Family{filter.FamilyIPv4}
+		default:
+			families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+		}
+	}
+	var result []filter.FirewallRule
+	for _, family := range families {
+		converted := rule
+		converted.Scope = filter.Scope{Provider: provider, Family: family, Direction: filter.DirectionInput}
+		if (source == filter.ProviderIptables || source == filter.ProviderNftables) && (provider == filter.ProviderIptables || provider == filter.ProviderNftables) {
+			converted.Scope.Chain = rule.Scope.Chain
+		}
+		converted.NativeKind, converted.OrderBucket = "", ""
+		converted.UUID, converted.OrderIndex = "", nil
+		if provider != filter.ProviderFirewalld {
+			converted.Priority = nil
+		}
+		expanded, err := filter.ExpandAtomicRules(applySelectedProviderScopeDefaults(converted, provider))
 		if err != nil {
 			return nil, err
 		}
-		var converted []filter.FirewallRule
-		for _, sourceRule := range rules {
-			policy, err := firewallRuleFromDomain(sourceRule)
-			if err != nil {
-				return nil, err
-			}
-			targetRules, err := expandStoredFirewallRule(policy, provider)
-			if err != nil {
-				return nil, err
-			}
-			converted = append(converted, targetRules...)
-		}
-		return converted, nil
+		result = append(result, expanded...)
 	}
-	rule := applySelectedProviderScopeDefaults(item.Rule, provider)
-	if provider == filter.ProviderUFW && strings.TrimSpace(rule.DestinationPort) != "" {
-		protocol := strings.ToLower(strings.TrimSpace(rule.Protocol))
-		if protocol == "" || protocol == "all" || protocol == "any" {
-			return filter.ExpandAtomicRules(rule)
-		}
-	}
-	return []filter.FirewallRule{rule}, nil
+	return result, nil
 }
 
 func applySelectedProviderScopeDefaults(rule filter.FirewallRule, selected filter.Provider) filter.FirewallRule {
@@ -2010,7 +935,27 @@ func applySelectedProviderScopeDefaults(rule filter.FirewallRule, selected filte
 }
 
 func prepareFirewallCreateRule(ctx context.Context, runtime filter.Adapter, request dto.FirewallRuleCreateItem) (dto.FirewallRuleCreateItem, error) {
+	request.Rule.Description = strings.TrimSpace(request.Rule.Description)
 	selected := runtime.Provider()
+	if (selected == filter.ProviderIptables || selected == filter.ProviderNftables) && request.Rule.Scope.Chain != "" && request.Rule.Scope.Chain != filter.IptablesInputChain && request.Rule.Description != "" {
+		return dto.FirewallRuleCreateItem{}, filter.ErrRuleOperation
+	}
+	if request.Raw != "" && request.ParseStatus != "" && request.ParseStatus != filter.ParseStatusSupported {
+		if request.Rule.Scope.Provider != selected {
+			return dto.FirewallRuleCreateItem{}, filter.ErrUnsupportedScope
+		}
+		plan, err := runtime.BuildCommands(filter.RuleSet{Scope: request.Rule.Scope}, []filter.RuleChange{{Operation: filter.ChangeCreate, After: &request.Rule, Raw: request.Raw, CommandOnly: true, Append: true}})
+		if err != nil {
+			return dto.FirewallRuleCreateItem{}, err
+		}
+		description := request.Rule.Description
+		request.Rule = plan.Rules[0].Expected.Rule
+		request.Rule.Description = description
+		if plan.Rules[0].Expected.ParseStatus == filter.ParseStatusSupported {
+			request.ParseStatus, request.Raw = filter.ParseStatusSupported, ""
+		}
+		return request, nil
+	}
 	rule, err := filter.NormalizeRule(applySelectedProviderScopeDefaults(request.Rule, selected))
 	if err != nil {
 		return dto.FirewallRuleCreateItem{}, err
@@ -2024,6 +969,7 @@ func prepareFirewallCreateRule(ctx context.Context, runtime filter.Adapter, requ
 	}
 	rule.UUID = ""
 	request.Rule = rule
+	request.ParseStatus = filter.ParseStatusSupported
 	if request.SourceKind == "" {
 		request.SourceKind = constant.FirewallRuleSourceUser
 	}
@@ -2048,82 +994,6 @@ func readFirewallRuleScopes(client filter.Adapter, ctx context.Context, scopes [
 	return snapshots, nil
 }
 
-func observedFirewallRuleCollisionIndex(snapshot filter.RuleSet) (firewallRuleCollisionIndex, error) {
-	index := make(firewallRuleCollisionIndex, len(snapshot.Rules))
-	for _, observed := range snapshot.Rules {
-		if observed.ParseStatus != filter.ParseStatusSupported {
-			continue
-		}
-		if err := index.Add(observed.Rule); err != nil {
-			return nil, err
-		}
-	}
-	return index, nil
-}
-
-func firewallRuleFromDomain(rule filter.FirewallRule) (model.FirewallRule, error) {
-	normalized, err := filter.NormalizeRule(rule)
-	if err != nil {
-		return model.FirewallRule{}, err
-	}
-	switch normalized.NativeKind {
-	case "", filter.NativeKindRule, filter.NativeKindZonePort, filter.NativeKindRichRule, filter.NativeKindUFWRule:
-	default:
-		return model.FirewallRule{}, fmt.Errorf("%w: native rule %q cannot be stored as a provider-neutral policy", filter.ErrUnsupportedScope, normalized.NativeKind)
-	}
-	record := model.FirewallRule{
-		Family:             string(normalized.Scope.Family),
-		Protocol:           normalized.Protocol,
-		SourceAddress:      normalized.SourceAddress,
-		SourcePort:         normalized.SourcePort,
-		DestinationAddress: normalized.DestinationAddress,
-		DestinationPort:    normalized.DestinationPort,
-		Interface:          normalized.Interface,
-		ConnectionStates:   strings.Join(normalized.ConnectionStates, ","),
-		Action:             string(normalized.Action),
-		Description:        normalized.Description,
-	}
-	return record, nil
-}
-
-func sortFirewallRules(rules []model.FirewallRule, provider filter.Provider) {
-	sort.SliceStable(rules, func(i, j int) bool {
-		left, right := rules[i], rules[j]
-		if provider == filter.ProviderFirewalld {
-			switch {
-			case left.Priority == nil && right.Priority != nil:
-				return false
-			case left.Priority != nil && right.Priority == nil:
-				return true
-			case left.Priority != nil && right.Priority != nil && *left.Priority != *right.Priority:
-				return *left.Priority < *right.Priority
-			}
-		} else {
-			switch {
-			case left.Sequence == nil && right.Sequence != nil:
-				return false
-			case left.Sequence != nil && right.Sequence == nil:
-				return true
-			case left.Sequence != nil && right.Sequence != nil && *left.Sequence != *right.Sequence:
-				return *left.Sequence < *right.Sequence
-			}
-		}
-		return left.UUID < right.UUID
-	})
-}
-func firewallRuleModelForCreate(rule filter.FirewallRule, request dto.FirewallRuleCreateItem, origin string) (model.FirewallRule, error) {
-	record, err := firewallRuleFromDomain(rule)
-	if err != nil {
-		return model.FirewallRule{}, err
-	}
-	record.Origin = origin
-	record.Owner = strings.TrimSpace(request.SourceKind)
-	if sourceID := strings.TrimSpace(request.SourceID); sourceID != "" {
-		record.Owner += ":" + sourceID
-	}
-	return record, nil
-}
-
 func firewallTaskName(operation, subsystem, backend string) string {
 	name := i18n.GetMsgByKey(subsystem)
 	if backend != "" {
@@ -2144,6 +1014,143 @@ func closeUnstartedFirewallTask(t *task.Task) {
 	if closer, ok := t.Logger.Out.(io.Closer); ok {
 		_ = closer.Close()
 	}
+}
+
+func loadFirewallRuleState(ctx context.Context, runtime filter.Adapter, state map[string]filter.RuleSet) error {
+	for _, group := range firewallScopeReadGroups(filter.ManagedInputScopes(runtime.Provider())) {
+		snapshots, err := listFirewallRuleScopes(runtime, ctx, group)
+		if errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		for _, snapshot := range snapshots {
+			missing := false
+			for _, notice := range snapshot.Notices {
+				missing = missing || notice.Code == filter.ScopeNoticeManagedScopeMissing || notice.Code == filter.ScopeNoticeManagedScopeInactive
+			}
+			if !missing {
+				state[snapshot.Scope.Key()] = snapshot
+			}
+		}
+	}
+	return nil
+}
+
+func firewallRuleDuplicateKey(observed filter.ObservedRule, converted bool) (string, error) {
+	if converted && observed.ParseStatus == filter.ParseStatusSupported && observed.Rule.Scope.Provider == filter.ProviderFirewalld {
+		priority := 0
+		observed.Rule.Priority = &priority
+		observed.Rule.NativeKind, observed.Rule.OrderBucket = filter.NativeKindRichRule, ""
+	}
+	key, err := filter.DescriptionID(observed)
+	if converted {
+		key = "converted:" + key
+	}
+	return key, err
+}
+
+func (s *FirewallService) syncPortWhitelist(ctx context.Context, ruleState map[string]filter.RuleSet) error {
+	firewallWhitelistMu.Lock()
+	defer firewallWhitelistMu.Unlock()
+	ports, err := loadFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	return s.applyPortWhitelist(ctx, ports, ruleState)
+}
+
+func (s *FirewallService) applyPortWhitelist(ctx context.Context, ports []firewall.PortWhitelist, ruleState map[string]filter.RuleSet, families ...filter.Family) error {
+	required, err := firewall.RequiredPortWhitelist(ports)
+	if err != nil {
+		return err
+	}
+	provider, err := s.selectedProvider(ctx)
+	if err != nil {
+		return err
+	}
+	direct := provider == filter.ProviderIptables || provider == filter.ProviderNftables
+	if !direct {
+		client, err := s.baseClient()
+		if err != nil {
+			return err
+		}
+		active, err := client.Status()
+		if err != nil || !active {
+			return err
+		}
+	}
+	runtime, err := s.firewallAdapter(provider)
+	if err != nil {
+		return err
+	}
+	firewallRuleMutationMu.Lock()
+	defer firewallRuleMutationMu.Unlock()
+	if ruleState == nil {
+		ruleState = make(map[string]filter.RuleSet)
+		if err := loadFirewallRuleState(ctx, runtime, ruleState); err != nil {
+			return err
+		}
+	}
+	keys := make(map[string]bool)
+	for _, snapshot := range ruleState {
+		for _, observed := range snapshot.Rules {
+			if observed.ParseStatus != filter.ParseStatusSupported {
+				continue
+			}
+			families := []filter.Family{observed.Rule.Scope.Family}
+			if families[0] == filter.FamilyInet {
+				families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+			}
+			for _, family := range families {
+				rule := observed.Rule
+				rule.Scope.Family = family
+				key, err := filter.RuleMatchKey(rule)
+				if err == nil {
+					keys[string(rule.Action)+key] = true
+				}
+			}
+		}
+	}
+	rules := whitelistRules(provider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
+	var changes []firewallRuleBatchItem
+	for _, rule := range rules {
+		if len(families) > 0 && !slices.Contains(families, rule.Scope.Family) {
+			continue
+		}
+		item, err := prepareFirewallCreateRule(ctx, runtime, dto.FirewallRuleCreateItem{Rule: rule, SourceKind: constant.FirewallRuleSourceSecurity})
+		if err != nil {
+			return err
+		}
+		rule = item.Rule
+		snapshot, available := ruleState[rule.Scope.Key()]
+		if !available {
+			continue
+		}
+		key, err := filter.RuleMatchKey(rule)
+		if err != nil {
+			return err
+		}
+		key = string(rule.Action) + key
+		if keys[key] {
+			continue
+		}
+		keys[key] = true
+		rule.UUID = uuid.NewString()
+		if provider != filter.ProviderFirewalld {
+			position := int64(1)
+			rule.OrderIndex = &position
+		}
+		changes = append(changes, firewallRuleBatchItem{snapshot: snapshot, change: filter.RuleChange{Operation: filter.ChangeCreate, After: &rule}})
+	}
+	var failures []error
+	for _, err := range executeFirewallRuleBatches(ctx, runtime, changes) {
+		if err != nil && !errors.Is(err, filterfirewalld.ErrAlreadyEnabled) && !errors.Is(err, filterufw.ErrAlreadyEnabled) {
+			failures = append(failures, err)
+		}
+	}
+	return errors.Join(failures...)
 }
 
 func whitelistRules(provider filter.Provider, ports, required []firewall.SystemPort) []filter.FirewallRule {
@@ -2171,615 +1178,12 @@ func customWhitelist(entries []firewall.PortWhitelist) []firewall.PortWhitelist 
 	return result
 }
 
-func (s *FirewallService) loadFirewallSyncRules(ctx context.Context, request dto.FirewallRuleSyncRequest) (filter.Adapter, []*firewallSyncRule, []filter.RuleSet, error) {
-	if request.SourceProvider != "" || request.ResetSource {
-		return nil, nil, nil, fmt.Errorf("%w: system synchronization reads rules from the database", filter.ErrInvalidRule)
+func loadForwardingFirewallOverview(manager forwarding.Adapter, families []string) (dto.FirewallSubsystemStatus, error) {
+	ipv4, ipv4Err := loadForwardingFamilyInfo(manager, constant.FirewallFamilyIPv4)
+	if len(families) == 1 {
+		return dto.FirewallSubsystemStatus{IPv6Enabled: false, IsInit: ipv4.Initialized, IsBind: ipv4.Bound, IPv4: ipv4}, ipv4Err
 	}
-	if err := s.checkSelectedProvider(ctx, request.TargetProvider); err != nil {
-		return nil, nil, nil, err
-	}
-	runtime, err := s.firewallAdapter(request.TargetProvider)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	stored, err := s.rules.List(ctx)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	sortFirewallRules(stored, request.TargetProvider)
-	ports, err := loadFirewallPortWhiteList()
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	required, err := firewall.RequiredPortWhitelist(ports)
-	if err != nil {
-		return nil, nil, nil, err
-	}
-	whitelistDesired := whitelistRules(request.TargetProvider, firewall.ExpandPortWhitelist(customWhitelist(ports)), firewall.ExpandPortWhitelist(required))
-	rules := make([]*firewallSyncRule, 0, len(stored))
-	preservedMarkers := make(map[string]bool)
-	compileFailed := false
-	whitelist := filter.NewPortWhitelistIndex(ports)
-	for _, record := range stored {
-		desired, preserved, err := s.compileRestorableFirewallRules(ctx, record, runtime, required)
-		if err != nil {
-			compileFailed = true
-			rules = append(rules, &firewallSyncRule{FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: record.UUID, Status: firewallsync.StatusBlocked, Reason: err.Error()}})
-			continue
-		}
-		for _, rule := range preserved {
-			preservedMarkers[rule.Marker] = true
-		}
-		for _, native := range desired {
-			rule := native.Rule
-			native.Protected = whitelist.Matches(rule)
-			rules = append(rules, &firewallSyncRule{desired: native, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: record.UUID, Rule: &rule}})
-		}
-	}
-	identities := make(firewallRuleCollisionIndex, len(rules))
-	for _, existing := range rules {
-		if existing.Rule != nil {
-			if err := identities.Add(*existing.Rule); err != nil {
-				return nil, nil, nil, err
-			}
-		}
-	}
-	for _, candidate := range whitelistDesired {
-		prepared, err := prepareFirewallCreateRule(ctx, runtime, dto.FirewallRuleCreateItem{Rule: candidate})
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		rule := prepared.Rule
-		if err := identities.CheckDuplicate(rule); errors.Is(err, filter.ErrRuleOperation) {
-			continue
-		} else if err != nil {
-			return nil, nil, nil, err
-		}
-		if err := identities.Add(rule); err != nil {
-			return nil, nil, nil, err
-		}
-		key, err := filter.RuleKey(rule)
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		rule.UUID = uuid.NewSHA1(uuid.NameSpaceOID, []byte(key)).String()
-		rules = append(rules, &firewallSyncRule{
-			desired:              filter.DesiredRule{UUID: rule.UUID, Rule: rule, RuleKey: key, Origin: filter.RuleOriginCreated, Protected: true},
-			FirewallRuleSyncItem: dto.FirewallRuleSyncItem{SourceUUID: rule.UUID, Rule: &rule},
-		})
-	}
-	scopes := filter.ManagedInputScopes(request.TargetProvider)
-	if compileFailed {
-		scopes = slices.DeleteFunc(scopes, func(scope filter.Scope) bool {
-			return !slices.ContainsFunc(rules, func(rule *firewallSyncRule) bool {
-				return rule.Rule != nil && rule.Rule.Scope.Key() == scope.Key()
-			})
-		})
-	}
-	snapshots := make([]filter.RuleSet, 0, len(scopes))
-	for _, group := range firewallScopeReadGroups(scopes) {
-		current, err := readMutableFirewallRuleScopes(runtime, ctx, group)
-		if errors.Is(err, filter.ErrFamilyUnavailable) {
-			for _, rule := range rules {
-				if rule.Rule != nil && slices.ContainsFunc(group, func(scope filter.Scope) bool { return scope.Key() == rule.Rule.Scope.Key() }) {
-					rule.Status, rule.Reason = firewallsync.StatusBlocked, err.Error()
-				}
-			}
-			continue
-		}
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		snapshots = append(snapshots, current...)
-	}
-	for _, snapshot := range snapshots {
-		scope := snapshot.Scope
-		desired := make([]filter.DesiredRule, 0)
-		byUUID := make(map[string]*firewallSyncRule)
-		for _, rule := range rules {
-			if rule.Rule != nil && rule.Rule.Scope.Key() == scope.Key() {
-				desired = append(desired, rule.desired)
-				byUUID[rule.desired.Rule.UUID] = rule
-			}
-		}
-		inventory, err := mergeFirewallInventory(filter.InventoryMergeInput{Observed: snapshot.Rules, Desired: desired})
-		if err != nil {
-			return nil, nil, nil, err
-		}
-		for _, item := range inventory {
-			if item.Desired == nil {
-				if compileFailed || item.Observed == nil || !strings.HasPrefix(item.Observed.Marker, "1panel-rule:") || preservedMarkers[item.Observed.Marker] {
-					continue
-				}
-				observed := item.Observed
-				if observed.Rule.Scope.Chain == filter.BasicBeforeChain {
-					continue
-				}
-				rule := &firewallSyncRule{observed: observed, FirewallRuleSyncItem: dto.FirewallRuleSyncItem{
-					SourceUUID: strings.TrimPrefix(observed.Marker, "1panel-rule:"), Rule: &observed.Rule, Status: firewallsync.StatusRemove,
-					ReasonCode: firewallsync.ReasonManagedOnlyInTarget, Reason: firewallSyncReasonMessage(firewallsync.ReasonManagedOnlyInTarget),
-				}}
-				if observed.Protected || observed.ParseStatus == filter.ParseStatusOpaque {
-					rule.Status, rule.ReasonCode = firewallsync.StatusBlocked, firewallsync.ReasonUnsafeRemoval
-					rule.Reason = firewallSyncReasonMessage(rule.ReasonCode)
-				}
-				rules = append(rules, rule)
-				continue
-			}
-			rule := byUUID[item.Desired.Rule.UUID]
-			rule.observed = item.Observed
-			if item.Match == filter.InventoryMatchExact && item.Observed != nil && scope.Provider == filter.ProviderFirewalld {
-				rule.Rule.Priority = item.Observed.Rule.Priority
-				rule.Rule.NativeKind = item.Observed.Rule.NativeKind
-				rule.Rule.OrderBucket = item.Observed.Rule.OrderBucket
-				rule.desired.Rule = *rule.Rule
-				rule.desired.RuleKey, err = filter.RuleKey(*rule.Rule)
-				if err != nil {
-					return nil, nil, nil, err
-				}
-			}
-			divergent := item.Observed != nil && item.Observed.Persistence != "" && item.Observed.Persistence != filter.PersistenceStatusConverged
-			switch {
-			case item.Match == filter.InventoryMatchExact && !divergent:
-				rule.Status, rule.Reason = firewallsync.StatusExisting, "rule already matches database policy"
-			case item.Match == filter.InventoryMatchMissing || item.Match == filter.InventoryMatchChanged || item.Match == filter.InventoryMatchExact:
-				rule.Status, rule.Reason = firewallsync.StatusReady, "target rule differs from database policy"
-				if item.Observed != nil && item.Observed.Protected {
-					rule.Status, rule.Reason = firewallsync.StatusBlocked, filter.ErrProtectedRule.Error()
-				}
-			default:
-				rule.Status, rule.Reason = firewallsync.StatusBlocked, fmt.Sprintf("target rule cannot be synchronized: %s", item.Match)
-			}
-		}
-	}
-	return runtime, rules, snapshots, nil
-}
-
-func (s *FirewallService) compileRestorableFirewallRules(ctx context.Context, stored model.FirewallRule, client filter.Adapter, required []firewall.PortWhitelist) (restorable, preserved []filter.DesiredRule, err error) {
-	provider := client.Provider()
-	compiled, err := compileStoredFirewallRules(ctx, stored, client)
-	if err != nil {
-		return nil, nil, err
-	}
-	if (provider != filter.ProviderIptables && provider != filter.ProviderNftables) || !strings.HasPrefix(stored.Owner, constant.FirewallRuleSourceSecurity+":"+constant.FirewallSystemAcceptedPortSourcePrefix) {
-		return compiled, nil, nil
-	}
-	requiredPorts := firewall.ExpandPortWhitelist(required)
-	for _, desired := range compiled {
-		covered := false
-		for _, port := range requiredPorts {
-			covered, err = filter.SameRuleContent(desired.Rule, firewall.RuleForSystemPort(provider, firewall.SystemPort(port)))
-			if err != nil {
-				return nil, nil, err
-			}
-			if covered {
-				break
-			}
-		}
-		if covered {
-			preserved = append(preserved, desired)
-		} else {
-			restorable = append(restorable, desired)
-		}
-	}
-	return restorable, preserved, nil
-}
-
-func (s *FirewallService) removeTransferredSystemPortRules(ctx context.Context, provider filter.Provider, ports []firewall.PortWhitelist) error {
-	if provider != filter.ProviderIptables && provider != filter.ProviderNftables {
-		return nil
-	}
-	firewallRuleMutationMu.Lock()
-	defer firewallRuleMutationMu.Unlock()
-	required, err := firewall.RequiredPortWhitelist(ports)
-	if err != nil {
-		return err
-	}
-	runtime, err := s.firewallAdapter(provider)
-	if err != nil {
-		return err
-	}
-	stored, err := s.rules.List(ctx)
-	if err != nil {
-		return err
-	}
-	custom := filter.NewPortWhitelistIndex(customWhitelist(ports))
-	candidates := make([]model.FirewallRule, 0)
-	keysByUUID := make(map[string][]string)
-	scopes := make([]filter.Scope, 0)
-	for _, record := range stored {
-		if record.Origin != constant.FirewallRuleOriginCreated || !strings.HasPrefix(record.Owner, constant.FirewallRuleSourceSecurity+":"+constant.FirewallSystemAcceptedPortSourcePrefix) {
-			continue
-		}
-		restorable, preserved, err := s.compileRestorableFirewallRules(ctx, record, runtime, required)
-		if isFirewallPolicyIncompatible(err) {
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		if len(restorable) != 0 || len(preserved) == 0 || slices.ContainsFunc(preserved, func(rule filter.DesiredRule) bool { return custom.Matches(rule.Rule) }) {
-			continue
-		}
-		for _, desired := range preserved {
-			rule := desired.Rule
-			rule.Scope.Chain = filter.BasicBeforeChain
-			key, err := filter.RuleMatchKey(rule)
-			if err != nil {
-				return err
-			}
-			keysByUUID[record.UUID] = append(keysByUUID[record.UUID], key)
-			scopes = append(scopes, rule.Scope)
-		}
-		candidates = append(candidates, record)
-	}
-	present := make(map[string]bool)
-	for _, group := range firewallScopeReadGroups(scopes) {
-		snapshots, err := readMutableFirewallRuleScopes(runtime, ctx, group)
-		if errors.Is(err, filter.ErrFamilyUnavailable) {
-			continue
-		}
-		if err != nil {
-			return err
-		}
-		for _, snapshot := range snapshots {
-			for _, observed := range snapshot.Rules {
-				if observed.ParseStatus != filter.ParseStatusSupported || observed.Rule.Action != filter.ActionAccept || (observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged) {
-					continue
-				}
-				key, err := filter.RuleMatchKey(observed.Rule)
-				if err != nil {
-					return err
-				}
-				present[key] = true
-			}
-		}
-	}
-	candidates = slices.DeleteFunc(candidates, func(record model.FirewallRule) bool {
-		return slices.ContainsFunc(keysByUUID[record.UUID], func(key string) bool { return !present[key] })
-	})
-	var failures []error
-	for ruleUUID, err := range s.rules.DeleteBatchWithRevision(ctx, candidates) {
-		failures = append(failures, fmt.Errorf("remove transferred system port rule %s: %w", ruleUUID, err))
-	}
-	return errors.Join(failures...)
-}
-
-func firewallInventoryRuleKey(rule filter.FirewallRule) (string, error) {
-	if rule.Scope.Provider == filter.ProviderFirewalld {
-		key, err := filter.RuleMatchKey(rule)
-		return key + ":" + string(rule.Action), err
-	}
-	return filter.RuleKey(rule)
-}
-
-func mergeFirewallInventory(input filter.InventoryMergeInput) ([]filter.InventoryItem, error) {
-	candidates := make([]observedInventoryCandidate, len(input.Observed))
-	byRuleKey := make(map[string][]int)
-	byInstanceKey := make(map[string][]int)
-	byMarker := make(map[string][]int)
-	bySemanticKey := make(map[string][]int)
-	byPartialRuleKey := make(map[string][]int)
-	for index, observed := range input.Observed {
-		candidate := observedInventoryCandidate{rule: observed}
-		if marker := strings.TrimSpace(candidate.rule.Marker); marker != "" {
-			markerKey := candidate.rule.Rule.Scope.Key() + "\x00" + marker
-			byMarker[markerKey] = append(byMarker[markerKey], index)
-		}
-		if observed.ParseStatus == filter.ParseStatusSupported {
-			normalized, err := filter.NormalizeRule(observed.Rule)
-			if err != nil {
-				return nil, fmt.Errorf("normalize observed firewall rule %d: %w", index, err)
-			}
-			candidate.rule.Rule = normalized
-			candidate.ruleKey, err = filter.RuleKey(normalized)
-			if err != nil {
-				return nil, err
-			}
-			key, err := firewallInventoryRuleKey(normalized)
-			if err != nil {
-				return nil, err
-			}
-			byRuleKey[key] = append(byRuleKey[key], index)
-			if instanceKey, err := filter.InstanceKey(candidate.rule); err == nil {
-				candidate.instanceKey = instanceKey
-				candidate.rule.InstanceKey = instanceKey
-				byInstanceKey[instanceKey] = append(byInstanceKey[instanceKey], index)
-			}
-		}
-		if observed.ParseStatus != filter.ParseStatusOpaque {
-			rule := candidate.rule.Rule
-			protocolUnknown, supportedFields := false, true
-			for _, field := range observed.UncertainFields {
-				if field != filter.ObservedFieldProtocol {
-					supportedFields = false
-					break
-				}
-				protocolUnknown = true
-			}
-			if supportedFields {
-				key := candidate.ruleKey
-				var err error
-				if protocolUnknown {
-					rule.Protocol = "tcp"
-					key, err = filter.RuleKey(rule)
-				} else if key == "" {
-					key, err = filter.RuleKey(rule)
-				}
-				if err == nil {
-					key += "\x00" + strings.TrimSpace(observed.Marker)
-					if protocolUnknown {
-						key = "protocol\x00" + key
-						byPartialRuleKey[key] = append(byPartialRuleKey[key], index)
-					} else if observed.ParseStatus != filter.ParseStatusSupported {
-						key = "exact\x00" + key
-						byPartialRuleKey[key] = append(byPartialRuleKey[key], index)
-					} else {
-						bySemanticKey[key] = append(bySemanticKey[key], index)
-					}
-				}
-			}
-		}
-		candidates[index] = candidate
-	}
-
-	normalizedDesired := make([]filter.DesiredRule, 0, len(input.Desired))
-	desiredMatches := make(map[int]int)
-	desiredMatchStates := make([]filter.InventoryMatch, 0, len(input.Desired))
-	for _, desired := range input.Desired {
-		normalized, err := filter.NormalizeRule(desired.Rule)
-		if err != nil {
-			return nil, fmt.Errorf("normalize desired firewall rule %q: %w", desired.UUID, err)
-		}
-		desired.Rule = normalized
-		calculatedKey, err := filter.RuleKey(normalized)
-		if err != nil {
-			return nil, err
-		}
-		if desired.RuleKey != "" && desired.RuleKey != calculatedKey {
-			return nil, fmt.Errorf("%w: desired rule %q key does not match its semantics", filter.ErrInvalidRule, desired.UUID)
-		}
-		desired.RuleKey = calculatedKey
-
-		match, matchState := findObservedInventoryMatch(desired, candidates, byRuleKey, byInstanceKey, byMarker, bySemanticKey, byPartialRuleKey)
-		normalizedIndex := len(normalizedDesired)
-		normalizedDesired = append(normalizedDesired, desired)
-		desiredMatchStates = append(desiredMatchStates, matchState)
-		if match >= 0 {
-			candidates[match].claimed = true
-			desiredMatches[match] = normalizedIndex
-		}
-	}
-
-	items := make([]filter.InventoryItem, 0, len(candidates)+len(normalizedDesired))
-	matchedDesired := make(map[int]struct{}, len(desiredMatches))
-	for index := range candidates {
-		candidate := &candidates[index]
-		if desiredIndex, exists := desiredMatches[index]; exists {
-			desired := normalizedDesired[desiredIndex]
-			observed := candidate.rule
-			match := desiredMatchStates[desiredIndex]
-			if match == filter.InventoryMatchExact && observed.ParseStatus != filter.ParseStatusSupported {
-				orderIndex := observed.Rule.OrderIndex
-				observed.Rule = desired.Rule
-				observed.Rule.OrderIndex = orderIndex
-				observed.ParseStatus = filter.ParseStatusSupported
-				observed.UncertainFields = nil
-			}
-			displayRule := observed.Rule
-			displayRule.Description = desired.Rule.Description
-			state := inventoryStateForDesired(desired, match)
-			if observed.Protected {
-				state = filter.InventoryStateProtected
-			} else if observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged {
-				state = filter.InventoryStateDrifted
-			}
-			items = append(items, filter.InventoryItem{
-				Rule:     displayRule,
-				Observed: &observed,
-				Desired:  &desired,
-				State:    state,
-				Match:    match,
-			})
-			matchedDesired[desiredIndex] = struct{}{}
-			continue
-		}
-		observed := candidate.rule
-		state := filter.InventoryStateExternal
-		if observed.Protected {
-			state = filter.InventoryStateProtected
-		} else if _, protected := input.ProtectedObservedKeys[candidate.ruleKey]; protected {
-			state = filter.InventoryStateProtected
-		}
-		match := filter.InventoryMatchNone
-		if observed.ParseStatus != filter.ParseStatusSupported {
-			match = filter.InventoryMatchOpaque
-		}
-		items = append(items, filter.InventoryItem{Rule: observed.Rule, Observed: &observed, State: state, Match: match})
-	}
-	for index, desired := range normalizedDesired {
-		if _, matched := matchedDesired[index]; matched {
-			continue
-		}
-		desiredCopy := desired
-		match := desiredMatchStates[index]
-		items = append(items, filter.InventoryItem{
-			Rule:    desired.Rule,
-			Desired: &desiredCopy,
-			State:   inventoryStateForDesired(desired, match),
-			Match:   match,
-		})
-	}
-	return items, nil
-}
-
-func findObservedInventoryMatch(desired filter.DesiredRule, candidates []observedInventoryCandidate, byRuleKey, byInstanceKey, byMarker, bySemanticKey, byPartialRuleKey map[string][]int) (int, filter.InventoryMatch) {
-	if marker := strings.TrimSpace(desired.Marker); marker != "" {
-		match, status := matchUnclaimedSemanticCandidate(desired, marker, candidates, bySemanticKey, byPartialRuleKey)
-		if status != filter.InventoryMatchMissing {
-			return match, status
-		}
-		markerKey := desired.Rule.Scope.Key() + "\x00" + marker
-		match, status = uniqueUnclaimedCandidate(byMarker, markerKey, candidates)
-		if match >= 0 && candidates[match].rule.ParseStatus != filter.ParseStatusOpaque &&
-			!filter.ObservedRuleMatchesExpected(candidates[match].rule, desired.Rule) {
-			return match, filter.InventoryMatchChanged
-		}
-		if status != filter.InventoryMatchMissing {
-			return match, status
-		}
-		if desired.Origin == filter.RuleOriginAdopted {
-			match, status = matchUnclaimedSemanticCandidate(desired, "", candidates, bySemanticKey, byPartialRuleKey)
-			if status != filter.InventoryMatchMissing {
-				if match >= 0 {
-					return match, filter.InventoryMatchChanged
-				}
-				return match, status
-			}
-		}
-		legacyMarker := "1panel-rule:" + strings.TrimSpace(desired.UUID)
-		if legacyMarker != "1panel-rule:" && legacyMarker != marker {
-			match, status = matchUnclaimedSemanticCandidate(desired, legacyMarker, candidates, bySemanticKey, byPartialRuleKey)
-			if status != filter.InventoryMatchMissing {
-				if match >= 0 {
-					return match, filter.InventoryMatchChanged
-				}
-				return match, status
-			}
-		}
-		return match, status
-	}
-	var match int
-	if desired.ObservedInstanceKey != "" {
-		match = firstUnclaimedCandidate(byInstanceKey, desired.ObservedInstanceKey, candidates)
-	} else {
-		key, err := firewallInventoryRuleKey(desired.Rule)
-		if err != nil {
-			return -1, filter.InventoryMatchMissing
-		}
-		match = firstUnclaimedCandidate(byRuleKey, key, candidates)
-	}
-	if match < 0 {
-		return -1, filter.InventoryMatchMissing
-	}
-	return match, filter.InventoryMatchExact
-}
-
-func firstUnclaimedCandidate(byKey map[string][]int, key string, candidates []observedInventoryCandidate) int {
-	indices := byKey[key]
-	for len(indices) > 0 && candidates[indices[0]].claimed {
-		indices = indices[1:]
-	}
-	if len(indices) == 0 {
-		delete(byKey, key)
-		return -1
-	}
-	byKey[key] = indices
-	return indices[0]
-}
-
-func uniqueUnclaimedCandidate(byKey map[string][]int, key string, candidates []observedInventoryCandidate) (int, filter.InventoryMatch) {
-	match := firstUnclaimedCandidate(byKey, key, candidates)
-	if match < 0 {
-		return -1, filter.InventoryMatchMissing
-	}
-	for _, index := range byKey[key][1:] {
-		if !candidates[index].claimed {
-			return -1, filter.InventoryMatchAmbiguous
-		}
-	}
-	return match, filter.InventoryMatchExact
-}
-
-func matchUnclaimedSemanticCandidate(desired filter.DesiredRule, marker string, candidates []observedInventoryCandidate, bySemanticKey, byPartialRuleKey map[string][]int) (int, filter.InventoryMatch) {
-	key := desired.RuleKey + "\x00" + marker
-	if match := firstUnclaimedCandidate(bySemanticKey, key, candidates); match >= 0 {
-		return match, filter.InventoryMatchExact
-	}
-	if len(byPartialRuleKey) == 0 {
-		return -1, filter.InventoryMatchMissing
-	}
-	match, status := uniqueUnclaimedCandidate(byPartialRuleKey, "exact\x00"+key, candidates)
-	if status == filter.InventoryMatchAmbiguous {
-		return match, status
-	}
-	protocolIndependent := desired.Rule
-	protocolIndependent.Protocol = "tcp"
-	partialKey, err := filter.RuleKey(protocolIndependent)
-	if err != nil {
-		return match, status
-	}
-	partial, partialStatus := uniqueUnclaimedCandidate(byPartialRuleKey, "protocol\x00"+partialKey+"\x00"+marker, candidates)
-	if partialStatus == filter.InventoryMatchAmbiguous || (match >= 0 && partial >= 0) {
-		return -1, filter.InventoryMatchAmbiguous
-	}
-	if match >= 0 {
-		return match, status
-	}
-	return partial, partialStatus
-}
-
-func inventoryStateForDesired(desired filter.DesiredRule, match filter.InventoryMatch) filter.InventoryState {
-	if match != filter.InventoryMatchExact {
-		return filter.InventoryStateDrifted
-	}
-	if desired.Protected {
-		return filter.InventoryStateProtected
-	}
-	switch desired.Origin {
-	case filter.RuleOriginAdopted:
-		return filter.InventoryStateAdopted
-	default:
-		return filter.InventoryStateManaged
-	}
-}
-
-func firewallSyncReasonMessage(code firewallsync.ReasonCode) string {
-	switch code {
-	case firewallsync.ReasonAlreadyExists:
-		return "rule already exists in target backend"
-	case firewallsync.ReasonOnlyExistsInTarget:
-		return "rule exists only in target backend"
-	case firewallsync.ReasonManagedOnlyInTarget:
-		return "managed rule exists only in target backend"
-	case firewallsync.ReasonUnsafeRemoval:
-		return "managed runtime rule cannot be safely removed"
-	case firewallsync.ReasonReadOnlyRule:
-		return "read-only runtime rule is preserved but cannot be synchronized"
-	default:
-		return ""
-	}
-}
-
-func appendDatabaseSyncFailure(result *dto.FirewallRuleSyncResult, item dto.FirewallRuleSyncItem, err error) {
-	if err == nil {
-		err = errors.New("database synchronization failed")
-	}
-	result.Failed++
-	result.Errors = append(result.Errors, dto.FirewallRuleSyncFailure{
-		SourceUUID: item.SourceUUID,
-		Rule:       item.Rule, ForwardRule: item.ForwardRule, DockerRule: item.DockerRule,
-		Error: err.Error(),
-	})
-}
-
-func firewallDeleteChange(current filter.ObservedRule, desired filter.DesiredRule) (filter.RuleChange, error) {
-	if err := filter.GuardMutation(current); err != nil {
-		return filter.RuleChange{}, err
-	}
-	before := current.Rule
-	if before.UUID == "" && strings.HasPrefix(current.Marker, "1panel-rule:") {
-		before.UUID = strings.TrimSpace(strings.TrimPrefix(current.Marker, "1panel-rule:"))
-	}
-	if before.UUID == "" {
-		before.UUID = desired.Rule.UUID
-	}
-	return filter.RuleChange{Operation: filter.ChangeDelete, Before: &before, Locator: &current.Locator, UnmarkedAdopted: current.Marker == "" && desired.Origin == filter.RuleOriginAdopted}, nil
-}
-
-func loadForwardingFirewallOverview(manager forwarding.Adapter) (dto.FirewallSubsystemStatus, error) {
-	ipv4, ipv4Err := loadForwardingFamilyInfo(manager, manager.Name(), constant.FirewallFamilyIPv4)
-	ipv6, ipv6Err := loadForwardingFamilyInfo(manager, manager.Name(), constant.FirewallFamilyIPv6)
+	ipv6, ipv6Err := loadForwardingFamilyInfo(manager, constant.FirewallFamilyIPv6)
 	if ipv6.Available {
 		interfaces, err := forwarding.IPv6RAInterfaces(os.ReadFile)
 		var pathError *os.PathError
@@ -2796,88 +1200,326 @@ func loadForwardingFirewallOverview(manager forwarding.Adapter) (dto.FirewallSub
 			ipv6.Reason = "ipv6_forwarding_not_enabled"
 		}
 	}
-	return dto.FirewallSubsystemStatus{IsInit: ipv4.Initialized || ipv6.Initialized, IsBind: ipv4.Bound || ipv6.Bound, IPv4: ipv4, IPv6: ipv6}, errors.Join(ipv4Err, ipv6Err)
+	return dto.FirewallSubsystemStatus{IPv6Enabled: len(families) > 1, IsInit: ipv4.Initialized || ipv6.Initialized, IsBind: ipv4.Bound || ipv6.Bound, IPv4: ipv4, IPv6: ipv6}, errors.Join(ipv4Err, ipv6Err)
 }
 
-func loadForwardingFamilyInfo(manager forwarding.Adapter, backend, family string) (dto.FirewallBackendFamilyStatus, error) {
-	initialized, bound, err := manager.FamilyStatus(family)
+func loadForwardingFamilyInfo(manager forwarding.Adapter, family string) (dto.FirewallBackendFamilyStatus, error) {
+	initialized, bound, partial, err := manager.FamilyState(family)
+	if family == constant.FirewallFamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+		return dto.FirewallBackendFamilyStatus{}, nil
+	}
 	available := err == nil
-	if backend == constant.FirewallProviderIptables && family == constant.FirewallFamilyIPv6 {
+	if manager.Name() == constant.FirewallProviderIptables && family == constant.FirewallFamilyIPv6 {
 		commands, commandErr := lifecycle.ResolveIptablesCommands()
 		available = available && commandErr == nil && commands.IPv6Available()
 	}
-	return dto.FirewallBackendFamilyStatus{Available: available, Initialized: initialized, Bound: bound}, err
+	return dto.FirewallBackendFamilyStatus{Available: available, Initialized: initialized, Bound: bound, Partial: partial}, err
 }
 
-func (s *ForwardingService) forwardingEnabled() (bool, error) {
-	if s.enabled != nil {
-		return s.enabled()
-	}
-	status, err := settingRepo.GetValueByKey(constant.FirewallForwardingInitializedKey)
-	return status == constant.StatusEnable, err
-}
-
-func (s *ForwardingService) initializeForwarding(manager forwarding.Adapter) error {
-	if err := s.saveForwardingBackend(manager.Name()); err != nil {
+func (s *ForwardingService) operateRules(ctx context.Context, request dto.ForwardRuleOperate, t *task.Task, initialize bool, families ...string) (resultErr error) {
+	defer func() { resultErr = errors.Join(resultErr, ctx.Err()) }()
+	forwardingMutationMu.Lock()
+	defer forwardingMutationMu.Unlock()
+	if err := ctx.Err(); err != nil {
 		return err
 	}
-	return manager.Enable()
-}
-
-func (s *ForwardingService) saveForwardingBackend(backend string) error {
-	if s.persistBackend != nil {
-		return s.persistBackend(backend)
+	var allowed []string
+	if initialize || request.Import {
+		var err error
+		allowed, err = loadFirewallFamilies()
+		if err != nil {
+			return err
+		}
 	}
-	return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
+	skippedIPv6 := 0
+	type operationBatch struct {
+		operation forwarding.OperationType
+		rules     []forwarding.Rule
+	}
+	groups := make([]operationBatch, 0)
+	for _, operation := range request.Rules {
+		kind := forwarding.OperationType(operation.Operation)
+		if kind != forwarding.OperationAdd && kind != forwarding.OperationRemove {
+			return fmt.Errorf("unsupported forwarding operation %q", operation.Operation)
+		}
+		if len(groups) == 0 || groups[len(groups)-1].operation != kind {
+			groups = append(groups, operationBatch{operation: kind})
+		}
+		for _, protocol := range strings.Split(operation.Protocol, "/") {
+			rule, err := forwarding.NormalizeRule(forwarding.Rule{
+				Family: operation.Family, Protocol: protocol, Port: operation.Port,
+				TargetIP: operation.TargetIP, TargetPort: operation.TargetPort, Interface: operation.Interface,
+			})
+			if err != nil {
+				return err
+			}
+			if len(allowed) > 0 && rule.Family == forwarding.FamilyIPv6 && !slices.Contains(allowed, forwarding.FamilyIPv6) {
+				skippedIPv6++
+				continue
+			}
+			groups[len(groups)-1].rules = append(groups[len(groups)-1].rules, rule)
+		}
+	}
+	logFirewallIPv6Skipped(t, "forwarding", skippedIPv6)
+	groups = slices.DeleteFunc(groups, func(group operationBatch) bool { return len(group.rules) == 0 })
+	if !initialize && len(groups) == 0 && skippedIPv6 > 0 {
+		return nil
+	}
+	manager, err := s.clientFactory(ctx)
+	if err != nil {
+		return err
+	}
+	if initialize {
+		if err := initializeForwarding(manager, allowed); err != nil {
+			return err
+		}
+		if !slices.Contains(allowed, forwarding.FamilyIPv6) && t != nil {
+			t.Logf("IPv6 firewall support is disabled; skipping IPv6 forwarding chain initialization")
+		}
+		for _, family := range families {
+			if !slices.Contains(allowed, family) {
+				continue
+			}
+			if err := manager.OperateFamily(family, true); err != nil {
+				return err
+			}
+		}
+	}
+	initialized, _, err := manager.InitStatus()
+	if err != nil {
+		return err
+	}
+	if !initialized {
+		return filter.ErrProviderUnavailable
+	}
+	checkedFamilies := make(map[string]bool)
+	for _, group := range groups {
+		for _, rule := range group.rules {
+			if checkedFamilies[rule.Family] {
+				continue
+			}
+			checkedFamilies[rule.Family] = true
+			ready, _, err := manager.FamilyStatus(rule.Family)
+			if err != nil {
+				return err
+			}
+			if !ready {
+				if !initialize {
+					return fmt.Errorf("%s forwarding chains are not initialized", rule.Family)
+				}
+				if err := manager.OperateFamily(rule.Family, true); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	stored, err := manager.List()
+	if err != nil {
+		return err
+	}
+	stored = slices.Clone(stored)
+	counts := make(map[string]int, len(stored))
+	for index, rule := range stored {
+		normalized, err := forwarding.NormalizeRule(rule)
+		if err != nil {
+			return err
+		}
+		stored[index] = normalized
+		counts[normalized.Identity()]++
+	}
+	succeeded, failed, skipped := 0, 0, 0
+	defer func() {
+		if t != nil {
+			t.Log(i18n.GetMsgWithMap("FirewallRuleOperationResult", map[string]interface{}{"succeeded": succeeded, "failed": failed}))
+			if skipped > 0 {
+				t.Logf("%s: %d", i18n.GetMsgByKey("FirewallCreateRuleSkipped"), skipped)
+			}
+		}
+	}()
+	record := func(operation forwarding.OperationType, rule forwarding.Rule, status string, cause error) {
+		label := fmt.Sprintf("%s %s %s %s -> %s:%s", operation, rule.Family, rule.Protocol, rule.Port, rule.TargetIP, rule.TargetPort)
+		switch status {
+		case "skipped":
+			skipped++
+			if t != nil {
+				t.Logf("%s %s: %v", label, i18n.GetMsgByKey("FirewallCreateRuleSkipped"), cause)
+			}
+		case "failed":
+			failed++
+			if t != nil {
+				t.LogFailedWithErr(label, cause)
+			}
+		default:
+			succeeded++
+			if t != nil {
+				t.LogSuccess(label)
+			}
+		}
+	}
+	var failures []error
+	var interfaces map[string]bool
+	for _, group := range groups {
+		if group.operation != forwarding.OperationAdd {
+			continue
+		}
+		for _, rule := range group.rules {
+			if rule.Interface == "" {
+				continue
+			}
+			if counts[rule.Identity()] > 0 {
+				continue
+			}
+			if interfaces == nil {
+				available, err := net.Interfaces()
+				if err != nil {
+					return fmt.Errorf("load forwarding interfaces: %w", err)
+				}
+				interfaces = make(map[string]bool, len(available))
+				for _, item := range available {
+					interfaces[item.Name] = true
+				}
+			}
+			if !interfaces[rule.Interface] {
+				err := buserr.WithMap("ErrForwardInterfaceNotFound", map[string]interface{}{"name": rule.Interface}, nil)
+				failures = append(failures, err)
+				record(group.operation, rule, "failed", err)
+			}
+		}
+	}
+	if len(failures) > 0 {
+		return errors.Join(failures...)
+	}
+	isEdit := len(request.Rules) == 2 && len(groups) == 2 && groups[0].operation == forwarding.OperationRemove && groups[1].operation == forwarding.OperationAdd
+	if isEdit {
+		old := make(map[string]bool, len(groups[0].rules))
+		for _, rule := range groups[0].rules {
+			old[rule.Identity()] = true
+		}
+		unchanged := len(old) == len(groups[1].rules)
+		duplicate := false
+		next := make(map[string]bool, len(groups[1].rules))
+		for _, rule := range groups[1].rules {
+			key := rule.Identity()
+			next[key] = true
+			unchanged = unchanged && old[key]
+			if counts[key] > 0 && !old[key] {
+				duplicate = true
+			}
+		}
+		if unchanged || duplicate {
+			for _, group := range groups {
+				for _, rule := range group.rules {
+					record(group.operation, rule, "skipped", buserr.New("ErrRecordExist"))
+				}
+			}
+			return nil
+		}
+		for _, rule := range groups[0].rules {
+			if counts[rule.Identity()] == 0 {
+				record(forwarding.OperationRemove, rule, "failed", filter.ErrRuleStale)
+				return filter.ErrRuleStale
+			}
+		}
+		removals := make([]forwarding.Rule, 0, len(groups[0].rules))
+		for _, rule := range groups[0].rules {
+			if !next[rule.Identity()] {
+				removals = append(removals, rule)
+			}
+		}
+		groups[0], groups[1] = groups[1], operationBatch{operation: forwarding.OperationRemove, rules: removals}
+	}
+	for _, group := range groups {
+		byFamily := make(map[string][]forwarding.Rule, 2)
+		seen := make(map[string]bool, len(group.rules))
+		for _, rule := range group.rules {
+			key := rule.Identity()
+			exists := counts[key] > 0
+			if seen[key] || (group.operation == forwarding.OperationAdd && exists) {
+				record(group.operation, rule, "skipped", buserr.New("ErrRecordExist"))
+				continue
+			}
+			if group.operation == forwarding.OperationRemove && !exists {
+				failures = append(failures, filter.ErrRuleStale)
+				record(group.operation, rule, "failed", filter.ErrRuleStale)
+				continue
+			}
+			seen[key] = true
+			copies := 1
+			if group.operation == forwarding.OperationRemove && manager.Name() == constant.FirewallProviderIptables {
+				copies = counts[key]
+			}
+			for i := 0; i < copies; i++ {
+				byFamily[rule.Family] = append(byFamily[rule.Family], rule)
+			}
+		}
+		for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+			rules := byFamily[family]
+			if len(rules) == 0 {
+				continue
+			}
+			err := ctx.Err()
+
+			if err == nil {
+				if group.operation == forwarding.OperationAdd {
+					err = manager.CreateRules(ctx, rules)
+				} else {
+					err = manager.DeleteRules(ctx, rules)
+				}
+			}
+			if err != nil {
+				failures = append(failures, err)
+				for _, rule := range rules {
+					record(group.operation, rule, "failed", err)
+				}
+				continue
+			}
+			for _, rule := range rules {
+				if group.operation == forwarding.OperationAdd {
+					counts[rule.Identity()]++
+					stored = append(stored, rule)
+				} else {
+					delete(counts, rule.Identity())
+					stored = slices.DeleteFunc(stored, func(item forwarding.Rule) bool { return item.Identity() == rule.Identity() })
+				}
+				record(group.operation, rule, "succeeded", nil)
+			}
+		}
+		if len(failures) > 0 && (isEdit || group.operation == forwarding.OperationRemove) {
+			break
+		}
+	}
+	return errors.Join(errors.Join(failures...), persistForwardingRules(manager, stored))
 }
 
-func (s *ForwardingService) persistForwardingEnabled() error {
-	if s.markEnabled != nil {
-		return s.markEnabled()
+func initializeForwarding(manager forwarding.Adapter, families []string) error {
+	if err := settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, manager.Name()); err != nil {
+		return err
+	}
+	if !slices.Contains(families, forwarding.FamilyIPv6) {
+		global.LOG.Info("IPv6 firewall support is disabled; skipping IPv6 forwarding chain initialization")
+	}
+	if err := manager.Enable(families...); err != nil {
+		return err
 	}
 	return settingRepo.UpdateOrCreate(constant.FirewallForwardingInitializedKey, constant.StatusEnable)
-}
-
-func recordForwardingSyncError(err error) {
-	forwardingSyncStateMu.Lock()
-	forwardingLastSyncErr = err
-	forwardingSyncStateMu.Unlock()
-}
-
-func forwardingRulesFromModels(stored []model.ForwardingRule) []forwarding.Rule {
-	rules := make([]forwarding.Rule, 0, len(stored))
-	for _, rule := range stored {
-		rules = append(rules, forwarding.Rule{
-			Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP,
-			TargetPort: rule.TargetPort, Interface: rule.Interface,
-		})
-	}
-	return rules
 }
 
 func newForwardingService() *ForwardingService {
 	return &ForwardingService{
 		clientFactory: newForwardingAdapter,
-		rules:         forwardingRuleRepo,
-		markEnabled: func() error {
-			return settingRepo.UpdateOrCreate(constant.FirewallForwardingInitializedKey, constant.StatusEnable)
-		},
-		persistBackend: func(backend string) error {
-			return settingRepo.UpdateOrCreate(constant.FirewallForwardingBackendKey, backend)
-		},
 	}
 }
 
-func newForwardingAdapter() (forwarding.Adapter, error) {
+func newForwardingAdapter(ctx context.Context) (forwarding.Adapter, error) {
 	selected, _ := settingRepo.GetValueByKey(constant.FirewallForwardingBackendKey)
 	selected = strings.TrimSpace(selected)
 	if selected == "" {
 		selected = constant.FirewallProviderIptables
 	}
-	return newForwardingAdapterFor(selected)
+	return newForwardingAdapterFor(ctx, selected)
 }
 
-func newForwardingAdapterFor(backend string) (forwarding.Adapter, error) {
+func newForwardingAdapterFor(ctx context.Context, backend string) (forwarding.Adapter, error) {
 	client, err := lifecycle.NewClient(backend)
 	if err != nil {
 		return nil, fmt.Errorf(
@@ -2887,73 +1529,12 @@ func newForwardingAdapterFor(backend string) (forwarding.Adapter, error) {
 	}
 	switch client.Name() {
 	case constant.FirewallProviderIptables:
-		return forwarding.NewIptables(client.Name()), nil
+		return forwarding.NewIptables(ctx, client.Name()), nil
 	case constant.FirewallProviderNftables:
-		return forwarding.NewNftables(), nil
+		return forwarding.NewNftables(ctx), nil
 	default:
 		return nil, errForwardingBackendUnavailable
 	}
-}
-
-func ReconcileDockerPortGuard(ctx context.Context) error {
-	return NewIDockerPortGuardService().Reconcile(ctx)
-}
-
-func (s *DockerPortGuardService) reconcileLocked(ctx context.Context) error {
-	persistedEnabled, err := dockerPortGuardPersistedEnabled()
-	if err != nil {
-		return fmt.Errorf("load Docker port guard persisted status: %w", err)
-	}
-	backends := []string{constant.FirewallProviderIptables, constant.FirewallProviderNftables}
-	if s.runtime != nil {
-		backends = []string{selectedDockerFirewallBackend(constant.FirewallProviderIptables)}
-	}
-	initializedByBackend := make(map[string]bool, len(backends))
-	initialized := false
-	for _, backend := range backends {
-		initialized, err = s.guardRuntime(backend).Initialized(dockerfirewall.FamilyIPv4)
-		if err != nil {
-			return &dockerfirewall.FamilyError{Family: dockerfirewall.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
-		}
-		initializedByBackend[backend] = initialized
-		if initialized {
-			break
-		}
-	}
-	if !initialized && !persistedEnabled {
-		return nil
-	}
-	runtime, backend, err := s.runtimeForDocker(ctx)
-	if err != nil {
-		return err
-	}
-	initialized, inspected := initializedByBackend[backend]
-	if !inspected {
-		initialized, err = runtime.Initialized(dockerfirewall.FamilyIPv4)
-		if err != nil {
-			return &dockerfirewall.FamilyError{Family: dockerfirewall.FamilyIPv4, Err: fmt.Errorf("inspect initialization: %w", err)}
-		}
-	}
-	if !initialized && !persistedEnabled {
-		return nil
-	}
-	policies, err := s.runtimePolicies(ctx)
-	if err != nil {
-		return err
-	}
-	inventory, err := runtime.ListPolicies()
-	if err != nil {
-		return err
-	}
-	if !initialized {
-		err = runtime.Initialize(policies, inventory)
-	} else {
-		err = runtime.ReplacePolicies(policies, inventory)
-	}
-	if err != nil {
-		return err
-	}
-	return verifyDockerFirewall(runtime, policies, inventory.ReadOnly)
 }
 
 func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerfirewall.Runtime, string, error) {
@@ -2973,24 +1554,24 @@ func (s *DockerPortGuardService) runtimeForDocker(ctx context.Context) (dockerfi
 	if backend != constant.FirewallProviderIptables && backend != constant.FirewallProviderNftables {
 		return nil, backend, fmt.Errorf("Docker firewall backend %q is not supported", backend)
 	}
-	return s.guardRuntime(backend), backend, nil
+	return s.guardRuntime(ctx, backend), backend, nil
 }
 
-func (s *DockerPortGuardService) guardRuntime(backend string) dockerfirewall.Runtime {
+func (s *DockerPortGuardService) guardRuntime(ctx context.Context, backend string) dockerfirewall.Runtime {
 	if s.runtimeForBackend != nil {
-		return s.runtimeForBackend(backend)
+		return s.runtimeForBackend(ctx, backend)
 	}
 	if s.runtime != nil {
 		return s.runtime
 	}
-	return newDockerFirewallRuntime(backend)
+	return newDockerFirewallRuntime(ctx, backend)
 }
 
-func newDockerFirewallRuntime(backend string) dockerfirewall.Runtime {
+func newDockerFirewallRuntime(ctx context.Context, backend string) dockerfirewall.Runtime {
 	if backend == constant.FirewallProviderNftables {
-		return dockerfirewall.NewNftables()
+		return dockerfirewall.NewNftables(ctx)
 	}
-	return dockerfirewall.NewIptables()
+	return dockerfirewall.NewIptables(ctx)
 }
 
 func selectedDockerFirewallBackend(fallback string) string {
@@ -3013,29 +1594,6 @@ func dockerFirewallBackend(info system.Info) string {
 	return strings.ToLower(info.FirewallBackend.Driver)
 }
 
-func (s *DockerPortGuardService) runtimePolicies(ctx context.Context) ([]dockerfirewall.Policy, error) {
-	stored, err := s.policies.ListManaged(ctx)
-	if err != nil {
-		return nil, err
-	}
-	policies := make([]dockerfirewall.Policy, 0, len(stored))
-	for _, policy := range stored {
-		sources := []string{}
-		_ = json.Unmarshal([]byte(policy.Sources), &sources)
-		policies = append(policies, dockerfirewall.Policy{UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol, Mode: policy.Mode, Sources: sources})
-	}
-	return policies, nil
-}
-
-func dockerGuardReadOnlyPolicyUUID(policy dockerfirewall.ReadOnlyPolicy) string {
-	nativeRules, _ := json.Marshal(policy.NativeRules)
-	fingerprint := strings.Join([]string{
-		policy.Policy.Family, policy.Policy.HostIP, strconv.Itoa(int(policy.Policy.HostPort)),
-		policy.Policy.Protocol, policy.Action, string(nativeRules),
-	}, "\x00")
-	return uuid.NewSHA1(uuid.NameSpaceOID, []byte(fingerprint)).String()
-}
-
 func dockerPortGuardPersistedEnabled() (bool, error) {
 	status, err := settingRepo.GetValueByKey(constant.FirewallDockerPortGuardStatusKey)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -3044,110 +1602,10 @@ func dockerPortGuardPersistedEnabled() (bool, error) {
 	return status == constant.StatusEnable, err
 }
 
-func verifyDockerFirewall(runtime dockerfirewall.Runtime, desired []dockerfirewall.Policy, preserved []dockerfirewall.ReadOnlyPolicy) error {
-	inventory, err := runtime.ListPolicies()
-	if err != nil {
-		return fmt.Errorf("verify synchronized Docker firewall policies: %w", err)
-	}
-	if !dockerFirewallPoliciesEqual(inventory.Policies, desired) {
-		return fmt.Errorf("verify synchronized Docker firewall policies: target policies do not match the database")
-	}
-	if !readOnlyStatesEqual(inventory.ReadOnly, preserved) {
-		return fmt.Errorf("verify synchronized Docker firewall policies: read-only runtime rules changed")
-	}
-	return nil
-}
-
-func dockerFirewallPoliciesEqual(left, right []dockerfirewall.Policy) bool {
-	if len(left) != len(right) {
-		return false
-	}
-	counts := make(map[string]int, len(left))
-	for _, policy := range left {
-		counts[dockerFirewallPolicyKey(policy)]++
-	}
-	for _, policy := range right {
-		key := dockerFirewallPolicyKey(policy)
-		if counts[key] == 0 {
-			return false
-		}
-		counts[key]--
-	}
-	return true
-}
-
-func dockerFirewallPolicyKey(policy dockerfirewall.Policy) string {
-	mode := policy.Mode
-	if mode == dockerfirewall.ModeAllow && len(policy.Sources) == 0 {
-		mode = dockerfirewall.ModeAll
-	}
-	sources := make([]string, 0, len(policy.Sources))
-	for _, source := range policy.Sources {
-		source = strings.TrimSpace(source)
-		if prefix, err := netip.ParsePrefix(source); err == nil {
-			source = prefix.Masked().String()
-		} else if address, err := netip.ParseAddr(source); err == nil {
-			address = address.Unmap()
-			source = netip.PrefixFrom(address, address.BitLen()).String()
-		}
-		sources = append(sources, source)
-	}
-	sort.Strings(sources)
-	host := policy.HostIP
-	if address, err := netip.ParseAddr(host); err == nil {
-		host = address.String()
-	}
-	return strings.Join([]string{
-		policy.UUID, policy.Family, host, strconv.Itoa(int(policy.HostPort)),
-		policy.Protocol, mode, strings.Join(sources, ","),
-	}, "\x00")
-}
-
-func readOnlyStatesEqual(left, right []dockerfirewall.ReadOnlyPolicy) bool {
-	if len(left) != len(right) {
-		return false
-	}
-	leftRules := flattenNativeRules(left)
-	rightRules := flattenNativeRules(right)
-	if len(leftRules) != len(rightRules) {
-		return false
-	}
-	for index := range leftRules {
-		if leftRules[index].Family != rightRules[index].Family || !slices.Equal(leftRules[index].Tokens, rightRules[index].Tokens) {
-			return false
-		}
-	}
-	return true
-}
-
-func flattenNativeRules(policies []dockerfirewall.ReadOnlyPolicy) []dockerfirewall.NativeRule {
-	rules := make([]dockerfirewall.NativeRule, 0)
-	for _, policy := range policies {
-		rules = append(rules, policy.NativeRules...)
-	}
-	slices.SortStableFunc(rules, func(left, right dockerfirewall.NativeRule) int {
-		if left.Family < right.Family {
-			return -1
-		}
-		if left.Family > right.Family {
-			return 1
-		}
-		if left.Order < right.Order {
-			return -1
-		}
-		if left.Order > right.Order {
-			return 1
-		}
-		return 0
-	})
-	return rules
-}
-
 func newDockerPortGuardService() *DockerPortGuardService {
 	return &DockerPortGuardService{
-		policies: repo.NewIDockerPortGuardRepo(),
-		client:   docker.NewDockerClient,
-		version:  dockerFirewallVersion,
+		client:  docker.NewDockerClient,
+		version: dockerFirewallVersion,
 	}
 }
 
@@ -3331,28 +1789,6 @@ func restoreFail2BanAfterFirewallStart() error {
 	return nil
 }
 
-func currentFirewallRuleSyncTaskLocked() (dto.FirewallRuleSyncTask, error) {
-	if firewallRuleSyncTaskID != "" {
-		return dto.FirewallRuleSyncTask{TaskID: firewallRuleSyncTaskID, Executing: true}, nil
-	}
-	if global.TaskDB == nil {
-		return dto.FirewallRuleSyncTask{}, nil
-	}
-	taskRepo := repo.NewITaskRepo()
-	record, err := taskRepo.GetFirst(
-		repo.WithByStatus(constant.StatusExecuting),
-		repo.WithByType(task.TaskScopeFirewall),
-		taskRepo.WithOperate(task.TaskSync),
-	)
-	if err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return dto.FirewallRuleSyncTask{}, nil
-		}
-		return dto.FirewallRuleSyncTask{}, err
-	}
-	return dto.FirewallRuleSyncTask{TaskID: record.ID, Executing: true}, nil
-}
-
 func (s *FirewallService) operateFilterChainBase(provider string, request dto.FilterChainOperation) error {
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
@@ -3368,14 +1804,54 @@ func (s *FirewallService) operateFilterChainBaseLocked(provider string, request 
 	}
 	operation := firewall.BaseOperation(request.Operate)
 	var ports []firewall.PortWhitelist
-	if operation == firewall.BaseOperationInit || operation == firewall.BaseOperationBind {
+	if operation == firewall.BaseOperationInit {
 		var err error
 		ports, err = LoadRequiredFirewallPortWhiteList()
 		if err != nil {
 			return err
 		}
 	}
-	if provider == constant.FirewallProviderNftables {
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return err
+	}
+	if operation == firewall.BaseOperationInit && !slices.Contains(families, constant.FirewallFamilyIPv6) {
+		global.LOG.Info("IPv6 firewall support is disabled; skipping IPv6 host chain initialization")
+	}
+	if operation == firewall.BaseOperationBind {
+		bound := false
+		for _, family := range families {
+			status, err := loadSystemFirewallFamilyInfo(provider, family)
+			if err != nil {
+				return err
+			}
+			if !status.Initialized {
+				continue
+			}
+			if provider == constant.FirewallProviderNftables {
+				err = nftables_helper.OperateFamily(filter.Family(family), false, nil)
+			} else {
+				err = iptables_helper.OperateFamily(family, false, nil)
+			}
+			if err != nil {
+				return err
+			}
+			bound = true
+		}
+		if !bound {
+			return filter.ErrProviderUnavailable
+		}
+	} else if len(families) == 1 && operation != firewall.BaseOperationUnbind {
+		initialize := operation == firewall.BaseOperationInit
+		if provider == constant.FirewallProviderNftables {
+			err = nftables_helper.OperateFamily(filter.FamilyIPv4, initialize, ports)
+		} else {
+			err = iptables_helper.OperateFamily(constant.FirewallFamilyIPv4, initialize, ports)
+		}
+		if err != nil {
+			return err
+		}
+	} else if provider == constant.FirewallProviderNftables {
 		if err := nftables_helper.Operate(operation, ports); err != nil {
 			return err
 		}
@@ -3463,54 +1939,7 @@ func resetServiceFirewallClient(client lifecycle.Client, withDockerRestart bool,
 	return resetter.Reset()
 }
 
-func (s *FirewallService) desiredFirewallRulesByScope(ctx context.Context, stored []model.FirewallRule, runtime filter.Adapter) (map[string][]filter.DesiredRule, []filter.InventoryItem) {
-	provider := runtime.Provider()
-	desired := make(map[string][]filter.DesiredRule)
-	var failures []filter.InventoryItem
-	ports, protectionErr := loadFirewallPortWhiteList()
-	var required []firewall.PortWhitelist
-	if protectionErr == nil {
-		loadRequired := s.requiredPorts
-		if loadRequired != nil {
-			required, protectionErr = loadRequired()
-		} else {
-			required, protectionErr = firewall.RequiredPortWhitelist(ports)
-		}
-	}
-	whitelist := filter.NewPortWhitelistIndex(ports)
-	for _, record := range stored {
-		compiled, _, err := s.compileRestorableFirewallRules(ctx, record, runtime, required)
-		if err == nil {
-			err = protectionErr
-		}
-		if err != nil {
-			rule := filter.FirewallRule{
-				UUID:     record.UUID,
-				Scope:    filter.Scope{Provider: provider, Family: filter.Family(record.Family), Direction: filter.DirectionInput}.Normalize(),
-				Protocol: record.Protocol, SourceAddress: record.SourceAddress, SourcePort: record.SourcePort,
-				DestinationAddress: record.DestinationAddress, DestinationPort: record.DestinationPort,
-				Interface: record.Interface, ConnectionStates: strings.FieldsFunc(record.ConnectionStates, func(r rune) bool { return r == ',' }),
-				Action: filter.Action(record.Action), Description: record.Description, Priority: record.Priority,
-			}
-			failures = append(failures, filter.InventoryItem{
-				Incompatible: isFirewallPolicyIncompatible(err),
-				Rule:         rule, State: filter.InventoryStateDrifted, Match: filter.InventoryMatchNone,
-				Desired: &filter.DesiredRule{UUID: record.UUID, Rule: rule, Origin: filter.RuleOrigin(record.Origin), Protected: protectionErr != nil || whitelist.Matches(rule)},
-				Error:   fmt.Sprintf("policy %s: %v", record.UUID, err),
-			})
-			continue
-		}
-		for _, rule := range compiled {
-			rule.Protected = whitelist.Matches(rule.Rule)
-			rule.Expanded = len(compiled) > 1
-			key := rule.Rule.Scope.Key()
-			desired[key] = append(desired[key], rule)
-		}
-	}
-	return desired, failures
-}
-
-func firewallInventoryPositionRanges(provider filter.Provider, items []filter.InventoryItem) (ipv4, ipv6 filter.PositionRange) {
+func firewallInventoryPositionRanges(provider filter.Provider, chain string, items []filter.InventoryItem) (ipv4, ipv6 filter.PositionRange) {
 	if provider == filter.ProviderFirewalld {
 		return filter.PositionRange{Min: -32768, Max: 32767}, filter.PositionRange{Min: -32768, Max: 32767}
 	}
@@ -3522,18 +1951,18 @@ func firewallInventoryPositionRanges(provider filter.Provider, items []filter.In
 		if scope.Provider != provider || scope.Direction != filter.DirectionInput {
 			continue
 		}
+		position := *item.Observed.Locator.Position
+		if position < 1 {
+			continue
+		}
 		if (provider == filter.ProviderIptables || provider == filter.ProviderNftables) &&
-			(scope.Table != "filter" || scope.Chain != filter.IptablesInputChain) {
+			(scope.Table != "filter" || scope.Chain != chain) {
 			continue
 		}
 		bounds := &ipv4
 		if scope.Family == filter.FamilyIPv6 {
 			bounds = &ipv6
 		} else if scope.Family != filter.FamilyIPv4 {
-			continue
-		}
-		position := *item.Observed.Locator.Position
-		if position < 1 {
 			continue
 		}
 		if bounds.Min == 0 || position < bounds.Min {
@@ -3545,139 +1974,6 @@ func firewallInventoryPositionRanges(provider filter.Provider, items []filter.In
 		}
 	}
 	return
-}
-
-func (s *FirewallService) adoptRule(ctx context.Context, runtime filter.Adapter, snapshot filter.RuleSet, observed filter.ObservedRule, source dto.FirewallRuleCreateItem) error {
-	if (observed.Rule.Scope.Provider == filter.ProviderIptables || observed.Rule.Scope.Provider == filter.ProviderNftables) &&
-		(observed.Rule.Scope.Chain == filter.BasicBeforeChain || observed.Rule.Scope.Chain == filter.BasicAfterChain) {
-		return fmt.Errorf("%w: system preset chains cannot be adopted", filter.ErrUnsupportedScope)
-	}
-	if observed.Protected {
-		return filter.ErrProtectedRule
-	}
-	if observed.ParseStatus != filter.ParseStatusSupported ||
-		(observed.Persistence != "" && observed.Persistence != filter.PersistenceStatusConverged) {
-		return fmt.Errorf("%w: rule cannot be managed", filter.ErrRuleOperation)
-	}
-	rule, err := prepareFirewallBackendRule(ctx, runtime, observed.Rule)
-	if err != nil {
-		return err
-	}
-	if rule.Scope.Provider != filter.ProviderFirewalld && observed.Locator.Position != nil {
-		position := int64(*observed.Locator.Position)
-		rule.OrderIndex = &position
-	}
-	record, err := firewallRuleModelForCreate(rule, source, constant.FirewallRuleOriginAdopted)
-	if err != nil {
-		return err
-	}
-	stored, err := s.rules.List(ctx)
-	if err != nil {
-		return err
-	}
-	if runtime.Provider() == filter.ProviderNftables {
-		duplicates := 0
-		for _, candidate := range snapshot.Rules {
-			if candidate.ParseStatus != filter.ParseStatusSupported {
-				continue
-			}
-			same, err := filter.SameRuleContent(candidate.Rule, rule)
-			if err != nil {
-				return err
-			}
-			if same {
-				duplicates++
-				if duplicates > 1 {
-					return buserr.WithDetail("ErrInvalidParams", "duplicate firewall rules prevent adoption; manually delete duplicate rules and retry", nil)
-				}
-			}
-		}
-	}
-	identities, err := firewallRuleCollisions(stored, rule.Scope.Provider)
-	if err != nil {
-		return err
-	}
-	for _, existing := range stored {
-		marker := "1panel-rule:" + existing.UUID
-		if existing.UUID != "" && (observed.Marker == marker || strings.HasPrefix(observed.Marker, marker+"-")) {
-			return fmt.Errorf("%w: rule is already managed", filter.ErrRuleOperation)
-		}
-	}
-	if err := identities.CheckDuplicate(rule); err != nil {
-		if errors.Is(err, filter.ErrRuleOperation) {
-			return buserr.WithDetail("ErrInvalidParams", "duplicate firewall rules prevent adoption; manually delete duplicate rules and retry", nil)
-		}
-		return err
-	}
-	record.UUID = uuid.NewString()
-	rule.UUID = record.UUID
-	if runtime.Provider() != filter.ProviderNftables {
-		ports, err := loadFirewallPortWhiteList()
-		if err != nil {
-			return err
-		}
-		if filter.RuleMatchesPortWhitelist(rule, ports) {
-			return filter.ErrProtectedRule
-		}
-		before := observed.Rule
-		before.UUID = record.UUID
-		scope := filter.RuleSet{Scope: rule.Scope}
-		remove, err := runtime.BuildCommands(scope, []filter.RuleChange{{
-			Operation: filter.ChangeDelete, Before: &before, CommandOnly: true,
-			UnmarkedAdopted: observed.Marker == "", PreviousMarker: observed.Marker,
-		}})
-		if err != nil {
-			return err
-		}
-		create, err := runtime.BuildCommands(scope, []filter.RuleChange{{
-			Operation: filter.ChangeCreate, After: &rule, CommandOnly: true, Append: rule.OrderIndex == nil,
-		}})
-		if err != nil {
-			return err
-		}
-		remove.CommandOnly, create.CommandOnly = true, true
-		if err := runtime.RunCommands(ctx, remove); err != nil {
-			return err
-		}
-		record.Priority = rule.Priority
-		saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 30*time.Second)
-		err = s.saveFirewallRule(saveCtx, &record)
-		cancel()
-		if err != nil {
-			return err
-		}
-		runErr := runtime.RunCommands(ctx, create)
-		if err := errors.Join(runErr, persistFirewallRules(ctx, runtime, create)); err != nil {
-			return buserr.WithDetail("ErrFirewallRuleSavedApplyFailed", err.Error(), err)
-		}
-		return nil
-	}
-	plan, verification, err := applyFirewallChanges(runtime, ctx, snapshot, []filter.RuleChange{{
-		Operation: filter.ChangeAdopt, After: &rule, Locator: &observed.Locator, PreviousMarker: observed.Marker,
-	}})
-	if err != nil {
-		return err
-	}
-	if !verification.Matched {
-		return filter.ErrVerificationFailed
-	}
-	if _, err := filter.FindCommittedObserved(verification.RuleSet, rule, plan); err != nil {
-		return rollbackFirewallPlan(ctx, runtime, plan, err)
-	}
-	return s.saveFirewallRule(ctx, &record)
-}
-
-func (index firewallRuleCollisionIndex) CheckDuplicate(rule filter.FirewallRule) error {
-	key, err := filter.RuleMatchKey(rule)
-	if err != nil {
-		return err
-	}
-	for _, action := range index[key] {
-		if action == rule.Action {
-			return checkCollisionActions(rule.Action, action)
-		}
-	}
-	return nil
 }
 
 func findPortWhitelistRule(rules []firewall.PortWhitelist, target firewall.PortWhitelist) (int, error) {
@@ -3720,10 +2016,7 @@ func loadSSHWhitelistPortFrom(path string) (string, error) {
 
 func newFirewallService() *FirewallService {
 	return &FirewallService{
-		rules:                  repo.NewIFirewallRuleRepo(),
 		adapters:               nil,
-		forwardingSync:         newForwardingService(),
-		dockerSync:             newDockerPortGuardService(),
 		selectedProvider:       firewallRuleSelectedProvider,
 		requiredPorts:          LoadRequiredFirewallPortWhiteList,
 		cleanupBackend:         cleanupSystemBackend,
@@ -3733,7 +2026,7 @@ func newFirewallService() *FirewallService {
 		restoreForwarding: func(ctx context.Context) error {
 			return newForwardingService().Restore(ctx)
 		},
-		restoreDockerGuard: ReconcileDockerPortGuard,
+		restoreDockerGuard: RestoreDockerPortGuard,
 		baseClient:         NewSelectedSystemFirewallClient,
 	}
 }
@@ -3744,272 +2037,6 @@ func firewallRuleSelectedProvider(context.Context) (filter.Provider, error) {
 		return "", fmt.Errorf("%w: %v", filter.ErrProviderUnavailable, err)
 	}
 	return filter.Provider(client.Name()), nil
-}
-
-func (s *ForwardingService) loadRuleSyncCandidates(ctx context.Context, targetProvider filter.Provider) (forwarding.Adapter, []forwardingRuleSyncCandidate, []forwarding.Rule, bool, error) {
-	target, err := s.clientFactory()
-	if err != nil {
-		return nil, nil, nil, false, err
-	}
-	if target.Name() != string(targetProvider) {
-		return nil, nil, nil, false, fmt.Errorf(
-			"%w: selected forwarding backend is %s, requested target is %s",
-			filter.ErrProviderUnavailable, target.Name(), targetProvider,
-		)
-	}
-	stored, err := s.rules.List(ctx)
-	if err != nil {
-		return nil, nil, nil, false, err
-	}
-	candidates := make([]forwardingRuleSyncCandidate, 0, len(stored))
-	for _, record := range stored {
-		rule := forwarding.Rule{
-			Family: record.Family, Protocol: record.Protocol, Port: record.Port, TargetIP: record.TargetIP,
-			TargetPort: record.TargetPort, Interface: record.Interface,
-		}
-		normalized, normalizeErr := forwarding.NormalizeRule(rule)
-		candidates = append(candidates, forwardingRuleSyncCandidate{rule: normalized, err: normalizeErr})
-	}
-	initialized, _, err := target.InitStatus()
-	if err != nil {
-		return nil, nil, nil, false, err
-	}
-	targetRules := make([]forwarding.Rule, 0)
-	if initialized {
-		targetRules, err = target.List()
-		if err != nil {
-			return nil, nil, nil, false, err
-		}
-		targetRules, err = normalizeForwardingRuntimeRules(targetRules)
-		if err != nil {
-			return nil, nil, nil, false, err
-		}
-	}
-	return target, candidates, targetRules, initialized, nil
-}
-
-func normalizeForwardingRuntimeRules(rules []forwarding.Rule) ([]forwarding.Rule, error) {
-	normalized := make([]forwarding.Rule, 0, len(rules))
-	for _, rule := range rules {
-		item, err := forwarding.NormalizeRule(rule)
-		if err != nil {
-			return nil, fmt.Errorf("normalize target forwarding rule %s: %w", rule.Identity(), err)
-		}
-		normalized = append(normalized, item)
-	}
-	return normalized, nil
-}
-
-func databaseRuleSyncTarget(request dto.FirewallRuleSyncRequest, subsystem string) (filter.Provider, error) {
-	if request.SourceProvider != "" {
-		return "", fmt.Errorf("%w: %s synchronization reads rules from the database and does not accept a source provider", filter.ErrInvalidRule, subsystem)
-	}
-	if request.ResetSource {
-		return "", fmt.Errorf("%w: %s synchronization does not have a source firewall to reset", filter.ErrInvalidRule, subsystem)
-	}
-	if request.TargetProvider != filter.ProviderIptables && request.TargetProvider != filter.ProviderNftables {
-		return "", fmt.Errorf("%w: %s synchronization only supports iptables and nftables targets", filter.ErrInvalidRule, subsystem)
-	}
-	return request.TargetProvider, nil
-}
-
-func forwardingSyncPreview(target filter.Provider, candidates []forwardingRuleSyncCandidate, actual []forwarding.Rule) dto.FirewallRuleSyncPreview {
-	desired := make([]firewallSyncDesired[forwarding.Rule], 0, len(candidates))
-	for _, candidate := range candidates {
-		desired = append(desired, firewallSyncDesired[forwarding.Rule]{
-			Value: candidate.rule,
-			Payload: dto.FirewallRuleSyncItem{
-				SourceUUID: candidate.rule.Identity(), ForwardRule: &dto.ForwardRule{Family: candidate.rule.Family, Protocol: candidate.rule.Protocol, Port: candidate.rule.Port, TargetIP: candidate.rule.TargetIP, TargetPort: candidate.rule.TargetPort, Interface: candidate.rule.Interface},
-			},
-			Err: candidate.err,
-		})
-	}
-	return firewallDiffPreview(
-		"forwarding", target, desired, actual,
-		func(rule forwarding.Rule) string { return rule.Identity() },
-		func(rule forwarding.Rule) dto.FirewallRuleSyncItem {
-			return dto.FirewallRuleSyncItem{SourceUUID: rule.Identity(), ForwardRule: &dto.ForwardRule{Family: rule.Family, Protocol: rule.Protocol, Port: rule.Port, TargetIP: rule.TargetIP, TargetPort: rule.TargetPort, Interface: rule.Interface}}
-		},
-	)
-}
-
-func firewallDiffPreview[T any](subsystem string, target filter.Provider, desired []firewallSyncDesired[T], actual []T, key func(T) string, actualItem func(T) dto.FirewallRuleSyncItem) dto.FirewallRuleSyncPreview {
-	preview := dto.FirewallRuleSyncPreview{Subsystem: subsystem, TargetProvider: target, Items: make([]dto.FirewallRuleSyncItem, 0, len(desired)+len(actual))}
-	actualByKey := make(map[string][]int, len(actual))
-	for index, value := range actual {
-		actualByKey[key(value)] = append(actualByKey[key(value)], index)
-	}
-	matched := make([]bool, len(actual))
-	for _, candidate := range desired {
-		item := candidate.Payload
-		item.Status, item.ReasonCode, item.Reason = "", "", ""
-		switch {
-		case candidate.Err != nil:
-			item.Status, item.ReasonCode, item.Reason = firewallsync.StatusBlocked, firewallsync.ReasonInvalidPolicy, candidate.Err.Error()
-		default:
-			match := -1
-			for _, index := range actualByKey[key(candidate.Value)] {
-				if !matched[index] {
-					match = index
-					break
-				}
-			}
-			if match >= 0 {
-				matched[match] = true
-				item.Status, item.ReasonCode = firewallsync.StatusExisting, firewallsync.ReasonAlreadyExists
-				item.Reason = firewallSyncReasonMessage(item.ReasonCode)
-			} else {
-				item.Status = firewallsync.StatusReady
-			}
-		}
-		preview.Add(item)
-	}
-	for index, value := range actual {
-		if matched[index] {
-			continue
-		}
-		item := actualItem(value)
-		item.Status, item.ReasonCode = firewallsync.StatusRemove, firewallsync.ReasonOnlyExistsInTarget
-		item.Reason = firewallSyncReasonMessage(item.ReasonCode)
-		preview.Add(item)
-	}
-	return preview
-}
-
-func firewallSyncResult(preview dto.FirewallRuleSyncPreview, cause error, executed bool) dto.FirewallRuleSyncResult {
-	result := dto.FirewallRuleSyncResult{Subsystem: preview.Subsystem, TargetProvider: preview.TargetProvider}
-	for _, item := range preview.Items {
-		if item.Status != firewallsync.StatusRemove {
-			result.Total++
-		}
-		switch item.Status {
-		case firewallsync.StatusExisting:
-			result.Skipped++
-		case firewallsync.StatusBlocked:
-			appendDatabaseSyncFailure(&result, item, errors.New(item.Reason))
-		case firewallsync.StatusReady:
-			if executed {
-				if cause != nil {
-					appendDatabaseSyncFailure(&result, item, cause)
-				} else {
-					result.Succeeded++
-				}
-			}
-		case firewallsync.StatusRemove:
-			if executed && cause == nil {
-				result.Removed++
-			}
-		}
-	}
-	return result
-}
-
-func firewallRuleStatesEqual[T any](left, right []T, key func(T) string) bool {
-	if len(left) != len(right) {
-		return false
-	}
-	counts := make(map[string]int, len(left))
-	for _, value := range left {
-		counts[key(value)]++
-	}
-	for _, value := range right {
-		valueKey := key(value)
-		if counts[valueKey] == 0 {
-			return false
-		}
-		counts[valueKey]--
-	}
-	return true
-}
-
-func (s *DockerPortGuardService) loadRuleSyncCandidates(ctx context.Context, request dto.FirewallRuleSyncRequest) (string, []model.DockerPortGuardPolicy, dockerfirewall.Runtime, error) {
-	targetProvider, err := databaseRuleSyncTarget(request, "Docker")
-	if err != nil {
-		return "", nil, nil, err
-	}
-	target := string(targetProvider)
-	selected, err := s.selectedRuleSyncBackend(ctx)
-	if err != nil {
-		return "", nil, nil, err
-	}
-	if target != selected {
-		return "", nil, nil, fmt.Errorf(
-			"%w: selected Docker firewall backend is %s, requested target is %s",
-			filter.ErrProviderUnavailable, selected, target,
-		)
-	}
-	policies, err := s.policies.ListManaged(ctx)
-	if err != nil {
-		return "", nil, nil, err
-	}
-	return target, policies, s.guardRuntime(target), nil
-}
-
-func (s *DockerPortGuardService) selectedRuleSyncBackend(ctx context.Context) (string, error) {
-	selected, _ := settingRepo.GetValueByKey(constant.FirewallDockerBackendKey)
-	selected = strings.ToLower(strings.TrimSpace(selected))
-	if selected == constant.FirewallProviderIptables || selected == constant.FirewallProviderNftables {
-		return selected, nil
-	}
-	if s.client == nil {
-		return "", buserr.New("ErrDockerFailed")
-	}
-	cli, err := s.client()
-	if err != nil {
-		return "", buserr.WithDetail("ErrDockerFailed", err.Error(), err)
-	}
-	defer cli.Close()
-	info, err := cli.Info(ctx)
-	if err != nil {
-		return "", buserr.WithDetail("ErrDockerFailed", err.Error(), err)
-	}
-	return selectedDockerFirewallBackend(dockerFirewallBackend(info)), nil
-}
-
-func dockerSyncPreview(target filter.Provider, policies []model.DockerPortGuardPolicy, inventory dockerfirewall.PolicyInventory) dto.FirewallRuleSyncPreview {
-	desired := make([]firewallSyncDesired[dockerfirewall.Policy], 0, len(policies))
-	for _, policy := range policies {
-		sources := []string{}
-		_ = json.Unmarshal([]byte(policy.Sources), &sources)
-		desired = append(desired, firewallSyncDesired[dockerfirewall.Policy]{
-			Value: dockerfirewall.Policy{
-				UUID: policy.UUID, Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort,
-				Protocol: policy.Protocol, Mode: policy.Mode, Sources: sources,
-			},
-			Payload: dto.FirewallRuleSyncItem{SourceUUID: policy.UUID, DockerRule: &dto.DockerPortGuardEndpoint{
-				Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-				PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: sources, Description: policy.Description,
-				TrafficPath: dockerTrafficPathUnknown, ManagementTarget: dockerManagementNeedsDiagnosis,
-				ManagementReason: dockerReasonNoMatchingPath,
-			}},
-		})
-	}
-	preview := firewallDiffPreview(
-		"docker", target, desired, inventory.Policies, dockerFirewallPolicyKey,
-		func(policy dockerfirewall.Policy) dto.FirewallRuleSyncItem {
-			return dto.FirewallRuleSyncItem{SourceUUID: policy.UUID, DockerRule: &dto.DockerPortGuardEndpoint{
-				Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol,
-				PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: append([]string(nil), policy.Sources...),
-				TrafficPath: dockerTrafficPathUnknown, ManagementTarget: dockerManagementNeedsDiagnosis,
-				ManagementReason: dockerReasonNoMatchingPath,
-			}}
-		},
-	)
-	for _, policy := range inventory.ReadOnly {
-		preview.Add(dto.FirewallRuleSyncItem{
-			SourceUUID: dockerGuardReadOnlyPolicyUUID(policy),
-			DockerRule: &dto.DockerPortGuardEndpoint{
-				Family: policy.Policy.Family, HostIP: policy.Policy.HostIP, HostPort: policy.Policy.HostPort,
-				Protocol: policy.Policy.Protocol, PolicyUUID: dockerGuardReadOnlyPolicyUUID(policy), Sources: append([]string(nil), policy.Policy.Sources...),
-				NativeAction: policy.Action, ReadOnly: true, TrafficPath: dockerTrafficPathUnknown,
-				ManagementTarget: dockerManagementNeedsDiagnosis, ManagementReason: dockerReasonNoMatchingPath,
-			},
-			Status:     firewallsync.StatusBlocked,
-			ReasonCode: firewallsync.ReasonReadOnlyRule,
-			Reason:     firewallSyncReasonMessage(firewallsync.ReasonReadOnlyRule),
-		})
-	}
-	return preview
 }
 
 func discoverDockerEndpoints(ctx context.Context, cli *client.Client, all bool) ([]dto.DockerPortGuardEndpoint, error) {
@@ -4045,12 +2072,12 @@ func discoverDockerEndpoints(ctx context.Context, cli *client.Client, all bool) 
 	return endpoints, nil
 }
 
-func annotateDockerEndpointManagement(endpoints []dto.DockerPortGuardEndpoint, backend string) {
+func annotateDockerEndpointManagement(ctx context.Context, endpoints []dto.DockerPortGuardEndpoint, backend string) {
 	rules := map[string]dockerfirewall.DNATRules{
-		constant.FirewallFamilyIPv4: dockerfirewall.ReadDNATRules(backend, constant.FirewallFamilyIPv4),
-		constant.FirewallFamilyIPv6: dockerfirewall.ReadDNATRules(backend, constant.FirewallFamilyIPv6),
+		constant.FirewallFamilyIPv4: dockerfirewall.ReadDNATRules(ctx, backend, constant.FirewallFamilyIPv4),
+		constant.FirewallFamilyIPv6: dockerfirewall.ReadDNATRules(ctx, backend, constant.FirewallFamilyIPv6),
 	}
-	proxies := dockerfirewall.ReadProxyEndpoints()
+	proxies := dockerfirewall.ReadProxyEndpoints(ctx)
 	inspections := make(map[string]dockerfirewall.EndpointInspection, len(rules))
 	for family, familyRules := range rules {
 		inspections[family] = dockerfirewall.InspectEndpoints(backend, family, familyRules, proxies)
@@ -4111,7 +2138,7 @@ func groupDockerGuardContainers(endpoints []dto.DockerPortGuardEndpoint) []dto.D
 		for i, endpoint := range container.Endpoints {
 			sources := append([]string(nil), endpoint.Sources...)
 			sort.Strings(sources)
-			policyKey := fmt.Sprintf("%t|%s|%s|%t|%s|%s|%s", endpoint.PolicyUUID != "", endpoint.Mode, strings.Join(sources, ","), endpoint.Effective, endpoint.Description, endpoint.ManagementTarget, endpoint.ManagementReason)
+			policyKey := fmt.Sprintf("%t|%s|%s|%t|%s|%s", endpoint.PolicyUUID != "", endpoint.Mode, strings.Join(sources, ","), endpoint.Effective, endpoint.ManagementTarget, endpoint.ManagementReason)
 			items = append(items, docker.PortRangeItem{
 				Key:        endpoint.Family + "|" + endpoint.HostIP + "|" + endpoint.Protocol + "|" + policyKey,
 				PublicPort: endpoint.HostPort, PrivatePort: endpoint.ContainerPort,
@@ -4166,19 +2193,29 @@ func normalizeDockerFirewallUUIDs(values []string) ([]string, error) {
 	return uuids, nil
 }
 
-func queueFirewallRuleTask(subsystem, operation string, labels []string, apply func(context.Context) error) (dto.FilterChainOperationResponse, error) {
-	taskItem, err := task.NewTask(firewallTaskName(operation, subsystem, ""), operation, task.TaskScopeFirewall, "", 0)
+func queueFirewallRuleTask(subsystem, operation, taskID string, labels []string, apply func(*task.Task) error) (dto.FilterChainOperationResponse, error) {
+	taskItem, err := task.NewTask(firewallTaskName(operation, subsystem, ""), operation, task.TaskScopeFirewall, taskID, 0)
 	if err != nil {
 		return dto.FilterChainOperationResponse{}, err
 	}
 	taskItem.AddSubTaskWithOps(taskItem.Name, func(t *task.Task) error {
-		t.Logf("rules=%d", len(labels))
+		if labels != nil {
+			t.Logf("rules=%d", len(labels))
+		}
 		err := t.TaskCtx.Err()
 		if err == nil {
-			err = apply(t.TaskCtx)
+			err = apply(t)
 		}
-		succeeded, failed := 0, 0
+		err = errors.Join(err, t.TaskCtx.Err())
+		if labels == nil {
+			return err
+		}
+		succeeded, failed, skipped := 0, 0, 0
 		for _, label := range labels {
+			if label == "" {
+				skipped++
+				continue
+			}
 			if err != nil {
 				failed++
 				t.LogFailedWithErr(label, err)
@@ -4187,12 +2224,12 @@ func queueFirewallRuleTask(subsystem, operation string, labels []string, apply f
 				t.LogSuccess(label)
 			}
 		}
-		t.Log(i18n.GetMsgWithMap("FirewallRuleOperationResult", map[string]interface{}{
-			"succeeded": succeeded, "failed": failed,
+		t.Log(i18n.GetMsgWithMap("FirewallCreateRulesResult", map[string]interface{}{
+			"succeeded": succeeded, "failed": failed, "skipped": skipped,
 		}))
 		return err
 	}, nil, 0, 0)
-	if err := repo.NewITaskRepo().Save(context.Background(), taskItem.Task); err != nil {
+	if err := taskRepo.Save(context.Background(), taskItem.Task); err != nil {
 		taskItem.LogFailedWithErr(taskItem.Name, err)
 		closeUnstartedFirewallTask(taskItem)
 		return dto.FilterChainOperationResponse{}, fmt.Errorf("save firewall rule task: %w", err)
@@ -4209,13 +2246,14 @@ func normalizeDockerFirewallPolicy(policy dockerfirewall.Policy) (dockerfirewall
 	if policy.HostPort == 0 ||
 		(policy.Protocol != "tcp" && policy.Protocol != "udp") ||
 		(policy.Family != dockerfirewall.FamilyIPv4 && policy.Family != dockerfirewall.FamilyIPv6) ||
-		(policy.Mode != dockerfirewall.ModeAll && policy.Mode != dockerfirewall.ModeSources && policy.Mode != dockerfirewall.ModeAllow) {
+		(policy.Mode != dockerfirewall.ModeAll && policy.Mode != dockerfirewall.ModeSources && policy.Mode != dockerfirewall.ModeAllow && policy.Mode != dockerfirewall.ModeAcceptSources && policy.Mode != dockerfirewall.ModeAcceptAll) {
 		return dockerfirewall.Policy{}, buserr.WithDetail("ErrInvalidParams", "invalid policy fields", nil)
 	}
 	address, err := netip.ParseAddr(policy.HostIP)
 	if err != nil || (policy.Family == dockerfirewall.FamilyIPv4) != address.Is4() {
 		return dockerfirewall.Policy{}, buserr.WithDetail("ErrInvalidParams", "host IP does not match address family", nil)
 	}
+	policy.HostIP = address.String()
 	normalizedSources := make([]string, 0, len(policy.Sources))
 	seen := make(map[string]struct{}, len(policy.Sources))
 	for _, source := range policy.Sources {
@@ -4244,26 +2282,15 @@ func normalizeDockerFirewallPolicy(policy dockerfirewall.Policy) (dockerfirewall
 			normalizedSources = append(normalizedSources, canonical)
 		}
 	}
-	if policy.Mode != dockerfirewall.ModeAll && len(normalizedSources) == 0 {
+	if policy.Mode != dockerfirewall.ModeAll && policy.Mode != dockerfirewall.ModeAcceptAll && len(normalizedSources) == 0 {
 		return dockerfirewall.Policy{}, buserr.WithDetail("ErrInvalidParams", "source-based modes require at least one source", nil)
 	}
-	if policy.Mode == dockerfirewall.ModeAll {
+	if policy.Mode == dockerfirewall.ModeAll || policy.Mode == dockerfirewall.ModeAcceptAll {
 		normalizedSources = []string{}
 	}
 	sort.Strings(normalizedSources)
 	policy.Sources = normalizedSources
 	return policy, nil
-}
-
-func (i forwardingInventoryItem) SyncStatus() string {
-	switch {
-	case i.IsDesired && i.IsRuntime:
-		return forwardingSyncConverged
-	case i.IsDesired:
-		return forwardingSyncMissing
-	default:
-		return forwardingSyncRuntimeOnly
-	}
 }
 
 func forwardingOperationsOnlyRemove(operations []dto.ForwardRuleOperation) bool {
@@ -4317,4 +2344,655 @@ func InitializeFirewallWhitelistPorts(entries []firewall.PortWhitelist) ([]firew
 		}
 	}
 	return firewall.ValidatePortWhitelist(entries)
+}
+func (s *FirewallService) readFirewallInventory(ctx context.Context, provider filter.Provider, scopes []filter.Scope) (dto.FirewallRuleInventoryResponse, error) {
+	response := dto.FirewallRuleInventoryResponse{Items: make([]filter.InventoryItem, 0)}
+	runtime, err := s.firewallAdapter(provider)
+	if err != nil {
+		return response, err
+	}
+	for _, scope := range scopes {
+		if scope.Provider != provider {
+			return response, filter.ErrInvalidScope
+		}
+	}
+	for _, group := range firewallScopeReadGroups(scopes) {
+		snapshots, err := listFirewallRuleScopes(runtime, ctx, group)
+		if errors.Is(err, filter.ErrFamilyUnavailable) {
+			response.Notices = append(response.Notices, filter.ScopeNotice{Code: filter.ScopeNoticeFamilyUnavailable, Values: []string{string(group[0].Family), err.Error()}})
+			continue
+		}
+		if err != nil {
+			return response, err
+		}
+		for _, snapshot := range snapshots {
+			response.Notices = append(response.Notices, snapshot.Notices...)
+			for _, observed := range snapshot.Rules {
+				observed.InstanceKey, err = filter.InstanceKey(observed)
+				if err != nil {
+					return response, err
+				}
+				response.Items = append(response.Items, filter.InventoryItem{Rule: observed.Rule, Observed: &observed})
+			}
+		}
+	}
+	if provider == filter.ProviderUFW {
+		sort.SliceStable(response.Items, func(i, j int) bool {
+			left, right := response.Items[i].Observed.Locator.Position, response.Items[j].Observed.Locator.Position
+			return left != nil && right != nil && *left < *right
+		})
+	}
+	return response, nil
+}
+
+func saveFirewallDescription(ctx context.Context, observed filter.ObservedRule, description string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	id, err := filter.DescriptionID(observed)
+	if err != nil {
+		return err
+	}
+	description = strings.TrimSpace(description)
+	if description == "" {
+		return settingRepo.DelDescription(id)
+	}
+	existing, err := settingRepo.GetDescription(settingRepo.WithByDescriptionID(id), repo.WithByType("firewall"))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return settingRepo.CreateDescription(&model.CommonDescription{ID: id, Type: "firewall", Description: description})
+	}
+	if err != nil {
+		return err
+	}
+	return settingRepo.UpdateDescription(existing.ID, map[string]interface{}{"description": description})
+}
+
+func (s *FirewallService) updateObservedRule(ctx context.Context, request dto.FirewallRuleUpdate) error {
+	metadata := request.Description != nil || request.OrderIndex != nil || request.Priority != nil
+	if (request.Rule != nil) == metadata || request.OrderIndex != nil && request.Priority != nil {
+		return filter.ErrInvalidRule
+	}
+	runtime, err := s.resolveRuntime(ctx, request.Scope.Provider)
+	if err != nil {
+		return err
+	}
+	snapshot, err := readMutableFirewallRules(runtime, ctx, request.Scope)
+	if err != nil {
+		return err
+	}
+	observed, err := filter.FindCandidate(snapshot.Rules, request.InstanceKey)
+	if err != nil {
+		return filter.ErrRuleStale
+	}
+	if err := filter.GuardMutation(observed); err != nil {
+		return err
+	}
+	if request.Rule != nil {
+		ports, err := loadFirewallPortWhiteList()
+		if err != nil {
+			return err
+		}
+		if filter.NewPortWhitelistIndex(ports).Matches(observed.Rule) {
+			return filter.ErrProtectedRule
+		}
+	}
+	if request.Rule == nil && request.OrderIndex == nil && request.Priority == nil {
+		return saveFirewallDescription(ctx, observed, *request.Description)
+	}
+	if observed.ParseStatus != filter.ParseStatusSupported {
+		return filter.ErrUnsupportedScope
+	}
+	before := observed.Rule
+	before.UUID = uuid.NewString()
+	after := before
+	operation := filter.ChangeReorder
+	if runtime.Provider() == filter.ProviderFirewalld {
+		operation = filter.ChangeUpdate
+	}
+	if request.Rule != nil {
+		after, err = prepareFirewallBackendRule(ctx, runtime, *request.Rule)
+		if err != nil {
+			return err
+		}
+		operation = filter.ChangeUpdate
+	} else {
+		after.OrderIndex, after.Priority = request.OrderIndex, before.Priority
+		if request.Priority != nil {
+			after.Priority = request.Priority
+		}
+	}
+	if after.Scope.Normalize().Key() != before.Scope.Key() {
+		return filter.ErrUnsupportedScope
+	}
+	after.UUID = before.UUID
+	after, err = filter.NormalizeRule(after)
+	if err != nil {
+		return err
+	}
+	beforeKey, err := firewallRuleDuplicateKey(observed, false)
+	if err != nil {
+		return err
+	}
+	afterKey, err := firewallRuleDuplicateKey(filter.ObservedRule{Rule: after, ParseStatus: filter.ParseStatusSupported}, false)
+	if err != nil {
+		return err
+	}
+	if beforeKey == afterKey {
+		if after.OrderIndex == nil || observed.Locator.Position != nil && *after.OrderIndex == int64(*observed.Locator.Position) {
+			if request.Rule != nil {
+				return saveFirewallDescription(ctx, observed, request.Rule.Description)
+			}
+			if request.Description != nil {
+				return saveFirewallDescription(ctx, observed, *request.Description)
+			}
+			return nil
+		}
+	} else {
+		var matchKey string
+		if runtime.Provider() == filter.ProviderUFW {
+			matchKey, err = filter.RuleMatchKey(after)
+			if err != nil {
+				return err
+			}
+		}
+		for _, candidate := range snapshot.Rules {
+			instanceKey, err := filter.InstanceKey(candidate)
+			if err != nil {
+				return err
+			}
+			if instanceKey == request.InstanceKey {
+				continue
+			}
+			key, err := firewallRuleDuplicateKey(candidate, false)
+			if err != nil {
+				return err
+			}
+			if key == afterKey {
+				return buserr.New("ErrRecordExist")
+			}
+			if runtime.Provider() == filter.ProviderUFW && candidate.ParseStatus == filter.ParseStatusSupported {
+				candidateMatch, err := filter.RuleMatchKey(candidate.Rule)
+				if err != nil {
+					return err
+				}
+				if candidateMatch == matchKey && candidate.Rule.Action != after.Action {
+					return buserr.New("ErrFirewallRuleConflict")
+				}
+			}
+		}
+	}
+	description := before.Description
+	id, err := filter.DescriptionID(observed)
+	if err != nil {
+		return err
+	}
+	stored, err := settingRepo.GetDescription(settingRepo.WithByDescriptionID(id), repo.WithByType("firewall"))
+	if err == nil {
+		description = stored.Description
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return err
+	}
+	if request.Rule != nil {
+		description = request.Rule.Description
+	}
+	if request.Description != nil {
+		description = *request.Description
+	}
+	plan, err := applyFirewallChanges(runtime, ctx, snapshot, []filter.RuleChange{{
+		Operation: operation, Before: &before, After: &after, Locator: &observed.Locator, PreviousMarker: observed.Marker,
+	}})
+	if err != nil {
+		return err
+	}
+	return saveFirewallDescription(ctx, plan.Rules[0].Expected, description)
+}
+
+func firewallBackupDirectory(subsystem string) (string, error) {
+	var directory string
+	switch subsystem {
+	case "system":
+		directory = "host"
+	case "docker":
+		directory = "docker"
+	case "forwarding":
+		directory = "forward"
+	default:
+		return "", filter.ErrInvalidRule
+	}
+	return filepath.Join(global.Dir.BaseDir, "1panel", "backup", "firewall", directory), nil
+}
+
+func readFirewallBackup(name string) ([]dto.FirewallRuleExportItem, error) {
+	if name == "" || name != filepath.Base(name) || filepath.Ext(name) != ".json" {
+		return nil, filter.ErrInvalidRule
+	}
+	directory, err := firewallBackupDirectory("system")
+	if err != nil {
+		return nil, err
+	}
+	file, err := os.OpenInRoot(directory, name)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	if !info.Mode().IsRegular() {
+		return nil, filter.ErrInvalidRule
+	}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+	var items []dto.FirewallRuleExportItem
+	if err := json.Unmarshal(data, &items); err != nil {
+		return nil, err
+	}
+	if items == nil {
+		return nil, filter.ErrInvalidRule
+	}
+	for _, item := range items {
+		if err := item.Scope.ValidateMVP(); err != nil {
+			return nil, err
+		}
+		switch item.ParseStatus {
+		case "", filter.ParseStatusSupported:
+			if _, err := filter.NormalizeRule(item.FirewallRule); err != nil {
+				return nil, err
+			}
+		case filter.ParseStatusPartial, filter.ParseStatusOpaque:
+			if item.Raw == "" {
+				return nil, filter.ErrInvalidRule
+			}
+		default:
+			return nil, filter.ErrInvalidRule
+		}
+	}
+	return items, nil
+}
+
+func writeFirewallJSON(directory, name string, value any) (string, error) {
+	data, err := json.MarshalIndent(value, "", "  ")
+	if err != nil {
+		return "", err
+	}
+	if err := os.MkdirAll(directory, 0700); err != nil {
+		return "", err
+	}
+	file, err := os.CreateTemp(directory, ".firewall-*.tmp")
+	if err != nil {
+		return "", err
+	}
+	temporary := file.Name()
+	defer os.Remove(temporary)
+	_, writeErr := file.Write(data)
+	syncErr := file.Sync()
+	closeErr := file.Close()
+	if err := errors.Join(writeErr, syncErr, closeErr); err != nil {
+		return "", err
+	}
+	target := filepath.Join(directory, name)
+	if err := os.Rename(temporary, target); err != nil {
+		return "", err
+	}
+	return target, nil
+}
+
+func readFirewallSubsystemBackup(name, subsystem string) (dto.FirewallSubsystemBackup, error) {
+	var backup dto.FirewallSubsystemBackup
+	if name == "" || name != filepath.Base(name) || (filepath.Ext(name) != ".json" && name != subsystem+"-iptables.rules" && name != subsystem+"-nftables.rules") {
+		return backup, filter.ErrInvalidRule
+	}
+	directory, err := firewallBackupDirectory(subsystem)
+	if err != nil {
+		return backup, err
+	}
+	if filepath.Ext(name) == ".rules" {
+		directory = global.Dir.FirewallDir
+	}
+	file, err := os.OpenInRoot(directory, name)
+	if err != nil {
+		return backup, err
+	}
+	defer file.Close()
+	info, err := file.Stat()
+	if err != nil {
+		return backup, err
+	}
+	if !info.Mode().IsRegular() {
+		return backup, filter.ErrInvalidRule
+	}
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return backup, err
+	}
+	if err := json.Unmarshal(data, &backup); err != nil {
+		return backup, err
+	}
+	if backup.Subsystem != subsystem || (backup.Provider != filter.ProviderIptables && backup.Provider != filter.ProviderNftables) {
+		return backup, filter.ErrInvalidRule
+	}
+	for _, family := range backup.Families {
+		if family != forwarding.FamilyIPv4 && family != forwarding.FamilyIPv6 {
+			return backup, filter.ErrInvalidRule
+		}
+	}
+	switch subsystem {
+	case "forwarding":
+		if backup.Forwarding == nil || backup.Docker != nil {
+			return backup, filter.ErrInvalidRule
+		}
+		for i, rule := range backup.Forwarding {
+			normalized, err := forwarding.NormalizeRule(rule)
+			if err != nil {
+				return backup, err
+			}
+			backup.Forwarding[i] = normalized
+		}
+	case "docker":
+		if backup.Docker == nil || len(backup.Forwarding) > 0 {
+			return backup, filter.ErrInvalidRule
+		}
+		seen := make(map[string]bool)
+		for i, policy := range backup.Docker.Policies {
+			if _, err := uuid.Parse(policy.UUID); err != nil {
+				return backup, filter.ErrInvalidRule
+			}
+			normalized := policy
+			if len(policy.NativeRules) == 0 {
+				var err error
+				normalized, err = normalizeDockerFirewallPolicy(policy)
+				if err != nil {
+					return backup, err
+				}
+			}
+			if seen[normalized.UUID] {
+				return backup, filter.ErrInvalidRule
+			}
+			seen[normalized.UUID] = true
+			backup.Docker.Policies[i] = normalized
+		}
+		for _, policy := range backup.Docker.Policies {
+			for _, rule := range policy.NativeRules {
+				if rule.Family != dockerfirewall.FamilyIPv4 && rule.Family != dockerfirewall.FamilyIPv6 {
+					return backup, filter.ErrInvalidRule
+				}
+				if len(rule.Tokens) == 0 {
+					return backup, filter.ErrInvalidRule
+				}
+				for _, token := range rule.Tokens {
+					if strings.ContainsAny(token, "\r\n\x00") {
+						return backup, filter.ErrInvalidRule
+					}
+				}
+				if backup.Provider == filter.ProviderIptables && (len(rule.Tokens) < 3 || rule.Tokens[0] != "-A" || rule.Tokens[1] != dockerfirewall.Chain) {
+					return backup, filter.ErrInvalidRule
+				}
+			}
+		}
+	default:
+		return backup, filter.ErrInvalidRule
+	}
+	return backup, nil
+}
+
+func forwardingBackup(manager forwarding.Adapter, rules []forwarding.Rule) (dto.FirewallSubsystemBackup, error) {
+	if rules == nil {
+		rules = []forwarding.Rule{}
+	}
+	backup := dto.FirewallSubsystemBackup{Subsystem: "forwarding", Provider: filter.Provider(manager.Name()), Forwarding: rules}
+	for _, family := range []string{forwarding.FamilyIPv4, forwarding.FamilyIPv6} {
+		initialized, _, err := manager.FamilyStatus(family)
+		if family == forwarding.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
+		}
+		if err != nil {
+			return backup, err
+		}
+		if initialized {
+			backup.Families = append(backup.Families, family)
+		}
+	}
+	return backup, nil
+}
+
+func persistForwardingRules(manager forwarding.Adapter, rules []forwarding.Rule) error {
+	backup, err := forwardingBackup(manager, rules)
+	if err != nil {
+		return err
+	}
+	_, err = writeFirewallJSON(global.Dir.FirewallDir, "forwarding-"+manager.Name()+".rules", backup)
+	return err
+}
+
+func persistDockerRules(backend string, inventory dockerfirewall.PolicyInventory) error {
+	_, err := writeFirewallJSON(global.Dir.FirewallDir, "docker-"+backend+".rules", dto.FirewallSubsystemBackup{Subsystem: "docker", Provider: filter.Provider(backend), Docker: &inventory})
+	return err
+}
+
+func dockerPolicyEndpointKey(policy dockerfirewall.Policy) string {
+	return strings.Join([]string{policy.Family, policy.HostIP, strconv.Itoa(int(policy.HostPort)), policy.Protocol}, "\x00")
+}
+
+func dockerGuardInventoryEndpoints(inventory dockerfirewall.PolicyInventory) []dto.DockerPortGuardEndpoint {
+	result := make([]dto.DockerPortGuardEndpoint, 0, len(inventory.Policies))
+	for _, policy := range inventory.Policies {
+		if _, err := normalizeDockerFirewallPolicy(policy); err != nil {
+			policy.Mode = ""
+		}
+		result = append(result, dto.DockerPortGuardEndpoint{Family: policy.Family, HostIP: policy.HostIP, HostPort: policy.HostPort, Protocol: policy.Protocol, PolicyUUID: policy.UUID, Mode: policy.Mode, Sources: policy.Sources, TrafficPath: dockerTrafficPathUnknown, ManagementTarget: dockerManagementNeedsDiagnosis, ManagementReason: dockerReasonNoMatchingPath})
+	}
+	return result
+}
+
+func applyDockerPolicies(ctx context.Context, runtime dockerfirewall.Runtime, backend string, inventory dockerfirewall.PolicyInventory, desired []dockerfirewall.Policy) error {
+	families := make(map[string]bool)
+	for _, policy := range desired {
+		families[policy.Family] = true
+	}
+	for family := range families {
+		initialized, err := runtime.Initialized(family)
+		if err != nil {
+			return err
+		}
+		if !initialized {
+			return filter.ErrProviderUnavailable
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if err := runtime.ReplacePolicies(desired, inventory); err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	inventory.Policies = desired
+	return persistDockerRules(backend, inventory)
+}
+
+func (s *DockerPortGuardService) initialize(ctx context.Context, request dto.DockerPortGuardOperation, t *task.Task) error {
+	runtime, backend, err := s.runtimeForDocker(ctx)
+	if err != nil {
+		return err
+	}
+	inventory, err := runtime.ListPolicies()
+	if err != nil {
+		return err
+	}
+	if request.BackupFile != "" {
+		backup, err := readFirewallSubsystemBackup(request.BackupFile, "docker")
+		if err != nil {
+			return err
+		}
+		inventory, err = mergeDockerBackup(inventory, backup, backend, t)
+		if err != nil {
+			return err
+		}
+	}
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return err
+	}
+	if !slices.Contains(families, constant.FirewallFamilyIPv6) {
+		if t != nil {
+			t.Logf("IPv6 firewall support is disabled; skipping IPv6 Docker chain initialization")
+		} else {
+			global.LOG.Info("IPv6 firewall support is disabled; skipping IPv6 Docker chain initialization")
+		}
+	}
+	if err := runtime.Initialize(inventory.Policies, inventory, families...); err != nil {
+		return err
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if err := persistDockerRules(backend, inventory); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerBackendKey, backend); err != nil {
+		return err
+	}
+	if err := settingRepo.UpdateOrCreate(constant.FirewallDockerPortGuardStatusKey, constant.StatusEnable); err != nil {
+		return err
+	}
+	return nil
+}
+
+func mergeDockerBackup(current dockerfirewall.PolicyInventory, backup dto.FirewallSubsystemBackup, backend string, t *task.Task) (dockerfirewall.PolicyInventory, error) {
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return current, err
+	}
+	skippedIPv6 := 0
+	defer func() { logFirewallIPv6Skipped(t, "Docker", skippedIPv6) }()
+	empty := len(current.Policies) == 0
+	byEndpoint := make(map[string]bool, len(current.Policies))
+	byUUID := make(map[string]bool, len(current.Policies))
+	for _, policy := range current.Policies {
+		byEndpoint[dockerPolicyEndpointKey(policy)] = true
+		byUUID[policy.UUID] = true
+	}
+	if current.RuleOrders == nil {
+		current.RuleOrders = make(map[string][]int64)
+	}
+	var maxOrder int64
+	for _, existing := range current.Policies {
+		for _, rule := range existing.NativeRules {
+			maxOrder = max(maxOrder, rule.Order)
+		}
+		for _, order := range current.RuleOrders[existing.Family+"\x00"+existing.UUID] {
+			maxOrder = max(maxOrder, order)
+		}
+	}
+	for _, policy := range backup.Docker.Policies {
+		if policy.Family == dockerfirewall.FamilyIPv6 && !slices.Contains(families, dockerfirewall.FamilyIPv6) {
+			skippedIPv6++
+			continue
+		}
+		if byEndpoint[dockerPolicyEndpointKey(policy)] {
+			if t != nil {
+				t.Logf("%s %s %s:%d %s: %v", policy.Family, policy.Protocol, policy.HostIP, policy.HostPort, i18n.GetMsgByKey("FirewallCreateRuleSkipped"), buserr.New("ErrRecordExist"))
+			}
+			continue
+		}
+		if byUUID[policy.UUID] {
+			return current, filter.ErrRuleStale
+		}
+		if string(backup.Provider) != backend {
+			policy, err = normalizeDockerFirewallPolicy(policy)
+			if err != nil {
+				return current, err
+			}
+			policy, err = dockerfirewall.ConvertPolicyBackend(policy, string(backup.Provider), backend)
+			if err != nil {
+				return current, err
+			}
+		}
+		if !empty {
+			policy.NativeRules = append([]dockerfirewall.NativeRule(nil), policy.NativeRules...)
+			for i := range policy.NativeRules {
+				maxOrder++
+				policy.NativeRules[i].Order = maxOrder
+			}
+		}
+		current.Policies = append(current.Policies, policy)
+		byEndpoint[dockerPolicyEndpointKey(policy)], byUUID[policy.UUID] = true, true
+		key := policy.Family + "\x00" + policy.UUID
+		if empty {
+			current.RuleOrders[key] = backup.Docker.RuleOrders[key]
+		}
+	}
+	return current, nil
+}
+
+func RestoreDockerPortGuard(ctx context.Context) error {
+	return newDockerPortGuardService().Restore(ctx)
+}
+
+func RestoreDockerPortGuardBestEffort(ctx context.Context) {
+	if err := RestoreDockerPortGuard(ctx); err != nil {
+		global.LOG.Warnf("restore Docker port guard failed: %v", err)
+	}
+}
+
+func loadFirewallFamilies() ([]string, error) {
+	value, err := settingRepo.GetValueByKey(constant.FirewallIPv6SupportKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, err
+	}
+	if value == constant.StatusDisable {
+		return []string{constant.FirewallFamilyIPv4}, nil
+	}
+	return []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6}, nil
+}
+
+func ipv4PortWhitelist(rules []firewall.PortWhitelist) []firewall.PortWhitelist {
+	result := make([]firewall.PortWhitelist, 0, len(rules))
+	for _, rule := range rules {
+		sources := make([]string, 0, len(rule.Sources))
+		for _, source := range rule.Sources {
+			if !strings.Contains(source, ":") {
+				sources = append(sources, source)
+			}
+		}
+		if len(sources) == 0 {
+			continue
+		}
+		rule.Sources = sources
+		result = append(result, rule)
+	}
+	return result
+}
+
+func validateFirewallWhitelistFamilies(rules []firewall.PortWhitelist) error {
+	families, err := loadFirewallFamilies()
+	if err != nil {
+		return err
+	}
+	if !slices.Contains(families, constant.FirewallFamilyIPv6) {
+		for _, rule := range rules {
+			for _, source := range rule.Sources {
+				if strings.Contains(source, ":") {
+					return fmt.Errorf("IPv6 firewall support is disabled")
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func logFirewallIPv6Skipped(t *task.Task, subsystem string, count int) {
+	if count == 0 {
+		return
+	}
+	message := fmt.Sprintf("IPv6 firewall support is disabled; skipped %d IPv6 %s rule(s)", count, subsystem)
+	if t != nil {
+		t.Log(message)
+	} else {
+		global.LOG.Info(message)
+	}
 }

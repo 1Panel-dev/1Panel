@@ -40,15 +40,19 @@ func PersistRuleset(ctx context.Context) error {
 	return atomicWrite(filepath.Join(global.Dir.FirewallDir, RulesFile), []byte(ruleset.String()))
 }
 
-func Restore() error {
-	file := filepath.Join(global.Dir.FirewallDir, RulesFile)
-	if _, err := os.Stat(file); errors.Is(err, os.ErrNotExist) {
+func Restore(families ...filter.Family) error {
+	if len(families) == 0 {
+		families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	}
+	data, err := os.ReadFile(filepath.Join(global.Dir.FirewallDir, RulesFile))
+	if errors.Is(err, os.ErrNotExist) {
 		return nil
-	} else if err != nil {
+	}
+	if err != nil {
 		return err
 	}
-	existing := make([]string, 0, 2)
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+	var script strings.Builder
+	for _, family := range families {
 		tableFamily := TableFamily(family)
 		_, exists, err := readNftObject(run, "list", "table", tableFamily, TableName)
 		if family == filter.FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable) {
@@ -58,18 +62,35 @@ func Restore() error {
 			return err
 		}
 		if exists {
-			existing = append(existing, tableFamily)
+			continue
 		}
+		table, err := savedTableRules(string(data), tableFamily, TableName)
+		if err != nil {
+			return err
+		}
+		script.WriteString(table)
 	}
-	if len(existing) == 2 {
+	if script.Len() == 0 {
 		return nil
 	}
-	for _, tableFamily := range existing {
-		if _, err := run("delete", "table", tableFamily, TableName); err != nil {
-			return fmt.Errorf("remove partial nftables %s table before restore: %w", tableFamily, err)
+	return RunScript(script.String())
+}
+
+func savedTableRules(ruleset, family, table string) (string, error) {
+	header := "table " + family + " " + table + " {"
+	lines := strings.Split(ruleset, "\n")
+	for index, line := range lines {
+		if line != header {
+			continue
 		}
+		for end := index + 1; end < len(lines); end++ {
+			if lines[end] == "}" {
+				return strings.Join(lines[index:end+1], "\n") + "\n", nil
+			}
+		}
+		return "", fmt.Errorf("incomplete saved nftables table %s %s", family, table)
 	}
-	return runCommand("-f", file)
+	return "", nil
 }
 
 func atomicWrite(target string, data []byte) error {

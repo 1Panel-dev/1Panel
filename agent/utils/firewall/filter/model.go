@@ -88,9 +88,7 @@ const (
 type ScopeNoticeCode string
 
 const (
-	ScopeNoticeDefaultScopeMismatch     ScopeNoticeCode = "default_scope_mismatch"
 	ScopeNoticeManagedScopeInactive     ScopeNoticeCode = "managed_scope_inactive"
-	ScopeNoticeUnmanagedActiveScopes    ScopeNoticeCode = "unmanaged_active_scopes"
 	ScopeNoticeRuntimePermanentMismatch ScopeNoticeCode = "runtime_permanent_mismatch"
 	ScopeNoticeManagedScopeMissing      ScopeNoticeCode = "managed_scope_missing"
 	ScopeNoticeFamilyUnavailable        ScopeNoticeCode = "family_unavailable"
@@ -302,11 +300,4 @@ type RuleSet struct {
 	Scope        Scope          `json:"scope"`
 	Rules        []ObservedRule `json:"rules"`
 	Notices      []ScopeNotice  `json:"notices,omitempty"`
-}
-
-type Capabilities struct {
-	Marker           bool
-	OwnedChains      bool
-	ExplicitPosition bool
-	ExplicitPriority bool
 }

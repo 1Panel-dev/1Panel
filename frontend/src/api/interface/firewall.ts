@@ -18,6 +18,7 @@ export namespace Firewall {
         ipv6: BackendFamilyStatus;
     }
     export interface BackendFamilyStatus {
+        partial?: boolean;
         available: boolean;
         initialized: boolean;
         bound: boolean;
@@ -31,6 +32,7 @@ export namespace Firewall {
         options: BackendOption[];
     }
     export interface Settings {
+        ipv6Enabled?: boolean;
         system: BackendGroup;
         forwarding: BackendGroup;
         docker: BackendGroup;
@@ -60,6 +62,7 @@ export namespace Firewall {
         queued?: boolean;
     }
     export interface FirewallBase {
+        ipv6Enabled?: boolean;
         lifecycleTaskID?: string;
         name: string;
         backend: string;
@@ -72,7 +75,6 @@ export namespace Firewall {
         pingStatus: string;
         message?: string;
         reason?: string;
-        syncError?: string;
         ipv4: BackendFamilyStatus;
         ipv6: BackendFamilyStatus;
     }
@@ -102,9 +104,6 @@ export namespace Firewall {
         targetIP: string;
         targetPort: string;
         interface: string;
-        isDesired?: boolean;
-        isRuntime?: boolean;
-        syncStatus?: 'converged' | 'missing' | 'runtime_only';
     }
     export type Family = 'ipv4' | 'ipv6' | 'inet';
     export type Direction = 'input';
@@ -124,6 +123,8 @@ export namespace Firewall {
     }
 
     export interface Rule {
+        raw?: string;
+        parseStatus?: ParseStatus;
         uuid?: string;
         scope: Scope;
         nativeKind?: NativeKind;
@@ -161,41 +162,21 @@ export namespace Firewall {
         persistence?: PersistenceStatus;
     }
 
-    export type RuleOrigin = 'created' | 'adopted';
-    export type InventoryState = 'managed' | 'adopted' | 'external' | 'drifted' | 'protected';
-    export type InventoryMatch = 'none' | 'exact' | 'changed' | 'missing' | 'ambiguous' | 'opaque';
-
-    export interface DesiredRule {
-        uuid: string;
-        rule: Rule;
-        ruleKey: string;
-        origin: RuleOrigin;
-        protected?: boolean;
-        expanded?: boolean;
-        marker?: string;
-        observedInstanceKey?: string;
-    }
-
     export interface PositionRange {
         min: number;
         max: number;
     }
 
     export interface InventoryItem {
-        incompatible?: boolean;
-        error?: string;
         rule: Rule;
-        observed?: ObservedRule;
-        desired?: DesiredRule;
-        state: InventoryState;
-        match: InventoryMatch;
+        observed: ObservedRule;
+        isWhitelist: boolean;
+        descriptionID: string;
     }
 
     export type ScopeNoticeCode =
         | 'family_unavailable'
-        | 'default_scope_mismatch'
         | 'managed_scope_inactive'
-        | 'unmanaged_active_scopes'
         | 'runtime_permanent_mismatch'
         | 'default_policy'
         | 'managed_scope_missing';
@@ -210,29 +191,34 @@ export namespace Firewall {
         ipv6Range: PositionRange;
         total: number;
         allTotal: number;
-        managedTotal: number;
         items: InventoryItem[];
         notices?: ScopeNotice[];
     }
 
     export interface ResetResponse {
+        backupPath: string;
         removed: number;
         disabled: boolean;
     }
 
+    export interface RuleBackups {
+        directory: string;
+        files: Array<{ name: string; provider: Provider; ruleCount: number; modifiedAt: number }>;
+    }
+
     export interface ResetRequest {
+        subsystem?: BackendSubsystem;
+        backup?: boolean;
         provider?: Provider;
         withDockerRestart?: boolean;
     }
 
     export interface InventoryRequest extends ReqPage {
-        refresh?: boolean;
         scopes: Scope[];
         all?: boolean;
         info: string;
         families?: Array<'ipv4' | 'ipv6'>;
         actions?: Array<'accept' | 'deny'>;
-        states?: InventoryState[];
         excludeChains?: string[];
     }
 
@@ -243,20 +229,16 @@ export namespace Firewall {
         permanent: boolean;
     }
 
-    export interface AdoptRequest {
-        scope: Scope;
-        instanceKey?: string;
-        rule?: Rule;
-        marker?: string;
-    }
-
     export interface CreateItem {
+        raw?: string;
+        parseStatus?: ParseStatus;
         rule: Rule;
         sourceKind?: 'user' | 'panel' | 'security' | 'imported';
-        sourceID?: string;
     }
 
     export interface CreateRequest {
+        backupFile?: string;
+        initialize?: boolean;
         items: CreateItem[];
     }
 
@@ -276,68 +258,13 @@ export namespace Firewall {
         error?: string;
     }
 
-    export interface RuleSyncRequest {
-        subsystem: BackendSubsystem;
-        sourceProvider?: Provider;
-        targetProvider: Provider;
-        resetSource?: boolean;
-        taskID?: string;
-    }
-
-    export type RuleSyncStatus = 'ready' | 'existing' | 'remove' | 'blocked';
-
-    export interface RuleSyncItem {
-        sourceUUID: string;
-        rule?: Rule;
-        forwardRule?: RuleForward;
-        dockerRule?: DockerGuardEndpoint;
-        status: RuleSyncStatus;
-        reasonCode?: string;
-        reason?: string;
-    }
-
-    export interface RuleSyncPreview {
-        subsystem: BackendSubsystem;
-        sourceProvider?: Provider;
-        targetProvider: Provider;
-        total: number;
-        ready: number;
-        existing: number;
-        removed: number;
-        blocked: number;
-        items: RuleSyncItem[];
-    }
-
-    export interface RuleSyncResult {
-        subsystem: BackendSubsystem;
-        sourceProvider?: Provider;
-        targetProvider: Provider;
-        total: number;
-        succeeded: number;
-        skipped: number;
-        removed: number;
-        failed: number;
-        errors?: RuleSyncFailure[];
-        taskID?: string;
-        queued?: boolean;
-    }
-
-    export interface RuleSyncTask {
-        taskID?: string;
-        executing: boolean;
-    }
-
-    export interface RuleSyncFailure {
-        sourceUUID: string;
-        rule?: Rule;
-        forwardRule?: RuleForward;
-        dockerRule?: DockerGuardEndpoint;
-        error: string;
+    export interface RuleTarget {
+        scope: Scope;
+        instanceKey: string;
     }
 
     export interface DeleteRequest {
-        uuids: string[];
-        beforeRules?: { scope: Scope; instanceKey: string }[];
+        targets: (RuleTarget & { observed: ObservedRule })[];
     }
 
     export interface DeleteResponse {
@@ -350,7 +277,7 @@ export namespace Firewall {
 
     export interface DeleteFailure {
         index: number;
-        uuid: string;
+        instanceKey: string;
         error: string;
     }
 
@@ -361,6 +288,7 @@ export namespace Firewall {
         | { rule?: never; description?: string; orderIndex?: never; priority: number };
 
     export interface DockerGuardBase {
+        ipv6Enabled?: boolean;
         name: string;
         version: string;
         isExist: boolean;
@@ -372,6 +300,7 @@ export namespace Firewall {
         message?: string;
     }
     export interface DockerGuardFamilyStatus {
+        partial?: boolean;
         state: 'effective' | 'disabled' | 'not_effective';
         reason?:
             | 'command_missing'
@@ -397,12 +326,9 @@ export namespace Firewall {
         compose?: string;
         application?: string;
         policyUUID?: string;
-        mode?: 'deny_sources' | 'allow_sources' | 'deny_all';
-        nativeAction?: string;
-        readOnly?: boolean;
+        mode?: 'deny_sources' | 'allow_sources' | 'deny_all' | 'accept_sources' | 'accept_all';
         sources: string[];
         effective: boolean;
-        description?: string;
         trafficPath: 'forward' | 'input' | 'unknown';
         managementTarget?: 'container_guard' | 'host_firewall' | 'needs_diagnosis';
         managementReason?: 'nat_inspect_failed' | 'nat_chain_unreachable' | 'proxy_inspect_failed' | 'no_matching_path';
@@ -433,12 +359,12 @@ export namespace Firewall {
         protocol: 'tcp' | 'udp';
     }
     export interface DockerGuardPolicy extends DockerGuardEndpointIdentity {
-        mode: 'deny_sources' | 'allow_sources' | 'deny_all';
+        mode: 'deny_sources' | 'allow_sources' | 'deny_all' | 'accept_sources' | 'accept_all';
         sources: string[];
-        description: string;
     }
     export interface DockerGuardPolicyBatch {
         policies: DockerGuardPolicy[];
+        import?: boolean;
     }
     export interface DockerGuardPolicyBatchDelete {
         uuids: string[];

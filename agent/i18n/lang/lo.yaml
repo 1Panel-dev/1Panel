@@ -674,8 +674,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'ບໍ່ພົບ chain DOCKER-USER ຂອງ Docker. ກະລຸນາເລີ່ມ Docker ໃໝ່ແລ້ວລອງອີກຄັ້ງ'
 ErrDockerNftablesChainUnavailable: 'ບໍ່ພົບ chain ໄຟວໍ nftables IPv4 ຂອງ Docker. ກະລຸນາກວດສອບວ່າ Docker ລຸ້ນປັດຈຸບັນຮອງຮັບ backend ໄຟວໍ nftables, ເລີ່ມ Docker ໃໝ່ແລ້ວລອງອີກຄັ້ງ'
-ErrDockerForwardPolicyDrop: 'ນະໂຍບາຍເລີ່ມຕົ້ນ FORWARD ຂອງ {{ .family }} ແມ່ນ DROP. ກະລຸນາປັບແລ້ວລອງອີກຄັ້ງ'
-ErrUFWRuleAdopt: 'ຈັດການກົດ UFW ບໍ່ສຳເລັດ: {{ .detail }}. ຖ້າ UFW ລຸ້ນປັດຈຸບັນຕ່ຳກວ່າ 0.35, ກະລຸນາອັບເກຣດ UFW ແລ້ວລອງໃໝ່'
+ErrDockerForwardPolicyDrop: 'ເຊີບເວີນີ້ຈຳກັດການສົ່ງຕໍ່ເຄືອຂ່າຍ. ຍັງບໍ່ສາມາດເປີດໃຊ້ການປ້ອງກັນພອດຄອນເທນເນີໄດ້ໃນຕອນນີ້.'
 Firewall: 'ໄຟວອລ'
 FirewallTaskHost: 'ໄຟວໍໂຮສ'
 FirewallTaskForwarding: 'ການສົ່ງຕໍ່ພອດ'
@@ -689,28 +688,15 @@ FirewallCreateRulesStep: 'ສ້າງກົດໄຟວໍ'
 FirewallCreateRulesResult: 'ຜົນການສ້າງ: ສຳເລັດ {{ .succeeded }}, ລົ້ມເຫຼວ {{ .failed }}, ບໍ່ໄດ້ດຳເນີນການ {{ .skipped }}'
 FirewallRuleOperationResult: 'ຜົນການດຳເນີນການ: ສຳເລັດ {{ .succeeded }} ລາຍການ, ລົ້ມເຫຼວ {{ .failed }} ລາຍການ'
 FirewallCreateRuleSkipped: 'ບໍ່ໄດ້ດຳເນີນການ'
-FirewallCreateBatchStep: 'ສົ່ງ {{ .count }} ກົດເປັນຊຸດໄປຫາ {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; ແປງເປັນ {{ .count }} ກົດ'
-FirewallCreateRuleExecutionFailed: 'ການສ້າງກົດລົ້ມເຫຼວ. ບໍ່ໄດ້ບັນທຶກໃນຖານຂໍ້ມູນ ແລະ ບໍ່ໄດ້ຍ້ອນກັບຄຳສັ່ງທີ່ດຳເນີນການແລ້ວ'
-FirewallCreateRulePersistenceFailed: 'ສ້າງກົດແລ້ວ ແຕ່ບັນທຶກຂໍ້ມູນການຈັດການບໍ່ສຳເລັດ'
-FirewallAdoptRulePersistenceFailed: 'ຄຳສັ່ງນຳກົດເຂົ້າການຈັດການໄດ້ດຳເນີນການແລ້ວ ແຕ່ບໍ່ສາມາດບັນທຶກຂໍ້ມູນການຈັດການໄດ້'
-FirewallSyncOperationsResult: 'ການດຳເນີນການຊິງຄ໌: ລຶບ {{ .removed }}, ສ້າງ {{ .created }}, ລົ້ມເຫຼວ {{ .failed }}, ບໍ່ໄດ້ດຳເນີນການ {{ .skipped }}, ກົງກັນແລ້ວ {{ .unchanged }} (ບໍ່ຕ້ອງປ່ຽນແປງ)'
-FirewallSyncRuleUnchanged: 'ກົງກັນແລ້ວ; ບໍ່ຕ້ອງປ່ຽນແປງ'
-FirewallSyncStep: 'ຊິງຄ໌ກົດໄປຫາ {{ .name }}'
-FirewallSyncFailed: 'ຊິງຄ໌ກົດໄຟວອລ {{ .failed }} ລາຍການບໍ່ສຳເລັດ'
-FirewallResetSourceStep: 'ຣີເຊັດ ແລະ ປິດໃຊ້ໄຟວອລຕົ້ນທາງ {{ .name }}'
-FirewallResetSourceResult: 'ຣີເຊັດໄຟວອລຕົ້ນທາງແລ້ວ ແລະ ລຶບກົດຖານຂໍ້ມູນ {{ .removed }} ລາຍການ'
+FirewallCreateRuleExecutionFailed: 'ການສ້າງກົດລົ້ມເຫຼວ. ຄຳສັ່ງທີ່ດຳເນີນການແລ້ວບໍ່ໄດ້ຖືກຍ້ອນກັບ'
 FirewallInitializeChainsStep: 'ເລີ່ມຕົ້ນ ແລະ ຜູກ chain ພື້ນຖານ {{ .name }}'
-FirewallRestoreRulesStep: 'ກູ້ຄືນກົດຖານຂໍ້ມູນໄປຫາ {{ .name }}'
 FirewallSyncWhitelistStep: 'ຊິງຄ໌ລາຍການພອດໄຟວໍທີ່ອະນຸຍາດ'
 FirewallEnableForwardingStep: 'ເປີດໃຊ້ ແລະ ຜູກ chain ສົ່ງຕໍ່ພອດ'
 FirewallRestoreForwardingRulesStep: 'ກູ້ຄືນກົດສົ່ງຕໍ່ພອດຈາກຖານຂໍ້ມູນ'
 FirewallInspectDockerGuardStep: 'ກວດສອບ backend firewall Docker ແລະ ນະໂຍບາຍ'
 FirewallInitializeDockerGuardStep: 'ເລີ່ມຕົ້ນ ແລະ ຜູກ chain ປ້ອງກັນພອດ {{ .name }}'
 FirewallPersistDockerGuardStep: 'ບັນທຶກສະຖານະປ້ອງກັນພອດ Docker'
-ErrFirewallRuleScopeChange: "ໄຟວໍປັດຈຸບັນບໍ່ຮອງຮັບການປ່ຽນຂອບເຂດຂອງກົດ (ເຊັ່ນ ຕະກູນທີ່ຢູ່ IPv4/IPv6). ກະລຸນາສ້າງກົດໃໝ່."
-FirewallWhitelistReleased: "{{ .name }}: ຍົກເລີກການປ້ອງກັນລາຍຊື່ທີ່ອະນຸຍາດແລ້ວ; ຍັງຄົງກົດອະນຸຍາດໄວ້. ຫາກຕ້ອງການປິດພອດ ໃຫ້ລຶບກົດດ້ວຍຕົນເອງຈາກລາຍການກົດ"
-FirewallWhitelistRequired: "{{ .name }}: ປ້ອງກັນໂດຍກົດພອດທີ່ຈຳເປັນຂອງລະບົບ"
 FileTaskCopy: 'ສຳເນົາໄຟລ໌ໄປທີ່ {{ .dst }}'
 FileTaskMove: 'ຍ້າຍໄຟລ໌ໄປທີ່ {{ .dst }}'
 FileTaskCompress: 'ບີບອັດໄຟລ໌ໄປທີ່ {{ .dst }}'
@@ -718,11 +704,13 @@ FileTaskDecompress: 'ແຕກໄຟລ໌ໄປທີ່ {{ .dst }}'
 FileTaskSource: 'ເສັ້ນທາງຕົ້ນທາງ: {{ .path }}'
 FileTaskFormat: 'ຮູບແບບໄຟລ໌ບີບອັດ: {{ .format }}'
 FileTaskRename: 'ຊື່ໄຟລ໌ປາຍທາງ: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "ແບັກເອນປັດຈຸບັນ {{ .current }} ຍັງມີກົດຂອງ 1Panel. ກະລຸນາລຶບອອກກ່ອນປ່ຽນໄປ {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "ການສົ່ງຕໍ່ IPv4 ຖືກປິດ. ກະລຸນາຕັ້ງ net.ipv4.ip_forward=1 ກ່ອນໃຊ້ແບັກເອນໄຟວໍຂອງ Docker."
 ErrFirewallRuleSavedApplyFailed: "ບັນທຶກການຕັ້ງຄ່າກົດໃໝ່ແລ້ວ ແຕ່ນຳໃຊ້ກັບໄຟວໍບໍ່ສຳເລັດ. ລອງອີກຄັ້ງດ້ວຍການຊິງຂໍ້ມູນ: {{ .detail }}"
+ErrFirewallRuleConflict: "ມີກົດ UFW ທີ່ມີເງື່ອນໄຂກົງກັນແຕ່ການດຳເນີນການຕ່າງກັນແລ້ວ. ກະລຸນາແກ້ໄຂກົດທີ່ມີຢູ່."
+ErrForwardInterfaceNotFound: "ບໍ່ພົບອິນເຕີເຟດເຄືອຂ່າຍ {{ .name }} ທີ່ລະບຸໃນກົດສົ່ງຕໍ່. ກະລຸນາກວດສອບຊື່ ແລ້ວລອງໃໝ່."
 
 ErrSSHPublicKey: "ກະລຸນາປ້ອນຄີສາທາລະນະ SSH ທີ່ຖືກຕ້ອງ"
 ErrSSHPrivateKey: "ຄີສ່ວນຕົວ SSH ບໍ່ຖືກຕ້ອງ ຫຼື ລະຫັດຜ່ານຜິດ; ຄີທີ່ເຂົ້າລະຫັດຕ້ອງໃຊ້ລະຫັດຜ່ານເດີມ"
 ErrSSHKeyMismatch: "ຄີສາທາລະນະ ແລະ ຄີສ່ວນຕົວ SSH ບໍ່ກົງກັນ"
+

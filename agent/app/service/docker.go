@@ -487,6 +487,9 @@ func (u *DockerService) OperateDocker(req dto.DockerOperation) error {
 	if err := controller.Handle(req.Operation, service); err != nil {
 		return err
 	}
+	if req.Operation == "start" || req.Operation == "restart" {
+		return RestoreDockerPortGuard(context.Background())
+	}
 	return nil
 }
 

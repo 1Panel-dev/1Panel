@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Rantaian DOCKER-USER Docker tidak ditemui. Mulakan semula Docker dan cuba lagi'
 ErrDockerNftablesChainUnavailable: 'Rantaian firewall IPv4 nftables Docker tidak ditemui. Pastikan versi Docker semasa menyokong bahagian belakang firewall nftables, mulakan semula Docker dan cuba lagi'
-ErrDockerForwardPolicyDrop: 'Dasar lalai FORWARD {{ .family }} ialah DROP. Laraskan dasar dan cuba lagi'
-ErrUFWRuleAdopt: 'Gagal mengurus peraturan UFW: {{ .detail }}. Jika versi UFW semasa lebih lama daripada 0.35, tingkatkan UFW dan cuba lagi'
+ErrDockerForwardPolicyDrop: 'Pelayan ini mengehadkan pemajuan rangkaian. Perlindungan port kontena tidak dapat diaktifkan buat masa ini.'
 Firewall: 'Firewall'
 FirewallTaskHost: 'Tembok api hos'
 FirewallTaskForwarding: 'Pemajuan port'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'Cipta peraturan tembok api'
 FirewallCreateRulesResult: 'Hasil penciptaan: {{ .succeeded }} berjaya, {{ .failed }} gagal, {{ .skipped }} tidak dilaksanakan'
 FirewallRuleOperationResult: 'Hasil operasi: {{ .succeeded }} berjaya, {{ .failed }} gagal'
 FirewallCreateRuleSkipped: 'Tidak dilaksanakan'
-FirewallCreateBatchStep: 'Hantar {{ .count }} peraturan secara kelompok ke {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; ditukar kepada {{ .count }} peraturan'
-FirewallCreateRuleExecutionFailed: 'Penciptaan peraturan gagal. Tiada rekod disimpan dalam pangkalan data dan arahan yang dilaksanakan tidak dibatalkan'
-FirewallCreateRulePersistenceFailed: 'Peraturan telah dicipta, tetapi rekod pengurusannya tidak dapat disimpan'
-FirewallAdoptRulePersistenceFailed: 'Arahan pengambilalihan peraturan telah dilaksanakan, tetapi rekod pengurusannya tidak dapat disimpan'
-FirewallSyncOperationsResult: 'Operasi penyegerakan: {{ .removed }} dipadam, {{ .created }} dicipta, {{ .failed }} gagal, {{ .skipped }} tidak dilaksanakan, {{ .unchanged }} sudah sepadan (tiada perubahan diperlukan)'
-FirewallSyncRuleUnchanged: 'Sudah sepadan; tiada perubahan diperlukan'
-FirewallSyncStep: 'Segerakkan peraturan ke {{ .name }}'
-FirewallSyncFailed: '{{ .failed }} peraturan firewall gagal disegerakkan'
-FirewallResetSourceStep: 'Tetapkan semula dan nyahdayakan firewall sumber {{ .name }}'
-FirewallResetSourceResult: 'Firewall sumber ditetapkan semula; {{ .removed }} peraturan pangkalan data dipadamkan'
+FirewallCreateRuleExecutionFailed: 'Penciptaan peraturan gagal. Arahan yang dilaksanakan tidak dibatalkan'
 FirewallInitializeChainsStep: 'Mulakan dan ikat rantai asas {{ .name }}'
-FirewallRestoreRulesStep: 'Pulihkan peraturan pangkalan data ke {{ .name }}'
 FirewallSyncWhitelistStep: 'Segerakkan senarai putih port firewall'
 FirewallEnableForwardingStep: 'Aktifkan dan ikat rantai pemajuan port'
 FirewallRestoreForwardingRulesStep: 'Pulihkan peraturan pemajuan port pangkalan data'
 FirewallInspectDockerGuardStep: 'Periksa backend firewall Docker dan polisi'
 FirewallInitializeDockerGuardStep: 'Mulakan dan ikat rantai perlindungan port {{ .name }}'
 FirewallPersistDockerGuardStep: 'Simpan status perlindungan port Docker'
-ErrFirewallRuleScopeChange: "Tembok api semasa tidak menyokong perubahan skop peraturan (seperti keluarga alamat IPv4/IPv6). Sila cipta peraturan baharu."
-FirewallWhitelistReleased: "{{ .name }}: perlindungan senarai dibenarkan telah dilepaskan; peraturan izin dikekalkan. Untuk menutup port, padamkan peraturan secara manual daripada senarai peraturan"
-FirewallWhitelistRequired: "{{ .name }}: dilindungi oleh peraturan port wajib sistem"
 FileTaskCopy: 'Salin fail ke {{ .dst }}'
 FileTaskMove: 'Pindahkan fail ke {{ .dst }}'
 FileTaskCompress: 'Mampatkan fail ke {{ .dst }}'
@@ -727,11 +713,13 @@ FileTaskDecompress: 'Ekstrak fail ke {{ .dst }}'
 FileTaskSource: 'Laluan sumber: {{ .path }}'
 FileTaskFormat: 'Format arkib: {{ .format }}'
 FileTaskRename: 'Nama fail sasaran: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "Bahagian belakang semasa {{ .current }} masih mengandungi peraturan 1Panel. Buangkannya sebelum beralih kepada {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "Pemajuan IPv4 dilumpuhkan. Tetapkan net.ipv4.ip_forward=1 sebelum menggunakan bahagian belakang tembok api Docker."
 ErrFirewallRuleSavedApplyFailed: "Konfigurasi peraturan baharu telah disimpan, tetapi gagal digunakan pada tembok api. Cuba lagi melalui penyegerakan: {{ .detail }}"
+ErrFirewallRuleConflict: "Peraturan UFW dengan syarat padanan yang sama tetapi tindakan berbeza sudah wujud. Sila edit peraturan sedia ada."
+ErrForwardInterfaceNotFound: "Antara muka rangkaian {{ .name }} yang dinyatakan dalam peraturan pemajuan tidak wujud. Semak namanya dan cuba lagi."
 
 ErrSSHPublicKey: "Masukkan kunci awam SSH yang sah"
 ErrSSHPrivateKey: "Kunci peribadi SSH tidak sah atau frasa laluan salah; kunci yang disulitkan memerlukan frasa laluan asal"
 ErrSSHKeyMismatch: "Kunci awam dan peribadi SSH tidak sepadan"
+

@@ -49,10 +49,13 @@ type Adapter interface {
 	CreateRules(context.Context, []Rule) error
 	DeleteRules(context.Context, []Rule) error
 	ReplaceRules(rules []Rule) error
-	Enable() error
+	Enable(...string) error
+	OperateFamily(string, bool) error
+	UnbindFamily(string) error
 	Cleanup() error
 	InitStatus() (bool, bool, error)
 	FamilyStatus(family string) (bool, bool, error)
+	FamilyState(family string) (bool, bool, bool, error)
 	Replay() error
 }
 

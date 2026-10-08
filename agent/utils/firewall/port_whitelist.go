@@ -263,7 +263,7 @@ func NormalizeSystemPorts(ports []SystemPort) (map[string]SystemPort, error) {
 }
 
 func SystemPortKey(port SystemPort) string {
-	key := LegacySystemPortKey(port)
+	key := strings.ToLower(strings.TrimSpace(port.Protocol)) + "/" + strings.TrimSpace(port.Port)
 	if family := strings.ToLower(strings.TrimSpace(port.Family)); family != "" {
 		key = family + "/" + key
 	}
@@ -271,10 +271,6 @@ func SystemPortKey(port SystemPort) string {
 		key += "/" + source
 	}
 	return key
-}
-
-func LegacySystemPortKey(port SystemPort) string {
-	return strings.ToLower(strings.TrimSpace(port.Protocol)) + "/" + strings.TrimSpace(port.Port)
 }
 
 func SortedSystemPortKeys(ports map[string]SystemPort) []string {
