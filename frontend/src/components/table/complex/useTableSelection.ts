@@ -184,7 +184,6 @@ export const useTableSelection = (
         selectedRows,
         isRowSelected,
         clearSelects,
-        pruneSelection,
         toggleSelection,
         selectRow,
         syncTableSelection,

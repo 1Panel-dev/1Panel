@@ -174,7 +174,6 @@ import { useCardColumns } from './useCardColumns';
 import { useContextMenu } from './useContextMenu';
 import { useResponsivePagination } from './useResponsivePagination';
 import { useTableSelection } from './useTableSelection';
-import { useTablePageState } from './useTablePageState';
 const slots = useSlots();
 const attrs = useAttrs();
 const { isMobile, openMenuTabs, currentNode } = useGlobalStore();
@@ -343,12 +342,10 @@ const handleRightClick = (row, column, event) => {
 };
 
 function currentChange() {
-    clearSelects();
     emit('search');
 }
 
 function sizeChange() {
-    clearSelects();
     props.paginationConfig.currentPage = 1;
     localStorage.setItem(props.paginationConfig.cacheSizeKey, props.paginationConfig.pageSize);
     emit('search');
@@ -462,13 +459,25 @@ watch([currentViewMode, tableData, () => props.syncCardContentHeight], scheduleC
     flush: 'post',
 });
 
-useTablePageState(
-    () => props.paginationConfig,
-    () => [
-        currentNode.value,
-        typeof props.selectionContext === 'function' ? props.selectionContext() : props.selectionContext,
+watch([() => props.paginationConfig?.currentPage, () => props.paginationConfig?.pageSize], clearSelects, {
+    flush: 'sync',
+});
+
+watch(
+    [
+        currentNode,
+        () =>
+            JSON.stringify(
+                typeof props.selectionContext === 'function' ? props.selectionContext() : props.selectionContext,
+            ),
     ],
-    clearSelects,
+    () => {
+        clearSelects();
+        if (props.paginationConfig) {
+            props.paginationConfig.currentPage = 1;
+        }
+    },
+    { flush: 'sync' },
 );
 
 onBeforeUnmount(() => {
