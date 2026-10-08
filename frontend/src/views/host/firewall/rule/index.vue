@@ -397,6 +397,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { Firewall } from '@/api/interface/firewall';
 import { Process } from '@/api/interface/process';
 import {
@@ -516,6 +517,7 @@ const visibleIptablesChains = ref<string[]>(
     loadCachedFilterValues(chainFilterStorageKey, iptablesChains, ['1PANEL_BASIC']),
 );
 const searchName = ref('');
+useSearchPersistence('host/firewall/rule/index', { search: searchName });
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const positionRanges = ref<Partial<Record<Firewall.Family, Firewall.PositionRange>>>({});
 const inventoryTotal = ref(0);

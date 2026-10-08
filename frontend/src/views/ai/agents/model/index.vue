@@ -69,6 +69,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { onMounted, reactive, ref } from 'vue';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
@@ -85,6 +86,7 @@ const items = ref<AI.AgentAccountItem[]>([]);
 const addRef = ref();
 const modelPoolRef = ref();
 const searchName = ref('');
+useSearchPersistence('ai/agents/model/index', { search: searchName });
 const apiType = ref('');
 const apiTypeOptions = ref<string[]>([]);
 
