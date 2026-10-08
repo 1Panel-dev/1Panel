@@ -3,6 +3,7 @@ package docker
 import (
 	"context"
 	"sort"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/docker/docker/api/types/container"
@@ -18,6 +19,10 @@ type NetworkCleanupClient interface {
 }
 
 func CleanUnusedNetworks(ctx context.Context, cli NetworkCleanupClient, onResult ...func(string, dto.NetworkCleanupItem)) (*dto.NetworkCleanupReport, error) {
+	return CleanUnusedNetworksBefore(ctx, cli, time.Time{}, onResult...)
+}
+
+func CleanUnusedNetworksBefore(ctx context.Context, cli NetworkCleanupClient, until time.Time, onResult ...func(string, dto.NetworkCleanupItem)) (*dto.NetworkCleanupReport, error) {
 	networks, err := cli.NetworkList(ctx, network.ListOptions{})
 	if err != nil {
 		return nil, err
@@ -67,6 +72,8 @@ func CleanUnusedNetworks(ctx context.Context, cli NetworkCleanupClient, onResult
 			item.Reason = "unsupported_network"
 		case used[n.Name] || used[n.ID]:
 			item.Reason = "container_connected"
+		case !until.IsZero() && (n.Created.IsZero() || n.Created.After(until)):
+			item.Reason = "recent"
 		}
 		if item.Reason != "" {
 			record("skipped", item)

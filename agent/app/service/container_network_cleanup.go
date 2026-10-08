@@ -3,48 +3,41 @@ package service
 import (
 	"fmt"
 	"sync"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/google/uuid"
 )
 
 var networkCleanupMu sync.Mutex
 
 func (u *ContainerService) CleanNetworks() (*dto.NetworkCleanupTask, error) {
-	taskItem, err := task.NewTaskWithOps(i18n.GetMsgByKey("Network"), task.TaskClean, task.TaskScopeContainer, "", 0)
-	if err != nil {
+	taskID := uuid.NewString()
+	if err := u.Prune(dto.ContainerPrune{TaskID: taskID, PruneType: "network"}); err != nil {
 		return nil, err
 	}
-	taskItem.AddSubTask(i18n.GetMsgByKey("TaskClean"), func(t *task.Task) error {
-		networkCleanupMu.Lock()
-		defer networkCleanupMu.Unlock()
-		if err := t.TaskCtx.Err(); err != nil {
-			return err
-		}
-		cli, err := docker.NewDockerClient()
-		if err != nil {
-			return err
-		}
-		defer cli.Close()
-		return executeNetworkCleanup(t, cli)
-	}, nil)
-	go func() {
-		if err := taskItem.Execute(); err != nil {
-			global.LOG.Errorf("network cleanup task %s failed: %v", taskItem.TaskID, err)
-		}
-	}()
-	return &dto.NetworkCleanupTask{TaskID: taskItem.TaskID}, nil
+	return &dto.NetworkCleanupTask{TaskID: taskID}, nil
 }
 
-func executeNetworkCleanup(t *task.Task, cli docker.NetworkCleanupClient) error {
+func executeNetworkCleanup(t *task.Task, cli docker.NetworkCleanupClient, cutoff ...time.Time) error {
+	networkCleanupMu.Lock()
+	defer networkCleanupMu.Unlock()
+	if err := t.TaskCtx.Err(); err != nil {
+		return err
+	}
+	var until time.Time
+	if len(cutoff) > 0 {
+		until = cutoff[0]
+	}
 	t.Log(i18n.GetMsgByKey("PruneStart"))
-	report, err := docker.CleanUnusedNetworks(t.TaskCtx, cli, func(status string, item dto.NetworkCleanupItem) {
+	report, err := docker.CleanUnusedNetworksBefore(t.TaskCtx, cli, until, func(status string, item dto.NetworkCleanupItem) {
 		key := "NetworkCleanupDeleted"
 		if status == "skipped" || status == "failed" {
 			key = map[string]string{
+				"recent":              "NetworkCleanupRecent",
 				"protected":           "NetworkCleanupProtected",
 				"container_connected": "NetworkCleanupConnected",
 				"network_in_use":      "NetworkCleanupConnected",
