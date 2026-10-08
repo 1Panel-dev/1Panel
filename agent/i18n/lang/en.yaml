@@ -745,3 +745,7 @@ NetworkCleanupInspectFailed: "Failed to inspect network [{{ .name }}] ({{ .id }}
 NetworkCleanupRemoveFailed: "Failed to remove network [{{ .name }}] ({{ .id }})"
 NetworkCleanupSummary: "Network cleanup finished: deleted {{ .deleted }}, skipped {{ .skipped }}, failed {{ .failed }}"
 NetworkCleanupPartialFailure: "Some networks could not be cleaned; see the task log"
+
+ErrSSHPublicKey: "Enter a valid SSH public key"
+ErrSSHPrivateKey: "Invalid SSH private key or incorrect passphrase; encrypted keys require the original passphrase"
+ErrSSHKeyMismatch: "The SSH public and private keys do not match"
