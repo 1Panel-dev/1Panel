@@ -83,6 +83,7 @@ func (b *BaseApi) CreateRootCert(c *gin.Context) {
 	}
 	if err := loadCertAfterDecrypt(&req); err != nil {
 		helper.BadRequest(c, err)
+		return
 	}
 	if err := sshService.CreateRootCert(req); err != nil {
 		helper.InternalServer(c, err)
@@ -107,6 +108,7 @@ func (b *BaseApi) EditRootCert(c *gin.Context) {
 	}
 	if err := loadCertAfterDecrypt(&req); err != nil {
 		helper.BadRequest(c, err)
+		return
 	}
 	if err := sshService.EditRootCert(req); err != nil {
 		helper.InternalServer(c, err)

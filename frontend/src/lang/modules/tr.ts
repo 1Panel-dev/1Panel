@@ -2921,6 +2921,9 @@ const message = {
         privateKey: 'Özel Anahtar',
         publicKey: 'Genel Anahtar',
         password: 'Parola',
+        existingPassPhrase: 'Mevcut özel anahtar parolası',
+        existingPassPhraseHelper:
+            'Özel anahtar şifreliyse mevcut parolayı girin; değilse boş bırakın. Bu işlem parolayı değiştirmez.',
         createMode: 'Oluşturma Yöntemi',
         generate: 'Otomatik Oluştur',
         unSyncPass: 'Anahtar parolası senkronize edilemez',

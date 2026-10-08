@@ -2930,6 +2930,9 @@ const message = {
         privateKey: 'Clave privada',
         publicKey: 'Clave pública',
         password: 'Contraseña',
+        existingPassPhrase: 'Contraseña actual de la clave privada',
+        existingPassPhraseHelper:
+            'Introduce la contraseña original si la clave privada está cifrada; en caso contrario, deja el campo vacío. Esto no cambia la contraseña.',
         createMode: 'Método de creación',
         generate: 'Autogenerar',
         unSyncPass: 'La contraseña de la clave no se puede sincronizar',

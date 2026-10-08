@@ -2865,6 +2865,9 @@ const message = {
         privateKey: '秘密鍵',
         publicKey: '公開鍵',
         password: 'パスワード',
+        existingPassPhrase: '既存の秘密鍵のパスフレーズ',
+        existingPassPhraseHelper:
+            '秘密鍵が暗号化されている場合は元のパスフレーズを入力し、それ以外は空欄にしてください。パスフレーズは変更されません。',
         createMode: '作成方法',
         generate: '自動生成',
         unSyncPass: '鍵パスワードは同期できません',

@@ -2827,6 +2827,9 @@ const message = {
         privateKey: '개인 키',
         publicKey: '공개 키',
         password: '비밀번호',
+        existingPassPhrase: '기존 개인 키 암호',
+        existingPassPhraseHelper:
+            '개인 키가 암호화되어 있으면 원래 암호를 입력하고, 그렇지 않으면 비워 두세요. 이 작업은 암호를 변경하지 않습니다.',
         createMode: '생성 방식',
         generate: '자동 생성',
         unSyncPass: '키 비밀번호 동기화 불가',

@@ -2720,6 +2720,8 @@ const message = {
         privateKey: '私鑰',
         publicKey: '公鑰',
         password: '密碼',
+        existingPassPhrase: '現有私鑰密碼',
+        existingPassPhraseHelper: '私鑰已加密時填寫原密碼，未加密則留空；此處不會修改私鑰密碼。',
         createMode: '建立方式',
         generate: '自動生成',
         unSyncPass: '金鑰密碼無法同步',

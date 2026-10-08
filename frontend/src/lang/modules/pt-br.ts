@@ -2929,6 +2929,9 @@ const message = {
         privateKey: 'Chave Privada',
         publicKey: 'Chave Pública',
         password: 'Senha',
+        existingPassPhrase: 'Senha atual da chave privada',
+        existingPassPhraseHelper:
+            'Informe a senha original se a chave privada estiver criptografada; caso contrário, deixe em branco. Isso não altera a senha.',
         createMode: 'Método de Criação',
         generate: 'Gerar Automaticamente',
         unSyncPass: 'Senha da chave não pode ser sincronizada',
