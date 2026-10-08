@@ -722,3 +722,7 @@ FileTaskRename: 'ຊື່ໄຟລ໌ປາຍທາງ: {{ .name }}'
 ErrFirewallBackendCleanupRequired: "ແບັກເອນປັດຈຸບັນ {{ .current }} ຍັງມີກົດຂອງ 1Panel. ກະລຸນາລຶບອອກກ່ອນປ່ຽນໄປ {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "ການສົ່ງຕໍ່ IPv4 ຖືກປິດ. ກະລຸນາຕັ້ງ net.ipv4.ip_forward=1 ກ່ອນໃຊ້ແບັກເອນໄຟວໍຂອງ Docker."
 ErrFirewallRuleSavedApplyFailed: "ບັນທຶກການຕັ້ງຄ່າກົດໃໝ່ແລ້ວ ແຕ່ນຳໃຊ້ກັບໄຟວໍບໍ່ສຳເລັດ. ລອງອີກຄັ້ງດ້ວຍການຊິງຂໍ້ມູນ: {{ .detail }}"
+
+ErrSSHPublicKey: "ກະລຸນາປ້ອນຄີສາທາລະນະ SSH ທີ່ຖືກຕ້ອງ"
+ErrSSHPrivateKey: "ຄີສ່ວນຕົວ SSH ບໍ່ຖືກຕ້ອງ ຫຼື ລະຫັດຜ່ານຜິດ; ຄີທີ່ເຂົ້າລະຫັດຕ້ອງໃຊ້ລະຫັດຜ່ານເດີມ"
+ErrSSHKeyMismatch: "ຄີສາທາລະນະ ແລະ ຄີສ່ວນຕົວ SSH ບໍ່ກົງກັນ"

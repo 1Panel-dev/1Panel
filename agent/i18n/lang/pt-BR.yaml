@@ -731,3 +731,7 @@ FileTaskRename: 'Nome do arquivo de destino: {{ .name }}'
 ErrFirewallBackendCleanupRequired: "O backend atual {{ .current }} ainda contém regras do 1Panel. Remova-as antes de mudar para {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "O encaminhamento IPv4 está desativado. Defina net.ipv4.ip_forward=1 antes de usar o backend de firewall do Docker."
 ErrFirewallRuleSavedApplyFailed: "A configuração da nova regra foi salva, mas não pôde ser aplicada ao firewall. Tente novamente por meio da sincronização: {{ .detail }}"
+
+ErrSSHPublicKey: "Informe uma chave pública SSH válida"
+ErrSSHPrivateKey: "Chave privada SSH inválida ou senha incorreta; chaves criptografadas exigem a senha original"
+ErrSSHKeyMismatch: "As chaves pública e privada SSH não correspondem"

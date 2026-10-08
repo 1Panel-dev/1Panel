@@ -731,3 +731,7 @@ FileTaskRename: '保存先ファイル名：{{ .name }}'
 ErrFirewallBackendCleanupRequired: "現在のバックエンド {{ .current }} に 1Panel ルールが残っています。{{ .target }} に切り替える前に削除してください。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 転送が無効です。Docker のファイアウォールバックエンドを使用する前に net.ipv4.ip_forward=1 を設定してください。"
 ErrFirewallRuleSavedApplyFailed: "新しいルール設定は保存されましたが、ファイアウォールへの適用に失敗しました。同期で再試行してください：{{ .detail }}"
+
+ErrSSHPublicKey: "有効な SSH 公開鍵を入力してください"
+ErrSSHPrivateKey: "SSH 秘密鍵の形式が無効か、パスフレーズが間違っています。暗号化された鍵には元のパスフレーズが必要です"
+ErrSSHKeyMismatch: "SSH 公開鍵と秘密鍵が一致しません"
