@@ -185,6 +185,7 @@
                     <template #main>
                         <div v-loading="loading">
                             <ComplexTable
+                                :selection-context="() => [searchName, selectedRuleFilters, visibleIptablesChains]"
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
                                 :data="allRows"
@@ -661,7 +662,6 @@ const loadRules = async (refreshUsage: boolean) => {
         paginationConfig.total = total;
         inventoryTotal.value = response.data.allTotal || 0;
         managedTotal.value = response.data.managedTotal || 0;
-        selects.value = [];
     } finally {
         if (requestID === searchRequestID) loading.value = false;
     }

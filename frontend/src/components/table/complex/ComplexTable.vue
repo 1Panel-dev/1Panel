@@ -11,6 +11,7 @@
             <fu-table
                 v-if="currentViewMode === 'table'"
                 v-bind="$attrs"
+                :data="props.data"
                 ref="tableRef"
                 @select="handleSelect"
                 @selection-change="handleSelectionChange"
@@ -175,7 +176,7 @@ import { useResponsivePagination } from './useResponsivePagination';
 import { useTableSelection } from './useTableSelection';
 const slots = useSlots();
 const attrs = useAttrs();
-const { isMobile, openMenuTabs } = useGlobalStore();
+const { isMobile, openMenuTabs, currentNode } = useGlobalStore();
 
 defineOptions({ name: 'ComplexTable' });
 export type DropdownProps = FuTableOperationButton;
@@ -184,6 +185,8 @@ type ViewMode = 'table' | 'card';
 
 const props = defineProps({
     header: String,
+    data: { type: Array as PropType<any[]>, default: () => [] },
+    selectionContext: { type: [String, Number, Array, Object, Function], default: undefined },
     paginationConfig: {
         type: Object,
         required: false,
@@ -239,7 +242,7 @@ const selectionColumn = computed(() =>
     columnNodes.value.find((column) => (column.props as Record<string, any> | null)?.type === 'selection'),
 );
 const tableData = computed(() => {
-    const data = attrs.data;
+    const data = props.data;
     return Array.isArray(data) ? data : [];
 });
 const cardContentStyle = computed(() => {
@@ -295,7 +298,7 @@ const {
     isDisabled: isRightButtonDisabled,
     click: rightButtonClick,
 } = useContextMenu(() => props.rightButtons);
-const getTableData = () => (Array.isArray(attrs.data) ? attrs.data : []);
+const getTableData = () => props.data || [];
 const isRowSelectable = (row: any) => {
     const selectable = (selectionColumn.value?.props as Record<string, any> | null)?.selectable;
     return typeof selectable === 'function' ? selectable(row) : true;
@@ -304,7 +307,6 @@ const {
     selectedRows,
     isRowSelected,
     clearSelects,
-    pruneSelection,
     toggleSelection,
     selectRow,
     syncTableSelection,
@@ -313,7 +315,18 @@ const {
     handleRowClick,
     handleKeyDown: handleSelectionKeyDown,
     handleKeyUp,
-} = useTableSelection(tableRef, getTableData, (rows) => emit('update:selects', rows), isRowSelectable);
+} = useTableSelection(
+    tableRef,
+    getTableData,
+    (rows) => emit('update:selects', rows),
+    isRowSelectable,
+    (row) => {
+        const key = attrs.rowKey ?? attrs['row-key'];
+        if (typeof key === 'function') return row == null ? undefined : key(row);
+        if (typeof key === 'string') return key.split('.').reduce((value, part) => value?.[part], row);
+        return row?.id;
+    },
+);
 const toggleCardSelection = (row: any, selected: boolean) => {
     selectRow(row, selected);
 };
@@ -446,7 +459,26 @@ watch([currentViewMode, tableData, () => props.syncCardContentHeight], scheduleC
     flush: 'post',
 });
 
-watch(tableData, pruneSelection);
+watch([() => props.paginationConfig?.currentPage, () => props.paginationConfig?.pageSize], clearSelects, {
+    flush: 'sync',
+});
+
+watch(
+    [
+        currentNode,
+        () =>
+            JSON.stringify(
+                typeof props.selectionContext === 'function' ? props.selectionContext() : props.selectionContext,
+            ),
+    ],
+    () => {
+        clearSelects();
+        if (props.paginationConfig) {
+            props.paginationConfig.currentPage = 1;
+        }
+    },
+    { flush: 'sync' },
+);
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', calcHeight);

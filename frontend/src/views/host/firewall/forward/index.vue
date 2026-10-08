@@ -57,6 +57,18 @@
                     </template>
                     <template #main>
                         <ComplexTable
+                            :selection-context="() => [searchName, fireName]"
+                            :row-key="
+                                (row) =>
+                                    JSON.stringify([
+                                        row.family,
+                                        row.protocol,
+                                        row.port,
+                                        row.targetIP,
+                                        row.targetPort,
+                                        row.interface,
+                                    ])
+                            "
                             :pagination-config="paginationConfig"
                             v-model:selects="selects"
                             @search="search"
