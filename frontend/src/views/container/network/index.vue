@@ -100,7 +100,8 @@ import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
-import { deleteNetwork, searchNetwork, inspect, cleanNetworks } from '@/api/modules/container';
+import { newUUID } from '@/utils/id';
+import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
 import TaskLog from '@/components/log/task/index.vue';
 import i18n from '@/lang';
@@ -141,10 +142,11 @@ const onClean = () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        await cleanNetworks()
-            .then((res) => {
+        const params = { taskID: newUUID(), pruneType: 'network', withTagAll: false };
+        await containerPrune(params)
+            .then(() => {
                 loading.value = false;
-                openTaskLog(res.data.taskID);
+                openTaskLog(params.taskID);
             })
             .catch(() => {
                 loading.value = false;
