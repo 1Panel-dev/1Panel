@@ -14,6 +14,7 @@
                     v-model:file-list="uploaderFiles"
                     action="#"
                     :auto-upload="false"
+                    :disabled="loading"
                     :show-file-list="false"
                     :limit="1"
                     accept=".json"
@@ -29,6 +30,13 @@
                 <el-text v-else type="info">.json</el-text>
             </div>
 
+            <el-alert
+                v-if="deduplicatedCount"
+                class="mt-3"
+                type="info"
+                :closable="false"
+                :title="$t('firewall.importDuplicatesRemoved', [deduplicatedCount])"
+            />
             <el-card class="mt-3 w-full" shadow="never" v-loading="loading">
                 <template #header>
                     <div class="import-preview-header">
@@ -43,11 +51,6 @@
                     <el-table-column label="IP" :min-width="60" prop="family">
                         <template #default="{ row }">
                             {{ row.family === 'ipv6' ? 'IPv6' : 'IPv4' }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('commons.table.status')" :min-width="80">
-                        <template #default="{ row }">
-                            <Status :status="row.status" />
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
@@ -93,17 +96,10 @@ import { MsgError } from '@/utils/message';
 import i18n from '@/lang';
 import { getErrorMessage } from '@/utils/misc';
 import { isAxiosError } from 'axios';
-import { getNetworkOptions } from '@/api/modules/host';
 import { operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
-import {
-    FIREWALL_BATCH_LIMIT,
-    FIREWALL_IMPORT_MAX_SIZE,
-    inferAddressFamily,
-    isValidAddressForFamily,
-    isValidPortRange,
-    normalizePortRange,
-} from '@/views/host/firewall/utils/validation';
+import { normalizeForwardRuleImport, parseForwardRuleImport } from '../transfer';
+import { FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE } from '@/views/host/firewall/utils/validation';
 import { Document } from '@element-plus/icons-vue';
 
 const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
@@ -111,100 +107,78 @@ const emit = defineEmits<{ (e: 'created', taskID: string): void }>();
 const visible = ref(false);
 const loading = ref(false);
 const submitError = ref('');
-const selects = ref<any>([]);
-const displayData = ref<any>([]);
-const currentRules = ref<Firewall.RuleInfo[]>([]);
+const selects = ref<Firewall.RuleForward[]>([]);
+const displayData = ref<Firewall.RuleForward[]>([]);
+const deduplicatedCount = ref(0);
 const currentFireName = ref('');
-const availableInterfaces = ref<string[]>([]);
 
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
-const acceptParams = async (fireName: string): Promise<void> => {
+const acceptParams = (fireName: string) => {
     loading.value = false;
     submitError.value = '';
     displayData.value = [];
     selects.value = [];
-    currentRules.value = [];
-    availableInterfaces.value = [];
+    deduplicatedCount.value = 0;
     uploaderFiles.value = [];
 
     uploadRef.value?.clearFiles();
     currentFireName.value = fireName;
     visible.value = true;
-    loadCurrentData(fireName);
 };
 
-const loadCurrentData = async (fireName: string) => {
-    const res = await searchForwardRule({
-        strategy: '',
-        info: '',
-        page: 1,
-        pageSize: 10000,
-    });
-    currentRules.value = res.data.items || [];
-    if (fireName === 'iptables' || fireName === 'nftables') {
-        const networkRes = await getNetworkOptions();
-        availableInterfaces.value = networkRes.data || [];
-    }
-};
-
-const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
-    if (!_uploadFile.raw) return;
+const fileOnChange = async (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
+    if (!uploadFile.raw) return;
     loading.value = true;
     submitError.value = '';
     displayData.value = [];
-
+    deduplicatedCount.value = 0;
     selects.value = [];
-
     uploaderFiles.value = uploadFiles;
 
-    if (_uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
+    if (uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
         uploadRef.value?.clearFiles();
         uploaderFiles.value = [];
         loading.value = false;
         MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
         return;
     }
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const content = e.target.result as string;
-            const parsed = JSON.parse(content);
-
-            if (!Array.isArray(parsed)) {
-                MsgError(i18n.global.t('commons.msg.errImportFormat'));
-                loading.value = false;
-                return;
+    try {
+        const parsed = parseForwardRuleImport(await uploadFile.raw.text());
+        if (!parsed) throw new Error(i18n.global.t('commons.msg.errImportFormat'));
+        const imported = parsed.flatMap((item) => {
+            const rule = normalizeForwardRuleImport(item);
+            return rule.protocol.split('/').map((protocol) => ({ ...rule, protocol }));
+        });
+        const response = await searchForwardRule({ strategy: '', info: '', page: 1, pageSize: 10000, all: true });
+        if (!visible.value || uploaderFiles.value[0]?.uid !== uploadFile.uid) return;
+        const ruleKey = (rule: Firewall.RuleForward) =>
+            JSON.stringify([rule.family, rule.protocol, rule.port, rule.targetIP, rule.targetPort, rule.interface]);
+        const seen = new Set((response.data.items || []).map((rule) => ruleKey(normalizeForwardRuleImport(rule))));
+        const unique: Firewall.RuleForward[] = [];
+        let duplicates = 0;
+        for (const rule of imported) {
+            const key = ruleKey(rule);
+            if (seen.has(key)) {
+                duplicates++;
+                continue;
             }
-
-            if (parsed.length > FIREWALL_BATCH_LIMIT) {
-                MsgError(
-                    i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]),
-                );
-                loading.value = false;
-                return;
-            }
-            for (const item of parsed) {
-                if (!item.family && typeof item.targetIP === 'string') {
-                    item.family = inferAddressFamily(item.targetIP);
-                }
-                if (!checkDataFormat(item)) {
-                    MsgError(i18n.global.t('commons.msg.errImportFormat'));
-                    loading.value = false;
-                    return;
-                }
-                item.port = normalizePortRange(item.port);
-                item.targetPort = normalizePortRange(item.targetPort);
-            }
-
-            compareRules(parsed);
-            loading.value = false;
-        } catch (error) {
-            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
-            loading.value = false;
+            seen.add(key);
+            unique.push(rule);
         }
-    };
-    reader.readAsText(_uploadFile.raw);
+        if (unique.length > FIREWALL_BATCH_LIMIT) {
+            MsgError(i18n.global.t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024]));
+            return;
+        }
+        displayData.value = unique;
+        deduplicatedCount.value = duplicates;
+    } catch (error) {
+        if (visible.value && uploaderFiles.value[0]?.uid === uploadFile.uid) {
+            submitError.value = getErrorMessage(error) || i18n.global.t('commons.msg.errImportFormat');
+        }
+    } finally {
+        if (uploaderFiles.value[0]?.uid === uploadFile.uid) loading.value = false;
+    }
 };
 
 const handleExceed: UploadProps['onExceed'] = (files) => {
@@ -212,51 +186,6 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
     const file = files[0] as UploadRawFile;
     file.uid = genFileId();
     uploadRef.value!.handleStart(file);
-};
-
-const checkDataFormat = (item: any): boolean => {
-    if (!item.family || !item.protocol || !item.targetIP || !item.port || !item.targetPort) {
-        return false;
-    }
-    if (!['ipv4', 'ipv6'].includes(item.family)) return false;
-    if (!isValidAddressForFamily(item.family, item.targetIP, false)) return false;
-    if (!['tcp', 'udp', 'tcp/udp'].includes(item.protocol)) {
-        return false;
-    }
-    if (!isValidPortRange(item.port) || !isValidPortRange(item.targetPort)) return false;
-
-    if (
-        (currentFireName.value === 'iptables' || currentFireName.value === 'nftables') &&
-        item.interface !== undefined &&
-        item.interface !== null
-    ) {
-        const interfaceValue = item.interface;
-        if (interfaceValue !== '' && interfaceValue !== 'all') {
-            if (!availableInterfaces.value.includes(interfaceValue)) {
-                return false;
-            }
-        }
-    }
-
-    return true;
-};
-
-const compareRules = (importedRules: any[]) => {
-    const newRules: any[] = [];
-    const duplicateRules: any[] = [];
-
-    const ruleKey = (rule: Firewall.RuleForward | Firewall.RuleInfo) =>
-        `${rule.family}:${rule.protocol}:${rule.port}:${rule.targetIP}:${rule.targetPort}:${rule.interface || ''}`;
-    const existingKeys = new Set(currentRules.value.map(ruleKey));
-    for (const importedRule of importedRules) {
-        if (!existingKeys.has(ruleKey(importedRule))) {
-            newRules.push({ ...importedRule, status: 'new' });
-        } else {
-            duplicateRules.push({ ...importedRule, status: 'duplicate' });
-        }
-    }
-
-    displayData.value = [...newRules, ...duplicateRules];
 };
 
 const onImport = async () => {
@@ -286,7 +215,7 @@ const onImport = async () => {
     }
 
     try {
-        const result = (await operateForwardRule({ rules })).data;
+        const result = (await operateForwardRule({ rules, import: true })).data;
         if (!result.taskID || !result.queued) {
             submitError.value = i18n.global.t('commons.msg.operationFailed');
             return;

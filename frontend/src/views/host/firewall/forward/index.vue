@@ -15,7 +15,7 @@
                 <template v-if="isInit" #actions>
                     <el-divider direction="vertical" />
                     <el-button v-permission v-node-admin type="primary" link @click="cleanupBackend">
-                        {{ $t('firewall.cleanupAction') }}
+                        {{ $t('commons.button.reset') }}
                     </el-button>
                 </template>
             </FireStatus>
@@ -25,12 +25,12 @@
                     <span v-else>{{ $t('firewall.basicStatus') }}</span>
                 </el-card>
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isInit || !isBind }">
+                    <template v-if="fireStatusRef?.forwardDropFamilies" #prompt>
+                        <el-alert type="warning" :closable="false" :title="$t('firewall.forwardPolicyDropWarning')" />
+                    </template>
                     <template #leftToolBar>
                         <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
-                        </el-button>
-                        <el-button v-permission v-node-admin @click="openRuleSync">
-                            {{ $t('commons.button.sync') }}
                         </el-button>
                         <el-button
                             v-permission
@@ -52,8 +52,8 @@
                     </template>
                     <template #rightToolBar>
                         <TableSearch @search="search()" v-model:searchName="searchName" />
-                        <TableRefresh @search="refreshAfterSync" />
-                        <TableSetting title="firewall-forward-refresh" @search="refreshAfterSync" />
+                        <TableRefresh @search="refreshRules" />
+                        <TableSetting title="firewall-forward-refresh" @search="refreshRules" />
                     </template>
                     <template #main>
                         <ComplexTable
@@ -82,19 +82,6 @@
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.protocol')" :min-width="70" prop="protocol" />
-                            <el-table-column :label="$t('commons.table.status')" :min-width="90" prop="syncStatus">
-                                <template #default="{ row }">
-                                    <el-tooltip
-                                        :disabled="!syncStatusMessage(row.syncStatus)"
-                                        :content="syncStatusMessage(row.syncStatus)"
-                                        placement="top"
-                                    >
-                                        <el-tag :type="syncStatusType(row.syncStatus)">
-                                            {{ syncStatusLabel(row.syncStatus) }}
-                                        </el-tag>
-                                    </el-tooltip>
-                                </template>
-                            </el-table-column>
                             <el-table-column :label="$t('firewall.sourcePort')" :min-width="70" prop="port" />
                             <el-table-column :min-width="80" :label="$t('firewall.targetIP')" prop="targetIP" />
                             <el-table-column :label="$t('firewall.targetPort')" :min-width="70" prop="targetPort" />
@@ -124,23 +111,11 @@
             </div>
         </div>
 
-        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()">
-            <template #content>
-                <el-form class="mt-4 mb-1" ref="deleteForm" label-position="left">
-                    <el-form-item>
-                        <el-checkbox v-model="forceDelete" :label="$t('website.forceDelete')" />
-                        <span class="input-help">
-                            {{ $t('website.forceDeleteHelper') }}
-                        </span>
-                    </el-form-item>
-                </el-form>
-            </template>
-        </OpDialog>
+        <OpDialog ref="opRef" @search="search" @submit="onSubmitDelete()" />
         <OperateDialog @created="openRuleTask" ref="dialogRef" />
         <ImportDialog @created="openRuleTask" ref="dialogImportRef" />
-        <TaskLog ref="taskLogRef" @close="refreshAfterSync" />
-        <RuleSync ref="ruleSyncRef" @search="refreshAfterSync" />
-        <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
+        <TaskLog ref="taskLogRef" @close="refreshRules" />
+        <RuleReset ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
     </div>
 </template>
 
@@ -148,14 +123,14 @@
 import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
-import RuleSync from '@/views/host/firewall/sync/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import RuleReset from '@/views/host/firewall/components/rule-reset.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { onMounted, reactive, ref } from 'vue';
-import { operateFirewallBackend, operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
+import { resetFirewallRules, operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
+import { buildForwardRuleExport } from './transfer';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { getErrorMessage } from '@/utils/misc';
@@ -172,34 +147,33 @@ const isInit = ref(false);
 const isBind = ref(false);
 const fireName = ref();
 const fireStatusRef = ref();
-const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
-const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const cleanupConfirmRef = ref<InstanceType<typeof RuleReset>>();
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
 const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID, true);
 
-const openRuleSync = () => {
-    if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
-    ruleSyncRef.value?.acceptParams(fireName.value, 'forwarding');
-};
-
-const refreshAfterSync = async () => {
+const refreshRules = async () => {
     await fireStatusRef.value?.acceptParams();
 };
 
 const cleanupBackend = () => {
     if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
     cleanupConfirmRef.value?.acceptParams({
-        header: i18n.global.t('firewall.cleanupAction'),
-        operationInfo: i18n.global.t('firewall.cleanupForwardingBackendHelper', [fireName.value]),
-        submitInputInfo: fireName.value,
+        message: i18n.global.t('firewall.cleanupForwardingBackendHelper', [fireName.value]),
+        provider: fireName.value,
     });
 };
 
-const submitCleanupBackend = async () => {
+const submitCleanupBackend = async (backup: boolean) => {
     if (fireName.value !== 'iptables' && fireName.value !== 'nftables') return;
     loading.value = true;
     try {
-        await operateFirewallBackend({ subsystem: 'forwarding', backend: fireName.value, operation: 'cleanup' });
+        const result = await resetFirewallRules({
+            subsystem: 'forwarding',
+            provider: fireName.value,
+            backup,
+        });
+        if (result.data.backupPath)
+            await ElMessageBox.alert(result.data.backupPath, i18n.global.t('commons.button.export'));
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await fireStatusRef.value?.acceptParams();
     } finally {
@@ -207,24 +181,8 @@ const submitCleanupBackend = async () => {
     }
 };
 
-const syncStatusLabel = (status?: Firewall.RuleForward['syncStatus']) => {
-    if (status === 'converged') return i18n.global.t('firewall.effective');
-    if (status === 'runtime_only') return i18n.global.t('firewall.forwardUnsynced');
-    return i18n.global.t('firewall.notEffective');
-};
-const syncStatusType = (status?: Firewall.RuleForward['syncStatus']) => {
-    if (status === 'converged') return 'success';
-    return status === 'runtime_only' ? 'warning' : 'danger';
-};
-const syncStatusMessage = (status?: Firewall.RuleForward['syncStatus']) => {
-    if (status === 'missing') return i18n.global.t('firewall.ruleSyncReasonDetail.missingFromTarget');
-    if (status === 'runtime_only') return i18n.global.t('firewall.ruleSyncReasonDetail.onlyInTarget');
-    return '';
-};
-
 const opRef = ref();
 const dialogImportRef = ref();
-const forceDelete = ref(false);
 const operateRules = ref();
 
 const data = ref();
@@ -318,7 +276,7 @@ const onSubmitDelete = async () => {
     if (loading.value) return;
     loading.value = true;
     try {
-        const result = (await operateForwardRule({ rules: operateRules.value, forceDelete: forceDelete.value })).data;
+        const result = (await operateForwardRule({ rules: operateRules.value })).data;
         if (!result.taskID || !result.queued) {
             MsgError(i18n.global.t('commons.msg.operationFailed'));
             return;
@@ -368,18 +326,8 @@ const exportRules = async (rules: Firewall.RuleForward[]) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
         },
     );
-    const exportData = rules.map((item) => ({
-        family: item.family,
-        protocol: item.protocol,
-        port: item.port,
-        targetIP: item.targetIP,
-        targetPort: item.targetPort,
-        interface: item.interface,
-    }));
-    downloadWithContent(
-        JSON.stringify(exportData, null, 2),
-        `1panel-firewall-forward-${getCurrentDateFormatted()}.json`,
-    );
+    const exported = buildForwardRuleExport(rules);
+    downloadWithContent(JSON.stringify(exported, null, 2), `1panel-firewall-forward-${getCurrentDateFormatted()}.json`);
 };
 
 const onExport = async () => exportRules(selects.value.length > 0 ? selects.value : await loadAllRules());
@@ -404,7 +352,6 @@ const buttons = [
 ];
 
 onMounted(() => {
-    forceDelete.value = false;
     if (fireName.value !== '-') {
         loading.value = true;
         fireStatusRef.value.acceptParams();

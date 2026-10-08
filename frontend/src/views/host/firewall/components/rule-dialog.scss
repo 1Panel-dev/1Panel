@@ -1,0 +1,151 @@
+.firewall-rule-dialog.el-dialog {
+    width: min(720px, calc(100vw - 32px));
+
+    .el-dialog__body {
+        padding-top: 8px;
+    }
+
+    .el-dialog__footer {
+        padding-top: 20px;
+    }
+
+    .el-alert__title {
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+
+    .firewall-rule-dialog__content {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        min-height: 100px;
+    }
+
+    .firewall-rule-dialog__modes {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+    }
+
+    .firewall-rule-dialog__choices,
+    .firewall-rule-dialog__files {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+    }
+
+    .el-radio.is-bordered {
+        height: auto;
+        min-height: 48px;
+        margin: 0;
+        padding: 16px;
+        border-radius: 8px;
+        white-space: normal;
+
+        &.is-checked {
+            background: var(--el-color-primary-light-9);
+        }
+
+        &:not(.is-disabled):hover {
+            border-color: var(--el-color-primary);
+        }
+
+        .el-radio__label {
+            min-width: 0;
+            width: 100%;
+            padding-left: 12px;
+            line-height: 1.5;
+        }
+    }
+
+    .firewall-rule-dialog__choice-title {
+        display: block;
+        font-weight: 500;
+    }
+
+    .firewall-rule-dialog__choice-description {
+        display: block;
+        margin-top: 6px;
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .firewall-rule-dialog__confirmation {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        border-top: 1px solid var(--el-border-color-lighter);
+        padding-top: 20px;
+
+        code {
+            display: inline-block;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: var(--el-fill-color);
+            color: var(--el-color-danger);
+        }
+    }
+
+    .firewall-rule-dialog__directory {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+        line-height: 1.7;
+        overflow-wrap: anywhere;
+
+        .el-icon {
+            flex-shrink: 0;
+            margin-top: 3px;
+            font-size: 16px;
+        }
+    }
+
+    .firewall-rule-dialog__files {
+        flex-wrap: nowrap;
+        max-height: 320px;
+        overflow-y: auto;
+        padding: 2px;
+
+        > .el-radio {
+            flex-shrink: 0;
+            width: 100%;
+        }
+    }
+
+    .firewall-rule-dialog__file-name {
+        display: flex;
+        align-items: flex-start;
+        gap: 8px;
+        overflow-wrap: anywhere;
+        font-weight: 500;
+
+        .el-icon {
+            flex-shrink: 0;
+            margin-top: 3px;
+        }
+    }
+
+    .firewall-rule-dialog__file-meta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 6px 16px;
+        margin-top: 8px;
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+    }
+
+    .el-empty {
+        padding: 12px 0;
+    }
+
+    @media (max-width: 600px) {
+        .firewall-rule-dialog__modes {
+            grid-template-columns: 1fr;
+        }
+    }
+}

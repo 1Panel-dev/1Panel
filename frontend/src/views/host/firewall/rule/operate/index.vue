@@ -6,9 +6,17 @@
         :auto-close="!loading"
         @close="handleClose"
     >
+        <el-alert
+            v-if="editAccess === 'metadata'"
+            class="!mb-4"
+            type="info"
+            show-icon
+            :closable="false"
+            :title="$t('firewall.whitelistRuleProtected')"
+        />
         <el-form ref="formRef" v-loading="loading" label-position="top" :model="form" :rules="rules">
             <el-form-item :label="$t('firewall.action')" prop="action">
-                <el-radio-group v-model="form.action" :disabled="descriptionOnly">
+                <el-radio-group v-model="form.action" :disabled="contentReadonly">
                     <el-radio-button value="accept">
                         {{ $t('firewall.accept') }}
                     </el-radio-button>
@@ -18,7 +26,7 @@
                 </el-radio-group>
             </el-form-item>
             <el-form-item :label="$t('commons.table.protocol')" prop="protocol">
-                <el-select v-model="form.protocol" :disabled="descriptionOnly" class="w-full" @change="changeProtocol">
+                <el-select v-model="form.protocol" :disabled="contentReadonly" class="w-full" @change="changeProtocol">
                     <el-option v-if="mode === 'create' || provider === 'ufw'" label="TCP/UDP" value="tcp/udp" />
                     <el-option label="TCP" value="tcp" />
                     <el-option label="UDP" value="udp" />
@@ -36,7 +44,7 @@
                         ref="sourceAddressRefs"
                         v-model.trim="item.address"
                         class="source-address-select"
-                        :disabled="descriptionOnly"
+                        :disabled="contentReadonly"
                         clearable
                         :placeholder="$t('firewall.sourceAddressPlaceholder')"
                         @keyup.enter.prevent="addSourceAddressOnEnter(index)"
@@ -57,7 +65,7 @@
                         v-model.trim="form.destinationPorts[index]"
                         class="destination-port-input"
                         clearable
-                        :disabled="descriptionOnly || !portProtocol"
+                        :disabled="contentReadonly || !portProtocol"
                         :placeholder="$t('firewall.destinationPortPlaceholder')"
                         @keyup.enter.prevent="addDestinationPortOnEnter(index)"
                     >
@@ -65,7 +73,7 @@
                             <el-button
                                 v-if="mode === 'create'"
                                 icon="Delete"
-                                :disabled="descriptionOnly || !portProtocol"
+                                :disabled="contentReadonly || !portProtocol"
                                 @click="removeRuleRow(index)"
                             />
                         </template>
@@ -74,7 +82,7 @@
                 <el-button
                     v-if="mode === 'create'"
                     class="mt-2"
-                    :disabled="descriptionOnly || !portProtocol"
+                    :disabled="contentReadonly || !portProtocol"
                     @click="addRuleRow"
                 >
                     {{ $t('commons.button.add') }}
@@ -126,8 +134,10 @@ import {
 
 const provider = ref<Firewall.Provider>('iptables');
 const mode = ref<'create' | 'edit'>('create');
-const editingUUID = ref('');
-const descriptionOnly = ref(false);
+const editingTarget = ref<Firewall.RuleTarget>();
+const editAccess = ref<'rule' | 'metadata' | 'description'>('rule');
+const descriptionOnly = computed(() => editAccess.value === 'description');
+const contentReadonly = computed(() => editAccess.value !== 'rule');
 const editingRule = ref<Firewall.Rule>();
 const originalFormRule = ref<Firewall.Rule>();
 const drawerVisible = ref(false);
@@ -304,8 +314,8 @@ const resetForm = () => {
     form.action = 'accept';
     form.priority = undefined;
     form.description = '';
-    editingUUID.value = '';
-    descriptionOnly.value = false;
+    editingTarget.value = undefined;
+    editAccess.value = 'rule';
     editingRule.value = undefined;
     originalFormRule.value = undefined;
     resetBatch();
@@ -317,18 +327,20 @@ const acceptParams = (
     item?: Firewall.InventoryItem,
     ranges: Partial<Record<Firewall.Family, Firewall.PositionRange>> = {},
     supportsExplicitPriority = true,
-    onlyDescription = false,
 ) => {
     provider.value = value;
     firewalldPrioritySupported.value = supportsExplicitPriority;
     positionRanges.value = ranges;
-    mode.value = item?.desired?.uuid ? 'edit' : 'create';
+    mode.value = item?.observed?.instanceKey ? 'edit' : 'create';
     resetForm();
-    descriptionOnly.value = mode.value === 'edit' && onlyDescription;
-    if (mode.value === 'edit' && item?.desired?.uuid) {
-        const rule = descriptionOnly.value ? item.desired.rule : item.rule;
+    if (mode.value === 'edit') {
+        editAccess.value =
+            item.observed.parseStatus !== 'supported' ? 'description' : item.isWhitelist ? 'metadata' : 'rule';
+    }
+    if (mode.value === 'edit' && item?.observed?.instanceKey) {
+        const rule = item.rule;
         const currentPosition = item.observed?.locator.position || rule.orderIndex;
-        editingUUID.value = item.desired.uuid;
+        editingTarget.value = { scope: item.rule.scope, instanceKey: item.observed.instanceKey };
         editingRule.value = {
             ...rule,
             scope: { ...rule.scope },
@@ -511,7 +523,7 @@ const prepareRulesFromForm = async () => {
 };
 
 const executeEdit = async () => {
-    if (!editingUUID.value || previewRules.value.length === 0) return;
+    if (!editingTarget.value || previewRules.value.length === 0) return;
     const updatedRule = previewRules.value[0];
     const before = originalFormRule.value || editingRule.value;
     const changed = before ? changedRuleFields(before, updatedRule) : [];
@@ -539,7 +551,7 @@ const executeEdit = async () => {
             request = { description: description || '' };
         }
     }
-    await updateFirewallRule(editingUUID.value, request);
+    await updateFirewallRule(editingTarget.value!, request);
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     emit('search');
     drawerVisible.value = false;

@@ -52,8 +52,9 @@ func BindIPv6BaseChains() error {
 }
 
 func buildIPv6BaseInitializationScript(dir string, ports []firewall.PortWhitelist, output string) (string, error) {
+	existing := iptablesRuleIndex(output)
 	for _, chain := range BasicChains() {
-		if !containsIptablesRule(output, "-N "+chain) {
+		if !existing[canonicalIptablesRule("-N "+chain)] {
 			return buildBaseChainsRestoreScript(dir, true, ports...)
 		}
 	}
@@ -64,7 +65,9 @@ func buildIPv6BaseInitializationScript(dir string, ports []firewall.PortWhitelis
 	var script strings.Builder
 	script.WriteString("*filter\n")
 	for _, rule := range defaults {
-		if !containsIptablesRule(output, rule) {
+		key := canonicalIptablesRule(rule)
+		if !existing[key] {
+			existing[key] = true
 			script.WriteString(rule + "\n")
 		}
 	}

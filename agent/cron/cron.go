@@ -1,6 +1,7 @@
 package cron
 
 import (
+	"context"
 	"crypto/rand"
 	"fmt"
 	"math/big"
@@ -81,6 +82,17 @@ func Run() {
 	}
 	if _, err := global.Cron.AddJob("0 3 */31 * *", job.NewBackupJob()); err != nil {
 		global.LOG.Errorf("can not add  backup token refresh corn job: %s", err.Error())
+	}
+	if _, err := global.Cron.AddFunc("@every 240h", func() {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Minute)
+		defer cancel()
+		deleted, err := service.NewISettingService().CleanupDescriptions(ctx)
+		if err != nil {
+			global.LOG.Errorf("clean unused common descriptions: %v", err)
+		}
+		global.LOG.Infof("common description cleanup completed, deleted %d records", deleted)
+	}); err != nil {
+		global.LOG.Errorf("add common description cleanup job: %v", err)
 	}
 
 	var cronJobs []model.Cronjob

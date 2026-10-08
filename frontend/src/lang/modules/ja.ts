@@ -4236,39 +4236,42 @@ const message = {
         useEAB: 'EAB認証を使用',
     },
     firewall: {
+        ipv6Support: 'IPv6 サポート',
+        ipv6SupportHelper:
+            'IPv6 ファイアウォールルールの管理と適用を制御します。サーバーの IPv6 ネットワーク機能には影響しません。',
+        ipv6DisableContainerHelper: 'コンテナの IPv6 ポート情報を非表示にします。',
+        ipv6DisableWhitelistHelper: '許可リスト内の IPv6 ルールを削除し、それ以外の既存の IPv6 ルールは保持します。',
+        ipv6DisableRulesHelper: '1Panel が管理する iptables、nftables の IPv6 ルールを無効にします。',
+        ipv6DisableNetworkHelper: 'サーバーの IPv6 ネットワーク機能は無効になりません。',
+        ipv6DisableEffectHelper: '対象の IPv6 アクセス制限とポート転送は適用されなくなります。',
+        ipv6Disabled: 'IPv6 サポートは無効です。先にファイアウォール設定で有効にしてください。',
+        familyRepair: '修復',
+        familyIncomplete: '{0} のチェーンが不完全です',
+        resetWithBackup: 'ルールをバックアップしてリセット',
+        resetOnly: 'リセットのみ',
+        resetWithBackupHelper: '現在のモジュールのルールを JSON に保存し、初期化時に復元できます。',
+        resetOnlyHelper: '新しいバックアップを作成せずに現在のルールを消去します。既存のバックアップは保持されます。',
+        backupDirectoryHelper: '{0} 内の有効なルールバックアップを表示します。既定では最新のファイルが選択されます。',
+        restoreAllRules: '初期化してルールを復元',
+        importRuleBackup: 'バックアップからインポート',
+        initializeOnly: '初期化のみ',
+        backupRuleCount: 'ルール数',
+        noRuleBackup: '復元可能なルールバックアップがありません',
+        ruleBackupLoadFailed:
+            'ルールのバックアップを読み込めませんでした。再試行するか、バックアップを復元せずに初期化してください。',
         create: 'ルールを作成します',
         edit: 'ルールを編集します',
         quickJump: 'クイックアクセス',
         used: '使用済み',
         unUsed: '未使用',
-        managed: 'パネル作成',
-        managedHelper: '1Panel が作成・管理するルールです。編集または削除できます。',
-        adopted: '外部ルール管理',
-        adoptedHelper: 'システムに既に存在し、現在は 1Panel が管理しているルールです。',
-        external: '外部ルール',
-        externalHelper:
-            'システムに存在しますが、まだ 1Panel の管理対象ではありません。必要に応じて管理対象にできます。',
-        protected: 'システム保護',
-        protectedHelper: '組み込みルールとホワイトリストに完全一致するルールは編集・削除できません。',
-        stateShort: { managed: 'パネル', adopted: '管理済', external: '外部', protected: '保護', drifted: '差異' },
+        whitelist: '許可リスト',
+        builtinRuleProtected: 'システム内蔵の保護ルールです。編集や削除はできません。',
+        whitelistRuleProtected:
+            '許可リストのルールは順序と説明のみ変更できます。その他の変更は「設定 → ポート許可リスト」で行ってください。',
         ruleTargetRequired: 'IP アドレスまたはポートを1つ以上入力してください',
-        resolution_adopt: '管理対象にする',
-        plan_duplicate_rules:
-            '条件とアクションが同じルールが重複しているため、管理対象に追加できません。重複ルールを手動で削除してから再試行してください。',
-        adoptRuleConfirm: '管理対象にすると、1Panel がこの既存ルールの保守と削除を行えるようになります。続行しますか？',
-        plan_exact_rule_conflict: '一致条件が同じで、許可・拒否の動作が逆のルールが存在します。',
-        allRulesAlreadyExist: '確認した {0} 件のルールはすべて既に存在します。新しく作成するルールはありません。',
-        plan_managed_rule_drifted:
-            '管理対象ルールが実際のファイアウォールと一致しません。先に不整合を解消してください。',
-        plan_opaque_rule_in_target_scope: '対象範囲に安全に解析できないルールがあります。操作を停止しました。',
-        plan_runtime_permanent_mismatch: '実行中と永続設定のファイアウォール構成が異なります。先に同期してください。',
-        plan_protected_rule: 'このルールは保護されており、管理対象化、変更、削除はできません。',
-        plan_blocked: 'このルールは安全に適用できません。ルールを更新して再試行してください。',
         largeRuleSet:
             'ファイアウォールルールが多すぎると操作が遅くなる可能性があります。iptables または nftables の使用を推奨します。',
-        scopeDefaultMismatch: 'システムの既定 zone は {0} です。このページでは public zone のみ管理します。',
         scopeMissing: '管理対象スコープ {0} がありません。最初のルール適用時に安全に作成されます。',
-        scopeUnmanagedActive: '他の有効な範囲が見つかりました：{0}。1Panel はそのルールを変更しません。',
         dockerRestart: 'ファイアウォール操作にはDockerサービスの再起動が必要です',
         firewallHelper: '{0}システムファイアウォール',
         firewallNotStart: '現在、システムファイアウォールは有効になっていません。最初に有効にします。',
@@ -4292,7 +4295,7 @@ const message = {
         systemFirewall: 'ホストファイアウォール',
         systemFirewallHelper: 'ホストのポートアクセスと受信ルールを管理します。',
         forwardPolicyDropWarning:
-            '{0} の FORWARD のデフォルトポリシーは DROP です。iptables/ip6tables のルールで明示的に許可されていない他のホストへの転送トラフィックは、遮断される可能性があります。該当する IP バージョンの許可ルールを確認してください。',
+            'このサーバーではネットワーク転送が制限されているため、ポート転送ルールが機能しない可能性があります。',
         forwardingHelper: 'ポート転送ルールを管理します。',
         dockerFirewallHelper: '1Panel のコンテナポート保護の管理方法を選択します。',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0、実験的',
@@ -4301,6 +4304,7 @@ const message = {
         addressFamily: 'IP バージョン',
         portOrRange: 'ポート / 範囲',
         batchLimit: '一度に作成またはインポートできるルールは、展開後の件数で最大 {0} 件です。',
+        importDuplicatesRemoved: 'ファイル内の重複と既存ルールを含む、{0} 件の重複ルールを除外しました。',
         importLimit: '最大 {0} 件のルール（展開後の件数）をインポートできます。ファイルサイズの上限は {1} KB です。',
         ruleSyncTitle: 'ルールを同期',
         ruleSyncAction: 'ルールを同期',
@@ -4318,19 +4322,9 @@ const message = {
         ruleSyncBlocked: '同期不可',
         ruleSyncReason: '確認結果',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: 'ルールは既にデータベースポリシーと一致しています。',
-            managedOrderDiffers: '管理対象ルールの順序がデータベースの順序と異なります。',
-            managedOnlyInTarget: '管理対象ルールは対象ファイアウォールにのみ存在します。',
-            managedRuntimeCannotRemove: '管理対象の実行中ルールを安全に削除できません。',
             missingFromTarget: '対象ファイアウォールにこのルールがありません。',
-            targetDiffers: '対象ルールがデータベースポリシーと異なります。',
             alreadyExistsInTarget: '対象ファイアウォールにこのルールは既に存在します。',
             onlyInTarget: 'このルールは対象ファイアウォールにのみ存在します。',
-            stale: 'ファイアウォールルールの状態が古くなっています。更新して再試行してください。',
-            protectedRule: '保護されたファイアウォールルールは変更できません。',
-            dockerAcceptReadOnly:
-                'この ACCEPT ルールは読み取り専用で、他のルールを同期しても保持されます。削除する場合は、ホスト上で手動で削除してください。',
-            cannotReconcile: '対象ルールを同期できません：{0}',
         },
         ruleSyncPartial: '同期完了：成功 {0} 件、存在済み {1} 件、失敗 {2} 件。',
         ruleSyncSuccess: '同期完了：成功 {0} 件、存在済み {1} 件、削除 {2} 件。',
@@ -4340,17 +4334,18 @@ const message = {
             remove: '削除予定',
             blocked: '同期不可',
         },
+        initializeFromFile: 'ファイルから初期化',
+        downloadRuleBackup: 'ルールのバックアップをダウンロード',
+        importFileHelper:
+            '最大 64 MB の JSON ファイルをファイル順に分割してインポートします。変換できないルールはエラーとして報告します。',
         resetDirectRulesHelper:
-            '{0} から 1Panel システムファイアウォールのチェーン、実行ルール、永続化ファイルを削除し、データベースポリシーは保持します',
-        resetWhitelistRulesHelper:
-            '{0} の有効なカスタム設定をリセットし、インストール時の既定値に戻して無効化します。データベースポリシーは保持され、後で再同期できます。',
+            '{0} のすべての 1Panel ホストファイアウォールチェーン、実行中のルール、永続化ファイルを削除します。',
+        resetWhitelistRulesHelper: '{0} のカスタム設定をリセットし、既定の状態に戻して無効にします。',
         cleanupForwardingBackendHelper:
-            '{0} の 1Panel ポート転送ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
+            '{0} の 1Panel 転送ルール、チェーン、自動復元ファイルをすべて削除します。既存の JSON バックアップは保持されます。',
         cleanupDockerBackendHelper:
-            '{0} の 1Panel Docker ポート保護ランタイムルールをリセットします。関連するルールとチェーンをすべて削除し、データベースデータを保持します',
-        cleanupBeforeBackendSwitch:
-            '現在の {0} バックエンドには 1Panel の実行時ルールが残っています。{1} に切り替える前にリセットしてください。リセットでは実行時ルールのみが削除され、データベースポリシーは保持されます。切り替え後に再初期化または同期できます。',
-        cleanupAction: 'リセット',
+            '{0} の 1Panel Docker 保護ルール、チェーン、自動復元ファイルをすべて削除します。既存の JSON バックアップは保持されます。',
+        cleanupBeforeBackendSwitch: '{1} に切り替える前に現在の {0} をリセットし、ルールの復元方法を確認してください。',
         backendSwitchNotice:
             'ファイアウォールの管理方式は 1 つだけ有効にすることを推奨します。複数のファイアウォールを同時に実行すると、ルールの競合、状態の不一致、コンテナーポートへのアクセス異常が発生する可能性があります。',
         switchBackendHelper: '{0} に切り替えますか？',
@@ -4396,8 +4391,7 @@ const message = {
         portDetails: 'ポート詳細',
         orphanEndpoints: '未関連付けエンドポイント',
         orphanPolicies: '未関連付けルール',
-        orphanPoliciesHelper:
-            '以下の {0} 件のルールは Docker ポートにバインドされていません。一致するポートが検出されると自動的にバインドされます。',
+        orphanPoliciesHelper: 'これら {0} 件のシステムルールに一致する Docker 公開ポートはありません。',
         composeOrApp: 'Compose / アプリ',
         sources: '送信元',
         deniedSources: '拒否する送信元',
@@ -4406,6 +4400,8 @@ const message = {
         protectionMode: '保護モード',
         denySources: '指定した送信元を拒否',
         allowSources: '指定した送信元のみ許可',
+        acceptSources: '指定した送信元を直接許可',
+        acceptAll: 'すべての通信を直接許可',
         denyAll: 'すべてのアクセスを拒否',
         dockerGuardMixedFamilyHelper:
             'IPv4 と IPv6 の両方が選択されています。送信元指定は個別に設定してください。「すべて拒否」はそのまま適用できます。',
@@ -4449,7 +4445,7 @@ const message = {
             'アンバインド - アンバインドすると、追加されたすべてのファイアウォールルールが無効になります。注意して操作してください。確認しますか？',
         portWhiteList: 'ポートホワイトリスト',
         whitelistConfigHelper:
-            '許可リストは設定の保存と一致する許可ルールの保護のみを行います。不足するルールは起動、再起動、初期化、同期時に追加されます。許可リストを編集・削除しても既存のルールは削除されません。',
+            '許可リストの保存時に不足する許可ルールを追加し、一致するルールを保護します。許可リストの編集や削除では既存のルールは削除されません。',
         whitelistDeleteConfirm:
             'このホワイトリスト項目のみを削除します。既存のファイアウォールルールは保持されます。続行しますか？',
         portWhiteListHelper:
@@ -4467,7 +4463,7 @@ const message = {
         whitelistServicePortsHelper:
             'ポートを1つ入力してください（1-65535）。サービスの待受ポートは変更されません。サービス設定でポートを変更すると、このホワイトリスト項目も更新されます。',
         whitelistSourcesHelper:
-            'IP アドレスまたは CIDR をカンマか改行で区切って入力してください。 空欄の場合、すべての IPv4 および IPv6 の接続元を許可します。',
+            'IP アドレスまたは CIDR をカンマか改行で区切って入力してください。空欄の場合、{0} を許可します。',
         destinationPortPlaceholder: '例: 80、80,443、8080-8089',
         deleteRuleConfirm: '{0} 個のルールを削除します。続行しますか？',
         deleteUsedRuleConfirm:
@@ -7220,12 +7216,17 @@ const message = {
             storagePoolHelper: 'ストレージプールは仮想マシンのディスクと ISO ファイルを保存します。',
             network: 'ネットワーク',
             bridgeName: 'ブリッジ名',
+            sourceInterface: 'ホストのネットワークインターフェース',
+            macvtapNetworkHelper:
+                'VM を LAN 内の独立したコンピューターのように使えます。ホストの既存 IP 設定を変更せず、他の機器から VM の IP に直接アクセスできます。注意：既定では、この接続を通じてホストと VM は直接通信できません。',
+            macvtapInterfaceHelper:
+                '接続先の LAN につながる有線インターフェースを選択します。ホストと共有できます。VM の IP は LAN から割り当てられるか、VM 内で手動設定します。ネットワーク側で複数の機器（複数の MAC アドレス）の接続を許可する必要があります。',
             natNetworkHelper:
-                'VM はホスト経由でネットワークに接続できますが、外部の機器から VM へ直接アクセスすることは通常できません。',
+                'インターネット接続だけが必要な VM や、少数のサービスを公開する VM に適しています。VM はホスト経由で通信します。他の機器からサービスにアクセスするには、通常、別途ポート転送の設定が必要です。',
             bridgeNetworkHelper:
-                'VM をホスト上の既存ブリッジ（br0 など）に接続します。未使用の追加 NIC がある場合は、その NIC 用のブリッジを作成して使用できます。',
+                'VM をネットワークスイッチにつないだ独立したコンピューターのように使えます。ホストと LAN 内の他の機器から直接アクセスできます。先にホストでブリッジを設定してください。',
             bridgeNameHelper:
-                'br0 など、ホスト上に既に存在する Linux bridge を選択してください。物理 NIC は bridge ではなく、docker/libvirt 管理の bridge はここでは選択できません。',
+                '設定済みのブリッジ（例：br0）を選択します。選択肢がない場合は、先にホストで作成してください。物理インターフェースや Docker/libvirt が管理するブリッジは選択できません。',
             natCIDRHelper: 'CIDR、ゲートウェイ、DHCP アドレス範囲は新しい NAT 仮想ネットワークに使用されます。',
             networkCIDR: 'ネットワーク CIDR',
             gateway: 'ゲートウェイ',
@@ -7243,6 +7244,7 @@ const message = {
             available: '利用可能',
             vmCount: '関連 VM',
             usedIPs: '使用済み IP',
+            usedIPsUnavailable: '取得は未対応です',
             monitor: '監視',
             monitorNotReady: '仮想マシンが実行されていないため、監視データを利用できません。',
             monitorLoadFailed: 'VM の監視データを取得できませんでした。',

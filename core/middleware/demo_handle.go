@@ -30,7 +30,6 @@ var demoAllowedRoutes = map[demoRoute]struct{}{
 	{http.MethodPost, "/api/v2/hosts/firewall/base"}:                {},
 	{http.MethodPost, "/api/v2/hosts/firewall/forward/base"}:        {},
 	{http.MethodPost, "/api/v2/hosts/firewall/rules/native/detail"}: {},
-	{http.MethodPost, "/api/v2/hosts/firewall/rules/sync/preview"}:  {},
 
 	{http.MethodPost, "/api/v2/core/auth/login"}:     {},
 	{http.MethodPost, "/api/v2/core/logs/login"}:     {},

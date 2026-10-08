@@ -1,13 +1,15 @@
 package docker_guard
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
 )
 
@@ -23,9 +25,12 @@ type Nftables struct {
 	runner Runner
 }
 
-func NewNftables() *Nftables { return &Nftables{runner: commandRunner{}} }
+func NewNftables(ctx context.Context) *Nftables { return &Nftables{runner: commandRunner{ctx: ctx}} }
 
-func (m *Nftables) Initialize(policies []Policy, inventory PolicyInventory) error {
+func (m *Nftables) Initialize(policies []Policy, inventory PolicyInventory, families ...string) error {
+	if len(families) == 0 {
+		families = []string{FamilyIPv4, FamilyIPv6}
+	}
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if !m.runner.Exists("nft") {
@@ -34,26 +39,33 @@ func (m *Nftables) Initialize(policies []Policy, inventory PolicyInventory) erro
 	if err := CheckIPv4Forwarding(); err != nil {
 		return err
 	}
-	if err := m.checkForwardPolicy(); err != nil {
+	if err := m.checkForwardPolicy(families...); err != nil {
 		return err
 	}
 	if err := m.ensureFamily(FamilyIPv4, true); err != nil {
 		return err
 	}
-	if err := m.ensureFamily(FamilyIPv6, false); err != nil {
-		return &FamilyError{Family: FamilyIPv6, Err: err}
+	if slices.Contains(families, FamilyIPv6) {
+		if err := m.ensureFamily(FamilyIPv6, false); err != nil {
+			return &FamilyError{Family: FamilyIPv6, Err: err}
+		}
 	}
-	return m.rebuildLocked(policies, inventory)
+	return m.rebuildLocked(policies, inventory, families...)
 }
 
-func (m *Nftables) Bind() error {
+func (m *Nftables) Bind(families ...string) error {
+	if len(families) == 0 {
+		families = []string{FamilyIPv4, FamilyIPv6}
+	}
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if err := m.bindExistingFamily(FamilyIPv4, true); err != nil {
 		return err
 	}
-	if err := m.bindExistingFamily(FamilyIPv6, false); err != nil {
-		return &FamilyError{Family: FamilyIPv6, Err: err}
+	if slices.Contains(families, FamilyIPv6) {
+		if err := m.bindExistingFamily(FamilyIPv6, false); err != nil {
+			return &FamilyError{Family: FamilyIPv6, Err: err}
+		}
 	}
 	return nil
 }
@@ -68,11 +80,11 @@ func (m *Nftables) ListPolicies() (PolicyInventory, error) {
 	if !m.runner.Exists("nft") {
 		return PolicyInventory{}, nil
 	}
-	inventory := PolicyInventory{Policies: make([]Policy, 0), ManagedRuleOrders: make(map[string][]int64)}
+	inventory := PolicyInventory{Policies: make([]Policy, 0), RuleOrders: make(map[string][]int64)}
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
 		output, err := nftables_helper.ReadChain(m.run, tableFamily, NftTable, NftChain)
-		if errors.Is(err, nftables_helper.ErrChainNotFound) {
+		if errors.Is(err, nftables_helper.ErrChainNotFound) || (family == FamilyIPv6 && errors.Is(err, filter.ErrFamilyUnavailable)) {
 			continue
 		}
 		if err != nil {
@@ -83,18 +95,20 @@ func (m *Nftables) ListPolicies() (PolicyInventory, error) {
 			return PolicyInventory{}, &FamilyError{Family: family, Err: err}
 		}
 		inventory.Policies = append(inventory.Policies, parsed.Policies...)
-		inventory.ReadOnly = append(inventory.ReadOnly, parsed.ReadOnly...)
-		for key, orders := range parsed.ManagedRuleOrders {
-			inventory.ManagedRuleOrders[key] = append([]int64(nil), orders...)
+		for key, orders := range parsed.RuleOrders {
+			inventory.RuleOrders[key] = append([]int64(nil), orders...)
 		}
 	}
 	return inventory, nil
 }
 
-func (m *Nftables) Unbind() error {
+func (m *Nftables) Unbind(families ...string) error {
+	if len(families) == 0 {
+		families = []string{FamilyIPv4, FamilyIPv6}
+	}
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
-	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+	for _, family := range families {
 		if err := m.unbindFamily(family); err != nil {
 			return &FamilyError{Family: family, Err: err}
 		}
@@ -106,12 +120,16 @@ func (m *Nftables) Cleanup() error {
 	mutationMu.Lock()
 	defer mutationMu.Unlock()
 	if !m.runner.Exists("nft") {
-		return nil
+		return errors.New("nft is not installed")
 	}
 	commands := make([][]string, 0, 2)
 	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
 		tableFamily := nftTableFamily(family)
-		if !m.objectExists("table", tableFamily, NftTable) {
+		_, exists, err := nftables_helper.ReadTable(m.run, tableFamily, NftTable)
+		if err != nil {
+			return err
+		}
+		if !exists {
 			continue
 		}
 		commands = append(commands, []string{"delete", "table", tableFamily, NftTable})
@@ -160,7 +178,7 @@ func (m *Nftables) Status(family string) FamilyStatus {
 		}
 	}
 	if !baseExists || !guardExists {
-		return FamilyStatus{State: StatusDisabled, Reason: ReasonGuardChainMissing}
+		return FamilyStatus{State: StatusDisabled, Reason: ReasonGuardChainMissing, Partial: baseExists || guardExists}
 	}
 	status := FamilyStatus{State: StatusNotEffective, Initialized: true}
 	rules := baseRules.String()
@@ -260,11 +278,14 @@ func (m *Nftables) ensureJump(family string) error {
 	return m.runBatch(commands)
 }
 
-func (m *Nftables) rebuildLocked(policies []Policy, inventory PolicyInventory) error {
+func (m *Nftables) rebuildLocked(policies []Policy, inventory PolicyInventory, families ...string) error {
+	if len(families) == 0 {
+		families = []string{FamilyIPv4, FamilyIPv6}
+	}
 	if !m.runner.Exists("nft") {
 		return nil
 	}
-	for _, family := range []string{FamilyIPv4, FamilyIPv6} {
+	for _, family := range families {
 		tableFamily := nftTableFamily(family)
 		if !m.objectExists("chain", tableFamily, NftTable, NftChain) {
 			continue
@@ -284,44 +305,37 @@ func (m *Nftables) rebuildLocked(policies []Policy, inventory PolicyInventory) e
 	return nil
 }
 
-type orderedNftRule struct {
-	order int64
-	index int
-	rules [][]string
-}
-
 func orderedNftRules(family string, policies []Policy, inventory PolicyInventory) [][]string {
 	tableFamily := nftTableFamily(family)
-	segments := make([]orderedNftRule, 0, len(policies)+len(inventory.ReadOnly))
+	segments := make([]orderedPolicyRule, 0, len(policies))
 	maxOrder := int64(0)
-	index := 0
-	for _, orders := range inventory.ManagedRuleOrders {
+	for _, orders := range inventory.RuleOrders {
 		for _, order := range orders {
-			if order > maxOrder {
-				maxOrder = order
-			}
+			maxOrder = max(maxOrder, order)
 		}
 	}
-	for _, item := range inventory.ReadOnly {
-		for _, native := range item.NativeRules {
-			if native.Family != family || len(native.Tokens) == 0 || native.Tokens[0] == "-A" {
-				continue
-			}
-			command := []string{"add", "rule", tableFamily, NftTable, NftChain}
-			command = append(command, quoteNftTokens(native.Tokens)...)
-			segments = append(segments, orderedNftRule{order: native.Order, index: index, rules: [][]string{command}})
-			index++
-			if native.Order > maxOrder {
-				maxOrder = native.Order
-			}
+	for _, policy := range policies {
+		for _, rule := range policy.NativeRules {
+			maxOrder = max(maxOrder, rule.Order)
 		}
 	}
 	for _, policy := range policies {
 		if policy.Family != family {
 			continue
 		}
+		if len(policy.NativeRules) > 0 {
+			for _, native := range policy.NativeRules {
+				if native.Family != family || len(native.Tokens) == 0 || native.Tokens[0] == "-A" {
+					continue
+				}
+				command := []string{"add", "rule", tableFamily, NftTable, NftChain}
+				command = append(command, quoteNftTokens(native.Tokens)...)
+				segments = append(segments, orderedPolicyRule{order: native.Order, rule: command})
+			}
+			continue
+		}
 		compiled := compileNftPolicy(policy)
-		orders := inventory.ManagedRuleOrders[policy.Family+"\x00"+policy.UUID]
+		orders := inventory.RuleOrders[policy.Family+"\x00"+policy.UUID]
 		for ruleIndex, rule := range compiled {
 			order := int64(0)
 			if ruleIndex < len(orders) {
@@ -330,27 +344,16 @@ func orderedNftRules(family string, policies []Policy, inventory PolicyInventory
 				maxOrder++
 				order = maxOrder
 			}
-			segments = append(segments, orderedNftRule{order: order, index: index, rules: [][]string{rule}})
-			index++
+			segments = append(segments, orderedPolicyRule{order: order, rule: rule})
 		}
 	}
-	sort.SliceStable(segments, func(left, right int) bool {
-		if segments[left].order == segments[right].order {
-			return segments[left].index < segments[right].index
-		}
-		return segments[left].order < segments[right].order
-	})
-	rules := make([][]string, 0)
-	for _, segment := range segments {
-		rules = append(rules, segment.rules...)
-	}
-	return rules
+	return sortPolicyRules(segments)
 }
 
 func quoteNftTokens(tokens []string) []string {
 	quoted := make([]string, 0, len(tokens))
-	for _, token := range tokens {
-		if strings.ContainsAny(token, " \t\\\"'") && !strings.HasPrefix(token, `"`) {
+	for index, token := range tokens {
+		if (index > 0 && tokens[index-1] == "comment" || strings.ContainsAny(token, " \t\\\"'")) && !strings.HasPrefix(token, `"`) {
 			quoted = append(quoted, strconv.Quote(token))
 			continue
 		}
@@ -367,15 +370,22 @@ func compileNftPolicy(policy Policy) [][]string {
 		base = append(base, "ct", "original", addressKeyword, "daddr", policy.HostIP)
 	}
 	base = append(base, "ct", "original", "proto-dst", strconv.Itoa(int(policy.HostPort)))
-	comment := strconv.Quote("1panel-docker:" + policy.UUID)
-	if policy.Mode == ModeAll {
-		return [][]string{append(append([]string{}, base...), "drop", "comment", comment)}
+	marker := "1panel-docker:" + policy.UUID
+	comment := strconv.Quote(marker)
+	if policy.Mode == ModeAll || policy.Mode == ModeAcceptAll {
+		target := "drop"
+		if policy.Mode == ModeAcceptAll {
+			target = "accept"
+		}
+		return [][]string{append(append([]string{}, base...), target, "comment", comment)}
 	}
 	target := "drop"
 	capacity := len(policy.Sources)
 	if policy.Mode == ModeAllow {
 		target = "return"
 		capacity++
+	} else if policy.Mode == ModeAcceptSources {
+		target = "accept"
 	}
 	rules := make([][]string, 0, capacity)
 	for _, source := range policy.Sources {
@@ -506,11 +516,14 @@ func nftHasFirstUniqueJump(output string) bool {
 	return false
 }
 
-func (m *Nftables) checkForwardPolicy() error {
+func (m *Nftables) checkForwardPolicy(families ...string) error {
 	for _, family := range []struct{ command, name string }{
 		{"iptables", FamilyIPv4},
 		{"ip6tables", FamilyIPv6},
 	} {
+		if len(families) > 0 && !slices.Contains(families, family.name) {
+			continue
+		}
 		if !m.runner.Exists(family.command) {
 			continue
 		}
@@ -526,11 +539,7 @@ func (m *Nftables) checkForwardPolicy() error {
 			}
 			found = true
 			if fields[2] == "DROP" {
-				label := "IPv4"
-				if family.name == FamilyIPv6 {
-					label = "IPv6"
-				}
-				return &FamilyError{Family: family.name, Err: buserr.WithMap("ErrDockerForwardPolicyDrop", map[string]interface{}{"family": label}, nil)}
+				return &FamilyError{Family: family.name, Err: buserr.New("ErrDockerForwardPolicyDrop")}
 			}
 			if fields[2] != "ACCEPT" {
 				return &FamilyError{Family: family.name, Err: fmt.Errorf("unexpected iptables FORWARD policy: %s", fields[2])}
@@ -541,4 +550,24 @@ func (m *Nftables) checkForwardPolicy() error {
 		}
 	}
 	return nil
+}
+
+func (m *Nftables) OperateFamily(family string, initialize bool) error {
+	if family != FamilyIPv4 && family != FamilyIPv6 {
+		return fmt.Errorf("unsupported Docker firewall family %q", family)
+	}
+	if family == FamilyIPv4 {
+		if err := CheckIPv4Forwarding(); err != nil {
+			return err
+		}
+	}
+	mutationMu.Lock()
+	defer mutationMu.Unlock()
+	if err := m.checkForwardPolicy(family); err != nil {
+		return err
+	}
+	if initialize {
+		return m.ensureFamily(family, true)
+	}
+	return m.bindExistingFamily(family, true)
 }

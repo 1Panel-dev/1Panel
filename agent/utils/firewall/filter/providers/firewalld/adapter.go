@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -46,17 +45,6 @@ func NewAdapterWithBackend(reader CommandReader, writer CommandWriter) *Adapter 
 }
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderFirewalld }
-
-func (a *Adapter) Capabilities(ctx context.Context) (filter.Capabilities, error) {
-	explicitPriority, err := a.supportsRichRulePriority(ctx)
-	if err != nil {
-		return filter.Capabilities{}, err
-	}
-	return filter.Capabilities{
-
-		ExplicitPriority: explicitPriority,
-	}, nil
-}
 
 func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error {
 	if rule.Priority == nil || *rule.Priority == 0 {
@@ -215,8 +203,13 @@ func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) err
 		return errors.New("firewalld writer is required")
 	}
 	executed, alreadyEnabled := 0, 0
+	var missing error
 	for index, command := range commands.Commands {
 		err := a.writer.Run(ctx, command)
+		if errors.Is(err, filter.ErrRuleNotFound) && plan.CommandOnly {
+			missing = err
+			continue
+		}
 		if errors.Is(err, ErrAlreadyEnabled) {
 			alreadyEnabled++
 			err = nil
@@ -232,7 +225,7 @@ func (a *Adapter) RunCommands(ctx context.Context, plan filter.CommandBatch) err
 	if commands.Operation == filter.ChangeCreate && alreadyEnabled > 0 && alreadyEnabled == len(commands.Commands) {
 		return ErrAlreadyEnabled
 	}
-	return nil
+	return missing
 }
 
 func (a *Adapter) Rollback(ctx context.Context, plan filter.CommandBatch) error {
@@ -299,10 +292,66 @@ func batchCommands(plan filter.CommandBatch) (filter.RuleCommands, error) {
 }
 
 func (a *Adapter) compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.RuleCommands, error) {
-	rule := change.After
-	if change.Operation == filter.ChangeDelete {
-		rule = change.Before
+	if change.Operation == filter.ChangeCreate && change.Raw != "" && change.After != nil {
+		raw := strings.TrimSpace(change.Raw)
+		if strings.ContainsAny(raw, "\r\n\x00") {
+			return filter.RuleCommands{}, filter.ErrInvalidRule
+		}
+		var expected filter.ObservedRule
+		kind := "rich-rule"
+		if change.After.NativeKind == filter.NativeKindZoneService {
+			if !validServiceName(raw) {
+				return filter.RuleCommands{}, filter.ErrInvalidRule
+			}
+			expected = opaqueZoneService(snapshot.Scope, raw)
+			kind = "service"
+		} else {
+			if !strings.HasPrefix(raw, "rule ") {
+				return filter.RuleCommands{}, filter.ErrUnsupportedScope
+			}
+			expected = opaqueRichRule(change.After.Scope, raw)
+		}
+		commands, rollback := ruleCommands("--add-"+kind+"="+raw, "--remove-"+kind+"="+raw)
+		return filter.RuleCommands{Operation: filter.ChangeCreate, Expected: expected, Commands: commands, RollbackCommands: rollback}, nil
 	}
+	if change.Operation == filter.ChangeDelete {
+		if change.Target == nil || change.Target.Rule.Scope.Key() != snapshot.Scope.Key() {
+			return filter.RuleCommands{}, filter.ErrInvalidRule
+		}
+		kind, value, ok := strings.Cut(change.Target.Locator.Canonical, ":")
+		if !ok || value == "" || strings.ContainsAny(value, "\r\n\x00") {
+			return filter.RuleCommands{}, filter.ErrInvalidRule
+		}
+		var target filter.ObservedRule
+		switch kind {
+		case "port":
+			rules := parseZonePorts(snapshot.Scope, value)
+			if len(rules) != 1 {
+				return filter.RuleCommands{}, filter.ErrInvalidRule
+			}
+			target = rules[0]
+		case "service":
+			if !validServiceName(value) {
+				return filter.RuleCommands{}, filter.ErrInvalidRule
+			}
+			target = opaqueZoneService(snapshot.Scope, value)
+		case "rich":
+			kind = "rich-rule"
+			if !strings.HasPrefix(value, "rule ") {
+				return filter.RuleCommands{}, filter.ErrInvalidRule
+			}
+			var parsed bool
+			target, _, parsed = parseRichRule(snapshot.Scope, value)
+			if !parsed {
+				target = opaqueRichRule(snapshot.Scope, value)
+			}
+		default:
+			return filter.RuleCommands{}, filter.ErrUnsupportedScope
+		}
+		commands, rollback := ruleCommands("--remove-"+kind+"="+value, "--add-"+kind+"="+value)
+		return filter.RuleCommands{Operation: filter.ChangeDelete, Previous: &target, Expected: target, Commands: commands, RollbackCommands: rollback}, nil
+	}
+	rule := change.After
 	if rule == nil {
 		return filter.RuleCommands{}, fmt.Errorf("%w: %s rule is required", filter.ErrInvalidRule, change.Operation)
 	}
@@ -322,16 +371,8 @@ func (a *Adapter) compileChange(snapshot filter.RuleSet, change filter.RuleChang
 	switch change.Operation {
 	case filter.ChangeCreate:
 		plan.Commands, plan.RollbackCommands = ruleCommands(nativeOption(normalized, "add"), nativeOption(normalized, "remove"))
-	case filter.ChangeAdopt:
-		target, targetErr := validateMutationTarget(snapshot, change, normalized, false)
-		if targetErr != nil {
-			return filter.RuleCommands{}, targetErr
-		}
-		plan.Previous = &target
-		plan.Expected = target
-		plan.Expected.Rule.UUID = normalized.UUID
 	case filter.ChangeUpdate:
-		target, targetErr := validateMutationTarget(snapshot, change, normalized, true)
+		target, targetErr := validateMutationTarget(snapshot, change)
 		if targetErr != nil {
 			return filter.RuleCommands{}, targetErr
 		}
@@ -343,19 +384,6 @@ func (a *Adapter) compileChange(snapshot filter.RuleSet, change filter.RuleChang
 		addCommands, removeNewCommands := ruleCommands(nativeOption(normalized, "add"), nativeOption(normalized, "remove"))
 		plan.Commands = append(removeCommands, addCommands...)
 		plan.RollbackCommands = append(restoreCommands, removeNewCommands...)
-	case filter.ChangeDelete:
-		if change.CommandOnly && change.Locator == nil {
-			plan.Commands, plan.RollbackCommands = ruleCommands(nativeOption(normalized, "remove"), nativeOption(normalized, "add"))
-			break
-		}
-		target, targetErr := validateMutationTarget(snapshot, change, normalized, true)
-		if targetErr != nil {
-			return filter.RuleCommands{}, targetErr
-		}
-		plan.Previous = &target
-		plan.Expected = target
-		plan.Expected.Rule.UUID = normalized.UUID
-		plan.Commands, plan.RollbackCommands = observedRuleCommands(target, "remove", "add")
 	default:
 		return filter.RuleCommands{}, fmt.Errorf("%w: unsupported operation %s", filter.ErrInvalidRule, change.Operation)
 	}
@@ -441,42 +469,20 @@ func nativeOption(rule filter.FirewallRule, operation string) string {
 	return "--" + operation + "-rich-rule=" + canonicalRichRule(rule)
 }
 
-func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange, normalized filter.FirewallRule, requireOwned bool) (filter.ObservedRule, error) {
-	if change.Locator == nil || change.Locator.Canonical == "" {
-		return filter.ObservedRule{}, fmt.Errorf("%w: firewalld mutation requires canonical locator", filter.ErrInvalidRule)
-	}
-	if change.Locator.Provider != "" && change.Locator.Provider != filter.ProviderFirewalld {
-		return filter.ObservedRule{}, fmt.Errorf("%w: locator provider mismatch", filter.ErrInvalidRule)
-	}
-	if change.Locator.ScopeKey != "" && change.Locator.ScopeKey != snapshot.Scope.Key() {
-		return filter.ObservedRule{}, fmt.Errorf("%w: locator scope mismatch", filter.ErrInvalidRule)
-	}
-	matches := make([]filter.ObservedRule, 0, 1)
-	for _, observed := range snapshot.Rules {
-		if observed.Locator.Canonical == change.Locator.Canonical {
-			matches = append(matches, observed)
-		}
-	}
-	if len(matches) != 1 {
-		return filter.ObservedRule{}, filter.ErrRuleStale
-	}
-	target := matches[0]
-	if target.Protected {
-		return filter.ObservedRule{}, filter.ErrProtectedRule
+func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange) (filter.ObservedRule, error) {
+	target, err := filter.LocateRule(snapshot, change.Locator)
+	if err != nil {
+		return filter.ObservedRule{}, err
 	}
 	if target.ParseStatus != filter.ParseStatusSupported {
-		return filter.ObservedRule{}, filter.ErrRuleStale
+		return filter.ObservedRule{}, filter.ErrUnsupportedScope
 	}
-	want := normalized
-	if requireOwned {
-		if change.Before == nil || change.Before.UUID == "" {
-			return filter.ObservedRule{}, fmt.Errorf("%w: managed previous rule is required", filter.ErrInvalidRule)
-		}
-		prepared, err := (&Adapter{}).PrepareRule(*change.Before)
-		if err != nil {
-			return filter.ObservedRule{}, err
-		}
-		want = prepared
+	if change.Before == nil {
+		return filter.ObservedRule{}, filter.ErrInvalidRule
+	}
+	want, err := (&Adapter{}).PrepareRule(*change.Before)
+	if err != nil {
+		return filter.ObservedRule{}, err
 	}
 	wantKey, wantErr := filter.RuleKey(want)
 	targetKey, targetErr := filter.RuleKey(target.Rule)
@@ -665,6 +671,7 @@ type mergedObject struct {
 
 func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filter.ObservedRule, error) {
 	objects := make(map[string]*mergedObject)
+	var ordered []*mergedObject
 	richObjects := make(map[string]*mergedObject)
 	add := func(rule filter.ObservedRule, runtimeState bool) *mergedObject {
 		key := string(rule.Rule.NativeKind) + "\x00" + rule.Locator.Canonical
@@ -673,6 +680,7 @@ func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filt
 			copy := rule
 			object = &mergedObject{rule: copy}
 			objects[key] = object
+			ordered = append(ordered, object)
 		}
 		if runtimeState {
 			object.runtime = true
@@ -716,7 +724,7 @@ func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filt
 	}
 
 	rules := make([]filter.ObservedRule, 0, len(objects))
-	for _, object := range objects {
+	for _, object := range ordered {
 		switch {
 		case object.runtime && object.permanent:
 			object.rule.Persistence = filter.PersistenceStatusConverged
@@ -727,17 +735,7 @@ func mergeZoneObjects(scope filter.Scope, runtime, permanent zoneOutput) ([]filt
 		}
 		rules = append(rules, object.rule)
 	}
-	sort.SliceStable(rules, func(i, j int) bool {
-		left, right := rules[i], rules[j]
-		leftRank, rightRank := bucketRank(left.Rule.OrderBucket), bucketRank(right.Rule.OrderBucket)
-		if leftRank != rightRank {
-			return leftRank < rightRank
-		}
-		if left.Rule.Priority != nil && right.Rule.Priority != nil && *left.Rule.Priority != *right.Rule.Priority {
-			return *left.Rule.Priority < *right.Rule.Priority
-		}
-		return left.Locator.Canonical < right.Locator.Canonical
-	})
+
 	return rules, nil
 }
 
@@ -1009,21 +1007,6 @@ func sameStringSet(left, right []string) bool {
 	return true
 }
 
-func bucketRank(bucket string) int {
-	switch bucket {
-	case filter.OrderBucketRichPre:
-		return 0
-	case filter.OrderBucketRichZeroDeny:
-		return 1
-	case filter.OrderBucketZonePrimitiveAllow, filter.OrderBucketRichZeroAllow:
-		return 2
-	case filter.OrderBucketRichPost:
-		return 3
-	default:
-		return 4
-	}
-}
-
 func richOrderBucket(priority int, action filter.Action) string {
 	if priority < 0 {
 		return filter.OrderBucketRichPre
@@ -1049,7 +1032,7 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if err := validateSystemCommand(command); err != nil {
 		return err
 	}
-	options, removals, alreadyEnabled := 0, 0, 0
+	options, removals, alreadyEnabled, missing := 0, 0, 0, 0
 	for _, arg := range command.Args {
 		if strings.HasPrefix(arg, "--add-") || strings.HasPrefix(arg, "--remove-") {
 			options++
@@ -1078,6 +1061,7 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 		case strings.HasPrefix(line, "Warning: ALREADY_ENABLED:"):
 			alreadyEnabled++
 		case strings.HasPrefix(line, "Warning: NOT_ENABLED:"):
+			missing++
 			if removals != options {
 				return fmt.Errorf("%w: %s", filter.ErrRuleStale, stderr.String())
 			}
@@ -1087,6 +1071,9 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	}
 	if alreadyEnabled > 0 && alreadyEnabled == options {
 		return ErrAlreadyEnabled
+	}
+	if missing > 0 {
+		return fmt.Errorf("%w: %s", filter.ErrRuleNotFound, stderr.String())
 	}
 	return nil
 }

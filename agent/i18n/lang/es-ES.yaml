@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'No se encontró la cadena DOCKER-USER de Docker. Reinicie Docker y vuelva a intentarlo'
 ErrDockerNftablesChainUnavailable: 'No se encontró la cadena de firewall IPv4 de nftables de Docker. Compruebe que la versión actual de Docker admita el backend de firewall nftables, reinicie Docker y vuelva a intentarlo'
-ErrDockerForwardPolicyDrop: 'La política predeterminada de FORWARD para {{ .family }} es DROP. Ajústela y vuelva a intentarlo'
-ErrUFWRuleAdopt: 'No se pudo administrar la regla UFW: {{ .detail }}. Si la versión actual de UFW es anterior a 0.35, actualice UFW y vuelva a intentarlo'
+ErrDockerForwardPolicyDrop: 'Este servidor restringe el reenvío de red. Por ahora no se puede habilitar la protección de puertos de contenedores.'
 Firewall: 'Firewall'
 FirewallTaskHost: 'Cortafuegos del host'
 FirewallTaskForwarding: 'Reenvío de puertos'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'Crear reglas de cortafuegos'
 FirewallCreateRulesResult: 'Resultado de creación: {{ .succeeded }} correctas, {{ .failed }} fallidas, {{ .skipped }} sin ejecutar'
 FirewallRuleOperationResult: 'Resultado de la operación: {{ .succeeded }} correctas, {{ .failed }} fallidas'
 FirewallCreateRuleSkipped: 'Sin ejecutar'
-FirewallCreateBatchStep: 'Enviar {{ .count }} reglas en un lote a {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; convertido en {{ .count }} reglas'
-FirewallCreateRuleExecutionFailed: 'Error al crear la regla. No se guardó ningún registro en la base de datos ni se revirtieron los comandos ejecutados'
-FirewallCreateRulePersistenceFailed: 'La regla se creó, pero no se pudo guardar su registro de gestión'
-FirewallAdoptRulePersistenceFailed: 'Se ejecutó la adopción de la regla, pero no se pudo guardar su registro de gestión'
-FirewallSyncOperationsResult: 'Operaciones de sincronización: {{ .removed }} eliminadas, {{ .created }} creadas, {{ .failed }} fallidas, {{ .skipped }} sin ejecutar, {{ .unchanged }} ya coinciden (sin cambios necesarios)'
-FirewallSyncRuleUnchanged: 'Ya coincide; no requiere cambios'
-FirewallSyncStep: 'Sincronizar reglas con {{ .name }}'
-FirewallSyncFailed: 'No se pudieron sincronizar {{ .failed }} reglas del firewall'
-FirewallResetSourceStep: 'Restablecer y desactivar el firewall de origen {{ .name }}'
-FirewallResetSourceResult: 'Firewall de origen restablecido; se eliminaron {{ .removed }} reglas de la base de datos'
+FirewallCreateRuleExecutionFailed: 'Error al crear la regla. Los comandos ejecutados no se revirtieron'
 FirewallInitializeChainsStep: 'Inicializar y vincular las cadenas base de {{ .name }}'
-FirewallRestoreRulesStep: 'Restaurar las reglas de la base de datos en {{ .name }}'
 FirewallSyncWhitelistStep: 'Sincronizar la lista de puertos permitidos del firewall'
 FirewallEnableForwardingStep: 'Habilitar y vincular las cadenas de reenvío de puertos'
 FirewallRestoreForwardingRulesStep: 'Restaurar las reglas de reenvío de puertos de la base de datos'
 FirewallInspectDockerGuardStep: 'Inspeccionar el backend del firewall de Docker y las políticas'
 FirewallInitializeDockerGuardStep: 'Inicializar y vincular las cadenas de protección de puertos de {{ .name }}'
 FirewallPersistDockerGuardStep: 'Guardar el estado de protección de puertos de Docker'
-ErrFirewallRuleScopeChange: "El cortafuegos actual no permite cambiar el ámbito de una regla (como su familia de direcciones IPv4/IPv6). Cree una regla nueva."
-FirewallWhitelistReleased: "{{ .name }}: protección de la lista de permitidos retirada; se conserva la regla de permiso. Para cerrar el puerto, elimine la regla manualmente de la lista"
-FirewallWhitelistRequired: "{{ .name }}: protegido por las reglas de puertos obligatorios del sistema"
 FileTaskCopy: 'Copiar archivos a {{ .dst }}'
 FileTaskMove: 'Mover archivos a {{ .dst }}'
 FileTaskCompress: 'Comprimir archivos en {{ .dst }}'
@@ -727,11 +713,13 @@ FileTaskDecompress: 'Extraer archivos a {{ .dst }}'
 FileTaskSource: 'Ruta de origen: {{ .path }}'
 FileTaskFormat: 'Formato del archivo: {{ .format }}'
 FileTaskRename: 'Nombre del archivo de destino: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "El backend actual {{ .current }} aún contiene reglas de 1Panel. Elimínelas antes de cambiar a {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "El reenvío IPv4 está desactivado. Configure net.ipv4.ip_forward=1 antes de usar el backend de cortafuegos de Docker."
 ErrFirewallRuleSavedApplyFailed: "Se guardó la configuración de la nueva regla, pero no se pudo aplicar al cortafuegos. Vuelva a intentarlo mediante la sincronización: {{ .detail }}"
+ErrFirewallRuleConflict: "Ya existe una regla UFW con las mismas condiciones y una acción diferente. Edite la regla existente."
+ErrForwardInterfaceNotFound: "La interfaz de red {{ .name }} indicada en la regla de reenvío no existe. Compruebe el nombre e inténtelo de nuevo."
 
 ErrSSHPublicKey: "Introduce una clave pública SSH válida"
 ErrSSHPrivateKey: "Clave privada SSH no válida o contraseña incorrecta; las claves cifradas requieren la contraseña original"
 ErrSSHKeyMismatch: "Las claves pública y privada SSH no coinciden"
+

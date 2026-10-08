@@ -38,9 +38,8 @@ var (
 	monitorRepo     = repo.NewIMonitorRepo()
 	vllmMonitorRepo = &repo.VLLMMonitorRepo{}
 
-	settingRepo        = repo.NewISettingRepo()
-	forwardingRuleRepo = repo.NewIForwardingRuleRepo()
-	backupRepo         = repo.NewIBackupRepo()
+	settingRepo = repo.NewISettingRepo()
+	backupRepo  = repo.NewIBackupRepo()
 
 	websiteRepo               = repo.NewIWebsiteRepo()
 	websiteDomainRepo         = repo.NewIWebsiteDomainRepo()

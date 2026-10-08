@@ -4320,45 +4320,43 @@ const message = {
         useEAB: 'EAB kimlik doğrulamasını kullan',
     },
     firewall: {
+        ipv6Support: 'IPv6 desteği',
+        ipv6SupportHelper:
+            'Sunucunun IPv6 ağ işlevlerini etkilemeden IPv6 güvenlik duvarı kurallarının yönetimini ve uygulanmasını kontrol eder.',
+        ipv6DisableContainerHelper: 'Konteynerlerin IPv6 port bilgilerini gizleyin.',
+        ipv6DisableWhitelistHelper:
+            'İzin listesindeki IPv6 kurallarını kaldırın ve mevcut diğer IPv6 kurallarını koruyun.',
+        ipv6DisableRulesHelper: '1Panel tarafından yönetilen iptables ve nftables IPv6 kurallarını devre dışı bırakın.',
+        ipv6DisableNetworkHelper: 'Bu işlem sunucunun IPv6 ağ işlevlerini kapatmaz.',
+        ipv6DisableEffectHelper: 'İlgili IPv6 erişim kısıtlamaları ve port yönlendirmeleri artık uygulanmaz.',
+        ipv6Disabled: 'IPv6 desteği devre dışı. Önce güvenlik duvarı ayarlarından etkinleştirin.',
+        familyRepair: 'Onar',
+        familyIncomplete: '{0} zincirleri eksik',
+        resetWithBackup: 'Kuralları yedekle ve sıfırla',
+        resetOnly: 'Yalnızca sıfırla',
+        resetWithBackupHelper: 'Geçerli modül kurallarını başlatma sırasında geri yüklemek için JSON olarak kaydedin.',
+        resetOnlyHelper: 'Yeni yedek oluşturmadan mevcut kuralları temizleyin. Önceki yedekler korunur.',
+        backupDirectoryHelper:
+            '{0} içindeki geçerli kural yedekleri listelenir. Varsayılan olarak en yeni dosya seçilir.',
+        restoreAllRules: 'Başlat ve kuralları geri yükle',
+        importRuleBackup: 'Yedekten içe aktar',
+        initializeOnly: 'Yalnızca başlat',
+        backupRuleCount: 'Kural sayısı',
+        noRuleBackup: 'Geri yüklenebilir kural yedeği bulunamadı',
+        ruleBackupLoadFailed: 'Kural yedekleri yüklenemedi. Yeniden deneyin veya yedeği geri yüklemeden başlatın.',
         create: 'Kural oluştur',
         edit: 'Kuralı düzenle',
         quickJump: 'Hızlı erişim',
         used: 'Kullanıldı',
         unUsed: 'Kullanılmadı',
-        managed: 'Panel tarafından oluşturuldu',
-        managedHelper: '1Panel tarafından oluşturulur ve yönetilir. Düzenlenebilir veya silinebilir.',
-        adopted: 'Harici yönetilen',
-        adoptedHelper: 'Önceden sistemde bulunan ve artık 1Panel tarafından yönetilen bir kuraldır.',
-        external: 'Harici kural',
-        externalHelper:
-            'Sistemde bulunan ancak henüz 1Panel tarafından yönetilmeyen bir kuraldır. Gerektiğinde yönetime alınabilir.',
-        protected: 'Sistem korumalı',
-        protectedHelper: 'Yerleşik kurallar ve beyaz listeyle tam olarak eşleşen kurallar düzenlenemez veya silinemez.',
-        stateShort: {
-            managed: 'Panel',
-            adopted: 'Yönetilen',
-            external: 'Harici',
-            protected: 'Korumalı',
-            drifted: 'Farklı',
-        },
+        whitelist: 'İzin listesi',
+        builtinRuleProtected: 'Sistemin yerleşik koruma kuralıdır. Düzenlenemez veya silinemez.',
+        whitelistRuleProtected:
+            'İzin listesi kurallarında yalnızca sıra ve açıklama değiştirilebilir. Diğer değişiklikler için Ayarlar → İzin verilen bağlantı noktaları bölümüne gidin.',
         ruleTargetRequired: 'En az bir IP adresi veya port girin',
-        resolution_adopt: 'Yönetimi devral',
-        plan_duplicate_rules:
-            'Koşulları ve eylemleri aynı olan yinelenen kurallar yönetime alınamaz. Yinelenen kuralları elle silip yeniden deneyin.',
-        adoptRuleConfirm: 'Devraldıktan sonra 1Panel bu mevcut kuralı yönetebilir ve silebilir. Devam edilsin mi?',
-        plan_exact_rule_conflict:
-            'Aynı eşleşme koşullarına sahip, ancak izin verme veya reddetme eylemi zıt olan bir kural zaten var.',
-        allRulesAlreadyExist: 'Kontrol edilen {0} kuralın tümü zaten mevcut. Oluşturulacak yeni kural yok.',
-        plan_managed_rule_drifted: 'Yönetilen kural etkin güvenlik duvarıyla eşleşmiyor. Önce farkı giderin.',
-        plan_opaque_rule_in_target_scope: 'Hedef kapsamda güvenle ayrıştırılamayan bir kural var. İşlem durduruldu.',
-        plan_runtime_permanent_mismatch: 'Etkin ve kalıcı güvenlik duvarı yapılandırmaları farklı. Önce eşitleyin.',
-        plan_protected_rule: 'Bu kural korumalıdır; yönetimi devralınamaz, değiştirilemez veya silinemez.',
-        plan_blocked: 'Bu kural güvenle uygulanamıyor. Listeyi yenileyip tekrar deneyin.',
         largeRuleSet:
             'Çok fazla güvenlik duvarı kuralı işlemleri yavaşlatabilir. iptables veya nftables kullanılması önerilir.',
-        scopeDefaultMismatch: 'Sistemin varsayılan zone değeri {0}; bu sayfa yalnızca public zone alanını yönetir.',
         scopeMissing: 'Yönetilen {0} kapsamı eksik ve ilk kural uygulanırken güvenli şekilde oluşturulacak.',
-        scopeUnmanagedActive: 'Başka etkin kapsamlar algılandı: {0}. 1Panel bunların kurallarını değiştirmez.',
         dockerRestart: 'Güvenlik duvarı işlemleri Docker hizmetinin yeniden başlatılmasını gerektirir',
         firewallHelper: '{0} sistem güvenlik duvarı',
         firewallNotStart: 'Sistem güvenlik duvarı şu anda etkin değil. Önce etkinleştirin.',
@@ -4381,8 +4379,7 @@ const message = {
         dockerGuard: 'Konteyner portu koruması',
         systemFirewall: 'Ana makine güvenlik duvarı',
         systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
-        forwardPolicyDropWarning:
-            '{0} için varsayılan FORWARD ilkesi DROP olarak ayarlanmış. Diğer ana bilgisayarlara yönlendirilen trafik, iptables/ip6tables kurallarıyla açıkça izin verilmediği sürece engellenebilir. İlgili IP sürümünün izin kurallarını kontrol edin.',
+        forwardPolicyDropWarning: 'Bu sunucu ağ yönlendirmesini kısıtlıyor. Port yönlendirme kuralları çalışmayabilir.',
         forwardingHelper: 'Port yönlendirme kurallarını yönetir.',
         dockerFirewallHelper: '1Panel konteyner portu korumasının nasıl yönetileceğini seçer.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, deneysel',
@@ -4391,6 +4388,8 @@ const message = {
         addressFamily: 'IP sürümü',
         portOrRange: 'Port / aralık',
         batchLimit: 'Genişletme sonrasında bir defada en fazla {0} kural oluşturabilir veya içe aktarabilirsiniz.',
+        importDuplicatesRemoved:
+            'Dosya içindeki tekrarlar ve zaten mevcut kurallar dahil {0} yinelenen kural kaldırıldı.',
         importLimit:
             'En fazla {0} kural (genişletme sonrası sayıya göre) içe aktarılabilir; dosya boyutu {1} KB değerini aşmamalıdır.',
         ruleSyncTitle: 'Kuralları eşitle',
@@ -4409,19 +4408,9 @@ const message = {
         ruleSyncBlocked: 'Kullanılamaz',
         ruleSyncReason: 'Kontrol sonucu',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: 'Kural zaten veritabanı ilkesiyle eşleşiyor.',
-            managedOrderDiffers: 'Yönetilen kuralların sırası veritabanı sırasından farklı.',
-            managedOnlyInTarget: 'Yönetilen kural yalnızca hedef güvenlik duvarında mevcut.',
-            managedRuntimeCannotRemove: 'Yönetilen etkin kural güvenli bir şekilde kaldırılamıyor.',
             missingFromTarget: 'Kural hedef güvenlik duvarında bulunmuyor.',
-            targetDiffers: 'Hedef kural veritabanı ilkesinden farklı.',
             alreadyExistsInTarget: 'Kural hedef güvenlik duvarında zaten mevcut.',
             onlyInTarget: 'Kural yalnızca hedef güvenlik duvarında mevcut.',
-            stale: 'Güvenlik duvarı kuralının durumu güncel değil. Yenileyip tekrar deneyin.',
-            protectedRule: 'Bu korumalı güvenlik duvarı kuralı değiştirilemez.',
-            dockerAcceptReadOnly:
-                'Bu ACCEPT kuralı salt okunurdur ve diğer kurallar eşitlenirken korunur. Kaldırmak için ana makinede manuel olarak silin.',
-            cannotReconcile: 'Hedef kural eşitlenemiyor: {0}',
         },
         ruleSyncPartial: 'Eşitleme tamamlandı: {0} başarılı, {1} zaten mevcut, {2} başarısız.',
         ruleSyncSuccess: 'Eşitleme tamamlandı: {0} başarılı, {1} zaten mevcut, {2} silindi.',
@@ -4431,17 +4420,20 @@ const message = {
             remove: 'Silinecek',
             blocked: 'Kullanılamaz',
         },
+        initializeFromFile: 'Dosyadan başlat',
+        downloadRuleBackup: 'Kural yedeğini indir',
+        importFileHelper:
+            '64 MB boyutuna kadar JSON dosyalarını dosya sırasıyla toplu olarak içe aktarın. Dönüştürülemeyen kurallar hata olarak bildirilir.',
         resetDirectRulesHelper:
-            '{0} içindeki 1Panel sistem güvenlik duvarı zincirlerini, çalışma zamanı kurallarını ve kalıcı dosyaları silin; veritabanı ilkelerini koruyun',
+            '{0} içindeki tüm 1Panel ana makine güvenlik duvarı zincirlerini, etkin kuralları ve kalıcı dosyaları silin.',
         resetWhitelistRulesHelper:
-            '{0} içindeki etkin özel yapılandırmayı sıfırlayın, kurulum varsayılanlarını geri yükleyin ve {0} öğesini devre dışı bırakın; veritabanı ilkeleri korunur ve yeniden eşitlenebilir.',
+            '{0} özel yapılandırmasını sıfırlayın, varsayılanları geri yükleyin ve devre dışı bırakın.',
         cleanupForwardingBackendHelper:
-            '{0} içindeki 1Panel bağlantı noktası yönlendirme çalışma zamanı kurallarını sıfırlayın: ilgili tüm kuralları ve zincirleri silip veritabanı verilerini koruyun',
+            '{0} üzerindeki tüm 1Panel yönlendirme kurallarını, zincirlerini ve otomatik kurtarma dosyalarını silin. Mevcut JSON yedekleri korunur.',
         cleanupDockerBackendHelper:
-            '{0} içindeki 1Panel Docker bağlantı noktası koruma çalışma zamanı kurallarını sıfırlayın: ilgili tüm kuralları ve zincirleri silip veritabanı verilerini koruyun',
+            '{0} üzerindeki tüm 1Panel Docker koruma kurallarını, zincirlerini ve otomatik kurtarma dosyalarını silin. Mevcut JSON yedekleri korunur.',
         cleanupBeforeBackendSwitch:
-            'Mevcut {0} arka ucu hâlâ 1Panel çalışma zamanı kuralları içeriyor. {1} arka ucuna geçmeden önce sıfırlayın. Sıfırlama yalnızca çalışma zamanı kurallarını temizler; veritabanı ilkeleri korunur ve geçişten sonra yeniden başlatılabilir veya eşitlenebilir.',
-        cleanupAction: 'Sıfırla',
+            '{1} sistemine geçmeden önce mevcut {0} sistemini sıfırlayın ve kuralların nasıl geri yükleneceğini doğrulayın.',
         backendSwitchNotice:
             'Yalnızca bir güvenlik duvarı yönetim yönteminin etkinleştirilmesi önerilir. Birden fazla güvenlik duvarının aynı anda çalışması kural çakışmalarına, tutarsız durumlara veya konteyner bağlantı noktası erişim sorunlarına yol açabilir.',
         switchBackendHelper: '{0} arka ucuna geçilsin mi?',
@@ -4490,8 +4482,7 @@ const message = {
         portDetails: 'Port ayrıntıları',
         orphanEndpoints: 'İlişkilendirilmemiş uç noktalar',
         orphanPolicies: 'İlişkilendirilmemiş kurallar',
-        orphanPoliciesHelper:
-            'Aşağıdaki {0} kural bir Docker portuna bağlı değil. Eşleşen bir port algılandığında otomatik olarak bağlanır.',
+        orphanPoliciesHelper: 'Bu {0} sistem kuralıyla eşleşen yayımlanmış bir Docker bağlantı noktası yok.',
         composeOrApp: 'Compose / Uygulama',
         sources: 'Kaynaklar',
         deniedSources: 'Reddedilen kaynaklar',
@@ -4500,6 +4491,8 @@ const message = {
         protectionMode: 'Koruma modu',
         denySources: 'Belirtilen kaynakları reddet',
         allowSources: 'Yalnızca belirtilen kaynaklara izin ver',
+        acceptSources: 'Belirtilen kaynakları doğrudan kabul et',
+        acceptAll: 'Tüm trafiği doğrudan kabul et',
         denyAll: 'Tüm erişimi reddet',
         dockerGuardMixedFamilyHelper:
             'IPv4 ve IPv6 birlikte seçildi. Kaynak tabanlı ilkeleri ayrı ayrı yapılandırın; tüm erişimi reddet doğrudan uygulanabilir.',
@@ -4542,7 +4535,7 @@ const message = {
             'Bağlantıyı Kaldır - Bağlantı kaldırıldığında, eklenen tüm güvenlik duvarı kuralları geçersiz olacaktır. Dikkatli ilerleyin. Onaylıyor musunuz?',
         portWhiteList: 'Port beyaz listesi',
         whitelistConfigHelper:
-            'İzin listesi yalnızca yapılandırmayı kaydeder ve eşleşen izin kurallarını korur. Eksik kurallar başlatma, yeniden başlatma, ilk yapılandırma veya eşitleme sırasında eklenir. İzin listesi girdilerini düzenlemek veya silmek mevcut kuralları kaldırmaz.',
+            'İzin listesini kaydetmek eksik izin kurallarını ekler ve eşleşen kuralları korur. Liste girdilerini düzenlemek veya silmek mevcut kuralları kaldırmaz.',
         whitelistDeleteConfirm:
             'Yalnızca bu beyaz liste kaydı silinecek. Mevcut güvenlik duvarı kuralları korunacak. Devam edilsin mi?',
         portWhiteListHelper:
@@ -4560,7 +4553,7 @@ const message = {
         whitelistServicePortsHelper:
             'Tek bir port girin (1-65535). Bu işlem hizmetin dinleme portunu değiştirmez. Hizmet ayarlarında port değiştirildiğinde bu beyaz liste kaydı da güncellenir.',
         whitelistSourcesHelper:
-            'IP adreslerini veya CIDR aralıklarını virgül ya da yeni satırla ayırın. Tüm IPv4 ve IPv6 kaynaklarına izin vermek için boş bırakın.',
+            'IP adreslerini veya CIDR aralıklarını virgül ya da yeni satırla ayırın. {0} kaynaklarına izin vermek için boş bırakın.',
         destinationPortPlaceholder: 'örn. 80, 80,443 veya 8080-8089',
         deleteRuleConfirm: '{0} kural silinecek. Devam etmek istiyor musunuz?',
         deleteUsedRuleConfirm:
@@ -7349,12 +7342,17 @@ const message = {
             storagePoolHelper: 'Depolama havuzu, sanal makine disklerini ve ISO dosyalarını saklar.',
             network: 'Ağ',
             bridgeName: 'Bridge Adı',
+            sourceInterface: 'Ana makine ağ arayüzü',
+            macvtapNetworkHelper:
+                'Sanal makine yerel ağda ayrı bir bilgisayar gibi çalışır. Ana makinenin mevcut IP ayarlarını değiştirmeden diğer cihazlar sanal makinenin IP adresine doğrudan erişebilir. Not: varsayılan olarak ana makine ve sanal makine bu bağlantı üzerinden doğrudan iletişim kuramaz.',
+            macvtapInterfaceHelper:
+                'Hedef yerel ağa bağlı kablolu arayüzü seçin; ana makineyle paylaşılabilir. Sanal makinenin IP adresi ağ tarafından atanır veya sanal makine içinde elle ayarlanır. Ağ, bu arayüzde birden fazla cihaza (birden fazla MAC adresine) izin vermelidir.',
             natNetworkHelper:
-                'VM’ler ana makine üzerinden ağa erişebilir, ancak harici cihazlar genellikle onlara doğrudan erişemez.',
+                'İnternet erişimi gereken veya az sayıda hizmet sunan sanal makineler için uygundur. Sanal makine internete ana makine üzerinden çıkar. Diğer cihazların hizmetlere erişmesi için genellikle ayrıca bağlantı noktası yönlendirmesi yapılandırılmalıdır.',
             bridgeNetworkHelper:
-                'VM’leri ana makinedeki mevcut bir bridge’e (örneğin br0) bağlayın. Ana makinede kullanılmayan ek bir ağ kartı varsa, bunun için bir bridge oluşturup kullanabilirsiniz.',
+                'Sanal makine bir ağ anahtarına bağlı ayrı bir bilgisayar gibi çalışır. Ana makine ve yerel ağdaki diğer cihazlar ona doğrudan erişebilir. Önce ana makinede bir köprü yapılandırın.',
             bridgeNameHelper:
-                'Ana makinede var olan br0 gibi bir Linux bridge seçin. Fiziksel NIC bridge değildir ve docker/libvirt tarafından yönetilen bridge burada seçilemez.',
+                'br0 gibi yapılandırılmış bir köprü seçin. Seçenek yoksa önce ana makinede bir köprü oluşturun. Fiziksel arayüzler ve Docker/libvirt tarafından yönetilen köprüler burada seçilemez.',
             natCIDRHelper: 'CIDR, ağ geçidi ve DHCP aralığı yeni NAT sanal ağı tarafından kullanılır.',
             networkCIDR: 'Ağ CIDR',
             gateway: 'Ağ Geçidi',
@@ -7372,6 +7370,7 @@ const message = {
             available: 'Kullanılabilir',
             vmCount: 'Bağlı VMler',
             usedIPs: 'Kullanılan IPler',
+            usedIPsUnavailable: 'Henüz alınamıyor',
             monitor: 'İzleme',
             monitorNotReady: 'Sanal makine çalışmıyor. İzleme verileri kullanılamıyor.',
             monitorLoadFailed: 'VM izleme verileri alınamadı.',

@@ -6,20 +6,26 @@ import (
 	"os"
 	"time"
 
+	"errors"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/init/migration/migrations"
-	migrationutils "github.com/1Panel-dev/1Panel/agent/init/migration/migrations/utils"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/nftables_helper"
+	"gorm.io/gorm"
 )
 
 func Init() {
 	ctx := context.Background()
+	defer initDockerPortGuard(ctx)
+	if err := initForwardingRules(ctx); err != nil {
+		global.LOG.Warnf("restore forwarding rules from file failed, err: %v", err)
+	}
 	client, err := service.NewSelectedSystemFirewallClient()
 	if err != nil {
 		global.LOG.Errorf("select system firewall provider failed, err: %v", err)
@@ -31,38 +37,33 @@ func Init() {
 		if err := migrations.TransferFirewalldSSHService(ctx, client, service.NewIFirewallService().SyncPortWhitelist); err != nil {
 			global.LOG.Warnf("synchronize firewall whitelist on startup failed, err: %v", err)
 		}
-		if initialize {
-			initDockerPortGuard(ctx)
-		}
 	}()
-	if err := migrationutils.TransferHostFirewall(ctx, clientName); err != nil {
-		global.LOG.Errorf("transfer legacy host firewall records failed, err: %v", err)
+	families := []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6}
+	nftFamilies := []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	ipv6Status, err := repo.NewISettingRepo().GetValueByKey(constant.FirewallIPv6SupportKey)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		global.LOG.Errorf("load firewall IPv6 setting failed: %v", err)
 		return
 	}
-	if err := migrationutils.TransferLegacyHostFirewallRuleOwnership(ctx, clientName, service.AdoptLegacyHostFirewallRuleOwnership); err != nil {
-		global.LOG.Warnf("transfer legacy host firewall rule ownership failed, err: %v", err)
-	}
-	if err := migrationutils.TransferFirewallForwarding(ctx); err != nil {
-		global.LOG.Errorf("transfer legacy forwarding rules failed, err: %v", err)
-		return
-	}
-	if err := initForwardingRules(ctx); err != nil {
-		global.LOG.Warnf("restore forwarding rules failed, manual synchronization is available, err: %v", err)
+	if ipv6Status == constant.StatusDisable {
+		global.LOG.Info("IPv6 firewall support is disabled; skipping IPv6 host chains and saved rules during startup")
+		families = families[:1]
+		nftFamilies = nftFamilies[:1]
 	}
 	initialize = needInit()
 	if !initialize {
-		repairIptablesBaseChains(clientName)
+		repairIptablesBaseChains(clientName, families...)
 		return
 	}
 	InitPingStatus()
 	global.LOG.Info("initializing firewall settings...")
 	if clientName == "nftables" {
-		if err := nftables_helper.Restore(); err != nil {
+		if err := nftables_helper.Restore(nftFamilies...); err != nil {
 			global.LOG.Errorf("restore nftables rules failed, err: %v", err)
 		}
 		status, _ := repo.NewISettingRepo().GetValueByKey("IptablesStatus")
 		if status == constant.StatusEnable {
-			if err := nftables_helper.Bind(); err != nil {
+			if err := nftables_helper.Bind(nftFamilies...); err != nil {
 				global.LOG.Errorf("bind nftables base chains failed, err: %v", err)
 			}
 		}
@@ -78,7 +79,7 @@ func Init() {
 		global.LOG.Errorf("load required firewall ports failed, err: %v", err)
 		return
 	}
-	if err := iptables_helper.RestoreBaseChains(requiredPorts); err != nil {
+	if err := iptables_helper.RestoreBaseChains(requiredPorts, families...); err != nil {
 		global.LOG.Errorf("restore iptables base chains failed, err: %v", err)
 		return
 	}
@@ -94,7 +95,7 @@ func Init() {
 
 }
 
-func repairIptablesBaseChains(clientName string) {
+func repairIptablesBaseChains(clientName string, families ...string) {
 	if clientName != constant.FirewallProviderIptables {
 		return
 	}
@@ -108,7 +109,7 @@ func repairIptablesBaseChains(clientName string) {
 		global.LOG.Warnf("load required firewall ports for base chain repair failed, err: %v", err)
 		return
 	}
-	if err := iptables_helper.RepairBaseChains(ports); err != nil {
+	if err := iptables_helper.RepairBaseChains(ports, families...); err != nil {
 		global.LOG.Warnf("repair iptables base chains failed, err: %v", err)
 	}
 }
@@ -120,7 +121,7 @@ func initDockerPortGuard(ctx context.Context) {
 	)
 	var restoreErr error
 	for attempt := 1; attempt <= attempts; attempt++ {
-		restoreErr = service.ReconcileDockerPortGuard(ctx)
+		restoreErr = service.RestoreDockerPortGuard(ctx)
 		if restoreErr == nil {
 			return
 		}

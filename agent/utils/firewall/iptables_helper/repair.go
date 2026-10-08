@@ -14,12 +14,15 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
-func RepairBaseChains(ports []firewall.PortWhitelist) error {
+func RepairBaseChains(ports []firewall.PortWhitelist, families ...string) error {
+	if len(families) == 0 {
+		families = []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6}
+	}
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil {
 		return err
 	}
-	for _, family := range []string{constant.FirewallFamilyIPv4, constant.FirewallFamilyIPv6} {
+	for _, family := range families {
 		ipv6 := family == constant.FirewallFamilyIPv6
 		run, executable := RunWithStd, commands.Restore4
 		if ipv6 {

@@ -309,16 +309,15 @@ func (s *Session) detach(a *attachment, clean, revalidate bool, cursor uint64) {
 	if revalidate {
 		s.revalidateCursor = cursor
 	}
-	shouldClose := clean || (!s.Persistent && !revalidate)
-	if !shouldClose {
+	if !clean {
 		timeout := graceTimeout
-		if revalidate {
+		if !s.Persistent || revalidate {
 			timeout = revalidateGrace
 		}
 		s.grace = time.AfterFunc(timeout, s.Close)
 	}
 	s.mu.Unlock()
-	if shouldClose {
+	if clean {
 		s.Close()
 	}
 }
