@@ -154,7 +154,7 @@ func NewTask(name, operate, taskScope, taskID string, resourceID uint) (*Task, e
 	logPath := path.Join(global.Dir.TaskDir, taskScope, taskID+".log")
 	logger := logrus.New()
 	logger.SetFormatter(&SimpleFormatter{})
-	logFile, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY, constant.FilePerm)
+	logFile, err := os.OpenFile(logPath, os.O_TRUNC|os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.FilePerm)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open log file: %w", err)
 	}
