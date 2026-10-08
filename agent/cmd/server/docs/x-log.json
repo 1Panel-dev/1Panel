@@ -265,8 +265,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "应用端口修改 [key]-[name] =\u003e [port]",
-		"formatEN": "Application port update [key]-[name] =\u003e [port]"
+		"formatZH": "应用端口修改 [key]-[name] => [port]",
+		"formatEN": "Application port update [key]-[name] => [port]"
 	},
 	"/apps/installed/sort/update": {
 		"bodyKeys": [],
@@ -679,8 +679,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "容器重命名 [name] =\u003e [newName]",
-		"formatEN": "rename container [name] =\u003e [newName]"
+		"formatZH": "容器重命名 [name] => [newName]",
+		"formatEN": "rename container [name] => [newName]"
 	},
 	"/containers/repo": {
 		"bodyKeys": [
@@ -831,8 +831,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
-		"formatEN": "update api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
+		"formatZH": "更新 API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/auth/expired/reset": {
 		"bodyKeys": [],
@@ -1716,8 +1716,8 @@
 				"output_value": "name"
 			}
 		],
-		"formatZH": "更新用户 [name] API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
-		"formatEN": "update user [name] api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
+		"formatZH": "更新用户 [name] API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update user [name] api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/enterprise/users/del": {
 		"bodyKeys": [
@@ -1918,8 +1918,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统监听信息 =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
-		"formatEN": "update system bind info =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]"
+		"formatZH": "修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]",
+		"formatEN": "update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]"
 	},
 	"/core/settings/memo": {
 		"bodyKeys": [],
@@ -1948,8 +1948,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统端口 =\u003e [serverPort]",
-		"formatEN": "update system port =\u003e [serverPort]"
+		"formatZH": "修改系统端口 => [serverPort]",
+		"formatEN": "update system port => [serverPort]"
 	},
 	"/core/settings/proxy/update": {
 		"bodyKeys": [
@@ -1974,8 +1974,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统 ssl =\u003e [ssl]",
-		"formatEN": "update system ssl =\u003e [ssl]"
+		"formatZH": "修改系统 ssl => [ssl]",
+		"formatEN": "update system ssl => [ssl]"
 	},
 	"/core/settings/terminal/update": {
 		"bodyKeys": [],
@@ -1991,8 +1991,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统配置 [key] =\u003e [value]",
-		"formatEN": "update system setting [key] =\u003e [value]"
+		"formatZH": "修改系统配置 [key] => [value]",
+		"formatEN": "update system setting [key] => [value]"
 	},
 	"/core/settings/upgrade": {
 		"bodyKeys": [
@@ -2000,8 +2000,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新系统 =\u003e [version]",
-		"formatEN": "upgrade system =\u003e [version]"
+		"formatZH": "更新系统 => [version]",
+		"formatEN": "upgrade system => [version]"
 	},
 	"/core/xapp/appQRCode": {
 		"bodyKeys": [
@@ -2888,8 +2888,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "首页应用 [key] =\u003e 显示：[value]",
-		"formatEN": "app launcher [key] =\u003e show: [value]"
+		"formatZH": "首页应用 [key] => 显示：[value]",
+		"formatEN": "app launcher [key] => show: [value]"
 	},
 	"/dashboard/quick/change": {
 		"bodyKeys": [],
@@ -3017,7 +3017,7 @@
 			}
 		],
 		"formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the mysql database [name] is modified =\u003e [description]"
+		"formatEN": "The description of the mysql database [name] is modified => [description]"
 	},
 	"/databases/grants": {
 		"bodyKeys": [
@@ -3098,7 +3098,7 @@
 			}
 		],
 		"formatZH": "mongodb 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the mongodb database [name] is modified =\u003e [description]"
+		"formatEN": "The description of the mongodb database [name] is modified => [description]"
 	},
 	"/databases/mongodb/password": {
 		"bodyKeys": [
@@ -3183,7 +3183,7 @@
 			}
 		],
 		"formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the postgresql database [name] is modified =\u003e [description]"
+		"formatEN": "The description of the postgresql database [name] is modified => [description]"
 	},
 	"/databases/pg/password": {
 		"bodyKeys": [
@@ -3288,8 +3288,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] =\u003e [newHost] 描述 [description]",
-		"formatEN": "update mysql database [database] user [username] access [host] =\u003e [newHost] description [description]"
+		"formatZH": "更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] => [newHost] 描述 [description]",
+		"formatEN": "update mysql database [database] user [username] access [host] => [newHost] description [description]"
 	},
 	"/databases/variables/update": {
 		"bodyKeys": [],
@@ -3325,8 +3325,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "批量修改文件权限和用户/组 [paths] =\u003e [mode]/[user]/[group]",
-		"formatEN": "Batch change file mode and owner [paths] =\u003e [mode]/[user]/[group]"
+		"formatZH": "批量修改文件权限和用户/组 [paths] => [mode]/[user]/[group]",
+		"formatEN": "Batch change file mode and owner [paths] => [mode]/[user]/[group]"
 	},
 	"/files/chunkdownload": {
 		"bodyKeys": [
@@ -3416,8 +3416,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改权限 [path] =\u003e [mode]",
-		"formatEN": "Change mode [path] =\u003e [mode]"
+		"formatZH": "修改权限 [path] => [mode]",
+		"formatEN": "Change mode [path] => [mode]"
 	},
 	"/files/move": {
 		"bodyKeys": [
@@ -3426,8 +3426,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "移动文件 [oldPaths] =\u003e [newPath]",
-		"formatEN": "Move [oldPaths] =\u003e [newPath]"
+		"formatZH": "移动文件 [oldPaths] => [newPath]",
+		"formatEN": "Move [oldPaths] => [newPath]"
 	},
 	"/files/owner": {
 		"bodyKeys": [
@@ -3437,8 +3437,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改用户/组 [path] =\u003e [user]/[group]",
-		"formatEN": "Change owner [path] =\u003e [user]/[group]"
+		"formatZH": "修改用户/组 [path] => [user]/[group]",
+		"formatEN": "Change owner [path] => [user]/[group]"
 	},
 	"/files/preview": {
 		"bodyKeys": [
@@ -3472,8 +3472,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "重命名 [oldName] =\u003e [newName]",
-		"formatEN": "Rename [oldName] =\u003e [newName]"
+		"formatZH": "重命名 [oldName] => [newName]",
+		"formatEN": "Rename [oldName] => [newName]"
 	},
 	"/files/save": {
 		"bodyKeys": [
@@ -3530,8 +3530,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "下载 url =\u003e [path]/[name]",
-		"formatEN": "Download url =\u003e [path]/[name]"
+		"formatZH": "下载 url => [path]/[name]",
+		"formatEN": "Download url => [path]/[name]"
 	},
 	"/files/wget/process/remove": {
 		"bodyKeys": [
@@ -3681,12 +3681,16 @@
 		"formatZH": "删除 Docker 端口防护策略 [uuids]",
 		"formatEN": "delete Docker port guard policies [uuids]"
 	},
-	"/hosts/firewall/docker/sync": {
-		"bodyKeys": [],
+	"/hosts/firewall/family/operate": {
+		"bodyKeys": [
+			"subsystem",
+			"family",
+			"operation"
+		],
+		"formatEN": "[operation] [subsystem] [family] firewall chains",
+		"formatZH": "[operation] [subsystem] [family] 防火墙链",
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步 Docker 端口防护规则",
-		"formatEN": "sync Docker port guard rules"
+		"beforeFunctions": []
 	},
 	"/hosts/firewall/filter/operate": {
 		"bodyKeys": [
@@ -3727,13 +3731,6 @@
 		"formatZH": "添加防火墙规则",
 		"formatEN": "create firewall rules"
 	},
-	"/hosts/firewall/rules/adopt": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "纳管防火墙规则",
-		"formatEN": "adopt firewall rule"
-	},
 	"/hosts/firewall/rules/delete": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -3743,12 +3740,12 @@
 	},
 	"/hosts/firewall/rules/reorder": {
 		"bodyKeys": [
-			"uuid"
+			"instanceKey"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "调整防火墙规则顺序 [uuid]",
-		"formatEN": "reorder firewall rule [uuid]"
+		"formatZH": "调整防火墙规则顺序 [instanceKey]",
+		"formatEN": "reorder firewall rule [instanceKey]"
 	},
 	"/hosts/firewall/rules/reset": {
 		"bodyKeys": [],
@@ -3757,25 +3754,23 @@
 		"formatZH": "重置防火墙规则",
 		"formatEN": "reset firewall rules"
 	},
-	"/hosts/firewall/rules/sync": {
-		"bodyKeys": [
-			"subsystem",
-			"sourceProvider",
-			"targetProvider"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步 [subsystem] 防火墙规则到 [targetProvider]",
-		"formatEN": "sync [subsystem] firewall rules to [targetProvider]"
-	},
 	"/hosts/firewall/rules/update": {
 		"bodyKeys": [
-			"uuid"
+			"instanceKey"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防火墙规则 [uuid]",
-		"formatEN": "update firewall rule [uuid]"
+		"formatZH": "更新防火墙规则 [instanceKey]",
+		"formatEN": "update firewall rule [instanceKey]"
+	},
+	"/hosts/firewall/settings/ipv6": {
+		"bodyKeys": [
+			"status"
+		],
+		"formatEN": "Set firewall IPv6 support to [status]",
+		"formatZH": "设置防火墙 IPv6 支持为 [status]",
+		"paramKeys": [],
+		"beforeFunctions": []
 	},
 	"/hosts/firewall/settings/operate": {
 		"bodyKeys": [
@@ -3893,8 +3888,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改 SSH 配置 [key] =\u003e [newValue]",
-		"formatEN": "update SSH setting [key] =\u003e [newValue]"
+		"formatZH": "修改 SSH 配置 [key] => [newValue]",
+		"formatEN": "update SSH setting [key] => [newValue]"
 	},
 	"/hosts/tool/config/set": {
 		"bodyKeys": [
@@ -4155,7 +4150,7 @@
 			}
 		],
 		"formatZH": "快照 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the snapshot [name] is modified =\u003e [description]"
+		"formatEN": "The description of the snapshot [name] is modified => [description]"
 	},
 	"/settings/snapshot/import": {
 		"bodyKeys": [
@@ -4247,8 +4242,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统配置 [key] =\u003e [value]",
-		"formatEN": "update system setting [key] =\u003e [value]"
+		"formatZH": "修改系统配置 [key] => [value]",
+		"formatEN": "update system setting [key] => [value]"
 	},
 	"/toolbox/clam": {
 		"bodyKeys": [
@@ -4366,8 +4361,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改主机参数 [key] =\u003e [value]",
-		"formatEN": "update device conf [key] =\u003e [value]"
+		"formatZH": "修改主机参数 [key] => [value]",
+		"formatEN": "update device conf [key] => [value]"
 	},
 	"/toolbox/device/update/host": {
 		"bodyKeys": [
@@ -4376,8 +4371,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改主机 Host [key] =\u003e [value]",
-		"formatEN": "update device host [key] =\u003e [value]"
+		"formatZH": "修改主机 Host [key] => [value]",
+		"formatEN": "update device host [key] => [value]"
 	},
 	"/toolbox/device/update/swap": {
 		"bodyKeys": [
@@ -4405,8 +4400,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
-		"formatEN": "update fail2ban conf [key] =\u003e [value]"
+		"formatZH": "修改 Fail2ban 配置 [key] => [value]",
+		"formatEN": "update fail2ban conf [key] => [value]"
 	},
 	"/toolbox/ftp": {
 		"bodyKeys": [
@@ -4665,8 +4660,8 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "修改默认 server =\u003e [domain]",
-		"formatEN": "Change default server =\u003e [domain]"
+		"formatZH": "修改默认 server => [domain]",
+		"formatEN": "Change default server => [domain]"
 	},
 	"/websites/del": {
 		"bodyKeys": [
@@ -5429,8 +5424,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防篡改信息 [website][path] =\u003e [status]",
-		"formatEN": "update tamper info [website][path] =\u003e [status]"
+		"formatZH": "更新防篡改信息 [website][path] => [status]",
+		"formatEN": "update tamper info [website][path] => [status]"
 	},
 	"/xpack/vllm/command-template/create": {
 		"bodyKeys": [

@@ -522,17 +522,18 @@ const scheduleReconnect = (forRevalidation = false) => {
         writeNotice('33', i18n.global.t('terminal.sessionReconnecting'));
         reconnectNoticeShown = true;
     }
-    reconnectTimer = setTimeout(
-        () => {
-            reconnectTimer = null;
-            if (closing || !sessionId.value) return;
+    if (forRevalidation) {
+        if (!closing && sessionId.value) {
             initWebSocket(wsEndpoint, wsArgs);
-        },
-        forRevalidation ? 0 : reconnectDelay,
-    );
-    if (!forRevalidation) {
-        reconnectDelay = Math.min(reconnectDelay * 2, 8000);
+        }
+        return;
     }
+    reconnectTimer = setTimeout(() => {
+        reconnectTimer = null;
+        if (closing || !sessionId.value) return;
+        initWebSocket(wsEndpoint, wsArgs);
+    }, reconnectDelay);
+    reconnectDelay = Math.min(reconnectDelay * 2, 8000);
 };
 
 const stopReconnect = () => {

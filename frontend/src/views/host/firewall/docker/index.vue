@@ -1,7 +1,7 @@
 <template>
     <div>
         <FireRouter />
-        <DockerGuardStatus :base="data.base" @operate="operate" @cleanup="cleanupBackend" />
+        <DockerGuardStatus :base="data.base" @operate="operate" @refresh="search" @cleanup="cleanupBackend" />
         <el-card v-if="data.base.isExist && !data.base.message && !data.base.initialized" class="mask-prompt">
             <span>{{ $t('firewall.initHelper', [data.base.name]) }}</span>
         </el-card>
@@ -16,16 +16,7 @@
                 <el-alert v-else type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
             </template>
             <template #leftToolBar>
-                <el-button
-                    v-if="data.base.backend === 'iptables' || data.base.backend === 'nftables'"
-                    v-permission
-                    type="primary"
-                    v-node-admin
-                    @click="openRuleSync"
-                >
-                    {{ $t('commons.button.sync') }}
-                </el-button>
-                <el-button v-if="allOrphanPolicies.length" plain @click="orphanDrawerVisible = true">
+                <el-button plain @click="orphanDrawerVisible = true">
                     {{ $t('firewall.orphanPolicies') }} ({{ allOrphanPolicies.length }})
                 </el-button>
                 <el-button
@@ -129,12 +120,6 @@
                                                 </div>
                                             </div>
                                         </el-descriptions-item>
-                                        <el-descriptions-item
-                                            v-if="group.endpoint.description"
-                                            :label="$t('commons.table.description')"
-                                        >
-                                            {{ group.endpoint.description }}
-                                        </el-descriptions-item>
                                     </el-descriptions>
                                 </el-popover>
                                 <el-button v-if="row.portGroups.length > 5" plain size="small" @click="openPorts(row)">
@@ -154,7 +139,12 @@
             </template>
         </LayoutContent>
 
-        <DrawerPro v-model="orphanDrawerVisible" :header="$t('firewall.orphanPolicies')" size="large">
+        <DrawerPro
+            v-model="orphanDrawerVisible"
+            :header="$t('firewall.orphanPolicies')"
+            size="large"
+            @close="orphanSelects = []"
+        >
             <template #content>
                 <el-alert
                     type="info"
@@ -162,23 +152,28 @@
                     show-icon
                     :title="$t('firewall.orphanPoliciesHelper', [allOrphanPolicies.length])"
                 />
-                <div class="mt-3">
+                <div class="mt-3 flex flex-wrap items-center justify-between gap-2">
                     <el-button
                         v-permission
                         v-node-admin
-                        :disabled="orphanSelects.length === 0"
+                        :disabled="loading || orphanSelects.length === 0"
                         @click="removePolicies(orphanSelects, true)"
                     >
                         {{ $t('commons.button.delete') }}
                     </el-button>
+                    <div class="flex items-center gap-2">
+                        <TableSearch v-model:searchName="orphanSearchName" />
+                        <TableRefresh @search="search" />
+                    </div>
                 </div>
                 <ComplexTable
+                    v-model:selects="orphanSelects"
+                    v-loading="loading"
                     :data="orphanPageRows"
                     :pagination-config="orphanPaginationConfig"
                     row-key="policyUUID"
                     max-height="calc(100vh - 220px)"
                     class="mt-3"
-                    @selection-change="changeOrphanSelection"
                 >
                     <el-table-column type="selection" width="48" />
                     <el-table-column :label="$t('commons.table.port')" min-width="190">
@@ -192,14 +187,6 @@
                     <el-table-column :label="$t('firewall.sources')" min-width="200" show-overflow-tooltip>
                         <template #default="{ row }">{{ displaySources(row) || '-' }}</template>
                     </el-table-column>
-                    <el-table-column
-                        prop="description"
-                        :label="$t('commons.table.description')"
-                        min-width="160"
-                        show-overflow-tooltip
-                    >
-                        <template #default="{ row }">{{ row.description || '-' }}</template>
-                    </el-table-column>
                     <el-table-column :label="$t('commons.table.operate')" width="80" fixed="right">
                         <template #default="{ row }">
                             <el-button
@@ -207,6 +194,7 @@
                                 v-node-admin
                                 type="primary"
                                 link
+                                :disabled="loading"
                                 @click="removePolicies([row], false)"
                             >
                                 {{ $t('commons.button.delete') }}
@@ -225,9 +213,9 @@
             @created="openRuleTask"
         />
         <DockerGuardImport ref="importRef" @created="openRuleTask" />
-        <RuleSync ref="ruleSyncRef" @search="search" />
-        <ConfirmDialog ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
+        <RuleReset ref="cleanupConfirmRef" @confirm="submitCleanupBackend" />
         <TaskLog ref="taskLogRef" @close="search" />
+        <RuleInitialize ref="initializeRef" @initialize="initializeOnly" @complete="search" />
     </div>
 </template>
 
@@ -237,15 +225,16 @@ import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
 import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
 import DockerGuardImport from '@/views/host/firewall/docker/import/index.vue';
-import RuleSync from '@/views/host/firewall/sync/index.vue';
-import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import RuleReset from '@/views/host/firewall/components/rule-reset.vue';
 import TaskLog from '@/components/log/task/index.vue';
+import RuleInitialize from '@/views/host/firewall/components/rule-initialize.vue';
 import { Firewall } from '@/api/interface/firewall';
+import { buildDockerPolicyExport } from './transfer';
 import {
     deleteDockerPortGuardPolicies,
     loadDockerPortGuard,
     operateDockerPortGuard,
-    operateFirewallBackend,
+    resetFirewallRules,
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -268,11 +257,11 @@ import { newUUID } from '@/utils/id';
 const loading = ref(false);
 const detailRef = ref<InstanceType<typeof DockerGuardDetail>>();
 const importRef = ref<InstanceType<typeof DockerGuardImport>>();
-const ruleSyncRef = ref<InstanceType<typeof RuleSync>>();
-const cleanupConfirmRef = ref<InstanceType<typeof ConfirmDialog>>();
+const cleanupConfirmRef = ref<InstanceType<typeof RuleReset>>();
 const taskLogRef = ref<InstanceType<typeof TaskLog>>();
 const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID, true);
 const orphanDrawerVisible = ref(false);
+const orphanSearchName = ref('');
 const searchName = ref('');
 const selects = ref<Firewall.DockerGuardContainer[]>([]);
 const orphanSelects = ref<Firewall.DockerGuardEndpoint[]>([]);
@@ -294,13 +283,13 @@ const data = reactive<Firewall.DockerGuardList>({
 const allOrphanPolicies = computed(() => {
     const result = new Map<string, Firewall.DockerGuardEndpoint>();
     for (const endpoint of data.orphanPolicies || []) {
-        result.set(dockerGuardEndpointKey(endpoint), endpoint);
+        result.set(endpoint.policyUUID, endpoint);
     }
     for (const container of data.containers || []) {
         if (container.key !== '__orphan__' && container.endpoints.some((endpoint) => endpoint.containerID)) continue;
         for (const endpoint of container.endpoints) {
             if (!endpoint.policyUUID) continue;
-            result.set(dockerGuardEndpointKey(endpoint), endpoint);
+            result.set(endpoint.policyUUID, endpoint);
         }
     }
     return [...result.values()];
@@ -345,7 +334,7 @@ const containerRows = computed(() => {
 });
 
 const orphanRows = computed(() => {
-    const keyword = searchName.value.trim().toLowerCase();
+    const keyword = orphanSearchName.value.trim().toLowerCase();
     return allOrphanPolicies.value.filter((endpoint) => {
         if (!keyword) return true;
         return [
@@ -354,7 +343,6 @@ const orphanRows = computed(() => {
             endpoint.hostPort,
             endpoint.protocol,
             endpoint.mode,
-            endpoint.description,
             ...(endpoint.sources || []),
         ]
             .filter((item) => item !== undefined)
@@ -382,6 +370,8 @@ const orphanPageRows = computed(() => {
 });
 watch(searchName, () => {
     paginationConfig.currentPage = 1;
+});
+watch(orphanSearchName, () => {
     orphanPaginationConfig.currentPage = 1;
 });
 watch([() => paginationConfig.total, () => orphanPaginationConfig.total], () => {
@@ -403,7 +393,6 @@ const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
                 protocol: endpoint.protocol,
                 mode: endpoint.mode,
                 sources: endpoint.sources || [],
-                description: endpoint.description || '',
             });
         }
     }
@@ -416,7 +405,6 @@ const policies = computed<Firewall.DockerGuardPolicy[]>(() => {
             protocol: endpoint.protocol,
             mode: endpoint.mode,
             sources: endpoint.sources || [],
-            description: endpoint.description || '',
         });
     }
     return [...result.values()];
@@ -440,7 +428,6 @@ const policiesFromEndpoints = (endpoints: Firewall.DockerGuardEndpoint[]) => {
             protocol: endpoint.protocol,
             mode: endpoint.mode,
             sources: endpoint.sources || [],
-            description: endpoint.description || '',
         });
     }
     return [...result.values()];
@@ -472,7 +459,13 @@ const search = async () => {
         loading.value = false;
     }
 };
-const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
+const initializeRef = ref<InstanceType<typeof RuleInitialize>>();
+const initializeOnly = () => operate('initialize', true);
+const operate = async (operation: 'initialize' | 'bind' | 'unbind', confirmed = false) => {
+    if (operation === 'initialize' && !confirmed) {
+        await initializeRef.value?.acceptParams(i18n.global.t('firewall.initMsg', [data.base.name]), true, 'docker');
+        return;
+    }
     if (operation === 'unbind') {
         try {
             await ElMessageBox.confirm(
@@ -501,26 +494,27 @@ const operate = async (operation: 'initialize' | 'bind' | 'unbind') => {
 const cleanupBackend = () => {
     if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
     cleanupConfirmRef.value?.acceptParams({
-        header: i18n.global.t('firewall.cleanupAction'),
-        operationInfo: i18n.global.t('firewall.cleanupDockerBackendHelper', [data.base.backend]),
-        submitInputInfo: data.base.backend,
+        message: i18n.global.t('firewall.cleanupDockerBackendHelper', [data.base.backend]),
+        provider: data.base.backend,
     });
 };
 
-const submitCleanupBackend = async () => {
+const submitCleanupBackend = async (backup: boolean) => {
     if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
     loading.value = true;
     try {
-        await operateFirewallBackend({ subsystem: 'docker', backend: data.base.backend, operation: 'cleanup' });
+        const result = await resetFirewallRules({
+            subsystem: 'docker',
+            provider: data.base.backend,
+            backup,
+        });
+        if (result.data.backupPath)
+            await ElMessageBox.alert(result.data.backupPath, i18n.global.t('commons.button.export'));
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         await search();
     } finally {
         loading.value = false;
     }
-};
-const openRuleSync = () => {
-    if (data.base.backend !== 'iptables' && data.base.backend !== 'nftables') return;
-    ruleSyncRef.value?.acceptParams(data.base.backend, 'docker');
 };
 const openImport = () => {
     importRef.value?.acceptParams();
@@ -535,17 +529,17 @@ const exportPolicies = async (items: Firewall.DockerGuardPolicy[]) => {
     } catch {
         return;
     }
-    downloadWithContent(JSON.stringify(items, null, 2), `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`);
+    const exported = buildDockerPolicyExport(items);
+    downloadWithContent(
+        JSON.stringify(exported, null, 2),
+        `1panel-docker-port-guard-${getCurrentDateFormatted()}.json`,
+    );
 };
 const exportPoliciesBySelection = () => {
-    const selected = policiesFromEndpoints(selectedEndpoints.value);
-    return exportPolicies(selected.length > 0 ? selected : policies.value);
+    return exportPolicies(selects.value.length > 0 ? policiesFromEndpoints(selectedEndpoints.value) : policies.value);
 };
 const openPorts = (row: Firewall.DockerGuardContainer) => {
     detailRef.value?.acceptParams(row);
-};
-const changeOrphanSelection = (rows: Firewall.DockerGuardEndpoint[]) => {
-    orphanSelects.value = rows;
 };
 const removePolicies = async (endpoints: Firewall.DockerGuardEndpoint[], batch: boolean) => {
     const uuids = policyUUIDs(endpoints);
@@ -581,8 +575,11 @@ const removePolicies = async (endpoints: Firewall.DockerGuardEndpoint[], batch: 
 };
 const removeSelectedPolicies = () => removePolicies(selectedEndpoints.value, true);
 const protectionModeLabel = (row: Firewall.DockerGuardEndpoint) => {
+    if (!row.mode) return i18n.global.t('firewall.accept');
     if (row.mode === 'deny_sources') return i18n.global.t('firewall.denySources');
     if (row.mode === 'allow_sources') return i18n.global.t('firewall.allowSources');
+    if (row.mode === 'accept_sources') return i18n.global.t('firewall.acceptSources');
+    if (row.mode === 'accept_all') return i18n.global.t('firewall.acceptAll');
     return i18n.global.t('firewall.denyAll');
 };
 const endpointStatusType = (row: Firewall.DockerGuardEndpoint) => {

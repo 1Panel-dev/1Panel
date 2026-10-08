@@ -9,28 +9,29 @@ var (
 	ErrAdapterUnavailable   = errors.New("firewall rule adapter is unavailable")
 	ErrInventoryUnavailable = errors.New("firewall rule inventory is unavailable")
 	ErrFamilyUnavailable    = errors.New("firewall address family is unavailable")
+	ErrRuleNotFound         = errors.New("firewall rule does not exist")
 )
 
 type ChangeOperation string
 
 const (
 	ChangeCreate  ChangeOperation = "create"
-	ChangeAdopt   ChangeOperation = "adopt"
 	ChangeUpdate  ChangeOperation = "update"
 	ChangeDelete  ChangeOperation = "delete"
 	ChangeReorder ChangeOperation = "reorder"
 )
 
 type RuleChange struct {
-	CommandOnly     bool            `json:"-"`
-	UnmarkedAdopted bool            `json:"-"`
-	Operation       ChangeOperation `json:"operation"`
-	Before          *FirewallRule   `json:"before,omitempty"`
-	After           *FirewallRule   `json:"after,omitempty"`
-	Locator         *Locator        `json:"locator,omitempty"`
-	PreviousMarker  string          `json:"previousMarker,omitempty"`
-	Append          bool            `json:"append,omitempty"`
-	RestoreAtEnd    bool            `json:"restoreAtEnd,omitempty"`
+	Target         *ObservedRule   `json:"-"`
+	Raw            string          `json:"raw,omitempty"`
+	CommandOnly    bool            `json:"-"`
+	Operation      ChangeOperation `json:"operation"`
+	Before         *FirewallRule   `json:"before,omitempty"`
+	After          *FirewallRule   `json:"after,omitempty"`
+	Locator        *Locator        `json:"locator,omitempty"`
+	PreviousMarker string          `json:"previousMarker,omitempty"`
+	Append         bool            `json:"append,omitempty"`
+	RestoreAtEnd   bool            `json:"restoreAtEnd,omitempty"`
 }
 
 type NativeCommand struct {
@@ -69,7 +70,6 @@ func (p CommandBatch) CreatesOnly() bool {
 
 type Adapter interface {
 	Provider() Provider
-	Capabilities(context.Context) (Capabilities, error)
 	ListRules(context.Context, Scope) (RuleSet, error)
 	BuildCommands(RuleSet, []RuleChange) (CommandBatch, error)
 	RunCommands(context.Context, CommandBatch) error

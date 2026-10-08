@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: "火山方舟 Coding Plan"
 # 防火墙
 ErrDockerIptablesChainUnavailable: "未检测到 Docker 的 DOCKER-USER 链，请重启 Docker 后重试"
 ErrDockerNftablesChainUnavailable: "未检测到 Docker 的 nftables IPv4 防火墙链，请确认当前 Docker 版本支持 nftables 防火墙后端，重启 Docker 后重试"
-ErrDockerForwardPolicyDrop: '检测到 {{ .family }} FORWARD 默认策略为 DROP，请调整后重试'
-ErrUFWRuleAdopt: "UFW 规则纳管失败：{{ .detail }}。如果当前 UFW 版本低于 0.35，请先升级 UFW 后重试"
+ErrDockerForwardPolicyDrop: '当前服务器限制了网络转发，暂时无法启用容器端口防护。'
 Firewall: "防火墙"
 FirewallTaskHost: '主机防火墙'
 FirewallTaskForwarding: '端口转发'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: '创建防火墙规则'
 FirewallCreateRulesResult: '创建结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条'
 FirewallRuleOperationResult: '操作结果：成功 {{ .succeeded }} 条，失败 {{ .failed }} 条'
 FirewallCreateRuleSkipped: '未执行'
-FirewallCreateBatchStep: '向 {{ .backend }} 批量提交 {{ .count }} 条规则'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}：{{ .rule }}；转换为 {{ .count }} 条规则'
-FirewallCreateRuleExecutionFailed: '规则创建失败，未入库，已执行的命令不回滚'
-FirewallCreateRulePersistenceFailed: '规则已创建，但纳管信息保存失败'
-FirewallAdoptRulePersistenceFailed: '规则纳管命令已执行，但纳管信息保存失败'
-FirewallSyncOperationsResult: '同步操作汇总：删除成功 {{ .removed }} 条，创建成功 {{ .created }} 条，失败 {{ .failed }} 条，未执行 {{ .skipped }} 条，已一致无需变更 {{ .unchanged }} 条'
-FirewallSyncRuleUnchanged: '已一致，无需变更'
-FirewallSyncStep: "同步规则到 {{ .name }}"
-FirewallSyncFailed: "{{ .failed }} 条防火墙规则同步失败"
-FirewallResetSourceStep: "重置并停用源防火墙 {{ .name }}"
-FirewallResetSourceResult: "源防火墙重置完成，已删除 {{ .removed }} 条数据库规则"
+FirewallCreateRuleExecutionFailed: '规则创建失败，已执行的命令不回滚'
 FirewallInitializeChainsStep: "初始化并绑定 {{ .name }} 基础链"
-FirewallRestoreRulesStep: "恢复数据库规则到 {{ .name }}"
 FirewallSyncWhitelistStep: "同步防火墙端口白名单"
 FirewallEnableForwardingStep: "启用并绑定端口转发链"
 FirewallRestoreForwardingRulesStep: "恢复数据库端口转发规则"
 FirewallInspectDockerGuardStep: "检查 Docker 防火墙后端和防护策略"
 FirewallInitializeDockerGuardStep: "初始化并绑定 {{ .name }} 端口防护链"
 FirewallPersistDockerGuardStep: "保存 Docker 端口防护状态"
-ErrFirewallRuleScopeChange: "当前防火墙不支持修改规则的作用范围（如 IPv4/IPv6 地址族），请新建规则。"
-FirewallWhitelistReleased: "{{ .name }}：已解除白名单保护，放行规则保留；如需关闭端口，请在规则列表手动删除"
-FirewallWhitelistRequired: "{{ .name }}：由系统必需端口规则保护"
 FileTaskCopy: '复制文件到 {{ .dst }}'
 FileTaskMove: '移动文件到 {{ .dst }}'
 FileTaskCompress: '压缩文件到 {{ .dst }}'
@@ -727,11 +713,13 @@ FileTaskDecompress: '解压文件到 {{ .dst }}'
 FileTaskSource: '源路径：{{ .path }}'
 FileTaskFormat: '压缩格式：{{ .format }}'
 FileTaskRename: '目标文件名：{{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "当前后端 {{ .current }} 中仍有 1Panel 规则，请先清理后再切换到 {{ .target }}。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 转发未开启，请先设置 net.ipv4.ip_forward=1，再使用 Docker 防火墙后端。"
 ErrFirewallRuleSavedApplyFailed: "新规则配置已保存，但应用到防火墙失败。可通过同步重试：{{ .detail }}"
+ErrFirewallRuleConflict: "UFW 中已存在匹配条件相同但动作不同的规则，请编辑已有规则。"
+ErrForwardInterfaceNotFound: "转发规则指定的网卡 {{ .name }} 不存在，请检查网卡名称后重试。"
 
 ErrSSHPublicKey: "请输入有效的 SSH 公钥"
 ErrSSHPrivateKey: "SSH 私钥格式无效或密码错误；加密私钥需要填写原密码"
 ErrSSHKeyMismatch: "SSH 公钥与私钥不匹配"
+

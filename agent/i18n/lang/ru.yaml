@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Цепочка Docker DOCKER-USER не найдена. Перезапустите Docker и повторите попытку'
 ErrDockerNftablesChainUnavailable: 'Цепочка IPv4 брандмауэра nftables Docker не найдена. Убедитесь, что текущая версия Docker поддерживает бэкенд брандмауэра nftables, перезапустите Docker и повторите попытку'
-ErrDockerForwardPolicyDrop: 'Политика FORWARD по умолчанию для {{ .family }} — DROP. Измените её и повторите попытку'
-ErrUFWRuleAdopt: 'Не удалось принять правило UFW под управление: {{ .detail }}. Если текущая версия UFW ниже 0.35, обновите UFW и повторите попытку'
+ErrDockerForwardPolicyDrop: 'На этом сервере ограничена пересылка сетевого трафика. Сейчас невозможно включить защиту портов контейнеров.'
 Firewall: 'Межсетевой экран'
 FirewallTaskHost: 'Межсетевой экран хоста'
 FirewallTaskForwarding: 'Перенаправление портов'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'Создание правил межсетевого �
 FirewallCreateRulesResult: 'Результат создания: успешно — {{ .succeeded }}, ошибок — {{ .failed }}, не выполнено — {{ .skipped }}'
 FirewallRuleOperationResult: 'Результат операции: успешно — {{ .succeeded }}, ошибок — {{ .failed }}'
 FirewallCreateRuleSkipped: 'Не выполнено'
-FirewallCreateBatchStep: 'Отправка {{ .count }} правил одним пакетом в {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; преобразовано в {{ .count }} правил'
-FirewallCreateRuleExecutionFailed: 'Не удалось создать правило. Запись в базе данных не сохранена, выполненные команды не отменены'
-FirewallCreateRulePersistenceFailed: 'Правило создано, но не удалось сохранить запись управления'
-FirewallAdoptRulePersistenceFailed: 'Команды принятия правила под управление выполнены, но сохранить запись управления не удалось'
-FirewallSyncOperationsResult: 'Операции синхронизации: удалено {{ .removed }}, создано {{ .created }}, ошибок {{ .failed }}, не выполнено {{ .skipped }}, уже совпадают (изменения не нужны): {{ .unchanged }}'
-FirewallSyncRuleUnchanged: 'Уже совпадает; изменения не нужны'
-FirewallSyncStep: 'Синхронизировать правила с {{ .name }}'
-FirewallSyncFailed: 'Не удалось синхронизировать правил межсетевого экрана: {{ .failed }}'
-FirewallResetSourceStep: 'Сбросить и отключить исходный межсетевой экран {{ .name }}'
-FirewallResetSourceResult: 'Исходный межсетевой экран сброшен; удалено правил из базы данных: {{ .removed }}'
+FirewallCreateRuleExecutionFailed: 'Не удалось создать правило. Выполненные команды не отменены'
 FirewallInitializeChainsStep: 'Инициализировать и привязать базовые цепочки {{ .name }}'
-FirewallRestoreRulesStep: 'Восстановить правила базы данных в {{ .name }}'
 FirewallSyncWhitelistStep: 'Синхронизировать белый список портов межсетевого экрана'
 FirewallEnableForwardingStep: 'Включить и привязать цепочки перенаправления портов'
 FirewallRestoreForwardingRulesStep: 'Восстановить правила перенаправления портов из базы данных'
 FirewallInspectDockerGuardStep: 'Проверить бэкенд межсетевого экрана Docker и политики'
 FirewallInitializeDockerGuardStep: 'Инициализировать и привязать цепочки защиты портов {{ .name }}'
 FirewallPersistDockerGuardStep: 'Сохранить состояние защиты портов Docker'
-ErrFirewallRuleScopeChange: "Текущий межсетевой экран не поддерживает изменение области действия правила (например, семейства адресов IPv4/IPv6). Создайте новое правило."
-FirewallWhitelistReleased: "{{ .name }}: защита списка разрешённых портов снята; разрешающее правило сохранено. Чтобы закрыть порт, удалите правило вручную из списка правил"
-FirewallWhitelistRequired: "{{ .name }}: защищён обязательными правилами системных портов"
 FileTaskCopy: 'Копирование файлов в {{ .dst }}'
 FileTaskMove: 'Перемещение файлов в {{ .dst }}'
 FileTaskCompress: 'Сжатие файлов в {{ .dst }}'
@@ -727,11 +713,13 @@ FileTaskDecompress: 'Распаковка файлов в {{ .dst }}'
 FileTaskSource: 'Исходный путь: {{ .path }}'
 FileTaskFormat: 'Формат архива: {{ .format }}'
 FileTaskRename: 'Имя целевого файла: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "В текущем бэкенде {{ .current }} остались правила 1Panel. Удалите их перед переключением на {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "Пересылка IPv4 отключена. Перед использованием бэкенда межсетевого экрана Docker установите net.ipv4.ip_forward=1."
 ErrFirewallRuleSavedApplyFailed: "Настройки нового правила сохранены, но применить их к межсетевому экрану не удалось. Повторите попытку с помощью синхронизации: {{ .detail }}"
+ErrFirewallRuleConflict: "В UFW уже есть правило с такими же условиями и другим действием. Отредактируйте существующее правило."
+ErrForwardInterfaceNotFound: "Сетевой интерфейс {{ .name }}, указанный в правиле перенаправления, не существует. Проверьте имя и повторите попытку."
 
 ErrSSHPublicKey: "Введите действительный открытый ключ SSH"
 ErrSSHPrivateKey: "Недопустимый закрытый ключ SSH или неверная парольная фраза; для зашифрованных ключей требуется исходная парольная фраза"
 ErrSSHKeyMismatch: "Открытый и закрытый ключи SSH не соответствуют друг другу"
+

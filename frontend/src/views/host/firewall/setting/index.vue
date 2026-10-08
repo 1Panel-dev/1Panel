@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="loading">
+    <div v-loading="loading || ipv6Updating">
         <FireRouter />
         <LayoutContent :title="$t('commons.button.set')">
             <template #prompt>
@@ -74,6 +74,16 @@
                                 <span class="input-help">{{ item.helper }}</span>
                             </el-form-item>
 
+                            <el-form-item :label="$t('firewall.ipv6Support')">
+                                <el-switch
+                                    v-permission
+                                    v-node-admin
+                                    :model-value="settings?.ipv6Enabled !== false"
+                                    :disabled="!settings"
+                                    @change="changeIPv6"
+                                />
+                                <span class="input-help">{{ $t('firewall.ipv6SupportHelper') }}</span>
+                            </el-form-item>
                             <el-form-item :label="$t('firewall.noPing')">
                                 <el-radio-group v-model="pingStatus" @change="changePing">
                                     <el-radio-button v-permission v-node-admin value="Enable">
@@ -102,18 +112,20 @@
         <WhiteList
             ref="whiteListRef"
             :rules="settings?.portWhiteList"
+            :ipv6-enabled="settings?.ipv6Enabled !== false"
             :panel-port="settings?.panelPort"
             :ssh-port="settings?.sshPort"
             :loading="loading"
             @saved="load"
         />
+        <TaskLog ref="ipv6TaskRef" @close="finishIPv6Operation" />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue';
+import { computed, h, ref } from 'vue';
 import { Firewall } from '@/api/interface/firewall';
-import { loadFirewallSettings, operateFire, operateFirewallBackend } from '@/api/modules/firewall';
+import { loadFirewallSettings, operateFire, operateFirewallBackend, operateFirewallIPv6 } from '@/api/modules/firewall';
 import FireRouter from '@/views/host/firewall/index.vue';
 import WhiteList from '@/views/host/firewall/setting/white-list/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -121,9 +133,12 @@ import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { Check } from '@element-plus/icons-vue';
+import TaskLog from '@/components/log/task/index.vue';
 
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
+const ipv6Updating = ref(false);
+const ipv6TaskRef = ref<InstanceType<typeof TaskLog>>();
 const settings = ref<Firewall.Settings>();
 const savedBackends = ref<Record<Firewall.BackendSubsystem, string>>({
     system: '',
@@ -165,7 +180,9 @@ interface BackendInitializationState {
 }
 
 const backendInitializationState = (option: Firewall.BackendOption): BackendInitializationState => {
-    const availableFamilies = [option.ipv4, option.ipv6].filter((status) => status.available);
+    const availableFamilies = (
+        settings.value?.ipv6Enabled === false ? [option.ipv4] : [option.ipv4, option.ipv6]
+    ).filter((status) => status.available);
     if (availableFamilies.length === 0) {
         return option.initialized
             ? { label: 'firewall.initializedStatus', type: 'success' }
@@ -243,7 +260,7 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
         group.selected = previous;
         await ElMessageBox.alert(
             i18n.global.t('firewall.cleanupBeforeBackendSwitch', [previous, backend]),
-            i18n.global.t('firewall.cleanupAction'),
+            i18n.global.t('commons.button.reset'),
             { type: 'warning' },
         );
         return;
@@ -277,7 +294,7 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
         if (result?.errorCode === 'FW_BACKEND_CLEANUP_REQUIRED') {
             await ElMessageBox.alert(
                 i18n.global.t('firewall.cleanupBeforeBackendSwitch', [previous, backend]),
-                i18n.global.t('firewall.cleanupAction'),
+                i18n.global.t('commons.button.reset'),
                 { type: 'warning' },
             );
         } else if (result?.message) {
@@ -288,6 +305,47 @@ const changeBackend = async (subsystem: Firewall.BackendSubsystem, group: Firewa
         }
     } finally {
         loading.value = false;
+    }
+};
+
+const finishIPv6Operation = async () => {
+    ipv6Updating.value = false;
+    await load();
+};
+const changeIPv6 = async (value: string | number | boolean) => {
+    if (ipv6Updating.value || loading.value) return;
+    const enabled = value === true;
+    if (!enabled) {
+        const confirmed = await ElMessageBox.confirm(
+            h(
+                'ul',
+                { class: 'list-disc pl-4 space-y-2' },
+                ['Rules', 'Container', 'Whitelist', 'Network', 'Effect'].map((item) =>
+                    h('li', i18n.global.t(`firewall.ipv6Disable${item}Helper`)),
+                ),
+            ),
+            i18n.global.t('commons.msg.infoTitle'),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        )
+            .then(() => true)
+            .catch(() => false);
+        if (!confirmed) return;
+    }
+    ipv6Updating.value = true;
+    try {
+        const { data } = await operateFirewallIPv6(enabled);
+        if (data.queued && data.taskID) {
+            ipv6TaskRef.value?.openWithTaskID(data.taskID, true);
+        } else {
+            await finishIPv6Operation();
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        }
+    } catch (error) {
+        await finishIPv6Operation();
+        throw error;
     }
 };
 

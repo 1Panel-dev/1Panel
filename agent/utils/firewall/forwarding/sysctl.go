@@ -12,7 +12,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 )
 
-func ensureForwardingSysctls(system forwardingSystem, withIPv6 bool) error {
+func ensureFamilyForwardingSysctls(system forwardingSystem, family string) error {
+	withIPv6 := family == FamilyIPv6
 	if withIPv6 {
 		interfaces, err := IPv6RAInterfaces(system.ReadFile)
 		if err != nil {
@@ -24,7 +25,7 @@ func ensureForwardingSysctls(system forwardingSystem, withIPv6 bool) error {
 	}
 	paths := []string{"/proc/sys/net/ipv4/ip_forward"}
 	if withIPv6 {
-		paths = append(paths, "/proc/sys/net/ipv6/conf/all/forwarding")
+		paths = []string{"/proc/sys/net/ipv6/conf/all/forwarding"}
 	}
 	for _, path := range paths {
 		if err := system.WriteFile(path, []byte("1"), constant.FilePerm); err != nil {
@@ -35,7 +36,7 @@ func ensureForwardingSysctls(system forwardingSystem, withIPv6 bool) error {
 	if err != nil && !errors.Is(err, os.ErrNotExist) {
 		return fmt.Errorf("failed to read /etc/sysctl.conf: %w", err)
 	}
-	content := enableForwardingSysctls(string(data), withIPv6)
+	content := enableFamilyForwardingSysctls(string(data), family)
 	if err := system.WriteFile("/etc/sysctl.conf", []byte(content), constant.FilePerm); err != nil {
 		return fmt.Errorf("failed to persist IP forwarding: %w", err)
 	}
@@ -126,11 +127,11 @@ func IPv6RAInterfaces(readFile func(string) ([]byte, error)) ([]string, error) {
 	return interfaces, nil
 }
 
-func enableForwardingSysctls(content string, withIPv6 bool) string {
+func enableFamilyForwardingSysctls(content, family string) string {
 	lines := strings.Split(strings.TrimRight(content, "\n"), "\n")
 	wanted := map[string]string{"net.ipv4.ip_forward": "net.ipv4.ip_forward = 1"}
-	if withIPv6 {
-		wanted["net.ipv6.conf.all.forwarding"] = "net.ipv6.conf.all.forwarding = 1"
+	if family == FamilyIPv6 {
+		wanted = map[string]string{"net.ipv6.conf.all.forwarding": "net.ipv6.conf.all.forwarding = 1"}
 	}
 	found := make(map[string]bool, len(wanted))
 	for index, line := range lines {

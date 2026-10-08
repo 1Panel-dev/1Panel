@@ -26,41 +26,13 @@
                             :status="baseInfo.isActive ? 'enable' : 'disable'"
                         />
                         <el-tag>{{ $t('app.version') }}: {{ baseInfo.version }}</el-tag>
-                        <el-popover
-                            v-if="familyIssues.length"
-                            placement="bottom"
-                            trigger="hover"
-                            :title="$t('commons.msg.infoTitle')"
-                            :width="300"
-                            popper-class="firewall-family-issue-popper"
-                        >
-                            <template #reference>
-                                <el-icon class="firewall-family-hint-icon" :aria-label="$t('commons.msg.infoTitle')">
-                                    <WarningFilled />
-                                </el-icon>
-                            </template>
-                            <div class="firewall-family-issue-list">
-                                <div
-                                    v-for="issue in familyIssues"
-                                    :key="issue.family"
-                                    class="firewall-family-issue-item"
-                                >
-                                    {{ familyIssueText(issue) }}
-                                </div>
-                            </div>
-                            <div v-if="retryableFamilyIssues.length" class="firewall-family-issue-footer">
-                                <el-button
-                                    v-permission
-                                    v-node-admin
-                                    :loading="familyRetrying"
-                                    size="small"
-                                    type="primary"
-                                    @click.stop="onRetryFamilyIssues"
-                                >
-                                    {{ $t('commons.button.retry') }}
-                                </el-button>
-                            </div>
-                        </el-popover>
+                        <FamilyIssues
+                            :subsystem="isDirectForward ? 'forwarding' : 'system'"
+                            :backend="backendName as Firewall.Provider"
+                            :issues="familyActions"
+                            :disabled="lifecycleBusy"
+                            @complete="loadBaseInfo"
+                        />
                     </div>
                     <div class="mt-0.5">
                         <template v-if="isServiceBackend">
@@ -111,7 +83,14 @@
                             </template>
                         </template>
                         <template v-if="isDirectManaged">
-                            <el-divider v-if="isDirectBase || !anyFamilyBound" direction="vertical" />
+                            <el-divider
+                                v-if="
+                                    isDirectBase
+                                        ? anyFamilyBound || allAvailableFamiliesInitialized || !anyFamilyInitialized
+                                        : !anyFamilyBound
+                                "
+                                direction="vertical"
+                            />
                             <template v-if="isDirectBase">
                                 <el-button
                                     v-if="anyFamilyBound"
@@ -133,7 +112,11 @@
                                 >
                                     {{ $t('commons.button.bind') }}
                                 </el-button>
-                                <el-tooltip v-else :content="initActionHelper" placement="bottom">
+                                <el-tooltip
+                                    v-else-if="!anyFamilyInitialized"
+                                    :content="initActionHelper"
+                                    placement="bottom"
+                                >
                                     <el-button v-permission v-node-admin type="primary" link @click="onInit">
                                         {{ $t('commons.button.init') }}
                                     </el-button>
@@ -161,22 +144,6 @@
                 :closable="false"
                 :title="$t('firewall.directBackendConflictWarning', [backendName, baseInfo.conflictBackend])"
             />
-            <el-alert
-                v-if="props.currentTab === 'forward' && baseInfo.syncError"
-                class="mt-3"
-                type="warning"
-                show-icon
-                :closable="false"
-                :title="baseInfo.syncError"
-            />
-            <el-alert
-                v-if="props.currentTab === 'forward' && forwardDropFamilies"
-                class="mt-3"
-                type="warning"
-                show-icon
-                :closable="false"
-                :title="$t('firewall.forwardPolicyDropWarning', [forwardDropFamilies])"
-            />
         </div>
         <el-alert v-else-if="baseInfo.isExist" class="card-interval" type="error" show-icon :closable="false">
             <template #title>
@@ -199,6 +166,7 @@
             </template>
         </DockerRestart>
         <TaskLog ref="taskLogRef" @close="handleInitializationTaskClose" />
+        <RuleInitialize ref="initializeRef" @initialize="initializeOnly" @complete="loadBaseInfo" />
     </div>
 </template>
 
@@ -218,9 +186,11 @@ import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
 import { loadDockerStatus } from '@/api/modules/container';
-import { Document, WarningFilled } from '@element-plus/icons-vue';
+import { Document } from '@element-plus/icons-vue';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
+import FamilyIssues from '@/views/host/firewall/components/family-issues.vue';
+import RuleInitialize from '@/views/host/firewall/components/rule-initialize.vue';
 import { newUUID } from '@/utils/id';
 
 const props = defineProps({
@@ -242,7 +212,6 @@ const baseInfo = ref<Firewall.FirewallBase>({
     pingStatus: '',
     message: '',
     reason: '',
-    syncError: '',
     ipv4: { available: false, initialized: false, bound: false },
     ipv6: { available: false, initialized: false, bound: false },
 });
@@ -250,7 +219,6 @@ const dockerRef = ref();
 const operation = ref('restart');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
-const familyRetrying = ref(false);
 const taskLogRef = ref();
 const lifecycleSubmitting = ref(false);
 const lifecycleBusy = computed(() => lifecycleSubmitting.value || !!baseInfo.value.lifecycleTaskID);
@@ -266,20 +234,22 @@ const isDirectForward = computed(
     () => props.currentTab === 'forward' && (backendName.value === 'iptables' || backendName.value === 'nftables'),
 );
 const isDirectManaged = computed(() => isDirectBase.value || isDirectForward.value);
-const familyStatuses = computed(
-    () =>
+const familyStatuses = computed(() =>
+    (
         [
             { family: 'IPv4', status: baseInfo.value.ipv4 },
             { family: 'IPv6', status: baseInfo.value.ipv6 },
-        ] as const,
+        ] as const
+    ).filter((item) => item.family === 'IPv4' || baseInfo.value.ipv6Enabled !== false),
 );
 const availableFamilies = computed(() => familyStatuses.value.filter((item) => item.status.available));
-const forwardDropFamilies = computed(() =>
-    familyStatuses.value
+const forwardDropFamilies = computed(() => {
+    if (backendUnavailable.value || !baseInfo.value.isExist || baseInfo.value.message) return '';
+    return familyStatuses.value
         .filter((item) => item.status.forwardPolicy === 'DROP')
         .map((item) => item.family)
-        .join(', '),
-);
+        .join(', ');
+});
 const anyFamilyInitialized = computed(() => availableFamilies.value.some((item) => item.status.initialized));
 const allAvailableFamiliesInitialized = computed(
     () => availableFamilies.value.length > 0 && availableFamilies.value.every((item) => item.status.initialized),
@@ -291,27 +261,38 @@ interface FamilyIssue extends Firewall.BackendFamilyStatus {
 const managedChainName = computed(() => (props.currentTab === 'forward' ? '1PANEL_FORWARD' : '1PANEL_BASIC'));
 const familyIssues = computed<FamilyIssue[]>(() => {
     if (!isDirectManaged.value) return [];
+    if (!anyFamilyInitialized.value && !familyStatuses.value.some((item) => item.status.partial)) return [];
     if (isDirectForward.value) {
         if (familyStatuses.value.every((item) => item.status.bound && !item.status.reason)) return [];
-        return familyStatuses.value.map((item) => ({ family: item.family, ...item.status }));
+        return familyStatuses.value
+            .filter(
+                (item) =>
+                    !item.status.available || !item.status.initialized || !item.status.bound || item.status.reason,
+            )
+            .map((item) => ({ family: item.family, ...item.status }));
     }
-    if (!anyFamilyBound.value) return [];
     return familyStatuses.value
         .filter((item) => !item.status.available || !item.status.initialized || !item.status.bound)
         .map((item) => ({
             family: item.family,
             available: item.status.available,
             initialized: item.status.initialized,
+            partial: item.status.partial,
             bound: item.status.bound,
         }));
 });
-const retryableFamilyIssues = computed(() =>
-    familyIssues.value.filter(
-        (item) =>
-            item.available &&
-            !item.bound &&
-            (!item.reason || (isDirectForward.value && item.reason === 'ipv6_forwarding_not_enabled')),
-    ),
+const familyActions = computed(() =>
+    familyIssues.value.map((issue) => {
+        let action: 'initialize' | 'repair' | 'bind' | undefined;
+        if (issue.available && (!issue.reason || issue.reason === 'ipv6_forwarding_not_enabled') && !issue.bound) {
+            action = issue.partial ? 'repair' : !issue.initialized ? 'initialize' : 'bind';
+        }
+        return {
+            family: issue.family === 'IPv6' ? ('ipv6' as const) : ('ipv4' as const),
+            message: familyIssueText(issue),
+            action,
+        };
+    }),
 );
 const familyIssueText = (issue: FamilyIssue) => {
     if (!issue.available) return i18n.global.t('firewall.familyUnsupported', [issue.family]);
@@ -319,6 +300,7 @@ const familyIssueText = (issue: FamilyIssue) => {
         return i18n.global.t('firewall.ipv6RARisk', [issue.raInterfaces?.join(', ') || '-']);
     }
     if (issue.reason === 'ipv6_ra_check_failed') return i18n.global.t('firewall.ipv6RACheckFailed');
+    if (issue.partial) return i18n.global.t('firewall.familyIncomplete', [issue.family]);
     if (issue.reason === 'ipv6_forwarding_not_enabled') return i18n.global.t('firewall.ipv6ForwardingOnDemand');
     const status = i18n.global.t(
         !issue.initialized ? 'firewall.notInitialized' : issue.bound ? 'commons.status.bound' : 'commons.status.unbind',
@@ -392,46 +374,29 @@ const loadDocker = async () => {
     dockerStatus.value = res.data.isActive;
 };
 
+const initializeRef = ref<InstanceType<typeof RuleInitialize>>();
+
 const onInit = async () => {
-    let chainName = '';
-    let msg = '';
-    switch (props.currentTab) {
-        case 'base':
-            chainName = '1PANEL_BASIC';
-            msg = baseInfo.value.conflictBackend
-                ? i18n.global.t('firewall.initDirectBackendConflictMsg', [
-                      baseInfo.value.name || backendName.value,
-                      baseInfo.value.conflictBackend,
-                  ])
-                : i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
-            break;
-        case 'forward':
-            chainName = '1PANEL_FORWARD';
-            msg = i18n.global.t('firewall.initMsg', [baseInfo.value.name || backendName.value]);
-            break;
-        default:
-            return;
-    }
-    try {
-        await ElMessageBox.confirm(msg, i18n.global.t('commons.button.init'), {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        });
-    } catch {
+    const name = baseInfo.value.name || backendName.value;
+    const message =
+        props.currentTab === 'base' && baseInfo.value.conflictBackend
+            ? i18n.global.t('firewall.initDirectBackendConflictMsg', [name, baseInfo.value.conflictBackend])
+            : i18n.global.t('firewall.initMsg', [name]);
+    await initializeRef.value?.acceptParams(message, true, props.currentTab === 'forward' ? 'forwarding' : 'system');
+};
+
+const initializeOnly = async () => {
+    if (props.currentTab === 'base' && !isDirectBase.value) {
+        await onOperate('start');
         return;
     }
-    if (props.currentTab === 'base') {
-        const result = (await operateFilterChain(chainName, 'init-' + props.currentTab, newUUID())).data;
-        if (result.queued && result.taskID) {
-            taskLogRef.value?.openWithTaskID(result.taskID, true);
-            return;
-        }
-    } else {
-        const result = (await enableForwarding(newUUID())).data;
-        if (result.queued && result.taskID) {
-            taskLogRef.value?.openWithTaskID(result.taskID, true);
-            return;
-        }
+    const result =
+        props.currentTab === 'base'
+            ? (await operateFilterChain('1PANEL_BASIC', 'init-base', newUUID())).data
+            : (await enableForwarding(newUUID())).data;
+    if (result.queued && result.taskID) {
+        taskLogRef.value?.openWithTaskID(result.taskID, true);
+        return;
     }
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await loadBaseInfo();
@@ -453,26 +418,6 @@ const onBind = async () => {
     await operateFilterChain('1PANEL_BASIC', 'bind-base');
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     await loadBaseInfo();
-};
-
-const onRetryFamilyIssues = async () => {
-    if (familyRetrying.value || retryableFamilyIssues.value.length === 0) return;
-    familyRetrying.value = true;
-    try {
-        if (isDirectForward.value) {
-            const result = (await enableForwarding(newUUID())).data;
-            if (result.queued && result.taskID) {
-                taskLogRef.value?.openWithTaskID(result.taskID, true);
-                return;
-            }
-        } else {
-            await operateFilterChain('1PANEL_BASIC', 'bind-base');
-        }
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        await loadBaseInfo();
-    } finally {
-        familyRetrying.value = false;
-    }
 };
 
 const onUnBind = async () => {
@@ -536,41 +481,8 @@ onBeforeUnmount(() => {
 });
 
 defineExpose({
+    forwardDropFamilies,
     acceptParams,
+    openInitialization: onInit,
 });
 </script>
-
-<style lang="scss">
-.firewall-family-hint-icon {
-    align-self: center;
-    color: var(--el-color-warning);
-    font-size: 16px;
-}
-
-.firewall-family-issue-popper.el-popover {
-    padding: 12px;
-    border-color: var(--el-color-warning-light-7);
-    border-radius: 8px;
-    box-shadow: var(--el-box-shadow-light);
-}
-
-.firewall-family-issue-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.firewall-family-issue-item {
-    color: var(--el-text-color-regular);
-    font-size: 13px;
-    line-height: 20px;
-}
-
-.firewall-family-issue-footer {
-    display: flex;
-    justify-content: flex-end;
-    margin-top: 12px;
-    padding-top: 10px;
-    border-top: 1px solid var(--el-border-color-lighter);
-}
-</style>

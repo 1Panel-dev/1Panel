@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Docker DOCKER-USER 체인을 찾을 수 없습니다. Docker를 다시 시작한 후 재시도하세요'
 ErrDockerNftablesChainUnavailable: 'Docker nftables IPv4 방화벽 체인을 찾을 수 없습니다. 현재 Docker 버전이 nftables 방화벽 백엔드를 지원하는지 확인하고 Docker를 다시 시작한 후 재시도하세요'
-ErrDockerForwardPolicyDrop: '{{ .family }} FORWARD 기본 정책이 DROP입니다. 정책을 조정한 후 다시 시도하세요'
-ErrUFWRuleAdopt: 'UFW 규칙 관리에 실패했습니다: {{ .detail }}. 현재 UFW 버전이 0.35 미만이면 UFW를 업그레이드한 후 다시 시도하세요'
+ErrDockerForwardPolicyDrop: '현재 서버에서 네트워크 전달이 제한되어 컨테이너 포트 보호를 활성화할 수 없습니다.'
 Firewall: '방화벽'
 FirewallTaskHost: '호스트 방화벽'
 FirewallTaskForwarding: '포트 포워딩'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: '방화벽 규칙 생성'
 FirewallCreateRulesResult: '생성 결과: 성공 {{ .succeeded }}개, 실패 {{ .failed }}개, 미실행 {{ .skipped }}개'
 FirewallRuleOperationResult: '작업 결과: 성공 {{ .succeeded }}개, 실패 {{ .failed }}개'
 FirewallCreateRuleSkipped: '미실행'
-FirewallCreateBatchStep: '{{ .backend }}에 규칙 {{ .count }}개 일괄 제출'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; 규칙 {{ .count }}개로 변환'
-FirewallCreateRuleExecutionFailed: '규칙 생성에 실패했습니다. 데이터베이스에 저장하지 않았으며 실행된 명령은 롤백하지 않습니다'
-FirewallCreateRulePersistenceFailed: '규칙은 생성되었지만 관리 정보를 저장하지 못했습니다'
-FirewallAdoptRulePersistenceFailed: '규칙 관리 등록 명령은 실행되었지만 관리 정보를 저장하지 못했습니다'
-FirewallSyncOperationsResult: '동기화 작업: 삭제 성공 {{ .removed }}개, 생성 성공 {{ .created }}개, 실패 {{ .failed }}개, 미실행 {{ .skipped }}개, 이미 일치하여 변경 불필요 {{ .unchanged }}개'
-FirewallSyncRuleUnchanged: '이미 일치하여 변경이 필요하지 않음'
-FirewallSyncStep: '{{ .name }}에 규칙 동기화'
-FirewallSyncFailed: '방화벽 규칙 {{ .failed }}개를 동기화하지 못했습니다'
-FirewallResetSourceStep: '원본 방화벽 {{ .name }} 초기화 및 비활성화'
-FirewallResetSourceResult: '원본 방화벽을 초기화하고 데이터베이스 규칙 {{ .removed }}개를 삭제했습니다'
+FirewallCreateRuleExecutionFailed: '규칙 생성에 실패했습니다. 실행된 명령은 롤백하지 않습니다'
 FirewallInitializeChainsStep: '{{ .name }} 기본 체인 초기화 및 바인딩'
-FirewallRestoreRulesStep: '데이터베이스 규칙을 {{ .name }}에 복원'
 FirewallSyncWhitelistStep: '방화벽 포트 허용 목록 동기화'
 FirewallEnableForwardingStep: '포트 전달 체인 활성화 및 바인딩'
 FirewallRestoreForwardingRulesStep: '데이터베이스 포트 전달 규칙 복원'
 FirewallInspectDockerGuardStep: 'Docker 방화벽 백엔드 및 보호 정책 확인'
 FirewallInitializeDockerGuardStep: '{{ .name }} 포트 보호 체인 초기화 및 바인딩'
 FirewallPersistDockerGuardStep: 'Docker 포트 보호 상태 저장'
-ErrFirewallRuleScopeChange: "현재 방화벽에서는 규칙의 적용 범위(예: IPv4/IPv6 주소 패밀리)를 변경할 수 없습니다. 새 규칙을 생성하세요."
-FirewallWhitelistReleased: "{{ .name }}: 허용 목록 보호가 해제되었으며 허용 규칙은 유지됩니다. 포트를 닫으려면 규칙 목록에서 수동으로 삭제하세요"
-FirewallWhitelistRequired: "{{ .name }}: 시스템 필수 포트 규칙으로 보호됩니다"
 FileTaskCopy: '{{ .dst }}에 파일 복사'
 FileTaskMove: '{{ .dst }}로 파일 이동'
 FileTaskCompress: '{{ .dst }}에 파일 압축'
@@ -727,11 +713,13 @@ FileTaskDecompress: '{{ .dst }}에 압축 해제'
 FileTaskSource: '원본 경로: {{ .path }}'
 FileTaskFormat: '압축 형식: {{ .format }}'
 FileTaskRename: '대상 파일 이름: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "현재 백엔드 {{ .current }}에 1Panel 규칙이 남아 있습니다. {{ .target }}로 전환하기 전에 정리하세요."
 ErrDockerIPv4ForwardingDisabled: "IPv4 전달이 비활성화되어 있습니다. Docker 방화벽 백엔드를 사용하기 전에 net.ipv4.ip_forward=1을 설정하세요."
 ErrFirewallRuleSavedApplyFailed: "새 규칙 설정이 저장되었지만 방화벽에 적용하지 못했습니다. 동기화하여 다시 시도하세요: {{ .detail }}"
+ErrFirewallRuleConflict: "UFW에 일치 조건이 같지만 동작이 다른 규칙이 이미 있습니다. 기존 규칙을 편집하세요."
+ErrForwardInterfaceNotFound: "전달 규칙에 지정된 네트워크 인터페이스 {{ .name }}이 존재하지 않습니다. 이름을 확인한 후 다시 시도하세요."
 
 ErrSSHPublicKey: "유효한 SSH 공개 키를 입력하세요"
 ErrSSHPrivateKey: "SSH 개인 키 형식이 잘못되었거나 암호가 틀립니다. 암호화된 키에는 원래 암호가 필요합니다"
 ErrSSHKeyMismatch: "SSH 공개 키와 개인 키가 일치하지 않습니다"
+

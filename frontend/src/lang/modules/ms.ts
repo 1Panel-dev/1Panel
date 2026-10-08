@@ -4314,49 +4314,43 @@ const message = {
         useEAB: 'Gunakan pengesahan EAB',
     },
     firewall: {
+        ipv6Support: 'Sokongan IPv6',
+        ipv6SupportHelper:
+            'Mengawal pengurusan dan penguatkuasaan peraturan tembok api IPv6 tanpa menjejaskan rangkaian IPv6 pelayan.',
+        ipv6DisableContainerHelper: 'Sembunyikan maklumat port IPv6 bekas.',
+        ipv6DisableWhitelistHelper:
+            'Buang peraturan IPv6 daripada senarai dibenarkan dan kekalkan semua peraturan IPv6 sedia ada yang lain.',
+        ipv6DisableRulesHelper: 'Nyahdayakan peraturan IPv6 iptables dan nftables yang diuruskan oleh 1Panel.',
+        ipv6DisableNetworkHelper: 'Ini tidak menyahdayakan rangkaian IPv6 pelayan.',
+        ipv6DisableEffectHelper: 'Sekatan akses IPv6 dan pemajuan port yang terlibat tidak lagi berkuat kuasa.',
+        ipv6Disabled: 'Sokongan IPv6 dinyahdayakan. Dayakannya dalam tetapan tembok api dahulu.',
+        familyRepair: 'Baiki',
+        familyIncomplete: 'Rantaian {0} tidak lengkap',
+        resetWithBackup: 'Sandarkan peraturan dan tetapkan semula',
+        resetOnly: 'Tetapkan semula sahaja',
+        resetWithBackupHelper: 'Simpan peraturan modul semasa sebagai JSON untuk dipulihkan semasa pemulaan.',
+        resetOnlyHelper: 'Padam peraturan semasa tanpa sandaran baharu. Sandaran sedia ada dikekalkan.',
+        backupDirectoryHelper:
+            'Sandaran peraturan yang sah dalam {0} disenaraikan di bawah. Fail terkini dipilih secara lalai.',
+        restoreAllRules: 'Mulakan dan pulihkan peraturan',
+        importRuleBackup: 'Import daripada sandaran',
+        initializeOnly: 'Mulakan sahaja',
+        backupRuleCount: 'Bilangan peraturan',
+        noRuleBackup: 'Tiada sandaran peraturan yang boleh dipulihkan',
+        ruleBackupLoadFailed: 'Gagal memuatkan sandaran peraturan. Cuba lagi atau mulakan tanpa memulihkan sandaran.',
         create: 'Buat peraturan',
         edit: 'Edit peraturan',
         quickJump: 'Akses pantas',
         used: 'Digunakan',
         unUsed: 'Tidak Digunakan',
-        managed: 'Dicipta panel',
-        managedHelper: 'Dicipta dan diselenggara oleh 1Panel. Peraturan ini boleh diedit atau dipadam.',
-        adopted: 'Luaran terurus',
-        adoptedHelper: 'Peraturan sistem sedia ada yang kini diselenggara oleh 1Panel.',
-        external: 'Peraturan luaran',
-        externalHelper:
-            'Peraturan sistem sedia ada yang belum diurus oleh 1Panel. Ia boleh diambil alih apabila diperlukan.',
-        protected: 'Dilindungi sistem',
-        protectedHelper:
-            'Peraturan terbina dalam dan peraturan yang sepadan tepat dengan senarai putih tidak boleh diedit atau dipadam.',
-        stateShort: {
-            managed: 'Panel',
-            adopted: 'Terurus',
-            external: 'Luaran',
-            protected: 'Dilindungi',
-            drifted: 'Berbeza',
-        },
+        whitelist: 'Senarai dibenarkan',
+        builtinRuleProtected: 'Peraturan perlindungan terbina dalam sistem. Ia tidak boleh diedit atau dipadam.',
+        whitelistRuleProtected:
+            'Peraturan senarai dibenarkan hanya membenarkan perubahan susunan dan penerangan. Untuk perubahan lain, pergi ke Tetapan → Senarai port yang dibenarkan.',
         ruleTargetRequired: 'Masukkan sekurang-kurangnya satu alamat IP atau port',
-        resolution_adopt: 'Ambil alih pengurusan',
-        plan_duplicate_rules:
-            'Peraturan pendua dengan syarat dan tindakan yang sama tidak boleh diambil alih untuk diurus. Padam peraturan pendua secara manual dan cuba lagi.',
-        adoptRuleConfirm:
-            'Selepas diambil alih, 1Panel boleh menyelenggara dan memadam peraturan sedia ada ini. Teruskan?',
-        plan_exact_rule_conflict:
-            'Peraturan dengan syarat padanan yang sama mempunyai tindakan benarkan atau sekat yang bertentangan.',
-        allRulesAlreadyExist: 'Kesemua {0} peraturan yang diperiksa sudah wujud. Tiada peraturan baharu untuk dicipta.',
-        plan_managed_rule_drifted:
-            'Peraturan terurus tidak sepadan dengan tembok api aktif. Selesaikan perbezaan dahulu.',
-        plan_opaque_rule_in_target_scope:
-            'Skop sasaran mengandungi peraturan yang tidak dapat dihuraikan dengan selamat. Operasi dihentikan.',
-        plan_runtime_permanent_mismatch: 'Konfigurasi tembok api aktif dan kekal berbeza. Segerakkan dahulu.',
-        plan_protected_rule: 'Peraturan ini dilindungi dan tidak boleh diambil alih, diubah atau dipadam.',
-        plan_blocked: 'Peraturan ini tidak dapat digunakan dengan selamat. Muat semula senarai dan cuba lagi.',
         largeRuleSet:
             'Terlalu banyak peraturan tembok api boleh melambatkan operasi. Penggunaan iptables atau nftables disyorkan.',
-        scopeDefaultMismatch: 'Zon lalai sistem ialah {0}; halaman ini hanya mengurus zon public.',
         scopeMissing: 'Skop terurus {0} tiada dan akan dicipta dengan selamat apabila peraturan pertama digunakan.',
-        scopeUnmanagedActive: 'Skop aktif lain dikesan: {0}. 1Panel tidak akan mengubah peraturannya.',
         dockerRestart: 'Operasi firewall memerlukan memulakan semula perkhidmatan Docker',
         firewallHelper: '{0} firewall sistem',
         firewallNotStart: 'Firewall sistem belum diaktifkan. Aktifkannya dahulu.',
@@ -4381,7 +4375,7 @@ const message = {
         systemFirewall: 'Tembok api hos',
         systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
         forwardPolicyDropWarning:
-            'Dasar FORWARD lalai untuk {0} ialah DROP. Trafik yang dimajukan ke hos lain mungkin disekat melainkan dibenarkan secara jelas oleh peraturan iptables/ip6tables. Semak peraturan kebenaran untuk versi IP yang berkenaan.',
+            'Pelayan ini mengehadkan pemajuan rangkaian. Peraturan pemajuan port mungkin tidak berfungsi.',
         forwardingHelper: 'Mengurus peraturan pemajuan port.',
         dockerFirewallHelper: 'Memilih cara 1Panel mengurus perlindungan port bekas.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, percubaan',
@@ -4390,6 +4384,8 @@ const message = {
         addressFamily: 'Versi IP',
         portOrRange: 'Port / julat',
         batchLimit: 'Cipta atau import maksimum {0} peraturan setiap kelompok selepas pengembangan.',
+        importDuplicatesRemoved:
+            '{0} peraturan pendua telah dibuang, termasuk pendua dalam fail dan peraturan yang sudah wujud.',
         importLimit:
             'Import sehingga {0} peraturan (dikira selepas pengembangan), dengan saiz fail tidak melebihi {1} KB.',
         ruleSyncTitle: 'Segerakkan peraturan',
@@ -4408,19 +4404,9 @@ const message = {
         ruleSyncBlocked: 'Tidak tersedia',
         ruleSyncReason: 'Hasil semakan',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: 'Peraturan sudah sepadan dengan dasar pangkalan data.',
-            managedOrderDiffers: 'Susunan peraturan terurus berbeza daripada turutan pangkalan data.',
-            managedOnlyInTarget: 'Peraturan terurus hanya wujud dalam tembok api sasaran.',
-            managedRuntimeCannotRemove: 'Peraturan aktif terurus tidak dapat dipadam dengan selamat.',
             missingFromTarget: 'Peraturan tiada dalam tembok api sasaran.',
-            targetDiffers: 'Peraturan sasaran berbeza daripada dasar pangkalan data.',
             alreadyExistsInTarget: 'Peraturan sudah wujud dalam tembok api sasaran.',
             onlyInTarget: 'Peraturan hanya wujud dalam tembok api sasaran.',
-            stale: 'Keadaan peraturan tembok api sudah lapuk. Muat semula dan cuba lagi.',
-            protectedRule: 'Peraturan tembok api yang dilindungi ini tidak boleh diubah.',
-            dockerAcceptReadOnly:
-                'Peraturan ACCEPT ini adalah baca sahaja dan akan dikekalkan semasa peraturan lain disegerakkan. Untuk membuangnya, padam secara manual pada hos.',
-            cannotReconcile: 'Peraturan sasaran tidak dapat disegerakkan: {0}',
         },
         ruleSyncPartial: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} gagal.',
         ruleSyncSuccess: 'Penyegerakan selesai: {0} berjaya, {1} sudah wujud dan {2} dipadam.',
@@ -4430,17 +4416,19 @@ const message = {
             remove: 'Untuk dipadam',
             blocked: 'Tidak tersedia',
         },
-        resetDirectRulesHelper:
-            'Padam rantaian, peraturan masa jalan dan fail berterusan tembok api sistem 1Panel daripada {0}; dasar pangkalan data yang disimpan dikekalkan',
+        initializeFromFile: 'Mulakan daripada fail',
+        downloadRuleBackup: 'Muat turun sandaran peraturan',
+        importFileHelper:
+            'Import fail JSON sehingga 64 MB secara kelompok mengikut susunan fail. Peraturan yang tidak dapat ditukar akan dilaporkan sebagai ralat.',
+        resetDirectRulesHelper: 'Padam semua rantai tembok api hos 1Panel, peraturan aktif dan fail kekal dalam {0}.',
         resetWhitelistRulesHelper:
-            'Tetapkan semula konfigurasi tersuai aktif dalam {0}, pulihkan tetapan pemasangan asal dan nyahdayakan {0}; dasar pangkalan data dikekalkan dan boleh disegerakkan semula.',
+            'Tetapkan semula konfigurasi tersuai {0}, pulihkan tetapan lalai dan nyahaktifkannya.',
         cleanupForwardingBackendHelper:
-            'Tetapkan semula peraturan masa jalan pemajuan port 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
+            'Padam semua peraturan pemajuan, rantaian dan fail pemulihan automatik 1Panel daripada {0}. Sandaran JSON sedia ada dikekalkan.',
         cleanupDockerBackendHelper:
-            'Tetapkan semula peraturan masa jalan perlindungan port Docker 1Panel dalam {0}: padam semua peraturan dan rantaian berkaitan sambil mengekalkan data pangkalan data',
+            'Padam semua peraturan perlindungan Docker, rantaian dan fail pemulihan automatik 1Panel daripada {0}. Sandaran JSON sedia ada dikekalkan.',
         cleanupBeforeBackendSwitch:
-            'Bahagian belakang semasa {0} masih mengandungi peraturan masa jalan 1Panel. Tetapkan semula sebelum bertukar kepada {1}. Penetapan semula hanya membersihkan peraturan masa jalan; dasar pangkalan data dikekalkan dan boleh dimulakan atau disegerakkan selepas penukaran.',
-        cleanupAction: 'Tetapkan semula',
+            'Tetapkan semula {0} semasa sebelum beralih kepada {1} dan sahkan cara peraturannya akan dipulihkan.',
         backendSwitchNotice:
             'Disyorkan untuk mengaktifkan hanya satu kaedah pengurusan tembok api. Menjalankan berbilang tembok api serentak boleh menyebabkan konflik peraturan, status tidak konsisten atau masalah akses port kontena.',
         switchBackendHelper: 'Tukar kepada {0}?',
@@ -4486,8 +4474,7 @@ const message = {
         portDetails: 'Butiran port',
         orphanEndpoints: 'Titik akhir tidak berkaitan',
         orphanPolicies: 'Peraturan tidak berkaitan',
-        orphanPoliciesHelper:
-            '{0} peraturan berikut belum terikat pada port Docker. Peraturan akan diikat secara automatik apabila port sepadan dikesan.',
+        orphanPoliciesHelper: '{0} peraturan sistem ini tiada port Docker terbitan yang sepadan.',
         composeOrApp: 'Compose / Aplikasi',
         sources: 'Sumber',
         deniedSources: 'Sumber ditolak',
@@ -4496,6 +4483,8 @@ const message = {
         protectionMode: 'Mod perlindungan',
         denySources: 'Tolak sumber tertentu',
         allowSources: 'Benarkan sumber tertentu sahaja',
+        acceptSources: 'Terima sumber yang ditentukan secara langsung',
+        acceptAll: 'Terima semua trafik secara langsung',
         denyAll: 'Tolak semua akses',
         dockerGuardMixedFamilyHelper:
             'IPv4 dan IPv6 dipilih. Konfigurasikan dasar berasaskan sumber secara berasingan; tolak semua boleh digunakan terus.',
@@ -4538,7 +4527,7 @@ const message = {
             'Nyahikat - Apabila tidak terikat, semua peraturan firewall yang ditambah akan menjadi tidak sah. Teruskan dengan berhati-hati. Sahkan?',
         portWhiteList: 'Senarai putih port',
         whitelistConfigHelper:
-            'Senarai dibenarkan hanya menyimpan konfigurasi dan melindungi peraturan kebenaran yang sepadan. Peraturan yang tiada ditambah semasa mula, mula semula, pemulaan atau penyegerakan. Mengedit atau memadam entri tidak membuang peraturan sedia ada.',
+            'Menyimpan senarai dibenarkan menambah peraturan kebenaran yang tiada dan melindungi peraturan yang sepadan. Mengedit atau memadam entri senarai tidak memadam peraturan sedia ada.',
         whitelistDeleteConfirm:
             'Hanya entri senarai putih ini akan dipadam. Peraturan tembok api sedia ada akan dikekalkan. Teruskan?',
         portWhiteListHelper:
@@ -4556,7 +4545,7 @@ const message = {
         whitelistServicePortsHelper:
             'Masukkan satu port (1-65535). Ini tidak mengubah port pendengaran perkhidmatan. Menukar port dalam tetapan perkhidmatan turut mengemas kini entri senarai putih ini.',
         whitelistSourcesHelper:
-            'Masukkan alamat IP atau julat CIDR, dipisahkan dengan koma atau baris baharu. Biarkan kosong untuk membenarkan semua sumber IPv4 dan IPv6.',
+            'Masukkan alamat IP atau julat CIDR, dipisahkan dengan koma atau baris baharu. Biarkan kosong untuk membenarkan {0}.',
         destinationPortPlaceholder: 'contoh: 80, 80,443 atau 8080-8089',
         deleteRuleConfirm: 'Akan memadam {0} peraturan. Teruskan?',
         deleteUsedRuleConfirm:

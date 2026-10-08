@@ -33,12 +33,6 @@ func NewAdapterWithBackend(backend Backend) *Adapter { return &Adapter{backend: 
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderNftables }
 
-func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
-	return filter.Capabilities{
-		Marker: true, OwnedChains: true, ExplicitPosition: true,
-	}, nil
-}
-
 func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
 	rule, err := filter.NormalizeRule(rule)
 	if err != nil {
@@ -164,7 +158,7 @@ func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleCh
 		return filter.CommandBatch{}, fmt.Errorf("%w: nftables mutation requires exactly one change", filter.ErrInvalidRule)
 	}
 	change := changes[0]
-	if change.Operation != filter.ChangeUpdate && change.Operation != filter.ChangeAdopt && change.Operation != filter.ChangeReorder {
+	if change.Operation != filter.ChangeUpdate && change.Operation != filter.ChangeReorder {
 		return filter.CommandBatch{}, fmt.Errorf("%w: unsupported nftables mutation %s", filter.ErrInvalidRule, change.Operation)
 	}
 	expected, previous, err := compileChange(snapshot, change)
@@ -180,7 +174,9 @@ func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleCh
 	target := *expected.Locator.Position
 	var script string
 	if target == *previous.Locator.Position {
-		if change.Operation != filter.ChangeReorder {
+		if change.Operation == filter.ChangeReorder {
+			rulePlan.Expected = *previous
+		} else {
 			script = fmt.Sprintf("replace rule %s handle %s %s\n", chain, handle, expected.Raw)
 			if strings.ContainsAny(previous.Raw, "\r\n") || previous.Raw == "" {
 				return filter.CommandBatch{}, fmt.Errorf("%w: invalid native nftables rule", filter.ErrInvalidRule)
@@ -213,17 +209,17 @@ func compileDeleteBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (f
 	plan := filter.CommandBatch{Provider: filter.ProviderNftables, Scope: snapshot.Scope, CommandOnly: true}
 	var script strings.Builder
 	for _, change := range changes {
-		expected, previous, err := compileChange(snapshot, change)
-		if err != nil {
-			return filter.CommandBatch{}, err
+		if change.Target == nil || change.Target.Rule.Scope.Key() != snapshot.Scope.Key() || change.Target.Raw == "" {
+			return filter.CommandBatch{}, filter.ErrInvalidRule
 		}
-		handle := previous.Locator.NativeID
-		if _, err := strconv.ParseUint(handle, 10, 64); err != nil || change.Locator.NativeID != handle {
-			return filter.CommandBatch{}, filter.ErrRuleStale
+		handle := change.Target.Locator.NativeID
+		if _, err := strconv.ParseUint(handle, 10, 64); err != nil {
+			return filter.CommandBatch{}, filter.ErrInvalidRule
 		}
+		target := parseRule(snapshot.Scope, change.Target.Raw, handle, 0)
 		fmt.Fprintf(&script, "delete rule %s %s %s handle %s\n", nftables_helper.TableFamily(snapshot.Scope.Family), nftables_helper.TableName, nativeChainName(snapshot.Scope), handle)
 		plan.Rules = append(plan.Rules, filter.RuleCommands{
-			RuleUUID: ruleUUID(change), Operation: filter.ChangeDelete, Previous: previous, Expected: expected,
+			Operation: filter.ChangeDelete, Previous: &target, Expected: target,
 		})
 	}
 	plan.Rules[0].Commands = []filter.NativeCommand{{Executable: "nft", Stdin: script.String()}}
@@ -234,6 +230,16 @@ func compileCreateBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (f
 	plan := filter.CommandBatch{Provider: filter.ProviderNftables, Scope: snapshot.Scope, CommandOnly: true}
 	var script strings.Builder
 	for _, change := range changes {
+		if change.Raw != "" {
+			if strings.ContainsAny(change.Raw, "\r\n;\x00") {
+				return filter.CommandBatch{}, filter.ErrInvalidRule
+			}
+			expected := parseRule(snapshot.Scope, change.Raw, "", len(snapshot.Rules)+1)
+			expected.Locator.Position = nil
+			fmt.Fprintf(&script, "add rule %s %s %s %s\n", nftables_helper.TableFamily(snapshot.Scope.Family), nftables_helper.TableName, nativeChainName(snapshot.Scope), change.Raw)
+			plan.Rules = append(plan.Rules, filter.RuleCommands{Operation: filter.ChangeCreate, Expected: expected})
+			continue
+		}
 		if change.After == nil {
 			return filter.CommandBatch{}, fmt.Errorf("%w: create rule is required", filter.ErrInvalidRule)
 		}
@@ -664,7 +670,11 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 		return fmt.Errorf("unexpected nftables executable %q", command.Executable)
 	}
 	if command.Stdin != "" {
-		return nftables_helper.RunScriptContext(ctx, command.Stdin)
+		err := nftables_helper.RunScriptContext(ctx, command.Stdin)
+		if err != nil && strings.Contains(err.Error(), "No such file or directory") && strings.HasPrefix(command.Stdin, "delete rule ") {
+			return fmt.Errorf("%w: %v", filter.ErrRuleNotFound, err)
+		}
+		return err
 	}
 	return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second)).
 		RunWithOptionalSudo(command.Executable, command.Args...)

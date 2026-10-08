@@ -9,18 +9,39 @@ import (
 )
 
 func LoadInitStatus(tab string) (bool, bool, error) {
-	return loadInitStatus(tab, RunWithStd, true)
+	return loadInitStatus(tab, RunWithStd)
 }
 
 func LoadFamilyInitStatus(family, tab string) (bool, bool, error) {
+	initialized, bound, _, err := LoadFamilyState(family, tab)
+	return initialized, bound, err
+}
+
+func LoadFamilyState(family, tab string) (bool, bool, bool, error) {
+	runner := RunWithStd
 	switch family {
 	case constant.FirewallFamilyIPv4:
-		return loadInitStatus(tab, RunWithStd, true)
 	case constant.FirewallFamilyIPv6:
-		return loadInitStatus(tab, RunIPv6WithStd, true)
+		runner = RunIPv6WithStd
 	default:
-		return false, false, fmt.Errorf("unsupported iptables family %q", family)
+		return false, false, false, fmt.Errorf("unsupported iptables family %q", family)
 	}
+	if tab != "base" {
+		return false, false, false, nil
+	}
+	output, err := runner(FilterTab, "-S")
+	if err != nil {
+		return false, false, false, err
+	}
+	count := 0
+	for _, chain := range BasicChains() {
+		if containsIptablesRule(output, "-N "+chain) {
+			count++
+		}
+	}
+	initialized := count == len(BasicChains())
+	_, bound := checkWithInitAndBind([]string{"-N " + BasicBeforeChain, "-N " + BasicChain, "-N " + BasicAfterChain}, []string{"-A INPUT -j " + BasicBeforeChain, "-A INPUT -j " + BasicChain, "-A INPUT -j " + BasicAfterChain}, strings.Split(output, "\n"))
+	return initialized, bound, count > 0 && !initialized, nil
 }
 
 func LoadFamilyBindStatus(family string) (bool, error) {
@@ -54,7 +75,7 @@ func hasBaseChainBinding(output string) bool {
 	return false
 }
 
-func loadInitStatus(tab string, runner func(string, ...string) (string, error), requireTerminalRules bool) (bool, bool, error) {
+func loadInitStatus(tab string, runner func(string, ...string) (string, error)) (bool, bool, error) {
 	switch tab {
 	case "base":
 		filterRules, err := runner(FilterTab, "-S")
@@ -66,14 +87,6 @@ func loadInitStatus(tab string, runner func(string, ...string) (string, error), 
 			"-N " + BasicBeforeChain,
 			"-N " + BasicChain,
 			"-N " + BasicAfterChain,
-			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(IoRuleIn, "'", "\""), " -j ACCEPT", "")),
-			fmt.Sprintf("-A %s %s -j ACCEPT", BasicBeforeChain, strings.ReplaceAll(strings.ReplaceAll(EstablishedRule, "'", "\""), " -j ACCEPT", "")),
-		}
-		if requireTerminalRules {
-			initRules = append(initRules,
-				fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllTcp),
-				fmt.Sprintf("-A %s %s", BasicAfterChain, DropAllUdp),
-			)
 		}
 		bindRules := []string{
 			fmt.Sprintf("-A %s -j %s", InputChain, BasicBeforeChain),
@@ -88,15 +101,9 @@ func loadInitStatus(tab string, runner func(string, ...string) (string, error), 
 }
 
 func checkWithInitAndBind(initRules, bindRules []string, lines []string) (bool, bool) {
+	output := strings.Join(lines, "\n")
 	for _, rule := range initRules {
-		found := false
-		for _, line := range lines {
-			if strings.TrimSpace(line) == strings.TrimSpace(rule) {
-				found = true
-				break
-			}
-		}
-		if !found {
+		if !containsIptablesRule(output, rule) {
 			if global.LOG != nil {
 				global.LOG.Debugf("not found init rule: %s", rule)
 			}

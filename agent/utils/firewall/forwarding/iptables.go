@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
 	"strconv"
 	"strings"
 	"time"
@@ -13,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	firewallutil "github.com/1Panel-dev/1Panel/agent/utils/firewall"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/iptables_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 	"github.com/mattn/go-shellwords"
@@ -29,33 +31,35 @@ type iptablesBackend interface {
 	LoadIPv6RulesFromFile(table, chain, fileName string) error
 }
 
-type systemIptablesBackend struct{}
+type systemIptablesBackend struct{ ctx context.Context }
 
 func (systemIptablesBackend) IPv6Available() bool {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	return err == nil && commands.IPv6Available()
 }
 
-func (systemIptablesBackend) Run(table string, args ...string) error {
-	return iptables_helper.Run(table, args...)
+func (b systemIptablesBackend) Run(table string, args ...string) error {
+	_, err := iptables_helper.RunWithStdContext(b.ctx, table, args...)
+	return err
 }
 
-func (systemIptablesBackend) RunWithStd(table string, args ...string) (string, error) {
+func (b systemIptablesBackend) RunWithStd(table string, args ...string) (string, error) {
 	if len(args) == 1 && args[0] == "-S" {
-		return iptables_helper.ReadTable(context.Background(), table, false)
+		return iptables_helper.ReadTable(b.ctx, table, false)
 	}
-	return iptables_helper.RunWithStd(table, args...)
+	return iptables_helper.RunWithStdContext(b.ctx, table, args...)
 }
 
-func (systemIptablesBackend) RunIPv6(table string, args ...string) error {
-	return iptables_helper.RunIPv6(table, args...)
+func (b systemIptablesBackend) RunIPv6(table string, args ...string) error {
+	_, err := iptables_helper.RunIPv6WithStdContext(b.ctx, table, args...)
+	return err
 }
 
-func (systemIptablesBackend) RunIPv6WithStd(table string, args ...string) (string, error) {
+func (b systemIptablesBackend) RunIPv6WithStd(table string, args ...string) (string, error) {
 	if len(args) == 1 && args[0] == "-S" {
-		return iptables_helper.ReadTable(context.Background(), table, true)
+		return iptables_helper.ReadTable(b.ctx, table, true)
 	}
-	return iptables_helper.RunIPv6WithStd(table, args...)
+	return iptables_helper.RunIPv6WithStdContext(b.ctx, table, args...)
 }
 
 func (systemIptablesBackend) Restore(ctx context.Context, family, input string) error {
@@ -76,7 +80,7 @@ func (systemIptablesBackend) Restore(ctx context.Context, family, input string) 
 	if err == nil && strings.TrimSpace(stderr.String()) != "" {
 		err = fmt.Errorf("firewall command warning: %s", strings.TrimSpace(stderr.String()))
 	}
-	return firewallutil.WrapBatchCommandError(executable+" --noflush --wait", input, err)
+	return errors.Join(firewallutil.WrapBatchCommandError(executable+" --noflush --wait", input, err), ctx.Err())
 }
 
 func (systemIptablesBackend) LoadRulesFromFile(table, chain, fileName string) error {
@@ -103,15 +107,17 @@ func (defaultForwardingSystem) WriteFile(name string, data []byte, perm os.FileM
 }
 
 type Iptables struct {
+	ctx      context.Context
 	provider string
 	backend  iptablesBackend
 	system   forwardingSystem
 }
 
-func NewIptables(provider string) *Iptables {
+func NewIptables(ctx context.Context, provider string) *Iptables {
 	return &Iptables{
+		ctx:      ctx,
 		provider: provider,
-		backend:  systemIptablesBackend{},
+		backend:  systemIptablesBackend{ctx: ctx},
 		system:   defaultForwardingSystem{},
 	}
 }
@@ -130,6 +136,9 @@ func (l *Iptables) List() ([]Rule, error) {
 		return rules, nil
 	}
 	stdout, err = l.backend.RunIPv6WithStd(iptables_helper.NatTab, "-S")
+	if errors.Is(err, filter.ErrFamilyUnavailable) {
+		return rules, nil
+	}
 	if err != nil {
 		return nil, fmt.Errorf("failed to list IPv6 NAT rules: %w", err)
 	}
@@ -156,31 +165,25 @@ func (l *Iptables) ReplaceRules(rules []Rule) error {
 			}
 			continue
 		}
-		if family == FamilyIPv6 {
-			if len(byFamily[family]) > 0 {
-				if err := ensureForwardingSysctls(l.system, true); err != nil {
-					failures = append(failures, err)
-					continue
-				}
-			} else {
-				initialized, _, err := l.familyInitStatus(family)
-				if err != nil {
-					failures = append(failures, err)
-					continue
-				}
-				if !initialized {
-					continue
-				}
-			}
+		initialized, _, err := l.FamilyStatus(family)
+		if family == FamilyIPv6 && len(byFamily[family]) == 0 && errors.Is(err, filter.ErrFamilyUnavailable) {
+			continue
 		}
-		if err := l.batchEnsureChains(family); err != nil {
-			return err
+		if err != nil {
+			failures = append(failures, err)
+			continue
+		}
+		if !initialized {
+			if len(byFamily[family]) > 0 {
+				failures = append(failures, fmt.Errorf("%s forwarding chains are not initialized", family))
+			}
+			continue
 		}
 		script, err := buildIptablesForwardScript(byFamily[family], OperationAdd, true)
 		if err != nil {
 			return err
 		}
-		if err := l.backend.Restore(context.Background(), family, script); err != nil {
+		if err := l.backend.Restore(l.ctx, family, script); err != nil {
 			return fmt.Errorf("restore %s forwarding rules: %w", family, err)
 		}
 	}
@@ -198,17 +201,6 @@ func (l *Iptables) CreateRules(ctx context.Context, rules []Rule) error {
 	family := rules[0].Family
 	if family == "" {
 		family = FamilyIPv4
-	}
-	if family == FamilyIPv6 {
-		if !l.backend.IPv6Available() {
-			return fmt.Errorf("ip6tables command family is unavailable")
-		}
-		if err := ensureForwardingSysctls(l.system, true); err != nil {
-			return err
-		}
-		if err := l.batchEnsureChains(family); err != nil {
-			return err
-		}
 	}
 	return l.backend.Restore(ctx, family, script)
 }
@@ -310,14 +302,21 @@ func isRemoteTarget(family, target string) bool {
 	return target != "" && target != "127.0.0.1" && target != "localhost"
 }
 
-func (l *Iptables) Enable() error {
-	if err := ensureForwardingSysctls(l.system, false); err != nil {
+func (l *Iptables) Enable(families ...string) error {
+	if err := l.OperateFamily(FamilyIPv4, true); err != nil {
 		return err
 	}
-	return l.batchEnsureChains(FamilyIPv4)
+	if len(families) > 0 && !slices.Contains(families, FamilyIPv6) {
+		return nil
+	}
+	initialized, _, err := l.FamilyStatus(FamilyIPv6)
+	if err != nil || !initialized {
+		return err
+	}
+	return l.OperateFamily(FamilyIPv6, false)
 }
 
-func (l *Iptables) batchEnsureChains(family string) error {
+func (l *Iptables) batchEnsureChains(family string, initialize bool) error {
 	list := l.backend.RunWithStd
 	if family == FamilyIPv6 {
 		list = l.backend.RunIPv6WithStd
@@ -330,11 +329,16 @@ func (l *Iptables) batchEnsureChains(family string) error {
 		}
 		outputs[table] = output
 	}
+	if !initialize && (!containsExactLine(outputs[iptables_helper.NatTab], "-N "+ChainPreRouting) ||
+		!containsExactLine(outputs[iptables_helper.NatTab], "-N "+ChainPostRouting) ||
+		!containsExactLine(outputs[iptables_helper.FilterTab], "-N "+ChainForward)) {
+		return fmt.Errorf("%s forwarding chains are not initialized", family)
+	}
 	script := buildIptablesForwardLifecycleScript(outputs, true)
 	if script == "" {
 		return nil
 	}
-	if err := l.backend.Restore(context.Background(), family, script); err != nil {
+	if err := l.backend.Restore(l.ctx, family, script); err != nil {
 		return fmt.Errorf("batch initialize %s forwarding chains: %w", family, err)
 	}
 	return nil
@@ -359,7 +363,7 @@ func (l *Iptables) Cleanup() error {
 		}
 		script := buildIptablesForwardLifecycleScript(outputs, false)
 		if script != "" {
-			if err := l.backend.Restore(context.Background(), family, script); err != nil {
+			if err := l.backend.Restore(l.ctx, family, script); err != nil {
 				return fmt.Errorf("batch delete %s forwarding chains: %w", family, err)
 			}
 		}
@@ -518,6 +522,9 @@ func (l *Iptables) InitStatus() (bool, bool, error) {
 		return ipv4Init, ipv4Bind, nil
 	}
 	ipv6Init, ipv6Bind, err := l.familyInitStatus(FamilyIPv6)
+	if errors.Is(err, filter.ErrFamilyUnavailable) {
+		return ipv4Init, ipv4Bind, nil
+	}
 	if err != nil {
 		return false, false, err
 	}
@@ -525,6 +532,14 @@ func (l *Iptables) InitStatus() (bool, bool, error) {
 }
 
 func (l *Iptables) familyInitStatus(family string) (bool, bool, error) {
+	initialized, bound, _, err := l.FamilyState(family)
+	return initialized, bound, err
+}
+
+func (l *Iptables) FamilyState(family string) (bool, bool, bool, error) {
+	if family == FamilyIPv6 && !l.backend.IPv6Available() {
+		return false, false, false, nil
+	}
 	sysctlPath := "/proc/sys/net/ipv4/ip_forward"
 	label := "IPv4"
 	list := l.backend.RunWithStd
@@ -535,27 +550,24 @@ func (l *Iptables) familyInitStatus(family string) (bool, bool, error) {
 	}
 	data, err := l.system.ReadFile(sysctlPath)
 	if family == FamilyIPv6 && errors.Is(err, os.ErrNotExist) {
-		return false, false, nil
+		return false, false, false, nil
 	}
 	if err != nil {
-		return false, false, fmt.Errorf("read %s forwarding status: %w", label, err)
+		return false, false, false, fmt.Errorf("read %s forwarding status: %w", label, err)
 	}
 	forwardingEnabled := strings.TrimSpace(string(data)) != "0"
 	natRules, err := list(iptables_helper.NatTab, "-S")
 	if err != nil {
-		return false, false, fmt.Errorf("list %s NAT initialization rules: %w", label, err)
+		return false, false, false, fmt.Errorf("list %s NAT initialization rules: %w", label, err)
 	}
 	natInit, natBind := checkInitAndBind(
 		[]string{"-N " + ChainPreRouting, "-N " + ChainPostRouting},
 		[]string{"-A PREROUTING -j " + ChainPreRouting, "-A POSTROUTING -j " + ChainPostRouting},
 		strings.Split(natRules, "\n"),
 	)
-	if !natInit {
-		return false, false, nil
-	}
 	filterRules, err := list(iptables_helper.FilterTab, "-S")
 	if err != nil {
-		return false, false, fmt.Errorf("list %s filter initialization rules: %w", label, err)
+		return false, false, false, fmt.Errorf("list %s filter initialization rules: %w", label, err)
 	}
 	filterInit, _ := checkInitAndBind(
 		[]string{"-N " + ChainForward},
@@ -563,7 +575,9 @@ func (l *Iptables) familyInitStatus(family string) (bool, bool, error) {
 		strings.Split(filterRules, "\n"),
 	)
 	filterBind := forwardBindingEffective(filterRules)
-	return natInit && filterInit, forwardingEnabled && natBind && filterInit && filterBind, nil
+	initialized := natInit && filterInit
+	present := containsExactLine(natRules, "-N "+ChainPreRouting) || containsExactLine(natRules, "-N "+ChainPostRouting) || containsExactLine(filterRules, "-N "+ChainForward)
+	return initialized, forwardingEnabled && natBind && filterInit && filterBind, present && !initialized, nil
 }
 
 func (l *Iptables) FamilyStatus(family string) (bool, bool, error) {
@@ -601,7 +615,7 @@ func (l *Iptables) Replay() error {
 		if family == FamilyIPv6 && !l.backend.IPv6Available() {
 			continue
 		}
-		if err := l.batchEnsureChains(family); err != nil {
+		if err := l.batchEnsureChains(family, true); err != nil {
 			return err
 		}
 	}
@@ -725,4 +739,60 @@ func loadProtocol(protocol string) string {
 	default:
 		return protocol
 	}
+}
+
+func (l *Iptables) OperateFamily(family string, initialize bool) error {
+	if family != FamilyIPv4 && family != FamilyIPv6 {
+		return fmt.Errorf("unsupported forwarding family %q", family)
+	}
+	if family == FamilyIPv6 && !l.backend.IPv6Available() {
+		return fmt.Errorf("ip6tables command family is unavailable")
+	}
+	if !initialize {
+		initialized, _, err := l.FamilyStatus(family)
+		if err != nil {
+			return err
+		}
+		if !initialized {
+			return fmt.Errorf("%s forwarding chains are not initialized", family)
+		}
+	}
+	if err := ensureFamilyForwardingSysctls(l.system, family); err != nil {
+		return err
+	}
+	return l.batchEnsureChains(family, initialize)
+}
+
+func (l *Iptables) UnbindFamily(family string) error {
+	if family != FamilyIPv4 && family != FamilyIPv6 {
+		return fmt.Errorf("unsupported forwarding family %q", family)
+	}
+	if family == FamilyIPv6 && !l.backend.IPv6Available() {
+		return nil
+	}
+	read := l.backend.RunWithStd
+	if family == FamilyIPv6 {
+		read = l.backend.RunIPv6WithStd
+	}
+	var script strings.Builder
+	for _, table := range []string{iptables_helper.NatTab, iptables_helper.FilterTab} {
+		output, err := read(table, "-S")
+		if err != nil {
+			return err
+		}
+		var removals []string
+		for _, pair := range [][2]string{{"PREROUTING", ChainPreRouting}, {"POSTROUTING", ChainPostRouting}, {"FORWARD", ChainForward}} {
+			rule := "-A " + pair[0] + " -j " + pair[1]
+			for range countExactLines(output, rule) {
+				removals = append(removals, "-D "+pair[0]+" -j "+pair[1])
+			}
+		}
+		if len(removals) > 0 {
+			script.WriteString("*" + table + "\n" + strings.Join(removals, "\n") + "\nCOMMIT\n")
+		}
+	}
+	if script.Len() == 0 {
+		return nil
+	}
+	return l.backend.Restore(l.ctx, family, script.String())
 }

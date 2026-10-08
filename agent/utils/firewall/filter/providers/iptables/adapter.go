@@ -49,12 +49,6 @@ func NewAdapterWithBackend(reader RuleReader, writer RuleWriter) *Adapter {
 
 func (a *Adapter) Provider() filter.Provider { return filter.ProviderIptables }
 
-func (a *Adapter) Capabilities(context.Context) (filter.Capabilities, error) {
-	return filter.Capabilities{
-		Marker: true, OwnedChains: true, ExplicitPosition: true,
-	}, nil
-}
-
 func (a *Adapter) AppendUnverified(ctx context.Context, rule filter.FirewallRule, comment string) error {
 	rule, err := filter.NormalizeRule(rule)
 	if err != nil {
@@ -163,8 +157,7 @@ func (a *Adapter) BuildCommands(snapshot filter.RuleSet, changes []filter.RuleCh
 	if createOnly {
 		return compileCreateBatch(snapshot, changes)
 	}
-	externalDelete := len(changes) == 1 && changes[0].Locator == nil && (changes[0].UnmarkedAdopted || changes[0].PreviousMarker != "")
-	if deleteOnly && !externalDelete {
+	if deleteOnly {
 		return compileDeleteBatch(snapshot, changes)
 	}
 	if len(changes) != 1 {
@@ -221,14 +214,15 @@ func compileDeleteBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (f
 	var script strings.Builder
 	fmt.Fprintf(&script, "*%s\n", snapshot.Scope.Table)
 	for _, change := range changes {
-		rulePlan, err := compileChange(snapshot, change)
+		if change.Target == nil || change.Target.Rule.Scope.Key() != snapshot.Scope.Key() || change.Target.Raw == "" {
+			return filter.CommandBatch{}, filter.ErrInvalidRule
+		}
+		line, err := restoreRuleLine(snapshot.Scope, *change.Target)
 		if err != nil {
 			return filter.CommandBatch{}, err
 		}
-		line, err := restoreRuleLine(snapshot.Scope, *rulePlan.Previous)
-		if err != nil {
-			return filter.CommandBatch{}, err
-		}
+		target := parseRule(snapshot.Scope, line, 0)
+		rulePlan := filter.RuleCommands{Operation: filter.ChangeDelete, Previous: &target, Expected: target}
 		script.WriteString(strings.Replace(line, "-A ", "-D ", 1))
 		script.WriteByte('\n')
 		rulePlan.Commands, rulePlan.RollbackCommands = nil, nil
@@ -238,6 +232,14 @@ func compileDeleteBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (f
 	plan.Rules[0].Commands = []filter.NativeCommand{{
 		Executable: restoreExecutableForFamily(snapshot.Scope.Family), Args: []string{"--noflush", "--wait"}, Stdin: script.String(),
 	}}
+	if len(changes) == 1 {
+		args, err := shellwords.Parse(plan.Rules[0].Expected.Raw)
+		if err != nil {
+			return filter.CommandBatch{}, err
+		}
+		args[0] = "-D"
+		plan.Rules[0].Commands = []filter.NativeCommand{{Executable: executableForFamily(snapshot.Scope.Family), Args: append([]string{"-w", "-t", snapshot.Scope.Table}, args...)}}
+	}
 	return plan, nil
 }
 
@@ -246,6 +248,17 @@ func compileCreateBatch(snapshot filter.RuleSet, changes []filter.RuleChange) (f
 	var script strings.Builder
 	fmt.Fprintf(&script, "*%s\n", snapshot.Scope.Table)
 	for _, change := range changes {
+		if change.Raw != "" {
+			observed := parseRule(snapshot.Scope, change.Raw, len(snapshot.Rules)+1)
+			line, err := restoreRuleLine(snapshot.Scope, observed)
+			if err != nil {
+				return filter.CommandBatch{}, err
+			}
+			script.WriteString(line + "\n")
+			observed.Locator.Position = nil
+			plan.Rules = append(plan.Rules, filter.RuleCommands{Operation: filter.ChangeCreate, Expected: observed})
+			continue
+		}
 		rulePlan, err := compileChange(snapshot, change)
 		if err != nil {
 			return filter.CommandBatch{}, err
@@ -379,17 +392,7 @@ func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.Ru
 		return filter.RuleCommands{}, fmt.Errorf("%w: protocol %q does not match %s", filter.ErrInvalidRule, normalized.Protocol, normalized.Scope.Family)
 	}
 	marker := "1panel-rule:" + normalized.UUID
-	if change.Operation == filter.ChangeDelete && change.CommandOnly && change.Locator == nil {
-		previous := filter.ObservedRule{Rule: normalized, Marker: marker, ParseStatus: filter.ParseStatusSupported}
-		var commands []filter.NativeCommand
-		if change.UnmarkedAdopted || change.PreviousMarker != "" {
-			previous.Marker = change.PreviousMarker
-			args := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}
-			args = append(args, compileObservedRuleArgs(previous)...)
-			commands = []filter.NativeCommand{{Executable: executableForFamily(snapshot.Scope.Family), Args: args}}
-		}
-		return filter.RuleCommands{RuleUUID: normalized.UUID, Operation: change.Operation, Previous: &previous, Expected: previous, Commands: commands}, nil
-	}
+
 	position := len(snapshot.Rules) + 1
 	verb := "-I"
 	var target filter.ObservedRule
@@ -400,12 +403,6 @@ func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.Ru
 			return filter.RuleCommands{}, fmt.Errorf("%w: create target is out of range", filter.ErrInvalidRule)
 		}
 		position = insertionPosition(snapshot, normalized)
-	case filter.ChangeAdopt:
-		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
-		if err != nil {
-			return filter.RuleCommands{}, err
-		}
-		verb = "-R"
 	case filter.ChangeUpdate:
 		position, target, err = validateMutationTarget(snapshot, change, normalized, marker)
 		if err != nil {
@@ -450,7 +447,7 @@ func compileChange(snapshot filter.RuleSet, change filter.RuleChange) (filter.Ru
 	case filter.ChangeCreate:
 		rollbackArgs = append(rollbackArgs, "-D", snapshot.Scope.Chain)
 		rollbackArgs = append(rollbackArgs, compileRuleArgs(normalized, marker)...)
-	case filter.ChangeAdopt, filter.ChangeUpdate:
+	case filter.ChangeUpdate:
 		rollbackArgs = append(rollbackArgs, "-R", snapshot.Scope.Chain, strconv.Itoa(position))
 		rollbackArgs = append(rollbackArgs, compileObservedRuleArgs(target)...)
 	case filter.ChangeDelete:
@@ -483,10 +480,11 @@ func positionalMutationPlan(snapshot filter.RuleSet, rule filter.FirewallRule, p
 		RuleUUID: rule.UUID, Operation: operation, Previous: &previous, Expected: expected,
 	}
 	if position == targetPosition {
+		plan.Expected = previous
 		return plan
 	}
 	executable := executableForFamily(snapshot.Scope.Family)
-	deleteArgs := append([]string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain}, compileObservedRuleArgs(previous)...)
+	deleteArgs := []string{"-w", "-t", snapshot.Scope.Table, "-D", snapshot.Scope.Chain, strconv.Itoa(position)}
 	insertArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(targetPosition)}
 	insertArgs = append(insertArgs, compileRuleArgs(rule, marker)...)
 	restoreArgs := []string{"-w", "-t", snapshot.Scope.Table, "-I", snapshot.Scope.Chain, strconv.Itoa(position)}
@@ -587,8 +585,7 @@ func validateMutationTarget(snapshot filter.RuleSet, change filter.RuleChange, a
 	if wantErr != nil || observedErr != nil || wantKey != observedKey {
 		return 0, filter.ObservedRule{}, filter.ErrRuleStale
 	}
-	if change.Operation != filter.ChangeAdopt && observed.Marker != marker &&
-		!(change.Operation == filter.ChangeDelete && change.UnmarkedAdopted && observed.Marker == "") {
+	if observed.Marker != change.PreviousMarker {
 		return 0, filter.ObservedRule{}, filter.ErrRuleStale
 	}
 	return position, observed, nil
@@ -654,11 +651,15 @@ func (systemBackend) Run(ctx context.Context, command filter.NativeCommand) erro
 	if err != nil {
 		return err
 	}
-	options := []cmd.Option{cmd.WithContext(ctx), cmd.WithTimeout(60 * time.Second)}
+	options := []cmd.Option{cmd.WithContext(ctx), cmd.WithTimeout(60 * time.Second), cmd.WithEnv("LC_ALL=C")}
 	if command.Stdin != "" {
 		options = append(options, cmd.WithStdin(strings.NewReader(command.Stdin)))
 	}
-	return cmd.NewCommandMgr(options...).RunWithOptionalSudo(executable, command.Args...)
+	err = cmd.NewCommandMgr(options...).RunWithOptionalSudo(executable, command.Args...)
+	if err != nil && (strings.Contains(err.Error(), "Bad rule (does a matching rule exist in that chain?)") || strings.Contains(err.Error(), "No chain/target/match by that name")) {
+		return fmt.Errorf("%w: %v", filter.ErrRuleNotFound, err)
+	}
+	return err
 }
 
 func (systemBackend) Save(ctx context.Context, scope filter.Scope) error {

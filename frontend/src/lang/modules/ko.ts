@@ -4159,39 +4159,41 @@ const message = {
         useEAB: 'EAB 인증 사용',
     },
     firewall: {
+        ipv6Support: 'IPv6 지원',
+        ipv6SupportHelper:
+            'IPv6 방화벽 규칙의 관리 및 적용을 제어하며 서버의 IPv6 네트워크 기능에는 영향을 주지 않습니다.',
+        ipv6DisableContainerHelper: '컨테이너의 IPv6 포트 정보를 숨깁니다.',
+        ipv6DisableWhitelistHelper: '허용 목록의 IPv6 규칙을 제거하고 나머지 기존 IPv6 규칙은 유지합니다.',
+        ipv6DisableRulesHelper: '1Panel이 관리하는 iptables 및 nftables의 IPv6 규칙을 비활성화합니다.',
+        ipv6DisableNetworkHelper: '서버의 IPv6 네트워크 기능은 비활성화되지 않습니다.',
+        ipv6DisableEffectHelper: '해당 IPv6 접근 제한과 포트 포워딩은 더 이상 적용되지 않습니다.',
+        ipv6Disabled: 'IPv6 지원이 비활성화되어 있습니다. 먼저 방화벽 설정에서 활성화하세요.',
+        familyRepair: '복구',
+        familyIncomplete: '{0} 체인이 불완전합니다',
+        resetWithBackup: '규칙 백업 후 초기화',
+        resetOnly: '초기화만 수행',
+        resetWithBackupHelper: '현재 모듈의 규칙을 JSON으로 저장하여 초기화 시 복원할 수 있습니다.',
+        resetOnlyHelper: '새 백업 없이 현재 규칙을 삭제합니다. 기존 백업은 유지됩니다.',
+        backupDirectoryHelper: '{0}의 유효한 규칙 백업을 표시합니다. 기본적으로 최신 파일이 선택됩니다.',
+        restoreAllRules: '초기화 및 규칙 복원',
+        importRuleBackup: '백업에서 가져오기',
+        initializeOnly: '초기화만 수행',
+        backupRuleCount: '규칙 수',
+        noRuleBackup: '복원할 수 있는 규칙 백업이 없습니다',
+        ruleBackupLoadFailed: '규칙 백업을 불러오지 못했습니다. 다시 시도하거나 백업을 복원하지 않고 초기화하세요.',
         create: '규칙 만들기',
         edit: '규칙 수정',
         quickJump: '빠른 이동',
 
         used: '사용됨',
         unUsed: '사용 안 함',
-        managed: '패널 생성',
-        managedHelper: '1Panel에서 생성하고 관리하는 규칙으로 편집하거나 삭제할 수 있습니다.',
-        adopted: '외부 규칙 관리',
-        adoptedHelper: '기존 시스템 규칙을 현재 1Panel에서 관리하고 있습니다.',
-        external: '외부 규칙',
-        externalHelper:
-            '시스템에 존재하지만 아직 1Panel에서 관리하지 않는 규칙이며 필요할 때 관리 대상으로 전환할 수 있습니다.',
-        protected: '시스템 보호',
-        protectedHelper: '기본 제공 규칙과 화이트리스트에 정확히 일치하는 규칙은 편집하거나 삭제할 수 없습니다.',
-        stateShort: { managed: '패널', adopted: '관리', external: '외부', protected: '보호', drifted: '불일치' },
+        whitelist: '허용 목록',
+        builtinRuleProtected: '시스템 기본 보호 규칙입니다. 편집하거나 삭제할 수 없습니다.',
+        whitelistRuleProtected:
+            '허용 목록 규칙은 순서와 설명만 변경할 수 있습니다. 다른 변경은 설정 → 포트 허용 목록에서 진행하세요.',
         ruleTargetRequired: 'IP 주소 또는 포트를 하나 이상 입력하세요',
-        resolution_adopt: '관리 대상으로 전환',
-        plan_duplicate_rules:
-            '조건과 동작이 동일한 중복 규칙은 관리 대상으로 추가할 수 없습니다. 중복 규칙을 수동으로 삭제한 후 다시 시도하세요.',
-        adoptRuleConfirm:
-            '관리 대상으로 전환하면 1Panel이 이 기존 규칙을 유지하고 삭제할 수 있습니다. 계속하시겠습니까?',
-        plan_exact_rule_conflict: '일치 조건이 같지만 허용 또는 거부 동작이 반대인 규칙이 이미 있습니다.',
-        allRulesAlreadyExist: '확인한 규칙 {0}개가 모두 이미 존재합니다. 새로 생성할 규칙이 없습니다.',
-        plan_managed_rule_drifted: '관리 규칙이 실제 방화벽과 일치하지 않습니다. 먼저 불일치를 해결하세요.',
-        plan_opaque_rule_in_target_scope: '대상 범위에 안전하게 분석할 수 없는 규칙이 있어 작업을 중지했습니다.',
-        plan_runtime_permanent_mismatch: '실행 중 구성과 영구 방화벽 구성이 다릅니다. 먼저 동기화하세요.',
-        plan_protected_rule: '이 규칙은 보호되어 관리 전환, 변경 또는 삭제할 수 없습니다.',
-        plan_blocked: '이 규칙을 안전하게 적용할 수 없습니다. 목록을 새로 고친 후 다시 시도하세요.',
         largeRuleSet: '방화벽 규칙이 너무 많으면 작업이 느려질 수 있습니다. iptables 또는 nftables 사용을 권장합니다.',
-        scopeDefaultMismatch: '시스템 기본 zone은 {0}이며 이 페이지는 public zone만 관리합니다.',
         scopeMissing: '관리 범위 {0}이(가) 없으며 첫 규칙을 적용할 때 안전하게 생성됩니다.',
-        scopeUnmanagedActive: '다른 활성 범위가 감지되었습니다: {0}. 1Panel은 해당 규칙을 변경하지 않습니다.',
         dockerRestart: '방화벽 작업에는 Docker 서비스 재시작이 필요합니다',
         firewallHelper: '{0} 시스템 방화벽',
         firewallNotStart: '현재 시스템 방화벽이 활성화되지 않았습니다. 먼저 활성화하세요.',
@@ -4213,8 +4215,7 @@ const message = {
         dockerGuard: '컨테이너 포트 보호',
         systemFirewall: '호스트 방화벽',
         systemFirewallHelper: '호스트 포트 접근과 인바운드 규칙을 관리합니다.',
-        forwardPolicyDropWarning:
-            '{0}의 FORWARD 기본 정책은 DROP입니다. iptables/ip6tables 규칙에서 명시적으로 허용하지 않은 다른 호스트로의 전달 트래픽은 차단될 수 있습니다. 해당 IP 버전의 허용 규칙을 확인하세요.',
+        forwardPolicyDropWarning: '현재 서버에서 네트워크 전달이 제한되어 포트 전달 규칙이 작동하지 않을 수 있습니다.',
         forwardingHelper: '포트 포워딩 규칙을 관리합니다.',
         dockerFirewallHelper: '1Panel 컨테이너 포트 보호 관리 방식을 선택합니다.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, 실험적',
@@ -4223,6 +4224,7 @@ const message = {
         addressFamily: 'IP 버전',
         portOrRange: '포트 / 범위',
         batchLimit: '한 번에 생성하거나 가져올 수 있는 규칙은 확장 후 기준으로 최대 {0}개입니다.',
+        importDuplicatesRemoved: '파일 내 중복 및 이미 존재하는 규칙을 포함하여 중복 규칙 {0}개를 제거했습니다.',
         importLimit: '최대 {0}개의 규칙(확장 후 기준)을 가져올 수 있으며, 파일 크기는 {1} KB를 초과할 수 없습니다.',
         ruleSyncTitle: '규칙 동기화',
         ruleSyncAction: '규칙 동기화',
@@ -4240,19 +4242,9 @@ const message = {
         ruleSyncBlocked: '동기화 불가',
         ruleSyncReason: '검사 결과',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: '규칙이 이미 데이터베이스 정책과 일치합니다.',
-            managedOrderDiffers: '관리 규칙 순서가 데이터베이스 순서와 다릅니다.',
-            managedOnlyInTarget: '관리 규칙이 대상 방화벽에만 존재합니다.',
-            managedRuntimeCannotRemove: '관리 중인 런타임 규칙을 안전하게 삭제할 수 없습니다.',
             missingFromTarget: '대상 방화벽에 이 규칙이 없습니다.',
-            targetDiffers: '대상 규칙이 데이터베이스 정책과 다릅니다.',
             alreadyExistsInTarget: '대상 방화벽에 이 규칙이 이미 존재합니다.',
             onlyInTarget: '이 규칙은 대상 방화벽에만 존재합니다.',
-            stale: '방화벽 규칙 상태가 오래되었습니다. 새로 고친 후 다시 시도하세요.',
-            protectedRule: '보호된 방화벽 규칙은 수정할 수 없습니다.',
-            dockerAcceptReadOnly:
-                '이 ACCEPT 규칙은 읽기 전용이며 다른 규칙을 동기화할 때 그대로 유지됩니다. 제거하려면 호스트에서 수동으로 삭제하세요.',
-            cannotReconcile: '대상 규칙을 동기화할 수 없습니다: {0}',
         },
         ruleSyncPartial: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 실패 {2}개.',
         ruleSyncSuccess: '동기화 완료: 성공 {0}개, 이미 존재 {1}개, 삭제 {2}개.',
@@ -4262,17 +4254,17 @@ const message = {
             remove: '삭제 예정',
             blocked: '동기화 불가',
         },
-        resetDirectRulesHelper:
-            '{0}에서 1Panel 시스템 방화벽 체인, 실행 규칙 및 영구 파일을 삭제하고 데이터베이스 정책은 유지합니다',
-        resetWhitelistRulesHelper:
-            '{0}의 활성 사용자 설정을 재설정하고 설치 기본값으로 복원한 후 비활성화합니다. 데이터베이스 정책은 유지되며 나중에 다시 동기화할 수 있습니다.',
+        initializeFromFile: '파일에서 초기화',
+        downloadRuleBackup: '규칙 백업 다운로드',
+        importFileHelper:
+            '최대 64 MB의 JSON 파일을 파일 순서대로 나누어 가져옵니다. 변환할 수 없는 규칙은 오류로 보고됩니다.',
+        resetDirectRulesHelper: '{0}의 모든 1Panel 호스트 방화벽 체인, 실행 중인 규칙 및 영구 저장 파일을 삭제합니다.',
+        resetWhitelistRulesHelper: '{0}의 사용자 설정을 초기화하고 기본 상태로 복원한 후 비활성화합니다.',
         cleanupForwardingBackendHelper:
-            '{0}의 1Panel 포트 전달 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
+            '{0}의 모든 1Panel 전달 규칙, 체인 및 자동 복구 파일을 삭제합니다. 기존 JSON 백업은 유지됩니다.',
         cleanupDockerBackendHelper:
-            '{0}의 1Panel Docker 포트 보호 런타임 규칙을 재설정합니다. 관련 규칙과 체인을 모두 삭제하고 데이터베이스 데이터는 유지합니다',
-        cleanupBeforeBackendSwitch:
-            '현재 {0} 백엔드에 1Panel 런타임 규칙이 남아 있습니다. {1}(으)로 전환하기 전에 먼저 재설정하세요. 재설정은 런타임 규칙만 정리하며 데이터베이스 정책은 유지됩니다. 전환 후 다시 초기화하거나 동기화할 수 있습니다.',
-        cleanupAction: '재설정',
+            '{0}의 모든 1Panel Docker 보호 규칙, 체인 및 자동 복구 파일을 삭제합니다. 기존 JSON 백업은 유지됩니다.',
+        cleanupBeforeBackendSwitch: '{1}(으)로 전환하기 전에 현재 {0}을(를) 초기화하고 규칙 복원 방법을 확인하세요.',
         backendSwitchNotice:
             '하나의 방화벽 관리 방식만 활성화하는 것이 좋습니다. 여러 방화벽을 동시에 실행하면 규칙 충돌, 상태 불일치 또는 컨테이너 포트 접근 오류가 발생할 수 있습니다.',
         switchBackendHelper: '{0}(으)로 전환하시겠습니까?',
@@ -4319,8 +4311,7 @@ const message = {
         portDetails: '포트 상세 정보',
         orphanEndpoints: '연결되지 않은 엔드포인트',
         orphanPolicies: '연결되지 않은 규칙',
-        orphanPoliciesHelper:
-            '다음 {0}개 규칙은 Docker 포트에 바인딩되지 않았습니다. 일치하는 포트가 감지되면 자동으로 바인딩됩니다.',
+        orphanPoliciesHelper: '이 시스템 규칙 {0}개와 일치하는 Docker 게시 포트가 없습니다.',
         composeOrApp: 'Compose / 앱',
         sources: '소스',
         deniedSources: '거부된 소스',
@@ -4329,6 +4320,8 @@ const message = {
         protectionMode: '보호 모드',
         denySources: '지정한 소스 거부',
         allowSources: '지정한 소스만 허용',
+        acceptSources: '지정된 소스를 직접 허용',
+        acceptAll: '모든 트래픽을 직접 허용',
         denyAll: '모든 접근 거부',
         dockerGuardMixedFamilyHelper:
             'IPv4와 IPv6가 모두 선택되었습니다. 출발지 지정 정책은 각각 설정해야 하며, 모든 접근 거부는 바로 적용할 수 있습니다.',
@@ -4370,7 +4363,7 @@ const message = {
             '바인딩 해제 - 바인딩 해제 시 추가된 모든 방화벽 규칙이 무효화됩니다. 주의하여 진행하세요. 확인하시겠습니까?',
         portWhiteList: '포트 화이트리스트',
         whitelistConfigHelper:
-            '허용 목록은 설정만 저장하고 일치하는 허용 규칙을 보호합니다. 누락된 규칙은 시작, 재시작, 초기화 또는 동기화 시 추가됩니다. 허용 목록을 편집하거나 삭제해도 기존 규칙은 삭제되지 않습니다.',
+            '허용 목록을 저장하면 누락된 허용 규칙을 추가하고 일치하는 규칙을 보호합니다. 허용 목록 항목을 수정하거나 삭제해도 기존 규칙은 삭제되지 않습니다.',
         whitelistDeleteConfirm: '이 화이트리스트 항목만 삭제됩니다. 기존 방화벽 규칙은 유지됩니다. 계속하시겠습니까?',
         portWhiteListHelper:
             '단일 포트(예: 80) 또는 포트 범위(예: 8000-8100)를 입력하세요. 포트 번호는 1~65535여야 합니다.',
@@ -4387,7 +4380,7 @@ const message = {
         whitelistServicePortsHelper:
             '포트 하나를 입력하세요(1-65535). 서비스의 수신 포트는 변경되지 않습니다. 서비스 설정에서 포트를 변경하면 이 화이트리스트 항목도 업데이트됩니다.',
         whitelistSourcesHelper:
-            'IP 주소 또는 CIDR 대역을 쉼표나 줄바꿈으로 구분하세요. 비워 두면 모든 IPv4 및 IPv6 출발지를 허용합니다.',
+            'IP 주소 또는 CIDR 대역을 쉼표나 줄바꿈으로 구분하세요. 비워 두면 {0}을(를) 허용합니다.',
         destinationPortPlaceholder: '예: 80, 80,443 또는 8080-8089',
         deleteRuleConfirm: '{0}개의 규칙을 삭제합니다. 계속하시겠습니까?',
         deleteUsedRuleConfirm:
