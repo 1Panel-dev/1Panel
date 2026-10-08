@@ -77,7 +77,6 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 
 		baRouter.GET("/network", baseApi.ListNetwork)
 		baRouter.POST("/network/del", baseApi.DeleteNetwork)
-		baRouter.POST("/network/clean", baseApi.CleanNetworks)
 		baRouter.POST("/network/search", baseApi.SearchNetwork)
 		baRouter.POST("/network", baseApi.CreateNetwork)
 		baRouter.GET("/volume", baseApi.ListVolume)

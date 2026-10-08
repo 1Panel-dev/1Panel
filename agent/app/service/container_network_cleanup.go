@@ -9,18 +9,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
-	"github.com/google/uuid"
 )
 
 var networkCleanupMu sync.Mutex
-
-func (u *ContainerService) CleanNetworks() (*dto.NetworkCleanupTask, error) {
-	taskID := uuid.NewString()
-	if err := u.Prune(dto.ContainerPrune{TaskID: taskID, PruneType: "network"}); err != nil {
-		return nil, err
-	}
-	return &dto.NetworkCleanupTask{TaskID: taskID}, nil
-}
 
 func executeNetworkCleanup(t *task.Task, cli docker.NetworkCleanupClient, cutoff ...time.Time) error {
 	networkCleanupMu.Lock()
