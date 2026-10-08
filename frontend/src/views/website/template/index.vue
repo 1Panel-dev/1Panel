@@ -59,6 +59,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { Website } from '@/api/interface/website';
 import { deleteTemplate, searchTemplates } from '@/api/modules/website';
 import TemplateOperate from '@/views/website/template/operate/index.vue';
@@ -71,6 +72,7 @@ import { reactive, ref, onMounted } from 'vue';
 const loading = ref(false);
 const data = ref<Website.Template[]>([]);
 const searchName = ref('');
+useSearchPersistence('website/template/index', { search: searchName });
 const opRef = ref();
 const operateRef = ref();
 const outputCreateRef = ref();

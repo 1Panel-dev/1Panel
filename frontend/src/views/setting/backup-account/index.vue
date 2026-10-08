@@ -120,8 +120,9 @@
     </div>
 </template>
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { dateFormat } from '@/utils/date';
-import { onMounted, ref } from 'vue';
+import { toRef, onMounted, ref } from 'vue';
 import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
 import Operate from '@/views/setting/backup-account/operate/index.vue';
 import DetailShow from '@/components/detail-show/index.vue';
@@ -142,6 +143,7 @@ const paginationConfig = reactive({
     type: '',
     name: '',
 });
+useSearchPersistence('setting/backup-account/index', { search: toRef(paginationConfig, 'name') });
 const opRef = ref();
 const dialogRef = ref();
 const detailRef = ref();

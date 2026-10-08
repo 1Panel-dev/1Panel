@@ -323,6 +323,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { nextTick, onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
@@ -365,6 +366,7 @@ const loading = ref(false);
 const maskShow = ref(true);
 const submitLoading = ref(false);
 const searchName = ref('');
+useSearchPersistence('database/mongodb/index', { search: searchName });
 const createVisible = ref(false);
 const appStatusRef = ref();
 const bindRef = ref();

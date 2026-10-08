@@ -139,6 +139,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import AppCard from '@/views/app-store/installed/app/card.vue';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
@@ -156,7 +157,7 @@ import IgnoreApp from '@/views/app-store/installed/ignore/create/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 
 import { searchAppInstalled, installedOp, appInstalledDeleteCheck, updateAppInstallSort } from '@/api/modules/app';
-import { onMounted, onUnmounted, reactive, ref, nextTick } from 'vue';
+import { toRef, onMounted, onUnmounted, reactive, ref, nextTick } from 'vue';
 import Sortable from 'sortablejs';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
@@ -210,6 +211,7 @@ const searchReq = reactive({
     update: false,
     sync: false,
 });
+useSearchPersistence('app-store/installed/index', { search: toRef(searchReq, 'name') });
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');

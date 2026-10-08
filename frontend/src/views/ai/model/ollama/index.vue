@@ -184,6 +184,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import Conn from '@/views/ai/model/ollama/conn/index.vue';
@@ -234,6 +235,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
+useSearchPersistence('ai/model/ollama/index', { search: searchName });
 const appInstallID = ref(0);
 
 const opRef = ref();

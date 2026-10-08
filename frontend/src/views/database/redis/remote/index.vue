@@ -73,6 +73,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { dateFormat } from '@/utils/date';
 import { onMounted, reactive, ref } from 'vue';
 import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
@@ -98,6 +99,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('database/redis/remote/index', { search: searchName });
 
 const search = async (column?: any) => {
     paginationConfig.orderBy = column?.order ? column.prop : paginationConfig.orderBy;
