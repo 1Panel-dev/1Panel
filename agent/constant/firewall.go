@@ -17,6 +17,7 @@ const (
 )
 
 const (
+	FirewallIPv6SupportKey           = "FirewallIPv6Support"
 	FirewallSystemBackendKey         = "FirewallProvider"
 	FirewallForwardingBackendKey     = "ForwardingBackend"
 	FirewallDockerBackendKey         = "DockerFirewallBackend"
@@ -33,12 +34,7 @@ const (
 const (
 	FirewallSystemAcceptedPortSourcePrefix = "accepted-port:"
 
-	FirewallRuleOriginCreated = "created"
-	FirewallRuleOriginAdopted = "adopted"
-
 	FirewallRuleSourceUser     = "user"
 	FirewallRuleSourceImported = "imported"
-	FirewallRuleSourcePanel    = "panel"
 	FirewallRuleSourceSecurity = "security"
-	FirewallRuleSourceApp      = "application"
 )

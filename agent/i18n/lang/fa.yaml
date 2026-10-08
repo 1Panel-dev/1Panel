@@ -684,8 +684,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'زنجیره DOCKER-USER داکر یافت نشد. داکر را راه‌اندازی مجدد کنید و دوباره تلاش کنید'
 ErrDockerNftablesChainUnavailable: 'زنجیره فایروال IPv4 مربوط به nftables داکر یافت نشد. بررسی کنید نسخه فعلی داکر از بک‌اند فایروال nftables پشتیبانی کند، سپس داکر را راه‌اندازی مجدد کرده و دوباره تلاش کنید'
-ErrDockerForwardPolicyDrop: 'سیاست پیش‌فرض FORWARD برای {{ .family }} برابر DROP است. آن را تغییر دهید و دوباره تلاش کنید'
-ErrUFWRuleAdopt: 'مدیریت قانون UFW ناموفق بود: {{ .detail }}. اگر نسخه فعلی UFW قدیمی‌تر از 0.35 است، ابتدا UFW را ارتقا دهید و دوباره تلاش کنید'
+ErrDockerForwardPolicyDrop: 'این سرور هدایت ترافیک شبکه را محدود کرده است. در حال حاضر امکان فعال‌سازی محافظت از پورت کانتینرها وجود ندارد.'
 Firewall: 'فایروال'
 FirewallTaskHost: 'دیواره آتش میزبان'
 FirewallTaskForwarding: 'هدایت پورت'
@@ -699,28 +698,15 @@ FirewallCreateRulesStep: 'ایجاد قوانین دیوار آتش'
 FirewallCreateRulesResult: 'نتیجه ایجاد: {{ .succeeded }} موفق، {{ .failed }} ناموفق، {{ .skipped }} اجرا نشده'
 FirewallRuleOperationResult: 'نتیجه عملیات: {{ .succeeded }} موفق، {{ .failed }} ناموفق'
 FirewallCreateRuleSkipped: 'اجرا نشده'
-FirewallCreateBatchStep: 'ارسال {{ .count }} قانون به صورت دسته‌ای به {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}؛ به {{ .count }} قانون تبدیل شد'
-FirewallCreateRuleExecutionFailed: 'ایجاد قانون ناموفق بود. هیچ رکوردی در پایگاه داده ذخیره نشد و دستورات اجراشده بازگردانی نشدند'
-FirewallCreateRulePersistenceFailed: 'قانون ایجاد شد، اما ذخیره رکورد مدیریتی آن ناموفق بود'
-FirewallAdoptRulePersistenceFailed: 'دستور پذیرش قانون برای مدیریت اجرا شد، اما اطلاعات مدیریت ذخیره نشد'
-FirewallSyncOperationsResult: 'عملیات همگام‌سازی: {{ .removed }} حذف‌شده، {{ .created }} ایجادشده، {{ .failed }} ناموفق، {{ .skipped }} اجرا‌نشده، {{ .unchanged }} از قبل مطابق (بدون نیاز به تغییر)'
-FirewallSyncRuleUnchanged: 'از قبل مطابق است؛ نیازی به تغییر نیست'
-FirewallSyncStep: 'همگام‌سازی قوانین با {{ .name }}'
-FirewallSyncFailed: 'همگام‌سازی {{ .failed }} قانون فایروال ناموفق بود'
-FirewallResetSourceStep: 'بازنشانی و غیرفعال‌کردن فایروال مبدأ {{ .name }}'
-FirewallResetSourceResult: 'فایروال مبدأ بازنشانی شد و {{ .removed }} قانون پایگاه داده حذف شد'
+FirewallCreateRuleExecutionFailed: 'ایجاد قانون ناموفق بود. دستورات اجراشده بازگردانی نشدند'
 FirewallInitializeChainsStep: 'راه‌اندازی و اتصال زنجیره‌های پایه {{ .name }}'
-FirewallRestoreRulesStep: 'بازیابی قوانین پایگاه داده در {{ .name }}'
 FirewallSyncWhitelistStep: 'همگام‌سازی فهرست مجاز پورت‌های فایروال'
 FirewallEnableForwardingStep: 'فعال‌سازی و اتصال زنجیره‌های هدایت پورت'
 FirewallRestoreForwardingRulesStep: 'بازیابی قوانین هدایت پورت پایگاه داده'
 FirewallInspectDockerGuardStep: 'بررسی پشتیبان فایروال Docker و سیاست‌ها'
 FirewallInitializeDockerGuardStep: 'راه‌اندازی و اتصال زنجیره‌های محافظت پورت {{ .name }}'
 FirewallPersistDockerGuardStep: 'ذخیره وضعیت محافظت پورت Docker'
-ErrFirewallRuleScopeChange: "فایروال فعلی از تغییر محدودهٔ قانون (مانند خانوادهٔ آدرس IPv4/IPv6) پشتیبانی نمی‌کند. لطفاً یک قانون جدید ایجاد کنید."
-FirewallWhitelistReleased: "{{ .name }}: حفاظت فهرست مجاز برداشته شد؛ قانون اجازه حفظ می‌شود. برای بستن پورت، قانون را به‌صورت دستی از فهرست قوانین حذف کنید"
-FirewallWhitelistRequired: "{{ .name }}: توسط قوانین پورت‌های ضروری سیستم محافظت می‌شود"
 FileTaskCopy: 'کپی فایل‌ها به {{ .dst }}'
 FileTaskMove: 'انتقال فایل‌ها به {{ .dst }}'
 FileTaskCompress: 'فشرده‌سازی فایل‌ها در {{ .dst }}'
@@ -728,11 +714,13 @@ FileTaskDecompress: 'استخراج فایل‌ها در {{ .dst }}'
 FileTaskSource: 'مسیر مبدأ: {{ .path }}'
 FileTaskFormat: 'قالب بایگانی: {{ .format }}'
 FileTaskRename: 'نام فایل مقصد: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "بک‌اند فعلی {{ .current }} هنوز شامل قوانین 1Panel است. پیش از تغییر به {{ .target }} آن‌ها را پاک کنید."
 ErrDockerIPv4ForwardingDisabled: "ارسال IPv4 غیرفعال است. پیش از استفاده از بک‌اند فایروال Docker، مقدار net.ipv4.ip_forward=1 را تنظیم کنید."
 ErrFirewallRuleSavedApplyFailed: "پیکربندی قانون جدید ذخیره شد، اما اعمال آن در دیوار آتش ناموفق بود. با همگام‌سازی دوباره تلاش کنید: {{ .detail }}"
+ErrFirewallRuleConflict: "یک قانون UFW با شرایط تطبیق یکسان و عملکرد متفاوت از قبل وجود دارد. قانون موجود را ویرایش کنید."
+ErrForwardInterfaceNotFound: "رابط شبکه {{ .name }} مشخص‌شده در قانون انتقال وجود ندارد. نام رابط را بررسی کرده و دوباره تلاش کنید."
 
 ErrSSHPublicKey: "یک کلید عمومی SSH معتبر وارد کنید"
 ErrSSHPrivateKey: "کلید خصوصی SSH نامعتبر یا عبارت عبور نادرست است؛ کلیدهای رمزگذاری‌شده به عبارت عبور اصلی نیاز دارند"
 ErrSSHKeyMismatch: "کلید عمومی و خصوصی SSH مطابقت ندارند"
+

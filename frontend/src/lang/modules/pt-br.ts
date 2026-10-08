@@ -4334,48 +4334,45 @@ const message = {
         useEAB: 'Usar autenticação EAB',
     },
     firewall: {
+        ipv6Support: 'Suporte a IPv6',
+        ipv6SupportHelper:
+            'Controla o gerenciamento e a aplicação das regras de firewall IPv6 sem afetar a rede IPv6 do servidor.',
+        ipv6DisableContainerHelper: 'Ocultar as informações de portas IPv6 dos contêineres.',
+        ipv6DisableWhitelistHelper:
+            'Remover as regras IPv6 da lista de permissões e manter as demais regras IPv6 existentes.',
+        ipv6DisableRulesHelper: 'Desativar as regras IPv6 de iptables e nftables gerenciadas pelo 1Panel.',
+        ipv6DisableNetworkHelper: 'Isso não desativa a rede IPv6 do servidor.',
+        ipv6DisableEffectHelper:
+            'As restrições de acesso IPv6 e o encaminhamento de portas afetados deixarão de ser aplicados.',
+        ipv6Disabled: 'O suporte a IPv6 está desativado. Ative-o primeiro nas configurações do firewall.',
+        familyRepair: 'Reparar',
+        familyIncomplete: 'As cadeias de {0} estão incompletas',
+        resetWithBackup: 'Salvar regras e redefinir',
+        resetOnly: 'Apenas redefinir',
+        resetWithBackupHelper: 'Salve as regras do módulo atual em JSON para restaurá-las durante a inicialização.',
+        resetOnlyHelper: 'Limpar as regras atuais sem criar um novo backup. Os backups existentes são mantidos.',
+        backupDirectoryHelper:
+            'Os backups válidos de regras em {0} são listados abaixo. O mais recente é selecionado por padrão.',
+        restoreAllRules: 'Inicializar e restaurar regras',
+        importRuleBackup: 'Importar do backup',
+        initializeOnly: 'Apenas inicializar',
+        backupRuleCount: 'Número de regras',
+        noRuleBackup: 'Nenhum backup de regras disponível para restauração',
+        ruleBackupLoadFailed:
+            'Não foi possível carregar os backups das regras. Tente novamente ou inicialize sem restaurar um backup.',
         create: 'Criar regra',
         edit: 'Editar regra',
         quickJump: 'Acesso rápido',
         used: 'Usado',
         unUsed: 'Não usado',
-        managed: 'Criada pelo painel',
-        managedHelper: 'Criada e mantida pelo 1Panel. Pode ser editada ou excluída.',
-        adopted: 'Externa gerenciada',
-        adoptedHelper: 'Uma regra existente do sistema que agora é mantida pelo 1Panel.',
-        external: 'Regra externa',
-        externalHelper:
-            'Regra existente do sistema que ainda não é gerenciada pelo 1Panel. Pode ser adotada quando necessário.',
-        protected: 'Protegida pelo sistema',
-        protectedHelper:
-            'As regras integradas e as que correspondem exatamente à lista de permissões não podem ser editadas nem excluídas.',
-        stateShort: {
-            managed: 'Painel',
-            adopted: 'Gerenciada',
-            external: 'Externa',
-            protected: 'Protegida',
-            drifted: 'Divergente',
-        },
+        whitelist: 'Lista de permissões',
+        builtinRuleProtected: 'Regra de proteção integrada do sistema. Não pode ser editada nem excluída.',
+        whitelistRuleProtected:
+            'Regras da lista de permissões permitem alterar apenas a ordem e a descrição. Para outras alterações, acesse Configurações → Lista de portas permitidas.',
         ruleTargetRequired: 'Informe pelo menos um endereço IP ou uma porta',
-        resolution_adopt: 'Assumir gerenciamento',
-        plan_duplicate_rules:
-            'Regras duplicadas com condições e ações idênticas não podem ser gerenciadas. Exclua manualmente as regras duplicadas e tente novamente.',
-        adoptRuleConfirm: 'Depois disso, o 1Panel poderá manter e excluir esta regra existente. Continuar?',
-        plan_exact_rule_conflict:
-            'Já existe uma regra com as mesmas condições, mas com uma ação oposta de permitir ou negar.',
-        allRulesAlreadyExist: 'Todas as {0} regras verificadas já existem. Não há novas regras para criar.',
-        plan_managed_rule_drifted:
-            'A regra gerenciada não corresponde ao firewall ativo. Resolva a divergência primeiro.',
-        plan_opaque_rule_in_target_scope:
-            'O escopo contém uma regra que não pode ser analisada com segurança. A operação foi interrompida.',
-        plan_runtime_permanent_mismatch: 'As configurações ativa e permanente são diferentes. Sincronize-as primeiro.',
-        plan_protected_rule: 'Esta regra está protegida e não pode ser assumida, alterada ou excluída.',
-        plan_blocked: 'A regra não pode ser aplicada com segurança. Atualize a lista e tente novamente.',
         largeRuleSet:
             'Regras de firewall em excesso podem tornar as operações lentas. Recomendamos usar iptables ou nftables.',
-        scopeDefaultMismatch: 'A zona padrão do sistema é {0}; esta página gerencia apenas a zona public.',
         scopeMissing: 'O escopo gerenciado {0} não existe e será criado com segurança ao aplicar a primeira regra.',
-        scopeUnmanagedActive: 'Outros escopos ativos foram detectados: {0}. O 1Panel não modificará suas regras.',
         dockerRestart: 'Operações de firewall exigem reinicialização do serviço Docker',
         firewallHelper: 'Firewall do sistema {0}',
         firewallNotStart: 'O firewall do sistema não está habilitado atualmente. Habilite-o primeiro.',
@@ -4399,7 +4396,7 @@ const message = {
         systemFirewall: 'Firewall do host',
         systemFirewallHelper: 'Controla o acesso às portas do host e as regras de entrada.',
         forwardPolicyDropWarning:
-            'A política padrão de FORWARD para {0} é DROP. O tráfego encaminhado para outros hosts pode ser bloqueado se não for permitido explicitamente pelas regras do iptables/ip6tables. Verifique as regras de permissão da versão IP correspondente.',
+            'Este servidor restringe o encaminhamento de rede. As regras de encaminhamento de portas podem não funcionar.',
         forwardingHelper: 'Gerencia regras de encaminhamento de portas.',
         dockerFirewallHelper: 'Seleciona como o 1Panel gerencia a proteção de portas de contêineres.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4408,6 +4405,8 @@ const message = {
         addressFamily: 'Versão do IP',
         portOrRange: 'Porta / intervalo',
         batchLimit: 'Crie ou importe no máximo {0} regras por lote, após a expansão.',
+        importDuplicatesRemoved:
+            'Foram removidas {0} regras duplicadas, incluindo repetições no arquivo e regras já existentes.',
         importLimit: 'Importe até {0} regras (contadas após a expansão), com um arquivo de no máximo {1} KB.',
         ruleSyncTitle: 'Sincronizar regras',
         ruleSyncAction: 'Sincronizar regras',
@@ -4425,19 +4424,9 @@ const message = {
         ruleSyncBlocked: 'Indisponíveis',
         ruleSyncReason: 'Resultado da verificação',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: 'A regra já corresponde à política do banco de dados.',
-            managedOrderDiffers: 'A ordem das regras gerenciadas difere da sequência do banco de dados.',
-            managedOnlyInTarget: 'A regra gerenciada existe apenas no firewall de destino.',
-            managedRuntimeCannotRemove: 'A regra ativa gerenciada não pode ser removida com segurança.',
             missingFromTarget: 'A regra não existe no firewall de destino.',
-            targetDiffers: 'A regra de destino difere da política do banco de dados.',
             alreadyExistsInTarget: 'A regra já existe no firewall de destino.',
             onlyInTarget: 'A regra existe apenas no firewall de destino.',
-            stale: 'O estado da regra está desatualizado. Atualize e tente novamente.',
-            protectedRule: 'Esta regra protegida do firewall não pode ser modificada.',
-            dockerAcceptReadOnly:
-                'Esta regra ACCEPT é somente leitura e será preservada durante a sincronização das outras regras. Para removê-la, exclua-a manualmente no host.',
-            cannotReconcile: 'Não foi possível sincronizar a regra de destino: {0}',
         },
         ruleSyncPartial: 'Sincronização concluída: {0} com sucesso, {1} já existiam e {2} falharam.',
         ruleSyncSuccess: 'Sincronização concluída: {0} com sucesso, {1} já existiam e {2} removidas.',
@@ -4447,17 +4436,20 @@ const message = {
             remove: 'A remover',
             blocked: 'Indisponível',
         },
+        initializeFromFile: 'Inicializar pelo arquivo',
+        downloadRuleBackup: 'Baixar backup das regras',
+        importFileHelper:
+            'Importe arquivos JSON de até 64 MB em lotes, na ordem do arquivo. Regras que não puderem ser convertidas serão informadas como erros.',
         resetDirectRulesHelper:
-            'Exclua de {0} as cadeias, regras em execução e arquivos persistentes do firewall do 1Panel; as políticas salvas no banco são mantidas',
+            'Excluir todas as cadeias do firewall do host do 1Panel, regras ativas e arquivos persistentes de {0}.',
         resetWhitelistRulesHelper:
-            'Redefina a configuração personalizada ativa em {0}, restaure os padrões de instalação e desative {0}; as políticas do banco são mantidas e podem ser sincronizadas novamente.',
+            'Redefinir as configurações personalizadas de {0}, restaurar os padrões e desativá-lo.',
         cleanupForwardingBackendHelper:
-            'Redefina as regras de execução de encaminhamento de portas do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
+            'Exclua de {0} todas as regras e cadeias de encaminhamento do 1Panel e os arquivos de recuperação automática. Os backups JSON existentes são mantidos.',
         cleanupDockerBackendHelper:
-            'Redefina as regras de execução de proteção de portas Docker do 1Panel em {0}: exclua todas as regras e cadeias relacionadas e mantenha os dados do banco de dados',
+            'Exclua de {0} todas as regras e cadeias de proteção Docker do 1Panel e os arquivos de recuperação automática. Os backups JSON existentes são mantidos.',
         cleanupBeforeBackendSwitch:
-            'O backend atual {0} ainda contém regras de execução do 1Panel. Redefina-o antes de mudar para {1}. A redefinição remove apenas as regras de execução; as políticas do banco são mantidas e podem ser inicializadas ou sincronizadas após a troca.',
-        cleanupAction: 'Redefinir',
+            'Redefina o {0} atual antes de mudar para {1} e confirme como as regras serão restauradas.',
         backendSwitchNotice:
             'Recomenda-se habilitar apenas uma forma de gerenciamento de firewall. Executar vários firewalls ao mesmo tempo pode causar conflitos de regras, estados inconsistentes ou falhas de acesso às portas dos contêineres.',
         switchBackendHelper: 'Mudar para {0}?',
@@ -4505,8 +4497,7 @@ const message = {
         portDetails: 'Detalhes da porta',
         orphanEndpoints: 'Endpoints não associados',
         orphanPolicies: 'Regras não associadas',
-        orphanPoliciesHelper:
-            'As {0} regra(s) a seguir não estão vinculadas a uma porta Docker. Elas serão vinculadas automaticamente quando uma porta correspondente for detectada.',
+        orphanPoliciesHelper: 'Estas {0} regras do sistema não têm uma porta publicada do Docker correspondente.',
         composeOrApp: 'Compose / Aplicativo',
         sources: 'Origens',
         deniedSources: 'Origens negadas',
@@ -4515,6 +4506,8 @@ const message = {
         protectionMode: 'Modo de proteção',
         denySources: 'Negar origens especificadas',
         allowSources: 'Permitir somente origens especificadas',
+        acceptSources: 'Aceitar diretamente as origens especificadas',
+        acceptAll: 'Aceitar diretamente todo o tráfego',
         denyAll: 'Negar todo o acesso',
         dockerGuardMixedFamilyHelper:
             'IPv4 e IPv6 estão selecionados. Configure as políticas baseadas em origem separadamente; bloquear tudo pode ser aplicado diretamente.',
@@ -4560,7 +4553,7 @@ const message = {
             'Desvincular - Quando desvinculado, todas as regras de firewall adicionadas se tornarão inválidas. Prossiga com cautela. Confirmar?',
         portWhiteList: 'Lista branca de portas',
         whitelistConfigHelper:
-            'A lista de permissões apenas salva a configuração e protege as regras de permissão correspondentes. As regras ausentes são adicionadas ao iniciar, reiniciar, inicializar ou sincronizar. Editar ou excluir entradas não remove as regras existentes.',
+            'Salvar a lista de permissões adiciona as regras de permissão ausentes e protege as correspondentes. Editar ou excluir entradas da lista não remove regras existentes.',
         whitelistDeleteConfirm:
             'Apenas esta entrada da lista de permissões será excluída. As regras existentes do firewall serão mantidas. Continuar?',
         portWhiteListHelper:
@@ -4578,7 +4571,7 @@ const message = {
         whitelistServicePortsHelper:
             'Informe uma única porta (1-65535). Isso não altera a porta de escuta do serviço. Alterar a porta nas configurações do serviço também atualiza esta entrada da lista de permissões.',
         whitelistSourcesHelper:
-            'Insira endereços IP ou intervalos CIDR separados por vírgulas ou quebras de linha. Deixe em branco para permitir todas as origens IPv4 e IPv6.',
+            'Insira endereços IP ou intervalos CIDR separados por vírgulas ou quebras de linha. Deixe em branco para permitir {0}.',
         destinationPortPlaceholder: 'por exemplo: 80, 80,443 ou 8080-8089',
         deleteRuleConfirm: 'Excluirá {0} regras. Continuar?',
         deleteUsedRuleConfirm:
@@ -7386,12 +7379,17 @@ const message = {
             storagePoolHelper: 'O pool de armazenamento guarda os discos das máquinas virtuais e os arquivos ISO.',
             network: 'Rede',
             bridgeName: 'Nome da Bridge',
+            sourceInterface: 'Interface de rede do host',
+            macvtapNetworkHelper:
+                'A VM funciona como um computador independente na LAN. Outros dispositivos podem acessar seu IP diretamente, sem alterar as configurações de IP do host. Atenção: por padrão, o host e a VM não podem se comunicar diretamente por esta conexão.',
+            macvtapInterfaceHelper:
+                'Selecione uma interface cabeada conectada à LAN desejada; ela pode ser compartilhada com o host. A LAN atribui o IP da VM, ou você pode configurá-lo manualmente na VM. A rede deve permitir vários dispositivos nesta interface (vários endereços MAC).',
             natNetworkHelper:
-                'As VMs podem acessar a rede pelo host, mas dispositivos externos geralmente não podem acessá-las diretamente.',
+                'Indicado para VMs que precisam de acesso à internet ou oferecem poucos serviços. A VM acessa a internet pelo host. Outros dispositivos geralmente precisam de encaminhamento de portas configurado separadamente para acessar seus serviços.',
             bridgeNetworkHelper:
-                'Conecte as VMs a uma bridge existente do host (como br0). Se o host tiver uma placa de rede adicional não utilizada, crie uma bridge para ela e use-a.',
+                'A VM funciona como um computador independente conectado a um switch. Tanto o host quanto outros dispositivos da LAN podem acessá-la diretamente. Primeiro, configure uma bridge no host.',
             bridgeNameHelper:
-                'Selecione uma Linux bridge existente no host, como br0. NICs físicas não são bridges, e bridges gerenciadas por docker/libvirt não podem ser selecionadas aqui.',
+                'Selecione uma bridge configurada, como br0. Se não houver nenhuma, crie uma no host primeiro. Interfaces físicas e bridges gerenciadas pelo Docker/libvirt não podem ser selecionadas aqui.',
             natCIDRHelper: 'CIDR, gateway e intervalo DHCP são usados pela nova rede virtual NAT.',
             networkCIDR: 'CIDR da Rede',
             gateway: 'Gateway',
@@ -7409,6 +7407,7 @@ const message = {
             available: 'Disponível',
             vmCount: 'VMs Vinculadas',
             usedIPs: 'IPs Usados',
+            usedIPsUnavailable: 'Consulta ainda não disponível',
             monitor: 'Monitoramento',
             monitorNotReady: 'A máquina virtual não está em execução. Os dados de monitoramento não estão disponíveis.',
             monitorLoadFailed: 'Falha ao obter os dados de monitoramento da VM.',

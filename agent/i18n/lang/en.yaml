@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'The Docker DOCKER-USER chain was not found. Restart Docker and try again'
 ErrDockerNftablesChainUnavailable: 'The Docker nftables IPv4 firewall chain was not found. Verify that the current Docker version supports the nftables firewall backend, restart Docker, and try again'
-ErrDockerForwardPolicyDrop: '{{ .family }} FORWARD defaults to DROP. Adjust the policy and retry'
-ErrUFWRuleAdopt: 'Failed to adopt the UFW rule: {{ .detail }}. If the installed UFW version is earlier than 0.35, upgrade UFW and try again'
+ErrDockerForwardPolicyDrop: 'This server restricts network forwarding. Container port protection cannot be enabled at this time.'
 Firewall: 'Firewall'
 FirewallTaskHost: 'Host firewall'
 FirewallTaskForwarding: 'Port forwarding'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'Create firewall rules'
 FirewallCreateRulesResult: 'Creation result: {{ .succeeded }} succeeded, {{ .failed }} failed, {{ .skipped }} not executed'
 FirewallRuleOperationResult: 'Operation result: {{ .succeeded }} succeeded, {{ .failed }} failed'
 FirewallCreateRuleSkipped: 'Not executed'
-FirewallCreateBatchStep: 'Submit {{ .count }} rules as a batch to {{ .backend }}'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}; converted to {{ .count }} rules'
-FirewallCreateRuleExecutionFailed: 'Rule creation failed; no database record was saved and executed commands were not rolled back'
-FirewallCreateRulePersistenceFailed: 'The rule was created, but its management record could not be saved'
-FirewallAdoptRulePersistenceFailed: 'The rule was adopted, but its management record could not be saved'
-FirewallSyncOperationsResult: 'Synchronization operations: {{ .removed }} deleted, {{ .created }} created, {{ .failed }} failed, {{ .skipped }} not executed, {{ .unchanged }} already matching (no changes needed)'
-FirewallSyncRuleUnchanged: 'Already matching; no changes needed'
-FirewallSyncStep: 'Synchronize rules to {{ .name }}'
-FirewallSyncFailed: '{{ .failed }} firewall rules failed to synchronize'
-FirewallResetSourceStep: 'Reset and disable source firewall {{ .name }}'
-FirewallResetSourceResult: 'Source firewall reset completed; {{ .removed }} database rules were deleted'
+FirewallCreateRuleExecutionFailed: 'Rule creation failed; executed commands were not rolled back'
 FirewallInitializeChainsStep: 'Initialize and bind {{ .name }} base chains'
-FirewallRestoreRulesStep: 'Restore database rules to {{ .name }}'
 FirewallSyncWhitelistStep: 'Synchronize firewall port whitelist'
 FirewallEnableForwardingStep: 'Enable and bind port forwarding chains'
 FirewallRestoreForwardingRulesStep: 'Restore database port forwarding rules'
 FirewallInspectDockerGuardStep: 'Inspect Docker firewall backend and policies'
 FirewallInitializeDockerGuardStep: 'Initialize and bind {{ .name }} port guard chains'
 FirewallPersistDockerGuardStep: 'Persist Docker port guard status'
-ErrFirewallRuleScopeChange: "The current firewall does not support changing a rule's scope (such as its IPv4/IPv6 address family). Please create a new rule."
-FirewallWhitelistReleased: "{{ .name }}: whitelist protection released; allow rule retained. To close the port, delete the rule manually from the rule list"
-FirewallWhitelistRequired: "{{ .name }}: protected by mandatory system port rules"
 FileTaskCopy: 'Copy files to {{ .dst }}'
 FileTaskMove: 'Move files to {{ .dst }}'
 FileTaskCompress: 'Compress files to {{ .dst }}'
@@ -727,10 +713,11 @@ FileTaskDecompress: 'Extract files to {{ .dst }}'
 FileTaskSource: 'Source path: {{ .path }}'
 FileTaskFormat: 'Archive format: {{ .format }}'
 FileTaskRename: 'Target filename: {{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "The current backend {{ .current }} still contains 1Panel rules. Clean it up before switching to {{ .target }}."
 ErrDockerIPv4ForwardingDisabled: "IPv4 forwarding is disabled. Set net.ipv4.ip_forward=1 before using Docker's firewall backend."
 ErrFirewallRuleSavedApplyFailed: "The new rule configuration was saved, but applying it to the firewall failed. Retry by synchronizing: {{ .detail }}"
+ErrFirewallRuleConflict: "A UFW rule with the same match conditions and a different action already exists. Edit the existing rule instead."
+ErrForwardInterfaceNotFound: "Network interface {{ .name }} specified by the forwarding rule does not exist. Check the interface name and retry."
 
 ErrSSHPublicKey: "Enter a valid SSH public key"
 ErrSSHPrivateKey: "Invalid SSH private key or incorrect passphrase; encrypted keys require the original passphrase"

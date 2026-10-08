@@ -18,6 +18,8 @@ const (
 	ModeSources              = "deny_sources"
 	ModeAllow                = "allow_sources"
 	ModeAll                  = "deny_all"
+	ModeAcceptSources        = "accept_sources"
+	ModeAcceptAll            = "accept_all"
 	StatusEffective          = "effective"
 	StatusDisabled           = "disabled"
 	StatusNotEffective       = "not_effective"
@@ -35,7 +37,12 @@ type FamilyError struct {
 	Err    error
 }
 
-func (e *FamilyError) Error() string { return fmt.Sprintf("%s Docker port guard: %v", e.Family, e.Err) }
+func (e *FamilyError) Error() string {
+	if err, ok := e.Err.(buserr.BusinessError); ok && err.Msg == "ErrDockerForwardPolicyDrop" {
+		return err.Error()
+	}
+	return fmt.Sprintf("%s Docker port guard: %v", e.Family, e.Err)
+}
 func (e *FamilyError) Unwrap() error { return e.Err }
 
 type ProxyEndpoint struct {
@@ -55,16 +62,18 @@ type DNATRules struct {
 }
 
 type Policy struct {
-	UUID     string
-	Family   string
-	HostIP   string
-	HostPort uint16
-	Protocol string
-	Mode     string
-	Sources  []string
+	UUID        string
+	Family      string
+	HostIP      string
+	HostPort    uint16
+	Protocol    string
+	Mode        string
+	Sources     []string
+	NativeRules []NativeRule `json:",omitempty"`
 }
 
 type FamilyStatus struct {
+	Partial     bool
 	State       string
 	Reason      string
 	Initialized bool
@@ -78,24 +87,17 @@ type NativeRule struct {
 	Tokens []string `json:"tokens"`
 }
 
-type ReadOnlyPolicy struct {
-	Policy      Policy
-	Action      string
-	Sequence    int64
-	NativeRules []NativeRule
-}
-
 type PolicyInventory struct {
-	Policies          []Policy
-	ReadOnly          []ReadOnlyPolicy
-	ManagedRuleOrders map[string][]int64
+	Policies   []Policy
+	RuleOrders map[string][]int64
 }
 
 type Runtime interface {
-	Initialize([]Policy, PolicyInventory) error
-	Bind() error
+	Initialize([]Policy, PolicyInventory, ...string) error
+	Bind(...string) error
+	OperateFamily(string, bool) error
 	ReplacePolicies([]Policy, PolicyInventory) error
-	Unbind() error
+	Unbind(...string) error
 	Cleanup() error
 	Initialized(string) (bool, error)
 	Status(string) FamilyStatus

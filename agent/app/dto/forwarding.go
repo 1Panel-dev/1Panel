@@ -24,15 +24,11 @@ type ForwardRule struct {
 
 	UsedStatus  string `json:"usedStatus"`
 	Description string `json:"description"`
-
-	IsDesired  bool   `json:"isDesired"`
-	IsRuntime  bool   `json:"isRuntime"`
-	SyncStatus string `json:"syncStatus"`
 }
 
 type ForwardRuleOperate struct {
-	ForceDelete bool                   `json:"forceDelete"`
-	Rules       []ForwardRuleOperation `json:"rules" validate:"required,min=1,dive"`
+	Import bool                   `json:"import"`
+	Rules  []ForwardRuleOperation `json:"rules" validate:"required,min=1,dive"`
 }
 
 type ForwardRuleOperation struct {

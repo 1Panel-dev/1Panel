@@ -21,7 +21,11 @@ func Cleanup() error {
 	commands := make([][]string, 0, 2)
 	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
 		tableFamily := TableFamily(family)
-		if _, err := run("list", "table", tableFamily, TableName); err != nil {
+		_, exists, err := ReadTable(run, tableFamily, TableName)
+		if err != nil {
+			return err
+		}
+		if !exists {
 			continue
 		}
 		commands = append(commands, []string{"delete", "table", tableFamily, TableName})
@@ -64,9 +68,12 @@ func enableBase(prepare bool, requiredPorts []firewall.PortWhitelist) error {
 	return nil
 }
 
-func ensureBaseChains() error {
+func ensureBaseChains(families ...filter.Family) error {
+	if len(families) == 0 {
+		families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	}
 	commands := make([][]string, 0, 10)
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+	for _, family := range families {
 		tableFamily := TableFamily(family)
 		output, tableExists, err := ReadTable(run, tableFamily, TableName)
 		if err != nil {
@@ -106,22 +113,35 @@ func requiredPortCommand(tableFamily string, rule firewall.SystemPort) []string 
 		"accept", "comment", `"`+requiredPortComment+`"`)
 }
 
-func initPreRules(requiredPorts []firewall.PortWhitelist) error {
+func initPreRules(requiredPorts []firewall.PortWhitelist, families ...filter.Family) error {
+	if len(families) == 0 {
+		families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	}
 	ports, err := firewall.NormalizeRequiredPorts(requiredPorts)
 	if err != nil {
 		return err
 	}
 	rules := firewall.ExpandPortWhitelist(ports)
 	var commands [][]string
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+	for _, family := range families {
 		tableFamily := TableFamily(family)
-		output, _, err := readNftObject(run, "-n", "list", "chain", tableFamily, TableName, BasicBeforeChain)
+		output, _, err := ReadTable(run, tableFamily, TableName)
 		if err != nil {
 			return err
+		}
+		chains := ParseTableChains(output)
+		existing := make(map[string]map[string]bool)
+		for _, chain := range []string{BasicBeforeChain, BasicAfterChain} {
+			existing[chain] = make(map[string]bool)
+			for _, line := range strings.Split(chains[chain], "\n") {
+				existing[chain][canonicalRequiredPortRule(line)] = true
+			}
 		}
 		candidates := [][]string{
 			{"add", "rule", tableFamily, TableName, BasicBeforeChain, "iifname", `"lo"`, "accept", "comment", `"Loopback Whitelist"`},
 			{"add", "rule", tableFamily, TableName, BasicBeforeChain, "ct", "state", "{", "established,related", "}", "accept", "comment", `"ESTABLISHED Whitelist"`},
+			{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"},
+			{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "udp", "drop"},
 		}
 		for _, rule := range rules {
 			if rule.Family == string(family) {
@@ -129,90 +149,86 @@ func initPreRules(requiredPorts []firewall.PortWhitelist) error {
 			}
 		}
 		for _, command := range candidates {
+			chain := command[4]
 			expression := strings.Join(command[5:], " ")
-			if !containsRequiredPortRule(output, expression) {
+			key := canonicalRequiredPortRule(expression)
+			if !existing[chain][key] {
+				existing[chain][key] = true
 				commands = append(commands, command)
-				output += "\n" + expression
 			}
 		}
-		commands = append(commands,
-			[]string{"flush", "chain", tableFamily, TableName, BasicAfterChain},
-			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "tcp", "drop"},
-			[]string{"add", "rule", tableFamily, TableName, BasicAfterChain, "meta", "l4proto", "udp", "drop"},
-		)
 	}
 	return runBatch(commands...)
 }
 
-func containsRequiredPortRule(output, expression string) bool {
-	canonical := func(line string) string {
-		line, _, _ = strings.Cut(line, " comment ")
-		line, _, _ = strings.Cut(line, " # handle ")
-		for _, protocol := range []string{"tcp", "udp"} {
-			line = strings.ReplaceAll(line, "meta l4proto "+protocol+" ", "")
-		}
-		line = strings.NewReplacer("{", "", "}", "", ", ", ",", " ,", ",").Replace(line)
-		fields := strings.Fields(line)
-		for index, field := range fields {
-			if index >= 2 && fields[index-2] == "ct" && fields[index-1] == "state" {
-				states := strings.Split(field, ",")
-				for i, state := range states {
-					value, err := strconv.ParseUint(state, 0, 64)
-					if err != nil {
-						continue
-					}
-					switch value {
-					case 1:
-						states[i] = "invalid"
-					case 2:
-						states[i] = "established"
-					case 4:
-						states[i] = "related"
-					case 8:
-						states[i] = "new"
-					case 64:
-						states[i] = "untracked"
-					}
+func canonicalRequiredPortRule(line string) string {
+	line, _, _ = strings.Cut(line, " comment ")
+	line, _, _ = strings.Cut(line, " # handle ")
+	for _, protocol := range []string{"tcp", "udp"} {
+		line = strings.ReplaceAll(line, "meta l4proto "+protocol+" "+protocol+" ", protocol+" ")
+	}
+	line = strings.NewReplacer("{", "", "}", "", ", ", ",", " ,", ",").Replace(line)
+	fields := strings.Fields(line)
+	for index, field := range fields {
+		if index >= 2 && fields[index-2] == "ct" && fields[index-1] == "state" {
+			states := strings.Split(field, ",")
+			for i, state := range states {
+				value, err := strconv.ParseUint(state, 0, 64)
+				if err != nil {
+					continue
 				}
-				slices.Sort(states)
-				fields[index] = strings.Join(states, ",")
-			}
-			if prefix, err := netip.ParsePrefix(field); err == nil {
-				prefix = prefix.Masked()
-				fields[index] = prefix.String()
-				if prefix.Bits() == prefix.Addr().BitLen() {
-					fields[index] = prefix.Addr().String()
+				switch value {
+				case 1:
+					states[i] = "invalid"
+				case 2:
+					states[i] = "established"
+				case 4:
+					states[i] = "related"
+				case 8:
+					states[i] = "new"
+				case 64:
+					states[i] = "untracked"
 				}
 			}
+			slices.Sort(states)
+			fields[index] = strings.Join(states, ",")
 		}
-		return strings.Join(fields, " ")
-	}
-	wanted := canonical(expression)
-	for _, line := range strings.Split(output, "\n") {
-		if canonical(line) == wanted {
-			return true
+		if prefix, err := netip.ParsePrefix(field); err == nil {
+			prefix = prefix.Masked()
+			fields[index] = prefix.String()
+			if prefix.Bits() == prefix.Addr().BitLen() {
+				fields[index] = prefix.Addr().String()
+			}
 		}
 	}
-	return false
+	return strings.Join(fields, " ")
 }
 
-func Bind() error {
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+func Bind(families ...filter.Family) error {
+	if len(families) == 0 {
+		families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	}
+	for _, family := range families {
 		tableFamily := TableFamily(family)
-		if _, err := run("list", "chain", tableFamily, TableName, InputChain); err != nil {
-			return fmt.Errorf("1Panel nftables %s input chain is not initialized: %w", tableFamily, err)
+		initialized, _, err := LoadFamilyInitStatus(family, "base")
+		if err != nil {
+			return err
+		}
+		if !initialized {
+			return fmt.Errorf("1Panel nftables %s chains are not initialized", tableFamily)
 		}
 	}
 	commands := make([][]string, 0, 8)
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+	for _, family := range families {
 		tableFamily := TableFamily(family)
+		commands = append(commands, []string{"add", "table", tableFamily, TableName})
 		commands = append(commands, []string{"flush", "chain", tableFamily, TableName, InputChain})
 		for _, chain := range BasicChains() {
 			commands = append(commands, []string{"add", "rule", tableFamily, TableName, InputChain, "jump", chain})
 		}
 	}
 	if err := runBatch(commands...); err != nil {
-		cleanupErr := flushInputChains()
+		cleanupErr := flushInputChains(families...)
 		return errors.Join(err, cleanupErr)
 	}
 	return PersistRuleset(context.Background())
@@ -225,10 +241,28 @@ func Unbind() error {
 	return PersistRuleset(context.Background())
 }
 
-func flushInputChains() error {
+func flushInputChains(families ...filter.Family) error {
+	if len(families) == 0 {
+		families = []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6}
+	}
 	commands := make([][]string, 0, 2)
-	for _, family := range []filter.Family{filter.FamilyIPv4, filter.FamilyIPv6} {
+	for _, family := range families {
 		commands = append(commands, []string{"flush", "chain", TableFamily(family), TableName, InputChain})
 	}
 	return runBatch(commands...)
+}
+
+func OperateFamily(family filter.Family, initialize bool, ports []firewall.PortWhitelist) error {
+	if family != filter.FamilyIPv4 && family != filter.FamilyIPv6 {
+		return fmt.Errorf("unsupported nftables family %q", family)
+	}
+	if initialize {
+		if err := ensureBaseChains(family); err != nil {
+			return err
+		}
+		if err := initPreRules(ports, family); err != nil {
+			return err
+		}
+	}
+	return Bind(family)
 }

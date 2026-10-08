@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"regexp"
 	"strings"
 )
 
@@ -51,28 +52,6 @@ func RuleMatchKey(rule FirewallRule) (string, error) {
 	normalized.Action, normalized.NativeKind, normalized.OrderBucket = "", "", ""
 	normalized.Priority = nil
 	return normalizedRuleKey(normalized)
-}
-
-func OppositeActions(left, right Action) bool {
-	return left == ActionAccept && (right == ActionDrop || right == ActionReject) ||
-		right == ActionAccept && (left == ActionDrop || left == ActionReject)
-}
-
-func SameRuleContent(before, after FirewallRule) (bool, error) {
-	before, err := NormalizeRule(before)
-	if err != nil {
-		return false, err
-	}
-	after, err = NormalizeRule(after)
-	if err != nil {
-		return false, err
-	}
-	previous, err := RuleMatchKey(before)
-	if err != nil {
-		return false, err
-	}
-	requested, err := RuleMatchKey(after)
-	return err == nil && previous == requested && before.Action == after.Action, err
 }
 
 func normalizedRuleKey(normalized FirewallRule) (string, error) {
@@ -230,4 +209,30 @@ func ObservedRuleMatchesExpected(observed ObservedRule, expected FirewallRule) b
 	gotKey, gotErr := RuleKey(hydrated)
 	wantKey, wantErr := RuleKey(expected)
 	return gotErr == nil && wantErr == nil && gotKey == wantKey
+}
+
+var descriptionCounterPattern = regexp.MustCompile(`\bcounter packets \d+ bytes \d+\b`)
+
+func DescriptionID(observed ObservedRule) (string, error) {
+	if observed.ParseStatus == ParseStatusSupported {
+		key, err := RuleKey(observed.Rule)
+		return "firewall:" + key, err
+	}
+	raw := observed.Raw
+	if observed.Rule.Scope.Provider == ProviderUFW {
+		if end := strings.Index(raw, "]"); strings.HasPrefix(strings.TrimSpace(raw), "[") && end >= 0 {
+			raw = strings.Join(strings.Fields(raw[end+1:]), " ")
+		}
+	}
+	if observed.Rule.Scope.Provider == ProviderNftables {
+		raw = descriptionCounterPattern.ReplaceAllString(raw, "counter")
+	}
+	payload, err := json.Marshal(struct {
+		Scope Scope
+		Raw   string
+	}{observed.Rule.Scope.Normalize(), raw})
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("firewall:%x", sha256.Sum256(payload)), nil
 }

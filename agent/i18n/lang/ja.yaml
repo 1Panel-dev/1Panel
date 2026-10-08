@@ -683,8 +683,7 @@ AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Docker の DOCKER-USER チェーンが見つかりません。Docker を再起動してから再試行してください'
 ErrDockerNftablesChainUnavailable: 'Docker の nftables IPv4 ファイアウォールチェーンが見つかりません。現在の Docker バージョンが nftables ファイアウォールバックエンドをサポートしていることを確認し、Docker を再起動してから再試行してください'
-ErrDockerForwardPolicyDrop: '{{ .family }} FORWARD の既定ポリシーが DROP です。変更してから再試行してください'
-ErrUFWRuleAdopt: 'UFW ルールの管理に失敗しました：{{ .detail }}。現在の UFW バージョンが 0.35 未満の場合は、UFW をアップグレードしてから再試行してください'
+ErrDockerForwardPolicyDrop: 'このサーバーではネットワーク転送が制限されているため、現在コンテナのポート保護を有効にできません。'
 Firewall: 'ファイアウォール'
 FirewallTaskHost: 'ホストファイアウォール'
 FirewallTaskForwarding: 'ポート転送'
@@ -698,28 +697,15 @@ FirewallCreateRulesStep: 'ファイアウォールルールを作成'
 FirewallCreateRulesResult: '作成結果：成功 {{ .succeeded }} 件、失敗 {{ .failed }} 件、未実行 {{ .skipped }} 件'
 FirewallRuleOperationResult: '操作結果：成功 {{ .succeeded }} 件、失敗 {{ .failed }} 件'
 FirewallCreateRuleSkipped: '未実行'
-FirewallCreateBatchStep: '{{ .backend }} に {{ .count }} 件のルールを一括送信'
 FirewallImportRuleConversion: '[{{ .index }}/{{ .total }}] {{ .source }} → {{ .target }}: {{ .rule }}；{{ .count }} 件のルールに変換'
-FirewallCreateRuleExecutionFailed: 'ルールの作成に失敗しました。データベースには保存せず、実行済みのコマンドはロールバックしません'
-FirewallCreateRulePersistenceFailed: 'ルールは作成されましたが、管理情報の保存に失敗しました'
-FirewallAdoptRulePersistenceFailed: 'ルールの管理対象への取り込みコマンドは実行されましたが、管理情報の保存に失敗しました'
-FirewallSyncOperationsResult: '同期操作：削除成功 {{ .removed }} 件、作成成功 {{ .created }} 件、失敗 {{ .failed }} 件、未実行 {{ .skipped }} 件、一致済みで変更不要 {{ .unchanged }} 件'
-FirewallSyncRuleUnchanged: '一致済み、変更不要'
-FirewallSyncStep: '{{ .name }} にルールを同期'
-FirewallSyncFailed: '{{ .failed }} 件のファイアウォールルールを同期できませんでした'
-FirewallResetSourceStep: '移行元ファイアウォール {{ .name }} をリセットして無効化'
-FirewallResetSourceResult: '移行元ファイアウォールをリセットし、データベースルール {{ .removed }} 件を削除しました'
+FirewallCreateRuleExecutionFailed: 'ルールの作成に失敗しました。実行済みのコマンドはロールバックしません'
 FirewallInitializeChainsStep: '{{ .name }} のベースチェーンを初期化してバインド'
-FirewallRestoreRulesStep: 'データベースルールを {{ .name }} に復元'
 FirewallSyncWhitelistStep: 'ファイアウォールポート許可リストを同期'
 FirewallEnableForwardingStep: 'ポート転送チェーンを有効化してバインド'
 FirewallRestoreForwardingRulesStep: 'データベースのポート転送ルールを復元'
 FirewallInspectDockerGuardStep: 'Docker ファイアウォールバックエンドと保護ポリシーを確認'
 FirewallInitializeDockerGuardStep: '{{ .name }} のポート保護チェーンを初期化してバインド'
 FirewallPersistDockerGuardStep: 'Docker ポート保護状態を保存'
-ErrFirewallRuleScopeChange: "現在のファイアウォールでは、ルールの適用範囲（IPv4/IPv6 アドレスファミリーなど）を変更できません。新しいルールを作成してください。"
-FirewallWhitelistReleased: "{{ .name }}：許可リストの保護を解除しました。許可ルールは保持されます。ポートを閉じるには、ルール一覧から手動で削除してください"
-FirewallWhitelistRequired: "{{ .name }}：システム必須ポートのルールで保護されています"
 FileTaskCopy: 'ファイルを {{ .dst }} にコピー'
 FileTaskMove: 'ファイルを {{ .dst }} に移動'
 FileTaskCompress: 'ファイルを {{ .dst }} に圧縮'
@@ -727,11 +713,13 @@ FileTaskDecompress: 'ファイルを {{ .dst }} に展開'
 FileTaskSource: '元のパス：{{ .path }}'
 FileTaskFormat: '圧縮形式：{{ .format }}'
 FileTaskRename: '保存先ファイル名：{{ .name }}'
-
 ErrFirewallBackendCleanupRequired: "現在のバックエンド {{ .current }} に 1Panel ルールが残っています。{{ .target }} に切り替える前に削除してください。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 転送が無効です。Docker のファイアウォールバックエンドを使用する前に net.ipv4.ip_forward=1 を設定してください。"
 ErrFirewallRuleSavedApplyFailed: "新しいルール設定は保存されましたが、ファイアウォールへの適用に失敗しました。同期で再試行してください：{{ .detail }}"
+ErrFirewallRuleConflict: "UFW に同じ一致条件でアクションが異なるルールが既に存在します。既存のルールを編集してください。"
+ErrForwardInterfaceNotFound: "転送ルールで指定されたネットワークインターフェース {{ .name }} は存在しません。名前を確認して再試行してください。"
 
 ErrSSHPublicKey: "有効な SSH 公開鍵を入力してください"
 ErrSSHPrivateKey: "SSH 秘密鍵の形式が無効か、パスフレーズが間違っています。暗号化された鍵には元のパスフレーズが必要です"
 ErrSSHKeyMismatch: "SSH 公開鍵と秘密鍵が一致しません"
+

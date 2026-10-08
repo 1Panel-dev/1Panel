@@ -81,6 +81,7 @@ func RunScriptContext(ctx context.Context, script string) error {
 	return runScriptFile(script, func(file string) error {
 		return cmd.NewCommandMgr(
 			cmd.WithContext(ctx),
+			cmd.WithEnv("LC_ALL=C"),
 			cmd.WithTimeout(60*time.Second),
 		).RunWithOptionalSudo("nft", "-f", file)
 	})
@@ -169,26 +170,35 @@ func hasBaseChainBinding(output string) bool {
 }
 
 func loadFamilyInitStatus(family filter.Family) (bool, bool, error) {
+	initialized, bound, _, err := LoadFamilyState(family)
+	return initialized, bound, err
+}
+
+func LoadFamilyState(family filter.Family) (bool, bool, bool, error) {
 	output, exists, err := ReadTable(run, TableFamily(family), TableName)
 	if err != nil || !exists {
-		return false, false, err
+		return false, false, false, err
 	}
 	chains := ParseTableChains(output)
-	for _, chain := range BasicChains() {
-		if _, exists := chains[chain]; !exists {
-			return false, false, nil
+	count := 0
+	for _, chain := range append(BasicChains(), InputChain) {
+		if _, ok := chains[chain]; ok {
+			count++
 		}
+	}
+	if count != len(BasicChains())+1 {
+		return false, false, count > 0, nil
 	}
 	input, exists := chains[InputChain]
 	if !exists {
-		return false, false, nil
+		return false, false, false, nil
 	}
 	for _, chain := range BasicChains() {
 		if !strings.Contains(input, "jump "+chain) {
-			return true, false, nil
+			return true, false, false, nil
 		}
 	}
-	return true, true, nil
+	return true, !TableDormant(output), false, nil
 }
 
 func ReadTable(run func(...string) (string, error), family, table string) (string, bool, error) {
@@ -227,4 +237,34 @@ func ReadChain(run func(...string) (string, error), family, table, chain string)
 		return "", ErrChainNotFound
 	}
 	return output, nil
+}
+
+func TableDormant(output string) bool {
+	for _, line := range strings.Split(output, "\n") {
+		fields := strings.Fields(strings.TrimSuffix(strings.TrimSpace(line), ";"))
+		if len(fields) > 0 && fields[0] == "chain" {
+			break
+		}
+		if len(fields) > 1 && fields[0] == "flags" {
+			for _, flag := range strings.Split(strings.Join(fields[1:], ""), ",") {
+				if flag == "dormant" {
+					return true
+				}
+			}
+		}
+	}
+	return false
+}
+
+func SetTableDormant(ctx context.Context, family, table string) error {
+	manager := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(60*time.Second))
+	output, exists, err := ReadTable(func(args ...string) (string, error) { return manager.RunWithOptionalSudoAndStdout("nft", args...) }, family, table)
+	if err != nil || !exists || TableDormant(output) {
+		return err
+	}
+	script, err := buildBatchScript([]string{"add", "table", family, table, "{", "flags", "dormant", ";", "}"})
+	if err != nil {
+		return err
+	}
+	return RunScriptContext(ctx, script)
 }

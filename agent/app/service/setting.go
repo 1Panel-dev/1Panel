@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -44,6 +45,7 @@ type ISettingService interface {
 	GetLocalConnForSSH() (dto.SSHConnData, error)
 
 	SaveDescription(req dto.CommonDescription) error
+	CleanupDescriptions(context.Context) (int64, error)
 }
 
 func NewISettingService() ISettingService {

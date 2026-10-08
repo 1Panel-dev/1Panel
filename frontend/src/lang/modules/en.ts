@@ -4250,45 +4250,41 @@ const message = {
         useEAB: 'Use EAB authentication',
     },
     firewall: {
+        ipv6Support: 'IPv6 support',
+        ipv6SupportHelper:
+            'Controls the management and enforcement of IPv6 firewall rules without affecting IPv6 networking on the server.',
+        ipv6DisableContainerHelper: 'Hide IPv6 port information for containers.',
+        ipv6DisableWhitelistHelper: 'Remove IPv6 rules from the allowlist and retain all other existing IPv6 rules.',
+        ipv6DisableRulesHelper: 'Disable IPv6 rules managed by 1Panel in iptables and nftables.',
+        ipv6DisableNetworkHelper: 'This does not disable IPv6 networking on the server.',
+        ipv6DisableEffectHelper:
+            'The affected IPv6 access restrictions and port forwarding will no longer take effect.',
+        ipv6Disabled: 'IPv6 support is disabled. Enable it in firewall settings first.',
+        familyRepair: 'Repair',
+        familyIncomplete: '{0} chains are incomplete',
+        resetWithBackup: 'Back up rules and reset',
+        resetOnly: 'Reset only',
+        resetWithBackupHelper: 'Save the current module rules as JSON for restoration during initialization.',
+        resetOnlyHelper: 'Clear current rules without creating a new backup. Existing backups are kept.',
+        backupDirectoryHelper: 'Valid rule backups in {0} are listed below. The newest file is selected by default.',
+        restoreAllRules: 'Initialize and restore rules',
+        importRuleBackup: 'Import from backup',
+        initializeOnly: 'Initialize only',
+        backupRuleCount: 'Rule count',
+        noRuleBackup: 'No restorable rule backups found',
+        ruleBackupLoadFailed: 'Failed to load rule backups. Retry or choose initialization without restoring a backup.',
         create: 'Create rule',
         edit: 'Edit rule',
         quickJump: 'Quick access',
         used: 'Used',
         unUsed: 'Unused',
-        managed: 'Panel-created',
-        managedHelper: 'Created and managed by 1Panel.',
-        adopted: 'Externally managed',
-        adoptedHelper: 'An existing system rule now managed by 1Panel.',
-        external: 'External rule',
-        externalHelper: 'Not managed by 1Panel.',
-        protected: 'System-protected',
-        protectedHelper: 'Built-in rules and rules that exactly match the whitelist cannot be edited or deleted.',
-        stateShort: {
-            managed: 'Panel-created',
-            adopted: 'Externally managed',
-            external: 'External rule',
-            protected: 'System-protected',
-            drifted: 'Abnormal',
-        },
+        whitelist: 'Whitelist',
+        builtinRuleProtected: 'Built-in system protection rule. It cannot be edited or deleted.',
+        whitelistRuleProtected:
+            'Whitelist rules allow only order and description changes. For other changes, go to Settings → Port whitelist.',
         ruleTargetRequired: 'Enter at least one IP address or port',
-        resolution_adopt: 'Take over management',
-        plan_duplicate_rules:
-            'Rules with identical conditions and actions cannot be adopted. Manually delete duplicate rules and retry.',
-        adoptRuleConfirm: 'After takeover, 1Panel can maintain and delete this existing rule. Continue?',
-        plan_exact_rule_conflict: 'A rule with identical matching conditions has an opposing allow or deny action.',
-        allRulesAlreadyExist: 'All {0} checked rules already exist. There are no new rules to create.',
-        plan_managed_rule_drifted:
-            'The 1Panel management record differs from the live firewall rule. Check the system rule.',
-        plan_opaque_rule_in_target_scope:
-            'The target scope contains a rule that cannot be parsed safely. The operation was stopped.',
-        plan_runtime_permanent_mismatch:
-            'The runtime and permanent firewall configurations differ. Synchronize them first.',
-        plan_protected_rule: 'This rule is protected and cannot be taken over, changed, or deleted.',
-        plan_blocked: 'This rule cannot be applied safely. Refresh the rules and try again.',
         largeRuleSet: 'Too many firewall rules may slow down operations. We recommend using iptables or nftables.',
-        scopeDefaultMismatch: 'The system default zone is {0}; this page manages only the public zone.',
         scopeMissing: 'Managed scope {0} is missing and will be created safely when the first rule is applied.',
-        scopeUnmanagedActive: 'Other active scopes were detected: {0}. 1Panel will not modify their rules.',
         dockerRestart: 'Firewall operations require restarting the Docker service',
         firewallHelper: '{0} system firewall',
         firewallNotStart: 'The system firewall is not enabled at present. Enable it first.',
@@ -4311,7 +4307,7 @@ const message = {
         systemFirewall: 'Host firewall',
         systemFirewallHelper: 'Controls host port access and inbound firewall rules.',
         forwardPolicyDropWarning:
-            'The default FORWARD policy for {0} is DROP. Traffic forwarded to other hosts may be blocked unless explicitly allowed by iptables/ip6tables rules. Check the allow rules for the corresponding IP version.',
+            'This server restricts network forwarding. Port forwarding rules may not take effect.',
         forwardingHelper: 'Manages port-forwarding rules.',
         dockerFirewallHelper: 'Selects how 1Panel manages container port protection.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4320,6 +4316,8 @@ const message = {
         addressFamily: 'IP version',
         portOrRange: 'Port / range',
         batchLimit: 'Create or import at most {0} rules per batch (after expansion).',
+        importDuplicatesRemoved:
+            'Removed {0} duplicate rules, including duplicates within the file and rules that already exist.',
         importLimit: 'Import up to {0} rules (counted after expansion), with a file size of at most {1} KB.',
         ruleSyncTitle: 'Synchronize rules',
         ruleSyncAction: 'Sync rules',
@@ -4337,19 +4335,9 @@ const message = {
         ruleSyncBlocked: 'Unavailable',
         ruleSyncReason: 'Check result',
         ruleSyncReasonDetail: {
-            matchesDatabasePolicy: 'The rule already matches the database policy.',
-            managedOrderDiffers: 'The managed rule order differs from the database sequence.',
-            managedOnlyInTarget: 'The managed rule exists only in the target firewall.',
-            managedRuntimeCannotRemove: 'The managed runtime rule cannot be removed safely.',
             missingFromTarget: 'The rule is missing from the target firewall.',
-            targetDiffers: 'The target rule differs from the database policy.',
             alreadyExistsInTarget: 'The rule already exists in the target firewall.',
             onlyInTarget: 'The rule exists only in the target firewall.',
-            stale: 'The firewall rule state is outdated. Refresh and try again.',
-            protectedRule: 'This protected firewall rule cannot be modified.',
-            dockerAcceptReadOnly:
-                'This ACCEPT rule is read-only and will be preserved while other rules are synchronized. To remove it, delete it manually on the host.',
-            cannotReconcile: 'The target rule cannot be reconciled: {0}',
         },
         ruleSyncPartial: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} failed.',
         ruleSyncSuccess: 'Synchronization completed: {0} succeeded, {1} already existed, and {2} were removed.',
@@ -4359,17 +4347,18 @@ const message = {
             remove: 'To remove',
             blocked: 'Unavailable',
         },
-        resetDirectRulesHelper:
-            'Delete all 1Panel system firewall chains, runtime rules, and persisted files from {0}; saved database policies are retained',
-        resetWhitelistRulesHelper:
-            'Reset the active custom firewall configuration in {0}, restore installation defaults, and disable {0}; saved database policies are retained and can be synchronized again.',
+        initializeFromFile: 'Initialize from file',
+        downloadRuleBackup: 'Download rule backup',
+        importFileHelper:
+            'Import JSON files up to 64 MB in file order, in batches. Rules that cannot be converted are reported as errors.',
+        resetDirectRulesHelper: 'Delete all 1Panel host firewall chains, runtime rules and persistence files in {0}.',
+        resetWhitelistRulesHelper: 'Reset custom configuration in {0}, restore defaults and disable it.',
         cleanupForwardingBackendHelper:
-            'Reset the 1Panel port forwarding runtime rules in {0}: delete all related rules and chains while retaining database data',
+            'Delete all 1Panel forwarding rules, chains, and automatic recovery files from {0}. Existing JSON backups are kept.',
         cleanupDockerBackendHelper:
-            'Reset the 1Panel Docker port protection runtime rules in {0}: delete all related rules and chains while retaining database data',
+            'Delete all 1Panel Docker protection rules, chains, and automatic recovery files from {0}. Existing JSON backups are kept.',
         cleanupBeforeBackendSwitch:
-            'The current {0} backend still contains 1Panel runtime rules. Reset it before switching to {1}. Resetting only removes runtime rules; saved database policies are retained and can be initialized or synchronized after switching.',
-        cleanupAction: 'Reset',
+            'Reset the current {0} before switching to {1}, and confirm how its rules will be restored.',
         backendSwitchNotice:
             'Use only one firewall management method at a time. Running multiple firewalls simultaneously may cause rule conflicts, inconsistent status, or container port access failures.',
         switchBackendHelper: 'Switch to {0}?',
@@ -4417,8 +4406,7 @@ const message = {
         portDetails: 'Port details',
         orphanEndpoints: 'Unassociated endpoints',
         orphanPolicies: 'Unassociated rules',
-        orphanPoliciesHelper:
-            'The following {0} rule(s) are not bound to a Docker port. They will be bound automatically when a matching port is detected.',
+        orphanPoliciesHelper: 'These {0} system rules have no matching published Docker port.',
         composeOrApp: 'Compose / App',
         sources: 'Sources',
         deniedSources: 'Denied sources',
@@ -4427,6 +4415,8 @@ const message = {
         protectionMode: 'Protection mode',
         denySources: 'Deny specified sources',
         allowSources: 'Allow specified sources only',
+        acceptSources: 'Accept specified sources directly',
+        acceptAll: 'Accept all traffic directly',
         denyAll: 'Deny all access',
         dockerGuardMixedFamilyHelper:
             'IPv4 and IPv6 are both selected. Configure source-based policies separately; deny all can be applied directly.',
@@ -4470,7 +4460,7 @@ const message = {
             'Unbind - When unbound, all added firewall rules will become invalid. Proceed with caution. Confirm?',
         portWhiteList: 'Port allowlist',
         whitelistConfigHelper:
-            'The allowlist only saves configuration and protects matching allow rules. Missing rules are added on start, restart, initialization, or synchronization. Editing or deleting allowlist entries does not remove existing rules.',
+            'Saving the allowlist adds missing allow rules and protects matching rules. Editing or deleting allowlist entries does not remove existing rules.',
         whitelistDeleteConfirm:
             'Only this whitelist entry will be deleted. Existing firewall rules will remain. Continue?',
         portWhiteListHelper:
@@ -4488,7 +4478,7 @@ const message = {
         whitelistServicePortsHelper:
             'Enter a single port (1-65535). This does not change the service listening port. Changing the port in the service settings also updates this whitelist entry.',
         whitelistSourcesHelper:
-            'Enter IP addresses or CIDR ranges, separated by commas or new lines. Leave blank to allow all IPv4 and IPv6 sources.',
+            'Enter IP addresses or CIDR ranges, separated by commas or new lines. Leave blank to allow {0}.',
         destinationPortPlaceholder: 'e.g. 80, 80,443, or 8080-8089',
         deleteRuleConfirm: 'Will delete {0} rules. Continue?',
         deleteUsedRuleConfirm:
@@ -7234,12 +7224,17 @@ const message = {
             storagePoolHelper: 'The storage pool stores VM disks and ISO files.',
             network: 'Network',
             bridgeName: 'Bridge Name',
+            sourceInterface: 'Host network interface',
+            macvtapNetworkHelper:
+                'The VM acts like a separate computer on your LAN. Other devices can access its IP directly, without changing the host’s existing IP settings. Note: the host and VM cannot communicate directly through this connection by default.',
+            macvtapInterfaceHelper:
+                'Select a wired interface connected to the intended LAN; it can be shared with the host. The LAN assigns the VM’s IP, or you can set it manually in the VM. The network must allow multiple devices on this interface (multiple MAC addresses).',
             natNetworkHelper:
-                'VMs can access the network through the host, but external devices usually cannot access them directly.',
+                'Suitable for VMs that need internet access or expose only a few services. The VM goes online through the host. Other devices usually need separately configured port forwarding to access its services.',
             bridgeNetworkHelper:
-                'Connect VMs to an existing host bridge (such as br0). If the host has an unused additional NIC, create a bridge for it and use it.',
+                'The VM acts like a separate computer connected to a network switch. Both the host and other LAN devices can access it directly. First, configure a bridge on the host.',
             bridgeNameHelper:
-                'Select an existing Linux bridge on the host, such as br0. Physical NICs are not bridges, and docker/libvirt managed bridges cannot be selected here.',
+                'Select a configured bridge, such as br0. If none are available, create one on the host first. Physical interfaces and bridges managed by Docker/libvirt cannot be selected here.',
             natCIDRHelper: 'CIDR, gateway, and DHCP range are used by the new NAT virtual network.',
             networkCIDR: 'Network CIDR',
             gateway: 'Gateway',
@@ -7257,6 +7252,7 @@ const message = {
             available: 'Available',
             vmCount: 'Linked VMs',
             usedIPs: 'Used IPs',
+            usedIPsUnavailable: 'Retrieval not supported yet',
             monitor: 'Monitor',
             monitorNotReady: 'The virtual machine is not running. Monitoring data is unavailable.',
             monitorLoadFailed: 'Failed to get VM monitoring data.',

@@ -6,6 +6,7 @@ import (
 	"net/netip"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -253,7 +254,7 @@ func saveBaseChainsFamily(ipv6 bool) error {
 	return nil
 }
 
-func RestoreBaseChains(requiredPorts []firewall.PortWhitelist) error {
+func RestoreBaseChains(requiredPorts []firewall.PortWhitelist, families ...string) error {
 	commands, err := lifecycle.ResolveIptablesCommands()
 	if err != nil {
 		return err
@@ -268,7 +269,7 @@ func RestoreBaseChains(requiredPorts []firewall.PortWhitelist) error {
 	if err := restoreRules(commands.Restore4, input); err != nil {
 		return fmt.Errorf("batch restore IPv4 base chains: %w", err)
 	}
-	if !commands.IPv6Available() {
+	if !commands.IPv6Available() || (len(families) > 0 && !slices.Contains(families, constant.FirewallFamilyIPv6)) {
 		return nil
 	}
 	if err := ensureBaseChainsFamily(true); err != nil {
@@ -285,6 +286,7 @@ func RestoreBaseChains(requiredPorts []firewall.PortWhitelist) error {
 }
 
 func buildBaseChainsRestoreScript(firewallDir string, ipv6 bool, requiredPorts ...firewall.PortWhitelist) (string, error) {
+	existing := make(map[string]bool)
 	var script strings.Builder
 	script.WriteString("*filter\n")
 	for _, chain := range BasicChains() {
@@ -314,6 +316,7 @@ func buildBaseChainsRestoreScript(firewallDir string, ipv6 bool, requiredPorts .
 			if !strings.HasPrefix(line, prefix) || strings.ContainsAny(line, "\r\n") {
 				continue
 			}
+			existing[canonicalIptablesRule(line)] = true
 			script.WriteString(line)
 			script.WriteByte('\n')
 		}
@@ -327,7 +330,9 @@ func buildBaseChainsRestoreScript(firewallDir string, ipv6 bool, requiredPorts .
 		return "", err
 	}
 	for _, rule := range defaults {
-		if !containsIptablesRule(script.String(), rule) {
+		key := canonicalIptablesRule(rule)
+		if !existing[key] {
+			existing[key] = true
 			if strings.HasPrefix(rule, "-A "+BasicBeforeChain+" ") && strings.Contains(rule, " --dport ") {
 				rule = strings.Replace(rule, "-A "+BasicBeforeChain+" ", "-I "+BasicBeforeChain+" 1 ", 1)
 			}
@@ -419,23 +424,29 @@ func applyRequiredFirewallPortWhiteListRules(portWhiteList []firewall.PortWhitel
 }
 
 func buildRequiredPortsRestoreScript(desired []firewall.SystemPort, family string, beforeRaw, afterRaw string, includeDefaults bool) string {
+	existing := iptablesRuleIndex(beforeRaw + "\n" + afterRaw)
 	var commands []string
 	for _, line := range []string{"-A " + BasicBeforeChain + " " + IoRuleIn, "-A " + BasicBeforeChain + " " + EstablishedRule} {
-		if !containsIptablesRule(beforeRaw, line) {
+		key := canonicalIptablesRule(line)
+		if !existing[key] {
+			existing[key] = true
 			commands = append(commands, line)
 		}
 	}
 	for _, rule := range desired {
 		line := iptablesSystemPortRuleLine(rule)
-		if rule.Family == family && !containsIptablesRule(beforeRaw, line) {
+		key := canonicalIptablesRule(line)
+		if rule.Family == family && !existing[key] {
+			existing[key] = true
 			commands = append(commands, strings.Replace(line, "-A "+BasicBeforeChain+" ", "-I "+BasicBeforeChain+" 1 ", 1))
-			beforeRaw += "\n" + line
 		}
 	}
 	if includeDefaults {
 		for _, rule := range []string{DropAllTcp, DropAllUdp} {
 			line := "-A " + BasicAfterChain + " " + rule
-			if !containsIptablesRule(afterRaw, line) {
+			key := canonicalIptablesRule(line)
+			if !existing[key] {
+				existing[key] = true
 				commands = append(commands, line)
 			}
 		}
@@ -459,35 +470,101 @@ func containsIptablesRule(output, rule string) bool {
 }
 
 func countIptablesRule(output, rule string) int {
-	canonical := func(value string) string {
-		fields, err := shellwords.Parse(value)
-		if err != nil || len(fields)%2 != 0 {
-			return strings.TrimSpace(value)
-		}
-		var options []string
-		for index := 0; index < len(fields); index += 2 {
-			key, value := fields[index], fields[index+1]
-			if key == "--comment" || key == "-m" && (value == "comment" || value == "tcp" || value == "udp") {
-				continue
-			}
-			if prefix, err := netip.ParsePrefix(value); err == nil {
-				prefix = prefix.Masked()
-				value = prefix.String()
-				if prefix.Bits() == prefix.Addr().BitLen() {
-					value = prefix.Addr().String()
-				}
-			}
-			options = append(options, key+" "+value)
-		}
-		sort.Strings(options)
-		return strings.Join(options, " ")
-	}
-	rule = canonical(rule)
+	rule = canonicalIptablesRule(rule)
 	count := 0
 	for _, line := range strings.Split(output, "\n") {
-		if canonical(line) == rule {
+		if canonicalIptablesRule(line) == rule {
 			count++
 		}
 	}
 	return count
+}
+
+func canonicalIptablesRule(value string) string {
+	fields, err := shellwords.Parse(value)
+	if err != nil || len(fields)%2 != 0 {
+		return strings.TrimSpace(value)
+	}
+	var options []string
+	for index := 0; index < len(fields); index += 2 {
+		key, value := fields[index], fields[index+1]
+		if key == "--comment" || key == "-m" && (value == "comment" || value == "tcp" || value == "udp") {
+			continue
+		}
+		if key == "-m" && value == "state" {
+			value = "conntrack"
+		}
+		if key == "--state" || key == "--ctstate" {
+			key = "--ctstate"
+			states := strings.Split(strings.ToUpper(value), ",")
+			sort.Strings(states)
+			value = strings.Join(states, ",")
+		}
+		if prefix, err := netip.ParsePrefix(value); err == nil {
+			prefix = prefix.Masked()
+			value = prefix.String()
+			if prefix.Bits() == prefix.Addr().BitLen() {
+				value = prefix.Addr().String()
+			}
+		}
+		options = append(options, key+" "+value)
+	}
+	sort.Strings(options)
+	return strings.Join(options, " ")
+}
+
+func iptablesRuleIndex(output string) map[string]bool {
+	rules := make(map[string]bool)
+	for _, line := range strings.Split(output, "\n") {
+		rules[canonicalIptablesRule(line)] = true
+	}
+	return rules
+}
+
+func OperateFamily(family string, initialize bool, ports []firewall.PortWhitelist) error {
+	if family != constant.FirewallFamilyIPv4 && family != constant.FirewallFamilyIPv6 {
+		return fmt.Errorf("unsupported iptables family %q", family)
+	}
+	commands, err := lifecycle.ResolveIptablesCommands()
+	if err != nil {
+		return err
+	}
+	ipv6 := family == constant.FirewallFamilyIPv6
+	read, executable := RunWithStd, commands.Restore4
+	if ipv6 {
+		if !commands.IPv6Available() {
+			return fmt.Errorf("ip6tables and ip6tables-restore are required")
+		}
+		read, executable = RunIPv6WithStd, commands.Restore6
+	}
+	output, err := read(FilterTab, "-S")
+	if err != nil {
+		return err
+	}
+	lines := make([]string, 0)
+	for _, chain := range BasicChains() {
+		if !containsIptablesRule(output, "-N "+chain) {
+			if !initialize {
+				return fmt.Errorf("%s chain %s is not initialized", family, chain)
+			}
+			lines = append(lines, "-N "+chain)
+		}
+	}
+	if initialize {
+		defaults, err := baseDefaultRules(ports, family)
+		if err != nil {
+			return err
+		}
+		existing := iptablesRuleIndex(output)
+		for _, rule := range defaults {
+			if !existing[canonicalIptablesRule(rule)] {
+				lines = append(lines, rule)
+			}
+		}
+	}
+	lines = append(lines, baseChainBindingCommands(output, true)...)
+	if err := restoreRules(executable, "*filter\n"+strings.Join(lines, "\n")+"\nCOMMIT\n"); err != nil {
+		return err
+	}
+	return saveBaseChainsFamily(ipv6)
 }

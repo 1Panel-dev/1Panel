@@ -89,7 +89,7 @@
                     :autosize="{ minRows: 3, maxRows: 8 }"
                     :placeholder="$t('firewall.sourceAddressPlaceholder')"
                 />
-                <span class="input-help">{{ $t('firewall.whitelistSourcesHelper') }}</span>
+                <span class="input-help">{{ $t('firewall.whitelistSourcesHelper', [defaultSources.join(', ')]) }}</span>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -124,6 +124,7 @@ const props = defineProps<{
     panelPort?: string;
     sshPort?: string;
     loading: boolean;
+    ipv6Enabled?: boolean;
 }>();
 const emit = defineEmits<{ (e: 'saved'): void }>();
 const drawerVisible = ref(false);
@@ -132,6 +133,7 @@ const saving = ref(false);
 const busy = computed(() => props.loading || saving.value);
 const disabled = computed(() => busy.value || !props.rules);
 const data = computed(() => props.rules || []);
+const defaultSources = computed(() => (props.ipv6Enabled === false ? ['0.0.0.0/0'] : ['0.0.0.0/0', '::/0']));
 const editingRule = ref<WhiteListRule>();
 const formRef = ref<FormInstance>();
 const form = ref({
@@ -162,6 +164,10 @@ const rules: FormRules = {
     sourceInput: [
         {
             validator: (_rule, value: string, callback) => {
+                if (props.ipv6Enabled === false && splitTagValues([value]).some((source) => source.includes(':'))) {
+                    callback(new Error(i18n.global.t('firewall.ipv6Disabled')));
+                    return;
+                }
                 if (splitTagValues([value]).some((source) => !isValidIPOrCIDR(source))) {
                     callback(new Error(i18n.global.t('commons.rule.ip')));
                     return;
@@ -195,7 +201,7 @@ const openEditor = (rule?: WhiteListRule) => {
         type: rule?.type || 'custom',
         protocol: rule?.protocol || 'tcp',
         port: rule?.port || '',
-        sourceInput: formatHostAddressList(rule ? rule.sources || [] : ['0.0.0.0/0', '::/0']),
+        sourceInput: formatHostAddressList(rule ? rule.sources || [] : defaultSources.value),
     };
     formRef.value?.clearValidate();
     dialogVisible.value = true;
@@ -207,7 +213,7 @@ const saveRule = async () => {
     if (!valid) return;
     const sources = splitTagValues([form.value.sourceInput]);
     if (!sources.length) {
-        sources.push('0.0.0.0/0', '::/0');
+        sources.push(...defaultSources.value);
     }
     let rule: WhiteListRule;
     try {
