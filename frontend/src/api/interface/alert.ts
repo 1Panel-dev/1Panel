@@ -58,8 +58,6 @@ export namespace Alert {
         inodesUsed: number;
         inodesFree: number;
         inodesUsedPercent: number;
-        errorType?: string;
-        error?: string;
     }
 
     export interface AlertSearch extends ReqPage {

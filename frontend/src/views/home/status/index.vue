@@ -272,9 +272,6 @@
                         <el-descriptions-item :label="$t('home.fileSystem')">
                             {{ item.device }}
                         </el-descriptions-item>
-                        <el-descriptions-item v-if="isDiskFailed(item)" :label="$t('commons.table.status')">
-                            <span class="disk-failed">{{ diskErrorDetail(item) }}</span>
-                        </el-descriptions-item>
                     </el-descriptions>
                     <el-descriptions title="Inode" direction="vertical" :column="4" size="small">
                         <el-descriptions-item :label="$t('home.total')">{{ item.inodesTotal }}</el-descriptions-item>
@@ -301,7 +298,7 @@
                     </el-descriptions>
                     <template #reference>
                         <v-charts
-                            @click="openDisk(item)"
+                            @click="routerToFileWithPath(item.path)"
                             height="160px"
                             :id="`disk${index}`"
                             type="pie"
@@ -310,8 +307,7 @@
                         />
                     </template>
                 </el-popover>
-                <span class="input-help disk-failed" v-if="isDiskFailed(item)">{{ diskErrorLabel(item) }}</span>
-                <span class="input-help" v-else>{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
+                <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
             </el-col>
         </template>
         <template v-for="(item, index) of currentInfo.gpuData" :key="index">
@@ -481,7 +477,6 @@
 <script setup lang="ts">
 import { Dashboard } from '@/api/interface/dashboard';
 import { computeSize } from '@/utils/size';
-import { diskErrorDetail, diskErrorLabel, isDiskFailed } from '@/utils/disk';
 import i18n from '@/lang';
 import { nextTick, onBeforeUnmount, ref } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
@@ -639,13 +634,6 @@ const acceptParams = (current: Dashboard.CurrentInfo, base: Dashboard.BaseInfo):
             currentInfo.value.xpuData.length;
         showMore.value = localStorage.getItem('dashboard_show') === 'more';
     });
-};
-
-// Opening a mount that does not answer would only hang the file list.
-const openDisk = (disk: Dashboard.DiskInfo) => {
-    if (!isDiskFailed(disk)) {
-        routerToFileWithPath(disk.path);
-    }
 };
 
 const isShow = (val: string, index: number) => {
@@ -849,9 +837,6 @@ defineExpose({
 </script>
 
 <style scoped lang="scss">
-.disk-failed {
-    color: var(--el-color-warning);
-}
 .buttonClass {
     margin-top: 28%;
     font-size: 14px;

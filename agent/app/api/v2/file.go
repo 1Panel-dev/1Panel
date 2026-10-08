@@ -1547,11 +1547,7 @@ func (b *BaseApi) BatchChangeModeAndOwner(c *gin.Context) {
 // @Security Timestamp
 // @Router /files/mount [post]
 func (b *BaseApi) GetHostMount(c *gin.Context) {
-	disks, err := fileService.GetHostMount()
-	if err != nil {
-		helper.InternalServer(c, err)
-		return
-	}
+	disks := fileService.GetHostMount()
 	helper.SuccessWithData(c, disks)
 }
 

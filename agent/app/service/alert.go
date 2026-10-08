@@ -353,11 +353,7 @@ func (a AlertService) UpdateStatus(id uint, status string) error {
 }
 
 func (a AlertService) GetDisks() ([]dto.DiskDTO, error) {
-	// An overlay mounted at / is the root disk, which disk alerts have always covered.
-	infos, err := loadDiskInfoWith(true)
-	if err != nil {
-		return nil, err
-	}
+	infos := loadDiskInfo(true)
 	disks := make([]dto.DiskDTO, 0, len(infos))
 	for _, item := range infos {
 		disks = append(disks, dto.DiskDTO(item))

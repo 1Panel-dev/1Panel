@@ -103,7 +103,6 @@ export namespace Dashboard {
         ioWriteTime: number;
 
         diskData: Array<DiskInfo>;
-        diskError?: string;
 
         gpuData: Array<GPUInfo>;
         npuData: Array<NPUInfo>;
@@ -144,9 +143,6 @@ export namespace Dashboard {
         inodesUsed: number;
         inodesFree: number;
         inodesUsedPercent: number;
-
-        errorType?: string;
-        error?: string;
     }
     export interface GPUInfo {
         type: string;

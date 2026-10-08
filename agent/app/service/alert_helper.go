@@ -1066,61 +1066,37 @@ func processAllDisks(alert dto.AlertDTO) error {
 		global.LOG.Errorf("error getting disk list, err: %v", err)
 		return err
 	}
-	var errMsgs []string
 	for _, item := range diskList {
-		var err error
-		if item.Error != "" {
-			// Already known to be unreadable; a stat of our own would only fail again.
-			err = errors.New(item.Error)
-		} else {
-			err = checkAndCreateDiskAlert(alert, item.Path)
-		}
-		if err != nil {
-			errMsg := fmt.Sprintf("disk path %s process failed: %v", item.Path, err)
-			errMsgs = append(errMsgs, errMsg)
-			global.LOG.Errorf("%s", errMsg)
+		if item.Total == 0 {
 			continue
 		}
-	}
-	if len(errMsgs) > 0 {
-		return fmt.Errorf("batch process disks failed, error count: %d, details: %s", len(errMsgs), strings.Join(errMsgs, "; "))
+		checkAndCreateDiskAlert(alert, item.Path, &disk.UsageStat{Used: item.Used, UsedPercent: item.UsedPercent})
 	}
 	return nil
 }
 
 func processSingleDisk(alert dto.AlertDTO) error {
-	err := checkAndCreateDiskAlert(alert, alert.Project)
+	usageStat, err := loadDiskUsageWithTimeout(alert.Project, true)
 	if err != nil {
-		global.LOG.Errorf("%s", err.Error())
+		global.LOG.Errorf("error getting disk usage for %s, err: %v", alert.Project, err)
 		return err
 	}
+	checkAndCreateDiskAlert(alert, alert.Project, usageStat)
 	return nil
 }
 
-func checkAndCreateDiskAlert(alert dto.AlertDTO, path string) error {
-	mount, err := lookupDiskMount(path)
-	if err != nil {
-		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
-		return err
-	}
-	stat, err := diskStats.stat(mount)
-	if err != nil {
-		global.LOG.Errorf("error getting disk usage for %s, err: %v", path, err)
-		return err
-	}
-
-	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, stat.Usage)
+func checkAndCreateDiskAlert(alert dto.AlertDTO, path string, usageStat *disk.UsageStat) {
+	usedTotal, usedStr := calculateUsedTotal(alert.Cycle, usageStat)
 	commonTotal := float64(alert.Count)
 	if alert.Cycle == 1 {
 		commonTotal *= 1024 * 1024 * 1024
 	}
 	if usedTotal < commonTotal {
-		return nil
+		return
 	}
 	params := createAlertDiskParams(path, usedStr)
 	sender := NewAlertSender(alert, alert.Project)
 	sender.ResourceSend(path, params)
-	return nil
 }
 
 func calculateUsedTotal(cycle uint, usageStat *disk.UsageStat) (float64, string) {

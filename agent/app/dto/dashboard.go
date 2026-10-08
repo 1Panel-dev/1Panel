@@ -116,8 +116,6 @@ type DashboardCurrent struct {
 	IOWriteTime  uint64 `json:"ioWriteTime"`
 
 	DiskData []DiskInfo `json:"diskData"`
-	// DiskError is set when the mount table could not be read; DiskData is then empty.
-	DiskError string `json:"diskError"`
 
 	NetBytesSent uint64 `json:"netBytesSent"`
 	NetBytesRecv uint64 `json:"netBytesRecv"`
@@ -156,11 +154,6 @@ type DiskInfo struct {
 	InodesUsed        uint64  `json:"inodesUsed"`
 	InodesFree        uint64  `json:"inodesFree"`
 	InodesUsedPercent float64 `json:"inodesUsedPercent"`
-
-	// ErrorType (timeout, denied, missing or error) and Error are set when the
-	// usage of the mount could not be loaded; the sizes are then zero.
-	ErrorType string `json:"errorType"`
-	Error     string `json:"error"`
 }
 
 type GPUInfo struct {

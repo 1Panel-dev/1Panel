@@ -9,6 +9,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -183,12 +184,6 @@ func (u *DashboardService) LoadBaseInfo(ioOption string, netOption string) (*dto
 func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *dto.DashboardCurrent {
 	var currentInfo dto.DashboardCurrent
 	shotTime := time.Now()
-	// Loaded first, so the disks and their errors are reported even if the host can not be sampled.
-	diskData, diskErr := loadDiskInfo()
-	if diskErr != nil {
-		currentInfo.DiskError = diskErr.Error()
-	}
-	currentInfo.DiskData = diskData
 	hostInfo, err := psutil.HOST.GetHostInfo(false)
 	if err != nil {
 		global.LOG.Errorf("load host info failed: %v", err)
@@ -247,6 +242,7 @@ func (u *DashboardService) LoadCurrentInfo(ioOption string, netOption string) *d
 	currentInfo.SwapMemoryUsed = swapInfo.Used
 	currentInfo.SwapMemoryUsedPercent = swapInfo.UsedPercent
 
+	currentInfo.DiskData = loadDiskInfo(false)
 	currentInfo.GPUData, currentInfo.NPUData, currentInfo.XPUData = loadAcceleratorInfo()
 
 	if ioOption == "all" {
@@ -453,8 +449,121 @@ func (u *DashboardService) ListLauncherOption(filter string) ([]dto.LauncherOpti
 	return data, nil
 }
 
-func loadDiskInfo() ([]dto.DiskInfo, error) {
-	return loadDiskInfoWith(false)
+type diskInfo struct {
+	Type   string
+	Mount  string
+	Device string
+}
+
+func loadDiskInfo(forceRefresh bool) []dto.DiskInfo {
+	var datas []dto.DiskInfo
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
+	format := `NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}`
+	stdout, err := cmdMgr.RunPipe(
+		cmd.PipeCommand{Name: "df", Args: []string{"-hT", "-P"}},
+		cmd.PipeCommand{Name: "awk", Args: []string{format}},
+	)
+	if err != nil {
+		global.LOG.Errorf("load disk info with df -hT -P failed, err: %v", err)
+		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
+		stdout, err = cmdMgr2.RunPipe(
+			cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
+			cmd.PipeCommand{Name: "awk", Args: []string{format}},
+		)
+		if err != nil {
+			global.LOG.Errorf("load disk info with df -lhT -P failed, err: %v", err)
+			return datas
+		}
+	}
+	lines := strings.Split(stdout, "\n")
+
+	var mounts []diskInfo
+	var excludes = []string{"/mnt/cdrom", "/boot", "/boot/efi", "/dev", "/dev/shm", "/run/lock", "/run", "/run/shm", "/run/user"}
+	for _, line := range lines {
+		fields := strings.Split(line, "\t")
+		if len(fields) < 7 {
+			continue
+		}
+		if strings.HasPrefix(fields[6], "/snap") || len(strings.Split(fields[6], "/")) > 10 {
+			continue
+		}
+		if strings.TrimSpace(fields[1]) == "tmpfs" || strings.TrimSpace(fields[1]) == "overlay" {
+			continue
+		}
+		if strings.Contains(fields[2], "K") {
+			continue
+		}
+		if strings.Contains(fields[6], "docker") || strings.Contains(fields[6], "podman") || strings.Contains(fields[6], "containerd") || strings.HasPrefix(fields[6], "/var/lib/containers") {
+			continue
+		}
+		isExclude := false
+		for _, exclude := range excludes {
+			if exclude == fields[6] {
+				isExclude = true
+			}
+		}
+		if isExclude {
+			continue
+		}
+		mounts = append(mounts, diskInfo{Type: fields[1], Device: fields[0], Mount: strings.Join(fields[6:], " ")})
+	}
+
+	var (
+		wg sync.WaitGroup
+		mu sync.Mutex
+	)
+	wg.Add(len(mounts))
+	for i := 0; i < len(mounts); i++ {
+		go func(mount diskInfo) {
+			defer wg.Done()
+
+			var itemData dto.DiskInfo
+			itemData.Path = mount.Mount
+			itemData.Type = mount.Type
+			itemData.Device = mount.Device
+
+			state, err := loadDiskUsageWithTimeout(mount.Mount, forceRefresh)
+			if err != nil {
+				global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, err)
+			} else {
+				itemData.Total = state.Total
+				itemData.Free = state.Free
+				itemData.Used = state.Used
+				itemData.UsedPercent = state.UsedPercent
+				itemData.InodesTotal = state.InodesTotal
+				itemData.InodesUsed = state.InodesUsed
+				itemData.InodesFree = state.InodesFree
+				itemData.InodesUsedPercent = state.InodesUsedPercent
+			}
+			mu.Lock()
+			datas = append(datas, itemData)
+			mu.Unlock()
+		}(mounts[i])
+	}
+	wg.Wait()
+
+	sort.Slice(datas, func(i, j int) bool {
+		return datas[i].Path < datas[j].Path
+	})
+	return datas
+}
+
+func loadDiskUsageWithTimeout(path string, forceRefresh bool) (*disk.UsageStat, error) {
+	type diskResult struct {
+		state *disk.UsageStat
+		err   error
+	}
+	resultCh := make(chan diskResult, 1)
+	go func() {
+		state, err := psutil.DISK.GetUsage(path, forceRefresh)
+		resultCh <- diskResult{state: state, err: err}
+	}()
+	select {
+	case <-time.After(5 * time.Second):
+		return nil, fmt.Errorf("load disk usage from %s: timeout", path)
+	case result := <-resultCh:
+		return result.state, result.err
+	}
 }
 
 func loadAcceleratorInfo() ([]dto.GPUInfo, []dto.NPUInfo, []dto.XPUInfo) {

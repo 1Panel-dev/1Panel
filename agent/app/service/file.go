@@ -81,7 +81,7 @@ type IFileService interface {
 	ReadLogByLine(req request.FileReadByLineReq) (*response.FileLineContent, error)
 
 	BatchCheckFiles(req request.FilePathsCheck) []response.ExistFileInfo
-	GetHostMount() ([]dto.DiskInfo, error)
+	GetHostMount() []dto.DiskInfo
 	GetUsersAndGroups() (*response.UserGroupResponse, error)
 	Convert(req request.FileConvertRequest)
 	ConvertLog(req dto.PageInfo) (int64, []response.FileConvertLog, error)
@@ -1309,8 +1309,8 @@ func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.Exi
 	return fileList
 }
 
-func (f *FileService) GetHostMount() ([]dto.DiskInfo, error) {
-	return loadDiskInfo()
+func (f *FileService) GetHostMount() []dto.DiskInfo {
+	return loadDiskInfo(false)
 }
 
 func (f *FileService) GetUsersAndGroups() (*response.UserGroupResponse, error) {

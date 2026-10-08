@@ -35153,9 +35153,6 @@ const docTemplate = `{
 					},
 					"type": "array"
 				},
-				"diskError": {
-					"type": "string"
-				},
 				"gpuData": {
 					"items": {
 						"$ref": "#/definitions/dto.GPUInfo"
@@ -35644,12 +35641,6 @@ const docTemplate = `{
 		"dto.DiskInfo": {
 			"properties": {
 				"device": {
-					"type": "string"
-				},
-				"error": {
-					"type": "string"
-				},
-				"errorType": {
 					"type": "string"
 				},
 				"free": {

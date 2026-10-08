@@ -111,9 +111,6 @@ type DiskDTO struct {
 	InodesUsed        uint64  `json:"inodesUsed"`
 	InodesFree        uint64  `json:"inodesFree"`
 	InodesUsedPercent float64 `json:"inodesUsedPercent"`
-
-	ErrorType string `json:"errorType"`
-	Error     string `json:"error"`
 }
 
 type AlertLogSearch struct {

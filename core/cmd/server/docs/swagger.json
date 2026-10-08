@@ -35149,9 +35149,6 @@
 					},
 					"type": "array"
 				},
-				"diskError": {
-					"type": "string"
-				},
 				"gpuData": {
 					"items": {
 						"$ref": "#/definitions/dto.GPUInfo"
@@ -35640,12 +35637,6 @@
 		"dto.DiskInfo": {
 			"properties": {
 				"device": {
-					"type": "string"
-				},
-				"error": {
-					"type": "string"
-				},
-				"errorType": {
 					"type": "string"
 				},
 				"free": {
