@@ -16,8 +16,15 @@
                     </el-form-item>
                 </el-col>
             </el-row>
+            <el-form-item :label="$t('ssh.createMode')" prop="mode" v-if="dialogData.title === 'create'">
+                <el-radio-group v-model="dialogData.rowData.mode" @change="onModeChange">
+                    <el-radio value="generate">{{ $t('ssh.generate') }}</el-radio>
+                    <el-radio value="input">{{ $t('ssh.input') }}</el-radio>
+                    <el-radio value="import">{{ $t('ssh.import') }}</el-radio>
+                </el-radio-group>
+            </el-form-item>
             <el-row :gutter="20">
-                <el-col :span="12">
+                <el-col :span="12" v-if="isGenerate">
                     <el-form-item :label="$t('ssh.encryptionMode')" prop="encryptionMode">
                         <el-select v-model="dialogData.rowData.encryptionMode">
                             <el-option label="ED25519" value="ed25519" />
@@ -28,50 +35,38 @@
                     </el-form-item>
                 </el-col>
                 <el-col :span="12">
-                    <el-form-item :label="$t('commons.login.password')" prop="passPhrase">
+                    <el-form-item :label="$t(isGenerate ? 'ssh.password' : 'ssh.existingPassPhrase')" prop="passPhrase">
                         <el-input v-model="dialogData.rowData.passPhrase" type="password" show-password>
-                            <template #append>
+                            <template #append v-if="isGenerate">
                                 <el-button @click="random">
                                     {{ $t('commons.button.random') }}
                                 </el-button>
                             </template>
                         </el-input>
+                        <span class="input-help" v-if="!isGenerate">{{ $t('ssh.existingPassPhraseHelper') }}</span>
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-form-item :label="$t('ssh.createMode')" prop="mode" v-if="dialogData.title === 'create'">
-                <el-radio-group v-model="dialogData.rowData.mode">
-                    <el-radio value="generate">{{ $t('ssh.generate') }}</el-radio>
-                    <el-radio value="input">{{ $t('ssh.input') }}</el-radio>
-                    <el-radio value="import">{{ $t('ssh.import') }}</el-radio>
-                </el-radio-group>
-            </el-form-item>
-            <div v-if="dialogData.rowData.mode === 'input'">
+            <div v-if="!isGenerate">
                 <el-row :gutter="20">
                     <el-col :span="12">
                         <el-form-item :label="$t('ssh.privateKey')" prop="privateKey">
-                            <el-input type="textarea" :rows="2" v-model="dialogData.rowData.privateKey" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col :span="12">
-                        <el-form-item :label="$t('ssh.publicKey')" prop="publicKey">
-                            <el-input type="textarea" :rows="2" v-model="dialogData.rowData.publicKey" />
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </div>
-            <div v-if="dialogData.rowData.mode === 'import'">
-                <el-row :gutter="20">
-                    <el-col :span="12">
-                        <el-form-item :label="$t('ssh.privateKey')" prop="privateKey">
+                            <el-input
+                                v-if="dialogData.rowData.mode === 'input'"
+                                type="textarea"
+                                :rows="4"
+                                v-model="dialogData.rowData.privateKey"
+                            />
                             <el-upload
+                                v-else
                                 action="#"
                                 :auto-upload="false"
                                 ref="uploadPrivateRef"
                                 class="upload mt-2 w-full"
                                 :limit="1"
-                                :on-change="privateOnChange"
+                                :on-change="(file) => onKeyChange('privateKey', file)"
                                 :on-exceed="privateExceed"
+                                :on-remove="() => onKeyRemove('privateKey')"
                             >
                                 <el-button size="small" icon="Upload">
                                     {{ $t('commons.button.upload') }}
@@ -81,14 +76,22 @@
                     </el-col>
                     <el-col :span="12">
                         <el-form-item :label="$t('ssh.publicKey')" prop="publicKey">
+                            <el-input
+                                v-if="dialogData.rowData.mode === 'input'"
+                                type="textarea"
+                                :rows="4"
+                                v-model="dialogData.rowData.publicKey"
+                            />
                             <el-upload
+                                v-else
                                 action="#"
                                 :auto-upload="false"
                                 ref="uploadPublicRef"
                                 class="upload mt-2 w-full"
                                 :limit="1"
-                                :on-change="publicOnChange"
+                                :on-change="(file) => onKeyChange('publicKey', file)"
                                 :on-exceed="publicExceed"
+                                :on-remove="() => onKeyRemove('publicKey')"
                             >
                                 <el-button size="small" icon="Upload">
                                     {{ $t('commons.button.upload') }}
@@ -104,7 +107,7 @@
         </el-form>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button type="primary" @click="onConfirm(formRef)">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
@@ -114,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue';
+import { computed, onBeforeUnmount, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { ElForm, genFileId, UploadFile, UploadProps, UploadRawFile } from 'element-plus';
 import { Host } from '@/api/interface/host';
@@ -139,16 +142,41 @@ type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref();
 const uploadPrivateRef = ref();
 const uploadPublicRef = ref();
+const isGenerate = computed(() => dialogData.value.title === 'create' && dialogData.value.rowData?.mode === 'generate');
+
+type KeyField = 'privateKey' | 'publicKey';
+const keyReaders: Partial<Record<KeyField, FileReader>> = {};
+
+const cancelKeyRead = (field?: KeyField) => {
+    const fields: KeyField[] = field ? [field] : ['privateKey', 'publicKey'];
+    for (const key of fields) {
+        const reader = keyReaders[key];
+        delete keyReaders[key];
+        reader?.abort();
+    }
+};
+
+onBeforeUnmount(() => cancelKeyRead());
 
 const acceptParams = (params: DialogProps): void => {
+    cancelKeyRead();
     dialogData.value = params;
+    params.rowData.passPhrase ||= '';
+    params.rowData.privateKey ||= '';
+    params.rowData.publicKey ||= '';
     if (params.title === 'edit') {
         params.rowData.mode = 'input';
         dialogData.value.rowData.publicKey = Base64.decode(params.rowData.publicKey);
         dialogData.value.rowData.privateKey = Base64.decode(params.rowData.privateKey);
         if (params.rowData.passPhrase) {
             dialogData.value.rowData.passPhrase = Base64.decode(params.rowData.passPhrase);
+            if (dialogData.value.rowData.passPhrase === '<UN-SET>') {
+                dialogData.value.rowData.passPhrase = '';
+            }
         }
+    }
+    if (!isGenerate.value) {
+        dialogData.value.rowData.encryptionMode = '';
     }
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
@@ -156,20 +184,49 @@ const acceptParams = (params: DialogProps): void => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 function checkPassword(rule: any, value: any, callback: any) {
-    if (dialogData.value.rowData.passPhrase !== '') {
+    if (isGenerate.value && value) {
         const reg = /^[A-Za-z0-9]{6,15}$/;
-        if (!reg.test(dialogData.value.rowData.passPhrase)) {
+        if (!reg.test(value)) {
             return callback(new Error(i18n.global.t('ssh.passwordHelper')));
         }
     }
     callback();
 }
+const checkKey = (rule: { field: string }, value: string, callback: (error?: Error) => void) => {
+    if (isGenerate.value) {
+        return callback();
+    }
+    const content = value?.trim();
+    if (!content) {
+        return callback(new Error(i18n.global.t('commons.rule.requiredInput')));
+    }
+    const pattern =
+        rule.field === 'publicKey'
+            ? /^(?:ssh-(?:rsa|ed25519|dss)|ecdsa-sha2-nistp(?:256|384|521))[ \t]+[A-Za-z0-9+/]+={0,2}(?:[ \t]+[^\r\n]*)?$/
+            : /^-----BEGIN ((?:OPENSSH |RSA |EC |DSA |ENCRYPTED )?PRIVATE KEY)-----\r?\n(?:Proc-Type: 4,ENCRYPTED\r?\nDEK-Info: [^\r\n]+\r?\n\r?\n)?[A-Za-z0-9+/][A-Za-z0-9+/=\r\n]*\r?\n-----END \1-----$/;
+    if (!pattern.test(content)) {
+        return callback(new Error(i18n.global.t('commons.rule.formatErr')));
+    }
+    callback();
+};
+
+const onModeChange = () => {
+    cancelKeyRead();
+    dialogData.value.rowData.encryptionMode = isGenerate.value ? 'ed25519' : '';
+    dialogData.value.rowData.passPhrase = '';
+    dialogData.value.rowData.privateKey = '';
+    dialogData.value.rowData.publicKey = '';
+    uploadPrivateRef.value?.clearFiles();
+    uploadPublicRef.value?.clearFiles();
+    formRef.value?.clearValidate();
+};
+
 const rules = reactive({
     name: Rules.simpleName,
     encryptionMode: Rules.requiredSelect,
     passPhrase: [{ validator: checkPassword, trigger: 'blur' }],
-    privateKey: [Rules.requiredInput],
-    publicKey: [Rules.requiredInput],
+    privateKey: [{ required: true, validator: checkKey, trigger: ['blur', 'change'] }],
+    publicKey: [{ required: true, validator: checkKey, trigger: ['blur', 'change'] }],
 });
 
 const onConfirm = async (formEl: FormInstance | undefined) => {
@@ -177,23 +234,27 @@ const onConfirm = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
+        const request = {
+            ...dialogData.value.rowData,
+            encryptionMode: isGenerate.value ? dialogData.value.rowData.encryptionMode : '',
+        };
         if (dialogData.value.title === 'create') {
-            await createCert(dialogData.value.rowData)
+            await createCert(request)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisible.value = false;
+                    handleClose();
                     emit('search');
                 })
                 .catch(() => {
                     loading.value = false;
                 });
         } else {
-            await editCert(dialogData.value.rowData)
+            await editCert(request)
                 .then(() => {
                     loading.value = false;
                     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    drawerVisible.value = false;
+                    handleClose();
                     emit('search');
                 })
                 .catch(() => {
@@ -203,35 +264,41 @@ const onConfirm = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const privateOnChange = (_uploadFile: UploadFile) => {
+const onKeyRemove = (field: KeyField) => {
+    cancelKeyRead(field);
+    dialogData.value.rowData[field] = '';
+    formRef.value?.validateField(field).catch(() => {});
+};
+
+const onKeyChange = (field: KeyField, uploadFile: UploadFile) => {
+    const rowData = dialogData.value.rowData;
+    if (!drawerVisible.value || rowData.mode !== 'import') return;
+    cancelKeyRead(field);
+    rowData[field] = '';
     const reader = new FileReader();
+    keyReaders[field] = reader;
     reader.onload = (e) => {
-        try {
-            dialogData.value.rowData.privateKey = e.target.result as string;
-        } catch (error) {
-            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
-        }
+        if (keyReaders[field] !== reader || dialogData.value.rowData !== rowData) return;
+        delete keyReaders[field];
+        rowData[field] = e.target.result as string;
+        formRef.value?.validateField(field).catch(() => {});
     };
-    reader.readAsText(_uploadFile.raw);
+    reader.onerror = () => {
+        if (keyReaders[field] !== reader || dialogData.value.rowData !== rowData) return;
+        delete keyReaders[field];
+        MsgError(i18n.global.t('commons.msg.errImport'));
+    };
+    reader.readAsText(uploadFile.raw);
 };
 const privateExceed: UploadProps['onExceed'] = (files) => {
+    onKeyRemove('privateKey');
     uploadPrivateRef.value!.clearFiles();
     const file = files[0] as UploadRawFile;
     file.uid = genFileId();
     uploadPrivateRef.value!.handleStart(file);
 };
-const publicOnChange = (_uploadFile: UploadFile) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            dialogData.value.rowData.publicKey = e.target.result as string;
-        } catch (error) {
-            MsgError(i18n.global.t('commons.msg.errImport') + error.message);
-        }
-    };
-    reader.readAsText(_uploadFile.raw);
-};
 const publicExceed: UploadProps['onExceed'] = (files) => {
+    onKeyRemove('publicKey');
     uploadPublicRef.value!.clearFiles();
     const file = files[0] as UploadRawFile;
     file.uid = genFileId();
@@ -243,6 +310,7 @@ const random = async () => {
 };
 
 const handleClose = () => {
+    cancelKeyRead();
     drawerVisible.value = false;
 };
 

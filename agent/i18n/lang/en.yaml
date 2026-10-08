@@ -732,6 +732,10 @@ ErrFirewallBackendCleanupRequired: "The current backend {{ .current }} still con
 ErrDockerIPv4ForwardingDisabled: "IPv4 forwarding is disabled. Set net.ipv4.ip_forward=1 before using Docker's firewall backend."
 ErrFirewallRuleSavedApplyFailed: "The new rule configuration was saved, but applying it to the firewall failed. Retry by synchronizing: {{ .detail }}"
 
+ErrSSHPublicKey: "Enter a valid SSH public key"
+ErrSSHPrivateKey: "Invalid SSH private key or incorrect passphrase; encrypted keys require the original passphrase"
+ErrSSHKeyMismatch: "The SSH public and private keys do not match"
+
 NetworkCleanupDeleted: "Deleted network [{{ .name }}] ({{ .id }})"
 NetworkCleanupProtected: "Skipped network [{{ .name }}] ({{ .id }}): reserved network"
 NetworkCleanupConnected: "Skipped network [{{ .name }}] ({{ .id }}): containers connected or network in use; not deleted"

@@ -2888,6 +2888,9 @@ const message = {
         privateKey: 'Private Key',
         publicKey: 'Public Key',
         password: 'Password',
+        existingPassPhrase: 'Existing private key passphrase',
+        existingPassPhraseHelper:
+            'Enter the original passphrase if the private key is encrypted; otherwise leave blank. This does not change the passphrase.',
         createMode: 'Creation Method',
         generate: 'Auto-generate',
         unSyncPass: 'Key password cannot be synchronized',

@@ -2751,6 +2751,8 @@ const message = {
         privateKey: '私钥',
         publicKey: '公钥',
         password: '密码',
+        existingPassPhrase: '已有私钥密码',
+        existingPassPhraseHelper: '私钥已加密时填写原密码，未加密则留空；此处不会修改私钥密码。',
         createMode: '创建方式',
         generate: '自动生成',
         unSyncPass: '密钥密码无法同步',
