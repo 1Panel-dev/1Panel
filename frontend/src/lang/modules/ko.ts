@@ -7081,12 +7081,17 @@ const message = {
             storagePoolHelper: '스토리지 풀은 가상 머신 디스크와 ISO 파일을 저장합니다.',
             network: '네트워크',
             bridgeName: '브리지 이름',
+            sourceInterface: '호스트 네트워크 인터페이스',
+            macvtapNetworkHelper:
+                'VM을 LAN의 독립된 컴퓨터처럼 사용할 수 있습니다. 호스트의 기존 IP 설정을 바꾸지 않고 다른 장치에서 VM의 IP로 직접 접근할 수 있습니다. 참고: 기본적으로 이 연결을 통해 호스트와 VM은 직접 통신할 수 없습니다.',
+            macvtapInterfaceHelper:
+                '대상 LAN에 연결된 유선 인터페이스를 선택하세요. 호스트와 공유할 수 있습니다. VM의 IP는 LAN에서 할당하거나 VM 내부에서 직접 설정합니다. 네트워크에서 이 인터페이스를 통한 여러 장치의 연결(여러 MAC 주소)을 허용해야 합니다.',
             natNetworkHelper:
-                'VM은 호스트를 통해 네트워크에 연결할 수 있지만, 외부 장치에서는 일반적으로 VM에 직접 접근할 수 없습니다.',
+                '인터넷 접속만 필요하거나 소수의 서비스를 공개하는 VM에 적합합니다. VM은 호스트를 통해 인터넷에 연결됩니다. 다른 장치에서 VM 서비스에 접근하려면 일반적으로 포트 전달을 별도로 설정해야 합니다.',
             bridgeNetworkHelper:
-                'VM을 호스트의 기존 브리지(예: br0)에 연결합니다. 호스트에 사용하지 않는 추가 네트워크 카드가 있으면 브리지를 만들어 사용할 수 있습니다.',
+                'VM을 네트워크 스위치에 연결된 독립된 컴퓨터처럼 사용할 수 있습니다. 호스트와 LAN의 다른 장치에서 직접 접근할 수 있습니다. 먼저 호스트에 브리지를 설정해야 합니다.',
             bridgeNameHelper:
-                'br0와 같이 호스트에 이미 존재하는 Linux bridge를 선택하세요. 물리 NIC는 bridge가 아니며 docker/libvirt가 관리하는 bridge는 여기서 선택할 수 없습니다.',
+                '설정된 브리지(예: br0)를 선택하세요. 선택 항목이 없으면 먼저 호스트에 브리지를 만드세요. 물리 인터페이스와 Docker/libvirt가 관리하는 브리지는 선택할 수 없습니다.',
             natCIDRHelper: 'CIDR, 게이트웨이, DHCP 주소 범위는 새 NAT 가상 네트워크에 사용됩니다.',
             networkCIDR: '네트워크 CIDR',
             gateway: '게이트웨이',
@@ -7104,6 +7109,7 @@ const message = {
             available: '사용 가능',
             vmCount: '연결된 VM',
             usedIPs: '사용된 IP',
+            usedIPsUnavailable: '아직 조회를 지원하지 않음',
             monitor: '모니터링',
             monitorNotReady: '가상 머신이 실행 중이 아니어서 모니터링 데이터를 사용할 수 없습니다.',
             monitorLoadFailed: 'VM 모니터링 데이터를 가져오지 못했습니다.',

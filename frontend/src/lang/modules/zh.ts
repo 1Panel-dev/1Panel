@@ -6793,11 +6793,17 @@ const message = {
             storagePoolHelper: '存储池用于保存虚拟机磁盘和镜像文件。',
             network: '网络',
             bridgeName: '桥接名称',
-            natNetworkHelper: '虚拟机可通过宿主机访问网络，外部设备通常无法直接访问虚拟机。',
+            sourceInterface: '宿主机网卡',
+            macvtapNetworkHelper:
+                '让虚拟机像局域网中的一台独立电脑，其他设备可直接通过它的 IP 访问，无需改动宿主机原有 IP 配置。注意：宿主机与虚拟机默认不能通过此连接直接互访。',
+            macvtapInterfaceHelper:
+                '选择连接目标局域网的有线网卡，可与宿主机共用。虚拟机 IP 由局域网分配，也可在虚拟机内手动设置。网络需允许多个设备通过这张网卡接入（多个 MAC 地址）。',
+            natNetworkHelper:
+                '适合只需上网，或只开放少量服务的虚拟机。虚拟机通过宿主机上网；其他设备访问虚拟机服务时，通常需要另外配置端口转发。',
             bridgeNetworkHelper:
-                '让虚拟机接入宿主机已有的网桥（如 br0）。如宿主机有未使用的额外网卡，也可为其创建网桥后使用。',
+                '让虚拟机像接在交换机上的独立电脑，宿主机和局域网内其他设备都可直接访问它。使用前，需要先在宿主机上配置好网桥。',
             bridgeNameHelper:
-                '请选择宿主机上已存在的 Linux bridge，例如 br0。物理网卡不是 bridge，docker/libvirt 管理的 bridge 不能在这里选择。',
+                '选择已配置的网桥，例如 br0；没有可选项时，请先在宿主机上创建网桥。这里不能直接选择物理网卡或 Docker/libvirt 管理的网桥。',
             natCIDRHelper: 'CIDR、网关和 DHCP 地址段将用于新建的 NAT 虚拟网络。',
             networkCIDR: '网络 CIDR',
             gateway: '网关',
@@ -6814,6 +6820,7 @@ const message = {
             available: '可用',
             vmCount: '关联虚拟机',
             usedIPs: '已用 IP',
+            usedIPsUnavailable: '暂不支持获取',
             monitor: '监控',
             monitorNotReady: '虚拟机未运行，无法获取监控数据。',
             monitorLoadFailed: '获取虚拟机监控数据失败。',

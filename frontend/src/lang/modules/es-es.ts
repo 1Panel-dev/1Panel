@@ -7349,12 +7349,17 @@ const message = {
                 'El pool de almacenamiento guarda los discos de las máquinas virtuales y los archivos ISO.',
             network: 'Red',
             bridgeName: 'Nombre del bridge',
+            sourceInterface: 'Interfaz de red del anfitrión',
+            macvtapNetworkHelper:
+                'La VM funciona como otro ordenador de la LAN. Otros dispositivos pueden acceder directamente a su IP sin cambiar la configuración IP del anfitrión. Nota: de forma predeterminada, el anfitrión y la VM no pueden comunicarse directamente por esta conexión.',
+            macvtapInterfaceHelper:
+                'Seleccione una interfaz cableada conectada a la LAN deseada; puede compartirla con el anfitrión. La LAN asigna la IP de la VM, o puede configurarla manualmente en ella. La red debe permitir varios dispositivos en esta interfaz (varias direcciones MAC).',
             natNetworkHelper:
-                'Las VM pueden acceder a la red a través del host, pero los dispositivos externos normalmente no pueden acceder a ellas directamente.',
+                'Adecuado para VM que necesitan acceso a Internet o publican pocos servicios. La VM sale a Internet a través del anfitrión. Para acceder a sus servicios desde otros dispositivos, normalmente debe configurar el reenvío de puertos por separado.',
             bridgeNetworkHelper:
-                'Conecta las VM a un bridge existente del host (como br0). Si el host tiene una NIC adicional sin usar, puedes crear un bridge para ella y utilizarlo.',
+                'La VM funciona como un ordenador independiente conectado a un conmutador. Tanto el anfitrión como otros dispositivos de la LAN pueden acceder directamente. Primero debe configurar un puente en el anfitrión.',
             bridgeNameHelper:
-                'Seleccione un Linux bridge existente en el host, como br0. Las NIC físicas no son bridges, y los bridges gestionados por docker/libvirt no pueden seleccionarse aquí.',
+                'Seleccione un puente configurado, como br0. Si no hay ninguno, créelo primero en el anfitrión. No puede seleccionar interfaces físicas ni puentes administrados por Docker/libvirt.',
             natCIDRHelper: 'CIDR, puerta de enlace y rango DHCP se usarán en la nueva red virtual NAT.',
             networkCIDR: 'CIDR de red',
             gateway: 'Puerta de enlace',
@@ -7372,6 +7377,7 @@ const message = {
             available: 'Disponible',
             vmCount: 'VM vinculadas',
             usedIPs: 'IP usadas',
+            usedIPsUnavailable: 'Obtención aún no disponible',
             monitor: 'Supervisión',
             monitorNotReady: 'La máquina virtual no está en ejecución. Los datos de supervisión no están disponibles.',
             monitorLoadFailed: 'No se pudieron obtener los datos de supervisión de la VM.',

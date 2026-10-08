@@ -7220,12 +7220,17 @@ const message = {
             storagePoolHelper: 'ストレージプールは仮想マシンのディスクと ISO ファイルを保存します。',
             network: 'ネットワーク',
             bridgeName: 'ブリッジ名',
+            sourceInterface: 'ホストのネットワークインターフェース',
+            macvtapNetworkHelper:
+                'VM を LAN 内の独立したコンピューターのように使えます。ホストの既存 IP 設定を変更せず、他の機器から VM の IP に直接アクセスできます。注意：既定では、この接続を通じてホストと VM は直接通信できません。',
+            macvtapInterfaceHelper:
+                '接続先の LAN につながる有線インターフェースを選択します。ホストと共有できます。VM の IP は LAN から割り当てられるか、VM 内で手動設定します。ネットワーク側で複数の機器（複数の MAC アドレス）の接続を許可する必要があります。',
             natNetworkHelper:
-                'VM はホスト経由でネットワークに接続できますが、外部の機器から VM へ直接アクセスすることは通常できません。',
+                'インターネット接続だけが必要な VM や、少数のサービスを公開する VM に適しています。VM はホスト経由で通信します。他の機器からサービスにアクセスするには、通常、別途ポート転送の設定が必要です。',
             bridgeNetworkHelper:
-                'VM をホスト上の既存ブリッジ（br0 など）に接続します。未使用の追加 NIC がある場合は、その NIC 用のブリッジを作成して使用できます。',
+                'VM をネットワークスイッチにつないだ独立したコンピューターのように使えます。ホストと LAN 内の他の機器から直接アクセスできます。先にホストでブリッジを設定してください。',
             bridgeNameHelper:
-                'br0 など、ホスト上に既に存在する Linux bridge を選択してください。物理 NIC は bridge ではなく、docker/libvirt 管理の bridge はここでは選択できません。',
+                '設定済みのブリッジ（例：br0）を選択します。選択肢がない場合は、先にホストで作成してください。物理インターフェースや Docker/libvirt が管理するブリッジは選択できません。',
             natCIDRHelper: 'CIDR、ゲートウェイ、DHCP アドレス範囲は新しい NAT 仮想ネットワークに使用されます。',
             networkCIDR: 'ネットワーク CIDR',
             gateway: 'ゲートウェイ',
@@ -7243,6 +7248,7 @@ const message = {
             available: '利用可能',
             vmCount: '関連 VM',
             usedIPs: '使用済み IP',
+            usedIPsUnavailable: '取得は未対応です',
             monitor: '監視',
             monitorNotReady: '仮想マシンが実行されていないため、監視データを利用できません。',
             monitorLoadFailed: 'VM の監視データを取得できませんでした。',

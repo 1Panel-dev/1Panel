@@ -7386,12 +7386,17 @@ const message = {
             storagePoolHelper: 'O pool de armazenamento guarda os discos das máquinas virtuais e os arquivos ISO.',
             network: 'Rede',
             bridgeName: 'Nome da Bridge',
+            sourceInterface: 'Interface de rede do host',
+            macvtapNetworkHelper:
+                'A VM funciona como um computador independente na LAN. Outros dispositivos podem acessar seu IP diretamente, sem alterar as configurações de IP do host. Atenção: por padrão, o host e a VM não podem se comunicar diretamente por esta conexão.',
+            macvtapInterfaceHelper:
+                'Selecione uma interface cabeada conectada à LAN desejada; ela pode ser compartilhada com o host. A LAN atribui o IP da VM, ou você pode configurá-lo manualmente na VM. A rede deve permitir vários dispositivos nesta interface (vários endereços MAC).',
             natNetworkHelper:
-                'As VMs podem acessar a rede pelo host, mas dispositivos externos geralmente não podem acessá-las diretamente.',
+                'Indicado para VMs que precisam de acesso à internet ou oferecem poucos serviços. A VM acessa a internet pelo host. Outros dispositivos geralmente precisam de encaminhamento de portas configurado separadamente para acessar seus serviços.',
             bridgeNetworkHelper:
-                'Conecte as VMs a uma bridge existente do host (como br0). Se o host tiver uma placa de rede adicional não utilizada, crie uma bridge para ela e use-a.',
+                'A VM funciona como um computador independente conectado a um switch. Tanto o host quanto outros dispositivos da LAN podem acessá-la diretamente. Primeiro, configure uma bridge no host.',
             bridgeNameHelper:
-                'Selecione uma Linux bridge existente no host, como br0. NICs físicas não são bridges, e bridges gerenciadas por docker/libvirt não podem ser selecionadas aqui.',
+                'Selecione uma bridge configurada, como br0. Se não houver nenhuma, crie uma no host primeiro. Interfaces físicas e bridges gerenciadas pelo Docker/libvirt não podem ser selecionadas aqui.',
             natCIDRHelper: 'CIDR, gateway e intervalo DHCP são usados pela nova rede virtual NAT.',
             networkCIDR: 'CIDR da Rede',
             gateway: 'Gateway',
@@ -7409,6 +7414,7 @@ const message = {
             available: 'Disponível',
             vmCount: 'VMs Vinculadas',
             usedIPs: 'IPs Usados',
+            usedIPsUnavailable: 'Consulta ainda não disponível',
             monitor: 'Monitoramento',
             monitorNotReady: 'A máquina virtual não está em execução. Os dados de monitoramento não estão disponíveis.',
             monitorLoadFailed: 'Falha ao obter os dados de monitoramento da VM.',

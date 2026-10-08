@@ -7344,12 +7344,17 @@ const message = {
             storagePoolHelper: 'Kolam storan menyimpan cakera mesin maya dan fail ISO.',
             network: 'Rangkaian',
             bridgeName: 'Nama Bridge',
+            sourceInterface: 'Antara muka rangkaian hos',
+            macvtapNetworkHelper:
+                'VM bertindak seperti komputer berasingan dalam LAN. Peranti lain boleh mengakses IP-nya secara terus tanpa mengubah tetapan IP hos. Nota: secara lalai, hos dan VM tidak boleh berkomunikasi secara terus melalui sambungan ini.',
+            macvtapInterfaceHelper:
+                'Pilih antara muka berwayar yang bersambung ke LAN sasaran; ia boleh dikongsi dengan hos. LAN memberikan IP VM, atau anda boleh menetapkannya secara manual dalam VM. Rangkaian mesti membenarkan beberapa peranti pada antara muka ini (berbilang alamat MAC).',
             natNetworkHelper:
-                'VM boleh mengakses rangkaian melalui hos, tetapi peranti luar biasanya tidak boleh mengaksesnya secara langsung.',
+                'Sesuai untuk VM yang memerlukan akses internet atau menyediakan beberapa perkhidmatan sahaja. VM mengakses internet melalui hos. Peranti lain biasanya memerlukan pemajuan port yang dikonfigurasi secara berasingan untuk mengakses perkhidmatannya.',
             bridgeNetworkHelper:
-                'Sambungkan VM ke bridge hos sedia ada (seperti br0). Jika hos mempunyai kad rangkaian tambahan yang tidak digunakan, anda boleh mencipta bridge untuknya dan menggunakannya.',
+                'VM bertindak seperti komputer berasingan yang disambungkan ke suis rangkaian. Hos dan peranti LAN lain boleh mengaksesnya secara terus. Konfigurasikan bridge pada hos terlebih dahulu.',
             bridgeNameHelper:
-                'Pilih Linux bridge sedia ada pada hos, seperti br0. NIC fizikal bukan bridge, dan bridge yang diurus docker/libvirt tidak boleh dipilih di sini.',
+                'Pilih bridge yang telah dikonfigurasi, seperti br0. Jika tiada pilihan, cipta bridge pada hos terlebih dahulu. Antara muka fizikal dan bridge yang diurus oleh Docker/libvirt tidak boleh dipilih di sini.',
             natCIDRHelper: 'CIDR, get laluan dan julat DHCP digunakan oleh rangkaian maya NAT baharu.',
             networkCIDR: 'CIDR Rangkaian',
             gateway: 'Get Laluan',
@@ -7367,6 +7372,7 @@ const message = {
             available: 'Tersedia',
             vmCount: 'VM Terpaut',
             usedIPs: 'IP Digunakan',
+            usedIPsUnavailable: 'Pengambilan belum disokong',
             monitor: 'Pemantauan',
             monitorNotReady: 'Mesin maya tidak berjalan. Data pemantauan tidak tersedia.',
             monitorLoadFailed: 'Gagal mendapatkan data pemantauan VM.',
