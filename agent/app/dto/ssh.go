@@ -25,7 +25,7 @@ type RootCertOperate struct {
 	ID             uint   `json:"id"`
 	Name           string `json:"name"`
 	Mode           string `json:"mode"`
-	EncryptionMode string `json:"encryptionMode" validate:"required,oneof=rsa ed25519 ecdsa dsa"`
+	EncryptionMode string `json:"encryptionMode"`
 	PassPhrase     string `json:"passPhrase"`
 	PublicKey      string `json:"publicKey"`
 	PrivateKey     string `json:"privateKey"`

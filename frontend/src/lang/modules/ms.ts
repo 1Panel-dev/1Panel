@@ -2930,6 +2930,9 @@ const message = {
         privateKey: 'Kunci Persendirian',
         publicKey: 'Kunci Awam',
         password: 'Kata Laluan',
+        existingPassPhrase: 'Frasa laluan kunci peribadi sedia ada',
+        existingPassPhraseHelper:
+            'Masukkan frasa laluan asal jika kunci peribadi disulitkan; jika tidak, biarkan kosong. Ini tidak mengubah frasa laluan.',
         createMode: 'Kaedah Penciptaan',
         generate: 'Jana Automatik',
         unSyncPass: 'Kata laluan kunci tidak dapat diselaraskan',

@@ -731,3 +731,7 @@ FileTaskRename: '目标文件名：{{ .name }}'
 ErrFirewallBackendCleanupRequired: "当前后端 {{ .current }} 中仍有 1Panel 规则，请先清理后再切换到 {{ .target }}。"
 ErrDockerIPv4ForwardingDisabled: "IPv4 转发未开启，请先设置 net.ipv4.ip_forward=1，再使用 Docker 防火墙后端。"
 ErrFirewallRuleSavedApplyFailed: "新规则配置已保存，但应用到防火墙失败。可通过同步重试：{{ .detail }}"
+
+ErrSSHPublicKey: "请输入有效的 SSH 公钥"
+ErrSSHPrivateKey: "SSH 私钥格式无效或密码错误；加密私钥需要填写原密码"
+ErrSSHKeyMismatch: "SSH 公钥与私钥不匹配"

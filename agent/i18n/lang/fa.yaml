@@ -732,3 +732,7 @@ FileTaskRename: 'نام فایل مقصد: {{ .name }}'
 ErrFirewallBackendCleanupRequired: "بک‌اند فعلی {{ .current }} هنوز شامل قوانین 1Panel است. پیش از تغییر به {{ .target }} آن‌ها را پاک کنید."
 ErrDockerIPv4ForwardingDisabled: "ارسال IPv4 غیرفعال است. پیش از استفاده از بک‌اند فایروال Docker، مقدار net.ipv4.ip_forward=1 را تنظیم کنید."
 ErrFirewallRuleSavedApplyFailed: "پیکربندی قانون جدید ذخیره شد، اما اعمال آن در دیوار آتش ناموفق بود. با همگام‌سازی دوباره تلاش کنید: {{ .detail }}"
+
+ErrSSHPublicKey: "یک کلید عمومی SSH معتبر وارد کنید"
+ErrSSHPrivateKey: "کلید خصوصی SSH نامعتبر یا عبارت عبور نادرست است؛ کلیدهای رمزگذاری‌شده به عبارت عبور اصلی نیاز دارند"
+ErrSSHKeyMismatch: "کلید عمومی و خصوصی SSH مطابقت ندارند"

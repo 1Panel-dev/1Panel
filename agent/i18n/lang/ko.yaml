@@ -731,3 +731,7 @@ FileTaskRename: '대상 파일 이름: {{ .name }}'
 ErrFirewallBackendCleanupRequired: "현재 백엔드 {{ .current }}에 1Panel 규칙이 남아 있습니다. {{ .target }}로 전환하기 전에 정리하세요."
 ErrDockerIPv4ForwardingDisabled: "IPv4 전달이 비활성화되어 있습니다. Docker 방화벽 백엔드를 사용하기 전에 net.ipv4.ip_forward=1을 설정하세요."
 ErrFirewallRuleSavedApplyFailed: "새 규칙 설정이 저장되었지만 방화벽에 적용하지 못했습니다. 동기화하여 다시 시도하세요: {{ .detail }}"
+
+ErrSSHPublicKey: "유효한 SSH 공개 키를 입력하세요"
+ErrSSHPrivateKey: "SSH 개인 키 형식이 잘못되었거나 암호가 틀립니다. 암호화된 키에는 원래 암호가 필요합니다"
+ErrSSHKeyMismatch: "SSH 공개 키와 개인 키가 일치하지 않습니다"
