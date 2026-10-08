@@ -107,6 +107,7 @@
                     <template #main>
                         <div v-loading="loading">
                             <ComplexTable
+                                :selection-context="() => [searchName, selectedRuleFilters]"
                                 v-model:selects="selects"
                                 :pagination-config="paginationConfig"
                                 :data="allRows"
@@ -301,6 +302,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { Firewall } from '@/api/interface/firewall';
 import type { FuTableOperationButton } from '@/components/table/shared';
 import { buildHostRuleExport } from './transfer';
@@ -403,6 +405,7 @@ const showFirewallUnavailablePrompt = computed(
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>(loadCachedFilterValues(ruleFilterStorageKey, ruleFilterOptions, []));
 const searchName = ref('');
+useSearchPersistence('host/firewall/rule/index', { search: searchName });
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const positionRanges = ref<Partial<Record<Firewall.Family, Firewall.PositionRange>>>({});
 const inventoryTotal = ref(0);

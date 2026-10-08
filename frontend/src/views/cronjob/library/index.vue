@@ -60,6 +60,8 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :selection-context="() => [searchInfo, group]"
+                    row-key="id"
                     v-model:selects="selects"
                     :pagination-config="paginationConfig"
                     :data="data"
@@ -130,6 +132,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { deepCopy } from '@/utils/misc';
 import { newUUID } from '@/utils/id';
@@ -167,6 +170,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchInfo = ref<string>('');
+useSearchPersistence('cronjob/library/index', { search: searchInfo });
 const group = ref<string>('');
 const groupOptions = ref();
 

@@ -19,6 +19,8 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :selection-context="() => [searchName]"
+                    row-key="id"
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
@@ -223,6 +225,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import {
     searchSnapshotPage,
     snapshotDelete,
@@ -258,6 +261,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('setting/snapshot/index', { search: searchName });
 
 const opRef = ref();
 

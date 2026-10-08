@@ -138,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { computed, ref, watch } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
@@ -168,6 +169,11 @@ const getDefaultMarketSource = (): HermesSkillMarketSource => {
 const marketSource = ref<HermesSkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
+useSearchPersistence(
+    'ai/agents/agent/config/tabs/skills/hermes',
+    { installedKeyword, marketKeyword },
+    () => agentId.value || undefined,
+);
 const installedSkills = ref<AI.AgentSkillItem[]>([]);
 const marketResults = ref<AI.AgentSkillSearchItem[]>([]);
 const installingSkill = ref('');
@@ -315,8 +321,6 @@ const handleModeChange = async (value: SkillViewMode) => {
 const load = async (id: number) => {
     agentId.value = id;
     mode.value = 'market';
-    installedKeyword.value = '';
-    marketKeyword.value = '';
     marketSource.value = getDefaultMarketSource();
     marketSearched.value = false;
     installedSkills.value = [];

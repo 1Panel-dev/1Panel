@@ -221,7 +221,8 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { toRef, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, pushSSLToNode, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
 import AcmeAccount from './acme-account/index.vue';
@@ -286,6 +287,7 @@ const req = reactive({
     orderBy: 'updated_at',
     order: 'descending',
 });
+useSearchPersistence('website/ssl/index', { search: toRef(req, 'domain') });
 const pushForm = ref({
     id: 0,
     pushNode: true,

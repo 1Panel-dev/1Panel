@@ -226,6 +226,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import BindDialog from '@/views/database/mysql/bind/index.vue';
 import UserDialog from '@/views/database/mysql/user/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
@@ -300,6 +301,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
+useSearchPersistence('database/mysql/index', { search: searchName });
 
 const mysqlContainer = ref();
 const mysqlStatus = ref();

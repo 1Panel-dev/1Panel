@@ -57,6 +57,18 @@
                     </template>
                     <template #main>
                         <ComplexTable
+                            :selection-context="() => [searchName, fireName]"
+                            :row-key="
+                                (row) =>
+                                    JSON.stringify([
+                                        row.family,
+                                        row.protocol,
+                                        row.port,
+                                        row.targetIP,
+                                        row.targetPort,
+                                        row.interface,
+                                    ])
+                            "
                             :pagination-config="paginationConfig"
                             v-model:selects="selects"
                             @search="search"
@@ -108,6 +120,7 @@
 </template>
 
 <script lang="ts" setup>
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
@@ -128,6 +141,7 @@ import { ElMessageBox } from 'element-plus';
 const loading = ref();
 const selects = ref<any>([]);
 const searchName = ref();
+useSearchPersistence('host/firewall/forward/index', { search: searchName });
 
 const isInit = ref(false);
 const isBind = ref(false);

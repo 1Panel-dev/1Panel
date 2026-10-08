@@ -272,6 +272,7 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchPersistence } from '@/composables/useSearchPersistence';
 import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAgentCheck, pageAgents, resetAgentToken, unbindAgentWebsite, updateAgentRemark } from '@/api/modules/ai';
@@ -340,6 +341,7 @@ const isActive = ref(false);
 const isExist = ref(false);
 const noApp = ref(false);
 const searchName = ref('');
+useSearchPersistence('ai/agents/agent/index', { search: searchName });
 const defaultHttpsPort = ref(443);
 const openrestyPortLoaded = ref(false);
 const websiteDomainsMap = ref<Record<number, Website.Domain[]>>({});
