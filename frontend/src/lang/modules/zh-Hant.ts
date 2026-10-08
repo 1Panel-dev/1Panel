@@ -6728,11 +6728,17 @@ const message = {
             storagePoolHelper: '儲存池用於儲存虛擬機磁碟與鏡像檔案。',
             network: '網路',
             bridgeName: '橋接名稱',
-            natNetworkHelper: '虛擬機可透過主機存取網路，外部裝置通常無法直接存取虛擬機。',
+            sourceInterface: '宿主機網卡',
+            macvtapNetworkHelper:
+                '讓虛擬機像區域網路中的一台獨立電腦，其他裝置可直接透過它的 IP 存取，無需更動宿主機原有 IP 設定。注意：宿主機與虛擬機預設無法透過此連線直接互訪。',
+            macvtapInterfaceHelper:
+                '選擇連接目標區域網路的有線網卡，可與宿主機共用。虛擬機 IP 由區域網路分配，也可在虛擬機內手動設定。網路需允許多個裝置透過這張網卡接入（多個 MAC 位址）。',
+            natNetworkHelper:
+                '適合只需上網，或只開放少量服務的虛擬機。虛擬機透過宿主機上網；其他裝置存取虛擬機服務時，通常需要另外設定連接埠轉送。',
             bridgeNetworkHelper:
-                '讓虛擬機接入主機既有的網橋（如 br0）。如主機有未使用的額外網卡，也可為其建立網橋後使用。',
+                '讓虛擬機像接在交換器上的獨立電腦，宿主機和區域網路內其他裝置都可直接存取它。使用前，需要先在宿主機上設定好網橋。',
             bridgeNameHelper:
-                '請選擇主機上已存在的 Linux bridge，例如 br0。實體網卡不是 bridge，docker/libvirt 管理的 bridge 不能在此選擇。',
+                '選擇已設定的網橋，例如 br0；沒有可選項時，請先在宿主機上建立網橋。這裡無法直接選擇實體網卡或 Docker/libvirt 管理的網橋。',
             natCIDRHelper: 'CIDR、閘道和 DHCP 位址範圍將用於新建的 NAT 虛擬網路。',
             networkCIDR: '網路 CIDR',
             gateway: '閘道',
@@ -6749,6 +6755,7 @@ const message = {
             available: '可用',
             vmCount: '關聯虛擬機',
             usedIPs: '已用 IP',
+            usedIPsUnavailable: '暫不支援取得',
             monitor: '監控',
             monitorNotReady: '虛擬機未執行，無法取得監控資料。',
             monitorLoadFailed: '取得虛擬機監控資料失敗。',

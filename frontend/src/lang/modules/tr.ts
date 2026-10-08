@@ -7346,12 +7346,17 @@ const message = {
             storagePoolHelper: 'Depolama havuzu, sanal makine disklerini ve ISO dosyalarını saklar.',
             network: 'Ağ',
             bridgeName: 'Bridge Adı',
+            sourceInterface: 'Ana makine ağ arayüzü',
+            macvtapNetworkHelper:
+                'Sanal makine yerel ağda ayrı bir bilgisayar gibi çalışır. Ana makinenin mevcut IP ayarlarını değiştirmeden diğer cihazlar sanal makinenin IP adresine doğrudan erişebilir. Not: varsayılan olarak ana makine ve sanal makine bu bağlantı üzerinden doğrudan iletişim kuramaz.',
+            macvtapInterfaceHelper:
+                'Hedef yerel ağa bağlı kablolu arayüzü seçin; ana makineyle paylaşılabilir. Sanal makinenin IP adresi ağ tarafından atanır veya sanal makine içinde elle ayarlanır. Ağ, bu arayüzde birden fazla cihaza (birden fazla MAC adresine) izin vermelidir.',
             natNetworkHelper:
-                'VM’ler ana makine üzerinden ağa erişebilir, ancak harici cihazlar genellikle onlara doğrudan erişemez.',
+                'İnternet erişimi gereken veya az sayıda hizmet sunan sanal makineler için uygundur. Sanal makine internete ana makine üzerinden çıkar. Diğer cihazların hizmetlere erişmesi için genellikle ayrıca bağlantı noktası yönlendirmesi yapılandırılmalıdır.',
             bridgeNetworkHelper:
-                'VM’leri ana makinedeki mevcut bir bridge’e (örneğin br0) bağlayın. Ana makinede kullanılmayan ek bir ağ kartı varsa, bunun için bir bridge oluşturup kullanabilirsiniz.',
+                'Sanal makine bir ağ anahtarına bağlı ayrı bir bilgisayar gibi çalışır. Ana makine ve yerel ağdaki diğer cihazlar ona doğrudan erişebilir. Önce ana makinede bir köprü yapılandırın.',
             bridgeNameHelper:
-                'Ana makinede var olan br0 gibi bir Linux bridge seçin. Fiziksel NIC bridge değildir ve docker/libvirt tarafından yönetilen bridge burada seçilemez.',
+                'br0 gibi yapılandırılmış bir köprü seçin. Seçenek yoksa önce ana makinede bir köprü oluşturun. Fiziksel arayüzler ve Docker/libvirt tarafından yönetilen köprüler burada seçilemez.',
             natCIDRHelper: 'CIDR, ağ geçidi ve DHCP aralığı yeni NAT sanal ağı tarafından kullanılır.',
             networkCIDR: 'Ağ CIDR',
             gateway: 'Ağ Geçidi',
@@ -7369,6 +7374,7 @@ const message = {
             available: 'Kullanılabilir',
             vmCount: 'Bağlı VMler',
             usedIPs: 'Kullanılan IPler',
+            usedIPsUnavailable: 'Henüz alınamıyor',
             monitor: 'İzleme',
             monitorNotReady: 'Sanal makine çalışmıyor. İzleme verileri kullanılamıyor.',
             monitorLoadFailed: 'VM izleme verileri alınamadı.',

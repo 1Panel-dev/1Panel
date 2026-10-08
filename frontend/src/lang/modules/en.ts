@@ -7231,12 +7231,17 @@ const message = {
             storagePoolHelper: 'The storage pool stores VM disks and ISO files.',
             network: 'Network',
             bridgeName: 'Bridge Name',
+            sourceInterface: 'Host network interface',
+            macvtapNetworkHelper:
+                'The VM acts like a separate computer on your LAN. Other devices can access its IP directly, without changing the host’s existing IP settings. Note: the host and VM cannot communicate directly through this connection by default.',
+            macvtapInterfaceHelper:
+                'Select a wired interface connected to the intended LAN; it can be shared with the host. The LAN assigns the VM’s IP, or you can set it manually in the VM. The network must allow multiple devices on this interface (multiple MAC addresses).',
             natNetworkHelper:
-                'VMs can access the network through the host, but external devices usually cannot access them directly.',
+                'Suitable for VMs that need internet access or expose only a few services. The VM goes online through the host. Other devices usually need separately configured port forwarding to access its services.',
             bridgeNetworkHelper:
-                'Connect VMs to an existing host bridge (such as br0). If the host has an unused additional NIC, create a bridge for it and use it.',
+                'The VM acts like a separate computer connected to a network switch. Both the host and other LAN devices can access it directly. First, configure a bridge on the host.',
             bridgeNameHelper:
-                'Select an existing Linux bridge on the host, such as br0. Physical NICs are not bridges, and docker/libvirt managed bridges cannot be selected here.',
+                'Select a configured bridge, such as br0. If none are available, create one on the host first. Physical interfaces and bridges managed by Docker/libvirt cannot be selected here.',
             natCIDRHelper: 'CIDR, gateway, and DHCP range are used by the new NAT virtual network.',
             networkCIDR: 'Network CIDR',
             gateway: 'Gateway',
@@ -7254,6 +7259,7 @@ const message = {
             available: 'Available',
             vmCount: 'Linked VMs',
             usedIPs: 'Used IPs',
+            usedIPsUnavailable: 'Retrieval not supported yet',
             monitor: 'Monitor',
             monitorNotReady: 'The virtual machine is not running. Monitoring data is unavailable.',
             monitorLoadFailed: 'Failed to get VM monitoring data.',
