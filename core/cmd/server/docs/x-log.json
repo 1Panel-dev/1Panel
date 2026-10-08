@@ -4039,12 +4039,21 @@
 	},
 	"/runtimes/operate": {
 		"bodyKeys": [
-			"id"
+			"ID"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "操作运行环境 [id]",
-		"formatEN": "Operate runtime [id]"
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "ID",
+				"isList": false,
+				"db": "runtimes",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "操作运行环境 [name]",
+		"formatEN": "Operate runtime [name]"
 	},
 	"/runtimes/php/config": {
 		"bodyKeys": [
