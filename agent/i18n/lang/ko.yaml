@@ -300,6 +300,9 @@ BuildCache: '빌드 캐시'
 Volume: '스토리지 볼륨'
 Network: '네트워크'
 PruneStart: '정리 중입니다. 잠시만 기다려주세요...'
+NetworkCleanupConnected: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 연결된 컨테이너가 있거나 사용 중이므로 삭제하지 않음"
+NetworkCleanupSummary: "네트워크 정리 완료: 삭제 {{ .deleted }}개, 건너뜀 {{ .skipped }}개, 실패 {{ .failed }}개"
+NetworkCleanupPartialFailure: "일부 네트워크를 정리하지 못했습니다. 작업 로그를 확인하세요"
 ContainerBackupPrepare: '컨테이너 백업 작업 공간 준비'
 ContainerBackupStop: '백업 전에 컨테이너 중지'
 ContainerBackupInspect: '컨테이너 inspect 및 네트워크 정보 백업'

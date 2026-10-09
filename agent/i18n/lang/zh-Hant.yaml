@@ -300,6 +300,9 @@ BuildCache: '構建快取'
 Volume: '磁碟區'
 Network: '網路'
 PruneStart: '清理中，請稍候...'
+NetworkCleanupConnected: "跳過網路 [{{ .name }}] ({{ .id }})：仍有容器連接或正在使用，未刪除"
+NetworkCleanupSummary: "網路清理完成：已刪除 {{ .deleted }}，已跳過 {{ .skipped }}，失敗 {{ .failed }}"
+NetworkCleanupPartialFailure: "部分網路清理失敗，請查看任務日誌"
 ContainerBackupPrepare: '準備容器備份工作目錄'
 ContainerBackupStop: '備份前停止容器'
 ContainerBackupInspect: '備份容器 Inspect 與網路資訊'

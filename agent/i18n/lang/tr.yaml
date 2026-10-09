@@ -300,6 +300,9 @@ BuildCache: 'Derleme önbelleği'
 Volume: 'Depolama hacmi'
 Network: 'Ağ'
 PruneStart: 'Temizlik devam ediyor, lütfen bekleyin...'
+NetworkCleanupConnected: "Ağ [{{ .name }}] ({{ .id }}) atlandı: bağlı konteynerler var veya ağ kullanımda; silinmedi"
+NetworkCleanupSummary: "Ağ temizliği tamamlandı: silinen {{ .deleted }}, atlanan {{ .skipped }}, başarısız {{ .failed }}"
+NetworkCleanupPartialFailure: "Bazı ağlar temizlenemedi; görev günlüğünü kontrol edin"
 ContainerBackupPrepare: 'Konteyner yedekleme çalışma alanını hazırla'
 ContainerBackupStop: 'Yedeklemeden önce konteyneri durdur'
 ContainerBackupInspect: 'Konteyner inspect ve ağ bilgisini yedekle'

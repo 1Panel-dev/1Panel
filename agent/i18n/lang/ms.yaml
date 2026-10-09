@@ -300,6 +300,9 @@ BuildCache: 'Cache binaan'
 Volume: 'Jilid storan'
 Network: 'Rangkaian'
 PruneStart: 'Pembersihan sedang dijalankan, sila tunggu...'
+NetworkCleanupConnected: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: terdapat kontena yang disambungkan atau rangkaian sedang digunakan; tidak dipadamkan"
+NetworkCleanupSummary: "Pembersihan rangkaian selesai: dipadamkan {{ .deleted }}, dilangkau {{ .skipped }}, gagal {{ .failed }}"
+NetworkCleanupPartialFailure: "Sesetengah rangkaian tidak dapat dibersihkan; semak log tugas"
 ContainerBackupPrepare: 'Sediakan ruang kerja sandaran kontena'
 ContainerBackupStop: 'Hentikan kontena sebelum sandaran'
 ContainerBackupInspect: 'Sandarkan inspect dan rangkaian kontena'
