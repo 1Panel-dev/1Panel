@@ -1310,7 +1310,7 @@ func (f *FileService) BatchCheckFiles(req request.FilePathsCheck) []response.Exi
 }
 
 func (f *FileService) GetHostMount() []dto.DiskInfo {
-	return loadDiskInfo()
+	return loadDiskInfo(false)
 }
 
 func (f *FileService) GetUsersAndGroups() (*response.UserGroupResponse, error) {

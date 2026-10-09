@@ -4,11 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"mime"
-	"sort"
 	"strconv"
 	"strings"
-	"sync"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -20,12 +17,10 @@ import (
 	alertUtil "github.com/1Panel-dev/1Panel/agent/utils/alert"
 	alertconfig "github.com/1Panel-dev/1Panel/agent/utils/alert_config"
 	alertwebhook "github.com/1Panel-dev/1Panel/agent/utils/alert_webhook"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/copier"
 	"github.com/1Panel-dev/1Panel/agent/utils/email"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack/providers"
-	"github.com/shirou/gopsutil/v4/disk"
 )
 
 type AlertService struct{}
@@ -358,120 +353,12 @@ func (a AlertService) UpdateStatus(id uint, status string) error {
 }
 
 func (a AlertService) GetDisks() ([]dto.DiskDTO, error) {
-	var disks []dto.DiskDTO
-	excludes := map[string]struct{}{
-		"/mnt/cdrom": {}, "/boot": {}, "/boot/efi": {}, "/dev": {}, "/dev/shm": {},
-		"/run/lock": {}, "/run": {}, "/run/shm": {}, "/run/user": {},
+	infos := loadDiskInfo(true)
+	disks := make([]dto.DiskDTO, 0, len(infos))
+	for _, item := range infos {
+		disks = append(disks, dto.DiskDTO(item))
 	}
-	stdout, err := executeDiskCommand()
-	if err != nil {
-		return disks, nil
-	}
-
-	lines := strings.Split(stdout, "\n")
-	var mounts []dto.AlertDiskInfo
-
-	for _, line := range lines {
-		fields := strings.Fields(line)
-		if len(fields) < 7 {
-			continue
-		}
-		mountPoint := strings.Join(fields[6:], " ")
-		if shouldExclude(fields, mountPoint, excludes) {
-			continue
-		}
-		mounts = append(mounts, dto.AlertDiskInfo{Type: fields[1], Device: fields[0], Mount: mountPoint})
-
-	}
-
-	var (
-		wg sync.WaitGroup
-		mu sync.Mutex
-	)
-	wg.Add(len(mounts))
-	for i := 0; i < len(mounts); i++ {
-		go func(timeoutCh <-chan time.Time, mount dto.AlertDiskInfo) {
-			defer wg.Done()
-
-			var itemData dto.DiskDTO
-			itemData.Path = mount.Mount
-			itemData.Type = mount.Type
-			itemData.Device = mount.Device
-			select {
-			case <-timeoutCh:
-				mu.Lock()
-				disks = append(disks, itemData)
-				mu.Unlock()
-				global.LOG.Errorf("load disk info from %s failed, err: timeout", mount.Mount)
-			default:
-				state, err := disk.Usage(mount.Mount)
-				if err != nil {
-					mu.Lock()
-					disks = append(disks, itemData)
-					mu.Unlock()
-					global.LOG.Errorf("load disk info from %s failed, err: %v", mount.Mount, err)
-					return
-				}
-				itemData.Total = state.Total
-				itemData.Free = state.Free
-				itemData.Used = state.Used
-				itemData.UsedPercent = state.UsedPercent
-				itemData.InodesTotal = state.InodesTotal
-				itemData.InodesUsed = state.InodesUsed
-				itemData.InodesFree = state.InodesFree
-				itemData.InodesUsedPercent = state.InodesUsedPercent
-				mu.Lock()
-				disks = append(disks, itemData)
-				mu.Unlock()
-			}
-		}(time.After(5*time.Second), mounts[i])
-	}
-	wg.Wait()
-
-	sort.Slice(disks, func(i, j int) bool {
-		return disks[i].Path < disks[j].Path
-	})
 	return disks, nil
-}
-
-func executeDiskCommand() (string, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	stdout, err := cmdMgr.RunWithStdout("df", "-hT", "-P")
-	if err != nil {
-		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunWithStdout("df", "-lhT", "-P")
-	}
-	if err != nil {
-		return stdout, err
-	}
-	var lines []string
-	for _, line := range strings.Split(stdout, "\n") {
-		if !strings.Contains(line, "/") || strings.Contains(line, "tmpfs") || strings.Contains(line, "snap/core") || strings.Contains(line, "udev") {
-			continue
-		}
-		lines = append(lines, line)
-	}
-	if len(lines) == 0 {
-		return "", nil
-	}
-	return strings.Join(lines, "\n"), nil
-}
-
-func shouldExclude(fields []string, mountPoint string, excludes map[string]struct{}) bool {
-	if strings.HasPrefix(mountPoint, "/snap") || len(strings.Split(mountPoint, "/")) > 10 {
-		return true
-	}
-	if strings.TrimSpace(fields[1]) == "tmpfs" {
-		return true
-	}
-	if strings.Contains(fields[2], "K") {
-		return true
-	}
-	if strings.Contains(mountPoint, "docker") {
-		return true
-	}
-	_, excluded := excludes[mountPoint]
-	return excluded
 }
 
 func (a AlertService) PageAlertLogs(search dto.AlertLogSearch) (int64, []dto.AlertLogDTO, error) {
