@@ -558,15 +558,10 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 	}, nil)
 
 	if inThread {
-		if err := taskItem.Prepare(); err != nil {
-			unlock()
-			_ = client.Close()
-			return err
-		}
 		go func() {
 			defer unlock()
 			defer client.Close()
-			if err := taskItem.ExecutePrepared(); err != nil {
+			if err := taskItem.Execute(); err != nil {
 				global.LOG.Error(err.Error())
 			}
 		}()
