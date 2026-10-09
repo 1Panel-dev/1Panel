@@ -87,6 +87,7 @@ const (
 	TaskScopeCronjob          = "Cronjob"
 	TaskScopeClam             = "Clam"
 	TaskScopeSystem           = "System"
+	TaskScopeVm               = "VirtualMachine"
 	TaskScopeFirewall         = "Firewall"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"
@@ -257,7 +258,15 @@ func (s *SubTask) Execute() error {
 		case <-ctx.Done():
 			s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
 			err = errors.New("timeout!")
+			if s.RootTask.Task.Type == TaskScopeVm {
+				<-done
+			}
 		case err = <-done:
+			if s.RootTask.Task.Type == TaskScopeVm && ctx.Err() != nil {
+				s.RootTask.Log(i18n.GetWithName("TaskTimeout", subTaskName))
+				err = errors.New("timeout!")
+				break
+			}
 			if err != nil {
 				s.RootTask.Log(i18n.GetWithNameAndErr("SubTaskFailed", subTaskName, err))
 				if err.Error() == i18n.GetMsgByKey("ErrShutDown") {
