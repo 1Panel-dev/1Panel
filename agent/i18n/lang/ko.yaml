@@ -718,6 +718,8 @@ ErrDockerIPv4ForwardingDisabled: "IPv4 전달이 비활성화되어 있습니다
 ErrFirewallRuleSavedApplyFailed: "새 규칙 설정이 저장되었지만 방화벽에 적용하지 못했습니다. 동기화하여 다시 시도하세요: {{ .detail }}"
 ErrFirewallRuleConflict: "UFW에 일치 조건이 같지만 동작이 다른 규칙이 이미 있습니다. 기존 규칙을 편집하세요."
 ErrForwardInterfaceNotFound: "전달 규칙에 지정된 네트워크 인터페이스 {{ .name }}이 존재하지 않습니다. 이름을 확인한 후 다시 시도하세요."
+ErrIPv6RARisk: "네트워크 연결이 끊길 위험이 있어 IPv6 전달 활성화를 차단했습니다. 문서와 시스템 로그를 확인하세요."
+ErrIPv6RACheckFailed: "네트워크 구성을 확인할 수 없어 IPv6 전달 활성화를 차단했습니다. 자세한 내용은 시스템 로그를 확인하세요."
 
 ErrSSHPublicKey: "유효한 SSH 공개 키를 입력하세요"
 ErrSSHPrivateKey: "SSH 개인 키 형식이 잘못되었거나 암호가 틀립니다. 암호화된 키에는 원래 암호가 필요합니다"

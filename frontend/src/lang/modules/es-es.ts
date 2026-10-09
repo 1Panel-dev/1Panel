@@ -4357,8 +4357,6 @@ const message = {
         dockerGuard: 'Protección de puertos de contenedores',
         systemFirewall: 'Firewall del host',
         systemFirewallHelper: 'Controla el acceso a los puertos del host y las reglas de entrada.',
-        forwardPolicyDropWarning:
-            'Este servidor restringe el reenvío de red. Es posible que las reglas de reenvío de puertos no surtan efecto.',
         forwardingHelper: 'Gestiona las reglas de reenvío de puertos.',
         dockerFirewallHelper: 'Selecciona cómo gestiona 1Panel la protección de puertos de contenedores.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4443,9 +4441,9 @@ const message = {
             'Las reglas INPUT del host no protegen directamente este puerto publicado por Docker. Haz clic para abrir la protección de puertos de contenedores.',
         notInitialized: 'No inicializado',
         ipv6RARisk:
-            'El reenvío IPv6 está bloqueado: las interfaces {0} tienen accept_ra=1 y pueden depender de RA/SLAAC. Revise la configuración de red, configure accept_ra=2 de forma persistente en las interfaces que necesitan RA y vuelva a intentarlo.',
+            'El reenvío IPv6 está bloqueado para evitar una posible pérdida de conectividad. Consulte la documentación y los registros del sistema.',
         ipv6RACheckFailed:
-            'No se puede comprobar la configuración RA de IPv6. Se ha bloqueado la activación del reenvío IPv6. Revise la configuración de red y vuelva a intentarlo.',
+            'El reenvío IPv6 está bloqueado porque no se pudo comprobar la configuración de red. Consulte los registros del sistema.',
         ipv6ForwardingOnDemand:
             'El reenvío IPv6 no está habilitado. Se comprobará y habilitará al añadir o restaurar reglas IPv6.',
         familyUnsupported: 'El sistema no admite {0}',

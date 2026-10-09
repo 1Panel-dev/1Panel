@@ -718,6 +718,8 @@ ErrDockerIPv4ForwardingDisabled: "O encaminhamento IPv4 está desativado. Defina
 ErrFirewallRuleSavedApplyFailed: "A configuração da nova regra foi salva, mas não pôde ser aplicada ao firewall. Tente novamente por meio da sincronização: {{ .detail }}"
 ErrFirewallRuleConflict: "Já existe uma regra UFW com as mesmas condições e uma ação diferente. Edite a regra existente."
 ErrForwardInterfaceNotFound: "A interface de rede {{ .name }} especificada na regra de encaminhamento não existe. Verifique o nome e tente novamente."
+ErrIPv6RARisk: "O encaminhamento IPv6 foi bloqueado para evitar uma possível perda de conexão. Consulte a documentação e os logs do sistema."
+ErrIPv6RACheckFailed: "O encaminhamento IPv6 foi bloqueado porque não foi possível verificar a configuração de rede. Consulte os logs do sistema."
 
 ErrSSHPublicKey: "Informe uma chave pública SSH válida"
 ErrSSHPrivateKey: "Chave privada SSH inválida ou senha incorreta; chaves criptografadas exigem a senha original"

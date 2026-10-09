@@ -718,6 +718,8 @@ ErrDockerIPv4ForwardingDisabled: "Pemajuan IPv4 dilumpuhkan. Tetapkan net.ipv4.i
 ErrFirewallRuleSavedApplyFailed: "Konfigurasi peraturan baharu telah disimpan, tetapi gagal digunakan pada tembok api. Cuba lagi melalui penyegerakan: {{ .detail }}"
 ErrFirewallRuleConflict: "Peraturan UFW dengan syarat padanan yang sama tetapi tindakan berbeza sudah wujud. Sila edit peraturan sedia ada."
 ErrForwardInterfaceNotFound: "Antara muka rangkaian {{ .name }} yang dinyatakan dalam peraturan pemajuan tidak wujud. Semak namanya dan cuba lagi."
+ErrIPv6RARisk: "Pemajuan IPv6 disekat bagi mengelakkan risiko kehilangan sambungan rangkaian. Rujuk dokumentasi dan log sistem."
+ErrIPv6RACheckFailed: "Pemajuan IPv6 disekat kerana konfigurasi rangkaian tidak dapat diperiksa. Lihat log sistem untuk butiran."
 
 ErrSSHPublicKey: "Masukkan kunci awam SSH yang sah"
 ErrSSHPrivateKey: "Kunci peribadi SSH tidak sah atau frasa laluan salah; kunci yang disulitkan memerlukan frasa laluan asal"

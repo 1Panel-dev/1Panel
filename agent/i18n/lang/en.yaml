@@ -718,6 +718,8 @@ ErrDockerIPv4ForwardingDisabled: "IPv4 forwarding is disabled. Set net.ipv4.ip_f
 ErrFirewallRuleSavedApplyFailed: "The new rule configuration was saved, but applying it to the firewall failed. Retry by synchronizing: {{ .detail }}"
 ErrFirewallRuleConflict: "A UFW rule with the same match conditions and a different action already exists. Edit the existing rule instead."
 ErrForwardInterfaceNotFound: "Network interface {{ .name }} specified by the forwarding rule does not exist. Check the interface name and retry."
+ErrIPv6RARisk: "IPv6 forwarding is blocked to prevent possible network loss. See the documentation and system logs for details."
+ErrIPv6RACheckFailed: "IPv6 forwarding is blocked because the network configuration could not be checked. See the system logs for details."
 
 ErrSSHPublicKey: "Enter a valid SSH public key"
 ErrSSHPrivateKey: "Invalid SSH private key or incorrect passphrase; encrypted keys require the original passphrase"

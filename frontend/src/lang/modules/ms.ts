@@ -4374,8 +4374,6 @@ const message = {
         dockerGuard: 'Perlindungan port bekas',
         systemFirewall: 'Tembok api hos',
         systemFirewallHelper: 'Mengawal akses port hos dan peraturan masuk.',
-        forwardPolicyDropWarning:
-            'Pelayan ini mengehadkan pemajuan rangkaian. Peraturan pemajuan port mungkin tidak berfungsi.',
         forwardingHelper: 'Mengurus peraturan pemajuan port.',
         dockerFirewallHelper: 'Memilih cara 1Panel mengurus perlindungan port bekas.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, percubaan',
@@ -4459,9 +4457,9 @@ const message = {
             'Peraturan INPUT hos tidak melindungi port terbitan Docker ini secara langsung. Klik untuk membuka perlindungan port bekas.',
         notInitialized: 'Belum dimulakan',
         ipv6RARisk:
-            'Pemajuan IPv6 disekat: antara muka {0} mempunyai accept_ra=1 dan mungkin bergantung pada RA/SLAAC. Semak konfigurasi rangkaian, tetapkan accept_ra=2 secara kekal pada antara muka yang memerlukan RA, kemudian cuba lagi.',
+            'Pemajuan IPv6 disekat bagi mengelakkan risiko kehilangan sambungan rangkaian. Rujuk dokumentasi dan log sistem.',
         ipv6RACheckFailed:
-            'Konfigurasi RA IPv6 tidak dapat diperiksa. Pengaktifan pemajuan IPv6 disekat. Semak konfigurasi rangkaian sistem dan cuba lagi.',
+            'Pemajuan IPv6 disekat kerana konfigurasi rangkaian tidak dapat diperiksa. Lihat log sistem untuk butiran.',
         ipv6ForwardingOnDemand:
             'Pemajuan IPv6 belum diaktifkan. Ia akan diperiksa dan diaktifkan apabila peraturan IPv6 ditambah atau dipulihkan.',
         familyUnsupported: 'Sistem tidak menyokong {0}',

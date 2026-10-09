@@ -718,6 +718,8 @@ ErrDockerIPv4ForwardingDisabled: "IPv4 转发未开启，请先设置 net.ipv4.i
 ErrFirewallRuleSavedApplyFailed: "新规则配置已保存，但应用到防火墙失败。可通过同步重试：{{ .detail }}"
 ErrFirewallRuleConflict: "UFW 中已存在匹配条件相同但动作不同的规则，请编辑已有规则。"
 ErrForwardInterfaceNotFound: "转发规则指定的网卡 {{ .name }} 不存在，请检查网卡名称后重试。"
+ErrIPv6RARisk: "IPv6 转发存在断网风险，已阻止启用。请参阅文档，详情见系统日志。"
+ErrIPv6RACheckFailed: "无法检查 IPv6 网络配置，已阻止启用转发。详情见系统日志。"
 
 ErrSSHPublicKey: "请输入有效的 SSH 公钥"
 ErrSSHPrivateKey: "SSH 私钥格式无效或密码错误；加密私钥需要填写原密码"

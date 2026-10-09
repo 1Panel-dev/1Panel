@@ -4395,8 +4395,6 @@ const message = {
         dockerGuard: 'Proteção de portas de contêineres',
         systemFirewall: 'Firewall do host',
         systemFirewallHelper: 'Controla o acesso às portas do host e as regras de entrada.',
-        forwardPolicyDropWarning:
-            'Este servidor restringe o encaminhamento de rede. As regras de encaminhamento de portas podem não funcionar.',
         forwardingHelper: 'Gerencia regras de encaminhamento de portas.',
         dockerFirewallHelper: 'Seleciona como o 1Panel gerencia a proteção de portas de contêineres.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4482,9 +4480,9 @@ const message = {
             'As regras INPUT do host não protegem diretamente esta porta publicada pelo Docker. Clique para abrir a proteção de portas de contêineres.',
         notInitialized: 'Não inicializado',
         ipv6RARisk:
-            'O encaminhamento IPv6 foi bloqueado: as interfaces {0} têm accept_ra=1 e podem depender de RA/SLAAC. Verifique a configuração de rede, configure accept_ra=2 de forma persistente nas interfaces que precisam de RA e tente novamente.',
+            'O encaminhamento IPv6 foi bloqueado para evitar uma possível perda de conexão. Consulte a documentação e os logs do sistema.',
         ipv6RACheckFailed:
-            'Não foi possível verificar a configuração RA do IPv6. A ativação do encaminhamento IPv6 foi bloqueada. Verifique a configuração de rede e tente novamente.',
+            'O encaminhamento IPv6 foi bloqueado porque não foi possível verificar a configuração de rede. Consulte os logs do sistema.',
         ipv6ForwardingOnDemand:
             'O encaminhamento IPv6 não está ativado. Ele será verificado e ativado ao adicionar ou restaurar regras IPv6.',
         familyUnsupported: 'O sistema não oferece suporte a {0}',

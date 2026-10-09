@@ -9,13 +9,10 @@ import (
 	"strconv"
 	"strings"
 	"sync"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/filter"
 	"github.com/1Panel-dev/1Panel/agent/utils/firewall/forwarding"
@@ -82,23 +79,6 @@ func (s *ForwardingService) LoadBaseInfo(ctx context.Context) (dto.FirewallSubsy
 	baseInfo.PingStatus = firewall.LoadPingStatus()
 	baseInfo.IsInit, baseInfo.IsBind = status.IsInit, status.IsBind
 	baseInfo.IPv4, baseInfo.IPv6 = status.IPv4, status.IPv6
-	for _, family := range []struct {
-		command string
-		status  *dto.FirewallBackendFamilyStatus
-	}{
-		{"iptables", &baseInfo.IPv4},
-		{"ip6tables", &baseInfo.IPv6},
-	} {
-		if family.command == "ip6tables" && !baseInfo.IPv6Enabled {
-			continue
-		}
-		policy, err := loadForwardPolicy(ctx, family.command)
-		if err != nil {
-			global.LOG.Warnf("inspect %s FORWARD policy: %v", family.command, err)
-			continue
-		}
-		family.status.ForwardPolicy = policy
-	}
 	return baseInfo, nil
 }
 
@@ -307,27 +287,4 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 
 func NewIForwardingService() IForwardingService {
 	return newForwardingService()
-}
-
-func loadForwardPolicy(ctx context.Context, command string) (string, error) {
-	if !cmd.Which(command) {
-		command += "-nft"
-		if !cmd.Which(command) {
-			return "", nil
-		}
-	}
-	output, err := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second)).RunWithOptionalSudoAndStdout(command, "-t", "filter", "-w", "2", "-S", "FORWARD")
-	if err != nil {
-		return "", err
-	}
-	for _, line := range strings.Split(output, "\n") {
-		fields := strings.Fields(line)
-		if len(fields) == 3 && fields[0] == "-P" && fields[1] == "FORWARD" {
-			if fields[2] != "ACCEPT" && fields[2] != "DROP" {
-				return "", fmt.Errorf("unexpected FORWARD policy: %s", fields[2])
-			}
-			return fields[2], nil
-		}
-	}
-	return "", errors.New("FORWARD default policy was not found")
 }
