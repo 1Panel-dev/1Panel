@@ -1893,6 +1893,13 @@ const message = {
         imageName: 'Nombre de la imagen',
         pull: 'Descargar',
         path: 'Ruta',
+        imageUploadDrop: 'Arrastre un archivo de imagen aquí o haga clic para subirlo',
+        imageUploadHelper:
+            'Se permite cualquier formato de archivo. Docker valida el contenido. Los archivos subidos se conservan para reintentar la importación o eliminarlos manualmente.',
+        imageImportUnknown:
+            'No se puede consultar el estado de la tarea de importación. Reintente la consulta o seleccione otro archivo para iniciar una nueva importación. El archivo anterior se conservará en el servidor.',
+        imageImportSubmitted:
+            'Tarea de importación de imagen enviada. Consulte el registro de la tarea para ver el resultado.',
         importImage: 'Importar',
         buildArgs: 'Argumentos de Construcción',
         imageBuild: 'Construir',

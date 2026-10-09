@@ -1773,6 +1773,11 @@ const message = {
         delInsecureHelper: '刪除授信需要重新啟動 docker 服務，是否刪除？',
         pull: '拉取',
         path: '路徑',
+        imageUploadDrop: '拖曳映像檔案至此處，或點擊上傳',
+        imageUploadHelper: '不限制檔案格式，由 Docker 驗證內容。上傳的檔案會保留，可重試匯入或手動刪除。',
+        imageImportUnknown:
+            '暫時無法取得匯入任務狀態。可重試查詢，或重新選擇檔案發起新的匯入；原上傳檔案會保留在伺服器上。',
+        imageImportSubmitted: '映像匯入任務已提交，請查看任務日誌',
         importImage: '匯入映像',
         imageBuild: '構建映像',
         buildArgs: '構建參數',

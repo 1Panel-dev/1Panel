@@ -1883,6 +1883,12 @@ const message = {
         imageName: 'İmaj adı',
         pull: 'Çek',
         path: 'Yol',
+        imageUploadDrop: 'Bir imaj dosyasını buraya sürükleyin veya yüklemek için tıklayın',
+        imageUploadHelper:
+            'Tüm dosya biçimlerine izin verilir. Docker içeriği doğrular. Yüklenen dosyalar, içe aktarmayı yeniden denemek veya elle silmek için saklanır.',
+        imageImportUnknown:
+            'İçe aktarma görevinin durumu alınamıyor. Durumu kontrol etmeyi yeniden deneyin veya yeni bir içe aktarma başlatmak için başka bir dosya seçin. Önceki yükleme sunucuda saklanacaktır.',
+        imageImportSubmitted: 'İmajı içe aktarma görevi gönderildi. Sonuç için görev günlüğünü kontrol edin.',
         importImage: 'İçe aktar',
         buildArgs: 'Derleme Argümanları',
         imageBuild: 'Oluştur',

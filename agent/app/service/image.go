@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -325,18 +324,16 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 	}
 
 	go func() {
-		client, err := docker.NewDockerClient()
-		if err != nil {
-			taskItem.Log("Failed to create Docker client: " + err.Error())
-			return
-		}
-		defer client.Close()
-
 		for _, itemPath := range req.Paths {
 			currentPath := itemPath
 			itemName := path.Base(currentPath)
 			taskItem.AddSubTask(i18n.GetWithName("TaskImport", itemName), func(t *task.Task) error {
 				taskItem.Logf("----------------- %s -----------------", itemName)
+				client, err := docker.NewDockerClient()
+				if err != nil {
+					return err
+				}
+				defer client.Close()
 				file, err := os.Open(currentPath)
 				if err != nil {
 					return err
@@ -347,14 +344,7 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 					return err
 				}
 				defer res.Body.Close()
-				content, err := io.ReadAll(res.Body)
-				if err != nil {
-					return err
-				}
-				if strings.Contains(string(content), "Error") {
-					return errors.New(string(content))
-				}
-				return nil
+				return consumeImageLoadResponse(res.Body, taskItem.Log)
 			}, nil)
 		}
 		_ = taskItem.Execute()
