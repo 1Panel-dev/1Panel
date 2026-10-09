@@ -27,6 +27,7 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/registry"
+	"github.com/docker/docker/pkg/jsonmessage"
 	"github.com/moby/go-archive"
 )
 
@@ -350,6 +351,29 @@ func (u *ImageService) ImageLoad(req dto.ImageLoad) error {
 		_ = taskItem.Execute()
 	}()
 	return nil
+}
+
+// Docker may report load failures in a successful HTTP response's JSON stream.
+func consumeImageLoadResponse(reader io.Reader, log func(string)) error {
+	decoder := json.NewDecoder(reader)
+	for {
+		var message jsonmessage.JSONMessage
+		if err := decoder.Decode(&message); err != nil {
+			if errors.Is(err, io.EOF) {
+				return nil
+			}
+			return err
+		}
+		if message.Error != nil && message.Error.Message != "" {
+			return message.Error
+		}
+		if message.ErrorMessage != "" {
+			return errors.New(message.ErrorMessage)
+		}
+		if text := strings.TrimSpace(message.Stream); text != "" {
+			log(text)
+		}
+	}
 }
 
 func (u *ImageService) ImageSave(req dto.ImageSave) error {
