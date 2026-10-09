@@ -339,6 +339,11 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 
 	operationTask, err := task.NewTaskWithOps(install.Name, taskType, task.TaskScopeApp, req.TaskID, install.ID)
 	if err != nil {
+		install.Status = constant.StatusUpErr
+		install.Message = err.Error()
+		if saveErr := appInstallRepo.Save(context.Background(), &install); saveErr != nil {
+			return fmt.Errorf("%w; save failed operation status: %v", err, saveErr)
+		}
 		return err
 	}
 	operation := string(req.Operate)
@@ -567,11 +572,15 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 		return err
 	}
 	for _, i := range allList {
-		if i.Status == constant.StatusInstalling || i.Status == constant.StatusUpgrading || i.Status == constant.StatusRebuilding || i.Status == constant.StatusUninstalling {
+		if appInstallOperationInterruptedOnRestart(i.Status) {
 			if systemInit {
-				i.Status = constant.StatusError
-				i.Message = "1Panel restart causes the task to terminate"
-				_ = appInstallRepo.Save(context.Background(), &i)
+				i.Status = appInstallOperationFailureStatus(i.Status)
+				i.Message = constant.InterruptedMsg
+				if err := appInstallRepo.Save(context.Background(), &i); err != nil {
+					return err
+				}
+			} else if err := syncAppInstallStatus(&i, false); err != nil {
+				global.LOG.Errorf("sync install app[%s] error,mgs: %s", i.Name, err.Error())
 			}
 			continue
 		}
@@ -931,10 +940,34 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
+	operation := ""
+	switch appInstall.Status {
+	case constant.StatusInstalling:
+		operation = task.TaskInstall
+	case constant.StatusUpgrading:
+		operation = task.TaskUpgrade
+	case constant.StatusRebuilding:
+		operation = task.TaskBuild
+	case constant.StatusUninstalling:
+		operation = task.TaskUninstall
+	case constant.StatusStarting, constant.StatusWaiting:
+		operation = task.TaskUpdate
+	case constant.StatusRestarting:
+		operation = task.TaskRestart
+	}
+	if operation != "" {
+		if err := reconcileAppInstallTaskFailure(appInstall, operation, global.DB, global.TaskDB); err != nil {
+			return err
+		}
+	}
 	switch appInstall.Status {
 	case constant.StatusInstalling, constant.StatusRebuilding, constant.StatusUpgrading, constant.StatusUninstalling,
 		constant.StatusStarting, constant.StatusRestarting, constant.StatusWaiting:
 		return nil
+	case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
+		if !force {
+			return nil
+		}
 	}
 	cli, err := docker.NewClient()
 	if err != nil {

@@ -57,7 +57,10 @@ func (u *TaskLogService) ReadByLine(req request.TaskLogReadReq) (*response.FileL
 	if req.TaskID != "" {
 		opts = append(opts, taskRepo.WithByID(req.TaskID))
 	} else {
-		opts = append(opts, repo.WithOrderRuleBy("created_at", "desc"), repo.WithByType(req.TaskType), taskRepo.WithOperate(req.TaskOperate), taskRepo.WithResourceID(req.ResourceID))
+		opts = append(opts, repo.WithOrderRuleBy("created_at", "desc"), repo.WithByType(req.TaskType), taskRepo.WithResourceID(req.ResourceID))
+		if req.TaskOperate != "" {
+			opts = append(opts, taskRepo.WithOperate(req.TaskOperate))
+		}
 	}
 	taskModel, err := taskRepo.GetFirst(opts...)
 	if err != nil {

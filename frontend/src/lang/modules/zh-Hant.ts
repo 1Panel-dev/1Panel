@@ -1006,6 +1006,12 @@ const message = {
             whiteListHelper: '限制僅白名單中的 IP 可瀏覽',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI 網關已支援獨立部署',
+            deploymentNoticeDescription:
+                'AI 網關現已支援獨立部署，1Panel 內建 AI 網關後續將不再更新。建議前往應用程式商店安裝獨立版本，您也可以繼續使用目前版本。',
+            deploymentNoticeContinue: '已知悉，繼續使用',
+            deploymentNoticeAppStore: '前往應用程式商店',
+            deploymentNoticeNoAppPermission: '您沒有應用程式商店存取權限，請聯絡管理員安裝獨立版本。',
             title: 'AI 閘道',
             apiReference: '介面說明',
             notInstalled: '未安裝',
