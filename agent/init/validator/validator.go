@@ -20,6 +20,12 @@ func Init() {
 	if err := validator.RegisterValidation("password", checkPasswordPattern); err != nil {
 		panic(err)
 	}
+	if err := validator.RegisterValidation("vm_name", checkVMNamePattern); err != nil {
+		panic(err)
+	}
+	if err := validator.RegisterValidation("vm_common", checkVMCommonPattern); err != nil {
+		panic(err)
+	}
 	global.VALID = validator
 }
 
@@ -54,4 +60,13 @@ func checkPasswordPattern(fl validator.FieldLevel) bool {
 	}
 
 	return false
+}
+
+func checkVMNamePattern(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	return re.GetRegex(re.VMNameValidationPattern).MatchString(value)
+}
+func checkVMCommonPattern(fl validator.FieldLevel) bool {
+	value := fl.Field().String()
+	return re.GetRegex(re.VMCommonPattern).MatchString(value)
 }

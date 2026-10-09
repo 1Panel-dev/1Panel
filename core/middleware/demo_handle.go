@@ -86,7 +86,7 @@ var demoDeniedRoutes = map[demoRoute]struct{}{
 	{http.MethodGet, "/api/v2/hosts/terminal/local"}:      {},
 	{http.MethodGet, "/api/v2/hosts/terminal/ssh"}:        {},
 	{http.MethodGet, "/api/v2/hosts/terminal/container"}:  {},
-	{http.MethodGet, "/api/v2/core/xpack/vms/console/ws"}: {},
+	{http.MethodGet, "/api/v2/xpack/vms/console/ws"}: {},
 }
 
 func DemoHandle() gin.HandlerFunc {
