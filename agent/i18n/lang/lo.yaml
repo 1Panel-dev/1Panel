@@ -290,6 +290,9 @@ BuildCache: 'ແຄດການສ້າງ'
 Volume: 'ວໍລຸມ (Volume)'
 Network: "ເຄືອຂ່າຍ"
 PruneStart: 'ກຳລັງດຳເນີນການທຳຄວາມສະອາດ'
+NetworkCleanupConnected: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ມີຄອນເທນເນີເຊື່ອມຕໍ່ຢູ່ ຫຼື ເຄືອຂ່າຍກຳລັງຖືກໃຊ້ງານ; ບໍ່ໄດ້ລຶບ"
+NetworkCleanupSummary: "ການລ້າງເຄືອຂ່າຍສຳເລັດ: ລຶບແລ້ວ {{ .deleted }}, ຂ້າມ {{ .skipped }}, ລົ້ມເຫຼວ {{ .failed }}"
+NetworkCleanupPartialFailure: "ບໍ່ສາມາດລ້າງບາງເຄືອຂ່າຍໄດ້; ກະລຸນາເບິ່ງບັນທຶກວຽກ"
 ContainerBackupPrepare: 'ກຽມພື້ນທີ່ເຮັດວຽກສຳລັບສຳຮອງຂໍ້ມູນຄອນເທນເນີ'
 ContainerBackupStop: 'ຢຸດຄອນເທນເນີກ່ອນການສຳຮອງຂໍ້ມູນ'
 ContainerBackupInspect: 'ກວດສອບຄອນເທນເນີ ແລະ ເຄືອຂ່າຍສຳລັບການສຳຮອງຂໍ້ມູນ'

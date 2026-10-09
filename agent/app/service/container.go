@@ -383,11 +383,6 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 }
 
 func (u *ContainerService) Prune(req dto.ContainerPrune) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	defer client.Close()
 	name := ""
 	switch req.PruneType {
 	case "container":
@@ -408,6 +403,14 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 	}
 
 	taskItem.AddSubTask(i18n.GetMsgByKey("TaskClean"), func(t *task.Task) error {
+		if err := t.TaskCtx.Err(); err != nil {
+			return err
+		}
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
 		pruneFilters := filters.NewArgs()
 		if req.WithTagAll {
 			pruneFilters.Add("dangling", "false")
@@ -431,10 +434,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			}
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "network":
-			_, err := client.NetworksPrune(context.Background(), pruneFilters)
-			if err != nil {
-				return err
-			}
+			return cleanUnusedNetworks(t, client)
 		case "volume":
 			versions, err := client.ServerVersion(context.Background())
 			if err != nil {

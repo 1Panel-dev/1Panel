@@ -300,6 +300,9 @@ BuildCache: 'Build Cache'
 Volume: 'Volume'
 Network: "Network"
 PruneStart: 'Cleaning in progress'
+NetworkCleanupConnected: "Skipped network [{{ .name }}] ({{ .id }}): containers connected or network in use; not deleted"
+NetworkCleanupSummary: "Network cleanup finished: deleted {{ .deleted }}, skipped {{ .skipped }}, failed {{ .failed }}"
+NetworkCleanupPartialFailure: "Some networks could not be cleaned; see the task log"
 ContainerBackupPrepare: 'Prepare container backup workspace'
 ContainerBackupStop: 'Stop container before backup'
 ContainerBackupInspect: 'Backup container inspect and network'

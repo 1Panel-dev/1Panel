@@ -300,6 +300,9 @@ BuildCache: 'کش ساخت'
 Volume: 'حجم'
 Network: "شبکه"
 PruneStart: 'پاک‌سازی در حال انجام است'
+NetworkCleanupConnected: "از شبکه [{{ .name }}] ({{ .id }}) صرف‌نظر شد: کانتینر متصل دارد یا در حال استفاده است؛ حذف نشد"
+NetworkCleanupSummary: "پاک‌سازی شبکه‌ها پایان یافت: حذف‌شده {{ .deleted }}، ردشده {{ .skipped }}، ناموفق {{ .failed }}"
+NetworkCleanupPartialFailure: "پاک‌سازی برخی شبکه‌ها ناموفق بود؛ گزارش وظیفه را بررسی کنید"
 ContainerBackupPrepare: 'آماده‌سازی فضای کاری پشتیبان کانتینر'
 ContainerBackupStop: 'توقف کانتینر قبل از پشتیبان‌گیری'
 ContainerBackupInspect: 'بررسی و شبکه کانتینر پشتیبان'

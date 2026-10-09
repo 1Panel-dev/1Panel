@@ -2,15 +2,23 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/errdefs"
 )
+
+var networkCleanupSlot = make(chan struct{}, 1)
 
 func (u *ContainerService) PageNetwork(req dto.SearchWithPage) (int64, interface{}, error) {
 	client, err := docker.NewDockerClient()
@@ -169,6 +177,117 @@ func (u *ContainerService) CreateNetwork(req dto.NetworkCreate) error {
 	}
 	if _, err := client.NetworkCreate(context.TODO(), req.Name, options); err != nil {
 		return err
+	}
+	return nil
+}
+
+func cleanUnusedNetworks(t *task.Task, cli *client.Client) error {
+	ctx := t.TaskCtx
+	select {
+	case networkCleanupSlot <- struct{}{}:
+		defer func() { <-networkCleanupSlot }()
+	case <-ctx.Done():
+		return ctx.Err()
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	networks, err := cli.NetworkList(ctx, network.ListOptions{})
+	if err != nil {
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		return err
+	}
+	deleted, skipped, failed := 0, 0, 0
+	defer func() {
+		t.Log(i18n.GetMsgWithMap("NetworkCleanupSummary", map[string]interface{}{
+			"deleted": deleted, "skipped": skipped, "failed": failed,
+		}))
+	}()
+	var used map[string]bool
+	sort.Slice(networks, func(i, j int) bool { return networks[i].Name < networks[j].Name })
+	for _, n := range networks {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		switch n.Name {
+		case "none", "host", "bridge", "1panel-network":
+			skipped++
+			continue
+		}
+		if n.Scope != "local" || n.Ingress || n.ConfigOnly {
+			skipped++
+			continue
+		}
+		values := map[string]interface{}{"name": n.Name, "id": n.ID}
+		if used == nil {
+			containers, err := cli.ContainerList(ctx, container.ListOptions{All: true})
+			if err != nil {
+				if ctx.Err() != nil {
+					return ctx.Err()
+				}
+				return err
+			}
+			used = make(map[string]bool)
+			for _, c := range containers {
+				if c.NetworkSettings == nil {
+					continue
+				}
+				for name, endpoint := range c.NetworkSettings.Networks {
+					used[name] = true
+					if endpoint != nil {
+						used[endpoint.NetworkID] = true
+					}
+				}
+			}
+		}
+		if used[n.Name] || used[n.ID] {
+			skipped++
+			t.Log(i18n.GetMsgWithMap("NetworkCleanupConnected", values))
+			continue
+		}
+		inspected, err := cli.NetworkInspect(ctx, n.ID, network.InspectOptions{})
+		if err != nil {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if errdefs.IsNotFound(err) {
+				skipped++
+			} else {
+				failed++
+				t.Logf("Failed to inspect network [%s] (%s): %v", n.Name, n.ID, err)
+			}
+			continue
+		}
+		if len(inspected.Containers) > 0 {
+			skipped++
+			t.Log(i18n.GetMsgWithMap("NetworkCleanupConnected", values))
+			continue
+		}
+		if err := cli.NetworkRemove(ctx, n.ID); err != nil {
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			switch {
+			case errdefs.IsNotFound(err):
+				skipped++
+			case errdefs.IsConflict(err):
+				skipped++
+				t.Log(i18n.GetMsgWithMap("NetworkCleanupConnected", values))
+			default:
+				failed++
+				t.Logf("Failed to remove network [%s] (%s): %v", n.Name, n.ID, err)
+			}
+			continue
+		}
+		deleted++
+	}
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if failed > 0 {
+		return errors.New(i18n.GetMsgByKey("NetworkCleanupPartialFailure"))
 	}
 	return nil
 }

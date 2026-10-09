@@ -300,6 +300,9 @@ BuildCache: 'ビルドキャッシュ'
 Volume: 'ストレージボリューム'
 Network: 'ネットワーク'
 PruneStart: 'クリーンアップ中、しばらくお待ちください...'
+NetworkCleanupConnected: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：コンテナが接続されているか使用中のため、削除しませんでした"
+NetworkCleanupSummary: "ネットワークのクリーンアップが完了しました：削除 {{ .deleted }} 件、スキップ {{ .skipped }} 件、失敗 {{ .failed }} 件"
+NetworkCleanupPartialFailure: "一部のネットワークをクリーンアップできませんでした。タスクログを確認してください"
 ContainerBackupPrepare: 'コンテナバックアップ作業領域を準備'
 ContainerBackupStop: 'バックアップ前にコンテナを停止'
 ContainerBackupInspect: 'コンテナ inspect とネットワーク情報をバックアップ'

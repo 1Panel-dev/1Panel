@@ -300,6 +300,9 @@ BuildCache: 'Caché de compilación'
 Volume: 'Volumen de almacenamiento'
 Network: 'Red'
 PruneStart: 'Limpiando en progreso espere...'
+NetworkCleanupConnected: "Se omitió la red [{{ .name }}] ({{ .id }}): hay contenedores conectados o la red está en uso; no se eliminó"
+NetworkCleanupSummary: "Limpieza de redes finalizada: eliminadas {{ .deleted }}, omitidas {{ .skipped }}, fallidas {{ .failed }}"
+NetworkCleanupPartialFailure: "No se pudieron limpiar algunas redes; consulte el registro de la tarea"
 ContainerBackupPrepare: 'Preparar espacio de respaldo del contenedor'
 ContainerBackupStop: 'Detener contenedor antes del respaldo'
 ContainerBackupInspect: 'Respaldar inspect y red del contenedor'
