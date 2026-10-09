@@ -22,6 +22,10 @@ type DBBaseInfo struct {
 	Port          int64  `json:"port"`
 }
 
+type RedisCliInstall struct {
+	TaskID string `json:"taskID" validate:"omitempty,uuid"`
+}
+
 // mysql
 type MysqlDBSearch struct {
 	PageInfo

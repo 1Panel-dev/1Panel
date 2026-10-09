@@ -81,7 +81,13 @@
                         :style="{ height: `calc(100vh - ${loadHeight()})`, 'background-color': '#000' }"
                         :description="loadErrMsg()"
                     >
-                        <el-button v-if="currentDB.from === 'remote'" v-permission type="primary" @click="installCli">
+                        <el-button
+                            v-if="currentDB.from === 'remote'"
+                            v-permission
+                            type="primary"
+                            :loading="cliSubmitting"
+                            @click="installCli"
+                        >
                             {{ $t('commons.button.enable') }}
                         </el-button>
                     </el-empty>
@@ -134,6 +140,7 @@
         </DialogPro>
 
         <QuickCmd ref="dialogQuickCmdRef" @reload="loadQuickCmd" />
+        <TaskLog ref="cliTaskLogRef" @close="checkCliValid" />
     </div>
 </template>
 
@@ -148,11 +155,13 @@ import { checkAppInstalled } from '@/api/modules/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
 import { Database } from '@/api/interface/database';
-import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
+
+import TaskLog from '@/components/log/task/index.vue';
+import { newUUID } from '@/utils/id';
 
 const { currentNode, currentRedisDB, openMenuTabs } = useGlobalStore();
 useOperateNodeContext(currentNode);
@@ -170,7 +179,11 @@ const appStatusRef = ref();
 
 const open = ref(false);
 
-const redisCliExist = ref();
+const redisCliExist = ref(false);
+const cliSubmitting = ref(false);
+const cliTaskLogRef = ref<InstanceType<typeof TaskLog>>();
+const operateNode = currentNode.value;
+let disposed = false;
 
 const appKey = ref('redis');
 const appName = ref();
@@ -250,6 +263,7 @@ const changeDatabase = async () => {
 const loadDBOptions = async () => {
     try {
         const res = await listDatabases('redis,redis-cluster');
+        if (disposed || operateNode !== currentNode.value) return;
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
@@ -286,7 +300,7 @@ const loadDBOptions = async () => {
             reOpenTerminal();
         }
     } finally {
-        isLoaded.value = true;
+        if (!disposed && operateNode === currentNode.value) isLoaded.value = true;
     }
 };
 
@@ -301,6 +315,9 @@ const reOpenTerminal = async () => {
 };
 
 const initTerminal = async () => {
+    if (disposed || !currentDB.value) return;
+    const database = currentDBName.value;
+    const isCurrent = () => !disposed && operateNode === currentNode.value && database === currentDBName.value;
     loading.value = true;
     if (currentDB.value.from === 'remote') {
         if (!redisCliExist.value) {
@@ -311,9 +328,10 @@ const initTerminal = async () => {
         loading.value = false;
         redisIsExist.value = true;
         nextTick(() => {
+            if (!isCurrent()) return;
             terminalShow.value = true;
             redisStatus.value = 'Running';
-            terminalRef.value.acceptParams({
+            terminalRef.value?.acceptParams({
                 endpoint: '/api/v2/hosts/terminal/container',
                 args: `source=redis&name=${currentDBName.value}&from=${currentDB.value.from}`,
                 error: '',
@@ -325,13 +343,15 @@ const initTerminal = async () => {
     }
     await checkAppInstalled(currentDB.value.type, currentDBName.value)
         .then((res) => {
+            if (!isCurrent()) return;
             redisIsExist.value = res.data.isExist;
             redisStatus.value = res.data.status;
             loading.value = false;
             nextTick(() => {
+                if (!isCurrent()) return;
                 if (res.data.status === 'Running') {
                     terminalShow.value = true;
-                    terminalRef.value.acceptParams({
+                    terminalRef.value?.acceptParams({
                         endpoint: '/api/v2/hosts/terminal/container',
                         args: `source=${currentDB.value.type}&name=${currentDBName.value}&from=${currentDB.value.from}`,
                         error: '',
@@ -342,6 +362,7 @@ const initTerminal = async () => {
             isRefresh.value = !isRefresh.value;
         })
         .catch(() => {
+            if (!isCurrent()) return;
             closeTerminal(false);
             loading.value = false;
         });
@@ -353,27 +374,30 @@ const closeTerminal = async (isKeepShow: boolean) => {
 };
 
 const checkCliValid = async () => {
-    await checkRedisCli()
-        .then((res) => {
-            redisCliExist.value = res.data;
-            loadDBOptions();
-        })
-        .catch(() => {
-            loadDBOptions();
-        });
+    if (disposed || operateNode !== currentNode.value) return;
+    try {
+        const res = await checkRedisCli();
+        if (disposed || operateNode !== currentNode.value) return;
+        redisCliExist.value = res.data;
+    } finally {
+        if (!disposed && operateNode === currentNode.value) await loadDBOptions();
+    }
 };
+
 const installCli = async () => {
-    loading.value = true;
-    await installRedisCli()
-        .then(() => {
-            loading.value = false;
-            redisCliExist.value = true;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            reOpenTerminal();
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    if (cliSubmitting.value) return;
+    cliSubmitting.value = true;
+    try {
+        const res = await installRedisCli(newUUID(), operateNode);
+        if (disposed || operateNode !== currentNode.value) return;
+        if (res.data) {
+            cliTaskLogRef.value?.openWithTaskID(res.data, true, operateNode);
+        } else {
+            await checkCliValid();
+        }
+    } finally {
+        cliSubmitting.value = false;
+    }
 };
 
 const loadQuickCmd = async () => {
@@ -403,6 +427,7 @@ const onAfter = () => {
     initTerminal();
 };
 onBeforeUnmount(() => {
+    disposed = true;
     closeTerminal(false);
 });
 </script>

@@ -15092,9 +15092,26 @@ const docTemplate = `{
 		},
 		"/databases/redis/install/cli": {
 			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.RedisCliInstall"
+						}
+					}
+				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"type": "string"
+						}
 					}
 				},
 				"security": [
@@ -40148,6 +40165,14 @@ const docTemplate = `{
 				"pageSize"
 			],
 			"type": "object"
+		},
+		"dto.RedisCliInstall": {
+			"type": "object",
+			"properties": {
+				"taskID": {
+					"type": "string"
+				}
+			}
 		},
 		"dto.RedisConf": {
 			"properties": {
