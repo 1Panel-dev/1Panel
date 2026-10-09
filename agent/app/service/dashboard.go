@@ -457,24 +457,7 @@ type diskInfo struct {
 
 func loadDiskInfo(forceRefresh bool) []dto.DiskInfo {
 	var datas []dto.DiskInfo
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
-	format := `NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}`
-	stdout, err := cmdMgr.RunPipe(
-		cmd.PipeCommand{Name: "df", Args: []string{"-hT", "-P"}},
-		cmd.PipeCommand{Name: "awk", Args: []string{format}},
-	)
-	if err != nil {
-		global.LOG.Errorf("load disk info with df -hT -P failed, err: %v", err)
-		cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
-		stdout, err = cmdMgr2.RunPipe(
-			cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
-			cmd.PipeCommand{Name: "awk", Args: []string{format}},
-		)
-		if err != nil {
-			global.LOG.Errorf("load disk info with df -lhT -P failed, err: %v", err)
-			return datas
-		}
-	}
+	stdout := loadDiskMounts()
 	lines := strings.Split(stdout, "\n")
 
 	var mounts []diskInfo
@@ -546,6 +529,51 @@ func loadDiskInfo(forceRefresh bool) []dto.DiskInfo {
 		return datas[i].Path < datas[j].Path
 	})
 	return datas
+}
+
+var diskMountsMu sync.Mutex
+
+func loadDiskMounts() string {
+	if !diskMountsMu.TryLock() {
+		return ""
+	}
+	resultCh := make(chan string, 1)
+	go func() {
+		var stdout string
+		defer func() {
+			diskMountsMu.Unlock()
+			resultCh <- stdout
+		}()
+		cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(2 * time.Second))
+		format := `NR>1 && !/tmpfs|snap\/core|udev/ {printf "%s\t%s\t%s\t%s\t%s\t%s\t%s\n", $1, $2, $3, $4, $5, $6, $7}`
+		output, err := cmdMgr.RunPipe(
+			cmd.PipeCommand{Name: "df", Args: []string{"-hT", "-P"}},
+			cmd.PipeCommand{Name: "awk", Args: []string{format}},
+		)
+		if err != nil {
+			global.LOG.Errorf("load disk info with df -hT -P failed, err: %v", err)
+			cmdMgr2 := cmd.NewCommandMgr(cmd.WithTimeout(1 * time.Second))
+			output, err = cmdMgr2.RunPipe(
+				cmd.PipeCommand{Name: "df", Args: []string{"-lhT", "-P"}},
+				cmd.PipeCommand{Name: "awk", Args: []string{format}},
+			)
+			if err != nil {
+				global.LOG.Errorf("load disk info with df -lhT -P failed, err: %v", err)
+				return
+			}
+		}
+
+		stdout = output
+	}()
+	timer := time.NewTimer(3 * time.Second)
+	defer timer.Stop()
+	select {
+	case stdout := <-resultCh:
+		return stdout
+	case <-timer.C:
+		global.LOG.Error("load disk mounts timed out; df collection is still running")
+		return ""
+	}
 }
 
 func loadDiskUsageWithTimeout(path string, forceRefresh bool) (*disk.UsageStat, error) {
