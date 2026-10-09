@@ -300,6 +300,9 @@ BuildCache: '빌드 캐시'
 Volume: '스토리지 볼륨'
 Network: '네트워크'
 PruneStart: '정리 중입니다. 잠시만 기다려주세요...'
+NetworkCleanupConnected: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 연결된 컨테이너가 있거나 사용 중이므로 삭제하지 않음"
+NetworkCleanupSummary: "네트워크 정리 완료: 삭제 {{ .deleted }}개, 건너뜀 {{ .skipped }}개, 실패 {{ .failed }}개"
+NetworkCleanupPartialFailure: "일부 네트워크를 정리하지 못했습니다. 작업 로그를 확인하세요"
 ContainerBackupPrepare: '컨테이너 백업 작업 공간 준비'
 ContainerBackupStop: '백업 전에 컨테이너 중지'
 ContainerBackupInspect: '컨테이너 inspect 및 네트워크 정보 백업'
@@ -723,16 +726,6 @@ ErrSSHPublicKey: "유효한 SSH 공개 키를 입력하세요"
 ErrSSHPrivateKey: "SSH 개인 키 형식이 잘못되었거나 암호가 틀립니다. 암호화된 키에는 원래 암호가 필요합니다"
 ErrSSHKeyMismatch: "SSH 공개 키와 개인 키가 일치하지 않습니다"
 
-NetworkCleanupDeleted: "네트워크 [{{ .name }}] ({{ .id }}) 삭제됨"
-NetworkCleanupProtected: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 보호된 네트워크"
-NetworkCleanupConnected: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 연결된 컨테이너가 있거나 사용 중이므로 삭제하지 않음"
-NetworkCleanupUnsupported: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 특수 네트워크"
-NetworkCleanupGone: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 이미 존재하지 않음"
-NetworkCleanupInspectFailed: "네트워크 [{{ .name }}] ({{ .id }}) 검사 실패로 삭제하지 않음"
-NetworkCleanupRemoveFailed: "네트워크 [{{ .name }}] ({{ .id }}) 삭제 실패"
-NetworkCleanupSummary: "네트워크 정리 완료: 삭제 {{ .deleted }}개, 건너뜀 {{ .skipped }}개, 실패 {{ .failed }}개"
-NetworkCleanupPartialFailure: "일부 네트워크를 정리하지 못했습니다. 작업 로그를 확인하세요"
-NetworkCleanupRecent: "네트워크 [{{ .name }}] ({{ .id }}) 건너뜀: 생성 후 24시간이 지나지 않았거나 생성 시간을 알 수 없음"
 # 가상 머신
 ErrVMNotFound: "가상 머신이 존재하지 않습니다"
 ErrVMAlreadyExists: "가상 머신이 이미 존재합니다"

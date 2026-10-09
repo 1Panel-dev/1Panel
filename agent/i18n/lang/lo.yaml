@@ -290,6 +290,9 @@ BuildCache: 'ແຄດການສ້າງ'
 Volume: 'ວໍລຸມ (Volume)'
 Network: "ເຄືອຂ່າຍ"
 PruneStart: 'ກຳລັງດຳເນີນການທຳຄວາມສະອາດ'
+NetworkCleanupConnected: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ມີຄອນເທນເນີເຊື່ອມຕໍ່ຢູ່ ຫຼື ເຄືອຂ່າຍກຳລັງຖືກໃຊ້ງານ; ບໍ່ໄດ້ລຶບ"
+NetworkCleanupSummary: "ການລ້າງເຄືອຂ່າຍສຳເລັດ: ລຶບແລ້ວ {{ .deleted }}, ຂ້າມ {{ .skipped }}, ລົ້ມເຫຼວ {{ .failed }}"
+NetworkCleanupPartialFailure: "ບໍ່ສາມາດລ້າງບາງເຄືອຂ່າຍໄດ້; ກະລຸນາເບິ່ງບັນທຶກວຽກ"
 ContainerBackupPrepare: 'ກຽມພື້ນທີ່ເຮັດວຽກສຳລັບສຳຮອງຂໍ້ມູນຄອນເທນເນີ'
 ContainerBackupStop: 'ຢຸດຄອນເທນເນີກ່ອນການສຳຮອງຂໍ້ມູນ'
 ContainerBackupInspect: 'ກວດສອບຄອນເທນເນີ ແລະ ເຄືອຂ່າຍສຳລັບການສຳຮອງຂໍ້ມູນ'
@@ -714,16 +717,6 @@ ErrSSHPublicKey: "ກະລຸນາປ້ອນຄີສາທາລະນະ S
 ErrSSHPrivateKey: "ຄີສ່ວນຕົວ SSH ບໍ່ຖືກຕ້ອງ ຫຼື ລະຫັດຜ່ານຜິດ; ຄີທີ່ເຂົ້າລະຫັດຕ້ອງໃຊ້ລະຫັດຜ່ານເດີມ"
 ErrSSHKeyMismatch: "ຄີສາທາລະນະ ແລະ ຄີສ່ວນຕົວ SSH ບໍ່ກົງກັນ"
 
-NetworkCleanupDeleted: "ລຶບເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}) ແລ້ວ"
-NetworkCleanupProtected: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ເປັນເຄືອຂ່າຍທີ່ສະຫງວນໄວ້"
-NetworkCleanupConnected: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ມີຄອນເທນເນີເຊື່ອມຕໍ່ຢູ່ ຫຼື ເຄືອຂ່າຍກຳລັງຖືກໃຊ້ງານ; ບໍ່ໄດ້ລຶບ"
-NetworkCleanupUnsupported: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ເປັນເຄືອຂ່າຍພິເສດ"
-NetworkCleanupGone: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ບໍ່ມີເຄືອຂ່າຍນີ້ແລ້ວ"
-NetworkCleanupInspectFailed: "ກວດສອບເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}) ບໍ່ສຳເລັດ; ບໍ່ໄດ້ລຶບ"
-NetworkCleanupRemoveFailed: "ລຶບເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}) ບໍ່ສຳເລັດ"
-NetworkCleanupSummary: "ການລ້າງເຄືອຂ່າຍສຳເລັດ: ລຶບແລ້ວ {{ .deleted }}, ຂ້າມ {{ .skipped }}, ລົ້ມເຫຼວ {{ .failed }}"
-NetworkCleanupPartialFailure: "ບໍ່ສາມາດລ້າງບາງເຄືອຂ່າຍໄດ້; ກະລຸນາເບິ່ງບັນທຶກວຽກ"
-NetworkCleanupRecent: "ຂ້າມເຄືອຂ່າຍ [{{ .name }}] ({{ .id }}): ສ້າງຂຶ້ນບໍ່ຮອດ 24 ຊົ່ວໂມງ ຫຼື ບໍ່ຮູ້ເວລາສ້າງ"
 # virtual machine
 ErrVMNotFound: "ບໍ່ມີເຄື່ອງສະເໝືອນ"
 ErrVMAlreadyExists: "ມີເຄື່ອງສະເໝືອນຢູ່ແລ້ວ"

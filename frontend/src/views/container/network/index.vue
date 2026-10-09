@@ -142,7 +142,11 @@ const onClean = () => {
         type: 'info',
     }).then(async () => {
         loading.value = true;
-        const params = { taskID: newUUID(), pruneType: 'network', withTagAll: false };
+        let params = {
+            taskID: newUUID(),
+            pruneType: 'network',
+            withTagAll: false,
+        };
         await containerPrune(params)
             .then(() => {
                 loading.value = false;

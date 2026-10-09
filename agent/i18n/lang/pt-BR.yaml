@@ -300,6 +300,9 @@ BuildCache: 'Cache de construção'
 Volume: 'Volume de armazenamento'
 Network: 'Rede'
 PruneStart: 'Limpando em andamento aguarde...'
+NetworkCleanupConnected: "Rede [{{ .name }}] ({{ .id }}) ignorada: há contêineres conectados ou a rede está em uso; não foi excluída"
+NetworkCleanupSummary: "Limpeza de redes concluída: excluídas {{ .deleted }}, ignoradas {{ .skipped }}, falhas {{ .failed }}"
+NetworkCleanupPartialFailure: "Não foi possível limpar algumas redes; consulte o log da tarefa"
 ContainerBackupPrepare: 'Preparar área de backup do contêiner'
 ContainerBackupStop: 'Parar contêiner antes do backup'
 ContainerBackupInspect: 'Fazer backup do inspect e rede do contêiner'
@@ -723,16 +726,6 @@ ErrSSHPublicKey: "Informe uma chave pública SSH válida"
 ErrSSHPrivateKey: "Chave privada SSH inválida ou senha incorreta; chaves criptografadas exigem a senha original"
 ErrSSHKeyMismatch: "As chaves pública e privada SSH não correspondem"
 
-NetworkCleanupDeleted: "Rede [{{ .name }}] ({{ .id }}) excluída"
-NetworkCleanupProtected: "Rede [{{ .name }}] ({{ .id }}) ignorada: rede reservada"
-NetworkCleanupConnected: "Rede [{{ .name }}] ({{ .id }}) ignorada: há contêineres conectados ou a rede está em uso; não foi excluída"
-NetworkCleanupUnsupported: "Rede [{{ .name }}] ({{ .id }}) ignorada: rede especial"
-NetworkCleanupGone: "Rede [{{ .name }}] ({{ .id }}) ignorada: já não existe"
-NetworkCleanupInspectFailed: "Falha ao inspecionar a rede [{{ .name }}] ({{ .id }}); não foi excluída"
-NetworkCleanupRemoveFailed: "Falha ao excluir a rede [{{ .name }}] ({{ .id }})"
-NetworkCleanupSummary: "Limpeza de redes concluída: excluídas {{ .deleted }}, ignoradas {{ .skipped }}, falhas {{ .failed }}"
-NetworkCleanupPartialFailure: "Não foi possível limpar algumas redes; consulte o log da tarefa"
-NetworkCleanupRecent: "Rede [{{ .name }}] ({{ .id }}) ignorada: criada há menos de 24 horas ou data de criação desconhecida"
 # máquina virtual
 ErrVMNotFound: "Máquina virtual não existe"
 ErrVMAlreadyExists: "Máquina virtual já existe"

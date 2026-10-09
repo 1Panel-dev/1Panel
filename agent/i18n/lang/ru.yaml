@@ -300,6 +300,9 @@ BuildCache: 'Кэш сборки'
 Volume: 'Том хранилища'
 Network: 'Сеть'
 PruneStart: 'Очистка выполняется, пожалуйста, подождите...'
+NetworkCleanupConnected: "Сеть [{{ .name }}] ({{ .id }}) пропущена: подключены контейнеры или сеть используется; не удалена"
+NetworkCleanupSummary: "Очистка сетей завершена: удалено {{ .deleted }}, пропущено {{ .skipped }}, ошибок {{ .failed }}"
+NetworkCleanupPartialFailure: "Не удалось очистить некоторые сети; проверьте журнал задачи"
 ContainerBackupPrepare: 'Подготовить рабочую область резервной копии контейнера'
 ContainerBackupStop: 'Остановить контейнер перед резервным копированием'
 ContainerBackupInspect: 'Сделать резервную копию inspect и сети контейнера'
@@ -723,16 +726,6 @@ ErrSSHPublicKey: "Введите действительный открытый �
 ErrSSHPrivateKey: "Недопустимый закрытый ключ SSH или неверная парольная фраза; для зашифрованных ключей требуется исходная парольная фраза"
 ErrSSHKeyMismatch: "Открытый и закрытый ключи SSH не соответствуют друг другу"
 
-NetworkCleanupDeleted: "Сеть [{{ .name }}] ({{ .id }}) удалена"
-NetworkCleanupProtected: "Сеть [{{ .name }}] ({{ .id }}) пропущена: зарезервированная сеть"
-NetworkCleanupConnected: "Сеть [{{ .name }}] ({{ .id }}) пропущена: подключены контейнеры или сеть используется; не удалена"
-NetworkCleanupUnsupported: "Сеть [{{ .name }}] ({{ .id }}) пропущена: специальная сеть"
-NetworkCleanupGone: "Сеть [{{ .name }}] ({{ .id }}) пропущена: больше не существует"
-NetworkCleanupInspectFailed: "Не удалось проверить сеть [{{ .name }}] ({{ .id }}); сеть не удалена"
-NetworkCleanupRemoveFailed: "Не удалось удалить сеть [{{ .name }}] ({{ .id }})"
-NetworkCleanupSummary: "Очистка сетей завершена: удалено {{ .deleted }}, пропущено {{ .skipped }}, ошибок {{ .failed }}"
-NetworkCleanupPartialFailure: "Не удалось очистить некоторые сети; проверьте журнал задачи"
-NetworkCleanupRecent: "Сеть [{{ .name }}] ({{ .id }}) пропущена: создана менее 24 часов назад или время создания неизвестно"
 # виртуальная машина
 ErrVMNotFound: "Виртуальная машина не существует"
 ErrVMAlreadyExists: "Виртуальная машина уже существует"

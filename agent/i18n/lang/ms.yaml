@@ -300,6 +300,9 @@ BuildCache: 'Cache binaan'
 Volume: 'Jilid storan'
 Network: 'Rangkaian'
 PruneStart: 'Pembersihan sedang dijalankan, sila tunggu...'
+NetworkCleanupConnected: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: terdapat kontena yang disambungkan atau rangkaian sedang digunakan; tidak dipadamkan"
+NetworkCleanupSummary: "Pembersihan rangkaian selesai: dipadamkan {{ .deleted }}, dilangkau {{ .skipped }}, gagal {{ .failed }}"
+NetworkCleanupPartialFailure: "Sesetengah rangkaian tidak dapat dibersihkan; semak log tugas"
 ContainerBackupPrepare: 'Sediakan ruang kerja sandaran kontena'
 ContainerBackupStop: 'Hentikan kontena sebelum sandaran'
 ContainerBackupInspect: 'Sandarkan inspect dan rangkaian kontena'
@@ -723,16 +726,6 @@ ErrSSHPublicKey: "Masukkan kunci awam SSH yang sah"
 ErrSSHPrivateKey: "Kunci peribadi SSH tidak sah atau frasa laluan salah; kunci yang disulitkan memerlukan frasa laluan asal"
 ErrSSHKeyMismatch: "Kunci awam dan peribadi SSH tidak sepadan"
 
-NetworkCleanupDeleted: "Rangkaian [{{ .name }}] ({{ .id }}) dipadamkan"
-NetworkCleanupProtected: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: rangkaian terpelihara"
-NetworkCleanupConnected: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: terdapat kontena yang disambungkan atau rangkaian sedang digunakan; tidak dipadamkan"
-NetworkCleanupUnsupported: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: rangkaian khas"
-NetworkCleanupGone: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: tidak lagi wujud"
-NetworkCleanupInspectFailed: "Gagal memeriksa rangkaian [{{ .name }}] ({{ .id }}); tidak dipadamkan"
-NetworkCleanupRemoveFailed: "Gagal memadamkan rangkaian [{{ .name }}] ({{ .id }})"
-NetworkCleanupSummary: "Pembersihan rangkaian selesai: dipadamkan {{ .deleted }}, dilangkau {{ .skipped }}, gagal {{ .failed }}"
-NetworkCleanupPartialFailure: "Sesetengah rangkaian tidak dapat dibersihkan; semak log tugas"
-NetworkCleanupRecent: "Rangkaian [{{ .name }}] ({{ .id }}) dilangkau: dicipta dalam tempoh 24 jam terakhir atau masa penciptaan tidak diketahui"
 # mesin maya
 ErrVMNotFound: "Mesin maya tidak wujud"
 ErrVMAlreadyExists: "Mesin maya sudah wujud"

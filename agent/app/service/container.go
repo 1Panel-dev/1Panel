@@ -411,13 +411,6 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 			return err
 		}
 		defer client.Close()
-		if req.PruneType == "network" {
-			var until time.Time
-			if req.WithTagAll {
-				until = time.Now().Add(-24 * time.Hour)
-			}
-			return executeNetworkCleanup(t, client, until)
-		}
 		pruneFilters := filters.NewArgs()
 		if req.WithTagAll {
 			pruneFilters.Add("dangling", "false")
@@ -429,26 +422,28 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 		SpaceReclaimed := 0
 		switch req.PruneType {
 		case "container":
-			rep, err := client.ContainersPrune(t.TaskCtx, pruneFilters)
+			rep, err := client.ContainersPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "image":
-			rep, err := client.ImagesPrune(t.TaskCtx, pruneFilters)
+			rep, err := client.ImagesPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
 			SpaceReclaimed = int(rep.SpaceReclaimed)
+		case "network":
+			return cleanUnusedNetworks(t, client)
 		case "volume":
-			versions, err := client.ServerVersion(t.TaskCtx)
+			versions, err := client.ServerVersion(context.Background())
 			if err != nil {
 				return err
 			}
 			if common.ComparePanelVersion(versions.APIVersion, "1.42") {
 				pruneFilters.Add("all", "true")
 			}
-			rep, err := client.VolumesPrune(t.TaskCtx, pruneFilters)
+			rep, err := client.VolumesPrune(context.Background(), pruneFilters)
 			if err != nil {
 				return err
 			}
@@ -456,7 +451,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 		case "buildcache":
 			opts := build.CachePruneOptions{}
 			opts.All = true
-			rep, err := client.BuildCachePrune(t.TaskCtx, opts)
+			rep, err := client.BuildCachePrune(context.Background(), opts)
 			if err != nil {
 				return err
 			}

@@ -300,6 +300,9 @@ BuildCache: 'ビルドキャッシュ'
 Volume: 'ストレージボリューム'
 Network: 'ネットワーク'
 PruneStart: 'クリーンアップ中、しばらくお待ちください...'
+NetworkCleanupConnected: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：コンテナが接続されているか使用中のため、削除しませんでした"
+NetworkCleanupSummary: "ネットワークのクリーンアップが完了しました：削除 {{ .deleted }} 件、スキップ {{ .skipped }} 件、失敗 {{ .failed }} 件"
+NetworkCleanupPartialFailure: "一部のネットワークをクリーンアップできませんでした。タスクログを確認してください"
 ContainerBackupPrepare: 'コンテナバックアップ作業領域を準備'
 ContainerBackupStop: 'バックアップ前にコンテナを停止'
 ContainerBackupInspect: 'コンテナ inspect とネットワーク情報をバックアップ'
@@ -723,16 +726,6 @@ ErrSSHPublicKey: "有効な SSH 公開鍵を入力してください"
 ErrSSHPrivateKey: "SSH 秘密鍵の形式が無効か、パスフレーズが間違っています。暗号化された鍵には元のパスフレーズが必要です"
 ErrSSHKeyMismatch: "SSH 公開鍵と秘密鍵が一致しません"
 
-NetworkCleanupDeleted: "ネットワーク [{{ .name }}] ({{ .id }}) を削除しました"
-NetworkCleanupProtected: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：保護対象のネットワークです"
-NetworkCleanupConnected: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：コンテナが接続されているか使用中のため、削除しませんでした"
-NetworkCleanupUnsupported: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：特殊なネットワークです"
-NetworkCleanupGone: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：すでに存在しません"
-NetworkCleanupInspectFailed: "ネットワーク [{{ .name }}] ({{ .id }}) の確認に失敗したため、削除しませんでした"
-NetworkCleanupRemoveFailed: "ネットワーク [{{ .name }}] ({{ .id }}) の削除に失敗しました"
-NetworkCleanupSummary: "ネットワークのクリーンアップが完了しました：削除 {{ .deleted }} 件、スキップ {{ .skipped }} 件、失敗 {{ .failed }} 件"
-NetworkCleanupPartialFailure: "一部のネットワークをクリーンアップできませんでした。タスクログを確認してください"
-NetworkCleanupRecent: "ネットワーク [{{ .name }}] ({{ .id }}) をスキップしました：作成から24時間未満、または作成日時が不明です"
 # 仮想マシン
 ErrVMNotFound: "仮想マシンが存在しません"
 ErrVMAlreadyExists: "仮想マシンは既に存在します"
