@@ -721,6 +721,8 @@ ErrDockerIPv4ForwardingDisabled: "El reenvío IPv4 está desactivado. Configure 
 ErrFirewallRuleSavedApplyFailed: "Se guardó la configuración de la nueva regla, pero no se pudo aplicar al cortafuegos. Vuelva a intentarlo mediante la sincronización: {{ .detail }}"
 ErrFirewallRuleConflict: "Ya existe una regla UFW con las mismas condiciones y una acción diferente. Edite la regla existente."
 ErrForwardInterfaceNotFound: "La interfaz de red {{ .name }} indicada en la regla de reenvío no existe. Compruebe el nombre e inténtelo de nuevo."
+ErrIPv6RARisk: "El reenvío IPv6 está bloqueado para evitar una posible pérdida de conectividad. Consulte la documentación y los registros del sistema."
+ErrIPv6RACheckFailed: "El reenvío IPv6 está bloqueado porque no se pudo comprobar la configuración de red. Consulte los registros del sistema."
 
 ErrSSHPublicKey: "Introduce una clave pública SSH válida"
 ErrSSHPrivateKey: "Clave privada SSH no válida o contraseña incorrecta; las claves cifradas requieren la contraseña original"

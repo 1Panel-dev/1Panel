@@ -4311,8 +4311,6 @@ const message = {
         dockerGuard: 'Container Port Guard',
         systemFirewall: 'Host firewall',
         systemFirewallHelper: 'Controls host port access and inbound firewall rules.',
-        forwardPolicyDropWarning:
-            'This server restricts network forwarding. Port forwarding rules may not take effect.',
         forwardingHelper: 'Manages port-forwarding rules.',
         dockerFirewallHelper: 'Selects how 1Panel manages container port protection.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, experimental',
@@ -4395,9 +4393,9 @@ const message = {
             'Host INPUT rules do not directly protect this Docker published port. Click to open Container Port Guard.',
         notInitialized: 'Not initialized',
         ipv6RARisk:
-            'IPv6 forwarding is blocked: interfaces {0} have accept_ra=1 and may rely on RA/SLAAC. Review the network configuration, persist accept_ra=2 on interfaces that need RA, then retry.',
+            'IPv6 forwarding is blocked to prevent possible network loss. See the documentation and system logs for details.',
         ipv6RACheckFailed:
-            'Cannot check IPv6 RA configuration. Enabling IPv6 forwarding is blocked. Check the system network configuration and retry.',
+            'IPv6 forwarding is blocked because the network configuration could not be checked. See the system logs for details.',
         ipv6ForwardingOnDemand:
             'IPv6 forwarding is not enabled. It will be checked and enabled when IPv6 rules are added or restored.',
         familyUnsupported: 'The system does not support {0}',

@@ -15,7 +15,7 @@
                 </template>
             </i18n-t>
         </NoSuchService>
-        <div class="app-status card-interval" v-else-if="baseInfo.isExist && !baseInfo.message">
+        <div class="app-status card-interval" v-else-if="baseInfo.isExist">
             <el-card>
                 <div class="flex w-full flex-col gap-4 md:flex-row">
                     <div class="flex flex-wrap gap-4 ml-3">
@@ -145,16 +145,6 @@
                 :title="$t('firewall.directBackendConflictWarning', [backendName, baseInfo.conflictBackend])"
             />
         </div>
-        <el-alert v-else-if="baseInfo.isExist" class="card-interval" type="error" show-icon :closable="false">
-            <template #title>
-                <div class="flex items-center gap-2">
-                    <span>{{ baseInfo.message }}</span>
-                    <el-button v-permission v-node-admin type="primary" link @click="goToFirewallSetting">
-                        {{ $t('commons.button.set') }}
-                    </el-button>
-                </div>
-            </template>
-        </el-alert>
         <DockerRestart
             ref="dockerRef"
             v-model:withDockerRestart="withDockerRestart"
@@ -210,7 +200,6 @@ const baseInfo = ref<Firewall.FirewallBase>({
     conflictBackend: '',
     version: '',
     pingStatus: '',
-    message: '',
     reason: '',
     ipv4: { available: false, initialized: false, bound: false },
     ipv6: { available: false, initialized: false, bound: false },
@@ -243,13 +232,6 @@ const familyStatuses = computed(() =>
     ).filter((item) => item.family === 'IPv4' || baseInfo.value.ipv6Enabled !== false),
 );
 const availableFamilies = computed(() => familyStatuses.value.filter((item) => item.status.available));
-const forwardDropFamilies = computed(() => {
-    if (backendUnavailable.value || !baseInfo.value.isExist || baseInfo.value.message) return '';
-    return familyStatuses.value
-        .filter((item) => item.status.forwardPolicy === 'DROP')
-        .map((item) => item.family)
-        .join(', ');
-});
 const anyFamilyInitialized = computed(() => availableFamilies.value.some((item) => item.status.initialized));
 const allAvailableFamiliesInitialized = computed(
     () => availableFamilies.value.length > 0 && availableFamilies.value.every((item) => item.status.initialized),
@@ -297,7 +279,7 @@ const familyActions = computed(() =>
 const familyIssueText = (issue: FamilyIssue) => {
     if (!issue.available) return i18n.global.t('firewall.familyUnsupported', [issue.family]);
     if (issue.reason === 'ipv6_ra_required') {
-        return i18n.global.t('firewall.ipv6RARisk', [issue.raInterfaces?.join(', ') || '-']);
+        return i18n.global.t('firewall.ipv6RARisk');
     }
     if (issue.reason === 'ipv6_ra_check_failed') return i18n.global.t('firewall.ipv6RACheckFailed');
     if (issue.partial) return i18n.global.t('firewall.familyIncomplete', [issue.family]);
@@ -481,7 +463,6 @@ onBeforeUnmount(() => {
 });
 
 defineExpose({
-    forwardDropFamilies,
     acceptParams,
     openInitialization: onInit,
 });

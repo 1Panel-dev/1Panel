@@ -6,7 +6,6 @@
             :closable="false"
             :title="$t('firewall.importLimit', [FIREWALL_BATCH_LIMIT, FIREWALL_IMPORT_MAX_SIZE / 1024])"
         />
-        <el-alert v-if="submitError" class="mb-3" type="error" :closable="false" :title="submitError" />
         <div class="import-file-bar mt-3">
             <el-upload
                 ref="uploadRef"
@@ -100,7 +99,6 @@ const policies = ref<Firewall.DockerGuardPolicy[]>([]);
 const selects = ref(new Set<Firewall.DockerGuardPolicy>());
 const uploadRef = ref();
 const uploaderFiles = ref<UploadFile[]>([]);
-const submitError = ref('');
 const displaySources = (policy: Firewall.DockerGuardPolicy) => formatHostAddressList(policy.sources, policy.family);
 
 const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
@@ -109,7 +107,6 @@ const fileOnChange = (uploadFile: UploadFile, uploadFiles: UploadFiles) => {
 
     policies.value = [];
     selects.value = new Set();
-    submitError.value = '';
     uploaderFiles.value = uploadFiles;
     if (uploadFile.raw.size > FIREWALL_IMPORT_MAX_SIZE) {
         uploadRef.value?.clearFiles();
@@ -162,7 +159,6 @@ const onImport = async () => {
         return;
     }
     loading.value = true;
-    submitError.value = '';
     try {
         const result = (
             await upsertDockerPortGuardPolicies({
@@ -171,16 +167,17 @@ const onImport = async () => {
             })
         ).data;
         if (!result.taskID || !result.queued) {
-            submitError.value = i18n.global.t('commons.msg.operationFailed');
+            MsgError(i18n.global.t('commons.msg.operationFailed'));
             return;
         }
         visible.value = false;
         emit('created', result.taskID);
     } catch (error) {
-        submitError.value =
+        MsgError(
             (isAxiosError(error) && error.response?.data?.message) ||
-            (error && getErrorMessage(error)) ||
-            i18n.global.t('commons.res.commonError');
+                (error && getErrorMessage(error)) ||
+                i18n.global.t('commons.res.commonError'),
+        );
     } finally {
         loading.value = false;
     }
@@ -200,7 +197,6 @@ const acceptParams = () => {
     policies.value = [];
     selects.value = new Set();
     uploaderFiles.value = [];
-    submitError.value = '';
     uploadRef.value?.clearFiles();
     visible.value = true;
 };

@@ -4384,7 +4384,6 @@ const message = {
         dockerGuard: 'Konteyner portu koruması',
         systemFirewall: 'Ana makine güvenlik duvarı',
         systemFirewallHelper: 'Ana makine port erişimini ve gelen kuralları yönetir.',
-        forwardPolicyDropWarning: 'Bu sunucu ağ yönlendirmesini kısıtlıyor. Port yönlendirme kuralları çalışmayabilir.',
         forwardingHelper: 'Port yönlendirme kurallarını yönetir.',
         dockerFirewallHelper: '1Panel konteyner portu korumasının nasıl yönetileceğini seçer.',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0, deneysel',
@@ -4471,9 +4470,9 @@ const message = {
             'Ana makine INPUT kuralları bu Docker yayımlanmış portunu doğrudan korumaz. Konteyner portu korumasını açmak için tıklayın.',
         notInitialized: 'Başlatılmadı',
         ipv6RARisk:
-            'IPv6 yönlendirme engellendi: {0} arayüzlerinde accept_ra=1 ayarlı ve bu arayüzler RA/SLAAC kullanıyor olabilir. Ağ yapılandırmasını kontrol edin, RA gereken arayüzlerde accept_ra=2 ayarını kalıcı olarak uygulayın ve yeniden deneyin.',
+            'Ağ bağlantısının kesilme riski nedeniyle IPv6 yönlendirmesi engellendi. Belgeleri ve sistem günlüklerini inceleyin.',
         ipv6RACheckFailed:
-            'IPv6 RA yapılandırması kontrol edilemedi. IPv6 yönlendirmeyi etkinleştirme engellendi. Sistem ağ yapılandırmasını kontrol edip yeniden deneyin.',
+            'Ağ yapılandırması denetlenemediği için IPv6 yönlendirmesi engellendi. Ayrıntılar için sistem günlüklerini inceleyin.',
         ipv6ForwardingOnDemand:
             'IPv6 yönlendirme etkin değil. IPv6 kuralları eklenirken veya geri yüklenirken kontrol edilip etkinleştirilecektir.',
         familyUnsupported: 'Sistem {0} desteğini sunmuyor',

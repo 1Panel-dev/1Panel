@@ -1185,15 +1185,17 @@ func loadForwardingFirewallOverview(manager forwarding.Adapter, families []strin
 	}
 	ipv6, ipv6Err := loadForwardingFamilyInfo(manager, constant.FirewallFamilyIPv6)
 	if ipv6.Available {
-		interfaces, err := forwarding.IPv6RAInterfaces(os.ReadFile)
+		interfaces, err := forwarding.IPv6RAInterfaces(os.ReadFile, forwarding.LoadDockerIPv4BridgePorts)
 		var pathError *os.PathError
 		switch {
 		case errors.As(err, &pathError) && errors.Is(err, os.ErrNotExist) && pathError.Path == "/proc/net/if_inet6":
 			ipv6.Available, ipv6.Initialized, ipv6.Bound = false, false, false
 		case err != nil:
+			global.LOG.Warnf("IPv6 forwarding RA check failed: %v", err)
 			ipv6.Reason = "ipv6_ra_check_failed"
 			ipv6.Bound = false
 		case len(interfaces) > 0:
+			global.LOG.Warnf("IPv6 forwarding RA risk: interfaces %s may depend on RA/SLAAC with accept_ra=1", strings.Join(interfaces, ", "))
 			ipv6.Reason, ipv6.RAInterfaces = "ipv6_ra_required", interfaces
 			ipv6.Bound = false
 		case !ipv6.Bound:

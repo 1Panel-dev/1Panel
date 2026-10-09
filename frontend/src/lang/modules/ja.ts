@@ -4299,8 +4299,6 @@ const message = {
         dockerGuard: 'コンテナポート保護',
         systemFirewall: 'ホストファイアウォール',
         systemFirewallHelper: 'ホストのポートアクセスと受信ルールを管理します。',
-        forwardPolicyDropWarning:
-            'このサーバーではネットワーク転送が制限されているため、ポート転送ルールが機能しない可能性があります。',
         forwardingHelper: 'ポート転送ルールを管理します。',
         dockerFirewallHelper: '1Panel のコンテナポート保護の管理方法を選択します。',
         dockerNftablesRequirement: 'Docker ≥ 29.0.0、実験的',
@@ -4382,9 +4380,9 @@ const message = {
             'ホストの INPUT ルールでは、この Docker 公開ポートを直接保護できません。クリックしてコンテナポート保護を開きます。',
         notInitialized: '未初期化',
         ipv6RARisk:
-            'IPv6 転送がブロックされています。インターフェース {0} は accept_ra=1 で、RA/SLAAC に依存している可能性があります。ネットワーク設定を確認し、RA が必要なインターフェースで accept_ra=2 を永続的に設定してから再試行してください。',
+            'ネットワーク切断のおそれがあるため、IPv6 転送の有効化をブロックしました。ドキュメントとシステムログをご確認ください。',
         ipv6RACheckFailed:
-            'IPv6 RA 設定を確認できないため、IPv6 転送の有効化をブロックしました。システムのネットワーク設定を確認して再試行してください。',
+            'ネットワーク設定を確認できないため、IPv6 転送の有効化をブロックしました。詳細はシステムログをご確認ください。',
         ipv6ForwardingOnDemand: 'IPv6 転送は無効です。IPv6 ルールの追加または復元時に確認して有効化します。',
         familyUnsupported: 'システムは {0} をサポートしていません',
         familyChainIssue: '{0} · {1} チェーン · {2}',

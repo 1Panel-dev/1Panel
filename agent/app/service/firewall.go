@@ -108,9 +108,7 @@ func (s *FirewallService) LoadBaseInfo(chainGroup string) (dto.FirewallSubsystem
 			status.Reason = constant.FirewallBackendNotInstalled
 			return status, nil
 		}
-		status.IsExist = true
-		status.Message = err.Error()
-		return status, nil
+		return status, err
 	}
 	status.IsExist = true
 	runtimeStatus, err := lifecycle.LoadStatus(client)

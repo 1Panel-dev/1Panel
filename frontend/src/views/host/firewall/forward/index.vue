@@ -25,9 +25,6 @@
                     <span v-else>{{ $t('firewall.basicStatus') }}</span>
                 </el-card>
                 <LayoutContent :title="$t('firewall.forwardRule', 2)" :class="{ mask: !isInit || !isBind }">
-                    <template v-if="fireStatusRef?.forwardDropFamilies" #prompt>
-                        <el-alert type="warning" :closable="false" :title="$t('firewall.forwardPolicyDropWarning')" />
-                    </template>
                     <template #leftToolBar>
                         <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                             {{ $t('commons.button.create') }}
