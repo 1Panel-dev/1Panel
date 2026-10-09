@@ -12,8 +12,7 @@
             v-loading="loading"
         >
             <template #prompt>
-                <el-alert v-if="data.base.message" type="warning" :closable="false" :title="data.base.message" />
-                <el-alert v-else type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
+                <el-alert type="info" :closable="false" :title="$t('firewall.dockerGuardHelper')" />
             </template>
             <template #leftToolBar>
                 <el-button plain @click="orphanDrawerVisible = true">
@@ -455,6 +454,7 @@ const search = async () => {
     loading.value = true;
     try {
         Object.assign(data, (await loadDockerPortGuard()).data);
+        if (data.base.message) MsgError(data.base.message);
         selects.value = [];
         orphanSelects.value = [];
     } finally {

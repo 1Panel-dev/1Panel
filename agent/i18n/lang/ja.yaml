@@ -721,6 +721,8 @@ ErrDockerIPv4ForwardingDisabled: "IPv4 転送が無効です。Docker のファ�
 ErrFirewallRuleSavedApplyFailed: "新しいルール設定は保存されましたが、ファイアウォールへの適用に失敗しました。同期で再試行してください：{{ .detail }}"
 ErrFirewallRuleConflict: "UFW に同じ一致条件でアクションが異なるルールが既に存在します。既存のルールを編集してください。"
 ErrForwardInterfaceNotFound: "転送ルールで指定されたネットワークインターフェース {{ .name }} は存在しません。名前を確認して再試行してください。"
+ErrIPv6RARisk: "ネットワーク切断のおそれがあるため、IPv6 転送の有効化をブロックしました。ドキュメントとシステムログをご確認ください。"
+ErrIPv6RACheckFailed: "ネットワーク設定を確認できないため、IPv6 転送の有効化をブロックしました。詳細はシステムログをご確認ください。"
 
 ErrSSHPublicKey: "有効な SSH 公開鍵を入力してください"
 ErrSSHPrivateKey: "SSH 秘密鍵の形式が無効か、パスフレーズが間違っています。暗号化された鍵には元のパスフレーズが必要です"

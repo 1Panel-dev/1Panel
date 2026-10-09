@@ -36372,9 +36372,6 @@ const docTemplate = `{
 				"bound": {
 					"type": "boolean"
 				},
-				"forwardPolicy": {
-					"type": "string"
-				},
 				"initialized": {
 					"type": "boolean"
 				},

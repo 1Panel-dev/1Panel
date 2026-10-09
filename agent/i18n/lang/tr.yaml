@@ -721,6 +721,8 @@ ErrDockerIPv4ForwardingDisabled: "IPv4 yönlendirmesi devre dışı. Docker güv
 ErrFirewallRuleSavedApplyFailed: "Yeni kural yapılandırması kaydedildi, ancak güvenlik duvarına uygulanamadı. Eşitleme yaparak yeniden deneyin: {{ .detail }}"
 ErrFirewallRuleConflict: "UFW içinde aynı eşleşme koşullarına sahip, farklı bir eylem uygulayan bir kural zaten var. Mevcut kuralı düzenleyin."
 ErrForwardInterfaceNotFound: "Yönlendirme kuralında belirtilen {{ .name }} ağ arayüzü mevcut değil. Arayüz adını kontrol edip yeniden deneyin."
+ErrIPv6RARisk: "Ağ bağlantısının kesilme riski nedeniyle IPv6 yönlendirmesi engellendi. Belgeleri ve sistem günlüklerini inceleyin."
+ErrIPv6RACheckFailed: "Ağ yapılandırması denetlenemediği için IPv6 yönlendirmesi engellendi. Ayrıntılar için sistem günlüklerini inceleyin."
 
 ErrSSHPublicKey: "Geçerli bir SSH açık anahtarı girin"
 ErrSSHPrivateKey: "SSH özel anahtarı geçersiz veya parola yanlış; şifreli anahtarlar mevcut parolayı gerektirir"
