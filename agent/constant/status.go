@@ -1,6 +1,10 @@
 package constant
 
 const (
+	StatusInactive       = "Inactive"
+	StatusUnknown        = "Unknown"
+	StatusDegraded       = "Degraded"
+	StatusInaccessible   = "Inaccessible"
 	StatusRunning        = "Running"
 	StatusCanceled       = "Canceled"
 	StatusDone           = "Done"

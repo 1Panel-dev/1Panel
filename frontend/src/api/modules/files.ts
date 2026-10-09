@@ -30,8 +30,8 @@ export const getFilesTree = (params: File.ReqFile) => {
     return http.post<File.FileTree[]>('files/tree', params);
 };
 
-export const createFile = (form: File.FileCreate) => {
-    return http.post<File.File>('files', form);
+export const createFile = (form: File.FileCreate, currentNode?: string) => {
+    return http.post<File.File>('files', form, undefined, currentNode ? { CurrentNode: currentNode } : undefined);
 };
 
 export const deleteFile = (form: File.FileDelete) => {
@@ -105,8 +105,13 @@ export const restoreFileHistory = (id: number) => {
     return http.post<File.File>('files/history/restore', { id });
 };
 
-export const checkFile = (path: string, withInit: boolean) => {
-    return http.post<boolean>('files/check', { path: path, withInit: withInit });
+export const checkFile = (path: string, withInit: boolean, currentNode?: string) => {
+    return http.post<boolean>(
+        'files/check',
+        { path: path, withInit: withInit },
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const uploadFileData = (params: FormData, config: FileUploadRequestConfig) => {
@@ -146,8 +151,13 @@ export const changeOwner = (params: File.FileOwner) => {
     return http.post<File.File>('files/owner', params);
 };
 
-export const wgetFile = (params: File.FileWget) => {
-    return http.post<File.FileWgetRes>('files/wget', params);
+export const wgetFile = (params: File.FileWget, currentNode?: string) => {
+    return http.post<File.FileWgetRes>(
+        'files/wget',
+        params,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const getFileDownloadPreference = () => {

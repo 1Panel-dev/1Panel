@@ -99,6 +99,7 @@ const (
 	TaskScopeTamper           = "Tamper"
 	TaskScopeFileConvert      = "Convert"
 	TaskScopeTask             = "Task"
+	TaskScopeVm               = "VirtualMachine"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {

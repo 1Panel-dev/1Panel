@@ -80,7 +80,6 @@ const (
 	TaskScopeCluster    = "Cluster"
 	TaskScopeAppInstall = "AppInstallTask"
 	TaskScopeAI         = "AI"
-	TaskScopeVm         = "VirtualMachine"
 )
 
 func GetTaskName(resourceName, operate, scope string) string {
