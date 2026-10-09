@@ -174,8 +174,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
-import { onMounted, reactive, ref } from 'vue';
+import { useSearchReset } from '@/composables/useSearchReset';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { deleteFtp, searchFtp, updateFtp, syncFtp, operateFtp, getFtpBase } from '@/api/modules/toolbox';
@@ -201,7 +201,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchPersistence('toolbox/ftp/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const form = reactive({
     isActive: true,

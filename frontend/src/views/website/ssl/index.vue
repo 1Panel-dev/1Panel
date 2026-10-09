@@ -221,7 +221,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { toRef, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, pushSSLToNode, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
@@ -287,7 +287,10 @@ const req = reactive({
     orderBy: 'updated_at',
     order: 'descending',
 });
-useSearchPersistence('website/ssl/index', { search: toRef(req, 'domain') });
+useSearchReset(
+    { search: toRef(req, 'domain'), page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const pushForm = ref({
     id: 0,
     pushNode: true,

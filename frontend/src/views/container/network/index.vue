@@ -95,10 +95,10 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
-import { reactive, ref } from 'vue';
+import { toRef, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { deleteNetwork, searchNetwork, inspect, containerPrune } from '@/api/modules/container';
@@ -121,7 +121,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchPersistence('container/network/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const opRef = ref();
 const isActive = ref(false);

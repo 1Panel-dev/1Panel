@@ -302,7 +302,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { Firewall } from '@/api/interface/firewall';
 import type { FuTableOperationButton } from '@/components/table/shared';
 import { buildHostRuleExport } from './transfer';
@@ -330,7 +330,7 @@ import RuleReset from '@/views/host/firewall/components/rule-reset.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
 import { loadDockerStatus } from '@/api/modules/container';
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { toRef, computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import { useElementSize } from '@vueuse/core';
 import { ElMessageBox } from 'element-plus';
 import { Expand, Loading, Lock, Refresh } from '@element-plus/icons-vue';
@@ -405,7 +405,6 @@ const showFirewallUnavailablePrompt = computed(
 const firewallVersion = ref('');
 const selectedRuleFilters = ref<RuleFilter[]>(loadCachedFilterValues(ruleFilterStorageKey, ruleFilterOptions, []));
 const searchName = ref('');
-useSearchPersistence('host/firewall/rule/index', { search: searchName });
 const inventoryItems = ref<Firewall.InventoryItem[]>([]);
 const positionRanges = ref<Partial<Record<Firewall.Family, Firewall.PositionRange>>>({});
 const inventoryTotal = ref(0);
@@ -433,6 +432,7 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-rule-page-size')) || 20,
     total: 0,
 });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const providerScopes = (): Firewall.Scope[] => {
     if (provider.value === 'iptables' || provider.value === 'nftables') {

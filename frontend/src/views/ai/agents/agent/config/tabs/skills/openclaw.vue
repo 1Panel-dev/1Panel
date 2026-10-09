@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { computed, ref, watch } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
@@ -181,10 +181,15 @@ const getDefaultMarketSource = (): SkillMarketSource => {
 const marketSource = ref<SkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
-useSearchPersistence(
-    'ai/agents/agent/config/tabs/skills/openclaw',
+useSearchReset(
     { installedKeyword, marketKeyword },
-    () => agentId.value || undefined,
+    {
+        scope: () => agentId.value || undefined,
+        onRevisit: () => {
+            marketResults.value = [];
+            marketSearched.value = false;
+        },
+    },
 );
 const skills = ref<AI.AgentSkillItem[]>([]);
 const marketResults = ref<AI.AgentSkillSearchItem[]>([]);

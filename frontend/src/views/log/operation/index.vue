@@ -125,12 +125,12 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/date';
 import { cleanLogs, getOperationLogs } from '@/api/modules/log';
-import { onMounted, reactive, ref } from 'vue';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -146,7 +146,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref<string>('');
-useSearchPersistence('log/operation/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const searchGroup = ref<string>('');
 const searchStatus = ref<string>('');
 const searchNode = ref<string>('');

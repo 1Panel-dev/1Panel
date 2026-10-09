@@ -474,7 +474,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
@@ -490,7 +490,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { computed, reactive, ref } from 'vue';
+import { toRef, computed, reactive, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -536,7 +536,7 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const searchName = ref();
-useSearchPersistence('container/container/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();

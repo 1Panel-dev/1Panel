@@ -120,14 +120,14 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import FireStatus from '@/views/host/firewall/status/index.vue';
 import RuleReset from '@/views/host/firewall/components/rule-reset.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import { resetFirewallRules, operateForwardRule, searchForwardRule } from '@/api/modules/firewall';
 import { Firewall } from '@/api/interface/firewall';
 import { buildForwardRuleExport } from './transfer';
@@ -141,7 +141,6 @@ import { ElMessageBox } from 'element-plus';
 const loading = ref();
 const selects = ref<any>([]);
 const searchName = ref();
-useSearchPersistence('host/firewall/forward/index', { search: searchName });
 
 const isInit = ref(false);
 const isBind = ref(false);
@@ -192,6 +191,7 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-forward-page-size')) || 20,
     total: 0,
 });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const search = async () => {
     if (!isInit.value || !isBind.value || fireName.value === '-') {

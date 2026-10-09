@@ -100,13 +100,13 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/terminal/command/operate/index.vue';
 import ImportDialog from '@/views/terminal/command/import/index.vue';
 import { editCommand, deleteCommand, getCommandPage, exportCommands } from '@/api/modules/command';
-import { reactive, ref } from 'vue';
+import { toRef, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { getGroupList } from '@/api/modules/group';
@@ -124,7 +124,7 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const info = ref();
-useSearchPersistence('terminal/command/index', { search: info });
+useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const group = ref<string>('');
 const dialogRef = ref();
 const opRef = ref();
