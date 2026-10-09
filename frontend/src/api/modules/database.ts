@@ -190,11 +190,17 @@ export const redisPersistenceConf = (type: string, database: string) => {
         name: database,
     });
 };
-export const checkRedisCli = () => {
-    return http.get<boolean>(`/databases/redis/check`);
+export const loadRedisCliStatus = (node: string) => {
+    return http.get<Database.RedisCliStatus>(
+        `/databases/redis/cli/status?operateNode=${encodeURIComponent(node)}`,
+        undefined,
+        { skipErrorMessage: true },
+    );
 };
-export const installRedisCli = () => {
-    return http.post(`/databases/redis/install/cli`, {}, TimeoutEnum.T_5M);
+export const installRedisCli = (taskID: string, node: string) => {
+    return http.post<Database.RedisCliStatus>(`/databases/redis/install/cli?operateNode=${encodeURIComponent(node)}`, {
+        taskID,
+    });
 };
 export const changeRedisPassword = (database: string, password: string) => {
     if (password) {

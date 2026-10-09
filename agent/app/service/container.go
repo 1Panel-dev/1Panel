@@ -484,6 +484,10 @@ func (u *ContainerService) LoadResourceLimit() (*dto.ResourceLimit, error) {
 }
 
 func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bool) error {
+	return u.containerCreate(req, inThread, "")
+}
+
+func (u *ContainerService) containerCreate(req dto.ContainerOperate, inThread bool, taskName string) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
@@ -497,7 +501,10 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 		return buserr.New("ErrContainerName")
 	}
 
-	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
+	if taskName == "" {
+		taskName = task.GetTaskName(req.Name, task.TaskCreate, task.TaskScopeContainer)
+	}
+	taskItem, err := task.NewTask(taskName, task.TaskCreate, task.TaskScopeContainer, req.TaskID, 1)
 	if err != nil {
 		unlock()
 		_ = client.Close()
@@ -558,10 +565,15 @@ func (u *ContainerService) ContainerCreate(req dto.ContainerOperate, inThread bo
 	}, nil)
 
 	if inThread {
+		if err := taskItem.Prepare(); err != nil {
+			unlock()
+			_ = client.Close()
+			return err
+		}
 		go func() {
 			defer unlock()
 			defer client.Close()
-			if err := taskItem.Execute(); err != nil {
+			if err := taskItem.ExecutePrepared(); err != nil {
 				global.LOG.Error(err.Error())
 			}
 		}()

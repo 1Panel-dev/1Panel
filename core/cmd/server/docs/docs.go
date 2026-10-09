@@ -15010,6 +15010,30 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/databases/redis/cli/status": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RedisCliStatus"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load redis-cli installation status",
+				"tags": [
+					"Database Redis"
+				]
+			}
+		},
 		"/databases/redis/conf": {
 			"post": {
 				"consumes": [
@@ -15092,9 +15116,26 @@ const docTemplate = `{
 		},
 		"/databases/redis/install/cli": {
 			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.RedisCliInstall"
+						}
+					}
+				],
 				"responses": {
 					"200": {
-						"description": "OK"
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.RedisCliStatus"
+						}
 					}
 				},
 				"security": [
@@ -40151,6 +40192,31 @@ const docTemplate = `{
 				"pageSize"
 			],
 			"type": "object"
+		},
+		"dto.RedisCliInstall": {
+			"type": "object",
+			"properties": {
+				"taskID": {
+					"type": "string"
+				}
+			}
+		},
+		"dto.RedisCliStatus": {
+			"type": "object",
+			"properties": {
+				"errorMsg": {
+					"type": "string"
+				},
+				"installed": {
+					"type": "boolean"
+				},
+				"status": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			}
 		},
 		"dto.RedisConf": {
 			"properties": {

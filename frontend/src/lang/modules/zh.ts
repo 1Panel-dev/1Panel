@@ -722,6 +722,11 @@ const message = {
         keyspaceMisses: '查找数据库键失败的次数',
         hit: '查找数据库键命中率',
         latestForkUsec: '最近一次 fork() 操作耗费的微秒数',
+        redisCliEnableTask: '启用 Redis 远程终端',
+        redisCliEnabling: '正在启用 Redis 远程终端',
+        redisCliEnabled: 'Redis 远程终端已启用',
+        redisCliEnableFailed: 'Redis 远程终端启用失败，请查看任务日志后重试',
+        redisCliTaskSubmitted: '启用任务已提交，可在任务中心查看进度',
         redisCliHelper: '未检测到 redis-cli 服务，请先启用服务！',
         redisQuickCmd: 'Redis 快速命令',
 
