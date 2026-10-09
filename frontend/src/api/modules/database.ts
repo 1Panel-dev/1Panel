@@ -198,7 +198,7 @@ export const loadRedisCliStatus = (node: string) => {
     );
 };
 export const installRedisCli = (taskID: string, node: string) => {
-    return http.post<Database.RedisCliStatus>(`/databases/redis/install/cli?operateNode=${encodeURIComponent(node)}`, {
+    return http.post<string>(`/databases/redis/install/cli?operateNode=${encodeURIComponent(node)}`, {
         taskID,
     });
 };

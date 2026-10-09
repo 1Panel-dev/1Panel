@@ -15134,7 +15134,7 @@ const docTemplate = `{
 					"200": {
 						"description": "OK",
 						"schema": {
-							"$ref": "#/definitions/dto.RedisCliStatus"
+							"type": "string"
 						}
 					}
 				},
@@ -40196,23 +40196,6 @@ const docTemplate = `{
 		"dto.RedisCliInstall": {
 			"type": "object",
 			"properties": {
-				"taskID": {
-					"type": "string"
-				}
-			}
-		},
-		"dto.RedisCliStatus": {
-			"type": "object",
-			"properties": {
-				"errorMsg": {
-					"type": "string"
-				},
-				"installed": {
-					"type": "boolean"
-				},
-				"status": {
-					"type": "string"
-				},
 				"taskID": {
 					"type": "string"
 				}

@@ -86,28 +86,9 @@
                             v-permission
                             type="primary"
                             :loading="cliSubmitting"
-                            :disabled="(!cliStatusLoaded || cliInstalling) && !cliPollFailed"
                             @click="installCli"
                         >
-                            {{
-                                cliPollFailed
-                                    ? $t('commons.button.retry')
-                                    : cliInstalling
-                                      ? $t('database.redisCliEnabling')
-                                      : $t('commons.button.enable')
-                            }}
-                        </el-button>
-                        <el-button
-                            v-if="
-                                currentDB.from === 'remote' &&
-                                cliTaskID &&
-                                (cliInstalling || redisCliExist || cliTaskStatus === 'Failed')
-                            "
-                            link
-                            type="primary"
-                            @click="openCliTaskLog"
-                        >
-                            {{ $t('commons.button.log') }}
+                            {{ $t('commons.button.enable') }}
                         </el-button>
                     </el-empty>
                     <div>
@@ -159,7 +140,7 @@
         </DialogPro>
 
         <QuickCmd ref="dialogQuickCmdRef" @reload="loadQuickCmd" />
-        <TaskLog ref="cliTaskLogRef" />
+        <TaskLog ref="cliTaskLogRef" @close="checkCliValid" />
     </div>
 </template>
 
@@ -174,14 +155,12 @@ import { checkAppInstalled } from '@/api/modules/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { listDatabases, loadRedisCliStatus, installRedisCli } from '@/api/modules/database';
 import { Database } from '@/api/interface/database';
-import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
 
 import TaskLog from '@/components/log/task/index.vue';
-import bus from '@/global/bus';
 import { newUUID } from '@/utils/id';
 
 const { currentNode, currentRedisDB, openMenuTabs } = useGlobalStore();
@@ -202,21 +181,8 @@ const open = ref(false);
 
 const redisCliExist = ref(false);
 const cliSubmitting = ref(false);
-const cliStatusLoaded = ref(false);
-const cliPollFailed = ref(false);
-const cliTaskID = ref('');
-const cliTaskStatus = ref('');
 const cliTaskLogRef = ref<InstanceType<typeof TaskLog>>();
-const cliInstalling = computed(() => cliTaskStatus.value === 'Executing');
-const cliStatusText = computed(() => {
-    if (cliPollFailed.value) return i18n.global.t('commons.res.commonError');
-    if (cliInstalling.value) return i18n.global.t('database.redisCliEnabling');
-    if (cliTaskStatus.value === 'Failed') return i18n.global.t('database.redisCliEnableFailed');
-    return redisCliExist.value ? i18n.global.t('database.redisCliEnabled') : i18n.global.t('database.redisCliHelper');
-});
-let cliPollTimer: ReturnType<typeof setTimeout>;
-let cliGeneration = 0;
-let cliPollFailures = 0;
+const operateNode = currentNode.value;
 let disposed = false;
 
 const appKey = ref('redis');
@@ -298,7 +264,7 @@ const loadDBOptions = async () => {
     const generation = cliGeneration;
     try {
         const res = await listDatabases('redis,redis-cluster');
-        if (disposed || generation !== cliGeneration) return;
+        if (disposed || operateNode !== currentNode.value) return;
         let datas = res.data || [];
         dbOptionsLocal.value = [];
         dbOptionsRemote.value = [];
@@ -335,7 +301,7 @@ const loadDBOptions = async () => {
             reOpenTerminal();
         }
     } finally {
-        if (!disposed && generation === cliGeneration) isLoaded.value = true;
+        if (!disposed && operateNode === currentNode.value) isLoaded.value = true;
     }
 };
 
@@ -351,9 +317,8 @@ const reOpenTerminal = async () => {
 
 const initTerminal = async () => {
     if (disposed || !currentDB.value) return;
-    const generation = cliGeneration;
     const database = currentDBName.value;
-    const isCurrent = () => !disposed && generation === cliGeneration && database === currentDBName.value;
+    const isCurrent = () => !disposed && operateNode === currentNode.value && database === currentDBName.value;
     loading.value = true;
     if (currentDB.value.from === 'remote') {
         if (!redisCliExist.value) {
@@ -461,44 +426,29 @@ const refreshCliStatus = async (generation: number) => {
 };
 
 const checkCliValid = async () => {
-    const generation = cliGeneration;
-    await refreshCliStatus(generation);
-    if (!disposed && generation === cliGeneration) await loadDBOptions();
+    if (disposed || operateNode !== currentNode.value) return;
+    try {
+        const res = await checkRedisCli();
+        if (disposed || operateNode !== currentNode.value) return;
+        redisCliExist.value = res.data;
+    } finally {
+        if (!disposed && operateNode === currentNode.value) await loadDBOptions();
+    }
 };
 
 const installCli = async () => {
     if (cliSubmitting.value) return;
-    if (cliPollFailed.value) {
-        cliPollFailures = 0;
-        cliPollFailed.value = false;
-        cliSubmitting.value = true;
-        const generation = cliGeneration;
-        try {
-            await refreshCliStatus(generation);
-        } finally {
-            if (!disposed && generation === cliGeneration) cliSubmitting.value = false;
-        }
-        return;
-    }
-    if (cliInstalling.value || !cliStatusLoaded.value) return;
-    const generation = cliGeneration;
-    const node = currentNode.value;
     cliSubmitting.value = true;
-    clearTimeout(cliPollTimer);
     try {
-        const res = await installRedisCli(newUUID(), node);
-        if (disposed || generation !== cliGeneration) return;
-        applyCliStatus(res.data);
-        if (cliInstalling.value) {
-            MsgSuccess(i18n.global.t('database.redisCliTaskSubmitted'));
-            openCliTaskLog();
-            scheduleCliPoll(generation);
+        const res = await installRedisCli(newUUID(), operateNode);
+        if (disposed || operateNode !== currentNode.value) return;
+        if (res.data) {
+            cliTaskLogRef.value?.openWithTaskID(res.data, true, operateNode);
+        } else {
+            await checkCliValid();
         }
-    } catch {
-        // The server may have accepted the task even if the response was lost.
-        if (!disposed && generation === cliGeneration) await refreshCliStatus(generation);
     } finally {
-        if (!disposed && generation === cliGeneration) cliSubmitting.value = false;
+        cliSubmitting.value = false;
     }
 };
 
@@ -551,8 +501,6 @@ const onAfter = () => {
 };
 onBeforeUnmount(() => {
     disposed = true;
-    cliGeneration++;
-    clearTimeout(cliPollTimer);
     closeTerminal(false);
 });
 </script>
