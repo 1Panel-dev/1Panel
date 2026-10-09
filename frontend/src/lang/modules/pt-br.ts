@@ -741,12 +741,6 @@ const message = {
         keyspaceMisses: 'Número de tentativas falhas de encontrar a chave do banco de dados.',
         hit: 'Taxa de acerto de chave de banco de dados.',
         latestForkUsec: 'Número de microssegundos gastos na última operação fork()',
-        redisCliEnableTask: 'Habilitar terminal remoto do Redis',
-        redisCliEnabling: 'Habilitando terminal remoto do Redis',
-        redisCliEnabled: 'Terminal remoto do Redis habilitado',
-        redisCliEnableFailed:
-            'Falha ao habilitar o terminal remoto do Redis. Verifique o log da tarefa e tente novamente.',
-        redisCliTaskSubmitted: 'Tarefa enviada. Acompanhe o progresso na central de tarefas.',
         redisCliHelper: '"redis-cli" não foi detectado. Habilite o serviço primeiro.',
         redisQuickCmd: 'Comandos rápidos Redis',
         recoverHelper: 'Isso sobrescreverá os dados com [{0}]. Deseja continuar?',

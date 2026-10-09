@@ -118,9 +118,7 @@ class RequestHttp {
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
                     if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
-                        if (!(response.config as RequestConfig).skipErrorMessage) {
-                            MsgError(i18n.global.t('license.tamperHelper'));
-                        }
+                        MsgError(i18n.global.t('license.tamperHelper'));
                         return Promise.reject(data);
                     }
                     if (!(response.config as RequestConfig).skipErrorMessage) {
@@ -132,10 +130,8 @@ class RequestHttp {
             },
             async (error: AxiosError) => {
                 const { response } = error;
-                const silent = (error.config as RequestConfig)?.skipErrorMessage;
 
-                if (!silent && error.message.indexOf('timeout') !== -1)
-                    MsgError(i18n.global.t('commons.msg.requestTimeout'));
+                if (error.message.indexOf('timeout') !== -1) MsgError(i18n.global.t('commons.msg.requestTimeout'));
                 if (response) {
                     switch (response.status) {
                         case 313:
@@ -145,7 +141,6 @@ class RequestHttp {
                             if (isCsrfForbidden(response)) {
                                 return Promise.reject(error);
                             }
-                            if (silent) return Promise.reject(error);
                             if (response.data && response.data['message']) {
                                 MsgError(response.data['message']);
                             } else {
@@ -156,11 +151,10 @@ class RequestHttp {
                         case 502:
                         case 524:
                         case 407:
-                            if (!silent)
-                                checkStatus(
-                                    response.status,
-                                    response.data && response.data['message'] ? response.data['message'] : '',
-                                );
+                            checkStatus(
+                                response.status,
+                                response.data && response.data['message'] ? response.data['message'] : '',
+                            );
                             return Promise.reject(error);
                         default:
                             return Promise.reject(error);

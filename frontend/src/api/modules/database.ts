@@ -190,12 +190,8 @@ export const redisPersistenceConf = (type: string, database: string) => {
         name: database,
     });
 };
-export const loadRedisCliStatus = (node: string) => {
-    return http.get<Database.RedisCliStatus>(
-        `/databases/redis/cli/status?operateNode=${encodeURIComponent(node)}`,
-        undefined,
-        { skipErrorMessage: true },
-    );
+export const checkRedisCli = () => {
+    return http.get<boolean>(`/databases/redis/check`);
 };
 export const installRedisCli = (taskID: string, node: string) => {
     return http.post<string>(`/databases/redis/install/cli?operateNode=${encodeURIComponent(node)}`, {

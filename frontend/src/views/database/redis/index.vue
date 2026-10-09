@@ -150,10 +150,10 @@ import Conn from '@/views/database/redis/conn/index.vue';
 import Terminal from '@/components/terminal/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import QuickCmd from '@/views/database/redis/command/index.vue';
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue';
+import { nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
 import { checkAppInstalled } from '@/api/modules/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { listDatabases, loadRedisCliStatus, installRedisCli } from '@/api/modules/database';
+import { listDatabases, checkRedisCli, installRedisCli } from '@/api/modules/database';
 import { Database } from '@/api/interface/database';
 import i18n from '@/lang';
 import { getCommandList } from '@/api/modules/command';
@@ -261,7 +261,6 @@ const changeDatabase = async () => {
 };
 
 const loadDBOptions = async () => {
-    const generation = cliGeneration;
     try {
         const res = await listDatabases('redis,redis-cluster');
         if (disposed || operateNode !== currentNode.value) return;
@@ -308,7 +307,7 @@ const loadDBOptions = async () => {
 const loadErrMsg = () => {
     return currentDB.value.from === 'local'
         ? i18n.global.t('commons.service.serviceNotStarted', ['Redis'])
-        : cliStatusText.value;
+        : i18n.global.t('database.redisCliHelper');
 };
 const reOpenTerminal = async () => {
     closeTerminal(false);
@@ -374,57 +373,6 @@ const closeTerminal = async (isKeepShow: boolean) => {
     terminalShow.value = isKeepShow;
 };
 
-const openCliTaskLog = () => {
-    if (cliTaskID.value) cliTaskLogRef.value?.openWithTaskID(cliTaskID.value, cliInstalling.value, currentNode.value);
-};
-
-const applyCliStatus = (status: Database.RedisCliStatus) => {
-    const wasInstalling = cliInstalling.value;
-    const wasReady = redisCliExist.value && !wasInstalling;
-    redisCliExist.value = status.installed;
-    cliTaskID.value = status.taskID;
-    cliTaskStatus.value = status.status;
-    cliStatusLoaded.value = true;
-    if (!wasReady && status.installed && !cliInstalling.value && currentDB.value?.from === 'remote') {
-        reOpenTerminal();
-    }
-    if (wasInstalling && !cliInstalling.value) {
-        bus.emit('refreshTask', true);
-        if (status.status === 'Success' && status.installed) {
-            MsgSuccess(i18n.global.t('database.redisCliEnabled'));
-        } else if (status.status === 'Failed') {
-            MsgError(i18n.global.t('database.redisCliEnableFailed'));
-        }
-    }
-};
-
-const scheduleCliPoll = (generation: number, delay = 2000) => {
-    clearTimeout(cliPollTimer);
-    if (disposed || generation !== cliGeneration) return;
-    cliPollTimer = setTimeout(() => refreshCliStatus(generation), delay);
-};
-
-const refreshCliStatus = async (generation: number) => {
-    try {
-        const res = await loadRedisCliStatus(currentNode.value);
-        if (disposed || generation !== cliGeneration) return;
-        cliPollFailures = 0;
-        cliPollFailed.value = false;
-        applyCliStatus(res.data);
-        if (cliInstalling.value) scheduleCliPoll(generation);
-    } catch (error) {
-        if (disposed || generation !== cliGeneration) return;
-        const status = error?.response?.status ?? error?.code;
-        // Only retry network errors, rate limiting and server errors.
-        const retryable = !Number.isFinite(status) || status === 429 || status >= 500;
-        if (retryable && ++cliPollFailures <= 5) {
-            scheduleCliPoll(generation, Math.min(2000 * 2 ** (cliPollFailures - 1), 30000));
-        } else {
-            cliPollFailed.value = true;
-        }
-    }
-};
-
 const checkCliValid = async () => {
     if (disposed || operateNode !== currentNode.value) return;
     try {
@@ -467,27 +415,6 @@ const quickInput = (val: any) => {
 const onSetQuickCmd = () => {
     dialogQuickCmdRef.value.acceptParams();
 };
-
-watch(currentNode, () => {
-    cliGeneration++;
-    clearTimeout(cliPollTimer);
-    cliTaskLogRef.value?.handleClose();
-    closeTerminal(false);
-    redisCliExist.value = false;
-    cliSubmitting.value = false;
-    cliStatusLoaded.value = false;
-    cliPollFailed.value = false;
-    cliPollFailures = 0;
-    cliTaskID.value = '';
-    cliTaskStatus.value = '';
-    currentDB.value = undefined;
-    redisStatus.value = undefined;
-    dbOptionsLocal.value = [];
-    dbOptionsRemote.value = [];
-    isLoaded.value = false;
-    loading.value = false;
-    checkCliValid();
-});
 
 onMounted(() => {
     loadQuickCmd();

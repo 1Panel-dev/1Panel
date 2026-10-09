@@ -739,12 +739,6 @@ const message = {
         keyspaceMisses: 'データベースキーを見つけようとする試みの失敗の数。',
         hit: 'データベースキーヒット率を見つけます。',
         latestForkUsec: '最後のfork（）操作に費やされたマイクロ秒数。',
-        redisCliEnableTask: 'Redis リモートターミナルを有効化',
-        redisCliEnabling: 'Redis リモートターミナルを有効化中',
-        redisCliEnabled: 'Redis リモートターミナルが有効になりました',
-        redisCliEnableFailed:
-            'Redis リモートターミナルの有効化に失敗しました。タスクログを確認して再試行してください。',
-        redisCliTaskSubmitted: 'タスクを送信しました。タスクセンターで進捗を確認できます。',
         redisCliHelper: '「Redis-Cli」サービスは検出されません。最初にサービスを有効にします。',
         redisQuickCmd: 'Redis Quickコマンド',
         recoverHelper: 'これにより、[{0}]でデータが上書きされます。続けたいですか？',

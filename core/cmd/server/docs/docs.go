@@ -15010,30 +15010,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/databases/redis/cli/status": {
-			"get": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"$ref": "#/definitions/dto.RedisCliStatus"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Load redis-cli installation status",
-				"tags": [
-					"Database Redis"
-				]
-			}
-		},
 		"/databases/redis/conf": {
 			"post": {
 				"consumes": [

@@ -742,12 +742,6 @@ const message = {
         keyspaceMisses: 'Cantidad de intentos fallidos para encontrar la clave.',
         hit: 'Proporción de aciertos de clave de la base de datos.',
         latestForkUsec: 'Microsegundos consumidos en la última operación fork().',
-        redisCliEnableTask: 'Habilitar terminal remoto de Redis',
-        redisCliEnabling: 'Habilitando terminal remoto de Redis',
-        redisCliEnabled: 'Terminal remoto de Redis habilitado',
-        redisCliEnableFailed:
-            'No se pudo habilitar el terminal remoto de Redis. Revise el registro de la tarea y vuelva a intentarlo.',
-        redisCliTaskSubmitted: 'Tarea enviada. Consulte el progreso en el centro de tareas.',
         redisCliHelper: 'No se detectó el servicio "redis-cli". Primero habilite el servicio.',
         redisQuickCmd: 'Comandos rápidos de Redis',
         recoverHelper: 'Esto sobrescribirá los datos con [{0}]. ¿Desea continuar?',

@@ -24,7 +24,6 @@ const formatSkillInstallTask = () => {
 };
 
 const taskTextMap: Record<string, () => string> = {
-    RedisCliEnable: () => i18n.global.t('database.redisCliEnableTask'),
     BatchInstallAgent: () => formatBatchAgentTask('Install'),
     DispatchAgentInstallTasks: () => formatDispatchAgentTask('Install'),
     BatchUpgradeAgent: () => formatBatchAgentTask('Upgrade'),
