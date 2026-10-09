@@ -575,6 +575,8 @@ const message = {
         cancelKeepAlive: 'Hentikan pengekalan sesi halaman',
     },
     header: {
+        userCenter: 'Pusat Pengguna',
+        exitSystem: 'Log keluar',
         logout: 'Log keluar',
     },
     database: {

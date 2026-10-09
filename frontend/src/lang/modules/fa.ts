@@ -565,6 +565,8 @@ const message = {
         cancelKeepAlive: 'لغو حفظ نشست صفحه',
     },
     header: {
+        userCenter: 'مرکز کاربری',
+        exitSystem: 'خروج از سیستم',
         logout: 'خروج',
     },
     database: {

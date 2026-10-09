@@ -570,6 +570,8 @@ const message = {
         cancelKeepAlive: 'Sayfa oturumunu korumayı bırak',
     },
     header: {
+        userCenter: 'Kullanıcı Merkezi',
+        exitSystem: 'Çıkış yap',
         logout: 'Çıkış',
     },
     database: {

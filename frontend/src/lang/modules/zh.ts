@@ -552,6 +552,8 @@ const message = {
         cancelKeepAlive: '取消保持页面会话',
     },
     header: {
+        userCenter: '用户中心',
+        exitSystem: '退出系统',
         logout: '退出登录',
     },
     database: {

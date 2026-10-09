@@ -562,6 +562,8 @@ const message = {
         cancelKeepAlive: '페이지 세션 유지 해제',
     },
     header: {
+        userCenter: '사용자 센터',
+        exitSystem: '로그아웃',
         logout: '로그아웃',
     },
     database: {

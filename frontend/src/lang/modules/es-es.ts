@@ -570,6 +570,8 @@ const message = {
         cancelKeepAlive: 'Dejar de mantener la sesión de la página',
     },
     header: {
+        userCenter: 'Centro de usuario',
+        exitSystem: 'Cerrar sesión',
         logout: 'Cerrar sesión',
     },
     database: {

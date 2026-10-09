@@ -563,6 +563,8 @@ const message = {
         cancelKeepAlive: 'ຍົກເລີກການຮັກສາເຊັດຊັນໜ້າ',
     },
     header: {
+        userCenter: 'ສູນຜູ້ໃຊ້',
+        exitSystem: 'ອອກຈາກລະບົບ',
         logout: 'ອອກຈາກລະບົບ',
     },
     database: {

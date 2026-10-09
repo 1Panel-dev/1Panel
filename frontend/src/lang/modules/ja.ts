@@ -568,6 +568,8 @@ const message = {
         cancelKeepAlive: 'ページセッションの保持を解除',
     },
     header: {
+        userCenter: 'ユーザーセンター',
+        exitSystem: 'ログアウト',
         logout: 'ログアウト',
     },
     database: {
