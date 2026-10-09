@@ -1850,6 +1850,11 @@ const message = {
         imageName: '画像名',
         pull: '引く',
         path: 'パス',
+        imageUploadDrop: 'イメージファイルをここにドラッグするか、クリックしてアップロードしてください',
+        imageUploadHelper:
+            'ファイル形式に制限はありません。Docker が内容を検証します。アップロードしたファイルは保持されるため、インポートを再試行したり、手動で削除したりできます。',
+        imageUploadEmpty: 'ファイルが空です。有効なイメージファイルを選択してください。',
+        imageImportSubmitted: 'イメージのインポートタスクを送信しました。結果はタスクログで確認してください。',
         importImage: '輸入',
         buildArgs: 'ビルド引数',
         imageBuild: '建てる',

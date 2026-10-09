@@ -1884,6 +1884,11 @@ const message = {
         imageName: 'Nome da imagem',
         pull: 'Puxar',
         path: 'Caminho',
+        imageUploadDrop: 'Arraste um arquivo de imagem para cá ou clique para enviar',
+        imageUploadHelper:
+            'Qualquer formato de arquivo é permitido. O Docker valida o conteúdo. Os arquivos enviados são mantidos para novas tentativas de importação ou exclusão manual.',
+        imageUploadEmpty: 'O arquivo está vazio. Selecione um arquivo de imagem válido.',
+        imageImportSubmitted: 'Tarefa de importação de imagem enviada. Consulte o log da tarefa para ver o resultado.',
         importImage: 'Importar',
         buildArgs: 'Argumentos de Build',
         imageBuild: 'Construção de imagem',

@@ -1822,6 +1822,11 @@ const message = {
         imageName: 'ຊື່ Image',
         pull: 'ດຶງຂໍ້ມູນ (Pull)',
         path: 'ເສັ້ນທາງ',
+        imageUploadDrop: 'ລາກໄຟລ໌ອິມເມຈມາວາງບ່ອນນີ້ ຫຼື ຄລິກເພື່ອອັບໂຫຼດ',
+        imageUploadHelper:
+            'ບໍ່ຈຳກັດຮູບແບບໄຟລ໌. Docker ຈະກວດສອບເນື້ອຫາ. ໄຟລ໌ທີ່ອັບໂຫຼດຈະຖືກເກັບໄວ້ ເພື່ອໃຫ້ສາມາດລອງນຳເຂົ້າອີກຄັ້ງ ຫຼື ລຶບດ້ວຍຕົນເອງ.',
+        imageUploadEmpty: 'ໄຟລ໌ຫວ່າງເປົ່າ. ກະລຸນາເລືອກໄຟລ໌ອິມເມຈທີ່ຖືກຕ້ອງ.',
+        imageImportSubmitted: 'ສົ່ງວຽກນຳເຂົ້າອິມເມຈແລ້ວ. ກະລຸນາເບິ່ງບັນທຶກວຽກເພື່ອກວດສອບຜົນ.',
         importImage: 'ນຳເຂົ້າ',
         buildArgs: 'Build Arguments',
         imageBuild: 'ສ້າງ (Build)',

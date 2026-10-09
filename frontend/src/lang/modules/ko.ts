@@ -1833,6 +1833,11 @@ const message = {
         imageName: '이미지 이름',
         pull: '풀',
         path: '경로',
+        imageUploadDrop: '이미지 파일을 여기로 끌어 놓거나 클릭하여 업로드하세요',
+        imageUploadHelper:
+            '파일 형식에는 제한이 없습니다. Docker가 내용을 검증합니다. 업로드한 파일은 보관되므로 가져오기를 다시 시도하거나 수동으로 삭제할 수 있습니다.',
+        imageUploadEmpty: '빈 파일입니다. 유효한 이미지 파일을 선택하세요.',
+        imageImportSubmitted: '이미지 가져오기 작업이 제출되었습니다. 작업 로그에서 결과를 확인하세요.',
         importImage: '가져오기',
         buildArgs: '빌드 인수',
         imageBuild: '이미지 빌드',
