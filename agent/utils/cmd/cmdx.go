@@ -251,6 +251,10 @@ func (c *CommandHelper) buildPipeCommands(ctx context.Context, commands []PipeCo
 		cmdItem.SysProcAttr = &syscall.SysProcAttr{
 			Setpgid: true,
 		}
+		cmdItem.Cancel = func() error {
+			_ = syscall.Kill(-cmdItem.Process.Pid, syscall.SIGKILL)
+			return cmdItem.Process.Kill()
+		}
 		cmds = append(cmds, cmdItem)
 	}
 	return cmds
@@ -335,6 +339,12 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{
 		Setpgid: true,
 	}
+	if newContext != nil {
+		cmd.Cancel = func() error {
+			_ = syscall.Kill(-cmd.Process.Pid, syscall.SIGKILL)
+			return cmd.Process.Kill()
+		}
+	}
 
 	customWriter := &CustomWriter{taskItem: c.taskItem}
 	var stdout, stderr bytes.Buffer
@@ -398,6 +408,9 @@ func (c *CommandHelper) run(name string, arg ...string) (string, error) {
 	}()
 	select {
 	case err := <-done:
+		if newContext != nil && newContext.Err() != nil {
+			return "", c.pipeResultErr(newContext, err)
+		}
 		if err != nil {
 			return handleErr(&stdout, &stderr, c.IgnoreExist1, err)
 		}
