@@ -86,17 +86,23 @@ func (b *BaseApi) CheckHasCli(c *gin.Context) {
 
 // @Tags Database Redis
 // @Summary Install redis-cli
-// @Success 200
+// @Accept json
+// @Param request body dto.RedisCliInstall true "request"
+// @Success 200 {string} string
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /databases/redis/install/cli [post]
 func (b *BaseApi) InstallCli(c *gin.Context) {
-	if err := redisService.InstallCli(); err != nil {
+	var req dto.RedisCliInstall
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	data, err := redisService.InstallCli(req)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-
-	helper.Success(c)
+	helper.SuccessWithData(c, data)
 }
 
 // @Tags Database Redis

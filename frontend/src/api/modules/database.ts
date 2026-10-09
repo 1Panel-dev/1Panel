@@ -193,8 +193,10 @@ export const redisPersistenceConf = (type: string, database: string) => {
 export const checkRedisCli = () => {
     return http.get<boolean>(`/databases/redis/check`);
 };
-export const installRedisCli = () => {
-    return http.post(`/databases/redis/install/cli`, {}, TimeoutEnum.T_5M);
+export const installRedisCli = (taskID: string, node: string) => {
+    return http.post<string>(`/databases/redis/install/cli?operateNode=${encodeURIComponent(node)}`, {
+        taskID,
+    });
 };
 export const changeRedisPassword = (database: string, password: string) => {
     if (password) {

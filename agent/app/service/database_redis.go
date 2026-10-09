@@ -8,6 +8,12 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
+
+	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/google/uuid"
+	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -17,11 +23,14 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
-	"github.com/docker/docker/api/types/container"
+	dockerclient "github.com/docker/docker/client"
 	_ "github.com/go-sql-driver/mysql"
 )
 
 type RedisService struct{}
+
+// The CLI container is shared by all remote Redis databases on this node.
+var redisCliInstallMutex sync.Mutex
 
 type IRedisService interface {
 	UpdateConf(req dto.RedisConfUpdate) error
@@ -33,7 +42,7 @@ type IRedisService interface {
 	LoadPersistenceConf(req dto.LoadRedisStatus) (*dto.RedisPersistence, error)
 
 	CheckHasCli() bool
-	InstallCli() error
+	InstallCli(req dto.RedisCliInstall) (string, error)
 }
 
 func NewIRedisService() IRedisService {
@@ -61,30 +70,65 @@ func (u *RedisService) UpdateConf(req dto.RedisConfUpdate) error {
 }
 
 func (u *RedisService) CheckHasCli() bool {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return false
-	}
-	defer client.Close()
-	containerLists, err := client.ContainerList(context.Background(), container.ListOptions{})
-	if err != nil {
-		return false
-	}
-	for _, item := range containerLists {
-		if strings.ReplaceAll(item.Names[0], "/", "") == "1Panel-redis-cli-tools" {
-			return true
-		}
-	}
-	return false
+	installed, _ := u.checkCliInstalled()
+	return installed
 }
 
-func (u *RedisService) InstallCli() error {
+func (u *RedisService) checkCliInstalled() (bool, error) {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return false, err
+	}
+	defer client.Close()
+	info, err := client.ContainerInspect(context.Background(), "1Panel-redis-cli-tools")
+	if dockerclient.IsErrNotFound(err) {
+		return false, nil
+	}
+	if err != nil {
+		return false, err
+	}
+	return info.ContainerJSONBase != nil && info.State != nil && info.State.Running, nil
+}
+
+func (u *RedisService) InstallCli(req dto.RedisCliInstall) (string, error) {
+	if !redisCliInstallMutex.TryLock() {
+		return "", buserr.New("TaskIsExecuting")
+	}
+	defer redisCliInstallMutex.Unlock()
 	item := dto.ContainerOperate{
+		TaskID:   req.TaskID,
 		Name:     "1Panel-redis-cli-tools",
 		Image:    "redis:7.4.4",
 		Networks: []dto.ContainerNetwork{{Network: "1panel-network"}},
 	}
-	return NewIContainerService().ContainerCreate(item, false)
+	running, err := taskRepo.GetFirst(
+		repo.WithByName(task.GetTaskName(item.Name, task.TaskCreate, task.TaskScopeContainer)),
+		repo.WithByType(task.TaskScopeContainer),
+		taskRepo.WithByStatus(constant.StatusExecuting),
+	)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		return "", err
+	}
+	if running.ID != "" {
+		return running.ID, nil
+	}
+	installed, err := u.checkCliInstalled()
+	if err != nil || installed {
+		return "", err
+	}
+	if item.TaskID == "" {
+		item.TaskID = uuid.NewString()
+	}
+	if _, err := taskRepo.GetFirst(taskRepo.WithByID(item.TaskID)); !errors.Is(err, gorm.ErrRecordNotFound) {
+		if err != nil {
+			return "", err
+		}
+		return "", buserr.New("TaskIsExecuting")
+	}
+	if err := NewIContainerService().ContainerCreate(item, true); err != nil {
+		return "", err
+	}
+	return item.TaskID, nil
 }
 
 func (u *RedisService) ChangePassword(req dto.ChangeRedisPass) error {
