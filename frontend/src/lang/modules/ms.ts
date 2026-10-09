@@ -1885,8 +1885,7 @@ const message = {
         imageUploadDrop: 'Seret fail imej ke sini atau klik untuk memuat naik',
         imageUploadHelper:
             'Semua format fail dibenarkan. Docker mengesahkan kandungannya. Fail yang dimuat naik disimpan untuk mencuba semula import atau dipadam secara manual.',
-        imageImportUnknown:
-            'Status tugas import tidak tersedia. Cuba semak semula atau pilih fail lain untuk memulakan import baharu. Fail yang dimuat naik sebelum ini akan disimpan pada pelayan.',
+        imageUploadEmpty: 'Fail kosong. Pilih arkib imej yang sah.',
         imageImportSubmitted: 'Tugas import imej telah dihantar. Semak log tugas untuk melihat hasilnya.',
         importImage: 'Import',
         buildArgs: 'Argumen Binaan',

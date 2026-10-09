@@ -1872,8 +1872,7 @@ const message = {
         imageUploadDrop: 'Drop an image file here, or click to upload',
         imageUploadHelper:
             'Any file format is allowed. Docker validates the contents. Uploaded files are retained for retrying imports or manual deletion.',
-        imageImportUnknown:
-            'The import task status is unavailable. Retry checking it, or select another file to start a new import. The previous upload will be retained on the server.',
+        imageUploadEmpty: 'The file is empty. Select a valid image archive.',
         imageImportSubmitted: 'Image import task submitted. Check the task log for the result.',
         importImage: 'Import',
         buildArgs: 'Build Arguments',

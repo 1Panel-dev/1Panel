@@ -1887,8 +1887,7 @@ const message = {
         imageUploadDrop: 'Arraste um arquivo de imagem para cá ou clique para enviar',
         imageUploadHelper:
             'Qualquer formato de arquivo é permitido. O Docker valida o conteúdo. Os arquivos enviados são mantidos para novas tentativas de importação ou exclusão manual.',
-        imageImportUnknown:
-            'O status da tarefa de importação não está disponível. Tente consultá-lo novamente ou selecione outro arquivo para iniciar uma nova importação. O arquivo anterior será mantido no servidor.',
+        imageUploadEmpty: 'O arquivo está vazio. Selecione um arquivo de imagem válido.',
         imageImportSubmitted: 'Tarefa de importação de imagem enviada. Consulte o log da tarefa para ver o resultado.',
         importImage: 'Importar',
         buildArgs: 'Argumentos de Build',

@@ -1795,8 +1795,7 @@ const message = {
         path: '路径',
         imageUploadDrop: '拖拽镜像文件到此处，或点击上传',
         imageUploadHelper: '不限制文件格式，由 Docker 校验内容。上传的文件会保留，可重试导入或手动删除。',
-        imageImportUnknown:
-            '暂时无法获取导入任务状态。可重试查询，或重新选择文件发起新的导入；原上传文件会保留在服务器上。',
+        imageUploadEmpty: '不能上传空文件，请选择有效的镜像文件。',
         imageImportSubmitted: '镜像导入任务已提交，请查看任务日志',
         importImage: '导入镜像',
         imageBuild: '构建镜像',
