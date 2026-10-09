@@ -383,11 +383,6 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 }
 
 func (u *ContainerService) Prune(req dto.ContainerPrune) error {
-	client, err := docker.NewDockerClient()
-	if err != nil {
-		return err
-	}
-	defer client.Close()
 	name := ""
 	switch req.PruneType {
 	case "container":
@@ -408,6 +403,21 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 	}
 
 	taskItem.AddSubTask(i18n.GetMsgByKey("TaskClean"), func(t *task.Task) error {
+		if err := t.TaskCtx.Err(); err != nil {
+			return err
+		}
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		if req.PruneType == "network" {
+			var until time.Time
+			if req.WithTagAll {
+				until = time.Now().Add(-24 * time.Hour)
+			}
+			return executeNetworkCleanup(t, client, until)
+		}
 		pruneFilters := filters.NewArgs()
 		if req.WithTagAll {
 			pruneFilters.Add("dangling", "false")
@@ -419,31 +429,26 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 		SpaceReclaimed := 0
 		switch req.PruneType {
 		case "container":
-			rep, err := client.ContainersPrune(context.Background(), pruneFilters)
+			rep, err := client.ContainersPrune(t.TaskCtx, pruneFilters)
 			if err != nil {
 				return err
 			}
 			SpaceReclaimed = int(rep.SpaceReclaimed)
 		case "image":
-			rep, err := client.ImagesPrune(context.Background(), pruneFilters)
+			rep, err := client.ImagesPrune(t.TaskCtx, pruneFilters)
 			if err != nil {
 				return err
 			}
 			SpaceReclaimed = int(rep.SpaceReclaimed)
-		case "network":
-			_, err := client.NetworksPrune(context.Background(), pruneFilters)
-			if err != nil {
-				return err
-			}
 		case "volume":
-			versions, err := client.ServerVersion(context.Background())
+			versions, err := client.ServerVersion(t.TaskCtx)
 			if err != nil {
 				return err
 			}
 			if common.ComparePanelVersion(versions.APIVersion, "1.42") {
 				pruneFilters.Add("all", "true")
 			}
-			rep, err := client.VolumesPrune(context.Background(), pruneFilters)
+			rep, err := client.VolumesPrune(t.TaskCtx, pruneFilters)
 			if err != nil {
 				return err
 			}
@@ -451,7 +456,7 @@ func (u *ContainerService) Prune(req dto.ContainerPrune) error {
 		case "buildcache":
 			opts := build.CachePruneOptions{}
 			opts.All = true
-			rep, err := client.BuildCachePrune(context.Background(), opts)
+			rep, err := client.BuildCachePrune(t.TaskCtx, opts)
 			if err != nil {
 				return err
 			}

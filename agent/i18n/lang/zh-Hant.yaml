@@ -723,6 +723,17 @@ ErrSSHPublicKey: "請輸入有效的 SSH 公鑰"
 ErrSSHPrivateKey: "SSH 私鑰格式無效或密碼錯誤；加密私鑰需要填寫原密碼"
 ErrSSHKeyMismatch: "SSH 公鑰與私鑰不相符"
 
+NetworkCleanupDeleted: "網路 [{{ .name }}] ({{ .id }}) 已刪除"
+NetworkCleanupProtected: "跳過網路 [{{ .name }}] ({{ .id }})：預設保留網路，未刪除"
+NetworkCleanupConnected: "跳過網路 [{{ .name }}] ({{ .id }})：仍有容器連接或正在使用，未刪除"
+NetworkCleanupUnsupported: "跳過網路 [{{ .name }}] ({{ .id }})：特殊網路，未刪除"
+NetworkCleanupGone: "跳過網路 [{{ .name }}] ({{ .id }})：網路已不存在"
+NetworkCleanupInspectFailed: "網路 [{{ .name }}] ({{ .id }}) 檢查失敗，未刪除"
+NetworkCleanupRemoveFailed: "網路 [{{ .name }}] ({{ .id }}) 刪除失敗"
+NetworkCleanupSummary: "網路清理完成：已刪除 {{ .deleted }}，已跳過 {{ .skipped }}，失敗 {{ .failed }}"
+NetworkCleanupPartialFailure: "部分網路清理失敗，請查看任務日誌"
+NetworkCleanupRecent: "跳過網路 [{{ .name }}] ({{ .id }})：建立不足 24 小時或建立時間未知，未刪除"
+
 # 虛擬機
 ErrVMNotFound: "虛擬機不存在"
 ErrVMAlreadyExists: "虛擬機已存在"
