@@ -2851,6 +2851,36 @@ onBeforeUnmount(() => {
     border-bottom: 1px solid var(--el-border-color-light) !important;
 }
 
+/* Keep the closable tab width stable so switching tabs does not reflow the tab bar */
+:deep(.file-tabs .el-tabs__header .el-tabs__item.is-closable) {
+    padding: 0 20px;
+
+    .is-icon-close {
+        width: 14px;
+        margin-left: 5px;
+        right: 0;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity var(--el-transition-duration);
+    }
+
+    &.is-active,
+    &:hover,
+    &:focus-within {
+        .is-icon-close {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+        .is-icon-close {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    }
+}
+
 :deep(.file-tabs .el-tabs--card > .el-tabs__header .el-tabs__item.is-active) {
     border-bottom-width: 1px !important;
 }
