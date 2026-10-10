@@ -550,6 +550,11 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 
 	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskInstall, task.TaskScopeApp, req.TaskID, appInstall.ID)
 	if err != nil {
+		appInstall.Status = constant.StatusInstallErr
+		appInstall.Message = err.Error()
+		if saveErr := appInstallRepo.Save(context.Background(), appInstall); saveErr != nil {
+			err = fmt.Errorf("%w; save failed install status: %v", err, saveErr)
+		}
 		return
 	}
 
@@ -557,7 +562,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		return
 	}
 
-	installApp := func(t *task.Task) error {
+	installApp := func(t *task.Task) (err error) {
 		if err = copyData(t, app, appDetail, appInstall, req); err != nil {
 			return err
 		}

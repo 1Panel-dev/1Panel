@@ -1051,6 +1051,13 @@ const message = {
             whiteListHelper: 'دسترسی را فقط به IP‌های موجود در لیست سفید محدود کنید',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'درگاه هوش مصنوعی از استقرار مستقل پشتیبانی می‌کند',
+            deploymentNoticeDescription:
+                'درگاه هوش مصنوعی اکنون از استقرار مستقل پشتیبانی می‌کند. درگاه هوش مصنوعی داخلی 1Panel دیگر به‌روزرسانی دریافت نخواهد کرد. توصیه می‌کنیم نسخه مستقل را از فروشگاه برنامه نصب کنید. همچنین می‌توانید به استفاده از نسخه فعلی ادامه دهید.',
+            deploymentNoticeContinue: 'متوجه شدم، ادامه استفاده',
+            deploymentNoticeAppStore: 'رفتن به فروشگاه برنامه',
+            deploymentNoticeNoAppPermission:
+                'شما به فروشگاه برنامه دسترسی ندارید. برای نصب نسخه مستقل با مدیر تماس بگیرید.',
             title: 'دروازه AI',
             apiReference: 'راهنمای API',
             notInstalled: 'نصب نشده',

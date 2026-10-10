@@ -1065,6 +1065,13 @@ const message = {
             whiteListHelper: 'Restrict access to only IPs in the whitelist',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway supports standalone deployment',
+            deploymentNoticeDescription:
+                'AI Gateway now supports standalone deployment. The built-in AI Gateway in 1Panel will no longer receive updates. We recommend installing the standalone version from the App Store. You can also continue using the current version.',
+            deploymentNoticeContinue: 'Understood, continue using',
+            deploymentNoticeAppStore: 'Go to App Store',
+            deploymentNoticeNoAppPermission:
+                'You do not have access to the App Store. Contact your administrator to install the standalone version.',
             title: 'AI Gateway',
             apiReference: 'API Reference',
             notInstalled: 'Not installed',

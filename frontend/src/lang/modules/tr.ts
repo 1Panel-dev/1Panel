@@ -1076,6 +1076,13 @@ const message = {
             whiteListHelper: 'Erişimi yalnızca beyaz listedeki IPlerle sınırlayın',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway bağımsız dağıtımı destekliyor',
+            deploymentNoticeDescription:
+                'AI Gateway artık bağımsız dağıtımı destekliyor. 1Panel içindeki AI Gateway artık güncelleme almayacak. Uygulama mağazasından bağımsız sürümü yüklemenizi öneririz. Mevcut sürümü kullanmaya da devam edebilirsiniz.',
+            deploymentNoticeContinue: 'Anladım, kullanmaya devam et',
+            deploymentNoticeAppStore: 'Uygulama mağazasına git',
+            deploymentNoticeNoAppPermission:
+                'Uygulama mağazasına erişim izniniz yok. Bağımsız sürümü yüklemek için yöneticinizle iletişime geçin.',
             title: 'AI Ağ Geçidi',
             apiReference: 'API Referansı',
             notInstalled: 'Kurulu değil',

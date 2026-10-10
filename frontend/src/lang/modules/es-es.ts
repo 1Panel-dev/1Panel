@@ -1069,6 +1069,13 @@ const message = {
             whiteListHelper: 'Restringir el acceso solo a las IP incluidas en la lista blanca',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway admite la implementación independiente',
+            deploymentNoticeDescription:
+                'AI Gateway ahora admite la implementación independiente. AI Gateway integrado en 1Panel dejará de recibir actualizaciones. Recomendamos instalar la versión independiente desde la tienda de aplicaciones. También puede seguir usando la versión actual.',
+            deploymentNoticeContinue: 'Entendido, seguir usando',
+            deploymentNoticeAppStore: 'Ir a la tienda de aplicaciones',
+            deploymentNoticeNoAppPermission:
+                'No tiene acceso a la tienda de aplicaciones. Contacte con su administrador para instalar la versión independiente.',
             title: 'Gateway de IA',
             apiReference: 'Referencia de API',
             notInstalled: 'No instalado',

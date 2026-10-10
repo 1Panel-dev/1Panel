@@ -1077,6 +1077,13 @@ const message = {
             whiteListHelper: 'Hadkan akses kepada hanya IP dalam senarai putih',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway menyokong penggunaan kendiri',
+            deploymentNoticeDescription:
+                'AI Gateway kini menyokong penggunaan kendiri. AI Gateway terbina dalam 1Panel tidak lagi akan menerima kemas kini. Kami mengesyorkan pemasangan versi kendiri daripada gedung aplikasi. Anda juga boleh terus menggunakan versi semasa.',
+            deploymentNoticeContinue: 'Faham, terus gunakan',
+            deploymentNoticeAppStore: 'Pergi ke gedung aplikasi',
+            deploymentNoticeNoAppPermission:
+                'Anda tidak mempunyai akses ke gedung aplikasi. Hubungi pentadbir untuk memasang versi kendiri.',
             title: 'Gateway AI',
             apiReference: 'Rujukan API',
             notInstalled: 'Belum dipasang',
