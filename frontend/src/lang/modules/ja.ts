@@ -4163,6 +4163,8 @@ const message = {
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
     },
     ssl: {
+        deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
+        deleteAndRevoke: '削除して失効',
         create: 'リクエスト',
         provider: 'タイプ',
         manualCreate: '手動で作成されます',

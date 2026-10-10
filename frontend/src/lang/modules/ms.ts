@@ -4240,6 +4240,8 @@ const message = {
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
     },
     ssl: {
+        deleteConfirm: 'Sijil berikut akan dipadamkan. Sijil ACME akan dibatalkan secara automatik. Teruskan?',
+        deleteAndRevoke: 'Padam dan batalkan',
         create: 'Permintaan',
         provider: 'Jenis',
         manualCreate: 'Dicipta secara manual',

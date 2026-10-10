@@ -4259,6 +4259,9 @@ const message = {
             'Ativar isso pode evitar vazamento de certificados, definir um site padrão invalidará esta configuração',
     },
     ssl: {
+        deleteConfirm:
+            'Os certificados a seguir serão excluídos. Os certificados ACME serão revogados automaticamente. Continuar?',
+        deleteAndRevoke: 'Excluir e revogar',
         create: 'Solicitar',
         provider: 'Tipo',
         manualCreate: 'Criado manualmente',

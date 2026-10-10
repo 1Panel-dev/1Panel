@@ -3898,6 +3898,8 @@ const message = {
         sslRejectHandshakeHelper: '開啟之後可以避免憑證洩露，設置預設網站會讓此設置失效',
     },
     ssl: {
+        deleteConfirm: '將對以下憑證進行 刪除 操作，ACME 類型憑證會被自動撤銷，是否繼續？',
+        deleteAndRevoke: '刪除並撤銷',
         create: '申請憑證',
         provider: '類型',
         manualCreate: '手動建立',
