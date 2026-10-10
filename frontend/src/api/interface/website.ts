@@ -311,6 +311,7 @@ export namespace Website {
         email: string;
         url: string;
         type: string;
+        keyType: string;
         useProxy: boolean;
     }
 

@@ -179,7 +179,7 @@ import { Rules, checkMaxLength } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
-import { computed, reactive, ref } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/ssl';
@@ -265,6 +265,15 @@ const initData = () => ({
 
 const ssl = ref(initData());
 const operate = ref('create');
+watch([() => ssl.value.acmeAccountId, acmeAccounts], () => {
+    if (operate.value !== 'create' || ssl.value.provider === 'selfSigned') {
+        return;
+    }
+    const account = acmeAccounts.value?.find((item) => item.id === ssl.value.acmeAccountId);
+    if (account?.keyType) {
+        ssl.value.keyType = account.keyType;
+    }
+});
 const dnsResolve = ref<Website.DNSResolve[]>([]);
 const em = defineEmits(['close', 'submit']);
 
