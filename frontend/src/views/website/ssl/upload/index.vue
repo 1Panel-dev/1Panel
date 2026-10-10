@@ -9,11 +9,11 @@
                 </el-select>
             </el-form-item>
             <div v-if="ssl.type === 'paste'">
-                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                    <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
-                </el-form-item>
                 <el-form-item :label="$t('website.certificate')" prop="certificate">
                     <el-input v-model="ssl.certificate" :rows="6" type="textarea" />
+                </el-form-item>
+                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                    <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
                 </el-form-item>
             </div>
             <div v-if="ssl.type === 'local'">
