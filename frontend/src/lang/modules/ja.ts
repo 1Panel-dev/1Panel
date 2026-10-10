@@ -1054,6 +1054,13 @@ const message = {
             whiteListHelper: 'ホワイトリスト内のIPのみアクセスを許可する',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI ゲートウェイの独立したデプロイに対応',
+            deploymentNoticeDescription:
+                'AI ゲートウェイは独立したデプロイに対応しました。1Panel 内蔵の AI ゲートウェイは今後更新されません。アプリストアから独立版をインストールすることをお勧めします。現在のバージョンを引き続き使用することもできます。',
+            deploymentNoticeContinue: '了解して使用を継続',
+            deploymentNoticeAppStore: 'アプリストアへ',
+            deploymentNoticeNoAppPermission:
+                'アプリストアへのアクセス権限がありません。管理者に独立版のインストールを依頼してください。',
             title: 'AI ゲートウェイ',
             apiReference: 'API リファレンス',
             notInstalled: '未インストール',

@@ -1019,6 +1019,12 @@ const message = {
             whiteListHelper: '限制仅白名单中的 IP 可访问',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI 网关已支持独立部署',
+            deploymentNoticeDescription:
+                'AI 网关现已支持独立部署，1Panel 内置 AI 网关后续将不再更新。建议前往应用商店安装独立版本，您也可以继续使用当前版本。',
+            deploymentNoticeContinue: '已知晓，继续使用',
+            deploymentNoticeAppStore: '前往应用商店',
+            deploymentNoticeNoAppPermission: '您没有应用商店访问权限，请联系管理员安装独立版本。',
             title: 'AI 网关',
             apiReference: '接口说明',
             notInstalled: '未安装',

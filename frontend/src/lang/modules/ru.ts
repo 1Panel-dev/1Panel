@@ -1065,6 +1065,13 @@ const message = {
             whiteListHelper: 'Ограничить доступ только для IP-адресов из белого списка',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway поддерживает отдельное развёртывание',
+            deploymentNoticeDescription:
+                'AI Gateway теперь поддерживает отдельное развёртывание. Встроенный AI Gateway в 1Panel больше не будет получать обновления. Рекомендуем установить отдельную версию из магазина приложений. Вы также можете продолжить использовать текущую версию.',
+            deploymentNoticeContinue: 'Понятно, продолжить использование',
+            deploymentNoticeAppStore: 'Перейти в магазин приложений',
+            deploymentNoticeNoAppPermission:
+                'У вас нет доступа к магазину приложений. Обратитесь к администратору для установки отдельной версии.',
             title: 'AI-шлюз',
             apiReference: 'Справочник API',
             notInstalled: 'Не установлен',

@@ -1406,9 +1406,8 @@ func handleErr(install model.AppInstall, err error, out string) error {
 }
 
 func doNotNeedSync(installed model.AppInstall) bool {
-	return installed.Status == constant.StatusInstalling || installed.Status == constant.StatusRebuilding || installed.Status == constant.StatusUpgrading ||
-		installed.Status == constant.StatusSyncing || installed.Status == constant.StatusUninstalling || installed.Status == constant.StatusInstallErr ||
-		installed.Status == constant.StatusStarting || installed.Status == constant.StatusRestarting || installed.Status == constant.StatusWaiting
+	return appInstallOperationPending(installed.Status) || installed.Status == constant.StatusSyncing ||
+		installed.Status == constant.StatusInstallErr || installed.Status == constant.StatusUpgradeErr || installed.Status == constant.StatusUpErr
 }
 
 func synAppInstall(containers map[string]container.Summary, appInstall *model.AppInstall, force bool) {
@@ -1502,6 +1501,11 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 	}
 
 	for _, installed := range appInstallList {
+		if sync && appInstallOperationPending(installed.Status) {
+			if err := syncAppInstallStatus(&installed, false); err != nil {
+				return nil, err
+			}
+		}
 		if updated && ignoreUpdate(installed) {
 			continue
 		}

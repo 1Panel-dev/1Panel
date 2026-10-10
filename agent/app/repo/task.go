@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
@@ -110,7 +111,9 @@ func (t TaskRepo) Update(ctx context.Context, task *model.Task) error {
 }
 
 func (t TaskRepo) UpdateRunningTaskToFailed() error {
-	return getTaskDb(t.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{"status": constant.StatusFailed, "error_msg": "1Panel restart causes failure"}).Error
+	return getTaskDb(t.WithByStatus(constant.StatusExecuting)).Model(&model.Task{}).Updates(map[string]interface{}{
+		"status": constant.StatusFailed, "error_msg": constant.InterruptedMsg, "end_at": time.Now(),
+	}).Error
 }
 
 func (t TaskRepo) CountExecutingTask() (int64, error) {

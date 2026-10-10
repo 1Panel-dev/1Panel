@@ -1043,6 +1043,12 @@ const message = {
             whiteListHelper: '화이트리스트에 있는 IP만 접근 허용',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI 게이트웨이 독립 배포 지원',
+            deploymentNoticeDescription:
+                'AI 게이트웨이가 독립 배포를 지원합니다. 1Panel 내장 AI 게이트웨이는 더 이상 업데이트되지 않습니다. 앱 스토어에서 독립 버전을 설치하는 것을 권장합니다. 현재 버전을 계속 사용할 수도 있습니다.',
+            deploymentNoticeContinue: '확인, 계속 사용',
+            deploymentNoticeAppStore: '앱 스토어로 이동',
+            deploymentNoticeNoAppPermission: '앱 스토어 접근 권한이 없습니다. 관리자에게 독립 버전 설치를 요청하세요.',
             title: 'AI 게이트웨이',
             apiReference: 'API 안내',
             notInstalled: '설치되지 않음',

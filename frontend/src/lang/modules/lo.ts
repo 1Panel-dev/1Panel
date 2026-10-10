@@ -1040,6 +1040,13 @@ const message = {
             whiteListHelper: 'ຈຳກັດການເຂົ້າເຖິງສະເພາະ IP ໃນລາຍຊື່ທີ່ອະນຸຍາດ',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway ຮອງຮັບການຕິດຕັ້ງແບບແຍກຕ່າງຫາກ',
+            deploymentNoticeDescription:
+                'AI Gateway ຮອງຮັບການຕິດຕັ້ງແບບແຍກຕ່າງຫາກແລ້ວ. AI Gateway ທີ່ມາພ້ອມກັບ 1Panel ຈະບໍ່ໄດ້ຮັບການອັບເດດອີກ. ແນະນຳໃຫ້ຕິດຕັ້ງລຸ້ນແຍກຕ່າງຫາກຈາກຮ້ານແອັບ. ທ່ານຍັງສາມາດໃຊ້ລຸ້ນປັດຈຸບັນຕໍ່ໄດ້.',
+            deploymentNoticeContinue: 'ຮັບຊາບ, ໃຊ້ຕໍ່',
+            deploymentNoticeAppStore: 'ໄປທີ່ຮ້ານແອັບ',
+            deploymentNoticeNoAppPermission:
+                'ທ່ານບໍ່ມີສິດເຂົ້າເຖິງຮ້ານແອັບ. ກະລຸນາຕິດຕໍ່ຜູ້ດູແລເພື່ອຕິດຕັ້ງລຸ້ນແຍກຕ່າງຫາກ.',
             title: 'AI Gateway',
             apiReference: 'ຄູ່ມື API',
             notInstalled: 'ຍັງບໍ່ໄດ້ຕິດຕັ້ງ',

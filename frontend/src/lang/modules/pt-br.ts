@@ -1072,6 +1072,13 @@ const message = {
                 'Após ativar, você pode desativar o acesso externo à porta em Loja de Apps - Instalado - Ollama - Parâmetros para melhorar a segurança.',
         },
         aiProxy: {
+            deploymentNoticeTitle: 'AI Gateway permite implantação independente',
+            deploymentNoticeDescription:
+                'O AI Gateway agora permite implantação independente. O AI Gateway integrado ao 1Panel não receberá mais atualizações. Recomendamos instalar a versão independente pela loja de aplicativos. Você também pode continuar usando a versão atual.',
+            deploymentNoticeContinue: 'Entendido, continuar usando',
+            deploymentNoticeAppStore: 'Ir à loja de aplicativos',
+            deploymentNoticeNoAppPermission:
+                'Você não tem acesso à loja de aplicativos. Contate o administrador para instalar a versão independente.',
             title: 'Gateway de IA',
             apiReference: 'Referência da API',
             notInstalled: 'Não instalado',
