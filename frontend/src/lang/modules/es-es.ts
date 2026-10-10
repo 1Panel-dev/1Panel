@@ -4225,6 +4225,9 @@ const message = {
             'Habilitar esto puede evitar la fuga de certificados, establecer un sitio web predeterminado invalidará esta configuración',
     },
     ssl: {
+        deleteConfirm:
+            'Se eliminarán los siguientes certificados. Los certificados ACME se revocarán automáticamente. ¿Desea continuar?',
+        deleteAndRevoke: 'Eliminar y revocar',
         create: 'Solicitar',
         provider: 'Tipo',
         manualCreate: 'Creado manualmente',

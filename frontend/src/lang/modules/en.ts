@@ -4175,6 +4175,9 @@ const message = {
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
     },
     ssl: {
+        deleteConfirm:
+            'The following certificates will be deleted. ACME certificates will be automatically revoked. Continue?',
+        deleteAndRevoke: 'Delete and revoke',
         create: 'Request',
         provider: 'Type',
         manualCreate: 'Created manually',

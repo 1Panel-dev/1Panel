@@ -4086,6 +4086,8 @@ const message = {
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
     },
     ssl: {
+        deleteConfirm: '다음 인증서를 삭제합니다. ACME 인증서는 자동으로 폐기됩니다. 계속하시겠습니까?',
+        deleteAndRevoke: '삭제 및 폐기',
         create: '요청',
         provider: '유형',
         manualCreate: '수동 생성됨',

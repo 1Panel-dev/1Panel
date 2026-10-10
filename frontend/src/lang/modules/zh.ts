@@ -3943,6 +3943,8 @@ const message = {
         sslRejectHandshakeHelper: '开启之后可以避免证书泄露，设置默认网站会让此设置失效',
     },
     ssl: {
+        deleteConfirm: '将对以下证书进行 删除 操作，ACME类型证书会被自动吊销，是否继续？',
+        deleteAndRevoke: '删除并吊销',
         create: '申请证书',
         provider: '类型',
         manualCreate: '手动创建',

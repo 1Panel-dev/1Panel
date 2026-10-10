@@ -4244,6 +4244,9 @@ const message = {
             'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
     },
     ssl: {
+        deleteConfirm:
+            'Aşağıdaki sertifikalar silinecek. ACME sertifikaları otomatik olarak iptal edilecek. Devam edilsin mi?',
+        deleteAndRevoke: 'Sil ve iptal et',
         create: 'İstek',
         provider: 'Tür',
         manualCreate: 'Manuel olarak oluşturuldu',
