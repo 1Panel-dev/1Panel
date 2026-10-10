@@ -566,6 +566,8 @@ const message = {
         cancelKeepAlive: 'Не сохранять сеанс страницы',
     },
     header: {
+        userCenter: 'Центр пользователя',
+        exitSystem: 'Выйти из системы',
         logout: 'Выход',
     },
     database: {

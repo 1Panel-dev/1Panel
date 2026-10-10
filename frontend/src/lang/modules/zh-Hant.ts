@@ -548,6 +548,8 @@ const message = {
         cancelKeepAlive: '取消保持頁面工作階段',
     },
     header: {
+        userCenter: '使用者中心',
+        exitSystem: '登出系統',
         logout: '登出',
     },
     database: {
