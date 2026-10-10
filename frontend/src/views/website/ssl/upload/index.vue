@@ -9,21 +9,14 @@
                 </el-select>
             </el-form-item>
             <div v-if="ssl.type === 'paste'">
-                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
-                    <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
-                </el-form-item>
                 <el-form-item :label="$t('website.certificate')" prop="certificate">
                     <el-input v-model="ssl.certificate" :rows="6" type="textarea" />
                 </el-form-item>
+                <el-form-item :label="$t('website.privateKey')" prop="privateKey">
+                    <el-input v-model="ssl.privateKey" :rows="6" type="textarea" />
+                </el-form-item>
             </div>
             <div v-if="ssl.type === 'local'">
-                <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
-                    <el-input v-model="ssl.privateKeyPath">
-                        <template #prepend>
-                            <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
-                        </template>
-                    </el-input>
-                </el-form-item>
                 <el-form-item :label="$t('website.certificatePath')" prop="certificatePath">
                     <el-input v-model="ssl.certificatePath">
                         <template #prepend>
@@ -31,15 +24,22 @@
                         </template>
                     </el-input>
                 </el-form-item>
+                <el-form-item :label="$t('website.privateKeyPath')" prop="privateKeyPath">
+                    <el-input v-model="ssl.privateKeyPath">
+                        <template #prepend>
+                            <el-button icon="Folder" @click="keyFileRef.acceptParams({ dir: false })" />
+                        </template>
+                    </el-input>
+                </el-form-item>
             </div>
             <div v-if="ssl.type === 'upload'">
-                <el-form-item :label="$t('website.privateKey')" prop="privateKeyFile">
+                <el-form-item :label="$t('website.certificate')" prop="certificateFile">
                     <el-upload
-                        ref="privateKeyUpload"
+                        ref="certificateUpload"
                         :auto-upload="false"
                         :limit="1"
-                        :on-change="handlePrivateKeyChange"
-                        :file-list="privateKeyFileList"
+                        :on-change="handleCertificateChange"
+                        :file-list="certificateFileList"
                         class="p-w-200"
                     >
                         <template #trigger>
@@ -49,13 +49,13 @@
                         </template>
                     </el-upload>
                 </el-form-item>
-                <el-form-item :label="$t('website.certificate')" prop="certificateFile">
+                <el-form-item :label="$t('website.privateKey')" prop="privateKeyFile">
                     <el-upload
-                        ref="certificateUpload"
+                        ref="privateKeyUpload"
                         :auto-upload="false"
                         :limit="1"
-                        :on-change="handleCertificateChange"
-                        :file-list="certificateFileList"
+                        :on-change="handlePrivateKeyChange"
+                        :file-list="privateKeyFileList"
                         class="p-w-200"
                     >
                         <template #trigger>
