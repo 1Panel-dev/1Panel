@@ -10,6 +10,14 @@
             <PrimaryMenu />
         </div>
         <Logo :isCollapse="isCollapse" />
+        <Collapse
+            ref="nodeSelectorRef"
+            class="node-selector"
+            :version="version"
+            @open-task="openTask"
+            @refresh="search"
+            @user-change="currentUser = $event"
+        />
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -23,7 +31,40 @@
                 <SubItem :menuList="routerMenus" :level="0" />
             </el-menu>
         </el-scrollbar>
-        <Collapse :version="version" @open-task="openTask" @refresh="search" />
+        <el-dropdown
+            v-if="currentUser"
+            class="user-dropdown"
+            trigger="click"
+            placement="right-end"
+            :popper-options="{ modifiers: [{ name: 'flip', enabled: false }] }"
+            :show-arrow="false"
+            :hide-on-click="true"
+            @visible-change="userMenuVisible = $event"
+            @command="handleUserCommand"
+        >
+            <button
+                type="button"
+                class="user-entry"
+                :class="{ 'is-active': userMenuVisible }"
+                :aria-label="currentUser.name"
+                :title="currentUser.name"
+            >
+                <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                <span v-if="!isCollapse" class="user-name">{{ currentUser.name }}</span>
+            </button>
+            <template #dropdown>
+                <el-dropdown-menu class="user-menu">
+                    <el-dropdown-item command="userCenter">
+                        <SvgIcon class="user-menu-icon" iconName="p-gerenzhongxin1" />
+                        <span>{{ $t('header.userCenter') }}</span>
+                    </el-dropdown-item>
+                    <el-dropdown-item command="logout">
+                        <SvgIcon class="user-menu-icon" iconName="p-tuichudenglu3" />
+                        <span>{{ $t('header.exitSystem') }}</span>
+                    </el-dropdown-item>
+                </el-dropdown-menu>
+            </template>
+        </el-dropdown>
     </div>
 </template>
 
@@ -40,12 +81,24 @@ import { getSettingBaseInfo } from '@/api/modules/setting';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
 import { hasPermissionMetaAccess, hasRouteRoleAccess } from '@/utils/rbac';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import type { Login } from '@/api/interface/auth';
 
 const route = useRoute();
 const router = useRouter();
 const menuStore = MenuStore();
 const { currentNode, isAdmin, menuAccordion, permissions } = useGlobalStore();
 const version = ref();
+const nodeSelectorRef = ref<InstanceType<typeof Collapse>>();
+const currentUser = ref<Login.AuthInfo>();
+const userMenuVisible = ref(false);
+
+const handleUserCommand = (command: string) => {
+    if (command === 'userCenter') {
+        nodeSelectorRef.value?.openUserInfo();
+    } else if (command === 'logout') {
+        nodeSelectorRef.value?.logout();
+    }
+};
 
 const activeMenu = computed(() => {
     const { meta, path } = route;
@@ -324,8 +377,14 @@ watch(
     height: 100%;
     background: var(--panel-menu-bg-color) no-repeat top;
 
+    .logo,
+    .node-selector {
+        flex-shrink: 0;
+    }
+
     .el-scrollbar {
         flex: 1;
+        min-height: 0;
         .el-menu {
             overflow: auto;
             overflow-x: hidden;
@@ -336,5 +395,63 @@ watch(
 
 .ico {
     height: 20px !important;
+}
+
+.user-dropdown {
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.user-menu {
+    min-width: 160px;
+
+    :deep(.el-dropdown-menu__item) {
+        gap: 8px;
+        padding: 10px 16px;
+    }
+
+    .user-menu-icon {
+        flex-shrink: 0;
+        font-size: 8px;
+    }
+}
+
+.user-entry {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+    position: relative;
+    width: 100%;
+    height: 48px;
+    padding: 0 25px;
+    border: 0;
+    border-top: 1px solid var(--panel-footer-border);
+    background: transparent;
+    color: var(--panel-main-bg-color-1);
+    font-family: inherit;
+    font-size: var(--el-font-size-base);
+    line-height: 1.5;
+    text-align: left;
+    cursor: pointer;
+
+    .icon {
+        flex-shrink: 0;
+        font-size: 8px;
+    }
+
+    .user-name {
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    &:hover,
+    &:focus-visible,
+    &.is-active {
+        color: var(--el-color-primary);
+        background: var(--el-menu-item-bg-color);
+    }
 }
 </style>

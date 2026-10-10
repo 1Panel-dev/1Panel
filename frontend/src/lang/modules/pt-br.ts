@@ -568,6 +568,8 @@ const message = {
         cancelKeepAlive: 'Parar de manter a sessão da página',
     },
     header: {
+        userCenter: 'Central do usuário',
+        exitSystem: 'Sair',
         logout: 'Logout',
     },
     database: {
