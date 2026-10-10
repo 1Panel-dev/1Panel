@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { Website } from '@/api/interface/website';
 import { deleteTemplate, searchTemplates } from '@/api/modules/website';
 import TemplateOperate from '@/views/website/template/operate/index.vue';
@@ -67,12 +67,11 @@ import OutputCreate from '@/views/website/template/output/create.vue';
 import OutputList from '@/views/website/template/output/index.vue';
 import { dateFormat } from '@/utils/date';
 import i18n from '@/lang';
-import { reactive, ref, onMounted } from 'vue';
+import { toRef, reactive, ref, onMounted } from 'vue';
 
 const loading = ref(false);
 const data = ref<Website.Template[]>([]);
 const searchName = ref('');
-useSearchPersistence('website/template/index', { search: searchName });
 const opRef = ref();
 const operateRef = ref();
 const outputCreateRef = ref();
@@ -91,6 +90,7 @@ const paginationConfig = reactive({
     pageSize: 20,
     total: 0,
 });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const buttons = [
     {

@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { onActivated, ref, watch } from 'vue';
 defineOptions({ name: 'TableSearch' });
 
 const emit = defineEmits(['search', 'update:searchName']);
@@ -41,6 +41,10 @@ watch(
     },
     { immediate: true },
 );
+
+onActivated(() => {
+    searchInfo.value = props.searchName;
+});
 
 const search = () => {
     emit('update:searchName', searchInfo.value);

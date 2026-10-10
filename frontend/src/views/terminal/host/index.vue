@@ -79,12 +79,12 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import GroupDialog from '@/components/agent-group/index.vue';
 import OperateDialog from '@/views/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/terminal';
 import { getAgentGroupList } from '@/api/modules/group';
-import { reactive, ref } from 'vue';
+import { toRef, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { Host } from '@/api/interface/host';
 import { MsgSuccess } from '@/utils/message';
@@ -100,7 +100,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
-useSearchPersistence('terminal/host/index', { search: info });
+useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const group = ref<string>('');
 
 const opRef = ref();

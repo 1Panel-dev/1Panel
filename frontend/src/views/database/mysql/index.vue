@@ -226,7 +226,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import BindDialog from '@/views/database/mysql/bind/index.vue';
 import UserDialog from '@/views/database/mysql/user/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
@@ -241,7 +241,7 @@ import PortJumpDialog from '@/components/port-jump/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/date';
 import { ElMessageBox } from 'element-plus';
-import { onMounted, reactive, ref } from 'vue';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import {
     deleteCheckMysqlDB,
     listDatabases,
@@ -301,7 +301,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchPersistence('database/mysql/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const mysqlContainer = ref();
 const mysqlStatus = ref();

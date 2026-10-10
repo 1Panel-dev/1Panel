@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import Conn from '@/views/ai/model/ollama/conn/index.vue';
@@ -195,7 +195,7 @@ import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import Del from '@/views/ai/model/ollama/del/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
-import { onMounted, reactive, ref } from 'vue';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { App } from '@/api/interface/app';
 import {
@@ -237,7 +237,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchPersistence('ai/model/ollama/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const appInstallID = ref(0);
 
 const opRef = ref();

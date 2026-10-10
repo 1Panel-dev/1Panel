@@ -323,8 +323,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
-import { nextTick, onMounted, reactive, ref } from 'vue';
+import { useSearchReset } from '@/composables/useSearchReset';
+import { toRef, nextTick, onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
 import { Position } from '@element-plus/icons-vue';
@@ -366,7 +366,6 @@ const loading = ref(false);
 const maskShow = ref(true);
 const submitLoading = ref(false);
 const searchName = ref('');
-useSearchPersistence('database/mongodb/index', { search: searchName });
 const createVisible = ref(false);
 const appStatusRef = ref();
 const bindRef = ref();
@@ -400,6 +399,7 @@ const paginationConfig = reactive({
     orderBy: 'createdAt',
     order: 'null',
 });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();

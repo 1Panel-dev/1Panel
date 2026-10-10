@@ -272,11 +272,11 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
-import { onMounted, ref, toRefs } from 'vue';
+import { toRef, onMounted, ref, toRefs } from 'vue';
 import {
     deleteCronjob,
     editCronjobGroup,
@@ -332,7 +332,7 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
-useSearchPersistence('cronjob/cronjob/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const search = async (column?: any) => {
     if (column) {

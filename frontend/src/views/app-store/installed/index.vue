@@ -139,7 +139,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import AppCard from '@/views/app-store/installed/app/card.vue';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
@@ -211,7 +211,10 @@ const searchReq = reactive({
     update: false,
     sync: false,
 });
-useSearchPersistence('app-store/installed/index', { search: toRef(searchReq, 'name') });
+useSearchReset(
+    { search: toRef(searchReq, 'name'), page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const router = useRouter();
 const activeName = ref(i18n.global.t('app.installed'));
 const mode = ref('installed');

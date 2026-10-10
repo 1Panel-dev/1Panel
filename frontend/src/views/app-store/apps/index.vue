@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { App } from '@/api/interface/app';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
@@ -105,7 +105,10 @@ const req = reactive({
     resource: 'all',
     showCurrentArch: false,
 });
-useSearchPersistence('app-store/apps/index', { search: toRef(req, 'name') });
+useSearchReset(
+    { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search(req) },
+);
 
 const apps = ref<App.AppItem[]>([]);
 const loading = ref(false);
