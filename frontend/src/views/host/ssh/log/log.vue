@@ -93,11 +93,11 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormatServerTimezone } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
-import { onMounted, reactive, ref } from 'vue';
+import { toRef, onMounted, reactive, ref } from 'vue';
 import { cleanSSHLogs, exportSSHLogs, loadSSHLogs } from '@/api/modules/host';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
@@ -120,7 +120,7 @@ const exportConfig = reactive({
     status: 'All',
 });
 const searchInfo = ref();
-useSearchPersistence('host/ssh/log/log', { search: searchInfo });
+useSearchReset({ search: searchInfo, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const searchStatus = ref('All');
 
 const search = async () => {

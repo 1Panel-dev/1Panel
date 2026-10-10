@@ -167,7 +167,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { computed, onMounted, ref, useAttrs } from 'vue';
+import { computed, onDeactivated, onMounted, ref, useAttrs } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { flattenVNodes, type FuTableOperationButton } from '@/components/table/shared';
 import { useCardColumns } from './useCardColumns';
@@ -458,6 +458,8 @@ onMounted(() => {
 watch([currentViewMode, tableData, () => props.syncCardContentHeight], scheduleCardContentHeightSync, {
     flush: 'post',
 });
+
+onDeactivated(clearSelects);
 
 watch([() => props.paginationConfig?.currentPage, () => props.paginationConfig?.pageSize], clearSelects, {
     flush: 'sync',

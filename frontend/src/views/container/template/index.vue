@@ -81,8 +81,8 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
-import { reactive, ref } from 'vue';
+import { useSearchReset } from '@/composables/useSearchReset';
+import { toRef, reactive, ref } from 'vue';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
 import { Container } from '@/api/interface/container';
@@ -111,7 +111,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchPersistence('container/template/index', { search: searchName });
+useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const search = async () => {
     if (!isActive.value || !isExist.value) {

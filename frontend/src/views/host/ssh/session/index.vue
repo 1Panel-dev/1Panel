@@ -24,7 +24,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import FireRouter from '@/views/host/ssh/index.vue';
 import { toRef, ref, onMounted, onUnmounted, reactive } from 'vue';
 import i18n from '@/lang';
@@ -38,7 +38,7 @@ const sshSearch = reactive({
     type: 'ssh',
     loginUser: '',
 });
-useSearchPersistence('host/ssh/session/index', { search: toRef(sshSearch, 'loginUser') });
+useSearchReset({ search: toRef(sshSearch, 'loginUser') }, { onRevisit: () => search() });
 
 const buttons = [
     {

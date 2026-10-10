@@ -346,7 +346,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
@@ -451,7 +451,10 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const req = pageState.req;
-useSearchPersistence('website/website/index', { search: toRef(req, 'name') });
+useSearchReset(
+    { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const tableSort = pageState.tableSort;
 
 const goRouter = async (key: string) => {

@@ -739,7 +739,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchPersistence } from '@/composables/useSearchPersistence';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { toRef, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
@@ -853,7 +853,6 @@ const initData = () => ({
     sortOrder: 'ascending',
 });
 let req = reactive(initData());
-useSearchPersistence('host/file-management/index', { search: toRef(req, 'search') });
 let loading = ref(false);
 const paths = ref<FilePaths[]>([]);
 const breadcrumbVisiblePaths = ref<FilePaths[]>([]);
@@ -986,6 +985,10 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('file-page-size')) || 100,
     total: 0,
 });
+useSearchReset(
+    { search: toRef(req, 'search'), page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const btnWrapperRefs = ref<Record<string, any>>({});
 
