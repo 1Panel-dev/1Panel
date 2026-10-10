@@ -87,7 +87,6 @@ const (
 	TaskScopeCronjob          = "Cronjob"
 	TaskScopeClam             = "Clam"
 	TaskScopeSystem           = "System"
-	TaskScopeVm               = "VirtualMachine"
 	TaskScopeFirewall         = "Firewall"
 	TaskScopeAppStore         = "AppStore"
 	TaskScopeSnapshot         = "Snapshot"
