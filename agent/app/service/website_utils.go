@@ -1,6 +1,7 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"crypto/x509"
 	"encoding/json"
@@ -14,6 +15,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -124,7 +126,255 @@ func applyLocationProxyPass(location *components.Location, proxyPass string, sni
 	location.UpdateDirective("proxy_ssl_name", []string{sslName})
 }
 
-func createIndexFile(website *model.Website, runtime *model.Runtime) error {
+// websiteCreateFiles owns only paths actually created by this attempt.
+// Never recursively remove a reused directory (or a newly populated one).
+type websiteCreateFiles struct {
+	mu         sync.Mutex
+	entries    []websiteCreatedPath
+	rolledBack bool
+	restores   []func() error
+}
+type websiteCreatedPath struct {
+	path string
+	info os.FileInfo
+}
+
+func (f *websiteCreateFiles) mkdir(name string) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.rolledBack {
+		return fmt.Errorf("website creation already rolled back")
+	}
+	return f.mkdirLocked(filepath.Clean(name))
+}
+
+func (f *websiteCreateFiles) mkdirLocked(name string) error {
+	info, err := os.Lstat(name)
+	if err == nil {
+		if !info.IsDir() {
+			return fmt.Errorf("website path is not a directory: %s", name)
+		}
+		return nil
+	}
+	if !os.IsNotExist(err) {
+		return err
+	}
+	if err = f.mkdirLocked(filepath.Dir(name)); err != nil {
+		return err
+	}
+	if err = os.Mkdir(name, constant.DirPerm); err != nil {
+		if os.IsExist(err) {
+			return f.mkdirLocked(name)
+		}
+		return err
+	}
+	info, err = os.Lstat(name)
+	if err != nil {
+		return err
+	}
+	f.entries = append(f.entries, websiteCreatedPath{name, info})
+	return nil
+}
+
+// preserveExisting is for user content and logs; generated configuration must
+// fail on collision. Exclusive creation also protects against concurrent writes.
+func (f *websiteCreateFiles) write(name string, data []byte, mode os.FileMode, preserveExisting bool) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.rolledBack {
+		return fmt.Errorf("website creation already rolled back")
+	}
+	if err := f.mkdirLocked(filepath.Dir(name)); err != nil {
+		return err
+	}
+	file, err := os.OpenFile(name, os.O_WRONLY|os.O_CREATE|os.O_EXCL, mode)
+	if os.IsExist(err) && preserveExisting {
+		info, statErr := os.Lstat(name)
+		if statErr != nil {
+			return statErr
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("website path is not a regular file: %s", name)
+		}
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("create website file %s: %w", name, err)
+	}
+	info, err := file.Stat()
+	if err != nil {
+		_ = file.Close()
+		return err
+	}
+	f.entries = append(f.entries, websiteCreatedPath{name, info})
+	_, err = file.Write(data)
+	closeErr := file.Close()
+	if err != nil {
+		return err
+	}
+	return closeErr
+}
+
+func (f *websiteCreateFiles) rollback() error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	f.rolledBack = true
+	var firstErr error
+	for i := len(f.restores) - 1; i >= 0; i-- {
+		if err := f.restores[i](); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	f.restores = nil
+	for i := len(f.entries) - 1; i >= 0; i-- {
+		entry := f.entries[i]
+		info, err := os.Lstat(entry.path)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			if firstErr == nil {
+				firstErr = err
+			}
+			continue
+		}
+		if !os.SameFile(entry.info, info) {
+			continue
+		}
+		// os.Remove refuses non-empty directories, preserving untracked content.
+		if err = os.Remove(entry.path); err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
+}
+
+func (f *websiteCreateFiles) copyTemplate(src, dst string) error {
+	// Check the entire template before copying any files. Reject symlinks and
+	// collisions rather than truncating existing content.
+	err := filepath.Walk(src, func(name string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(src, name)
+		if err != nil {
+			return err
+		}
+		target := filepath.Join(dst, rel)
+		if !info.IsDir() && !info.Mode().IsRegular() {
+			return fmt.Errorf("unsupported template file: %s", name)
+		}
+		existing, err := os.Lstat(target)
+		if os.IsNotExist(err) {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		if info.IsDir() && existing.IsDir() {
+			return nil
+		}
+		return fmt.Errorf("website template path already exists: %s", target)
+	})
+	if err != nil {
+		return err
+	}
+	return filepath.Walk(src, func(name string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		rel, err := filepath.Rel(src, name)
+		if err != nil {
+			return err
+		}
+		target := filepath.Join(dst, rel)
+		if info.IsDir() {
+			return f.mkdir(target)
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("unsupported template file: %s", name)
+		}
+		data, err := os.ReadFile(name)
+		if err != nil {
+			return err
+		}
+		return f.write(target, data, constant.FilePerm, false)
+	})
+}
+
+// Only change ownership on files created by this attempt, never recursively on
+// an existing document root.
+func (f *websiteCreateFiles) chownNew(root string) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.rolledBack {
+		return fmt.Errorf("website creation already rolled back")
+	}
+	for _, entry := range f.entries {
+		rel, err := filepath.Rel(root, entry.path)
+		if err != nil {
+			return err
+		}
+		if rel == ".." || filepath.IsAbs(rel) || (len(rel) > 3 && rel[:3] == "../") {
+			continue
+		}
+		info, err := os.Lstat(entry.path)
+		if err != nil {
+			return err
+		}
+		if !os.SameFile(entry.info, info) {
+			continue
+		}
+		if err := os.Chown(entry.path, constant.WebsiteUID, constant.WebsiteGID); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+// Shared WAF metadata is restored only while it still contains our exact write.
+// Never restore a stale snapshot over changes made by another operation.
+func (f *websiteCreateFiles) replaceShared(name string, before, after []byte) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.rolledBack {
+		return fmt.Errorf("website creation already rolled back")
+	}
+	info, err := os.Lstat(name)
+	if err != nil {
+		return err
+	}
+	if !info.Mode().IsRegular() {
+		return fmt.Errorf("website config is not a regular file: %s", name)
+	}
+	current, err := os.ReadFile(name)
+	if err != nil {
+		return err
+	}
+	if !bytes.Equal(current, before) {
+		return fmt.Errorf("website config changed during creation: %s", name)
+	}
+	f.restores = append(f.restores, func() error {
+		now, err := os.Lstat(name)
+		if err != nil {
+			return err
+		}
+		if !os.SameFile(info, now) {
+			return fmt.Errorf("website config replaced; skipping rollback: %s", name)
+		}
+		data, err := os.ReadFile(name)
+		if err != nil {
+			return err
+		}
+		if !bytes.Equal(data, after) {
+			return fmt.Errorf("website config changed; skipping rollback: %s", name)
+		}
+		return os.WriteFile(name, before, info.Mode().Perm())
+	})
+	return os.WriteFile(name, after, info.Mode().Perm())
+}
+
+func createIndexFile(website *model.Website, runtime *model.Runtime, created *websiteCreateFiles) error {
 	var (
 		indexPath      string
 		indexContent   string
@@ -145,49 +395,23 @@ func createIndexFile(website *model.Website, runtime *model.Runtime) error {
 		}
 	}
 
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(indexFolder) {
-		if err := fileOp.CreateDir(indexFolder, constant.DirPerm); err != nil {
-			return err
-		}
+	if err := created.write(indexPath, []byte(indexContent), constant.FilePerm, true); err != nil {
+		return err
 	}
-	if !fileOp.Stat(indexPath) {
-		if err := fileOp.CreateFile(indexPath); err != nil {
-			return err
-		}
+	html404, _ := websiteService.GetDefaultHtml("404")
+	if err := created.write(path.Join(indexFolder, "404.html"), []byte(html404.Content), constant.FilePerm, true); err != nil {
+		return err
 	}
 	if website.Type == constant.Runtime && runtime.Resource == constant.ResourceAppstore {
-		if err := chownRootDir(indexFolder); err != nil {
-			return err
-		}
-	}
-	if err := fileOp.WriteFile(indexPath, strings.NewReader(indexContent), constant.DirPerm); err != nil {
-		return err
-	}
-
-	html404, _ := websiteService.GetDefaultHtml("404")
-	path404 := path.Join(indexFolder, "404.html")
-	if err := fileOp.WriteFile(path404, strings.NewReader(html404.Content), constant.DirPerm); err != nil {
-		return err
+		return created.chownNew(indexFolder)
 	}
 
 	return nil
 }
 
-func createProxyFile(website *model.Website) error {
+func createProxyFile(website *model.Website, created *websiteCreateFiles) error {
 	proxyFolder := GetSitePath(*website, SiteProxyDir)
 	filePath := path.Join(proxyFolder, "root.conf")
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(proxyFolder) {
-		if err := fileOp.CreateDir(proxyFolder, constant.DirPerm); err != nil {
-			return err
-		}
-	}
-	if !fileOp.Stat(filePath) {
-		if err := fileOp.CreateFile(filePath); err != nil {
-			return err
-		}
-	}
 	config, err := parser.NewStringParser(string(nginx_conf.Proxy)).Parse()
 	if err != nil {
 		return err
@@ -201,57 +425,40 @@ func createProxyFile(website *model.Website) error {
 	location.ChangePath("^~", "/")
 	applyLocationProxyPass(location, website.Proxy, nil, "")
 	location.UpdateDirective("proxy_set_header", []string{"Host", "$host"})
-	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+	if err := created.write(filePath, []byte(nginx.DumpConfig(config, nginx.IndentedStyle)), constant.FilePerm, false); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
 	return nil
 }
 
-func createWebsiteFolder(website *model.Website, runtime *model.Runtime) error {
+func createWebsiteFolder(website *model.Website, runtime *model.Runtime, created *websiteCreateFiles) error {
 	siteFolder := GetSiteDir(website.Alias)
-	fileOp := files.NewFileOp()
-	if !fileOp.Stat(siteFolder) {
-		if err := fileOp.CreateDir(siteFolder, constant.DirPerm); err != nil {
+	dirs := []string{siteFolder, path.Join(siteFolder, "log")}
+	if website.Type != constant.Stream {
+		dirs = append(dirs, path.Join(siteFolder, "index"), path.Join(siteFolder, "ssl"))
+	}
+	for _, dir := range dirs {
+		if err := created.mkdir(dir); err != nil {
 			return err
 		}
-		if err := fileOp.CreateDir(path.Join(siteFolder, "log"), constant.DirPerm); err != nil {
+	}
+	for _, name := range []string{"access.log", "error.log"} {
+		if err := created.write(path.Join(siteFolder, "log", name), nil, constant.FilePerm, true); err != nil {
 			return err
 		}
-		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "access.log")); err != nil {
+	}
+	if website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
+		if err := created.write(path.Join(siteFolder, "php-pool", "php-fpm.sock"), nil, constant.FilePerm, true); err != nil {
 			return err
 		}
-		if err := fileOp.CreateFile(path.Join(siteFolder, "log", "error.log")); err != nil {
+	}
+	if website.Type == constant.Static || (website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP) {
+		if err := createIndexFile(website, runtime, created); err != nil {
 			return err
 		}
-		if website.Type != constant.Stream {
-			if err := fileOp.CreateDir(path.Join(siteFolder, "index"), constant.DirPerm); err != nil {
-				return err
-			}
-			if err := fileOp.CreateDir(path.Join(siteFolder, "ssl"), constant.DirPerm); err != nil {
-				return err
-			}
-		}
-		if website.Type == constant.Runtime {
-			if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceLocal {
-				phpPoolDir := path.Join(siteFolder, "php-pool")
-				if err := fileOp.CreateDir(phpPoolDir, constant.DirPerm); err != nil {
-					return err
-				}
-				if err := fileOp.CreateFile(path.Join(phpPoolDir, "php-fpm.sock")); err != nil {
-					return err
-				}
-			}
-		}
-		if website.Type == constant.Static || (website.Type == constant.Runtime && runtime.Type == constant.RuntimePHP) {
-			if err := createIndexFile(website, runtime); err != nil {
-				return err
-			}
-		}
-		if website.Type == constant.Proxy {
-			if err := createProxyFile(website); err != nil {
-				return err
-			}
-		}
+	}
+	if website.Type == constant.Proxy {
+		return createProxyFile(website, created)
 	}
 	return nil
 }
@@ -261,12 +468,12 @@ type websiteInitialSSL struct {
 	request     request.WebsiteHTTPSOp
 }
 
-func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime, streamConfig request.StreamConfig, initialSSL *websiteInitialSSL) error {
+func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, appInstall *model.AppInstall, runtime *model.Runtime, streamConfig request.StreamConfig, initialSSL *websiteInitialSSL, created *websiteCreateFiles) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
-	if err = createWebsiteFolder(website, runtime); err != nil {
+	if err = createWebsiteFolder(website, runtime, created); err != nil {
 		return err
 	}
 	var (
@@ -334,7 +541,10 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		if initialSSL != nil {
 			plan := buildWebsiteTLSPlan(domains, nginxInstall.HttpPort, nginxInstall.HttpsPort)
 			applyWebsiteSSLConfig(server, *website, plan, initialSSL.request)
-			if err = createPemFile(*website, initialSSL.certificate); err != nil {
+			if err = created.write(path.Join(GetSitePath(*website, SiteSSLDir), "fullchain.pem"), []byte(initialSSL.certificate.Pem), constant.FilePerm, false); err != nil {
+				return err
+			}
+			if err = created.write(path.Join(GetSitePath(*website, SiteSSLDir), "privkey.pem"), []byte(initialSSL.certificate.PrivateKey), 0600, false); err != nil {
 				return err
 			}
 		}
@@ -404,7 +614,7 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		}
 	}
 	config.FilePath = configPath
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+	if err = created.write(configPath, []byte(nginx.DumpConfig(config, nginx.IndentedStyle)), constant.FilePerm, false); err != nil {
 		return err
 	}
 	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
@@ -499,7 +709,7 @@ func createOpenBasedirConfig(website *model.Website) {
 	_ = fileOp.SaveFile(userIniPath, fmt.Sprintf("open_basedir=/www/sites/%s/index:/tmp/", website.Alias), 0644)
 }
 
-func createWafConfig(website *model.Website, domains []model.WebsiteDomain) error {
+func createWafConfig(website *model.Website, domains []model.WebsiteDomain, created *websiteCreateFiles) error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -520,6 +730,11 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 			return err
 		}
 	}
+	for _, existing := range websitesArray {
+		if existing.Key == website.Alias {
+			return fmt.Errorf("WAF website already exists: %s", website.Alias)
+		}
+	}
 	wafWebsite := request.WafWebsite{
 		Key:     website.Alias,
 		Domains: make([]string, 0),
@@ -535,9 +750,6 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 	if err != nil {
 		return err
 	}
-	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
-		return err
-	}
 
 	var (
 		sitesDir          = path.Join(wafDataPath, "sites")
@@ -551,13 +763,25 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain) erro
 		return err
 	}
 
-	defer func() {
-		if err != nil {
-			_ = fileOp.DeleteDir(websiteDir)
+	if err := created.write(path.Join(websiteDir, "config.json"), defaultConfigContent, constant.FilePerm, false); err != nil {
+		return err
+	}
+	if err := created.mkdir(path.Join(websiteDir, "rules")); err != nil {
+		return err
+	}
+	for _, name := range []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite", "cdn"} {
+		data, err := os.ReadFile(path.Join(defaultRuleDir, name+".json"))
+		if os.IsNotExist(err) {
+			continue
 		}
-	}()
-
-	if err := moveDefaultWafConfig(websiteDir, defaultConfigContent, defaultRuleDir, fileOp); err != nil {
+		if err != nil {
+			return err
+		}
+		if err := created.write(path.Join(websiteDir, "rules", name+".json"), data, constant.FilePerm, false); err != nil {
+			return err
+		}
+	}
+	if err := created.replaceShared(websitesConfigPath, content, websitesContent); err != nil {
 		return err
 	}
 

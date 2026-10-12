@@ -526,10 +526,8 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		website.SiteDir = create.SiteDir
 	}
 
+	createdFiles := &websiteCreateFiles{}
 	configNginx := func(t *task.Task) error {
-		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig, initialSSL); err != nil {
-			return err
-		}
 		if create.Type == constant.Static && create.TemplateOutputID > 0 {
 			templateOutput, err := websiteTemplateOutputRepo.GetFirst(repo.WithByID(create.TemplateOutputID))
 			if err != nil {
@@ -541,12 +539,15 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			if _, err := os.Stat(templateOutput.OutputPath); err != nil {
 				return buserr.New("ErrFileNotFound")
 			}
-			if err := copyDir(templateOutput.OutputPath, GetSitePath(*website, SiteIndexDir)); err != nil {
+			if err := createdFiles.copyTemplate(templateOutput.OutputPath, GetSitePath(*website, SiteIndexDir)); err != nil {
 				return err
 			}
 		}
+		if err = configDefaultNginx(website, domains, appInstall, runtime, create.StreamConfig, initialSSL, createdFiles); err != nil {
+			return err
+		}
 		if website.Type != constant.Stream {
-			if err = createWafConfig(website, domains); err != nil {
+			if err = createWafConfig(website, domains, createdFiles); err != nil {
 				return err
 			}
 			if create.Type == constant.Runtime {
@@ -555,7 +556,9 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 					return err
 				}
 				if runtime.Type == constant.RuntimePHP && runtime.Resource == constant.ResourceAppstore {
-					createOpenBasedirConfig(website)
+					if err := createdFiles.write(path.Join(GetSitePath(*website, SiteIndexDir), ".user.ini"), []byte(fmt.Sprintf("open_basedir=/www/sites/%s/index:/tmp/", website.Alias)), 0644, true); err != nil {
+						return err
+					}
 				}
 			}
 		}
@@ -575,12 +578,19 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 		}
 
-		tx.Commit()
+		if err := tx.Commit().Error; err != nil {
+			return err
+		}
 		return nil
 	}
 
 	deleteWebsite := func(t *task.Task) {
-		_ = deleteWebsiteFolder(website)
+		if rollbackErr := createdFiles.rollback(); rollbackErr != nil {
+			t.Log(fmt.Sprintf("website file rollback: %v", rollbackErr))
+		}
+		if reloadErr := opNginx(nginxInstall.ContainerName, constant.NginxReload); reloadErr != nil {
+			t.Log(fmt.Sprintf("reload OpenResty after rollback: %v", reloadErr))
+		}
 	}
 
 	createTask.AddSubTask(i18n.GetMsgByKey("ConfigOpenresty"), configNginx, deleteWebsite)
