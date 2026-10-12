@@ -1527,6 +1527,24 @@ const message = {
             extraHeaders: 'Cabeçalhos extras',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/s',
+            requestsPerSecond: 'Solicitações/s',
+            finishReasonLabels: {
+                stop: 'Conclusão normal',
+                length: 'Limite de comprimento atingido',
+                abort: 'Abortada',
+                error: 'Erro',
+                repetition: 'Repetição',
+            },
+            requestAnalysis: 'Análise de solicitações',
+            promptDistribution: 'Distribuição do comprimento dos tokens de entrada',
+            generationDistribution: 'Distribuição do comprimento dos tokens de saída',
+            finishReasons: 'Motivos de conclusão das solicitações',
+            queueTime: 'Tempo médio na fila',
+            averageGenerationTokens: 'Média de tokens de saída por solicitação',
+            prefixCacheHitRate: 'Taxa de acertos do cache de prefixos',
+            distributionHelper:
+                'As distribuições de comprimento mostram taxas de solicitações e não mudam com a seleção de média ou pico.',
             cleanHelper:
                 'Limpar apenas o histórico de monitoramento desta instância do vLLM? Outras instâncias e o monitoramento do host e da GPU não serão afetados.',
             overview: 'Visão geral',

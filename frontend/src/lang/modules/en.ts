@@ -1517,6 +1517,24 @@ const message = {
             extraHeaders: 'Extra Headers',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/s',
+            requestsPerSecond: 'Requests/s',
+            finishReasonLabels: {
+                stop: 'Normal completion',
+                length: 'Length limit reached',
+                abort: 'Aborted',
+                error: 'Error',
+                repetition: 'Repetition',
+            },
+            requestAnalysis: 'Request analysis',
+            promptDistribution: 'Prompt token length distribution',
+            generationDistribution: 'Generation token length distribution',
+            finishReasons: 'Request finish reasons',
+            queueTime: 'Mean queue time',
+            averageGenerationTokens: 'Mean output tokens per request',
+            prefixCacheHitRate: 'Prefix cache hit rate',
+            distributionHelper:
+                'Length distributions show request rates and are unaffected by the average/peak selection.',
             cleanHelper:
                 'Clear monitoring history only for this vLLM instance? Other instances, host and GPU monitoring are unaffected.',
             overview: 'Overview',

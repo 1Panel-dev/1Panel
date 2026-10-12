@@ -1526,6 +1526,24 @@ const message = {
             extraHeaders: 'Encabezados adicionales',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/s',
+            requestsPerSecond: 'Solicitudes/s',
+            finishReasonLabels: {
+                stop: 'Finalización normal',
+                length: 'Límite de longitud alcanzado',
+                abort: 'Cancelada',
+                error: 'Error',
+                repetition: 'Repetición',
+            },
+            requestAnalysis: 'Análisis de solicitudes',
+            promptDistribution: 'Distribución de longitud de tokens de entrada',
+            generationDistribution: 'Distribución de longitud de tokens de salida',
+            finishReasons: 'Motivos de finalización de solicitudes',
+            queueTime: 'Tiempo medio en cola',
+            averageGenerationTokens: 'Tokens de salida medios por solicitud',
+            prefixCacheHitRate: 'Tasa de aciertos de caché de prefijos',
+            distributionHelper:
+                'Las distribuciones de longitud muestran tasas de solicitudes y no cambian al seleccionar media o pico.',
             cleanHelper:
                 '¿Borrar solo el historial de monitoreo de esta instancia de vLLM? No afecta a otras instancias ni al monitoreo del host o de GPU.',
             overview: 'Resumen',

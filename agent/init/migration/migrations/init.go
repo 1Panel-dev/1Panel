@@ -1874,3 +1874,10 @@ var AddMonitorSettings = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddVLLMRequestMetrics = &gormigrate.Migration{
+	ID: "20261010-vllm-request-metrics",
+	Migrate: func(tx *gorm.DB) error {
+		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
+	},
+}

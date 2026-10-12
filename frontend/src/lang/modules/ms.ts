@@ -1531,6 +1531,24 @@ const message = {
             extraHeaders: 'Pengepala Tambahan',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/s',
+            requestsPerSecond: 'Permintaan/s',
+            finishReasonLabels: {
+                stop: 'Selesai secara normal',
+                length: 'Had panjang dicapai',
+                abort: 'Dibatalkan',
+                error: 'Ralat',
+                repetition: 'Pengulangan',
+            },
+            requestAnalysis: 'Analisis permintaan',
+            promptDistribution: 'Taburan panjang token input',
+            generationDistribution: 'Taburan panjang token output',
+            finishReasons: 'Sebab permintaan tamat',
+            queueTime: 'Purata masa dalam baris gilir',
+            averageGenerationTokens: 'Purata token output setiap permintaan',
+            prefixCacheHitRate: 'Kadar padanan cache awalan',
+            distributionHelper:
+                'Taburan panjang menunjukkan kadar permintaan dan tidak dipengaruhi oleh pilihan purata/puncak.',
             cleanHelper:
                 'Padamkan sejarah pemantauan untuk instans vLLM ini sahaja? Instans lain serta pemantauan hos dan GPU tidak terjejas.',
             overview: 'Gambaran keseluruhan',

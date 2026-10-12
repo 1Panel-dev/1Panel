@@ -31,12 +31,12 @@ var vllmMetricsClient = &http.Client{
 	CheckRedirect: func(req *http.Request, via []*http.Request) error { return http.ErrUseLastResponse },
 }
 
-func (m *MonitorService) LoadVLLMMonitorData(req dto.MonitorVLLMSearch) (dto.MonitorVLLMData, error) {
+func (m *MonitorService) LoadVLLMMonitorData(ctx context.Context, req dto.MonitorVLLMSearch) (dto.MonitorVLLMData, error) {
 	data := dto.MonitorVLLMData{Points: []model.MonitorVLLM{}}
 	if !req.EndTime.After(req.StartTime) {
 		return data, fmt.Errorf("invalid vLLM history request")
 	}
-	install, err := appInstallRepo.GetFirst(repo.WithByID(req.AppInstallID))
+	install, err := appInstallRepo.GetFirstByCtx(ctx, repo.WithByID(req.AppInstallID))
 	if err != nil {
 		return data, err
 	}
@@ -49,23 +49,31 @@ func (m *MonitorService) LoadVLLMMonitorData(req dto.MonitorVLLMSearch) (dto.Mon
 		return data, err
 	}
 	req.StartTime, req.EndTime = req.StartTime.In(loc), req.EndTime.In(loc)
-	data.SampleCount, err = vllmMonitorRepo.Count(req.AppInstallID, req.StartTime, req.EndTime)
+	data.SampleCount, err = vllmMonitorRepo.Count(ctx, req.AppInstallID, req.StartTime, req.EndTime)
 	if err != nil || data.SampleCount == 0 {
 		return data, err
 	}
 	if data.SampleCount > 1200 {
 		data.BucketSeconds = (req.EndTime.Unix() - req.StartTime.Unix() + 600) / 600
 	}
-	points, err := vllmMonitorRepo.History(req.AppInstallID, req.StartTime, req.EndTime, data.BucketSeconds, req.Aggregation)
+	points, err := vllmMonitorRepo.History(ctx, req.AppInstallID, req.StartTime, req.EndTime, data.BucketSeconds, req.Aggregation, req.Group)
 	if err != nil {
 		return data, err
 	}
 	if data.BucketSeconds > 0 {
-		if req.Aggregation != "max" {
-			for i := range points {
-				if err := vllm.AggregateHistograms(points[i].HistogramSamples, &points[i].MonitorVLLM); err != nil {
-					return data, err
-				}
+		aggregates := map[int64]*vllm.HistoryAccumulator{}
+		err = vllmMonitorRepo.WalkDeltas(ctx, req.AppInstallID, req.StartTime, req.EndTime, data.BucketSeconds, req.Aggregation, req.Group, func(bucket int64, histograms, requests string) error {
+			if aggregates[bucket] == nil {
+				aggregates[bucket] = &vllm.HistoryAccumulator{}
+			}
+			return aggregates[bucket].Add(histograms, requests, req.Aggregation, req.Group)
+		})
+		if err != nil {
+			return data, err
+		}
+		for i := range points {
+			if aggregate := aggregates[points[i].Bucket]; aggregate != nil {
+				aggregate.Apply(&points[i].MonitorVLLM, req.Aggregation)
 			}
 		}
 		next := 0
@@ -93,6 +101,14 @@ func (m *MonitorService) LoadVLLMMonitorData(req dto.MonitorVLLMSearch) (dto.Mon
 		}
 		interval := time.Duration(intervalSeconds) * time.Second
 		for i, point := range points {
+			if err := ctx.Err(); err != nil {
+				return data, err
+			}
+			var aggregate vllm.HistoryAccumulator
+			if err := aggregate.Add(point.HistogramDeltas, point.RequestDeltas, "max", req.Group); err != nil {
+				return data, err
+			}
+			aggregate.Apply(&point.MonitorVLLM, "max")
 			if i > 0 && point.CreatedAt.Sub(points[i-1].CreatedAt) > 2*interval {
 				data.Points = append(data.Points, model.MonitorVLLM{CreatedAt: points[i-1].CreatedAt.Add(interval), AppInstallID: req.AppInstallID})
 			}

@@ -1505,6 +1505,23 @@ const message = {
             extraHeaders: '追加ヘッダー',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/秒',
+            requestsPerSecond: 'リクエスト/秒',
+            finishReasonLabels: {
+                stop: '正常終了',
+                length: '長さ上限に到達',
+                abort: '中止',
+                error: 'エラー',
+                repetition: '繰り返し出力',
+            },
+            requestAnalysis: 'リクエスト分析',
+            promptDistribution: '入力トークン長の分布',
+            generationDistribution: '出力トークン長の分布',
+            finishReasons: 'リクエスト終了理由',
+            queueTime: '平均キュー待機時間',
+            averageGenerationTokens: 'リクエストあたりの平均出力トークン数',
+            prefixCacheHitRate: 'プレフィックスキャッシュヒット率',
+            distributionHelper: '長さの分布はリクエストレートで集計され、平均／ピークの切り替えには影響されません。',
             cleanHelper:
                 'この vLLM インスタンスの監視履歴のみを削除しますか？他のインスタンス、ホスト、GPU の監視には影響しません。',
             overview: '概要',

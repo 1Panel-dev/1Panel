@@ -1490,6 +1490,23 @@ const message = {
             extraHeaders: '추가 헤더',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/초',
+            requestsPerSecond: '요청/초',
+            finishReasonLabels: {
+                stop: '정상 종료',
+                length: '길이 제한 도달',
+                abort: '중단',
+                error: '오류',
+                repetition: '반복 출력',
+            },
+            requestAnalysis: '요청 분석',
+            promptDistribution: '입력 토큰 길이 분포',
+            generationDistribution: '출력 토큰 길이 분포',
+            finishReasons: '요청 종료 사유',
+            queueTime: '평균 대기 시간',
+            averageGenerationTokens: '요청당 평균 출력 토큰 수',
+            prefixCacheHitRate: '접두사 캐시 적중률',
+            distributionHelper: '길이 분포는 요청 속도로 집계되며 평균/최댓값 선택의 영향을 받지 않습니다.',
             cleanHelper:
                 '현재 vLLM 인스턴스의 모니터링 기록만 삭제하시겠습니까? 다른 인스턴스, 호스트 및 GPU 모니터링에는 영향을 주지 않습니다.',
             overview: '개요',

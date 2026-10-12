@@ -17,6 +17,7 @@ import (
 type Metrics map[string]map[string]float64
 
 type histogram struct {
+	Seconds float64            `json:"seconds,omitempty"`
 	Sum     float64            `json:"sum"`
 	Count   float64            `json:"count"`
 	Buckets map[string]float64 `json:"buckets,omitempty"`
@@ -37,14 +38,16 @@ func Parse(reader io.Reader) (Metrics, error) {
 		}
 		name := strings.TrimPrefix(match[1], "vllm:")
 		switch name {
-		case "num_requests_running", "num_requests_waiting", "kv_cache_usage_perc", "gpu_cache_usage_perc", "prompt_tokens_total", "generation_tokens_total", "request_success_total":
+		case "request_prefill_time_seconds_bucket", "request_decode_time_seconds_bucket", "request_queue_time_seconds_bucket":
+			continue
+		case "num_requests_running", "num_requests_waiting", "kv_cache_usage_perc", "gpu_cache_usage_perc", "prompt_tokens_total", "generation_tokens_total", "request_success_total", "prefix_cache_hits_total", "prefix_cache_queries_total":
 		default:
 			base := strings.TrimSuffix(strings.TrimSuffix(strings.TrimSuffix(name, "_sum"), "_count"), "_bucket")
 			if base == name {
 				continue
 			}
 			switch base {
-			case "time_to_first_token_seconds", "time_per_output_token_seconds", "inter_token_latency_seconds", "e2e_request_latency_seconds", "request_prefill_time_seconds", "request_decode_time_seconds":
+			case "time_to_first_token_seconds", "time_per_output_token_seconds", "inter_token_latency_seconds", "e2e_request_latency_seconds", "request_prefill_time_seconds", "request_decode_time_seconds", "request_queue_time_seconds", "request_prompt_tokens", "request_generation_tokens":
 			default:
 				continue
 			}
@@ -117,7 +120,7 @@ func Calculate(current, previous Metrics, elapsed float64) (model.MonitorVLLM, e
 		}
 	}
 	histograms := map[string]histogram{}
-	for _, name := range []string{"time_to_first_token_seconds", "inter_token_latency_seconds", "e2e_request_latency_seconds", "request_prefill_time_seconds", "request_decode_time_seconds"} {
+	for _, name := range []string{"time_to_first_token_seconds", "inter_token_latency_seconds", "e2e_request_latency_seconds", "request_prefill_time_seconds", "request_decode_time_seconds", "request_queue_time_seconds", "request_prompt_tokens", "request_generation_tokens"} {
 		source := name
 		if name == "inter_token_latency_seconds" && len(current[name+"_count"]) == 0 {
 			source = "time_per_output_token_seconds"
@@ -127,9 +130,21 @@ func Calculate(current, previous Metrics, elapsed float64) (model.MonitorVLLM, e
 		if sum == nil || count == nil {
 			continue
 		}
-		histograms[name] = histogram{Sum: *sum, Count: *count, Buckets: bucketDeltas(current[source+"_bucket"], previous[source+"_bucket"], *count)}
+		item := histogram{Sum: *sum, Count: *count}
+		switch name {
+		case "request_prefill_time_seconds", "request_decode_time_seconds", "request_queue_time_seconds":
+		default:
+			item.Buckets = bucketDeltas(current[source+"_bucket"], previous[source+"_bucket"], *count)
+		}
+		if name == "request_prompt_tokens" || name == "request_generation_tokens" {
+			item.Seconds = elapsed
+		}
+		histograms[name] = item
 	}
-	applyHistograms(&result, histograms)
+	applyHistograms(&result, histograms, true)
+	if err := calculateRequestMetrics(current, previous, elapsed, &result); err != nil {
+		return model.MonitorVLLM{}, err
+	}
 	encoded, err := json.Marshal(histograms)
 	if err != nil {
 		return model.MonitorVLLM{}, err
@@ -138,43 +153,24 @@ func Calculate(current, previous Metrics, elapsed float64) (model.MonitorVLLM, e
 	return result, nil
 }
 
-func AggregateHistograms(encoded string, result *model.MonitorVLLM) error {
-	var samples []map[string]histogram
-	if err := json.Unmarshal([]byte(encoded), &samples); err != nil {
-		return err
-	}
-	merged := map[string]histogram{}
-	for _, sample := range samples {
-		for name, item := range sample {
-			if item.Count == 0 {
-				continue
-			}
-			total, exists := merged[name]
-			if !exists {
-				merged[name] = item
-				continue
-			}
-			total.Sum += item.Sum
-			total.Count += item.Count
-			if len(total.Buckets) != len(item.Buckets) {
-				total.Buckets = nil
-			}
-			for bound, count := range total.Buckets {
-				addition, ok := item.Buckets[bound]
-				if !ok {
-					total.Buckets = nil
-					break
-				}
-				total.Buckets[bound] = count + addition
-			}
-			merged[name] = total
+func applyHistograms(result *model.MonitorVLLM, histograms map[string]histogram, includeMeans bool) {
+	for name, target := range map[string]*map[string]float64{
+		"request_prompt_tokens":     &result.PromptDistribution,
+		"request_generation_tokens": &result.GenerationDistribution,
+	} {
+		item := histograms[name]
+		if item.Seconds <= 0 || len(item.Buckets) == 0 {
+			continue
+		}
+		result.IntervalSeconds = math.Max(result.IntervalSeconds, item.Seconds)
+		*target = make(map[string]float64, len(item.Buckets))
+		for bound, count := range item.Buckets {
+			(*target)[bound] = count / item.Seconds
 		}
 	}
-	applyHistograms(result, merged)
-	return nil
-}
-
-func applyHistograms(result *model.MonitorVLLM, histograms map[string]histogram) {
+	if !includeMeans {
+		return
+	}
 	for _, item := range []struct {
 		name      string
 		mean      **float64
@@ -185,6 +181,8 @@ func applyHistograms(result *model.MonitorVLLM, histograms map[string]histogram)
 		{"e2e_request_latency_seconds", &result.RequestLatency, []**float64{&result.RequestLatencyP50, &result.RequestLatencyP90, &result.RequestLatencyP95, &result.RequestLatencyP99}},
 		{"request_prefill_time_seconds", &result.PrefillTime, nil},
 		{"request_decode_time_seconds", &result.DecodeTime, nil},
+		{"request_queue_time_seconds", &result.QueueTime, nil},
+		{"request_generation_tokens", &result.AverageGenerationTokens, nil},
 	} {
 		histogram, ok := histograms[item.name]
 		if !ok || histogram.Count <= 0 {
