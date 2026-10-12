@@ -63,7 +63,7 @@
         "@tailwindcss/postcss": "^4.3.3",
         "@types/node": "^26.6.3",
         "@types/uuid": "^11.0.0",
-        "@typescript-eslint/eslint-plugin": "^8.65.0",
+        "@typescript-eslint/eslint-plugin": "^8.71.1",
         "@typescript-eslint/parser": "^8.68.0",
         "@vitejs/plugin-vue": "^6.0.7",
         "@vitejs/plugin-vue-jsx": "^5.1.6",
