@@ -92,6 +92,9 @@ func dockerPolicyRuleKey(tokens []string, backend string) string {
 				if address, err := netip.ParseAddr(value); err == nil {
 					value = netip.PrefixFrom(address, address.BitLen()).String()
 				} else if prefix, err := netip.ParsePrefix(value); err == nil {
+					if prefix.Bits() == 0 {
+						continue
+					}
 					value = prefix.Masked().String()
 				}
 			}
@@ -156,7 +159,13 @@ func parseDockerGuardPolicies(output, family string) (PolicyInventory, error) {
 			group.acceptedSource = append(group.acceptedSource, source)
 		case action == "accept":
 			group.acceptAll = true
-		case action == "return" && source != "":
+		case action == "return":
+			if source == "" {
+				source = "0.0.0.0/0"
+				if family == FamilyIPv6 {
+					source = "::/0"
+				}
+			}
 			group.allowedSource = append(group.allowedSource, source)
 		case action == "drop" && source != "":
 			group.droppedSource = append(group.droppedSource, source)

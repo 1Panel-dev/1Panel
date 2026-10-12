@@ -582,6 +582,18 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 	if err != nil {
 		return result, err
 	}
+	importPrioritySupported := true
+	if adapter, ok := runtime.(*filterfirewalld.Adapter); ok && slices.ContainsFunc(request.Items, func(item dto.FirewallRuleCreateItem) bool {
+		return item.SourceKind == constant.FirewallRuleSourceImported
+	}) {
+		importPrioritySupported, err = adapter.SupportsRichRulePriority(ctx)
+		if err != nil {
+			return result, err
+		}
+		if !importPrioritySupported && t != nil {
+			t.Log("firewalld does not support rich rule priority; ignoring priority for imported rules, original rule ordering is not preserved")
+		}
+	}
 	preparedItems := make([]*createItem, 0, len(request.Items))
 	var stop error
 	for index, item := range request.Items {
@@ -593,6 +605,16 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 			continue
 		}
 		item.Rule.OrderIndex = nil
+		if item.SourceKind == constant.FirewallRuleSourceImported && !importPrioritySupported {
+			item.Rule.Priority = nil
+			if item.Rule.Scope.Provider == filter.ProviderFirewalld && item.Raw != "" && item.ParseStatus != "" && item.ParseStatus != filter.ParseStatusSupported && item.Rule.NativeKind != filter.NativeKindZoneService {
+				item.Raw, err = filterfirewalld.RemoveRichRulePriority(item.Raw)
+				if err != nil {
+					record(createItem{index: index, request: item}, "skipped", err)
+					continue
+				}
+			}
+		}
 		rules, err := expandFirewallCreateRule(item, selected)
 		if err != nil {
 			status := "failed"
@@ -693,7 +715,7 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 			record(*item, "skipped", buserr.New("ErrRecordExist"))
 			continue
 		}
-		if converted {
+		if converted && importPrioritySupported {
 			priority++
 		}
 		if existing[key] {
@@ -713,7 +735,7 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 			}
 			ufwActions[matchKey] = map[filter.Action]bool{item.request.Rule.Action: true}
 		}
-		if converted {
+		if converted && importPrioritySupported {
 			if priority > 32767 {
 				return result, fmt.Errorf("%w: firewalld import order exceeds the priority range", filter.ErrExpansionLimit)
 			}
@@ -729,18 +751,19 @@ func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallR
 				continue
 			}
 			item.request = prepared
-			actualKey, err := firewallRuleDuplicateKey(filter.ObservedRule{Rule: prepared.Rule, ParseStatus: prepared.ParseStatus}, false)
+		}
+		pending[key] = true
+		if converted {
+			actualKey, err := firewallRuleDuplicateKey(filter.ObservedRule{Rule: item.request.Rule, ParseStatus: item.request.ParseStatus}, false)
 			if err != nil {
 				return result, err
 			}
-			pending[key] = true
 			if existing[actualKey] || pending[actualKey] {
 				record(*item, "skipped", buserr.New("ErrRecordExist"))
 				continue
 			}
 			pending[actualKey] = true
 		}
-		pending[key] = true
 		mergedItems = append(mergedItems, item)
 	}
 	for _, item := range mergedItems {
