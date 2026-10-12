@@ -52,11 +52,11 @@ require (
 	github.com/tomasen/fcgi_client v0.0.0-20180423082037-2bb3d819fd19
 	github.com/upyun/go-sdk v2.1.0+incompatible
 	go.mongodb.org/mongo-driver/v2 v2.9.2
-	golang.org/x/crypto v0.57.0
-	golang.org/x/net v0.58.0
-	golang.org/x/sync v0.23.0
-	golang.org/x/sys v0.48.0
-	golang.org/x/text v0.42.0
+	golang.org/x/crypto v0.58.0
+	golang.org/x/net v0.60.0
+	golang.org/x/sync v0.24.0
+	golang.org/x/sys v0.49.0
+	golang.org/x/text v0.43.0
 	golang.org/x/time v0.16.0
 	google.golang.org/genproto v0.0.0-20260414002931-afd174a4e478
 	gopkg.in/ini.v1 v1.67.3
@@ -66,6 +66,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/alex-ant/gomath v0.0.0-20160516115720-89013a210a82 // indirect
