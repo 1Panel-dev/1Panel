@@ -30,7 +30,7 @@
         "@vue-office/docx": "^1.6.2",
         "@vue-office/excel": "^1.7.8",
         "@vueuse/core": "^15.0.0",
-        "@xterm/addon-fit": "^0.10.0",
+        "@xterm/addon-fit": "^0.11.0",
         "@xterm/xterm": "^5.5.0",
         "anser": "^2.3.5",
         "axios": "^1.20.0",
