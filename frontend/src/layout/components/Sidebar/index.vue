@@ -32,32 +32,24 @@
             @user-change="currentUser = $event"
         />
         <div class="user-actions" :class="{ 'is-collapsed': isCollapse }">
-            <el-tooltip
+            <button
                 v-if="currentUser"
-                :content="$t('xpack.user.userInfo')"
-                placement="top"
-                popper-class="sidebar-user-tooltip"
+                type="button"
+                class="user-entry"
+                :aria-label="$t('xpack.user.userInfo') + ' ' + currentUser.name"
+                @click="nodeSelectorRef?.openUserInfo()"
             >
-                <button
-                    type="button"
-                    class="user-entry"
-                    :aria-label="$t('xpack.user.userInfo') + ' ' + currentUser.name"
-                    @click="nodeSelectorRef?.openUserInfo()"
-                >
-                    <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
-                    <span v-if="!isCollapse" class="user-name">{{ currentUser.name }}</span>
-                </button>
-            </el-tooltip>
-            <el-tooltip :content="$t('header.exitSystem')" placement="top" popper-class="sidebar-user-tooltip">
-                <button
-                    type="button"
-                    class="user-entry logout-entry"
-                    :aria-label="$t('header.exitSystem')"
-                    @click="nodeSelectorRef?.logout()"
-                >
-                    <SvgIcon class="icon" iconName="p-tuichudenglu3" />
-                </button>
-            </el-tooltip>
+                <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                <span v-if="!isCollapse" class="user-name">{{ currentUser.name }}</span>
+            </button>
+            <button
+                type="button"
+                class="user-entry logout-entry"
+                :aria-label="$t('header.exitSystem')"
+                @click="nodeSelectorRef?.logout()"
+            >
+                <SvgIcon class="icon" iconName="p-tuichudenglu3" />
+            </button>
         </div>
     </div>
 </template>
@@ -439,18 +431,5 @@ watch(
     justify-content: center;
     padding: 0;
     border-left: 1px solid var(--panel-footer-border);
-}
-</style>
-
-<style lang="scss">
-.el-popper.sidebar-user-tooltip {
-    background: var(--el-menu-item-bg-color);
-    color: var(--el-color-primary);
-    border-color: var(--panel-footer-border);
-
-    .el-popper__arrow::before {
-        background: var(--el-menu-item-bg-color);
-        border-color: var(--panel-footer-border);
-    }
 }
 </style>
