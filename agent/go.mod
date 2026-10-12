@@ -27,7 +27,7 @@ require (
 	github.com/jinzhu/copier v0.4.0
 	github.com/joho/godotenv v1.5.1
 	github.com/klauspost/compress v1.19.2
-	github.com/mattn/go-shellwords v1.0.14
+	github.com/mattn/go-shellwords v1.0.16
 	github.com/mholt/archiver/v4 v4.0.0-alpha.8
 	github.com/miekg/dns v1.1.73
 	github.com/minio/minio-go/v7 v7.3.0
@@ -66,6 +66,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/alex-ant/gomath v0.0.0-20160516115720-89013a210a82 // indirect
