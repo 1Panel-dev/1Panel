@@ -551,7 +551,8 @@ const welcomeOpen = ref();
 const shadowContainer = ref();
 
 const chartOption = ref('network');
-let timer: NodeJS.Timer | null = null;
+let timer: ReturnType<typeof setInterval> | null = null;
+let initialSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let isInit = ref<boolean>(true);
 let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
@@ -795,14 +796,16 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     const res = await loadBaseInfo(searchInfo.ioOption, searchInfo.netOption);
     baseInfo.value = res.data;
     updateCurrentInfo(baseInfo.value.currentInfo);
-    skipNextCurrentInfoDelta.value = true;
-    onLoadCurrentInfo();
+    skipNextCurrentInfoDelta.value = !isInit;
+    if (!isInit) {
+        onLoadCurrentInfo();
+    }
     isStatusInit.value = false;
     statusRef.value?.acceptParams(currentInfo.value, baseInfo.value);
     appRef.value?.acceptParams();
-    if (isInit) {
+    if (isInit && isCurrentActive.value) {
         clearTimer();
-        timer = setInterval(async () => {
+        const refreshCurrentInfo = async () => {
             try {
                 if (!isCurrentActive.value) {
                     throw new Error('jump out');
@@ -814,7 +817,9 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
             } catch {
                 clearTimer();
             }
-        }, 3000);
+        };
+        initialSampleTimer = setTimeout(refreshCurrentInfo, 500);
+        timer = setInterval(refreshCurrentInfo, 3000);
     }
 };
 
@@ -850,7 +855,9 @@ const jumpPanel = (row: any) => {
 
 const onLoadCurrentInfo = async () => {
     const res = await loadCurrentInfo(searchInfo.ioOption, searchInfo.netOption);
-    if (skipNextCurrentInfoDelta.value) {
+    const timeInterval =
+        (new Date(res.data.shotTime).getTime() - new Date(currentInfo.value.shotTime).getTime()) / 1000;
+    if (skipNextCurrentInfoDelta.value || !Number.isFinite(timeInterval) || timeInterval <= 0) {
         skipNextCurrentInfoDelta.value = false;
         currentChartInfo.netBytesSent = 0;
         currentChartInfo.netBytesRecv = 0;
@@ -866,7 +873,6 @@ const onLoadCurrentInfo = async () => {
     currentInfo.value.timeSinceUptime = res.data.timeSinceUptime;
     currentInfo.value.runningTime = res.data.runningTime;
 
-    let timeInterval = Number(res.data.uptime - currentInfo.value.uptime) || 3;
     currentChartInfo.netBytesSent =
         res.data.netBytesSent - currentInfo.value.netBytesSent > 0
             ? Number(((res.data.netBytesSent - currentInfo.value.netBytesSent) / 1024 / timeInterval).toFixed(2))
@@ -1146,6 +1152,8 @@ onBeforeRouteUpdate((to, from, next) => {
 const clearTimer = () => {
     clearInterval(Number(timer));
     timer = null;
+    clearTimeout(Number(initialSampleTimer));
+    initialSampleTimer = null;
 };
 
 onMounted(() => {
