@@ -209,18 +209,36 @@ func buildBaseChainBindingsRestoreScript(output string, bind bool) string {
 }
 
 func baseChainBindingCommands(output string, bind bool) []string {
-	lines := make([]string, 0, len(BasicChains())*2)
-	for _, chain := range BasicChains() {
-		binding := "-A " + InputChain + " -j " + chain
-		for _, current := range strings.Split(output, "\n") {
-			if strings.TrimSpace(current) == binding {
-				lines = append(lines, "-D "+InputChain+" -j "+chain)
+	chains := BasicChains()
+	lines := make([]string, 0, len(chains)*2)
+	position, insertAt := 0, 1
+	for _, current := range strings.Split(output, "\n") {
+		current = strings.TrimSpace(current)
+		if !strings.HasPrefix(current, "-A "+InputChain+" ") {
+			continue
+		}
+		if chain := strings.TrimPrefix(current, "-A "+InputChain+" -j "); slices.Contains(chains, chain) {
+			lines = append(lines, "-D "+InputChain+" -j "+chain)
+			continue
+		}
+		position++
+		if !bind {
+			continue
+		}
+		fields, err := shellwords.Parse(current)
+		if err != nil {
+			continue
+		}
+		for index := 2; index+1 < len(fields); index++ {
+			if fields[index] == "-j" && strings.HasPrefix(fields[index+1], "f2b-") {
+				insertAt = position + 1
+				break
 			}
 		}
 	}
 	if bind {
-		for index, chain := range BasicChains() {
-			lines = append(lines, fmt.Sprintf("-I %s %d -j %s", InputChain, index+1, chain))
+		for index, chain := range chains {
+			lines = append(lines, fmt.Sprintf("-I %s %d -j %s", InputChain, insertAt+index, chain))
 		}
 	}
 	return lines
