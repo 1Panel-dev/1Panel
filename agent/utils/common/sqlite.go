@@ -7,43 +7,20 @@ import (
 	"path"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
 
 func LoadDBConnByPath(fullPath, dbName string) *gorm.DB {
-	if _, err := createDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
-		panic(fmt.Errorf("init db dir failed, err: %v", err))
-	}
-	if _, err := os.Stat(fullPath); err != nil {
-		f, err := os.Create(fullPath)
-		if err != nil {
-			panic(fmt.Errorf("init %s db file failed, err: %v", dbName, err))
-		}
-		_ = f.Close()
-	}
-
 	db, err := GetDBWithPath(fullPath)
 	if err != nil {
-		panic(err)
+		panic(fmt.Errorf("init %s db failed, err: %w", dbName, err))
 	}
 	return db
 }
 
 func LoadDBConnByPathWithErr(fullPath, dbName string) (*gorm.DB, error) {
-	if _, err := createDirWhenNotExist(true, path.Dir(fullPath)); err != nil {
-		return nil, fmt.Errorf("init db dir failed, err: %v", err)
-	}
-	if _, err := os.Stat(fullPath); err != nil {
-		f, err := os.Create(fullPath)
-		if err != nil {
-			return nil, fmt.Errorf("init %s db file failed, err: %v", dbName, err)
-		}
-		_ = f.Close()
-	}
-
 	db, err := GetDBWithPath(fullPath)
 	if err != nil {
 		return nil, fmt.Errorf("init %s db failed, err: %v", dbName, err)
@@ -60,6 +37,30 @@ func CloseDB(db *gorm.DB) {
 }
 
 func GetDBWithPath(dbPath string) (*gorm.DB, error) {
+	dbDir := path.Dir(dbPath)
+	if err := os.MkdirAll(dbDir, 0700); err != nil {
+		return nil, fmt.Errorf("init db dir failed, err: %w", err)
+	}
+	if err := os.Chmod(dbDir, 0700); err != nil {
+		return nil, fmt.Errorf("set db dir permissions failed, err: %w", err)
+	}
+	file, err := os.OpenFile(dbPath, os.O_CREATE|os.O_RDWR, 0600)
+	if err != nil {
+		return nil, fmt.Errorf("init db file failed, err: %w", err)
+	}
+	if err := file.Chmod(0600); err != nil {
+		_ = file.Close()
+		return nil, fmt.Errorf("set db file permissions failed, err: %w", err)
+	}
+	if err := file.Close(); err != nil {
+		return nil, err
+	}
+	for _, suffix := range []string{"-wal", "-shm", "-journal"} {
+		if err := os.Chmod(dbPath+suffix, 0600); err != nil && !os.IsNotExist(err) {
+			return nil, fmt.Errorf("set db sidecar permissions failed, err: %w", err)
+		}
+	}
+
 	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		Logger:                                   newLogger(),
@@ -103,18 +104,4 @@ func newLogger() logger.Interface {
 			Colorful:                  false,
 		},
 	)
-}
-
-func createDirWhenNotExist(isDir bool, pathItem string) (string, error) {
-	checkPath := pathItem
-	if !isDir {
-		checkPath = path.Dir(pathItem)
-	}
-	if _, err := os.Stat(checkPath); err != nil && os.IsNotExist(err) {
-		if err = os.MkdirAll(checkPath, os.ModePerm); err != nil {
-			global.LOG.Errorf("mkdir %s failed, err: %v", checkPath, err)
-			return pathItem, err
-		}
-	}
-	return pathItem, nil
 }

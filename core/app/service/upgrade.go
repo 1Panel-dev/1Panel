@@ -495,7 +495,9 @@ func (u *UpgradeService) handleRollback(originalDir string, errStep int, svcInfo
 	_ = settingRepo.Update("SystemStatus", "Free")
 	dbPath := path.Join(global.CONF.Base.InstallDir, "1panel")
 	if _, err := os.Stat(path.Join(originalDir, "db")); err == nil {
-		if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
+		if err := os.Chmod(path.Join(originalDir, "db"), 0700); err != nil {
+			global.LOG.Errorf("set rollback db dir permissions failed, err: %v", err)
+		} else if err := files.CopyItem(true, true, path.Join(originalDir, "db"), dbPath); err != nil {
 			global.LOG.Errorf("rollback 1panel db failed, err: %v", err)
 		}
 	}

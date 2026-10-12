@@ -494,6 +494,9 @@ func restartCompose(composePath string, itemHelper *snapRecoverHelper) error {
 func recoverDBData(src string, itemHelper *snapRecoverHelper) error {
 	itemHelper.Task.Log("---------------------- 11 / 11 ----------------------")
 	itemHelper.Task.LogStart(i18n.GetMsgByKey("RecoverDBData"))
+	if err := os.Chmod(src, 0700); err != nil {
+		return err
+	}
 	dbDir := path.Join(global.Dir.DataDir, "db")
 	if err := os.RemoveAll(dbDir); err != nil {
 		itemHelper.Task.LogWithStatus(i18n.GetMsgByKey("RecoverDBData"), err)
