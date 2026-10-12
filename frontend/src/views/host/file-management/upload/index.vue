@@ -121,13 +121,8 @@
 <script setup lang="ts">
 import { computed, nextTick, reactive, ref } from 'vue';
 import { UploadFile, UploadFiles, UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
-import {
-    batchCheckFiles,
-    chunkUploadFileData,
-    stopChunkUpload,
-    uploadFileData,
-    type FileUploadRequestConfig,
-} from '@/api/modules/files';
+import { batchCheckFiles, stopChunkUpload, uploadFileData } from '@/api/modules/files';
+import { CHUNK_SIZE, uploadChunkWithRetry } from '@/utils/chunk-upload';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import { Close, Document, UploadFilled } from '@element-plus/icons-vue';
@@ -225,8 +220,6 @@ const uploaderFiles = ref<UploadFiles>([]);
 const hoverIndex = ref<number | null>(null);
 const tmpFiles = ref<UploadFiles>([]);
 const breakFlag = ref(false);
-const CHUNK_SIZE = 1024 * 1024 * 5;
-const MAX_CHUNK_RETRIES = 3;
 
 const upload = (command: string) => {
     if (uploadLocked.value) {
@@ -501,54 +494,6 @@ const cleanupActiveChunkUpload = async () => {
         await stopChunkUpload(active.uploadID, active.node);
     } catch (error) {
         console.error(error);
-    }
-};
-
-const shouldRetryChunkUpload = (error: unknown) => {
-    const item = error as {
-        code?: string | number;
-        data?: { retryable?: boolean };
-        response?: { status?: number };
-    };
-    if (item?.code === 'ERR_CANCELED') {
-        return false;
-    }
-    if (typeof item?.data?.retryable === 'boolean') {
-        return item.data.retryable;
-    }
-    const status = item?.response?.status ?? (typeof item?.code === 'number' ? item.code : undefined);
-    return !status || status === 408 || status === 429 || status >= 500;
-};
-
-const waitForChunkRetry = (attempt: number, signal: AbortSignal) => {
-    return new Promise<void>((resolve) => {
-        if (signal.aborted) {
-            resolve();
-            return;
-        }
-        const timer = window.setTimeout(done, 500 * 2 ** attempt);
-        function done() {
-            window.clearTimeout(timer);
-            signal.removeEventListener('abort', done);
-            resolve();
-        }
-        signal.addEventListener('abort', done, { once: true });
-    });
-};
-
-const uploadChunkWithRetry = async (formData: FormData, config: FileUploadRequestConfig, signal: AbortSignal) => {
-    let retryCount = 0;
-    while (true) {
-        try {
-            await chunkUploadFileData(formData, config);
-            return;
-        } catch (error) {
-            if (signal.aborted || retryCount >= MAX_CHUNK_RETRIES || !shouldRetryChunkUpload(error)) {
-                throw error;
-            }
-            await waitForChunkRetry(retryCount, signal);
-            retryCount++;
-        }
     }
 };
 
