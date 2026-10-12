@@ -25,6 +25,7 @@ import (
 	"github.com/go-acme/lego/v5/providers/dns/namecheap"
 	"github.com/go-acme/lego/v5/providers/dns/namedotcom"
 	"github.com/go-acme/lego/v5/providers/dns/namesilo"
+	"github.com/go-acme/lego/v5/providers/dns/netcup"
 	"github.com/go-acme/lego/v5/providers/dns/ovh"
 	"github.com/go-acme/lego/v5/providers/dns/porkbun"
 	"github.com/go-acme/lego/v5/providers/dns/rainyun"
@@ -58,6 +59,7 @@ const (
 	NameCheap    DnsType = "NameCheap"
 	NameCom      DnsType = "NameCom"
 	NameSilo     DnsType = "NameSilo"
+	Netcup       DnsType = "Netcup"
 	Ovh          DnsType = "Ovh"
 	PorkBun      DnsType = "PorkBun"
 	RainYun      DnsType = "RainYun"
@@ -72,26 +74,27 @@ const (
 )
 
 type DNSParam struct {
-	ID           string `json:"id"`
-	Token        string `json:"token"`
-	AccessKey    string `json:"accessKey"`
-	SecretKey    string `json:"secretKey"`
-	Email        string `json:"email"`
-	APIkey       string `json:"apiKey"`
-	APIUser      string `json:"apiUser"`
-	APISecret    string `json:"apiSecret"`
-	APIPrefix    string `json:"apiPrefix"`
-	SecretID     string `json:"secretID"`
-	ClientID     string `json:"clientID"`
-	Password     string `json:"password"`
-	Region       string `json:"region"`
-	Username     string `json:"username"`
-	AuthID       string `json:"authID"`
-	SubAuthID    string `json:"subAuthID"`
-	AuthPassword string `json:"authPassword"`
-	Endpoint     string `json:"endpoint"`
-	AccessToken  string `json:"accessToken"`
-	BaseURL      string `json:"baseURL"`
+	ID             string `json:"id"`
+	Token          string `json:"token"`
+	AccessKey      string `json:"accessKey"`
+	SecretKey      string `json:"secretKey"`
+	Email          string `json:"email"`
+	APIkey         string `json:"apiKey"`
+	APIUser        string `json:"apiUser"`
+	APISecret      string `json:"apiSecret"`
+	APIPrefix      string `json:"apiPrefix"`
+	SecretID       string `json:"secretID"`
+	ClientID       string `json:"clientID"`
+	Password       string `json:"password"`
+	Region         string `json:"region"`
+	Username       string `json:"username"`
+	AuthID         string `json:"authID"`
+	SubAuthID      string `json:"subAuthID"`
+	AuthPassword   string `json:"authPassword"`
+	Endpoint       string `json:"endpoint"`
+	AccessToken    string `json:"accessToken"`
+	BaseURL        string `json:"baseURL"`
+	CustomerNumber string `json:"customerNumber"`
 }
 
 var (
@@ -164,6 +167,14 @@ func getDNSProviderConfig(dnsType DnsType, params string, httpClient *http.Clien
 		config.PropagationTimeout = propagationTimeout
 		config.PollingInterval = pollingInterval
 		p, err = namesilo.NewDNSProviderConfig(config)
+	case Netcup:
+		config := newDNSProviderConfig(netcup.NewDefaultConfig(), httpClient)
+		config.Customer = param.CustomerNumber
+		config.Key = param.APIkey
+		config.Password = param.Password
+		config.PropagationTimeout = propagationTimeout
+		config.PollingInterval = pollingInterval
+		p, err = netcup.NewDNSProviderConfig(config)
 	case Godaddy:
 		config := newDNSProviderConfig(godaddy.NewDefaultConfig(), httpClient)
 		config.APIKey = param.APIkey
