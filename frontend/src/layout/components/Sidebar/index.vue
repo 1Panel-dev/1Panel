@@ -10,14 +10,6 @@
             <PrimaryMenu />
         </div>
         <Logo :isCollapse="isCollapse" />
-        <Collapse
-            ref="nodeSelectorRef"
-            class="node-selector"
-            :version="version"
-            @open-task="openTask"
-            @refresh="search"
-            @user-change="currentUser = $event"
-        />
         <el-scrollbar>
             <el-menu
                 :default-active="activeMenu"
@@ -31,40 +23,42 @@
                 <SubItem :menuList="routerMenus" :level="0" />
             </el-menu>
         </el-scrollbar>
-        <el-dropdown
-            v-if="currentUser"
-            class="user-dropdown"
-            trigger="click"
-            placement="right-end"
-            :popper-options="{ modifiers: [{ name: 'flip', enabled: false }] }"
-            :show-arrow="false"
-            :hide-on-click="true"
-            @visible-change="userMenuVisible = $event"
-            @command="handleUserCommand"
-        >
-            <button
-                type="button"
-                class="user-entry"
-                :class="{ 'is-active': userMenuVisible }"
-                :aria-label="currentUser.name"
-                :title="currentUser.name"
+        <Collapse
+            ref="nodeSelectorRef"
+            class="node-selector"
+            :version="version"
+            @open-task="openTask"
+            @refresh="search"
+            @user-change="currentUser = $event"
+        />
+        <div class="user-actions" :class="{ 'is-collapsed': isCollapse }">
+            <el-tooltip
+                v-if="currentUser"
+                :content="$t('xpack.user.userInfo')"
+                placement="top"
+                popper-class="sidebar-user-tooltip"
             >
-                <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
-                <span v-if="!isCollapse" class="user-name">{{ currentUser.name }}</span>
-            </button>
-            <template #dropdown>
-                <el-dropdown-menu class="user-menu">
-                    <el-dropdown-item command="userCenter">
-                        <SvgIcon class="user-menu-icon" iconName="p-gerenzhongxin1" />
-                        <span>{{ $t('header.userCenter') }}</span>
-                    </el-dropdown-item>
-                    <el-dropdown-item command="logout">
-                        <SvgIcon class="user-menu-icon" iconName="p-tuichudenglu3" />
-                        <span>{{ $t('header.exitSystem') }}</span>
-                    </el-dropdown-item>
-                </el-dropdown-menu>
-            </template>
-        </el-dropdown>
+                <button
+                    type="button"
+                    class="user-entry"
+                    :aria-label="$t('xpack.user.userInfo') + ' ' + currentUser.name"
+                    @click="nodeSelectorRef?.openUserInfo()"
+                >
+                    <SvgIcon class="icon" iconName="p-gerenzhongxin1" />
+                    <span v-if="!isCollapse" class="user-name">{{ currentUser.name }}</span>
+                </button>
+            </el-tooltip>
+            <el-tooltip :content="$t('header.exitSystem')" placement="top" popper-class="sidebar-user-tooltip">
+                <button
+                    type="button"
+                    class="user-entry logout-entry"
+                    :aria-label="$t('header.exitSystem')"
+                    @click="nodeSelectorRef?.logout()"
+                >
+                    <SvgIcon class="icon" iconName="p-tuichudenglu3" />
+                </button>
+            </el-tooltip>
+        </div>
     </div>
 </template>
 
@@ -90,15 +84,6 @@ const { currentNode, isAdmin, menuAccordion, permissions } = useGlobalStore();
 const version = ref();
 const nodeSelectorRef = ref<InstanceType<typeof Collapse>>();
 const currentUser = ref<Login.AuthInfo>();
-const userMenuVisible = ref(false);
-
-const handleUserCommand = (command: string) => {
-    if (command === 'userCenter') {
-        nodeSelectorRef.value?.openUserInfo();
-    } else if (command === 'logout') {
-        nodeSelectorRef.value?.logout();
-    }
-};
 
 const activeMenu = computed(() => {
     const { meta, path } = route;
@@ -397,22 +382,18 @@ watch(
     height: 20px !important;
 }
 
-.user-dropdown {
+.user-actions {
+    display: flex;
     flex-shrink: 0;
-    width: 100%;
-}
+    border-top: 1px solid var(--panel-footer-border);
 
-.user-menu {
-    min-width: 160px;
-
-    :deep(.el-dropdown-menu__item) {
-        gap: 8px;
-        padding: 10px 16px;
+    &.is-collapsed .user-entry {
+        justify-content: center;
+        padding: 0;
     }
 
-    .user-menu-icon {
-        flex-shrink: 0;
-        font-size: 8px;
+    &.is-collapsed .logout-entry {
+        flex: 1;
     }
 }
 
@@ -420,13 +401,13 @@ watch(
     display: flex;
     align-items: center;
     gap: 7px;
-    flex-shrink: 0;
+    flex: 1;
+    min-width: 0;
     position: relative;
-    width: 100%;
     height: 48px;
-    padding: 0 25px;
+    padding: 0 0 0 25px;
     border: 0;
-    border-top: 1px solid var(--panel-footer-border);
+    border-radius: 0;
     background: transparent;
     color: var(--panel-main-bg-color-1);
     font-family: inherit;
@@ -448,10 +429,28 @@ watch(
     }
 
     &:hover,
-    &:focus-visible,
-    &.is-active {
+    &:focus-visible {
         color: var(--el-color-primary);
         background: var(--el-menu-item-bg-color);
+    }
+}
+.logout-entry {
+    flex: 0 0 42px;
+    justify-content: center;
+    padding: 0;
+    border-left: 1px solid var(--panel-footer-border);
+}
+</style>
+
+<style lang="scss">
+.el-popper.sidebar-user-tooltip {
+    background: var(--el-menu-item-bg-color);
+    color: var(--el-color-primary);
+    border-color: var(--panel-footer-border);
+
+    .el-popper__arrow::before {
+        background: var(--el-menu-item-bg-color);
+        border-color: var(--panel-footer-border);
     }
 }
 </style>

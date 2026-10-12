@@ -2,7 +2,7 @@
     <div>
         <el-popover
             v-model:visible="popoverVisible"
-            placement="right-start"
+            placement="right-end"
             :show-arrow="false"
             :offset="0"
             :width="200"
@@ -312,7 +312,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     box-sizing: border-box;
-    border-bottom: 1px solid var(--panel-footer-border);
+    border-top: 1px solid var(--panel-footer-border);
     height: 48px;
     .icon {
         margin-left: 25px;
