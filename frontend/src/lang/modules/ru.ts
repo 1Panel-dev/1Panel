@@ -1520,6 +1520,24 @@ const message = {
             extraHeaders: 'Дополнительные заголовки',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/с',
+            requestsPerSecond: 'Запросов/с',
+            finishReasonLabels: {
+                stop: 'Нормальное завершение',
+                length: 'Достигнут лимит длины',
+                abort: 'Прервано',
+                error: 'Ошибка',
+                repetition: 'Повторение',
+            },
+            requestAnalysis: 'Анализ запросов',
+            promptDistribution: 'Распределение длины входных токенов',
+            generationDistribution: 'Распределение длины выходных токенов',
+            finishReasons: 'Причины завершения запросов',
+            queueTime: 'Среднее время в очереди',
+            averageGenerationTokens: 'Среднее число выходных токенов на запрос',
+            prefixCacheHitRate: 'Доля попаданий в кэш префиксов',
+            distributionHelper:
+                'Распределения длины показывают частоту запросов и не зависят от выбора среднего или пикового значения.',
             cleanHelper:
                 'Удалить историю мониторинга только этого экземпляра vLLM? Другие экземпляры, мониторинг хоста и GPU не будут затронуты.',
             overview: 'Обзор',

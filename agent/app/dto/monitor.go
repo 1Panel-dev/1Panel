@@ -127,6 +127,7 @@ type GPUProcess struct {
 }
 
 type MonitorVLLMSearch struct {
+	Group        string    `json:"group" validate:"omitempty,oneof=overview latency requests"`
 	AppInstallID uint      `json:"appInstallID" validate:"required"`
 	StartTime    time.Time `json:"startTime" validate:"required"`
 	EndTime      time.Time `json:"endTime" validate:"required"`

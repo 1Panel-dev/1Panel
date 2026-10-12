@@ -1527,6 +1527,23 @@ const message = {
             extraHeaders: 'Ek Başlıklar',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/sn',
+            requestsPerSecond: 'İstek/sn',
+            finishReasonLabels: {
+                stop: 'Normal tamamlanma',
+                length: 'Uzunluk sınırına ulaşıldı',
+                abort: 'İptal edildi',
+                error: 'Hata',
+                repetition: 'Tekrarlama',
+            },
+            requestAnalysis: 'İstek analizi',
+            promptDistribution: 'Girdi belirteci uzunluk dağılımı',
+            generationDistribution: 'Çıktı belirteci uzunluk dağılımı',
+            finishReasons: 'İstek bitiş nedenleri',
+            queueTime: 'Ortalama kuyruk süresi',
+            averageGenerationTokens: 'İstek başına ortalama çıktı belirteci',
+            prefixCacheHitRate: 'Önek önbelleği isabet oranı',
+            distributionHelper: 'Uzunluk dağılımları istek hızlarını gösterir ve ortalama/tepe seçiminden etkilenmez.',
             cleanHelper:
                 'Yalnızca bu vLLM örneğinin izleme geçmişi temizlensin mi? Diğer örnekler, ana makine ve GPU izlemesi etkilenmez.',
             overview: 'Genel bakış',

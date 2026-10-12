@@ -79,12 +79,20 @@ type MonitorGPU struct {
 }
 
 type MonitorVLLM struct {
-	ID              uint      `json:"-" gorm:"primarykey;autoIncrement"`
-	CreatedAt       time.Time `json:"createdAt"`
-	AppInstallID    uint      `json:"appInstallID"`
-	Status          string    `json:"status"`
-	RawMetrics      string    `json:"-"`
-	HistogramDeltas string    `json:"-"`
+	ID                      uint               `json:"-" gorm:"primarykey;autoIncrement"`
+	CreatedAt               time.Time          `json:"createdAt"`
+	AppInstallID            uint               `json:"appInstallID"`
+	Status                  string             `json:"status"`
+	RawMetrics              string             `json:"-"`
+	HistogramDeltas         string             `json:"-"`
+	IntervalSeconds         float64            `json:"intervalSeconds" gorm:"-"`
+	RequestDeltas           string             `json:"-"`
+	QueueTime               *float64           `json:"queueTime"`
+	AverageGenerationTokens *float64           `json:"averageGenerationTokens"`
+	PrefixCacheHitRate      *float64           `json:"prefixCacheHitRate"`
+	FinishReasons           map[string]float64 `json:"finishReasons" gorm:"-"`
+	PromptDistribution      map[string]float64 `json:"promptDistribution" gorm:"-"`
+	GenerationDistribution  map[string]float64 `json:"generationDistribution" gorm:"-"`
 
 	Running               *float64 `json:"running"`
 	Waiting               *float64 `json:"waiting"`

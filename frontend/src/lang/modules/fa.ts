@@ -1502,6 +1502,23 @@ const message = {
             extraHeaders: 'هدرهای اضافی',
         },
         vllmMonitor: {
+            tokensPerSecond: 'tokens/ثانیه',
+            requestsPerSecond: 'درخواست/ثانیه',
+            finishReasonLabels: {
+                stop: 'پایان عادی',
+                length: 'رسیدن به حد طول',
+                abort: 'لغوشده',
+                error: 'خطا',
+                repetition: 'تکرار خروجی',
+            },
+            requestAnalysis: 'تحلیل درخواست‌ها',
+            promptDistribution: 'توزیع طول توکن‌های ورودی',
+            generationDistribution: 'توزیع طول توکن‌های خروجی',
+            finishReasons: 'دلایل پایان درخواست‌ها',
+            queueTime: 'میانگین زمان انتظار در صف',
+            averageGenerationTokens: 'میانگین توکن‌های خروجی هر درخواست',
+            prefixCacheHitRate: 'نرخ اصابت حافظه نهان پیشوند',
+            distributionHelper: 'توزیع طول، نرخ درخواست‌ها را نشان می‌دهد و از انتخاب میانگین یا اوج تأثیر نمی‌پذیرد.',
             cleanHelper:
                 'فقط سابقه نظارت این نمونه vLLM پاک شود؟ سایر نمونه\u200cها و نظارت میزبان و GPU تغییری نمی\u200cکنند.',
             overview: 'نمای کلی',
