@@ -217,6 +217,10 @@ export const DNSTypes = [
         value: 'NameSilo',
     },
     {
+        label: 'Netcup',
+        value: 'Netcup',
+    },
+    {
         label: 'NameCheap',
         value: 'NameCheap',
     },

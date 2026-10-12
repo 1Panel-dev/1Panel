@@ -110,6 +110,21 @@
                             <el-input v-model.trim="account.authorization['token']"></el-input>
                         </el-form-item>
                     </div>
+                    <div v-if="account.type === 'Netcup'">
+                        <el-form-item label="Customer Number" prop="authorization.customerNumber">
+                            <el-input v-model.trim="account.authorization['customerNumber']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API Key" prop="authorization.apiKey">
+                            <el-input v-model.trim="account.authorization['apiKey']"></el-input>
+                        </el-form-item>
+                        <el-form-item label="API Password" prop="authorization.password">
+                            <el-input
+                                v-model.trim="account.authorization['password']"
+                                type="password"
+                                show-password
+                            ></el-input>
+                        </el-form-item>
+                    </div>
                     <div
                         v-if="account.type === 'FreeMyIP' || account.type === 'Vercel' || account.type === 'IonosCloud'"
                     >
@@ -245,6 +260,7 @@ const rules = ref<any>({
         apiPrefix: [Rules.requiredInput],
         username: [Rules.requiredInput],
         password: [Rules.requiredInput],
+        customerNumber: [Rules.requiredInput],
     },
 });
 const account = ref({
