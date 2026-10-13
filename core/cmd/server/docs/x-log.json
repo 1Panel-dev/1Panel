@@ -265,8 +265,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "应用端口修改 [key]-[name] => [port]",
-		"formatEN": "Application port update [key]-[name] => [port]"
+		"formatZH": "应用端口修改 [key]-[name] =\u003e [port]",
+		"formatEN": "Application port update [key]-[name] =\u003e [port]"
 	},
 	"/apps/installed/sort/update": {
 		"bodyKeys": [],
@@ -679,8 +679,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "容器重命名 [name] => [newName]",
-		"formatEN": "rename container [name] => [newName]"
+		"formatZH": "容器重命名 [name] =\u003e [newName]",
+		"formatEN": "rename container [name] =\u003e [newName]"
 	},
 	"/containers/repo": {
 		"bodyKeys": [
@@ -831,8 +831,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
-		"formatEN": "update api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
+		"formatZH": "更新 API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/auth/expired/reset": {
 		"bodyKeys": [],
@@ -1716,8 +1716,8 @@
 				"output_value": "name"
 			}
 		],
-		"formatZH": "更新用户 [name] API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
-		"formatEN": "update user [name] api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
+		"formatZH": "更新用户 [name] API 接口配置 =\u003e IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]",
+		"formatEN": "update user [name] api config =\u003e IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"
 	},
 	"/core/enterprise/users/del": {
 		"bodyKeys": [
@@ -1918,8 +1918,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统监听信息 => ipv6: [ipv6], 监听 IP: [bindAddress]",
-		"formatEN": "update system bind info => ipv6: [ipv6], 监听 IP: [bindAddress]"
+		"formatZH": "修改系统监听信息 =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]",
+		"formatEN": "update system bind info =\u003e ipv6: [ipv6], 监听 IP: [bindAddress]"
 	},
 	"/core/settings/memo": {
 		"bodyKeys": [],
@@ -1948,8 +1948,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统端口 => [serverPort]",
-		"formatEN": "update system port => [serverPort]"
+		"formatZH": "修改系统端口 =\u003e [serverPort]",
+		"formatEN": "update system port =\u003e [serverPort]"
 	},
 	"/core/settings/proxy/update": {
 		"bodyKeys": [
@@ -1974,8 +1974,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统 ssl => [ssl]",
-		"formatEN": "update system ssl => [ssl]"
+		"formatZH": "修改系统 ssl =\u003e [ssl]",
+		"formatEN": "update system ssl =\u003e [ssl]"
 	},
 	"/core/settings/terminal/update": {
 		"bodyKeys": [],
@@ -1991,8 +1991,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统配置 [key] => [value]",
-		"formatEN": "update system setting [key] => [value]"
+		"formatZH": "修改系统配置 [key] =\u003e [value]",
+		"formatEN": "update system setting [key] =\u003e [value]"
 	},
 	"/core/settings/upgrade": {
 		"bodyKeys": [
@@ -2000,8 +2000,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新系统 => [version]",
-		"formatEN": "upgrade system => [version]"
+		"formatZH": "更新系统 =\u003e [version]",
+		"formatEN": "upgrade system =\u003e [version]"
 	},
 	"/core/xapp/appQRCode": {
 		"bodyKeys": [
@@ -2459,282 +2459,6 @@
 		"formatZH": "同步 SSL 证书 [primaryDomain]",
 		"formatEN": "sync SSL certificate [primaryDomain]"
 	},
-	"/xpack/vms": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name]",
-		"formatEN": "create VM [name]"
-	},
-	"/xpack/vms/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "virtual_machines",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机 [name]",
-		"formatEN": "delete VM [name]"
-	},
-	"/xpack/vms/disks/resize": {
-		"bodyKeys": [
-			"name",
-			"target",
-			"sizeGiB"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
-		"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB"
-	},
-	"/xpack/vms/environment/enable": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "启用虚拟机运行环境",
-		"formatEN": "enable VM runtime environment"
-	},
-	"/xpack/vms/iso": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机镜像 [name] [type]",
-		"formatEN": "create VM ISO [name] [type]"
-	},
-	"/xpack/vms/iso/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_isos",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机镜像 [name]",
-		"formatEN": "delete VM ISO [name]"
-	},
-	"/xpack/vms/iso/update": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新虚拟机镜像 [name] [type]",
-		"formatEN": "update VM ISO [name] [type]"
-	},
-	"/xpack/vms/networks": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机网络 [name] [type]",
-		"formatEN": "create VM network [name] [type]"
-	},
-	"/xpack/vms/networks/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_networks",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机网络 [name]",
-		"formatEN": "delete VM network [name]"
-	},
-	"/xpack/vms/networks/update": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_networks",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新虚拟机网络 [name]",
-		"formatEN": "update VM network [name]"
-	},
-	"/xpack/vms/operate": {
-		"bodyKeys": [
-			"name",
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "操作虚拟机 [name] [operate]",
-		"formatEN": "operate VM [name] [operate]"
-	},
-	"/xpack/vms/orphans/clean": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "清理虚拟机孤立数据",
-		"formatEN": "clean VM orphaned data"
-	},
-	"/xpack/vms/rename": {
-		"bodyKeys": [
-			"name",
-			"newName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "重命名虚拟机 [name] 为 [newName]",
-		"formatEN": "rename VM [name] to [newName]"
-	},
-	"/xpack/vms/snapshots": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "create VM [name] snapshot [snapshotName]"
-	},
-	"/xpack/vms/snapshots/del": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "delete VM [name] snapshot [snapshotName]"
-	},
-	"/xpack/vms/snapshots/recover": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "recover VM [name] snapshot [snapshotName]"
-	},
-	"/xpack/vms/storages": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机存储 [name] [type]",
-		"formatEN": "create VM storage [name] [type]"
-	},
-	"/xpack/vms/storages/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_storages",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机存储 [name]",
-		"formatEN": "delete VM storage [name]"
-	},
-	"/xpack/vms/storages/update": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_storages",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新虚拟机存储 [name]",
-		"formatEN": "update VM storage [name]"
-	},
-	"/xpack/vms/sync": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步虚拟机",
-		"formatEN": "sync virtual machines"
-	},
-	"/xpack/vms/templates": {
-		"bodyKeys": [
-			"name",
-			"templateName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
-		"formatEN": "create VM [name] template [templateName]"
-	},
-	"/xpack/vms/templates/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_templates",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机模板 [name]",
-		"formatEN": "delete VM template [name]"
-	},
-	"/xpack/vms/update": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新虚拟机 [name]",
-		"formatEN": "update VM [name]"
-	},
 	"/cronjobs": {
 		"bodyKeys": [
 			"type",
@@ -2888,8 +2612,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "首页应用 [key] => 显示：[value]",
-		"formatEN": "app launcher [key] => show: [value]"
+		"formatZH": "首页应用 [key] =\u003e 显示：[value]",
+		"formatEN": "app launcher [key] =\u003e show: [value]"
 	},
 	"/dashboard/quick/change": {
 		"bodyKeys": [],
@@ -3017,7 +2741,7 @@
 			}
 		],
 		"formatZH": "mysql 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the mysql database [name] is modified => [description]"
+		"formatEN": "The description of the mysql database [name] is modified =\u003e [description]"
 	},
 	"/databases/grants": {
 		"bodyKeys": [
@@ -3098,7 +2822,7 @@
 			}
 		],
 		"formatZH": "mongodb 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the mongodb database [name] is modified => [description]"
+		"formatEN": "The description of the mongodb database [name] is modified =\u003e [description]"
 	},
 	"/databases/mongodb/password": {
 		"bodyKeys": [
@@ -3183,7 +2907,7 @@
 			}
 		],
 		"formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the postgresql database [name] is modified => [description]"
+		"formatEN": "The description of the postgresql database [name] is modified =\u003e [description]"
 	},
 	"/databases/pg/password": {
 		"bodyKeys": [
@@ -3288,8 +3012,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] => [newHost] 描述 [description]",
-		"formatEN": "update mysql database [database] user [username] access [host] => [newHost] description [description]"
+		"formatZH": "更新 mysql 数据库 [database] 用户 [username] 访问权限 [host] =\u003e [newHost] 描述 [description]",
+		"formatEN": "update mysql database [database] user [username] access [host] =\u003e [newHost] description [description]"
 	},
 	"/databases/variables/update": {
 		"bodyKeys": [],
@@ -3325,8 +3049,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "批量修改文件权限和用户/组 [paths] => [mode]/[user]/[group]",
-		"formatEN": "Batch change file mode and owner [paths] => [mode]/[user]/[group]"
+		"formatZH": "批量修改文件权限和用户/组 [paths] =\u003e [mode]/[user]/[group]",
+		"formatEN": "Batch change file mode and owner [paths] =\u003e [mode]/[user]/[group]"
 	},
 	"/files/chunkdownload": {
 		"bodyKeys": [
@@ -3416,8 +3140,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改权限 [path] => [mode]",
-		"formatEN": "Change mode [path] => [mode]"
+		"formatZH": "修改权限 [path] =\u003e [mode]",
+		"formatEN": "Change mode [path] =\u003e [mode]"
 	},
 	"/files/move": {
 		"bodyKeys": [
@@ -3426,8 +3150,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "移动文件 [oldPaths] => [newPath]",
-		"formatEN": "Move [oldPaths] => [newPath]"
+		"formatZH": "移动文件 [oldPaths] =\u003e [newPath]",
+		"formatEN": "Move [oldPaths] =\u003e [newPath]"
 	},
 	"/files/owner": {
 		"bodyKeys": [
@@ -3437,8 +3161,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改用户/组 [path] => [user]/[group]",
-		"formatEN": "Change owner [path] => [user]/[group]"
+		"formatZH": "修改用户/组 [path] =\u003e [user]/[group]",
+		"formatEN": "Change owner [path] =\u003e [user]/[group]"
 	},
 	"/files/preview": {
 		"bodyKeys": [
@@ -3472,8 +3196,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "重命名 [oldName] => [newName]",
-		"formatEN": "Rename [oldName] => [newName]"
+		"formatZH": "重命名 [oldName] =\u003e [newName]",
+		"formatEN": "Rename [oldName] =\u003e [newName]"
 	},
 	"/files/save": {
 		"bodyKeys": [
@@ -3530,8 +3254,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "下载 url => [path]/[name]",
-		"formatEN": "Download url => [path]/[name]"
+		"formatZH": "下载 url =\u003e [path]/[name]",
+		"formatEN": "Download url =\u003e [path]/[name]"
 	},
 	"/files/wget/process/remove": {
 		"bodyKeys": [
@@ -3673,13 +3397,11 @@
 		"formatEN": "batch update Docker port guard policies"
 	},
 	"/hosts/firewall/docker/policies/delete/batch": {
-		"bodyKeys": [
-			"uuids"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "删除 Docker 端口防护策略 [uuids]",
-		"formatEN": "delete Docker port guard policies [uuids]"
+		"formatZH": "删除 Docker 端口防护策略",
+		"formatEN": "delete Docker port guard policies"
 	},
 	"/hosts/firewall/family/operate": {
 		"bodyKeys": [
@@ -3687,10 +3409,10 @@
 			"family",
 			"operation"
 		],
-		"formatEN": "[operation] [subsystem] [family] firewall chains",
-		"formatZH": "[operation] [subsystem] [family] 防火墙链",
 		"paramKeys": [],
-		"beforeFunctions": []
+		"beforeFunctions": [],
+		"formatZH": "[operation] [subsystem] [family] 防火墙链",
+		"formatEN": "[operation] [subsystem] [family] firewall chains"
 	},
 	"/hosts/firewall/filter/operate": {
 		"bodyKeys": [
@@ -3739,13 +3461,11 @@
 		"formatEN": "delete firewall rules"
 	},
 	"/hosts/firewall/rules/reorder": {
-		"bodyKeys": [
-			"instanceKey"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "调整防火墙规则顺序 [instanceKey]",
-		"formatEN": "reorder firewall rule [instanceKey]"
+		"formatZH": "调整防火墙规则顺序",
+		"formatEN": "reorder firewall rule"
 	},
 	"/hosts/firewall/rules/reset": {
 		"bodyKeys": [],
@@ -3755,22 +3475,20 @@
 		"formatEN": "reset firewall rules"
 	},
 	"/hosts/firewall/rules/update": {
-		"bodyKeys": [
-			"instanceKey"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防火墙规则 [instanceKey]",
-		"formatEN": "update firewall rule [instanceKey]"
+		"formatZH": "更新防火墙规则",
+		"formatEN": "update firewall rule"
 	},
 	"/hosts/firewall/settings/ipv6": {
 		"bodyKeys": [
 			"status"
 		],
-		"formatEN": "Set firewall IPv6 support to [status]",
-		"formatZH": "设置防火墙 IPv6 支持为 [status]",
 		"paramKeys": [],
-		"beforeFunctions": []
+		"beforeFunctions": [],
+		"formatZH": "设置防火墙 IPv6 支持为 [status]",
+		"formatEN": "Set firewall IPv6 support to [status]"
 	},
 	"/hosts/firewall/settings/operate": {
 		"bodyKeys": [
@@ -3812,11 +3530,13 @@
 		"formatEN": "update firewall port whitelist"
 	},
 	"/hosts/monitor/clean": {
-		"bodyKeys": [],
+		"bodyKeys": [
+			"type"
+		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "清空监控数据",
-		"formatEN": "clean monitor datas"
+		"formatZH": "清空 [type] 监控数据",
+		"formatEN": "clean [type] monitoring data"
 	},
 	"/hosts/monitor/setting/update": {
 		"bodyKeys": [
@@ -3888,8 +3608,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改 SSH 配置 [key] => [newValue]",
-		"formatEN": "update SSH setting [key] => [newValue]"
+		"formatZH": "修改 SSH 配置 [key] =\u003e [newValue]",
+		"formatEN": "update SSH setting [key] =\u003e [newValue]"
 	},
 	"/hosts/tool/config/set": {
 		"bodyKeys": [
@@ -4150,7 +3870,7 @@
 			}
 		],
 		"formatZH": "快照 [name] 描述信息修改 [description]",
-		"formatEN": "The description of the snapshot [name] is modified => [description]"
+		"formatEN": "The description of the snapshot [name] is modified =\u003e [description]"
 	},
 	"/settings/snapshot/import": {
 		"bodyKeys": [
@@ -4242,8 +3962,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改系统配置 [key] => [value]",
-		"formatEN": "update system setting [key] => [value]"
+		"formatZH": "修改系统配置 [key] =\u003e [value]",
+		"formatEN": "update system setting [key] =\u003e [value]"
 	},
 	"/toolbox/clam": {
 		"bodyKeys": [
@@ -4361,8 +4081,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改主机参数 [key] => [value]",
-		"formatEN": "update device conf [key] => [value]"
+		"formatZH": "修改主机参数 [key] =\u003e [value]",
+		"formatEN": "update device conf [key] =\u003e [value]"
 	},
 	"/toolbox/device/update/host": {
 		"bodyKeys": [
@@ -4371,8 +4091,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改主机 Host [key] => [value]",
-		"formatEN": "update device host [key] => [value]"
+		"formatZH": "修改主机 Host [key] =\u003e [value]",
+		"formatEN": "update device host [key] =\u003e [value]"
 	},
 	"/toolbox/device/update/swap": {
 		"bodyKeys": [
@@ -4400,8 +4120,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "修改 Fail2ban 配置 [key] => [value]",
-		"formatEN": "update fail2ban conf [key] => [value]"
+		"formatZH": "修改 Fail2ban 配置 [key] =\u003e [value]",
+		"formatEN": "update fail2ban conf [key] =\u003e [value]"
 	},
 	"/toolbox/ftp": {
 		"bodyKeys": [
@@ -4660,8 +4380,8 @@
 				"output_value": "domain"
 			}
 		],
-		"formatZH": "修改默认 server => [domain]",
-		"formatEN": "Change default server => [domain]"
+		"formatZH": "修改默认 server =\u003e [domain]",
+		"formatEN": "Change default server =\u003e [domain]"
 	},
 	"/websites/del": {
 		"bodyKeys": [
@@ -5424,8 +5144,8 @@
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "更新防篡改信息 [website][path] => [status]",
-		"formatEN": "update tamper info [website][path] => [status]"
+		"formatZH": "更新防篡改信息 [website][path] =\u003e [status]",
+		"formatEN": "update tamper info [website][path] =\u003e [status]"
 	},
 	"/xpack/vllm/command-template/create": {
 		"bodyKeys": [
@@ -5503,6 +5223,282 @@
 		"beforeFunctions": [],
 		"formatZH": "更新 vLLM [name]",
 		"formatEN": "update vLLM [name]"
+	},
+	"/xpack/vms": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name]",
+		"formatEN": "create VM [name]"
+	},
+	"/xpack/vms/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "virtual_machines",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机 [name]",
+		"formatEN": "delete VM [name]"
+	},
+	"/xpack/vms/disks/resize": {
+		"bodyKeys": [
+			"name",
+			"target",
+			"sizeGiB"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
+		"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB"
+	},
+	"/xpack/vms/environment/enable": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "启用虚拟机运行环境",
+		"formatEN": "enable VM runtime environment"
+	},
+	"/xpack/vms/iso": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机镜像 [name] [type]",
+		"formatEN": "create VM ISO [name] [type]"
+	},
+	"/xpack/vms/iso/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_isos",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机镜像 [name]",
+		"formatEN": "delete VM ISO [name]"
+	},
+	"/xpack/vms/iso/update": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机镜像 [name] [type]",
+		"formatEN": "update VM ISO [name] [type]"
+	},
+	"/xpack/vms/networks": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机网络 [name] [type]",
+		"formatEN": "create VM network [name] [type]"
+	},
+	"/xpack/vms/networks/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机网络 [name]",
+		"formatEN": "delete VM network [name]"
+	},
+	"/xpack/vms/networks/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机网络 [name]",
+		"formatEN": "update VM network [name]"
+	},
+	"/xpack/vms/operate": {
+		"bodyKeys": [
+			"name",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "操作虚拟机 [name] [operate]",
+		"formatEN": "operate VM [name] [operate]"
+	},
+	"/xpack/vms/orphans/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理虚拟机孤立数据",
+		"formatEN": "clean VM orphaned data"
+	},
+	"/xpack/vms/rename": {
+		"bodyKeys": [
+			"name",
+			"newName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重命名虚拟机 [name] 为 [newName]",
+		"formatEN": "rename VM [name] to [newName]"
+	},
+	"/xpack/vms/snapshots": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "create VM [name] snapshot [snapshotName]"
+	},
+	"/xpack/vms/snapshots/del": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "delete VM [name] snapshot [snapshotName]"
+	},
+	"/xpack/vms/snapshots/recover": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "recover VM [name] snapshot [snapshotName]"
+	},
+	"/xpack/vms/storages": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机存储 [name] [type]",
+		"formatEN": "create VM storage [name] [type]"
+	},
+	"/xpack/vms/storages/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机存储 [name]",
+		"formatEN": "delete VM storage [name]"
+	},
+	"/xpack/vms/storages/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机存储 [name]",
+		"formatEN": "update VM storage [name]"
+	},
+	"/xpack/vms/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步虚拟机",
+		"formatEN": "sync virtual machines"
+	},
+	"/xpack/vms/templates": {
+		"bodyKeys": [
+			"name",
+			"templateName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
+		"formatEN": "create VM [name] template [templateName]"
+	},
+	"/xpack/vms/templates/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_templates",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机模板 [name]",
+		"formatEN": "delete VM template [name]"
+	},
+	"/xpack/vms/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机 [name]",
+		"formatEN": "update VM [name]"
 	},
 	"/xpack/waf/block/export": {
 		"bodyKeys": [],

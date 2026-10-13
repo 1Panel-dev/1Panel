@@ -262,8 +262,6 @@ func (s *ForwardingService) Restore(ctx context.Context) error {
 		if err := manager.OperateFamily(family, missing[family]); err != nil {
 			return err
 		}
-	}
-	for _, family := range families {
 		if !missing[family] {
 			continue
 		}

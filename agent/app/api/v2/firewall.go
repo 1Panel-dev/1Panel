@@ -318,7 +318,7 @@ func (b *BaseApi) DeleteFirewallRules(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/update [post]
-// @x-panel-log {"bodyKeys":["instanceKey"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙规则 [instanceKey]","formatEN":"update firewall rule [instanceKey]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新防火墙规则","formatEN":"update firewall rule"}
 func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleUpdate
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
@@ -340,7 +340,7 @@ func (b *BaseApi) UpdateFirewallRule(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/rules/reorder [post]
-// @x-panel-log {"bodyKeys":["instanceKey"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序 [instanceKey]","formatEN":"reorder firewall rule [instanceKey]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"调整防火墙规则顺序","formatEN":"reorder firewall rule"}
 func (b *BaseApi) ReorderFirewallRule(c *gin.Context) {
 	var request dto.FirewallRuleReorder
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
@@ -556,7 +556,7 @@ func (b *BaseApi) OperateDockerPortGuard(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /hosts/firewall/docker/policies/delete/batch [post]
-// @x-panel-log {"bodyKeys":["uuids"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除 Docker 端口防护策略 [uuids]","formatEN":"delete Docker port guard policies [uuids]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除 Docker 端口防护策略","formatEN":"delete Docker port guard policies"}
 func (b *BaseApi) DeleteDockerPortGuardPolicies(c *gin.Context) {
 	var request dto.DockerPortGuardPolicyBatchDelete
 	if err := helper.CheckBindAndValidate(&request, c); err != nil {
