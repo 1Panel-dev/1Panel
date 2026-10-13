@@ -76,7 +76,7 @@ class RequestHttp {
         );
 
         this.service.interceptors.response.use(
-            (response: AxiosResponse) => {
+            async (response: AxiosResponse) => {
                 const globalStore = GlobalStore();
                 const { data } = response;
                 const authResult = handleAuthResponseCode(data, { showRBACMessage: true });
@@ -100,9 +100,9 @@ class RequestHttp {
                     return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.NODE_UNBIND) {
-                    changeToLocal();
+                    await changeToLocal();
                     window.location.reload();
-                    return;
+                    return Promise.reject(data);
                 }
                 if (data.code == ResultEnum.ERR_GLOBAL_LOADING) {
                     globalStore.isLoading = true;
