@@ -326,39 +326,46 @@ func (u *ContainerService) Inspect(req dto.InspectReq) (string, error) {
 	case "container":
 		inspectInfo, err = client.ContainerInspect(context.Background(), req.ID)
 	case "compose":
-		filePath := ""
-		cli, err := docker.NewDockerClient()
-		if err != nil {
-			return "", err
-		}
-		defer cli.Close()
+		config, workdir := "", ""
 		options := container.ListOptions{All: true}
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", fmt.Sprintf("%s=%s", composeProjectLabel, req.ID))
-		containers, err := cli.ContainerList(context.Background(), options)
+		containers, err := client.ContainerList(context.Background(), options)
 		if err != nil {
 			return "", err
 		}
-		for _, container := range containers {
-			config := container.Labels[composeConfigLabel]
-			if len(req.Detail) != 0 && strings.Contains(config, req.Detail) {
-				config = req.Detail
-			}
-			workdir := container.Labels[composeWorkdirLabel]
-			if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
-				filePath = config
-				break
-			} else {
-				filePath = workdir
-				break
-			}
-		}
 		if len(containers) == 0 {
-			composeItem, _ := composeRepo.GetRecord(repo.WithByName(req.ID))
-			filePath = composeItem.Path
+			composeItem, err := composeRepo.GetRecord(repo.WithByName(req.ID))
+			if err != nil {
+				return "", err
+			}
+			config = composeItem.Path
+			workdir = filepath.Dir(primaryComposePath(config))
+		} else {
+			config = containers[0].Labels[composeConfigLabel]
+			workdir = containers[0].Labels[composeWorkdirLabel]
 		}
-		if _, err := os.Stat(filePath); err != nil {
+		composeFiles, err := resolveComposeFiles(workdir, config)
+		if err != nil {
 			return "", err
+		}
+		filePath := composeFiles[0]
+		if strings.TrimSpace(req.Detail) != "" {
+			selectedFiles, err := resolveComposeFiles(workdir, req.Detail)
+			if err != nil {
+				return "", err
+			}
+			if len(selectedFiles) != 1 || !slices.Contains(composeFiles, selectedFiles[0]) {
+				return "", fmt.Errorf("compose file %s does not belong to project %s", req.Detail, req.ID)
+			}
+			filePath = selectedFiles[0]
+		}
+		info, err := os.Stat(filePath)
+		if err != nil {
+			return "", err
+		}
+		if !info.Mode().IsRegular() {
+			return "", fmt.Errorf("compose path %s is not a regular file", filePath)
 		}
 		content, err := os.ReadFile(filePath)
 		if err != nil {
