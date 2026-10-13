@@ -140,6 +140,8 @@ ErrComposeProjectNameEmpty: 'Docker Compose yapılandırmasından veya dosyanın
 ErrComposeNameInvalid: 'Geçersiz Compose proje adı: küçük harf veya rakamla başlamalı, yalnızca küçük harf, rakam, kısa çizgi ve alt çizgi içermeli ve 1-256 karakter uzunluğunda olmalıdır.'
 ErrAppVersionUnavailable: 'Bu uygulama sürümü uzak hizmetten kaldırıldı. Lütfen başka bir sürüm seçip tekrar deneyin.'
 ErrVllmGB10ProOnly: 'Bu vLLM sürümü yalnızca 1Panel Professional Edition sürümünde kullanılabilir.'
+ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway yalnızca aynı veritabanı türü (SQLite veya PostgreSQL) içinde yükseltilebilir.'
+ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway yedeği ve hedef uygulama aynı veritabanı türünü (SQLite veya PostgreSQL) kullanmalıdır.'
 ErrAppWarn: 'Anormal durum, lütfen günlüğü kontrol edin'
 ErrAppParamKey: 'Parametre {{ .name }} alanı anormal'
 ErrAppUpgrade: 'Uygulama {{ .name }} yükseltmesi başarısız {{ .err }}'

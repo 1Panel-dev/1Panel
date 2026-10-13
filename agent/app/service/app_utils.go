@@ -1571,6 +1571,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 
 		var versions []string
 		for _, appDetail := range details {
+			if !isAIGatewayUpgradeVersionAllowed(installed.App.Key, installed.Version, appDetail.Version) {
+				continue
+			}
 			ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(appDetail.ID), appIgnoreUpgradeRepo.WithScope("version"))
 			if len(ignores) > 0 {
 				continue
@@ -2279,7 +2282,12 @@ func getAppVersions(key string, details []model.AppDetail) []string {
 		}
 		versionsRaw = append(versionsRaw, detail.Version)
 	}
-	versions = common.GetSortedVersions(versionsRaw)
+	if isAIGatewayApp(key) {
+		sortAIGatewayVersions(versionsRaw)
+		versions = versionsRaw
+	} else {
+		versions = common.GetSortedVersions(versionsRaw)
+	}
 	if hasLatest {
 		versions = append([]string{latestVersion}, versions...)
 	}

@@ -687,6 +687,9 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		if !canAccessVllmVersion(app.Key, detail.Version) {
 			continue
 		}
+		if !isAIGatewayUpgradeVersionAllowed(app.Key, install.Version, detail.Version) {
+			continue
+		}
 		ignores, _ := appIgnoreUpgradeRepo.List(runtimeRepo.WithDetailId(detail.ID), appIgnoreUpgradeRepo.WithScope("version"))
 		if len(ignores) > 0 {
 			continue

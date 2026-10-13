@@ -106,6 +106,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
+	if !isAIGatewayUpgradeVersionAllowed(install.App.Key, install.Version, detail.Version) {
+		return buserr.New("ErrAIGatewayDatabaseTypeMismatch")
+	}
 	if err = checkVllmVersionAccess(install.App.Key, detail.Version); err != nil {
 		return err
 	}
