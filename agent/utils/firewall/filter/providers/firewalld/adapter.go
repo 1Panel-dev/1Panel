@@ -50,7 +50,7 @@ func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error
 	if rule.Priority == nil || *rule.Priority == 0 {
 		return nil
 	}
-	supported, err := a.supportsRichRulePriority(ctx)
+	supported, err := a.SupportsRichRulePriority(ctx)
 	if err != nil {
 		return err
 	}
@@ -60,7 +60,7 @@ func (a *Adapter) CheckRule(ctx context.Context, rule filter.FirewallRule) error
 	return nil
 }
 
-func (a *Adapter) supportsRichRulePriority(ctx context.Context) (bool, error) {
+func (a *Adapter) SupportsRichRulePriority(ctx context.Context) (bool, error) {
 	a.prioritySupportMu.Lock()
 	defer a.prioritySupportMu.Unlock()
 	if a.richRulePrioritySupported != nil {
@@ -80,6 +80,52 @@ func (a *Adapter) supportsRichRulePriority(ctx context.Context) (bool, error) {
 	supported := major > 0 || minor >= 7
 	a.richRulePrioritySupported = &supported
 	return supported, nil
+}
+
+func RemoveRichRulePriority(raw string) (string, error) {
+	if strings.ContainsAny(raw, "\r\n\x00") {
+		return "", filter.ErrInvalidRule
+	}
+	parts := make([]string, 0)
+	removed := false
+	for start := 0; start < len(raw); {
+		if raw[start] == ' ' || raw[start] == '\t' {
+			start++
+			continue
+		}
+		end, quote := start, byte(0)
+		for end < len(raw) {
+			char := raw[end]
+			if char == '\\' && quote != '\'' {
+				end += 2
+				continue
+			}
+			if quote != 0 {
+				if char == quote {
+					quote = 0
+				}
+			} else if char == '\'' || char == '"' {
+				quote = char
+			} else if char == ' ' || char == '\t' {
+				break
+			}
+			end++
+		}
+		if quote != 0 || end > len(raw) {
+			return "", filter.ErrInvalidRule
+		}
+		token := raw[start:end]
+		if strings.HasPrefix(token, "priority=") {
+			removed = true
+		} else {
+			parts = append(parts, token)
+		}
+		start = end
+	}
+	if !removed || len(parts) == 0 || parts[0] != "rule" {
+		return raw, nil
+	}
+	return strings.Join(parts, " "), nil
 }
 
 func parseFirewalldVersion(output string) (int, int, error) {
