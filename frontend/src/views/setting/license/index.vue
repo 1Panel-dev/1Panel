@@ -108,6 +108,7 @@ import BindXpack from '@/views/setting/license/bind/xpack.vue';
 import { dateFormat } from '@/utils/date';
 import i18n from '@/lang';
 import { MsgError, MsgSuccess } from '@/utils/message';
+import { changeToLocal } from '@/utils/node';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { globalStore } = useGlobalStore();
 
@@ -198,7 +199,10 @@ const submitUnbind = async () => {
         force: forceUnbind.value,
         withDockerRestart: withDockerRestart.value,
     })
-        .then(() => {
+        .then(async () => {
+            if (unbindRow.value.freeNodes?.some((node) => node.name === globalStore.currentNode)) {
+                await changeToLocal();
+            }
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             window.location.reload();
