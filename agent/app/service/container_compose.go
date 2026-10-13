@@ -71,10 +71,9 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 			ContainerCount: 0,
 			CreatedAt:      localItem.CreatedAt.Format(constant.DateTimeLayout),
 			ConfigFile:     localItem.Path,
-			Workdir:        strings.TrimSuffix(localItem.Path, "/docker-compose.yml"),
+			Workdir:        filepath.Dir(primaryComposePath(localItem.Path)),
 		}
 		composeItemLocal.CreatedBy = "1Panel"
-		composeItemLocal.Path = localItem.Path
 		composeLocalMap[localItem.Name] = composeItemLocal
 	}
 
@@ -112,11 +111,6 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 				if ok {
 					composeItem.CreatedBy = createdBy
 				}
-				if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
-					composeItem.Path = config
-				} else {
-					composeItem.Path = workdir
-				}
 				for i := 0; i < len(composeCreatedByLocal); i++ {
 					if composeCreatedByLocal[i].Name == name {
 						composeItem.CreatedBy = "1Panel"
@@ -147,7 +141,9 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 
 	for key, value := range mergedMap {
 		value.Name = key
-		value.ComposeFileExists = composeFileExists(value.Workdir, value.ConfigFile)
+		composeFiles, err := resolveComposeFiles(value.Workdir, value.ConfigFile)
+		value.Path = strings.Join(composeFiles, ",")
+		value.ComposeFileExists = err == nil && composeFileExists(composeFiles)
 		value.IsPinned = pinnedByName[key]
 		records = append(records, value)
 	}
@@ -190,29 +186,6 @@ func (u *ContainerService) PageCompose(req dto.SearchWithPage) (int64, interface
 	}
 	listItem := loadEnv(BackDatas)
 	return int64(total), listItem, nil
-}
-
-func composeFileExists(workdir, configFile string) bool {
-	workdir = strings.TrimSpace(workdir)
-	configFile = strings.TrimSpace(configFile)
-	if configFile == "" {
-		return false
-	}
-	for _, item := range strings.Split(configFile, ",") {
-		file := strings.TrimSpace(item)
-		if file == "" {
-			continue
-		}
-		if !filepath.IsAbs(file) && workdir != "" {
-			file = filepath.Join(workdir, file)
-		}
-		file = filepath.Clean(file)
-		info, err := os.Stat(file)
-		if err == nil && !info.IsDir() {
-			return true
-		}
-	}
-	return false
 }
 
 func (u *ContainerService) TestCompose(req dto.ComposeCreate) (bool, error) {
@@ -522,10 +495,6 @@ func isComposeProjectNameEmptyError(err error) bool {
 }
 
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
-	if len(req.Path) == 0 && req.Operation == "delete" {
-		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
-		return nil
-	}
 	if cmd.CheckIllegal(req.Path, req.Operation) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -535,13 +504,19 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 		}
 		if req.WithFile {
 			for _, item := range strings.Split(req.Path, ",") {
-				if len(item) != 0 {
-					_ = os.RemoveAll(path.Dir(item))
+				item = strings.TrimSpace(item)
+				if !filepath.IsAbs(item) || filepath.Dir(item) == "/" {
+					continue
+				}
+				info, err := os.Stat(item)
+				if err == nil && info.Mode().IsRegular() {
+					if err := os.RemoveAll(filepath.Dir(item)); err != nil && !req.Force {
+						return err
+					}
 				}
 			}
 		}
-		_ = composeRepo.DeleteRecord(repo.WithByName(req.Name))
-		return nil
+		return composeRepo.DeleteRecord(repo.WithByName(req.Name))
 	}
 	if req.Operation == "up" {
 		if stdout, err := compose.Up(req.Path, req.Name); err != nil {
@@ -584,13 +559,13 @@ func (u *ContainerService) ComposeUpdate(req dto.ComposeUpdate) error {
 			write.Flush()
 
 			global.LOG.Infof("docker-compose.yml %s has been replaced, now start to docker-compose restart", req.DetailPath)
-			if err := newComposeEnv(req.DetailPath, req.Env); err != nil {
+			if err := newComposeEnv(primaryComposePath(req.Path), req.Env); err != nil {
 				return err
 			}
 
 			if err := compose.UpWithTask(req.Path, t, req.ForcePull, req.Name); err != nil {
 				global.LOG.Errorf("update failed when handle compose up, err: %s, now try to recreate the old compose file", err)
-				if err := recreateCompose(string(oldFile), req.Path, req.Name); err != nil {
+				if err := recreateCompose(string(oldFile), req.Path, req.DetailPath, req.Name); err != nil {
 					return fmt.Errorf("update failed and recreate old compose file also failed, err: %v", err)
 				}
 				return fmt.Errorf("update failed when handle compose up, err: %s", err)
@@ -702,9 +677,18 @@ func (u *ContainerService) loadPath(req *dto.ComposeCreate) error {
 }
 
 func removeContainerForCompose(composeName, composePath string) error {
-	if _, err := os.Stat(composePath); err == nil {
-		if stdout, err := compose.Operate(composePath, "down", composeName); err != nil {
-			return errors.New(stdout)
+	composeFiles, err := resolveComposeFiles("", composePath)
+	filesAvailable := err == nil
+	for _, file := range composeFiles {
+		info, err := os.Stat(file)
+		if err != nil || !info.Mode().IsRegular() {
+			filesAvailable = false
+			break
+		}
+	}
+	if filesAvailable {
+		if stdout, err := compose.Operate(strings.Join(composeFiles, ","), "down", composeName); err != nil {
+			return fmt.Errorf("docker-compose down failed, std: %s, err: %w", stdout, err)
 		}
 		return nil
 	}
@@ -722,14 +706,17 @@ func removeContainerForCompose(composeName, composePath string) error {
 	if err != nil {
 		return err
 	}
+	var removeErrors []error
 	for _, c := range containers {
-		_ = client.ContainerRemove(ctx, c.ID, container.RemoveOptions{RemoveVolumes: true, Force: true})
+		if err := client.ContainerRemove(ctx, c.ID, container.RemoveOptions{RemoveVolumes: true, Force: true}); err != nil {
+			removeErrors = append(removeErrors, fmt.Errorf("remove container %s failed: %w", c.ID, err))
+		}
 	}
-	return nil
+	return errors.Join(removeErrors...)
 }
 
-func recreateCompose(content, path, projectName string) error {
-	file, err := os.OpenFile(path, os.O_WRONLY|os.O_TRUNC, 0640)
+func recreateCompose(content, composePath, detailPath, projectName string) error {
+	file, err := os.OpenFile(detailPath, os.O_WRONLY|os.O_TRUNC, 0640)
 	if err != nil {
 		return err
 	}
@@ -738,7 +725,7 @@ func recreateCompose(content, path, projectName string) error {
 	_, _ = write.WriteString(content)
 	write.Flush()
 
-	if stdout, err := compose.Up(path, projectName); err != nil {
+	if stdout, err := compose.Up(composePath, projectName); err != nil {
 		return errors.New(string(stdout))
 	}
 	return nil
@@ -746,6 +733,9 @@ func recreateCompose(content, path, projectName string) error {
 
 func loadEnv(list []dto.ComposeInfo) []dto.ComposeInfo {
 	for i := 0; i < len(list); i++ {
+		if list[i].Path == "" {
+			continue
+		}
 		tmpPath := list[i].Path
 		if strings.Contains(list[i].Path, ",") {
 			tmpPath = strings.Split(list[i].Path, ",")[0]
@@ -773,4 +763,36 @@ func newComposeEnv(pathItem string, env string) error {
 		return err
 	}
 	return nil
+}
+
+func resolveComposeFiles(workdir, configFile string) ([]string, error) {
+	workdir = strings.TrimSpace(workdir)
+	var files []string
+	for _, item := range strings.Split(configFile, ",") {
+		file := strings.TrimSpace(item)
+		if file == "" {
+			continue
+		}
+		if !filepath.IsAbs(file) {
+			if !filepath.IsAbs(workdir) {
+				return nil, fmt.Errorf("cannot resolve compose file %s without an absolute working directory", file)
+			}
+			file = filepath.Join(workdir, file)
+		}
+		files = append(files, filepath.Clean(file))
+	}
+	if len(files) == 0 {
+		return nil, fmt.Errorf("compose config file is not specified")
+	}
+	return files, nil
+}
+
+func composeFileExists(files []string) bool {
+	for _, file := range files {
+		info, err := os.Stat(file)
+		if err == nil && info.Mode().IsRegular() {
+			return true
+		}
+	}
+	return false
 }

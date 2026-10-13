@@ -371,43 +371,39 @@ func loadComposePathAndFiles(composeName string, dockerClient *client.Client) (s
 		}
 		config := targetContainer.Labels[composeConfigLabel]
 		workdir := targetContainer.Labels[composeWorkdirLabel]
-		if len(config) != 0 && len(workdir) != 0 && strings.Contains(config, workdir) {
-			composePath = config
-		} else {
-			composePath = workdir
+		files, err := resolveComposeFiles(workdir, config)
+		if err != nil {
+			return "", nil, err
 		}
+		composePath = strings.Join(files, ",")
 	}
-	composeFiles := normalizeComposeFiles(composePath)
-	if len(composeFiles) == 0 {
-		return "", nil, fmt.Errorf("compose file not found for %s", composeName)
+	composeFiles, err := normalizeComposeFiles(composePath)
+	if err != nil {
+		return "", nil, err
 	}
-	return composePath, composeFiles, nil
+	return strings.Join(composeFiles, ","), composeFiles, nil
 }
 
-func normalizeComposeFiles(composePath string) []string {
-	items := strings.Split(composePath, ",")
-	result := make([]string, 0)
-	seen := make(map[string]struct{})
-	for _, item := range items {
-		item = strings.TrimSpace(item)
-		if item == "" {
-			continue
-		}
-		stat, err := os.Stat(item)
-		if err == nil && stat.IsDir() {
-			item = path.Join(item, "docker-compose.yml")
-		}
-		if _, err := os.Stat(item); err != nil {
-			continue
-		}
-		if _, ok := seen[item]; ok {
-			continue
-		}
-		seen[item] = struct{}{}
-		result = append(result, item)
+func normalizeComposeFiles(composePath string) ([]string, error) {
+	files, err := resolveComposeFiles("", composePath)
+	if err != nil {
+		return nil, err
 	}
-	sort.Strings(result)
-	return result
+	for i, file := range files {
+		info, err := os.Stat(file)
+		if err == nil && info.IsDir() {
+			file = filepath.Join(file, "docker-compose.yml")
+			info, err = os.Stat(file)
+			files[i] = file
+		}
+		if err != nil {
+			return nil, err
+		}
+		if !info.Mode().IsRegular() {
+			return nil, fmt.Errorf("compose path %s is not a regular file", file)
+		}
+	}
+	return files, nil
 }
 
 func (c *composeBackupContext) close() {
@@ -621,20 +617,46 @@ func safeJoinWithinBase(baseDir, name string) (string, error) {
 }
 
 func stepRestoreComposeFiles(recoverCtx *composeRecoverContext) error {
-	if recoverCtx.targetDir != "" {
-		_ = os.RemoveAll(recoverCtx.targetDir)
+	composeFiles := recoverCtx.meta.Files
+	if strings.TrimSpace(recoverCtx.meta.ComposePath) != "" {
+		filesByPath := make(map[string]composeBackupFile, len(composeFiles))
+		for _, item := range composeFiles {
+			filesByPath[filepath.Clean(item.OriginalPath)] = item
+		}
+		orderedFiles := make([]composeBackupFile, 0, len(composeFiles))
+		for _, file := range strings.Split(recoverCtx.meta.ComposePath, ",") {
+			file = strings.TrimSpace(file)
+			if file == "" {
+				continue
+			}
+			file = filepath.Clean(file)
+			item, ok := filesByPath[file]
+			if !ok {
+				if len(composeFiles) != 1 || file != filepath.Dir(composeFiles[0].OriginalPath) {
+					return fmt.Errorf("compose file %s is missing from backup metadata", file)
+				}
+				item = composeFiles[0]
+			}
+			orderedFiles = append(orderedFiles, item)
+		}
+		composeFiles = orderedFiles
 	}
-	if err := os.MkdirAll(recoverCtx.targetDir, os.ModePerm); err != nil {
-		return err
+	if len(composeFiles) == 0 {
+		return fmt.Errorf("compose files are missing from backup metadata")
 	}
-	restored := make([]string, 0, len(recoverCtx.meta.Files))
-	for _, item := range recoverCtx.meta.Files {
+	restored := make([]string, 0, len(composeFiles))
+	sourceByTarget := make(map[string]string, len(composeFiles))
+	for _, item := range composeFiles {
 		backupPath, err := safeJoinWithinBase(recoverCtx.tmpDir, item.BackupPath)
 		if err != nil {
 			return fmt.Errorf("invalid compose backup path %q, err: %v", item.BackupPath, err)
 		}
-		if !recoverCtx.fileOp.Stat(backupPath) {
-			continue
+		info, err := os.Stat(backupPath)
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("compose backup path %s is not a regular file", backupPath)
 		}
 		targetName := item.FileName
 		if item.RelativePath != "" {
@@ -650,6 +672,29 @@ func stepRestoreComposeFiles(recoverCtx *composeRecoverContext) error {
 		if err != nil {
 			return fmt.Errorf("invalid compose target path %q, err: %v", targetName, err)
 		}
+		sourcePath := item.OriginalPath
+		if sourcePath == "" {
+			sourcePath = backupPath
+		}
+		sourcePath = filepath.Clean(sourcePath)
+		if previous, ok := sourceByTarget[targetPath]; ok && previous != sourcePath {
+			return fmt.Errorf("compose files %q and %q resolve to the same restore path %q", previous, sourcePath, targetPath)
+		}
+		sourceByTarget[targetPath] = sourcePath
+		restored = append(restored, targetPath)
+	}
+	if recoverCtx.targetDir != "" {
+		_ = os.RemoveAll(recoverCtx.targetDir)
+	}
+	if err := os.MkdirAll(recoverCtx.targetDir, os.ModePerm); err != nil {
+		return err
+	}
+	for i, item := range composeFiles {
+		backupPath, err := safeJoinWithinBase(recoverCtx.tmpDir, item.BackupPath)
+		if err != nil {
+			return fmt.Errorf("invalid compose backup path %q, err: %v", item.BackupPath, err)
+		}
+		targetPath := restored[i]
 		if err := os.MkdirAll(path.Dir(targetPath), os.ModePerm); err != nil {
 			return err
 		}
@@ -660,7 +705,6 @@ func stepRestoreComposeFiles(recoverCtx *composeRecoverContext) error {
 		if err := recoverCtx.fileOp.SaveFile(targetPath, string(content), fs.ModePerm); err != nil {
 			return err
 		}
-		restored = append(restored, targetPath)
 	}
 	envPath := path.Join(recoverCtx.tmpDir, "compose_files", ".env")
 	if recoverCtx.fileOp.Stat(envPath) {
@@ -672,14 +716,6 @@ func stepRestoreComposeFiles(recoverCtx *composeRecoverContext) error {
 			return err
 		}
 	}
-	if len(restored) == 0 {
-		defaultPath := path.Join(recoverCtx.targetDir, "docker-compose.yml")
-		if !recoverCtx.fileOp.Stat(defaultPath) {
-			return fmt.Errorf("compose file not found in backup data")
-		}
-		restored = append(restored, defaultPath)
-	}
-	sort.Strings(restored)
 	recoverCtx.composePath = strings.Join(restored, ",")
 	return nil
 }

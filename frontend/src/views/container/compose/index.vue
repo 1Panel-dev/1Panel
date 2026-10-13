@@ -350,6 +350,7 @@
                                     v-if="showType !== 'log' && !(showType === 'env' && isAppStoreCompose)"
                                     v-permission
                                     type="primary"
+                                    :disabled="detailLoading || !composeContent"
                                     @click="onSubmitEdit"
                                 >
                                     {{ $t('commons.button.save') }}
@@ -741,18 +742,24 @@ const loadDetail = async (row: Container.ComposeInfo, withRefresh: boolean) => {
 };
 
 const inspectCompose = async (name: string, detailPath: string) => {
+    composeContent.value = '';
     if (!currentCompose.value?.composeFileExists) {
-        composeContent.value = '';
         loadContainerStats();
         detailLoading.value = false;
         return;
     }
+    detailLoading.value = true;
     await inspect({ id: name, type: 'compose', detail: detailPath })
         .then((res) => {
+            if (currentCompose.value?.name !== name || currentYamlPath.value !== detailPath) {
+                return;
+            }
             composeContent.value = res.data;
-            detailLoading.value = false;
         })
         .finally(() => {
+            if (currentCompose.value?.name !== name || currentYamlPath.value !== detailPath) {
+                return;
+            }
             loadContainerStats();
             detailLoading.value = false;
         });
