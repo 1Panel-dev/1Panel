@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'アプリケーションの種類または名前が一�
 # アラート
 ErrAlertMethodNotSupported: 'このバージョンではこの通知方法は利用できません'
 ErrAlertSync: 'アラーム情報の同期エラーです。確認してもう一度お試しください。'
+ErrWebhookTestFailed: 'Webhook の設定を確認してください。詳細はシステムログを参照してください。'
 
 # タスク - ランタイム
 ErrInstallExtension: 'インストールタスクが進行中です、タスクが終了するのを待ってください'
 
 # アラートメールテンプレート
 PanelAlertTitle: 'パネルアラート通知'
-TestAlertTitle: 'テストメール - メール接続の確認'
-TestAlert: 'これはテストメールです。メール送信設定が正しく構成されているかを確認します。'
+TestAlertTitle: 'パネルのテスト通知'
+TestAlertMessage: 'これは通知チャネルの設定と接続性を確認するためのテスト通知です。'
 LicenseExpirationAlert: 'あなたの {{ .node }}{{ .ip }} パネル、ライセンスは {{ .day }} 日後に期限切れになります。詳細はパネルにログインして'
 CronJobFailedAlert: 'あなたの {{ .node }}{{ .ip }} パネル、スケジュールタスク {{ .name }} の実行に失敗しました。詳細はパネルにログインして'
 ClamAlert: 'あなたの {{ .node }}{{ .ip }} パネル、ウイルススキャンタスクで {{ .num }} 個の感染ファイルを検出しました。詳細はパネルにログインして'

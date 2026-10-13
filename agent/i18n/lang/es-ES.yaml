@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'El tipo o nombre de la aplicación no coincide'
 # alerta
 ErrAlertMethodNotSupported: 'Esta versión no admite este método de alerta'
 ErrAlertSync: 'Error en la sincronización de la alerta, revise e intente de nuevo'
+ErrWebhookTestFailed: 'Revisa la configuración del Webhook. Consulta los registros del sistema para más detalles.'
 
 # tarea - entorno de ejecución
 ErrInstallExtension: 'Ya hay una tarea de instalación en curso, espere a que termine'
 
 # plantilla de correo de alerta
 PanelAlertTitle: 'Notificación de alerta del panel'
-TestAlertTitle: 'Correo de prueba - Verificar conectividad de correo'
-TestAlert: 'Este es un correo de prueba para verificar que la configuración de envío de correos es correcta.'
+TestAlertTitle: 'Notificación de prueba del panel'
+TestAlertMessage: 'Esta es una notificación de prueba para verificar la configuración y la conectividad del canal de notificaciones.'
 LicenseExpirationAlert: 'Su Panel {{ .node }}{{ .ip }}, la licencia expirará en {{ .day }} días. Inicie sesión en el panel para ver los detalles.'
 CronJobFailedAlert: 'Su Panel {{ .node }}{{ .ip }}, la ejecución de la tarea programada {{ .name }} falló. Inicie sesión en el panel para ver los detalles.'
 ClamAlert: 'Su Panel {{ .node }}{{ .ip }}, la tarea de escaneo antivirus detectó {{ .num }} archivos infectados. Inicie sesión en el panel para ver los detalles.'

@@ -77,7 +77,7 @@ type IAlertService interface {
 	UpdateAlertConfigStatus(req dto.AlertConfigStatusUpdate, operator string) error
 	DeleteAlertConfig(id uint) error
 	TestAlertConfig(req dto.AlertConfigTest) (bool, error)
-	TestCustomAlertConfig(req dto.AlertConfigTest) (dto.AlertConfigTestResult, error)
+	TestCustomAlertConfig(req dto.AlertConfigTest, lang string) (dto.AlertConfigTestResult, error)
 }
 
 func NewIAlertService() IAlertService {
@@ -851,7 +851,7 @@ func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
 
 	msg := email.EmailMessage{
 		Subject: i18n.GetMsgByKey("TestAlertTitle"),
-		Body:    i18n.GetMsgByKey("TestAlert"),
+		Body:    i18n.GetMsgByKey("TestAlertMessage"),
 		IsHTML:  false,
 	}
 	transport := xpack.MultiNodeProvider.LoadRequestTransport()
@@ -899,7 +899,7 @@ func resolveEmailTestConfig(req dto.AlertConfigTest) (dto.AlertEmailConfig, erro
 	return emailConfig, nil
 }
 
-func (a AlertService) TestCustomAlertConfig(req dto.AlertConfigTest) (dto.AlertConfigTestResult, error) {
+func (a AlertService) TestCustomAlertConfig(req dto.AlertConfigTest, lang string) (dto.AlertConfigTestResult, error) {
 	if req.Type != constant.Custom {
 		return dto.AlertConfigTestResult{}, fmt.Errorf("alert config test type must be custom")
 	}
@@ -928,12 +928,15 @@ func (a AlertService) TestCustomAlertConfig(req dto.AlertConfigTest) (dto.AlertC
 	}
 	tester, ok := xpack.AlertProvider.(providers.CustomWebhookTester)
 	if !ok {
+		if global.LOG != nil {
+			global.LOG.Warnf("webhook test failed: %v", providers.ErrCustomWebhookUnsupported)
+		}
 		return dto.AlertConfigTestResult{
 			Success: false,
 			Message: providers.ErrCustomWebhookUnsupported.Error(),
 		}, nil
 	}
-	return tester.TestCustomWebhook(resolved)
+	return tester.TestCustomWebhook(resolved, lang)
 }
 
 func (a AlertService) ExternalUpdateAlert(updateAlert dto.AlertCreate, operator string) error {

@@ -633,14 +633,15 @@ AppAttributesNotMatch: "应用类型或名称不一致"
 # 告警
 ErrAlertMethodNotSupported: "当前版本不支持此告警方式"
 ErrAlertSync: "告警信息同步错误，请检查后重试"
+ErrWebhookTestFailed: "请检查 Webhook 配置，详细原因请查看系统日志"
 
 # 任务 - 运行环境
 ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"
 
 # 告警邮件模板
 PanelAlertTitle: "面板告警通知"
-TestAlertTitle: "测试邮件 - 验证邮箱连通性"
-TestAlert: "这是一封测试邮件，用于验证邮箱发件配置。"
+TestAlertTitle: "面板测试通知"
+TestAlertMessage: "这是一条测试通知，用于验证通知渠道配置及连通性。"
 LicenseExpirationAlert: "您的 {{ .node }}{{ .ip }} 面板，许可证将在 {{ .day }} 天后到期，请登录面板查看详情。"
 CronJobFailedAlert: "您的 {{ .node }}{{ .ip }} 面板，计划任务-{{ .name }}执行失败，请登录面板查看详情。"
 ClamAlert: "您的 {{ .node }}{{ .ip }} 面板，病毒扫描任务发现 {{ .num }} 个感染文件，请登录面板查看详情。"

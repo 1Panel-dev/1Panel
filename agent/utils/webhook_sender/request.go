@@ -142,7 +142,7 @@ func Execute(ctx context.Context, input Request) (Result, error) {
 	}
 
 	if err := validateResponse(input.Preset, resp.StatusCode, responseBody); err != nil {
-		return result, err
+		return result, safeResponseError(err, input, target)
 	}
 	return result, nil
 }
@@ -332,6 +332,14 @@ func (b *proxyConnectionBody) Close() error {
 }
 
 func captureResponse(body []byte, input Request, target preparedTarget) string {
+	var document any
+	decoder := json.NewDecoder(bytes.NewReader(body))
+	decoder.UseNumber()
+	if json.Valid(body) && decoder.Decode(&document) == nil {
+		if canonical, err := json.Marshal(document); err == nil {
+			body = canonical
+		}
+	}
 	response := strings.ToValidUTF8(string(body), "\uFFFD")
 	redactions := make([]string, 0, len(input.Headers)+8)
 	redactions = append(redactions, urlRedactionValues(input.URL)...)
@@ -345,15 +353,103 @@ func captureResponse(body []byte, input Request, target preparedTarget) string {
 		}
 		redactions = append(redactions, headerRedactionValues(name, value)...)
 	}
+	redactions = append(redactions, bodyRedactionValues(input)...)
+	for _, value := range append([]string(nil), redactions...) {
+		if encoded, err := json.Marshal(value); err == nil && len(encoded) > 2 {
+			redactions = append(redactions, string(encoded[1:len(encoded)-1]))
+		}
+	}
 	sort.SliceStable(redactions, func(i, j int) bool {
 		return len(redactions[i]) > len(redactions[j])
 	})
+	seen := make(map[string]struct{}, len(redactions))
+	replacements := make([]string, 0, len(redactions)*2)
 	for _, value := range redactions {
-		if value != "" {
-			response = strings.ReplaceAll(response, value, "[REDACTED]")
+		if value == "" {
+			continue
 		}
+		if _, exists := seen[value]; exists {
+			continue
+		}
+		seen[value] = struct{}{}
+		replacements = append(replacements, value, "[REDACTED]")
+	}
+	if len(replacements) > 0 {
+		response = strings.NewReplacer(replacements...).Replace(response)
 	}
 	return truncateUTF8(response, MaxCapturedResponseBytes)
+}
+
+func bodyRedactionValues(input Request) []string {
+	values := []string{string(input.Body)}
+	switch input.Format {
+	case BodyJSON:
+		var document any
+		decoder := json.NewDecoder(bytes.NewReader(input.Body))
+		decoder.UseNumber()
+		if decoder.Decode(&document) == nil {
+			var collect func(any, string)
+			collect = func(value any, key string) {
+				switch typed := value.(type) {
+				case string:
+					if len(typed) >= 4 || typed != "" && sensitiveBodyKey(key) {
+						values = append(values, typed)
+					}
+				case json.Number:
+					if sensitiveBodyKey(key) {
+						values = append(values, typed.String())
+					}
+				case map[string]any:
+					for childKey, child := range typed {
+						collect(child, childKey)
+					}
+				case []any:
+					for _, child := range typed {
+						collect(child, key)
+					}
+				}
+			}
+			collect(document, "")
+		}
+	case BodyForm:
+		if fields, err := url.ParseQuery(string(input.Body)); err == nil {
+			for key, fieldValues := range fields {
+				for _, value := range fieldValues {
+					if len(value) >= 4 || value != "" && sensitiveBodyKey(key) {
+						values = append(values, value)
+						encoded := url.QueryEscape(value)
+						percentSpaces := strings.ReplaceAll(encoded, "+", "%20")
+						values = append(values, encoded, percentSpaces, lowercasePercentEscapes(encoded), lowercasePercentEscapes(percentSpaces))
+					}
+				}
+			}
+		}
+	}
+	return values
+}
+
+func lowercasePercentEscapes(value string) string {
+	encoded := []byte(value)
+	for i := 0; i+2 < len(encoded); i++ {
+		if encoded[i] != '%' {
+			continue
+		}
+		for j := i + 1; j <= i+2; j++ {
+			if encoded[j] >= 'A' && encoded[j] <= 'F' {
+				encoded[j] += 'a' - 'A'
+			}
+		}
+		i += 2
+	}
+	return string(encoded)
+}
+
+func sensitiveBodyKey(key string) bool {
+	normalized := strings.ToLower(strings.NewReplacer("-", "", "_", "").Replace(key))
+	return normalized == "key" || normalized == "authorization" || normalized == "cookie" ||
+		strings.Contains(normalized, "password") || strings.Contains(normalized, "passwd") ||
+		strings.Contains(normalized, "token") || strings.Contains(normalized, "secret") ||
+		strings.Contains(normalized, "credential") || strings.Contains(normalized, "apikey")
 }
 
 func urlRedactionValues(rawURL string) []string {
@@ -744,24 +840,4 @@ func isPinnedWebhookAddress(host string, addresses []net.IP) bool {
 		}
 	}
 	return false
-}
-
-func validateResponse(preset Preset, statusCode int, body []byte) error {
-	if preset == "" {
-		preset = PresetGeneric
-	}
-	switch preset {
-	case PresetSlack:
-		if statusCode != http.StatusOK || strings.TrimSpace(string(body)) != "ok" {
-			return errors.New("webhook provider rejected response")
-		}
-		return nil
-	case PresetGeneric, PresetDiscord, PresetTeams:
-		if statusCode < http.StatusOK || statusCode >= http.StatusMultipleChoices {
-			return errors.New("webhook provider rejected response")
-		}
-		return nil
-	default:
-		return errors.New("unsupported webhook preset")
-	}
 }

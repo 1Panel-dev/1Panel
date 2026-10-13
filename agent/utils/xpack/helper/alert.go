@@ -59,9 +59,9 @@ func (a *alertHelper) CreateTaskScanCustomWebhookAlertLog(alert dto.AlertDTO, al
 	return providers.DeliveryResult{}, err
 }
 
-func (a *alertHelper) TestCustomWebhook(config dto.AlertCustomWebhookResolvedConfig) (dto.AlertConfigTestResult, error) {
+func (a *alertHelper) TestCustomWebhook(config dto.AlertCustomWebhookResolvedConfig, lang string) (dto.AlertConfigTestResult, error) {
 	transport, agentInfo := loadCommunityCustomWebhookContext()
-	return alertUtil.TestCustomWebhook(config, transport, agentInfo)
+	return alertUtil.TestCustomWebhook(config, transport, agentInfo, lang)
 }
 
 func (a *alertHelper) GetLicenseErrorAlert() (uint, error) {

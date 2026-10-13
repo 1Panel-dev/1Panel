@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'Uygulama türü veya adı eşleşmiyor'
 # uyarı
 ErrAlertMethodNotSupported: 'Bu sürüm bu uyarı yöntemini desteklemiyor'
 ErrAlertSync: 'Alarm bilgisi senkronizasyon hatası, lütfen kontrol edin ve tekrar deneyin'
+ErrWebhookTestFailed: 'Lütfen Webhook yapılandırmasını kontrol edin. Ayrıntılar için sistem günlüklerine bakın.'
 
 # görev - çalışma zamanı
 ErrInstallExtension: 'Zaten devam eden bir kurulum görevi var, görevin bitmesini bekleyin'
 
 # uyarı e-posta şablonu
 PanelAlertTitle: 'Panel Uyarı Bildirimi'
-TestAlertTitle: 'Test E-postası - E-posta Bağlantısını Doğrula'
-TestAlert: 'Bu, e-posta gönderim ayarlarınızın doğru yapılandırıldığını doğrulamak için gönderilen bir test e-postasıdır.'
+TestAlertTitle: 'Panel Test Bildirimi'
+TestAlertMessage: 'Bu, bildirim kanalı yapılandırmasını ve bağlantısını doğrulamak için gönderilen bir test bildirimidir.'
 LicenseExpirationAlert: 'Paneliniz {{ .node }}{{ .ip }}, lisans {{ .day }} gün içinde süresi dolacak. Detaylar için paneline giriş yapın.'
 CronJobFailedAlert: 'Paneliniz {{ .node }}{{ .ip }}, zamanlanmış görev {{ .name }} çalıştırma başarısız oldu. Detaylar için paneline giriş yapın.'
 ClamAlert: 'Paneliniz {{ .node }}{{ .ip }}, virüs tarama görevi {{ .num }} enfekte dosya tespit etti. Detaylar için paneline giriş yapın.'

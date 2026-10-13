@@ -13,6 +13,41 @@ export type CustomWebhookPreset = 'genericJson' | 'slack' | 'discord' | 'teamsWo
 export type CustomWebhookBodyType = 'json' | 'form' | 'text';
 export type CustomWebhookSecretAction = 'keep' | 'replace' | 'clear';
 
+export interface CustomWebhookTestState {
+    attempt: number;
+    pending: boolean;
+    passed: boolean;
+}
+
+export const createCustomWebhookTestState = (): CustomWebhookTestState => ({
+    attempt: 0,
+    pending: false,
+    passed: false,
+});
+
+export const invalidateCustomWebhookTest = (state: CustomWebhookTestState): void => {
+    state.attempt += 1;
+    state.pending = false;
+    state.passed = false;
+};
+
+export const beginCustomWebhookTest = (state: CustomWebhookTestState): number => {
+    invalidateCustomWebhookTest(state);
+    state.pending = true;
+    return state.attempt;
+};
+
+export const completeCustomWebhookTest = (
+    state: CustomWebhookTestState,
+    attempt: number,
+    success: boolean,
+): boolean => {
+    if (attempt !== state.attempt || !state.pending) return false;
+    state.pending = false;
+    state.passed = success;
+    return true;
+};
+
 export interface CustomWebhookSecretView {
     configured: boolean;
     masked?: string;
@@ -464,6 +499,51 @@ const isJsonTemplateValid = (value: string): boolean => {
     } catch {
         return false;
     }
+};
+
+export type CustomWebhookJsonFormatResult =
+    { success: true; template: string } | { success: false; error: 'jsonInvalid' | 'bodyTooLarge' };
+
+export const formatCustomWebhookJsonTemplate = (template: string): CustomWebhookJsonFormatResult => {
+    if (!isJsonTemplateValid(template)) return { success: false, error: 'jsonInvalid' };
+
+    const tokens = template.matchAll(/"(?:\\.|[^"\\])*"|[{}[\],:]|[^\s{}[\],:]+/g);
+    const parts: string[] = [];
+    const encoder = new TextEncoder();
+    let remaining = CUSTOM_WEBHOOK_LIMITS.body;
+    let depth = 0;
+    let previous = '';
+
+    const append = (value: string): boolean => {
+        if (value.length > remaining) return false;
+        const size = encoder.encode(value).length;
+        if (size > remaining) return false;
+        remaining -= size;
+        parts.push(value);
+        return true;
+    };
+    const appendIndent = (): boolean => {
+        const size = 1 + depth * 2;
+        if (size > remaining) return false;
+        remaining -= size;
+        parts.push('\n' + '  '.repeat(depth));
+        return true;
+    };
+
+    for (const [token] of tokens) {
+        if (token === '}' || token === ']') {
+            depth -= 1;
+            if (previous !== '{' && previous !== '[' && !appendIndent()) {
+                return { success: false, error: 'bodyTooLarge' };
+            }
+        } else if (previous === '{' || previous === '[' || previous === ',') {
+            if (!appendIndent()) return { success: false, error: 'bodyTooLarge' };
+        }
+        if (!append(token === ':' ? ': ' : token)) return { success: false, error: 'bodyTooLarge' };
+        if (token === '{' || token === '[') depth += 1;
+        previous = token;
+    }
+    return { success: true, template: parts.join('') };
 };
 
 const hasTemplateJsonKey = (value: string): boolean => {

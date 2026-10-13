@@ -31,11 +31,35 @@
             </el-select>
         </el-form-item>
 
-        <el-form-item :label="$t('xpack.alert.webhookUrl')" :error="errorFor('url')">
+        <el-form-item class="webhook-url-item" :label="$t('xpack.alert.webhookUrl')" :error="errorFor('url')">
+            <template #label>
+                <div class="flex w-full flex-wrap items-center justify-between gap-x-3">
+                    <span>{{ $t('xpack.alert.webhookUrl') }}</span>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <el-button
+                            v-if="modelValue.url.configured && modelValue.url.action !== 'keep'"
+                            link
+                            type="primary"
+                            @click.prevent="keepUrl"
+                        >
+                            {{ $t('xpack.alert.keepSecret') }}
+                        </el-button>
+                        <el-button
+                            v-if="allowClearUrl && modelValue.url.configured && modelValue.url.action !== 'clear'"
+                            link
+                            type="danger"
+                            @click.prevent="clearUrl"
+                        >
+                            {{ $t('xpack.alert.clearSecret') }}
+                        </el-button>
+                    </div>
+                </div>
+            </template>
             <template v-if="modelValue.url.action === 'keep'">
                 <div class="secret-editor">
                     <el-input
                         :model-value="secretEditorValue(modelValue.url)"
+                        :aria-label="$t('xpack.alert.webhookUrl')"
                         type="password"
                         show-password
                         autocomplete="new-password"
@@ -43,18 +67,13 @@
                         :placeholder="secretEditorPlaceholder(modelValue.url, 'https://example.com/webhook')"
                         @update:model-value="updateUrlValue"
                     />
-                    <div class="secret-editor__actions">
-                        <el-button v-if="allowClearUrl" plain type="danger" @click="clearUrl">
-                            {{ $t('xpack.alert.clearSecret') }}
-                        </el-button>
-                    </div>
                 </div>
             </template>
             <template v-else-if="modelValue.url.action === 'clear'">
                 <div class="secret-editor">
-                    <el-alert :closable="false" type="warning" :title="$t('xpack.alert.secretCleared')" />
                     <el-input
                         model-value=""
+                        :aria-label="$t('xpack.alert.webhookUrl')"
                         type="password"
                         show-password
                         autocomplete="new-password"
@@ -62,17 +81,13 @@
                         placeholder="https://example.com/webhook"
                         @update:model-value="updateUrlValue"
                     />
-                    <div class="secret-editor__actions">
-                        <el-button v-if="modelValue.url.configured" plain @click="keepUrl">
-                            {{ $t('xpack.alert.keepSecret') }}
-                        </el-button>
-                    </div>
                 </div>
             </template>
             <template v-else>
                 <div class="secret-editor">
                     <el-input
                         :model-value="modelValue.url.value"
+                        :aria-label="$t('xpack.alert.webhookUrl')"
                         type="password"
                         show-password
                         autocomplete="new-password"
@@ -80,15 +95,8 @@
                         placeholder="https://example.com/webhook"
                         @update:model-value="updateUrlValue"
                     />
-                    <div v-if="modelValue.url.configured" class="secret-editor__actions">
-                        <el-button plain @click="keepUrl">{{ $t('xpack.alert.keepSecret') }}</el-button>
-                        <el-button v-if="allowClearUrl" plain type="danger" @click="clearUrl">
-                            {{ $t('xpack.alert.clearSecret') }}
-                        </el-button>
-                    </div>
                 </div>
             </template>
-            <span class="input-help">{{ $t('xpack.alert.webhookUrlSecretHelper') }}</span>
             <span class="input-help">{{ $t('xpack.alert.webhookPublicAddressHelper') }}</span>
         </el-form-item>
 
@@ -101,7 +109,22 @@
             <span class="input-help">POST · {{ derivedContentType }}</span>
         </el-form-item>
 
-        <el-form-item :label="$t('xpack.alert.bodyTemplate')" :error="errorFor('body')">
+        <el-form-item class="body-template-item" :label="$t('xpack.alert.bodyTemplate')" :error="errorFor('body')">
+            <template #label>
+                <div class="flex w-full min-w-0 flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                    <span>{{ $t('xpack.alert.bodyTemplate') }}</span>
+                    <el-button
+                        v-if="modelValue.body.type === 'json'"
+                        class="min-h-11 shrink-0 sm:min-h-6"
+                        link
+                        type="primary"
+                        :disabled="!modelValue.body.template.trim()"
+                        @click.prevent="formatJsonBody"
+                    >
+                        {{ $t('xpack.alert.formatJson') }}
+                    </el-button>
+                </div>
+            </template>
             <template v-if="modelValue.body.type === 'form'">
                 <div class="key-value-list">
                     <div v-for="(field, index) in modelValue.body.fields" :key="field.uid" class="key-value-row">
@@ -135,10 +158,16 @@
             <el-input
                 v-else
                 ref="bodyTemplateInputRef"
+                class="body-template-editor"
                 :model-value="modelValue.body.template"
+                :aria-label="$t('xpack.alert.bodyTemplate')"
                 type="textarea"
-                :rows="modelValue.body.type === 'json' ? 10 : 6"
+                :rows="modelValue.body.type === 'json' ? 12 : 7"
                 :maxlength="CUSTOM_WEBHOOK_LIMITS.body"
+                :wrap="modelValue.body.type === 'json' ? 'off' : 'soft'"
+                :spellcheck="false"
+                autocapitalize="off"
+                autocomplete="off"
                 resize="vertical"
                 @focus="bodyTemplateFocused = true"
                 @update:model-value="updateBodyTemplate"
@@ -188,11 +217,6 @@
                             </template>
                             <template v-else-if="header.action === 'clear'">
                                 <div class="secret-editor">
-                                    <el-alert
-                                        :closable="false"
-                                        type="warning"
-                                        :title="$t('xpack.alert.secretCleared')"
-                                    />
                                     <el-input
                                         model-value=""
                                         :maxlength="CUSTOM_WEBHOOK_LIMITS.headerValue"
@@ -228,6 +252,7 @@
                                     <el-button
                                         v-if="header.configured && header.action !== 'keep'"
                                         link
+                                        type="primary"
                                         @click="setHeaderSecretAction(index, 'keep')"
                                     >
                                         {{ $t('xpack.alert.keepSecret') }}
@@ -281,6 +306,7 @@
 import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { ElInput, ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
+import { MsgError } from '@/utils/message';
 import {
     CUSTOM_WEBHOOK_VARIABLES,
     CUSTOM_WEBHOOK_LIMITS,
@@ -294,6 +320,7 @@ import {
     contentTypeForBodyType,
     createCustomWebhookFormField,
     createCustomWebhookHeader,
+    formatCustomWebhookJsonTemplate,
     insertCustomWebhookVariable,
     isCustomWebhookSecretHeader,
     isCustomWebhookPresetPristine,
@@ -424,6 +451,33 @@ const changeBodyType = (value: string | number | boolean | undefined) => {
 
 const updateBodyTemplate = (template: string) => {
     emitValue(updateCustomWebhookBodyTemplate(props.modelValue, template));
+};
+
+const formatJsonBody = () => {
+    if (props.modelValue.body.type !== 'json') return;
+    const result = formatCustomWebhookJsonTemplate(props.modelValue.body.template);
+    if (!result.success) {
+        MsgError(
+            i18n.global.t(
+                result.error === 'bodyTooLarge'
+                    ? 'xpack.alert.jsonFormatTooLarge'
+                    : 'xpack.alert.customWebhookValidation.jsonInvalid',
+            ),
+        );
+        return;
+    }
+    if (result.template === props.modelValue.body.template) return;
+    updateBodyTemplate(result.template);
+    void nextTick(() => {
+        bodyTemplateInputRef.value?.focus();
+        const textarea = bodyTemplateInputRef.value?.textarea;
+        if (textarea) {
+            textarea.setSelectionRange(0, 0);
+            textarea.scrollTop = 0;
+            textarea.scrollLeft = 0;
+        }
+        bodyTemplateFocused.value = true;
+    });
 };
 
 const addFormField = () => {
@@ -571,13 +625,28 @@ const errorFor = (field: string): string => {
     gap: 8px;
 }
 
-.secret-editor__actions,
 .header-card__footer,
 .header-card__secret-actions {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.webhook-url-item :deep(.el-form-item__label),
+.body-template-item :deep(.el-form-item__label) {
+    width: 100%;
+    height: auto;
+    min-height: 22px;
+}
+
+.body-template-editor :deep(.el-textarea__inner) {
+    padding: 12px;
+    font-family: var(--el-font-family-monospace, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+    font-size: 13px;
+    line-height: 1.6;
+    tab-size: 2;
+    background-color: var(--el-fill-color-extra-light);
 }
 
 .key-value-list,
@@ -664,7 +733,7 @@ const errorFor = (field: string): string => {
         min-height: 44px;
     }
 
-    .secret-editor__actions > .el-button,
+    .webhook-url-item :deep(.el-form-item__label .el-button),
     .key-value-row > .el-button {
         min-height: 44px;
     }

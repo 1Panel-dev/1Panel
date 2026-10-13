@@ -10,6 +10,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/webhook_sender"
 	"github.com/gin-gonic/gin"
 )
 
@@ -378,10 +381,24 @@ func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 		return
 	}
 	if req.Type == constant.Custom {
-		result, err := alertService.TestCustomAlertConfig(req)
+		lang := strings.TrimSpace(c.GetHeader("Accept-Language"))
+		if lang == "" {
+			lang = i18n.GetLanguageFromDB()
+		}
+		result, err := alertService.TestCustomAlertConfig(req, lang)
 		if err != nil {
-			helper.InternalServer(c, err)
-			return
+			if global.LOG != nil {
+				global.LOG.Warnf("webhook test preparation failed: configID=%d error=%q", req.ID,
+					webhook_sender.DiagnosticText(err.Error(), webhook_sender.Request{
+						Format: webhook_sender.BodyJSON, Body: []byte(req.Config),
+					}))
+			}
+			result = dto.AlertConfigTestResult{Success: false}
+		}
+		result.Response = ""
+		result.Message = ""
+		if !result.Success {
+			result.Message = i18n.GetMsgByKeyAndLang(lang, "ErrWebhookTestFailed")
 		}
 		helper.SuccessWithData(c, result)
 		return

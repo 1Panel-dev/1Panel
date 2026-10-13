@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'O tipo ou nome do aplicativo não corresponde'
 # alerta
 ErrAlertMethodNotSupported: 'Esta versão não oferece suporte a este método de alerta'
 ErrAlertSync: 'Erro de sincronização de informações de alarme, verifique e'
+ErrWebhookTestFailed: 'Verifique a configuração do Webhook. Consulte os logs do sistema para mais detalhes.'
 
 # tarefa - runtime
 ErrInstallExtension: 'Já existe uma tarefa de instalação em andamento, aguarde a conclusão da tarefa'
 
 # modelo de e-mail de alerta
 PanelAlertTitle: 'Notificação de Alerta do Painel'
-TestAlertTitle: 'E-mail de Teste - Verificar Conectividade de E-mail'
-TestAlert: 'Este é um e-mail de teste para verificar se sua configuração de envio de e-mails está correta.'
+TestAlertTitle: 'Notificação de teste do painel'
+TestAlertMessage: 'Esta é uma notificação de teste para verificar a configuração e a conectividade do canal de notificações.'
 LicenseExpirationAlert: 'Seu Painel {{ .node }}{{ .ip }}, a licença expirará em {{ .day }} dias. Faça login no painel para obter detalhes.'
 CronJobFailedAlert: 'Seu Painel {{ .node }}{{ .ip }}, a execução da tarefa agendada {{ .name }} falhou. Faça login no painel para obter detalhes.'
 ClamAlert: 'Seu Painel {{ .node }}{{ .ip }}, a tarefa de verificação de vírus detectou {{ .num }} arquivos infectados. Faça login no painel para obter detalhes.'
