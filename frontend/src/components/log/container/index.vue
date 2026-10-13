@@ -126,14 +126,14 @@ const styleVars = computed(() => ({
 
 const terminalElement = ref<HTMLDivElement | null>(null);
 let eventSource: EventSource | null = null;
+let searchVersion = 0;
 let term: Terminal | null = null;
 const fitAddon = new FitAddon();
-let onScrollDisposable: { dispose: () => void } | null = null;
 const MAX_VIEW_LINES = 20000;
-const followBottom = ref(true);
+let followBottom = true;
 
 const logSearch = reactive({
-    isWatch: props.defaultFollow ? true : true,
+    isWatch: true,
     isShowTimestamp: props.defaultIsShowTimestamp,
     container: '',
     mode: 'all',
@@ -168,6 +168,7 @@ const timeOptions = ref([
 ]);
 
 const stopListening = () => {
+    searchVersion++;
     if (eventSource) {
         eventSource.close();
         eventSource = null;
@@ -175,26 +176,13 @@ const stopListening = () => {
 };
 
 const clearTerminal = () => {
-    term?.reset();
-    followBottom.value = true;
+    // Queue the reset after pending writes so old logs cannot appear in a new search.
+    term?.write('\x1bc');
+    followBottom = true;
 };
 
 const writeLogLine = (data: string) => {
-    if (!term) return;
-    term.writeln(data);
-    if (followBottom.value) {
-        term.scrollToBottom();
-    }
-};
-
-const bindXTermEvents = () => {
-    if (!term) return;
-    onScrollDisposable?.dispose();
-    onScrollDisposable = term.onScroll(() => {
-        if (!term) return;
-        const active = term.buffer.active;
-        followBottom.value = active.baseY + active.cursorY >= active.length - 2;
-    });
+    term?.writeln(data);
 };
 
 const showEventSourceAuthError = (message: string) => {
@@ -235,11 +223,15 @@ const initTerminal = () => {
     term.open(terminalElement.value);
     term.loadAddon(fitAddon);
     fitAddon.fit();
-    bindXTermEvents();
-};
-
-const handleClose = async () => {
-    stopListening();
+    // Terminal.dispose() also disposes these listeners.
+    term.onScroll(() => {
+        if (!term) return;
+        const active = term.buffer.active;
+        followBottom = active.viewportY >= active.baseY;
+    });
+    term.onWriteParsed(() => {
+        if (followBottom) term?.scrollToBottom();
+    });
 };
 
 const searchLogs = async () => {
@@ -248,6 +240,7 @@ const searchLogs = async () => {
         return;
     }
     stopListening();
+    const version = searchVersion;
     clearTerminal();
 
     let currentNode = globalCurrentNode.value;
@@ -261,15 +254,19 @@ const searchLogs = async () => {
     }
 
     const authError = await checkStreamAuth(url, currentNode);
+    if (version !== searchVersion) return;
     if (authError) {
         showEventSourceAuthError(authError);
         return;
     }
-    eventSource = new EventSource(url);
-    eventSource.onmessage = (event: MessageEvent) => {
+    const source = new EventSource(url);
+    eventSource = source;
+    source.onmessage = (event: MessageEvent) => {
+        if (version !== searchVersion) return;
         writeLogLine(event.data);
     };
-    eventSource.onerror = (event: MessageEvent) => {
+    source.onerror = (event: MessageEvent) => {
+        if (version !== searchVersion) return;
         stopListening();
         if (event.data && event.data != '') {
             MsgError(event.data);
@@ -353,8 +350,6 @@ onMounted(() => {
     logSearch.resource = props.resource;
 
     logSearch.tail = 100;
-    logSearch.mode = 'all';
-    logSearch.isWatch = true;
 
     nextTick(() => {
         initTerminal();
@@ -369,8 +364,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-    handleClose();
-    onScrollDisposable?.dispose();
+    stopListening();
     if (term) {
         term.dispose();
         term = null;
