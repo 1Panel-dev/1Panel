@@ -810,31 +810,31 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
 	messageChan := make(chan string, 1024)
 	errorChan := make(chan error, 1)
-	doneChan := make(chan struct{})
-
-	go func() {
-		<-ctx.Request.Context().Done()
-		close(doneChan)
-	}()
+	logCtx, cancel := context.WithCancel(ctx.Request.Context())
+	defer cancel()
+	doneChan := logCtx.Done()
 	go collectLogs(doneChan, params, messageChan, errorChan)
 	ctx.Stream(func(w io.Writer) bool {
-		select {
-		case msg, ok := <-messageChan:
-			if !ok {
-				return false
-			}
-			_, err := fmt.Fprintf(w, "data: %s\n\n", msg)
-			if err != nil {
-				return false
-			}
-			return true
-		case err := <-errorChan:
-			if err != nil {
-				_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err.Error())
-			}
-			return false
-		}
+		return writeContainerLogMessage(w, doneChan, messageChan, errorChan)
 	})
+}
+
+func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan string, errors <-chan error) bool {
+	select {
+	case <-done:
+		return false
+	case message, ok := <-messages:
+		if ok {
+			_, err := fmt.Fprintf(w, "data: %s\n\n", message)
+			return err == nil
+		}
+		// The collector closes both channels when it finishes. Drain all buffered
+		// logs before handling its result, or a ready error channel can drop the tail.
+		if err := <-errors; err != nil {
+			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
+		}
+		return false
+	}
 }
 
 func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- string, errorChan chan<- error) {
