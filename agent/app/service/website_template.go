@@ -403,38 +403,3 @@ func renderMainHTMLFromZip(zipPath string, values map[string]string) (string, er
 	}
 	return renderContent(string(content), values), nil
 }
-
-func copyDir(src, dst string) error {
-	return filepath.Walk(src, func(p string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		relPath, err := filepath.Rel(src, p)
-		if err != nil {
-			return err
-		}
-		targetPath := filepath.Join(dst, relPath)
-		if info.IsDir() {
-			return os.MkdirAll(targetPath, constant.DirPerm)
-		}
-		return copyFile(p, targetPath)
-	})
-}
-
-func copyFile(src, dst string) error {
-	srcFile, err := os.Open(src)
-	if err != nil {
-		return err
-	}
-	defer srcFile.Close()
-	if err := os.MkdirAll(filepath.Dir(dst), constant.DirPerm); err != nil {
-		return err
-	}
-	dstFile, err := os.Create(dst)
-	if err != nil {
-		return err
-	}
-	defer dstFile.Close()
-	_, err = io.Copy(dstFile, srcFile)
-	return err
-}
