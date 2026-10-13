@@ -140,6 +140,8 @@ ErrComposeProjectNameEmpty: 'نام پروژه از پیکربندی Docker Comp
 ErrComposeNameInvalid: 'نام پروژه Compose نامعتبر است: باید با حرف کوچک یا عدد شروع شود، فقط شامل حروف کوچک، اعداد، خط تیره و زیرخط باشد و ۱ تا ۲۵۶ نویسه داشته باشد.'
 ErrAppVersionUnavailable: 'این نسخه برنامه از سرویس راه دور حذف شده است. لطفاً نسخه دیگری را انتخاب کرده و دوباره تلاش کنید.'
 ErrVllmGB10ProOnly: 'این نسخه vLLM فقط در نسخه حرفه‌ای 1Panel در دسترس است.'
+ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway فقط در همان نوع پایگاه داده (SQLite یا PostgreSQL) قابل ارتقا است.'
+ErrAIGatewayRecoverDatabaseTypeMismatch: 'نسخه پشتیبان AI Gateway و برنامه مقصد باید از یک نوع پایگاه داده (SQLite یا PostgreSQL) استفاده کنند.'
 ErrAppWarn: 'وضعیت برنامه غیرعادی است؛ لاگ‌ها را بررسی کنید'
 ErrAppParamKey: 'پارامتر برنامه نامعتبر است: {{ .name }}'
 ErrAppUpgrade: 'ارتقاء برنامه ناموفق بود: {{ .name }} {{ .err }}'

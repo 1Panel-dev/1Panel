@@ -140,6 +140,8 @@ ErrComposeProjectNameEmpty: 'Nama projek tidak dapat diperoleh daripada konfigur
 ErrComposeNameInvalid: 'Nama projek Compose tidak sah: mesti bermula dengan huruf kecil atau nombor, hanya mengandungi huruf kecil, nombor, tanda sempang dan garis bawah, serta sepanjang 1-256 aksara.'
 ErrAppVersionUnavailable: 'Versi aplikasi ini telah dialih keluar daripada perkhidmatan jauh. Sila pilih versi lain dan cuba lagi.'
 ErrVllmGB10ProOnly: 'Versi vLLM ini hanya tersedia dalam 1Panel Edisi Profesional.'
+ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway hanya boleh dinaik taraf dalam jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
+ErrAIGatewayRecoverDatabaseTypeMismatch: 'Sandaran AI Gateway dan aplikasi sasaran mesti menggunakan jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
 ErrAppWarn: 'Status tidak normal, sila semak log'
 ErrAppParamKey: 'Parameter {{ .name }} medan tidak normal'
 ErrAppUpgrade: 'Peningkatan {{ .name }} aplikasi gagal {{ .err }}'
