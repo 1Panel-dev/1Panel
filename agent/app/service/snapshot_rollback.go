@@ -106,6 +106,9 @@ func (u *SnapshotService) SnapshotRollback(req dto.SnapshotRecover) error {
 		taskItem.AddSubTask(
 			i18n.GetWithName("SnapCopy", global.Dir.BaseDir),
 			func(t *task.Task) error {
+				if err := os.Chmod(path.Join(rootDir, "1panel/db"), 0700); err != nil {
+					return err
+				}
 				return FileOp.CopyDir(path.Join(rootDir, "1panel"), global.Dir.BaseDir)
 			},
 			nil,

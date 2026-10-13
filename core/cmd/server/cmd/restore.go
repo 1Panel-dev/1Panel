@@ -91,6 +91,9 @@ var restoreCmd = &cobra.Command{
 		}
 		fmt.Println(i18n.GetMsgByKeyForCmd("RestoreStep4"))
 		if _, err := os.Stat(path.Join(tmpPath, "db")); err == nil {
+			if err := os.Chmod(path.Join(tmpPath, "db"), 0700); err != nil {
+				return err
+			}
 			dbPath := path.Join(baseDir, "1panel")
 			targetDBDir := path.Join(dbPath, "db")
 			if err := os.RemoveAll(targetDBDir); err != nil {
