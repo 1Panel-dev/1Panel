@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"log"
 	"net"
 	"os"
@@ -179,6 +180,10 @@ func (f *websiteCreateFiles) mkdirLocked(name string) error {
 // preserveExisting is for user content and logs; generated configuration must
 // fail on collision. Exclusive creation also protects against concurrent writes.
 func (f *websiteCreateFiles) write(name string, data []byte, mode os.FileMode, preserveExisting bool) error {
+	return f.writeReader(name, bytes.NewReader(data), mode, preserveExisting)
+}
+
+func (f *websiteCreateFiles) writeReader(name string, data io.Reader, mode os.FileMode, preserveExisting bool) error {
 	f.mu.Lock()
 	defer f.mu.Unlock()
 	if f.rolledBack {
@@ -207,7 +212,7 @@ func (f *websiteCreateFiles) write(name string, data []byte, mode os.FileMode, p
 		return err
 	}
 	f.entries = append(f.entries, websiteCreatedPath{name, info})
-	_, err = file.Write(data)
+	_, err = io.Copy(file, data)
 	closeErr := file.Close()
 	if err != nil {
 		return err
@@ -250,35 +255,8 @@ func (f *websiteCreateFiles) rollback() error {
 }
 
 func (f *websiteCreateFiles) copyTemplate(src, dst string) error {
-	// Check the entire template before copying any files. Reject symlinks and
-	// collisions rather than truncating existing content.
-	err := filepath.Walk(src, func(name string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		rel, err := filepath.Rel(src, name)
-		if err != nil {
-			return err
-		}
-		target := filepath.Join(dst, rel)
-		if !info.IsDir() && !info.Mode().IsRegular() {
-			return fmt.Errorf("unsupported template file: %s", name)
-		}
-		existing, err := os.Lstat(target)
-		if os.IsNotExist(err) {
-			return nil
-		}
-		if err != nil {
-			return err
-		}
-		if info.IsDir() && existing.IsDir() {
-			return nil
-		}
-		return fmt.Errorf("website template path already exists: %s", target)
-	})
-	if err != nil {
-		return err
-	}
+	// Reject symlinks and create files exclusively. The caller rolls back any
+	// paths created before a collision or copy error.
 	return filepath.Walk(src, func(name string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -294,11 +272,12 @@ func (f *websiteCreateFiles) copyTemplate(src, dst string) error {
 		if !info.Mode().IsRegular() {
 			return fmt.Errorf("unsupported template file: %s", name)
 		}
-		data, err := os.ReadFile(name)
+		file, err := os.Open(name)
 		if err != nil {
 			return err
 		}
-		return f.write(target, data, constant.FilePerm, false)
+		defer file.Close()
+		return f.writeReader(target, file, constant.FilePerm, false)
 	})
 }
 
@@ -332,14 +311,13 @@ func (f *websiteCreateFiles) chownNew(root string) error {
 	return nil
 }
 
-// Shared WAF metadata is restored only while it still contains our exact write.
-// Never restore a stale snapshot over changes made by another operation.
-func (f *websiteCreateFiles) replaceShared(name string, before, after []byte) error {
-	f.mu.Lock()
-	defer f.mu.Unlock()
-	if f.rolledBack {
-		return fmt.Errorf("website creation already rolled back")
-	}
+// Serialize sites.json read-modify-write operations across website creations,
+// deletions, domain updates, and creation rollbacks.
+var wafWebsitesMu sync.Mutex
+
+func updateWAFWebsites(name string, update func([]request.WafWebsite) ([]request.WafWebsite, error)) error {
+	wafWebsitesMu.Lock()
+	defer wafWebsitesMu.Unlock()
 	info, err := os.Lstat(name)
 	if err != nil {
 		return err
@@ -347,31 +325,56 @@ func (f *websiteCreateFiles) replaceShared(name string, before, after []byte) er
 	if !info.Mode().IsRegular() {
 		return fmt.Errorf("website config is not a regular file: %s", name)
 	}
-	current, err := os.ReadFile(name)
+	content, err := os.ReadFile(name)
 	if err != nil {
 		return err
 	}
-	if !bytes.Equal(current, before) {
-		return fmt.Errorf("website config changed during creation: %s", name)
+	var websites []request.WafWebsite
+	if len(content) > 0 {
+		if err := json.Unmarshal(content, &websites); err != nil {
+			return err
+		}
+	}
+	websites, err = update(websites)
+	if err != nil {
+		return err
+	}
+	content, err = json.Marshal(websites)
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(name, content, info.Mode().Perm())
+}
+
+func (f *websiteCreateFiles) addWAFWebsite(name string, website request.WafWebsite) error {
+	f.mu.Lock()
+	defer f.mu.Unlock()
+	if f.rolledBack {
+		return fmt.Errorf("website creation already rolled back")
+	}
+	if err := updateWAFWebsites(name, func(websites []request.WafWebsite) ([]request.WafWebsite, error) {
+		for _, existing := range websites {
+			if existing.Key == website.Key {
+				return nil, fmt.Errorf("WAF website already exists: %s", website.Key)
+			}
+		}
+		return append(websites, website), nil
+	}); err != nil {
+		return err
 	}
 	f.restores = append(f.restores, func() error {
-		now, err := os.Lstat(name)
-		if err != nil {
-			return err
-		}
-		if !os.SameFile(info, now) {
-			return fmt.Errorf("website config replaced; skipping rollback: %s", name)
-		}
-		data, err := os.ReadFile(name)
-		if err != nil {
-			return err
-		}
-		if !bytes.Equal(data, after) {
-			return fmt.Errorf("website config changed; skipping rollback: %s", name)
-		}
-		return os.WriteFile(name, before, info.Mode().Perm())
+		return updateWAFWebsites(name, func(websites []request.WafWebsite) ([]request.WafWebsite, error) {
+			// Keep the latest records for other sites, including concurrent domain changes.
+			remaining := make([]request.WafWebsite, 0, len(websites))
+			for _, existing := range websites {
+				if existing.Key != website.Key {
+					remaining = append(remaining, existing)
+				}
+			}
+			return remaining, nil
+		})
 	})
-	return os.WriteFile(name, after, info.Mode().Perm())
+	return nil
 }
 
 func createIndexFile(website *model.Website, runtime *model.Runtime, created *websiteCreateFiles) error {
@@ -617,14 +620,10 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 	if err = created.write(configPath, []byte(nginx.DumpConfig(config, nginx.IndentedStyle)), constant.FilePerm, false); err != nil {
 		return err
 	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
-		return err
-	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-		return err
-	}
 	return nil
 }
+
+var defaultWAFRuleNames = []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite", "cdn"}
 
 func moveDefaultWafConfig(websiteDir string, defaultConfigContent []byte, defaultRuleDir string, fileOp files.FileOp) error {
 	if !fileOp.Stat(websiteDir) {
@@ -641,8 +640,7 @@ func moveDefaultWafConfig(websiteDir string, defaultConfigContent []byte, defaul
 			return err
 		}
 	}
-	defaultRulesName := []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite", "cdn"}
-	for _, ruleName := range defaultRulesName {
+	for _, ruleName := range defaultWAFRuleNames {
 		srcPath := path.Join(defaultRuleDir, ruleName+".json")
 		if fileOp.Stat(srcPath) {
 			_ = fileOp.Copy(srcPath, websiteRuleDir)
@@ -680,7 +678,10 @@ func createAllWebsitesWAFConfig(websites []model.Website) error {
 	if err != nil {
 		return err
 	}
-	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
+	wafWebsitesMu.Lock()
+	err = fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm)
+	wafWebsitesMu.Unlock()
+	if err != nil {
 		return err
 	}
 	var (
@@ -720,21 +721,6 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain, crea
 		return nil
 	}
 	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
-	content, err := fileOp.GetContent(websitesConfigPath)
-	if err != nil {
-		return err
-	}
-	var websitesArray []request.WafWebsite
-	if len(content) != 0 {
-		if err := json.Unmarshal(content, &websitesArray); err != nil {
-			return err
-		}
-	}
-	for _, existing := range websitesArray {
-		if existing.Key == website.Alias {
-			return fmt.Errorf("WAF website already exists: %s", website.Alias)
-		}
-	}
 	wafWebsite := request.WafWebsite{
 		Key:     website.Alias,
 		Domains: make([]string, 0),
@@ -744,11 +730,6 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain, crea
 	for _, domain := range domains {
 		wafWebsite.Domains = append(wafWebsite.Domains, domain.Domain)
 		wafWebsite.Host = append(wafWebsite.Host, domain.Domain+":"+strconv.Itoa(domain.Port))
-	}
-	websitesArray = append(websitesArray, wafWebsite)
-	websitesContent, err := json.Marshal(websitesArray)
-	if err != nil {
-		return err
 	}
 
 	var (
@@ -769,7 +750,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain, crea
 	if err := created.mkdir(path.Join(websiteDir, "rules")); err != nil {
 		return err
 	}
-	for _, name := range []string{"acl", "args", "cookie", "defaultUaBlack", "defaultUrlBlack", "fileExt", "header", "methodWhite", "cdn"} {
+	for _, name := range defaultWAFRuleNames {
 		data, err := os.ReadFile(path.Join(defaultRuleDir, name+".json"))
 		if os.IsNotExist(err) {
 			continue
@@ -781,14 +762,7 @@ func createWafConfig(website *model.Website, domains []model.WebsiteDomain, crea
 			return err
 		}
 	}
-	if err := created.replaceShared(websitesConfigPath, content, websitesContent); err != nil {
-		return err
-	}
-
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
-		return err
-	}
-	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+	if err := created.addWAFWebsite(websitesConfigPath, wafWebsite); err != nil {
 		return err
 	}
 
@@ -851,27 +825,15 @@ func delWafConfig(website model.Website, force bool) error {
 		return nil
 	}
 	websitesConfigPath := path.Join(wafDataPath, "conf", "sites.json")
-	content, err := fileOp.GetContent(websitesConfigPath)
-	if err != nil {
-		return err
-	}
-	var websitesArray []request.WafWebsite
-	var newWebsiteArray []request.WafWebsite
-	if len(content) > 0 {
-		if err = json.Unmarshal(content, &websitesArray); err != nil {
-			return err
+	if err := updateWAFWebsites(websitesConfigPath, func(websites []request.WafWebsite) ([]request.WafWebsite, error) {
+		remaining := make([]request.WafWebsite, 0, len(websites))
+		for _, existing := range websites {
+			if existing.Key != website.Alias {
+				remaining = append(remaining, existing)
+			}
 		}
-	}
-	for _, wafWebsite := range websitesArray {
-		if wafWebsite.Key != website.Alias {
-			newWebsiteArray = append(newWebsiteArray, wafWebsite)
-		}
-	}
-	websitesContent, err := json.Marshal(newWebsiteArray)
-	if err != nil {
-		return err
-	}
-	if err := fileOp.SaveFileWithByte(websitesConfigPath, websitesContent, constant.DirPerm); err != nil {
+		return remaining, nil
+	}); err != nil {
 		return err
 	}
 

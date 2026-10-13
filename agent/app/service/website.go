@@ -563,6 +563,14 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			}
 		}
 
+		// Apply the site only after all Nginx, WAF, and PHP configuration is ready.
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
+			return err
+		}
+		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+			return err
+		}
+
 		tx, ctx := helper.GetTxAndContext()
 		defer tx.Rollback()
 		if err = websiteRepo.Create(ctx, website); err != nil {
