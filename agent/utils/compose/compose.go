@@ -158,6 +158,9 @@ func GetComposeImages(filePath string, projectName ...string) ([]string, error) 
 	if err == nil {
 		return images, nil
 	}
+	if strings.Contains(filePath, ",") {
+		return nil, err
+	}
 
 	content, readErr := os.ReadFile(filePath)
 	if readErr != nil {

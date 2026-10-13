@@ -18818,11 +18818,9 @@ const docTemplate = `{
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [
-						"uuids"
-					],
-					"formatEN": "delete Docker port guard policies [uuids]",
-					"formatZH": "删除 Docker 端口防护策略 [uuids]",
+					"bodyKeys": [],
+					"formatEN": "delete Docker port guard policies",
+					"formatZH": "删除 Docker 端口防护策略",
 					"paramKeys": []
 				}
 			}
@@ -19382,11 +19380,9 @@ const docTemplate = `{
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [
-						"instanceKey"
-					],
-					"formatEN": "reorder firewall rule [instanceKey]",
-					"formatZH": "调整防火墙规则顺序 [instanceKey]",
+					"bodyKeys": [],
+					"formatEN": "reorder firewall rule",
+					"formatZH": "调整防火墙规则顺序",
 					"paramKeys": []
 				}
 			}
@@ -19527,11 +19523,9 @@ const docTemplate = `{
 				],
 				"x-panel-log": {
 					"BeforeFunctions": [],
-					"bodyKeys": [
-						"instanceKey"
-					],
-					"formatEN": "update firewall rule [instanceKey]",
-					"formatZH": "更新防火墙规则 [instanceKey]",
+					"bodyKeys": [],
+					"formatEN": "update firewall rule",
+					"formatZH": "更新防火墙规则",
 					"paramKeys": []
 				}
 			}

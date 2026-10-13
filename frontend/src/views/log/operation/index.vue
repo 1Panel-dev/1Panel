@@ -10,46 +10,60 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <el-select v-model="searchGroup" @change="search()" clearable class="p-w-200">
+                <el-select v-model="searchGroup" @change="search()" clearable filterable class="p-w-200">
                     <template #prefix>{{ $t('logs.resource') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
+                    <el-option :label="$t('logs.detail.dashboard')" value="dashboard" />
                     <el-option :label="$t('logs.detail.apps')" value="apps" />
+                    <el-option :label="$t('xpack.customApp.name')" value="custom" />
                     <el-option :label="$t('logs.detail.openresty')" value="openresty" />
                     <el-option :label="$t('logs.detail.websites')" value="websites" />
                     <el-option :label="$t('logs.detail.monitor')" value="monitor" />
                     <el-option :label="$t('logs.detail.runtimes')" value="runtimes" />
                     <el-option :label="$t('logs.detail.ai')" value="ai" />
+                    <el-option :label="$t('aiTools.agents.agent')" value="agents" />
+                    <el-option :label="$t('aiTools.model.downloader')" value="model" />
+                    <el-option label="vLLM" value="vllm" />
                     <el-option :label="$t('logs.detail.ai_proxy')" value="ai-proxy" />
-                    <el-option :label="$t('logs.detail.ai_benchmark')" value="ai_benchmark" />
+                    <el-option :label="$t('logs.detail.ai_benchmark')" value="ai-benchmark" />
                     <el-option :label="$t('logs.detail.skills_hub')" value="skills-hub" />
                     <el-option :label="$t('logs.detail.databases')" value="databases" />
+                    <el-option :label="$t('xpack.cluster.cluster')" value="cluster" />
                     <el-option :label="$t('logs.detail.containers')" value="containers" />
+                    <el-option :label="$t('logs.detail.vms')" value="vms" />
                     <el-option :label="$t('menu.system')" value="hosts" />
                     <el-option :label="$t('logs.detail.files')" value="files" />
                     <el-option :label="$t('logs.detail.cronjobs')" value="cronjobs" />
+                    <el-option :label="$t('cronjob.library.library')" value="script" />
                     <el-option :label="$t('logs.detail.toolbox')" value="toolbox" />
                     <el-option :label="$t('logs.detail.process')" value="process" />
                     <el-option label="WAF" value="waf" />
                     <el-option :label="$t('logs.detail.nodes')" value="nodes" />
+                    <el-option :label="$t('logs.detail.sync')" value="sync" />
+                    <el-option :label="$t('logs.detail.exchange')" value="exchange" />
                     <el-option :label="$t('logs.detail.tampers')" value="tampers" />
                     <el-option :label="$t('logs.detail.xsetting')" value="xsetting" />
                     <el-option :label="$t('logs.detail.licenses')" value="licenses" />
                     <el-option :label="$t('logs.detail.logs')" value="logs" />
                     <el-option :label="$t('logs.detail.settings')" value="settings" />
+                    <el-option :label="$t('logs.detail.xapp')" value="xapp" />
+                    <el-option :label="$t('logs.detail.ops_report')" value="ops-report" />
                     <el-option :label="$t('logs.detail.alert')" value="alert" />
                     <el-option :label="$t('logs.detail.backups')" value="backups" />
                     <el-option :label="$t('logs.detail.groups')" value="groups" />
+                    <el-option :label="$t('logs.detail.users')" value="users" />
                     <el-option :label="$t('logs.detail.roles')" value="roles" />
+                    <el-option :label="$t('logs.detail.auth')" value="auth" />
                     <el-option :label="$t('logs.detail.auth_sources')" value="auth-sources" />
                     <el-option :label="$t('logs.detail.commands')" value="commands" />
                 </el-select>
-                <el-select v-model="searchStatus" @change="search()" clearable class="p-w-200">
+                <el-select v-model="searchStatus" @change="search()" clearable filterable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.status') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option :label="$t('commons.status.success')" value="Success" />
                     <el-option :label="$t('commons.status.failed')" value="Failed" />
                 </el-select>
-                <el-select v-if="isAdmin" v-model="searchNode" @change="search()" clearable class="p-w-200">
+                <el-select v-if="isAdmin" v-model="searchNode" @change="search()" clearable filterable class="p-w-200">
                     <template #prefix>{{ $t('xpack.node.node') }}</template>
                     <el-option :label="$t('commons.table.all')" value="" />
                     <el-option
