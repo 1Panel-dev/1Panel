@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: '현재 애플리케이션 버전이 원격 서비스�
 ErrVllmGB10ProOnly: '이 vLLM 버전은 1Panel 프로페셔널 에디션에서만 사용할 수 있습니다.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway는 동일한 데이터베이스 유형(SQLite 또는 PostgreSQL) 내에서만 업그레이드할 수 있습니다.'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway 백업과 대상 애플리케이션의 데이터베이스 유형(SQLite 또는 PostgreSQL)이 같아야 합니다.'
+ErrHermesUpgradeVersion: 'Hermes Agent는 인식 가능하고 주 버전 간 업그레이드 설정을 충족하는 최신 릴리스로만 업그레이드할 수 있습니다. 이전 버전으로 되돌리려면 백업을 복원하세요.'
 ErrAppWarn: '비정상적인 상태입니다. 로그를 확인해 주세요.'
 ErrAppParamKey: '매개변수 {{ .name }} 필드가 비정상입니다.'
 ErrAppUpgrade: '애플리케이션 {{ .name }} 업그레이드에 실패했습니다 {{ .err }}'

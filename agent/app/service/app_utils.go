@@ -1578,7 +1578,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			if len(ignores) > 0 {
 				continue
 			}
-			if common.IsCrossVersion(installed.Version, appDetail.Version) && !installed.App.CrossVersionUpdate {
+			if isCrossAppVersion(installed.App.Key, installed.Version, appDetail.Version) && !installed.App.CrossVersionUpdate {
 				continue
 			}
 			versions = append(versions, appDetail.Version)
@@ -1593,7 +1593,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			continue
 		}
 
-		versions = common.GetSortedVersions(versions)
+		versions = sortAppVersions(installed.App.Key, versions)
 		lastVersion := versions[0]
 
 		if installed.App.Key == constant.AppMysql || installed.App.Key == constant.AppMysqlCluster {
@@ -1608,10 +1608,10 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			}
 		}
 
-		if common.IsCrossVersion(installed.Version, lastVersion) {
+		if isCrossAppVersion(installed.App.Key, installed.Version, lastVersion) {
 			installDTO.CanUpdate = installed.App.CrossVersionUpdate
 		} else {
-			installDTO.CanUpdate = common.CompareVersion(lastVersion, installed.Version)
+			installDTO.CanUpdate = isNewerAppVersion(installed.App.Key, lastVersion, installed.Version)
 		}
 
 		if updated {
@@ -2286,7 +2286,7 @@ func getAppVersions(key string, details []model.AppDetail) []string {
 		sortAIGatewayVersions(versionsRaw)
 		versions = versionsRaw
 	} else {
-		versions = common.GetSortedVersions(versionsRaw)
+		versions = sortAppVersions(key, versionsRaw)
 	}
 	if hasLatest {
 		versions = append([]string{latestVersion}, versions...)

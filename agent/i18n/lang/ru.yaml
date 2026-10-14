@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: 'Эта версия приложения удален
 ErrVllmGB10ProOnly: 'Эта версия vLLM доступна только в профессиональной редакции 1Panel.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway можно обновлять только в пределах одного типа базы данных (SQLite или PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'Резервная копия AI Gateway и целевое приложение должны использовать один и тот же тип базы данных (SQLite или PostgreSQL).'
+ErrHermesUpgradeVersion: 'Hermes Agent можно обновить только до более нового распознанного выпуска, разрешённого настройкой обновления между основными версиями. Для возврата к старой версии восстановите резервную копию.'
 ErrAppWarn: 'Ненормальное состояние, проверьте журнал'
 ErrAppParamKey: 'Поле параметра {{ .name }} ненормально'
 ErrAppUpgrade: 'Обновление приложения {{ .name }} не удалось {{ .err }}'

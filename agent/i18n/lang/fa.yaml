@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: 'این نسخه برنامه از سرویس راه �
 ErrVllmGB10ProOnly: 'این نسخه vLLM فقط در نسخه حرفه‌ای 1Panel در دسترس است.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway فقط در همان نوع پایگاه داده (SQLite یا PostgreSQL) قابل ارتقا است.'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'نسخه پشتیبان AI Gateway و برنامه مقصد باید از یک نوع پایگاه داده (SQLite یا PostgreSQL) استفاده کنند.'
+ErrHermesUpgradeVersion: 'Hermes Agent فقط می‌تواند به نسخه جدیدتر و شناخته‌شده‌ای ارتقا یابد که تنظیمات ارتقا بین نسخه‌های اصلی اجازه می‌دهد. برای بازگشت به نسخه قدیمی، نسخه پشتیبان را بازیابی کنید.'
 ErrAppWarn: 'وضعیت برنامه غیرعادی است؛ لاگ‌ها را بررسی کنید'
 ErrAppParamKey: 'پارامتر برنامه نامعتبر است: {{ .name }}'
 ErrAppUpgrade: 'ارتقاء برنامه ناموفق بود: {{ .name }} {{ .err }}'

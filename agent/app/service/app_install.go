@@ -694,10 +694,10 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		if len(ignores) > 0 {
 			continue
 		}
-		if common.IsCrossVersion(install.Version, detail.Version) && !app.CrossVersionUpdate {
+		if isCrossAppVersion(app.Key, install.Version, detail.Version) && !app.CrossVersionUpdate {
 			continue
 		}
-		canUpgrade := common.CompareVersion(detail.Version, install.Version)
+		canUpgrade := isNewerAppVersion(app.Key, detail.Version, install.Version)
 		if app.Key == vllmAppKeyForUpgrade {
 			currentImage := loadVllmImageFromEnv(install.Env)
 			canUpgrade = isVllmUpgradeCandidate(install.Version, detail.Version, currentImage)
@@ -738,7 +738,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		}
 	}
 	sort.Slice(versions, func(i, j int) bool {
-		return common.CompareVersion(versions[i].Version, versions[j].Version)
+		return appVersionSortBefore(app.Key, versions[i].Version, versions[j].Version)
 	})
 	return versions, nil
 }

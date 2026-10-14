@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: 'Esta versão do aplicativo foi removida do serviço r
 ErrVllmGB10ProOnly: 'Esta versão do vLLM está disponível apenas no 1Panel Professional Edition.'
 ErrAIGatewayDatabaseTypeMismatch: 'O AI Gateway só pode ser atualizado dentro do mesmo tipo de banco de dados (SQLite ou PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'O backup do AI Gateway e o aplicativo de destino devem usar o mesmo tipo de banco de dados (SQLite ou PostgreSQL).'
+ErrHermesUpgradeVersion: 'O Hermes Agent só pode ser atualizado para uma versão reconhecida mais recente permitida pela configuração de atualização entre versões principais. Para voltar a uma versão anterior, restaure um backup.'
 ErrAppWarn: 'Status anormal, verifique o log'
 ErrAppParamKey: 'O campo de parâmetro {{ .name }} está anormal'
 ErrAppUpgrade: 'Falha na atualização do aplicativo {{ .name }} {{ .err }}'
