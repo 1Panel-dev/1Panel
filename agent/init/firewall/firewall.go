@@ -23,6 +23,9 @@ import (
 func Init() {
 	ctx := context.Background()
 	defer initDockerPortGuard(ctx)
+	if err := service.SyncPanelPortWhitelist(); err != nil {
+		global.LOG.Warnf("synchronize panel port whitelist on startup failed, err: %v", err)
+	}
 	if err := initForwardingRules(ctx); err != nil {
 		global.LOG.Warnf("restore forwarding rules from file failed, err: %v", err)
 	}

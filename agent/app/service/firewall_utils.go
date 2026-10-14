@@ -80,6 +80,50 @@ func LoadPanelPort() string {
 	return portSetting.Value
 }
 
+func SyncPanelPortWhitelist() error {
+	firewallWhitelistMu.Lock()
+	defer firewallWhitelistMu.Unlock()
+	portValue := global.CONF.Base.Port
+	if global.IsMaster {
+		var err error
+		portValue, err = settingRepo.GetCoreValueByKey("ServerPort")
+		if err != nil {
+			return err
+		}
+	}
+	port, err := strconv.ParseUint(portValue, 10, 16)
+	if err != nil || port == 0 {
+		return fmt.Errorf("invalid panel port %q", portValue)
+	}
+	portValue = strconv.FormatUint(port, 10)
+	value, err := settingRepo.GetValueByKey(constant.FirewallPortWhiteList)
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	var entries []firewall.PortWhitelist
+	if err := json.Unmarshal([]byte(value), &entries); err != nil {
+		return err
+	}
+	changed := false
+	for index := range entries {
+		if entries[index].Type == firewall.PortWhitelistTypePanel && entries[index].Port != portValue {
+			entries[index].Port = portValue
+			changed = true
+		}
+	}
+	if !changed {
+		return nil
+	}
+	updated, err := json.Marshal(entries)
+	if err != nil {
+		return err
+	}
+	return settingRepo.Update(constant.FirewallPortWhiteList, string(updated))
+}
+
 func (s *FirewallService) updateSystemAccessPortWhitelist(ctx context.Context, serviceType string, ports []string) error {
 	if len(ports) == 0 {
 		return fmt.Errorf("firewall whitelist %s requires a port", serviceType)
