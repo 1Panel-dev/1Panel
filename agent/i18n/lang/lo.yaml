@@ -132,6 +132,7 @@ ErrAppVersionUnavailable: 'ເວີຊັນແອັບນີ້ຖືກລ�
 ErrVllmGB10ProOnly: 'ເວີຊັນ vLLM ນີ້ມີໃຫ້ໃຊ້ສະເພາະໃນ 1Panel Professional Edition ເທົ່ານັ້ນ.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway ສາມາດອັບເກຣດໄດ້ພາຍໃນປະເພດຖານຂໍ້ມູນດຽວກັນເທົ່ານັ້ນ (SQLite ຫຼື PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'ຂໍ້ມູນສຳຮອງ AI Gateway ແລະ ແອັບເປົ້າໝາຍຕ້ອງໃຊ້ປະເພດຖານຂໍ້ມູນດຽວກັນ (SQLite ຫຼື PostgreSQL).'
+ErrHermesUpgradeVersion: 'Hermes Agent ສາມາດອັບເກຣດໄປຫາລຸ້ນໃໝ່ກວ່າທີ່ຮູ້ຈັກ ແລະ ອະນຸຍາດໂດຍການຕັ້ງຄ່າອັບເກຣດຂ້າມລຸ້ນຫຼັກເທົ່ານັ້ນ. ຖ້າຕ້ອງການກັບໄປລຸ້ນເກົ່າ ໃຫ້ກູ້ຄືນຈາກຂໍ້ມູນສຳຮອງ.'
 ErrAppWarn: 'ສະຖານະແອັບຜິດປົກກະຕິ; ກະລຸນາກວດສອບບັນທຶກ'
 ErrAppParamKey: 'ພາຣາມິເຕີຂອງແອັບບໍ່ຖືກຕ້ອງ: {{ .name }}'
 ErrAppUpgrade: 'ອັບເກຣດແອັບລົ້ມເຫຼວ: {{ .name }} {{ .err }}'

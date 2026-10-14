@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: '目前應用程式版本已從遠端服務下架，�
 ErrVllmGB10ProOnly: '此 vLLM 版本僅支援 1Panel 專業版'
 ErrAIGatewayDatabaseTypeMismatch: 'AI 閘道只能在相同資料庫類型（SQLite 或 PostgreSQL）之間升級。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI 閘道備份與目標應用程式的資料庫類型（SQLite 或 PostgreSQL）必須一致，無法跨資料庫類型還原。'
+ErrHermesUpgradeVersion: 'Hermes Agent 只能升級至可辨識且符合跨版本升級設定的較新版本。如需還原舊版本，請使用備份還原。'
 ErrAppWarn: '狀態異常，請檢視日誌'
 ErrAppParamKey: '參數{{ .name }} 欄位異常'
 ErrAppUpgrade: '應用程式{{ .name }} 升級失敗{{ .err }}'

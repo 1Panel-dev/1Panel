@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: 'Versi aplikasi ini telah dialih keluar daripada perkh
 ErrVllmGB10ProOnly: 'Versi vLLM ini hanya tersedia dalam 1Panel Edisi Profesional.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway hanya boleh dinaik taraf dalam jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'Sandaran AI Gateway dan aplikasi sasaran mesti menggunakan jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
+ErrHermesUpgradeVersion: 'Hermes Agent hanya boleh dinaik taraf kepada keluaran lebih baharu yang dikenal pasti dan dibenarkan oleh tetapan naik taraf antara versi utama. Untuk kembali kepada versi lama, pulihkan sandaran.'
 ErrAppWarn: 'Status tidak normal, sila semak log'
 ErrAppParamKey: 'Parameter {{ .name }} medan tidak normal'
 ErrAppUpgrade: 'Peningkatan {{ .name }} aplikasi gagal {{ .err }}'

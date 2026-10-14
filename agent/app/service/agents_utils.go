@@ -652,7 +652,7 @@ func checkAgentUpgradable(install model.AppInstall) bool {
 		if len(ignores) > 0 {
 			continue
 		}
-		if common.IsCrossVersion(install.Version, item.Version) && !install.App.CrossVersionUpdate {
+		if isCrossAppVersion(install.App.Key, install.Version, item.Version) && !install.App.CrossVersionUpdate {
 			continue
 		}
 		versions = append(versions, item.Version)
@@ -660,12 +660,12 @@ func checkAgentUpgradable(install model.AppInstall) bool {
 	if len(versions) == 0 {
 		return false
 	}
-	versions = common.GetSortedVersions(versions)
+	versions = sortAppVersions(install.App.Key, versions)
 	lastVersion := versions[0]
-	if common.IsCrossVersion(install.Version, lastVersion) {
+	if isCrossAppVersion(install.App.Key, install.Version, lastVersion) {
 		return install.App.CrossVersionUpdate
 	}
-	return common.CompareVersion(lastVersion, install.Version)
+	return isNewerAppVersion(install.App.Key, lastVersion, install.Version)
 }
 
 type openclawConfig struct {

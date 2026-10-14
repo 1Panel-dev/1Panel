@@ -109,6 +109,11 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if !isAIGatewayUpgradeVersionAllowed(install.App.Key, install.Version, detail.Version) {
 		return buserr.New("ErrAIGatewayDatabaseTypeMismatch")
 	}
+	if isHermesApp(install.App.Key) &&
+		(!isNewerAppVersion(install.App.Key, detail.Version, install.Version) ||
+			(isCrossAppVersion(install.App.Key, install.Version, detail.Version) && !install.App.CrossVersionUpdate)) {
+		return buserr.New("ErrHermesUpgradeVersion")
+	}
 	if err = checkVllmVersionAccess(install.App.Key, detail.Version); err != nil {
 		return err
 	}

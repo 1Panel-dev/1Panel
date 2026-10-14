@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: 'Bu uygulama sürümü uzak hizmetten kaldırıldı. L
 ErrVllmGB10ProOnly: 'Bu vLLM sürümü yalnızca 1Panel Professional Edition sürümünde kullanılabilir.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway yalnızca aynı veritabanı türü (SQLite veya PostgreSQL) içinde yükseltilebilir.'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway yedeği ve hedef uygulama aynı veritabanı türünü (SQLite veya PostgreSQL) kullanmalıdır.'
+ErrHermesUpgradeVersion: 'Hermes Agent yalnızca ana sürümler arası yükseltme ayarının izin verdiği, tanınan daha yeni bir sürüme yükseltilebilir. Eski bir sürüme dönmek için yedekten geri yükleyin.'
 ErrAppWarn: 'Anormal durum, lütfen günlüğü kontrol edin'
 ErrAppParamKey: 'Parametre {{ .name }} alanı anormal'
 ErrAppUpgrade: 'Uygulama {{ .name }} yükseltmesi başarısız {{ .err }}'

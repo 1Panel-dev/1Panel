@@ -142,6 +142,7 @@ ErrAppVersionUnavailable: '現在のアプリケーションバージョンは�
 ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway は同じデータベース種別（SQLite または PostgreSQL）間でのみアップグレードできます。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway のバックアップと復元先アプリのデータベース種別（SQLite または PostgreSQL）は一致している必要があります。'
+ErrHermesUpgradeVersion: 'Hermes Agent は、認識可能でメジャーバージョン間のアップグレード設定に適合する新しいリリースにのみアップグレードできます。以前のバージョンに戻すには、バックアップから復元してください。'
 ErrAppWarn: '異常な状態です。ログを確認してください'
 ErrAppParamKey: 'パラメータ {{ .name }} フィールドが異常です'
 ErrAppUpgrade: 'アプリケーション {{ .name }} のアップグレードに失敗しました {{ .err }}'
