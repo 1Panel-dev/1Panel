@@ -323,7 +323,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, nextTick, onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
@@ -392,14 +392,17 @@ const dbOptionsRemote = ref<Array<Database.DatabaseOption>>([]);
 
 const tableRows = ref<Array<Database.MongodbDBInfo>>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'mongodb-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('mongodb-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'database/mongodb/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();

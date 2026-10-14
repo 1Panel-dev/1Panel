@@ -474,7 +474,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
@@ -527,16 +527,14 @@ const portFilter = ref('');
 const showIPv6Ports = ref(true);
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'container-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('container-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     state: 'all',
     orderBy: 'name',
     order: 'ascending',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
@@ -552,6 +550,19 @@ const taskLogRef = ref();
 
 const tags = ref([]);
 const activeTag = ref('all');
+useSearchState(
+    'container/container/index',
+    {
+        search: searchName,
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+        state: toRef(paginationConfig, 'state'),
+        activeTag,
+        orderBy: toRef(paginationConfig, 'orderBy'),
+        order: toRef(paginationConfig, 'order'),
+    },
+    { onRevisit: () => search() },
+);
 
 const activeDropdownContainerId = ref('');
 const statFields = [

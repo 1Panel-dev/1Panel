@@ -3004,6 +3004,20 @@ const message = {
         remote: 'SSH remoto',
     },
     setting: {
+        panelCache: {
+            title: 'Configurações de cache',
+            tabs: 'Cache de abas',
+            pagination: 'Cache de paginação',
+            refresh: 'Cache do intervalo de atualização',
+            search: 'Cache do campo de pesquisa',
+            duration: 'Duração do cache',
+            '24h': '24 horas',
+            week: 'Uma semana',
+            month: 'Um mês',
+            forever: 'Permanente',
+            helper: 'O prazo é contado a partir da última alteração de estado. Após a expiração, os valores padrão são restaurados.',
+        },
+
         panel: 'Painel',
         user: 'Usuário do painel',
         userChange: 'Alterar usuário do painel',

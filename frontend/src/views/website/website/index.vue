@@ -339,7 +339,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
@@ -423,9 +423,8 @@ const appStatusRef = ref();
 
 const pageState = usePageState(() => ({
     paginationConfig: {
-        cacheSizeKey: 'website-page-size',
         currentPage: 1,
-        pageSize: Number(localStorage.getItem('website-page-size')) || 20,
+        pageSize: 20,
         total: 0,
     },
     req: {
@@ -444,8 +443,13 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const req = pageState.req;
-useSearchReset(
-    { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'website/website/index',
+    {
+        search: toRef(req, 'name'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search() },
 );
 const tableSort = pageState.tableSort;

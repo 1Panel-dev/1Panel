@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormatServerTimezone } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
@@ -108,9 +108,8 @@ const loading = ref();
 const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'ssh-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ssh-log-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 
@@ -120,7 +119,11 @@ const exportConfig = reactive({
     status: 'All',
 });
 const searchInfo = ref();
-useSearchReset({ search: searchInfo, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'host/ssh/log/log',
+    { search: searchInfo, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const searchStatus = ref('All');
 
 const search = async () => {

@@ -266,6 +266,7 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 		Language:      settingInfo.Language,
 		MenuTabs:      settingInfo.MenuTabs,
 		MenuAccordion: settingInfo.MenuAccordion,
+		PanelCache:    settingInfo.PanelCache,
 		PanelName:     settingInfo.PanelName,
 		Theme:         settingInfo.Theme,
 		NeedCaptcha:   needCaptcha,

@@ -2817,6 +2817,20 @@ const message = {
         stopSSHWarn: '是否断开此SSH连接',
     },
     setting: {
+        panelCache: {
+            title: '缓存设置',
+            tabs: '标签页缓存',
+            pagination: '翻页缓存',
+            refresh: '刷新频率缓存',
+            search: '搜索输入框缓存',
+            duration: '缓存时间',
+            '24h': '24h',
+            week: '一周',
+            month: '一月',
+            forever: '永久',
+            helper: '有效期从状态最后一次修改开始计算；过期后恢复默认值。',
+        },
+
         panel: '面板',
         user: '面板用户',
         userChange: '修改面板用户',

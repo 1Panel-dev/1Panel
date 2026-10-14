@@ -48,6 +48,7 @@
 </template>
 
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { Website } from '@/api/interface/website';
 import { deleteAcmeAccount, searchAcmeAccount, updateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
@@ -65,7 +66,7 @@ const createRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'acme-account-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('acme-account-page-size')) || 20,
+    pageSize: readCachedPageSize('acme-account-page-size') || 20,
     total: 0,
 });
 const opRef = ref();

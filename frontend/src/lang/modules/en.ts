@@ -2962,6 +2962,20 @@ const message = {
         remote: 'Remote SSH',
     },
     setting: {
+        panelCache: {
+            title: 'Cache settings',
+            tabs: 'Tab cache',
+            pagination: 'Pagination cache',
+            refresh: 'Refresh interval cache',
+            search: 'Search input cache',
+            duration: 'Cache duration',
+            '24h': '24h',
+            week: 'One week',
+            month: 'One month',
+            forever: 'Forever',
+            helper: 'Expires after the last state change. Expired values return to page defaults.',
+        },
+
         panel: 'Panel',
         user: 'Panel user',
         userChange: 'Change panel user',

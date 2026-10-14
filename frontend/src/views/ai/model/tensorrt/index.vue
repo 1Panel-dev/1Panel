@@ -77,6 +77,8 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import OperateDialog from './operate/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
@@ -101,6 +103,14 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
+useSearchState(
+    'ai/model/tensorrt/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 const searchName = ref();
 const opRef = ref();
 const dialogRef = ref();

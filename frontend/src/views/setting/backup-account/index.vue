@@ -120,7 +120,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { dateFormat } from '@/utils/date';
 import { toRef, onMounted, ref } from 'vue';
 import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
@@ -136,15 +136,19 @@ const { isProductPro, isFxplay, docsUrl, isMobile } = useGlobalStore();
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'backup-account-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('backup-account-size')) || 20,
+    pageSize: 20,
     total: 0,
     type: '',
     name: '',
 });
-useSearchReset(
-    { search: toRef(paginationConfig, 'name'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'setting/backup-account/index',
+    {
+        search: toRef(paginationConfig, 'name'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search() },
 );
 const opRef = ref();

@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import Conn from '@/views/ai/model/ollama/conn/index.vue';
@@ -231,13 +231,16 @@ const bindDomainRef = ref();
 const taskLogRef = ref();
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'model-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'ai/model/ollama/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const appInstallID = ref(0);
 
 const opRef = ref();

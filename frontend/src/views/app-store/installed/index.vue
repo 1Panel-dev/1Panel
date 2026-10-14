@@ -139,7 +139,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import AppCard from '@/views/app-store/installed/app/card.vue';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
@@ -181,9 +181,8 @@ const sortContainer = ref();
 let sortableInstance: Sortable | null = null;
 let timer: NodeJS.Timer | null = null;
 const paginationConfig = reactive({
-    cacheSizeKey: 'app-installed-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('app-installed-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const open = ref(false);
@@ -211,8 +210,13 @@ const searchReq = reactive({
     update: false,
     sync: false,
 });
-useSearchReset(
-    { search: toRef(searchReq, 'name'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'app-store/installed/index',
+    {
+        search: toRef(searchReq, 'name'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search() },
 );
 const router = useRouter();
@@ -237,8 +241,6 @@ const changeTag = (key: string) => {
 const search = async () => {
     searchReq.page = paginationConfig.currentPage;
     searchReq.pageSize = paginationConfig.pageSize;
-
-    localStorage.setItem('app-installed-page-size', String(searchReq.pageSize));
 
     const res = await searchAppInstalled(searchReq);
     data.value = res.data.items;

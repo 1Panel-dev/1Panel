@@ -263,7 +263,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
@@ -310,9 +310,8 @@ const groupOptions = ref();
 const dialogGroupRef = ref();
 const pageState = usePageState(() => ({
     paginationConfig: {
-        cacheSizeKey: 'cronjob-page-size',
         currentPage: 1,
-        pageSize: Number(localStorage.getItem('cronjob-page-size')) || 20,
+        pageSize: 20,
         total: 0,
         orderBy: 'createdAt',
         order: 'null',
@@ -323,7 +322,11 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'cronjob/cronjob/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const search = async (column?: any) => {
     if (column) {

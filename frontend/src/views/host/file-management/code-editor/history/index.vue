@@ -223,6 +223,7 @@
 </template>
 
 <script setup lang="ts">
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { computed, nextTick, onBeforeUnmount, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { dateFormatSimpleWithSecond } from '@/utils/date';
 import { computeSize } from '@/utils/size';
@@ -261,7 +262,7 @@ const activeCollapse = ref([]);
 const paginationConfig = reactive({
     cacheSizeKey: 'file-history-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('file-history-page-size')) || 20,
+    pageSize: readCachedPageSize('file-history-page-size') || 20,
     total: 0,
     small: false,
 });

@@ -190,7 +190,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -210,15 +210,18 @@ const selects = ref<any>([]);
 const { docsUrl, isFxplay, isProductPro, isMobile } = useGlobalStore();
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'clam-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('clam-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'toolbox/clam/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const opRef = ref();
 const dialogRef = ref();

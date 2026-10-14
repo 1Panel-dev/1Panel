@@ -6,6 +6,7 @@ import { DeviceType } from '@/enums/app';
 import i18n, { setActiveLocale } from '@/lang';
 import { isMasterOnlyPermissionCode, setMasterOnlyPermissionCodes, toManageCode } from '@/utils/permission-codes';
 import { clearPageStateCache } from '@/utils/page-state-cache';
+import { defaultPanelCache } from '@/utils/panel-cache';
 
 const CN_DOCS_URL = 'https://docs.fit2cloud.com/1panel';
 const INTL_DOCS_URL = 'https://1panel.pro/docs/v2';
@@ -33,6 +34,8 @@ const GlobalStore = defineStore('GlobalState', {
         isFullScreen: false,
         openMenuTabs: false,
         menuAccordion: false,
+        panelCache: { ...defaultPanelCache },
+        cacheUserID: '',
         watermark: null,
         watermarkShow: false,
         isLoading: false,
@@ -123,6 +126,7 @@ const GlobalStore = defineStore('GlobalState', {
         },
         clearAuthInfo() {
             clearPageStateCache();
+            this.cacheUserID = '';
             this.permissions = [];
             this.masterOnlyPermissions = [];
             this.nodeRoles = [];

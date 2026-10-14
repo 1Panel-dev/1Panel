@@ -33,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Runtime } from '@/api/interface/runtime';
 import { GetPHPExtensions, InstallPHPExtension, UnInstallPHPExtension } from '@/api/modules/runtime';
 import i18n from '@/lang';
@@ -49,7 +49,11 @@ const supportExtensions = ref([]);
 const loading = ref(false);
 const taskLogRef = ref();
 const searchName = ref('');
-useSearchReset({ search: searchName }, { onRevisit: () => searchByName() });
+useSearchState(
+    'website/runtime/php/extension-management/index',
+    { search: searchName },
+    { onRevisit: () => searchByName() },
+);
 const data = ref([]);
 
 const handleClose = () => {

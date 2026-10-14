@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { reactive, ref } from 'vue';
 import { searchFtpLog } from '@/api/modules/toolbox';
 import { computeSizeFromByte } from '@/utils/size';
@@ -46,7 +47,7 @@ import i18n from '@/lang';
 const paginationConfig = reactive({
     cacheSizeKey: 'ftp-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ftp-log-page-size')) || 20,
+    pageSize: readCachedPageSize('ftp-log-page-size') || 20,
     total: 0,
     user: '',
     operation: '',

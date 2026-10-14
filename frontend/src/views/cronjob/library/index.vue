@@ -124,7 +124,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { deepCopy } from '@/utils/misc';
 import { newUUID } from '@/utils/id';
@@ -156,13 +156,16 @@ const scriptSync = ref();
 
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'script-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('script-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchInfo = ref<string>('');
-useSearchReset({ search: searchInfo, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'cronjob/library/index',
+    { search: searchInfo, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const group = ref<string>('');
 const groupOptions = ref();
 

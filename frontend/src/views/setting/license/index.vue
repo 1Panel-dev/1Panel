@@ -99,6 +99,8 @@
 </template>
 
 <script setup lang="ts">
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { ref, reactive, onMounted } from 'vue';
 import { deleteLicense, searchLicense, syncLicense, unbindLicense } from '@/api/modules/setting';
 import LicenseImport from '@/components/license-import/index.vue';
@@ -125,13 +127,20 @@ const withDockerRestart = ref();
 
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'license-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('license-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     type: '',
     name: '',
 });
+useSearchState(
+    'setting/license/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 
 const loadMsg = (row: any) => {
     if (row.status === 'Exceptional') {

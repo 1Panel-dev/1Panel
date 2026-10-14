@@ -38,6 +38,7 @@
 </template>
 
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';
 import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
@@ -47,7 +48,7 @@ import { getDNSName } from '@/utils/ssl';
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('dns-account-page-size')) || 20,
+    pageSize: readCachedPageSize('dns-account-page-size') || 20,
     total: 0,
 });
 let data = ref<Website.DnsAccount[]>();

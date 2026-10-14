@@ -1,3 +1,4 @@
+import { applyPanelCacheSettings } from '@/utils/panel-cache';
 import {
     getLicenseStatus,
     getMasterLicenseStatus,
@@ -86,6 +87,7 @@ const loadDataFromDB = async () => {
     globalStore.entrance = res.data.securityEntrance;
     globalStore.openMenuTabs = res.data.menuTabs === 'Enable';
     globalStore.menuAccordion = res.data.menuAccordion === 'Enable';
+    applyPanelCacheSettings(res.data.panelCache);
 };
 
 export async function loadProductProFromDB() {

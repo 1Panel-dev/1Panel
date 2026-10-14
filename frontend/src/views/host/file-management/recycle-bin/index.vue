@@ -82,6 +82,7 @@
 </template>
 
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { getRecycleStatus, clearRecycle, getRecycleList, reduceFile } from '@/api/modules/files';
 import { reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
@@ -107,7 +108,7 @@ const status = ref('Enable');
 const paginationConfig = reactive({
     cacheSizeKey: 'recycle-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('recycle-page-size')) || 20,
+    pageSize: readCachedPageSize('recycle-page-size') || 20,
     total: 0,
 });
 

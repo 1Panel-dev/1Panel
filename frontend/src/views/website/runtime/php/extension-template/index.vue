@@ -24,6 +24,7 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { DeletePHPExtensions, SearchPHPExtensions } from '@/api/modules/runtime';
 import { reactive, ref } from 'vue';
 import Create from './operate/index.vue';
@@ -38,7 +39,7 @@ const opRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'website-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('website-page-size')) || 20,
+    pageSize: readCachedPageSize('website-page-size') || 20,
     total: 0,
 });
 

@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, reactive, ref } from 'vue';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
@@ -105,13 +105,16 @@ const isActive = ref(false);
 const isExist = ref(false);
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'compose-template-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('compose-template-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'container/template/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const search = async () => {
     if (!isActive.value || !isExist.value) {

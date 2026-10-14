@@ -1,3 +1,4 @@
+import { panelCacheKey, readPanelCache, writePanelCache, removePanelCache, prunePanelCache } from '@/utils/panel-cache';
 import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -102,29 +103,34 @@ router.beforeEach(async (to, from) => {
     if (to.name === 'Expired') {
         return true;
     }
-    const activeMenuKey = 'cachedRoute' + (to.meta.activeMenu || '');
+    const activeMenuKey = panelCacheKey(String(to.meta.activeMenu || ''));
     if (to.query.uncached != undefined) {
         const query = { ...to.query };
         delete query.uncached;
-        localStorage.removeItem(activeMenuKey);
+        removePanelCache('tabs', activeMenuKey);
         return { path: to.path, query };
     }
 
-    const cachedRoute = localStorage.getItem(activeMenuKey);
+    const cachedRoute = readPanelCache<string>('tabs', activeMenuKey);
     if (
         to.meta.activeMenu &&
         to.meta.activeMenu != from.meta.activeMenu &&
+        typeof cachedRoute === 'string' &&
         cachedRoute &&
         cachedRoute !== to.path &&
         !isRedirecting
     ) {
         const cachedRouteInfo = router.resolve(cachedRoute);
-        if (cachedRouteInfo.matched.length > 0 && hasRouteAccess(cachedRouteInfo)) {
+        if (
+            cachedRouteInfo.matched.length > 0 &&
+            cachedRouteInfo.meta.activeMenu === to.meta.activeMenu &&
+            hasRouteAccess(cachedRouteInfo)
+        ) {
             isRedirecting = true;
             NProgress.done();
             return cachedRoute;
         }
-        localStorage.removeItem(activeMenuKey);
+        removePanelCache('tabs', activeMenuKey);
     }
 
     if (!hasRouteAccess(to)) {
@@ -135,7 +141,13 @@ router.beforeEach(async (to, from) => {
     return true;
 });
 
-router.afterEach((to) => {
+router.afterEach((to, _from, failure) => {
+    prunePanelCache();
+    if (failure) {
+        isRedirecting = false;
+        NProgress.done();
+        return;
+    }
     if (to.meta.activeMenu && !to.meta.ignoreTab && !isRedirecting) {
         let notMathParam = true;
         if (to.matched.some((record) => record.path.includes(':'))) {
@@ -143,13 +155,13 @@ router.afterEach((to) => {
         }
         if (notMathParam) {
             if (to.meta.activeMenu === '/cronjobs' && to.path === '/cronjobs/cronjob/operate') {
-                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/cronjobs/cronjob');
+                writePanelCache('tabs', panelCacheKey(String(to.meta.activeMenu)), '/cronjobs/cronjob');
             } else if (to.meta.activeMenu === '/containers' && to.path === '/containers/container/operate') {
-                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/containers/container');
+                writePanelCache('tabs', panelCacheKey(String(to.meta.activeMenu)), '/containers/container');
             } else if (to.meta.activeMenu === '/toolbox' && to.path === '/toolbox/clam/setting') {
-                localStorage.setItem('cachedRoute' + to.meta.activeMenu, '/toolbox/clam');
+                writePanelCache('tabs', panelCacheKey(String(to.meta.activeMenu)), '/toolbox/clam');
             } else {
-                localStorage.setItem('cachedRoute' + to.meta.activeMenu, to.path);
+                writePanelCache('tabs', panelCacheKey(String(to.meta.activeMenu)), to.path);
             }
         }
     }

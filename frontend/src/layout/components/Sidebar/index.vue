@@ -55,6 +55,7 @@
 </template>
 
 <script setup lang="ts">
+import { applyPanelCacheSettings } from '@/utils/panel-cache';
 import { ref, computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
@@ -141,6 +142,7 @@ const search = async () => {
         settingInfo = res.data;
         version.value = res.data.systemVersion;
         menuAccordion.value = res.data.menuAccordion === 'Enable';
+        applyPanelCacheSettings(res.data.panelCache);
     } catch (error) {
         version.value = '';
     }

@@ -4,6 +4,16 @@ import (
 	"time"
 )
 
+const DefaultPanelCache = `{"tabs":true,"pagination":true,"refresh":true,"search":false,"duration":"24h"}`
+
+type PanelCache struct {
+	Tabs       *bool  `json:"tabs"`
+	Pagination *bool  `json:"pagination"`
+	Refresh    *bool  `json:"refresh"`
+	Search     *bool  `json:"search"`
+	Duration   string `json:"duration"`
+}
+
 type SettingInfo struct {
 	SystemVersion       string `json:"systemVersion"`
 	DeveloperMode       string `json:"developerMode"`
@@ -18,6 +28,7 @@ type SettingInfo struct {
 	Theme          string `json:"theme"`
 	MenuTabs       string `json:"menuTabs"`
 	MenuAccordion  string `json:"menuAccordion"`
+	PanelCache     string `json:"panelCache"`
 	Language       string `json:"language"`
 	DocSource      string `json:"docSource"`
 
@@ -62,6 +73,7 @@ type SettingBaseInfo struct {
 	Theme         string `json:"theme"`
 	MenuTabs      string `json:"menuTabs"`
 	MenuAccordion string `json:"menuAccordion"`
+	PanelCache    string `json:"panelCache"`
 	Language      string `json:"language"`
 	HideMenu      string `json:"hideMenu"`
 	DocSource     string `json:"docSource"`
@@ -288,6 +300,7 @@ type LoginSetting struct {
 	Language       string `json:"language"`
 	MenuTabs       string `json:"menuTabs"`
 	MenuAccordion  string `json:"menuAccordion"`
+	PanelCache     string `json:"panelCache"`
 	PanelName      string `json:"panelName"`
 	Theme          string `json:"theme"`
 	NeedCaptcha    bool   `json:"needCaptcha"`

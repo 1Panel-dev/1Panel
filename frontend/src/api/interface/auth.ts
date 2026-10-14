@@ -77,6 +77,7 @@ export namespace Login {
         language: string;
         menuTabs: string;
         menuAccordion: string;
+        panelCache: string;
         panelName: string;
         theme: string;
         isOffline: boolean;

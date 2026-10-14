@@ -2786,6 +2786,20 @@ const message = {
         stopSSHWarn: '是否斷開此SSH連接',
     },
     setting: {
+        panelCache: {
+            title: '快取設定',
+            tabs: '標籤頁快取',
+            pagination: '分頁快取',
+            refresh: '重新整理頻率快取',
+            search: '搜尋輸入框快取',
+            duration: '快取時間',
+            '24h': '24h',
+            week: '一週',
+            month: '一個月',
+            forever: '永久',
+            helper: '有效期從狀態最後一次修改開始計算；過期後恢復預設值。',
+        },
+
         panel: '面板',
         user: '面板使用者',
         userChange: '修改面板使用者',

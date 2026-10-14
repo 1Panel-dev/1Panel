@@ -2995,6 +2995,20 @@ const message = {
         remote: 'Uzak SSH',
     },
     setting: {
+        panelCache: {
+            title: 'Önbellek ayarları',
+            tabs: 'Sekme önbelleği',
+            pagination: 'Sayfalama önbelleği',
+            refresh: 'Yenileme aralığı önbelleği',
+            search: 'Arama alanı önbelleği',
+            duration: 'Önbellek süresi',
+            '24h': '24 saat',
+            week: 'Bir hafta',
+            month: 'Bir ay',
+            forever: 'Süresiz',
+            helper: 'Geçerlilik süresi son durum değişikliğinden itibaren hesaplanır. Süre dolduğunda varsayılan değerler geri yüklenir.',
+        },
+
         panel: 'Panel',
         user: 'Panel kullanıcısı',
         userChange: 'Panel kullanıcısını değiştir',

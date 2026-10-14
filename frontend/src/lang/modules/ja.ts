@@ -2937,6 +2937,20 @@ const message = {
         remote: 'リモートSSH',
     },
     setting: {
+        panelCache: {
+            title: 'キャッシュ設定',
+            tabs: 'タブのキャッシュ',
+            pagination: 'ページネーションのキャッシュ',
+            refresh: '更新間隔のキャッシュ',
+            search: '検索入力のキャッシュ',
+            duration: 'キャッシュ期間',
+            '24h': '24時間',
+            week: '1週間',
+            month: '1か月',
+            forever: '無期限',
+            helper: '有効期間は状態を最後に変更した時点から計算されます。期限が切れると既定値に戻ります。',
+        },
+
         panel: 'パネル',
         user: 'パネルユーザー',
         userChange: 'パネルユーザーを変更します',

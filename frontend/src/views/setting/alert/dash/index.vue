@@ -159,6 +159,8 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, reactive, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/secret-field';
@@ -191,13 +193,20 @@ const req = reactive({
 });
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'alert-list-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-list-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'created_at',
     order: 'null',
 });
+useSearchState(
+    'setting/alert/dash/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 const data = ref();
 
 const buttons = [

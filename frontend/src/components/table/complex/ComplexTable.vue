@@ -167,6 +167,7 @@
     </div>
 </template>
 <script setup lang="ts">
+import { panelCacheKey, writePanelCache } from '@/utils/panel-cache';
 import { computed, onDeactivated, onMounted, ref, useAttrs } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { flattenVNodes, type FuTableOperationButton } from '@/components/table/shared';
@@ -341,13 +342,33 @@ const handleRightClick = (row, column, event) => {
     openContextMenu(row, event);
 };
 
+watch(
+    () => props.data,
+    () => {
+        const pagination = props.paginationConfig;
+        if (!pagination || !pagination.pageSize) return;
+        const lastPage = Math.max(1, Math.ceil(pagination.total / pagination.pageSize));
+        if (pagination.currentPage > lastPage) {
+            pagination.currentPage = lastPage;
+            emit('search');
+        }
+    },
+    { flush: 'post' },
+);
+
 function currentChange() {
     emit('search');
 }
 
 function sizeChange() {
+    if (props.paginationConfig.cacheSizeKey) {
+        writePanelCache(
+            'pagination',
+            panelCacheKey(`size:${props.paginationConfig.cacheSizeKey}`),
+            props.paginationConfig.pageSize,
+        );
+    }
     props.paginationConfig.currentPage = 1;
-    localStorage.setItem(props.paginationConfig.cacheSizeKey, props.paginationConfig.pageSize);
     emit('search');
 }
 

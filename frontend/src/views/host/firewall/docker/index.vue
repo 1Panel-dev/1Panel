@@ -219,7 +219,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { computed, reactive, ref, watch } from 'vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
@@ -263,7 +263,8 @@ const openRuleTask = (taskID: string) => taskLogRef.value?.openWithTaskID(taskID
 const orphanDrawerVisible = ref(false);
 const orphanSearchName = ref('');
 const searchName = ref('');
-useSearchReset(
+useSearchState(
+    'host/firewall/docker/index',
     { search: searchName },
     {
         onRevisit: () => {
