@@ -272,7 +272,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import Records from '@/views/cronjob/cronjob/record/index.vue';
 import Backups from '@/views/cronjob/cronjob/backup/index.vue';
 import Import from '@/views/cronjob/cronjob/import/index.vue';
@@ -332,7 +332,7 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
-useSearchReset(
+useSearchState(
     'cronjob/cronjob/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

@@ -100,7 +100,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/terminal/command/operate/index.vue';
@@ -124,7 +124,7 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const info = ref();
-useSearchReset(
+useSearchState(
     'terminal/command/index',
     { search: info, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

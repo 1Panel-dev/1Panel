@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/date';
@@ -67,7 +67,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchInfo = ref<string>('');
-useSearchReset(
+useSearchState(
     'log/login/index',
     { search: searchInfo, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

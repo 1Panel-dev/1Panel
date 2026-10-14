@@ -157,7 +157,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, reactive, ref, computed } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
@@ -200,7 +200,7 @@ const paginationConfig = reactive({
     orderBy: 'createdAt',
     order: 'null',
 });
-useSearchReset(
+useSearchState(
     'container/image/index',
     { search: toRef(paginationConfig, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

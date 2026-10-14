@@ -346,7 +346,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
 import DefaultServer from '@/views/website/website/default/index.vue';
@@ -451,7 +451,7 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const req = pageState.req;
-useSearchReset(
+useSearchState(
     'website/website/index',
     { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

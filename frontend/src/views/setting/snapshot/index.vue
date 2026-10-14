@@ -225,7 +225,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import {
     searchSnapshotPage,
     snapshotDelete,
@@ -261,7 +261,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'setting/snapshot/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

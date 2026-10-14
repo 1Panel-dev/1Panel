@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -158,7 +158,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'container/volume/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

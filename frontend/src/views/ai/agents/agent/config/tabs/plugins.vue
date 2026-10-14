@@ -172,7 +172,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { computed, ref, watch } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
@@ -193,7 +193,7 @@ const searching = ref(false);
 const operating = ref('');
 const keyword = ref('');
 const marketKeyword = ref('');
-useSearchReset(
+useSearchState(
     'ai/agents/agent/config/tabs/plugins',
     { keyword, marketKeyword },
     {

@@ -93,7 +93,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormatServerTimezone } from '@/utils/date';
 import { downloadFile } from '@/utils/file';
@@ -120,7 +120,7 @@ const exportConfig = reactive({
     status: 'All',
 });
 const searchInfo = ref();
-useSearchReset(
+useSearchState(
     'host/ssh/log/log',
     { search: searchInfo, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

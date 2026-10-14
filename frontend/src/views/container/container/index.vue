@@ -474,7 +474,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';
 import UpgradeDialog from '@/views/container/container/upgrade/index.vue';
@@ -551,7 +551,7 @@ const taskLogRef = ref();
 
 const tags = ref([]);
 const activeTag = ref('all');
-useSearchReset(
+useSearchState(
     'container/container/index',
     {
         search: searchName,

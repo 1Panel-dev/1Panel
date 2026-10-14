@@ -302,7 +302,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Firewall } from '@/api/interface/firewall';
 import type { FuTableOperationButton } from '@/components/table/shared';
 import { buildHostRuleExport } from './transfer';
@@ -432,7 +432,7 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-rule-page-size')) || 20,
     total: 0,
 });
-useSearchReset(
+useSearchState(
     'host/firewall/rule/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

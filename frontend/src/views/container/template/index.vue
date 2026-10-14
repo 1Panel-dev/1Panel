@@ -81,7 +81,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, reactive, ref } from 'vue';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { downloadWithContent } from '@/utils/file';
@@ -111,7 +111,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'container/template/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

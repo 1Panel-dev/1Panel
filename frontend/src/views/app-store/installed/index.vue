@@ -139,7 +139,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import AppCard from '@/views/app-store/installed/app/card.vue';
 import Backups from '@/components/backup/index.vue';
 import Uploads from '@/components/upload/index.vue';
@@ -211,7 +211,7 @@ const searchReq = reactive({
     update: false,
     sync: false,
 });
-useSearchReset(
+useSearchState(
     'app-store/installed/index',
     { search: toRef(searchReq, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

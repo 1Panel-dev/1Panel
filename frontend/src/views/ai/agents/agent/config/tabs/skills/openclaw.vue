@@ -142,7 +142,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { computed, ref, watch } from 'vue';
 import { Refresh, Search } from '@element-plus/icons-vue';
 import { useI18n } from 'vue-i18n';
@@ -181,7 +181,7 @@ const getDefaultMarketSource = (): SkillMarketSource => {
 const marketSource = ref<SkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
-useSearchReset(
+useSearchState(
     'ai/agents/agent/config/tabs/skills/openclaw',
     { installedKeyword, marketKeyword },
     {

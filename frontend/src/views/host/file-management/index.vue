@@ -739,7 +739,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
@@ -985,7 +985,7 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('file-page-size')) || 100,
     total: 0,
 });
-useSearchReset(
+useSearchState(
     'host/file-management/index',
     { search: toRef(req, 'search'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

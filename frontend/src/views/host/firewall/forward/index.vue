@@ -117,7 +117,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import OperateDialog from './operate/index.vue';
 import ImportDialog from './import/index.vue';
 import FireRouter from '@/views/host/firewall/index.vue';
@@ -188,7 +188,7 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-forward-page-size')) || 20,
     total: 0,
 });
-useSearchReset(
+useSearchState(
     'host/firewall/forward/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

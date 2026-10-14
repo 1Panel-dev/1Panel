@@ -323,7 +323,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, nextTick, onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { getRandomStr } from '@/utils/id';
@@ -399,7 +399,7 @@ const paginationConfig = reactive({
     orderBy: 'createdAt',
     order: 'null',
 });
-useSearchReset(
+useSearchState(
     'database/mongodb/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

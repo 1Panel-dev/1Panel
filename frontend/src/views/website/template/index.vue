@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Website } from '@/api/interface/website';
 import { deleteTemplate, searchTemplates } from '@/api/modules/website';
 import TemplateOperate from '@/views/website/template/operate/index.vue';
@@ -90,7 +90,7 @@ const paginationConfig = reactive({
     pageSize: 20,
     total: 0,
 });
-useSearchReset(
+useSearchState(
     'website/template/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

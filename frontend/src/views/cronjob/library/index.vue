@@ -132,7 +132,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { deepCopy } from '@/utils/misc';
 import { newUUID } from '@/utils/id';
@@ -170,7 +170,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchInfo = ref<string>('');
-useSearchReset(
+useSearchState(
     'cronjob/library/index',
     { search: searchInfo, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

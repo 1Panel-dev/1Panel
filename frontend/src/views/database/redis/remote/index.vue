@@ -73,7 +73,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { dateFormat } from '@/utils/date';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
@@ -99,7 +99,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'database/redis/remote/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

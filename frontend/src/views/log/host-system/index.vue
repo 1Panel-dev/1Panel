@@ -101,7 +101,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Log } from '@/api/interface/log';
 import { getSystemLogStatus, listRunningServices, readSystemLogs } from '@/api/modules/log';
@@ -114,7 +114,7 @@ const logs = ref<Log.SystemLogItem[]>([]);
 const loading = ref(false);
 const watching = ref(false);
 const keyword = ref('');
-useSearchReset('log/host-system/index', { keyword }, { onRevisit: () => scheduleFilterSearch() });
+useSearchState('log/host-system/index', { keyword }, { onRevisit: () => scheduleFilterSearch() });
 const priority = ref('');
 const service = ref('');
 const services = ref<string[]>([]);

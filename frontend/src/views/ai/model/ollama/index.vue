@@ -186,7 +186,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import AppStatus from '@/components/app-status/index.vue';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import Conn from '@/views/ai/model/ollama/conn/index.vue';
@@ -237,7 +237,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'ai/model/ollama/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

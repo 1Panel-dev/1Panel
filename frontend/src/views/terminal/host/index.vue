@@ -79,7 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import GroupDialog from '@/components/agent-group/index.vue';
 import OperateDialog from '@/views/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/terminal';
@@ -100,7 +100,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
-useSearchReset(
+useSearchState(
     'terminal/host/index',
     { search: info, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

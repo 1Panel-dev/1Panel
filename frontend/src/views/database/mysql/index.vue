@@ -226,7 +226,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import BindDialog from '@/views/database/mysql/bind/index.vue';
 import UserDialog from '@/views/database/mysql/user/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
@@ -301,7 +301,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'database/mysql/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

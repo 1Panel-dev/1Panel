@@ -95,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { toRef, reactive, ref } from 'vue';
@@ -121,7 +121,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'container/network/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

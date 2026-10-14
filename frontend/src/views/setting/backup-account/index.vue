@@ -120,7 +120,7 @@
     </div>
 </template>
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { dateFormat } from '@/utils/date';
 import { toRef, onMounted, ref } from 'vue';
 import { searchBackup, deleteBackup, refreshToken } from '@/api/modules/backup';
@@ -143,7 +143,7 @@ const paginationConfig = reactive({
     type: '',
     name: '',
 });
-useSearchReset(
+useSearchState(
     'setting/backup-account/index',
     { search: toRef(paginationConfig, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

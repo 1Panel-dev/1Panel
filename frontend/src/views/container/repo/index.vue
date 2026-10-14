@@ -59,7 +59,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import OperatorDialog from '@/views/container/repo/operator/index.vue';
 import { toRef, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
@@ -78,7 +78,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'container/repo/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },

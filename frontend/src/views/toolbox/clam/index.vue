@@ -190,7 +190,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
@@ -218,7 +218,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset(
+useSearchState(
     'toolbox/clam/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
