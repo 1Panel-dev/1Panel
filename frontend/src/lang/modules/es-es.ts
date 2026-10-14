@@ -7078,16 +7078,17 @@ const message = {
             webhookPreset: 'Preajuste',
             genericJsonPreset: 'JSON genérico',
             customPreset: 'Personalizado',
-            webhookUrlSecretHelper: 'La URL del Webhook se almacena cifrada y se puede ver y editar aquí',
             webhookPublicAddressHelper:
                 'Solo se admiten direcciones HTTP/HTTPS accesibles públicamente; se bloquean las direcciones locales, privadas y reservadas',
             customWebhookRecoveryRequired:
-                'Esta configuración no es válida o procede de una versión anterior. Vuelve a introducir la URL del Webhook y las cabeceras secretas necesarias y guarda los cambios.',
+                'No se puede leer la configuración guardada del Webhook. Vuelve a introducir la URL y las cabeceras sensibles necesarias y realiza una prueba satisfactoria antes de guardar.',
             clearSecret: 'Borrar',
-            keepSecret: 'Mantener sin cambios',
-            secretCleared: 'Este secreto se borrará al guardar',
+            keepSecret: 'Restaurar valor guardado',
             bodyType: 'Tipo de Body',
             bodyTemplate: 'Plantilla del Body',
+            formatJson: 'Formatear',
+            jsonFormatTooLarge:
+                'El contenido formateado supera el límite de tamaño. Se ha conservado el contenido original.',
             formFieldName: 'Nombre del campo',
             formFieldValue: 'Valor del campo',
             addFormField: 'Añadir campo',

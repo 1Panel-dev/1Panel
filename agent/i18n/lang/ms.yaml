@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'Jenis atau nama aplikasi tidak sepadan'
 # amaran
 ErrAlertMethodNotSupported: 'Versi ini tidak menyokong kaedah amaran ini'
 ErrAlertSync: 'Ralat penyegerakan maklumat penggera, sila semak dan cuba lagi'
+ErrWebhookTestFailed: 'Sila semak konfigurasi Webhook. Lihat log sistem untuk butiran lanjut.'
 
 # tugas - runtime
 ErrInstallExtension: 'Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai'
 
 # templat mel amaran
 PanelAlertTitle: 'Notifikasi Amaran Panel'
-TestAlertTitle: 'E-mel Ujian - Sahkan Sambungan E-mel'
-TestAlert: 'Ini adalah e-mel ujian untuk mengesahkan konfigurasi penghantaran e-mel anda betul.'
+TestAlertTitle: 'Notifikasi Ujian Panel'
+TestAlertMessage: 'Ini ialah notifikasi ujian untuk mengesahkan konfigurasi dan kesambungan saluran notifikasi.'
 LicenseExpirationAlert: 'Panel {{ .node }}{{ .ip }} Anda, lesen akan tamat tempoh dalam {{ .day }} hari. Sila log masuk ke panel untuk butiran lanjut.'
 CronJobFailedAlert: 'Panel {{ .node }}{{ .ip }} Anda, tugas jadual {{ .name }} gagal dilaksanakan. Sila log masuk ke panel untuk butiran lanjut.'
 ClamAlert: 'Panel {{ .node }}{{ .ip }} Anda, tugas imbasan virus mengesan {{ .num }} fail yang dijangkiti. Sila log masuk ke panel untuk butiran lanjut.'

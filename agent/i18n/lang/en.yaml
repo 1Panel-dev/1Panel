@@ -633,14 +633,15 @@ AppAttributesNotMatch: 'Application type or name does not match'
 # alert
 ErrAlertMethodNotSupported: 'This version does not support this alert method'
 ErrAlertSync: 'Failed to sync alert message'
+ErrWebhookTestFailed: 'Please check the Webhook configuration. See the system logs for details.'
 
 # task - runtime
 ErrInstallExtension: 'Another extension install task is running'
 
 # alert mail template
 PanelAlertTitle: "Panel Alert Notification"
-TestAlertTitle: "Test Email - Verify Email Connectivity"
-TestAlert: "This is a test email to verify that your email sending configuration is correct."
+TestAlertTitle: "Panel Test Notification"
+TestAlertMessage: "This is a test notification to verify the notification channel configuration and connectivity."
 LicenseExpirationAlert: "Panel {{ .node }}{{ .ip }}: license expires in {{ .day }} days. Log in to view details."
 CronJobFailedAlert: "Panel {{ .node }}{{ .ip }}: scheduled task {{ .name }} failed. Log in to view details."
 ClamAlert: "Panel {{ .node }}{{ .ip }}: virus scan found {{ .num }} infected files. Log in to view details."

@@ -21,7 +21,7 @@ type AlertProvider interface {
 }
 
 type CustomWebhookTester interface {
-	TestCustomWebhook(config dto.AlertCustomWebhookResolvedConfig) (dto.AlertConfigTestResult, error)
+	TestCustomWebhook(config dto.AlertCustomWebhookResolvedConfig, lang string) (dto.AlertConfigTestResult, error)
 }
 
 type DeliveryResult struct {

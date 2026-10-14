@@ -166,8 +166,12 @@ import { Alert } from '@/api/interface/alert';
 import CustomWebhookForm from './custom-webhook-form.vue';
 import {
     CustomWebhookValidationIssue,
+    beginCustomWebhookTest,
+    completeCustomWebhookTest,
+    createCustomWebhookTestState,
     createDefaultCustomWebhookDraft,
     hydrateCustomWebhookDraft,
+    invalidateCustomWebhookTest,
     serializeCustomWebhookDraft,
     validateCustomWebhookDraft,
 } from './custom-webhook';
@@ -235,7 +239,8 @@ const defaultEmailForm = {
 
 const drawerVisible = ref(false);
 const loading = ref(false);
-const testLoading = ref(false);
+const customWebhookTestState = reactive(createCustomWebhookTestState());
+const testLoading = computed(() => customWebhookTestState.pending);
 const isEdit = ref(false);
 const isOK = ref(false);
 const emailRevision = ref(0);
@@ -273,14 +278,11 @@ const form = reactive({
 });
 
 const customWebhookValidationIssues = ref<CustomWebhookValidationIssue[]>([]);
-const customWebhookRevision = ref(0);
-const testedCustomWebhookRevision = ref<number | null>(null);
-const customWebhookTestPassed = computed(
-    () =>
-        testedCustomWebhookRevision.value !== null && testedCustomWebhookRevision.value === customWebhookRevision.value,
-);
+const customWebhookTestPassed = computed(() => customWebhookTestState.passed);
 const customWebhookSaveAllowed = computed(
-    () => customWebhookTestPassed.value || (form.status === 'Disable' && form.customWebhook.url.action === 'clear'),
+    () =>
+        !testLoading.value &&
+        (customWebhookTestPassed.value || (form.status === 'Disable' && form.customWebhook.url.action === 'clear')),
 );
 
 const drawerHeader = computed(() => {
@@ -421,7 +423,7 @@ const acceptParams = (params: DrawerProps): void => {
 
     isOK.value = false;
     customWebhookValidationIssues.value = [];
-    testedCustomWebhookRevision.value = null;
+    invalidateCustomWebhookTest(customWebhookTestState);
     drawerVisible.value = true;
     void loadAlertConfigs();
 };
@@ -450,7 +452,7 @@ const onTypeChange = (type: string) => {
     }
     isOK.value = false;
     customWebhookValidationIssues.value = [];
-    testedCustomWebhookRevision.value = null;
+    invalidateCustomWebhookTest(customWebhookTestState);
     formRef.value?.clearValidate();
 };
 
@@ -554,7 +556,9 @@ const onSave = async (formEl: FormInstance | undefined) => {
     }
     if (form.type === 'custom') {
         if (!customWebhookSaveAllowed.value) return;
+        const testedAttempt = customWebhookTestState.attempt;
         if (await validateCustomWebhook(formEl, form.status === 'Disable')) {
+            if (testedAttempt !== customWebhookTestState.attempt || !customWebhookSaveAllowed.value) return;
             try {
                 await saveAlertConfig();
             } catch {
@@ -576,11 +580,9 @@ const onSave = async (formEl: FormInstance | undefined) => {
 const onTest = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     if (form.type === 'custom') {
-        testedCustomWebhookRevision.value = null;
-        if (!(await validateCustomWebhook(formEl))) return;
-        testLoading.value = true;
+        const attempt = beginCustomWebhookTest(customWebhookTestState);
         try {
-            const testedRevision = customWebhookRevision.value;
+            if (!(await validateCustomWebhook(formEl)) || attempt !== customWebhookTestState.attempt) return;
             const config = JSON.stringify(serializeCustomWebhookDraft(form.customWebhook));
             const res = await TestCustomAlertConfig({
                 ...(form.id ? { id: form.id } : {}),
@@ -589,23 +591,17 @@ const onTest = async (formEl: FormInstance | undefined) => {
             });
             const raw = res.data as Alert.AlertConfigCustomTestResult | boolean;
             const result = typeof raw === 'boolean' ? undefined : raw;
-            const success = typeof raw === 'boolean' ? raw : Boolean(result?.success);
-            const message =
-                result?.message || i18n.global.t(success ? 'xpack.alert.alertTestOk' : 'xpack.alert.alertTestFailed');
+            const success = typeof raw === 'boolean' ? raw : result?.success === true;
+            if (!completeCustomWebhookTest(customWebhookTestState, attempt, success)) return;
             if (success) {
-                if (testedRevision !== customWebhookRevision.value) {
-                    MsgWarning(i18n.global.t('xpack.alert.testResultStale'));
-                    return;
-                }
-                testedCustomWebhookRevision.value = testedRevision;
-                MsgSuccess(message);
+                MsgSuccess(i18n.global.t('xpack.alert.alertTestOk'));
                 return;
             }
-            MsgError(message);
+            MsgError(result?.message || i18n.global.t('xpack.alert.alertTestFailed'));
         } catch {
             return;
         } finally {
-            testLoading.value = false;
+            completeCustomWebhookTest(customWebhookTestState, attempt, false);
         }
         return;
     }
@@ -669,8 +665,7 @@ watch(
     () => {
         if (form.type !== 'custom') return;
         customWebhookValidationIssues.value = [];
-        customWebhookRevision.value += 1;
-        testedCustomWebhookRevision.value = null;
+        invalidateCustomWebhookTest(customWebhookTestState);
     },
     { deep: true, flush: 'sync' },
 );
@@ -698,7 +693,7 @@ watch(
 
 const handleClose = () => {
     isOK.value = false;
-    testedCustomWebhookRevision.value = null;
+    invalidateCustomWebhookTest(customWebhookTestState);
     drawerVisible.value = false;
 };
 
