@@ -1,7 +1,6 @@
 package v2
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
@@ -328,8 +327,8 @@ func (b *BaseApi) UpdateAlertConfigStatus(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := alertService.UpdateAlertConfigStatus(req, loadAuditUser(c))
-	setAlertConfigLogName(c, req.ID)
+	name, err := alertService.UpdateAlertConfigStatus(req, loadAuditUser(c))
+	helper.SetOperationLogValues(c, map[string]string{"name": name})
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -362,8 +361,8 @@ func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	setAlertConfigLogName(c, req.ID)
-	err := alertService.DeleteAlertConfig(req.ID)
+	name, err := alertService.DeleteAlertConfig(req.ID)
+	helper.SetOperationLogValues(c, map[string]string{"name": name})
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -413,23 +412,4 @@ func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, flag)
-}
-
-// Resolve the current name for the operation log. Call before deleting the record.
-func setAlertConfigLogName(c *gin.Context, id uint) {
-	name := ""
-	if config, err := repo.NewIAlertRepo().GetConfigById(id); err == nil {
-		name = alertConfigLogName(config.Config, config.Title)
-	}
-	helper.SetOperationLogValues(c, map[string]string{"name": name})
-}
-
-func alertConfigLogName(config, title string) string {
-	var value struct {
-		DisplayName string `json:"displayName"`
-	}
-	if json.Unmarshal([]byte(config), &value) == nil && strings.TrimSpace(value.DisplayName) != "" {
-		return strings.TrimSpace(value.DisplayName)
-	}
-	return title
 }
