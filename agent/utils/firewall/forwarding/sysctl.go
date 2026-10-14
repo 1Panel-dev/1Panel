@@ -2,7 +2,6 @@ package forwarding
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -174,14 +173,19 @@ func LoadDockerIPv4BridgePorts() (map[string]bool, error) {
 	if err != nil {
 		return nil, err
 	}
-	output, err := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second)).RunWithOptionalSudoAndStdout("ip", "-details", "-json", "link", "show")
+	command := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
+	bridges, err := command.RunWithOptionalSudoAndStdout("ip", "-o", "link", "show", "type", "bridge")
 	if err != nil {
 		return nil, err
 	}
-	return dockerIPv4BridgePorts(networks, output)
+	ports, err := command.RunWithOptionalSudoAndStdout("ip", "-o", "link", "show", "type", "veth")
+	if err != nil {
+		return nil, err
+	}
+	return dockerIPv4BridgePorts(networks, bridges, ports)
 }
 
-func dockerIPv4BridgePorts(networks []network.Summary, linkJSON string) (map[string]bool, error) {
+func dockerIPv4BridgePorts(networks []network.Summary, bridgeOutput, portOutput string) (map[string]bool, error) {
 	bridges := make(map[string]bool)
 	for _, item := range networks {
 		if item.Driver != "bridge" || item.EnableIPv6 || item.ConfigOnly {
@@ -199,26 +203,36 @@ func dockerIPv4BridgePorts(networks []network.Summary, linkJSON string) (map[str
 			bridges[name] = true
 		}
 	}
-	var links []struct {
-		Name     string `json:"ifname"`
-		Master   string `json:"master"`
-		LinkInfo struct {
-			Kind string `json:"info_kind"`
-		} `json:"linkinfo"`
-	}
-	if err := json.Unmarshal([]byte(linkJSON), &links); err != nil {
-		return nil, err
-	}
 	confirmedBridges := make(map[string]bool)
-	for _, link := range links {
-		if link.LinkInfo.Kind == "bridge" && bridges[link.Name] {
-			confirmedBridges[link.Name] = true
-		}
-	}
 	ports := make(map[string]bool)
-	for _, link := range links {
-		if link.LinkInfo.Kind == "veth" && confirmedBridges[link.Master] {
-			ports[link.Name] = true
+	for index, output := range []string{bridgeOutput, portOutput} {
+		for _, line := range strings.Split(output, "\n") {
+			header, _, _ := strings.Cut(line, "\\")
+			fields := strings.Fields(header)
+			if len(fields) == 0 {
+				continue
+			}
+			if len(fields) < 3 || !strings.HasSuffix(fields[0], ":") || !strings.HasSuffix(fields[1], ":") {
+				return nil, fmt.Errorf("invalid network link entry: %q", line)
+			}
+			if _, err := strconv.Atoi(strings.TrimSuffix(fields[0], ":")); err != nil {
+				return nil, fmt.Errorf("invalid network link entry: %q", line)
+			}
+			name, _, _ := strings.Cut(strings.TrimSuffix(fields[1], ":"), "@")
+			if index == 0 {
+				if bridges[name] {
+					confirmedBridges[name] = true
+				}
+				continue
+			}
+			for i := 3; i+1 < len(fields); i++ {
+				if fields[i] == "master" {
+					if confirmedBridges[fields[i+1]] {
+						ports[name] = true
+					}
+					break
+				}
+			}
 		}
 	}
 	return ports, nil

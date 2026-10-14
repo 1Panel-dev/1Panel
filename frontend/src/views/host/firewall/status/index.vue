@@ -182,10 +182,12 @@ import TaskLog from '@/components/log/task/index.vue';
 import FamilyIssues from '@/views/host/firewall/components/family-issues.vue';
 import RuleInitialize from '@/views/host/firewall/components/rule-initialize.vue';
 import { newUUID } from '@/utils/id';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const props = defineProps({
     currentTab: String,
 });
+const { docsUrl } = useGlobalStore();
 
 const goToFirewallSetting = () => routerToName('FirewallSetting');
 const goToScriptLibrary = () => routerToNameWithQuery('Library', { uncached: 'true' });
@@ -272,6 +274,10 @@ const familyActions = computed(() =>
         return {
             family: issue.family === 'IPv6' ? ('ipv6' as const) : ('ipv4' as const),
             message: familyIssueText(issue),
+            helpUrl:
+                issue.available && issue.reason === 'ipv6_ra_required'
+                    ? `${docsUrl.value}/user_manual/hosts/firewall`
+                    : undefined,
             action,
         };
     }),
