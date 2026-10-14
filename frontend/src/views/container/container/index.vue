@@ -536,7 +536,6 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 const dialogUpgradeRef = ref();
 const dialogCommitRef = ref();
 const dialogPortJumpRef = ref();
@@ -552,6 +551,17 @@ const taskLogRef = ref();
 
 const tags = ref([]);
 const activeTag = ref('all');
+useSearchReset(
+    {
+        search: searchName,
+        page: toRef(paginationConfig, 'currentPage'),
+        state: toRef(paginationConfig, 'state'),
+        activeTag,
+        orderBy: toRef(paginationConfig, 'orderBy'),
+        order: toRef(paginationConfig, 'order'),
+    },
+    { onRevisit: () => search(), preserveOnRoutes: ['ContainerItem', 'ContainerCreate'] },
+);
 
 const activeDropdownContainerId = ref('');
 const statFields = [
