@@ -108,33 +108,29 @@
 		"formatEN": "create alert [title]"
 	},
 	"/alert/config/del": {
-		"bodyKeys": [
-			"id"
-		],
+		"bodyKeys": [],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除告警配置 [id]",
-		"formatEN": "delete alert config [id]"
+		"formatZH": "删除告警配置 [name]",
+		"formatEN": "delete alert config [name]",
+		"beforeFunctions": []
 	},
 	"/alert/config/status": {
 		"bodyKeys": [
-			"id",
 			"status"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新告警配置状态 [id][status]",
-		"formatEN": "update alert config status [id][status]"
+		"formatZH": "更新告警配置状态 [name][status]",
+		"formatEN": "update alert config status [name][status]",
+		"beforeFunctions": []
 	},
 	"/alert/config/update": {
 		"bodyKeys": [
-			"id",
 			"displayName"
 		],
 		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新告警配置 [id][displayName]",
-		"formatEN": "update alert config [id][displayName]"
+		"formatZH": "更新告警配置 [displayName]",
+		"formatEN": "update alert config [displayName]",
+		"beforeFunctions": []
 	},
 	"/alert/del": {
 		"bodyKeys": [

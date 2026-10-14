@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/url"
@@ -293,7 +294,7 @@ func (b *BaseApi) PageAlertConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/update [post]
-// @x-panel-log {"bodyKeys":["id","displayName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [id][displayName]","formatEN":"update alert config [id][displayName]"}
+// @x-panel-log {"bodyKeys":["displayName"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置 [displayName]","formatEN":"update alert config [displayName]"}
 func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 	var req dto.AlertConfigUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
@@ -321,13 +322,15 @@ func (b *BaseApi) UpdateAlertConfig(c *gin.Context) {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/status [post]
-// @x-panel-log {"bodyKeys":["id","status"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置状态 [id][status]","formatEN":"update alert config status [id][status]"}
+// @x-panel-log {"bodyKeys":["status"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新告警配置状态 [name][status]","formatEN":"update alert config status [name][status]"}
 func (b *BaseApi) UpdateAlertConfigStatus(c *gin.Context) {
 	var req dto.AlertConfigStatusUpdate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	if err := alertService.UpdateAlertConfigStatus(req, loadAuditUser(c)); err != nil {
+	err := alertService.UpdateAlertConfigStatus(req, loadAuditUser(c))
+	setAlertConfigLogName(c, req.ID)
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
@@ -353,12 +356,13 @@ func loadAuditUser(c *gin.Context) string {
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /alert/config/del [post]
-// @x-panel-log {"bodyKeys":["id"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除告警配置 [id]","formatEN":"delete alert config [id]"}
+// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"删除告警配置 [name]","formatEN":"delete alert config [name]"}
 func (b *BaseApi) DeleteAlertConfig(c *gin.Context) {
 	var req dto.DeleteRequest
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
+	setAlertConfigLogName(c, req.ID)
 	err := alertService.DeleteAlertConfig(req.ID)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -409,4 +413,23 @@ func (b *BaseApi) TestAlertConfig(c *gin.Context) {
 		return
 	}
 	helper.SuccessWithData(c, flag)
+}
+
+// Resolve the current name for the operation log. Call before deleting the record.
+func setAlertConfigLogName(c *gin.Context, id uint) {
+	name := ""
+	if config, err := repo.NewIAlertRepo().GetConfigById(id); err == nil {
+		name = alertConfigLogName(config.Config, config.Title)
+	}
+	helper.SetOperationLogValues(c, map[string]string{"name": name})
+}
+
+func alertConfigLogName(config, title string) string {
+	var value struct {
+		DisplayName string `json:"displayName"`
+	}
+	if json.Unmarshal([]byte(config), &value) == nil && strings.TrimSpace(value.DisplayName) != "" {
+		return strings.TrimSpace(value.DisplayName)
+	}
+	return title
 }

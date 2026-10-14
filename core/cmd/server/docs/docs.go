@@ -3906,13 +3906,11 @@ const docTemplate = `{
 					"Alert"
 				],
 				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [
-						"id"
-					],
-					"formatEN": "delete alert config [id]",
-					"formatZH": "删除告警配置 [id]",
-					"paramKeys": []
+					"bodyKeys": [],
+					"paramKeys": [],
+					"formatZH": "删除告警配置 [name]",
+					"formatEN": "delete alert config [name]",
+					"BeforeFunctions": []
 				}
 			}
 		},
@@ -4041,14 +4039,13 @@ const docTemplate = `{
 					"Alert"
 				],
 				"x-panel-log": {
-					"BeforeFunctions": [],
 					"bodyKeys": [
-						"id",
 						"displayName"
 					],
-					"formatEN": "update alert config [id][displayName]",
-					"formatZH": "更新告警配置 [id][displayName]",
-					"paramKeys": []
+					"paramKeys": [],
+					"formatZH": "更新告警配置 [displayName]",
+					"formatEN": "update alert config [displayName]",
+					"BeforeFunctions": []
 				}
 			}
 		},
