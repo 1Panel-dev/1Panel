@@ -301,7 +301,11 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'database/mysql/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const mysqlContainer = ref();
 const mysqlStatus = ref();

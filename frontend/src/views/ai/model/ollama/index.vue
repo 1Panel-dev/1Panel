@@ -237,7 +237,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'ai/model/ollama/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const appInstallID = ref(0);
 
 const opRef = ref();

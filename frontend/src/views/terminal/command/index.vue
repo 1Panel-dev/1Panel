@@ -124,7 +124,11 @@ const paginationConfig = reactive({
     order: 'ascending',
 });
 const info = ref();
-useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'terminal/command/index',
+    { search: info, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const group = ref<string>('');
 const dialogRef = ref();
 const opRef = ref();

@@ -218,7 +218,11 @@ const paginationConfig = reactive({
     order: 'null',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'toolbox/clam/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const opRef = ref();
 const dialogRef = ref();

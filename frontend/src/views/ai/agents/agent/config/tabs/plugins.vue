@@ -194,6 +194,7 @@ const operating = ref('');
 const keyword = ref('');
 const marketKeyword = ref('');
 useSearchReset(
+    'ai/agents/agent/config/tabs/plugins',
     { keyword, marketKeyword },
     {
         scope: () => agentId.value || undefined,

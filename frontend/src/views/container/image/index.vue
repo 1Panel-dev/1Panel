@@ -201,6 +201,7 @@ const paginationConfig = reactive({
     order: 'null',
 });
 useSearchReset(
+    'container/image/index',
     { search: toRef(paginationConfig, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );

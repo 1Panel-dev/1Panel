@@ -111,7 +111,11 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'ai/agents/model/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const search = async () => {
     const req: AI.AgentAccountSearch = {

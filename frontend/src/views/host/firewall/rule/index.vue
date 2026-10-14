@@ -432,7 +432,11 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-rule-page-size')) || 20,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'host/firewall/rule/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const providerScopes = (): Firewall.Scope[] => {
     if (provider.value === 'iptables' || provider.value === 'nftables') {

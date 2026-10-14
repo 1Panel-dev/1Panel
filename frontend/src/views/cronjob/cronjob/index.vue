@@ -332,7 +332,11 @@ const pageState = usePageState(() => ({
 }));
 const paginationConfig = pageState.paginationConfig;
 const { defaultGroupID, searchName, searchGroupID } = toRefs(pageState);
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'cronjob/cronjob/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const search = async (column?: any) => {
     if (column) {

@@ -1,5 +1,4 @@
-import { bindSearchReset } from '@/utils/search-reset';
-import router from '@/routers/router';
+import { bindSearchState } from '@/utils/search-reset';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { defineStore } from 'pinia';
 import { ref, reactive, toRef } from 'vue';
@@ -50,7 +49,7 @@ export const ProcessStore = defineStore('ProcessStore', () => {
     });
 
     const { currentNode } = useGlobalStore();
-    bindSearchReset([() => router.currentRoute.value.path, currentNode], {
+    bindSearchState(() => JSON.stringify([currentNode.value, 'host/process', '']), {
         pid: toRef(psSearch, 'pid'),
         name: toRef(psSearch, 'name'),
         username: toRef(psSearch, 'username'),

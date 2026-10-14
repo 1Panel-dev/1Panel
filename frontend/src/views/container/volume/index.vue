@@ -158,7 +158,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'container/volume/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const isActive = ref(false);
 const isExist = ref(false);
 

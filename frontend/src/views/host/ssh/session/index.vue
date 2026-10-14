@@ -38,7 +38,7 @@ const sshSearch = reactive({
     type: 'ssh',
     loginUser: '',
 });
-useSearchReset({ search: toRef(sshSearch, 'loginUser') }, { onRevisit: () => search() });
+useSearchReset('host/ssh/session/index', { search: toRef(sshSearch, 'loginUser') }, { onRevisit: () => search() });
 
 const buttons = [
     {

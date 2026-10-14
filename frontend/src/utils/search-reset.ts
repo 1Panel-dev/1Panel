@@ -1,41 +1,79 @@
-import { watch, type Ref, type WatchSource } from 'vue';
+import { watch, type Ref } from 'vue';
 
 export type SearchFields = Record<string, Ref<string | number | undefined>>;
-
-export const bindSearchReset = (sources: WatchSource[], fields: SearchFields) => {
-    const defaults = Object.values(fields).map((field) => ({ field, value: field.value }));
-    const reset = () => {
-        for (const { field, value } of defaults) field.value = value;
-    };
-    watch(sources, reset, { flush: 'sync' });
-    return reset;
-};
-
 type SearchValues = Record<string, string | number | undefined>;
 
-/** A short-lived return state, discarded as soon as navigation leaves its list/edit flow. */
-export const createSearchVisitCache = () => {
-    const entries = new Map<string, { routes: string[]; values: SearchValues }>();
-    let context: unknown;
-    const syncContext = (next: unknown) => {
-        if (context !== next) entries.clear();
-        context = next;
-    };
+/** Shared by normal page visits and edit-return visits; navigation never evicts a query. */
+export const createSearchVisitCache = (storage: () => Storage = () => localStorage) => {
+    const entries = new Map<string, SearchValues>();
     return {
-        navigate(route: string, nextContext: unknown) {
-            syncContext(nextContext);
-            for (const [key, entry] of entries) {
-                if (!entry.routes.includes(route)) entries.delete(key);
+        save(key: string, values: SearchValues) {
+            entries.set(key, { ...values });
+            try {
+                storage().setItem(
+                    `1panel:search-state:v2:${key}`,
+                    JSON.stringify(
+                        Object.fromEntries(Object.entries(values).map(([name, value]) => [name, value ?? null])),
+                    ),
+                );
+            } catch {
+                // Keep in-memory state when storage is unavailable or full.
             }
         },
-        save(key: string, routes: string[], route: string, nextContext: unknown, values: SearchValues) {
-            syncContext(nextContext);
-            if (routes.includes(route)) entries.set(key, { routes, values: { ...values } });
-        },
-        read(key: string, nextContext: unknown) {
-            syncContext(nextContext);
-            const values = entries.get(key)?.values;
-            return values ? { ...values } : undefined;
+        read(key: string): SearchValues | undefined {
+            const cached = entries.get(key);
+            if (cached) return { ...cached };
+            try {
+                const saved = JSON.parse(storage().getItem(`1panel:search-state:v2:${key}`) || 'null');
+                if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return undefined;
+                return Object.fromEntries(
+                    Object.entries(saved)
+                        .filter(
+                            ([, value]) =>
+                                value === null ||
+                                typeof value === 'string' ||
+                                (typeof value === 'number' && Number.isFinite(value)),
+                        )
+                        .map(([name, value]) => [name, value === null ? undefined : value]),
+                ) as SearchValues;
+            } catch {
+                return undefined;
+            }
         },
     };
+};
+
+const visitCache = createSearchVisitCache();
+
+export const bindSearchState = (key: () => string | undefined, fields: SearchFields, cache = visitCache) => {
+    const defaults = Object.fromEntries(Object.entries(fields).map(([name, field]) => [name, field.value]));
+    let restoring = false;
+    let activeKey: string | undefined;
+    const restore = () => {
+        activeKey = key();
+        if (!activeKey) return;
+        const saved = cache.read(activeKey) || defaults;
+        restoring = true;
+        try {
+            // Restore pagination last: search/filter watchers may reset it to page one.
+            const names = Object.keys(fields).sort((left, right) => Number(left === 'page') - Number(right === 'page'));
+            for (const name of names) {
+                const value = Object.hasOwn(saved, name) ? saved[name] : defaults[name];
+                const initial = defaults[name];
+                fields[name].value =
+                    initial !== undefined && value !== undefined && typeof value !== typeof initial ? initial : value;
+            }
+        } finally {
+            restoring = false;
+        }
+    };
+    watch(key, restore, { immediate: true, flush: 'sync' });
+    watch(
+        () => Object.fromEntries(Object.entries(fields).map(([name, field]) => [name, field.value])),
+        (values) => {
+            if (!restoring && activeKey) cache.save(activeKey, values);
+        },
+        { immediate: true, flush: 'sync' },
+    );
+    return restore;
 };

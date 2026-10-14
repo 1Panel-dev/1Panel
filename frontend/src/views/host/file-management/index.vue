@@ -986,6 +986,7 @@ const paginationConfig = reactive({
     total: 0,
 });
 useSearchReset(
+    'host/file-management/index',
     { search: toRef(req, 'search'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );

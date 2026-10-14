@@ -212,6 +212,7 @@ const searchReq = reactive({
     sync: false,
 });
 useSearchReset(
+    'app-store/installed/index',
     { search: toRef(searchReq, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );

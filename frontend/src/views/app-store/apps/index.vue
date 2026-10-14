@@ -106,6 +106,7 @@ const req = reactive({
     showCurrentArch: false,
 });
 useSearchReset(
+    'app-store/apps/index',
     { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search(req) },
 );

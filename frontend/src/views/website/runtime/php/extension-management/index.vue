@@ -49,7 +49,11 @@ const supportExtensions = ref([]);
 const loading = ref(false);
 const taskLogRef = ref();
 const searchName = ref('');
-useSearchReset({ search: searchName }, { onRevisit: () => searchByName() });
+useSearchReset(
+    'website/runtime/php/extension-management/index',
+    { search: searchName },
+    { onRevisit: () => searchByName() },
+);
 const data = ref([]);
 
 const handleClose = () => {

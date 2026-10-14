@@ -144,6 +144,7 @@ const paginationConfig = reactive({
     name: '',
 });
 useSearchReset(
+    'setting/backup-account/index',
     { search: toRef(paginationConfig, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );

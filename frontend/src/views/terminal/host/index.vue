@@ -100,7 +100,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
-useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'terminal/host/index',
+    { search: info, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const group = ref<string>('');
 
 const opRef = ref();

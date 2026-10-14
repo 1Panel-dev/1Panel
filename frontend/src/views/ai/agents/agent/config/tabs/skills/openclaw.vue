@@ -182,6 +182,7 @@ const marketSource = ref<SkillMarketSource>(getDefaultMarketSource());
 const marketSearched = ref(false);
 const agentId = ref(0);
 useSearchReset(
+    'ai/agents/agent/config/tabs/skills/openclaw',
     { installedKeyword, marketKeyword },
     {
         scope: () => agentId.value || undefined,

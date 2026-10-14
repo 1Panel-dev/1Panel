@@ -120,7 +120,11 @@ const exportConfig = reactive({
     status: 'All',
 });
 const searchInfo = ref();
-useSearchReset({ search: searchInfo, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'host/ssh/log/log',
+    { search: searchInfo, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const searchStatus = ref('All');
 
 const search = async () => {

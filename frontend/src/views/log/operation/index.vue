@@ -160,7 +160,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchName = ref<string>('');
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'log/operation/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const searchGroup = ref<string>('');
 const searchStatus = ref<string>('');
 const searchNode = ref<string>('');

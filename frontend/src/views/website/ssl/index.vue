@@ -288,6 +288,7 @@ const req = reactive({
     order: 'descending',
 });
 useSearchReset(
+    'website/ssl/index',
     { search: toRef(req, 'domain'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );

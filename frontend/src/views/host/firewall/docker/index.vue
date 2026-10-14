@@ -264,6 +264,7 @@ const orphanDrawerVisible = ref(false);
 const orphanSearchName = ref('');
 const searchName = ref('');
 useSearchReset(
+    'host/firewall/docker/index',
     { search: searchName },
     {
         onRevisit: () => {

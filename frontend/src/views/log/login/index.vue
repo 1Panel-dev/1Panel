@@ -67,7 +67,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const searchInfo = ref<string>('');
-useSearchReset({ search: searchInfo, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'log/login/index',
+    { search: searchInfo, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 const searchStatus = ref<string>('');
 
 const search = async () => {

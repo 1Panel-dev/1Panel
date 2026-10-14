@@ -552,6 +552,7 @@ const taskLogRef = ref();
 const tags = ref([]);
 const activeTag = ref('all');
 useSearchReset(
+    'container/container/index',
     {
         search: searchName,
         page: toRef(paginationConfig, 'currentPage'),
@@ -560,7 +561,7 @@ useSearchReset(
         orderBy: toRef(paginationConfig, 'orderBy'),
         order: toRef(paginationConfig, 'order'),
     },
-    { onRevisit: () => search(), preserveOnRoutes: ['ContainerItem', 'ContainerCreate'] },
+    { onRevisit: () => search() },
 );
 
 const activeDropdownContainerId = ref('');

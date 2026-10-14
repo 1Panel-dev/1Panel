@@ -400,7 +400,11 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'ai/agents/agent/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const checkNoApp = async () => {
     try {

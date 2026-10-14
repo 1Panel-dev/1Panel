@@ -577,7 +577,7 @@ const dialogBackupRef = ref();
 const uploadRef = ref();
 
 const searchName = ref('');
-useSearchReset({ search: searchName }, { onRevisit: () => search() });
+useSearchReset('container/compose/index', { search: searchName }, { onRevisit: () => search() });
 const includeAppStore = ref(localStorage.getItem('includeAppStore') !== 'false');
 const showType = ref('compose');
 const containerStats = ref<any[]>([]);

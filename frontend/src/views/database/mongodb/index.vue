@@ -399,7 +399,11 @@ const paginationConfig = reactive({
     orderBy: 'createdAt',
     order: 'null',
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'database/mongodb/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 type FormInstance = InstanceType<typeof ElForm>;
 const formRef = ref<FormInstance>();

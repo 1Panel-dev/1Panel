@@ -188,7 +188,11 @@ const paginationConfig = reactive({
     pageSize: Number(localStorage.getItem('firewall-forward-page-size')) || 20,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchReset(
+    'host/firewall/forward/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage') },
+    { onRevisit: () => search() },
+);
 
 const search = async () => {
     if (!isInit.value || !isBind.value || fireName.value === '-') {

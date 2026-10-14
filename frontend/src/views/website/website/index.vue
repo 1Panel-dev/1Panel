@@ -452,6 +452,7 @@ const pageState = usePageState(() => ({
 const paginationConfig = pageState.paginationConfig;
 const req = pageState.req;
 useSearchReset(
+    'website/website/index',
     { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
     { onRevisit: () => search() },
 );
