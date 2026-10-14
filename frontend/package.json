@@ -51,7 +51,7 @@
         "qs": "^6.16.0",
         "screenfull": "^6.0.2",
         "sortablejs": "^1.15.7",
-        "uuid": "^14.0.1",
+        "uuid": "^14.0.3",
         "vue": "^3.5.43",
         "vue-clipboard3": "^2.0.0",
         "vue-codemirror": "^6.1.1",
