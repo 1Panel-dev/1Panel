@@ -16,6 +16,7 @@ type ISettingRepo interface {
 	GetList(opts ...DBOption) ([]model.Setting, error)
 	Get(opts ...DBOption) (model.Setting, error)
 	GetValueByKey(key string) (string, error)
+	GetCoreValueByKey(key string) (string, error)
 	Create(key, value string) error
 	Update(key, value string) error
 	WithByKey(key string) DBOption
@@ -69,6 +70,17 @@ func (s *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 func (s *SettingRepo) GetValueByKey(key string) (string, error) {
 	var setting model.Setting
 	if err := global.DB.Model(&model.Setting{}).Where("key = ?", key).First(&setting).Error; err != nil {
+		return "", err
+	}
+	return setting.Value, nil
+}
+
+func (s *SettingRepo) GetCoreValueByKey(key string) (string, error) {
+	if global.CoreDB == nil {
+		return "", errors.New("core database is unavailable")
+	}
+	var setting model.Setting
+	if err := global.CoreDB.Where("key = ?", key).First(&setting).Error; err != nil {
 		return "", err
 	}
 	return setting.Value, nil
