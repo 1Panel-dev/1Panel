@@ -15,7 +15,19 @@
         <div v-for="issue in issues" :key="issue.family" class="family-row">
             <div class="family-row__body">
                 <el-tag size="small" type="info" effect="plain">{{ issue.family === 'ipv6' ? 'IPv6' : 'IPv4' }}</el-tag>
-                <p>{{ issue.message }}</p>
+                <p>
+                    {{ issue.message }}
+                    <el-link
+                        v-if="issue.helpUrl"
+                        class="ml-1 text-xs"
+                        type="primary"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        :href="issue.helpUrl"
+                    >
+                        {{ $t('commons.button.helpDoc') }}
+                    </el-link>
+                </p>
             </div>
             <el-button
                 v-if="issue.action"
@@ -55,6 +67,7 @@ import i18n from '@/lang';
 interface FamilyIssue {
     family: 'ipv4' | 'ipv6';
     message: string;
+    helpUrl?: string;
     action?: 'initialize' | 'repair' | 'bind';
 }
 const props = defineProps<{
