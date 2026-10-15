@@ -45,14 +45,7 @@
             <template #rightToolBar>
                 <el-select v-model="group" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
-                    <div v-for="item in groupOptions" :key="item.id">
-                        <el-option
-                            v-if="item.name === 'Default'"
-                            :label="$t('commons.table.default')"
-                            :value="item.id"
-                        />
-                        <el-option v-else :label="item.name" :value="item.id" />
-                    </div>
+                    <el-option v-for="item in groupOptions" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchInfo" />
                 <TableRefresh @search="search()" />
@@ -89,10 +82,7 @@
                             <el-button class="mr-3" size="small" v-if="row.isSystem">{{ $t('menu.system') }}</el-button>
                             <span v-if="row.groupBelong">
                                 <el-button size="small" v-for="(item, index) in row.groupBelong" :key="index">
-                                    <span v-if="item === 'Default'">
-                                        {{ $t('commons.table.default') }}
-                                    </span>
-                                    <span v-else>{{ item }}</span>
+                                    {{ item }}
                                 </el-button>
                             </span>
                         </template>

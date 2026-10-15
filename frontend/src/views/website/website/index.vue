@@ -45,14 +45,7 @@
                 <el-select v-model="req.websiteGroupId" @change="search()" class="p-w-200" :disabled="disabledConfig">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
                     <el-option :label="$t('commons.table.all')" :value="0"></el-option>
-                    <div v-for="item in groups" :key="item.id">
-                        <el-option
-                            v-if="item.name === 'Default'"
-                            :label="$t('commons.table.default')"
-                            :value="item.id"
-                        />
-                        <el-option v-else :label="item.name" :value="item.id" />
-                    </div>
+                    <el-option v-for="item in groups" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="req.name" :disabled="disabledConfig" />
                 <TableRefresh @search="search()" :disabled="disabledConfig" />

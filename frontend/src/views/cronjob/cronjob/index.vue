@@ -45,14 +45,7 @@
                 <TableViewSwitch v-model="viewMode" storage-key="cronjob" />
                 <el-select v-model="searchGroupID" @change="search()" clearable class="p-w-200">
                     <template #prefix>{{ $t('commons.table.group') }}</template>
-                    <div v-for="item in groupOptions" :key="item.id">
-                        <el-option
-                            v-if="item.name === 'Default'"
-                            :label="$t('commons.table.default')"
-                            :value="item.id"
-                        />
-                        <el-option v-else :label="item.name" :value="item.id" />
-                    </div>
+                    <el-option v-for="item in groupOptions" :key="item.id" :label="item.name" :value="item.id" />
                 </el-select>
                 <TableSearch @search="search()" v-model:searchName="searchName" />
                 <TableRefresh @search="search()" />
@@ -104,16 +97,14 @@
                                 @change="updateGroup(row)"
                             >
                                 <template #read>
-                                    {{ row.groupBelong === 'Default' ? $t('commons.table.default') : row.groupBelong }}
+                                    {{ row.groupBelong }}
                                 </template>
-                                <div v-for="item in groupOptions" :key="item.id">
-                                    <el-option
-                                        v-if="item.name === 'Default'"
-                                        :label="$t('commons.table.default')"
-                                        :value="item.id"
-                                    />
-                                    <el-option v-else :label="item.name" :value="item.id" />
-                                </div>
+                                <el-option
+                                    v-for="item in groupOptions"
+                                    :key="item.id"
+                                    :label="item.name"
+                                    :value="item.id"
+                                />
                             </fu-select-rw-switch>
                         </template>
                     </el-table-column>

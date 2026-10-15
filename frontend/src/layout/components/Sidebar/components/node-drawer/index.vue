@@ -163,9 +163,6 @@ const displayNodeName = (item: NodeItem) => {
 };
 
 const displayGroupName = (item: NodeItem) => {
-    if (item.groupBelong === 'Default') {
-        return i18n.global.t('commons.table.default');
-    }
     return item.group || item.groupBelong || i18n.global.t('commons.table.default');
 };
 
