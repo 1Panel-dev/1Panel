@@ -69,7 +69,12 @@
                     :heightDiff="300"
                 >
                     <el-table-column type="selection" fix />
-                    <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name" min-width="60">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        prop="name"
+                        min-width="140"
+                    >
                         <template #default="{ row }">
                             <el-text type="primary" class="cursor-pointer" @click="showScript(row)">
                                 {{ row.name }}
@@ -78,13 +83,10 @@
                     </el-table-column>
                     <el-table-column :label="$t('cronjob.library.isInteractive')" prop="isInteractive" min-width="60">
                         <template #default="{ row }">
-                            <div class="-mb-1">
-                                <el-icon v-if="row.isInteractive"><Check /></el-icon>
-                                <el-icon v-else><Minus /></el-icon>
-                            </div>
+                            {{ $t(row.isInteractive ? 'commons.true' : 'commons.false') }}
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.table.group')" min-width="120" prop="group">
+                    <el-table-column :label="$t('commons.table.group')" min-width="100" prop="group">
                         <template #default="{ row }">
                             <el-button class="mr-3" size="small" v-if="row.isSystem">{{ $t('menu.system') }}</el-button>
                             <span v-if="row.groupBelong">
