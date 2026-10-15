@@ -74,8 +74,8 @@ type IAlertService interface {
 	GetAlertConfig(req dto.AlertConfigQuery) ([]model.AlertConfig, error)
 	PageAlertConfig(req dto.AlertConfigPageReq) (int64, []model.AlertConfig, error)
 	UpdateAlertConfig(req dto.AlertConfigUpdate, operator string) error
-	UpdateAlertConfigStatus(req dto.AlertConfigStatusUpdate, operator string) error
-	DeleteAlertConfig(id uint) error
+	UpdateAlertConfigStatus(req dto.AlertConfigStatusUpdate, operator string) (string, error)
+	DeleteAlertConfig(id uint) (string, error)
 	TestAlertConfig(req dto.AlertConfigTest) (bool, error)
 	TestCustomAlertConfig(req dto.AlertConfigTest, lang string) (dto.AlertConfigTestResult, error)
 }
@@ -623,25 +623,26 @@ func (a AlertService) updateCustomAlertConfig(req dto.AlertConfigUpdate, operato
 	})
 }
 
-func (a AlertService) UpdateAlertConfigStatus(req dto.AlertConfigStatusUpdate, operator string) error {
+func (a AlertService) UpdateAlertConfigStatus(req dto.AlertConfigStatusUpdate, operator string) (string, error) {
 	if err := validateAlertConfigStatus(req.Status); err != nil {
-		return err
+		return "", err
 	}
 	config, err := alertRepo.GetConfigById(req.ID)
 	if err != nil {
-		return err
+		return "", err
 	}
+	name := alertConfigLogName(config.Config, config.Title)
 	if req.Status == constant.AlertEnable {
 		if err := a.validateCommunityAlertConfigType(config.Type); err != nil {
-			return err
+			return name, err
 		}
 		if config.Type == constant.Custom {
 			if _, err := alertwebhook.Resolve(config); err != nil {
-				return err
+				return name, err
 			}
 		}
 	}
-	return alertRepo.UpdateAlertConfig(map[string]interface{}{
+	return name, alertRepo.UpdateAlertConfig(map[string]interface{}{
 		"status":      req.Status,
 		"update_user": operator,
 	}, repo.WithByID(req.ID))
@@ -813,19 +814,20 @@ func alertConfigSMSPhone(configData string) string {
 	return strings.TrimSpace(cfg.Phone)
 }
 
-func (a AlertService) DeleteAlertConfig(id uint) error {
-	_, err := alertRepo.GetConfigById(id)
+func (a AlertService) DeleteAlertConfig(id uint) (string, error) {
+	config, err := alertRepo.GetConfigById(id)
 	if err != nil {
-		return err
+		return "", err
 	}
+	name := alertConfigLogName(config.Config, config.Title)
 	usedAlerts, err := alertRepo.List(alertRepo.WithByAlertMethodContainsConfigID(id))
 	if err != nil {
-		return err
+		return name, err
 	}
 	if len(usedAlerts) > 0 {
-		return buserr.New("ErrAlertConfigInUse")
+		return name, buserr.New("ErrAlertConfigInUse")
 	}
-	return alertRepo.DeleteAlertConfig(repo.WithByID(id))
+	return name, alertRepo.DeleteAlertConfig(repo.WithByID(id))
 }
 
 func (a AlertService) TestAlertConfig(req dto.AlertConfigTest) (bool, error) {
@@ -1042,4 +1044,14 @@ func (a AlertService) validateCronJobAlertChannels(alertType, advanced, method s
 	}
 	_, err = a.validateAlertMethodReferences(method)
 	return err
+}
+
+func alertConfigLogName(config, title string) string {
+	var value struct {
+		DisplayName string `json:"displayName"`
+	}
+	if json.Unmarshal([]byte(config), &value) == nil && strings.TrimSpace(value.DisplayName) != "" {
+		return strings.TrimSpace(value.DisplayName)
+	}
+	return title
 }

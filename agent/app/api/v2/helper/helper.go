@@ -3,6 +3,7 @@ package helper
 import (
 	"compress/gzip"
 	"context"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -183,4 +184,24 @@ func GetParamInt32(paramName string, c *gin.Context) (int32, error) {
 	}
 	intNum, _ := strconv.Atoi(idParam)
 	return int32(intNum), nil
+}
+
+// SetOperationLogValues supplies server-resolved values to Core's operation log.
+// Call before writing the response. Only pass public audit fields, never credentials.
+func SetOperationLogValues(c *gin.Context, values map[string]string) {
+	const header = "X-Op-Resolved"
+	resolved := make(map[string]string)
+	if data, err := base64.RawURLEncoding.DecodeString(c.Writer.Header().Get(header)); err == nil {
+		_ = json.Unmarshal(data, &resolved)
+	}
+	if resolved == nil {
+		resolved = make(map[string]string)
+	}
+	for key, value := range values {
+		resolved[key] = value
+	}
+	data, err := json.Marshal(resolved)
+	if err == nil {
+		c.Header(header, base64.RawURLEncoding.EncodeToString(data))
+	}
 }

@@ -133,11 +133,9 @@ func OperationLog() gin.HandlerFunc {
 			record.AuthMethod = "session"
 		}
 
+		// Handlers may supply audit values even without database resolution metadata.
+		mergeResolvedData(writer.resolvedHeader, formatMap)
 		if len(operationDic.BeforeFunctions) != 0 {
-			if needAgentResolve {
-				mergeResolvedData(writer.resolvedHeader, formatMap)
-			}
-
 			if allowCoreFallback && !hasAllResolvedData(formatMap, operationDic.BeforeFunctions) {
 				dbItem, err := newDB(record.Path)
 				if err == nil {
