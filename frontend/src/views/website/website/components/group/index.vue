@@ -1,12 +1,7 @@
 <template>
     <el-form-item :label="$t('commons.table.group')" :prop="prop">
         <el-select v-model="selectedValue">
-            <el-option
-                v-for="(group, index) in groups"
-                :key="index"
-                :label="group.name === 'Default' ? $t('commons.table.default') : group.name"
-                :value="group.id"
-            />
+            <el-option v-for="(group, index) in groups" :key="index" :label="group.name" :value="group.id" />
         </el-select>
     </el-form-item>
 </template>

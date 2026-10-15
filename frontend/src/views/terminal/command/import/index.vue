@@ -27,10 +27,7 @@
                 @change="changeGroup"
                 class="p-w-200 ml-2 mt-2"
             >
-                <div v-for="item in groupList" :key="item.id">
-                    <el-option v-if="item.name === 'Default'" :label="$t('commons.table.default')" :value="item.id" />
-                    <el-option v-else :label="item.name" :value="item.id" />
-                </div>
+                <el-option v-for="item in groupList" :key="item.id" :label="item.name" :value="item.id" />
             </el-select>
 
             <el-card class="mt-2 w-full" v-loading="loading">
@@ -54,12 +51,7 @@
                         min-width="80"
                         prop="groupBelong"
                         fix
-                    >
-                        <template #default="{ row }">
-                            <span v-if="row.groupBelong === 'Default'">{{ $t('commons.table.default') }}</span>
-                            <span v-else>{{ row.groupBelong }}</span>
-                        </template>
-                    </el-table-column>
+                    />
                     <el-table-column
                         :label="$t('terminal.command')"
                         :min-width="120"

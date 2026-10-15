@@ -154,7 +154,7 @@ const connectionTree = computed<ConnectionTreeItem[]>(() => {
         groups.push(
             ...hostTree.value.map((group): ConnectionTreeItem => ({
                 id: `host-group-${group.id}`,
-                label: group.label === 'Default' ? i18n.global.t('commons.table.default') : group.label,
+                label: group.label,
                 kind: 'group',
                 children: (group.children || []).map((host) => ({
                     id: `host-${host.id}`,

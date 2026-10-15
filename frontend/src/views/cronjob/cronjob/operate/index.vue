@@ -80,14 +80,12 @@
                                 <LayoutCol>
                                     <el-form-item :label="$t('commons.table.group')" prop="groupID">
                                         <el-select filterable v-model="form.groupID" clearable>
-                                            <div v-for="item in groupOptions" :key="item.id">
-                                                <el-option
-                                                    v-if="item.name === 'Default'"
-                                                    :label="$t('commons.table.default')"
-                                                    :value="item.id"
-                                                />
-                                                <el-option v-else :label="item.name" :value="item.id" />
-                                            </div>
+                                            <el-option
+                                                v-for="item in groupOptions"
+                                                :key="item.id"
+                                                :label="item.name"
+                                                :value="item.id"
+                                            />
                                         </el-select>
                                     </el-form-item>
                                 </LayoutCol>

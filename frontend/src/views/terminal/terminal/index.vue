@@ -268,11 +268,6 @@ const handleTabsRemove = async (targetName: string, action: 'remove' | 'add') =>
 const loadCommandTree = async () => {
     const res = await getCommandTree('command');
     commandTree.value = res.data || [];
-    for (const item of commandTree.value) {
-        if (item.label === 'Default') {
-            item.label = i18n.global.t('commons.table.default');
-        }
-    }
 };
 
 const sendToTerminals = (command: string, all: boolean) => {

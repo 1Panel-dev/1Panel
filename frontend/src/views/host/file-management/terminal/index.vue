@@ -33,7 +33,6 @@
 import { ref, nextTick } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import { getCommandTree } from '@/api/modules/command';
-import i18n from '@/lang';
 
 const terminalVisible = ref(false);
 const terminalRef = ref<InstanceType<typeof Terminal> | null>(null);
@@ -64,11 +63,6 @@ const initTerm = async (cwd: string) => {
 const loadCommandTree = async () => {
     const res = await getCommandTree('command');
     commandTree.value = res.data || [];
-    for (const item of commandTree.value) {
-        if (item.label === 'Default') {
-            item.label = i18n.global.t('commons.table.default');
-        }
-    }
 };
 
 function quickInput(val: Array<string>) {
