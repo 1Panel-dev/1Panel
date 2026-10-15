@@ -465,17 +465,10 @@ const loadGroups = async () => {
         searchGroupID.value = undefined;
         paginationConfig.currentPage = 1;
     }
-    for (const group of groupOptions.value) {
-        if (group.name === 'Default') {
-            defaultGroupID.value = group.id;
-            break;
-        }
-    }
+    defaultGroupID.value = groupOptions.value.find((group) => group.isDefault)?.id;
     for (const item of data.value) {
         if (item.groupID === 0) {
-            item.groupBelong = 'Default';
             item.groupID = defaultGroupID.value;
-            continue;
         }
         let hasGroup = false;
         for (const group of groupOptions.value) {
