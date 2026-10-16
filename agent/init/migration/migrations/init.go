@@ -1888,3 +1888,10 @@ var AddVLLMSampleInterval = &gormigrate.Migration{
 		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
 	},
 }
+
+var AddQuickDirectory = &gormigrate.Migration{
+	ID: "20261016-add-quick-directory",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.QuickDirectory{})
+	},
+}

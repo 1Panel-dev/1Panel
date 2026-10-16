@@ -495,6 +495,7 @@ const message = {
         recommend: 'Önerilen',
         dir: 'Dizin',
         alias: 'Takma Ad',
+        quickDirDelete: '({0}) silinsin mi?',
         quickDir: 'Hızlı Erişim',
         minQuickJump: 'En az bir hızlı erişim girdisi ekleyin',
         maxQuickJump: 'En fazla dört hızlı erişim girdisi ekleyebilirsiniz',

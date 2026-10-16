@@ -493,6 +493,7 @@ const message = {
     home: {
         recommend: 'Recomendado',
         dir: 'Directorio',
+        quickDirDelete: '¿Confirmar la eliminación de ({0})?',
         quickDir: 'Acceso rápido',
         minQuickJump: 'Agrega al menos una entrada de acceso rápido',
         maxQuickJump: 'Puedes agregar hasta cuatro entradas de acceso rápido',

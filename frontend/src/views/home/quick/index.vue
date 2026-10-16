@@ -10,25 +10,6 @@
                 <el-table-column prop="isShow" :label="$t('setting.ifShow')">
                     <template #default="{ row }">
                         <el-switch v-model="row.isShow" />
-                        <div v-if="row.name === 'File' && row.isShow">
-                            <el-input v-model="row.detail" class="w-full">
-                                <template #prepend>
-                                    <el-button
-                                        class="w-16"
-                                        v-if="row.name === 'File' && row.isShow"
-                                        icon="Folder"
-                                        @click="fileRef.acceptParams({ path: row.detail, isAll: true })"
-                                    />
-                                </template>
-                            </el-input>
-                            <el-input v-model="row.alias" class="mt-1">
-                                <template #prepend>
-                                    <el-button class="w-16">
-                                        {{ $t('home.alias') }}
-                                    </el-button>
-                                </template>
-                            </el-input>
-                        </div>
                     </template>
                 </el-table-column>
             </ComplexTable>
@@ -39,14 +20,12 @@
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
-        <FileList ref="fileRef" @choose="loadDir" />
     </DrawerPro>
 </template>
 <script lang="ts" setup>
 import { ref } from 'vue';
 import i18n from '@/lang';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
-import FileList from '@/components/file-list/index.vue';
 import { changeQuick, loadQuickOption } from '@/api/modules/dashboard';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
@@ -57,7 +36,6 @@ const acceptParams = (): void => {
     drawerVisible.value = true;
 };
 const quickOptions = ref([]);
-const fileRef = ref();
 
 const search = async () => {
     loading.value = true;
@@ -86,24 +64,15 @@ const onChangeShow = async () => {
         return;
     }
     loading.value = true;
-    await changeQuick(quickOptions.value)
+    await changeQuick(quickOptions.value.map(({ id, isShow }) => ({ id, isShow })))
         .then(() => {
             loading.value = false;
             MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             drawerVisible.value = false;
-            search();
         })
         .catch(() => {
             loading.value = false;
         });
-};
-
-const loadDir = async (path: string) => {
-    for (const item of quickOptions.value) {
-        if (item.name === 'File') {
-            item.detail = path;
-        }
-    }
 };
 
 const handleClose = () => {

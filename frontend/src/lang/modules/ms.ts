@@ -499,6 +499,7 @@ const message = {
         recommend: 'Disyorkan',
         dir: 'Direktori',
         alias: 'Alias',
+        quickDirDelete: 'Sahkan pemadaman ({0})?',
         quickDir: 'Akses Pantas',
         minQuickJump: 'Tambah sekurang-kurangnya satu entri akses pantas',
         maxQuickJump: 'Anda boleh menambah sehingga empat entri akses pantas',

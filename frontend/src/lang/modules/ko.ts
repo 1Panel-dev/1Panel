@@ -487,6 +487,7 @@ const message = {
         recommend: '추천',
         dir: '디렉토리',
         alias: '별칭',
+        quickDirDelete: '({0})을(를) 삭제하시겠습니까?',
         quickDir: '빠른 액세스',
         minQuickJump: '최소 하나의 빠른 액세스 항목을 추가하세요',
         maxQuickJump: '빠른 액세스를 최대 4개까지 추가할 수 있습니다',

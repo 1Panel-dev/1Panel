@@ -494,6 +494,7 @@ const message = {
         recommend: 'Recommended',
         dir: 'Directory',
         alias: 'Alias',
+        quickDirDelete: 'Delete ({0})?',
         quickDir: 'Quick Access',
         minQuickJump: 'Add at least one quick access entry',
         maxQuickJump: 'You can add up to four quick access entries',

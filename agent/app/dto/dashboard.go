@@ -31,7 +31,27 @@ type DashboardBase struct {
 }
 
 type ChangeQuicks struct {
-	Quicks []QuickJump `json:"quicks"`
+	Quicks []QuickVisibility `json:"quicks" validate:"required,dive"`
+}
+
+type QuickVisibility struct {
+	ID     uint `json:"id" validate:"required"`
+	IsShow bool `json:"isShow"`
+}
+
+type QuickDirectoryCreate struct {
+	Path  string `json:"path" validate:"required"`
+	Alias string `json:"alias"`
+}
+
+type QuickDirectoryDelete struct {
+	ID     uint `json:"id" validate:"required"`
+	Legacy bool `json:"legacy"`
+}
+
+type QuickDirectoryUpdate struct {
+	QuickDirectoryDelete
+	QuickDirectoryCreate
 }
 
 type QuickJump struct {

@@ -473,6 +473,7 @@ const message = {
         recommend: '推荐',
         dir: '目录',
         alias: '别名',
+        quickDirDelete: '确定删除（{0}）',
         quickDir: '快捷目录',
         minQuickJump: '请至少设置一个快速跳转入口！',
         maxQuickJump: '最多可设置四个快速跳转入口！',
