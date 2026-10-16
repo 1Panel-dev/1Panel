@@ -1450,6 +1450,14 @@ const message = {
             extraHeaders: '额外请求头',
         },
         vllmMonitor: {
+            concurrency: '当前并发',
+            sampleMoment: '采样时刻',
+            sampleWindow: '统计区间',
+            requestUnit: '个请求',
+            processing: '处理中',
+            queued: '排队中',
+            requestTiming: '请求耗时',
+            completedRequests: '区间完成请求数',
             tokensPerSecond: 'tokens/秒',
             requestsPerSecond: '请求/秒',
             finishReasonLabels: {

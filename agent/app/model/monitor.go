@@ -86,7 +86,9 @@ type MonitorVLLM struct {
 	RawMetrics              string             `json:"-"`
 	HistogramDeltas         string             `json:"-"`
 	IntervalSeconds         float64            `json:"intervalSeconds" gorm:"-"`
+	SampleIntervalSeconds   int                `json:"-"`
 	RequestDeltas           string             `json:"-"`
+	CompletedRequests       *float64           `json:"completedRequests" gorm:"-"`
 	QueueTime               *float64           `json:"queueTime"`
 	AverageGenerationTokens *float64           `json:"averageGenerationTokens"`
 	PrefixCacheHitRate      *float64           `json:"prefixCacheHitRate"`

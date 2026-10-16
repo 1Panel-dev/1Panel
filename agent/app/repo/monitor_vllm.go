@@ -16,7 +16,8 @@ type VLLMMonitorRepo struct{}
 
 type VLLMHistoryPoint struct {
 	model.MonitorVLLM
-	Bucket int64
+	Bucket            int64
+	CompletedRequests *float64
 }
 
 func (r *VLLMMonitorRepo) Create(point *model.MonitorVLLM) error {
@@ -77,11 +78,18 @@ func (r *VLLMMonitorRepo) History(ctx context.Context, id uint, start, end time.
 		}
 		db = db.Group("bucket").Order("bucket ASC")
 	} else {
-		columns = append([]string{"id", "created_at", "app_install_id", "status"}, metrics...)
+		columns = append([]string{"id", "created_at", "app_install_id", "status", "sample_interval_seconds"}, metrics...)
 		if group == "" || group == "requests" {
 			columns = append(columns, "histogram_deltas", "request_deltas")
 		}
 		db = db.Order("created_at ASC, id ASC")
+	}
+	if group == "" || group == "overview" {
+		count := "CASE WHEN json_valid(request_deltas) THEN CASE WHEN json_extract(request_deltas, '$.seconds') > 0 THEN ROUND(request_throughput * json_extract(request_deltas, '$.seconds')) END END"
+		if seconds > 0 {
+			count = "SUM(" + count + ")"
+		}
+		columns = append(columns, count+" AS completed_requests")
 	}
 	var points []VLLMHistoryPoint
 	err := db.Select(strings.Join(columns, ", ")).Scan(&points).Error

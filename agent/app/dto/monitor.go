@@ -1,6 +1,7 @@
 package dto
 
 import (
+	"encoding/json"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -142,6 +143,11 @@ type MonitorVLLMData struct {
 
 type MonitorVLLMCurrent struct {
 	AppInstallID uint `json:"appInstallID" validate:"required"`
+}
+
+type MonitorVLLMCurrentData struct {
+	model.MonitorVLLM
+	Metrics map[string]json.RawMessage `json:"metrics,omitempty"`
 }
 
 type MonitorVLLMClean struct {

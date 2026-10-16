@@ -114,6 +114,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddVLLMMonitor,
 		migrations.AddMonitorSettings,
 		migrations.AddVLLMRequestMetrics,
+		migrations.AddVLLMSampleInterval,
 	}
 }
 

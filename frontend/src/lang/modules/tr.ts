@@ -1527,6 +1527,14 @@ const message = {
             extraHeaders: 'Ek Başlıklar',
         },
         vllmMonitor: {
+            concurrency: 'Mevcut eşzamanlı istekler',
+            sampleMoment: 'Örnekleme anında',
+            sampleWindow: 'Örnekleme aralığı',
+            requestUnit: 'istek',
+            processing: 'İşleniyor',
+            queued: 'Kuyrukta',
+            requestTiming: 'İstek süreleri',
+            completedRequests: 'Aralıkta tamamlanan istek sayısı',
             tokensPerSecond: 'tokens/sn',
             requestsPerSecond: 'İstek/sn',
             finishReasonLabels: {

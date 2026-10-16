@@ -1505,6 +1505,14 @@ const message = {
             extraHeaders: '追加ヘッダー',
         },
         vllmMonitor: {
+            concurrency: '現在の同時リクエスト',
+            sampleMoment: 'サンプリング時点',
+            sampleWindow: '集計区間',
+            requestUnit: '件',
+            processing: '処理中',
+            queued: '待機中',
+            requestTiming: 'リクエスト処理時間',
+            completedRequests: '区間内の完了リクエスト数',
             tokensPerSecond: 'tokens/秒',
             requestsPerSecond: 'リクエスト/秒',
             finishReasonLabels: {

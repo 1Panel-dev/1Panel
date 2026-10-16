@@ -1502,6 +1502,14 @@ const message = {
             extraHeaders: 'هدرهای اضافی',
         },
         vllmMonitor: {
+            concurrency: 'درخواست‌های هم‌زمان فعلی',
+            sampleMoment: 'در لحظه نمونه‌برداری',
+            sampleWindow: 'بازه نمونه‌برداری',
+            requestUnit: 'درخواست',
+            processing: 'در حال پردازش',
+            queued: 'در صف',
+            requestTiming: 'زمان پردازش درخواست',
+            completedRequests: 'تعداد درخواست‌های تکمیل‌شده در بازه',
             tokensPerSecond: 'tokens/ثانیه',
             requestsPerSecond: 'درخواست/ثانیه',
             finishReasonLabels: {

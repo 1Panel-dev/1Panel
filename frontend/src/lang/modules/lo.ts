@@ -1484,6 +1484,14 @@ const message = {
             extraHeaders: 'Headers ເພີ່ມເຕີມ',
         },
         vllmMonitor: {
+            concurrency: 'ຄຳຮ້ອງຂໍພ້ອມກັນໃນປັດຈຸບັນ',
+            sampleMoment: 'ໃນເວລາເກັບຕົວຢ່າງ',
+            sampleWindow: 'ຊ່ວງເວລາເກັບຕົວຢ່າງ',
+            requestUnit: 'ຄຳຮ້ອງຂໍ',
+            processing: 'ກຳລັງປະມວນຜົນ',
+            queued: 'ກຳລັງລໍຖ້າ',
+            requestTiming: 'ເວລາປະມວນຜົນຄຳຮ້ອງຂໍ',
+            completedRequests: 'ຈຳນວນຄຳຮ້ອງຂໍທີ່ສຳເລັດໃນຊ່ວງເວລາ',
             tokensPerSecond: 'tokens/ວິນາທີ',
             requestsPerSecond: 'ຄຳຮ້ອງຂໍ/ວິນາທີ',
             finishReasonLabels: {
