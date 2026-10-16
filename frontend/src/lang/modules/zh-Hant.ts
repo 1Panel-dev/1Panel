@@ -1437,6 +1437,14 @@ const message = {
             extraHeaders: '額外請求標頭',
         },
         vllmMonitor: {
+            concurrency: '目前並行請求',
+            sampleMoment: '取樣時刻',
+            sampleWindow: '統計區間',
+            requestUnit: '個請求',
+            processing: '處理中',
+            queued: '排隊中',
+            requestTiming: '請求耗時',
+            completedRequests: '區間完成請求數',
             tokensPerSecond: 'tokens/秒',
             requestsPerSecond: '請求/秒',
             finishReasonLabels: {

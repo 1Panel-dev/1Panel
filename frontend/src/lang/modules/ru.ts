@@ -1520,6 +1520,14 @@ const message = {
             extraHeaders: 'Дополнительные заголовки',
         },
         vllmMonitor: {
+            concurrency: 'Текущие параллельные запросы',
+            sampleMoment: 'На момент замера',
+            sampleWindow: 'Интервал замера',
+            requestUnit: 'запросов',
+            processing: 'В обработке',
+            queued: 'В очереди',
+            requestTiming: 'Время обработки запросов',
+            completedRequests: 'Завершённые запросы за интервал',
             tokensPerSecond: 'tokens/с',
             requestsPerSecond: 'Запросов/с',
             finishReasonLabels: {

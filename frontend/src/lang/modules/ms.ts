@@ -1531,6 +1531,14 @@ const message = {
             extraHeaders: 'Pengepala Tambahan',
         },
         vllmMonitor: {
+            concurrency: 'Permintaan serentak semasa',
+            sampleMoment: 'Pada masa pensampelan',
+            sampleWindow: 'Selang pensampelan',
+            requestUnit: 'permintaan',
+            processing: 'Sedang diproses',
+            queued: 'Dalam baris gilir',
+            requestTiming: 'Tempoh permintaan',
+            completedRequests: 'Permintaan selesai dalam selang masa',
             tokensPerSecond: 'tokens/s',
             requestsPerSecond: 'Permintaan/s',
             finishReasonLabels: {

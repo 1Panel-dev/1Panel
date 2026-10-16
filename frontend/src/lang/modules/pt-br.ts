@@ -1527,6 +1527,14 @@ const message = {
             extraHeaders: 'Cabeçalhos extras',
         },
         vllmMonitor: {
+            concurrency: 'Concorrência atual',
+            sampleMoment: 'No momento da coleta',
+            sampleWindow: 'Intervalo de coleta',
+            requestUnit: 'solicitações',
+            processing: 'Em processamento',
+            queued: 'Na fila',
+            requestTiming: 'Tempo das solicitações',
+            completedRequests: 'Solicitações concluídas no intervalo',
             tokensPerSecond: 'tokens/s',
             requestsPerSecond: 'Solicitações/s',
             finishReasonLabels: {

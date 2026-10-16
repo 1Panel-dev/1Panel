@@ -1526,6 +1526,14 @@ const message = {
             extraHeaders: 'Encabezados adicionales',
         },
         vllmMonitor: {
+            concurrency: 'Concurrencia actual',
+            sampleMoment: 'Al tomar la muestra',
+            sampleWindow: 'Intervalo de muestreo',
+            requestUnit: 'solicitudes',
+            processing: 'En proceso',
+            queued: 'En cola',
+            requestTiming: 'Tiempo de las solicitudes',
+            completedRequests: 'Solicitudes completadas en el intervalo',
             tokensPerSecond: 'tokens/s',
             requestsPerSecond: 'Solicitudes/s',
             finishReasonLabels: {

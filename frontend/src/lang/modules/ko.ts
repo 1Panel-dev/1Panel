@@ -1490,6 +1490,14 @@ const message = {
             extraHeaders: '추가 헤더',
         },
         vllmMonitor: {
+            concurrency: '현재 동시 요청',
+            sampleMoment: '샘플링 시점',
+            sampleWindow: '집계 구간',
+            requestUnit: '개 요청',
+            processing: '처리 중',
+            queued: '대기 중',
+            requestTiming: '요청 소요 시간',
+            completedRequests: '구간 내 완료 요청 수',
             tokensPerSecond: 'tokens/초',
             requestsPerSecond: '요청/초',
             finishReasonLabels: {

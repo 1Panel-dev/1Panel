@@ -1517,6 +1517,14 @@ const message = {
             extraHeaders: 'Extra Headers',
         },
         vllmMonitor: {
+            concurrency: 'Current concurrency',
+            sampleMoment: 'At sampling time',
+            sampleWindow: 'Sample interval',
+            requestUnit: 'requests',
+            processing: 'Processing',
+            queued: 'Queued',
+            requestTiming: 'Request timing',
+            completedRequests: 'Requests completed in interval',
             tokensPerSecond: 'tokens/s',
             requestsPerSecond: 'Requests/s',
             finishReasonLabels: {

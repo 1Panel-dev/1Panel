@@ -1881,3 +1881,10 @@ var AddVLLMRequestMetrics = &gormigrate.Migration{
 		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
 	},
 }
+
+var AddVLLMSampleInterval = &gormigrate.Migration{
+	ID: "20261016-vllm-sample-interval",
+	Migrate: func(tx *gorm.DB) error {
+		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
+	},
+}
