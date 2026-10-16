@@ -4347,10 +4347,14 @@ const message = {
         resetWithBackup: 'Guardar reglas y restablecer',
         resetOnly: 'Solo restablecer',
         resetWithBackupHelper:
-            'Guarda las reglas del módulo actual en JSON para restaurarlas durante la inicialización.',
+            'Guarde las reglas del módulo actual en JSON para restaurarlas al inicializar o iniciar el cortafuegos.',
         resetOnlyHelper: 'Borrar las reglas actuales sin crear una copia nueva. Se conservan las copias existentes.',
         backupDirectoryHelper:
             'Se muestran las copias válidas de reglas en {0}. Se selecciona la más reciente por defecto.',
+        startOnly: 'Solo iniciar',
+        startAndRestore: 'Iniciar y restaurar desde una copia de seguridad',
+        startWithBackupHelper:
+            'Inicie el cortafuegos normalmente o elija una copia JSON existente para iniciar y restaurar reglas.',
         restoreAllRules: 'Inicializar y restaurar reglas',
         importRuleBackup: 'Importar desde copia de seguridad',
         initializeOnly: 'Solo inicializar',

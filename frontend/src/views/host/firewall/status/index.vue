@@ -57,7 +57,7 @@
                                     v-node-admin
                                     type="primary"
                                     :disabled="lifecycleBusy"
-                                    @click="onOperate('start')"
+                                    @click="onInit"
                                     link
                                 >
                                     {{ $t('commons.button.start') }}
@@ -145,18 +145,58 @@
                 :title="$t('firewall.directBackendConflictWarning', [backendName, baseInfo.conflictBackend])"
             />
         </div>
-        <DockerRestart
-            ref="dockerRef"
-            v-model:withDockerRestart="withDockerRestart"
-            @submit="onSubmit"
+        <DialogPro
+            v-model="operationVisible"
+            class="firewall-rule-dialog firewall-lifecycle-dialog"
             :title="$t('firewall.firewallHelper', [$t('commons.button.' + operation)])"
         >
-            <template #helper>
-                <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
+            <template #content>
+                <el-form class="firewall-rule-dialog__docker" label-position="top" @submit.prevent>
+                    <el-form-item :label="$t('firewall.dockerRestart')">
+                        <el-radio-group v-model="withDockerRestart">
+                            <el-radio :value="true">{{ $t('setting.restartNow') }}</el-radio>
+                            <el-radio :value="false">{{ $t('setting.restartLater') }}</el-radio>
+                        </el-radio-group>
+                        <p class="firewall-rule-dialog__docker-helper">
+                            {{ $t(withDockerRestart ? 'xpack.node.syncProxyHelper1' : 'xpack.node.syncProxyHelper2') }}
+                        </p>
+                    </el-form-item>
+                </el-form>
             </template>
-        </DockerRestart>
+            <template #footer>
+                <div class="firewall-rule-dialog__confirmation">
+                    <span>{{ $t('firewall.' + operation + 'FirewallHelper') }}</span>
+                </div>
+                <el-button @click="operationVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" @click="onSubmit">{{ $t('commons.button.confirm') }}</el-button>
+            </template>
+        </DialogPro>
         <TaskLog ref="taskLogRef" @close="handleInitializationTaskClose" />
-        <RuleInitialize ref="initializeRef" @initialize="initializeOnly" @complete="loadBaseInfo" />
+        <RuleInitialize
+            ref="initializeRef"
+            @initialize="initializeOnly"
+            @restore="onOperate('start', $event)"
+            @complete="loadBaseInfo"
+        >
+            <template v-if="isServiceBackend && dockerStatus" #before-options>
+                <el-form class="firewall-rule-dialog__docker" label-position="top" @submit.prevent>
+                    <el-form-item :label="$t('firewall.dockerRestart')">
+                        <el-radio-group v-model="withDockerRestart">
+                            <el-radio :value="true">{{ $t('setting.restartNow') }}</el-radio>
+                            <el-radio :value="false">{{ $t('setting.restartLater') }}</el-radio>
+                        </el-radio-group>
+                        <p class="firewall-rule-dialog__docker-helper">
+                            {{ $t(withDockerRestart ? 'xpack.node.syncProxyHelper1' : 'xpack.node.syncProxyHelper2') }}
+                        </p>
+                    </el-form-item>
+                </el-form>
+            </template>
+            <template v-if="isServiceBackend" #confirmation>
+                <div class="firewall-rule-dialog__confirmation">
+                    <span>{{ $t('firewall.startFirewallHelper') }}</span>
+                </div>
+            </template>
+        </RuleInitialize>
     </div>
 </template>
 
@@ -171,7 +211,7 @@ import {
 } from '@/api/modules/firewall';
 import i18n from '@/lang';
 import NoSuchService from '@/components/layout-content/no-such-service.vue';
-import DockerRestart from '@/components/docker-proxy/docker-restart.vue';
+import DialogPro from '@/components/dialog-pro/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { ElMessageBox } from 'element-plus';
 import { computed, nextTick, onBeforeUnmount, ref } from 'vue';
@@ -206,8 +246,9 @@ const baseInfo = ref<Firewall.FirewallBase>({
     ipv4: { available: false, initialized: false, bound: false },
     ipv6: { available: false, initialized: false, bound: false },
 });
-const dockerRef = ref();
+const operationVisible = ref(false);
 const operation = ref('restart');
+const restoreBackupFile = ref('');
 const dockerStatus = ref();
 const withDockerRestart = ref(false);
 const taskLogRef = ref();
@@ -365,12 +406,20 @@ const loadDocker = async () => {
 const initializeRef = ref<InstanceType<typeof RuleInitialize>>();
 
 const onInit = async () => {
+    if (lifecycleBusy.value) return;
+    if (isServiceBackend.value) withDockerRestart.value = !!dockerStatus.value;
     const name = baseInfo.value.name || backendName.value;
-    const message =
-        props.currentTab === 'base' && baseInfo.value.conflictBackend
-            ? i18n.global.t('firewall.initDirectBackendConflictMsg', [name, baseInfo.value.conflictBackend])
-            : i18n.global.t('firewall.initMsg', [name]);
-    await initializeRef.value?.acceptParams(message, true, props.currentTab === 'forward' ? 'forwarding' : 'system');
+    const message = isServiceBackend.value
+        ? i18n.global.t('firewall.startWithBackupHelper')
+        : props.currentTab === 'base' && baseInfo.value.conflictBackend
+          ? i18n.global.t('firewall.initDirectBackendConflictMsg', [name, baseInfo.value.conflictBackend])
+          : i18n.global.t('firewall.initMsg', [name]);
+    await initializeRef.value?.acceptParams(
+        message,
+        true,
+        props.currentTab === 'forward' ? 'forwarding' : 'system',
+        isServiceBackend.value,
+    );
 };
 
 const initializeOnly = async () => {
@@ -422,17 +471,22 @@ const onUnBind = async () => {
     await loadBaseInfo();
 };
 
-const onOperate = async (op: string) => {
+const onOperate = async (op: string, backupFile = '') => {
     if (lifecycleBusy.value) return;
     operation.value = op;
-    if (backendName.value === 'iptables' || backendName.value === 'nftables' || !dockerStatus.value) {
+    restoreBackupFile.value = backupFile;
+    if (op === 'start') {
+        await submitLifecycleOperation(!!dockerStatus.value && withDockerRestart.value);
+    } else if (backendName.value === 'iptables' || backendName.value === 'nftables' || !dockerStatus.value) {
         await submitLifecycleOperation(false);
     } else {
-        dockerRef.value.acceptParams({ title: i18n.global.t('firewall.dockerRestart') });
+        withDockerRestart.value = true;
+        operationVisible.value = true;
     }
 };
 
 const onSubmit = async () => {
+    operationVisible.value = false;
     await submitLifecycleOperation(withDockerRestart.value);
 };
 
@@ -447,7 +501,7 @@ const submitLifecycleOperation = async (restartDocker: boolean) => {
     lifecycleSubmitting.value = true;
     emit('update:loading', true);
     try {
-        const result = (await operateFire(operation.value, restartDocker)).data;
+        const result = (await operateFire(operation.value, restartDocker, restoreBackupFile.value || undefined)).data;
         if (disposed) return;
         if (result?.queued && result.taskID) {
             baseInfo.value.lifecycleTaskID = result.taskID;

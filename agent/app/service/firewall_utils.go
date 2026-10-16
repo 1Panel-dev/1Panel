@@ -554,6 +554,58 @@ func (s *FirewallService) checkSelectedProvider(ctx context.Context, requested f
 	return nil
 }
 
+func prepareFirewallRuleCreate(request dto.FirewallRuleCreate) (dto.FirewallRuleCreate, error) {
+	if request.BackupFile != "" {
+		if len(request.Items) != 0 {
+			return request, filter.ErrInvalidRule
+		}
+		items, err := readFirewallBackup(request.BackupFile)
+		if err != nil {
+			return request, err
+		}
+		for _, item := range items {
+			request.Items = append(request.Items, dto.FirewallRuleCreateItem{Rule: item.FirewallRule, Raw: item.Raw, ParseStatus: item.ParseStatus, SourceKind: constant.FirewallRuleSourceImported})
+		}
+	}
+
+	for index, item := range request.Items {
+		if item.SourceKind != constant.FirewallRuleSourceImported || item.Rule.Scope.Provider != filter.ProviderUFW || item.ParseStatus != filter.ParseStatusPartial || item.Raw == "" {
+			continue
+		}
+		observed := filterufw.ParseRules(item.Rule.Scope, item.Raw)
+		if len(observed) == 1 && observed[0].ParseStatus == filter.ParseStatusSupported {
+			observed[0].Rule.Description = item.Rule.Description
+			request.Items[index].Rule = observed[0].Rule
+			request.Items[index].ParseStatus, request.Items[index].Raw = filter.ParseStatusSupported, ""
+		}
+	}
+
+	return request, nil
+}
+
+func (s *FirewallService) runFirewallCreateRulesTask(t *task.Task, request dto.FirewallRuleCreate, provider filter.Provider) error {
+	ruleState := make(map[string]filter.RuleSet)
+	firewallRuleMutationMu.Lock()
+	if err := s.checkSelectedProvider(t.TaskCtx, provider); err != nil {
+		firewallRuleMutationMu.Unlock()
+		return err
+	}
+	_, err := s.createRules(t.TaskCtx, request, t, ruleState)
+	firewallRuleMutationMu.Unlock()
+	if !request.Initialize || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+		return err
+	}
+	if err != nil {
+		ruleState = nil
+	}
+	whitelistErr := s.syncPortWhitelist(t.TaskCtx, ruleState)
+	if whitelistErr == nil && provider == filter.ProviderFirewalld {
+		whitelistErr = lifecycleproviders.RemoveFirewalldSSHService()
+	}
+	t.LogWithStatus(i18n.GetMsgByKey("FirewallSyncWhitelistStep"), whitelistErr)
+	return errors.Join(err, whitelistErr)
+}
+
 func (s *FirewallService) createRules(ctx context.Context, request dto.FirewallRuleCreate, t *task.Task, ruleState map[string]filter.RuleSet) (result dto.FirewallRuleCreateResponse, taskErr error) {
 	var firstFailure error
 	defer func() {
@@ -1734,9 +1786,6 @@ func operateFirewallLifecycle(client lifecycle.Client, operation string, withDoc
 	var recoveryErrors []error
 	if prepareStart != nil {
 		err := prepareStart(client)
-		if err == nil && client.Name() == constant.FirewallProviderFirewalld {
-			err = lifecycleproviders.RemoveFirewalldSSHService()
-		}
 		if err != nil {
 			recoveryErrors = append(recoveryErrors, fmt.Errorf("prepare firewall after %s: %w", operation, err))
 		}

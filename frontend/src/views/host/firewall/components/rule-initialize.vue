@@ -1,12 +1,22 @@
 <template>
     <DialogPro
         v-model="visible"
-        class="firewall-rule-dialog"
-        :title="initialize ? $t('commons.button.init') : $t('firewall.importRuleBackup')"
+        class="firewall-rule-dialog firewall-initialize-dialog"
+        :title="
+            starting
+                ? $t('firewall.firewallHelper', [$t('commons.button.start')])
+                : initialize
+                  ? $t('commons.button.init')
+                  : $t('firewall.importRuleBackup')
+        "
+        :show-close="!loading"
+        :close-on-press-escape="!loading"
     >
         <template #content>
             <div v-loading="loading" class="firewall-rule-dialog__content">
-                <el-alert v-if="message" :title="message" type="warning" :closable="false" show-icon />
+                <slot name="before-options" />
+                <p v-if="message && starting" class="firewall-initialize-dialog__description">{{ message }}</p>
+                <el-alert v-else-if="message" :title="message" type="warning" :closable="false" show-icon />
                 <el-alert
                     v-if="backupLoadFailed"
                     :title="$t('firewall.ruleBackupLoadFailed')"
@@ -24,56 +34,61 @@
                     class="firewall-rule-dialog__modes"
                     :disabled="loading"
                 >
-                    <el-radio value="restore" border :disabled="!loaded || backups.files.length === 0">
-                        {{ $t('firewall.restoreAllRules') }}
+                    <el-radio value="initialize" border>
+                        <span class="firewall-rule-dialog__choice-title">{{ initializeLabel }}</span>
                     </el-radio>
-                    <el-radio value="initialize" border>{{ $t('firewall.initializeOnly') }}</el-radio>
+                    <el-radio value="restore" border>
+                        <span class="firewall-rule-dialog__choice-title">{{ restoreLabel }}</span>
+                    </el-radio>
                 </el-radio-group>
-                <div v-if="loaded" class="firewall-rule-dialog__directory">
+                <div v-if="loaded && mode === 'restore'" class="firewall-rule-dialog__directory">
                     <el-icon><FolderOpened /></el-icon>
                     <span>{{ $t('firewall.backupDirectoryHelper', [backups.directory]) }}</span>
                 </div>
-                <el-radio-group
-                    v-if="mode === 'restore' && backups.files.length"
-                    v-model="selected"
-                    class="firewall-rule-dialog__files"
-                    :disabled="loading"
-                    :aria-label="$t('firewall.importRuleBackup')"
-                >
-                    <el-radio v-for="file in backups.files" :key="file.name" :value="file.name" border>
-                        <span class="firewall-rule-dialog__file-name">
-                            <el-icon><Document /></el-icon>
-                            <span class="min-w-0">{{ file.name }}</span>
-                            <el-button
-                                v-permission
-                                class="shrink-0"
-                                type="primary"
-                                link
-                                size="small"
-                                :disabled="loading"
-                                :aria-label="`${$t('firewall.downloadRuleBackup')}: ${file.name}`"
-                                @click.stop.prevent="
-                                    downloadFile(`${backups.directory}/${file.name}`, globalStore.currentNode)
-                                "
-                            >
-                                {{ $t('commons.button.download') }}
-                            </el-button>
-                        </span>
-                        <span class="firewall-rule-dialog__file-meta">
-                            <el-tag size="small" type="info" effect="plain">{{ file.provider }}</el-tag>
-                            <span>{{ $t('firewall.backupRuleCount') }}: {{ file.ruleCount }}</span>
-                            <span>{{ new Date(file.modifiedAt).toLocaleString() }}</span>
-                        </span>
-                    </el-radio>
-                </el-radio-group>
-                <el-empty
-                    v-else-if="loaded && !backups.files.length"
-                    :description="$t('firewall.noRuleBackup')"
-                    :image-size="64"
-                />
+                <div v-if="mode === 'restore'" class="firewall-initialize-dialog__backups">
+                    <el-radio-group
+                        v-if="backups.files.length"
+                        v-model="selected"
+                        class="firewall-rule-dialog__files"
+                        :disabled="loading"
+                        :aria-label="$t('firewall.importRuleBackup')"
+                    >
+                        <el-radio v-for="file in backups.files" :key="file.name" :value="file.name" border>
+                            <span class="firewall-rule-dialog__file-name">
+                                <el-icon><Document /></el-icon>
+                                <span class="min-w-0">{{ file.name }}</span>
+                                <el-button
+                                    v-permission
+                                    class="shrink-0"
+                                    type="primary"
+                                    link
+                                    size="small"
+                                    :disabled="loading"
+                                    :aria-label="`${$t('firewall.downloadRuleBackup')}: ${file.name}`"
+                                    @click.stop.prevent="
+                                        downloadFile(`${backups.directory}/${file.name}`, globalStore.currentNode)
+                                    "
+                                >
+                                    {{ $t('commons.button.download') }}
+                                </el-button>
+                            </span>
+                            <span class="firewall-rule-dialog__file-meta">
+                                <el-tag size="small" type="info" effect="plain">{{ file.provider }}</el-tag>
+                                <span>{{ $t('firewall.backupRuleCount') }}: {{ file.ruleCount }}</span>
+                                <span>{{ new Date(file.modifiedAt).toLocaleString() }}</span>
+                            </span>
+                        </el-radio>
+                    </el-radio-group>
+                    <el-empty
+                        v-else-if="!initialize && loaded && !backups.files.length"
+                        :description="$t('firewall.noRuleBackup')"
+                        :image-size="64"
+                    />
+                </div>
             </div>
         </template>
         <template #footer>
+            <slot name="confirmation" />
             <el-button :disabled="loading" @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
             <el-button
                 type="primary"
@@ -81,13 +96,7 @@
                 :disabled="loading || (mode === 'restore' && (!loaded || !selected))"
                 @click="submit"
             >
-                {{
-                    initialize
-                        ? mode === 'restore'
-                            ? $t('firewall.restoreAllRules')
-                            : $t('firewall.initializeOnly')
-                        : $t('commons.button.import')
-                }}
+                {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
     </DialogPro>
@@ -95,7 +104,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import i18n from '@/lang';
 import { Document, FolderOpened } from '@element-plus/icons-vue';
 import DialogPro from '@/components/dialog-pro/index.vue';
 import { Firewall } from '@/api/interface/firewall';
@@ -110,13 +120,24 @@ import { GlobalStore } from '@/store';
 import { downloadFile } from '@/utils/file';
 
 const globalStore = GlobalStore();
-const emit = defineEmits<{ (event: 'initialize'): void; (event: 'complete'): void }>();
+const emit = defineEmits<{
+    (event: 'initialize'): void;
+    (event: 'restore', backupFile: string): void;
+    (event: 'complete'): void;
+}>();
 const visible = ref(false);
 const loading = ref(false);
 const loaded = ref(false);
 const backupLoadFailed = ref(false);
 const message = ref('');
 const initialize = ref(true);
+const starting = ref(false);
+const initializeLabel = computed(() =>
+    i18n.global.t(starting.value ? 'firewall.startOnly' : 'firewall.initializeOnly'),
+);
+const restoreLabel = computed(() =>
+    i18n.global.t(starting.value ? 'firewall.startAndRestore' : 'firewall.restoreAllRules'),
+);
 const subsystem = ref<Firewall.BackendSubsystem>('system');
 const mode = ref<'restore' | 'initialize'>('initialize');
 const selected = ref('');
@@ -127,8 +148,10 @@ const acceptParams = async (
     warning: string,
     withInitialization = true,
     target: Firewall.BackendSubsystem = 'system',
+    start = false,
 ) => {
     subsystem.value = target;
+    starting.value = start;
     initialize.value = withInitialization;
     message.value = warning;
     visible.value = true;
@@ -146,7 +169,7 @@ const loadBackups = async () => {
     try {
         backups.value = (await listFirewallRuleBackups(subsystem.value)).data;
         selected.value = backups.value.files[0]?.name || '';
-        mode.value = selected.value || !initialize.value ? 'restore' : 'initialize';
+        mode.value = !starting.value && (selected.value || !initialize.value) ? 'restore' : 'initialize';
         loaded.value = true;
     } catch {
         backupLoadFailed.value = true;
@@ -163,6 +186,11 @@ const submit = async () => {
         return;
     }
     if (!loaded.value || !selected.value) return;
+    if (starting.value) {
+        visible.value = false;
+        emit('restore', selected.value);
+        return;
+    }
     loading.value = true;
     try {
         const response =

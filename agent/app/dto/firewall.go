@@ -26,6 +26,7 @@ type FirewallSubsystemStatus struct {
 }
 
 type FirewallLifecycleOperation struct {
+	BackupFile        string `json:"backupFile,omitempty" validate:"omitempty,max=255"`
 	Operation         string `json:"operation" validate:"required,oneof=start stop restart disableBanPing enableBanPing"`
 	WithDockerRestart bool   `json:"withDockerRestart"`
 }

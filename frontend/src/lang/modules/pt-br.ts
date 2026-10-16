@@ -4384,10 +4384,15 @@ const message = {
         familyIncomplete: 'As cadeias de {0} estão incompletas',
         resetWithBackup: 'Salvar regras e redefinir',
         resetOnly: 'Apenas redefinir',
-        resetWithBackupHelper: 'Salve as regras do módulo atual em JSON para restaurá-las durante a inicialização.',
+        resetWithBackupHelper:
+            'Salve as regras do módulo atual em JSON para restaurá-las ao inicializar ou iniciar o firewall.',
         resetOnlyHelper: 'Limpar as regras atuais sem criar um novo backup. Os backups existentes são mantidos.',
         backupDirectoryHelper:
             'Os backups válidos de regras em {0} são listados abaixo. O mais recente é selecionado por padrão.',
+        startOnly: 'Apenas iniciar',
+        startAndRestore: 'Iniciar e restaurar do backup',
+        startWithBackupHelper:
+            'Inicie o firewall normalmente ou escolha um backup JSON existente para iniciar e restaurar regras.',
         restoreAllRules: 'Inicializar e restaurar regras',
         importRuleBackup: 'Importar do backup',
         initializeOnly: 'Apenas inicializar',
