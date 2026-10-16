@@ -4362,10 +4362,15 @@ const message = {
         familyIncomplete: 'Rantaian {0} tidak lengkap',
         resetWithBackup: 'Sandarkan peraturan dan tetapkan semula',
         resetOnly: 'Tetapkan semula sahaja',
-        resetWithBackupHelper: 'Simpan peraturan modul semasa sebagai JSON untuk dipulihkan semasa pemulaan.',
+        resetWithBackupHelper:
+            'Simpan peraturan modul semasa sebagai JSON untuk dipulihkan semasa pemulaan atau semasa tembok api dimulakan.',
         resetOnlyHelper: 'Padam peraturan semasa tanpa sandaran baharu. Sandaran sedia ada dikekalkan.',
         backupDirectoryHelper:
             'Sandaran peraturan yang sah dalam {0} disenaraikan di bawah. Fail terkini dipilih secara lalai.',
+        startOnly: 'Mula sahaja',
+        startAndRestore: 'Mula dan pulihkan daripada sandaran',
+        startWithBackupHelper:
+            'Mulakan tembok api seperti biasa atau pilih sandaran JSON sedia ada untuk memulakan dan memulihkan peraturan.',
         restoreAllRules: 'Mulakan dan pulihkan peraturan',
         importRuleBackup: 'Import daripada sandaran',
         initializeOnly: 'Mulakan sahaja',

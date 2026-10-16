@@ -21,10 +21,10 @@ export const loadForwardBaseInfo = () =>
 export const searchForwardRule = (request: Firewall.ForwardRuleSearch) =>
     http.post<ResPage<Firewall.RuleInfo>>('/hosts/firewall/forward/search', request, TimeoutEnum.T_40S);
 
-export const operateFire = (operation: string, withDockerRestart: boolean) =>
+export const operateFire = (operation: string, withDockerRestart: boolean, backupFile?: string) =>
     http.post<Firewall.FilterChainOperationResult>(
         '/hosts/firewall/operate',
-        { operation, withDockerRestart },
+        { operation, withDockerRestart, backupFile },
         TimeoutEnum.T_10M,
     );
 

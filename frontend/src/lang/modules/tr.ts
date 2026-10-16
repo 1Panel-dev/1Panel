@@ -4368,10 +4368,15 @@ const message = {
         familyIncomplete: '{0} zincirleri eksik',
         resetWithBackup: 'Kuralları yedekle ve sıfırla',
         resetOnly: 'Yalnızca sıfırla',
-        resetWithBackupHelper: 'Geçerli modül kurallarını başlatma sırasında geri yüklemek için JSON olarak kaydedin.',
+        resetWithBackupHelper:
+            'Geçerli modül kurallarını ilk kurulumda veya güvenlik duvarı başlatılırken geri yüklemek için JSON olarak kaydedin.',
         resetOnlyHelper: 'Yeni yedek oluşturmadan mevcut kuralları temizleyin. Önceki yedekler korunur.',
         backupDirectoryHelper:
             '{0} içindeki geçerli kural yedekleri listelenir. Varsayılan olarak en yeni dosya seçilir.',
+        startOnly: 'Yalnızca başlat',
+        startAndRestore: 'Başlat ve yedekten geri yükle',
+        startWithBackupHelper:
+            'Güvenlik duvarını normal başlatın veya başlatıp kuralları geri yüklemek için mevcut bir JSON yedeği seçin.',
         restoreAllRules: 'Başlat ve kuralları geri yükle',
         importRuleBackup: 'Yedekten içe aktar',
         initializeOnly: 'Yalnızca başlat',

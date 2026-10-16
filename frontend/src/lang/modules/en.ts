@@ -4299,9 +4299,14 @@ const message = {
         familyIncomplete: '{0} chains are incomplete',
         resetWithBackup: 'Back up rules and reset',
         resetOnly: 'Reset only',
-        resetWithBackupHelper: 'Save the current module rules as JSON for restoration during initialization.',
+        resetWithBackupHelper:
+            'Save the current module rules as JSON for restoration during initialization or startup.',
         resetOnlyHelper: 'Clear current rules without creating a new backup. Existing backups are kept.',
         backupDirectoryHelper: 'Valid rule backups in {0} are listed below. The newest file is selected by default.',
+        startOnly: 'Start only',
+        startAndRestore: 'Start and restore from backup',
+        startWithBackupHelper:
+            'Start the firewall normally, or choose an existing JSON backup to start and restore rules.',
         restoreAllRules: 'Initialize and restore rules',
         importRuleBackup: 'Import from backup',
         initializeOnly: 'Initialize only',

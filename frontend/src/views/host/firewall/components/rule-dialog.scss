@@ -149,3 +149,97 @@
         }
     }
 }
+
+.firewall-initialize-dialog.el-dialog,
+.firewall-lifecycle-dialog.el-dialog {
+    display: flex;
+    flex-direction: column;
+    width: min(680px, calc(100vw - 32px));
+    max-height: calc(92dvh - 24px);
+    margin-top: max(24px, 8vh);
+    margin-bottom: 24px;
+
+    .el-dialog__body {
+        min-height: 0;
+        overflow-y: auto;
+    }
+
+    .firewall-rule-dialog__content {
+        gap: 16px;
+    }
+
+    .firewall-initialize-dialog__description {
+        margin: 0;
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .firewall-rule-dialog__docker {
+        padding: 14px 16px;
+        border-radius: 8px;
+        background: var(--el-fill-color-light);
+
+        .el-form-item {
+            margin-bottom: 0;
+        }
+
+        .el-form-item__label {
+            height: auto;
+            margin-bottom: 8px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .el-form-item__content {
+            display: block;
+            line-height: 1.6;
+        }
+
+        .el-radio-group {
+            gap: 4px 24px;
+        }
+
+        .el-radio {
+            height: auto;
+            min-height: 28px;
+            margin-right: 0;
+            white-space: normal;
+        }
+    }
+
+    .firewall-rule-dialog__docker-helper {
+        margin: 6px 0 0;
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+        line-height: 1.7;
+    }
+
+    .firewall-rule-dialog__confirmation {
+        padding: 14px 0 16px;
+        color: var(--el-text-color-regular);
+        text-align: left;
+        font-size: 13px;
+        line-height: 1.7;
+    }
+
+    .firewall-rule-dialog__files {
+        max-height: min(240px, 30vh);
+    }
+
+    .firewall-rule-dialog__modes {
+        align-items: stretch;
+    }
+
+    .firewall-initialize-dialog__backups {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        border-top: 1px solid var(--el-border-color-lighter);
+        padding-top: 16px;
+    }
+
+    .firewall-rule-dialog__file-name > .min-w-0 {
+        flex: 1;
+    }
+}
