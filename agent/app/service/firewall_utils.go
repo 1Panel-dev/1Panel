@@ -1807,15 +1807,80 @@ func operateFirewallLifecycle(client lifecycle.Client, operation string, withDoc
 }
 
 func (c firewallLifecycleClient) Start() error {
+	firewallWhitelistMu.Lock()
+	defer firewallWhitelistMu.Unlock()
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
+	if err := c.prepareAccessWhitelistBeforeStart(); err != nil {
+		global.LOG.Warnf("prepare %s access whitelist before start failed: %v", c.Name(), err)
+	}
 	return c.Client.Start()
 }
 
 func (c firewallLifecycleClient) Restart() error {
+	firewallWhitelistMu.Lock()
+	defer firewallWhitelistMu.Unlock()
 	firewallRuleMutationMu.Lock()
 	defer firewallRuleMutationMu.Unlock()
+	if err := c.prepareAccessWhitelistBeforeStart(); err != nil {
+		global.LOG.Warnf("prepare %s access whitelist before restart failed: %v", c.Name(), err)
+	}
 	return c.Client.Restart()
+}
+
+func (c firewallLifecycleClient) prepareAccessWhitelistBeforeStart() error {
+	provider := filter.Provider(c.Name())
+	if provider != filter.ProviderFirewalld && provider != filter.ProviderUFW {
+		return nil
+	}
+	ports, err := LoadRequiredFirewallPortWhiteList()
+	if err != nil {
+		return err
+	}
+	var adapter filter.Adapter
+	var active bool
+	if provider == filter.ProviderFirewalld {
+		active, err = c.Status()
+		if err != nil {
+			return err
+		}
+		adapter = filterfirewalld.NewAdapter()
+	} else {
+		adapter = filterufw.NewAdapter()
+	}
+	var commands []filter.NativeCommand
+	for _, port := range firewall.ExpandPortWhitelist(ports) {
+		rule := firewall.RuleForSystemPort(provider, port)
+		rule.Scope = rule.Scope.Normalize()
+		rule.UUID = uuid.NewString()
+		if provider == filter.ProviderUFW {
+			position := int64(1)
+			rule.OrderIndex = &position
+		}
+		plan, err := adapter.BuildCommands(filter.RuleSet{Scope: rule.Scope}, []filter.RuleChange{{Operation: filter.ChangeCreate, After: &rule}})
+		if err != nil {
+			return err
+		}
+		for _, item := range plan.Rules {
+			for _, command := range item.Commands {
+				if provider == filter.ProviderFirewalld {
+					if active {
+						command.Args = append(command.Args, "--permanent")
+					} else {
+						command.Executable = "firewall-offline-cmd"
+					}
+				}
+				commands = append(commands, command)
+			}
+		}
+	}
+	manager := cmd.NewCommandMgr(cmd.WithTimeout(60*time.Second), cmd.WithEnv("LC_ALL=C", "LANGUAGE=en_US:en"))
+	for _, command := range commands {
+		if err := manager.RunWithOptionalSudo(command.Executable, command.Args...); err != nil {
+			return fmt.Errorf("prepare %s access whitelist before start: %w", provider, err)
+		}
+	}
+	return nil
 }
 
 func runFirewallLifecycleAction(t *task.Task, name string, action func() error) error {

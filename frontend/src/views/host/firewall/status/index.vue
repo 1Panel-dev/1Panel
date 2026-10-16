@@ -227,7 +227,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const props = defineProps({
     currentTab: String,
 });
-const { docsUrl } = useGlobalStore();
+const { docsUrl, isIntl } = useGlobalStore();
 
 const goToFirewallSetting = () => routerToName('FirewallSetting');
 const goToScriptLibrary = () => routerToNameWithQuery('Library', { uncached: 'true' });
@@ -317,7 +317,7 @@ const familyActions = computed(() =>
             message: familyIssueText(issue),
             helpUrl:
                 issue.available && issue.reason === 'ipv6_ra_required'
-                    ? `${docsUrl.value}/user_manual/hosts/firewall`
+                    ? `${docsUrl.value}/user_manual/${isIntl.value ? 'system' : 'hosts'}/firewall`
                     : undefined,
             action,
         };
