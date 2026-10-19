@@ -18,6 +18,7 @@
         size="w-70"
         :show-close="false"
         :modal="false"
+        modal-penetrable
         @opened="claim"
     >
         <template #header>
