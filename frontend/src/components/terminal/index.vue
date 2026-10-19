@@ -31,7 +31,7 @@ const { currentNode } = useGlobalStore();
 
 // session: agent side session id known (fresh or reattached)
 // expired: the agent no longer has the session; a reconnect must open a new one
-const emit = defineEmits(['session', 'expired']);
+const emit = defineEmits(['session', 'expired', 'reconnect']);
 
 // Close codes of the agent's session protocol (agent/utils/terminal/session.go).
 const CLOSE_SESSION_NOT_FOUND = 4404;
@@ -56,6 +56,7 @@ let closing = false;
 let reconnecting = false;
 let reconnectNoticeShown = false;
 let revalidating = false;
+let expired = false;
 let reconnectStartedAt = 0;
 let reconnectDelay = 1000;
 let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
@@ -279,6 +280,7 @@ function resizeTerminal() {
     if (terminalElement.value.clientWidth <= 0 || terminalElement.value.clientHeight <= 0) {
         return;
     }
+    if (terminalElement.value.closest('.terminal-host')) return;
 
     fitAddon.fit();
     if (isWsOpen()) {
@@ -484,6 +486,7 @@ const closeRealTerminal = (ev: CloseEvent) => {
                 '31',
                 ev.code === 1000 ? 'The connection has been disconnected.' : i18n.global.t('terminal.sessionExpired'),
             );
+            expired = true;
             emit('expired');
             return;
         case CLOSE_ATTACHED_ELSEWHERE:
@@ -602,6 +605,13 @@ function sendMsg(data: string, line: string = '') {
 
 function onTermData(data: string) {
     if (!data) return;
+    if (expired) {
+        if (isEnterInputData(data)) {
+            expired = false;
+            emit('reconnect');
+        }
+        return;
+    }
     if (aiNotice.value.loading) return;
     sendMsg(data, isEnterInputData(data) ? getCurrentTerminalLine() : '');
 }
