@@ -355,6 +355,20 @@
                         show-overflow-tooltip
                         prop="runTime"
                     />
+                    <!-- The API sorts by createdAt; the row field is named createTime. -->
+                    <el-table-column
+                        :label="$t('commons.table.createdAt')"
+                        card-type="description"
+                        min-width="180"
+                        show-overflow-tooltip
+                        prop="createdAt"
+                        sortable="custom"
+                        :sort-orders="['descending', 'ascending', null]"
+                    >
+                        <template #default="{ row }">
+                            {{ row.createTime }}
+                        </template>
+                    </el-table-column>
                     <fu-table-operations
                         card-type="button"
                         fix
