@@ -1253,7 +1253,12 @@ func buildOpenclawAccountModelConfig(account *model.AgentAccount, model dto.Agen
 	if err != nil {
 		return "", modelEntry{}, "", modelProvider{}, err
 	}
-	return providerPatch.PrimaryModel, buildOpenclawModelEntry(providerPatch.ModelID, model), providerPatch.ProviderKey, modelProvider{
+	entry := buildOpenclawModelEntry(providerPatch.ModelID, model)
+	if account.Provider == "minimax" && providerPatch.ModelID == "MiniMax-M3.1-Flash" {
+		entry.ContextWindow = 1000000
+		entry.MaxTokens = 524288
+	}
+	return providerPatch.PrimaryModel, entry, providerPatch.ProviderKey, modelProvider{
 		ApiKey:     providerPatch.APIKey,
 		BaseUrl:    providerPatch.BaseURL,
 		Api:        providerPatch.APIType,
