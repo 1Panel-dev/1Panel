@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "Kunci API yang belum dibatalkan dengan nama ini sudah wuju
 ErrAPIKeyNotFound: "Kunci API tidak wujud atau bukan milik pengguna semasa"
 ErrAPIKeyAppBindingDisabled: "Pemautan APP melalui kod QR tidak dibenarkan untuk kunci API ini"
 ErrAPIKeyTerminalUpgradeRequired: "Sokongan pengesahan terminal melalui kunci API tidak dapat disahkan. Semak sambungan nod dan naik taraf Agent sebelum mencuba lagi."
+LocalAppSyncDispatch: "Hantar penyegerakan aplikasi tempatan"
+LocalAppSyncDispatchNode: "Hantar penyegerakan aplikasi tempatan ke {{.node}} (tugas nod: {{.taskID}})"
+ErrLocalAppSyncDisabled: "Penyegerakan aplikasi tempatan antara nod dinyahdayakan"

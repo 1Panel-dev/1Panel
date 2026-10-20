@@ -415,6 +415,15 @@ func buildAgentItem(agent *model.Agent, appInstall *model.AppInstall, envMap map
 		} else {
 			item.WebUIPort = appInstall.HttpPort
 		}
+		if agentType == constant.AppDeepSeekHarness {
+			item.WebUIPort = appInstall.HttpsPort
+			if values, err := readAgentEnvMap(appInstall.GetEnvPath()); err == nil {
+				accessHost := values["HTTPS_ACCESS_HOST"]
+				if isDeepSeekAccessHost(accessHost) {
+					item.AccessHost = accessHost
+				}
+			}
+		}
 		item.Path = appInstall.GetPath()
 		item.Status = appInstall.Status
 		item.Message = appInstall.Message
@@ -442,7 +451,8 @@ func localizedAgentProviderName(provider string) string {
 }
 
 func isAgentAppKey(appKey string) bool {
-	return appKey == constant.AppOpenclaw || appKey == constant.AppCopaw || appKey == constant.AppHermesAgent
+	return appKey == constant.AppOpenclaw || appKey == constant.AppCopaw || appKey == constant.AppHermesAgent ||
+		appKey == constant.AppDeepSeekHarness || appKey == constant.AppOctop
 }
 
 func isOpenclawLegacyHTTPVersion(version string) bool {
@@ -1641,6 +1651,10 @@ func agentDashboardAuthEnvKeys(agentType string) (string, string, bool) {
 		return hermesDashboardUsernameEnvKey, hermesDashboardPasswordEnvKey, true
 	case constant.AppCopaw:
 		return qwenPawAuthUsernameEnvKey, qwenPawAuthPasswordEnvKey, true
+	case constant.AppDeepSeekHarness:
+		return "DSH_AUTH_USERNAME", "DSH_AUTH_PASSWORD", true
+	case constant.AppOctop:
+		return "OCTOP_ADMIN_USERNAME", "OCTOP_DEFAULT_PASSWORD", true
 	default:
 		return "", "", false
 	}

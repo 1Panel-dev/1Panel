@@ -777,6 +777,15 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                'Tarayıcıda kullanılan IPv4 adresini veya ana bilgisayar adını protokol, bağlantı noktası veya yol olmadan girin. HTTPS, uygulamanın yerel sertifikasını kullanır.',
+            deepSeekAuthHelper:
+                'Kullanıcı adı: harf, rakam, nokta, alt çizgi veya tire. Parola: en az 12 karakter; başta/sonda boşluk veya satır sonu içeremez.',
+            octopAuthHelper:
+                'Parola: harf ve rakam içeren en az 8 karakter; yaygın parolalardan kaçının. Reddedilirse kurulum yönergeleri için uygulama günlüklerini kontrol edin.',
+            initialCredentials: 'İlk giriş bilgileri; uygulamada değiştirildiyse güncel parolayı kullanın.',
+            nativeAgentAccessUnavailable:
+                'Mevcut kurulumda uyumlu HTTPS erişim adresi veya bağlantı noktası yok. Uygulama ayarlarını kontrol edin.',
             agent: 'Ajan',
             account: 'Model hesabı',
             batchOperation: 'Toplu işlem',
@@ -3751,6 +3760,7 @@ const message = {
         link: 'Bağlantı',
         showCurrentArch: 'Mimari',
         syncLocalApp: 'Yerel Uygulamayı Senkronize Et',
+        localAppSyncToNodes: 'Yerel uygulama eşitlemesine alt düğümleri dahil et',
         memoryRequiredHelper: 'Geçerli uygulama bellek gereksinimi {0}',
         gpuConfig: 'GPU Desteğini Etkinleştir',
         gpuConfigHelper:

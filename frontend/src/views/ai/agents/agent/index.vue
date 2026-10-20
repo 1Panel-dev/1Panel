@@ -178,6 +178,9 @@
                                 alignment="start"
                                 :size="2"
                             >
+                                <el-text v-if="row.agentType === 'octop'" type="info" size="small">
+                                    {{ $t('aiTools.agents.initialCredentials') }}
+                                </el-text>
                                 <span>{{ row.dashboardUsername || '-' }}</span>
                                 <el-space alignment="center">
                                     <span>{{ row.dashboardPassword ? '********' : '-' }}</span>
@@ -283,7 +286,7 @@ import { Website } from '@/api/interface/website';
 import { SearchWithPage } from '@/api/interface';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 
 import AddDialog from '@/views/ai/agents/agent/add/index.vue';
 import DeleteDialog from '@/views/ai/agents/agent/delete/index.vue';
@@ -302,6 +305,8 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import {
     getAgentProviderDisplayName,
     getOpenclawAccessScheme,
+    isAgentType,
+    isDeepSeekAccessHost,
     supportsAgentModelConfig,
     supportsAgentToken,
     supportsAgentDashboardAuth,
@@ -312,6 +317,8 @@ import NoApp from '@/views/app-store/apps/no-app/index.vue';
 import openclawIcon from '@/assets/images/ai-agent-openclaw.svg';
 import copawIcon from '@/assets/images/ai-agent-copaw.svg';
 import hermesIcon from '@/assets/images/ai-agent-hermes-agent.svg';
+import deepSeekIcon from '@/assets/images/ai-agent-deepseek-harness.png';
+import octopIcon from '@/assets/images/ai-agent-octop.png';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
@@ -358,8 +365,7 @@ const buttons = [
     {
         label: i18n.global.t('menu.config'),
         click: (row: AI.AgentItem) => openConfig(row),
-        show: (row: AI.AgentItem) =>
-            supportsAgentModelConfig(row.agentType) || supportsAgentDashboardAuth(row.agentType),
+        show: (row: AI.AgentItem) => supportsAgentModelConfig(row.agentType) || row.agentType === 'copaw',
         disabled: (row: AI.AgentItem) => row.status !== 'Running',
     },
     {
@@ -441,6 +447,10 @@ const getAgentTypeLabel = (agentType: AI.AgentType) => {
             return 'QwenPaw';
         case 'hermes-agent':
             return 'Hermes Agent';
+        case 'deepseek-harness':
+            return 'DeepSeek Harness';
+        case 'octop':
+            return 'Octop';
         default:
             return 'OpenClaw';
     }
@@ -452,6 +462,10 @@ const getAgentTypeIcon = (agentType: AI.AgentType) => {
             return copawIcon;
         case 'hermes-agent':
             return hermesIcon;
+        case 'deepseek-harness':
+            return deepSeekIcon;
+        case 'octop':
+            return octopIcon;
         default:
             return openclawIcon;
     }
@@ -461,8 +475,7 @@ const openCreate = (agentType?: AI.AgentType) => {
     if (noApp.value) {
         return;
     }
-    const targetType =
-        agentType === 'copaw' || agentType === 'hermes-agent' || agentType === 'openclaw' ? agentType : 'openclaw';
+    const targetType = isAgentType(agentType) ? agentType : 'openclaw';
     if (addRef.value?.open) {
         addRef.value.open(targetType);
     }
@@ -473,12 +486,7 @@ const openCreateFromQuery = async () => {
     if (!shouldOpen) {
         return;
     }
-    const agentType =
-        route.query.agentType === 'copaw'
-            ? 'copaw'
-            : route.query.agentType === 'hermes-agent'
-              ? 'hermes-agent'
-              : 'openclaw';
+    const agentType = isAgentType(route.query.agentType) ? route.query.agentType : 'openclaw';
     openCreate(agentType);
     const nextQuery = { ...route.query };
     delete nextQuery.open;
@@ -547,7 +555,12 @@ const openTerminal = (row: AI.AgentItem) => {
     openTerminalDialog({
         containerID: row.containerName,
         title,
-        users: row.agentType === 'hermes-agent' ? ['hermes', 'root'] : ['node', 'root'],
+        users:
+            row.agentType === 'hermes-agent'
+                ? ['hermes', 'root']
+                : row.agentType === 'octop'
+                  ? ['root']
+                  : ['node', 'root'],
         shell: '/bin/bash',
         initCmd: '',
     });
@@ -579,6 +592,14 @@ const openWorkDir = (row: AI.AgentItem) => {
 };
 
 const jumpWebUI = (row: AI.AgentItem) => {
+    if (row.agentType === 'deepseek-harness') {
+        if (!isDeepSeekAccessHost(row.accessHost || '') || !row.webUIPort) {
+            MsgError(i18n.global.t('aiTools.agents.nativeAgentAccessUnavailable'));
+            return;
+        }
+        window.open(`https://${row.accessHost}:${row.webUIPort}`, '_blank', 'noopener,noreferrer');
+        return;
+    }
     if (dialogPortJumpRef.value?.acceptParams) {
         dialogPortJumpRef.value.acceptParams({
             port: row.webUIPort,

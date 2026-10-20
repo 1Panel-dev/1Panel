@@ -1,7 +1,7 @@
 import { ReqPage } from '.';
 
 export namespace AI {
-    export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent';
+    export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent' | 'deepseek-harness' | 'octop';
 
     export interface OllamaModelInfo {
         id: number;
@@ -423,6 +423,7 @@ export namespace AI {
     }
 
     export interface AgentCreateReq {
+        accessHost?: string;
         name: string;
         remark: string;
         appVersion: string;
@@ -450,6 +451,7 @@ export namespace AI {
     }
 
     export interface AgentItem {
+        accessHost: string;
         id: number;
         name: string;
         remark: string;
