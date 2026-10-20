@@ -4321,7 +4321,7 @@ const message = {
         pushDir: 'Sertifikayı yerel dizine aktar',
         dir: 'Dizin',
         pushDirHelper:
-            'Sertifika dosyası "fullchain.pem" ve anahtar dosyası "privkey.pem" bu dizinde oluşturulacaktır.',
+            'Birden fazla dizin seçin veya her satıra bir dizin girin. Her dizinde "fullchain.pem" ve "privkey.pem" dosyaları oluşturulacaktır.',
         organizationDetail: 'Organizasyon detayları',
         fromWebsite: 'Web sitesinden',
         dnsMauanlHelper:

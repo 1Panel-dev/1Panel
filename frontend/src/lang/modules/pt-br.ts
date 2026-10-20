@@ -4335,7 +4335,7 @@ const message = {
         pushDir: 'Enviar o certificado para o diretório local',
         dir: 'Diretório',
         pushDirHelper:
-            'O arquivo do certificado "fullchain.pem" e o arquivo de chave "privkey.pem" serão gerados neste diretório.',
+            'Selecione vários diretórios ou informe um diretório por linha. Os arquivos "fullchain.pem" e "privkey.pem" serão gerados em cada diretório.',
         organizationDetail: 'Detalhes da organização',
         fromWebsite: 'Do site',
         dnsMauanlHelper:

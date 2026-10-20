@@ -4214,7 +4214,8 @@ const message = {
         domainHelper: 'هر خط یک نام دامنه، پشتیبانی از * و آدرس IP',
         pushDir: 'ارسال گواهی به دایرکتوری محلی',
         dir: 'دایرکتوری',
-        pushDirHelper: 'فایل گواهی "fullchain.pem" و فایل کلید "privkey.pem" در این دایرکتوری تولید می‌شوند.',
+        pushDirHelper:
+            'چند دایرکتوری انتخاب کنید یا در هر خط یک دایرکتوری وارد کنید. فایل‌های "fullchain.pem" و "privkey.pem" در هر دایرکتوری ایجاد می‌شوند.',
         organizationDetail: 'جزئیات سازمان',
         fromWebsite: 'از وب‌سایت',
         dnsMauanlHelper:

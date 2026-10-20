@@ -79,6 +79,16 @@
                 @row-click="handleRowClick"
                 class="cursor-pointer dialog-file-list"
             >
+                <el-table-column v-if="isMultiple && form.dir" width="48">
+                    <template #default="{ row }">
+                        <el-checkbox
+                            v-if="row.isDir && !row.isCreate"
+                            :model-value="selectedPathSet.has(row.path)"
+                            @click.stop
+                            @change="toggleDirectory(row.path)"
+                        />
+                    </template>
+                </el-table-column>
                 <el-table-column prop="name" show-overflow-tooltip fix>
                     <template #default="{ row }">
                         <svg-icon
@@ -131,6 +141,13 @@
             </el-table>
         </div>
         <div class="file-list-bottom">
+            <el-checkbox
+                v-if="isMultiple && form.dir"
+                :model-value="selectedPathSet.has(req.path)"
+                @change="toggleDirectory(req.path)"
+            >
+                {{ req.path }}
+            </el-checkbox>
             <div v-if="!isMultiple && selectRow?.path">
                 {{ $t('file.currentSelect') }}
                 <el-tooltip :content="selectRow.path" placement="top">
@@ -163,7 +180,11 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button type="primary" @click="selectFile" :disabled="disBtn">
+                <el-button
+                    type="primary"
+                    @click="selectFile"
+                    :disabled="disBtn || (isMultiple && selectRows.length === 0)"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -174,7 +195,7 @@
 <script lang="ts" setup>
 import { File } from '@/api/interface/file';
 import { computeDirSize, createFile, getFileContent, getFilesList, searchFavorite } from '@/api/modules/files';
-import { nextTick, onUpdated, reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
@@ -186,6 +207,7 @@ const paths = ref<string[]>([]);
 const req = reactive({ path: '/', expand: true, page: 1, pageSize: 300, showHidden: true });
 const selectRow = ref({ path: '', name: '' });
 const selectRows = ref<Array<{ path: string; name: string }>>([]);
+const selectedPathSet = computed(() => new Set(selectRows.value.map((item) => item.path)));
 const isMultiple = ref(false);
 const rowRefs = ref();
 const open = ref(false);
@@ -211,6 +233,7 @@ interface DialogProps {
     isAll?: boolean;
     disabled?: boolean;
     multiple?: boolean;
+    selectedPaths?: string[];
 }
 const acceptParams = (props: DialogProps): void => {
     form.path = props.path || '/';
@@ -218,7 +241,8 @@ const acceptParams = (props: DialogProps): void => {
     form.isAll = props.isAll || false;
     form.disabled = props.disabled || false;
     isMultiple.value = props.multiple || false;
-    selectRows.value = [];
+    disBtn.value = false;
+    selectRows.value = [...new Set(props.selectedPaths || [])].map((path) => ({ path, name: path }));
     selectRow.value = { path: '', name: '' };
     openPage();
     req.path = form.path;
@@ -281,7 +305,7 @@ const openDir = async (row: File.File, column: any, event: any) => {
     }
     // Handle file click
     const fullPath = (req.path === '/' ? req.path : req.path + '/') + row.name;
-    if (isMultiple.value) {
+    if (isMultiple.value && (form.isAll || !form.dir)) {
         // Multiple mode: toggle selection
         const index = selectRows.value.findIndex((r) => r.path === fullPath);
         if (index > -1) {
@@ -473,22 +497,25 @@ const createFolder = async (row: any) => {
     Object.assign(addItem, addForm);
     loading.value = true;
     createFile(addItem as File.FileCreate)
-        .then(() => {
+        .then(async () => {
             row.isCreate = false;
             disBtn.value = false;
             MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            await search(req);
         })
         .finally(() => {
             loading.value = false;
         });
 };
 
-onUpdated(() => {
-    if (form.path != '') {
-        req.path = form.path;
+const toggleDirectory = (path: string) => {
+    const index = selectRows.value.findIndex((item) => item.path === path);
+    if (index >= 0) {
+        selectRows.value.splice(index, 1);
+    } else {
+        selectRows.value.push({ path, name: path });
     }
-    search(req);
-});
+};
 
 const removeSelected = (index: number) => {
     selectRows.value.splice(index, 1);
