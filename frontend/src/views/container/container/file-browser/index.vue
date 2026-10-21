@@ -32,11 +32,9 @@
                         @blur="cancelPathEditing"
                         @keyup.enter.prevent="submitPathInput"
                     />
-                    <el-upload ref="uploadRef" :auto-upload="false" :show-file-list="false" :on-change="onUploadChange">
-                        <el-button class="mt-2" :loading="uploading" type="primary" plain>
-                            {{ $t('commons.button.upload') }}
-                        </el-button>
-                    </el-upload>
+                    <el-button class="mt-2" type="primary" plain @click="onUpload">
+                        {{ $t('commons.button.upload') }}
+                    </el-button>
                     <el-button class="mt-2 ml-3" plain :disabled="selectedRows.length === 0" @click="onBatchDelete">
                         {{ $t('commons.button.delete') }}
                     </el-button>
@@ -97,6 +95,7 @@
             </el-form>
         </template>
     </DrawerPro>
+    <FileUpload ref="uploadRef" @close="loadContainerFiles" />
     <DialogPro v-model="previewVisible" :title="previewTitle" size="w-70" :close-on-click-modal="true">
         <el-alert
             v-if="previewTruncated"
@@ -118,11 +117,11 @@ import {
     getContainerFileContent,
     getContainerFileSize,
     listContainerFiles,
-    uploadContainerFile,
 } from '@/api/modules/container';
 import { MsgError, MsgSuccess, MsgWarning } from '@/utils/message';
 import i18n from '@/lang';
-import { ElInput, ElMessageBox, UploadFile, UploadInstance } from 'element-plus';
+import { ElInput, ElMessageBox } from 'element-plus';
+import FileUpload from '@/views/host/file-management/upload/index.vue';
 import { Document, FolderOpened, HomeFilled } from '@element-plus/icons-vue';
 import { computeSize2 } from '@/utils/size';
 const visible = ref(false);
@@ -130,9 +129,8 @@ const title = ref('');
 const containerID = ref('');
 const filePath = ref('/');
 const containerFiles = ref<any[]>([]);
-const uploadRef = ref<UploadInstance>();
+const uploadRef = ref<InstanceType<typeof FileUpload>>();
 const pathInputRef = ref<InstanceType<typeof ElInput>>();
-const uploading = ref(false);
 const previewVisible = ref(false);
 const previewTitle = ref('');
 const previewContent = ref('');
@@ -253,27 +251,8 @@ const submitPathInput = async () => {
     }
 };
 
-const onUploadChange = async (uploadFile: UploadFile) => {
-    if (!uploadFile.raw) {
-        return;
-    }
-    const formData = new FormData();
-    formData.append('containerID', containerID.value);
-    formData.append('path', filePath.value);
-    formData.append('file', uploadFile.raw);
-    uploading.value = true;
-    await uploadContainerFile(formData)
-        .then(async () => {
-            MsgSuccess(i18n.global.t('file.uploadSuccess'));
-            await loadContainerFiles();
-        })
-        .catch((err) => {
-            MsgError(err?.message || i18n.global.t('commons.msg.operationFailed'));
-        })
-        .finally(() => {
-            uploading.value = false;
-            uploadRef.value?.clearFiles();
-        });
+const onUpload = () => {
+    uploadRef.value?.acceptParams({ path: filePath.value, containerID: containerID.value });
 };
 
 const onOpenFile = async (path: string) => {
