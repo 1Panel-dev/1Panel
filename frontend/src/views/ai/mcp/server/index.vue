@@ -98,6 +98,8 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { AI } from '@/api/interface/ai';
 import {
     deleteMcpServer,
@@ -129,11 +131,18 @@ const bindDomainRef = ref();
 const configRef = ref();
 const items = ref<AI.McpServer[]>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'mcp-server-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('mcp-server-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
+useSearchState(
+    'ai/mcp/server/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 
 const getUrl = (row: AI.McpServer) => {
     if (row.outputTransport == 'sse') {

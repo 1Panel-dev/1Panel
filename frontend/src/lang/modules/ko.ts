@@ -3056,6 +3056,20 @@ const message = {
         remote: '원격 SSH',
     },
     setting: {
+        panelCache: {
+            title: '캐시 설정',
+            tabs: '탭 캐시',
+            pagination: '페이지 이동 캐시',
+            refresh: '새로 고침 간격 캐시',
+            search: '검색 입력 캐시',
+            duration: '캐시 유지 기간',
+            '24h': '24시간',
+            week: '1주',
+            month: '1개월',
+            forever: '무기한',
+            helper: '유효 기간은 상태를 마지막으로 변경한 시점부터 계산됩니다. 만료되면 기본값으로 돌아갑니다.',
+        },
+
         panel: '패널',
         user: '패널 사용자',
         userChange: '패널 사용자 변경',

@@ -226,7 +226,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import BindDialog from '@/views/database/mysql/bind/index.vue';
 import UserDialog from '@/views/database/mysql/user/index.vue';
 import OperateDialog from '@/views/database/mysql/create/index.vue';
@@ -293,15 +293,18 @@ const dialogPortJumpRef = ref();
 const data = ref<Database.MysqlDBInfo[]>([]);
 let grantSummaryRequestID = 0;
 const paginationConfig = reactive({
-    cacheSizeKey: 'mysql-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('mysql-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'database/mysql/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const mysqlContainer = ref();
 const mysqlStatus = ref();

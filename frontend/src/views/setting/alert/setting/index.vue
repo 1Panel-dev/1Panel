@@ -149,6 +149,8 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import {
@@ -219,11 +221,18 @@ const config = ref<Alert.AlertConfigUpdateReq>({
 });
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'alert-config-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-config-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
+useSearchState(
+    'setting/alert/setting/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 
 const parseConfig = <T extends object>(raw: Alert.AlertConfigInfo, fallback: T): T => {
     try {

@@ -22,6 +22,7 @@ export const syncAuthInfo = async (currentNode?: string) => {
     const storeCurrentNode = globalStore.currentNode;
     if (!globalStore.isEnterprise) {
         const res = await getUserInfo();
+        globalStore.cacheUserID = `community:${res.data.id}`;
         globalStore.setAuthInfo({
             isAdmin: res.data.role === 'ADMIN',
             permissions: res.data.permissions || [],
@@ -31,6 +32,7 @@ export const syncAuthInfo = async (currentNode?: string) => {
         return res.data;
     }
     const res = await getEnterpriseUserInfo(currentNode ?? storeCurrentNode);
+    globalStore.cacheUserID = `enterprise:${res.data.id}`;
     globalStore.setAuthInfo({
         isAdmin: res.data.role === 'ADMIN',
         permissions: res.data.permissions || [],

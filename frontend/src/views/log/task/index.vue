@@ -49,6 +49,8 @@
 </template>
 
 <script setup lang="ts">
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/date';
 import { searchTasks } from '@/api/modules/log';
@@ -61,11 +63,18 @@ import { translateTaskText } from '@/utils/task';
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'task-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('task-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
+useSearchState(
+    'log/task/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 const taskLogRef = ref();
 const req = reactive({
     type: '',

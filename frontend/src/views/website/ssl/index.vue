@@ -221,7 +221,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, pushSSLToNode, searchSSL, updateSSL } from '@/api/modules/website';
 import DnsAccount from './dns-account/index.vue';
@@ -259,9 +259,8 @@ const PushToNode = defineAsyncComponent(async () => {
 });
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'ssl-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('ssl-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const acmeAccountRef = ref();
@@ -287,8 +286,13 @@ const req = reactive({
     orderBy: 'updated_at',
     order: 'descending',
 });
-useSearchReset(
-    { search: toRef(req, 'domain'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'website/ssl/index',
+    {
+        search: toRef(req, 'domain'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search() },
 );
 const pushForm = ref({

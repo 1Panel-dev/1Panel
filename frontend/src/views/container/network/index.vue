@@ -95,7 +95,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import CreateDialog from '@/views/container/network/create/index.vue';
 import DetailDrawer from '@/views/container/network/detail/index.vue';
 import { toRef, reactive, ref } from 'vue';
@@ -115,13 +115,16 @@ const taskLogRef = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'container-network-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('container-network-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'container/network/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const opRef = ref();
 const isActive = ref(false);

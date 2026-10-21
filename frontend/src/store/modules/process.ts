@@ -1,6 +1,5 @@
-import { bindSearchReset } from '@/utils/search-reset';
-import router from '@/routers/router';
-import { useGlobalStore } from '@/composables/useGlobalStore';
+import { bindSearchState } from '@/utils/search-reset';
+import { panelCacheKey } from '@/utils/panel-cache';
 import { defineStore } from 'pinia';
 import { ref, reactive, toRef } from 'vue';
 import { MsgError } from '@/utils/message';
@@ -49,8 +48,7 @@ export const ProcessStore = defineStore('ProcessStore', () => {
         port: undefined,
     });
 
-    const { currentNode } = useGlobalStore();
-    bindSearchReset([() => router.currentRoute.value.path, currentNode], {
+    const searchState = bindSearchState(() => panelCacheKey('host/process'), {
         pid: toRef(psSearch, 'pid'),
         name: toRef(psSearch, 'name'),
         username: toRef(psSearch, 'username'),
@@ -321,6 +319,7 @@ export const ProcessStore = defineStore('ProcessStore', () => {
     };
 
     return {
+        restoreSearchState: searchState.restore,
         isConnected,
         isConnecting,
         psData,

@@ -26,6 +26,7 @@ func Init() {
 }
 
 var baseSettingKeys = map[string]struct{}{
+	"PanelCache":                 {},
 	"PanelName":                  {},
 	"Theme":                      {},
 	"MenuTabs":                   {},

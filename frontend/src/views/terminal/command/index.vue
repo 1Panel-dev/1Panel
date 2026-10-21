@@ -91,7 +91,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Command } from '@/api/interface/command';
 import GroupDialog from '@/components/group/index.vue';
 import OperateDialog from '@/views/terminal/command/operate/index.vue';
@@ -107,15 +107,18 @@ const data = ref();
 const selects = ref<any>([]);
 const groupList = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'terminal-command-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('terminal-command-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'name',
     order: 'ascending',
 });
 const info = ref();
-useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'terminal/command/index',
+    { search: info, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const group = ref<string>('');
 const dialogRef = ref();
 const opRef = ref();

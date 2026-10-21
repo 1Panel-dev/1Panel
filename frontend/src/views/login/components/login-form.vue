@@ -357,6 +357,7 @@
 </template>
 
 <script setup lang="ts">
+import { applyPanelCacheSettings } from '@/utils/panel-cache';
 import { ref, reactive, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
 import type { ElForm } from 'element-plus';
 import {
@@ -926,6 +927,7 @@ const getSetting = async () => {
         i18n.warnHtmlMessage = false;
         openMenuTabs.value = res.data.menuTabs === 'Enable';
         menuAccordion.value = res.data.menuAccordion === 'Enable';
+        applyPanelCacheSettings(res.data.panelCache);
         themeConfig.value = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
         if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {

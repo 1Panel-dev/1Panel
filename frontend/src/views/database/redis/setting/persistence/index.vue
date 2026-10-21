@@ -133,6 +133,7 @@
 </template>
 
 <script lang="ts" setup>
+import { readCachedPageSize } from '@/utils/panel-cache';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { Database } from '@/api/interface/database';
 import { redisPersistenceConf, updateRedisPersistenceConf } from '@/api/modules/database';
@@ -188,7 +189,7 @@ const confirmDialogRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'redis-backup-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('redis-backup-page-size')) || 20,
+    pageSize: readCachedPageSize('redis-backup-page-size') || 20,
     total: 0,
 });
 

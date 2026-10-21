@@ -241,7 +241,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
@@ -305,15 +305,18 @@ const dialogPortJumpRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'postgresql-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('postgresql-page-size')) || 20,
+    pageSize: 20,
     total: 0,
     orderBy: 'createdAt',
     order: 'null',
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'database/postgresql/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const postgresqlContainer = ref();
 const postgresqlStatus = ref();

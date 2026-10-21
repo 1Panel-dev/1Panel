@@ -70,7 +70,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import GroupDialog from '@/components/agent-group/index.vue';
 import OperateDialog from '@/views/terminal/host/operate/index.vue';
 import { deleteHost, editHostGroup, searchHosts } from '@/api/modules/terminal';
@@ -85,13 +85,16 @@ const data = ref();
 const groupList = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'terminal-host-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('terminal-host-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const info = ref();
-useSearchReset({ search: info, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'terminal/host/index',
+    { search: info, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const group = ref<string>('');
 
 const opRef = ref();

@@ -302,7 +302,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { Firewall } from '@/api/interface/firewall';
 import type { FuTableOperationButton } from '@/components/table/shared';
 import { buildHostRuleExport } from './transfer';
@@ -427,12 +427,15 @@ const supportsFirewalldPriority = computed(() => {
     return major > 0 || minor >= 7;
 });
 const paginationConfig = reactive({
-    cacheSizeKey: 'firewall-rule-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('firewall-rule-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'host/firewall/rule/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const providerScopes = (): Firewall.Scope[] => {
     if (provider.value === 'iptables' || provider.value === 'nftables') {

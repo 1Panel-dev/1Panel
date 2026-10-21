@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import CreateDialog from '@/views/container/volume/create/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
@@ -152,13 +152,16 @@ const opRef = ref();
 const data = ref();
 const selects = ref<any>([]);
 const paginationConfig = reactive({
-    cacheSizeKey: 'container-volume-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('container-volume-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchName = ref();
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'container/volume/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const isActive = ref(false);
 const isExist = ref(false);
 

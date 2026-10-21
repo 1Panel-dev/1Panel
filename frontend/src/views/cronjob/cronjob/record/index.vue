@@ -256,6 +256,7 @@
 </template>
 
 <script lang="ts" setup>
+import { panelCacheKey, writePanelCache, readCachedPageSize } from '@/utils/panel-cache';
 import { reactive, ref } from 'vue';
 import { useMediaQuery } from '@vueuse/core';
 import { Cronjob } from '@/api/interface/cronjob';
@@ -309,7 +310,7 @@ const formatInterval = (interval?: number) => {
 };
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
-    let itemSize = Number(localStorage.getItem(searchInfo.cacheSizeKey));
+    let itemSize = readCachedPageSize(searchInfo.cacheSizeKey);
     if (itemSize) {
         searchInfo.pageSize = itemSize;
     }
@@ -341,7 +342,7 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
 const handleSizeChange = (val: number) => {
     searchInfo.pageSize = val;
-    localStorage.setItem(searchInfo.cacheSizeKey, val + '');
+    writePanelCache('pagination', panelCacheKey(`size:${searchInfo.cacheSizeKey}`), val);
     search(true);
 };
 const handleCurrentChange = (val: number) => {

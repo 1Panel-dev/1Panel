@@ -275,7 +275,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { deleteAgentCheck, pageAgents, resetAgentToken, unbindAgentWebsite, updateAgentRemark } from '@/api/modules/ai';
@@ -406,7 +406,11 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'ai/agents/agent/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const checkNoApp = async () => {
     try {

@@ -135,6 +135,8 @@
 </template>
 
 <script setup lang="ts">
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, reactive, ref } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { RuntimeDeleteCheck, SearchRuntimes } from '@/api/modules/runtime';
@@ -165,11 +167,18 @@ const { isMobile } = useGlobalStore();
 
 const taskLogRef = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'runtime-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('runtime-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
+useSearchState(
+    'website/runtime/php/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 let req = reactive<Runtime.RuntimeReq>({
     name: '',
     page: 1,

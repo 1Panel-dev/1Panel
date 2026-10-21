@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import { readCachedPageSize } from '@/utils/panel-cache';
 import { removeFileShare, searchFileShare } from '@/api/modules/files';
 import { File } from '@/api/interface/file';
 import i18n from '@/lang';
@@ -33,7 +34,7 @@ import { computed, reactive, ref } from 'vue';
 const paginationConfig = reactive({
     cacheSizeKey: 'share-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('share-page-size')) || 20,
+    pageSize: readCachedPageSize('share-page-size') || 20,
     total: 0,
 });
 const req = reactive({

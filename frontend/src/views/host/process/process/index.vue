@@ -83,6 +83,8 @@ import { useMediaQuery } from '@vueuse/core';
 const { currentNode } = useGlobalStore();
 const isCompactTable = useMediaQuery('(max-width: 1024px)');
 const processStore = ProcessStore();
+processStore.restoreSearchState();
+onActivated(() => processStore.restoreSearchState());
 const permissionDirective = resolveDirective('permission');
 
 const statusOptions = computed(() => [

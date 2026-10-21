@@ -20,57 +20,55 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onActivated, onDeactivated, onMounted, onUnmounted, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
+import { panelCacheKey, readPanelCache, writePanelCache } from '@/utils/panel-cache';
+
 defineOptions({ name: 'TableSetting' });
-
-const refreshRateUnit = ref<number>(0);
+const refreshRateUnit = ref(0);
 const emit = defineEmits(['search']);
-const props = defineProps({
-    title: String,
-    rate: Number,
-});
-
-let timer: NodeJS.Timer | null = null;
-
-const changeRefresh = (command: number) => {
-    refreshRateUnit.value = command || 0;
-    if (refreshRateUnit.value !== 0) {
-        if (timer) {
-            clearInterval(Number(timer));
-            timer = null;
-        }
-        timer = setInterval(() => {
-            emit('search');
-        }, 1000 * refreshRateUnit.value);
-    } else {
-        if (timer) {
-            clearInterval(Number(timer));
-            timer = null;
-        }
-    }
-    localStorage.setItem(props.title, refreshRateUnit.value + '');
+const props = defineProps({ title: String, rate: Number });
+const route = useRoute();
+// Capture the owning page; useRoute continues to change while a page is deactivated.
+const pagePath = route.path;
+const cacheKey = () => panelCacheKey(`refresh:${pagePath}:${props.title || ''}`);
+let timer: ReturnType<typeof setInterval> | undefined;
+let active = false;
+const stopTimer = () => {
+    clearInterval(timer);
+    timer = undefined;
 };
-
-onUnmounted(() => {
-    clearInterval(Number(timer));
-    timer = null;
-    if (props.title) {
-        localStorage.setItem(props.title, refreshRateUnit.value + '');
+const startTimer = () => {
+    stopTimer();
+    if (active && refreshRateUnit.value > 0) {
+        timer = setInterval(() => emit('search'), 1000 * refreshRateUnit.value);
     }
+};
+const restore = () => {
+    const rate = readPanelCache<number>('refresh', cacheKey());
+    refreshRateUnit.value = Number.isFinite(rate) && rate >= 0 ? rate : props.rate || 0;
+    startTimer();
+};
+const changeRefresh = (rate: number) => {
+    refreshRateUnit.value = rate;
+    writePanelCache('refresh', cacheKey(), rate);
+    startTimer();
+};
+const activate = () => {
+    if (active) return;
+    active = true;
+    restore();
+};
+watch(cacheKey, () => {
+    if (active) restore();
 });
-
-onMounted(() => {
-    if (props.title && localStorage.getItem(props.title) != null) {
-        let rate = Number(localStorage.getItem(props.title));
-        refreshRateUnit.value = rate ? Number(rate) : 0;
-        changeRefresh(refreshRateUnit.value);
-        return;
-    }
-    if (props.rate) {
-        refreshRateUnit.value = props.rate;
-        changeRefresh(refreshRateUnit.value);
-    }
+onMounted(activate);
+onActivated(activate);
+onDeactivated(() => {
+    active = false;
+    stopTimer();
 });
+onUnmounted(stopTimer);
 </script>
 
 <style lang="scss" scoped>

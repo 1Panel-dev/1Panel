@@ -54,6 +54,7 @@
 </template>
 
 <script setup lang="ts">
+import { prunePanelCache } from '@/utils/panel-cache';
 import { onMounted, computed, ref, watch, onBeforeUnmount } from 'vue';
 import { Sidebar, Footer, AppMain, MobileHeader, Tabs } from './components';
 import TerminalHost from '@/components/terminal/host.vue';
@@ -106,6 +107,7 @@ const loadingText = computed(() =>
 );
 
 let timer: NodeJS.Timer | null = null;
+let cacheCleanupTimer: ReturnType<typeof setInterval> | undefined;
 
 const classObj = computed(() => {
     return {
@@ -186,10 +188,12 @@ const loadStatus = async () => {
     }
 };
 onBeforeUnmount(() => {
+    clearInterval(cacheCleanupTimer);
     clearInterval(Number(timer));
     timer = null;
 });
 onMounted(() => {
+    cacheCleanupTimer = setInterval(() => prunePanelCache(), 300000);
     if (openMenuTabs.value && !tabsStore.activeTabPath) {
         handleMenuClick('/');
     }

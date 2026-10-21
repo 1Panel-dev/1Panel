@@ -132,6 +132,7 @@
 </template>
 
 <script setup lang="ts">
+import { readCachedPageSize } from '@/utils/panel-cache';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';
 import { File } from '@/api/interface/file';
@@ -226,7 +227,7 @@ const addFile = () => {
 const paginationConfig = reactive({
     cacheSizeKey: 'file-convert-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('file-convert-log-page-size')) || 20,
+    pageSize: readCachedPageSize('file-convert-log-page-size') || 20,
     total: 0,
 });
 

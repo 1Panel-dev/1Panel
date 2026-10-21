@@ -101,7 +101,8 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { panelCacheKey, writePanelCache, readCachedPageSize } from '@/utils/panel-cache';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, onUnmounted, reactive, ref, watch } from 'vue';
 import { Log } from '@/api/interface/log';
 import { getSystemLogStatus, listRunningServices, readSystemLogs } from '@/api/modules/log';
@@ -114,7 +115,7 @@ const logs = ref<Log.SystemLogItem[]>([]);
 const loading = ref(false);
 const watching = ref(false);
 const keyword = ref('');
-useSearchReset({ keyword }, { onRevisit: () => scheduleFilterSearch() });
+useSearchState('log/host-system/index', { keyword }, { onRevisit: () => scheduleFilterSearch() });
 const priority = ref('');
 const service = ref('');
 const services = ref<string[]>([]);
@@ -194,7 +195,7 @@ const loadPreviousPage = () => {
 };
 
 const changePageSize = () => {
-    localStorage.setItem(paginationConfig.cacheSizeKey, String(paginationConfig.pageSize));
+    writePanelCache('pagination', panelCacheKey(`size:${paginationConfig.cacheSizeKey}`), paginationConfig.pageSize);
     resetAndLoadLogs();
 };
 
@@ -263,7 +264,7 @@ const priorityType = (value: string) => {
 };
 
 onMounted(async () => {
-    const cachedPageSize = Number(localStorage.getItem(paginationConfig.cacheSizeKey));
+    const cachedPageSize = readCachedPageSize(paginationConfig.cacheSizeKey);
     if (pageSizes.includes(cachedPageSize)) {
         paginationConfig.pageSize = cachedPageSize;
     }

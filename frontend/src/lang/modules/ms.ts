@@ -3170,6 +3170,20 @@ const message = {
         remote: 'SSH jauh',
     },
     setting: {
+        panelCache: {
+            title: 'Tetapan cache',
+            tabs: 'Cache tab',
+            pagination: 'Cache halaman',
+            refresh: 'Cache sela penyegaran',
+            search: 'Cache input carian',
+            duration: 'Tempoh cache',
+            '24h': '24 jam',
+            week: 'Satu minggu',
+            month: 'Satu bulan',
+            forever: 'Kekal',
+            helper: 'Tempoh sah dikira dari perubahan keadaan terakhir. Selepas tamat tempoh, nilai lalai dipulihkan.',
+        },
+
         panel: 'Panel',
         user: 'Pengguna panel',
         userChange: 'Tukar pengguna panel',

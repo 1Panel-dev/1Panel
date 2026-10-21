@@ -139,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';
 import { dateFormat } from '@/utils/date';
@@ -154,13 +154,16 @@ const loading = ref();
 const data = ref();
 const confirmDialogRef = ref();
 const paginationConfig = reactive({
-    cacheSizeKey: 'operation-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('operation-log-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
 const searchName = ref<string>('');
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'log/operation/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 const searchGroup = ref<string>('');
 const searchStatus = ref<string>('');
 const searchNode = ref<string>('');

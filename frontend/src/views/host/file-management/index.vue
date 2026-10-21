@@ -739,7 +739,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
 import {
     addFavorite,
@@ -980,13 +980,17 @@ const getCurrentPath = () => pathRefs.value[editableTabsKey.value];
 const { searchableStatus, searchablePath, setSearchableInputRef, searchableInputBlur } = useMultipleSearchable(paths);
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'file-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('file-page-size')) || 100,
+    pageSize: 100,
     total: 0,
 });
-useSearchReset(
-    { search: toRef(req, 'search'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'host/file-management/index',
+    {
+        search: toRef(req, 'search'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search() },
 );
 

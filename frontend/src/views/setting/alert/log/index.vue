@@ -82,6 +82,8 @@
 </template>
 
 <script lang="ts" setup>
+import { toRef } from 'vue';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, reactive, ref } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { MsgSuccess } from '@/utils/message';
@@ -131,11 +133,18 @@ const resourceTypes = [
     'sshIpLogin',
 ];
 const paginationConfig = reactive({
-    cacheSizeKey: 'alert-log-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('alert-log-page-size')) || 20,
+    pageSize: 20,
     total: 0,
 });
+useSearchState(
+    'setting/alert/log/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 const req = reactive({
     page: 1,
     pageSize: 10,

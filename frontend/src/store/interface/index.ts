@@ -1,5 +1,6 @@
 import { RouteRecordRaw } from 'vue-router';
 import { DeviceType } from '@/enums/app';
+import type { PanelCacheSettings } from '@/utils/panel-cache';
 export interface ThemeConfigProp {
     panelName: string;
     primary: string;
@@ -34,6 +35,8 @@ export interface GlobalState {
     isFullScreen: boolean;
     openMenuTabs: boolean;
     menuAccordion: boolean;
+    panelCache: PanelCacheSettings;
+    cacheUserID: string;
     watermark: Watermark | null;
     watermarkShow: boolean;
     isLoading: boolean;

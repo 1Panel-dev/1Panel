@@ -70,7 +70,7 @@
 </template>
 
 <script lang="ts" setup>
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { App } from '@/api/interface/app';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import {
@@ -99,9 +99,8 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isProductPro, isOffline, isMobile, isEnterprise, isMaster, isXpackOrEE, isAdmin } = useGlobalStore();
 
 const paginationConfig = reactive({
-    cacheSizeKey: 'app-page-size',
     currentPage: 1,
-    pageSize: Number(localStorage.getItem('app-page-size')) || 60,
+    pageSize: 60,
     total: 0,
 });
 
@@ -113,8 +112,13 @@ const req = reactive({
     resource: 'all',
     showCurrentArch: false,
 });
-useSearchReset(
-    { search: toRef(req, 'name'), page: toRef(paginationConfig, 'currentPage') },
+useSearchState(
+    'app-store/apps/index',
+    {
+        search: toRef(req, 'name'),
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
     { onRevisit: () => search(req) },
 );
 
@@ -141,7 +145,6 @@ const search = async (req: App.AppReq) => {
     loading.value = true;
     req.pageSize = paginationConfig.pageSize;
     req.page = paginationConfig.currentPage;
-    localStorage.setItem('app-page-size', req.pageSize + '');
 
     const customReq = {
         page: req.page,

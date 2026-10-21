@@ -69,7 +69,7 @@
 </template>
 
 <script setup lang="ts">
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
@@ -111,7 +111,11 @@ const paginationConfig = reactive({
     pageSize: 10,
     total: 0,
 });
-useSearchReset({ search: searchName, page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'ai/agents/model/index',
+    { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
+    { onRevisit: () => search() },
+);
 
 const search = async () => {
     const req: AI.AgentAccountSearch = {
