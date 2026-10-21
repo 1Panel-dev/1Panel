@@ -66,7 +66,7 @@ var catalog = map[string]Meta{
 			{APIType: "openai-responses", BaseURL: "https://api.deepseek.com"},
 			anthropicAPIConfig("https://api.deepseek.com/anthropic", AuthModeXAPIKey),
 		},
-		Models: []Model{{ID: "deepseek-v4-flash", Name: "deepseek-v4-flash"}, {ID: "deepseek-v4-pro", Name: "deepseek-v4-pro"}},
+		Models: []Model{{ID: "deepseek-flash", Name: "deepseek-flash"}, {ID: "deepseek-v4-pro", Name: "deepseek-v4-pro"}},
 	},
 	"bailian-coding-plan": {
 		Key: "bailian-coding-plan", DisplayNameKey: "AIProviderBailianCodingPlan", Sort: 30, DefaultAPIType: "openai-completions", EnvKey: "QWEN_API_KEY",
