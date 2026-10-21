@@ -9,7 +9,8 @@ type AgentCreateReq struct {
 	WebUIPort         int      `json:"webUIPort" validate:"required,min=1,max=65535"`
 	BridgePort        int      `json:"bridgePort"`
 	AllowedOrigins    []string `json:"allowedOrigins"`
-	AgentType         string   `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent"`
+	AgentType         string   `json:"agentType" validate:"required,oneof=openclaw copaw hermes-agent deepseek-harness octop"`
+	AccessHost        string   `json:"accessHost"`
 	Model             string   `json:"model"`
 	AccountID         uint     `json:"accountId"`
 	Token             string   `json:"token"`
@@ -110,6 +111,7 @@ type AgentBatchOperateResult struct {
 }
 
 type AgentItem struct {
+	AccessHost           string    `json:"accessHost"`
 	ID                   uint      `json:"id"`
 	Name                 string    `json:"name"`
 	Remark               string    `json:"remark"`

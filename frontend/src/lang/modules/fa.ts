@@ -769,6 +769,14 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                'نشانی IPv4 یا نام میزبان مورد استفاده در مرورگر را بدون پروتکل، درگاه یا مسیر وارد کنید. HTTPS از گواهی محلی برنامه استفاده می‌کند.',
+            deepSeekAuthHelper:
+                'نام کاربری: حروف لاتین، اعداد، نقطه، زیرخط یا خط تیره. گذرواژه: حداقل ۱۲ نویسه، بدون فاصله در ابتدا و انتها یا شکست خط.',
+            octopAuthHelper:
+                'گذرواژه: حداقل ۸ نویسه شامل حروف و اعداد؛ از گذرواژه‌های رایج پرهیز کنید. اگر رد شد، راهنمای تنظیمات را در گزارش‌های برنامه ببینید.',
+            initialCredentials: 'اطلاعات ورود اولیه؛ اگر در برنامه تغییر کرده، از گذرواژه فعلی استفاده کنید.',
+            nativeAgentAccessUnavailable: 'نصب موجود نشانی یا درگاه HTTPS سازگار ندارد. تنظیمات برنامه را بررسی کنید.',
             agent: 'عامل',
             account: 'حساب مدل',
             batchOperation: 'عملیات دسته‌ای',
@@ -3802,6 +3810,7 @@ const message = {
         link: 'لینک',
         showCurrentArch: 'معماری',
         syncLocalApp: 'همگام‌سازی برنامه محلی',
+        localAppSyncToNodes: 'همگام‌سازی گره‌های فرزند هنگام همگام‌سازی برنامه‌های محلی',
         memoryRequiredHelper: 'نیاز حافظه برنامه فعلی {0}',
         gpuConfig: 'فعال‌سازی پشتیبانی GPU',
         gpuConfigHelper:
@@ -4358,7 +4367,8 @@ const message = {
         domainHelper: 'هر خط یک نام دامنه، پشتیبانی از * و آدرس IP',
         pushDir: 'ارسال گواهی به دایرکتوری محلی',
         dir: 'دایرکتوری',
-        pushDirHelper: 'فایل گواهی "fullchain.pem" و فایل کلید "privkey.pem" در این دایرکتوری تولید می‌شوند.',
+        pushDirHelper:
+            'چند دایرکتوری انتخاب کنید یا در هر خط یک دایرکتوری وارد کنید. فایل‌های "fullchain.pem" و "privkey.pem" در هر دایرکتوری ایجاد می‌شوند.',
         organizationDetail: 'جزئیات سازمان',
         fromWebsite: 'از وب‌سایت',
         dnsMauanlHelper:

@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "同じ名前の未失効 API キーが既に存在しま�
 ErrAPIKeyNotFound: "API キーが存在しないか、現在のユーザーに属していません"
 ErrAPIKeyAppBindingDisabled: "この API キーでは APP の QR コード連携が許可されていません"
 ErrAPIKeyTerminalUpgradeRequired: "API キーによるターミナル認証への対応を確認できません。ノードの接続を確認し、Agent を更新して再試行してください。"
+LocalAppSyncDispatch: "ローカルアプリ同期要求の送信"
+LocalAppSyncDispatchNode: "{{.node}} にローカルアプリ同期要求を送信（ノードタスク: {{.taskID}}）"
+ErrLocalAppSyncDisabled: "ノード間のローカルアプリ同期は無効です"

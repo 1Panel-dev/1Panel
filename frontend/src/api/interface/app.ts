@@ -1,6 +1,9 @@
 import { ReqPage, CommonModel } from '.';
 
 export namespace App {
+    export interface LocalAppSyncConfig {
+        enabled: boolean;
+    }
     export interface App extends CommonModel {
         name: string;
         icon?: string;

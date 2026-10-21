@@ -127,11 +127,21 @@
                     <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
                 </el-form-item>
                 <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="ssl.pushDir">
-                    <el-input v-model.trim="ssl.dir">
-                        <template #prepend>
-                            <el-button icon="Folder" @click="fileRef.acceptParams({ path: ssl.dir, dir: true })" />
-                        </template>
-                    </el-input>
+                    <el-button
+                        icon="Folder"
+                        class="mb-2"
+                        @click="
+                            fileRef.acceptParams({
+                                path: ssl.dir.split('\n')[0],
+                                dir: true,
+                                multiple: true,
+                                selectedPaths: ssl.dir.split('\n').filter(Boolean),
+                            })
+                        "
+                    >
+                        {{ $t('ssl.dir') }}
+                    </el-button>
+                    <el-input v-model.trim="ssl.dir" type="textarea" :rows="3" />
                     <span class="input-help">
                         {{ $t('ssl.pushDirHelper') }}
                     </span>
@@ -347,8 +357,8 @@ const acceptParams = (op: string, websiteSSL?: Website.SSLDTO) => {
     open.value = true;
 };
 
-const getPath = (dir: string) => {
-    ssl.value.dir = dir;
+const getPath = (dirs: string[]) => {
+    ssl.value.dir = dirs.join('\n');
 };
 
 const getAcmeAccounts = async () => {

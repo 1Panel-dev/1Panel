@@ -44,7 +44,7 @@
                             {{ ssl.acmeAccount.email }}
                         </el-descriptions-item>
                         <el-descriptions-item :label="$t('ssl.pushDir')" v-if="ssl.pushDir">
-                            {{ ssl.dir }}
+                            <div v-for="dir in ssl.dir.split('\n')" :key="dir">{{ dir }}</div>
                         </el-descriptions-item>
                     </el-descriptions>
                 </div>

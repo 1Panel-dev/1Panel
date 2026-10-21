@@ -73,7 +73,15 @@
 import { useSearchReset } from '@/composables/useSearchReset';
 import { App } from '@/api/interface/app';
 import { toRef, onMounted, reactive, ref } from 'vue';
-import { searchApp, syncApp, syncCutomAppStore, syncLocalApp, getCurrentNodeCustomAppConfig } from '@/api/modules/app';
+import {
+    searchApp,
+    syncApp,
+    syncCutomAppStore,
+    syncLocalApp,
+    getCurrentNodeCustomAppConfig,
+    getLocalAppSyncConfig,
+    dispatchLocalAppSync,
+} from '@/api/modules/app';
 import Install from '../detail/install/index.vue';
 import router from '@/routers';
 import { MsgSuccess } from '@/utils/message';
@@ -88,7 +96,7 @@ import AppCard from '@/views/app-store/apps/app/index.vue';
 import MainDiv from '@/components/main-div/index.vue';
 import { jumpToInstall } from '@/utils/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isProductPro, isOffline, isMobile, isEnterprise } = useGlobalStore();
+const { isProductPro, isOffline, isMobile, isEnterprise, isMaster, isXpackOrEE, isAdmin } = useGlobalStore();
 
 const paginationConfig = reactive({
     cacheSizeKey: 'app-page-size',
@@ -201,21 +209,27 @@ const sync = async () => {
     }
 };
 
-const syncLocal = () => {
+const syncLocal = async () => {
     const taskID = newUUID();
     const syncReq = {
         taskID: taskID,
     };
     syncing.value = true;
-    syncLocalApp(syncReq)
-        .then(() => {
+    try {
+        const dispatch =
+            isMaster.value && isXpackOrEE.value && isAdmin.value && (await getLocalAppSyncConfig()).data.enabled;
+        if (dispatch) {
+            await dispatchLocalAppSync(syncReq);
+            taskLogRef.value.openWithTaskID(taskID, true, 'local');
+        } else {
+            await syncLocalApp(syncReq);
             openTaskLog(taskID);
-            canUpdate.value = false;
-            search(req);
-        })
-        .finally(() => {
-            syncing.value = false;
-        });
+        }
+        canUpdate.value = false;
+        search(req);
+    } finally {
+        syncing.value = false;
+    }
 };
 
 const changeTag = (key: string) => {

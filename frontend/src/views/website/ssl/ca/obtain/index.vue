@@ -41,14 +41,21 @@
                         <el-checkbox v-model="obtain.pushDir" :label="$t('ssl.pushDir')" />
                     </el-form-item>
                     <el-form-item :label="$t('ssl.dir')" prop="dir" v-if="obtain.pushDir">
-                        <el-input v-model.trim="obtain.dir">
-                            <template #prepend>
-                                <el-button
-                                    icon="Folder"
-                                    @click="fileRef.acceptParams({ path: obtain.dir, dir: true })"
-                                />
-                            </template>
-                        </el-input>
+                        <el-button
+                            icon="Folder"
+                            class="mb-2"
+                            @click="
+                                fileRef.acceptParams({
+                                    path: obtain.dir.split('\n')[0],
+                                    dir: true,
+                                    multiple: true,
+                                    selectedPaths: obtain.dir.split('\n').filter(Boolean),
+                                })
+                            "
+                        >
+                            {{ $t('ssl.dir') }}
+                        </el-button>
+                        <el-input v-model.trim="obtain.dir" type="textarea" :rows="3" />
                         <span class="input-help">
                             {{ $t('ssl.pushDirHelper') }}
                         </span>
@@ -157,8 +164,8 @@ const resetForm = () => {
     obtain.value = initData();
 };
 
-const getPath = (dir: string) => {
-    obtain.value.dir = dir;
+const getPath = (dirs: string[]) => {
+    obtain.value.dir = dirs.join('\n');
 };
 
 const submit = async (formEl: FormInstance | undefined) => {

@@ -142,6 +142,9 @@ const (
 
 func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	agentType := req.AgentType
+	if err := validateNativeAgentCreate(req); err != nil {
+		return nil, err
+	}
 	if err := checkPortExist(req.WebUIPort); err != nil {
 		return nil, err
 	}
@@ -237,6 +240,8 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		}
 	} else if agentType == constant.AppCopaw {
 		dashboardAuth = normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword)
+	} else if agentType == constant.AppDeepSeekHarness || agentType == constant.AppOctop {
+		dashboardAuth = agentDashboardAuth{Username: req.DashboardUsername, Password: req.DashboardPassword}
 	}
 
 	params := map[string]interface{}{
@@ -245,6 +250,12 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		constant.HostIP:      "",
 	}
 	setAgentWebUIParams(params, agentType, detail.Version, req.WebUIPort)
+	if agentType == constant.AppDeepSeekHarness {
+		params["HTTPS_ACCESS_HOST"] = req.AccessHost
+	}
+	if agentType == constant.AppOctop {
+		params["OCTOP_LOG_LEVEL"] = "info"
+	}
 	if agentType == constant.AppOpenclaw {
 		if allowedOrigin := firstAllowedOrigin(allowedOrigins); allowedOrigin != "" {
 			params["ALLOWED_ORIGIN"] = allowedOrigin
@@ -738,7 +749,7 @@ func requiresAgentAccount(agentType string) bool {
 }
 
 func setAgentWebUIParams(params map[string]interface{}, agentType, appVersion string, webUIPort int) {
-	if agentType == constant.AppOpenclaw && isOpenclawHTTPSWindowVersion(appVersion) {
+	if agentType == constant.AppDeepSeekHarness || agentType == constant.AppOpenclaw && isOpenclawHTTPSWindowVersion(appVersion) {
 		params["PANEL_APP_PORT_HTTPS"] = webUIPort
 		return
 	}

@@ -740,6 +740,13 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                '填寫瀏覽器實際存取的 IPv4 位址或主機名稱，不含協定、連接埠或路徑。HTTPS 使用應用程式的本機憑證。',
+            deepSeekAuthHelper: '使用者名稱僅支援字母、數字、點、底線及連字號；密碼至少 12 位，不含前後空格或換行。',
+            octopAuthHelper:
+                '密碼至少 8 位且包含字母及數字，避免常見弱密碼。若初始化拒絕該密碼，請查看應用程式日誌中的設定說明。',
+            initialCredentials: '初始登入資訊；若已在應用程式內修改，以目前密碼為準。',
+            nativeAgentAccessUnavailable: '現有安裝缺少相容的 HTTPS 存取位址或連接埠，請檢查應用程式設定。',
             agent: 'Agent',
             account: '模型帳號',
             batchOperation: '批次操作',
@@ -3582,6 +3589,7 @@ const message = {
         link: '連結',
         showCurrentArch: '目前伺服器架構應用',
         syncLocalApp: '同步本機應用',
+        localAppSyncToNodes: '同步本機應用時聯動子節點',
         memoryRequiredHelper: '目前應用記憶體需求 {0}',
         gpuConfig: '開啟 GPU 支援',
         gpuConfigHelper: '請確保機器有 NVIDIA GPU 並且安裝 NVIDIA 驅動 和 NVIDIA docker Container Toolkit',
@@ -4101,7 +4109,7 @@ const message = {
         domainHelper: '一行一個網域名稱,支援*和IP位址',
         pushDir: '推送憑證到本機目錄',
         dir: '目錄',
-        pushDirHelper: '會在此目錄下產生兩個檔案，憑證檔案：fullchain.pem 金鑰檔案：privkey.pem',
+        pushDirHelper: '支援選擇多個目錄，也可每行填寫一個目錄。每個目錄下都會產生 fullchain.pem 和 privkey.pem。',
         organizationDetail: '機構詳情',
         fromWebsite: '從網站取得',
         dnsMauanlHelper: '手動解析模式需要在建立完之後點選申請按鈕取得 DNS 解析值',

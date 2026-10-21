@@ -782,6 +782,15 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                'Masukkan alamat IPv4 atau nama hos yang digunakan dalam pelayar, tanpa protokol, port atau laluan. HTTPS menggunakan sijil setempat aplikasi.',
+            deepSeekAuthHelper:
+                'Nama pengguna: huruf, nombor, titik, garis bawah atau sempang. Kata laluan: sekurang-kurangnya 12 aksara, tanpa ruang di awal/akhir atau baris baharu.',
+            octopAuthHelper:
+                'Kata laluan: sekurang-kurangnya 8 aksara dengan huruf dan nombor; elakkan kata laluan lazim. Jika ditolak, semak arahan persediaan dalam log aplikasi.',
+            initialCredentials: 'Maklumat log masuk awal; gunakan kata laluan semasa jika telah diubah dalam aplikasi.',
+            nativeAgentAccessUnavailable:
+                'Pemasangan sedia ada tiada alamat atau port HTTPS yang serasi. Semak tetapan aplikasi.',
             agent: 'Agen',
             account: 'Akaun model',
             batchOperation: 'Operasi pukal',
@@ -3898,6 +3907,7 @@ const message = {
         link: 'Pautan',
         showCurrentArch: 'Aplikasi seni bina pelayan semasa',
         syncLocalApp: 'Segerakkan Aplikasi Tempatan',
+        localAppSyncToNodes: 'Sertakan nod anak semasa menyegerakkan aplikasi tempatan',
         memoryRequiredHelper: 'Aplikasi semasa memerlukan {0} memori',
         gpuConfig: 'Aktifkan Sokongan GPU',
         gpuConfigHelper:
@@ -4463,7 +4473,8 @@ const message = {
         domainHelper: 'Satu nama domain setiap baris, menyokong * dan alamat IP',
         pushDir: 'Tolakkan sijil ke direktori tempatan',
         dir: 'Direktori',
-        pushDirHelper: 'Fail sijil "fullchain.pem" dan fail kunci "privkey.pem" akan dihasilkan dalam direktori ini.',
+        pushDirHelper:
+            'Pilih beberapa direktori atau masukkan satu direktori pada setiap baris. Fail "fullchain.pem" dan "privkey.pem" akan dihasilkan dalam setiap direktori.',
         organizationDetail: 'Butiran organisasi',
         fromWebsite: 'Daripada laman web',
         dnsMauanlHelper:

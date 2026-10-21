@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "Неотозванный ключ API с таким име
 ErrAPIKeyNotFound: "Ключ API не существует или не принадлежит текущему пользователю"
 ErrAPIKeyAppBindingDisabled: "Для этого ключа API привязка приложения через QR-код запрещена"
 ErrAPIKeyTerminalUpgradeRequired: "Не удалось проверить поддержку авторизации терминала по ключу API. Проверьте подключение узла, обновите его Agent и повторите попытку."
+LocalAppSyncDispatch: "Отправка запросов синхронизации локальных приложений"
+LocalAppSyncDispatchNode: "Отправка запроса синхронизации узлу {{.node}} (задача узла: {{.taskID}})"
+ErrLocalAppSyncDisabled: "Синхронизация локальных приложений между узлами отключена"

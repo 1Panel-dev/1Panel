@@ -10,6 +10,8 @@ const (
 	AppOpenclaw          = "openclaw"
 	AppCopaw             = "copaw"
 	AppHermesAgent       = "hermes-agent"
+	AppDeepSeekHarness   = "deepseek-harness"
+	AppOctop             = "octop"
 	AppMysql             = "mysql"
 	AppMariaDB           = "mariadb"
 	AppPostgresql        = "postgresql"

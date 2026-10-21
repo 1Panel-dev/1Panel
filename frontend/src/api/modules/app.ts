@@ -144,3 +144,15 @@ export function getAppIconUrl(appKey: string, node?: string): string {
 export const installAppToNodes = (param: App.InstallAppToNodes) => {
     return http.post(`/core/xpack/sync/app/install`, param);
 };
+
+export const getLocalAppSyncConfig = () => {
+    return http.get<App.LocalAppSyncConfig>('/core/xpack/settings/app/local-sync');
+};
+
+export const updateLocalAppSyncConfig = (config: App.LocalAppSyncConfig) => {
+    return http.post('/core/xpack/settings/app/local-sync', config);
+};
+
+export const dispatchLocalAppSync = (req: App.AppStoreSync) => {
+    return http.post('/core/xpack/settings/app/local-sync/dispatch', req);
+};

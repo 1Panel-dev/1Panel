@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "یک کلید API لغونشده با این نام از �
 ErrAPIKeyNotFound: "کلید API وجود ندارد یا متعلق به کاربر فعلی نیست"
 ErrAPIKeyAppBindingDisabled: "اتصال برنامه با کد QR برای این کلید API مجاز نیست"
 ErrAPIKeyTerminalUpgradeRequired: "امکان بررسی پشتیبانی از مجوزدهی ترمینال با کلید API وجود ندارد. اتصال گره را بررسی و Agent آن را ارتقا دهید، سپس دوباره تلاش کنید."
+LocalAppSyncDispatch: "ارسال درخواست همگام‌سازی برنامه‌های محلی"
+LocalAppSyncDispatchNode: "ارسال درخواست همگام‌سازی به {{.node}} (وظیفه گره: {{.taskID}})"
+ErrLocalAppSyncDisabled: "همگام‌سازی برنامه‌های محلی بین گره‌ها غیرفعال است"

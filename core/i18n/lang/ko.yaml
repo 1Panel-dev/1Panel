@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "같은 이름의 폐기되지 않은 API Key가 이미 있
 ErrAPIKeyNotFound: "API Key가 없거나 현재 사용자 소유가 아닙니다"
 ErrAPIKeyAppBindingDisabled: "이 API Key는 APP QR 코드 연결을 허용하지 않습니다"
 ErrAPIKeyTerminalUpgradeRequired: "API Key 터미널 인증 지원 여부를 확인할 수 없습니다. 노드 연결을 확인하고 Agent를 업그레이드한 후 다시 시도하세요."
+LocalAppSyncDispatch: "로컬 앱 동기화 요청 전송"
+LocalAppSyncDispatchNode: "{{.node}}에 로컬 앱 동기화 요청 전송 (노드 작업: {{.taskID}})"
+ErrLocalAppSyncDisabled: "노드 간 로컬 앱 동기화가 비활성화되어 있습니다"
