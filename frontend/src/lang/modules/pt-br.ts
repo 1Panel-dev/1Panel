@@ -492,6 +492,7 @@ const message = {
         recommend: 'Recomendado',
         dir: 'Diretório',
         alias: 'Apelido',
+        quickDirDelete: 'Confirmar a exclusão de ({0})?',
         quickDir: 'Acesso rápido',
         minQuickJump: 'Adicione pelo menos uma entrada de acesso rápido',
         maxQuickJump: 'Você pode adicionar até quatro entradas de acesso rápido',

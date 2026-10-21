@@ -8,7 +8,7 @@ export const loadOsInfo = () => {
 export const loadQuickOption = () => {
     return http.get<Array<Dashboard.QuickJump>>(`/dashboard/quick/option`);
 };
-export const changeQuick = (quicks: Array<Dashboard.QuickJump>) => {
+export const changeQuick = (quicks: Array<Pick<Dashboard.QuickJump, 'id' | 'isShow'>>) => {
     return http.post(`/dashboard/quick/change`, { quicks: quicks });
 };
 export const loadAppLauncher = () => {
@@ -48,3 +48,11 @@ export const loadTopMem = () => {
 export const systemRestart = (operation: string) => {
     return http.post(`/dashboard/system/restart/${operation}`);
 };
+
+export const loadQuickDirectories = () => http.get<Dashboard.QuickDirectory[]>('/dashboard/quick/directory');
+export const createQuickDirectory = (data: Omit<Dashboard.QuickDirectory, 'id'>) =>
+    http.post<Dashboard.QuickDirectory>('/dashboard/quick/directory', data);
+export const updateQuickDirectory = (data: Dashboard.QuickDirectory) =>
+    http.post<Dashboard.QuickDirectory>('/dashboard/quick/directory/update', data);
+export const deleteQuickDirectory = (id: number, legacy = false) =>
+    http.post('/dashboard/quick/directory/del', { id, legacy });

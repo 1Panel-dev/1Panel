@@ -196,7 +196,7 @@ const favorites = ref<File.Favorite[]>([]);
 const { searchableStatus, searchablePath, searchableInputRef, searchableInputBlur } = useSearchableForSelect(paths);
 const oldUrl = ref<string>('');
 
-const em = defineEmits(['choose']);
+const em = defineEmits(['choose', 'close']);
 
 const form = reactive({
     path: '/',
@@ -245,6 +245,7 @@ const handleClose = () => {
     open.value = false;
     selectRow.value = { path: '', name: '' };
     selectRows.value = [];
+    em('close');
 };
 
 const openPage = () => {

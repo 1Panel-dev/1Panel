@@ -492,6 +492,7 @@ const message = {
         recommend: 'おすすめ',
         dir: 'ディレクトリ',
         alias: 'エイリアス',
+        quickDirDelete: '（{0}）を削除しますか？',
         quickDir: 'クイックアクセス',
         minQuickJump: 'クイックアクセス項目を1つ以上追加してください',
         maxQuickJump: '最大4件のクイックアクセス項目を追加できます',
