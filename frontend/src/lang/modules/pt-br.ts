@@ -775,6 +775,15 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                'Informe o IPv4 ou nome do host usado no navegador, sem protocolo, porta ou caminho. O HTTPS usa o certificado local do aplicativo.',
+            deepSeekAuthHelper:
+                'Usuário: letras, números, ponto, sublinhado ou hífen. Senha: no mínimo 12 caracteres, sem espaços nas extremidades ou quebras de linha.',
+            octopAuthHelper:
+                'Senha: no mínimo 8 caracteres com letras e números; evite senhas comuns. Se rejeitada na inicialização, consulte as instruções nos logs do aplicativo.',
+            initialCredentials: 'Credenciais iniciais; se alteradas no aplicativo, use a senha atual.',
+            nativeAgentAccessUnavailable:
+                'A instalação existente não tem endereço ou porta HTTPS compatível. Verifique as configurações do aplicativo.',
             agent: 'Agente',
             account: 'Conta de modelo',
             batchOperation: 'Operação em lote',
@@ -3767,6 +3776,7 @@ const message = {
         link: 'Link',
         showCurrentArch: 'Aplicações da arquitetura atual do servidor',
         syncLocalApp: 'Sincronizar Aplicativo Local',
+        localAppSyncToNodes: 'Incluir nós filhos ao sincronizar apps locais',
         memoryRequiredHelper: 'O aplicativo atual requer {0} de memória',
         gpuConfig: 'Ativar Suporte a GPU',
         gpuConfigHelper:

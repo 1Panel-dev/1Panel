@@ -773,6 +773,15 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                'ブラウザーで使用する IPv4 アドレスまたはホスト名を、スキーム・ポート・パスなしで入力してください。HTTPS はアプリのローカル証明書を使用します。',
+            deepSeekAuthHelper:
+                'ユーザー名には英数字、ドット、アンダースコア、ハイフンを使用できます。パスワードは12文字以上で、前後の空白や改行を含めないでください。',
+            octopAuthHelper:
+                'パスワードは英字と数字を含む8文字以上とし、よく使われるパスワードを避けてください。初期化時に拒否された場合は、アプリのログで設定手順を確認してください。',
+            initialCredentials: '初期ログイン情報です。アプリ内で変更した場合は現在のパスワードを使用してください。',
+            nativeAgentAccessUnavailable:
+                '既存のインストールに対応する HTTPS アクセス先またはポートがありません。アプリの設定を確認してください。',
             agent: 'エージェント',
             account: 'モデルアカウント',
             batchOperation: '一括操作',
@@ -3679,6 +3688,7 @@ const message = {
         link: 'リンク',
         showCurrentArch: '現在のサーバーアーキテクチャのアプリケーション',
         syncLocalApp: 'ローカルアプリの同期',
+        localAppSyncToNodes: 'ローカルアプリ同期時に子ノードも同期',
         memoryRequiredHelper: '現在のアプリケーションは {0} メモリが必要です',
         gpuConfig: 'GPUサポートを有効化',
         gpuConfigHelper:

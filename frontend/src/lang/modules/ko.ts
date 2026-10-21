@@ -764,6 +764,15 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                '브라우저에서 사용하는 IPv4 주소 또는 호스트 이름을 입력하세요. 프로토콜, 포트, 경로는 제외하세요. HTTPS는 앱의 로컬 인증서를 사용합니다.',
+            deepSeekAuthHelper:
+                '사용자 이름은 영문, 숫자, 점, 밑줄, 하이픈만 지원합니다. 비밀번호는 12자 이상이며 앞뒤 공백이나 줄바꿈을 포함할 수 없습니다.',
+            octopAuthHelper:
+                '비밀번호는 문자와 숫자를 포함한 8자 이상이어야 하며 흔한 비밀번호는 피하세요. 초기화 시 거부되면 앱 로그의 설정 안내를 확인하세요.',
+            initialCredentials: '초기 로그인 정보입니다. 앱에서 변경했다면 현재 비밀번호를 사용하세요.',
+            nativeAgentAccessUnavailable:
+                '기존 설치에 호환되는 HTTPS 접속 주소 또는 포트가 없습니다. 앱 설정을 확인하세요.',
             agent: '에이전트',
             account: '모델 계정',
             batchOperation: '일괄 작업',
@@ -3614,6 +3623,7 @@ const message = {
         link: '링크',
         showCurrentArch: '현재 서버 아키텍처 애플리케이션',
         syncLocalApp: '로컬 애플리케이션 동기화',
+        localAppSyncToNodes: '로컬 앱 동기화 시 하위 노드도 동기화',
         memoryRequiredHelper: '현재 애플리케이션은 {0} 메모리가 필요합니다',
         gpuConfig: 'GPU 지원 활성화',
         gpuConfigHelper:

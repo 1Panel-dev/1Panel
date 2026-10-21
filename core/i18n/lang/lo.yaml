@@ -499,3 +499,6 @@ ErrAPIKeyNameExists: "ມີ API Key ທີ່ຍັງບໍ່ຖືກຖອ�
 ErrAPIKeyNotFound: "ບໍ່ພົບ API Key ຫຼືບໍ່ແມ່ນຂອງຜູ້ໃຊ້ປັດຈຸບັນ"
 ErrAPIKeyAppBindingDisabled: "API Key ນີ້ບໍ່ອະນຸຍາດໃຫ້ຜູກ APP ຜ່ານລະຫັດ QR"
 ErrAPIKeyTerminalUpgradeRequired: "ບໍ່ສາມາດຢືນຢັນການຮອງຮັບການອະນຸຍາດເທີມິນອນດ້ວຍ API Key. ກວດສອບການເຊື່ອມຕໍ່ໂນດ ແລະອັບເກຣດ Agent ກ່ອນລອງອີກ."
+LocalAppSyncDispatch: "ສົ່ງຄຳຂໍຊິງຄ໌ແອັບໃນເຄື່ອງ"
+LocalAppSyncDispatchNode: "ສົ່ງຄຳຂໍຊິງຄ໌ໄປຫາ {{.node}} (ວຽກຂອງໂນດ: {{.taskID}})"
+ErrLocalAppSyncDisabled: "ການຊິງຄ໌ແອັບລະຫວ່າງໂນດຍັງບໍ່ໄດ້ເປີດ"

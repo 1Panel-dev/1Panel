@@ -757,6 +757,13 @@ const message = {
     },
     aiTools: {
         agents: {
+            deepSeekAccessHostHelper:
+                '填写浏览器实际访问的 IPv4 地址或主机名，不含协议、端口或路径。HTTPS 使用应用的本地证书。',
+            deepSeekAuthHelper: '用户名仅支持字母、数字、点、下划线和连字符；密码至少 12 位，不含首尾空格或换行。',
+            octopAuthHelper:
+                '密码至少 8 位且包含字母和数字，避免常见弱密码。若初始化拒绝该密码，请查看应用日志中的设置说明。',
+            initialCredentials: '初始登录信息；若已在应用内修改，以当前密码为准。',
+            nativeAgentAccessUnavailable: '现有安装缺少兼容的 HTTPS 访问地址或端口，请检查应用设置。',
             agent: '智能体',
             account: '模型账号',
             batchOperation: '批量操作',
@@ -3493,6 +3500,7 @@ const message = {
         link: '链接',
         showCurrentArch: '本服务器架构应用',
         syncLocalApp: '同步本地应用',
+        localAppSyncToNodes: '同步本地应用时联动子节点',
         memoryRequiredHelper: '当前应用内存需求 {0}',
         gpuConfig: '开启 GPU 支持',
         gpuConfigHelper: '请确保机器有 NVIDIA GPU 并且安装 NVIDIA 驱动 和 NVIDIA docker Container Toolkit',
