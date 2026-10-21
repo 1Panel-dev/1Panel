@@ -4316,7 +4316,8 @@ const message = {
         domainHelper: 'Satu nama domain setiap baris, menyokong * dan alamat IP',
         pushDir: 'Tolakkan sijil ke direktori tempatan',
         dir: 'Direktori',
-        pushDirHelper: 'Fail sijil "fullchain.pem" dan fail kunci "privkey.pem" akan dihasilkan dalam direktori ini.',
+        pushDirHelper:
+            'Pilih beberapa direktori atau masukkan satu direktori pada setiap baris. Fail "fullchain.pem" dan "privkey.pem" akan dihasilkan dalam setiap direktori.',
         organizationDetail: 'Butiran organisasi',
         fromWebsite: 'Daripada laman web',
         dnsMauanlHelper:

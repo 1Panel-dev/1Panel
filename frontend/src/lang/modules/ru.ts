@@ -4303,7 +4303,8 @@ const message = {
         domainHelper: 'Одно доменное имя в строке, поддерживает * и IP-адрес',
         pushDir: 'Отправить сертификат в локальную директорию',
         dir: 'Директория',
-        pushDirHelper: 'В этой директории будут созданы файл сертификата "fullchain.pem" и файл ключа "privkey.pem".',
+        pushDirHelper:
+            'Выберите несколько директорий или укажите по одной директории в строке. В каждой директории будут созданы файлы "fullchain.pem" и "privkey.pem".',
         organizationDetail: 'Детали организации',
         fromWebsite: 'С веб-сайта',
         dnsMauanlHelper:

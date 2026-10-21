@@ -209,11 +209,17 @@ func (w WebsiteSSLService) Create(create request.WebsiteSSLCreate) (request.Webs
 		websiteSSL.Shell = create.Shell
 	}
 	if create.PushDir {
-		fileOP := files.NewFileOp()
-		if !fileOP.Stat(create.Dir) {
+		dirs := certificateDirectories(create.Dir)
+		if len(dirs) == 0 {
 			return res, buserr.New("ErrLinkPathNotFound")
 		}
-		websiteSSL.Dir = create.Dir
+		for _, dir := range dirs {
+			info, err := os.Stat(dir)
+			if err != nil || !info.IsDir() {
+				return res, buserr.New("ErrLinkPathNotFound")
+			}
+		}
+		websiteSSL.Dir = strings.Join(dirs, "\n")
 	}
 	setSSLPushConfig(&websiteSSL, create.PushNode, create.Nodes)
 
@@ -573,7 +579,9 @@ func (w WebsiteSSLService) obtainSSL(id uint, autoRenew bool) error {
 		if websiteSSL.ExecShell {
 			workDir := global.Dir.DataDir
 			if websiteSSL.PushDir {
-				workDir = websiteSSL.Dir
+				if dirs := certificateDirectories(websiteSSL.Dir); len(dirs) > 0 {
+					workDir = dirs[0]
+				}
 			}
 			printSSLLog(logger, "ExecShellStart", nil)
 			if err = runShellScriptFile(workDir, websiteSSL.Shell, logger); err != nil {
@@ -793,11 +801,16 @@ func (w WebsiteSSLService) Update(update request.WebsiteSSLUpdate) error {
 	}
 
 	if update.PushDir {
-		fileOP := files.NewFileOp()
-		if !fileOP.Stat(update.Dir) {
-			_ = fileOP.CreateDir(update.Dir, constant.DirPerm)
+		dirs := certificateDirectories(update.Dir)
+		if len(dirs) == 0 {
+			return buserr.New("ErrLinkPathNotFound")
 		}
-		updateParams["dir"] = update.Dir
+		for _, dir := range dirs {
+			if err := os.MkdirAll(dir, constant.DirPerm); err != nil {
+				return err
+			}
+		}
+		updateParams["dir"] = strings.Join(dirs, "\n")
 	}
 	var domains []string
 	if update.OtherDomains != "" {

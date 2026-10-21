@@ -1529,26 +1529,41 @@ func checkWebsitePort(defaultHTTPsPort, port int, websiteType string) error {
 	return nil
 }
 
+// certificateDirectories accepts both legacy single paths and newline-separated paths.
+func certificateDirectories(value string) []string {
+	var dirs []string
+	seen := make(map[string]bool)
+	for _, dir := range strings.Split(value, "\n") {
+		dir = strings.TrimSpace(dir)
+		if dir == "" {
+			continue
+		}
+		dir = filepath.Clean(dir)
+		if !seen[dir] {
+			seen[dir] = true
+			dirs = append(dirs, dir)
+		}
+	}
+	return dirs
+}
+
 func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
-	if websiteSSL.PushDir {
-		fileOp := files.NewFileOp()
-		var (
-			pushErr error
-			MsgMap  = map[string]interface{}{"path": websiteSSL.Dir, "status": i18n.GetMsgByKey("Success")}
-		)
-		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "privkey.pem"), websiteSSL.PrivateKey, constant.FilePerm); pushErr != nil {
-			MsgMap["status"] = i18n.GetMsgByKey("Failed")
-			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
-			logger.Println("Push dir failed:" + pushErr.Error())
+	if !websiteSSL.PushDir {
+		return
+	}
+	fileOp := files.NewFileOp()
+	for _, dir := range certificateDirectories(websiteSSL.Dir) {
+		status := i18n.GetMsgByKey("Success")
+		for _, file := range []struct{ name, content string }{
+			{"privkey.pem", websiteSSL.PrivateKey},
+			{"fullchain.pem", websiteSSL.Pem},
+		} {
+			if err := fileOp.SaveFile(path.Join(dir, file.name), file.content, constant.FilePerm); err != nil {
+				status = i18n.GetMsgByKey("Failed")
+				logger.Printf("Push dir %s failed: %s", dir, err)
+			}
 		}
-		if pushErr = fileOp.SaveFile(path.Join(websiteSSL.Dir, "fullchain.pem"), websiteSSL.Pem, constant.FilePerm); pushErr != nil {
-			MsgMap["status"] = i18n.GetMsgByKey("Failed")
-			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
-			logger.Println("Push dir failed:" + pushErr.Error())
-		}
-		if pushErr == nil {
-			logger.Println(i18n.GetMsgWithMap("PushDirLog", MsgMap))
-		}
+		logger.Println(i18n.GetMsgWithMap("PushDirLog", map[string]interface{}{"path": dir, "status": status}))
 	}
 }
 

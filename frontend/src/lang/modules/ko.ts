@@ -4160,7 +4160,8 @@ const message = {
         domainHelper: '줄당 하나의 도메인 이름, * 및 IP 주소 지원',
         pushDir: '로컬 디렉토리로 인증서 푸시',
         dir: '디렉토리',
-        pushDirHelper: '인증서 파일 "fullchain.pem" 및 키 파일 "privkey.pem"이 이 디렉토리에 생성됩니다.',
+        pushDirHelper:
+            '여러 디렉터리를 선택하거나 한 줄에 하나씩 입력하세요. 각 디렉터리에 "fullchain.pem"과 "privkey.pem" 파일이 생성됩니다.',
         organizationDetail: '조직 세부 정보',
         fromWebsite: '웹사이트에서 가져오기',
         dnsMauanlHelper: '수동 해석 모드에서는 생성 후 신청 버튼을 클릭하여 DNS 해석 값을 얻어야 합니다.',

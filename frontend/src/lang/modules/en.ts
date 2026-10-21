@@ -4253,7 +4253,7 @@ const message = {
         pushDir: 'Push the certificate to the local directory',
         dir: 'Directory',
         pushDirHelper:
-            'Certificate file "fullchain.pem" and key file "privkey.pem" will be generated in this directory.',
+            'Select multiple directories or enter one directory per line. Each directory will receive "fullchain.pem" and "privkey.pem".',
         organizationDetail: 'Organization details',
         fromWebsite: 'From website',
         dnsMauanlHelper:
