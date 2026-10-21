@@ -50,20 +50,12 @@
                                 <el-col :span="6" v-for="item in baseInfo.quickJump" :key="item.name">
                                     <span>{{ $t(item.title, 2) }}</span>
                                     <div class="count">
-                                        <el-tooltip
-                                            v-if="item.alias || item.detail.length > 20"
-                                            :content="item.detail"
-                                            placement="bottom"
-                                        >
-                                            <el-button
-                                                link
-                                                :disabled="!checkPermission('File')"
-                                                type="primary"
-                                                @click="quickJump(item)"
-                                            >
-                                                {{ item.alias || item.detail.substring(0, 18) + '...' }}
-                                            </el-button>
-                                        </el-tooltip>
+                                        <QuickDirectories
+                                            v-if="item.name === 'File'"
+                                            :count="item.detail"
+                                            :disabled="!checkPermission('File')"
+                                            @change="updateQuickDirectoryCount"
+                                        />
                                         <el-button
                                             link
                                             :disabled="!checkPermission(item.name)"
@@ -450,6 +442,7 @@ import SystemStatus from '@/views/home/status/index.vue';
 import AppLauncher from '@/views/home/app/index.vue';
 import VCharts from '@/components/v-charts/index.vue';
 import QuickJump from '@/views/home/quick/index.vue';
+import QuickDirectories from '@/views/home/quick/directories.vue';
 import CardWithHeader from '@/components/card-with-header/index.vue';
 import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 import i18n from '@/lang';
@@ -470,7 +463,7 @@ import {
     updateMemo,
     updateSetting,
 } from '@/api/modules/setting';
-import { routerToFileWithPath, routerToNameWithQuery, routerToPath } from '@/utils/router';
+import { routerToNameWithQuery, routerToPath } from '@/utils/router';
 import { getWelcomePage } from '@/api/modules/auth';
 import {
     clearDashboardCache,
@@ -823,10 +816,12 @@ const onLoadBaseInfo = async (isInit: boolean, range: string) => {
     }
 };
 
+const updateQuickDirectoryCount = (count: number) => {
+    const item = baseInfo.value.quickJump.find((item) => item.name === 'File');
+    if (item) item.detail = String(count);
+};
+
 const quickJump = (item: any) => {
-    if (item.name === 'File') {
-        return routerToFileWithPath(item.detail);
-    }
     return routerToPath(item.router);
 };
 

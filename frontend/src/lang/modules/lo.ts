@@ -487,6 +487,7 @@ const message = {
         recommend: 'ແນະນຳ',
         dir: 'ໄດເຣັກທໍຣີ',
         alias: 'ຊື່ຫຼິ້ນ',
+        quickDirDelete: 'ຢືນຢັນການລຶບ ({0}) ຫຼືບໍ່?',
         quickDir: 'ເຂົ້າເຖິງດ່ວນ',
         minQuickJump: 'ເພີ່ມການເຂົ້າເຖິງດ່ວນຢ່າງໜ້ອຍໜຶ່ງລາຍການ',
         maxQuickJump: 'ທ່ານສາມາດເພີ່ມການເຂົ້າເຖິງດ່ວນໄດ້ສູງສຸດສີ່ລາຍການ',
@@ -4141,7 +4142,8 @@ const message = {
         domainHelper: 'ໜຶ່ງໂດເມນຕໍ່ແຖວ, ຮອງຮັບ * ແລະ ທີ່ຢູ່ IP',
         pushDir: 'ສົ່ງໃບຢັ້ງຢືນໄປຍັງໂຟນເດີໃນເຄື່ອງ',
         dir: 'ໂຟນເດີ',
-        pushDirHelper: 'ໄຟລ໌ "fullchain.pem" ແລະ "privkey.pem" ຈະຖືກສ້າງໃນໂຟນເດີນີ້.',
+        pushDirHelper:
+            'ເລືອກຫຼາຍໂຟນເດີ ຫຼື ປ້ອນໜຶ່ງໂຟນເດີຕໍ່ແຖວ. ໄຟລ໌ "fullchain.pem" ແລະ "privkey.pem" ຈະຖືກສ້າງໃນແຕ່ລະໂຟນເດີ.',
         organizationDetail: 'ລາຍລະອຽດອົງກອນ',
         fromWebsite: 'ຈາກເວັບໄຊ',
         dnsMauanlHelper: 'ໃນໂໝດຈັດການ DNS ດ້ວຍຕົນເອງ, ທ່ານຕ້ອງຄລິກປຸ່ມ "ຂໍໃບຢັ້ງຢືນ" ຫຼັງຈາກສ້າງເພື່ອຮັບຄ່າ DNS',

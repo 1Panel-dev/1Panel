@@ -43,6 +43,10 @@ type IDashboardService interface {
 
 	LoadQuickOptions() []dto.QuickJump
 	ChangeQuick(req dto.ChangeQuicks) error
+	ListQuickDirectories() ([]model.QuickDirectory, error)
+	CreateQuickDirectory(req dto.QuickDirectoryCreate) (*model.QuickDirectory, error)
+	UpdateQuickDirectory(req dto.QuickDirectoryUpdate) (*model.QuickDirectory, error)
+	DeleteQuickDirectory(req dto.QuickDirectoryDelete) error
 
 	LoadAppLauncher(ctx *gin.Context) ([]dto.AppLauncher, error)
 	ChangeShow(req dto.SettingUpdate) error
@@ -397,16 +401,15 @@ func (u *DashboardService) LoadQuickOptions() []dto.QuickJump {
 }
 func (u *DashboardService) ChangeQuick(req dto.ChangeQuicks) error {
 	showCount := 0
-	var quicks []model.QuickJump
+	quicks := make([]model.QuickJump, 0, len(req.Quicks))
 	for _, item := range req.Quicks {
-		var quick model.QuickJump
 		if item.IsShow {
 			showCount++
 		}
-		if err := copier.Copy(&quick, &item); err != nil {
-			return err
-		}
-		quicks = append(quicks, quick)
+		quicks = append(quicks, model.QuickJump{
+			BaseModel: model.BaseModel{ID: item.ID},
+			IsShow:    item.IsShow,
+		})
 	}
 	if showCount == 0 {
 		return buserr.New("ErrMinQuickJump")
@@ -706,6 +709,13 @@ func loadQuickJump(base *dto.DashboardBase) {
 	quicks := launcherRepo.ListQuickJump(false)
 	for i := 0; i < len(quicks); i++ {
 		switch quicks[i].Name {
+		case "File":
+			count, err := launcherRepo.CountQuickDirectories()
+			if err != nil {
+				global.LOG.Errorf("load quick directory count: %v", err)
+			}
+			quicks[i].Detail = fmt.Sprintf("%d", count)
+			quicks[i].Alias = ""
 		case "Agent":
 			quicks[i].Detail = fmt.Sprintf("%d", base.AgentNumber)
 		case "Website":

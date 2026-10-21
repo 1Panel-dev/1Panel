@@ -212,10 +212,17 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 			websiteSSL.Shell = req.Shell
 		}
 		if req.PushDir {
-			if !files.NewFileOp().Stat(req.Dir) {
+			dirs := certificateDirectories(req.Dir)
+			if len(dirs) == 0 {
 				return nil, buserr.New("ErrLinkPathNotFound")
 			}
-			websiteSSL.Dir = req.Dir
+			for _, dir := range dirs {
+				info, err := os.Stat(dir)
+				if err != nil || !info.IsDir() {
+					return nil, buserr.New("ErrLinkPathNotFound")
+				}
+			}
+			websiteSSL.Dir = strings.Join(dirs, "\n")
 		}
 		if req.Domains != "" {
 			domainArray := strings.Split(req.Domains, "\n")
@@ -348,7 +355,9 @@ func (w WebsiteCAService) ObtainSSL(req request.WebsiteCAObtain) (*model.Website
 	if websiteSSL.ExecShell {
 		workDir := global.Dir.DataDir
 		if websiteSSL.PushDir {
-			workDir = websiteSSL.Dir
+			if dirs := certificateDirectories(websiteSSL.Dir); len(dirs) > 0 {
+				workDir = dirs[0]
+			}
 		}
 		logger.Println(i18n.GetMsgByKey("ExecShellStart"))
 		if err = runShellScriptFile(workDir, websiteSSL.Shell, logger); err != nil {

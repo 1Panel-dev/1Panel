@@ -3,6 +3,7 @@ package repo
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"gorm.io/gorm"
 )
 
 type LauncherRepo struct{}
@@ -17,6 +18,11 @@ type ILauncherRepo interface {
 	GetQuickJump(opts ...DBOption) (model.QuickJump, error)
 	ListQuickJump(withAll bool) []model.QuickJump
 	UpdateQuicks(quicks []model.QuickJump) error
+	ListQuickDirectories() ([]model.QuickDirectory, error)
+	CountQuickDirectories() (int64, error)
+	CreateQuickDirectory(item *model.QuickDirectory) error
+	UpdateQuickDirectory(item *model.QuickDirectory) error
+	DeleteQuickDirectory(id uint, legacy bool) error
 }
 
 func NewILauncherRepo() ILauncherRepo {
@@ -95,13 +101,73 @@ func (u *LauncherRepo) UpdateQuicks(quicks []model.QuickJump) error {
 	for _, item := range quicks {
 		if err := tx.Model(&model.QuickJump{}).Where("id = ?", item.ID).Updates(map[string]interface{}{
 			"is_show": item.IsShow,
-			"detail":  item.Detail,
-			"alias":   item.Alias,
 		}).Error; err != nil {
 			tx.Rollback()
 			return err
 		}
 	}
-	tx.Commit()
+	return tx.Commit().Error
+}
+
+// Legacy entries remain in the overview configuration until explicitly deleted.
+func legacyQuickDirectories(db *gorm.DB) *gorm.DB {
+	return db.Model(&model.QuickJump{}).Where("name = ? AND is_show = ? AND detail <> ?", "File", true, "")
+}
+
+func (u *LauncherRepo) ListQuickDirectories() ([]model.QuickDirectory, error) {
+	items := make([]model.QuickDirectory, 0)
+	if err := global.DB.Order("id ASC").Find(&items).Error; err != nil {
+		return nil, err
+	}
+	var quicks []model.QuickJump
+	if err := legacyQuickDirectories(global.DB).Order("id ASC").Find(&quicks).Error; err != nil {
+		return nil, err
+	}
+	for _, quick := range quicks {
+		items = append(items, model.QuickDirectory{BaseModel: quick.BaseModel, Path: quick.Detail, Alias: quick.Alias, Legacy: true})
+	}
+	return items, nil
+}
+func (u *LauncherRepo) CountQuickDirectories() (int64, error) {
+	var count, legacyCount int64
+	if err := global.DB.Model(&model.QuickDirectory{}).Count(&count).Error; err != nil {
+		return 0, err
+	}
+	if err := legacyQuickDirectories(global.DB).Count(&legacyCount).Error; err != nil {
+		return 0, err
+	}
+	return count + legacyCount, nil
+}
+func (u *LauncherRepo) CreateQuickDirectory(item *model.QuickDirectory) error {
+	return global.DB.Create(item).Error
+}
+func (u *LauncherRepo) UpdateQuickDirectory(item *model.QuickDirectory) error {
+	var result *gorm.DB
+	if item.Legacy {
+		result = legacyQuickDirectories(global.DB).Where("id = ?", item.ID).Updates(map[string]interface{}{"detail": item.Path, "alias": item.Alias})
+	} else {
+		result = global.DB.Model(&model.QuickDirectory{}).Where("id = ?", item.ID).Updates(map[string]interface{}{"path": item.Path, "alias": item.Alias})
+	}
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+func (u *LauncherRepo) DeleteQuickDirectory(id uint, legacy bool) error {
+	var result *gorm.DB
+	if legacy {
+		result = legacyQuickDirectories(global.DB).Where("id = ?", id).Updates(map[string]interface{}{"detail": nil, "alias": nil})
+	} else {
+		result = global.DB.Delete(&model.QuickDirectory{}, id)
+	}
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
 	return nil
 }

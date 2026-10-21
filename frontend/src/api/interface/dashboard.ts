@@ -8,6 +8,12 @@ export namespace Dashboard {
 
         diskSize: number;
     }
+    export interface QuickDirectory {
+        id: number;
+        legacy?: boolean;
+        path: string;
+        alias: string;
+    }
     export interface QuickJump {
         id: number;
         name: string;

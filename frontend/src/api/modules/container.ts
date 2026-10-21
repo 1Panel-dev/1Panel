@@ -1,4 +1,5 @@
 import http from '@/api';
+import type { AxiosRequestConfig } from 'axios';
 import { ResPage, SearchWithPage } from '../interface';
 import { Container } from '../interface/container';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -23,10 +24,11 @@ export const loadContainerUsers = (name: string) => {
 export const listContainerFiles = (params: Container.ContainerFileReq) => {
     return http.post<Array<Container.ContainerFileInfo>>(`/containers/files/search`, params, TimeoutEnum.T_40S);
 };
-export const uploadContainerFile = (params: FormData) => {
+export const uploadContainerFile = (params: FormData, config?: AxiosRequestConfig & { skipErrorMessage?: boolean }) => {
     return http.upload(`/containers/files/upload`, params, {
-        headers: { 'Content-Type': 'multipart/form-data' },
         timeout: TimeoutEnum.T_5M,
+        ...config,
+        headers: { 'Content-Type': 'multipart/form-data', ...config?.headers },
     });
 };
 export const getContainerFileContent = (params: Container.ContainerFileReq) => {

@@ -493,6 +493,7 @@ const message = {
     home: {
         recommend: 'Recomendado',
         dir: 'Directorio',
+        quickDirDelete: '¿Confirmar la eliminación de ({0})?',
         quickDir: 'Acceso rápido',
         minQuickJump: 'Agrega al menos una entrada de acceso rápido',
         maxQuickJump: 'Puedes agregar hasta cuatro entradas de acceso rápido',
@@ -4311,7 +4312,8 @@ const message = {
         domainHelper: 'Un dominio por línea, admite * y dirección IP',
         pushDir: 'Guardar certificado en el directorio local',
         dir: 'Directorio',
-        pushDirHelper: 'Se generarán los archivos "fullchain.pem" y "privkey.pem" en este directorio.',
+        pushDirHelper:
+            'Seleccione varios directorios o introduzca un directorio por línea. En cada directorio se generarán los archivos "fullchain.pem" y "privkey.pem".',
         organizationDetail: 'Detalles de la organización',
         fromWebsite: 'Desde el sitio web',
         dnsMauanlHelper: 'En modo manual, haz clic en solicitar tras la creación para obtener el valor DNS',

@@ -495,6 +495,7 @@ const message = {
         recommend: 'Önerilen',
         dir: 'Dizin',
         alias: 'Takma Ad',
+        quickDirDelete: '({0}) silinsin mi?',
         quickDir: 'Hızlı Erişim',
         minQuickJump: 'En az bir hızlı erişim girdisi ekleyin',
         maxQuickJump: 'En fazla dört hızlı erişim girdisi ekleyebilirsiniz',
@@ -4331,7 +4332,7 @@ const message = {
         pushDir: 'Sertifikayı yerel dizine aktar',
         dir: 'Dizin',
         pushDirHelper:
-            'Sertifika dosyası "fullchain.pem" ve anahtar dosyası "privkey.pem" bu dizinde oluşturulacaktır.',
+            'Birden fazla dizin seçin veya her satıra bir dizin girin. Her dizinde "fullchain.pem" ve "privkey.pem" dosyaları oluşturulacaktır.',
         organizationDetail: 'Organizasyon detayları',
         fromWebsite: 'Web sitesinden',
         dnsMauanlHelper:

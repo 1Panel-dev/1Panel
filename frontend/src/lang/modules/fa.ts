@@ -489,6 +489,7 @@ const message = {
         recommend: 'پیشنهادی',
         dir: 'دایرکتوری',
         alias: 'نام مستعار',
+        quickDirDelete: 'حذف ({0}) را تأیید می‌کنید؟',
         quickDir: 'دسترسی سریع',
         minQuickJump: 'حداقل یک ورودی دسترسی سریع اضافه کنید',
         maxQuickJump: 'می‌توانید حداکثر چهار ورودی دسترسی سریع اضافه کنید',
@@ -4223,7 +4224,8 @@ const message = {
         domainHelper: 'هر خط یک نام دامنه، پشتیبانی از * و آدرس IP',
         pushDir: 'ارسال گواهی به دایرکتوری محلی',
         dir: 'دایرکتوری',
-        pushDirHelper: 'فایل گواهی "fullchain.pem" و فایل کلید "privkey.pem" در این دایرکتوری تولید می‌شوند.',
+        pushDirHelper:
+            'چند دایرکتوری انتخاب کنید یا در هر خط یک دایرکتوری وارد کنید. فایل‌های "fullchain.pem" و "privkey.pem" در هر دایرکتوری ایجاد می‌شوند.',
         organizationDetail: 'جزئیات سازمان',
         fromWebsite: 'از وب‌سایت',
         dnsMauanlHelper:

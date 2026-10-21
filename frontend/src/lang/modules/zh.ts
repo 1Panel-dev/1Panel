@@ -473,6 +473,7 @@ const message = {
         recommend: '推荐',
         dir: '目录',
         alias: '别名',
+        quickDirDelete: '确定删除（{0}）',
         quickDir: '快捷目录',
         minQuickJump: '请至少设置一个快速跳转入口！',
         maxQuickJump: '最多可设置四个快速跳转入口！',
@@ -4023,7 +4024,8 @@ const message = {
         domainHelper: '一行一个域名,支持*和IP地址',
         pushDir: '推送证书到本地目录',
         dir: '目录',
-        pushDirHelper: '会在此目录下生成两个文件，证书文件：fullchain.pem 密钥文件：privkey.pem',
+        pushDirHelper:
+            '支持选择多个目录，也可每行填写一个目录。每个目录下都会生成证书文件 fullchain.pem 和密钥文件 privkey.pem',
         organizationDetail: '机构详情',
         fromWebsite: '从网站中获取',
         dnsMauanlHelper: '手动解析模式需要在创建完之后点击申请按钮获取 DNS 解析值',

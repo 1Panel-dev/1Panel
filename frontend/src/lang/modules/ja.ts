@@ -492,6 +492,7 @@ const message = {
         recommend: 'おすすめ',
         dir: 'ディレクトリ',
         alias: 'エイリアス',
+        quickDirDelete: '（{0}）を削除しますか？',
         quickDir: 'クイックアクセス',
         minQuickJump: 'クイックアクセス項目を1つ以上追加してください',
         maxQuickJump: '最大4件のクイックアクセス項目を追加できます',
@@ -4247,7 +4248,8 @@ const message = {
         domainHelper: '1行ごとに1つのドメイン名、 *およびIPアドレスをサポートします',
         pushDir: '証明書をローカルディレクトリにプッシュします',
         dir: 'ディレクトリ',
-        pushDirHelper: '証明書ファイル「FullChain.PEM」とキーファイル「Privkey.Pem」がこのディレクトリで生成されます。',
+        pushDirHelper:
+            '複数のディレクトリを選択するか、1行に1つずつディレクトリを入力してください。各ディレクトリに「fullchain.pem」と「privkey.pem」が生成されます。',
         organizationDetail: '組織の詳細',
         fromWebsite: 'ウェブサイトから',
         dnsMauanlHelper: '手動解像度モードでは、作成後に適用ボタンをクリックしてDNS解像度値を取得する必要があります',
