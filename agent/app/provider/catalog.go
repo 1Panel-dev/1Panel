@@ -82,7 +82,6 @@ var catalog = map[string]Meta{
 			{ID: "kimi-k2.5", Name: "Kimi K2.5"},
 			{ID: "qwen3.5-plus", Name: "Qwen3.5-Plus"},
 			{ID: "glm-5", Name: "GLM-5"},
-			{ID: "MiniMax-M2.5", Name: "MiniMax M2.5"},
 			{ID: "qwen3.6-plus", Name: "Qwen3.6-Plus"},
 			{ID: "qwen3.7-plus", Name: "Qwen3.7-Plus"},
 		},
@@ -114,7 +113,7 @@ var catalog = map[string]Meta{
 			{APIType: "openai-completions", BaseURL: "https://api.minimaxi.com/v1"},
 			{APIType: "minimax-images", BaseURL: "https://api.minimaxi.com"},
 		},
-		Models: []Model{{ID: "MiniMax-M3", Name: "MiniMax M3"}, {ID: "MiniMax-M2.7", Name: "MiniMax M2.7"}, {ID: "MiniMax-M2.7-highspeed", Name: "MiniMax M2.7 highspeed"}},
+		Models: []Model{{ID: "MiniMax-M3.1-Flash", Name: "MiniMax M3.1 Flash"}, {ID: "MiniMax-M3", Name: "MiniMax M3"}},
 	},
 	"xiaomi": {
 		Key: "xiaomi", DisplayName: "Xiaomi", Sort: 46, DefaultAPIType: "openai-completions", EnvKey: "XIAOMI_API_KEY",

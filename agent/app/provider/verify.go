@@ -118,10 +118,15 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 			headers["x-api-key"] = apiKey
 		}
 		headers["anthropic-version"] = "2023-06-01"
-		request.Body = mustJSON(map[string]interface{}{
+		body := map[string]interface{}{
 			"model": model, "max_tokens": defaultVerifyMaxTokens, "stream": false,
 			"messages": []map[string]interface{}{{"role": "user", "content": []map[string]string{{"type": "text", "text": "test"}}}},
-		})
+		}
+		if provider == "minimax" && model == "MiniMax-M3.1-Flash" {
+			body["thinking"] = map[string]string{"type": "adaptive"}
+			body["output_config"] = map[string]string{"effort": "max"}
+		}
+		request.Body = mustJSON(body)
 	case "openai-responses":
 		request.URL = baseURL + "/responses"
 		headers["Authorization"] = "Bearer " + apiKey
@@ -131,9 +136,13 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		if (provider != "ollama" && provider != "llmman") || strings.TrimSpace(apiKey) != "" {
 			headers["Authorization"] = "Bearer " + apiKey
 		}
-		request.Body = mustJSON(map[string]interface{}{
+		body := map[string]interface{}{
 			"model": model, "messages": []map[string]string{{"role": "user", "content": "test"}}, "max_tokens": defaultVerifyMaxTokens, "stream": false,
-		})
+		}
+		if provider == "minimax" && model == "MiniMax-M3.1-Flash" {
+			body["reasoning_effort"] = "max"
+		}
+		request.Body = mustJSON(body)
 	}
 	return request
 }
