@@ -180,6 +180,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
 import { computeSize } from '@/utils/size';
 import { debounce } from '@/utils/misc';
+const props = defineProps<{ currentNode?: string }>();
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
@@ -343,7 +344,7 @@ const getFileSize = async (path: string) => {
     };
     updateByPath(path, { btnLoading: true });
     try {
-        const res = await getFileContent(params);
+        const res = await getFileContent(params, props.currentNode);
         updateByPath(path, { dirSize: res.data.size });
     } finally {
         updateByPath(path, { btnLoading: false });
@@ -356,7 +357,7 @@ const getDirSize = async (path: string) => {
     };
     updateByPath(path, { btnLoading: true });
     try {
-        const res = await computeDirSize(req);
+        const res = await computeDirSize(req, props.currentNode);
         updateByPath(path, { dirSize: res.data.size });
     } finally {
         updateByPath(path, { btnLoading: false });
@@ -386,7 +387,7 @@ const getPaths = (reqPath: string) => {
 const search = async (req: File.ReqFile) => {
     req.dir = form.dir;
     loading.value = true;
-    await getFilesList(req)
+    await getFilesList(req, props.currentNode)
         .then((res) => {
             if (!res.data.path) {
                 req.path = oldUrl.value;
@@ -473,7 +474,7 @@ const createFolder = async (row: any) => {
     let addItem = {};
     Object.assign(addItem, addForm);
     loading.value = true;
-    createFile(addItem as File.FileCreate)
+    createFile(addItem as File.FileCreate, props.currentNode)
         .then(() => {
             row.isCreate = false;
             disBtn.value = false;
@@ -497,7 +498,7 @@ const removeSelected = (index: number) => {
 
 const loadFavorites = async () => {
     try {
-        const res = await searchFavorite({ page: 1, pageSize: 100 });
+        const res = await searchFavorite({ page: 1, pageSize: 100 }, props.currentNode);
         favorites.value = res.data.items || [];
     } catch {}
 };

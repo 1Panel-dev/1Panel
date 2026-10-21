@@ -1,4 +1,5 @@
 import { resolve } from 'path';
+import { benchmarkReportPlugin } from './build/benchmark-report';
 import { wrapperEnv } from './src/utils/get-env';
 import viteCompression from 'vite-plugin-compression';
 import eslintPlugin from 'vite-plugin-eslint2';
@@ -99,6 +100,7 @@ export default defineConfig(async ({ mode }: ConfigEnv): Promise<UserConfig> => 
             },
         },
         plugins: [
+            benchmarkReportPlugin(__dirname),
             patchCodeFilterOverflow(),
             vue(),
             eslintPlugin({
