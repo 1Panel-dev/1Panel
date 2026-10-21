@@ -773,3 +773,7 @@ VMSnapshotRecoverTask: "가상 머신 [{{ .vm }}] 스냅샷 [{{ .snapshot }}] �
 VMSnapshotRecoverStep: "가상 머신 스냅샷 [{{ .snapshot }}] 복구"
 VMSnapshotDeleteTask: "가상 머신 [{{ .vm }}] 스냅샷 [{{ .snapshot }}] 삭제"
 VMSnapshotDeleteStep: "가상 머신 스냅샷 [{{ .snapshot }}] 삭제"
+
+ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
+
+ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."

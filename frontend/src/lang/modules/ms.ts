@@ -4443,6 +4443,7 @@ const message = {
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm: 'Sijil berikut akan dipadamkan. Sijil ACME akan dibatalkan secara automatik. Teruskan?',
         deleteAndRevoke: 'Padam dan batalkan',
         create: 'Permintaan',

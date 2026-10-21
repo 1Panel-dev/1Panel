@@ -4376,6 +4376,7 @@ const message = {
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'The following certificates will be deleted. ACME certificates will be automatically revoked. Continue?',
         deleteAndRevoke: 'Delete and revoke',

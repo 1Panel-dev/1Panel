@@ -4080,6 +4080,7 @@ const message = {
         sslRejectHandshakeHelper: '開啟之後可以避免憑證洩露，設置預設網站會讓此設置失效',
     },
     ssl: {
+        caUploadHelp: '上傳下載的自簽根憑證 ZIP 檔案，包含 ca.crt 和 ca.key，最大 10 MB。',
         deleteConfirm: '將對以下憑證進行 刪除 操作，ACME 類型憑證會被自動撤銷，是否繼續？',
         deleteAndRevoke: '刪除並撤銷',
         create: '申請憑證',

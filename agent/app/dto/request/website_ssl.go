@@ -182,3 +182,12 @@ type WebsiteSSLFileUpload struct {
 	PushNode    bool   `json:"pushNode"`
 	Nodes       string `json:"nodes"`
 }
+
+type WebsiteCAImport struct {
+	Name            string `json:"name" validate:"required,max=128"`
+	Type            string `json:"type" validate:"required,oneof=paste local"`
+	Certificate     string `json:"certificate" validate:"required_if=Type paste"`
+	PrivateKey      string `json:"privateKey" validate:"required_if=Type paste"`
+	CertificatePath string `json:"certificatePath" validate:"required_if=Type local"`
+	PrivateKeyPath  string `json:"privateKeyPath" validate:"required_if=Type local"`
+}
