@@ -313,9 +313,10 @@ const initWebSocket = async (endpoint_: string, args: string = '') => {
     const protocol = href.split('//')[0] === 'http:' ? 'ws' : 'wss';
     const host = href.split('//')[1].split('/')[0];
     const endpoint = endpoint_.replace(/^\/+/, '');
-    let node = args.indexOf('id=') !== -1 ? 'local' : currentNode.value;
+    const params = new URLSearchParams(args);
+    const node = params.has('id') ? 'local' : currentNode.value;
     let conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}&operateNode=${node}`;
-    if (args.indexOf('operateNode=') !== -1) {
+    if (params.has('operateNode')) {
         conn = `${protocol}://${host}/${endpoint}?cols=${term.value.cols}&rows=${term.value.rows}&${args}`;
     }
     if (sessionId.value) {
