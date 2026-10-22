@@ -1,6 +1,6 @@
 module github.com/1Panel-dev/1Panel/core
 
-go 1.26.6
+go 1.27.3
 
 require (
 	github.com/beevik/etree v1.7.0
