@@ -177,7 +177,8 @@
                         min-width="120"
                     >
                         <template #default="{ row }">
-                            <div v-if="row.hasLoad">
+                            <span v-if="row.state !== 'running'">—</span>
+                            <div v-else-if="row.hasLoad">
                                 <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
                                 <div class="float-left source-font">
                                     {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%
@@ -243,7 +244,7 @@
                                     </template>
                                 </el-popover>
                             </div>
-                            <div v-if="!row.hasLoad">
+                            <div v-else>
                                 <el-button link loading></el-button>
                             </div>
                         </template>
