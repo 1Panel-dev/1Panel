@@ -8,6 +8,7 @@ import (
 	"maps"
 	"math"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -891,16 +892,52 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 	}
 }
 
+func appDownloadURL(rawURL, version string) (string, error) {
+	parsedURL, err := url.Parse(rawURL)
+	if err != nil {
+		return "", err
+	}
+	query := parsedURL.Query()
+	query.Set("v", version)
+	parsedURL.RawQuery = query.Encode()
+	return parsedURL.String(), nil
+}
+
+func currentAppDownloadURL(rawURL string) (string, error) {
+	storeVersion, err := settingRepo.GetValueByKey("AppStoreLastModified")
+	if err != nil {
+		return "", err
+	}
+	return appDownloadURL(rawURL, storeVersion)
+}
+
 func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.AppInstall, logger *logrus.Logger) (err error) {
 	if app.IsLocalApp() || app.IsCustomApp() {
 		return nil
 	}
+	defer func() {
+		if err != nil && appInstall != nil {
+			appInstall.Status = constant.StatusDownloadErr
+			appInstall.Message = err.Error()
+		}
+	}()
 	appResourceDir := path.Join(global.Dir.AppResourceDir, app.Resource)
 	appDownloadDir := app.GetAppResourcePath()
 	appVersionDir := path.Join(appDownloadDir, appDetail.Version)
 	fileOp := files.NewFileOp()
+	storeVersion, err := settingRepo.GetValueByKey("AppStoreLastModified")
+	if err != nil {
+		return err
+	}
+	cacheVersionPath := path.Join(appVersionDir, ".1panel-appstore-version")
 	if !appDetail.Update && fileOp.Stat(appVersionDir) {
-		return
+		if cachedVersion, readErr := os.ReadFile(cacheVersionPath); readErr == nil && string(cachedVersion) == storeVersion {
+			return nil
+		}
+	}
+	downloadURL, err := appDownloadURL(appDetail.DownloadUrl, storeVersion)
+	if err != nil {
+		return err
 	}
 	if !fileOp.Stat(appDownloadDir) {
 		_ = fileOp.CreateDir(appDownloadDir, constant.DirPerm)
@@ -909,23 +946,14 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		_ = fileOp.CreateDir(appVersionDir, constant.DirPerm)
 	}
 	if logger == nil {
-		global.LOG.Infof("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
+		global.LOG.Infof("download app [%s] from %s", app.Name, downloadURL)
 	} else {
-		logger.Printf("download app [%s] from %s", app.Name, appDetail.DownloadUrl)
+		logger.Printf("download app [%s] from %s", app.Name, downloadURL)
 	}
 
 	filePath := path.Join(appVersionDir, app.Key+"-"+appDetail.Version+".tar.gz")
 
-	defer func() {
-		if err != nil {
-			if appInstall != nil {
-				appInstall.Status = constant.StatusDownloadErr
-				appInstall.Message = err.Error()
-			}
-		}
-	}()
-
-	if err = files.DownloadFileWithProxy(appDetail.DownloadUrl, filePath); err != nil {
+	if err = files.DownloadFileWithProxy(downloadURL, filePath); err != nil {
 		if logger == nil {
 			global.LOG.Errorf("download app [%s] error %v", app.Name, err)
 		} else {
@@ -942,6 +970,9 @@ func downloadApp(app model.App, appDetail model.AppDetail, appInstall *model.App
 		return
 	}
 	_ = fileOp.DeleteFile(filePath)
+	if err = os.WriteFile(cacheVersionPath, []byte(storeVersion), constant.FilePerm); err != nil {
+		return err
+	}
 	appDetail.Update = false
 	_ = appDetailRepo.Update(context.Background(), appDetail)
 	return

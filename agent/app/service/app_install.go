@@ -707,6 +707,12 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
 				filename := filepath.Base(detail.DownloadUrl)
 				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
+				if app.Resource == constant.AppResourceRemote {
+					dockerComposeUrl, err = currentAppDownloadURL(dockerComposeUrl)
+					if err != nil {
+						return versions, err
+					}
+				}
 				statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 				if statusCode == http.StatusNotFound {
 					return versions, buserr.New("ErrAppVersionUnavailable")

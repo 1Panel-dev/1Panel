@@ -258,26 +258,35 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 		fileOp := files.NewFileOp()
 
 		versionPath := filepath.Join(app.GetAppResourcePath(), detail.Version)
-		if !fileOp.Stat(versionPath) || detail.Update {
-			if err = downloadApp(app, detail, nil, nil); err != nil && !fileOp.Stat(versionPath) {
-				return appDetailDTO, err
-			}
+		if err = downloadApp(app, detail, nil, nil); err != nil && !fileOp.Stat(versionPath) {
+			return appDetailDTO, err
+		}
+		if err == nil && app.Resource == constant.AppResourceRemote {
+			detail.Update = false
+			appDetailDTO.Update = false
 		}
 		switch app.Type {
 		case constant.RuntimePHP:
-			paramsPath := filepath.Join(versionPath, "data.yml")
-			if !fileOp.Stat(paramsPath) {
-				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", paramsPath, nil)
-			}
-			param, err := fileOp.GetContent(paramsPath)
-			if err != nil {
-				return appDetailDTO, err
-			}
 			paramMap := make(map[string]interface{})
-			if err = yaml.Unmarshal(param, &paramMap); err != nil {
-				return appDetailDTO, err
+			if app.Resource == constant.AppResourceRemote {
+				if err = json.Unmarshal([]byte(detail.Params), &paramMap); err != nil {
+					return appDetailDTO, err
+				}
+				appDetailDTO.Params = paramMap
+			} else {
+				paramsPath := filepath.Join(versionPath, "data.yml")
+				if !fileOp.Stat(paramsPath) {
+					return appDetailDTO, buserr.WithDetail("ErrFileNotExist", paramsPath, nil)
+				}
+				param, err := fileOp.GetContent(paramsPath)
+				if err != nil {
+					return appDetailDTO, err
+				}
+				if err = yaml.Unmarshal(param, &paramMap); err != nil {
+					return appDetailDTO, err
+				}
+				appDetailDTO.Params = paramMap["additionalProperties"]
 			}
-			appDetailDTO.Params = paramMap["additionalProperties"]
 			composePath := filepath.Join(versionPath, "docker-compose.yml")
 			if !fileOp.Stat(composePath) {
 				return appDetailDTO, buserr.WithDetail("ErrFileNotExist", composePath, nil)
@@ -308,6 +317,12 @@ func (a AppService) GetAppDetail(appID uint, version, appType string) (response.
 	if appDetailDTO.DockerCompose == "" {
 		filename := filepath.Base(appDetailDTO.DownloadUrl)
 		dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(appDetailDTO.DownloadUrl, filename), "docker-compose.yml")
+		if app.Resource == constant.AppResourceRemote {
+			dockerComposeUrl, err = currentAppDownloadURL(dockerComposeUrl)
+			if err != nil {
+				return appDetailDTO, err
+			}
+		}
 		statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 		if statusCode == http.StatusNotFound {
 			return appDetailDTO, buserr.New("ErrAppVersionUnavailable")
@@ -434,6 +449,12 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	} else {
 		if appDetail.DockerCompose == "" {
 			dockerComposeUrl := fmt.Sprintf("%s/%s/1panel/%s/%s/docker-compose.yml", global.AppRepoURL(), global.CONF.Base.Mode, app.Key, appDetail.Version)
+			if app.Resource == constant.AppResourceRemote {
+				dockerComposeUrl, err = currentAppDownloadURL(dockerComposeUrl)
+				if err != nil {
+					return
+				}
+			}
 			var statusCode int
 			statusCode, composeRes, err = req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
 			if statusCode == http.StatusNotFound {

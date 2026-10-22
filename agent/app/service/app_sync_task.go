@@ -191,7 +191,11 @@ func (c *appSyncContext) processOneApp(item appWorkItem) appWorkResult {
 
 		if _, ok := InitTypes[app.Type]; ok {
 			dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-			_, composeRes, err := req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			dockerComposeUrl, err := appDownloadURL(dockerComposeUrl, strconv.Itoa(c.list.LastModified))
+			var composeRes []byte
+			if err == nil {
+				_, composeRes, err = req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
+			}
 			if err == nil {
 				detail.DockerCompose = string(composeRes)
 			} else {
