@@ -38,7 +38,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/sftp v1.13.11
-	github.com/qiniu/go-sdk/v7 v7.27.0
+	github.com/qiniu/go-sdk/v7 v7.29.0
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/shirou/gopsutil/v4 v4.26.9
 	github.com/sirupsen/logrus v1.10.2
@@ -66,6 +66,7 @@ require (
 
 require (
 	filippo.io/edwards25519 v1.2.0 // indirect
+	github.com/Azure/go-ansiterm v0.0.0-20250102033503-faa5f7b0171c // indirect
 	github.com/BurntSushi/toml v1.6.0 // indirect
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/alex-ant/gomath v0.0.0-20160516115720-89013a210a82 // indirect
@@ -216,7 +217,6 @@ require (
 	go.yaml.in/yaml/v4 v4.0.0-rc.4 // indirect
 	go4.org v0.0.0-20260112195520-a5071408f32f // indirect
 	golang.org/x/arch v0.26.0 // indirect
-	golang.org/x/image v0.45.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
 	google.golang.org/grpc v1.83.2 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
