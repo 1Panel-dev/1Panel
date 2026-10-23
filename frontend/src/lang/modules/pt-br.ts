@@ -4490,6 +4490,7 @@ const message = {
             'Ativar isso pode evitar vazamento de certificados, definir um site padrão invalidará esta configuração',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'Os certificados a seguir serão excluídos. Os certificados ACME serão revogados automaticamente. Continuar?',
         deleteAndRevoke: 'Excluir e revogar',

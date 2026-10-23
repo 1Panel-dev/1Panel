@@ -458,7 +458,10 @@ watch(
         ];
         if (!names.length) return;
         try {
-            const { data } = await containerListStats(node, { signal: controller.signal, skipErrorMessage: true });
+            const { data } = await containerListStats(node, undefined, {
+                signal: controller.signal,
+                skipErrorMessage: true,
+            });
             if (controller.signal.aborted) return;
             const statsByName = new Map((data || []).map((item) => [item.containerName, item]));
             resourceStats.value = Object.fromEntries(names.map((name) => [name, statsByName.get(name) || null]));

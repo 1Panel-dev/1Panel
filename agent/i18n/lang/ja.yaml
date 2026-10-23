@@ -773,3 +773,7 @@ VMSnapshotRecoverTask: "仮想マシン [{{ .vm }}] のスナップショット 
 VMSnapshotRecoverStep: "仮想マシンのスナップショット [{{ .snapshot }}] を復元"
 VMSnapshotDeleteTask: "仮想マシン [{{ .vm }}] のスナップショット [{{ .snapshot }}] を削除"
 VMSnapshotDeleteStep: "仮想マシンのスナップショット [{{ .snapshot }}] を削除"
+
+ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
+
+ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."

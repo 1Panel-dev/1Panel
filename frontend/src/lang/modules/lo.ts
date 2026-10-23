@@ -4279,6 +4279,7 @@ const message = {
             'ການເປີດໃຊ້ສິ່ງນີ້ສາມາດຫຼີກລ່ຽງການຮົ່ວໄຫຼຂອງໃບຢັ້ງຢືນ, ແຕ່ການຕັ້ງເວັບໄຊເລີ່ມຕົ້ນຈະເຮັດໃຫ້ການຕັ້ງຄ່ານີ້ບໍ່ມີຜົນ',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm: 'ຈະລຶບໃບຢັ້ງຢືນຕໍ່ໄປນີ້. ໃບຢັ້ງຢືນ ACME ຈະຖືກຖອນໂດຍອັດຕະໂນມັດ. ຕ້ອງການສືບຕໍ່ບໍ?',
         deleteAndRevoke: 'ລຶບ ແລະ ຖອນ',
         create: 'ຮ້ອງຂໍ',

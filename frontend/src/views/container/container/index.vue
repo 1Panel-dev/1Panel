@@ -177,7 +177,8 @@
                         min-width="120"
                     >
                         <template #default="{ row }">
-                            <ContainerResource v-if="row.hasLoad" :stats="row">
+                            <span v-if="row.state !== 'running'">—</span>
+                            <ContainerResource v-else-if="row.hasLoad" :stats="row">
                                 <el-descriptions-item v-if="row.hasLoadSize">
                                     <template #label>
                                         {{ $t('container.sizeRw') }}
@@ -209,7 +210,7 @@
                                     </el-button>
                                 </template>
                             </ContainerResource>
-                            <div v-if="!row.hasLoad">
+                            <div v-else>
                                 <el-button link loading></el-button>
                             </div>
                         </template>
@@ -470,7 +471,7 @@ import Uploads from '@/components/upload/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
-import { toRef, computed, reactive, ref } from 'vue';
+import { toRef, computed, onBeforeUnmount, onDeactivated, reactive, ref } from 'vue';
 import {
     containerItemStats,
     containerListStats,
@@ -696,48 +697,84 @@ const dialogContainerLogRef = ref();
 const dialogRenameRef = ref();
 const dialogPruneRef = ref();
 
-const search = async (column?: any) => {
-    if (!isActive.value || !isExist.value) {
+let requestController: AbortController | undefined;
+
+const cancelRequests = () => {
+    requestController?.abort();
+    requestController = undefined;
+    loading.value = false;
+};
+onBeforeUnmount(cancelRequests);
+onDeactivated(cancelRequests);
+
+const loadContainers = async (background = false, column?: any) => {
+    if (!isActive.value || !isExist.value || (background && requestController)) {
         return;
     }
+    requestController?.abort();
+    const controller = new AbortController();
+    requestController = controller;
+    loading.value = !background;
     localStorage.setItem('includeAppStore', includeAppStore.value ? 'true' : 'false');
-    let filterItem = (router.currentRoute.value.query?.filters as string) || '';
     if (column) {
         paginationConfig.orderBy = column.order ? column.prop : defaultSort.prop;
         paginationConfig.order = column.order || defaultSort.order;
     }
-    let params = {
+    const params = {
         name: searchName.value,
         state: paginationConfig.state || 'all',
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
-        filters: filterItem,
+        filters: props.filters || (router.currentRoute.value.query?.filters as string) || '',
         orderBy: paginationConfig.orderBy,
         order: paginationConfig.order,
         excludeAppStore: !includeAppStore.value,
     };
-    loading.value = true;
-    const [containerResult, statsResult, statusResult] = await Promise.allSettled([
-        searchContainer(params),
-        containerListStats(),
-        loadContainerStatus(),
-    ]);
-    loading.value = false;
-
-    if (containerResult.status === 'fulfilled') {
-        const containers = containerResult.value.data.items || [];
+    const statusRequest = loadContainerStatus(undefined, true, controller.signal)
+        .then((res) => {
+            if (!controller.signal.aborted) {
+                updateTags(res.data || {});
+            }
+        })
+        .catch(() => {}); // Request errors are reported by the HTTP layer.
+    try {
+        const res = await searchContainer(params, undefined, controller.signal);
+        if (controller.signal.aborted) {
+            return;
+        }
+        const containers = res.data.items || [];
         syncContainerRows(containers);
-        paginationConfig.total = containerResult.value.data.total;
-    }
-
-    if (statsResult.status === 'fulfilled') {
-        applyStatsToRows(statsResult.value.data || []);
-    }
-
-    if (statusResult.status === 'fulfilled') {
-        updateTags(statusResult.value.data || {});
+        paginationConfig.total = res.data.total;
+        loading.value = false;
+        // Stopped containers no longer produce samples; discard their previous usage.
+        for (const row of data.value) {
+            if (row.state !== 'running') {
+                for (const field of statFields) {
+                    row[field] = 0;
+                }
+            }
+        }
+        const ids = containers.filter((item) => item.state === 'running').map((item) => item.containerID);
+        if (ids.length > 0) {
+            const stats = await containerListStats(undefined, ids, { signal: controller.signal });
+            if (!controller.signal.aborted) {
+                applyStatsToRows(stats.data || []);
+            }
+        }
+    } catch {
+        // Preserve the last successful rows; the HTTP layer reports the failure.
+    } finally {
+        if (!controller.signal.aborted) {
+            loading.value = false;
+        }
+        await statusRequest;
+        if (requestController === controller) {
+            requestController = undefined;
+        }
     }
 };
+
+const search = (column?: any) => loadContainers(false, column);
 
 const searchWithStatus = (item: string) => {
     activeTag.value = item;
@@ -767,21 +804,7 @@ const changePinned = (row: any, isPinned: boolean) => {
     });
 };
 
-const refresh = async () => {
-    let filterItem = props.filters ? props.filters : '';
-    let params = {
-        name: searchName.value,
-        state: paginationConfig.state || 'all',
-        page: paginationConfig.currentPage,
-        pageSize: paginationConfig.pageSize,
-        filters: filterItem,
-        orderBy: paginationConfig.orderBy,
-        order: paginationConfig.order,
-    };
-    const [containerResult, statsResult] = await Promise.all([searchContainer(params), containerListStats()]);
-    syncContainerRows(containerResult.data.items || []);
-    applyStatsToRows(statsResult.data || []);
-};
+const refresh = () => loadContainers(true);
 
 const loadSize = async (row: any) => {
     containerItemStats(row.containerID).then((res) => {

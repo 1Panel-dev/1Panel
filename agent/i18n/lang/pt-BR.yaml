@@ -773,3 +773,7 @@ VMSnapshotRecoverTask: "Restaurar snapshot [{{ .snapshot }}] da máquina virtual
 VMSnapshotRecoverStep: "Restaurar snapshot da máquina virtual [{{ .snapshot }}]"
 VMSnapshotDeleteTask: "Excluir snapshot [{{ .snapshot }}] da máquina virtual [{{ .vm }}]"
 VMSnapshotDeleteStep: "Excluir snapshot da máquina virtual [{{ .snapshot }}]"
+
+ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
+
+ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."

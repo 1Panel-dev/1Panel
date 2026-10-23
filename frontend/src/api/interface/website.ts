@@ -626,6 +626,9 @@ export namespace Website {
     }
 
     export interface SSLObtainByCA {
+        autoRenew: boolean;
+        execShell: boolean;
+        shell: string;
         id: number;
         domains: string;
         keyType: string;

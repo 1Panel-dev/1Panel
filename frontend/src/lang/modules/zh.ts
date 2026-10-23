@@ -4154,6 +4154,7 @@ const message = {
         sslRejectHandshakeHelper: '开启之后可以避免证书泄露，设置默认网站会让此设置失效',
     },
     ssl: {
+        caUploadHelp: '上传下载的自签根证书 ZIP 文件，包含 ca.crt 和 ca.key，最大 10 MB。',
         deleteConfirm: '将对以下证书进行 删除 操作，ACME类型证书会被自动吊销，是否继续？',
         deleteAndRevoke: '删除并吊销',
         create: '申请证书',

@@ -46,7 +46,7 @@ type RuntimeService struct {
 type IRuntimeService interface {
 	Page(req request.RuntimeSearch) (int64, []response.RuntimeDTO, error)
 	Create(create request.RuntimeCreate) (*model.Runtime, error)
-	Delete(delete request.RuntimeDelete) error
+	Delete(delete request.RuntimeDelete) (string, error)
 	Update(req request.RuntimeUpdate) error
 	Get(id uint) (res *response.RuntimeDTO, err error)
 	GetNodePackageRunScript(req request.NodePackageReq) ([]response.PackageScripts, error)
@@ -376,16 +376,16 @@ func (r *RuntimeService) DeleteCheck(runTimeId uint) ([]dto.AppResource, error) 
 	return res, nil
 }
 
-func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) error {
+func (r *RuntimeService) Delete(runtimeDelete request.RuntimeDelete) (string, error) {
 	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(runtimeDelete.ID))
 	if err != nil {
-		return err
+		return "", err
 	}
 	website, _ := websiteRepo.GetFirst(websiteRepo.WithRuntimeID(runtimeDelete.ID))
 	if website.ID > 0 {
-		return buserr.New("ErrDelWithWebsite")
+		return runtime.Name, buserr.New("ErrDelWithWebsite")
 	}
-	return startRuntimeDeleteTask(runtimeDelete, runtime)
+	return runtime.Name, startRuntimeDeleteTask(runtimeDelete, runtime)
 }
 
 func startRuntimeDeleteTask(runtimeDelete request.RuntimeDelete, runtime *model.Runtime) error {

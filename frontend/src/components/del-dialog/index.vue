@@ -1,6 +1,11 @@
 <template>
     <div>
-        <DialogPro v-model="open" :title="form.title" size="small" @close="handleClose">
+        <component
+            :is="drawer ? DrawerPro : DialogPro"
+            v-model="open"
+            v-bind="drawer ? { header: form.title, size: 'large' } : { title: form.title, size: 'small' }"
+            @close="handleClose"
+        >
             <div v-loading="loading" class="del-dialog-body">
                 <el-row type="flex" justify="center">
                     <el-col :span="22">
@@ -30,11 +35,14 @@
                     </el-button>
                 </span>
             </template>
-        </DialogPro>
+        </component>
     </div>
 </template>
 
 <script setup lang="ts">
+import DialogPro from '@/components/dialog-pro/index.vue';
+import DrawerPro from '@/components/drawer-pro/index.vue';
+withDefaults(defineProps<{ drawer?: boolean }>(), { drawer: false });
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { reactive, ref } from 'vue';
