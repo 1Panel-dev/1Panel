@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"database/sql"
 	"encoding/base64"
 	"errors"
 	"fmt"
@@ -1325,11 +1326,12 @@ func (w WebsiteService) ChangeDefaultServer(id uint) error {
 	return websiteRepo.Save(context.Background(), &website)
 }
 
-func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error {
+func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err error) {
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return err
 	}
+	wasPHP := website.Type == constant.Runtime
 	if website.Type == constant.Runtime {
 		oldRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
 		if err != nil {
@@ -1347,26 +1349,8 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 			return buserr.WithName("ErrImageNotExist", oldRuntime.Name)
 		}
 	}
-	configPath := GetSitePath(website, SiteConf)
-	nginxContent, err := files.NewFileOp().GetContent(configPath)
-	if err != nil {
-		return err
-	}
-	config, err := parser.NewStringParser(string(nginxContent)).Parse()
-	if err != nil {
-		return err
-	}
-	servers := config.FindServers()
-	if len(servers) == 0 {
-		return errors.New("nginx config is not valid")
-	}
-	server := servers[0]
-	fileOp := files.NewFileOp()
-	indexPHPPath := path.Join(GetSitePath(website, SiteIndexDir), "index.php")
-	indexHtmlPath := path.Join(GetSitePath(website, SiteIndexDir), "index.html")
+
 	if req.RuntimeID > 0 {
-		server.UpdateDirective("index", []string{"index.php index.html index.htm default.php default.htm default.html"})
-		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
 		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.RuntimeID))
 		if err != nil {
 			return err
@@ -1374,38 +1358,129 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) error
 		if runtime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
 		}
-		website.RuntimeID = req.RuntimeID
+		website.RuntimeID = runtime.ID
 		website.AppInstallID = 0
-		phpProxy := fmt.Sprintf("127.0.0.1:%s", runtime.Port)
-		website.Proxy = phpProxy
-		server.UpdatePHPProxy([]string{website.Proxy}, "")
+		website.Proxy = fmt.Sprintf("127.0.0.1:%s", runtime.Port)
 		website.Type = constant.Runtime
-		if !fileOp.Stat(indexPHPPath) {
-			_ = fileOp.WriteFile(indexPHPPath, strings.NewReader(string(nginx_conf.IndexPHP)), constant.FilePerm)
-		}
 	} else {
-		server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
 		website.RuntimeID = 0
 		website.Type = constant.Static
 		website.Proxy = ""
-		server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
-		if !fileOp.Stat(indexHtmlPath) {
-			_ = fileOp.WriteFile(indexHtmlPath, strings.NewReader(string(nginx_conf.Index)), constant.FilePerm)
-		}
 	}
 
-	config.FilePath = configPath
-	if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+	subsites, err := websiteRepo.List(websiteRepo.WithParentID(website.ID), websiteRepo.WithType(constant.Subsite))
+	if err != nil {
 		return err
 	}
+	websites := append([]model.Website{website}, subsites...)
+	configs := make([]*components.Config, 0, len(websites))
+	oldContents := make(map[string][]byte, len(websites))
+	fileOp := files.NewFileOp()
+	for i := range websites {
+		site := &websites[i]
+		if i > 0 {
+			site.RuntimeID = website.RuntimeID
+			site.Proxy = website.Proxy
+		}
+		configPath := GetSitePath(*site, SiteConf)
+		content, err := fileOp.GetContent(configPath)
+		if err != nil {
+			return err
+		}
+		config, err := parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return err
+		}
+		servers := config.FindServers()
+		if len(servers) == 0 {
+			return errors.New("nginx config is not valid")
+		}
+		server := servers[0]
+		if i == 0 || wasPHP != (req.RuntimeID > 0) {
+			if req.RuntimeID > 0 {
+				server.UpdateDirective("index", []string{"index.php index.html index.htm default.php default.htm default.html"})
+			} else {
+				server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
+			}
+		}
+		if req.RuntimeID > 0 && site.Status != constant.WebStopped {
+			updated := false
+			for _, location := range server.FindDirectives("location") {
+				if strings.Join(location.GetParameters(), " ") == "~ [^/]\\.php(/|$)" && location.GetBlock() != nil {
+					location.GetBlock().UpdateDirective("fastcgi_pass", []string{site.Proxy})
+					updated = true
+				}
+			}
+			if !updated {
+				server.UpdatePHPProxy([]string{site.Proxy}, "")
+			}
+		} else {
+			server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
+		}
+		config.FilePath = configPath
+		configs = append(configs, config)
+		oldContents[configPath] = content
+	}
+
+	indexPath := path.Join(GetSitePath(website, SiteIndexDir), "index.html")
+	indexContent := nginx_conf.Index
+	if req.RuntimeID > 0 {
+		indexPath = path.Join(GetSitePath(website, SiteIndexDir), "index.php")
+		indexContent = nginx_conf.IndexPHP
+	}
+	if !fileOp.Stat(indexPath) {
+		_ = fileOp.WriteFile(indexPath, strings.NewReader(string(indexContent)), constant.FilePerm)
+	}
+
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
 	}
-	if err = nginxCheckAndReload(string(nginxContent), configPath, nginxInstall.ContainerName); err != nil {
+	tx, ctx := helper.GetTxAndContext()
+	if err = tx.Error; err != nil {
 		return err
 	}
-	return websiteRepo.Save(context.Background(), &website)
+	written := 0
+	reloadAttempted := false
+	defer func() {
+		if err == nil {
+			return
+		}
+		if rollbackErr := tx.Rollback().Error; rollbackErr != nil && !errors.Is(rollbackErr, sql.ErrTxDone) {
+			err = errors.Join(err, rollbackErr)
+		}
+		for _, config := range configs[:written] {
+			if restoreErr := fileOp.WriteFile(config.FilePath, strings.NewReader(string(oldContents[config.FilePath])), constant.FilePerm); restoreErr != nil {
+				err = errors.Join(err, fmt.Errorf("restore %s: %w", config.FilePath, restoreErr))
+			}
+		}
+		if reloadAttempted {
+			if checkErr := opNginx(nginxInstall.ContainerName, constant.NginxCheck); checkErr != nil {
+				err = errors.Join(err, fmt.Errorf("check restored nginx configuration: %w", checkErr))
+			} else if reloadErr := opNginx(nginxInstall.ContainerName, constant.NginxReload); reloadErr != nil {
+				err = errors.Join(err, fmt.Errorf("reload restored nginx configuration: %w", reloadErr))
+			}
+		}
+	}()
+	for i := range websites {
+		if err = websiteRepo.Save(ctx, &websites[i]); err != nil {
+			return err
+		}
+	}
+	for _, config := range configs {
+		written++
+		if err = nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
+			return err
+		}
+	}
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxCheck); err != nil {
+		return err
+	}
+	reloadAttempted = true
+	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+	return tx.Commit().Error
 }
 
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
