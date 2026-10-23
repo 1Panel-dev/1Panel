@@ -125,6 +125,9 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 		if err := taskItem.Execute(); err != nil {
 			_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		}
+		if err := SyncOllamaModelAccount(false); err != nil {
+			global.LOG.Errorf("sync Ollama model account after pull: %v", err)
+		}
 	}()
 	return nil
 }
@@ -179,6 +182,9 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 		if err := taskItem.Execute(); err != nil {
 			_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		}
+		if err := SyncOllamaModelAccount(false); err != nil {
+			global.LOG.Errorf("sync Ollama model account after pull: %v", err)
+		}
 	}()
 	return nil
 }
@@ -202,7 +208,7 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 		logItem := path.Join(global.Dir.DataDir, "log", "AITools", item.Name)
 		_ = os.Remove(logItem)
 	}
-	return nil
+	return SyncOllamaModelAccount(false)
 }
 
 func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
@@ -250,7 +256,7 @@ func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
 		_ = aiRepo.Create(&item)
 	}
 
-	return dropList, nil
+	return dropList, SyncOllamaModelAccount(false)
 }
 
 func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {

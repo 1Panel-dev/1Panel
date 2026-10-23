@@ -468,7 +468,12 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		if err == nil && len(entries) == 0 {
 			_ = op.DeleteDir(parentDir)
 		}
-		tx.Commit()
+		if err := tx.Commit().Error; err != nil {
+			return err
+		}
+		if install.App.Key == "ollama" || install.App.Key == "vllm" {
+			CleanupLocalModelAccount(install.ID)
+		}
 
 		existApps, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(install.AppId))
 		if len(existApps) == 0 {

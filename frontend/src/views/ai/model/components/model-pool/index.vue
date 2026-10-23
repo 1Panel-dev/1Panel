@@ -2,7 +2,7 @@
     <DrawerPro v-model="open" :header="headerTitle" size="large" @close="handleClose">
         <template #content>
             <div v-loading="loading">
-                <div class="toolbar">
+                <div v-if="!readOnly" class="toolbar">
                     <el-button v-permission type="primary" @click="openCreate">
                         {{ $t('commons.button.add') }}
                     </el-button>
@@ -10,7 +10,12 @@
                 <ComplexTable :data="items">
                     <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
-                    <fu-table-operations :buttons="buttons" :label="$t('commons.table.operate')" fixed="right" />
+                    <fu-table-operations
+                        v-if="!readOnly"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                    />
                 </ComplexTable>
             </div>
         </template>
@@ -60,6 +65,7 @@ import { Rules } from '@/global/form-rules';
 const emit = defineEmits(['updated']);
 
 const open = ref(false);
+const readOnly = ref(false);
 const editorOpen = ref(false);
 const loading = ref(false);
 const saving = ref(false);
@@ -207,6 +213,7 @@ const handleClose = () => {
 };
 
 const openDrawer = async (row: AI.AgentAccountItem) => {
+    readOnly.value = Boolean(row.appInstallId);
     account.id = row.id;
     account.name = row.name;
     account.provider = row.provider;

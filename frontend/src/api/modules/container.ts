@@ -92,11 +92,14 @@ export const containerItemStats = (containerID: string, currentNode?: string) =>
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
-export const containerListStats = (currentNode?: string) => {
+export const containerListStats = (
+    currentNode?: string,
+    config?: AxiosRequestConfig & { skipErrorMessage?: boolean },
+) => {
     return http.get<Array<Container.ContainerListStats>>(
         `/containers/list/stats`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...config, headers: { ...config?.headers, ...(currentNode ? { CurrentNode: currentNode } : {}) } },
     );
 };
 export const containerStats = (id: string) => {

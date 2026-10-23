@@ -1376,6 +1376,21 @@ var RemoveUpageHideMenu = &gormigrate.Migration{
 	Migrate: reconcileHideMenuSetting,
 }
 
+var UpdateAiMenuOrder = &gormigrate.Migration{
+	ID: "20261023-update-ai-menu-order",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.UpdateChildMenuSortByLabel(tx, "AI-Menu", []dto.MenuLabelSort{
+			{Label: "AIModel", Sort: 50},
+			{Label: "AIProxyManagement", Sort: 75},
+			{Label: "Agents", Sort: 100},
+			{Label: "MCPServer", Sort: 200},
+			{Label: "SkillsHub", Sort: 225},
+			{Label: "AIBenchmark", Sort: 250},
+			{Label: "GPU", Sort: 300},
+		})
+	},
+}
+
 var UpdateFirewallMenuPath = &gormigrate.Migration{
 	ID: "20260819-update-firewall-menu-path",
 	Migrate: func(tx *gorm.DB) error {

@@ -22,8 +22,13 @@ export const loadOllamaModel = (name: string) => {
 export const syncOllamaModel = () => {
     return http.post<Array<AI.OllamaModelDropInfo>>(`/ai/ollama/model/sync`);
 };
-export const closeOllamaModel = (name: string) => {
-    return http.post(`/ai/ollama/close`, { name: name });
+export const closeOllamaModel = (name: string, currentNode?: string) => {
+    return http.post(
+        `/ai/ollama/close`,
+        { name: name },
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const bindDomain = (req: AI.BindDomain) => {

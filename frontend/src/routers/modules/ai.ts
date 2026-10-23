@@ -12,16 +12,6 @@ const aiRouter = {
     },
     children: [
         {
-            path: '/ai/agents/agent',
-            name: 'Agents',
-            component: () => import('@/views/ai/agents/agent/index.vue'),
-            meta: {
-                icon: 'p-jiqiren2',
-                title: 'aiTools.agents.agent',
-                permission: 'ai_agent_view',
-            },
-        },
-        {
             path: '/ai/model/account',
             name: 'AIModel',
             component: () => import('@/views/ai/model/index.vue'),
@@ -37,9 +27,30 @@ const aiRouter = {
             name: 'LocalModel',
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
-                title: 'aiTools.model.localModel',
+                title: 'aiTools.model.deployments',
                 activeMenu: '/ai/model/account',
                 permission: 'ai_model_view',
+            },
+        },
+        {
+            path: '/ai/model/files',
+            hidden: true,
+            name: 'ModelFiles',
+            component: () => import('@/views/ai/model/index.vue'),
+            meta: {
+                title: 'aiTools.model.files',
+                activeMenu: '/ai/model/account',
+                permission: 'ai_model_view',
+            },
+        },
+        {
+            path: '/ai/agents/agent',
+            name: 'Agents',
+            component: () => import('@/views/ai/agents/agent/index.vue'),
+            meta: {
+                icon: 'p-jiqiren2',
+                title: 'aiTools.agents.agent',
+                permission: 'ai_agent_view',
             },
         },
         {

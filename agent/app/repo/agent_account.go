@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
 )
 
@@ -18,6 +19,7 @@ type IAgentAccountRepo interface {
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	CountTextByProviders(providers []string) (map[string]int64, error)
+	SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
 
 func NewIAgentAccountRepo() IAgentAccountRepo {
@@ -95,6 +97,25 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 		counts[row.Provider] = row.Count
 	}
 	return counts, nil
+}
+
+func (a AgentAccountRepo) SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error {
+	return global.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(account).Error; err != nil {
+			return err
+		}
+		if err := tx.Where("account_id = ?", account.ID).Delete(&model.AgentAccountModel{}).Error; err != nil {
+			return err
+		}
+		if len(models) == 0 {
+			return nil
+		}
+		for i := range models {
+			models[i].AccountID = account.ID
+			models[i].SortOrder = i + 1
+		}
+		return tx.Create(&models).Error
+	})
 }
 
 func normalizeProviders(providers []string) []string {

@@ -18,7 +18,7 @@ export namespace AI {
         name: string;
     }
     export interface OllamaModelSearch extends ReqPage {
-        info: string;
+        info?: string;
     }
 
     export interface Info {
@@ -738,6 +738,7 @@ export namespace AI {
     }
 
     export interface AgentAccountItem {
+        appInstallId?: number;
         id: number;
         provider: string;
         providerName: string;

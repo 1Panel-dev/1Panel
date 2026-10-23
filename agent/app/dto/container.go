@@ -171,7 +171,8 @@ type ContainerItemStats struct {
 	BuildCacheReclaimable int64 `json:"buildCacheReclaimable"`
 }
 type ContainerListStats struct {
-	ContainerID string `json:"containerID"`
+	ContainerID   string `json:"containerID"`
+	ContainerName string `json:"containerName"`
 
 	CPUTotalUsage uint64  `json:"cpuTotalUsage"`
 	SystemUsage   uint64  `json:"systemUsage"`

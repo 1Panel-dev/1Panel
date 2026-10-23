@@ -177,6 +177,7 @@ export namespace Container {
     }
     export interface ContainerListStats {
         containerID: string;
+        containerName: string;
         cpuTotalUsage: number;
         systemUsage: number;
         cpuPercent: number;

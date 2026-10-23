@@ -1,5 +1,19 @@
 <template>
-    <DrawerPro :header="$t('commons.button.' + mode)" v-model="drawerVisiable" size="large" @close="handleClose">
+    <component
+        :is="inline ? 'div' : dialog ? DialogPro : DrawerPro"
+        v-bind="
+            inline
+                ? {}
+                : {
+                      modelValue: drawerVisiable,
+                      header: $t('commons.button.' + mode),
+                      title: $t('commons.button.' + mode),
+                      size: 'large',
+                  }
+        "
+        @update:model-value="drawerVisiable = $event"
+        @close="handleClose"
+    >
         <el-alert :title="$t('aiTools.tensorRT.imageAlert')" class="common-prompt" :closable="false" type="warning" />
         <el-form ref="formRef" label-position="top" :model="tensorRTLLM" :rules="rules" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
@@ -43,7 +57,7 @@
             </el-form-item>
             <NodeConfig v-model="tensorRTLLM" />
         </el-form>
-        <template #footer>
+        <template v-if="!inline" #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button v-permission :disabled="loading" type="primary" @click="onSubmit">
@@ -52,10 +66,12 @@
             </span>
         </template>
         <FileList ref="modelDirRef" @choose="getModelDir" />
-    </DrawerPro>
+    </component>
 </template>
 
 <script lang="ts" setup>
+import DialogPro from '@/components/dialog-pro/index.vue';
+const props = defineProps({ dialog: Boolean, inline: Boolean });
 import NodeConfig from '@/views/website/runtime//components/node-config.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import FileList from '@/components/file-list/index.vue';
@@ -90,7 +106,7 @@ const newTensorRTLLM = () => {
 };
 const modelDirRef = ref();
 const tensorRTLLM = ref(newTensorRTLLM());
-const emit = defineEmits(['search']);
+const emit = defineEmits(['search', 'close']);
 
 const openCreate = (): void => {
     mode.value = 'create';
@@ -119,6 +135,7 @@ const openEdit = (rowData: any): void => {
 
 const handleClose = () => {
     drawerVisiable.value = false;
+    emit('close');
 };
 
 const getModelDir = (path: string) => {
@@ -186,8 +203,14 @@ watch(
     { deep: true },
 );
 
+watch(drawerVisiable, (value) => {
+    if (props.inline && !value) handleClose();
+});
+
 defineExpose({
     openCreate,
+    submit: onSubmit,
+    loading,
     openEdit,
 });
 </script>

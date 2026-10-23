@@ -308,6 +308,9 @@ func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error
 	for i := 0; i < len(list); i++ {
 		go func(index int, item container.Summary) {
 			datas[index] = loadCpuAndMem(client, item.ID)
+			if len(item.Names) > 0 {
+				datas[index].ContainerName = strings.TrimPrefix(item.Names[0], "/")
+			}
 			wg.Done()
 		}(i, list[i])
 	}
