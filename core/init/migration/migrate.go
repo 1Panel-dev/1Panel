@@ -69,5 +69,6 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.MoveVirtualMachineMenuToXpack,
 		migrations.AddAPIKeys,
 		migrations.AddOperationLogAPIKey,
+		migrations.UpdateAiMenuOrder,
 	}
 }

@@ -386,6 +386,7 @@ type AgentAccountProviderCountReq struct {
 }
 
 type AgentAccountInfo struct {
+	AppInstallID    uint                `json:"appInstallId"`
 	ID              uint                `json:"id"`
 	MasterAccountID uint                `json:"masterAccountId"`
 	Provider        string              `json:"provider"`

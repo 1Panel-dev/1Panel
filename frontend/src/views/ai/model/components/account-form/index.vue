@@ -1,5 +1,10 @@
 <template>
-    <DrawerPro v-model="open" :header="headerTitle" size="large" @close="handleClose">
+    <component
+        :is="inline ? 'div' : DrawerPro"
+        v-bind="inline ? {} : { modelValue: open, header: headerTitle, size: 'large' }"
+        @update:model-value="open = $event"
+        @close="handleClose"
+    >
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" autocomplete="off" v-loading="loading">
             <el-form-item :label="$t('commons.table.name')" prop="name">
                 <el-input v-model="form.name" />
@@ -229,7 +234,7 @@
                 <span class="input-help">{{ $t('aiTools.agents.syncAgentsHelper') }}</span>
             </el-form-item>
         </el-form>
-        <template #footer>
+        <template v-if="!inline" #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button v-permission :disabled="loading" type="primary" @click="submit">
@@ -237,7 +242,7 @@
                 </el-button>
             </span>
         </template>
-    </DrawerPro>
+    </component>
 </template>
 
 <script setup lang="ts">
@@ -257,7 +262,10 @@ import { MsgError } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 
-const emit = defineEmits(['search']);
+import DrawerPro from '@/components/drawer-pro/index.vue';
+
+const props = defineProps({ inline: Boolean });
+const emit = defineEmits(['search', 'close']);
 
 const open = ref(false);
 const formRef = ref<FormInstance>();
@@ -291,7 +299,7 @@ const form = reactive({
 });
 
 const headerTitle = computed(() =>
-    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.create'),
+    form.id ? i18n.global.t('commons.button.edit') : i18n.global.t('aiTools.model.connectExternal'),
 );
 
 const selectedProvider = computed(() => providers.value[form.provider]);
@@ -641,6 +649,7 @@ const submit = async () => {
 };
 
 const handleClose = () => {
+    emit('close');
     formRef.value?.resetFields();
     loading.value = false;
     form.id = 0;
@@ -769,12 +778,18 @@ watch([() => form.apiKey, () => form.baseURL], () => {
     }
 });
 
+watch(open, (value) => {
+    if (props.inline && !value) handleClose();
+});
+
 onMounted(async () => {
-    await loadProviders();
+    if (!props.inline) await loadProviders();
 });
 
 defineExpose({
     open: openDrawer,
+    submit,
+    loading,
 });
 </script>
 

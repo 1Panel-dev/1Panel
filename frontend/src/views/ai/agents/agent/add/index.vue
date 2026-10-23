@@ -156,7 +156,7 @@ import {
 } from '@/utils/agent';
 import { App } from '@/api/interface/app';
 import AdvancedSetting from '@/components/advanced-setting/index.vue';
-import AccountAddDialog from '@/views/ai/agents/model/add/index.vue';
+import AccountAddDialog from '@/views/ai/model/components/account-form/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 

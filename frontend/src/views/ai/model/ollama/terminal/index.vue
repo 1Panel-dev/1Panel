@@ -1,13 +1,6 @@
 <template>
-    <DrawerPro
-        v-model="open"
-        :title="$t('menu.terminal')"
-        @close="handleClose"
-        :resource="title"
-        :autoClose="false"
-        :fullScreen="true"
-    >
-        <Terminal class="mt-2" style="height: calc(100vh - 175px)" ref="terminalRef"></Terminal>
+    <DialogPro v-model="open" :title="$t('menu.terminal')" size="w-70" @close="handleClose">
+        <Terminal class="mt-2" style="height: 55vh" ref="terminalRef"></Terminal>
 
         <template #footer>
             <span class="dialog-footer">
@@ -16,23 +9,26 @@
                 </el-button>
             </span>
         </template>
-    </DrawerPro>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>
-import { nextTick, ref } from 'vue';
+import { nextTick, onBeforeUnmount, ref } from 'vue';
 import Terminal from '@/components/terminal/index.vue';
 import { closeOllamaModel } from '@/api/modules/ai';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const title = ref();
+const { currentNode } = useGlobalStore();
 const open = ref(false);
 const itemName = ref();
 const terminalRef = ref();
+let operateNode = '';
 
 interface DialogProps {
     name: string;
 }
 const acceptParams = async (params: DialogProps): Promise<void> => {
+    operateNode = currentNode.value;
     itemName.value = params.name;
     open.value = true;
     initTerm();
@@ -40,7 +36,8 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
 
 const initTerm = () => {
     nextTick(() => {
-        terminalRef.value.acceptParams({
+        if (!open.value) return;
+        terminalRef.value?.acceptParams({
             endpoint: '/api/v2/hosts/terminal/container',
             args: `source=ollama&name=${itemName.value}`,
             error: '',
@@ -50,7 +47,10 @@ const initTerm = () => {
 };
 
 const onClose = async () => {
-    await closeOllamaModel(itemName.value)
+    const name = itemName.value;
+    if (!name) return;
+    itemName.value = '';
+    await closeOllamaModel(name, operateNode)
         .then(() => {
             terminalRef.value?.onClose();
         })
@@ -60,9 +60,10 @@ const onClose = async () => {
 };
 
 function handleClose() {
-    onClose();
     open.value = false;
+    onClose();
 }
+onBeforeUnmount(handleClose);
 
 defineExpose({
     acceptParams,

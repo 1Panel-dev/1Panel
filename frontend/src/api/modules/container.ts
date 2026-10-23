@@ -90,10 +90,14 @@ export const containerItemStats = (containerID: string, currentNode?: string) =>
         currentNode ? { CurrentNode: currentNode } : undefined,
     );
 };
-export const containerListStats = (currentNode?: string, ids?: string[], signal?: AbortSignal) => {
+export const containerListStats = (
+    currentNode?: string,
+    ids?: string[],
+    config?: AxiosRequestConfig & { skipErrorMessage?: boolean },
+) => {
     return http.get<Array<Container.ContainerListStats>>(`/containers/list/stats`, ids ? { ids: ids.join(',') } : {}, {
-        headers: currentNode ? { CurrentNode: currentNode } : undefined,
-        signal,
+        ...config,
+        headers: { ...config?.headers, ...(currentNode ? { CurrentNode: currentNode } : {}) },
     });
 };
 export const containerStats = (id: string) => {

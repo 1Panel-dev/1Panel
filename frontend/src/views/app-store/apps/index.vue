@@ -258,7 +258,9 @@ onMounted(async () => {
                 key: installKey.value,
             },
         };
-        installRef.value.acceptParams(params);
+        if (!['ollama', 'vllm'].includes(installKey.value) || !jumpToInstall('', installKey.value)) {
+            installRef.value.acceptParams(params);
+        }
     }
     search(req);
     if (isProductPro.value) {

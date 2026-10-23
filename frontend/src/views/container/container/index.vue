@@ -178,72 +178,38 @@
                     >
                         <template #default="{ row }">
                             <span v-if="row.state !== 'running'">—</span>
-                            <div v-else-if="row.hasLoad">
-                                <div class="source-font">CPU: {{ row.cpuPercent.toFixed(2) }}%</div>
-                                <div class="float-left source-font">
-                                    {{ $t('monitor.memory') }}: {{ row.memoryPercent.toFixed(2) }}%
-                                </div>
-                                <el-popover placement="right" width="500px" class="float-right">
-                                    <template #reference>
-                                        <svg-icon iconName="p-xiangqing" className="resource-detail-icon"></svg-icon>
+                            <ContainerResource v-else-if="row.hasLoad" :stats="row">
+                                <el-descriptions-item v-if="row.hasLoadSize">
+                                    <template #label>
+                                        {{ $t('container.sizeRw') }}
+                                        <el-tooltip :content="$t('container.sizeRwHelper')">
+                                            <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                        </el-tooltip>
                                     </template>
-                                    <template #default>
-                                        <el-descriptions direction="vertical" border :column="3" size="small">
-                                            <el-descriptions-item :label="$t('container.cpuUsage')">
-                                                {{ computeCPU(row.cpuTotalUsage) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.cpuTotal')">
-                                                {{ computeCPU(row.systemUsage) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.core')">
-                                                {{ row.percpuUsage }}
-                                            </el-descriptions-item>
-
-                                            <el-descriptions-item :label="$t('container.memUsage')">
-                                                {{ computeSizeForDocker(row.memoryUsage) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.memCache')">
-                                                {{ computeSizeForDocker(row.memoryCache) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item :label="$t('container.memTotal')">
-                                                {{ computeSizeForDocker(row.memoryLimit) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item v-if="row.hasLoadSize">
-                                                <template #label>
-                                                    {{ $t('container.sizeRw') }}
-                                                    <el-tooltip :content="$t('container.sizeRwHelper')">
-                                                        <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                    </el-tooltip>
-                                                </template>
-                                                {{ computeSize2(row.sizeRw) }}
-                                            </el-descriptions-item>
-                                            <el-descriptions-item
-                                                :label="$t('container.sizeRootFs')"
-                                                v-if="row.hasLoadSize"
-                                            >
-                                                <template #label>
-                                                    {{ $t('container.sizeRootFs') }}
-                                                    <el-tooltip :content="$t('container.sizeRootFsHelper')">
-                                                        <el-icon class="icon-item"><InfoFilled /></el-icon>
-                                                    </el-tooltip>
-                                                </template>
-                                                {{ computeSize2(row.sizeRootFs) }}
-                                            </el-descriptions-item>
-                                        </el-descriptions>
-
-                                        <el-button
-                                            class="mt-2"
-                                            v-if="!row.hasLoadSize"
-                                            size="small"
-                                            link
-                                            type="primary"
-                                            @click="loadSize(row)"
-                                        >
-                                            {{ $t('container.loadSize') }}
-                                        </el-button>
+                                    {{ computeSize2(row.sizeRw) }}
+                                </el-descriptions-item>
+                                <el-descriptions-item :label="$t('container.sizeRootFs')" v-if="row.hasLoadSize">
+                                    <template #label>
+                                        {{ $t('container.sizeRootFs') }}
+                                        <el-tooltip :content="$t('container.sizeRootFsHelper')">
+                                            <el-icon class="icon-item"><InfoFilled /></el-icon>
+                                        </el-tooltip>
                                     </template>
-                                </el-popover>
-                            </div>
+                                    {{ computeSize2(row.sizeRootFs) }}
+                                </el-descriptions-item>
+                                <template #footer>
+                                    <el-button
+                                        class="mt-2"
+                                        v-if="!row.hasLoadSize"
+                                        size="small"
+                                        link
+                                        type="primary"
+                                        @click="loadSize(row)"
+                                    >
+                                        {{ $t('container.loadSize') }}
+                                    </el-button>
+                                </template>
+                            </ContainerResource>
                             <div v-else>
                                 <el-button link loading></el-button>
                             </div>
@@ -520,7 +486,8 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import router from '@/routers';
-import { computeSize2, computeSizeForDocker, computeCPU } from '@/utils/size';
+import { computeSize2 } from '@/utils/size';
+import ContainerResource from '@/components/container-resource/index.vue';
 import { newUUID } from '@/utils/id';
 import { updateCommonDescription } from '@/api/modules/setting';
 
@@ -789,7 +756,7 @@ const loadContainers = async (background = false, column?: any) => {
         }
         const ids = containers.filter((item) => item.state === 'running').map((item) => item.containerID);
         if (ids.length > 0) {
-            const stats = await containerListStats(undefined, ids, controller.signal);
+            const stats = await containerListStats(undefined, ids, { signal: controller.signal });
             if (!controller.signal.aborted) {
                 applyStatsToRows(stats.data || []);
             }
@@ -1140,14 +1107,6 @@ const buttons = [
         text-overflow: ellipsis;
         white-space: nowrap;
     }
-}
-.source-font {
-    font-size: 12px;
-}
-.resource-detail-icon {
-    margin-top: -3px;
-    font-size: 6px;
-    cursor: pointer;
 }
 .tag-button {
     margin-top: -5px;

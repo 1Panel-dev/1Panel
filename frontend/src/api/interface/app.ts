@@ -136,6 +136,8 @@ export namespace App {
     }
 
     export interface AppInstall {
+        modelAccountBaseURLType?: string;
+        modelAccountBaseURL?: string;
         appDetailId: number;
         params: any;
         taskID: string;

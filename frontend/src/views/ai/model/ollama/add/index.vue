@@ -1,5 +1,5 @@
 <template>
-    <DrawerPro v-model="drawerVisible" :header="$t('commons.button.add')" @close="handleClose">
+    <DialogPro size="normal" v-model="drawerVisible" :title="$t('commons.button.add')" @close="handleClose">
         <el-alert type="info" :closable="false">
             <template #title>
                 <span class="flx-align-center">
@@ -32,7 +32,7 @@
                 </el-button>
             </span>
         </template>
-    </DrawerPro>
+    </DialogPro>
 </template>
 
 <script lang="ts" setup>

@@ -1895,3 +1895,13 @@ var AddQuickDirectory = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.QuickDirectory{})
 	},
 }
+
+var AddLocalModelAccountLink = &gormigrate.Migration{
+	ID: "20261023-add-local-model-account-link",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		return service.SyncOllamaModelAccount(true)
+	},
+}

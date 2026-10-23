@@ -48,6 +48,8 @@
                 :propStart="'params.'"
             />
 
+            <slot name="after-params" />
+
             <el-form-item prop="advanced">
                 <el-checkbox v-model="formData.advanced" :label="$t('app.advanced')" size="large" />
             </el-form-item>
@@ -320,19 +322,23 @@ const loadInstallDefaultConfig = async () => {
     }
 };
 
-const initForm = async (appKey: string) => {
+const initForm = async (appKey: string, allowPort?: boolean) => {
     operateNode.value = undefined;
     env.value = undefined;
     masterNodeAddr.value = undefined;
     formData.value.name = appKey.replace(/^local/, '');
-    await loadInstallDefaultConfig();
+    if (allowPort === undefined) {
+        await loadInstallDefaultConfig();
+    } else {
+        formData.value.allowPort = allowPort;
+    }
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
     if (appVersions.value.length > 0) {
         const defaultVersion = appVersions.value[0];
         formData.value.version = defaultVersion;
-        getVersionDetail(defaultVersion);
+        await getVersionDetail(defaultVersion);
     }
     if (isOffline.value) {
         formData.value.pullImage = false;

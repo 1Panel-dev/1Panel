@@ -2,6 +2,7 @@ package model
 
 type AgentAccount struct {
 	BaseModel
+	AppInstallID    uint   `json:"appInstallId"`
 	Provider        string `json:"provider"`
 	Name            string `json:"name"`
 	APIKey          string `json:"apiKey"`

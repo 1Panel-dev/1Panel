@@ -23,6 +23,9 @@ type AppInstallCreate struct {
 	Services    map[string]string      `json:"services"`
 	TaskID      string                 `json:"taskID"`
 
+	ModelAccountBaseURLType string `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
+	ModelAccountBaseURL     string `json:"modelAccountBaseURL"`
+
 	AppContainerConfig
 	NodePushConfig
 }

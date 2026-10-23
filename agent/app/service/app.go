@@ -499,6 +499,14 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	req.Params[constant.ContainerName] = containerName
 	appInstall.ContainerName = containerName
 
+	modelAccountBaseURL := ""
+	if app.Key == "ollama" {
+		modelAccountBaseURL, err = ResolveLocalModelAccountBaseURL(req.ModelAccountBaseURLType, req.ModelAccountBaseURL, containerName, "11434", httpPort)
+		if err != nil {
+			return
+		}
+	}
+
 	index := 0
 	serviceName := ""
 	for k := range servicesMap {
@@ -609,6 +617,10 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 			return err
 		}
 		updateToolApp(appInstall)
+		if app.Key == "ollama" {
+			_, err := SyncLocalModelAccount(*appInstall, 0, modelAccountBaseURL, nil, false, true)
+			return err
+		}
 		return nil
 	}
 

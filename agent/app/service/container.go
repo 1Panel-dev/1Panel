@@ -324,10 +324,12 @@ func (u *ContainerService) ContainerListStats(ctx context.Context, ids []string)
 			defer wg.Done()
 			for index := range jobs {
 				datas[index].ContainerID = list[index].ID
-				if ctx.Err() != nil || list[index].State != "running" {
-					continue
+				if ctx.Err() == nil && list[index].State == "running" {
+					datas[index] = loadCpuAndMem(ctx, client, list[index].ID)
 				}
-				datas[index] = loadCpuAndMem(ctx, client, list[index].ID)
+				if len(list[index].Names) > 0 {
+					datas[index].ContainerName = strings.TrimPrefix(list[index].Names[0], "/")
+				}
 			}
 		}()
 	}

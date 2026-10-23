@@ -28,6 +28,14 @@ const volcengineLogo: AgentProviderLogo = {
 };
 
 const providerLogos: Record<string, AgentProviderLogo> = {
+    nvidia: {
+        src: asset('nvidia.ico'),
+        mark: 'NV',
+        background: '#ffffff',
+        color: '#76b900',
+        borderColor: '#dcdfe6',
+        source: 'https://www.nvidia.com/favicon.ico',
+    },
     ollama: {
         src: asset('ollama.webp'),
         mark: 'OL',
