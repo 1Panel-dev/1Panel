@@ -882,6 +882,16 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 	if hasInvalidFileName(req.NewName) {
 		return buserr.New("ErrInvalidChar")
 	}
+	if req.OldName == req.NewName {
+		return nil
+	}
+	// os.Rename silently replaces an existing target on Linux, so reject the
+	// rename here to avoid losing the target file without confirmation.
+	if _, err := os.Lstat(req.NewName); err == nil {
+		return buserr.New("ErrFileIsExist")
+	} else if !os.IsNotExist(err) {
+		return err
+	}
 	fo := files.NewFileOp()
 	content, mode, shouldRecordHistory := readEditableFileHistoryContent(req.OldName)
 	if err := fo.Rename(req.OldName, req.NewName); err != nil {
