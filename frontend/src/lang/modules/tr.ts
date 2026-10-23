@@ -4447,6 +4447,7 @@ const message = {
             'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'Aşağıdaki sertifikalar silinecek. ACME sertifikaları otomatik olarak iptal edilecek. Devam edilsin mi?',
         deleteAndRevoke: 'Sil ve iptal et',

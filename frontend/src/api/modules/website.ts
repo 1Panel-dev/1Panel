@@ -451,3 +451,18 @@ export const deleteTemplateOutput = (params: { id: number }) => {
 export const getTemplateOutput = (id: number) => {
     return http.post<Website.TemplateOutputDTO>(`/websites/templates/outputs/get`, { id });
 };
+
+export const uploadCA = (params: FormData) => {
+    return http.upload(`/websites/ca/upload`, params);
+};
+
+export const importCA = (params: {
+    name: string;
+    type: 'paste' | 'local';
+    certificate?: string;
+    privateKey?: string;
+    certificatePath?: string;
+    privateKeyPath?: string;
+}) => {
+    return http.post(`/websites/ca/import`, params);
+};

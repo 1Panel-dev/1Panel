@@ -1,13 +1,16 @@
 package v2
 
 import (
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/gin-gonic/gin"
 )
 
@@ -175,4 +178,65 @@ func (b *BaseApi) DownloadCAFile(c *gin.Context) {
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
 	http.ServeContent(c.Writer, c.Request, info.Name(), info.ModTime(), file)
+}
+
+// @Tags Website CA
+// @Summary Upload website CA archive
+// @Accept multipart/form-data
+// @Param file formData file true "ZIP containing ca.crt and ca.key"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/ca/upload [post]
+func (b *BaseApi) UploadWebsiteCA(c *gin.Context) {
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 11<<20)
+	if err := c.Request.ParseMultipartForm(11 << 20); err != nil {
+		helper.InternalServer(c, buserr.New("ErrCAUpload"))
+		return
+	}
+	if c.Request.MultipartForm != nil {
+		defer c.Request.MultipartForm.RemoveAll()
+	}
+	file, err := c.FormFile("file")
+	if err != nil || file.Size > 10<<20 || !strings.HasSuffix(strings.ToLower(file.Filename), ".zip") {
+		helper.InternalServer(c, buserr.New("ErrCAUpload"))
+		return
+	}
+	stream, err := file.Open()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	defer stream.Close()
+	data, err := io.ReadAll(io.LimitReader(stream, (10<<20)+1))
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	if err = websiteCAService.Upload(file.Filename[:len(file.Filename)-len(".zip")], data); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Website CA
+// @Summary Import website CA from PEM or server files
+// @Accept json
+// @Param request body request.WebsiteCAImport true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /websites/ca/import [post]
+func (b *BaseApi) ImportWebsiteCA(c *gin.Context) {
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, 3<<20)
+	var req request.WebsiteCAImport
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := websiteCAService.Import(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
 }

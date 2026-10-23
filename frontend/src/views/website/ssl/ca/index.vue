@@ -1,38 +1,48 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('ssl.selfSigned')" size="large" @close="handleClose">
-        <template #content>
-            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
-                <template #toolbar>
-                    <el-button v-permission type="primary" @click="openCreate">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                </template>
-                <el-table-column :label="$t('commons.table.name')" show-overflow-tooltip prop="name"></el-table-column>
-                <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
-                    <template #default="{ row }">
-                        {{ getKeyName(row.keyType) }}
-                    </template>
-                </el-table-column>
-                <el-table-column
-                    prop="createdAt"
-                    :label="$t('commons.table.date')"
-                    :formatter="dateFormat"
-                    show-overflow-tooltip
-                />
-                <fu-table-operations
-                    :ellipsis="3"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fix
-                    width="250px"
-                />
-            </ComplexTable>
-            <Create ref="createRef" @close="search()" />
-            <Obtain ref="obtainRef" @close="search()" />
-            <Detail ref="detailRef" />
-        </template>
-    </DrawerPro>
-    <OpDialog ref="opRef" @search="search" />
+    <div>
+        <RouterButton :buttons="routerButton" />
+        <LayoutContent backName="SSL" :title="$t('ssl.selfSigned')">
+            <template #leftToolBar>
+                <el-button v-permission type="primary" @click="openCreate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
+                <el-button v-permission type="primary" plain @click="uploadRef?.acceptParams()">
+                    {{ $t('commons.button.upload') }}
+                </el-button>
+            </template>
+            <template #main>
+                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        show-overflow-tooltip
+                        prop="name"
+                    ></el-table-column>
+                    <el-table-column :label="$t('website.keyType')" show-overflow-tooltip prop="keyType">
+                        <template #default="{ row }">
+                            {{ getKeyName(row.keyType) }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.date')"
+                        :formatter="dateFormat"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        :ellipsis="3"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fix
+                        width="250px"
+                    />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+        <Upload ref="uploadRef" @uploaded="search()" />
+        <Create ref="createRef" @close="search()" />
+        <Detail ref="detailRef" />
+        <OpDialog ref="opRef" @search="search" />
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -40,17 +50,19 @@ import { readCachedPageSize } from '@/utils/panel-cache';
 import { Website } from '@/api/interface/website';
 import { deleteCA, searchCAs, downloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';
-import { reactive, ref } from 'vue';
+import { onMounted, reactive, ref, toRef } from 'vue';
+import { useSearchReset } from '@/composables/useSearchReset';
 import Create from './create/index.vue';
+import Upload from './upload/index.vue';
 import Detail from './detail/index.vue';
 import { getKeyName } from '@/utils/ssl';
 import { dateFormat } from '@/utils/date';
-import Obtain from './obtain/index.vue';
 
-const open = ref(false);
+const routerButton = [{ label: i18n.global.t('ssl.selfSigned'), path: '/websites/ssl/ca' }];
 const loading = ref(false);
 const data = ref();
 const createRef = ref();
+const uploadRef = ref();
 const paginationConfig = reactive({
     cacheSizeKey: 'ca-page-size',
     currentPage: 1,
@@ -58,18 +70,9 @@ const paginationConfig = reactive({
     total: 0,
 });
 const opRef = ref();
-const obtainRef = ref();
-const em = defineEmits(['close']);
 const detailRef = ref();
 
 const buttons = [
-    {
-        label: i18n.global.t('ssl.selfSign'),
-        permission: true,
-        click: function (row: Website.CA) {
-            obtain(row);
-        },
-    },
     {
         label: i18n.global.t('ssl.detail'),
         click: function (row: Website.CA) {
@@ -91,14 +94,7 @@ const buttons = [
     },
 ];
 
-const acceptParams = () => {
-    search();
-    open.value = true;
-};
-
-const obtain = (row: any) => {
-    obtainRef.value.acceptParams(row.id);
-};
+useSearchReset({ page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 
 const search = async () => {
     const req = {
@@ -113,11 +109,6 @@ const search = async () => {
 
 const openCreate = () => {
     createRef.value.acceptParams();
-};
-
-const handleClose = () => {
-    em('close', false);
-    open.value = false;
 };
 
 const deleteca = async (row: any) => {
@@ -144,13 +135,14 @@ const onDownload = (row: Website.CA) => {
             a.download = row.name + '.zip';
             const event = new MouseEvent('click');
             a.dispatchEvent(event);
+            window.URL.revokeObjectURL(downloadUrl);
         })
         .finally(() => {
             loading.value = false;
         });
 };
 
-defineExpose({
-    acceptParams,
+onMounted(() => {
+    search();
 });
 </script>

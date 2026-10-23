@@ -773,3 +773,7 @@ VMSnapshotRecoverTask: "復原虛擬機 [{{ .vm }}] 快照 [{{ .snapshot }}]"
 VMSnapshotRecoverStep: "復原虛擬機快照 [{{ .snapshot }}]"
 VMSnapshotDeleteTask: "刪除虛擬機 [{{ .vm }}] 快照 [{{ .snapshot }}]"
 VMSnapshotDeleteStep: "刪除虛擬機快照 [{{ .snapshot }}]"
+
+ErrCAUpload: "請上傳包含有效自簽根憑證 ca.crt 及匹配私鑰 ca.key 的 ZIP 檔案（最大 10 MB），金鑰演算法須為支援的 RSA 或 EC。"
+
+ErrCAImport: "請提供有效的自簽根憑證及匹配私鑰（每個最大 1 MB），金鑰演算法須為支援的 RSA 或 EC。"

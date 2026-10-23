@@ -1,42 +1,38 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.create')" @close="handleClose">
-        <el-row v-loading="loading">
-            <el-col :span="22" :offset="1">
-                <el-form @submit.prevent ref="caForm" label-position="top" :model="ca" :rules="rules">
-                    <el-form-item :label="$t('ssl.caName')" prop="name">
-                        <el-input v-model.trim="ca.name"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.commonName')" prop="commonName">
-                        <el-input v-model.trim="ca.commonName"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.company')" prop="organization">
-                        <el-input v-model.trim="ca.organization"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.department')" prop="organizationUint">
-                        <el-input v-model.trim="ca.organizationUint"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.country')" prop="country">
-                        <el-input v-model.trim="ca.country"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.province')" prop="province">
-                        <el-input v-model.trim="ca.province"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('ssl.city')" prop="city">
-                        <el-input v-model.trim="ca.city"></el-input>
-                    </el-form-item>
-                    <el-form-item :label="$t('website.keyType')" prop="keyType">
-                        <el-select v-model="ca.keyType">
-                            <el-option
-                                v-for="(keyType, index) in KeyTypes"
-                                :key="index"
-                                :label="keyType.label"
-                                :value="keyType.value"
-                            ></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-form>
-            </el-col>
-        </el-row>
+    <DrawerPro v-model="open" size="large" :header="$t('commons.button.create')" @close="handleClose">
+        <el-form v-loading="loading" @submit.prevent ref="caForm" label-position="top" :model="ca" :rules="rules">
+            <el-form-item :label="$t('ssl.caName')" prop="name">
+                <el-input v-model.trim="ca.name"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.commonName')" prop="commonName">
+                <el-input v-model.trim="ca.commonName"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.company')" prop="organization">
+                <el-input v-model.trim="ca.organization"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.department')" prop="organizationUint">
+                <el-input v-model.trim="ca.organizationUint"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.country')" prop="country">
+                <el-input v-model.trim="ca.country"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.province')" prop="province">
+                <el-input v-model.trim="ca.province"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('ssl.city')" prop="city">
+                <el-input v-model.trim="ca.city"></el-input>
+            </el-form-item>
+            <el-form-item :label="$t('website.keyType')" prop="keyType">
+                <el-select v-model="ca.keyType">
+                    <el-option
+                        v-for="(keyType, index) in KeyTypes"
+                        :key="index"
+                        :label="keyType.label"
+                        :value="keyType.value"
+                    ></el-option>
+                </el-select>
+            </el-form-item>
+        </el-form>
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
@@ -45,7 +41,7 @@
                 </el-button>
             </span>
         </template>
-    </DialogPro>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -90,7 +86,7 @@ const handleClose = () => {
 };
 
 const resetForm = () => {
-    caForm.value.resetFields();
+    caForm.value?.resetFields();
     ca.value = initData();
 };
 

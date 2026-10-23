@@ -4338,6 +4338,7 @@ const message = {
             'فعال‌سازی این گزینه می‌تواند از نشت گواهی جلوگیری کند، تنظیم یک وب‌سایت پیش‌فرض این تنظیم را بی‌اثر می‌کند',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm: 'گواهی‌های زیر حذف خواهند شد. گواهی‌های ACME به‌طور خودکار باطل خواهند شد. آیا ادامه می‌دهید؟',
         deleteAndRevoke: 'حذف و ابطال',
         create: 'درخواست',

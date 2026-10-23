@@ -13,6 +13,8 @@ func (a *WebsiteCARouter) InitRouter(Router *gin.RouterGroup) {
 
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
+		groupRouter.POST("/import", baseApi.ImportWebsiteCA)
+		groupRouter.POST("/upload", baseApi.UploadWebsiteCA)
 		groupRouter.POST("/search", baseApi.PageWebsiteCA)
 		groupRouter.POST("", baseApi.CreateWebsiteCA)
 		groupRouter.POST("/del", baseApi.DeleteWebsiteCA)

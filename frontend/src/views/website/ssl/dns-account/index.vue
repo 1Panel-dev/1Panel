@@ -1,40 +1,47 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('website.dnsAccountManage')" size="large" @close="handleClose">
-        <template #content>
-            <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
-                <template #toolbar>
-                    <el-button v-permission type="primary" @click="openCreate">
-                        {{ $t('commons.button.create') }}
-                    </el-button>
-                </template>
-                <el-table-column
-                    :label="$t('commons.table.name')"
-                    fix
-                    show-overflow-tooltip
-                    prop="name"
-                ></el-table-column>
-                <el-table-column :label="$t('commons.table.type')" prop="type">
-                    <template #default="{ row }">
-                        <span>{{ getDNSName(row.type) }}</span>
-                        <el-tooltip v-if="row.type === 'DnsPod'" :content="$t('ssl.dnsPodRemovedTip')" placement="top">
-                            <el-tag type="danger" size="small" class="ml-2">
-                                {{ $t('ssl.dnsPodRemoved') }}
-                            </el-tag>
-                        </el-tooltip>
-                    </template>
-                </el-table-column>
-                <fu-table-operations
-                    :ellipsis="1"
-                    :buttons="buttons"
-                    :label="$t('commons.table.operate')"
-                    fixed="right"
-                    fix
-                />
-            </ComplexTable>
-            <Create ref="createRef" @close="search()"></Create>
-        </template>
-    </DrawerPro>
-    <OpDialog ref="opRef" @search="search" />
+    <div>
+        <RouterButton :buttons="routerButton" />
+        <LayoutContent backName="SSL" :title="$t('website.dnsAccountManage')">
+            <template #leftToolBar>
+                <el-button v-permission type="primary" @click="openCreate">
+                    {{ $t('commons.button.create') }}
+                </el-button>
+            </template>
+            <template #main>
+                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
+                    <el-table-column
+                        :label="$t('commons.table.name')"
+                        fix
+                        show-overflow-tooltip
+                        prop="name"
+                    ></el-table-column>
+                    <el-table-column :label="$t('commons.table.type')" prop="type">
+                        <template #default="{ row }">
+                            <span>{{ getDNSName(row.type) }}</span>
+                            <el-tooltip
+                                v-if="row.type === 'DnsPod'"
+                                :content="$t('ssl.dnsPodRemovedTip')"
+                                placement="top"
+                            >
+                                <el-tag type="danger" size="small" class="ml-2">
+                                    {{ $t('ssl.dnsPodRemoved') }}
+                                </el-tag>
+                            </el-tooltip>
+                        </template>
+                    </el-table-column>
+                    <fu-table-operations
+                        :ellipsis="1"
+                        :buttons="buttons"
+                        :label="$t('commons.table.operate')"
+                        fixed="right"
+                        fix
+                    />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+        <Create ref="createRef" @saved="search()" />
+        <OpDialog drawer ref="opRef" @search="search" />
+    </div>
 </template>
 
 <script lang="ts" setup>
@@ -42,8 +49,9 @@ import { readCachedPageSize } from '@/utils/panel-cache';
 import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';
 import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
-import { onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref, toRef } from 'vue';
 import i18n from '@/lang';
+import { useSearchReset } from '@/composables/useSearchReset';
 import { getDNSName } from '@/utils/ssl';
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
@@ -53,7 +61,6 @@ const paginationConfig = reactive({
 });
 let data = ref<Website.DnsAccount[]>();
 let createRef = ref();
-let open = ref(false);
 const opRef = ref();
 
 const buttons = [
@@ -72,15 +79,6 @@ const buttons = [
         },
     },
 ];
-
-const acceptParams = () => {
-    search();
-    open.value = true;
-};
-
-const handleClose = () => {
-    open.value = false;
-};
 
 const search = () => {
     const req = {
@@ -118,7 +116,6 @@ onMounted(() => {
     search();
 });
 
-defineExpose({
-    acceptParams,
-});
+const routerButton = [{ label: i18n.global.t('website.dnsAccountManage'), path: '/websites/ssl/dns-account' }];
+useSearchReset({ page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
 </script>

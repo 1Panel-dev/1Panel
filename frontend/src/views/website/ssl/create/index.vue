@@ -1,7 +1,33 @@
 <template>
     <DrawerPro v-model="open" :header="$t('ssl.' + operate)" size="large" @close="handleClose">
-        <el-form ref="sslForm" label-position="top" :model="ssl" label-width="100px" :rules="rules" v-loading="loading">
-            <el-row :gutter="20">
+        <el-form
+            ref="sslForm"
+            label-position="top"
+            :model="ssl"
+            label-width="100px"
+            :rules="rules"
+            :disabled="loading"
+            v-loading="loading"
+        >
+            <el-form-item :label="$t('commons.table.type')" v-if="operate === 'create'">
+                <el-radio-group v-model="certificateType" @change="changeCertificateType">
+                    <el-radio-button value="acme">ACME</el-radio-button>
+                    <el-radio-button value="selfSigned">{{ $t('ssl.selfSigned') }}</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item
+                v-if="ssl.provider === 'selfSigned' && operate === 'create'"
+                :label="$t('ssl.ca')"
+                prop="caId"
+            >
+                <el-select v-model="ssl.caId" filterable :loading="caLoading">
+                    <el-option v-for="ca in cas" :key="ca.id" :label="ca.name" :value="ca.id" />
+                </el-select>
+            </el-form-item>
+            <el-form-item v-if="ssl.provider === 'selfSigned'" :label="$t('website.domain')" prop="domains">
+                <el-input v-model="ssl.domains" type="textarea" :rows="4" :placeholder="$t('ssl.domainHelper')" />
+            </el-form-item>
+            <el-row v-else :gutter="20">
                 <el-col :span="12">
                     <el-form-item :label="$t('website.primaryDomain')" prop="primaryDomain">
                         <el-input v-model.trim="ssl.primaryDomain"></el-input>
@@ -20,10 +46,14 @@
                     </el-form-item>
                 </el-col>
             </el-row>
-            <el-form-item :label="''" prop="autoRenew">
+            <el-form-item :label="''" prop="isIP" v-if="ssl.provider !== 'selfSigned'">
                 <el-checkbox v-model="ssl.isIP" :label="$t('ssl.isIP')" @change="changeIP" />
             </el-form-item>
-            <el-form-item :label="$t('website.otherDomains')" prop="otherDomains" v-if="!ssl.isIP">
+            <el-form-item
+                :label="$t('website.otherDomains')"
+                prop="otherDomains"
+                v-if="ssl.provider !== 'selfSigned' && !ssl.isIP"
+            >
                 <el-input type="textarea" :rows="3" v-model="ssl.otherDomains"></el-input>
             </el-form-item>
             <el-form-item :label="$t('website.remark')" prop="description">
@@ -60,6 +90,20 @@
                         :value="keyType.value"
                     ></el-option>
                 </el-select>
+            </el-form-item>
+            <el-form-item
+                v-if="ssl.provider === 'selfSigned' && operate === 'create'"
+                :label="$t('ssl.days')"
+                prop="time"
+            >
+                <el-input type="number" v-model.number="ssl.time">
+                    <template #append>
+                        <el-select v-model="ssl.unit" style="width: 100px">
+                            <el-option :label="$t('commons.units.day')" value="day" />
+                            <el-option :label="$t('commons.units.year')" value="year" />
+                        </el-select>
+                    </template>
+                </el-input>
             </el-form-item>
             <el-form-item :label="$t('website.provider')" prop="provider" v-if="ssl.provider != 'selfSigned'">
                 <el-radio-group v-model="ssl.provider" @change="changeProvider()">
@@ -123,6 +167,8 @@
                         {{ $t('ssl.nameserverHelper') }}
                     </span>
                 </el-form-item>
+            </div>
+            <div v-if="ssl.provider !== 'selfSigned' || operate === 'create'">
                 <el-form-item :label="''" prop="pushDir">
                     <el-checkbox v-model="ssl.pushDir" :label="$t('ssl.pushDir')" />
                 </el-form-item>
@@ -184,12 +230,20 @@
 
 <script lang="ts" setup>
 import { Website } from '@/api/interface/website';
-import { createSSL, listWebsites, searchAcmeAccount, searchDnsAccount, updateSSL } from '@/api/modules/website';
-import { Rules, checkMaxLength } from '@/global/form-rules';
+import {
+    createSSL,
+    listWebsites,
+    searchAcmeAccount,
+    searchDnsAccount,
+    updateSSL,
+    searchCAs,
+    obtainSSLByCA,
+} from '@/api/modules/website';
+import { Rules, checkMaxLength, checkNumberRange } from '@/global/form-rules';
 import FileList from '@/components/file-list/index.vue';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, nextTick, reactive, ref, watch } from 'vue';
 import { MsgSuccess } from '@/utils/message';
 import { KeyTypes } from '@/global/mimetype';
 import { getDNSName, getAccountName } from '@/utils/ssl';
@@ -232,7 +286,14 @@ const dnsAccounts = ref<Website.DnsAccount[]>();
 const acmeAccounts = ref<Website.AcmeAccount[]>();
 const sslForm = ref<FormInstance>();
 const websites = ref();
-const rules = ref({
+const certificateType = ref('acme');
+const cas = ref<Website.CA[]>([]);
+const caLoading = ref(false);
+let caRequestVersion = 0;
+const rules = computed(() => ({
+    caId: [Rules.requiredSelectBusiness],
+    time: [Rules.requiredInput, Rules.integerNumber, checkNumberRange(1, 10000)],
+    domains: [Rules.requiredInput],
     primaryDomain: [Rules.requiredInput, Rules.domainOrIP],
     acmeAccountId: [Rules.requiredSelectBusiness],
     dnsAccountId: [Rules.requiredSelectBusiness],
@@ -245,10 +306,14 @@ const rules = ref({
     shell: [Rules.requiredInput],
     description: [checkMaxLength(128)],
     pushNodes: [Rules.requiredSelect],
-});
+}));
 const websiteID = ref();
 
 const initData = () => ({
+    domains: '',
+    caId: undefined as number | undefined,
+    time: 10,
+    unit: 'year',
     id: 0,
     primaryDomain: '',
     otherDomains: '',
@@ -297,6 +362,10 @@ const resetForm = () => {
     dnsResolve.value = [];
     ssl.value = initData();
     websiteID.value = undefined;
+    certificateType.value = 'acme';
+    cas.value = [];
+    caRequestVersion++;
+    caLoading.value = false;
 };
 
 const changeIP = () => {
@@ -331,6 +400,9 @@ const acceptParams = (op: string, websiteSSL?: Website.SSLDTO) => {
         ssl.value.description = websiteSSL.description;
         ssl.value.id = websiteSSL.id;
         ssl.value.provider = websiteSSL.provider;
+        ssl.value.domains = [websiteSSL.primaryDomain, ...(websiteSSL.domains || '').split(',')]
+            .filter(Boolean)
+            .join('\n');
         ssl.value.skipDNS = websiteSSL.skipDNS;
         ssl.value.disableCNAME = websiteSSL.disableCNAME;
         ssl.value.nameserver1 = websiteSSL.nameserver1;
@@ -338,9 +410,6 @@ const acceptParams = (op: string, websiteSSL?: Website.SSLDTO) => {
         ssl.value.keyType = websiteSSL.keyType;
         ssl.value.execShell = websiteSSL.execShell;
         ssl.value.shell = websiteSSL.shell;
-        if (ssl.value.provider == 'selfSigned') {
-            rules.value.primaryDomain = [];
-        }
         ssl.value.pushNode = websiteSSL.pushNode;
         if (websiteSSL.nodes != '') {
             ssl.value.pushNodes = websiteSSL.nodes
@@ -355,6 +424,33 @@ const acceptParams = (op: string, websiteSSL?: Website.SSLDTO) => {
     getDnsAccounts();
     getwebsites();
     open.value = true;
+};
+
+const changeCertificateType = async () => {
+    ssl.value.provider = certificateType.value === 'selfSigned' ? 'selfSigned' : 'dnsAccount';
+    ssl.value.isIP = false;
+    await nextTick();
+    sslForm.value?.clearValidate();
+    if (certificateType.value !== 'selfSigned' || cas.value.length || caLoading.value) return;
+    caLoading.value = true;
+    const requestVersion = ++caRequestVersion;
+    try {
+        const items: Website.CA[] = [];
+        let page = 1;
+        while (true) {
+            const res = await searchCAs({ page, pageSize: 100 });
+            if (requestVersion !== caRequestVersion) return;
+            const batch = res.data.items || [];
+            items.push(...batch);
+            if (!batch.length || items.length >= res.data.total) break;
+            page++;
+        }
+        if (!open.value) return;
+        cas.value = items;
+        ssl.value.caId = items[0]?.id;
+    } finally {
+        if (requestVersion === caRequestVersion) caLoading.value = false;
+    }
 };
 
 const getPath = (dirs: string[]) => {
@@ -404,9 +500,9 @@ const changeWebsite = () => {
 };
 
 const submit = async (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
+    if (!formEl || loading.value) return;
     await formEl.validate((valid) => {
-        if (!valid) {
+        if (!valid || loading.value) {
             return;
         }
         let nodes = '';
@@ -416,6 +512,35 @@ const submit = async (formEl: FormInstance | undefined) => {
         loading.value = true;
         if (operate.value == 'create') {
             ssl.value.nodes = nodes;
+            if (ssl.value.provider === 'selfSigned') {
+                obtainSSLByCA({
+                    id: ssl.value.caId!,
+                    domains: ssl.value.domains
+                        .split('\n')
+                        .map((domain) => domain.trim())
+                        .filter(Boolean)
+                        .join('\n'),
+                    keyType: ssl.value.keyType,
+                    time: ssl.value.time,
+                    unit: ssl.value.unit,
+                    autoRenew: ssl.value.autoRenew,
+                    description: ssl.value.description,
+                    pushDir: ssl.value.pushDir,
+                    dir: ssl.value.dir,
+                    execShell: ssl.value.execShell,
+                    shell: ssl.value.shell,
+                    pushNode: ssl.value.pushNode,
+                    nodes,
+                })
+                    .then(() => {
+                        handleClose();
+                        MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
+                return;
+            }
             createSSL(ssl.value)
                 .then((res: any) => {
                     if (ssl.value.provider != 'dnsManual') {
@@ -429,6 +554,14 @@ const submit = async (formEl: FormInstance | undefined) => {
                 });
         }
         if (operate.value == 'edit') {
+            if (ssl.value.provider === 'selfSigned') {
+                const domains = ssl.value.domains
+                    .split('\n')
+                    .map((domain) => domain.trim())
+                    .filter(Boolean);
+                ssl.value.primaryDomain = domains[0];
+                ssl.value.otherDomains = domains.slice(1).join('\n');
+            }
             const sslUpdate = {
                 id: ssl.value.id,
                 primaryDomain: ssl.value.primaryDomain,

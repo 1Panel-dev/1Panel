@@ -774,3 +774,7 @@ VMSnapshotRecoverTask: "بازیابی اسنپ‌شات [{{ .snapshot }}] بر�
 VMSnapshotRecoverStep: "بازیابی اسنپ‌شات ماشین مجازی [{{ .snapshot }}]"
 VMSnapshotDeleteTask: "حذف اسنپ‌شات [{{ .snapshot }}] برای ماشین مجازی [{{ .vm }}]"
 VMSnapshotDeleteStep: "حذف اسنپ‌شات ماشین مجازی [{{ .snapshot }}]"
+
+ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
+
+ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."

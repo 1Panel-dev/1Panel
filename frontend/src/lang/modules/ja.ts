@@ -4361,6 +4361,7 @@ const message = {
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
     },
     ssl: {
+        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
         deleteAndRevoke: '削除して失効',
         create: 'リクエスト',
