@@ -58,10 +58,10 @@ type ContainerService struct{}
 var containerLogAnsiRegex = regexp.MustCompile("\x1b\\[[0-9;?]*[A-Za-z]|\x1b=|\x1b>")
 
 type IContainerService interface {
-	Page(req dto.PageContainer) (int64, interface{}, error)
+	Page(ctx context.Context, req dto.PageContainer) (int64, interface{}, error)
 	List() []dto.ContainerOptions
 	ListByImage(imageName string) []dto.ContainerOptions
-	LoadStatus() (dto.ContainerStatus, error)
+	LoadStatus(ctx context.Context, containersOnly bool) (dto.ContainerStatus, error)
 	PageNetwork(req dto.SearchWithPage) (int64, interface{}, error)
 	ListNetwork() ([]dto.Options, error)
 	PageVolume(req dto.SearchWithPage) (int64, interface{}, error)
@@ -80,7 +80,7 @@ type IContainerService interface {
 	ContainerUpdate(req dto.ContainerOperate) error
 	ContainerUpgrade(req dto.ContainerUpgrade) error
 	ContainerInfo(req dto.OperationWithName) (*dto.ContainerOperate, error)
-	ContainerListStats() ([]dto.ContainerListStats, error)
+	ContainerListStats(ctx context.Context, ids []string) ([]dto.ContainerListStats, error)
 	ContainerItemStats(ctx context.Context, req dto.OperationWithName) (dto.ContainerItemStats, error)
 	LoadResourceLimit() (*dto.ResourceLimit, error)
 	ContainerRename(req dto.ContainerRename) error
@@ -112,7 +112,7 @@ func NewIContainerService() IContainerService {
 	return &ContainerService{}
 }
 
-func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, error) {
+func (u *ContainerService) Page(ctx context.Context, req dto.PageContainer) (int64, interface{}, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return 0, nil, err
@@ -123,7 +123,7 @@ func (u *ContainerService) Page(req dto.PageContainer) (int64, interface{}, erro
 		options.Filters = filters.NewArgs()
 		options.Filters.Add("label", req.Filters)
 	}
-	containers, err := client.ContainerList(context.Background(), options)
+	containers, err := client.ContainerList(ctx, options)
 	if err != nil {
 		return 0, nil, err
 	}
@@ -206,27 +206,30 @@ func (u *ContainerService) ListByImage(imageName string) []dto.ContainerOptions 
 	return options
 }
 
-func (u *ContainerService) LoadStatus() (dto.ContainerStatus, error) {
+func (u *ContainerService) LoadStatus(ctx context.Context, containersOnly bool) (dto.ContainerStatus, error) {
 	var data dto.ContainerStatus
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return data, err
 	}
 	defer client.Close()
-	c := context.Background()
-
-	images, _ := client.ImageList(c, image.ListOptions{All: true})
-	data.ImageCount = len(images)
-	repo, _ := imageRepoRepo.List()
-	data.RepoCount = len(repo)
-	templates, _ := composeRepo.List()
-	data.ComposeTemplateCount = len(templates)
-	networks, _ := client.NetworkList(c, network.ListOptions{})
-	data.NetworkCount = len(networks)
-	volumes, _ := client.VolumeList(c, volume.ListOptions{})
-	data.VolumeCount = len(volumes.Volumes)
-	data.ComposeCount = loadComposeCount(client)
-	containers, _ := client.ContainerList(c, container.ListOptions{All: true})
+	if !containersOnly {
+		images, _ := client.ImageList(ctx, image.ListOptions{All: true})
+		data.ImageCount = len(images)
+		repo, _ := imageRepoRepo.List()
+		data.RepoCount = len(repo)
+		templates, _ := composeRepo.List()
+		data.ComposeTemplateCount = len(templates)
+		networks, _ := client.NetworkList(ctx, network.ListOptions{})
+		data.NetworkCount = len(networks)
+		volumes, _ := client.VolumeList(ctx, volume.ListOptions{})
+		data.VolumeCount = len(volumes.Volumes)
+		data.ComposeCount = loadComposeCount(client)
+	}
+	containers, err := client.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return data, err
+	}
 	data.ContainerCount = len(containers)
 	for _, item := range containers {
 		switch item.State {
@@ -292,25 +295,46 @@ func (u *ContainerService) ContainerItemStats(ctx context.Context, req dto.Opera
 	}
 	return data, nil
 }
-func (u *ContainerService) ContainerListStats() ([]dto.ContainerListStats, error) {
+func (u *ContainerService) ContainerListStats(ctx context.Context, ids []string) ([]dto.ContainerListStats, error) {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return nil, err
 	}
 	defer client.Close()
-	list, err := client.ContainerList(context.Background(), container.ListOptions{All: true})
+	options := container.ListOptions{All: true}
+	if ids != nil {
+		if len(ids) == 0 {
+			return []dto.ContainerListStats{}, nil
+		}
+		options.Filters = filters.NewArgs()
+		for _, id := range ids {
+			options.Filters.Add("id", id)
+		}
+	}
+	list, err := client.ContainerList(ctx, options)
 	if err != nil {
 		return nil, err
 	}
 	datas := make([]dto.ContainerListStats, len(list))
+	jobs := make(chan int)
 	var wg sync.WaitGroup
-	wg.Add(len(list))
-	for i := 0; i < len(list); i++ {
-		go func(index int, item container.Summary) {
-			datas[index] = loadCpuAndMem(client, item.ID)
-			wg.Done()
-		}(i, list[i])
+	for worker := 0; worker < min(8, len(list)); worker++ {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			for index := range jobs {
+				datas[index].ContainerID = list[index].ID
+				if ctx.Err() != nil || list[index].State != "running" {
+					continue
+				}
+				datas[index] = loadCpuAndMem(ctx, client, list[index].ID)
+			}
+		}()
 	}
+	for index := range list {
+		jobs <- index
+	}
+	close(jobs)
 	wg.Wait()
 	return datas, nil
 }
@@ -1722,11 +1746,13 @@ func selectImageRepo(imageName string, repos []model.ImageRepo) *model.ImageRepo
 	return selected
 }
 
-func loadCpuAndMem(client *client.Client, containerItem string) dto.ContainerListStats {
+func loadCpuAndMem(ctx context.Context, client *client.Client, containerItem string) dto.ContainerListStats {
+	ctx, cancel := context.WithTimeout(ctx, 3*time.Second)
+	defer cancel()
 	data := dto.ContainerListStats{
 		ContainerID: containerItem,
 	}
-	res, err := client.ContainerStats(context.Background(), containerItem, false)
+	res, err := client.ContainerStats(ctx, containerItem, false)
 	if err != nil {
 		return data
 	}
