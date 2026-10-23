@@ -272,13 +272,11 @@ func password() {
 		return
 	}
 	complexSetting := getSettingByKey(db, "ComplexityVerification")
-	if complexSetting == constant.StatusEnable {
-		if isValidPassword("newPassword") {
-			fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdatePasswordFormat"))
-			return
-		}
-	}
-	if len(newPassword) < 6 {
+	switch validatePassword(newPassword, complexSetting) {
+	case passwordTooWeak:
+		fmt.Println("\n" + i18n.GetMsgByKeyForCmd("UpdatePasswordFormat"))
+		return
+	case passwordTooShort:
 		fmt.Println(i18n.GetMsgByKeyForCmd("UpdatePasswordLen"))
 		return
 	}
@@ -377,6 +375,25 @@ func port() {
 		fmt.Println(std)
 	}
 }
+
+type passwordValidation int
+
+const (
+	passwordValid passwordValidation = iota
+	passwordTooShort
+	passwordTooWeak
+)
+
+func validatePassword(password, complexitySetting string) passwordValidation {
+	if complexitySetting == constant.StatusEnable && !isValidPassword(password) {
+		return passwordTooWeak
+	}
+	if len(password) < 6 {
+		return passwordTooShort
+	}
+	return passwordValid
+}
+
 func isValidPassword(password string) bool {
 	numCount := 0
 	alphaCount := 0
