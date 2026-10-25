@@ -51,7 +51,7 @@ import { Website } from '@/api/interface/website';
 import { deleteDnsAccount, searchDnsAccount } from '@/api/modules/website';
 import { onMounted, reactive, ref, toRef } from 'vue';
 import i18n from '@/lang';
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { getDNSName } from '@/utils/ssl';
 const paginationConfig = reactive({
     cacheSizeKey: 'dns-account-page-size',
@@ -117,5 +117,12 @@ onMounted(() => {
 });
 
 const routerButton = [{ label: i18n.global.t('website.dnsAccountManage'), path: '/websites/ssl/dns-account' }];
-useSearchReset({ page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'website/ssl/dns-account/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 </script>

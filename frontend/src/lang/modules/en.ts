@@ -1875,6 +1875,14 @@ const message = {
             'Only successful runs without request anomalies enter the median and min/max summaries. P99 is the median of per-run P99 values. Cache and external traffic are uncontrolled.',
     },
     benchmarkOverview: {
+        comparison: 'Scenario and concurrency comparison',
+        comparisonHelp: 'Click a scenario name to inspect that combination.',
+        sharedPrefix: 'Shared prefix ratio',
+        sharedPrefixHelp: 'Configured prefix tokens as a proportion of input length, not a measured cache hit rate.',
+        singleRequestThroughput: 'Per-request output throughput',
+        singleRequestThroughputHelp:
+            'Output tokens from successful requests divided by their total end-to-end time, including first-token wait, for each run. Shows the median of valid runs, or — when data is missing.',
+        aggregateOutputThroughput: 'Total output throughput',
         noResults: 'No valid test results. Check the failure reason and logs.',
         noGroupResults: 'No valid results for this combination. Select another scenario or concurrency.',
         partial: 'Partial results: the test did not fully succeed. Metrics cover valid points only.',

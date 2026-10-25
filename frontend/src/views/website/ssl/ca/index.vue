@@ -51,7 +51,7 @@ import { Website } from '@/api/interface/website';
 import { deleteCA, searchCAs, downloadCAFile } from '@/api/modules/website';
 import i18n from '@/lang';
 import { onMounted, reactive, ref, toRef } from 'vue';
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import Create from './create/index.vue';
 import Upload from './upload/index.vue';
 import Detail from './detail/index.vue';
@@ -94,7 +94,14 @@ const buttons = [
     },
 ];
 
-useSearchReset({ page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'website/ssl/ca/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 
 const search = async () => {
     const req = {

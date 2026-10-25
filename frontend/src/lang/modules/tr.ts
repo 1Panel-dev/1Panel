@@ -1889,6 +1889,15 @@ const message = {
             'Medyan ve en düşük/en yüksek değerler yalnızca istek anomalisi olmayan başarılı çalışmaları içerir. P99, çalışma başına P99 değerlerinin medyanıdır. Önbellek ve dış trafik kontrol edilmez.',
     },
     benchmarkOverview: {
+        comparison: 'Senaryo ve eşzamanlılık karşılaştırması',
+        comparisonHelp: 'Bu birleşimin ayrıntılarını görmek için senaryo adına tıklayın.',
+        sharedPrefix: 'Paylaşılan önek oranı',
+        sharedPrefixHelp:
+            'Yapılandırılan önek belirteçlerinin girdi uzunluğuna oranıdır; ölçülen önbellek isabet oranı değildir.',
+        singleRequestThroughput: 'İstek başına çıktı hızı',
+        singleRequestThroughputHelp:
+            'Her çalıştırmada başarılı isteklerin çıktı belirteçleri, ilk belirteci bekleme dahil toplam uçtan uca sürelerine bölünür. Geçerli çalıştırmaların medyanı gösterilir; veri yoksa — gösterilir.',
+        aggregateOutputThroughput: 'Toplam çıktı hızı',
         noResults: 'Geçerli test sonucu yok. Hata nedenini ve günlükleri kontrol edin.',
         noGroupResults: 'Bu birleşim için geçerli sonuç yok. Başka bir senaryo veya eşzamanlılık seçin.',
         partial: 'Kısmi sonuçlar: test tamamen başarılı olmadı. Metrikler yalnızca geçerli noktaları kapsar.',

@@ -1784,6 +1784,14 @@ const message = {
             '汇总仅使用成功且无请求异常的重复测试，显示中位数和最小/最大值。P99 是每次测试 P99 的中位数；缓存和外部流量未受控。',
     },
     benchmarkOverview: {
+        comparison: '场景与并发对照',
+        comparisonHelp: '点击场景名称查看该组合的指标详情。',
+        sharedPrefix: '共享前缀比例',
+        sharedPrefixHelp: '共享前缀比例为配置的前缀 Token 数占输入长度的比例，不代表实测缓存命中率。',
+        singleRequestThroughput: '单路输出吞吐',
+        singleRequestThroughputHelp:
+            '每轮成功请求的输出 Token 总数 ÷ 成功请求总耗时（包含首 Token 等待），再对有效轮次取中位数。缺少数据时显示 —。',
+        aggregateOutputThroughput: '总输出吞吐',
         noResults: '没有有效的测试结果，请查看失败原因和日志。',
         noGroupResults: '此组合没有有效结果，请切换场景或并发数。',
         partial: '部分结果：本次测试未完整成功，指标仅代表有效测点。',

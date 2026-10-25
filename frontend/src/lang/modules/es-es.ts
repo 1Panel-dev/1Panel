@@ -1890,6 +1890,15 @@ const message = {
             'La mediana y los mínimos/máximos solo incluyen ejecuciones correctas sin anomalías. P99 es la mediana de los P99 de cada ejecución. La caché y el tráfico externo no están controlados.',
     },
     benchmarkOverview: {
+        comparison: 'Comparación de escenarios y concurrencia',
+        comparisonHelp: 'Haz clic en un escenario para ver los detalles de esa combinación.',
+        sharedPrefix: 'Proporción de prefijo compartido',
+        sharedPrefixHelp:
+            'Tokens de prefijo configurados respecto a la longitud de entrada; no es una tasa medida de aciertos de caché.',
+        singleRequestThroughput: 'Rendimiento de salida por solicitud',
+        singleRequestThroughputHelp:
+            'Tokens de salida de solicitudes exitosas divididos por su tiempo total de extremo a extremo, incluida la espera del primer token, en cada ejecución. Se muestra la mediana de las ejecuciones válidas, o — si faltan datos.',
+        aggregateOutputThroughput: 'Rendimiento total de salida',
         noResults: 'No hay resultados válidos. Consulte la causa del fallo y los registros.',
         noGroupResults: 'Esta combinación no tiene resultados válidos. Seleccione otro escenario o concurrencia.',
         partial: 'Resultados parciales: la prueba no se completó con éxito. Solo se incluyen puntos válidos.',

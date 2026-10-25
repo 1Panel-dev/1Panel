@@ -55,7 +55,7 @@ import { readCachedPageSize } from '@/utils/panel-cache';
 import { Website } from '@/api/interface/website';
 import { deleteAcmeAccount, searchAcmeAccount, updateAcmeAccount } from '@/api/modules/website';
 import i18n from '@/lang';
-import { useSearchReset } from '@/composables/useSearchReset';
+import { useSearchState } from '@/utils/search-reset';
 import { onMounted, reactive, ref, toRef } from 'vue';
 import Create from './create/index.vue';
 import { getAccountName, getKeyName } from '@/utils/ssl';
@@ -120,7 +120,14 @@ const deleteAccount = async (row: any) => {
 };
 
 const routerButton = [{ label: i18n.global.t('website.acmeAccountManage'), path: '/websites/ssl/acme-account' }];
-useSearchReset({ page: toRef(paginationConfig, 'currentPage') }, { onRevisit: () => search() });
+useSearchState(
+    'website/ssl/acme-account/index',
+    {
+        page: toRef(paginationConfig, 'currentPage'),
+        pageSize: toRef(paginationConfig, 'pageSize'),
+    },
+    { onRevisit: () => search() },
+);
 onMounted(() => {
     search();
 });
