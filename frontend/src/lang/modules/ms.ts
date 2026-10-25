@@ -1892,6 +1892,15 @@ const message = {
             'Median dan minimum/maksimum hanya melibatkan ujian berjaya tanpa anomali permintaan. P99 ialah median P99 setiap ujian. Cache dan trafik luaran tidak dikawal.',
     },
     benchmarkOverview: {
+        comparison: 'Perbandingan senario dan keserentakan',
+        comparisonHelp: 'Klik nama senario untuk melihat butiran gabungan itu.',
+        sharedPrefix: 'Nisbah awalan dikongsi',
+        sharedPrefixHelp:
+            'Nisbah token awalan yang dikonfigurasi kepada panjang input, bukan kadar hit cache yang diukur.',
+        singleRequestThroughput: 'Daya pemprosesan output setiap permintaan',
+        singleRequestThroughputHelp:
+            'Token output permintaan berjaya dibahagi dengan jumlah masa hujung ke hujungnya, termasuk masa menunggu token pertama, bagi setiap larian. Memaparkan median larian sah, atau — jika data tiada.',
+        aggregateOutputThroughput: 'Jumlah daya pemprosesan output',
         noResults: 'Tiada keputusan ujian yang sah. Semak sebab kegagalan dan log.',
         noGroupResults: 'Tiada keputusan sah untuk gabungan ini. Pilih senario atau keserentakan lain.',
         partial: 'Keputusan separa: ujian tidak berjaya sepenuhnya. Metrik hanya merangkumi titik yang sah.',

@@ -1771,6 +1771,14 @@ const message = {
             '彙總僅採用成功且無請求異常的重複測試，顯示中位數與最小/最大值。P99 是各次 P99 的中位數；快取與外部流量未受控。',
     },
     benchmarkOverview: {
+        comparison: '情境與並行數對照',
+        comparisonHelp: '點選情境名稱查看該組合的指標詳情。',
+        sharedPrefix: '共用前綴比例',
+        sharedPrefixHelp: '共用前綴比例為設定的前綴 Token 數占輸入長度的比例，不代表實測快取命中率。',
+        singleRequestThroughput: '單路輸出吞吐量',
+        singleRequestThroughputHelp:
+            '每輪成功請求的輸出 Token 總數 ÷ 成功請求總耗時（包含首 Token 等待），再對有效輪次取中位數。缺少資料時顯示 —。',
+        aggregateOutputThroughput: '總輸出吞吐量',
         noResults: '沒有有效的測試結果，請查看失敗原因和日誌。',
         noGroupResults: '此組合沒有有效結果，請切換場景或並行數。',
         partial: '部分結果：本次測試未完整成功，指標僅代表有效測點。',

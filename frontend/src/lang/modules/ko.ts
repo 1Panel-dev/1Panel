@@ -1837,6 +1837,14 @@ const message = {
             '요청 이상이 없는 성공한 실행만 중앙값과 최솟값/최댓값에 포함합니다. P99는 각 실행 P99의 중앙값입니다. 캐시와 외부 트래픽은 통제되지 않습니다.',
     },
     benchmarkOverview: {
+        comparison: '시나리오 및 동시 요청 수 비교',
+        comparisonHelp: '시나리오 이름을 클릭하면 해당 조합의 상세 지표를 확인할 수 있습니다.',
+        sharedPrefix: '공유 접두사 비율',
+        sharedPrefixHelp: '입력 길이에 대한 설정된 접두사 토큰 수의 비율이며, 측정된 캐시 적중률이 아닙니다.',
+        singleRequestThroughput: '요청별 출력 처리량',
+        singleRequestThroughputHelp:
+            '각 실행에서 성공한 요청의 출력 토큰 합계를 첫 토큰 대기를 포함한 전체 응답 시간 합계로 나눕니다. 유효한 실행의 중앙값을 표시하며 데이터가 없으면 —를 표시합니다.',
+        aggregateOutputThroughput: '총 출력 처리량',
         noResults: '유효한 테스트 결과가 없습니다. 실패 원인과 로그를 확인하세요.',
         noGroupResults: '이 조합에 유효한 결과가 없습니다. 시나리오 또는 동시 실행 수를 변경하세요.',
         partial: '부분 결과: 테스트가 완전히 성공하지 않았습니다. 유효한 측정점만 반영합니다.',
