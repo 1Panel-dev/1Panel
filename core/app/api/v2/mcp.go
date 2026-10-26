@@ -297,13 +297,9 @@ func mcpServiceError(c *gin.Context, err error) {
 		mcpManagementError(c, err)
 		return
 	}
-	// Service manager errors contain only fixed service/asset diagnostics. Tool
-	// execution errors and credential payloads never pass through this function.
 	helper.InternalServer(c, err)
 }
 
-// Runtime routes deliberately do not enter panel Session/API Key middleware.
-// Their only identity is the dedicated Bearer, checked by MCPService each call.
 func MCPRuntimeTools(c *gin.Context) {
 	c.Header("Cache-Control", "no-store")
 	token, err := service.MCPBearer(c)

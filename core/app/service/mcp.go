@@ -529,7 +529,7 @@ func (s *MCPService) Authenticate(c *gin.Context, token string) (model.MCPCreden
 	return key, owner, nil
 }
 func (s *MCPService) RuntimeTools(c *gin.Context, token string) (map[string]any, error) {
-	key, owner, err := s.Authenticate(c, token)
+	key, _, err := s.Authenticate(c, token)
 	if err != nil {
 		return nil, err
 	}
@@ -545,14 +545,13 @@ func (s *MCPService) RuntimeTools(c *gin.Context, token string) (map[string]any,
 	for _, grant := range grants {
 		policies[grant.ToolID] = grant
 	}
-	latest, latestOwner, err := s.Authenticate(c, token)
+	latest, owner, err := s.Authenticate(c, token)
 	if err != nil {
 		return nil, err
 	}
 	if latest.Revision != key.Revision {
 		return nil, contract.Forbidden()
 	}
-	owner = latestOwner
 	nodes, err := s.credentialNodes(latest, owner)
 	if err != nil {
 		return nil, err

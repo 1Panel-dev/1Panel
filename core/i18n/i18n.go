@@ -4,6 +4,7 @@ import (
 	"embed"
 	"fmt"
 	"strings"
+	"sync"
 	"sync/atomic"
 
 	"github.com/1Panel-dev/1Panel/core/app/repo"
@@ -252,4 +253,31 @@ func initBundle() {
 	if !isSuccess {
 		panic("[i18n] failed to init language files, See log above for details")
 	}
+}
+
+var (
+	mcpDocumentBundleOnce sync.Once
+	mcpDocumentBundle     *i18n.Bundle
+	mcpDocumentBundleErr  error
+)
+
+func NewMCPDocumentLocalizer(lang string) (*i18n.Localizer, error) {
+	mcpDocumentBundleOnce.Do(func() {
+		documentBundle := i18n.NewBundle(language.English)
+		documentBundle.RegisterUnmarshalFunc("yaml", yaml.Unmarshal)
+		for _, file := range langFiles {
+			if _, err := documentBundle.LoadMessageFileFS(fs, file); err != nil {
+				mcpDocumentBundleErr = fmt.Errorf("load MCP document language %s: %w", file, err)
+				return
+			}
+		}
+		mcpDocumentBundle = documentBundle
+	})
+	if mcpDocumentBundleErr != nil {
+		return nil, mcpDocumentBundleErr
+	}
+	if strings.TrimSpace(lang) == "" {
+		lang = GetLanguage()
+	}
+	return i18n.NewLocalizer(mcpDocumentBundle, lang, language.English.String()), nil
 }
