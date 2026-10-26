@@ -460,7 +460,7 @@ const message = {
         ssl: '인증서 | 인증서들',
         database: '데이터베이스 | 데이터베이스들',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 관리',
         container: '컨테이너 | 컨테이너들',
         cronjob: '크론 작업 | 크론 작업들',
         system: '시스템',
@@ -1363,7 +1363,7 @@ const message = {
             apiKeyCount: 'API 키 수',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills 저장소',
             upload: 'Skill 업로드',
             importSkill: 'Skill 가져오기',
             repositoryAddress: '저장소 주소',
@@ -2658,7 +2658,7 @@ const message = {
         detail: {
             dashboard: '개요',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills 저장소',
             ai_proxy: 'AI 프록시',
             ai_benchmark: '벤치마크',
             groups: '그룹',

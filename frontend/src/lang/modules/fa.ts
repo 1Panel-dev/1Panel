@@ -463,7 +463,7 @@ const message = {
         ssl: 'گواهی | گواهی‌ها',
         database: 'پایگاه داده | پایگاه‌های داده',
         aiTools: 'هوش مصنوعی',
-        mcp: 'MCP',
+        mcp: 'مدیریت MCP',
         container: 'کانتینر | کانتینرها',
         cronjob: 'وظیفه زمان‌بندی شده | وظایف زمان‌بندی شده',
         system: 'سیستم',
@@ -1371,7 +1371,7 @@ const message = {
             sampleImportPlaceholder: 'هر خط یک نمونه',
         },
         skillsHub: {
-            title: 'مرکز مهارت',
+            title: 'مخزن مهارت‌ها',
             upload: 'بارگذاری مهارت',
             importSkill: 'واردات مهارت',
             repositoryAddress: 'آدرس مخزن',
@@ -2691,7 +2691,7 @@ const message = {
         detail: {
             dashboard: 'نمای کلی',
             ai: 'هوش مصنوعی',
-            skills_hub: 'مرکز مهارت',
+            skills_hub: 'مخزن مهارت‌ها',
             ai_proxy: 'پروکسی هوش مصنوعی',
             ai_benchmark: 'معیار سنجش',
             groups: 'گروه',

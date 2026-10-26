@@ -461,7 +461,7 @@ const message = {
         ssl: 'ໃບຢັ້ງຢືນ | ໃບຢັ້ງຢືນ',
         database: 'ຖານຂໍ້ມູນ | ຖານຂໍ້ມູນ',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'ການຈັດການ MCP',
         container: 'ຄອນເທນເນີ | ຄອນເທນເນີ',
         cronjob: 'ໜ້າວຽກຕັ້ງເວລາ | ໜ້າວຽກຕັ້ງເວລາ',
         system: 'ລະບົບ',
@@ -1358,7 +1358,7 @@ const message = {
             sampleImportPlaceholder: 'ໜຶ່ງຕົວຢ່າງຕໍ່ແຖວ',
         },
         skillsHub: {
-            title: 'ສູນລວມທັກສະ (Skills Hub)',
+            title: 'ຄັງທັກສະ',
             upload: 'ອັບໂຫຼດທັກສະ',
             importSkill: 'ນຳເຂົ້າທັກສະ',
             repositoryAddress: 'ທີ່ຢູ່ຄັງເກັບ (Repository)',
@@ -2634,7 +2634,7 @@ const message = {
         detail: {
             dashboard: 'ພາບລວມ',
             ai: 'AI',
-            skills_hub: 'ສູນລວມທັກສະ',
+            skills_hub: 'ຄັງທັກສະ',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'ການທົດສອບປະສິດທິພາບ',
             groups: 'ກຸ່ມ',

@@ -447,7 +447,7 @@ const message = {
         security: '安全',
         database: '資料庫',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 管理',
         container: '容器',
         cronjob: '計劃任務',
         system: '系統',
@@ -1314,7 +1314,7 @@ const message = {
             apiKeyCount: '數量',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills 倉庫',
             upload: '上傳 Skill',
             importSkill: '匯入 Skill',
             repositoryAddress: '倉庫地址',
@@ -2550,7 +2550,7 @@ const message = {
         detail: {
             dashboard: '概覽',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills 倉庫',
             ai_proxy: 'AI 網關',
             ai_benchmark: '基準測試',
             groups: '分組',
