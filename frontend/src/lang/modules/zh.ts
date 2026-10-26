@@ -448,7 +448,7 @@ const message = {
         security: '安全',
         database: '数据库',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 管理',
         container: '容器',
         cronjob: '计划任务',
         system: '系统',
@@ -815,7 +815,7 @@ const message = {
             contextWindow: '上下文窗口',
             useModelDefault: '使用模型默认值',
             reasoning: '推理模型',
-            verified: '验证状态',
+            verified: '验证成功',
             verifySkipped: '不验证',
             skillsTab: '技能',
             pluginsTab: '插件',
@@ -1017,6 +1017,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: '启动命令必须使用 {0} 端口，否则服务将无法访问。',
             ascendVisibleDevices: 'Ascend 可见设备（ASCEND_RT_VISIBLE_DEVICES）',
+            syncModelAccount: '同步到模型账号',
             modelAccountAddressHelper:
                 '容器地址适合智能体容器调用；127.0.0.1、本机 IP 或自定义地址适合 AI 网关或外部服务调用。',
             containerAddress: '容器地址',
@@ -1327,7 +1328,7 @@ const message = {
             sampleImportPlaceholder: '每行一个样本',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills 仓库',
             upload: '上传 Skill',
             importSkill: '导入 Skill',
             repositoryAddress: '仓库地址',
@@ -2581,7 +2582,7 @@ const message = {
         detail: {
             dashboard: '概览',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills 仓库',
             ai_proxy: 'AI 网关',
             ai_benchmark: '基准测试',
             groups: '分组',

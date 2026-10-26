@@ -136,6 +136,7 @@ export namespace App {
     }
 
     export interface AppInstall {
+        syncModelAccount?: boolean;
         modelAccountBaseURLType?: string;
         modelAccountBaseURL?: string;
         appDetailId: number;
@@ -229,6 +230,8 @@ export namespace App {
         name: string;
         version: string;
         isExist: boolean;
+        modelAccountBaseURLType: string;
+        modelAccountBaseURL: string;
         app: string;
         status: string;
         createdAt: string;
@@ -303,6 +306,12 @@ export namespace App {
     }
 
     export interface AppConfig {
+        appKey: string;
+        name: string;
+        httpPort: number;
+        syncModelAccount: boolean;
+        modelAccountBaseURLType: string;
+        modelAccountBaseURL: string;
         params: InstallParams[];
         rawCompose?: string;
         cpuQuota: number;

@@ -468,7 +468,7 @@ const message = {
         ssl: 'Sertifika | Sertifikalar',
         database: 'Veritabanı | Veritabanları',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP Yönetimi',
         container: 'Konteyner | Konteynerler',
         cronjob: 'Cron İşi | Cron İşleri',
         system: 'Sistem',
@@ -1074,6 +1074,7 @@ const message = {
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Model hesabına senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
@@ -1397,7 +1398,7 @@ const message = {
             apiKeyCount: 'Miktar',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills Deposu',
             upload: 'Skill yükle',
             importSkill: 'Skill içe aktar',
             repositoryAddress: 'Depo adresi',
@@ -2752,7 +2753,7 @@ const message = {
         detail: {
             dashboard: 'Genel Bakış',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills Deposu',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'Benchmark',
             groups: 'Grup',

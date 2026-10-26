@@ -472,7 +472,7 @@ const message = {
         ssl: 'Sijil',
         database: 'Pangkalan Data',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'Pengurusan MCP',
         container: 'Kontena',
         cronjob: 'Tugas Berjadual',
         system: 'System',
@@ -1075,6 +1075,7 @@ const message = {
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Segerakkan ke akaun model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',
@@ -1399,7 +1400,7 @@ const message = {
             apiKeyCount: 'Kuantiti',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Repositori Skills',
             upload: 'Muat naik Skill',
             importSkill: 'Import Kemahiran',
             repositoryAddress: 'Alamat repositori',
@@ -2759,7 +2760,7 @@ const message = {
         detail: {
             dashboard: 'Overview',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Repositori Skills',
             ai_proxy: 'Proksi AI',
             ai_benchmark: 'Penanda Aras',
             groups: 'Kumpulan',

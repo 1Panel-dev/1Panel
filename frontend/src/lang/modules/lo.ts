@@ -461,7 +461,7 @@ const message = {
         ssl: 'ໃບຢັ້ງຢືນ | ໃບຢັ້ງຢືນ',
         database: 'ຖານຂໍ້ມູນ | ຖານຂໍ້ມູນ',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'ການຈັດການ MCP',
         container: 'ຄອນເທນເນີ | ຄອນເທນເນີ',
         cronjob: 'ໜ້າວຽກຕັ້ງເວລາ | ໜ້າວຽກຕັ້ງເວລາ',
         system: 'ລະບົບ',
@@ -1038,6 +1038,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: 'ຄຳສັ່ງເລີ່ມຕົ້ນຕ້ອງໃຊ້ພອດ {0}; ບໍ່ດັ່ງນັ້ນຈະບໍ່ສາມາດເຂົ້າເຖິງບໍລິການໄດ້.',
             ascendVisibleDevices: 'ອຸປະກອນ Ascend ທີ່ເຫັນໄດ້ (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບັນຊີໂມເດວ',
             modelAccountAddressHelper:
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
             containerAddress: 'ທີ່ຢູ່ຄອນເທນເນີ',
@@ -1358,7 +1359,7 @@ const message = {
             sampleImportPlaceholder: 'ໜຶ່ງຕົວຢ່າງຕໍ່ແຖວ',
         },
         skillsHub: {
-            title: 'ສູນລວມທັກສະ (Skills Hub)',
+            title: 'ຄັງທັກສະ',
             upload: 'ອັບໂຫຼດທັກສະ',
             importSkill: 'ນຳເຂົ້າທັກສະ',
             repositoryAddress: 'ທີ່ຢູ່ຄັງເກັບ (Repository)',
@@ -2634,7 +2635,7 @@ const message = {
         detail: {
             dashboard: 'ພາບລວມ',
             ai: 'AI',
-            skills_hub: 'ສູນລວມທັກສະ',
+            skills_hub: 'ຄັງທັກສະ',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'ການທົດສອບປະສິດທິພາບ',
             groups: 'ກຸ່ມ',

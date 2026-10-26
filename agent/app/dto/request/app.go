@@ -23,6 +23,7 @@ type AppInstallCreate struct {
 	Services    map[string]string      `json:"services"`
 	TaskID      string                 `json:"taskID"`
 
+	SyncModelAccount        *bool  `json:"syncModelAccount"`
 	ModelAccountBaseURLType string `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
 	ModelAccountBaseURL     string `json:"modelAccountBaseURL"`
 
@@ -125,9 +126,12 @@ type AppInstallDelete struct {
 }
 
 type AppInstalledUpdate struct {
-	InstallId uint                   `json:"installId" validate:"required"`
-	Params    map[string]interface{} `json:"params" validate:"required"`
-	TaskID    string                 `json:"-"`
+	SyncModelAccount        *bool                  `json:"syncModelAccount"`
+	ModelAccountBaseURLType string                 `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
+	ModelAccountBaseURL     string                 `json:"modelAccountBaseURL"`
+	InstallId               uint                   `json:"installId" validate:"required"`
+	Params                  map[string]interface{} `json:"params" validate:"required"`
+	TaskID                  string                 `json:"-"`
 	AppContainerConfig
 }
 

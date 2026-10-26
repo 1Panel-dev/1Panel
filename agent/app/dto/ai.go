@@ -24,6 +24,12 @@ type OllamaModelName struct {
 	TaskID string `json:"taskID"`
 }
 
+type OllamaModelAccountSync struct {
+	ID                      uint   `json:"id" validate:"required"`
+	ModelAccountBaseURLType string `json:"modelAccountBaseURLType" validate:"required,oneof=container localhost systemIP custom"`
+	ModelAccountBaseURL     string `json:"modelAccountBaseURL"`
+}
+
 type OllamaBindDomain struct {
 	Domain       string `json:"domain" validate:"required"`
 	AppInstallID uint   `json:"appInstallID" validate:"required"`

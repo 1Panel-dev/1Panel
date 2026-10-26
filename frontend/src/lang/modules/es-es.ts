@@ -467,7 +467,7 @@ const message = {
         ssl: 'Certificado | Certificados',
         database: 'Base de datos | Bases de datos',
         aiTools: 'IA',
-        mcp: 'MCP',
+        mcp: 'Gestión de MCP',
         container: 'Contenedor | Contenedores',
         cronjob: 'Tarea programada | Tareas programadas',
         system: 'Sistema',
@@ -1066,6 +1066,7 @@ const message = {
             vllmCommandPortHelper:
                 'El comando de inicio debe usar el puerto {0}; de lo contrario, no se podrá acceder al servicio.',
             ascendVisibleDevices: 'Dispositivos Ascend visibles (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Sincronizar con cuenta de modelo',
             modelAccountAddressHelper:
                 'La dirección del contenedor es para contenedores de agentes; 127.0.0.1, IP del sistema o dirección personalizada es para AI Gateway o servicios externos.',
             containerAddress: 'Dirección del contenedor',
@@ -1393,7 +1394,7 @@ const message = {
             apiKeyCount: 'Cantidad',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Repositorio de Skills',
             upload: 'Subir Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Dirección del repositorio',
@@ -2762,7 +2763,7 @@ const message = {
         detail: {
             dashboard: 'Resumen general',
             ai: 'IA',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Repositorio de Skills',
             ai_proxy: 'Proxy de IA',
             ai_benchmark: 'Benchmark',
             groups: 'Grupo',

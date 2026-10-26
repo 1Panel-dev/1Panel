@@ -463,7 +463,7 @@ const message = {
         ssl: 'گواهی | گواهی‌ها',
         database: 'پایگاه داده | پایگاه‌های داده',
         aiTools: 'هوش مصنوعی',
-        mcp: 'MCP',
+        mcp: 'مدیریت MCP',
         container: 'کانتینر | کانتینرها',
         cronjob: 'وظیفه زمان‌بندی شده | وظایف زمان‌بندی شده',
         system: 'سیستم',
@@ -1048,6 +1048,7 @@ const message = {
             vllmCommandPortHelper:
                 'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'همگام‌سازی با حساب مدل',
             modelAccountAddressHelper:
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
             containerAddress: 'آدرس کانتینر',
@@ -1371,7 +1372,7 @@ const message = {
             sampleImportPlaceholder: 'هر خط یک نمونه',
         },
         skillsHub: {
-            title: 'مرکز مهارت',
+            title: 'مخزن مهارت‌ها',
             upload: 'بارگذاری مهارت',
             importSkill: 'واردات مهارت',
             repositoryAddress: 'آدرس مخزن',
@@ -2691,7 +2692,7 @@ const message = {
         detail: {
             dashboard: 'نمای کلی',
             ai: 'هوش مصنوعی',
-            skills_hub: 'مرکز مهارت',
+            skills_hub: 'مخزن مهارت‌ها',
             ai_proxy: 'پروکسی هوش مصنوعی',
             ai_benchmark: 'معیار سنجش',
             groups: 'گروه',

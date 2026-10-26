@@ -468,7 +468,7 @@ const message = {
         ssl: 'Certificate | Certificates',
         database: 'Database | Databases',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP Management',
         container: 'Container | Containers',
         cronjob: 'Cron Job | Cron Jobs',
         system: 'System',
@@ -1063,6 +1063,7 @@ const message = {
             vllmCommandPortHelper:
                 'The startup command must use port {0}; otherwise, the service will be inaccessible.',
             ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Sync to model account',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',
@@ -1387,7 +1388,7 @@ const message = {
             sampleImportPlaceholder: 'One sample per line',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills Repository',
             upload: 'Upload Skill',
             importSkill: 'Import Skill',
             repositoryAddress: 'Repository Address',
@@ -2719,7 +2720,7 @@ const message = {
         detail: {
             dashboard: 'Overview',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills Repository',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'Benchmark',
             groups: 'Group',

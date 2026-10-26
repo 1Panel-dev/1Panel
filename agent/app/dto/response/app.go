@@ -50,19 +50,21 @@ type TagDTO struct {
 }
 
 type AppInstalledCheck struct {
-	IsExist       bool      `json:"isExist"`
-	Name          string    `json:"name"`
-	App           string    `json:"app"`
-	Version       string    `json:"version"`
-	Status        string    `json:"status"`
-	CreatedAt     time.Time `json:"createdAt"`
-	LastBackupAt  string    `json:"lastBackupAt"`
-	AppInstallID  uint      `json:"appInstallId"`
-	ContainerName string    `json:"containerName"`
-	InstallPath   string    `json:"installPath"`
-	HttpPort      int       `json:"httpPort"`
-	HttpsPort     int       `json:"httpsPort"`
-	WebsiteDir    string    `json:"websiteDir"`
+	ModelAccountBaseURLType string    `json:"modelAccountBaseURLType"`
+	ModelAccountBaseURL     string    `json:"modelAccountBaseURL"`
+	IsExist                 bool      `json:"isExist"`
+	Name                    string    `json:"name"`
+	App                     string    `json:"app"`
+	Version                 string    `json:"version"`
+	Status                  string    `json:"status"`
+	CreatedAt               time.Time `json:"createdAt"`
+	LastBackupAt            string    `json:"lastBackupAt"`
+	AppInstallID            uint      `json:"appInstallId"`
+	ContainerName           string    `json:"containerName"`
+	InstallPath             string    `json:"installPath"`
+	HttpPort                int       `json:"httpPort"`
+	HttpsPort               int       `json:"httpsPort"`
+	WebsiteDir              string    `json:"websiteDir"`
 }
 
 type AppDetailDTO struct {
@@ -184,7 +186,13 @@ type AppParam struct {
 }
 
 type AppConfig struct {
-	Params     []AppParam `json:"params"`
-	RawCompose string     `json:"rawCompose"`
+	AppKey                  string     `json:"appKey"`
+	Name                    string     `json:"name"`
+	HttpPort                int        `json:"httpPort"`
+	SyncModelAccount        bool       `json:"syncModelAccount"`
+	ModelAccountBaseURLType string     `json:"modelAccountBaseURLType"`
+	ModelAccountBaseURL     string     `json:"modelAccountBaseURL"`
+	Params                  []AppParam `json:"params"`
+	RawCompose              string     `json:"rawCompose"`
 	request.AppContainerConfig
 }

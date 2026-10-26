@@ -57,7 +57,7 @@
         v-if="visible && view && view !== VllmPlaceholder && !failed && !missing"
         ref="contentRef"
         v-bind="
-            view === EngineConnection
+            view === EngineConnection || view === AppParams
                 ? {}
                 : view === ContainerLogs
                   ? { highlightDiff: 210 }
@@ -100,6 +100,7 @@ import { hasPermission } from '@/utils/rbac';
 import { hasManagePermissionAccess } from '@/utils/permission';
 import { newUUID } from '@/utils/id';
 import OllamaModels from '../../ollama/models/index.vue';
+import AppParams from '@/views/app-store/installed/detail/index.vue';
 import EngineConnection from '../connection/index.vue';
 import TensorForm from '../../tensorrt/operate/index.vue';
 import VllmPlaceholder from '../../vllm/index.vue';
@@ -196,9 +197,11 @@ const open = async (
                 await openUpgrade(data.appInstallId, version);
                 return;
             }
-            const component = action === 'connection' ? EngineConnection : action === 'log' ? ContainerLogs : undefined;
+            const component = { config: AppParams, connection: EngineConnection, log: ContainerLogs }[action];
             view.value = component ? markRaw(component) : undefined;
             await nextTick();
+            if (version !== request || !visible.value) return;
+            if (action === 'config') await contentRef.value?.acceptParams({ id: data.appInstallId, edit: true });
             if (action === 'connection')
                 contentRef.value?.acceptParams({
                     name: data.name,
@@ -304,7 +307,9 @@ watch([currentNode, () => route.fullPath, isProductPro, isFxplay], () => {
 });
 const operationDisabled = (row: Deployment) =>
     deleteLoading.value ||
-    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Waiting', 'Uninstalling'].includes(row.status);
+    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(
+        row.status,
+    );
 const deleteDeployment = async () => {
     const version = request;
     const row = deleting.value;
@@ -367,7 +372,7 @@ const returnToManagement = async () => {
     const previousView = view.value;
     await nextTick();
     if (view.value !== previousView) return;
-    if (actionName.value === 'task' || actionName.value === 'upgrade') emit('search');
+    if (['task', 'upgrade', 'config'].includes(actionName.value)) emit('search');
     if (deleted.value || standalone.value) visible.value = false;
     else if (instance.value) open(instance.value);
 };

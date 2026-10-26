@@ -465,7 +465,7 @@ const message = {
         ssl: '証明書|証明書',
         database: 'データベース|データベース',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 管理',
         container: 'コンテナ|コンテナ',
         cronjob: 'クロンジョブ|クロンの仕事',
         system: 'システム',
@@ -1052,6 +1052,7 @@ const message = {
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',
+            syncModelAccount: 'モデルアカウントに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',
@@ -1375,7 +1376,7 @@ const message = {
             apiKeyCount: 'API キー数',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills リポジトリ',
             upload: 'Skill をアップロード',
             importSkill: 'Skill をインポート',
             repositoryAddress: 'リポジトリアドレス',
@@ -2701,7 +2702,7 @@ const message = {
         detail: {
             dashboard: '概要',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills リポジトリ',
             ai_proxy: 'AIプロキシ',
             ai_benchmark: 'ベンチマーク',
             groups: 'グループ',

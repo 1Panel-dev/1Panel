@@ -464,7 +464,7 @@ const message = {
         ssl: 'Сертификат | Сертификаты',
         database: 'База данных | Базы данных',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'Управление MCP',
         container: 'Контейнер | Контейнеры',
         cronjob: 'Cron | Задачи Cron',
         system: 'Система',
@@ -1063,6 +1063,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: 'Команда запуска должна использовать порт {0}, иначе сервис будет недоступен.',
             ascendVisibleDevices: 'Видимые устройства Ascend (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Синхронизировать с аккаунтом модели',
             modelAccountAddressHelper:
                 'Адрес контейнера подходит для контейнеров агентов; 127.0.0.1, системный IP или пользовательский адрес подходит для AI Gateway или внешних сервисов.',
             containerAddress: 'Адрес контейнера',
@@ -1387,7 +1388,7 @@ const message = {
             apiKeyCount: 'Количество',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Репозиторий Skills',
             upload: 'Загрузить Skill',
             importSkill: 'Импортировать Skill',
             repositoryAddress: 'Адрес репозитория',
@@ -2743,7 +2744,7 @@ const message = {
         detail: {
             dashboard: 'Обзор',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Репозиторий Skills',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'Бенчмарк',
             groups: 'Группы',

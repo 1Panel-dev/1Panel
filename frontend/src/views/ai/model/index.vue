@@ -281,7 +281,7 @@
                             :buttons="deploymentButtons"
                             :label="$t('commons.table.operate')"
                             fixed="right"
-                            :ellipsis="4"
+                            :ellipsis="2"
                             width="240"
                         />
                     </ComplexTable>
@@ -305,6 +305,7 @@
         <AppResources :key="`resources:${currentNode}:${route.fullPath}`" ref="appResourcesRef" @close="search" />
         <TaskLog ref="taskRef" width="70%" @close="search" />
         <ModelPool ref="poolRef" @updated="search" />
+        <SyncService ref="syncRef" @search="search" />
         <component :is="templateView" v-if="templateView" ref="templateRef" />
     </div>
 </template>
@@ -338,6 +339,7 @@ import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import AppDelete from '@/views/app-store/installed/delete/index.vue';
 import AppResources from '@/views/app-store/installed/check/index.vue';
 import ModelPool from './components/model-pool/index.vue';
+import SyncService from './components/sync/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
 import { loadModelOverview, loadVllmAPI, readPages, vllmAvailable, type Deployment } from './deployment';
 
@@ -366,6 +368,7 @@ const upgradeRef = ref();
 const appDeleteRef = ref();
 const appResourcesRef = ref();
 const poolRef = ref();
+const syncRef = ref<InstanceType<typeof SyncService>>();
 const templateRef = ref();
 const templateView = shallowRef();
 const loading = ref(false);
@@ -566,7 +569,9 @@ const taskRef = ref();
 const pending = ref('');
 const operationDisabled = (row: Deployment) =>
     Boolean(pending.value) ||
-    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Waiting', 'Uninstalling'].includes(row.status);
+    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(
+        row.status,
+    );
 const statusDisabled = (row: Deployment) =>
     operationDisabled(row) || !hasManagePermissionAccess() || (row.engine === 'ollama' && !hasPermission('app_manage'));
 const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
@@ -602,21 +607,28 @@ const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart')
 };
 const deploymentButtons = [
     {
+        label: i18n.global.t('commons.button.edit'),
+        permission: true,
+        show: (row: Deployment) => row.engine === 'vllm' || (row.engine === 'ollama' && hasPermission('app_manage')),
+        disabled: operationDisabled,
+        click: (row: Deployment) => manageRef.value.open(row, 'config', true),
+    },
+    {
         label: i18n.global.t('aiTools.model.manage'),
         show: (row: Deployment) => row.engine !== 'vllm',
         click: manageDeployment,
     },
     {
-        label: i18n.global.t('commons.button.edit'),
-        permission: true,
-        show: (row: Deployment) => row.engine === 'vllm',
-        disabled: operationDisabled,
-        click: (row: Deployment) => manageRef.value.open(row, 'config', true),
-    },
-    {
         label: i18n.global.t('menu.monitor'),
         show: (row: Deployment) => row.engine === 'vllm',
         click: (row: Deployment) => manageRef.value.open(row, 'monitor', true),
+    },
+    {
+        label: i18n.global.t('commons.button.sync'),
+        permission: true,
+        show: (row: Deployment) => row.engine === 'ollama' || row.engine === 'vllm',
+        disabled: operationDisabled,
+        click: (row: Deployment) => syncRef.value.open(row),
     },
     {
         label: i18n.global.t('commons.button.log'),

@@ -159,6 +159,14 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	}
 
 	res.ContainerName = appInstall.ContainerName
+	res.ModelAccountBaseURLType = appInstall.ModelAccountBaseURLType
+	res.ModelAccountBaseURL = appInstall.ModelAccountBaseURL
+	if app.Key == "ollama" {
+		res.ModelAccountBaseURLType, res.ModelAccountBaseURL, err = loadOllamaModelAccountAddress(appInstall)
+		if err != nil {
+			return nil, err
+		}
+	}
 	res.Name = appInstall.Name
 	res.Version = appInstall.Version
 	res.CreatedAt = appInstall.CreatedAt
@@ -438,6 +446,32 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		}
 	}
 
+	modelAccountBaseURL := ""
+	if installed.App.Key == "ollama" {
+		if req.SyncModelAccount != nil {
+			installed.SyncModelAccount = *req.SyncModelAccount
+		}
+		if req.ModelAccountBaseURLType != "" {
+			installed.ModelAccountBaseURLType = req.ModelAccountBaseURLType
+			installed.ModelAccountBaseURL = req.ModelAccountBaseURL
+		} else if installed.SyncModelAccount {
+			installed.ModelAccountBaseURLType, installed.ModelAccountBaseURL, err = loadOllamaModelAccountAddress(oldInstalled)
+			if err != nil {
+				return err
+			}
+		}
+		if installed.SyncModelAccount {
+			containerName := installed.ContainerName
+			if req.Advanced && req.ContainerName != "" {
+				containerName = req.ContainerName
+			}
+			modelAccountBaseURL, err = ResolveLocalModelAccountBaseURL(installed.ModelAccountBaseURLType, installed.ModelAccountBaseURL, containerName, "11434", installed.HttpPort)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
 	backupDockerCompose := installed.DockerCompose
 	if req.Advanced {
 		composeMap := make(map[string]interface{})
@@ -562,6 +596,9 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	}
 	if proxyChanged && website.ID != 0 && currentProxyErr != nil {
 		global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", currentProxyErr).Error())
+	}
+	if installed.App.Key == "ollama" && installed.SyncModelAccount {
+		return syncOllamaModelAccount(installed, modelAccountBaseURL, true, true)
 	}
 	return nil
 }
@@ -934,6 +971,18 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	config := getAppCommonConfig(envs)
 	config.DockerCompose = install.DockerCompose
 	res.Params = params
+	res.AppKey = install.App.Key
+	res.Name = install.Name
+	res.HttpPort = install.HttpPort
+	res.SyncModelAccount = install.SyncModelAccount
+	res.ModelAccountBaseURLType = install.ModelAccountBaseURLType
+	res.ModelAccountBaseURL = install.ModelAccountBaseURL
+	if install.App.Key == "ollama" {
+		res.ModelAccountBaseURLType, res.ModelAccountBaseURL, err = loadOllamaModelAccountAddress(install)
+		if err != nil {
+			return nil, err
+		}
+	}
 	if config.ContainerName == "" {
 		config.ContainerName = install.ContainerName
 	}

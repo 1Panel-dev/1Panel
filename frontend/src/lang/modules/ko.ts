@@ -460,7 +460,7 @@ const message = {
         ssl: '인증서 | 인증서들',
         database: '데이터베이스 | 데이터베이스들',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 관리',
         container: '컨테이너 | 컨테이너들',
         cronjob: '크론 작업 | 크론 작업들',
         system: '시스템',
@@ -1041,6 +1041,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: '시작 명령은 {0} 포트를 사용해야 하며, 그렇지 않으면 서비스에 접근할 수 없습니다.',
             ascendVisibleDevices: 'Ascend 표시 장치 (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: '모델 계정에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
             containerAddress: '컨테이너 주소',
@@ -1363,7 +1364,7 @@ const message = {
             apiKeyCount: 'API 키 수',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills 저장소',
             upload: 'Skill 업로드',
             importSkill: 'Skill 가져오기',
             repositoryAddress: '저장소 주소',
@@ -2658,7 +2659,7 @@ const message = {
         detail: {
             dashboard: '개요',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills 저장소',
             ai_proxy: 'AI 프록시',
             ai_benchmark: '벤치마크',
             groups: '그룹',
