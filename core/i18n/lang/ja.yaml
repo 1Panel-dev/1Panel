@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "API キーによるターミナル認証へ�
 LocalAppSyncDispatch: "ローカルアプリ同期要求の送信"
 LocalAppSyncDispatchNode: "{{.node}} にローカルアプリ同期要求を送信（ノードタスク: {{.taskID}}）"
 ErrLocalAppSyncDisabled: "ノード間のローカルアプリ同期は無効です"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP 接続設定用プロンプト"
+MCPDocumentIntro: "このファイルを AI エージェントに渡し、記載された手順で設定するよう依頼してください。完全な Token が含まれるため、非公開で保管してください。"
+MCPDocumentTaskTitle: "AI エージェントへの設定タスク"
+MCPDocumentTask: "現在の環境で、以下に指定されたクライアントに 1Panel MCP を設定し、接続とツールの検出を検証してください。接続パラメーターには以下の設定ブロックを使用してください。"
+MCPDocumentClientCodex: "対象クライアント：Codex。まず設定の適用範囲と実際の CODEX_HOME を確認してください。有効な config.toml（既定：~/.codex/config.toml）を使用し、以下の TOML を対応する mcp_servers エントリーに統合してください。"
+MCPDocumentClientClaude: "対象クライアント：Claude。まず実際のクライアントのバージョンを確認してください。以下の JSON は HTTP MCP 設定に対応したクライアント向けです。そのバージョンが対応する設定場所または管理方法を使用し、stdio 専用の設定先にリモート HTTP 設定を書き込まないでください。"
+MCPDocumentClientGeneric: "対象クライアント：汎用 MCP クライアント。まず使用中のクライアントと設定の適用範囲を特定してください。不明な場合はユーザーに確認し、設定ファイルの場所を推測しないでください。クライアントの構文に従って、以下の接続パラメーターを統合してください。"
+MCPDocumentSteps: |-
+  1. 対象クライアントが Streamable HTTP と Bearer リクエストヘッダーに対応していることを確認してください。対応していないバージョンの場合は理由を説明してください。
+  2. 既存の設定を読み取り、バックアップしてください。以下の単一サーバーエントリーを統合し、ほかの MCP 設定とクライアント設定を保持してください。同名のエントリーがある場合は、その項目だけを更新してください。
+  3. URL と Authorization は提示された値をそのまま書き込んでください。Token の再生成、パネル権限やサービスの起動・停止状態の変更は行わないでください。Token をコマンド履歴、ログ、返信、Git に含めないでください。
+  4. HTTPS の証明書検証は有効のままにしてください。プライベート CA の場合はユーザーに信頼できる CA の提供を求め、サーバー証明書を自動的に信頼したり、TLS 検証を無効にしたりしないでください。HTTP は信頼できるネットワーク内に限定し、信頼できないネットワークを経由する前に HTTPS を設定してください。
+  5. クライアントで設定を再読み込みし、MCP 初期化と tools/list を検証してください。tools/call や書き込み操作は実行しないでください。再読み込みできない場合は、新しいセッションまたは再起動が必要であることを報告してください。ファイルの保存だけで接続成功と判断しないでください。
+  6. クライアント、設定場所、サーバー名、接続とツール検出の結果、未解決の問題を報告してください。Token は表示しないでください。
+MCPDocumentConfigTitle: "接続設定"
+MCPDocumentNotes: "パネルのサーバーは、ツール、ノード、所属アカウントの現在の権限をリクエストごとに確認します。Token を再生成した後はクライアント設定を更新してください。認証情報が無効化、取り消し、期限切れになった場合、接続は拒否されます。"
+MCPDocumentHTTPWarning: "現在のアドレスは暗号化されていない HTTP を使用しています。信頼できないネットワークで使用する前に HTTPS を設定してください。"
+
+# MCP management
+ErrMCPConflict: "MCP データが変更されたか、競合しています。再読み込みして確認してください。"
+ErrMCPPolicyChanged: "MCP ツールカタログまたは認可設定が変更されました。再読み込みして確認し、認可設定を保存してください。"
+ErrMCPCatalogUnavailable: "MCP ツールカタログを利用できません。サービスの状態を確認してください。"
+ErrMCPDisabled: "MCP サービスが有効になっていません。"
+ErrMCPSecretKeyUnavailable: "MCP 認証情報を暗号化できません。しばらくしてから再試行してください。"
+ErrMCPSecretInvalid: "保存済みの MCP Token を復号できません。Token を再生成してください。"
+ErrMCPCredentialInactive: "MCP 認証情報が無効、期限切れ、または取り消し済みです。"
+ErrMCPAuditUnavailable: "MCP 操作の監査記録を利用できません。操作結果を確認してから続行してください。"
+ErrMCPEndpointUnavailable: "先に有効な MCP 外部接続先を設定してください。"

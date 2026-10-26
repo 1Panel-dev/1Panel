@@ -1,22 +1,26 @@
 <template>
     <DrawerPro v-model="open" :header="$t('menu.config')" @close="handleClose" size="normal">
-        <codemirror
-            :autofocus="true"
-            :placeholder="$t('commons.msg.noneData')"
-            :indent-with-tab="true"
-            :tabSize="4"
-            style="height: 300px"
-            :lineWrapping="true"
-            :matchBrackets="true"
-            theme="cobalt"
-            :styleActiveLine="true"
-            :extensions="extensions"
-            v-model="prettyJson"
-            :disabled="true"
-        />
-        <CopyButton :content="prettyJson" class="mt-2" />
+        <div class="w-full min-w-0 overflow-hidden rounded border border-solid border-[var(--el-border-color)]">
+            <codemirror
+                :autofocus="true"
+                :placeholder="$t('commons.msg.noneData')"
+                :indent-with-tab="true"
+                :tabSize="4"
+                style="height: 300px"
+                :lineWrapping="true"
+                :matchBrackets="true"
+                theme="cobalt"
+                :styleActiveLine="true"
+                :extensions="extensions"
+                v-model="prettyJson"
+                :disabled="true"
+            />
+        </div>
+        <div class="mt-3 flex flex-wrap justify-end gap-2">
+            <CopyButton :content="prettyJson" :is-icon="false" />
+        </div>
         <template #footer>
-            <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
+            <el-button @click="handleClose">{{ $t('commons.button.close') }}</el-button>
         </template>
     </DrawerPro>
 </template>

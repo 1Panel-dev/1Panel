@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "Sokongan pengesahan terminal melalui kunci AP
 LocalAppSyncDispatch: "Hantar penyegerakan aplikasi tempatan"
 LocalAppSyncDispatchNode: "Hantar penyegerakan aplikasi tempatan ke {{.node}} (tugas nod: {{.taskID}})"
 ErrLocalAppSyncDisabled: "Penyegerakan aplikasi tempatan antara nod dinyahdayakan"
+
+# MCP connection document
+MCPDocumentTitle: "Arahan persediaan sambungan MCP 1Panel"
+MCPDocumentIntro: "Berikan fail ini kepada ejen AI dan minta ia melengkapkan persediaan mengikut dokumen. Fail ini mengandungi Token penuh; simpan secara peribadi."
+MCPDocumentTaskTitle: "Tugas konfigurasi untuk ejen AI"
+MCPDocumentTask: "Konfigurasikan MCP 1Panel dalam persekitaran semasa untuk klien yang dinyatakan di bawah, kemudian sahkan sambungan dan penemuan alat. Gunakan parameter sambungan dalam blok konfigurasi di bawah."
+MCPDocumentClientCodex: "Klien sasaran: Codex. Sahkan dahulu skop konfigurasi dan CODEX_HOME sebenar. Gunakan config.toml yang berkuat kuasa (lalai: ~/.codex/config.toml) dan gabungkan TOML di bawah ke dalam entri mcp_servers yang sepadan."
+MCPDocumentClientClaude: "Klien sasaran: Claude. Sahkan dahulu versi klien sebenar. JSON di bawah adalah untuk klien yang menyokong konfigurasi MCP melalui HTTP. Gunakan lokasi konfigurasi atau kaedah pengurusan yang disokong versi tersebut; jangan masukkan konfigurasi HTTP jauh ke dalam entri yang hanya menyokong stdio."
+MCPDocumentClientGeneric: "Klien sasaran: klien MCP umum. Kenal pasti dahulu klien yang digunakan dan skop konfigurasi. Tanya pengguna jika tidak pasti; jangan meneka lokasi fail konfigurasi. Gabungkan parameter sambungan di bawah mengikut sintaks klien."
+MCPDocumentSteps: |-
+  1. Sahkan bahawa klien sasaran menyokong Streamable HTTP dan pengepala permintaan Bearer. Jika versinya tidak menyokongnya, jelaskan sebabnya.
+  2. Baca dan sandarkan konfigurasi sedia ada. Gabungkan satu entri pelayan di bawah sambil mengekalkan tetapan MCP dan klien yang lain. Jika nama itu sudah wujud, kemas kini entri itu sahaja.
+  3. Tulis nilai URL dan Authorization tepat seperti yang diberikan. Jangan jana semula Token atau ubah kebenaran panel atau keadaan perkhidmatan. Jangan masukkan Token dalam sejarah perintah, log, balasan atau Git.
+  4. Kekalkan pengesahan sijil untuk HTTPS. Bagi CA peribadi, minta pengguna memberikan CA yang dipercayai; jangan mempercayai sijil pelayan secara automatik atau mematikan pengesahan TLS. Gunakan HTTP hanya pada rangkaian dipercayai; konfigurasikan HTTPS sebelum melalui rangkaian yang tidak dipercayai.
+  5. Muat semula melalui klien, kemudian sahkan permulaan MCP dan tools/list. Jangan jalankan tools/call atau operasi tulis. Jika muat semula tidak tersedia, laporkan bahawa sesi baharu atau mula semula diperlukan. Menyimpan fail bukan bukti sambungan berjaya.
+  6. Laporkan klien, lokasi konfigurasi, nama pelayan, hasil sambungan dan penemuan alat, serta masalah yang masih belum selesai. Sembunyikan Token.
+MCPDocumentConfigTitle: "Konfigurasi sambungan"
+MCPDocumentNotes: "Pelayan panel menyemak kebenaran alat, nod dan akaun pemilik semasa bagi setiap permintaan. Kemas kini konfigurasi klien selepas menjana semula Token. Akses ditolak apabila kelayakan dinyahdayakan, dibatalkan atau tamat tempoh."
+MCPDocumentHTTPWarning: "Alamat ini menggunakan HTTP tanpa penyulitan. Konfigurasikan HTTPS sebelum menggunakannya pada rangkaian yang tidak dipercayai."
+
+# MCP management
+ErrMCPConflict: "Data MCP telah berubah atau bercanggah dengan data sedia ada. Muat semula dan semak data tersebut."
+ErrMCPPolicyChanged: "Katalog alat MCP atau kebenaran telah berubah. Muat semula, semak dan simpan kebenaran."
+ErrMCPCatalogUnavailable: "Katalog alat MCP tidak tersedia. Semak status perkhidmatan."
+ErrMCPDisabled: "Perkhidmatan MCP tidak diaktifkan."
+ErrMCPSecretKeyUnavailable: "Penyulitan kelayakan MCP tidak tersedia. Cuba lagi kemudian."
+ErrMCPSecretInvalid: "Token MCP yang disimpan tidak dapat dinyahsulit. Jana semula Token."
+ErrMCPCredentialInactive: "Kelayakan MCP telah dinyahaktifkan, tamat tempoh atau dibatalkan."
+ErrMCPAuditUnavailable: "Audit operasi MCP tidak tersedia. Sahkan hasil operasi sebelum meneruskan."
+ErrMCPEndpointUnavailable: "Konfigurasikan alamat luaran MCP yang sah terlebih dahulu."

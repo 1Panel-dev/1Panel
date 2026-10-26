@@ -27,7 +27,7 @@
                     <el-option label="npx" value="npx" />
                     <el-option label="uvx" value="uvx" />
                 </el-select>
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.' + mcpServer.type + 'Helper') }}
                 </span>
             </el-form-item>
@@ -53,7 +53,7 @@
                         </el-select>
                     </template>
                 </el-input>
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.baseUrlHelper') }}
                 </span>
             </el-form-item>
@@ -65,7 +65,7 @@
             </el-form-item>
             <el-form-item :label="$t('aiTools.mcp.ssePath')" prop="ssePath" v-if="mcpServer.outputTransport === 'sse'">
                 <el-input v-model.trim="mcpServer.ssePath"></el-input>
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.ssePathHelper') }}
                 </span>
             </el-form-item>
@@ -75,7 +75,7 @@
                 v-if="mcpServer.outputTransport === 'streamableHttp'"
             >
                 <el-input v-model.trim="mcpServer.streamableHttpPath"></el-input>
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.streamableHttpPathHelper') }}
                 </span>
             </el-form-item>
@@ -85,7 +85,7 @@
                 prop="protocolVersion"
             >
                 <el-input v-model.trim="mcpServer.protocolVersion" />
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.protocolVersionHelper') }}
                 </span>
             </el-form-item>
@@ -97,7 +97,7 @@
                     :maxlength="4096"
                     placeholder='--header "x-user-id: 123" --logLevel debug'
                 />
-                <span class="input-help">
+                <span class="input-help mt-1 !leading-5">
                     {{ $t('aiTools.mcp.gatewayArgsHelper') }}
                 </span>
             </el-form-item>
@@ -107,7 +107,10 @@
             <el-form-item :label="$t('app.containerName')" prop="containerName">
                 <el-input v-model.trim="mcpServer.containerName"></el-input>
             </el-form-item>
-            <el-tabs type="border-card" class="mt-2">
+            <el-tabs
+                type="border-card"
+                class="mt-2 min-w-0 max-md:[&_.el-col]:!max-w-full max-md:[&_.el-col]:!w-full max-md:[&_.el-col]:!flex-none max-md:[&_.el-col-1]:!hidden [&_.el-col]:min-w-0"
+            >
                 <el-tab-pane :label="$t('commons.table.port')">
                     <div class="mt-1.5">
                         <el-row :gutter="20">
@@ -137,12 +140,12 @@
             </el-tabs>
         </el-form>
         <template #footer>
-            <span>
+            <div class="flex flex-wrap justify-end gap-2 [&>.el-button]:!ml-0">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button v-permission type="primary" @click="submit(mcpServerForm)" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </div>
         </template>
     </DrawerPro>
     <Import ref="importRef" @confirm="getImport" />

@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "Unable to verify API key terminal authorizati
 LocalAppSyncDispatch: "Dispatch local app sync"
 LocalAppSyncDispatchNode: "Dispatch local app sync to {{.node}} (node task: {{.taskID}})"
 ErrLocalAppSyncDisabled: "Local app sync across nodes is disabled"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP connection setup prompt"
+MCPDocumentIntro: "Give this file to an AI Agent and ask it to complete the setup described here. This file contains the full Token; keep it private."
+MCPDocumentTaskTitle: "Configuration task for the AI Agent"
+MCPDocumentTask: "Configure 1Panel MCP for the client specified below in the current environment, then verify the connection and tool discovery. Use the connection parameters in the configuration block below."
+MCPDocumentClientCodex: "Target client: Codex. First confirm the configuration scope and the actual CODEX_HOME. Use the active config.toml (default: ~/.codex/config.toml) and merge the TOML below into the corresponding mcp_servers entry."
+MCPDocumentClientClaude: "Target client: Claude. First confirm the actual client version. The JSON below is intended for clients that support HTTP MCP configuration. Use a configuration location or management method supported by that version; do not put remote HTTP configuration into an entry that only supports stdio."
+MCPDocumentClientGeneric: "Target client: a generic MCP client. First identify the client in use and the configuration scope. Ask the user if uncertain; do not guess the configuration file location. Merge the connection parameters below using the client’s syntax."
+MCPDocumentSteps: |-
+  1. Confirm that the target client supports Streamable HTTP and Bearer request headers. Explain the limitation if its version does not support them.
+  2. Read and back up the existing configuration. Merge the single server entry below, preserving all other MCP and client settings. If the name already exists, update only that entry.
+  3. Write the URL and Authorization values exactly as provided. Do not regenerate the Token or change panel permissions or service state. Do not put the Token in command history, logs, replies or Git.
+  4. Keep certificate verification enabled for HTTPS. For a private CA, ask the user to provide a trusted CA; do not automatically trust the server certificate or disable TLS verification. Use HTTP only on trusted networks; configure HTTPS before crossing an untrusted network.
+  5. Reload through the client, then verify MCP initialization and tools/list. Do not execute tools/call or write operations. If reloading is unavailable, report that a new session or restart is required. Saving a file does not prove a successful connection.
+  6. Report the client, configuration location, server name, connection and tool discovery results, and any remaining issues. Hide the Token.
+MCPDocumentConfigTitle: "Connection configuration"
+MCPDocumentNotes: "The panel server checks tool, node and current account permissions on every request. Update the client configuration after regenerating the Token. Access is rejected when the credential is disabled, revoked or expired."
+MCPDocumentHTTPWarning: "This address uses unencrypted HTTP. Configure HTTPS before using it on an untrusted network."
+
+# MCP management
+ErrMCPConflict: "MCP data changed or conflicts with existing data. Refresh and review it."
+ErrMCPPolicyChanged: "The MCP tool catalog or authorization changed. Refresh, review, and save the authorization."
+ErrMCPCatalogUnavailable: "The MCP tool catalog is unavailable. Check the service status."
+ErrMCPDisabled: "The MCP service is not enabled."
+ErrMCPSecretKeyUnavailable: "MCP credential encryption is unavailable. Try again later."
+ErrMCPSecretInvalid: "The stored MCP Token cannot be decrypted. Regenerate the Token."
+ErrMCPCredentialInactive: "The MCP credential is disabled, expired, or revoked."
+ErrMCPAuditUnavailable: "MCP operation auditing is unavailable. Verify the operation result before continuing."
+ErrMCPEndpointUnavailable: "Configure a valid external MCP endpoint first."

@@ -10,10 +10,14 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
+	mcpmeta "github.com/1Panel-dev/1Panel/core/utils/mcpapi/metadata"
 	"github.com/gin-gonic/gin"
 )
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
+	if msgKey == "ErrProxy" && ctx.GetBool("MCP_API_AUTH") && ctx.Request != nil && mcpmeta.TrustedRequest(ctx.Request) {
+		ctx.Header(mcpmeta.BusinessCodeHeader, "ErrProxy")
+	}
 	res := dto.Response{
 		Code:    code,
 		Message: "",

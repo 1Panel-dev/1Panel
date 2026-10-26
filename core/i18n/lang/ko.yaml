@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "API Key 터미널 인증 지원 여부를 확
 LocalAppSyncDispatch: "로컬 앱 동기화 요청 전송"
 LocalAppSyncDispatchNode: "{{.node}}에 로컬 앱 동기화 요청 전송 (노드 작업: {{.taskID}})"
 ErrLocalAppSyncDisabled: "노드 간 로컬 앱 동기화가 비활성화되어 있습니다"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP 연결 설정 프롬프트"
+MCPDocumentIntro: "이 파일을 AI 에이전트에 전달하고 문서에 따라 설정하도록 요청하세요. 전체 Token이 포함되어 있으므로 비공개로 보관하세요."
+MCPDocumentTaskTitle: "AI 에이전트의 설정 작업"
+MCPDocumentTask: "현재 환경에서 아래에 지정된 클라이언트에 1Panel MCP를 설정하고 연결 및 도구 검색을 검증하세요. 연결 매개변수는 아래 설정 블록을 기준으로 사용하세요."
+MCPDocumentClientCodex: "대상 클라이언트: Codex. 먼저 설정 범위와 실제 CODEX_HOME을 확인하세요. 적용 중인 config.toml(기본값: ~/.codex/config.toml)을 사용하고 아래 TOML을 해당 mcp_servers 항목에 병합하세요."
+MCPDocumentClientClaude: "대상 클라이언트: Claude. 먼저 실제 클라이언트 버전을 확인하세요. 아래 JSON은 HTTP MCP 설정을 지원하는 클라이언트용입니다. 해당 버전에서 지원하는 설정 위치나 관리 방법을 사용하고, stdio만 지원하는 항목에 원격 HTTP 설정을 넣지 마세요."
+MCPDocumentClientGeneric: "대상 클라이언트: 범용 MCP 클라이언트. 먼저 사용 중인 클라이언트와 설정 범위를 확인하세요. 확실하지 않으면 사용자에게 질문하고 설정 파일 위치를 추측하지 마세요. 클라이언트 구문에 따라 아래 연결 매개변수를 병합하세요."
+MCPDocumentSteps: |-
+  1. 대상 클라이언트가 Streamable HTTP와 Bearer 요청 헤더를 지원하는지 확인하세요. 해당 버전이 지원하지 않으면 이유를 설명하세요.
+  2. 기존 설정을 읽고 백업하세요. 아래의 단일 서버 항목을 병합하면서 다른 MCP 및 클라이언트 설정은 유지하세요. 같은 이름이 있으면 해당 항목만 업데이트하세요.
+  3. URL과 Authorization 값을 제공된 그대로 기록하세요. Token을 다시 생성하거나 패널 권한 또는 서비스 실행 상태를 변경하지 마세요. Token을 명령 기록, 로그, 답변 또는 Git에 포함하지 마세요.
+  4. HTTPS 인증서 검증을 유지하세요. 사설 CA를 사용하는 경우 사용자에게 신뢰할 수 있는 CA를 요청하고, 서버 인증서를 자동으로 신뢰하거나 TLS 검증을 끄지 마세요. HTTP는 신뢰할 수 있는 네트워크에서만 사용하고, 신뢰할 수 없는 네트워크를 통과하기 전에 HTTPS를 설정하세요.
+  5. 클라이언트에서 다시 로드한 후 MCP 초기화와 tools/list를 검증하세요. tools/call이나 쓰기 작업은 실행하지 마세요. 다시 로드할 수 없으면 새 세션 또는 재시작이 필요하다고 보고하세요. 파일 저장만으로 연결 성공을 판단하지 마세요.
+  6. 클라이언트, 설정 위치, 서버 이름, 연결 및 도구 검색 결과와 남은 문제를 보고하세요. Token은 숨기세요.
+MCPDocumentConfigTitle: "연결 설정"
+MCPDocumentNotes: "패널 서버는 요청마다 도구, 노드 및 소유 계정의 현재 권한을 검사합니다. Token을 다시 생성하면 클라이언트 설정을 업데이트해야 합니다. 자격 증명이 비활성화, 취소 또는 만료되면 접근이 거부됩니다."
+MCPDocumentHTTPWarning: "현재 주소는 암호화되지 않은 HTTP를 사용합니다. 신뢰할 수 없는 네트워크에서 사용하기 전에 HTTPS를 설정하세요."
+
+# MCP management
+ErrMCPConflict: "MCP 데이터가 변경되었거나 충돌합니다. 새로 고친 후 확인하세요."
+ErrMCPPolicyChanged: "MCP 도구 카탈로그 또는 권한이 변경되었습니다. 새로 고친 후 권한을 확인하고 저장하세요."
+ErrMCPCatalogUnavailable: "MCP 도구 카탈로그를 사용할 수 없습니다. 서비스 상태를 확인하세요."
+ErrMCPDisabled: "MCP 서비스가 활성화되지 않았습니다."
+ErrMCPSecretKeyUnavailable: "MCP 자격 증명을 암호화할 수 없습니다. 나중에 다시 시도하세요."
+ErrMCPSecretInvalid: "저장된 MCP Token을 복호화할 수 없습니다. Token을 다시 생성하세요."
+ErrMCPCredentialInactive: "MCP 자격 증명이 비활성화되었거나 만료 또는 취소되었습니다."
+ErrMCPAuditUnavailable: "MCP 작업 감사 기록을 사용할 수 없습니다. 작업 결과를 확인한 후 계속하세요."
+ErrMCPEndpointUnavailable: "먼저 유효한 MCP 외부 접속 주소를 설정하세요."

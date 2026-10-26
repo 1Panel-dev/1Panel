@@ -26,6 +26,8 @@ type AppInstallCreate struct {
 	ModelAccountBaseURLType string `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
 	ModelAccountBaseURL     string `json:"modelAccountBaseURL"`
 
+	MCPPreserveWebsiteDir bool `json:"-"`
+
 	AppContainerConfig
 	NodePushConfig
 }

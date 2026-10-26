@@ -26,6 +26,8 @@ type Local struct {
 	Database      string
 	Password      string
 	ContainerName string
+	// sqlContext belongs to a request-scoped copy, never the reusable client.
+	sqlContext context.Context
 }
 
 func NewLocal(command []string, dbType, containerName, password, database string) *Local {
@@ -45,6 +47,26 @@ func (r *Local) Create(info CreateInfo) error {
 	}
 
 	return nil
+}
+
+// CreateWithContext shares one deadline across all creation and rollback SQL.
+// Copying the client keeps concurrent or subsequent ordinary calls independent.
+func (r *Local) CreateWithContext(ctx context.Context, info CreateInfo) error {
+	if ctx == nil {
+		return errors.New("mysql creation context is required")
+	}
+	scoped := *r
+	scoped.PrefixCommand = append([]string(nil), r.PrefixCommand...)
+	scoped.sqlContext = ctx
+	return scoped.Create(info)
+}
+
+func (r *Local) commandContext(timeout uint) (context.Context, context.CancelFunc) {
+	parent := r.sqlContext
+	if parent == nil {
+		parent = context.Background()
+	}
+	return context.WithTimeout(parent, time.Duration(timeout)*time.Second)
 }
 
 func (r *Local) CreateDatabase(info CreateInfo) error {
@@ -396,14 +418,17 @@ func (r *Local) SyncDB(version string) ([]SyncDBInfo, error) {
 func (r *Local) Close() {}
 
 func (r *Local) ExecSQL(command string, timeout uint) error {
-	itemCommand := r.PrefixCommand[:]
+	itemCommand := append([]string(nil), r.PrefixCommand...)
 	itemCommand = append(itemCommand, command)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	ctx, cancel := r.commandContext(timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return buserr.New("ErrExecTimeOut")
+	}
+	if ctx.Err() != nil {
+		return ctx.Err()
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {
@@ -413,14 +438,17 @@ func (r *Local) ExecSQL(command string, timeout uint) error {
 }
 
 func (r *Local) ExecSQLForRows(command string, timeout uint) ([]string, error) {
-	itemCommand := r.PrefixCommand[:]
+	itemCommand := append([]string(nil), r.PrefixCommand...)
 	itemCommand = append(itemCommand, command)
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
+	ctx, cancel := r.commandContext(timeout)
 	defer cancel()
 	cmd := exec.CommandContext(ctx, "docker", itemCommand...)
 	stdout, err := cmd.CombinedOutput()
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New("ErrExecTimeOut")
+	}
+	if ctx.Err() != nil {
+		return nil, ctx.Err()
 	}
 	stdStr := strings.ReplaceAll(string(stdout), "mysql: [Warning] Using a password on the command line interface can be insecure.\n", "")
 	if err != nil || strings.HasPrefix(string(stdStr), "ERROR ") {

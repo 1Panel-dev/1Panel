@@ -16,6 +16,7 @@ var (
 func Routers() *gin.Engine {
 	Router = gin.Default()
 	Router.Use(i18n.UseI18n())
+	registerMCPRuntime(Router)
 
 	PrivateGroup := Router.Group("/api/v2")
 	if !global.IsMaster {

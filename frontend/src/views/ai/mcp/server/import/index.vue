@@ -3,11 +3,12 @@
         <template #header>
             {{ $t('aiTools.mcp.importMcpJson') }}
         </template>
-        <div>
+        <div class="w-full min-w-0">
             <el-input
                 v-model="mcpServerJson"
                 type="textarea"
                 :rows="15"
+                class="[&_textarea]:!font-mono [&_textarea]:!text-xs [&_textarea]:!leading-5"
                 placeholder='{
   "mcpServers": {
     "postgres": {
@@ -23,14 +24,14 @@
             ></el-input>
         </div>
         <template #footer>
-            <span class="dialog-footer">
+            <div class="flex flex-wrap justify-end gap-2 [&>.el-button]:!ml-0">
                 <el-button @click="onCancel">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button v-permission type="primary" @click="onConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </div>
         </template>
     </DialogPro>
 </template>
