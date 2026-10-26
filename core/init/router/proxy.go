@@ -18,9 +18,11 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/middleware"
+	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
 	terminalsession "github.com/1Panel-dev/1Panel/core/utils/terminal_session"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
+	"github.com/1Panel-dev/1Panel/core/utils/xpack/providers"
 	"github.com/gin-gonic/gin"
 )
 
@@ -33,6 +35,33 @@ var loadLocalTerminalCapabilities = func(ctx context.Context) (interface{}, erro
 func Proxy() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		terminalsession.ClearForwardedHeaders(c)
+		mcpapi.ClearForwardedHeaders(c.Request.Header)
+		if mcpapi.HasIdentity(c.Request) && !mcpapi.IsRequest(c.Request) {
+			c.AbortWithStatus(http.StatusForbidden)
+			return
+		}
+		if _, owner, ok := mcpapi.Identity(c.Request); ok {
+			nodeID, _ := mcpapi.NodeID(c.Request)
+			provider, supported := xpack.AuthProvider.(providers.MCPAPIAuthorizer)
+			if !c.GetBool("MCP_API_AUTH") || !supported || provider.AuthorizeMCPAPI(owner, nodeID, c.Request.Method, c.Request.URL.Path) != nil {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+			nodeName := "local"
+			if nodeProvider, supported := xpack.AuthProvider.(providers.MCPNodeProvider); supported {
+				node, err := nodeProvider.ResolveMCPNode(owner, nodeID)
+				if err != nil || node.ID != nodeID || node.IsLocal != (nodeID == "local") || node.IsLocal != (node.Name == "local") || node.Name == "" {
+					c.AbortWithStatus(http.StatusForbidden)
+					return
+				}
+				nodeName = node.Name
+			} else if nodeID != "local" {
+				c.AbortWithStatus(http.StatusForbidden)
+				return
+			}
+			c.Request.Header.Set("CurrentNode", url.QueryEscape(nodeName))
+			mcpapi.SetForwardedHeaders(c.Request.Header, c.Request)
+		}
 		reqPath := c.Request.URL.Path
 		if !middleware.ShouldProxyToAgent(reqPath) {
 			c.Next()
@@ -49,6 +78,10 @@ func Proxy() gin.HandlerFunc {
 		if err != nil {
 			helper.ErrorWithDetail(c, http.StatusBadRequest, "ErrProxy", err)
 			return
+		}
+		useLocalAgent := currentNode == "local" || len(currentNode) == 0
+		if nodeID, ok := mcpapi.NodeID(c.Request); ok {
+			useLocalAgent = nodeID == "local"
 		}
 
 		apiReq := c.GetBool("API_AUTH")
@@ -73,12 +106,12 @@ func Proxy() gin.HandlerFunc {
 			return
 		}
 
-		if reqPath == "/api/v2/hosts/terminal/local" && (currentNode == "local" || len(currentNode) == 0) {
+		if reqPath == "/api/v2/hosts/terminal/local" && useLocalAgent {
 			proxyLocalAgent(c)
 			return
 		}
 
-		if !strings.HasPrefix(reqPath, "/api/v2/core") && (currentNode == "local" || len(currentNode) == 0) {
+		if !strings.HasPrefix(reqPath, "/api/v2/core") && useLocalAgent {
 			proxyLocalAgent(c)
 			return
 		}
@@ -99,6 +132,7 @@ func isTerminalRevalidationEndpoint(reqPath string) bool {
 func isInternalOnlyAgentEndpoint(reqPath string) bool {
 	normalizedPath := path.Clean(reqPath)
 	return normalizedPath == "/api/v2/xpack/alert/offline/email" ||
+		strings.HasPrefix(normalizedPath, "/api/v2/internal/mcp/") ||
 		normalizedPath == "/api/v2/xpack/alert/offline/webhook" ||
 		normalizedPath == "/api/v2/hosts/firewall/port" ||
 		normalizedPath == "/api/v2/internal/terminal/sessions/revoke" ||

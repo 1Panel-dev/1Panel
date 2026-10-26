@@ -10,5 +10,6 @@ func commonGroups() []CommonRouter {
 		&GroupRouter{},
 		&ScriptRouter{},
 		&RuntimeDiagnosticsRouter{},
+		&PanelMCPRouter{},
 	}
 }

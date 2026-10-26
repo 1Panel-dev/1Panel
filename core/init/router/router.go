@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/swagger"
 	"github.com/1Panel-dev/1Panel/core/middleware"
 	rou "github.com/1Panel-dev/1Panel/core/router"
+	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"github.com/1Panel-dev/1Panel/core/utils/xpack"
 	"github.com/gin-contrib/gzip"
@@ -69,6 +70,8 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 
 func Routers() *gin.Engine {
 	Router = gin.New()
+	Router.Use(middleware.MCPTokenBoundary())
+	Router.Use(middleware.MCPAPIIdentity())
 	Router.Use(i18n.UseI18n())
 	Router.Use(middleware.WhiteAllow())
 	Router.Use(middleware.BindDomain())
@@ -85,6 +88,7 @@ func Routers() *gin.Engine {
 	if global.CONF.Base.IsDemo {
 		Router.Use(middleware.DemoHandle())
 	}
+	registerMCPTransport(Router)
 
 	Router.Use(middleware.FrontendFallback())
 	Router.Use(middleware.WebSocketOriginGuard())
@@ -109,6 +113,7 @@ func Routers() *gin.Engine {
 		security.HandleNotSecurity(c, "")
 	})
 
+	mcpapi.SetHandler(Router)
 	return Router
 }
 

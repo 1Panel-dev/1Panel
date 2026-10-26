@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "无法确认节点支持 API Key 终端授权
 LocalAppSyncDispatch: "下发本地应用同步"
 LocalAppSyncDispatchNode: "向节点 {{.node}} 下发本地应用同步（节点任务：{{.taskID}}）"
 ErrLocalAppSyncDisabled: "尚未开启本地应用跨节点同步"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP 接入配置提示词"
+MCPDocumentIntro: "将本文件交给 AI Agent，要求其按文档完成配置。本文件包含完整 Token，请私密保存。"
+MCPDocumentTaskTitle: "给 AI Agent 的配置任务"
+MCPDocumentTask: "请在当前环境中为下方指定的客户端配置 1Panel MCP，并完成连接和工具发现验证。连接参数以本文配置片段为准。"
+MCPDocumentClientCodex: "目标客户端：Codex。先确认配置作用域和实际 CODEX_HOME；使用生效的 config.toml（默认 ~/.codex/config.toml），将下方 TOML 合并到对应 mcp_servers 条目。"
+MCPDocumentClientClaude: "目标客户端：Claude。先确认实际客户端版本；下方 JSON 适用于支持 HTTP MCP 配置的客户端。使用该版本支持的配置位置或管理方式，不把远程 HTTP 配置写进仅支持 stdio 的入口。"
+MCPDocumentClientGeneric: "目标客户端：通用 MCP 客户端。先识别当前使用的客户端和配置作用域；无法确定时询问用户，不猜测配置文件位置。按照客户端语法合并下方连接参数。"
+MCPDocumentSteps: |-
+  1. 确认目标客户端支持 Streamable HTTP 与 Bearer 请求头；版本不支持时说明原因。
+  2. 读取并备份现有配置，将下方唯一服务器条目合并，保留其它 MCP 和客户端设置；同名时只更新这一项。
+  3. 按原值写入 URL 与 Authorization，不重置 Token、不更改面板权限或服务启停状态，不将 Token 写入命令行历史、日志、回复或 Git。
+  4. HTTPS 保持证书校验；私有 CA 需用户提供可信 CA，不自动信任服务端证书或关闭 TLS 校验。HTTP 仅限可信网络，跨不可信网络前先配置 HTTPS。
+  5. 使用客户端重新加载，执行 MCP 初始化及 tools/list 验证；不执行 tools/call 或写入操作。无法重载时报告需要新会话或重启，勿把保存文件当作连接成功。
+  6. 报告客户端、配置位置、服务器名、连接与工具发现结果及仍待处理的问题，隐藏 Token。
+MCPDocumentConfigTitle: "连接配置"
+MCPDocumentNotes: "工具、节点及所属账号当前权限由面板服务端每次校验。Token 重新生成后需更新客户端配置，停用、撤销或过期后接入会被拒绝。"
+MCPDocumentHTTPWarning: "当前地址使用未加密 HTTP；在不可信网络使用前，请先配置 HTTPS。"
+
+# MCP management
+ErrMCPConflict: "MCP 数据已变更或存在冲突，请刷新后重新核对。"
+ErrMCPPolicyChanged: "MCP 工具目录或授权已变更，请刷新后重新核对并保存授权。"
+ErrMCPCatalogUnavailable: "MCP 工具目录暂不可用，请检查服务状态。"
+ErrMCPDisabled: "MCP 服务未启用。"
+ErrMCPSecretKeyUnavailable: "MCP 凭据加密暂不可用，请稍后重试。"
+ErrMCPSecretInvalid: "存储的 MCP Token 无法解密，请重新生成 Token。"
+ErrMCPCredentialInactive: "MCP 凭据已停用、过期或撤销。"
+ErrMCPAuditUnavailable: "MCP 操作审计暂不可用，请核对操作结果后再继续。"
+ErrMCPEndpointUnavailable: "请先配置有效的 MCP 外部接入地址。"

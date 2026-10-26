@@ -21,6 +21,36 @@ import (
 
 type authHelper struct{ auth.PanelAPIKeyOwnerProvider }
 
+var _ providers.MCPManagementAuthorizer = (*authHelper)(nil)
+
+func (a *authHelper) AuthorizeMCPManagement(owner auth.APIKeyOwner, nodeName string, requiredCodes []string) error {
+	if err := providers.ValidateMCPManagementBoundary(nodeName, requiredCodes); err != nil {
+		return err
+	}
+	_, err := a.ResolveAPIKeyOwner(nil, owner.Type, owner.ID)
+	return err
+}
+
+var _ providers.MCPAPIAuthorizer = (*authHelper)(nil)
+
+func (a *authHelper) AuthorizeMCPAPI(owner auth.APIKeyOwner, nodeName, method, requestPath string) error {
+	if err := providers.ValidateMCPAPIBoundary(nodeName, method, requestPath); err != nil {
+		return err
+	}
+	_, err := a.ResolveMCPNode(owner, nodeName)
+	return err
+}
+
+func (a *authHelper) BindMCPAPIIdentity(c *gin.Context, owner auth.APIKeyOwner) error {
+	current, err := a.ResolveAPIKeyOwner(c, owner.Type, owner.ID)
+	if err != nil {
+		return err
+	}
+	providers.BindMCPResolvedOwner(c, current)
+	c.Set(psession.GinContextSessionUserKey, psession.SessionUser{ID: current.ID, Name: current.Name, Role: "ADMIN"})
+	return nil
+}
+
 func NewIAuthProvider() providers.AuthProvider {
 	return &authHelper{}
 }

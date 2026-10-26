@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "API anahtarıyla terminal yetkilendirme deste
 LocalAppSyncDispatch: "Yerel uygulama eşitleme isteği gönder"
 LocalAppSyncDispatchNode: "{{.node}} düğümüne yerel uygulama eşitleme isteği gönder (düğüm görevi: {{.taskID}})"
 ErrLocalAppSyncDisabled: "Düğümler arası yerel uygulama eşitleme devre dışı"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP bağlantı kurulum yönergesi"
+MCPDocumentIntro: "Bu dosyayı bir yapay zekâ ajanına verin ve belgede açıklanan kurulumu tamamlamasını isteyin. Dosya Token değerinin tamamını içerir; gizli tutun."
+MCPDocumentTaskTitle: "Yapay zekâ ajanı için yapılandırma görevi"
+MCPDocumentTask: "Mevcut ortamda aşağıda belirtilen istemci için 1Panel MCP bağlantısını yapılandırın; ardından bağlantıyı ve araç keşfini doğrulayın. Aşağıdaki yapılandırma bloğundaki bağlantı parametrelerini kullanın."
+MCPDocumentClientCodex: "Hedef istemci: Codex. Önce yapılandırmanın kapsamını ve gerçek CODEX_HOME konumunu doğrulayın. Etkin config.toml dosyasını (varsayılan: ~/.codex/config.toml) kullanın ve aşağıdaki TOML içeriğini ilgili mcp_servers girdisine birleştirin."
+MCPDocumentClientClaude: "Hedef istemci: Claude. Önce gerçek istemci sürümünü doğrulayın. Aşağıdaki JSON, HTTP MCP yapılandırmasını destekleyen istemciler içindir. Bu sürümün desteklediği yapılandırma konumunu veya yönetim yöntemini kullanın; uzak HTTP yapılandırmasını yalnızca stdio destekleyen bir girdiye yazmayın."
+MCPDocumentClientGeneric: "Hedef istemci: genel bir MCP istemcisi. Önce kullanılan istemciyi ve yapılandırmanın kapsamını belirleyin. Emin değilseniz kullanıcıya sorun; yapılandırma dosyasının konumunu tahmin etmeyin. Aşağıdaki bağlantı parametrelerini istemcinin sözdizimine göre birleştirin."
+MCPDocumentSteps: |-
+  1. Hedef istemcinin Streamable HTTP ve Bearer istek başlıklarını desteklediğini doğrulayın. Sürüm bunları desteklemiyorsa nedenini açıklayın.
+  2. Mevcut yapılandırmayı okuyun ve yedekleyin. Aşağıdaki tek sunucu girdisini birleştirirken diğer MCP ve istemci ayarlarını koruyun. Aynı ad varsa yalnızca o girdiyi güncelleyin.
+  3. URL ve Authorization değerlerini verildiği gibi yazın. Token değerini yeniden oluşturmayın; panel izinlerini veya hizmet durumunu değiştirmeyin. Token değerini komut geçmişine, günlüklere, yanıtlara veya Git içine yazmayın.
+  4. HTTPS için sertifika doğrulamasını açık tutun. Özel CA kullanılıyorsa kullanıcıdan güvenilir bir CA isteyin; sunucu sertifikasına otomatik olarak güvenmeyin veya TLS doğrulamasını kapatmayın. HTTP yalnızca güvenilir ağlarda kullanılmalıdır; güvenilmeyen bir ağdan geçmeden önce HTTPS yapılandırın.
+  5. İstemci üzerinden yeniden yükleyin; ardından MCP başlatma ve tools/list işlemlerini doğrulayın. tools/call veya yazma işlemleri çalıştırmayın. Yeniden yükleme mümkün değilse yeni oturum ya da yeniden başlatma gerektiğini bildirin. Dosyanın kaydedilmesi, bağlantının başarılı olduğunu kanıtlamaz.
+  6. İstemciyi, yapılandırma konumunu, sunucu adını, bağlantı ve araç keşfi sonuçlarını ve kalan sorunları bildirin. Token değerini gizleyin.
+MCPDocumentConfigTitle: "Bağlantı yapılandırması"
+MCPDocumentNotes: "Panel sunucusu her istekte araç, düğüm ve ilgili hesabın güncel izinlerini denetler. Token yeniden oluşturulduğunda istemci yapılandırmasını güncelleyin. Kimlik bilgisi devre dışı bırakılırsa, iptal edilirse veya süresi dolarsa erişim reddedilir."
+MCPDocumentHTTPWarning: "Bu adres şifrelenmemiş HTTP kullanıyor. Güvenilmeyen bir ağda kullanmadan önce HTTPS yapılandırın."
+
+# MCP management
+ErrMCPConflict: "MCP verileri değişti veya mevcut verilerle çakışıyor. Sayfayı yenileyip kontrol edin."
+ErrMCPPolicyChanged: "MCP araç kataloğu veya yetkilendirme değişti. Yenileyin, kontrol edin ve yetkilendirmeyi kaydedin."
+ErrMCPCatalogUnavailable: "MCP araç kataloğu kullanılamıyor. Hizmet durumunu kontrol edin."
+ErrMCPDisabled: "MCP hizmeti etkin değil."
+ErrMCPSecretKeyUnavailable: "MCP kimlik bilgilerinin şifrelenmesi kullanılamıyor. Daha sonra tekrar deneyin."
+ErrMCPSecretInvalid: "Kaydedilen MCP Token çözülemiyor. Token'ı yeniden oluşturun."
+ErrMCPCredentialInactive: "MCP kimlik bilgileri devre dışı, süresi dolmuş veya iptal edilmiş."
+ErrMCPAuditUnavailable: "MCP işlem denetimi kullanılamıyor. Devam etmeden önce işlem sonucunu doğrulayın."
+ErrMCPEndpointUnavailable: "Önce geçerli bir harici MCP adresi yapılandırın."

@@ -2,9 +2,12 @@ package v2
 
 import (
 	"encoding/base64"
+	"net/http"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
+	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -98,9 +101,23 @@ func (b *BaseApi) SearchDatabase(c *gin.Context) {
 // @Param type path string true "type"
 // @Router /databases/db/list/:type [get]
 func (b *BaseApi) ListDatabase(c *gin.Context) {
+	mcpRequest, trustedMCP := mcpapi.Check(c.Request)
+	if mcpRequest && !trustedMCP {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
 	dbType, err := helper.GetStrParamByKey(c, "type")
 	if err != nil {
 		helper.BadRequest(c, err)
+		return
+	}
+	if mcpRequest {
+		list, err := (&service.DatabaseService{}).ListForMCP(c.Request.Context(), dbType)
+		if err != nil {
+			helper.BadRequest(c, err)
+			return
+		}
+		helper.SuccessWithData(c, list)
 		return
 	}
 	list, err := databaseService.List(dbType)

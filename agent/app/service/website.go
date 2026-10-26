@@ -974,11 +974,16 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 	if err != nil {
 		return res, err
 	}
+	applyWebsiteHTTPSParams(&res, params)
+	return res, nil
+}
+
+func applyWebsiteHTTPSParams(res *response.WebsiteHTTPS, params []response.NginxParam) {
 	for _, p := range params {
 		if p.Name == "ssl_protocols" {
 			res.SSLProtocol = p.Params
 		}
-		if p.Name == "ssl_ciphers" {
+		if p.Name == "ssl_ciphers" && len(p.Params) > 0 {
 			res.Algorithm = p.Params[0]
 		}
 		if p.Name == "add_header" && len(p.Params) > 0 {
@@ -996,7 +1001,6 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 			}
 		}
 	}
-	return res, nil
 }
 
 func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error) {

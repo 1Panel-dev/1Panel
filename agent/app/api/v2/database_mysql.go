@@ -3,9 +3,12 @@ package v2
 import (
 	"context"
 	"encoding/base64"
+	"net/http"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
+	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,6 +22,11 @@ import (
 // @Router /databases [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"创建 mysql 数据库 [name]","formatEN":"create mysql database [name]"}
 func (b *BaseApi) CreateMysql(c *gin.Context) {
+	mcpRequest, trustedMCP := mcpapi.Check(c.Request)
+	if mcpRequest && !trustedMCP {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
 	var req dto.MysqlDBCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
@@ -31,6 +39,16 @@ func (b *BaseApi) CreateMysql(c *gin.Context) {
 			return
 		}
 		req.Password = string(password)
+	}
+	if mcpRequest {
+		created, err := (&service.MysqlService{}).CreateForMCP(c.Request.Context(), req)
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		nodeID, _ := mcpapi.NodeID(c.Request)
+		helper.SuccessWithData(c, map[string]any{"id": created.ID, "database": created.MysqlName, "name": created.Name, "nodeId": nodeID})
+		return
 	}
 
 	if _, err := mysqlService.Create(context.Background(), req); err != nil {
@@ -513,11 +531,25 @@ func (b *BaseApi) LoadRemoteAccess(c *gin.Context) {
 // @Security Timestamp
 // @Router /databases/status [post]
 func (b *BaseApi) LoadStatus(c *gin.Context) {
+	mcpRequest, trustedMCP := mcpapi.Check(c.Request)
+	if mcpRequest && !trustedMCP {
+		c.AbortWithStatus(http.StatusForbidden)
+		return
+	}
 	var req dto.OperationWithNameAndType
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
 
+	if mcpRequest {
+		data, err := (&service.MysqlService{}).LoadStatusForMCP(c.Request.Context(), req)
+		if err != nil {
+			helper.InternalServer(c, err)
+			return
+		}
+		helper.SuccessWithData(c, data)
+		return
+	}
 	data, err := mysqlService.LoadStatus(req)
 	if err != nil {
 		helper.InternalServer(c, err)

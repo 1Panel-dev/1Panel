@@ -5,12 +5,17 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
+	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"github.com/gin-gonic/gin"
 )
 
 func BindDomain() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		if mcpapi.IsRequest(c.Request) && c.GetBool("MCP_API_AUTH") {
+			c.Next()
+			return
+		}
 		localRequest := c.GetBool("LOCAL_REQUEST")
 		if localRequest {
 			c.Next()
