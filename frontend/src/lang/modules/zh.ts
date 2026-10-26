@@ -448,7 +448,7 @@ const message = {
         security: '安全',
         database: '数据库',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 管理',
         container: '容器',
         cronjob: '计划任务',
         system: '系统',
@@ -1327,7 +1327,7 @@ const message = {
             sampleImportPlaceholder: '每行一个样本',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills 仓库',
             upload: '上传 Skill',
             importSkill: '导入 Skill',
             repositoryAddress: '仓库地址',
@@ -2581,7 +2581,7 @@ const message = {
         detail: {
             dashboard: '概览',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills 仓库',
             ai_proxy: 'AI 网关',
             ai_benchmark: '基准测试',
             groups: '分组',

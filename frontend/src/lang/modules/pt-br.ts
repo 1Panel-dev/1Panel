@@ -465,7 +465,7 @@ const message = {
         ssl: 'Certificado | Certificados',
         database: 'Banco de Dados | Bancos de Dados',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'Gerenciamento de MCP',
         container: 'Contêineres',
         cronjob: 'Tarefa Cron | Tarefas Cron',
         system: 'Sistema',
@@ -1395,7 +1395,7 @@ const message = {
             apiKeyCount: 'Quantidade',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Repositório de Skills',
             upload: 'Enviar Skill',
             importSkill: 'Importar Skill',
             repositoryAddress: 'Endereço do repositório',
@@ -2759,7 +2759,7 @@ const message = {
         detail: {
             dashboard: 'Visão Geral',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Repositório de Skills',
             ai_proxy: 'Proxy de IA',
             ai_benchmark: 'Benchmark',
             groups: 'Grupos',

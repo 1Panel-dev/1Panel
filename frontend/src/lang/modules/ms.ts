@@ -472,7 +472,7 @@ const message = {
         ssl: 'Sijil',
         database: 'Pangkalan Data',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'Pengurusan MCP',
         container: 'Kontena',
         cronjob: 'Tugas Berjadual',
         system: 'System',
@@ -1399,7 +1399,7 @@ const message = {
             apiKeyCount: 'Kuantiti',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Repositori Skills',
             upload: 'Muat naik Skill',
             importSkill: 'Import Kemahiran',
             repositoryAddress: 'Alamat repositori',
@@ -2759,7 +2759,7 @@ const message = {
         detail: {
             dashboard: 'Overview',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Repositori Skills',
             ai_proxy: 'Proksi AI',
             ai_benchmark: 'Penanda Aras',
             groups: 'Kumpulan',

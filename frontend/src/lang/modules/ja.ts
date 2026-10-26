@@ -465,7 +465,7 @@ const message = {
         ssl: '証明書|証明書',
         database: 'データベース|データベース',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP 管理',
         container: 'コンテナ|コンテナ',
         cronjob: 'クロンジョブ|クロンの仕事',
         system: 'システム',
@@ -1375,7 +1375,7 @@ const message = {
             apiKeyCount: 'API キー数',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills リポジトリ',
             upload: 'Skill をアップロード',
             importSkill: 'Skill をインポート',
             repositoryAddress: 'リポジトリアドレス',
@@ -2701,7 +2701,7 @@ const message = {
         detail: {
             dashboard: '概要',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills リポジトリ',
             ai_proxy: 'AIプロキシ',
             ai_benchmark: 'ベンチマーク',
             groups: 'グループ',

@@ -468,7 +468,7 @@ const message = {
         ssl: 'Sertifika | Sertifikalar',
         database: 'Veritabanı | Veritabanları',
         aiTools: 'AI',
-        mcp: 'MCP',
+        mcp: 'MCP Yönetimi',
         container: 'Konteyner | Konteynerler',
         cronjob: 'Cron İşi | Cron İşleri',
         system: 'Sistem',
@@ -1397,7 +1397,7 @@ const message = {
             apiKeyCount: 'Miktar',
         },
         skillsHub: {
-            title: 'Skills Hub',
+            title: 'Skills Deposu',
             upload: 'Skill yükle',
             importSkill: 'Skill içe aktar',
             repositoryAddress: 'Depo adresi',
@@ -2752,7 +2752,7 @@ const message = {
         detail: {
             dashboard: 'Genel Bakış',
             ai: 'AI',
-            skills_hub: 'Skills Hub',
+            skills_hub: 'Skills Deposu',
             ai_proxy: 'AI Proxy',
             ai_benchmark: 'Benchmark',
             groups: 'Grup',
