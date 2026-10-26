@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -584,6 +585,21 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 
 		for _, form := range appForm.FormFields {
 			if v, ok := envs[form.EnvKey]; ok {
+				if form.EnvKey == "PHP_VERSION" {
+					// Refresh only version choices; keep the saved form if synchronized metadata is unavailable.
+					var latestForm dto.AppForm
+					if json.Unmarshal([]byte(appDetail.Params), &latestForm) == nil {
+						for _, latest := range latestForm.FormFields {
+							if latest.EnvKey == form.EnvKey && len(latest.Values) > 0 {
+								form.Values = latest.Values
+								break
+							}
+						}
+					}
+					if v != "" && !slices.ContainsFunc(form.Values, func(value dto.AppFormValue) bool { return value.Value == v }) {
+						form.Values = append(form.Values, dto.AppFormValue{Label: v, Value: v})
+					}
+				}
 				appParam := response.AppParam{
 					Edit:     false,
 					Key:      form.EnvKey,
