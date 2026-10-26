@@ -1,5 +1,10 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
+    <DialogPro
+        v-model="open"
+        :title="$t('commons.button.delete')"
+        :show-close="!loading"
+        :close-on-press-escape="!loading"
+    >
         <div v-loading="loading">
             <el-row>
                 <el-col :span="22" :offset="1">
@@ -20,23 +25,7 @@
                         </el-checkbox>
                     </div>
 
-                    <div class="file-list">
-                        <div class="flx-align-center mb-1" v-for="(row, index) in files" :key="index">
-                            <div>
-                                <svg-icon
-                                    v-if="row.isDir"
-                                    className="table-icon mr-1 "
-                                    iconName="p-file-folder"
-                                ></svg-icon>
-                                <svg-icon
-                                    v-else
-                                    className="table-icon mr-1"
-                                    :iconName="getIconName(row.extension)"
-                                ></svg-icon>
-                            </div>
-                            <span class="sle">{{ row.name }}</span>
-                        </div>
-                    </div>
+                    <DeleteFileList :files="files" />
                 </el-col>
             </el-row>
         </div>
@@ -57,26 +46,27 @@
 import i18n from '@/lang';
 import { ref } from 'vue';
 import { File } from '@/api/interface/file';
-import { getIcon } from '@/utils/file';
+import DeleteFileList from '../components/delete-file-list.vue';
+import { deleteFilesWithLimit } from '@/utils/file-delete';
 import { deleteFile, deleteFileByNode, getRecycleStatus, getRecycleStatusByNode } from '@/api/modules/files';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const open = ref(false);
-const files = ref();
+const files = ref<File.File[]>([]);
 const loading = ref(false);
 const em = defineEmits(['close']);
 const forceDelete = ref(false);
 const recycleStatus = ref('Enable');
 const reqNode = ref('');
 
-const acceptParams = (props: File.File[], node: string) => {
+const acceptParams = (props: File.File[], node = '') => {
     reqNode.value = '';
     if (node != '') {
         reqNode.value = node;
     }
     getStatus();
-    files.value = props;
+    files.value = [...props];
     open.value = true;
     forceDelete.value = false;
 };
@@ -101,47 +91,43 @@ const getStatus = async () => {
 };
 
 const onConfirm = async () => {
+    if (loading.value) return;
     loading.value = true;
+    const selected = [...files.value];
+    const node = reqNode.value;
+    const force = forceDelete.value;
     try {
-        const pros = [];
         let baseDir = '';
-        if (files.value.some((item) => item['isDir'])) {
+        if (selected.some((item) => item.isDir)) {
             const pathRes = await loadBaseDir();
             baseDir = pathRes.data;
         }
-        for (const s of files.value) {
-            if (s['isDir']) {
-                if (s['path'].indexOf('.1panel_clash') > -1) {
-                    MsgWarning(i18n.global.t('file.clashDeleteAlert'));
-                    return;
-                }
-                if (s['path'] === baseDir) {
-                    MsgWarning(i18n.global.t('file.panelInstallDir'));
-                    return;
-                }
+        // Validate the entire selection before starting any deletion request.
+        for (const file of selected) {
+            if (!file.isDir) continue;
+            if (file.path.includes('.1panel_clash')) {
+                MsgWarning(i18n.global.t('file.clashDeleteAlert'));
+                return;
             }
-            if (reqNode.value != '') {
-                pros.push(
-                    deleteFileByNode(
-                        { path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value },
-                        reqNode.value,
-                    ),
-                );
-            } else {
-                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+            if (file.path === baseDir) {
+                MsgWarning(i18n.global.t('file.panelInstallDir'));
+                return;
             }
         }
-        await Promise.all(pros);
-        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-        open.value = false;
-        em('close');
+        files.value = await deleteFilesWithLimit(selected, (file) => {
+            const params = { path: file.path, isDir: file.isDir, forceDelete: force };
+            return node ? deleteFileByNode(params, node) : deleteFile(params);
+        });
+        if (files.value.length === 0) {
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+            open.value = false;
+        }
+        if (files.value.length < selected.length) em('close');
+    } catch {
+        // The request interceptor reports errors such as a failed base-directory lookup.
     } finally {
         loading.value = false;
     }
-};
-
-const getIconName = (extension: string) => {
-    return getIcon(extension);
 };
 
 defineExpose({
@@ -150,18 +136,6 @@ defineExpose({
 </script>
 
 <style scoped>
-.resource {
-    margin-top: 10px;
-    max-height: 400px;
-    overflow: auto;
-}
-
-.file-list {
-    max-height: 400px;
-    overflow-y: auto;
-    margin-top: 15px;
-}
-
 .delete-warn {
     line-height: 20px;
     word-wrap: break-word;

@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.sync')" size="small" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('commons.button.sync')" @close="handleClose">
         <div v-loading="loading">
             <el-row type="flex" justify="center">
                 <el-col :span="22">

@@ -295,7 +295,7 @@
             </template>
         </DrawerPro>
 
-        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
+        <DialogPro v-model="open" :title="$t('app.checkTitle')">
             <div class="flex justify-center items-center gap-2 flex-wrap">
                 {{ $t('app.checkInstalledWarn', [dashboardName]) }}
                 <el-link icon="Position" type="primary" @click="getAppDetail">

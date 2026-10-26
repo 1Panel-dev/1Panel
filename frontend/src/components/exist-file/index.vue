@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DialogPro v-model="dialogVisible" :title="$t('file.existFileTitle')" size="normal">
+        <DialogPro v-model="dialogVisible" :title="$t('file.existFileTitle')">
             <el-alert :show-icon="true" type="warning" :closable="false">
                 <div class="whitespace-break-spaces">
                     <span>{{ $t('file.existFileHelper') }}</span>

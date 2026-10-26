@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('website.delete') + ' - ' + websiteName" size="small" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('website.delete') + ' - ' + websiteName" @close="handleClose">
         <div :key="key" v-loading="loading">
             <el-form ref="deleteForm" label-position="left">
                 <el-form-item>

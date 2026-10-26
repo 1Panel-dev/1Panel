@@ -77,7 +77,7 @@ import AddDialog from '@/views/ai/agents/model/add/index.vue';
 import ModelPoolDialog from '@/views/ai/agents/model/pool/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
 import ApiTypeTag from '@/components/api-type-tag/index.vue';
-import { ElMessageBox } from 'element-plus';
+import { confirmAction } from '@/utils/confirm';
 import i18n from '@/lang';
 import { dateFormat } from '@/utils/date';
 import { isAgentAccountVerificationSkipped } from '@/utils/agent';
@@ -197,14 +197,7 @@ const maskKey = (value: string) => {
 };
 
 const onDelete = async (row: AI.AgentAccountItem) => {
-    await ElMessageBox.confirm(
-        i18n.global.t('commons.msg.delete', [row.name]),
-        i18n.global.t('commons.button.delete'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
-    );
+    await confirmAction(i18n.global.t('commons.msg.delete', [row.name]), i18n.global.t('commons.button.delete'));
     await deleteAgentAccount({ id: row.id });
     await search();
 };

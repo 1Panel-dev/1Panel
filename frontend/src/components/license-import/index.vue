@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DialogPro v-model="open" class="level-up-pro" @close="handleClose">
+        <DialogPro size="normal" v-model="open" class="level-up-pro" @close="handleClose">
             <div style="text-align: center" v-loading="loading">
                 <span class="text-3xl font-medium title">
                     {{ $t('license.importLicense') }}

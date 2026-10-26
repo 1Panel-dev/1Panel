@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('ssl.apply')" size="small" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('ssl.apply')" @close="handleClose">
         <div class="text-center" v-loading="loading">
             <div v-if="ssl.websites && ssl.websites.length > 0">
                 <span>{{ $t('ssl.renewWebsite') }}</span>

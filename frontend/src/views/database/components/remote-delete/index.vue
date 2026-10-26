@@ -1,6 +1,6 @@
 <template>
-    <DialogPro v-model="open" :title="$t('database.unBindRemoteDB') + ' - ' + deleteReq.database" size="small">
-        <el-form ref="deleteForm" v-loading="loading" @submit.prevent>
+    <DialogPro v-model="open" :title="$t('database.unBindRemoteDB') + ' - ' + deleteReq.database">
+        <el-form v-loading="loading" @submit.prevent>
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('database.unBindForce')" />
                 <span class="input-help">
@@ -21,7 +21,7 @@
                 <el-button @click="open = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button type="primary" @click="submit" :disabled="loading">
+                <el-button type="primary" @click="submit" :loading="loading" :disabled="loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -30,7 +30,6 @@
 </template>
 
 <script lang="ts" setup>
-import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
 import { deleteDatabase } from '@/api/modules/database';
@@ -45,8 +44,6 @@ const deleteReq = ref({
 const open = ref(false);
 const loading = ref(false);
 
-const deleteForm = ref<FormInstance>();
-
 interface DialogProps {
     id: number;
     database: string;
@@ -54,7 +51,7 @@ interface DialogProps {
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
-const acceptParams = async (prop: DialogProps) => {
+const acceptParams = (prop: DialogProps) => {
     deleteReq.value = {
         id: prop.id,
         database: prop.database,
@@ -65,17 +62,18 @@ const acceptParams = async (prop: DialogProps) => {
 };
 
 const submit = async () => {
+    if (loading.value) return;
     loading.value = true;
-    deleteDatabase(deleteReq.value)
-        .then(() => {
-            loading.value = false;
-            emit('search');
-            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-            open.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        await deleteDatabase(deleteReq.value);
+        emit('search');
+        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        open.value = false;
+    } catch {
+        // The request interceptor reports failures; allow retry without losing the selection.
+    } finally {
+        loading.value = false;
+    }
 };
 
 defineExpose({

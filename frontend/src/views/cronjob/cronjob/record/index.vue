@@ -231,7 +231,7 @@
             </template>
         </LayoutContent>
 
-        <DialogPro v-model="open" :title="$t('commons.button.clean')" size="small">
+        <DialogPro v-model="open" :title="$t('commons.button.clean')">
             <el-form ref="deleteForm" label-position="left" v-loading="delLoading">
                 <el-form-item>
                     <el-checkbox v-model="cleanData" :label="$t('cronjob.cleanData')" />

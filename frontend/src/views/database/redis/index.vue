@@ -125,7 +125,7 @@
         <Setting ref="settingRef" style="margin-top: 30px" />
         <Conn ref="connRef" @check-exist="reOpenTerminal" @close-terminal="closeTerminal(true)" />
 
-        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
+        <DialogPro v-model="open" :title="$t('app.checkTitle')">
             <div class="flex justify-center items-center gap-2 flex-wrap">
                 {{ $t('app.checkInstalledWarn', ['Redis-Commander']) }}
                 <el-link icon="Position" @click="getAppDetail('redis-commander')" type="primary">

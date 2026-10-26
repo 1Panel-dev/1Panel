@@ -58,7 +58,7 @@
             </template>
         </LayoutContent>
 
-        <DialogPro v-model="open" :title="$t('commons.button.export')" size="mini">
+        <DialogPro v-model="open" :title="$t('commons.button.export')">
             <el-form class="mt-5" ref="backupForm" @submit.prevent v-loading="loading">
                 <el-form-item :label="$t('commons.table.status')">
                     <el-select v-model="exportConfig.status" class="w-full">

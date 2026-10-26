@@ -1,5 +1,5 @@
 <template>
-    <DialogPro :title="$t('file.list')" size="w-60" v-model="open" @close="handleClose">
+    <DialogPro :title="$t('file.list')" v-model="open" @close="handleClose">
         <div>
             <div
                 v-show="!searchableStatus"

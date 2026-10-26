@@ -106,7 +106,7 @@
             </template>
         </LayoutContent>
 
-        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
+        <DialogPro v-model="open" :title="$t('app.checkTitle')">
             <el-alert :closable="false" :title="$t('database.confNotFound')" type="info">
                 <el-link icon="Position" @click="goUpgrade()" type="primary">
                     {{ $t('database.goUpgrade') }}

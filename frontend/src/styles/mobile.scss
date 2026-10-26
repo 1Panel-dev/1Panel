@@ -84,9 +84,12 @@
 }
 
 @media only screen and (max-width: 1024px) {
-    .el-dialog:not(.is-fullscreen) {
+    .el-dialog.dialog-sized:not(.is-fullscreen) {
         min-width: min(420px, calc(100vw - 24px));
         max-width: calc(100vw - 24px);
+    }
+
+    .el-dialog:not(.is-fullscreen) {
         max-height: calc(100vh - 24px);
         max-height: calc(100dvh - 24px);
         display: flex;
@@ -133,10 +136,13 @@
 }
 
 @media only screen and (max-width: 767px) {
-    .el-dialog:not(.is-fullscreen) {
+    .el-dialog.dialog-sized:not(.is-fullscreen) {
         width: calc(100vw - 24px) !important;
         min-width: 0;
         max-width: calc(100vw - 24px);
+    }
+
+    .el-dialog:not(.is-fullscreen) {
         margin: 12px auto;
     }
 

@@ -96,7 +96,7 @@
         </template>
     </DrawerPro>
     <FileUpload ref="uploadRef" @close="loadContainerFiles" />
-    <DialogPro v-model="previewVisible" :title="previewTitle" size="w-70" :close-on-click-modal="true">
+    <DialogPro v-model="previewVisible" :title="previewTitle" :close-on-click-modal="true">
         <el-alert
             v-if="previewTruncated"
             :title="$t('file.previewTruncated')"

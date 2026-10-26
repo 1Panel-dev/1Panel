@@ -5,10 +5,11 @@
         :destroy-on-close="true"
         :close-on-click-modal="closeOnClickModal"
         :show-close="showClose"
-        :width="size"
+        :width="width"
+        :class="{ 'dialog-full-width': props.size === 'full', 'dialog-sized': !!props.size && props.size !== 'full' }"
         append-to-body
         draggable
-        :open="open"
+        @open="open"
         @opened="opened"
         :before-close="handleBeforeClose"
     >
@@ -46,7 +47,7 @@ const props = defineProps({
     },
     size: {
         type: String,
-        default: 'normal',
+        default: '',
     },
     modelValue: {
         type: Boolean,
@@ -54,32 +55,22 @@ const props = defineProps({
     },
 });
 
+// Explicit sizes preserve layouts such as imports; unspecified dialogs use the shared width.
+const widths: Record<string, string> = {
+    mini: '20%',
+    small: '30%',
+    normal: '40%',
+    large: '50%',
+    full: '100%',
+    'w-60': '60%',
+    'w-70': '70%',
+    'w-90': '90%',
+};
+const width = computed(() => (props.size ? (widths[props.size] ?? '50%') : undefined));
+
 const slots = useSlots();
 
 const emit = defineEmits(['update:modelValue', 'close', 'open', 'opened']);
-
-const size = computed(() => {
-    switch (props.size) {
-        case 'mini':
-            return '20%';
-        case 'small':
-            return '30%';
-        case 'normal':
-            return '40%';
-        case 'large':
-            return '50%';
-        case 'full':
-            return '100%';
-        case 'w-60':
-            return '60%';
-        case 'w-70':
-            return '70%';
-        case 'w-90':
-            return '90%';
-        default:
-            return '50%';
-    }
-});
 
 const dialogVisible = computed({
     get() {

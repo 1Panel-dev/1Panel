@@ -75,7 +75,7 @@
             </span>
         </template>
     </DrawerPro>
-    <DialogPro v-model="qrDialogOpen" :title="$t('file.shareQrDialogTitle')" size="small">
+    <DialogPro v-model="qrDialogOpen" :title="$t('file.shareQrDialogTitle')">
         <div class="share-qr-dialog">
             <div class="share-qr-title">{{ $t('file.shareQrDialogTitle') }}</div>
             <img v-if="qrCodeUrl" class="share-qr-image" :src="qrCodeUrl" :alt="$t('file.shareQrCode')" />

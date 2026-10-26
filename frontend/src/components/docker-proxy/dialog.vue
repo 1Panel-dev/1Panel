@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.msg.infoTitle')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.msg.infoTitle')">
         <el-form ref="formRef" label-position="top" @submit.prevent>
             <el-form-item :label="$t('xpack.node.syncProxyHelper')">
                 <el-radio-group v-model="restart">

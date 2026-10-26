@@ -147,7 +147,7 @@
             </template>
         </LayoutContent>
 
-        <DialogPro v-model="dashboardVisible" :title="$t('app.checkTitle')" size="mini">
+        <DialogPro v-model="dashboardVisible" :title="$t('app.checkTitle')">
             <div class="flex justify-center items-center gap-2 flex-wrap">
                 {{ $t('app.checkInstalledWarn', ['OpenWebUI']) }}
                 <el-link icon="Position" @click="goInstall('ollama-webui')" type="primary">

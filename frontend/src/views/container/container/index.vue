@@ -441,11 +441,7 @@
                 </ComplexTable>
             </template>
 
-            <DialogPro
-                v-model="portsDialogVisible"
-                :title="`${$t('commons.table.port')} - ${portsDialogContainer}`"
-                size="small"
-            >
+            <DialogPro v-model="portsDialogVisible" :title="`${$t('commons.table.port')} - ${portsDialogContainer}`">
                 <template #content>
                     <div class="container-port-dialog-filters">
                         <el-input v-model="portFilter" clearable :placeholder="$t('commons.button.search')" />

@@ -413,3 +413,11 @@ html {
         }
     }
 }
+
+// Standard dialogs share one width; explicitly sized dialogs keep their layout.
+.el-dialog:not(.is-fullscreen):not(.dialog-full-width):not(.dialog-sized),
+.el-message-box {
+    width: 60vw !important;
+    min-width: 0;
+    max-width: 60vw;
+}

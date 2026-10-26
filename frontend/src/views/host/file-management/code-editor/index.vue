@@ -1,7 +1,7 @@
 <template>
     <DialogPro
         v-model="open"
-        :size="isMobile ? 'full' : 'w-70'"
+        :size="isMobile ? 'full' : undefined"
         class="code-dialog !p-0"
         @opened="onOpen"
         :show-close="false"

@@ -1,10 +1,5 @@
 <template>
-    <DialogPro
-        v-model="open"
-        :title="$t('commons.button.delete') + ' - ' + resourceName"
-        size="small"
-        @close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + resourceName" @close="handleClose">
         <div :key="key" :loading="loading">
             <el-form ref="deleteForm" label-position="left">
                 <el-form-item>

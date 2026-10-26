@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('container.containerPrune')" size="small">
+    <DialogPro v-model="open" :title="$t('container.containerPrune')">
         <div>
             <ul class="help-ul">
                 <li class="lineClass" style="color: red">{{ $t('container.containerPruneHelper1') }}</li>

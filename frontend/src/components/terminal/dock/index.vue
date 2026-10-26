@@ -15,7 +15,6 @@
         v-if="isAdmin"
         v-model="open"
         :title="$t('menu.terminal')"
-        size="w-70"
         :show-close="false"
         :modal="false"
         modal-penetrable
