@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" size="small">
+    <DialogPro v-model="open">
         <el-form ref="formRef" label-position="top" @submit.prevent>
             <el-form-item :label="title">
                 <el-radio-group v-model="restart">

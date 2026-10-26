@@ -205,12 +205,7 @@
         </template>
     </DialogPro>
 
-    <DialogPro
-        v-model="passkeyPrereqDialogOpen"
-        :title="$t('setting.passkey')"
-        size="small"
-        @close="handlePasskeyPrereqDialogClose"
-    >
+    <DialogPro v-model="passkeyPrereqDialogOpen" :title="$t('setting.passkey')" @close="handlePasskeyPrereqDialogClose">
         <div class="passkey-prereq-dialog">
             <div class="passkey-prereq-title">{{ $t('setting.passkeyPrereqTitle') }}</div>
             <div class="passkey-prereq-list">

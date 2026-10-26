@@ -33,7 +33,7 @@
             </template>
         </DrawerPro>
 
-        <DialogPro v-model="connOpen" :title="$t('ssh.pubkey')" size="small" :showClose="false">
+        <DialogPro v-model="connOpen" :title="$t('ssh.pubkey')" :showClose="false">
             <el-descriptions class="margin-top" :column="1" border>
                 <el-descriptions-item align="center" :label="$t('ssh.password')">
                     <div>

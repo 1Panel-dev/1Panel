@@ -80,7 +80,7 @@ import { toRef, onMounted, reactive, ref } from 'vue';
 import { deleteCheckDatabase, searchDatabases } from '@/api/modules/database';
 import AppResources from '@/views/database/mysql/check/index.vue';
 import OperateDialog from '@/views/database/mysql/remote/operate/index.vue';
-import DeleteDialog from '@/views/database/mysql/remote/delete/index.vue';
+import DeleteDialog from '@/views/database/components/remote-delete/index.vue';
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 

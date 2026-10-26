@@ -1,6 +1,6 @@
 <template>
     <div>
-        <DialogPro v-model="open" :title="$t('app.checkTitle')" size="small">
+        <DialogPro v-model="open" :title="$t('app.checkTitle')">
             <el-alert :closable="false" :title="$t('setting.systemIPWarning')" type="info">
                 <el-link icon="Position" @click="jumpToPath(router, '/settings/panel')" type="primary">
                     {{ $t('firewall.quickJump') }}

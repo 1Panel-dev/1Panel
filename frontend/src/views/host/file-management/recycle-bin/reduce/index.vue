@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('file.reduce')" size="small">
+    <DialogPro v-model="open" :title="$t('file.reduce')">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.confirmReduce')" show-icon type="error" :closable="false"></el-alert>

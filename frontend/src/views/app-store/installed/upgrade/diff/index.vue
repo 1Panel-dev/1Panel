@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('app.composeDiff')" @close="handleClose" size="w-90">
+    <DialogPro v-model="open" :title="$t('app.composeDiff')" @close="handleClose">
         <div>
             <el-text type="warning">{{ $t('app.diffHelper') }}</el-text>
             <div ref="container" class="compose-diff"></div>

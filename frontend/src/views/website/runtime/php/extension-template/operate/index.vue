@@ -1,10 +1,5 @@
 <template>
-    <DialogPro
-        v-model="open"
-        :title="$t('commons.button.' + operate) + $t('php.extensions')"
-        size="small"
-        @close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.' + operate) + $t('php.extensions')" @close="handleClose">
         <el-row v-loading="loading">
             <el-col :span="22" :offset="1">
                 <el-form @submit.prevent ref="extensionsForm" label-position="top" :model="extensions" :rules="rules">

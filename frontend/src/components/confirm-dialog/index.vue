@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="submitVisible" :title="header" size="mini">
+    <DialogPro v-model="submitVisible" :title="header">
         <div>
             <span v-if="operationInfo" class="operation-info">{{ operationInfo }}</span>
             <slot />

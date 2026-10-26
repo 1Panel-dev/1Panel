@@ -3,7 +3,7 @@
         <component
             :is="drawer ? DrawerPro : DialogPro"
             v-model="open"
-            v-bind="drawer ? { header: form.title, size: 'large' } : { title: form.title, size: 'small' }"
+            v-bind="drawer ? { header: form.title, size: 'large' } : { title: form.title }"
             @close="handleClose"
         >
             <div v-loading="loading" class="del-dialog-body">
@@ -56,8 +56,8 @@ const form = reactive({
     api: null as Function,
     params: {},
 });
-const loading = ref();
-const open = ref();
+const loading = ref(false);
+const open = ref(false);
 const successMsg = ref('');
 const noMsg = ref(false);
 
@@ -68,8 +68,8 @@ interface DialogProps {
 
     api: Function;
     params: object;
-    successMsg: string;
-    noMsg: boolean;
+    successMsg?: string;
+    noMsg?: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
     form.title = props.title;
@@ -78,34 +78,32 @@ const acceptParams = (props: DialogProps): void => {
     form.api = props.api;
     form.params = props.params;
     successMsg.value = props.successMsg;
-    if (props.noMsg) {
-        noMsg.value = props.noMsg;
-    }
+    noMsg.value = props.noMsg ?? false;
     open.value = true;
 };
 
 const emit = defineEmits(['search', 'cancel', 'submit']);
 
 const onConfirm = async () => {
+    if (loading.value) return;
     if (form.api === null) {
         emit('submit');
         open.value = false;
         return;
     }
     loading.value = true;
-    await form
-        .api(form.params)
-        .then(() => {
-            emit('search');
-            if (!noMsg.value) {
-                MsgSuccess(successMsg.value ?? i18n.global.t('commons.msg.deleteSuccess'));
-            }
-            open.value = false;
-            loading.value = false;
-        })
-        .catch(() => {
-            loading.value = false;
-        });
+    try {
+        await form.api(form.params);
+        emit('search');
+        if (!noMsg.value) {
+            MsgSuccess(successMsg.value ?? i18n.global.t('commons.msg.deleteSuccess'));
+        }
+        open.value = false;
+    } catch {
+        // API errors are reported by the request interceptor; keep the dialog open for retry.
+    } finally {
+        loading.value = false;
+    }
 };
 
 const handleClose = () => {

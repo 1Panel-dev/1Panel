@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('file.downloadProcess')" size="small" @close="handleClose">
+    <DialogPro v-model="open" :title="$t('file.downloadProcess')" @close="handleClose">
         <template #content>
             <div v-loading="loading" class="space-y-4 p-4 min-h-[160px]">
                 <div

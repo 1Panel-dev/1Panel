@@ -60,12 +60,7 @@
         </template>
     </DialogPro>
 
-    <DialogPro
-        v-if="!props.viewOnly"
-        v-model="addDialogVisible"
-        :title="$t('database.addUserAuthorization')"
-        size="small"
-    >
+    <DialogPro v-if="!props.viewOnly" v-model="addDialogVisible" :title="$t('database.addUserAuthorization')">
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" v-loading="loading">
             <el-form-item :label="$t('commons.table.type')" prop="mode">
                 <el-radio-group v-model="form.mode" @change="changeMode">

@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.edit')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.edit')">
         <div v-if="isFromApp" class="leading-6">
             <div>
                 <span>{{ $t('container.updateHelper1') }}</span>

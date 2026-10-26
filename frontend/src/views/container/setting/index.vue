@@ -197,7 +197,7 @@
             </template>
         </LayoutContent>
 
-        <DialogPro v-model="open" :title="$t('container.iptablesDisable')" size="small">
+        <DialogPro v-model="open" :title="$t('container.iptablesDisable')">
             <div class="mt-2.5">
                 <span class="text-rose-500">{{ $t('container.iptablesHelper2') }}</span>
                 <div class="mt-2.5">

@@ -32,12 +32,7 @@
     <div class="log-container" :style="styleVars">
         <div class="xterm-log-viewer" ref="terminalElement"></div>
     </div>
-    <DialogPro
-        v-model="downloadDialogVisible"
-        :title="$t('commons.button.download')"
-        size="small"
-        :close-on-click-modal="true"
-    >
+    <DialogPro v-model="downloadDialogVisible" :title="$t('commons.button.download')" :close-on-click-modal="true">
         <el-form label-position="top">
             <el-form-item :label="$t('container.fetch')">
                 <el-select v-model="downloadForm.mode" class="w-full">

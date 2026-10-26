@@ -91,7 +91,7 @@
         </ComplexTable>
     </DrawerPro>
 
-    <DialogPro v-model="userDialogVisible" :title="userDialogTitle" size="small">
+    <DialogPro v-model="userDialogVisible" :title="userDialogTitle">
         <el-form ref="userFormRef" :model="userForm" :rules="userRules" label-position="top" v-loading="loading">
             <el-form-item :label="$t('commons.login.username')" prop="username">
                 <el-input v-model.trim="userForm.username" :disabled="userDialogMode === 'edit'" />
@@ -133,7 +133,7 @@
         </template>
     </DialogPro>
 
-    <DialogPro v-model="supplementDialogVisible" :title="$t('database.supplementPassword')" size="small">
+    <DialogPro v-model="supplementDialogVisible" :title="$t('database.supplementPassword')">
         <el-form
             ref="supplementFormRef"
             :model="supplementForm"
@@ -159,11 +159,7 @@
         </template>
     </DialogPro>
 
-    <DialogPro
-        v-model="deleteDialogVisible"
-        :title="$t('commons.button.delete') + ' - ' + deleteUserIdentity"
-        size="small"
-    >
+    <DialogPro v-model="deleteDialogVisible" :title="$t('commons.button.delete') + ' - ' + deleteUserIdentity">
         <div v-loading="loading">
             <div class="delete-user-title">{{ deleteUserIdentity }} {{ $t('database.userBoundDatabases') }}</div>
             <div class="delete-user-section">

@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="header" size="w-60" @close="handleClose">
+    <DialogPro v-model="open" :title="header" @close="handleClose">
         <div v-loading="loading" class="agent-file-drawer">
             <el-alert v-if="!agentId || !workspace" :title="$t('commons.msg.noneData')" type="info" :closable="false" />
             <template v-else>

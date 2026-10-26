@@ -430,7 +430,7 @@
 
         <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
 
-        <DialogPro v-model="welcomeOpen" size="w-70" id="welcomeDialog">
+        <DialogPro v-model="welcomeOpen" id="welcomeDialog">
             <div ref="shadowContainer" />
         </DialogPro>
     </div>

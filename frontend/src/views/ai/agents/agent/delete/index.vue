@@ -1,10 +1,5 @@
 <template>
-    <DialogPro
-        v-model="open"
-        :title="$t('commons.button.delete') + ' - ' + agentName"
-        size="small"
-        @close="handleClose"
-    >
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + agentName" @close="handleClose">
         <el-form ref="deleteForm" label-position="left" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteReq.forceDelete" :label="$t('website.forceDelete')" />

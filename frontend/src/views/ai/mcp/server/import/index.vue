@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="submitVisible">
+    <DialogPro size="normal" v-model="submitVisible">
         <template #header>
             {{ $t('aiTools.mcp.importMcpJson') }}
         </template>

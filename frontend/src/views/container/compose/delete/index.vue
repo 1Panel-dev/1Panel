@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + composeName" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.delete') + ' - ' + composeName">
         <el-form ref="deleteForm" v-loading="loading">
             <el-form-item>
                 <el-checkbox v-model="deleteFile" :label="$t('container.deleteFile')" />

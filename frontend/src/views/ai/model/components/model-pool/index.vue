@@ -49,7 +49,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
-import { ElMessageBox } from 'element-plus';
+import { confirmAction } from '@/utils/confirm';
 import {
     createAgentAccountModel,
     deleteAgentAccountModel,
@@ -180,13 +180,9 @@ const submit = async () => {
 };
 
 const onDelete = async (row: AI.AgentAccountModel) => {
-    await ElMessageBox.confirm(
+    await confirmAction(
         i18n.global.t('commons.msg.delete', [row.name || row.id]),
         i18n.global.t('commons.button.delete'),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-        },
     );
     await deleteAgentAccountModel({
         accountId: account.id,
