@@ -1052,6 +1052,7 @@ const message = {
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',
+            syncModelAccount: 'モデルアカウントに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',

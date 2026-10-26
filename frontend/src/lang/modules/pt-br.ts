@@ -1070,6 +1070,7 @@ const message = {
             vllmCommandPortHelper:
                 'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Sincronizar com conta de modelo',
             modelAccountAddressHelper:
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
             containerAddress: 'Endereço do contêiner',

@@ -117,6 +117,13 @@ func SyncOllamaModelAccount(createIfMissing bool) error {
 	if err != nil {
 		return err
 	}
+	if !install.SyncModelAccount {
+		return nil
+	}
+	return syncOllamaModelAccount(install, fmt.Sprintf("http://%s:11434/v1", install.ContainerName), false, createIfMissing)
+}
+
+func syncOllamaModelAccount(install model.AppInstall, baseURL string, updateBaseURL, createIfMissing bool) error {
 	models, err := aiRepo.List(repo.WithByStatus(constant.StatusSuccess), repo.WithOrderAsc("name"))
 	if err != nil {
 		return err
@@ -125,8 +132,32 @@ func SyncOllamaModelAccount(createIfMissing bool) error {
 	for _, item := range models {
 		items = append(items, dto.AgentAccountModel{ID: item.Name, Name: item.Name})
 	}
-	_, err = SyncLocalModelAccount(install, 0, fmt.Sprintf("http://%s:11434/v1", install.ContainerName), items, false, createIfMissing)
+	_, err = SyncLocalModelAccount(install, 0, baseURL, items, updateBaseURL, createIfMissing)
 	return err
+}
+
+func loadOllamaModelAccountAddress(install model.AppInstall) (string, string, error) {
+	addressType := install.ModelAccountBaseURLType
+	if addressType == "" {
+		addressType = "container"
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByAppInstallID(install.ID), repo.WithByProvider("ollama"))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return addressType, install.ModelAccountBaseURL, nil
+	}
+	if err != nil {
+		return "", "", err
+	}
+	if addressType != "custom" {
+		expectedURL, err := ResolveLocalModelAccountBaseURL(addressType, "", install.ContainerName, "11434", install.HttpPort)
+		if err != nil {
+			return "", "", err
+		}
+		if strings.TrimRight(account.BaseURL, "/") != expectedURL {
+			addressType = "custom"
+		}
+	}
+	return addressType, account.BaseURL, nil
 }
 
 func CleanupLocalModelAccount(installID uint) {

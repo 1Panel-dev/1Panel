@@ -28,6 +28,10 @@ type AppInstall struct {
 	Favorite      bool   `json:"favorite"`
 	SortOrder     int    `json:"sortOrder" gorm:"default:0"`
 
+	SyncModelAccount        bool   `json:"syncModelAccount"`
+	ModelAccountBaseURLType string `json:"modelAccountBaseURLType"`
+	ModelAccountBaseURL     string `json:"modelAccountBaseURL"`
+
 	App App `json:"app" gorm:"-:migration"`
 }
 

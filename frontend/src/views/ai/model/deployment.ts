@@ -17,6 +17,7 @@ export interface Deployment {
 
 interface VllmItem {
     appInstallId: number;
+    agentAccountId: number;
     path: string;
     upgradable: boolean;
     id: number;
@@ -25,6 +26,9 @@ interface VllmItem {
     appVersion: string;
     port: number;
     modelAccountBaseURL: string;
+    modelAccountBaseURLType: AI.ModelAccountSync['modelAccountBaseURLType'];
+    command: string;
+    imageType: string;
     containerName: string;
     modelDir: string;
     status: string;
@@ -32,7 +36,9 @@ interface VllmItem {
 
 interface VllmAPI {
     pageVllm: (req: ReqPage & { info: string }) => Promise<ResultData<ResPage<VllmItem>>>;
-    operateVllm: (req: { id: number; operate: string; taskID: string; forceDelete?: boolean }) => Promise<unknown>;
+    operateVllm: (
+        req: { id: number; operate: string; taskID: string; forceDelete?: boolean } & Partial<AI.ModelAccountSync>,
+    ) => Promise<unknown>;
 }
 
 const vllmModules = import.meta.glob<VllmAPI>('@/xpack/api/modules/vllm.ts');

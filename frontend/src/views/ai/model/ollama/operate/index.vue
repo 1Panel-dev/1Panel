@@ -9,6 +9,7 @@
             <template #after-params>
                 <AccountAddress
                     ref="accountRef"
+                    show-sync
                     :form="form"
                     :host-port="Number(form.params.PANEL_APP_PORT_HTTP) || 11434"
                     container-port="11434"
@@ -51,6 +52,7 @@ const form = ref({
     name: '',
     params: {} as Record<string, any>,
     containerName: '',
+    syncModelAccount: true,
     modelAccountBaseURLType: 'container',
     modelAccountBaseURL: '',
 });
@@ -68,6 +70,7 @@ const openCreate = async () => {
         formRef.value.resetForm();
         formRef.value.setFormData({
             restartPolicy: 'unless-stopped',
+            syncModelAccount: true,
             modelAccountBaseURLType: 'container',
             modelAccountBaseURL: '',
         });

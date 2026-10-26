@@ -501,6 +501,14 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 
 	modelAccountBaseURL := ""
 	if app.Key == "ollama" {
+		appInstall.SyncModelAccount = req.SyncModelAccount == nil || *req.SyncModelAccount
+		appInstall.ModelAccountBaseURLType = req.ModelAccountBaseURLType
+		if appInstall.ModelAccountBaseURLType == "" {
+			appInstall.ModelAccountBaseURLType = "container"
+		}
+		appInstall.ModelAccountBaseURL = req.ModelAccountBaseURL
+	}
+	if app.Key == "ollama" && appInstall.SyncModelAccount {
 		modelAccountBaseURL, err = ResolveLocalModelAccountBaseURL(req.ModelAccountBaseURLType, req.ModelAccountBaseURL, containerName, "11434", httpPort)
 		if err != nil {
 			return
@@ -617,7 +625,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 			return err
 		}
 		updateToolApp(appInstall)
-		if app.Key == "ollama" {
+		if app.Key == "ollama" && appInstall.SyncModelAccount {
 			_, err := SyncLocalModelAccount(*appInstall, 0, modelAccountBaseURL, nil, false, true)
 			return err
 		}

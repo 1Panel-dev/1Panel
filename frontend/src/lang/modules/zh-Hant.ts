@@ -798,7 +798,7 @@ const message = {
             contextWindow: '上下文視窗',
             useModelDefault: '使用模型預設值',
             reasoning: '推理模型',
-            verified: '驗證狀態',
+            verified: '驗證成功',
             verifySkipped: '略過驗證',
             skillsTab: 'Skill',
             pluginsTab: '外掛',
@@ -1004,6 +1004,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: '啟動命令必須使用 {0} 連接埠，否則服務將無法存取。',
             ascendVisibleDevices: 'Ascend 可見裝置（ASCEND_RT_VISIBLE_DEVICES）',
+            syncModelAccount: '同步到模型帳號',
             modelAccountAddressHelper:
                 '容器地址適合智能體容器呼叫；127.0.0.1、本機 IP 或自訂地址適合 AI 閘道或外部服務呼叫。',
             containerAddress: '容器地址',

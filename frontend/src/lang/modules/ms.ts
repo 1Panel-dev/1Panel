@@ -1075,6 +1075,7 @@ const message = {
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Segerakkan ke akaun model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',

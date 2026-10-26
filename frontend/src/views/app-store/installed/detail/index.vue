@@ -98,6 +98,15 @@
                         <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
                     </el-form-item>
                 </div>
+                <AccountAddress
+                    v-if="appKey === 'ollama'"
+                    ref="accountRef"
+                    show-sync
+                    :form="paramModel"
+                    :host-port="Number(paramModel.params.PANEL_APP_PORT_HTTP) || paramModel.httpPort"
+                    container-port="11434"
+                    :host-mode="paramModel.isHostMode"
+                />
                 <el-form-item prop="advanced">
                     <el-checkbox v-model="paramModel.advanced" :label="$t('app.advanced')" size="large" />
                 </el-form-item>
@@ -179,11 +188,12 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
+import AccountAddress from '@/views/ai/model/components/account-address/index.vue';
 import Diff from '@/views/app-store/installed/upgrade/diff/index.vue';
 
 import { App } from '@/api/interface/app';
 import { getAppInstallParams, updateAppInstallParams, updateInstallConfig } from '@/api/modules/app';
-import { reactive, ref } from 'vue';
+import { onBeforeUnmount, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -192,10 +202,12 @@ import { splitHttp, checkIpV4V6, checkDomain } from '@/utils/validate';
 import i18n from '@/lang';
 import { loadResourceLimit } from '@/api/modules/container';
 import { Container } from '@/api/interface/container';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 interface ParamProps {
     id: number;
-    app: any;
+    app?: any;
+    edit?: boolean;
 }
 const paramData = ref<ParamProps>({
     id: 0,
@@ -207,6 +219,7 @@ interface EditForm extends App.InstallParams {
 }
 
 const emit = defineEmits(['close']);
+const { currentNode } = useGlobalStore();
 const open = ref(false);
 const loading = ref(false);
 const params = ref<EditForm[]>();
@@ -222,10 +235,9 @@ const rules = reactive({
     containerName: [Rules.containerName],
     restartPolicy: [Rules.requiredSelect],
 });
-const submitModel = reactive<any>({
-    webUI: '',
-});
 const appType = ref('');
+const appKey = ref('');
+const accountRef = ref<InstanceType<typeof AccountAddress>>();
 const appConfigUpdate = ref<App.AppConfigUpdate>({
     installID: 0,
     webUI: '',
@@ -285,15 +297,15 @@ function checkPort(port: string) {
 }
 
 const acceptParams = async (props: ParamProps) => {
-    submitModel.installId = props.id;
     params.value = [];
     paramData.value.id = props.id;
     paramModel.params = {};
     edit.value = false;
     rules.params = {};
-    await get();
+    if (!(await get())) return;
     open.value = true;
     openConfig.value = false;
+    if (props.edit) editParam();
 };
 
 const handleClose = () => {
@@ -358,6 +370,7 @@ const get = async () => {
         paramModel.allowPort = res.data.allowPort;
         paramModel.containerName = res.data.containerName;
         paramModel.advanced = false;
+        paramModel.editCompose = false;
         paramModel.dockerCompose = res.data.dockerCompose;
         paramModel.isHostMode = res.data.hostMode;
         paramModel.specifyIP = res.data.specifyIP;
@@ -372,7 +385,15 @@ const get = async () => {
             webUI.protocol = httpConfig.proto + '://';
         }
         appType.value = res.data.type;
+        appKey.value = res.data.appKey;
+        paramModel.name = res.data.name;
+        paramModel.httpPort = res.data.httpPort;
+        paramModel.syncModelAccount = res.data.syncModelAccount;
+        paramModel.modelAccountBaseURLType = res.data.modelAccountBaseURLType || 'container';
+        paramModel.modelAccountBaseURL = res.data.modelAccountBaseURL;
+        return true;
     } catch (error) {
+        return false;
     } finally {
         loading.value = false;
     }
@@ -380,6 +401,8 @@ const get = async () => {
 
 const submit = async (formEl: FormInstance) => {
     if (!formEl) return;
+    const node = currentNode.value;
+    const installId = paramData.value.id;
     await formEl.validate((valid) => {
         if (!valid) {
             return;
@@ -389,7 +412,13 @@ const submit = async (formEl: FormInstance) => {
             cancelButtonText: i18n.global.t('commons.button.cancel'),
             type: 'info',
         }).then(async () => {
-            submitModel.params = paramModel.params;
+            if (!open.value || node !== currentNode.value || installId !== paramData.value.id) return;
+            const submitModel: Record<string, any> = { installId, params: paramModel.params };
+            if (appKey.value === 'ollama') {
+                submitModel.syncModelAccount = paramModel.syncModelAccount;
+                submitModel.modelAccountBaseURLType = paramModel.modelAccountBaseURLType;
+                submitModel.modelAccountBaseURL = accountRef.value.baseURL;
+            }
             if (paramModel.advanced) {
                 submitModel.advanced = paramModel.advanced;
                 submitModel.memoryLimit = paramModel.memoryLimit;
@@ -469,6 +498,10 @@ const changeUnit = () => {
 };
 
 defineExpose({ acceptParams });
+
+onBeforeUnmount(() => {
+    open.value = false;
+});
 </script>
 
 <style lang="scss" scoped>

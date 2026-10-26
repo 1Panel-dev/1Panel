@@ -1048,6 +1048,7 @@ const message = {
             vllmCommandPortHelper:
                 'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'همگام‌سازی با حساب مدل',
             modelAccountAddressHelper:
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
             containerAddress: 'آدرس کانتینر',

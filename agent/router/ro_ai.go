@@ -19,6 +19,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/ollama/model/recreate", baseApi.RecreateOllamaModel)
 		aiToolsRouter.POST("/ollama/model/search", baseApi.SearchOllamaModel)
 		aiToolsRouter.POST("/ollama/model/sync", baseApi.SyncOllamaModel)
+		aiToolsRouter.POST("/ollama/account/sync", baseApi.SyncOllamaModelAccount)
 		aiToolsRouter.POST("/ollama/model/load", baseApi.LoadOllamaModelDetail)
 		aiToolsRouter.POST("/ollama/model/del", baseApi.DeleteOllamaModel)
 		aiToolsRouter.POST("/domain/bind", baseApi.BindDomain)

@@ -1063,6 +1063,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: 'Команда запуска должна использовать порт {0}, иначе сервис будет недоступен.',
             ascendVisibleDevices: 'Видимые устройства Ascend (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Синхронизировать с аккаунтом модели',
             modelAccountAddressHelper:
                 'Адрес контейнера подходит для контейнеров агентов; 127.0.0.1, системный IP или пользовательский адрес подходит для AI Gateway или внешних сервисов.',
             containerAddress: 'Адрес контейнера',

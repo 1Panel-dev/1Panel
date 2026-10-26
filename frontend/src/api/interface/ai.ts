@@ -1,6 +1,11 @@
 import { ReqPage } from '.';
 
 export namespace AI {
+    export interface ModelAccountSync {
+        id: number;
+        modelAccountBaseURLType: 'container' | 'localhost' | 'systemIP' | 'custom';
+        modelAccountBaseURL: string;
+    }
     export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent' | 'deepseek-harness' | 'octop';
 
     export interface OllamaModelInfo {

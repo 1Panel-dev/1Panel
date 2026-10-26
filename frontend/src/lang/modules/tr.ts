@@ -1074,6 +1074,7 @@ const message = {
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Model hesabına senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',

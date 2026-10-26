@@ -35,6 +35,7 @@ type IAIToolService interface {
 	Recreate(req dto.OllamaModelName) error
 	Delete(req dto.ForceDelete) error
 	Sync() ([]dto.OllamaModelDropList, error)
+	SyncAccount(req dto.OllamaModelAccountSync) error
 	LoadDetail(name string) (string, error)
 	BindDomain(req dto.OllamaBindDomain) error
 	GetBindDomain(req dto.OllamaBindDomainReq) (*dto.OllamaBindDomainRes, error)
@@ -257,6 +258,27 @@ func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
 	}
 
 	return dropList, SyncOllamaModelAccount(false)
+}
+
+func (u *AIToolService) SyncAccount(req dto.OllamaModelAccountSync) error {
+	install, err := appInstallRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if install.App.Key != "ollama" {
+		return buserr.New("ErrInvalidParams")
+	}
+	baseURL, err := ResolveLocalModelAccountBaseURL(req.ModelAccountBaseURLType, req.ModelAccountBaseURL, install.ContainerName, "11434", install.HttpPort)
+	if err != nil {
+		return err
+	}
+	if err := syncOllamaModelAccount(install, baseURL, true, true); err != nil {
+		return err
+	}
+	return appInstallRepo.BatchUpdateBy(map[string]interface{}{
+		"model_account_base_url_type": req.ModelAccountBaseURLType,
+		"model_account_base_url":      baseURL,
+	}, repo.WithByID(install.ID))
 }
 
 func (u *AIToolService) BindDomain(req dto.OllamaBindDomain) error {

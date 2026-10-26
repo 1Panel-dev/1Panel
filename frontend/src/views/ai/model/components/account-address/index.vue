@@ -1,33 +1,38 @@
 <template>
     <div class="form-section-title">{{ $t('aiTools.agents.account') }}</div>
-    <span class="input-help model-account-helper">{{ $t('aiTools.model.modelAccountAddressHelper') }}</span>
-    <el-form-item
-        :label="$t('aiTools.agents.allowedOrigins')"
-        prop="modelAccountBaseURLType"
-        :rules="Rules.requiredSelect"
-    >
-        <el-radio-group v-model="form.modelAccountBaseURLType">
-            <el-radio-button
-                v-for="item in addressTypes"
-                :key="item.value"
-                :value="item.value"
-                :disabled="hostMode && item.value === 'container'"
-            >
-                {{ item.label }}
-            </el-radio-button>
-        </el-radio-group>
+    <el-form-item v-if="showSync">
+        <el-checkbox v-model="form.syncModelAccount">{{ $t('aiTools.model.syncModelAccount') }}</el-checkbox>
     </el-form-item>
-    <el-form-item
-        v-if="form.modelAccountBaseURLType === 'custom'"
-        label="Base URL"
-        prop="modelAccountBaseURL"
-        :rules="customURLRules"
-    >
-        <el-input v-model.trim="form.modelAccountBaseURL" placeholder="http://192.168.1.100:8000/v1" />
-    </el-form-item>
-    <el-form-item v-else label="Base URL">
-        <el-input :model-value="baseURL" readonly />
-    </el-form-item>
+    <template v-if="!showSync || form.syncModelAccount">
+        <span class="input-help model-account-helper">{{ $t('aiTools.model.modelAccountAddressHelper') }}</span>
+        <el-form-item
+            :label="$t('aiTools.agents.allowedOrigins')"
+            prop="modelAccountBaseURLType"
+            :rules="Rules.requiredSelect"
+        >
+            <el-radio-group v-model="form.modelAccountBaseURLType">
+                <el-radio-button
+                    v-for="item in addressTypes"
+                    :key="item.value"
+                    :value="item.value"
+                    :disabled="hostMode && item.value === 'container'"
+                >
+                    {{ item.label }}
+                </el-radio-button>
+            </el-radio-group>
+        </el-form-item>
+        <el-form-item
+            v-if="form.modelAccountBaseURLType === 'custom'"
+            label="Base URL"
+            prop="modelAccountBaseURL"
+            :rules="customURLRules"
+        >
+            <el-input v-model.trim="form.modelAccountBaseURL" placeholder="http://192.168.1.100:8000/v1" />
+        </el-form-item>
+        <el-form-item v-else label="Base URL">
+            <el-input :model-value="baseURL" readonly />
+        </el-form-item>
+    </template>
 </template>
 
 <script setup lang="ts">
@@ -39,6 +44,7 @@ import i18n from '@/lang';
 const props = defineProps<{
     form: {
         name: string;
+        syncModelAccount?: boolean;
         containerName: string;
         modelAccountBaseURLType: string;
         modelAccountBaseURL: string;
@@ -46,6 +52,7 @@ const props = defineProps<{
     hostPort: number;
     containerPort: string;
     hostMode?: boolean;
+    showSync?: boolean;
 }>();
 const systemIP = ref('');
 const addressTypes = computed(() => [

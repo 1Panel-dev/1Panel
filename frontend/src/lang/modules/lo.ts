@@ -1038,6 +1038,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: 'ຄຳສັ່ງເລີ່ມຕົ້ນຕ້ອງໃຊ້ພອດ {0}; ບໍ່ດັ່ງນັ້ນຈະບໍ່ສາມາດເຂົ້າເຖິງບໍລິການໄດ້.',
             ascendVisibleDevices: 'ອຸປະກອນ Ascend ທີ່ເຫັນໄດ້ (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບັນຊີໂມເດວ',
             modelAccountAddressHelper:
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
             containerAddress: 'ທີ່ຢູ່ຄອນເທນເນີ',

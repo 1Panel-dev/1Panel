@@ -1041,6 +1041,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: '시작 명령은 {0} 포트를 사용해야 하며, 그렇지 않으면 서비스에 접근할 수 없습니다.',
             ascendVisibleDevices: 'Ascend 표시 장치 (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: '모델 계정에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
             containerAddress: '컨테이너 주소',

@@ -1063,6 +1063,7 @@ const message = {
             vllmCommandPortHelper:
                 'The startup command must use port {0}; otherwise, the service will be inaccessible.',
             ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
+            syncModelAccount: 'Sync to model account',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',

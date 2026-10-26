@@ -815,7 +815,7 @@ const message = {
             contextWindow: '上下文窗口',
             useModelDefault: '使用模型默认值',
             reasoning: '推理模型',
-            verified: '验证状态',
+            verified: '验证成功',
             verifySkipped: '不验证',
             skillsTab: '技能',
             pluginsTab: '插件',
@@ -1017,6 +1017,7 @@ const message = {
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: '启动命令必须使用 {0} 端口，否则服务将无法访问。',
             ascendVisibleDevices: 'Ascend 可见设备（ASCEND_RT_VISIBLE_DEVICES）',
+            syncModelAccount: '同步到模型账号',
             modelAccountAddressHelper:
                 '容器地址适合智能体容器调用；127.0.0.1、本机 IP 或自定义地址适合 AI 网关或外部服务调用。',
             containerAddress: '容器地址',

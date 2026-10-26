@@ -114,6 +114,18 @@ func (b *BaseApi) SearchOllamaModel(c *gin.Context) {
 	})
 }
 
+func (b *BaseApi) SyncOllamaModelAccount(c *gin.Context) {
+	var req dto.OllamaModelAccountSync
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := aiToolService.SyncAccount(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
 // @Tags AI
 // @Summary Page Ollama models
 // @Accept json
