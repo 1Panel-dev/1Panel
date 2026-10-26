@@ -1870,6 +1870,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: '접두사 토큰 수',
+        seed: '난수 시드',
+        report: '보고서',
         prepareTimeoutHelp: '준비 시간 제한이며 전체 시간 제한에서 제외됩니다.',
         pointTimeoutHelp: '측정점별로 시작, 워밍업 및 모든 요청 시간을 측정하며, 남은 전체 시간의 제한도 받습니다.',
         totalTimeoutHelp: '준비 후 시작하며 모든 측정점과 대기 시간을 포함합니다. 시간 초과 시 테스트를 중단합니다.',

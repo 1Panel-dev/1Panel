@@ -1885,6 +1885,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'تعداد توکن\u200cهای پیشوند',
+        seed: 'بذر تصادفی',
+        report: 'گزارش',
         prepareTimeoutHelp: 'مهلت آماده‌سازی در مهلت کلی آزمون محاسبه نمی‌شود.',
         pointTimeoutHelp:
             'زمان‌سنج مستقل هر نقطه، شامل راه‌اندازی، گرم‌کردن و همه درخواست‌ها؛ محدود به زمان کلی باقی‌مانده.',

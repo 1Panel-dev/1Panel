@@ -1890,6 +1890,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'プレフィックストークン数',
+        seed: '乱数シード',
+        report: 'レポート',
         prepareTimeoutHelp: '準備時間の上限です。テスト全体のタイムアウトには含みません。',
         pointTimeoutHelp:
             '各測定点で個別に計時し、起動、ウォームアップ、全リクエストを含みます。全体の残り時間にも制限されます。',

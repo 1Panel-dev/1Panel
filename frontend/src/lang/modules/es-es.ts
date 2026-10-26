@@ -1921,6 +1921,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Tokens de prefijo',
+        seed: 'Semilla aleatoria',
+        report: 'Informe',
         prepareTimeoutHelp: 'Límite de preparación, excluido del tiempo límite total.',
         pointTimeoutHelp:
             'Tiempo independiente por punto, con inicio, calentamiento y solicitudes; limitado por el tiempo total restante.',

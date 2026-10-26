@@ -1918,6 +1918,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Token awalan',
+        seed: 'Benih rawak',
+        report: 'Laporan',
         prepareTimeoutHelp: 'Had masa persediaan, tidak termasuk had masa keseluruhan.',
         pointTimeoutHelp:
             'Pemasa berasingan setiap titik, termasuk permulaan, pemanasan dan semua permintaan; dihadkan oleh baki masa keseluruhan.',

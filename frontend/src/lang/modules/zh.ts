@@ -1815,6 +1815,9 @@ const message = {
         statusUnavailable: '无法获取服务状态，请刷新重试。',
     },
     benchmarkPlan: {
+        prefixTokens: '前缀 Token 数',
+        seed: '随机种子',
+        report: '报告',
         prepareTimeoutHelp: '准备阶段的时间上限，不计入整轮超时。',
         pointTimeoutHelp: '每个测点独立计时，含启动、预热和全部请求，受整轮剩余时间限制。',
         totalTimeoutHelp: '准备完成后计时，覆盖所有测点及间隔，超时后停止。',

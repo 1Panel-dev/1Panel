@@ -1806,6 +1806,9 @@ const message = {
         statusUnavailable: '無法取得服務狀態，請重新整理後重試。',
     },
     benchmarkPlan: {
+        prefixTokens: '前綴 Token 數',
+        seed: '隨機種子',
+        report: '報告',
         prepareTimeoutHelp: '準備階段的時間上限，不計入整輪逾時。',
         pointTimeoutHelp: '每個測點獨立計時，含啟動、預熱和全部請求，受整輪剩餘時間限制。',
         totalTimeoutHelp: '準備完成後計時，涵蓋所有測點及間隔，逾時後停止。',

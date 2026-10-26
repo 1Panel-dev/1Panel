@@ -1917,6 +1917,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Önek token sayısı',
+        seed: 'Rastgelelik tohumu',
+        report: 'Rapor',
         prepareTimeoutHelp: 'Hazırlık süresi sınırıdır; toplam zaman aşımına dahil değildir.',
         pointTimeoutHelp:
             'Her nokta ayrı ölçülür; başlangıç, ısınma ve tüm istekler dahildir. Kalan toplam süreyle sınırlıdır.',

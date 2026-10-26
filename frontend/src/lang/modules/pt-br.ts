@@ -1920,6 +1920,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Tokens de prefixo',
+        seed: 'Semente aleatória',
+        report: 'Relatório',
         prepareTimeoutHelp: 'Limite da preparação, excluído do tempo limite total.',
         pointTimeoutHelp:
             'Tempo separado por ponto, incluindo início, aquecimento e solicitações; limitado pelo tempo total restante.',

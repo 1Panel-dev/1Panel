@@ -1860,6 +1860,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'ຈຳນວນ Token ຄຳນຳໜ້າ',
+        seed: 'ຄ່າເລີ່ມຕົ້ນການສຸ່ມ',
+        report: 'ລາຍງານ',
         prepareTimeoutHelp: 'ເວລາຈຳກັດການກຽມການ ບໍ່ນັບໃນເວລາທັງຮອບ.',
         pointTimeoutHelp: 'ຈັບເວລາແຍກຕໍ່ຈຸດ ລວມການເລີ່ມ, ອຸ່ນເຄື່ອງ ແລະ ທຸກຄຳຮ້ອງຂໍ; ຈຳກັດດ້ວຍເວລາທັງຮອບທີ່ເຫຼືອ.',
         totalTimeoutHelp: 'ເລີ່ມຫຼັງກຽມການ ລວມທຸກຈຸດແລະໄລຍະຫ່າງ. ຢຸດທົດສອບເມື່ອໝົດເວລາ.',
