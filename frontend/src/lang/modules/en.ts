@@ -1905,6 +1905,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Prefix tokens',
+        seed: 'Random seed',
+        report: 'Report',
         prepareTimeoutHelp: 'Preparation time limit, excluded from the overall timeout.',
         pointTimeoutHelp:
             'Separate timer per point, including startup, warmups and all requests; capped by the remaining overall time.',
@@ -2048,18 +2051,30 @@ const message = {
         latency: 'Latency',
         usage: 'Requests and usage (valid runs)',
     },
+    modelDownloadExtra: {
+        downloadModel: 'Download model',
+        downloadTokenizer: 'Download tokenizer',
+        onlineDownload: 'Online download',
+        content: 'Download content',
+        fullModel: 'Full model',
+        tokenizerOnly: 'Tokenizer only',
+        deleteFiles: 'Also delete files',
+        deleteFilesHelp: 'When selected, the tokenizer directory and all its files will be deleted.',
+    },
     benchmarkTokenizer: {
         title: 'Tokenizer management',
-        local: 'Register local directory',
-        upload: 'Upload tokenizer package',
         uploadHelp:
             'Upload a ZIP / tar.gz containing tokenizer files without model weights. Maximum: 128 MiB compressed, 256 MiB extracted.',
-        source: 'Import method',
-        deleteLocal: 'Remove the registration for tokenizer “{0}”? The original directory and files will be kept.',
-        deleteUpload: 'Delete tokenizer “{0}” and its uploaded files? Historical test reports will be kept.',
         select: 'Select a tokenizer',
         selectHelp:
             'For offline testing, select a managed tokenizer. Custom input still accepts a local directory or repository name.',
+        deleteFilesHelp: 'When selected, directory {0} and all its files will also be permanently deleted.',
+        deleteNameConfirm: 'Enter the tokenizer name to confirm deletion: ',
+        deleteDirectoryWarning:
+            'The displayed directory and all its contents, including model weights, configuration and scripts, will be permanently deleted. This cannot be undone. If the directory is shared with a model, the model may no longer load or run.',
+        deleteWarning: 'Deleting files may cause tests currently using this tokenizer to fail.',
+        exists: 'Exists',
+        missing: 'Missing',
     },
     container: {
         createByCommand: 'Create by command',

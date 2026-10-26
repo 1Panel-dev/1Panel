@@ -1917,6 +1917,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Önek token sayısı',
+        seed: 'Rastgelelik tohumu',
+        report: 'Rapor',
         prepareTimeoutHelp: 'Hazırlık süresi sınırıdır; toplam zaman aşımına dahil değildir.',
         pointTimeoutHelp:
             'Her nokta ayrı ölçülür; başlangıç, ısınma ve tüm istekler dahildir. Kalan toplam süreyle sınırlıdır.',
@@ -2064,17 +2067,30 @@ const message = {
         latency: 'Gecikme',
         usage: 'İstekler ve kullanım (geçerli çalıştırmalar)',
     },
+    modelDownloadExtra: {
+        downloadModel: 'Modeli indir',
+        downloadTokenizer: 'Tokenleştiriciyi indir',
+        onlineDownload: 'Çevrimiçi indir',
+        content: 'İndirme içeriği',
+        fullModel: 'Tam model',
+        tokenizerOnly: 'Yalnızca tokenizer',
+        deleteFiles: 'Dosyaları da sil',
+        deleteFilesHelp: 'İşaretlendiğinde tokenlaştırıcı dizini ve içindeki tüm dosyalar silinecektir.',
+    },
     benchmarkTokenizer: {
         title: 'Tokenizer yönetimi',
-        local: 'Yerel dizini kaydet',
-        upload: 'Tokenizer paketini yükle',
         uploadHelp: 'Model ağırlıkları içermeyen ZIP / tar.gz yükleyin. Sınır: sıkıştırılmış 128 MiB, açılmış 256 MiB.',
-        source: 'İçe aktarma yöntemi',
-        deleteLocal: '“{0}” tokenizer kaydı kaldırılsın mı? Özgün dizin ve dosyalar korunur.',
-        deleteUpload: '“{0}” tokenizer ve yüklenen dosyaları silinsin mi? Geçmiş test raporları korunur.',
         select: 'Bir tokenizer seçin',
         selectHelp:
             'Çevrimdışı test için yönetilen bir tokenizer seçin. Özel giriş yerel dizin veya depo adını destekler.',
+        deleteFilesHelp: 'İşaretlendiğinde {0} dizini ve içindeki tüm dosyalar da kalıcı olarak silinecektir.',
+        deleteNameConfirm: 'Silmeyi onaylamak için tokenlaştırıcının adını girin: ',
+        deleteDirectoryWarning:
+            'Gösterilen dizin ve model ağırlıkları, yapılandırma ve betikler dahil tüm içeriği kalıcı olarak silinecektir. Bu işlem geri alınamaz. Dizin bir modelle paylaşılıyorsa model artık yüklenemeyebilir veya çalışmayabilir.',
+        deleteWarning:
+            'Dosyaların silinmesi, şu anda bu tokenizer kullanan testlerin başarısız olmasına neden olabilir.',
+        exists: 'Mevcut',
+        missing: 'Mevcut değil',
     },
     container: {
         createByCommand: 'Komutla oluştur',

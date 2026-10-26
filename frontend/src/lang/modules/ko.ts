@@ -1870,6 +1870,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: '접두사 토큰 수',
+        seed: '난수 시드',
+        report: '보고서',
         prepareTimeoutHelp: '준비 시간 제한이며 전체 시간 제한에서 제외됩니다.',
         pointTimeoutHelp: '측정점별로 시작, 워밍업 및 모든 요청 시간을 측정하며, 남은 전체 시간의 제한도 받습니다.',
         totalTimeoutHelp: '준비 후 시작하며 모든 측정점과 대기 시간을 포함합니다. 시간 초과 시 테스트를 중단합니다.',
@@ -2008,18 +2011,30 @@ const message = {
         latency: '지연',
         usage: '요청 및 사용량(유효한 실행)',
     },
+    modelDownloadExtra: {
+        downloadModel: '모델 다운로드',
+        downloadTokenizer: '토크나이저 다운로드',
+        onlineDownload: '온라인 다운로드',
+        content: '다운로드 내용',
+        fullModel: '전체 모델',
+        tokenizerOnly: '토크나이저만',
+        deleteFiles: '파일도 삭제',
+        deleteFilesHelp: '선택하면 토크나이저 디렉터리와 모든 파일이 삭제됩니다.',
+    },
     benchmarkTokenizer: {
         title: '토크나이저 관리',
-        local: '로컬 디렉터리 등록',
-        upload: '토크나이저 패키지 업로드',
         uploadHelp:
             '모델 가중치가 없는 ZIP / tar.gz 파일을 업로드하세요. 압축 파일은 128 MiB, 압축 해제 후에는 256 MiB까지 가능합니다.',
-        source: '가져오기 방식',
-        deleteLocal: '토크나이저 “{0}”의 등록을 삭제할까요? 원본 디렉터리와 파일은 유지됩니다.',
-        deleteUpload: '토크나이저 “{0}” 및 업로드한 파일을 삭제할까요? 기존 테스트 보고서는 유지됩니다.',
         select: '토크나이저 선택',
         selectHelp:
             '오프라인 환경에서는 관리 목록에서 선택하세요. 사용자 지정 입력은 로컬 디렉터리나 저장소 이름도 지원합니다.',
+        deleteFilesHelp: '선택하면 디렉터리 {0} 및 그 안의 모든 파일도 영구적으로 삭제됩니다.',
+        deleteNameConfirm: '삭제를 확인하려면 토크나이저 이름을 입력하세요: ',
+        deleteDirectoryWarning:
+            '표시된 디렉터리와 모델 가중치, 설정, 스크립트를 포함한 모든 내용이 영구적으로 삭제되며 복구할 수 없습니다. 모델과 디렉터리를 공유하는 경우 모델을 로드하거나 실행하지 못할 수 있습니다.',
+        deleteWarning: '파일을 삭제하면 현재 이 토크나이저를 사용 중인 테스트가 실패할 수 있습니다.',
+        exists: '존재함',
+        missing: '없음',
     },
     container: {
         createByCommand: '명령으로 생성',

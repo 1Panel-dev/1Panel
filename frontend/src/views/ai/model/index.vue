@@ -135,8 +135,7 @@
                                     <span class="cell-ellipsis" :title="model.id">{{ model.id }}</span>
                                     <el-button
                                         v-if="index === 1 && row.models.length > 2"
-                                        link
-                                        type="primary"
+                                        size="small"
                                         class="model-more"
                                         @click="poolRef.open(row)"
                                     >
@@ -215,8 +214,7 @@
                                     <span class="cell-ellipsis" :title="model">{{ model }}</span>
                                     <el-button
                                         v-if="row.engine === 'ollama' && index === 1 && row.models.length > 2"
-                                        link
-                                        type="primary"
+                                        size="small"
                                         class="model-more"
                                         @click="manageDeployment(row)"
                                     >
