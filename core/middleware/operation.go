@@ -23,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -36,6 +37,15 @@ const (
 func OperationLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Request.Header.Del(headerNeedOperationResolve)
+		if mcpapi.IsRequest(c.Request) && c.GetBool("MCP_API_AUTH") {
+			c.Next()
+			return
+		}
+		switch c.Request.URL.Path {
+		case "/api/v2/core/mcp/credentials/create", "/api/v2/core/mcp/credentials/reveal", "/api/v2/core/mcp/credentials/rotate", "/api/v2/core/mcp/credentials/export":
+			c.Next()
+			return
+		}
 
 		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()

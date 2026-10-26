@@ -1454,10 +1454,10 @@ func getWebsiteDomains(domains []request.WebsiteDomain, defaultHTTPPort, default
 			return
 		}
 		domainModel.Domain = strings.ToLower(domainModel.Domain)
-		domainModel.Port = domain.Port
 		if domain.Port == 0 {
 			domain.Port = defaultHTTPPort
 		}
+		domainModel.Port = domain.Port
 		domainModel.SSL = domain.SSL
 		domainModel.WebsiteID = websiteID
 		domainModels = append(domainModels, domainModel)

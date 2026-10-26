@@ -4,25 +4,23 @@
             <el-form ref="formRef" label-position="top" @submit.prevent :model="req" :rules="rules">
                 <el-alert class="common-prompt" :closable="false" type="warning">
                     <template #default>
-                        <ul>
+                        <ul class="m-0 list-disc space-y-1 pl-4 !leading-5">
                             <li>{{ $t('aiTools.proxy.proxyHelper1') }}</li>
                             <li>{{ $t('aiTools.proxy.proxyHelper2') }}</li>
-                            <li>{{ $t('aiTools.proxy.proxyHelper3') }}</li>
                         </ul>
                     </template>
                 </el-alert>
                 <el-form-item :label="$t('website.domain')" prop="domain">
                     <el-input v-model.trim="req.domain" :disabled="operate === 'update'" />
-                    <span class="input-help">
-                        {{ $t('aiTools.proxy.proxyHelper4') }}
-                    </span>
-                    <span class="input-help">
-                        {{ $t('aiTools.proxy.proxyHelper6') }}
+                    <span class="input-help mt-1 !leading-5">
+                        {{ $t('panelMCP.boundWebsiteHelp') }}
                         <el-link class="pageRoute" icon="Position" @click="toWebsite(req.websiteID)" type="primary">
                             {{ $t('firewall.quickJump') }}
                         </el-link>
                     </span>
-                    <el-text type="danger">{{ $t('aiTools.mcp.bindDomainHelper') }}</el-text>
+                    <el-text type="danger" class="mt-1 w-full !text-xs !leading-5">
+                        {{ $t('aiTools.mcp.bindDomainHelper') }}
+                    </el-text>
                 </el-form-item>
                 <el-form-item :label="$t('xpack.waf.whiteList') + ' IP'" prop="ipList">
                     <el-input
@@ -32,7 +30,7 @@
                         v-model="req.ipList"
                         :placeholder="$t('xpack.waf.ipGroupHelper')"
                     />
-                    <span class="input-help">
+                    <span class="input-help mt-1 !leading-5">
                         {{ $t('aiTools.proxy.whiteListHelper') }}
                     </span>
                 </el-form-item>
@@ -77,12 +75,14 @@
             </el-form>
         </div>
         <template #footer>
-            <el-button @click="handleClose">
-                {{ $t('commons.button.cancel') }}
-            </el-button>
-            <el-button v-permission type="primary" @click="onSubmit(formRef)">
-                {{ $t('commons.button.add') }}
-            </el-button>
+            <div class="flex flex-wrap justify-end gap-2 [&>.el-button]:!ml-0">
+                <el-button @click="handleClose">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button v-permission type="primary" @click="onSubmit(formRef)">
+                    {{ $t('commons.button.add') }}
+                </el-button>
+            </div>
         </template>
     </DrawerPro>
 </template>

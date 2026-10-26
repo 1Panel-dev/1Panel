@@ -78,9 +78,17 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 	var res []response.NginxParam
 	var block components.IBlock
 	if scope == constant.NginxScopeHttp {
-		block = nginxFull.RootConfig.Config.FindHttp()
+		httpBlock := nginxFull.RootConfig.Config.FindHttp()
+		if httpBlock == nil {
+			return nil, fmt.Errorf("nginx HTTP configuration block is missing")
+		}
+		block = httpBlock
 	} else {
-		block = nginxFull.SiteConfig.Config.FindServers()[0]
+		servers := nginxFull.SiteConfig.Config.FindServers()
+		if len(servers) == 0 {
+			return nil, fmt.Errorf("website nginx server block is missing")
+		}
+		block = servers[0]
 	}
 	for _, key := range keys {
 		dirs := block.FindDirectives(key)

@@ -12,6 +12,7 @@ import (
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -22,6 +23,7 @@ import (
 )
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
+	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
 	res := dto.Response{
 		Code:    code,
 		Message: "",
@@ -32,6 +34,7 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 }
 
 func ErrorWithBusinessCode(ctx *gin.Context, code int, businessCode, msgKey string, err error) {
+	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
 	res := dto.Response{
 		Code:      code,
 		ErrorCode: businessCode,
@@ -42,6 +45,7 @@ func ErrorWithBusinessCode(ctx *gin.Context, code int, businessCode, msgKey stri
 }
 
 func ErrorWithDetailAndData(ctx *gin.Context, code int, msgKey string, err error, data interface{}) {
+	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
 	res := dto.Response{
 		Code: code,
 		Data: data,

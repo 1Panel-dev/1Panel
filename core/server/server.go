@@ -2,6 +2,7 @@ package server
 
 import (
 	"bufio"
+	"context"
 	"crypto/tls"
 	"encoding/gob"
 	"fmt"
@@ -9,6 +10,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"runtime"
 	"strings"
 	"time"
 
@@ -36,6 +38,7 @@ import (
 )
 
 func Start() {
+	processStartedAt := time.Now()
 	re.Init()
 	viper.Init()
 	log.Init()
@@ -81,6 +84,20 @@ func Start() {
 	ln, err := net.Listen(tcpItem, server.Addr)
 	if err != nil {
 		panic(err)
+	}
+	if err := service.NewMCPService().RecoverInterruptedInvocations(processStartedAt); err != nil {
+		global.LOG.Errorf("MCP invocation audit recovery failed; runtime bridge is unavailable: %v", err)
+	} else if err := router.StartMCPBridge(); err != nil {
+		global.LOG.Errorf("MCP runtime bridge is unavailable: %v", err)
+	}
+	if runtime.GOOS == "linux" {
+		go func() {
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+			if err := service.NewMCPRuntimeService().PrepareOnStartup(ctx); err != nil {
+				global.LOG.Warnf("MCP Docker runtime preparation failed: %v", err)
+			}
+		}()
 	}
 	type tcpKeepAliveListener struct {
 		*net.TCPListener

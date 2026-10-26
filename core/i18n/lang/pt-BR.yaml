@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "Não foi possível verificar o suporte à aut
 LocalAppSyncDispatch: "Enviar sincronização de apps locais"
 LocalAppSyncDispatchNode: "Enviar sincronização de apps locais para {{.node}} (tarefa do nó: {{.taskID}})"
 ErrLocalAppSyncDisabled: "A sincronização de apps locais entre nós está desativada"
+
+# MCP connection document
+MCPDocumentTitle: "Instruções de configuração da conexão MCP do 1Panel"
+MCPDocumentIntro: "Entregue este arquivo a um agente de IA e peça que realize a configuração descrita. Este arquivo contém o Token completo; mantenha-o privado."
+MCPDocumentTaskTitle: "Tarefa de configuração para o agente de IA"
+MCPDocumentTask: "Configure o MCP do 1Panel no ambiente atual para o cliente indicado abaixo e verifique a conexão e a descoberta de ferramentas. Use os parâmetros do bloco de configuração abaixo."
+MCPDocumentClientCodex: "Cliente de destino: Codex. Primeiro confirme o escopo da configuração e o CODEX_HOME efetivo. Use o config.toml em uso (padrão: ~/.codex/config.toml) e mescle o TOML abaixo na entrada mcp_servers correspondente."
+MCPDocumentClientClaude: "Cliente de destino: Claude. Primeiro confirme a versão real do cliente. O JSON abaixo se destina a clientes compatíveis com a configuração MCP por HTTP. Use um local de configuração ou método de gerenciamento compatível com essa versão; não insira a configuração HTTP remota em uma entrada que aceite apenas stdio."
+MCPDocumentClientGeneric: "Cliente de destino: cliente MCP genérico. Primeiro identifique o cliente em uso e o escopo da configuração. Se houver dúvida, pergunte ao usuário; não adivinhe o local do arquivo. Mescle os parâmetros de conexão abaixo conforme a sintaxe do cliente."
+MCPDocumentSteps: |-
+  1. Confirme que o cliente de destino aceita Streamable HTTP e cabeçalhos de requisição Bearer. Se a versão não oferecer suporte, explique o motivo.
+  2. Leia a configuração existente e faça uma cópia de segurança. Mescle a única entrada de servidor abaixo, preservando as demais configurações MCP e do cliente. Se o nome já existir, atualize somente essa entrada.
+  3. Grave os valores de URL e Authorization exatamente como fornecidos. Não gere outro Token nem altere as permissões do painel ou o estado do serviço. Não inclua o Token no histórico de comandos, em logs, respostas ou no Git.
+  4. Mantenha a verificação de certificados habilitada para HTTPS. Para uma CA privada, solicite ao usuário uma CA confiável; não confie automaticamente no certificado do servidor nem desative a verificação TLS. Use HTTP apenas em redes confiáveis; configure HTTPS antes de passar por uma rede não confiável.
+  5. Recarregue pelo cliente e verifique a inicialização MCP e tools/list. Não execute tools/call nem operações de escrita. Se não for possível recarregar, informe que é necessária uma nova sessão ou reinicialização. Salvar o arquivo não comprova que a conexão funcionou.
+  6. Informe o cliente, o local da configuração, o nome do servidor, os resultados da conexão e da descoberta de ferramentas e as pendências. Oculte o Token.
+MCPDocumentConfigTitle: "Configuração da conexão"
+MCPDocumentNotes: "O servidor do painel verifica as permissões de ferramentas, nós e da conta atual em cada requisição. Após gerar um novo Token, atualize a configuração do cliente. O acesso será negado se a credencial for desativada, revogada ou expirar."
+MCPDocumentHTTPWarning: "Este endereço usa HTTP sem criptografia. Configure HTTPS antes de utilizá-lo em uma rede não confiável."
+
+# MCP management
+ErrMCPConflict: "Os dados MCP foram alterados ou estão em conflito. Atualize a página e revise-os."
+ErrMCPPolicyChanged: "O catálogo de ferramentas MCP ou a autorização foi alterado. Atualize, revise e salve a autorização."
+ErrMCPCatalogUnavailable: "O catálogo de ferramentas MCP está indisponível. Verifique o estado do serviço."
+ErrMCPDisabled: "O serviço MCP não está habilitado."
+ErrMCPSecretKeyUnavailable: "A criptografia de credenciais MCP está indisponível. Tente novamente mais tarde."
+ErrMCPSecretInvalid: "Não foi possível descriptografar o Token MCP armazenado. Gere um novo Token."
+ErrMCPCredentialInactive: "A credencial MCP está desabilitada, expirada ou revogada."
+ErrMCPAuditUnavailable: "A auditoria de operações MCP está indisponível. Verifique o resultado antes de continuar."
+ErrMCPEndpointUnavailable: "Configure primeiro um endereço externo MCP válido."

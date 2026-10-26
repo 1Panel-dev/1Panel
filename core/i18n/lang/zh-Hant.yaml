@@ -502,3 +502,33 @@ ErrAPIKeyTerminalUpgradeRequired: "無法確認節點支援 API Key 終端授權
 LocalAppSyncDispatch: "下發本機應用同步"
 LocalAppSyncDispatchNode: "向節點 {{.node}} 下發本機應用同步（節點任務：{{.taskID}}）"
 ErrLocalAppSyncDisabled: "尚未啟用本機應用跨節點同步"
+
+# MCP connection document
+MCPDocumentTitle: "1Panel MCP 連線設定提示詞"
+MCPDocumentIntro: "將本檔案交給 AI Agent，要求其依照文件完成設定。本檔案包含完整 Token，請妥善保密。"
+MCPDocumentTaskTitle: "給 AI Agent 的設定任務"
+MCPDocumentTask: "請在目前環境中為下方指定的用戶端設定 1Panel MCP，並驗證連線及工具探索。連線參數以下方設定片段為準。"
+MCPDocumentClientCodex: "目標用戶端：Codex。先確認設定範圍及實際 CODEX_HOME；使用生效的 config.toml（預設 ~/.codex/config.toml），將下方 TOML 合併至對應的 mcp_servers 項目。"
+MCPDocumentClientClaude: "目標用戶端：Claude。先確認實際用戶端版本；下方 JSON 適用於支援 HTTP MCP 設定的用戶端。使用該版本支援的設定位置或管理方式，不將遠端 HTTP 設定寫入僅支援 stdio 的入口。"
+MCPDocumentClientGeneric: "目標用戶端：通用 MCP 用戶端。先識別目前使用的用戶端及設定範圍；無法確定時詢問使用者，不猜測設定檔位置。依照用戶端語法合併下方連線參數。"
+MCPDocumentSteps: |-
+  1. 確認目標用戶端支援 Streamable HTTP 與 Bearer 請求標頭；版本不支援時說明原因。
+  2. 讀取並備份現有設定，合併下方唯一的伺服器項目，保留其他 MCP 和用戶端設定；同名時只更新該項目。
+  3. 按原值寫入 URL 與 Authorization，不重設 Token、不變更面板權限或服務啟停狀態，不將 Token 寫入命令列歷程、日誌、回覆或 Git。
+  4. HTTPS 保持憑證驗證；私有 CA 須由使用者提供可信任的 CA，不自動信任伺服器憑證或停用 TLS 驗證。HTTP 僅限可信任網路，跨不可信任網路前先設定 HTTPS。
+  5. 使用用戶端重新載入，執行 MCP 初始化及 tools/list 驗證；不執行 tools/call 或寫入操作。無法重新載入時回報需要新工作階段或重新啟動，勿將儲存檔案視為連線成功。
+  6. 回報用戶端、設定位置、伺服器名稱、連線與工具探索結果及尚待處理的問題，隱藏 Token。
+MCPDocumentConfigTitle: "連線設定"
+MCPDocumentNotes: "工具、節點及所屬帳號目前的權限由面板伺服器每次驗證。重新產生 Token 後須更新用戶端設定，停用、撤銷或過期後將拒絕連線。"
+MCPDocumentHTTPWarning: "目前位址使用未加密的 HTTP；在不可信任的網路使用前，請先設定 HTTPS。"
+
+# MCP management
+ErrMCPConflict: "MCP 資料已變更或存在衝突，請重新整理後再次核對。"
+ErrMCPPolicyChanged: "MCP 工具目錄或授權已變更，請重新整理後核對並儲存授權。"
+ErrMCPCatalogUnavailable: "MCP 工具目錄暫時無法使用，請檢查服務狀態。"
+ErrMCPDisabled: "MCP 服務尚未啟用。"
+ErrMCPSecretKeyUnavailable: "MCP 存取憑證加密暫時無法使用，請稍後重試。"
+ErrMCPSecretInvalid: "儲存的 MCP Token 無法解密，請重新產生 Token。"
+ErrMCPCredentialInactive: "MCP 存取憑證已停用、過期或撤銷。"
+ErrMCPAuditUnavailable: "MCP 操作稽核暫時無法使用，請核對操作結果後再繼續。"
+ErrMCPEndpointUnavailable: "請先設定有效的 MCP 外部連線位址。"
