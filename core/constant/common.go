@@ -236,6 +236,7 @@ var WebUrlMap = map[string]struct{}{
 }
 
 var DynamicRoutes = []string{
+	`^/ai/benchmark/[0-9]+$`,
 	`^/containers/composeDetail/[^/]+$`,
 	`^/databases/mysql/setting/[^/]+/[^/]+$`,
 	`^/databases/postgresql/setting/[^/]+/[^/]+$`,

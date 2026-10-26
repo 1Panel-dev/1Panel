@@ -1918,6 +1918,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Token awalan',
+        seed: 'Benih rawak',
+        report: 'Laporan',
         prepareTimeoutHelp: 'Had masa persediaan, tidak termasuk had masa keseluruhan.',
         pointTimeoutHelp:
             'Pemasa berasingan setiap titik, termasuk permulaan, pemanasan dan semua permintaan; dihadkan oleh baki masa keseluruhan.',
@@ -2065,17 +2068,29 @@ const message = {
         latency: 'Kependaman',
         usage: 'Permintaan dan penggunaan (pelaksanaan sah)',
     },
+    modelDownloadExtra: {
+        downloadModel: 'Muat turun model',
+        downloadTokenizer: 'Muat turun tokenizer',
+        onlineDownload: 'Muat turun dalam talian',
+        content: 'Kandungan muat turun',
+        fullModel: 'Model penuh',
+        tokenizerOnly: 'Tokenizer sahaja',
+        deleteFiles: 'Padam fail juga',
+        deleteFilesHelp: 'Jika ditandakan, direktori tokenizer dan semua failnya akan dipadam.',
+    },
     benchmarkTokenizer: {
         title: 'Pengurusan tokenizer',
-        local: 'Daftar direktori setempat',
-        upload: 'Muat naik pakej tokenizer',
         uploadHelp: 'Muat naik ZIP / tar.gz tanpa pemberat model. Had: 128 MiB dimampatkan, 256 MiB selepas diekstrak.',
-        source: 'Kaedah import',
-        deleteLocal: 'Alih keluar pendaftaran tokenizer “{0}”? Direktori dan fail asal akan dikekalkan.',
-        deleteUpload: 'Padam tokenizer “{0}” serta fail yang dimuat naik? Laporan ujian terdahulu akan dikekalkan.',
         select: 'Pilih tokenizer',
         selectHelp:
             'Untuk ujian luar talian, pilih tokenizer terurus. Input tersuai menerima direktori setempat atau nama repositori.',
+        deleteFilesHelp: 'Jika ditandakan, direktori {0} dan semua failnya juga akan dipadam secara kekal.',
+        deleteNameConfirm: 'Masukkan nama tokenizer untuk mengesahkan pemadaman: ',
+        deleteDirectoryWarning:
+            'Direktori yang dipaparkan dan semua kandungannya, termasuk pemberat model, konfigurasi dan skrip, akan dipadam secara kekal. Tindakan ini tidak boleh dibatalkan. Jika direktori dikongsi dengan model, model mungkin tidak lagi dapat dimuatkan atau dijalankan.',
+        deleteWarning: 'Memadam fail boleh menyebabkan ujian yang sedang menggunakan tokenizer ini gagal.',
+        exists: 'Wujud',
+        missing: 'Tiada',
     },
     container: {
         createByCommand: 'Cipta melalui perintah',

@@ -1890,6 +1890,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'プレフィックストークン数',
+        seed: '乱数シード',
+        report: 'レポート',
         prepareTimeoutHelp: '準備時間の上限です。テスト全体のタイムアウトには含みません。',
         pointTimeoutHelp:
             '各測定点で個別に計時し、起動、ウォームアップ、全リクエストを含みます。全体の残り時間にも制限されます。',
@@ -2032,18 +2035,30 @@ const message = {
         latency: 'レイテンシ',
         usage: 'リクエストと使用量（有効な実行）',
     },
+    modelDownloadExtra: {
+        downloadModel: 'モデルをダウンロード',
+        downloadTokenizer: 'トークナイザーをダウンロード',
+        onlineDownload: 'オンラインダウンロード',
+        content: 'ダウンロード内容',
+        fullModel: 'モデル全体',
+        tokenizerOnly: 'トークナイザーのみ',
+        deleteFiles: 'ファイルも削除する',
+        deleteFilesHelp: '選択すると、トークナイザーのディレクトリとすべてのファイルが削除されます。',
+    },
     benchmarkTokenizer: {
         title: 'トークナイザー管理',
-        local: 'ローカルディレクトリを登録',
-        upload: 'トークナイザーをアップロード',
         uploadHelp:
             'モデルの重みを含まない ZIP / tar.gz をアップロードしてください。圧縮時 128 MiB、展開後 256 MiB まで。',
-        source: 'インポート方法',
-        deleteLocal: '「{0}」の登録を解除しますか？元のディレクトリとファイルは保持されます。',
-        deleteUpload: '「{0}」とアップロード済みファイルを削除しますか？過去のテストレポートは保持されます。',
         select: 'トークナイザーを選択',
         selectHelp:
             'オフラインでは管理リストから選択してください。カスタム入力ではローカルパスやリポジトリ名も使えます。',
+        deleteFilesHelp: '選択すると、ディレクトリ {0} とその中のすべてのファイルも完全に削除されます。',
+        deleteNameConfirm: '削除を確認するには、トークナイザー名を入力してください：',
+        deleteDirectoryWarning:
+            '表示されたディレクトリと、その中のモデルの重み、設定、スクリプトを含むすべての内容が完全に削除されます。この操作は取り消せません。モデルとディレクトリを共有している場合、モデルを読み込んだり実行したりできなくなる可能性があります。',
+        deleteWarning: 'ファイルを削除すると、このトークナイザーを使用中のテストが失敗する可能性があります。',
+        exists: '存在する',
+        missing: '存在しない',
     },
     container: {
         createByCommand: 'コマンドで作成',

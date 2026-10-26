@@ -1920,6 +1920,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        prefixTokens: 'Tokens de prefixo',
+        seed: 'Semente aleatória',
+        report: 'Relatório',
         prepareTimeoutHelp: 'Limite da preparação, excluído do tempo limite total.',
         pointTimeoutHelp:
             'Tempo separado por ponto, incluindo início, aquecimento e solicitações; limitado pelo tempo total restante.',
@@ -2065,17 +2068,31 @@ const message = {
         latency: 'Latência',
         usage: 'Requisições e uso (execuções válidas)',
     },
+    modelDownloadExtra: {
+        downloadModel: 'Baixar modelo',
+        downloadTokenizer: 'Baixar tokenizador',
+        onlineDownload: 'Download online',
+        content: 'Conteúdo do download',
+        fullModel: 'Modelo completo',
+        tokenizerOnly: 'Apenas tokenizador',
+        deleteFiles: 'Excluir também os arquivos',
+        deleteFilesHelp:
+            'Ao selecionar esta opção, o diretório do tokenizador e todos os seus arquivos serão excluídos.',
+    },
     benchmarkTokenizer: {
         title: 'Gerenciamento de tokenizadores',
-        local: 'Registrar diretório local',
-        upload: 'Enviar pacote de tokenizador',
         uploadHelp: 'Envie um ZIP / tar.gz sem os pesos do modelo. Máximo: 128 MiB compactado e 256 MiB extraído.',
-        source: 'Método de importação',
-        deleteLocal: 'Remover o registro do tokenizador “{0}”? O diretório e os arquivos originais serão mantidos.',
-        deleteUpload: 'Excluir o tokenizador “{0}” e seus arquivos enviados? Os relatórios anteriores serão mantidos.',
         select: 'Selecionar um tokenizador',
         selectHelp:
             'Para testes offline, selecione um tokenizador gerenciado. A entrada personalizada aceita diretórios locais ou nomes de repositórios.',
+        deleteFilesHelp:
+            'Ao selecionar esta opção, o diretório {0} e todos os seus arquivos também serão excluídos permanentemente.',
+        deleteNameConfirm: 'Digite o nome do tokenizador para confirmar a exclusão: ',
+        deleteDirectoryWarning:
+            'O diretório exibido e todo o seu conteúdo, incluindo pesos do modelo, configurações e scripts, serão excluídos permanentemente. Esta ação não pode ser desfeita. Se o diretório for compartilhado com um modelo, ele poderá deixar de carregar ou executar.',
+        deleteWarning: 'Excluir os arquivos pode causar falhas nos testes que estão usando este tokenizador.',
+        exists: 'Existe',
+        missing: 'Não existe',
     },
     container: {
         createByCommand: 'Criar por comando',
