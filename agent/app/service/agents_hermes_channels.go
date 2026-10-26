@@ -8,11 +8,15 @@ import (
 )
 
 const hermesWeixinLoginScript = `import asyncio
-from gateway.platforms.weixin import qr_login
+try:
+    from plugins.platforms.weixin.adapter import qr_login
+except ModuleNotFoundError as exc:
+    if exc.name not in ('plugins', 'plugins.platforms', 'plugins.platforms.weixin', 'plugins.platforms.weixin.adapter'):
+        raise
+    from gateway.platforms.weixin import qr_login
 from hermes_cli.config import save_env_value
 
 creds = asyncio.run(qr_login('/opt/data'))
-print('RESULT =', creds)
 
 if not creds:
     raise SystemExit(1)
