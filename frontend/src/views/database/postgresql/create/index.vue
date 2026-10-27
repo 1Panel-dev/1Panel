@@ -66,7 +66,7 @@ const form = reactive({
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

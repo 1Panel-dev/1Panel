@@ -183,7 +183,7 @@ const rules = reactive({
     userMode: [Rules.requiredSelect],
     userKey: [Rules.requiredSelect],
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
     permission: [Rules.requiredSelect],
     permissionIPs: [Rules.requiredInput, Rules.noSpace, Rules.illegal, { validator: checkMysqlHosts, trigger: 'blur' }],
 });

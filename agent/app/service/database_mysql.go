@@ -437,7 +437,7 @@ func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*mode
 }
 
 func (u *MysqlService) create(ctx context.Context, req dto.MysqlDBCreate, mcpBounded bool) (*model.DatabaseMysql, error) {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Collation, req.Permission) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Collation, req.Permission) || strings.Contains(req.Password, " ") {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
 	if len(req.Username) != 0 && len(req.Password) == 0 {
@@ -680,7 +680,7 @@ func (u *MysqlService) ListGrantSummary(req dto.MysqlGrantSummarySearch) (map[st
 }
 
 func (u *MysqlService) CreateUser(req dto.MysqlUserCreate) error {
-	if cmd.CheckIllegal(req.Username, req.Password, req.Host) {
+	if cmd.CheckIllegal(req.Username, req.Password, req.Host) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	dbs := make([]string, 0, len(req.DBs))
@@ -883,7 +883,7 @@ func (u *MysqlService) UpdateUser(req dto.MysqlUserUpdate) error {
 }
 
 func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
-	if cmd.CheckIllegal(req.Username, req.Host, req.Password) {
+	if cmd.CheckIllegal(req.Username, req.Host, req.Password) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	if err := checkMysqlNormalUser(req.Username); err != nil {
@@ -936,7 +936,7 @@ func (u *MysqlService) ChangeUserPassword(req dto.MysqlUserPassword) error {
 }
 
 func (u *MysqlService) SaveUserPassword(req dto.MysqlUserPassword) error {
-	if cmd.CheckIllegal(req.Username, req.Host, req.Password) {
+	if cmd.CheckIllegal(req.Username, req.Host, req.Password) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	if err := checkMysqlNormalUser(req.Username); err != nil {
@@ -1302,7 +1302,7 @@ func isMysqlDatabaseResourceInUseError(err error) bool {
 }
 
 func (u *MysqlService) ChangePassword(req dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(req.Value) {
+	if cmd.CheckIllegal(req.Value) || strings.Contains(req.Value, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	cli, version, err := LoadMysqlClientByFrom(req.Database)

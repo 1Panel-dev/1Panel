@@ -5,12 +5,14 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql"
 	"github.com/1Panel-dev/1Panel/agent/utils/mysql/client"
@@ -126,6 +128,9 @@ func (u *DatabaseService) LoadItems(dbType string) ([]dto.DatabaseItem, error) {
 }
 
 func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
+	if (req.Type == constant.AppMysql || req.Type == constant.AppMariaDB || req.Type == constant.AppPostgresql || req.Type == constant.AppMongodb) && (cmd.CheckIllegal(req.Username, req.Password) || strings.Contains(req.Password, " ")) {
+		return false
+	}
 	if req.Timeout == 0 {
 		req.Timeout = 30
 	}
@@ -180,6 +185,9 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 }
 
 func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
+	if (req.Type == constant.AppMysql || req.Type == constant.AppMariaDB || req.Type == constant.AppPostgresql || req.Type == constant.AppMongodb) && (cmd.CheckIllegal(req.Username, req.Password) || strings.Contains(req.Password, " ")) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	if req.Timeout == 0 {
 		req.Timeout = 30
 	}
@@ -303,6 +311,9 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 }
 
 func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
+	if (req.Type == constant.AppMysql || req.Type == constant.AppMariaDB || req.Type == constant.AppPostgresql || req.Type == constant.AppMongodb) && (cmd.CheckIllegal(req.Username, req.Password) || strings.Contains(req.Password, " ")) {
+		return buserr.New("ErrCmdIllegal")
+	}
 	switch req.Type {
 	case constant.AppPostgresql:
 		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{

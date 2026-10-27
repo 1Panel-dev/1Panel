@@ -58,7 +58,7 @@ const confirmDialogRef = ref();
 
 const rules = reactive({
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
 });
 
 interface DialogProps {

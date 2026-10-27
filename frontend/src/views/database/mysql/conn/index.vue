@@ -161,7 +161,7 @@ const form = reactive({
     remoteIP: '',
 });
 const rules = reactive({
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
 });
 
 type FormInstance = InstanceType<typeof ElForm>;

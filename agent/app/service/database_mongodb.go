@@ -64,7 +64,7 @@ func (u *MongodbService) UpdateDescription(req dto.UpdateDescription) error {
 }
 
 func (u *MongodbService) Create(ctx context.Context, req dto.MongodbDBCreate) (*model.DatabaseMongodb, error) {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password) || strings.Contains(req.Password, " ") {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
 	if !isSupportedMongodbPrivilege(req.Permission) {
@@ -146,7 +146,7 @@ func (u *MongodbService) LoadFromRemote(req dto.MongodbLoadDB) error {
 }
 
 func (u *MongodbService) BindUser(req dto.MongodbBind) error {
-	if cmd.CheckIllegal(req.Database, req.Name, req.Username, req.Password) {
+	if cmd.CheckIllegal(req.Database, req.Name, req.Username, req.Password) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 
@@ -168,7 +168,7 @@ func (u *MongodbService) BindUser(req dto.MongodbBind) error {
 }
 
 func (u *MongodbService) ChangePassword(req dto.MongodbPassword) error {
-	if cmd.CheckIllegal(req.Database, req.Name, req.Password) {
+	if cmd.CheckIllegal(req.Database, req.Name, req.Password) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 
@@ -190,7 +190,7 @@ func (u *MongodbService) ChangePassword(req dto.MongodbPassword) error {
 }
 
 func (u *MongodbService) ChangeRootPassword(req dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(req.Value) {
+	if cmd.CheckIllegal(req.Value) || strings.Contains(req.Value, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	if req.From != constant.AppResourceLocal {

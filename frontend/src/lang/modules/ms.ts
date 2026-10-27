@@ -295,7 +295,7 @@ const message = {
             rePassword: 'Pengesahan kata laluan tidak sepadan dengan kata laluan.',
             requiredInput: 'Ruangan ini wajib diisi.',
             requiredSelect: 'Pilih satu item dalam senarai',
-            illegalChar: 'Suntikan aksara & ; $ \' ` ( ) " > < ｜ tidak disokong buat masa ini',
+            illegalChar: "Suntikan aksara & ; $ ' ` ( ) \" > < {'|'} tidak disokong buat masa ini",
             illegalInput: 'Ruangan ini tidak boleh mengandungi aksara tidak sah.',
             duplicate: 'Nilai ini mesti unik.',
             commonName:
