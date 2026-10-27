@@ -6,15 +6,13 @@ import (
 )
 
 const (
-	TokenizerDisallowedCharsPattern = `[^A-Za-z0-9._-]+`
-	OrderByValidationPattern        = `^[a-zA-Z_][a-zA-Z0-9_]*$`
+	OrderByValidationPattern = `^[a-zA-Z_][a-zA-Z0-9_]*$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
 
 func Init() {
 	patterns := []string{
-		TokenizerDisallowedCharsPattern,
 		OrderByValidationPattern,
 	}
 
