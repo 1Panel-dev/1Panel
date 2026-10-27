@@ -332,7 +332,7 @@ func setBundledFeishuConfig(conf map[string]interface{}, req dto.AgentFeishuConf
 			if len(bot.AllowFrom) > 0 {
 				entry["allowFrom"] = bot.AllowFrom
 			} else {
-				delete(entry, "allowFrom")
+				entry["allowFrom"] = []string{}
 			}
 		}
 		accounts[bot.AccountID] = entry
