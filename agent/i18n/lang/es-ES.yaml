@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "La actualización de compatibilidad de Feishu requiere 
 ErrFeishuUpgradeMounts: "Estos montajes no permiten una copia y restauración completas. Use los montajes de datos estándar dentro del directorio de la aplicación."
 
 AgentFeishuRecoveryDisabled: "Puerta de enlace recuperada con Feishu desactivado; se conserva la copia de configuración original."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

@@ -791,3 +791,5 @@ ErrFeishuUpgradeBackup: "ການອັບເກຣດ Feishu ຕ້ອງສ�
 ErrFeishuUpgradeMounts: "ຈຸດເຊື່ອມຂໍ້ມູນນີ້ບໍ່ສາມາດສຳຮອງແລະກູ້ຄືນທັງໝົດໄດ້. ໃຊ້ຈຸດເຊື່ອມມາດຕະຖານພາຍໃນໂຟນເດີແອັບ."
 
 AgentFeishuRecoveryDisabled: "ເກດເວກູ້ຄືນແລ້ວ ແຕ່ Feishu ຍັງປິດ; ສຳຮອງການຕັ້ງຄ່າເດີມຍັງຖືກເກັບໄວ້."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

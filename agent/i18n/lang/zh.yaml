@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "飞书兼容升级必须开启完整应用备份。"
 ErrFeishuUpgradeMounts: "当前挂载无法完整备份或恢复，请使用应用目录内的标准数据挂载后重试。"
 
 AgentFeishuRecoveryDisabled: "网关已恢复，飞书保持停用；原配置备份已保留。"
+
+ContainerUpgradeWaiting: "等待容器升级任务执行名额"

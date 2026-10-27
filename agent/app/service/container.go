@@ -1660,6 +1660,10 @@ func calculateNetwork(network map[string]container.NetworkStats) (float64, float
 }
 
 func checkImageExist(client *client.Client, imageItem string) bool {
+	return checkImageExistContext(context.Background(), client, imageItem)
+}
+
+func checkImageExistContext(ctx context.Context, client *client.Client, imageItem string) bool {
 	if client == nil {
 		var err error
 		client, err = docker.NewDockerClient()
@@ -1667,7 +1671,7 @@ func checkImageExist(client *client.Client, imageItem string) bool {
 			return false
 		}
 	}
-	images, err := client.ImageList(context.Background(), image.ListOptions{})
+	images, err := client.ImageList(ctx, image.ListOptions{})
 	if err != nil {
 		return false
 	}
@@ -1709,6 +1713,10 @@ func checkImageLike(client *client.Client, imageName string) bool {
 }
 
 func pullImages(task *task.Task, client *client.Client, imageName string) error {
+	return pullImagesContext(context.Background(), task, client, imageName)
+}
+
+func pullImagesContext(ctx context.Context, task *task.Task, client *client.Client, imageName string) error {
 	dockerCli := docker.NewClientWithExist(client)
 	repos, err := imageRepoRepo.List()
 	if err != nil {
@@ -1716,7 +1724,7 @@ func pullImages(task *task.Task, client *client.Client, imageName string) error 
 	}
 	imageRepo := selectImageRepo(imageName, repos)
 	if imageRepo == nil || !imageRepo.Auth {
-		return dockerCli.PullImageWithProcess(task, imageName)
+		return dockerCli.PullImageWithProcessContext(ctx, task, imageName)
 	}
 
 	options := image.PullOptions{}
@@ -1729,7 +1737,7 @@ func pullImages(task *task.Task, client *client.Client, imageName string) error 
 		return err
 	}
 	options.RegistryAuth = base64.URLEncoding.EncodeToString(encodedJSON)
-	return dockerCli.PullImageWithProcessAndOptions(task, imageName, options)
+	return dockerCli.PullImageWithProcessAndOptionsContext(ctx, task, imageName, options)
 }
 
 func selectImageRepo(imageName string, repos []model.ImageRepo) *model.ImageRepo {

@@ -197,12 +197,22 @@ func setLog(id, newLastLine string, task *task.Task) error {
 }
 
 func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string, options image.PullOptions) error {
-	out, err := c.cli.ImagePull(context.Background(), imageName, options)
+	return c.PullImageWithProcessAndOptionsContext(context.Background(), task, imageName, options)
+}
+
+func (c Client) PullImageWithProcessAndOptionsContext(ctx context.Context, task *task.Task, imageName string, options image.PullOptions) error {
+	out, err := c.cli.ImagePull(ctx, imageName, options)
 	if err != nil {
 		return err
 	}
 	defer out.Close()
-	return handlePullImageProcess(out, task)
+	stopClose := context.AfterFunc(ctx, func() { _ = out.Close() })
+	defer stopClose()
+	err = handlePullImageProcess(out, task)
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	return err
 }
 
 func handlePullImageProcess(out io.Reader, task *task.Task) error {
@@ -319,11 +329,15 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 }
 
 func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
+	return c.PullImageWithProcessContext(context.Background(), task, imageName)
+}
+
+func (c Client) PullImageWithProcessContext(ctx context.Context, task *task.Task, imageName string) error {
 	options := image.PullOptions{}
 	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
 		options.RegistryAuth = authStr
 	}
-	return c.PullImageWithProcessAndOptions(task, imageName, options)
+	return c.PullImageWithProcessAndOptionsContext(ctx, task, imageName, options)
 }
 
 func logProcess(progress map[string]interface{}, task *task.Task) {

@@ -14,8 +14,13 @@ export const searchContainer = (params: Container.ContainerSearch, currentNode?:
 export const listContainer = () => {
     return http.post<Array<Container.ContainerOption>>(`/containers/list`, {});
 };
-export const listContainerByImage = (image: string) => {
-    return http.post<Array<Container.ContainerOption>>(`/containers/list/byimage`, { name: image });
+export const listContainerByImage = (image: string, node?: string) => {
+    return http.post<Array<Container.ContainerOption>>(
+        `/containers/list/byimage`,
+        { name: image },
+        undefined,
+        node ? { CurrentNode: node } : undefined,
+    );
 };
 export const loadContainerUsers = (name: string) => {
     return http.post<Array<string>>(`/containers/users`, { name: name });
@@ -60,8 +65,8 @@ export const createContainer = (params: Container.ContainerHelper) => {
 export const updateContainer = (params: Container.ContainerHelper) => {
     return http.post(`/containers/update`, params, TimeoutEnum.T_10M);
 };
-export const upgradeContainer = (params: Container.ContainerUpgrade) => {
-    return http.post(`/containers/upgrade`, params, TimeoutEnum.T_10M);
+export const upgradeContainer = (params: Container.ContainerUpgrade, node?: string) => {
+    return http.post(`/containers/upgrade`, params, TimeoutEnum.T_10M, node ? { CurrentNode: node } : undefined);
 };
 export const commitContainer = (params: Container.ContainerCommit) => {
     return http.post(`/containers/commit`, params);

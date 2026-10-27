@@ -91,81 +91,95 @@ func (u *ContainerService) ContainerUpdate(req dto.ContainerOperate) error {
 	return nil
 }
 
+const containerUpgradeConcurrency = 2
+
+// Shared by all upgrade requests handled by this agent.
+var containerUpgradeSlots = make(chan struct{}, containerUpgradeConcurrency)
+
 func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 	client, err := docker.NewDockerClient()
 	if err != nil {
 		return err
 	}
-	ctx := context.Background()
 	taskItem, err := task.NewTaskWithOps(req.Image, task.TaskUpgrade, task.TaskScopeImage, req.TaskID, 1)
 	if err != nil {
 		_ = client.Close()
 		global.LOG.Errorf("new task for create container failed, err: %v", err)
 		return err
 	}
-	go func() {
-		defer client.Close()
-		taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
-			taskItem.LogStart(i18n.GetWithName("ContainerImagePull", req.Image))
-			if !checkImageExist(client, req.Image) || req.ForcePull {
-				if err := pullImages(taskItem, client, req.Image); err != nil {
-					if !req.ForcePull {
-						return err
-					}
-					return fmt.Errorf("pull image %s failed, err: %v", req.Image, err)
-				}
+	taskItem.AddSubTask(i18n.GetWithName("ContainerImagePull", req.Image), func(t *task.Task) error {
+		ctx, cancel := context.WithTimeout(context.Background(), containerUpgradePullTimeout)
+		defer cancel()
+		taskItem.LogStart(i18n.GetWithName("ContainerImagePull", req.Image))
+		if req.ForcePull || !checkImageExistContext(ctx, client, req.Image) {
+			if err := pullImagesContext(ctx, taskItem, client, req.Image); err != nil {
+				return fmt.Errorf("pull image %s failed: %w", req.Image, err)
+			}
+		}
+		return nil
+	}, nil)
+	var upgradeErrors []error
+	for _, item := range req.Names {
+		item := item
+		taskItem.AddSubTaskWithIgnoreErr(i18n.GetWithName("ContainerUpgradeItem", item), func(t *task.Task) error {
+			t.Logf("----------------- %s -----------------", item)
+			t.LogStart(i18n.GetWithName("ContainerAcquireLock", item))
+			ctx, cancel := context.WithTimeout(context.Background(), containerUpgradeReplaceTimeout)
+			defer cancel()
+			unlock, lockErr := containerOperationLock.lockContext(ctx, item)
+			if lockErr != nil {
+				upgradeErrors = append(upgradeErrors, fmt.Errorf("wait for container %s lock: %w", item, lockErr))
+				return lockErr
+			}
+			defer unlock()
+			t.LogWithStatus(i18n.GetWithName("ContainerAcquireLock", item), nil)
+
+			oldContainer, inspectErr := client.ContainerInspect(ctx, item)
+			t.LogWithStatus(i18n.GetWithName("ContainerLoadInfo", item), inspectErr)
+			if inspectErr != nil {
+				err := fmt.Errorf("reload container %s failed: %w", item, inspectErr)
+				upgradeErrors = append(upgradeErrors, err)
+				return err
+			}
+			config := cloneContainerConfig(oldContainer.Config)
+			config.Image = req.Image
+			if config.Labels == nil {
+				config.Labels = make(map[string]string)
+			}
+			config.Labels[containerUpgradeOwnerLabel] = oldContainer.ID
+			hostConf := cloneContainerHostConfig(oldContainer.HostConfig)
+			preserveContainerVolumeMounts(hostConf, oldContainer.Mounts)
+			networkConf, extraNetworks := buildContainerRecoverNetworkConfig(oldContainer.NetworkSettings, hostConf)
+			if err := normalizeContainerEndpointSettings(ctx, client, networkConf, extraNetworks); err != nil {
+				upgradeErr := fmt.Errorf("prepare networks for container %s failed: %w", item, err)
+				upgradeErrors = append(upgradeErrors, upgradeErr)
+				return upgradeErr
+			}
+			cleanupErr, err := switchContainerWithRecovery(ctx, client, item, oldContainer, func() (container.CreateResponse, error) {
+				return createContainerWithNetworks(ctx, client, config, hostConf, networkConf, extraNetworks, item)
+			}, config.Tty, t, true)
+			if err != nil {
+				upgradeErr := fmt.Errorf("upgrade container %s failed: %w", item, err)
+				upgradeErrors = append(upgradeErrors, upgradeErr)
+				return upgradeErr
+			}
+			if cleanupErr != nil {
+				t.Log(i18n.GetWithNameAndErr("ContainerCleanupWarning", containerSwitchBackupName(oldContainer.ID), cleanupErr))
 			}
 			return nil
-		}, nil)
-		var upgradeErrors []error
-		for _, item := range req.Names {
-			item := item
-			taskItem.AddSubTaskWithIgnoreErr(i18n.GetWithName("ContainerUpgradeItem", item), func(t *task.Task) error {
-				t.Logf("----------------- %s -----------------", item)
-				t.LogStart(i18n.GetWithName("ContainerAcquireLock", item))
-				unlock := containerOperationLock.lock(item)
-				defer unlock()
-				t.LogWithStatus(i18n.GetWithName("ContainerAcquireLock", item), nil)
-
-				oldContainer, inspectErr := client.ContainerInspect(ctx, item)
-				t.LogWithStatus(i18n.GetWithName("ContainerLoadInfo", item), inspectErr)
-				if inspectErr != nil {
-					err := fmt.Errorf("reload container %s failed: %w", item, inspectErr)
-					upgradeErrors = append(upgradeErrors, err)
-					return err
-				}
-				config := cloneContainerConfig(oldContainer.Config)
-				config.Image = req.Image
-				hostConf := cloneContainerHostConfig(oldContainer.HostConfig)
-				preserveContainerVolumeMounts(hostConf, oldContainer.Mounts)
-				networkConf, extraNetworks := buildContainerRecoverNetworkConfig(oldContainer.NetworkSettings, hostConf)
-				if err := normalizeContainerEndpointSettings(ctx, client, networkConf, extraNetworks); err != nil {
-					upgradeErr := fmt.Errorf("prepare networks for container %s failed: %w", item, err)
-					upgradeErrors = append(upgradeErrors, upgradeErr)
-					return upgradeErr
-				}
-				cleanupErr, err := switchContainer(ctx, client, item, oldContainer, func() (container.CreateResponse, error) {
-					return createContainerWithNetworks(ctx, client, config, hostConf, networkConf, extraNetworks, item)
-				}, config.Tty, t)
-				if err != nil {
-					upgradeErr := fmt.Errorf("upgrade container %s failed: %w", item, err)
-					upgradeErrors = append(upgradeErrors, upgradeErr)
-					return upgradeErr
-				}
-				if cleanupErr != nil {
-					t.Log(i18n.GetWithNameAndErr("ContainerCleanupWarning", containerSwitchBackupName(oldContainer.ID), cleanupErr))
-				}
-				return nil
-			})
-		}
-		taskItem.AddSubTask(i18n.GetMsgByKey("ContainerUpgradeSummary"), func(t *task.Task) error {
-			return errors.Join(upgradeErrors...)
-		}, nil)
-		if err := taskItem.Execute(); err != nil {
-			global.LOG.Error(err.Error())
-		}
-	}()
-
+		})
+	}
+	taskItem.AddSubTask(i18n.GetMsgByKey("ContainerUpgradeSummary"), func(t *task.Task) error {
+		return errors.Join(upgradeErrors...)
+	}, nil)
+	// Stage contexts own the deadlines, including a separate recovery budget.
+	for _, subTask := range taskItem.SubTasks {
+		subTask.Timeout = 0
+	}
+	if err := taskItem.ExecuteQueued(containerUpgradeSlots, "ContainerUpgradeWaiting", func() { _ = client.Close() }); err != nil {
+		_ = client.Close()
+		return err
+	}
 	return nil
 }
 
@@ -192,11 +206,16 @@ type containerOperationMutex struct {
 var containerOperationLock containerOperationMutex
 
 type containerOperationLockEntry struct {
-	mutex      sync.Mutex
+	token      chan struct{}
 	references int
 }
 
 func (l *containerOperationMutex) lock(names ...string) func() {
+	unlock, _ := l.lockContext(context.Background(), names...)
+	return unlock
+}
+
+func (l *containerOperationMutex) lockContext(ctx context.Context, names ...string) (func(), error) {
 	nameSet := make(map[string]struct{}, len(names))
 	for _, name := range names {
 		if name != "" {
@@ -209,7 +228,7 @@ func (l *containerOperationMutex) lock(names ...string) func() {
 	}
 	sort.Strings(orderedNames)
 	if len(orderedNames) == 0 {
-		return func() {}
+		return func() {}, nil
 	}
 
 	l.mutex.Lock()
@@ -220,7 +239,7 @@ func (l *containerOperationMutex) lock(names ...string) func() {
 	for _, name := range orderedNames {
 		entry := l.locks[name]
 		if entry == nil {
-			entry = &containerOperationLockEntry{}
+			entry = &containerOperationLockEntry{token: make(chan struct{}, 1)}
 			l.locks[name] = entry
 		}
 		entry.references++
@@ -228,12 +247,10 @@ func (l *containerOperationMutex) lock(names ...string) func() {
 	}
 	l.mutex.Unlock()
 
-	for _, entry := range entries {
-		entry.mutex.Lock()
-	}
-	return func() {
-		for index := len(entries) - 1; index >= 0; index-- {
-			entries[index].mutex.Unlock()
+	acquired := 0
+	release := func() {
+		for index := acquired - 1; index >= 0; index-- {
+			<-entries[index].token
 		}
 		l.mutex.Lock()
 		defer l.mutex.Unlock()
@@ -245,6 +262,20 @@ func (l *containerOperationMutex) lock(names ...string) func() {
 			}
 		}
 	}
+	for _, entry := range entries {
+		select {
+		case entry.token <- struct{}{}:
+			acquired++
+		case <-ctx.Done():
+			release()
+			return nil, ctx.Err()
+		}
+	}
+	if err := ctx.Err(); err != nil {
+		release()
+		return nil, err
+	}
+	return release, nil
 }
 
 type containerNetworkAttachment struct {
@@ -273,6 +304,131 @@ func switchContainer(
 	tty bool,
 	logger containerSwitchLogger,
 ) (cleanupErr error, err error) {
+	return switchContainerWithRecovery(ctx, cli, name, oldContainer, createNew, tty, logger, false)
+}
+
+
+const (
+	containerUpgradePullTimeout     = 30 * time.Minute
+	containerUpgradeReplaceTimeout  = 15 * time.Minute
+	containerUpgradeRecoveryTimeout = 5 * time.Minute
+	containerUpgradeOwnerLabel      = "io.1panel.upgrade.original-id"
+)
+
+// Reconcile against Docker's actual state: a failed request may already have
+// changed names, created a container, or disconnected a network on the daemon.
+func recoverContainerUpgrade(ctx context.Context, cli containerSwitchClient, name string, old container.InspectResponse, newID string, logger containerSwitchLogger) error {
+	original, err := cli.ContainerInspect(ctx, old.ID)
+	if err != nil {
+		return fmt.Errorf("inspect original %s: %w", old.ID, err)
+	}
+	if original.State == nil {
+		return fmt.Errorf("original container state unavailable")
+	}
+
+	replacement, inspectErr := cli.ContainerInspect(ctx, name)
+	if inspectErr != nil && !client.IsErrNotFound(inspectErr) {
+		return fmt.Errorf("inspect replacement by name: %w", inspectErr)
+	}
+	if inspectErr == nil && replacement.ID != old.ID {
+		if replacement.Config == nil || replacement.Config.Labels[containerUpgradeOwnerLabel] != old.ID {
+			return fmt.Errorf("container %s belongs to another operation; refusing to remove it", name)
+		}
+		if newID != "" && replacement.ID != newID {
+			return fmt.Errorf("replacement ID changed; refusing to remove it")
+		}
+		newID = replacement.ID
+	}
+	if newID != "" {
+		replacement, inspectErr = cli.ContainerInspect(ctx, newID)
+		if inspectErr != nil && !client.IsErrNotFound(inspectErr) {
+			return fmt.Errorf("inspect replacement %s: %w", newID, inspectErr)
+		}
+		if inspectErr == nil {
+			if replacement.ID == old.ID || replacement.Config == nil || replacement.Config.Labels[containerUpgradeOwnerLabel] != old.ID {
+				return fmt.Errorf("replacement identity could not be confirmed")
+			}
+			err = cli.ContainerRemove(ctx, newID, container.RemoveOptions{Force: true, RemoveVolumes: false})
+			logContainerSwitchStep(logger, "ContainerRollbackRemoveReplacement", name, err)
+			if err != nil && !client.IsErrNotFound(err) {
+				return fmt.Errorf("remove replacement: %w", err)
+			}
+		}
+	}
+	if strings.TrimPrefix(original.Name, "/") != name {
+		err = cli.ContainerRename(ctx, old.ID, name)
+		logContainerSwitchStep(logger, "ContainerRollbackRenameOld", name, err)
+		if err != nil {
+			return fmt.Errorf("restore original name: %w", err)
+		}
+	}
+	// Reload after mutations; connect only networks which are actually missing.
+	original, err = cli.ContainerInspect(ctx, old.ID)
+	if err != nil {
+		return err
+	}
+	primary, extras := buildContainerRecoverNetworkConfig(old.NetworkSettings, old.HostConfig)
+	wanted := make(map[string]*network.EndpointSettings)
+	if primary != nil {
+		for n, endpoint := range primary.EndpointsConfig {
+			if n != "bridge" {
+				wanted[n] = endpoint
+			}
+		}
+	}
+	for n, endpoint := range extras {
+		if n != "bridge" {
+			wanted[n] = endpoint
+		}
+	}
+	var reconnectErr error
+	for n, endpoint := range wanted {
+		if original.NetworkSettings != nil && original.NetworkSettings.Networks[n] != nil {
+			continue
+		}
+		err = cli.NetworkConnect(ctx, n, old.ID, endpoint)
+		logContainerSwitchStep(logger, "ContainerRollbackReconnectOld", n, err)
+		if err != nil {
+			reconnectErr = errors.Join(reconnectErr, fmt.Errorf("reconnect network %s: %w", n, err))
+		}
+	}
+	if reconnectErr != nil {
+		return reconnectErr
+	}
+	if old.State != nil && old.State.Running {
+		if original.State == nil {
+			return fmt.Errorf("original state unavailable after recovery")
+		}
+		if !original.State.Running {
+			err = restartOriginalContainer(ctx, cli, old.ID)
+			logContainerSwitchStep(logger, "ContainerRollbackRestartOld", name, err)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	verified, err := cli.ContainerInspect(ctx, old.ID)
+	if err != nil {
+		return fmt.Errorf("verify recovery: %w", err)
+	}
+	if strings.TrimPrefix(verified.Name, "/") != name {
+		return fmt.Errorf("original name was not restored")
+	}
+	if old.State != nil && old.State.Running && (verified.State == nil || !verified.State.Running) {
+		return fmt.Errorf("original container is not running after recovery")
+	}
+	for n := range wanted {
+		if verified.NetworkSettings == nil || verified.NetworkSettings.Networks[n] == nil {
+			return fmt.Errorf("network %s was not restored", n)
+		}
+	}
+	return nil
+}
+
+func switchContainerWithRecovery(ctx context.Context, cli containerSwitchClient, name string,
+	oldContainer container.InspectResponse, createNew func() (container.CreateResponse, error),
+	tty bool, logger containerSwitchLogger, boundedRecovery bool,
+) (cleanupErr error, err error) {
 	if oldContainer.ID == "" {
 		return nil, fmt.Errorf("original container ID is empty")
 	}
@@ -281,9 +437,32 @@ func switchContainer(
 		return nil, fmt.Errorf("cannot safely replace container %s with auto-remove enabled", name)
 	}
 
+	recoverUpgrade := func(newID string, cause error) error {
+		recoveryCtx, cancel := context.WithTimeout(context.Background(), containerUpgradeRecoveryTimeout)
+		defer cancel()
+		if newID != "" {
+			logContainerStartupLogs(recoveryCtx, cli, newID, name, tty, logger)
+		}
+		recoveryErr := recoverContainerUpgrade(recoveryCtx, cli, name, oldContainer, newID, logger)
+		if ctx.Err() != nil {
+			recoveryErr = errors.Join(recoveryErr, fmt.Errorf("Docker request timed out or was canceled; daemon-side completion cannot be confirmed: %w", ctx.Err()))
+		}
+		if recoveryErr != nil {
+			message := fmt.Sprintf("Recovery unconfirmed for container %s (original ID %s, backup %s): %v", name, oldContainer.ID, containerSwitchBackupName(oldContainer.ID), recoveryErr)
+			if logger != nil {
+				logger.Log(message)
+			}
+			return errors.Join(cause, errors.New(message))
+		}
+		return cause
+	}
+
 	if wasRunning {
 		if err := cli.ContainerStop(ctx, oldContainer.ID, container.StopOptions{}); err != nil {
 			logContainerSwitchStep(logger, "ContainerStopOld", name, err)
+			if boundedRecovery {
+				return nil, recoverUpgrade("", fmt.Errorf("stop original container failed: %w", err))
+			}
 			current, inspectErr := cli.ContainerInspect(ctx, oldContainer.ID)
 			if inspectErr == nil && current.State != nil && !current.State.Running {
 				restartErr := restartOriginalContainer(ctx, cli, oldContainer.ID)
@@ -298,6 +477,9 @@ func switchContainer(
 	backupName := containerSwitchBackupName(oldContainer.ID)
 	if err := cli.ContainerRename(ctx, oldContainer.ID, backupName); err != nil {
 		logContainerSwitchStep(logger, "ContainerRenameOld", name, err)
+		if boundedRecovery {
+			return nil, recoverUpgrade("", fmt.Errorf("rename original container failed: %w", err))
+		}
 		if wasRunning {
 			restartErr := restartOriginalContainer(ctx, cli, oldContainer.ID)
 			logContainerSwitchStep(logger, "ContainerRollbackRestartOld", name, restartErr)
@@ -309,6 +491,9 @@ func switchContainer(
 	disconnectedNetworks, disconnectErr := disconnectOriginalContainerNetworks(ctx, cli, oldContainer)
 	logContainerSwitchStep(logger, "ContainerDisconnectOld", backupName, disconnectErr)
 	if disconnectErr != nil {
+		if boundedRecovery {
+			return nil, recoverUpgrade("", disconnectErr)
+		}
 		rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, "", disconnectedNetworks, logger)
 		return nil, errors.Join(disconnectErr, rollbackErr)
 	}
@@ -316,11 +501,17 @@ func switchContainer(
 	created, createErr := createNew()
 	logContainerSwitchStep(logger, "ContainerCreateReplacement", name, createErr)
 	if createErr != nil {
+		if boundedRecovery {
+			return nil, recoverUpgrade(created.ID, createErr)
+		}
 		rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, created.ID, disconnectedNetworks, logger)
 		return nil, errors.Join(createErr, rollbackErr)
 	}
 	if err := cli.ContainerStart(ctx, created.ID, container.StartOptions{}); err != nil {
 		logContainerSwitchStep(logger, "ContainerStartReplacement", name, err)
+		if boundedRecovery {
+			return nil, recoverUpgrade(created.ID, fmt.Errorf("start new container failed: %w", err))
+		}
 		logContainerStartupLogs(ctx, cli, created.ID, name, tty, logger)
 		rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, created.ID, disconnectedNetworks, logger)
 		return nil, errors.Join(fmt.Errorf("start new container failed: %w", err), rollbackErr)
@@ -329,6 +520,9 @@ func switchContainer(
 	if wasRunning {
 		if err := waitContainerReady(ctx, cli, created.ID); err != nil {
 			logContainerSwitchStep(logger, "ContainerWaitReplacement", name, err)
+			if boundedRecovery {
+				return nil, recoverUpgrade(created.ID, fmt.Errorf("new container readiness check failed: %w", err))
+			}
 			logContainerStartupLogs(ctx, cli, created.ID, name, tty, logger)
 			rollbackErr := restoreOriginalContainer(ctx, cli, oldContainer.ID, name, wasRunning, created.ID, disconnectedNetworks, logger)
 			return nil, errors.Join(fmt.Errorf("new container readiness check failed: %w", err), rollbackErr)
@@ -336,6 +530,11 @@ func switchContainer(
 		logContainerSwitchStep(logger, "ContainerWaitReplacement", name, nil)
 	}
 
+	if boundedRecovery {
+		cleanupCtx, cancel := context.WithTimeout(context.Background(), containerUpgradeRecoveryTimeout)
+		defer cancel()
+		ctx = cleanupCtx
+	}
 	cleanupErr = cli.ContainerRemove(ctx, oldContainer.ID, container.RemoveOptions{Force: true, RemoveVolumes: false})
 	logContainerSwitchStep(logger, "ContainerRemoveOld", backupName, cleanupErr)
 	return cleanupErr, nil

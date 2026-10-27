@@ -292,10 +292,36 @@ func (t *Task) updateTask(task *model.Task) {
 	_ = t.taskRepo.Update(context.Background(), task)
 }
 
+// ExecuteQueued registers the task before returning and limits concurrent execution.
+// Subtasks must use Timeout = 0 and manage their own operation and recovery deadlines
+// so that a slot is held until the action and its cleanup have actually returned.
+func (t *Task) ExecuteQueued(slots chan struct{}, waitingStep string, onFinish func()) error {
+	t.Task.CurrentStep = waitingStep
+	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
+		_ = t.logFile.Close()
+		global.RemoveTaskCancel(t.TaskID)
+		return err
+	}
+	t.Log(i18n.GetMsgByKey(waitingStep))
+	go func() {
+		slots <- struct{}{}
+		defer func() { <-slots }()
+		defer onFinish()
+		if err := t.executeRegistered(); err != nil {
+			global.LOG.Error(err.Error())
+		}
+	}()
+	return nil
+}
+
 func (t *Task) Execute() error {
 	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
 		return err
 	}
+	return t.executeRegistered()
+}
+
+func (t *Task) executeRegistered() error {
 	var err error
 	t.Log(i18n.GetWithName("TaskStart", t.Name))
 	for i := 0; i < len(t.SubTasks); i++ {
