@@ -130,6 +130,12 @@ html.dark {
 
     --el-text-color-placeholder: var(--panel-main-bg-color-4);
 
+    .terminal-dock-handle {
+        box-shadow:
+            inset 0 0 0 1px var(--el-border-color-darker),
+            var(--el-box-shadow-light);
+    }
+
     .el-radio-button {
         --el-radio-button-checked-text-color: var(--panel-main-bg-color-10);
     }
