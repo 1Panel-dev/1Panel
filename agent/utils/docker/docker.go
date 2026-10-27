@@ -345,10 +345,12 @@ func PullImage(imageName string) error {
 	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
 		options.RegistryAuth = authStr
 	}
-	if _, err := cli.ImagePull(context.Background(), imageName, options); err != nil {
+	out, err := cli.ImagePull(context.Background(), imageName, options)
+	if err != nil {
 		return err
 	}
-	return nil
+	defer out.Close()
+	return handlePullImageProcess(out, nil)
 }
 
 func loadRegistryAuthFromDockerConfig(imageName string) (string, bool) {

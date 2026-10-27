@@ -1,6 +1,9 @@
 package service
 
 import (
+	"errors"
+	"fmt"
+	"os"
 	"path/filepath"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -11,6 +14,89 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"gopkg.in/yaml.v3"
 )
+
+// Keep the on-disk configuration as well as the model: files may contain edits
+// that have not been reflected in the database.
+type runtimeUpdateSnapshot struct {
+	runtime model.Runtime
+	files   []runtimeUpdateFile
+}
+
+type runtimeUpdateFile struct {
+	path    string
+	content []byte
+	mode    os.FileMode
+	exists  bool
+}
+
+func snapshotRuntimeUpdate(runtime *model.Runtime) (*runtimeUpdateSnapshot, error) {
+	snapshot := &runtimeUpdateSnapshot{runtime: *runtime}
+	for _, name := range []string{"docker-compose.yml", ".env", "run.sh"} {
+		file := runtimeUpdateFile{path: filepath.Join(runtime.GetPath(), name)}
+		info, err := os.Stat(file.path)
+		if errors.Is(err, os.ErrNotExist) {
+			snapshot.files = append(snapshot.files, file)
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		file.content, err = os.ReadFile(file.path)
+		if err != nil {
+			return nil, err
+		}
+		file.exists, file.mode = true, info.Mode().Perm()
+		snapshot.files = append(snapshot.files, file)
+	}
+	return snapshot, nil
+}
+
+func (s *runtimeUpdateSnapshot) restoreFiles() error {
+	var result error
+	for _, file := range s.files {
+		var err error
+		if file.exists {
+			err = os.WriteFile(file.path, file.content, file.mode)
+			if err == nil {
+				err = os.Chmod(file.path, file.mode)
+			}
+		} else {
+			err = os.Remove(file.path)
+			if errors.Is(err, os.ErrNotExist) {
+				err = nil
+			}
+		}
+		if err != nil {
+			result = errors.Join(result, fmt.Errorf("restore %s: %w", file.path, err))
+		}
+	}
+	return result
+}
+
+// This must finish before reCreateRuntime stops the existing container. A
+// failed preparation restores the previous version without touching Docker.
+func prepareRuntimeUpdate(runtime *model.Runtime, snapshot *runtimeUpdateSnapshot) error {
+	if err := pullRuntimeComposeImages(runtime.GetComposePath(), false, nil); err != nil {
+		result := fmt.Errorf("prepare runtime images: %w", err)
+		restoreErr := snapshot.restoreFiles()
+		*runtime = snapshot.runtime
+		if restoreErr != nil {
+			result = errors.Join(result, restoreErr)
+			runtime.Status = constant.StatusError
+		}
+		runtime.Message = result.Error()
+		if saveErr := runtimeRepo.Save(runtime); saveErr != nil {
+			result = errors.Join(result, fmt.Errorf("restore runtime record: %w", saveErr))
+		}
+		logFile, logErr := os.OpenFile(runtime.GetLogPath(), os.O_CREATE|os.O_WRONLY|os.O_APPEND, constant.FilePerm)
+		if logErr == nil {
+			_, logErr = fmt.Fprintln(logFile, result.Error())
+			logErr = errors.Join(logErr, logFile.Close())
+		}
+		return errors.Join(result, logErr)
+	}
+	return nil
+}
 
 func getRuntimeUpdateAppDetail(runtime *model.Runtime, req request.RuntimeUpdate) (model.AppDetail, error) {
 	current, err := appDetailRepo.GetFirst(repo.WithByID(runtime.AppDetailID))

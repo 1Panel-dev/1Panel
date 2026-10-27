@@ -647,7 +647,7 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 	return &res, nil
 }
 
-func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
+func (r *RuntimeService) Update(req request.RuntimeUpdate) (err error) {
 	runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -656,6 +656,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		runtime.Version = req.Version
 		return runtimeRepo.Save(runtime)
 	}
+	oldRuntime := *runtime
 	appDetail, err := getRuntimeUpdateAppDetail(runtime, req)
 	if err != nil {
 		return err
@@ -699,6 +700,20 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 	refreshTemplate := !fileOp.Stat(appVersionDir) || appDetail.Update
 	if err = downloadApp(app, appDetail, nil, nil); err != nil {
 		return err
+	}
+	var snapshot *runtimeUpdateSnapshot
+	if runtime.Type != constant.RuntimePHP {
+		snapshot, err = snapshotRuntimeUpdate(&oldRuntime)
+		if err != nil {
+			return err
+		}
+		defer func() {
+			if err != nil {
+				if restoreErr := snapshot.restoreFiles(); restoreErr != nil {
+					err = fmt.Errorf("%w; restore runtime configuration: %v", err, restoreErr)
+				}
+			}
+		}()
 	}
 	if versionChanged {
 		if err = updateRuntimeVersionFiles(runtime, appVersionDir); err != nil {
@@ -773,7 +788,13 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) error {
 		if err = runtimeRepo.Save(runtime); err != nil {
 			return err
 		}
-		go reCreateRuntime(runtime)
+		go func() {
+			if err := prepareRuntimeUpdate(runtime, snapshot); err != nil {
+				global.LOG.Errorf("prepare runtime [%s] update failed: %v", runtime.Name, err)
+				return
+			}
+			reCreateRuntime(runtime)
+		}()
 	}
 	return nil
 }

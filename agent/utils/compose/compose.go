@@ -104,6 +104,7 @@ func pullComposeImages(filePath string, forcePull bool, task *task.Task, project
 	if err != nil {
 		return err
 	}
+	defer dockerCLi.Close()
 	for _, image := range images {
 		if !forcePull {
 			if exist, _ := dockerCLi.ImageExists(image); exist {
