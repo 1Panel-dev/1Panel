@@ -1,12 +1,20 @@
 <template>
-    <el-dialog v-model="open" :show-close="showClose" @closed="handleClose" :width="width">
-        <div v-if="open">
-            <LogFile :config="config" :showTail="showTail"></LogFile>
-        </div>
+    <DialogPro
+        v-model="open"
+        :show-close="showClose"
+        :close-on-click-modal="true"
+        @closed="handleClosed"
+        :width="width"
+    >
+        <template #content>
+            <div v-if="open">
+                <LogFile :config="config" :showTail="showTail"></LogFile>
+            </div>
+        </template>
         <template #footer>
             <slot name="task-footer"></slot>
         </template>
-    </el-dialog>
+    </DialogPro>
 </template>
 <script lang="ts" setup>
 import { reactive, ref } from 'vue';
@@ -72,8 +80,11 @@ const openWithResourceID = (taskType: string, taskOperate: string, resourceID: n
 
 const em = defineEmits(['close']);
 const handleClose = () => {
-    em('close', true);
     open.value = false;
+};
+
+const handleClosed = () => {
+    em('close', true);
     bus.emit('refreshTask', true);
     bus.emit('refreshApp', true);
 };

@@ -478,10 +478,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
     onCloseLog();
-    if (resizeObserver && logContainer.value) {
-        resizeObserver.unobserve(logContainer.value);
-        resizeObserver.disconnect();
-    }
+    resizeObserver?.disconnect();
 });
 
 defineExpose({ changeTail, onDownload, clearLog });
