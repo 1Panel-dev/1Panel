@@ -73,22 +73,6 @@ func (b *BaseApi) CloseOllamaModel(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Sync Ollama model list
-// @Success 200 {array} dto.OllamaModelDropList
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /ai/ollama/model/sync [post]
-// @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 Ollama 模型列表","formatEN":"sync Ollama model list"}
-func (b *BaseApi) SyncOllamaModel(c *gin.Context) {
-	list, err := aiToolService.Sync()
-	if err != nil {
-		helper.BadRequest(c, err)
-		return
-	}
-	helper.SuccessWithData(c, list)
-}
-
-// @Tags AI
 // @Summary Page Ollama models
 // @Accept json
 // @Param request body dto.SearchWithPage true "request"

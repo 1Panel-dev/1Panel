@@ -1,5 +1,4 @@
 <template>
-    <div class="form-section-title">{{ $t('aiTools.agents.account') }}</div>
     <el-form-item v-if="showSync">
         <el-checkbox v-model="form.syncModelAccount">{{ $t('aiTools.model.syncModelAccount') }}</el-checkbox>
     </el-form-item>
@@ -84,10 +83,6 @@ defineExpose({ baseURL });
 </script>
 
 <style scoped>
-.form-section-title {
-    font-weight: 600;
-    margin-bottom: 12px;
-}
 .model-account-helper {
     display: block;
     margin-bottom: 12px;

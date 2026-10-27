@@ -14,11 +14,6 @@ type OllamaModelInfo struct {
 	CreatedAt time.Time `json:"createdAt"`
 }
 
-type OllamaModelDropList struct {
-	ID   uint   `json:"id"`
-	Name string `json:"name"`
-}
-
 type OllamaModelName struct {
 	Name   string `json:"name"`
 	TaskID string `json:"taskID"`

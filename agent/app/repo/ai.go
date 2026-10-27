@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
@@ -14,6 +16,7 @@ type IAiRepo interface {
 	Create(cronjob *model.OllamaModel) error
 	Update(id uint, vars map[string]interface{}) error
 	Delete(opts ...DBOption) error
+	DeleteAll(ctx context.Context) error
 }
 
 func NewIAiRepo() IAiRepo {
@@ -66,4 +69,8 @@ func (u *AiRepo) Delete(opts ...DBOption) error {
 		db = opt(db)
 	}
 	return db.Delete(&model.OllamaModel{}).Error
+}
+
+func (u *AiRepo) DeleteAll(ctx context.Context) error {
+	return getTx(ctx).Where("1 = 1").Delete(&model.OllamaModel{}).Error
 }

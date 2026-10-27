@@ -1064,8 +1064,6 @@ const message = {
             create_helper: 'Tarik "{0}"',
             ollama_doc: 'Anda boleh melawat laman web rasmi Ollama untuk mencari dan menemui lebih banyak model.',
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
-            ollama_sync:
-                'Semasa menyegerakkan model Ollama, model berikut didapati tidak wujud. Adakah anda mahu memadamkannya?',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
             vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
