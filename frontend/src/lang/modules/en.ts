@@ -292,7 +292,7 @@ const message = {
             rePassword: 'Confirm password is inconsistent with the password.',
             requiredInput: 'This field is required.',
             requiredSelect: 'Select an item in the list',
-            illegalChar: 'Injection of characters & ; $ \' ` ( ) " > < ｜ is currently not supported',
+            illegalChar: "Injection of characters & ; $ ' ` ( ) \" > < {'|'} is currently not supported",
             illegalInput: "This field mustn't contains illegal characters.",
             duplicate: 'This value must be unique.',
             commonName:

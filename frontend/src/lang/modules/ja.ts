@@ -292,7 +292,7 @@ const message = {
             rePassword: 'パスワードがパスワードと矛盾することを確認してください。',
             requiredInput: 'この項目は必須です。',
             requiredSelect: 'リスト内のアイテムを選択します',
-            illegalChar: '現在、文字 & ; $ \' ` ( ) " > < ｜ の注入はサポートされていません',
+            illegalChar: "現在、文字 & ; $ ' ` ( ) \" > < {'|'} の注入はサポートされていません",
             illegalInput: 'このフィールドには違法なキャラクターが含まれてはなりません。',
             duplicate: 'この値は一意である必要があります。',
             commonName:

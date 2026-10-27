@@ -263,6 +263,7 @@
                             <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
                         </template>
                     </el-input>
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('database.permission')" prop="permission">
                     <el-select v-model="createForm.permission" class="w-full">
@@ -418,7 +419,7 @@ const createForm = reactive({
 const rules = reactive({
     name: [Rules.requiredInput, Rules.dbName],
     username: [Rules.requiredInput, Rules.name],
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
     permission: [Rules.requiredSelect],
 });
 

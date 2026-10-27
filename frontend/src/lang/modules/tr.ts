@@ -295,7 +295,7 @@ const message = {
             rePassword: 'Şifre onayı, şifre ile tutarsız.',
             requiredInput: 'Bu alan gereklidir.',
             requiredSelect: 'Listeden bir öğe seçin',
-            illegalChar: '& ; $ ` ( ) " > < ｜ karakterlerinin enjekte edilmesi şu anda desteklenmiyor',
+            illegalChar: "& ; $ ' ` ( ) \" > < {'|'} karakterlerinin enjekte edilmesi şu anda desteklenmiyor",
             illegalInput: 'Bu alan yasadışı karakterler içermemelidir.',
             duplicate: 'Bu değer benzersiz olmalıdır.',
             commonName:

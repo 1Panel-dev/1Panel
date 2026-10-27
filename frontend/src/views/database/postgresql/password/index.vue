@@ -59,7 +59,7 @@ const changeForm = reactive({
 });
 const confirmDialogRef = ref();
 const rules = reactive({
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
 });
 
 interface DialogProps {

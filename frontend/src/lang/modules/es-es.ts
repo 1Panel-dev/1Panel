@@ -291,7 +291,7 @@ const message = {
             rePassword: 'La confirmación de la contraseña no coincide con la contraseña.',
             requiredInput: 'Este campo es obligatorio.',
             requiredSelect: 'Seleccione un elemento de la lista',
-            illegalChar: 'Actualmente no se admite la inyección de caracteres & ; $ \' ` ( ) " > < ｜',
+            illegalChar: "Actualmente no se admite la inyección de caracteres & ; $ ' ` ( ) \" > < {'|'}",
             illegalInput: 'Este campo no debe contener caracteres no permitidos.',
             duplicate: 'Este valor debe ser único.',
             commonName:

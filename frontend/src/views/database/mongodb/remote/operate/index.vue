@@ -38,6 +38,7 @@
                     show-password
                     v-model.trim="dialogData.rowData!.password"
                 />
+                <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
             </el-form-item>
             <el-form-item :label="$t('database.timeout')" prop="timeout">
                 <el-input-number
@@ -122,8 +123,8 @@ const rules = reactive({
     version: [Rules.requiredSelect],
     address: [Rules.ipV4V6OrDomain],
     port: [Rules.port],
-    username: [Rules.requiredInput],
-    password: [Rules.requiredInput],
+    username: [Rules.requiredInput, Rules.databaseUsername],
+    password: [Rules.requiredInput, Rules.databasePassword],
     timeout: [Rules.number, checkNumberRange(1, 600)],
 });
 

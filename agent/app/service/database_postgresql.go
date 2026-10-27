@@ -87,7 +87,7 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 }
 
 func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password) || strings.Contains(req.Password, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
@@ -123,7 +123,7 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 }
 
 func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error) {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format) {
+	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format) || strings.Contains(req.Password, " ") {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
 
@@ -366,7 +366,7 @@ func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error
 }
 
 func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
-	if cmd.CheckIllegal(req.Value) {
+	if cmd.CheckIllegal(req.Value) || strings.Contains(req.Value, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
 	cli, err := LoadPostgresqlClientByFrom(req.Database)

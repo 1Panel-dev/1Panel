@@ -290,7 +290,7 @@ const message = {
             rePassword: '확인 비밀번호가 비밀번호와 일치하지 않습니다.',
             requiredInput: '이 필드는 필수 항목입니다.',
             requiredSelect: '목록에서 항목을 선택하세요',
-            illegalChar: '현재 & ; $ \' ` ( ) " > < ｜ 문자 주입은 지원되지 않습니다',
+            illegalChar: "현재 & ; $ ' ` ( ) \" > < {'|'} 문자 주입은 지원되지 않습니다",
             illegalInput: '이 필드에는 유효하지 않은 문자가 포함될 수 없습니다.',
             duplicate: '이 값은 고유해야 합니다.',
             commonName:

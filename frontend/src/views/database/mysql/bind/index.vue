@@ -131,6 +131,7 @@
                 </el-form-item>
                 <el-form-item :label="$t('commons.login.password')" prop="password" required>
                     <el-input type="password" clearable show-password v-model.trim="form.password" />
+                    <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('database.permission')" prop="permission">
                     <el-select v-model="form.permission" @change="changePermission">
@@ -214,7 +215,7 @@ const rules = reactive({
     username: [Rules.requiredInput, Rules.name],
     permission: [Rules.requiredSelect],
     host: [Rules.requiredInput, Rules.noSpace, Rules.illegal, { validator: checkMysqlHosts, trigger: 'blur' }],
-    password: [Rules.requiredInput, Rules.noSpace, Rules.illegal],
+    password: [Rules.requiredInput, Rules.databasePassword],
 });
 
 interface DialogProps {

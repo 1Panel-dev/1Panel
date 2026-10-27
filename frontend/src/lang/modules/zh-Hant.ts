@@ -284,7 +284,7 @@ const message = {
             rePassword: '密碼不一致，請檢查後重新輸入',
             requiredInput: '請填寫必填項',
             requiredSelect: '請選擇必選項',
-            illegalChar: '暫不支援注入字元 & ; $ \' ` ( ) " > < ｜',
+            illegalChar: "暫不支援注入字元 & ; $ ' ` ( ) \" > < {'|'}",
             illegalInput: '輸入框中存在不合法字元',
             commonName: '支援非特殊字元開頭,英文、中文、數字、.-和_,長度1-128',
             userName: '支援非特殊字元開頭、英文、中文、數字和_,長度3-30',

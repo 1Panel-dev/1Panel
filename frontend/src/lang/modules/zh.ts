@@ -284,7 +284,7 @@ const message = {
             rePassword: '密码不一致，请检查后重新输入',
             requiredInput: '请填写必填项',
             requiredSelect: '请选择必选项',
-            illegalChar: '暂不支持注入字符 & ; $ \' ` ( ) " > < ｜',
+            illegalChar: "暂不支持注入字符 & ; $ ' ` ( ) \" > < {'|'}",
             illegalInput: '输入框中存在不合法字符',
             duplicate: '内容不能重复',
             commonName: '支持非特殊字符开头,英文、中文、数字、.-和_,长度1-128',
