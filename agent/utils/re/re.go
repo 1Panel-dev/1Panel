@@ -6,7 +6,6 @@ import (
 )
 
 const (
-	TokenizerDownloadNamePattern = `^[A-Za-z0-9][A-Za-z0-9._-]{0,63}-[0-9a-f]{12}$`
 	ModelDownloaderRepoIDPattern = `^[A-Za-z0-9][A-Za-z0-9._-]*/[A-Za-z0-9][A-Za-z0-9._-]*$`
 	VMNameValidationPattern      = `^[a-zA-Z0-9][a-zA-Z0-9._-]{0,63}$`
 	VMCommonPattern              = `^[a-zA-Z0-9][a-zA-Z0-9._:-]{0,63}$`
@@ -68,7 +67,6 @@ var regexMap = make(map[string]*regexp.Regexp)
 
 func Init() {
 	patterns := []string{
-		TokenizerDownloadNamePattern,
 		ModelDownloaderRepoIDPattern,
 		VMNameValidationPattern,
 		VMCommonPattern,
