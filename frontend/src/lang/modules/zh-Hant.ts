@@ -6470,6 +6470,13 @@ const message = {
             nodeUpgradeHelper: '選中的節點將在主節點升級完成後自動開始升級，無需手動操作。',
             nodeUpgradePackageManage: '安裝包管理',
             nodeUpgradePackageClean: '清理',
+            packageSource: '安裝包來源',
+            packageFromMaster: '主節點分發',
+            packageFromNode: '使用現有包',
+            packagePath: '子節點安裝包路徑',
+            packagePathHelper:
+                '填寫子節點上 .tar.gz 安裝包的絕對路徑。版本須與主節點一致，架構須符合子節點。保留原包，缺少的輔助檔案由主節點補傳。',
+            packagePathInvalid: '請輸入子節點上安裝包的絕對檔案路徑',
             nodeUpgradePackageFormatHelper: '僅支援 `1panel-agent_v*_*` 或 `1panel-v*-linux-*` 安裝包',
             nodeUpgradePackageHostConfirm: '即將選擇伺服器檔案：{0}，是否繼續？',
             nodeUpgradePackageCleanHelper: '即將清理所有低版本升級包，是否繼續？',
