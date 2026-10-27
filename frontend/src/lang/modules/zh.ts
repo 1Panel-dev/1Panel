@@ -5428,6 +5428,13 @@ const message = {
             nodeUpgradeHelper: '选中的节点将在主节点升级完成后自动开始升级，无需手动操作。',
             nodeUpgradePackageManage: '安装包管理',
             nodeUpgradePackageClean: '清理',
+            packageSource: '安装包来源',
+            packageFromMaster: '主节点分发',
+            packageFromNode: '使用已有包',
+            packagePath: '子节点安装包路径',
+            packagePathHelper:
+                '填写子节点上 .tar.gz 安装包的绝对路径。版本须与主节点一致，架构须匹配子节点。原包保留，缺少的辅助文件由主节点补传。',
+            packagePathInvalid: '请输入子节点上安装包的绝对文件路径',
             nodeUpgradePackageFormatHelper: '仅支持 `1panel-agent_v*_*` 或 `1panel-v*-linux-*` 安装包',
             nodeUpgradePackageHostConfirm: '即将选择服务器文件：{0}，是否继续？',
             nodeUpgradePackageCleanHelper: '即将清理所有低版本升级包，是否继续？',

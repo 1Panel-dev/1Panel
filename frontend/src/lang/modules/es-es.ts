@@ -7088,6 +7088,13 @@ const message = {
                 'Los nodos seleccionados comenzarán a actualizarse automáticamente después de que se complete la actualización del nodo maestro, sin necesidad de operación manual.',
             nodeUpgradePackageManage: 'Gestión de Paquetes de Instalación',
             nodeUpgradePackageClean: 'Limpiar',
+            packageSource: 'Origen del paquete',
+            packageFromMaster: 'Nodo principal',
+            packageFromNode: 'Paquete existente',
+            packagePath: 'Ruta del paquete en el nodo secundario',
+            packagePathHelper:
+                'Introduzca la ruta absoluta de un paquete .tar.gz en el nodo secundario. La versión debe coincidir con el nodo principal y la arquitectura con el nodo secundario. Se conserva el paquete original; los archivos auxiliares que falten se transfieren desde el nodo principal.',
+            packagePathInvalid: 'Introduzca una ruta absoluta al archivo del paquete en el nodo secundario',
             nodeUpgradePackageFormatHelper:
                 'Solo se admiten paquetes de instalación `1panel-agent_v*_*` o `1panel-v*-linux-*`',
             nodeUpgradePackageHostConfirm: 'Se seleccionará el archivo del servidor {0}. ¿Continuar?',

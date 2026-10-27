@@ -6963,6 +6963,13 @@ const message = {
                 '選択したノードは、マスターノードのアップグレード完了後に自動的にアップグレードを開始し、手動操作は不要です。',
             nodeUpgradePackageManage: 'インストールパッケージ管理',
             nodeUpgradePackageClean: 'クリーンアップ',
+            packageSource: 'パッケージの取得元',
+            packageFromMaster: 'メインノード',
+            packageFromNode: '既存パッケージ',
+            packagePath: '子ノード上のパッケージパス',
+            packagePathHelper:
+                '子ノード上の .tar.gz パッケージの絶対パスを入力してください。バージョンはメインノード、アーキテクチャは子ノードと一致する必要があります。元のパッケージは保持され、不足する補助ファイルはメインノードから転送されます。',
+            packagePathInvalid: '子ノード上のパッケージの絶対ファイルパスを入力してください',
             nodeUpgradePackageFormatHelper:
                 '`1panel-agent_v*_*` または `1panel-v*-linux-*` のインストールパッケージのみ対応しています',
             nodeUpgradePackageHostConfirm: 'サーバーファイル {0} を選択します。続行しますか？',

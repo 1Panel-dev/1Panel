@@ -6821,6 +6821,13 @@ const message = {
                 '선택된 노드는 마스터 노드 업그레이드 완료 후 자동으로 업그레이드를 시작하며 수동 작업이 필요하지 않습니다.',
             nodeUpgradePackageManage: '설치 패키지 관리',
             nodeUpgradePackageClean: '정리',
+            packageSource: '패키지 소스',
+            packageFromMaster: '주 노드',
+            packageFromNode: '기존 패키지',
+            packagePath: '하위 노드의 패키지 경로',
+            packagePathHelper:
+                '하위 노드에 있는 .tar.gz 패키지의 절대 경로를 입력하세요. 버전은 주 노드와, 아키텍처는 하위 노드와 일치해야 합니다. 원본 패키지는 유지되며 누락된 보조 파일은 주 노드에서 전송됩니다.',
+            packagePathInvalid: '하위 노드에 있는 패키지의 절대 파일 경로를 입력하세요',
             nodeUpgradePackageFormatHelper: '`1panel-agent_v*_*` 또는 `1panel-v*-linux-*` 설치 패키지만 지원됩니다',
             nodeUpgradePackageHostConfirm: '서버 파일 {0}을(를) 선택합니다. 계속하시겠습니까?',
             nodeUpgradePackageCleanHelper: '모든 낮은 버전의 업데이트 패키지를 정리합니다. 계속하시겠습니까?',

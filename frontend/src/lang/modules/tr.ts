@@ -7089,6 +7089,13 @@ const message = {
                 'Seçilen düğümler, ana düğüm yükseltmesi tamamlandıktan sonra otomatik olarak yükseltmeye başlayacaktır, manuel işlem gerekmez.',
             nodeUpgradePackageManage: 'Kurulum Paketi Yönetimi',
             nodeUpgradePackageClean: 'Temizle',
+            packageSource: 'Paket kaynağı',
+            packageFromMaster: 'Ana düğüm',
+            packageFromNode: 'Mevcut paket',
+            packagePath: 'Alt düğümdeki paket yolu',
+            packagePathHelper:
+                'Alt düğümdeki .tar.gz paketinin mutlak yolunu girin. Sürüm ana düğümle, mimari ise alt düğümle eşleşmelidir. Orijinal paket korunur; eksik yardımcı dosyalar ana düğümden aktarılır.',
+            packagePathInvalid: 'Alt düğümdeki paket dosyasının mutlak yolunu girin',
             nodeUpgradePackageFormatHelper:
                 'Yalnızca `1panel-agent_v*_*` veya `1panel-v*-linux-*` kurulum paketleri desteklenir',
             nodeUpgradePackageHostConfirm: 'Sunucu dosyası {0} seçilecek. Devam edilsin mi?',

@@ -6932,6 +6932,13 @@ const message = {
                 'گره‌های انتخاب شده پس از اتمام ارتقاء گره اصلی، به طور خودکار شروع به ارتقاء می‌کنند، بدون نیاز به عملیات دستی.',
             nodeUpgradePackageManage: 'مدیریت بسته نصب',
             nodeUpgradePackageClean: 'پاک‌سازی',
+            packageSource: 'منبع بسته',
+            packageFromMaster: 'گره اصلی',
+            packageFromNode: 'بسته موجود',
+            packagePath: 'مسیر بسته در گره فرزند',
+            packagePathHelper:
+                'مسیر مطلق بسته .tar.gz در گره فرزند را وارد کنید. نسخه باید با گره اصلی و معماری با گره فرزند مطابقت داشته باشد. بسته اصلی حفظ می‌شود؛ فایل‌های کمکی ناموجود از گره اصلی منتقل می‌شوند.',
+            packagePathInvalid: 'مسیر مطلق فایل بسته در گره فرزند را وارد کنید',
             nodeUpgradePackageFormatHelper:
                 'فقط بسته‌های نصب `1panel-agent_v*_*` یا `1panel-v*-linux-*` پشتیبانی می‌شوند',
             nodeUpgradePackageHostConfirm: 'فایل سرور {0} انتخاب خواهد شد. ادامه می‌دهید؟',

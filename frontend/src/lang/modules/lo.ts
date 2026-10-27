@@ -6750,6 +6750,13 @@ const message = {
             nodeUpgradeHelper: 'ໂນດທີ່ເລືອກຈະເລີ່ມອັບເກຣດອັດຕະໂນມັດຫຼັງຈາກໂນດຫຼັກອັບເກຣດສຳເລັດ.',
             nodeUpgradePackageManage: 'ຈັດການແພັກເກັດຕິດຕັ້ງ',
             nodeUpgradePackageClean: 'ລ້າງຂໍ້ມູນ',
+            packageSource: 'ແຫຼ່ງທີ່ມາຂອງແພັກເກດ',
+            packageFromMaster: 'ໂນດຫຼັກ',
+            packageFromNode: 'ແພັກເກດທີ່ມີຢູ່',
+            packagePath: 'ເສັ້ນທາງແພັກເກດໃນໂນດລູກ',
+            packagePathHelper:
+                'ປ້ອນເສັ້ນທາງແບບເຕັມຂອງແພັກເກດ .tar.gz ໃນໂນດລູກ. ເວີຊັນຕ້ອງກົງກັບໂນດຫຼັກ ແລະ ສະຖາປັດຕະຍະກຳຕ້ອງກົງກັບໂນດລູກ. ແພັກເກດຕົ້ນສະບັບຈະຖືກເກັບໄວ້; ໄຟລ໌ປະກອບທີ່ຂາດຈະຖືກໂອນຈາກໂນດຫຼັກ.',
+            packagePathInvalid: 'ກະລຸນາປ້ອນເສັ້ນທາງໄຟລ໌ແບບເຕັມຂອງແພັກເກດໃນໂນດລູກ',
             nodeUpgradePackageFormatHelper:
                 'ຮອງຮັບສະເພາະແພັກເກັດ `1panel-agent_v*_*` ຫຼື `1panel-v*-linux-*` ເທົ່ານັ້ນ',
             nodeUpgradePackageHostConfirm: 'ໄຟລ໌ເຊີເວີ {0} ຈະຖືກເລືອກ. ຕ້ອງການຕໍ່ບໍ?',

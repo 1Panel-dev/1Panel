@@ -7070,6 +7070,13 @@ const message = {
                 'Nod terpilih akan mula dinaik taraf secara automatik selepas naik taraf nod induk selesai, tiada operasi manual diperlukan.',
             nodeUpgradePackageManage: 'Pengurusan Pakej Pemasangan',
             nodeUpgradePackageClean: 'Bersihkan',
+            packageSource: 'Sumber pakej',
+            packageFromMaster: 'Nod utama',
+            packageFromNode: 'Pakej sedia ada',
+            packagePath: 'Laluan pakej pada nod anak',
+            packagePathHelper:
+                'Masukkan laluan mutlak pakej .tar.gz pada nod anak. Versi mesti sepadan dengan nod utama dan seni bina mesti sepadan dengan nod anak. Pakej asal dikekalkan; fail sokongan yang tiada dipindahkan daripada nod utama.',
+            packagePathInvalid: 'Masukkan laluan fail mutlak pakej pada nod anak',
             nodeUpgradePackageFormatHelper:
                 'Hanya pakej pemasangan `1panel-agent_v*_*` atau `1panel-v*-linux-*` disokong',
             nodeUpgradePackageHostConfirm: 'Fail pelayan {0} akan dipilih. Teruskan?',

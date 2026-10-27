@@ -6976,6 +6976,13 @@ const message = {
                 'Selected nodes will automatically start upgrading after the master node upgrade is completed, no manual operation required.',
             nodeUpgradePackageManage: 'Installation Package Management',
             nodeUpgradePackageClean: 'Clean',
+            packageSource: 'Package source',
+            packageFromMaster: 'Main node',
+            packageFromNode: 'Existing package',
+            packagePath: 'Package path on child node',
+            packagePathHelper:
+                'Enter the absolute path to a .tar.gz package on the child node. Its version must match the main node and its architecture must match the child node. The original package is kept; missing supporting files are transferred from the main node.',
+            packagePathInvalid: 'Enter an absolute file path to the package on the child node',
             nodeUpgradePackageFormatHelper:
                 'Only `1panel-agent_v*_*` or `1panel-v*-linux-*` installation packages are supported',
             nodeUpgradePackageHostConfirm: 'The server file {0} will be selected. Continue?',

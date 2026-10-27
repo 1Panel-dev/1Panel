@@ -7113,6 +7113,13 @@ const message = {
                 'Os nós selecionados começarão a atualizar automaticamente após a conclusão da atualização do nó mestre, nenhuma operação manual necessária.',
             nodeUpgradePackageManage: 'Gerenciamento de Pacotes de Instalação',
             nodeUpgradePackageClean: 'Limpar',
+            packageSource: 'Origem do pacote',
+            packageFromMaster: 'Nó principal',
+            packageFromNode: 'Pacote existente',
+            packagePath: 'Caminho do pacote no nó secundário',
+            packagePathHelper:
+                'Informe o caminho absoluto de um pacote .tar.gz no nó secundário. A versão deve corresponder à do nó principal e a arquitetura à do nó secundário. O pacote original é mantido; arquivos auxiliares ausentes são transferidos do nó principal.',
+            packagePathInvalid: 'Informe um caminho absoluto para o arquivo do pacote no nó secundário',
             nodeUpgradePackageFormatHelper:
                 'Somente pacotes de instalação `1panel-agent_v*_*` ou `1panel-v*-linux-*` são suportados',
             nodeUpgradePackageHostConfirm: 'O arquivo do servidor {0} será selecionado. Continuar?',
