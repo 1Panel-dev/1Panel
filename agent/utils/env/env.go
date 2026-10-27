@@ -29,7 +29,7 @@ func Write(envMap map[string]string, filename string) error {
 func Marshal(envMap map[string]string) (string, error) {
 	lines := make([]string, 0, len(envMap))
 	for k, v := range envMap {
-		if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
+		if d, ok := canonicalInt(v); ok {
 			lines = append(lines, fmt.Sprintf(`%s=%d`, k, d))
 		} else if shouldUseSingleQuotes(v) {
 			lines = append(lines, fmt.Sprintf(`%s='%s'`, k, v))
@@ -86,7 +86,7 @@ func MarshalWithOrder(envMap map[string]string, orders []string) (string, error)
 }
 
 func formatEnvLine(k, v string) string {
-	if d, err := strconv.Atoi(v); err == nil && !isStartWithZero(v) {
+	if d, ok := canonicalInt(v); ok {
 		return fmt.Sprintf(`%s=%d`, k, d)
 	} else if shouldUseSingleQuotes(v) {
 		return fmt.Sprintf(`%s='%s'`, k, v)
@@ -107,11 +107,14 @@ func GetEnvValueByKey(envPath, key string) (string, error) {
 	return value, nil
 }
 
-func isStartWithZero(value string) bool {
-	if strings.HasPrefix(value, "0") && len(value) > 1 {
-		return true
+// canonicalInt reports whether value is an integer that formats back to the
+// same string, so values such as "007", "+1" or "-01" keep their exact text.
+func canonicalInt(value string) (int, bool) {
+	d, err := strconv.Atoi(value)
+	if err != nil || strconv.Itoa(d) != value {
+		return 0, false
 	}
-	return false
+	return d, true
 }
 
 func hasEvenDoubleQuotes(s string) bool {
