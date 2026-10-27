@@ -740,6 +740,23 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                '升級前需要處理舊飛書外掛。此次升級必須完整備份；失敗時還原原映像及配套資料。未設定飛書時僅停用舊外掛。',
+            feishuRecoveryNotice: '切換失敗時將嘗試恢復閘道，但飛書保持停用，不會重新啟用舊外掛。原設定備份會保留。',
+            feishuRecover: '停用舊外掛並恢復啟動',
+            feishuRecoverConfirm:
+                '將備份設定、停用未設定的舊飛書外掛並重新啟動執行個體，短暫中斷所有頻道。外掛檔案將保留。是否繼續？',
+            feishuBuiltin: '內建飛書外掛',
+            feishuImageRequired: '請使用包含內建飛書外掛的映像。',
+            feishuLegacy: '舊外掛已停止維護。切換前請確認下方的工作階段隔離、串流回覆和 @ 設定。',
+            feishuBuiltinHint: '外掛隨 OpenClaw 映像一起更新。',
+            feishuSessionTopic: '依群組話題隔離',
+            feishuSessionTopicSender: '依群組話題和傳送者隔離',
+            feishuSwitch: '切換至內建外掛',
+            feishuMentionChoice: '切換前請明確選擇是否需要 @。',
+            feishuSwitchConfirm:
+                '將切換至內建飛書並重新啟動執行個體，短暫中斷所有頻道。舊外掛專有工具不再可用；串流與話題行為依所選設定執行，部分聊天可能產生新工作階段。憑證、繫結和配對儲存會保留。是否繼續？',
+
             deepSeekAccessHostHelper:
                 '填寫瀏覽器實際存取的 IPv4 位址或主機名稱，不含協定、連接埠或路徑。HTTPS 使用應用程式的本機憑證。',
             deepSeekAuthHelper: '使用者名稱僅支援字母、數字、點、底線及連字號；密碼至少 12 位，不含前後空格或換行。',

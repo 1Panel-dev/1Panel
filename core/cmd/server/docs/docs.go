@@ -1171,6 +1171,41 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/agents/channel/feishu/switch": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.AgentFeishuSwitchReq"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Switch to the bundled OpenClaw Feishu plugin",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/agents/channel/feishu/update": {
 			"post": {
 				"consumes": [
@@ -30117,6 +30152,33 @@ const docTemplate = `{
 		}
 	},
 	"definitions": {
+		"dto.AgentFeishuTransition": {
+			"type": "object",
+			"properties": {
+				"confirmed": {
+					"type": "boolean"
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"groupSessionScope": {
+					"type": "string",
+					"enum": [
+						"group",
+						"group_sender",
+						"group_topic",
+						"group_topic_sender"
+					]
+				},
+				"requireMention": {
+					"type": "string",
+					"enum": [
+						"true",
+						"false"
+					]
+				}
+			}
+		},
 		"dto.AgentAccountCreateReq": {
 			"properties": {
 				"apiKey": {
@@ -31215,11 +31277,17 @@ const docTemplate = `{
 		},
 		"dto.AgentFeishuConfig": {
 			"properties": {
+                "builtinManaged": {
+                    "type": "boolean"
+                },
 				"bots": {
 					"items": {
 						"$ref": "#/definitions/dto.AgentFeishuBot"
 					},
 					"type": "array"
+				},
+				"builtinAvailable": {
+					"type": "boolean"
 				},
 				"connectionMode": {
 					"type": "string"
@@ -31239,7 +31307,19 @@ const docTemplate = `{
 				"groupPolicy": {
 					"type": "string"
 				},
+				"groupSessionScope": {
+					"type": "string",
+					"enum": [
+						"group",
+						"group_sender",
+						"group_topic",
+						"group_topic_sender"
+					]
+				},
 				"installed": {
+					"type": "boolean"
+				},
+				"legacy": {
 					"type": "boolean"
 				},
 				"replyMode": {
@@ -31253,8 +31333,47 @@ const docTemplate = `{
 				},
 				"threadSession": {
 					"type": "boolean"
+				},
+				"legacyConfigured": {
+					"type": "boolean"
 				}
 			},
+			"type": "object"
+		},
+		"dto.AgentFeishuSwitchReq": {
+			"properties": {
+				"agentId": {
+					"type": "integer"
+				},
+				"groupSessionScope": {
+					"type": "string",
+					"enum": [
+						"group",
+						"group_sender",
+						"group_topic",
+						"group_topic_sender"
+					]
+				},
+				"requireMention": {
+					"type": "string",
+					"enum": [
+						"true",
+						"false"
+					]
+				},
+				"streaming": {
+					"type": "boolean"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"agentId",
+				"taskID",
+				"groupSessionScope",
+				"requireMention"
+			],
 			"type": "object"
 		},
 		"dto.AgentFeishuConfigReq": {
@@ -31302,6 +31421,15 @@ const docTemplate = `{
 						"disabled"
 					],
 					"type": "string"
+				},
+				"groupSessionScope": {
+					"type": "string",
+					"enum": [
+						"group",
+						"group_sender",
+						"group_topic",
+						"group_topic_sender"
+					]
 				},
 				"replyMode": {
 					"type": "string"
@@ -33167,6 +33295,12 @@ const docTemplate = `{
 				},
 				"version": {
 					"type": "string"
+				},
+				"feishuLegacy": {
+					"type": "boolean"
+				},
+				"feishuConfigured": {
+					"type": "boolean"
 				}
 			},
 			"type": "object"
@@ -42953,6 +43087,9 @@ const docTemplate = `{
 				},
 				"taskID": {
 					"type": "string"
+				},
+				"feishuTransition": {
+					"$ref": "#/definitions/dto.AgentFeishuTransition"
 				}
 			},
 			"required": [

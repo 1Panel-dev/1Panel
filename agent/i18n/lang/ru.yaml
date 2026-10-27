@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "Удалить снимок виртуальной маш
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "Исправьте несовместимые настройки перед продолжением: {{ .detail }}"
+ErrFeishuConfigChanged: "Настройки изменились во время переключения. Обновите страницу и повторите."
+ErrFeishuImageRequired: "Используйте образ со встроенным Feishu."
+ErrFeishuAlreadySwitched: "Feishu уже переключён на встроенный плагин."
+ErrFeishuSwitchRequired: "Сначала перейдите на встроенный плагин на странице канала Feishu."
+ErrFeishuManaged: "Управляйте Feishu на странице канала; плагин обновляется с образом."
+ErrFeishuRestore: "Не удалось восстановить настройки Feishu: {{ .err }}"
+ErrFeishuActivation: "Не удалось запустить встроенный плагин Feishu или шлюз."
+AgentFeishuSwitch: "Переключить плагин Feishu"
+AgentFeishuBackup: "Резервная копия настроек: {{ .name }}"
+AgentFeishuRestored: "Прежние настройки восстановлены."
+AgentFeishuProbeWarning: "Проверка подключения Feishu не пройдена. Проверьте сеть и учётные данные; переключение сохранено."
+AgentFeishuVerifyMessages: "Локальная активация завершена. Проверьте сопряжение, личные и групповые сообщения, маршрутизацию ботов и потоковые ответы в Feishu."
+
+ErrFeishuUpgradeConfirm: "Подтвердите параметры перехода Feishu на странице обновления."
+
+ErrFeishuUpgradeBackup: "Для обновления совместимости Feishu нужна полная резервная копия приложения."
+
+ErrFeishuUpgradeMounts: "Эти монтирования не поддерживают полное резервное копирование и восстановление. Используйте стандартные данные внутри каталога приложения."
+
+AgentFeishuRecoveryDisabled: "Шлюз восстановлен, Feishu отключён; исходная резервная копия конфигурации сохранена."

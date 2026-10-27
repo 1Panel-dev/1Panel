@@ -779,6 +779,11 @@ export namespace AI {
     }
 
     export interface AgentFeishuConfig {
+        builtinManaged?: boolean;
+        legacyConfigured?: boolean;
+        groupSessionScope?: string;
+        builtinAvailable?: boolean;
+        legacy?: boolean;
         enabled: boolean;
         threadSession: boolean;
         replyMode: string;
@@ -793,6 +798,7 @@ export namespace AI {
     }
 
     export interface AgentFeishuConfigUpdateReq {
+        groupSessionScope?: string;
         agentId: number;
         enabled: boolean;
         threadSession: boolean;
@@ -804,6 +810,21 @@ export namespace AI {
         domain?: string;
         connectionMode?: 'websocket' | 'webhook';
         bots: AgentFeishuBot[];
+    }
+
+    export interface AgentFeishuTransition {
+        confirmed: boolean;
+        streaming: boolean;
+        groupSessionScope: string;
+        requireMention: string;
+    }
+
+    export interface AgentFeishuSwitchReq {
+        agentId: number;
+        taskID: string;
+        streaming: boolean;
+        groupSessionScope: string;
+        requireMention: 'true' | 'false';
     }
 
     export interface AgentTelegramConfigReq {

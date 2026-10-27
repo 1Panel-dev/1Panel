@@ -778,3 +778,26 @@ VMSnapshotDeleteStep: "حذف اسنپ‌شات ماشین مجازی [{{ .snaps
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "پیش از ادامه تنظیمات ناسازگار را اصلاح کنید: {{ .detail }}"
+ErrFeishuConfigChanged: "تنظیمات هنگام تغییر عوض شد. صفحه را تازه و دوباره تلاش کنید."
+ErrFeishuImageRequired: "از تصویری با Feishu داخلی استفاده کنید."
+ErrFeishuAlreadySwitched: "Feishu قبلاً به افزونه داخلی تغییر کرده است."
+ErrFeishuSwitchRequired: "ابتدا در صفحه کانال Feishu به افزونه داخلی تغییر دهید."
+ErrFeishuManaged: "Feishu را از صفحه کانال مدیریت کنید؛ افزونه همراه تصویر به‌روز می‌شود."
+ErrFeishuRestore: "بازیابی تنظیمات Feishu ناموفق بود: {{ .err }}"
+ErrFeishuActivation: "راه‌اندازی افزونه داخلی Feishu یا دروازه ناموفق بود."
+AgentFeishuSwitch: "تغییر افزونه Feishu"
+AgentFeishuBackup: "پشتیبان تنظیمات: {{ .name }}"
+AgentFeishuRestored: "تنظیمات قبلی بازیابی شد."
+AgentFeishuProbeWarning: "بررسی اتصال Feishu ناموفق بود. شبکه و اطلاعات ورود را بررسی کنید؛ تغییر حفظ شد."
+AgentFeishuVerifyMessages: "فعال‌سازی محلی انجام شد. جفت‌سازی، پیام خصوصی و گروهی، مسیریابی ربات و پاسخ جریانی را در Feishu بررسی کنید."
+
+ErrFeishuUpgradeConfirm: "گزینه‌های انتقال Feishu را در صفحه ارتقا تأیید کنید."
+
+ErrFeishuUpgradeBackup: "ارتقای سازگاری Feishu به پشتیبان کامل برنامه نیاز دارد."
+
+ErrFeishuUpgradeMounts: "این اتصال‌های ذخیره‌سازی کاملاً قابل پشتیبان‌گیری و بازیابی نیستند. از مسیرهای استاندارد داده در پوشه برنامه استفاده کنید."
+
+AgentFeishuRecoveryDisabled: "دروازه بازیابی شد و Feishu غیرفعال است؛ پشتیبان تنظیمات اصلی حفظ شد."

@@ -272,6 +272,10 @@ export const getAgentFeishuConfig = (req: AI.AgentFeishuConfigReq) => {
     return http.post<AI.AgentFeishuConfig>(`/ai/agents/channel/feishu/get`, req);
 };
 
+export const switchAgentFeishuPlugin = (req: AI.AgentFeishuSwitchReq) => {
+    return http.post(`/ai/agents/channel/feishu/switch`, req);
+};
+
 export const updateAgentFeishuConfig = (req: AI.AgentFeishuConfigUpdateReq) => {
     return http.post(`/ai/agents/channel/feishu/update`, req);
 };

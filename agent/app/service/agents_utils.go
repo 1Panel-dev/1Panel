@@ -148,6 +148,10 @@ func readOpenclawConfig(configPath string) (map[string]interface{}, error) {
 }
 
 func writeOpenclawConfigRaw(configPath string, conf map[string]interface{}) error {
+	if _, busy := feishuSwitches.LoadOrStore(configPath, true); busy {
+		return buserr.New("TaskIsExecuting")
+	}
+	defer feishuSwitches.Delete(configPath)
 	ensureGatewaySecurityDefaults(conf)
 	ensureOpenclawUpdateDefaults(conf)
 	payload, err := json.MarshalIndent(conf, "", "  ")

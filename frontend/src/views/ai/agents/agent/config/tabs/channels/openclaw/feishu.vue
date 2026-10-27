@@ -1,6 +1,13 @@
 <template>
-    <el-form ref="formRef" v-loading="loading || approving" :model="form" :rules="rules" label-position="top">
+    <el-form
+        ref="formRef"
+        v-loading="loading || pluginLoading || approving"
+        :model="form"
+        :rules="rules"
+        label-position="top"
+    >
         <PluginInstall
+            v-if="!builtinManaged"
             :installed="installed"
             :installing="installing"
             :upgrading="upgrading"
@@ -13,29 +20,55 @@
             :uninstall-action="uninstallPlugin"
             :on-task-close="reload"
         />
+        <el-alert
+            v-else
+            :closable="false"
+            :type="!installed || legacy ? 'warning' : 'info'"
+            :title="t('aiTools.agents.feishuBuiltin')"
+            :description="
+                t(
+                    !installed
+                        ? 'aiTools.agents.feishuImageRequired'
+                        : legacy
+                          ? legacyConfigured
+                              ? 'aiTools.agents.feishuLegacy'
+                              : 'aiTools.agents.feishuRecoverConfirm'
+                          : 'aiTools.agents.feishuBuiltinHint',
+                )
+            "
+        />
         <template v-if="installed">
             <el-form-item :label="t('commons.table.status')" class="mt-4">
-                <el-switch v-model="form.enabled" />
+                <el-switch v-model="form.enabled" :disabled="legacy" />
             </el-form-item>
-            <div>
-                <el-form-item :label="t('aiTools.agents.threadSession')">
-                    <el-switch v-model="form.threadSession" />
-                </el-form-item>
-                <el-form-item :label="t('aiTools.agents.streaming')">
-                    <el-switch v-model="form.streaming" />
-                </el-form-item>
-                <el-form-item :label="t('aiTools.agents.replyMode')" prop="replyMode">
-                    <el-input v-model="form.replyMode" placeholder="auto" />
-                </el-form-item>
-                <el-form-item :label="t('aiTools.agents.requireMention')" prop="requireMention">
-                    <el-select v-model="form.requireMention">
-                        <el-option :label="t('aiTools.agents.requireMentionTrue')" value="true" />
-                        <el-option :label="t('aiTools.agents.requireMentionFalse')" value="false" />
-                        <el-option :label="t('aiTools.agents.requireMentionOpen')" value="open" />
-                    </el-select>
-                </el-form-item>
+            <div v-if="!legacy || legacyConfigured">
+                <FeishuTransition
+                    v-if="builtinManaged"
+                    v-model:streaming="form.streaming"
+                    v-model:group-session-scope="form.groupSessionScope"
+                    v-model:require-mention="form.requireMention"
+                    :allow-inherit="!legacy"
+                />
+                <template v-else>
+                    <el-form-item :label="t('aiTools.agents.threadSession')">
+                        <el-switch v-model="form.threadSession" />
+                    </el-form-item>
+                    <el-form-item :label="t('aiTools.agents.streaming')">
+                        <el-switch v-model="form.streaming" />
+                    </el-form-item>
+                    <el-form-item :label="t('aiTools.agents.replyMode')" prop="replyMode">
+                        <el-input v-model="form.replyMode" placeholder="auto" />
+                    </el-form-item>
+                    <el-form-item :label="t('aiTools.agents.requireMention')" prop="requireMention">
+                        <el-select v-model="form.requireMention">
+                            <el-option :label="t('aiTools.agents.requireMentionTrue')" value="true" />
+                            <el-option :label="t('aiTools.agents.requireMentionFalse')" value="false" />
+                            <el-option :label="t('aiTools.agents.requireMentionOpen')" value="open" />
+                        </el-select>
+                    </el-form-item>
+                </template>
                 <el-form-item :label="t('aiTools.agents.groupPolicy')" prop="groupPolicy">
-                    <el-select v-model="form.groupPolicy">
+                    <el-select v-model="form.groupPolicy" :disabled="legacy">
                         <el-option :label="t('aiTools.agents.policyOpen')" value="open" />
                         <el-option :label="t('aiTools.agents.policyAllowlist')" value="allowlist" />
                         <el-option :label="t('aiTools.agents.policyDisabled')" value="disabled" />
@@ -48,6 +81,7 @@
                 >
                     <el-input
                         v-model="form.groupAllowFromText"
+                        :disabled="legacy"
                         type="textarea"
                         :rows="3"
                         :placeholder="t('aiTools.agents.groupAllowFromPlaceholder')"
@@ -63,6 +97,7 @@
                 </el-form-item>
             </div>
             <ChannelBots
+                v-if="!legacy || legacyConfigured"
                 :bots="form.bots"
                 :fields="botFields"
                 :create-bot="createBot"
@@ -71,8 +106,8 @@
                 unique-field-prop="appId"
                 unique-field-label="App ID"
                 :summary-formatter="getBotSummary"
-                :add-disabled="!installed"
-                :disabled="!installed"
+                :add-disabled="legacy"
+                :disabled="legacy"
                 approvable
                 :approve-disabled="isApproveDisabled"
                 :fixed-account-ids="['default']"
@@ -81,12 +116,18 @@
                 @save="saveChannel"
                 @approve="approvePairing"
             />
-            <el-form-item class="mt-4">
-                <el-button v-permission type="primary" :loading="saving" :disabled="!installed" @click="saveChannel">
+            <el-form-item v-if="!legacy" class="mt-4">
+                <el-button v-permission type="primary" :loading="saving" :disabled="legacy" @click="saveChannel">
                     {{ t('commons.button.save') }}
                 </el-button>
             </el-form-item>
+            <el-form-item v-else class="mt-4">
+                <el-button v-permission type="primary" :loading="switching" @click="switchPlugin">
+                    {{ t(legacyConfigured ? 'aiTools.agents.feishuSwitch' : 'aiTools.agents.feishuRecover') }}
+                </el-button>
+            </el-form-item>
         </template>
+        <TaskLog ref="taskLogRef" @close="reload" />
     </el-form>
 </template>
 
@@ -96,12 +137,20 @@ import type { FormInstance } from 'element-plus';
 import { ElMessageBox } from 'element-plus';
 import { useI18n } from 'vue-i18n';
 import { AI } from '@/api/interface/ai';
-import { approveAgentChannelPairing, getAgentFeishuConfig, updateAgentFeishuConfig } from '@/api/modules/ai';
+import {
+    approveAgentChannelPairing,
+    getAgentFeishuConfig,
+    updateAgentFeishuConfig,
+    switchAgentFeishuPlugin,
+} from '@/api/modules/ai';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { Rules } from '@/global/form-rules';
+import TaskLog from '@/components/log/task/index.vue';
+import { newUUID } from '@/utils/id';
 import PluginInstall from '../components/plugin-install.vue';
 import { useAgentPluginChannel } from './useAgentPluginChannel';
 import ChannelBots from '../components/channel-bots.vue';
+import FeishuTransition from '../components/feishu-transition.vue';
 
 const { t } = useI18n();
 
@@ -129,10 +178,11 @@ interface FeishuForm extends Omit<AI.AgentFeishuConfig, 'bots'> {
 const saving = ref(false);
 const approving = ref(false);
 const formRef = ref<FormInstance>();
+const loading = ref(false);
 const {
     agentId,
-    loading,
-    installed,
+    loading: pluginLoading,
+    installed: pluginInstalled,
     installing,
     upgrading,
     uninstalling,
@@ -144,14 +194,22 @@ const {
     upgradePlugin,
     uninstallPlugin,
 } = useAgentPluginChannel('feishu');
+const builtinManaged = ref(true);
+const builtinAvailable = ref(false);
+const installed = computed(() => (builtinManaged.value ? builtinAvailable.value : pluginInstalled.value));
+const legacy = ref(false);
+const legacyConfigured = ref(false);
+const switching = ref(false);
+const taskLogRef = ref();
 
 const form = reactive<FeishuForm>({
     enabled: true,
     threadSession: true,
     streaming: false,
     replyMode: 'auto',
+    groupSessionScope: 'group',
     requireMention: 'true',
-    groupPolicy: 'open',
+    groupPolicy: 'allowlist',
     groupAllowFrom: [],
     groupAllowFromText: '',
     bots: [],
@@ -181,12 +239,17 @@ const parseTextList = (value: string): string[] => {
 
 const rules = reactive({
     replyMode: [Rules.requiredInput],
+    groupSessionScope: [Rules.requiredSelect],
     requireMention: [Rules.requiredSelect],
     groupPolicy: [Rules.requiredSelect],
     groupAllowFromText: [
         {
             validator: (_rule, value, callback) => {
-                if (form.groupPolicy === 'allowlist' && parseTextList(String(value || '')).length === 0) {
+                if (
+                    !legacy.value &&
+                    form.groupPolicy === 'allowlist' &&
+                    parseTextList(String(value || '')).length === 0
+                ) {
                     callback(new Error(t('aiTools.agents.allowFromRequired')));
                     return;
                 }
@@ -250,20 +313,33 @@ const updateBots = (bots: FeishuBotForm[]) => {
     form.bots = bots;
 };
 
-const isApproveDisabled = (bot: FeishuBotForm) => bot.dmPolicy !== 'pairing';
+const isApproveDisabled = (bot: FeishuBotForm) => legacy.value || bot.dmPolicy !== 'pairing';
 
 const load = async (id: number) => {
-    await loadPlugin(id);
-    const res = await getAgentFeishuConfig({ agentId: id });
-    form.enabled = res.data?.enabled ?? true;
-    form.threadSession = res.data?.threadSession ?? true;
-    form.streaming = res.data?.streaming ?? false;
-    form.replyMode = res.data?.replyMode || 'auto';
-    form.requireMention = res.data?.requireMention || 'true';
-    form.groupPolicy = res.data?.groupPolicy || 'open';
-    form.groupAllowFrom = res.data?.groupAllowFrom || [];
-    form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
-    form.bots = (res.data?.bots || []).map((bot) => normalizeBot(bot));
+    agentId.value = id;
+    loading.value = true;
+    try {
+        const res = await getAgentFeishuConfig({ agentId: id });
+        builtinManaged.value = Boolean(res.data?.builtinManaged);
+        builtinAvailable.value = Boolean(res.data?.builtinAvailable);
+        legacy.value = builtinManaged.value && Boolean(res.data?.legacy);
+        legacyConfigured.value = Boolean(res.data?.legacyConfigured);
+        if (!builtinManaged.value) {
+            await loadPlugin(id);
+        }
+        form.groupSessionScope = res.data?.groupSessionScope || 'group';
+        form.enabled = res.data?.enabled ?? true;
+        form.threadSession = res.data?.threadSession ?? true;
+        form.streaming = res.data?.streaming ?? false;
+        form.replyMode = res.data?.replyMode || 'auto';
+        form.requireMention = res.data?.requireMention || 'true';
+        form.groupPolicy = res.data?.groupPolicy || (builtinManaged.value ? 'allowlist' : 'open');
+        form.groupAllowFrom = res.data?.groupAllowFrom || [];
+        form.groupAllowFromText = (res.data?.groupAllowFrom || []).join('\n');
+        form.bots = (res.data?.bots || []).map((bot) => normalizeBot(bot));
+    } finally {
+        loading.value = false;
+    }
 };
 
 const reload = async () => {
@@ -314,6 +390,7 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
             agentId: agentId.value,
             enabled: form.enabled,
             threadSession: form.threadSession,
+            ...(builtinManaged.value ? { groupSessionScope: form.groupSessionScope } : {}),
             streaming: form.streaming,
             replyMode: form.replyMode,
             requireMention: form.requireMention,
@@ -327,6 +404,40 @@ const saveChannel = async (action: 'delete' | 'save' = 'save') => {
         throw error;
     } finally {
         saving.value = false;
+    }
+};
+
+const switchPlugin = async () => {
+    if (!agentId.value || switching.value || !formRef.value) return;
+    if (legacyConfigured.value) await formRef.value.validateField(['groupSessionScope', 'requireMention']);
+    if (legacyConfigured.value && form.requireMention === 'open') {
+        MsgWarning(t('aiTools.agents.feishuMentionChoice'));
+        return;
+    }
+    await ElMessageBox.confirm(
+        legacyConfigured.value
+            ? t('aiTools.agents.feishuSwitchConfirm') + ' ' + t('aiTools.agents.feishuRecoveryNotice')
+            : t('aiTools.agents.feishuRecoverConfirm'),
+        t('aiTools.agents.feishuSwitch'),
+        {
+            type: 'warning',
+            confirmButtonText: t('commons.button.confirm'),
+            cancelButtonText: t('commons.button.cancel'),
+        },
+    );
+    switching.value = true;
+    try {
+        const taskID = newUUID();
+        await switchAgentFeishuPlugin({
+            agentId: agentId.value,
+            taskID,
+            streaming: form.streaming,
+            groupSessionScope: form.groupSessionScope || 'group',
+            requireMention: legacyConfigured.value && form.requireMention === 'false' ? 'false' : 'true',
+        });
+        taskLogRef.value?.openWithTaskID(taskID);
+    } finally {
+        switching.value = false;
     }
 };
 

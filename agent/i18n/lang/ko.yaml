@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "가상 머신 스냅샷 [{{ .snapshot }}] 삭제"
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "계속하기 전에 호환되지 않는 설정을 수정하세요: {{ .detail }}"
+ErrFeishuConfigChanged: "전환 중 설정이 변경되었습니다. 새로고침 후 다시 시도하세요."
+ErrFeishuImageRequired: "Feishu가 내장된 이미지를 사용하세요."
+ErrFeishuAlreadySwitched: "이미 내장 Feishu 플러그인으로 전환했습니다."
+ErrFeishuSwitchRequired: "먼저 Feishu 채널 페이지에서 내장 플러그인으로 전환하세요."
+ErrFeishuManaged: "Feishu 채널 페이지에서 관리하세요. 플러그인은 이미지와 함께 업데이트됩니다."
+ErrFeishuRestore: "Feishu 설정 복구 실패: {{ .err }}"
+ErrFeishuActivation: "내장 Feishu 플러그인 또는 게이트웨이 시작에 실패했습니다."
+AgentFeishuSwitch: "Feishu 플러그인 전환"
+AgentFeishuBackup: "설정 백업: {{ .name }}"
+AgentFeishuRestored: "이전 설정을 복구했습니다."
+AgentFeishuProbeWarning: "Feishu 연결 확인에 실패했습니다. 네트워크와 자격 증명을 확인하세요. 전환 결과는 유지됩니다."
+AgentFeishuVerifyMessages: "로컬 활성화가 완료되었습니다. Feishu에서 페어링, 개인 및 그룹 채팅, 봇 라우팅과 스트리밍을 확인하세요."
+
+ErrFeishuUpgradeConfirm: "업그레이드 화면에서 Feishu 전환 옵션을 확인하세요."
+
+ErrFeishuUpgradeBackup: "Feishu 호환 업그레이드에는 전체 앱 백업이 필요합니다."
+
+ErrFeishuUpgradeMounts: "현재 마운트는 전체 백업 및 복원을 지원하지 않습니다. 앱 디렉터리 내부의 표준 데이터 마운트를 사용하세요."
+
+AgentFeishuRecoveryDisabled: "게이트웨이가 복구되었습니다. Feishu는 비활성 상태이며 원본 설정 백업은 유지됩니다."

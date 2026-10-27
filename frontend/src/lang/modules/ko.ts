@@ -764,6 +764,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                '업그레이드 전에 기존 Feishu 플러그인을 처리합니다. 전체 앱 백업이 필요하며 실패하면 이전 이미지와 해당 데이터를 복원합니다. 미설정 플러그인은 비활성화만 합니다.',
+            feishuRecoveryNotice:
+                '전환에 실패하면 Feishu를 비활성화한 상태로 게이트웨이 복구를 시도합니다. 기존 플러그인은 다시 활성화하지 않으며 원본 설정 백업을 보관합니다.',
+            feishuRecover: '기존 플러그인 비활성화 및 시작 복구',
+            feishuRecoverConfirm:
+                '설정을 백업하고 미설정 Feishu 플러그인을 비활성화한 뒤 다시 시작할까요? 모든 채널이 잠시 중단됩니다. 플러그인 파일은 유지합니다.',
+            feishuBuiltin: '내장 Feishu',
+            feishuImageRequired: 'Feishu가 내장된 이미지를 사용하세요.',
+            feishuLegacy:
+                '기존 플러그인의 유지 관리가 종료되었습니다. 전환 전에 세션 분리, 스트리밍 및 멘션 설정을 확인하세요.',
+            feishuBuiltinHint: '이 플러그인은 OpenClaw 이미지와 함께 업데이트됩니다.',
+            feishuSessionTopic: '그룹 주제별 분리',
+            feishuSessionTopicSender: '그룹 주제 및 발신자별 분리',
+            feishuSwitch: '내장 플러그인으로 전환',
+            feishuMentionChoice: '전환 전에 멘션 필요 여부를 명시적으로 선택하세요.',
+            feishuSwitchConfirm:
+                '내장 Feishu로 전환하고 다시 시작할까요? 모든 채널이 잠시 중단되고 기존 전용 도구는 사용할 수 없습니다. 스트리밍과 주제 동작은 선택한 설정을 따르며 일부 대화는 새 세션으로 시작됩니다. 자격 증명, 연결 및 페어링 정보는 유지됩니다.',
+
             deepSeekAccessHostHelper:
                 '브라우저에서 사용하는 IPv4 주소 또는 호스트 이름을 입력하세요. 프로토콜, 포트, 경로는 제외하세요. HTTPS는 앱의 로컬 인증서를 사용합니다.',
             deepSeekAuthHelper:

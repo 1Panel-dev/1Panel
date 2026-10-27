@@ -782,6 +782,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                'Pemalam Feishu lama perlu ditangani sebelum naik taraf. Sandaran aplikasi penuh diperlukan; kegagalan memulihkan imej lama dan datanya. Pemalam tanpa konfigurasi hanya dinyahaktifkan.',
+            feishuRecoveryNotice:
+                'Jika pertukaran gagal, pemulihan gerbang akan dicuba dengan Feishu dinyahaktifkan. Pemalam lama tidak diaktifkan semula. Sandaran konfigurasi asal dikekalkan.',
+            feishuRecover: 'Nyahaktif pemalam lama dan pulihkan permulaan',
+            feishuRecoverConfirm:
+                'Sandarkan konfigurasi, nyahaktifkan pemalam Feishu lama yang belum dikonfigurasi dan mulakan semula? Semua saluran terganggu seketika. Fail pemalam dikekalkan.',
+            feishuBuiltin: 'Feishu terbina dalam',
+            feishuImageRequired: 'Gunakan imej yang mengandungi Feishu terbina dalam.',
+            feishuLegacy:
+                'Pemalam lama tidak lagi diselenggara. Semak tetapan sesi, penstriman dan sebutan sebelum bertukar.',
+            feishuBuiltinHint: 'Pemalam ini dikemas kini bersama imej OpenClaw.',
+            feishuSessionTopic: 'Asingkan mengikut topik kumpulan',
+            feishuSessionTopicSender: 'Asingkan mengikut topik kumpulan dan penghantar',
+            feishuSwitch: 'Tukar kepada pemalam terbina dalam',
+            feishuMentionChoice: 'Pilih dengan jelas sama ada sebutan diperlukan sebelum bertukar.',
+            feishuSwitchConfirm:
+                'Tukar kepada Feishu terbina dalam dan mulakan semula? Semua saluran terganggu seketika. Alat khusus pemalam lama tidak lagi tersedia; penstriman dan topik mengikut pilihan anda, dan sesetengah sembang mungkin memulakan sesi baharu. Bukti kelayakan, ikatan dan pasangan dikekalkan.',
+
             deepSeekAccessHostHelper:
                 'Masukkan alamat IPv4 atau nama hos yang digunakan dalam pelayar, tanpa protokol, port atau laluan. HTTPS menggunakan sijil setempat aplikasi.',
             deepSeekAuthHelper:

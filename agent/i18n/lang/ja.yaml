@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "仮想マシンのスナップショット [{{ .snapshot 
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "続行前に互換性のない設定を修正してください：{{ .detail }}"
+ErrFeishuConfigChanged: "切り替え中に設定が変更されました。再読み込みして再試行してください。"
+ErrFeishuImageRequired: "Feishu を内蔵したイメージを使用してください。"
+ErrFeishuAlreadySwitched: "Feishu は組み込みプラグインに切り替え済みです。"
+ErrFeishuSwitchRequired: "先に Feishu チャネル画面で組み込みプラグインに切り替えてください。"
+ErrFeishuManaged: "Feishu はチャネル画面で管理してください。プラグインはイメージとともに更新されます。"
+ErrFeishuRestore: "Feishu 設定の復元に失敗しました：{{ .err }}"
+ErrFeishuActivation: "組み込み Feishu プラグインまたはゲートウェイを起動できませんでした。"
+AgentFeishuSwitch: "Feishu プラグインの切り替え"
+AgentFeishuBackup: "設定のバックアップ：{{ .name }}"
+AgentFeishuRestored: "以前の設定を復元しました。"
+AgentFeishuProbeWarning: "Feishu の接続確認に失敗しました。ネットワークと認証情報を確認してください。切り替え結果は保持しています。"
+AgentFeishuVerifyMessages: "ローカルの有効化が完了しました。Feishu でペアリング、個別・グループチャット、ボットルーティング、ストリーミングを確認してください。"
+
+ErrFeishuUpgradeConfirm: "更新画面で Feishu の切り替え設定を確認してください。"
+
+ErrFeishuUpgradeBackup: "Feishu 互換更新にはアプリ全体のバックアップが必要です。"
+
+ErrFeishuUpgradeMounts: "現在のマウントは完全なバックアップ・復元に対応しません。アプリディレクトリ内の標準データマウントを使用してください。"
+
+AgentFeishuRecoveryDisabled: "ゲートウェイを復旧しました。Feishu は無効のままで、元の設定のバックアップは保持しています。"

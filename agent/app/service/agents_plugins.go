@@ -107,6 +107,9 @@ func (a AgentService) InstallMarketPlugin(req dto.AgentPluginMarketInstallReq) e
 	if err != nil {
 		return err
 	}
+	if isOpenclawBundledFeishuVersion(install.Version) && (strings.TrimSpace(req.Package) == "@larksuite/openclaw-lark" || strings.TrimSpace(req.Package) == "@openclaw/feishu") {
+		return buserr.New("ErrFeishuManaged")
+	}
 	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeAI, req.AgentID); err != nil {
 		return err
 	}
@@ -131,6 +134,9 @@ func (a AgentService) OperatePlugin(req dto.AgentPluginOperateReq) error {
 	agent, install, err := a.loadOpenclawAgentAndInstall(req.AgentID)
 	if err != nil {
 		return err
+	}
+	if isOpenclawBundledFeishuVersion(install.Version) && (req.PluginID == "openclaw-lark" || req.PluginID == "feishu") {
+		return buserr.New("ErrFeishuManaged")
 	}
 	if err := task.CheckScopeTaskIsExecuting(task.TaskScopeAI, req.AgentID); err != nil {
 		return err

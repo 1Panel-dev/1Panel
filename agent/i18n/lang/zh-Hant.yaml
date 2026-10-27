@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "刪除虛擬機快照 [{{ .snapshot }}]"
 ErrCAUpload: "請上傳包含有效自簽根憑證 ca.crt 及匹配私鑰 ca.key 的 ZIP 檔案（最大 10 MB），金鑰演算法須為支援的 RSA 或 EC。"
 
 ErrCAImport: "請提供有效的自簽根憑證及匹配私鑰（每個最大 1 MB），金鑰演算法須為支援的 RSA 或 EC。"
+
+# Built-in Feishu
+ErrFeishuConfig: "請先處理不相容的設定：{{ .detail }}"
+ErrFeishuConfigChanged: "切換期間設定已變更，請重新整理後重試。"
+ErrFeishuImageRequired: "請使用包含內建飛書外掛的映像。"
+ErrFeishuAlreadySwitched: "飛書已切換至內建外掛。"
+ErrFeishuSwitchRequired: "請先在飛書管道頁面切換至內建外掛。"
+ErrFeishuManaged: "請在飛書管道頁面管理，外掛隨映像更新。"
+ErrFeishuRestore: "還原飛書設定失敗：{{ .err }}"
+ErrFeishuActivation: "內建飛書外掛或閘道啟動失敗。"
+AgentFeishuSwitch: "切換飛書外掛"
+AgentFeishuBackup: "設定備份：{{ .name }}"
+AgentFeishuRestored: "已還原切換前的設定。"
+AgentFeishuProbeWarning: "飛書連線檢查未通過，請檢查網路和憑證；已保留切換結果。"
+AgentFeishuVerifyMessages: "本機啟用完成，請在飛書驗證配對、私聊、群聊、機器人路由和串流回覆。"
+
+ErrFeishuUpgradeConfirm: "請在升級頁面確認飛書切換選項後重試。"
+
+ErrFeishuUpgradeBackup: "飛書相容升級必須開啟完整應用程式備份。"
+
+ErrFeishuUpgradeMounts: "目前掛載無法完整備份或還原，請使用應用程式目錄內的標準資料掛載。"
+
+AgentFeishuRecoveryDisabled: "閘道已恢復，飛書保持停用；原設定備份已保留。"

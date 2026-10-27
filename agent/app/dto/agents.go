@@ -433,32 +433,53 @@ type AgentFeishuConfigReq struct {
 	AgentID uint `json:"agentId" validate:"required"`
 }
 
+type AgentFeishuTransition struct {
+	Confirmed         bool   `json:"confirmed"`
+	Streaming         bool   `json:"streaming"`
+	GroupSessionScope string `json:"groupSessionScope"`
+	RequireMention    string `json:"requireMention"`
+}
+
+type AgentFeishuSwitchReq struct {
+	AgentID           uint   `json:"agentId" validate:"required"`
+	TaskID            string `json:"taskID" validate:"required"`
+	Streaming         bool   `json:"streaming"`
+	GroupSessionScope string `json:"groupSessionScope" validate:"required,oneof=group group_sender group_topic group_topic_sender"`
+	RequireMention    string `json:"requireMention" validate:"required,oneof=true false"`
+}
+
 type AgentFeishuConfigUpdateReq struct {
-	AgentID        uint             `json:"agentId" validate:"required"`
-	Enabled        bool             `json:"enabled"`
-	ThreadSession  bool             `json:"threadSession"`
-	ReplyMode      string           `json:"replyMode" validate:"required"`
-	Streaming      bool             `json:"streaming"`
-	RequireMention string           `json:"requireMention" validate:"required,oneof=true false open"`
-	GroupPolicy    string           `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
-	GroupAllowFrom []string         `json:"groupAllowFrom"`
-	Domain         string           `json:"domain"`
-	ConnectionMode string           `json:"connectionMode"`
-	Bots           []AgentFeishuBot `json:"bots" validate:"required,min=1"`
+	GroupSessionScope string           `json:"groupSessionScope" validate:"omitempty,oneof=group group_sender group_topic group_topic_sender"`
+	AgentID           uint             `json:"agentId" validate:"required"`
+	Enabled           bool             `json:"enabled"`
+	ThreadSession     bool             `json:"threadSession"`
+	ReplyMode         string           `json:"replyMode" validate:"required"`
+	Streaming         bool             `json:"streaming"`
+	RequireMention    string           `json:"requireMention" validate:"required,oneof=true false open"`
+	GroupPolicy       string           `json:"groupPolicy" validate:"required,oneof=open allowlist disabled"`
+	GroupAllowFrom    []string         `json:"groupAllowFrom"`
+	Domain            string           `json:"domain"`
+	ConnectionMode    string           `json:"connectionMode"`
+	Bots              []AgentFeishuBot `json:"bots" validate:"required,min=1"`
 }
 
 type AgentFeishuConfig struct {
-	Enabled        bool             `json:"enabled"`
-	ThreadSession  bool             `json:"threadSession"`
-	ReplyMode      string           `json:"replyMode"`
-	Streaming      bool             `json:"streaming"`
-	RequireMention string           `json:"requireMention"`
-	GroupPolicy    string           `json:"groupPolicy"`
-	GroupAllowFrom []string         `json:"groupAllowFrom"`
-	Domain         string           `json:"domain"`
-	ConnectionMode string           `json:"connectionMode"`
-	Bots           []AgentFeishuBot `json:"bots"`
-	Installed      bool             `json:"installed"`
+	BuiltinManaged    bool             `json:"builtinManaged"`
+	LegacyConfigured  bool             `json:"legacyConfigured"`
+	GroupSessionScope string           `json:"groupSessionScope"`
+	BuiltinAvailable  bool             `json:"builtinAvailable"`
+	Legacy            bool             `json:"legacy"`
+	Enabled           bool             `json:"enabled"`
+	ThreadSession     bool             `json:"threadSession"`
+	ReplyMode         string           `json:"replyMode"`
+	Streaming         bool             `json:"streaming"`
+	RequireMention    string           `json:"requireMention"`
+	GroupPolicy       string           `json:"groupPolicy"`
+	GroupAllowFrom    []string         `json:"groupAllowFrom"`
+	Domain            string           `json:"domain"`
+	ConnectionMode    string           `json:"connectionMode"`
+	Bots              []AgentFeishuBot `json:"bots"`
+	Installed         bool             `json:"installed"`
 }
 
 type AgentTelegramConfigReq struct {

@@ -768,3 +768,26 @@ VMSnapshotDeleteStep: "ລຶບສະແນັບຊັອດເຄື່ອງ
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "ກະລຸນາແກ້ໄຂການຕັ້ງຄ່າທີ່ບໍ່ເຂົ້າກັນກ່ອນ: {{ .detail }}"
+ErrFeishuConfigChanged: "ການຕັ້ງຄ່າປ່ຽນໃນລະຫວ່າງການສະຫຼັບ. ໂຫຼດໃໝ່ແລ້ວລອງອີກ."
+ErrFeishuImageRequired: "ໃຊ້ອິມເມຈທີ່ມີ Feishu ໃນຕົວ."
+ErrFeishuAlreadySwitched: "Feishu ໄດ້ສະຫຼັບເປັນປລັກອິນໃນຕົວແລ້ວ."
+ErrFeishuSwitchRequired: "ກະລຸນາສະຫຼັບໃນໜ້າຊ່ອງ Feishu ກ່ອນ."
+ErrFeishuManaged: "ຈັດການ Feishu ໃນໜ້າຊ່ອງ; ປລັກອິນອັບເດດພ້ອມອິມເມຈ."
+ErrFeishuRestore: "ກູ້ຄືນການຕັ້ງຄ່າ Feishu ບໍ່ສຳເລັດ: {{ .err }}"
+ErrFeishuActivation: "ປລັກອິນ Feishu ໃນຕົວ ຫຼື ເກດເວເລີ່ມບໍ່ສຳເລັດ."
+AgentFeishuSwitch: "ສະຫຼັບປລັກອິນ Feishu"
+AgentFeishuBackup: "ສຳຮອງການຕັ້ງຄ່າ: {{ .name }}"
+AgentFeishuRestored: "ກູ້ຄືນການຕັ້ງຄ່າເດີມແລ້ວ."
+AgentFeishuProbeWarning: "ກວດການເຊື່ອມຕໍ່ Feishu ບໍ່ຜ່ານ. ກວດເຄືອຂ່າຍ ແລະ ຂໍ້ມູນເຂົ້າໃຊ້; ຮັກສາຜົນການສະຫຼັບໄວ້."
+AgentFeishuVerifyMessages: "ເປີດໃຊ້ພາຍໃນສຳເລັດ. ກວດການຈັບຄູ່, ແຊັດສ່ວນຕົວ, ກຸ່ມ, ເສັ້ນທາງບອດ ແລະ ສະຕຣີມໃນ Feishu."
+
+ErrFeishuUpgradeConfirm: "ຢືນຢັນຕົວເລືອກການປ່ຽນ Feishu ໃນໜ້າອັບເກຣດ."
+
+ErrFeishuUpgradeBackup: "ການອັບເກຣດ Feishu ຕ້ອງສຳຮອງແອັບທັງໝົດ."
+
+ErrFeishuUpgradeMounts: "ຈຸດເຊື່ອມຂໍ້ມູນນີ້ບໍ່ສາມາດສຳຮອງແລະກູ້ຄືນທັງໝົດໄດ້. ໃຊ້ຈຸດເຊື່ອມມາດຕະຖານພາຍໃນໂຟນເດີແອັບ."
+
+AgentFeishuRecoveryDisabled: "ເກດເວກູ້ຄືນແລ້ວ ແຕ່ Feishu ຍັງປິດ; ສຳຮອງການຕັ້ງຄ່າເດີມຍັງຖືກເກັບໄວ້."

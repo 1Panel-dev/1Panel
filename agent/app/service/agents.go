@@ -88,6 +88,7 @@ type IAgentService interface {
 
 	GetFeishuConfig(req dto.AgentFeishuConfigReq) (*dto.AgentFeishuConfig, error)
 	UpdateFeishuConfig(req dto.AgentFeishuConfigUpdateReq) error
+	SwitchFeishuPlugin(req dto.AgentFeishuSwitchReq) error
 	GetTelegramConfig(req dto.AgentTelegramConfigReq) (*dto.AgentTelegramConfig, error)
 	UpdateTelegramConfig(req dto.AgentTelegramConfigUpdateReq) error
 	GetDiscordConfig(req dto.AgentIDReq) (*dto.AgentDiscordConfig, error)
@@ -1591,6 +1592,10 @@ func (a AgentService) UpdateConfigFile(req dto.AgentConfigFileUpdateReq) error {
 	if err != nil {
 		return err
 	}
+	if _, busy := feishuSwitches.LoadOrStore(agent.ConfigPath, true); busy {
+		return buserr.New("TaskIsExecuting")
+	}
+	defer feishuSwitches.Delete(agent.ConfigPath)
 	if err := validateAgentConfigFileContent(agent.AgentType, req.Content); err != nil {
 		return err
 	}

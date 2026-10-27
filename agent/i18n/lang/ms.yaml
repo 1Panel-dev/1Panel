@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "Padam syot kilat mesin maya [{{ .snapshot }}]"
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "Betulkan konfigurasi tidak serasi sebelum meneruskan: {{ .detail }}"
+ErrFeishuConfigChanged: "Konfigurasi berubah semasa pertukaran. Muat semula dan cuba lagi."
+ErrFeishuImageRequired: "Gunakan imej yang mengandungi Feishu terbina dalam."
+ErrFeishuAlreadySwitched: "Feishu sudah menggunakan pemalam terbina dalam."
+ErrFeishuSwitchRequired: "Tukar dahulu kepada pemalam terbina dalam pada halaman saluran Feishu."
+ErrFeishuManaged: "Urus Feishu pada halaman salurannya; pemalam dikemas kini bersama imej."
+ErrFeishuRestore: "Gagal memulihkan konfigurasi Feishu: {{ .err }}"
+ErrFeishuActivation: "Pemalam Feishu terbina dalam atau gerbang gagal dimulakan."
+AgentFeishuSwitch: "Tukar pemalam Feishu"
+AgentFeishuBackup: "Sandaran konfigurasi: {{ .name }}"
+AgentFeishuRestored: "Konfigurasi sebelumnya dipulihkan."
+AgentFeishuProbeWarning: "Semakan sambungan Feishu gagal. Semak rangkaian dan kelayakan; pertukaran dikekalkan."
+AgentFeishuVerifyMessages: "Pengaktifan setempat selesai. Sahkan pasangan, mesej peribadi, kumpulan, penghalaan bot dan penstriman dalam Feishu."
+
+ErrFeishuUpgradeConfirm: "Sahkan pilihan peralihan Feishu pada halaman naik taraf."
+
+ErrFeishuUpgradeBackup: "Naik taraf keserasian Feishu memerlukan sandaran aplikasi penuh."
+
+ErrFeishuUpgradeMounts: "Lekapan ini tidak boleh disandar dan dipulihkan sepenuhnya. Gunakan lekapan data standard dalam direktori aplikasi."
+
+AgentFeishuRecoveryDisabled: "Gerbang dipulihkan dengan Feishu dinyahaktifkan; sandaran konfigurasi asal dikekalkan."

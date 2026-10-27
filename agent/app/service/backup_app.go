@@ -197,7 +197,8 @@ func handleAppBackup(install *model.AppInstall, parentTask *task.Task, recordID 
 	return nil
 }
 
-func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string) error {
+func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string, startAfterRecover ...bool) error {
+	startAfter := len(startAfterRecover) == 0 || startAfterRecover[0]
 	// Validate AI Gateway backups before stopping the app, creating rollback
 	// backups, or touching its files/database. Keep the validated extraction for
 	// the restore so uploaded/encrypted archives are not unpacked twice.
@@ -246,12 +247,15 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			return err
 		}
 		defer func() {
+			defer os.RemoveAll(tmpPath)
+			if !startAfter {
+				return
+			}
 			if isRollback {
 				_, _ = compose.UpWithoutBuild(install.GetComposePath())
 			} else {
 				_, _ = compose.Up(install.GetComposePath())
 			}
-			_ = os.RemoveAll(tmpPath)
 		}()
 
 		if !fileOp.Stat(tmpPath+"/app.json") || !fileOp.Stat(tmpPath+"/app.tar.gz") {
@@ -352,8 +356,12 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 
 		appDir := install.GetPath()
 		backPath := fmt.Sprintf("%s_bak", appDir)
-		_ = fileOp.Rename(appDir, backPath)
-		_ = fileOp.CreateDir(appDir, constant.DirPerm)
+		if err := fileOp.Rename(appDir, backPath); err != nil && !startAfter {
+			return err
+		}
+		if err := fileOp.CreateDir(appDir, constant.DirPerm); err != nil && !startAfter {
+			return err
+		}
 
 		deCompressName := i18n.GetWithName("DeCompressFile", "app.tar.gz")
 		t.LogStart(deCompressName)
@@ -376,6 +384,10 @@ func handleAppRecover(install *model.AppInstall, parentTask *task.Task, recoverF
 			_, _ = file.WriteString(mergedEnvContent)
 		}
 
+		// The upgrade transaction verifies readiness before saving its restored install.
+		if !startAfter {
+			return nil
+		}
 		backupInstall.ID = install.ID
 		backupInstall.Status = constant.StatusRunning
 		backupInstall.AppId = install.AppId

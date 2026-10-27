@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "Eliminar instantánea de máquina virtual [{{ .snapshot }
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "Corrija la configuración incompatible antes de continuar: {{ .detail }}"
+ErrFeishuConfigChanged: "La configuración cambió durante la transición. Recargue y reintente."
+ErrFeishuImageRequired: "Use una imagen que incluya Feishu."
+ErrFeishuAlreadySwitched: "Feishu ya utiliza el complemento integrado."
+ErrFeishuSwitchRequired: "Cambie primero al complemento integrado desde la página del canal Feishu."
+ErrFeishuManaged: "Gestione Feishu desde su canal; el complemento se actualiza con la imagen."
+ErrFeishuRestore: "Error al restaurar la configuración de Feishu: {{ .err }}"
+ErrFeishuActivation: "No se pudo iniciar el complemento Feishu integrado o la puerta de enlace."
+AgentFeishuSwitch: "Cambiar el complemento Feishu"
+AgentFeishuBackup: "Copia de configuración: {{ .name }}"
+AgentFeishuRestored: "Se restauró la configuración anterior."
+AgentFeishuProbeWarning: "Falló la comprobación de conexión de Feishu. Revise la red y las credenciales; se conservó el cambio."
+AgentFeishuVerifyMessages: "Activación local completada. Verifique el emparejamiento, chats, grupos, rutas de bots y transmisión en Feishu."
+
+ErrFeishuUpgradeConfirm: "Confirme las opciones de transición de Feishu en la página de actualización."
+
+ErrFeishuUpgradeBackup: "La actualización de compatibilidad de Feishu requiere una copia completa de la aplicación."
+
+ErrFeishuUpgradeMounts: "Estos montajes no permiten una copia y restauración completas. Use los montajes de datos estándar dentro del directorio de la aplicación."
+
+AgentFeishuRecoveryDisabled: "Puerta de enlace recuperada con Feishu desactivado; se conserva la copia de configuración original."
