@@ -19,10 +19,6 @@ export const searchOllamaModel = (params: AI.OllamaModelSearch) => {
 export const loadOllamaModel = (name: string) => {
     return http.post<string>(`/ai/ollama/model/load`, { name: name });
 };
-export const syncOllamaModel = () => {
-    return http.post<Array<AI.OllamaModelDropInfo>>(`/ai/ollama/model/sync`);
-};
-
 export const syncOllamaModelAccount = (req: AI.ModelAccountSync) => {
     return http.post('/ai/ollama/account/sync', req);
 };

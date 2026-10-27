@@ -995,7 +995,6 @@ const message = {
             create_helper: '拉取 "{0}"',
             ollama_doc: '您可以瀏覽 Ollama 官方網站，搜尋並尋找更多模型。',
             container_conn_helper: '容器間瀏覽或連接使用此地址',
-            ollama_sync: '同步 Ollama 模型發現下列模型不存在，是否刪除？',
             from_remote: '該模型並非透過 1Panel 下載，無相關拉取日誌。',
             no_logs: '該模型的拉取日誌已被刪除，無法檢視相關日誌。',
             vllmVersionHelper: 'FusionXpark GB 10 伺服器請選擇 -cu130 版本',

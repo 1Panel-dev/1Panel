@@ -1059,8 +1059,6 @@ const message = {
             create_helper: 'Puxar "{0}"',
             ollama_doc: 'Você pode visitar o site oficial da Ollama para pesquisar e encontrar mais modelos.',
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
-            ollama_sync:
-                'Ao sincronizar os modelos Ollama, os modelos a seguir não foram encontrados. Deseja excluí-los?',
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
             vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',

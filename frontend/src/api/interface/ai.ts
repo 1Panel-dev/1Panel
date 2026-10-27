@@ -18,10 +18,6 @@ export namespace AI {
         message: string;
         createdAt: Date;
     }
-    export interface OllamaModelDropInfo {
-        id: number;
-        name: string;
-    }
     export interface OllamaModelSearch extends ReqPage {
         info?: string;
     }

@@ -53,13 +53,6 @@
 		"formatZH": "添加 Ollama 模型重试 [name]",
 		"formatEN": "re-add Ollama model [name]"
 	},
-	"/ai/ollama/model/sync": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步 Ollama 模型列表",
-		"formatEN": "sync Ollama model list"
-	},
 	"/ai/tensorrt/create": {
 		"bodyKeys": [
 			"name"

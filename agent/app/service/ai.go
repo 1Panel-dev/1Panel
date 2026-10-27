@@ -8,6 +8,7 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"sync"
 	"syscall"
 	"time"
 
@@ -28,13 +29,14 @@ import (
 
 type AIToolService struct{}
 
+var ollamaModelMu sync.Mutex
+
 type IAIToolService interface {
 	Search(search dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error)
 	Create(req dto.OllamaModelName) error
 	Close(name string) error
 	Recreate(req dto.OllamaModelName) error
 	Delete(req dto.ForceDelete) error
-	Sync() ([]dto.OllamaModelDropList, error)
 	SyncAccount(req dto.OllamaModelAccountSync) error
 	LoadDetail(name string) (string, error)
 	BindDomain(req dto.OllamaBindDomain) error
@@ -47,6 +49,7 @@ func NewIAIToolService() IAIToolService {
 }
 
 func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error) {
+	syncErr := syncOllamaModels()
 	var options []repo.DBOption
 	if len(req.Info) != 0 {
 		options = append(options, repo.WithByLikeName(req.Info))
@@ -60,6 +63,11 @@ func (u *AIToolService) Search(req dto.SearchWithPage) (int64, []dto.OllamaModel
 		var item dto.OllamaModelInfo
 		if err := copier.Copy(&item, &itemModel); err != nil {
 			return 0, nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
+		}
+		if syncErr != nil && item.Status != constant.StatusWaiting {
+			item.Status = constant.StatusUnknown
+			item.Message = syncErr.Error()
+			item.Size = ""
 		}
 		taskModel, _ := taskRepo.GetFirst(taskRepo.WithResourceID(item.ID), repo.WithByType(task.TaskScopeAI))
 		if len(taskModel.ID) != 0 {
@@ -86,6 +94,8 @@ func (u *AIToolService) LoadDetail(name string) (string, error) {
 }
 
 func (u *AIToolService) Create(req dto.OllamaModelName) error {
+	ollamaModelMu.Lock()
+	defer ollamaModelMu.Unlock()
 	if cmd.CheckIllegal(req.Name) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -148,6 +158,8 @@ func (u *AIToolService) Close(name string) error {
 }
 
 func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
+	ollamaModelMu.Lock()
+	defer ollamaModelMu.Unlock()
 	if cmd.CheckIllegal(req.Name) {
 		return buserr.New("ErrCmdIllegal")
 	}
@@ -191,6 +203,8 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 }
 
 func (u *AIToolService) Delete(req dto.ForceDelete) error {
+	ollamaModelMu.Lock()
+	defer ollamaModelMu.Unlock()
 	ollamaList, _ := aiRepo.List(repo.WithByIDs(req.IDs))
 	if len(ollamaList) == 0 {
 		return buserr.New("ErrRecordNotFound")
@@ -210,54 +224,6 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 		_ = os.Remove(logItem)
 	}
 	return SyncOllamaModelAccount(false)
-}
-
-func (u *AIToolService) Sync() ([]dto.OllamaModelDropList, error) {
-	containerName, err := LoadContainerName()
-	if err != nil {
-		return nil, err
-	}
-	stdout, err := cmd.RunDockerExecWithStdout(20*time.Second, containerName, "ollama", "list")
-	if err != nil {
-		return nil, err
-	}
-	var list []model.OllamaModel
-	lines := strings.Split(stdout, "\n")
-	for _, line := range lines {
-		parts := strings.Fields(line)
-		if len(parts) < 5 {
-			continue
-		}
-		if parts[0] == "NAME" {
-			continue
-		}
-		list = append(list, model.OllamaModel{Name: parts[0], Size: parts[2] + " " + parts[3]})
-	}
-	listInDB, _ := aiRepo.List()
-	var dropList []dto.OllamaModelDropList
-	for _, itemModel := range listInDB {
-		isExit := false
-		for i := 0; i < len(list); i++ {
-			if list[i].Name == itemModel.Name {
-				_ = aiRepo.Update(itemModel.ID, map[string]interface{}{"status": constant.StatusSuccess, "message": "", "size": list[i].Size})
-				list = append(list[:i], list[(i+1):]...)
-				isExit = true
-				break
-			}
-		}
-		if !isExit && itemModel.Status != constant.StatusWaiting {
-			_ = aiRepo.Update(itemModel.ID, map[string]interface{}{"status": constant.StatusDeleted, "message": "not exist", "size": ""})
-			dropList = append(dropList, dto.OllamaModelDropList{ID: itemModel.ID, Name: itemModel.Name})
-			continue
-		}
-	}
-	for _, item := range list {
-		item.Status = constant.StatusSuccess
-		item.From = "remote"
-		_ = aiRepo.Create(&item)
-	}
-
-	return dropList, SyncOllamaModelAccount(false)
 }
 
 func (u *AIToolService) SyncAccount(req dto.OllamaModelAccountSync) error {
@@ -398,6 +364,72 @@ func (u *AIToolService) UpdateBindDomain(req dto.OllamaBindDomain) error {
 	return nil
 }
 
+func syncOllamaModels() error {
+	ollamaModelMu.Lock()
+	defer ollamaModelMu.Unlock()
+	containerName, err := LoadContainerName()
+	if err != nil {
+		return err
+	}
+	stdout, err := cmd.RunDockerExecWithStdout(20*time.Second, containerName, "ollama", "list")
+	if err != nil {
+		return err
+	}
+	models := make(map[string]string)
+	lines := strings.Split(strings.TrimSpace(stdout), "\n")
+	if len(lines) == 0 || !strings.HasPrefix(strings.TrimSpace(lines[0]), "NAME") {
+		return fmt.Errorf("invalid ollama list output: %s", stdout)
+	}
+	for _, line := range lines[1:] {
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
+		parts := strings.Fields(line)
+		if len(parts) < 5 {
+			return fmt.Errorf("invalid ollama model entry: %s", line)
+		}
+		models[parts[0]] = parts[2] + " " + parts[3]
+	}
+	list, err := aiRepo.List()
+	if err != nil {
+		return err
+	}
+	known := make(map[string]bool, len(list))
+	for _, item := range list {
+		name := item.Name
+		if !strings.Contains(path.Base(name), ":") {
+			name += ":latest"
+		}
+		size, exists := models[name]
+		known[name] = true
+		if item.Status == constant.StatusWaiting {
+			continue
+		}
+		status, message := constant.StatusSuccess, ""
+		if !exists {
+			if item.Status == constant.StatusFailed || item.Status == constant.StatusCanceled {
+				continue
+			}
+			status, message = constant.StatusDeleted, "not exist"
+		}
+		if item.Status != status || item.Size != size || item.Message != message {
+			if err := aiRepo.Update(item.ID, map[string]interface{}{"status": status, "size": size, "message": message}); err != nil {
+				return err
+			}
+		}
+	}
+	for name, size := range models {
+		if known[name] {
+			continue
+		}
+		item := model.OllamaModel{Name: name, Size: size, From: "remote", Status: constant.StatusSuccess}
+		if err := aiRepo.Create(&item); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func LoadContainerName() (string, error) {
 	ollamaBaseInfo, err := appInstallRepo.LoadBaseInfo("ollama", "")
 	if err != nil {
@@ -415,12 +447,12 @@ func loadModelSize(name string, containerName string) (string, error) {
 		return "", err
 	}
 	lines := strings.Split(stdout, "\n")
+	if !strings.Contains(path.Base(name), ":") {
+		name += ":latest"
+	}
 	for _, line := range lines {
-		if !strings.Contains(line, name) {
-			continue
-		}
 		parts := strings.Fields(line)
-		if len(parts) < 5 {
+		if len(parts) < 5 || parts[0] != name {
 			continue
 		}
 		return parts[2] + " " + parts[3], nil

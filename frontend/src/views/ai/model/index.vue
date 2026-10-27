@@ -303,6 +303,7 @@
         <AppResources :key="`resources:${currentNode}:${route.fullPath}`" ref="appResourcesRef" @close="search" />
         <TaskLog ref="taskRef" width="70%" @close="search" />
         <ModelPool ref="poolRef" @updated="search" />
+        <TerminalDialog :key="`terminal:${currentNode}:${route.fullPath}`" ref="terminalRef" />
         <SyncService ref="syncRef" @search="search" />
         <component :is="templateView" v-if="templateView" ref="templateRef" />
     </div>
@@ -337,6 +338,7 @@ import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
 import AppDelete from '@/views/app-store/installed/delete/index.vue';
 import AppResources from '@/views/app-store/installed/check/index.vue';
 import ModelPool from './components/model-pool/index.vue';
+import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import SyncService from './components/sync/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
 import { loadModelOverview, loadVllmAPI, readPages, vllmAvailable, type Deployment } from './deployment';
@@ -345,7 +347,7 @@ const route = useRoute();
 const router = useRouter();
 const pagePath = route.path;
 const isCurrentPage = computed(() => route.path === pagePath);
-const { isProductPro, isFxplay, isIntl, currentNode } = useGlobalStore();
+const { isProductPro, isFxplay, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 const isFiles = pagePath === '/ai/model/files';
 const isLocal = pagePath === '/ai/model/local';
 const isManagement = computed(
@@ -366,6 +368,7 @@ const upgradeRef = ref();
 const appDeleteRef = ref();
 const appResourcesRef = ref();
 const poolRef = ref();
+const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
 const templateRef = ref();
 const templateView = shallowRef();
@@ -620,6 +623,18 @@ const deploymentButtons = [
         label: i18n.global.t('menu.monitor'),
         show: (row: Deployment) => row.engine === 'vllm',
         click: (row: Deployment) => manageRef.value.open(row, 'monitor', true),
+    },
+    {
+        label: i18n.global.t('menu.terminal'),
+        show: (row: Deployment) => row.engine === 'ollama' || row.engine === 'vllm',
+        disabled: (row: Deployment) =>
+            operationDisabled(row) || row.status !== 'Running' || !row.containerName || !isAdminOrNodeAdmin.value,
+        click: (row: Deployment) =>
+            terminalRef.value?.acceptParams({
+                containerID: row.containerName,
+                title: row.name,
+                node: currentNode.value,
+            }),
     },
     {
         label: i18n.global.t('commons.button.sync'),

@@ -3560,40 +3560,6 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/ollama/model/sync": {
-			"post": {
-				"responses": {
-					"200": {
-						"description": "OK",
-						"schema": {
-							"items": {
-								"$ref": "#/definitions/dto.OllamaModelDropList"
-							},
-							"type": "array"
-						}
-					}
-				},
-				"security": [
-					{
-						"ApiKeyAuth": []
-					},
-					{
-						"Timestamp": []
-					}
-				],
-				"summary": "Sync Ollama model list",
-				"tags": [
-					"AI"
-				],
-				"x-panel-log": {
-					"BeforeFunctions": [],
-					"bodyKeys": [],
-					"formatEN": "sync Ollama model list",
-					"formatZH": "同步 Ollama 模型列表",
-					"paramKeys": []
-				}
-			}
-		},
 		"/ai/tensorrt/create": {
 			"post": {
 				"consumes": [
@@ -39342,17 +39308,6 @@ const docTemplate = `{
 				},
 				"websiteID": {
 					"type": "integer"
-				}
-			},
-			"type": "object"
-		},
-		"dto.OllamaModelDropList": {
-			"properties": {
-				"id": {
-					"type": "integer"
-				},
-				"name": {
-					"type": "string"
 				}
 			},
 			"type": "object"

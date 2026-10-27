@@ -12,9 +12,6 @@
                 <el-button v-permission :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate">
                     {{ $t('commons.button.add') }}
                 </el-button>
-                <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="onSync">
-                    {{ $t('database.loadFromRemote') }}
-                </el-button>
                 <el-button v-permission :disabled="selects.length === 0" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
                 </el-button>
@@ -38,7 +35,7 @@
                     <el-table-column :label="$t('aiTools.model.model')" prop="name" min-width="180">
                         <template #default="{ row }">
                             <el-text
-                                v-if="row.size && modelInfo.status === 'Running'"
+                                v-if="row.status === 'Success' && modelInfo.status === 'Running'"
                                 type="primary"
                                 class="cursor-pointer"
                                 @click="onLoad(row.name)"
@@ -59,8 +56,11 @@
                                 {{ $t('commons.status.success') }}
                             </el-tag>
                             <el-tag v-if="row.status === 'Deleted'" type="info">
-                                {{ $t('database.isDelete') }}
+                                {{ $t('commons.status.notfound') }}
                             </el-tag>
+                            <el-tooltip v-if="row.status === 'Unknown'" :content="row.message" placement="top">
+                                <el-tag type="warning">{{ $t('commons.status.unknown') }}</el-tag>
+                            </el-tooltip>
                             <el-tag v-if="row.status === 'Canceled'" type="danger">
                                 {{ $t('commons.status.systemrestart') }}
                             </el-tag>
@@ -106,7 +106,6 @@
             </template>
         </OpDialog>
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
-        <Del ref="delRef" @search="search" />
         <Terminal ref="terminalRef" />
         <DialogPro v-model="detailVisible" :title="$t('commons.button.view')" size="large">
             <CodemirrorPro v-model="detailInfo" :height-diff="300" readonly mode="json" />
@@ -121,16 +120,9 @@ import { useSearchState } from '@/utils/search-reset';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
-import Del from '@/views/ai/model/ollama/del/index.vue';
 import { toRef, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
-import {
-    deleteOllamaModel,
-    loadOllamaModel,
-    recreateOllamaModel,
-    searchOllamaModel,
-    syncOllamaModel,
-} from '@/api/modules/ai';
+import { deleteOllamaModel, loadOllamaModel, recreateOllamaModel, searchOllamaModel } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { checkAppInstalled } from '@/api/modules/app';
 import { dateFormat } from '@/utils/date';
@@ -146,7 +138,6 @@ const selects = ref<any>([]);
 const addRef = ref();
 const detailVisible = ref(false);
 const detailInfo = ref('');
-const delRef = ref();
 const terminalRef = ref();
 const bindDomainRef = ref();
 const taskLogRef = ref();
@@ -188,29 +179,14 @@ const search = async () => {
             paginationConfig.total = res.data.total;
         })
         .catch(() => {
+            data.value = [];
+            paginationConfig.total = 0;
             loading.value = false;
         });
 };
 
 const onCreate = async () => {
     addRef.value.acceptParams();
-};
-
-const onSync = async () => {
-    loading.value = true;
-    await syncOllamaModel()
-        .then((res) => {
-            loading.value = false;
-            if (res.data?.length) {
-                delRef.value.acceptParams({ list: res.data });
-            } else {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                search();
-            }
-        })
-        .catch(() => {
-            loading.value = false;
-        });
 };
 
 const onLoad = async (name: string) => {
@@ -313,7 +289,7 @@ const buttons = [
             onReCreate(row.name);
         },
         disabled: (row: any) => {
-            return row.status === 'Success' || row.status === 'Waiting' || modelInfo.status !== 'Running';
+            return !['Deleted', 'Failed', 'Canceled'].includes(row.status) || modelInfo.status !== 'Running';
         },
     },
     {

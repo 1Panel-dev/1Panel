@@ -1063,8 +1063,6 @@ const message = {
             create_helper: '"{0}" çek',
             ollama_doc: 'Daha fazla model aramak ve bulmak için Ollama resmi web sitesini ziyaret edebilirsiniz.',
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
-            ollama_sync:
-                'Ollama modelini senkronize ederken aşağıdaki modellerin mevcut olmadığı tespit edildi, bunları silmek istiyor musunuz?',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
             vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',

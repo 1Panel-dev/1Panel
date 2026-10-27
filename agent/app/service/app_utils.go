@@ -391,12 +391,27 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 				}
 			}
 		}
+		if install.App.Key == "ollama" {
+			ollamaModelMu.Lock()
+			defer ollamaModelMu.Unlock()
+		}
 		tx, ctx := helper.GetTxAndContext()
 		defer tx.Rollback()
 		if err = appInstallRepo.Delete(ctx, install); err != nil {
 			return err
 		}
 		appKey := install.App.Key
+		if appKey == "ollama" {
+			remaining, listErr := appInstallRepo.ListBy(ctx, appInstallRepo.WithAppId(install.AppId))
+			if listErr != nil {
+				return listErr
+			}
+			if len(remaining) == 0 {
+				if err = aiRepo.DeleteAll(ctx); err != nil {
+					return err
+				}
+			}
+		}
 		if isAgentAppKey(appKey) {
 			_ = agentRepo.DeleteByAppInstallIDWithCtx(ctx, install.ID)
 		}
