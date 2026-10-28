@@ -62,7 +62,7 @@ import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isFullScreen } = useGlobalStore();
 
-const isFull = ref();
+const isFull = ref(false);
 
 const props = defineProps({
     header: String,
@@ -147,6 +147,7 @@ const handleBack = () => {
 
 const handleClose = () => {
     localOpenPage.value = false;
+    isFull.value = false;
     isFullScreen.value = false;
     emit('close');
 };

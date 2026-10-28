@@ -2045,8 +2045,8 @@ const message = {
         downloadTokenizer: '토크나이저 다운로드',
         onlineDownload: '온라인 다운로드',
         content: '다운로드 내용',
-        deleteFiles: '파일도 삭제',
-        deleteFilesHelp: '선택하면 토크나이저 디렉터리와 모든 파일이 삭제됩니다.',
+        deleteFiles: '{0}도 삭제',
+        deleteFilesPath: '{0} 파일 삭제: {1}',
     },
     benchmarkTokenizer: {
         title: '토크나이저 관리',
@@ -2058,7 +2058,7 @@ const message = {
         deleteFilesHelp: '선택하면 디렉터리 {0} 및 그 안의 모든 파일도 영구적으로 삭제됩니다.',
         deleteNameConfirm: '삭제를 확인하려면 토크나이저 이름을 입력하세요: ',
         deleteDirectoryWarning:
-            '표시된 디렉터리와 모델 가중치, 설정, 스크립트를 포함한 모든 내용이 영구적으로 삭제되며 복구할 수 없습니다. 모델과 디렉터리를 공유하는 경우 모델을 로드하거나 실행하지 못할 수 있습니다.',
+            '이 토크나이저는 기존 디렉터리를 참조합니다. 파일을 삭제하면 모델 파일을 포함한 디렉터리 전체와 모든 내용이 삭제됩니다. 토크나이저 등록 정보만 삭제하려면 체크박스를 선택 해제하세요.',
         deleteWarning: '파일을 삭제하면 현재 이 토크나이저를 사용 중인 테스트가 실패할 수 있습니다.',
         exists: '존재함',
         missing: '없음',

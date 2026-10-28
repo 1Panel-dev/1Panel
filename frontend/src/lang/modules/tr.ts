@@ -2102,8 +2102,8 @@ const message = {
         downloadTokenizer: 'Tokenleştiriciyi indir',
         onlineDownload: 'Çevrimiçi indir',
         content: 'İndirme içeriği',
-        deleteFiles: 'Dosyaları da sil',
-        deleteFilesHelp: 'İşaretlendiğinde tokenlaştırıcı dizini ve içindeki tüm dosyalar silinecektir.',
+        deleteFiles: '{0} öğesini de sil',
+        deleteFilesPath: '{0} dosyalarını sil: {1}',
     },
     benchmarkTokenizer: {
         title: 'Tokenizer yönetimi',
@@ -2114,7 +2114,7 @@ const message = {
         deleteFilesHelp: 'İşaretlendiğinde {0} dizini ve içindeki tüm dosyalar da kalıcı olarak silinecektir.',
         deleteNameConfirm: 'Silmeyi onaylamak için tokenlaştırıcının adını girin: ',
         deleteDirectoryWarning:
-            'Gösterilen dizin ve model ağırlıkları, yapılandırma ve betikler dahil tüm içeriği kalıcı olarak silinecektir. Bu işlem geri alınamaz. Dizin bir modelle paylaşılıyorsa model artık yüklenemeyebilir veya çalışmayabilir.',
+            'Bu tokenizer mevcut bir dizine başvurur. Dosyaları silmek, model dosyaları dahil tüm dizini ve içeriğini siler. Yalnızca tokenizer kaydını kaldırmak için onay kutusunun işaretini kaldırın.',
         deleteWarning:
             'Dosyaların silinmesi, şu anda bu tokenizer kullanan testlerin başarısız olmasına neden olabilir.',
         exists: 'Mevcut',

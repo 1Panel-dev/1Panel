@@ -2086,8 +2086,8 @@ const message = {
         downloadTokenizer: 'Download tokenizer',
         onlineDownload: 'Online download',
         content: 'Download content',
-        deleteFiles: 'Also delete files',
-        deleteFilesHelp: 'When selected, the tokenizer directory and all its files will be deleted.',
+        deleteFiles: 'Also delete {0}',
+        deleteFilesPath: 'Delete {0} files: {1}',
     },
     benchmarkTokenizer: {
         title: 'Tokenizer management',
@@ -2099,7 +2099,7 @@ const message = {
         deleteFilesHelp: 'When selected, directory {0} and all its files will also be permanently deleted.',
         deleteNameConfirm: 'Enter the tokenizer name to confirm deletion: ',
         deleteDirectoryWarning:
-            'The displayed directory and all its contents, including model weights, configuration and scripts, will be permanently deleted. This cannot be undone. If the directory is shared with a model, the model may no longer load or run.',
+            'This tokenizer references an existing directory. Deleting files will delete the entire directory and all its contents, including any model files. To remove only the tokenizer record, clear the checkbox.',
         deleteWarning: 'Deleting files may cause tests currently using this tokenizer to fail.',
         exists: 'Exists',
         missing: 'Missing',
