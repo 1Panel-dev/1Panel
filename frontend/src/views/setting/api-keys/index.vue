@@ -42,7 +42,7 @@
                                     />
                                 </el-tooltip>
                             </div>
-                            <div class="text-xs text-gray-500 break-all">{{ row.keyHint }}</div>
+                            <div class="text-xs text-[var(--el-text-color-secondary)] break-all">{{ row.keyHint }}</div>
                         </template>
                     </el-table-column>
                     <el-table-column :label="$t('commons.table.status')" min-width="100" prop="status">
@@ -137,26 +137,50 @@
             v-model="detailVisible"
             :header="$t('apiKeyManagement.details')"
             size="min(640px, 100vw)"
-            @close="clearLegacySecret"
+            @close="clearSecret"
         >
             <APIKeySummary v-if="detail" :item="detail" />
-            <div v-if="detail?.kind === 'legacy' && detail.status !== 'Revoked'" class="mt-5 flex flex-col gap-3">
-                <el-alert :title="$t('apiKeyManagement.legacyHelp')" type="info" :closable="false" show-icon />
-                <el-space wrap>
-                    <el-button type="primary" plain :loading="legacyBusy" @click="revealLegacy">
-                        {{ $t('apiKeyManagement.showLegacy') }}
+            <div v-if="detail && detail.status !== 'Revoked'" class="mt-5 flex flex-col gap-3">
+                <el-alert
+                    :title="
+                        $t(detail.kind === 'legacy' ? 'apiKeyManagement.legacyHelp' : 'apiKeyManagement.revealHelp')
+                    "
+                    type="info"
+                    :closable="false"
+                    show-icon
+                />
+                <el-space v-if="detail.kind === 'legacy'" wrap>
+                    <el-button :disabled="secretBusy" @click="resetLegacy">
+                        {{ $t('setting.apiKeyReset') }}
                     </el-button>
-                    <el-button :disabled="legacyBusy" @click="resetLegacy">{{ $t('setting.apiKeyReset') }}</el-button>
                 </el-space>
                 <el-input
-                    v-if="legacySecret"
-                    :model-value="legacySecret"
+                    :model-value="secret || '********'"
+                    :type="secret ? 'text' : 'password'"
                     :aria-label="$t('setting.apiKey')"
                     readonly
                     autocomplete="off"
                 >
+                    <template #suffix>
+                        <el-button
+                            link
+                            :icon="secret ? Hide : View"
+                            :loading="secretBusy && secretAction === 'reveal'"
+                            :disabled="loading || secretBusy"
+                            :aria-label="$t(secret ? 'apiKeyManagement.hideSecret' : 'apiKeyManagement.reveal')"
+                            :title="$t(secret ? 'apiKeyManagement.hideSecret' : 'apiKeyManagement.reveal')"
+                            :aria-pressed="!!secret"
+                            @click="toggleSecret"
+                        />
+                    </template>
                     <template #append>
-                        <CopyButton :content="legacySecret" :is-icon="false" />
+                        <el-button
+                            :loading="secretBusy && secretAction === 'copy'"
+                            :disabled="loading || secretBusy"
+                            @click="copySecret"
+                        >
+                            {{ $t('commons.button.copy') }}
+                        </el-button>
                     </template>
                 </el-input>
             </div>
@@ -165,10 +189,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref } from 'vue';
+import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import { Hide, View } from '@element-plus/icons-vue';
 import type { APIKey } from '@/api/interface/api-key';
-import { revokeAPIKey, searchAPIKeys, setAPIKeyStatus } from '@/api/modules/api-key';
+import { deleteAPIKey, revealAPIKey, revokeAPIKey, searchAPIKeys, setAPIKeyStatus } from '@/api/modules/api-key';
 import { generateApiKey, getUserInfo } from '@/api/modules/auth';
 import APIKeyEditor from '@/components/api-key-management/editor.vue';
 import APIKeySummary from '@/components/api-key-management/summary.vue';
@@ -176,35 +201,38 @@ import DrawerPro from '@/components/drawer-pro/index.vue';
 import type { FuTableOperationButton } from '@/components/table/shared';
 import { isAnyAPIKeyIP, normalizeAPIKeyIPs } from '@/utils/api-key';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
+import { copyText } from '@/utils/clipboard';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { isMobile, globalStore } = useGlobalStore();
 
 const items = ref<APIKey.Item[]>([]);
 const loading = ref(false);
 const editor = ref<InstanceType<typeof APIKeyEditor>>();
 const detail = ref<APIKey.Item>();
 const detailVisible = ref(false);
-const legacySecret = ref('');
-const legacyBusy = ref(false);
+const secret = ref('');
+const secretBusy = ref(false);
+const secretAction = ref<'reveal' | 'copy'>('reveal');
 const pagination = reactive({ currentPage: 1, pageSize: 20, total: 0 });
 let searchVersion = 0;
 let secretRequestVersion = 0;
 let active = false;
+let operationPending = false;
 
 const whitelistEntries = (value: string) =>
     normalizeAPIKeyIPs(value || '')
         .split('\n')
         .filter(Boolean);
 
-const clearLegacySecret = () => {
+const clearSecret = () => {
     secretRequestVersion++;
-    legacySecret.value = '';
-    legacyBusy.value = false;
+    secret.value = '';
+    secretBusy.value = false;
 };
 
-const search = async (preserveLegacyRequest?: number) => {
+const search = async (preserveSecretRequest?: number) => {
     const ticket = ++searchVersion;
     loading.value = true;
     try {
@@ -213,7 +241,7 @@ const search = async (preserveLegacyRequest?: number) => {
         const lastPage = Math.max(1, Math.ceil(response.data.total / pagination.pageSize));
         if (pagination.currentPage > lastPage) {
             pagination.currentPage = lastPage;
-            await search(preserveLegacyRequest);
+            await search(preserveSecretRequest);
             return;
         }
         items.value = response.data.items || [];
@@ -221,8 +249,8 @@ const search = async (preserveLegacyRequest?: number) => {
         if (detail.value) {
             const previousRevision = detail.value.revision;
             detail.value = items.value.find((entry) => entry.id === detail.value?.id);
-            if (detail.value?.revision !== previousRevision && preserveLegacyRequest !== secretRequestVersion)
-                clearLegacySecret();
+            if (detail.value?.revision !== previousRevision && preserveSecretRequest !== secretRequestVersion)
+                clearSecret();
             if (!detail.value) detailVisible.value = false;
         }
     } finally {
@@ -230,7 +258,7 @@ const search = async (preserveLegacyRequest?: number) => {
     }
 };
 const showDetail = (entry: APIKey.Item) => {
-    clearLegacySecret();
+    clearSecret();
     detail.value = entry;
     detailVisible.value = true;
 };
@@ -239,15 +267,19 @@ const operate = async (entry: APIKey.Item, action: string) => {
         editor.value?.open(entry);
         return;
     }
-    if (action !== 'status' && action !== 'revoke') return;
+    if (!active || operationPending || !['status', 'revoke', 'delete'].includes(action)) return;
+    operationPending = true;
+    const requestVersion = searchVersion;
     try {
         await ElMessageBox.confirm(
             i18n.global.t(
-                action === 'revoke'
-                    ? 'apiKeyManagement.revokeConfirm'
-                    : entry.status === 'Enable'
-                      ? 'apiKeyManagement.disableConfirm'
-                      : 'apiKeyManagement.enableConfirm',
+                action === 'delete'
+                    ? 'apiKeyManagement.deleteConfirm'
+                    : action === 'revoke'
+                      ? 'apiKeyManagement.revokeConfirm'
+                      : entry.status === 'Enable'
+                        ? 'apiKeyManagement.disableConfirm'
+                        : 'apiKeyManagement.enableConfirm',
                 [entry.name],
             ),
             i18n.global.t('apiKeyManagement.title'),
@@ -258,20 +290,29 @@ const operate = async (entry: APIKey.Item, action: string) => {
             },
         );
     } catch {
+        operationPending = false;
         return;
     }
+    if (!active || requestVersion !== searchVersion) {
+        operationPending = false;
+        return;
+    }
+    clearSecret();
     loading.value = true;
     try {
         const reference = { id: entry.id, revision: entry.revision };
         const response =
-            action === 'revoke'
-                ? await revokeAPIKey(reference)
-                : await setAPIKeyStatus({ ...reference, status: entry.status === 'Enable' ? 'Disable' : 'Enable' });
-        clearLegacySecret();
+            action === 'delete'
+                ? await deleteAPIKey(reference)
+                : action === 'revoke'
+                  ? await revokeAPIKey(reference)
+                  : await setAPIKeyStatus({ ...reference, status: entry.status === 'Enable' ? 'Disable' : 'Enable' });
+        clearSecret();
         if (response.data?.terminalClosePending) MsgWarning(i18n.global.t('apiKeyManagement.closePending'));
         else MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
     } finally {
-        await search();
+        operationPending = false;
+        if (active) await search();
     }
 };
 const buttons = computed<FuTableOperationButton<APIKey.Item>[]>(() => [
@@ -300,21 +341,59 @@ const buttons = computed<FuTableOperationButton<APIKey.Item>[]>(() => [
         show: (row) => row.status !== 'Revoked',
         click: (row) => operate(row, 'revoke'),
     },
+    {
+        label: i18n.global.t('commons.button.delete'),
+        show: (row) => row.kind === 'apiKey',
+        click: (row) => operate(row, 'delete'),
+    },
 ]);
-const revealLegacy = async () => {
-    if (legacyBusy.value || !detailVisible.value || detail.value?.kind !== 'legacy') return;
+const toggleSecret = async () => {
+    if (secretBusy.value || loading.value) return;
+    if (secret.value) clearSecret();
+    else await revealSecret();
+};
+const accessSecret = async (action: 'reveal' | 'copy') => {
+    if (secretBusy.value || loading.value || !active || !detailVisible.value || !detail.value) return;
+    if (detail.value.status === 'Revoked') return;
+    const reference = { id: detail.value.id, revision: detail.value.revision };
+    const kind = detail.value.kind;
     const ticket = ++secretRequestVersion;
-    legacyBusy.value = true;
+    secretAction.value = action;
+    secretBusy.value = true;
     try {
-        const response = await getUserInfo();
-        if (ticket === secretRequestVersion && detailVisible.value && active && detail.value?.kind === 'legacy')
-            legacySecret.value = response.data.apiKey;
+        if (action === 'copy' && secret.value) {
+            await copyText(secret.value);
+            return;
+        }
+        secret.value = '';
+        const data =
+            kind === 'legacy'
+                ? { ...reference, apiKey: (await getUserInfo()).data.apiKey }
+                : (await revealAPIKey(reference)).data;
+        if (
+            ticket === secretRequestVersion &&
+            active &&
+            detailVisible.value &&
+            detail.value?.id === reference.id &&
+            detail.value?.kind === kind &&
+            detail.value?.revision === reference.revision &&
+            data.id === reference.id &&
+            data.revision === reference.revision &&
+            data.apiKey
+        ) {
+            if (action === 'copy') await copyText(data.apiKey);
+            else secret.value = data.apiKey;
+        }
+    } catch {
+        if (ticket === secretRequestVersion && active) await search();
     } finally {
-        if (ticket === secretRequestVersion) legacyBusy.value = false;
+        if (ticket === secretRequestVersion) secretBusy.value = false;
     }
 };
+const revealSecret = () => accessSecret('reveal');
+const copySecret = () => accessSecret('copy');
 const resetLegacy = async () => {
-    if (legacyBusy.value || !detailVisible.value || detail.value?.kind !== 'legacy') return;
+    if (secretBusy.value || !detailVisible.value || detail.value?.kind !== 'legacy') return;
     const ticket = ++secretRequestVersion;
     try {
         await ElMessageBox.confirm(i18n.global.t('setting.apiKeyResetHelper'), i18n.global.t('setting.apiKeyReset'));
@@ -322,17 +401,18 @@ const resetLegacy = async () => {
         return;
     }
     if (ticket !== secretRequestVersion || !detailVisible.value || !active) return;
-    legacyBusy.value = true;
-    legacySecret.value = '';
+    secretAction.value = 'reveal';
+    secretBusy.value = true;
+    secret.value = '';
     try {
         const response = await generateApiKey();
         await search(ticket);
         // A reset changes the revision and deliberately clears any older reveal.
         // Never restore a secret after the original details drawer was closed.
         if (ticket === secretRequestVersion && detailVisible.value && active && detail.value?.kind === 'legacy')
-            legacySecret.value = response.data;
+            secret.value = response.data;
     } finally {
-        if (ticket === secretRequestVersion) legacyBusy.value = false;
+        if (ticket === secretRequestVersion) secretBusy.value = false;
     }
 };
 const activate = () => {
@@ -343,9 +423,16 @@ const activate = () => {
 const deactivate = () => {
     active = false;
     searchVersion++;
-    clearLegacySecret();
+    clearSecret();
     detailVisible.value = false;
 };
+watch(
+    () => globalStore.isLogin,
+    (loggedIn) => {
+        if (!loggedIn) deactivate();
+    },
+    { flush: 'sync' },
+);
 onMounted(activate);
 onActivated(activate);
 onDeactivated(deactivate);

@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"net"
+	"net/http"
 	"strconv"
 	"strings"
 	"time"
@@ -42,7 +43,7 @@ func APIAuthMiddleware(loadConfig APIAuthConfigLoader, onSuccess APIAuthSuccessH
 		ownerProvider = ownerProviders[0]
 	}
 	return func(c *gin.Context) {
-		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v2/core/auth") && !isAPIKeyManagementRequest(c) {
 			c.Next()
 			return
 		}
@@ -94,6 +95,20 @@ func APIAuthMiddleware(loadConfig APIAuthConfigLoader, onSuccess APIAuthSuccessH
 		}
 		SetAPIKeyContext(c, config, ownerProvider)
 		c.Next()
+	}
+}
+
+func isAPIKeyManagementRequest(c *gin.Context) bool {
+	if c.Request.Method != http.MethodPost {
+		return false
+	}
+	switch c.Request.URL.Path {
+	case "/api/v2/core/auth/api/keys/search", "/api/v2/core/auth/api/keys/create",
+		"/api/v2/core/auth/api/keys/update", "/api/v2/core/auth/api/keys/status",
+		"/api/v2/core/auth/api/keys/revoke", "/api/v2/core/auth/api/keys/delete":
+		return true
+	default:
+		return false
 	}
 }
 

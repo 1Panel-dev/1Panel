@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Show secret',
+        hideSecret: 'Hide secret',
+        revealHelp: 'Keep this secret secure. Disabled or expired keys remain unusable even when displayed.',
+        deleteConfirm:
+            'Delete “{0}”? Its secret will be destroyed and the key removed from the list. New requests will be rejected and terminal connections closed. Audit records are retained; running jobs are not cancelled. This cannot be undone.',
         title: 'API Key',
         manage: 'Manage API Keys',
         personalEntry: 'Manage your keys, access conditions, and APP binding in Settings.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'Allow APP QR binding',
         bindingDisableHelp:
             'Disabling QR binding prevents new device bindings. Devices already bound can continue to use the key until it is disabled, revoked, or expires.',
-        saveSecret: 'Copy and save this secret now. After closing, ordinary key management cannot display it again.',
-        saved: 'I have saved the secret',
-        alreadyCreated:
-            'This key was already created. Its secret will not be shown again. If the original response was lost, revoke and recreate it, or use QR binding if allowed.',
         uncertain:
             'The request result is uncertain. Retry with the same details to avoid duplicate keys, or close and check the list before creating another.',
         legacyHelp:

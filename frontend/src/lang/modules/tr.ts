@@ -2,6 +2,12 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Gizli anahtarı göster',
+        hideSecret: 'Gizli anahtarı gizle',
+        revealHelp:
+            'Gizli anahtarı güvenli tutun. Görüntülemek, devre dışı veya süresi dolmuş anahtarı kullanılabilir yapmaz.',
+        deleteConfirm:
+            '“{0}” silinsin mi? Gizli anahtar yok edilecek ve listeden kaldırılacaktır. Yeni istekler reddedilecek ve ilgili terminaller kapatılacaktır. Denetim kayıtları korunur; çalışan işler iptal edilmez. Bu işlem geri alınamaz.',
         title: 'API Key',
         manage: 'API anahtarlarını yönet',
         personalEntry: 'Ayarlar bölümünde anahtarlarınızı, erişim koşullarını ve uygulama QR bağlantısını yönetin.',
@@ -23,11 +29,6 @@ const message = {
         allowAppBinding: 'Uygulama QR bağlantısına izin ver',
         bindingDisableHelp:
             'QR eşleştirmesini devre dışı bırakmak yeni eşleştirmeleri engeller. Eşleştirilmiş cihazlar, anahtar devre dışı bırakılana, iptal edilene veya süresi dolana kadar kullanılmaya devam edebilir.',
-        saveSecret:
-            'Anahtarı şimdi kopyalayıp kaydedin. Kapattıktan sonra normal anahtar yönetimi tam anahtarı yeniden gösteremez.',
-        saved: 'Anahtarı kaydettim',
-        alreadyCreated:
-            'Bu anahtar zaten oluşturuldu ve yeniden gösterilmez. İlk yanıt kaybolduysa iptal edip yeniden oluşturun veya izin veriliyorsa QR bağlantısını kullanın.',
         uncertain:
             'İstek sonucu belirsiz. Tekrarları önlemek için aynı bilgilerle yeniden deneyin veya kapatıp yeni anahtar oluşturmadan listeyi kontrol edin.',
         legacyHelp:

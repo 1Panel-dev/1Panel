@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Mostrar segredo',
+        hideSecret: 'Ocultar segredo',
+        revealHelp: 'Guarde o segredo com segurança. Exibi-lo não reativa chaves desabilitadas ou expiradas.',
+        deleteConfirm:
+            'Excluir “{0}”? O segredo será destruído e a chave removida da lista. Novas solicitações serão rejeitadas e os terminais associados serão fechados. Os registros de auditoria serão mantidos; tarefas em execução não serão canceladas. Esta ação é irreversível.',
         title: 'API Key',
         manage: 'Gerenciar chaves API',
         personalEntry: 'Gerencie suas chaves, condições de acesso e vínculo do APP nas Configurações.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'Permitir vínculo do APP por QR',
         bindingDisableHelp:
             'Desativar a vinculação por QR impede novas vinculações. Os dispositivos já vinculados podem continuar usando a chave até que ela seja desativada, revogada ou expire.',
-        saveSecret: 'Copie e salve a chave agora. Após fechar, o gerenciamento normal não poderá exibi-la novamente.',
-        saved: 'Salvei a chave',
-        alreadyCreated:
-            'Esta chave já foi criada e não será exibida novamente. Se a resposta original foi perdida, revogue e recrie a chave ou use o QR, se permitido.',
         uncertain:
             'O resultado é incerto. Tente novamente com os mesmos dados para evitar duplicações ou feche e verifique a lista antes de criar outra.',
         legacyHelp:

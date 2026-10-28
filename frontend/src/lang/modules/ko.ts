@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: '비밀 키 표시',
+        hideSecret: '비밀 키 숨기기',
+        revealHelp: '비밀 키를 안전하게 보관하세요. 표시해도 비활성화되거나 만료된 키는 사용할 수 없습니다.',
+        deleteConfirm:
+            '“{0}”을(를) 삭제하시겠습니까? 비밀 키가 파기되고 목록에서 제거됩니다. 새 요청은 거부되고 연결된 터미널은 종료됩니다. 감사 기록은 유지되며 실행 중인 작업은 취소되지 않습니다. 이 작업은 되돌릴 수 없습니다.',
         title: 'API Key',
         manage: 'API Key 관리',
         personalEntry: '설정에서 내 키, 접근 조건 및 APP QR 연결을 관리합니다.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'APP QR 연결 허용',
         bindingDisableHelp:
             'QR 연결을 비활성화하면 새로운 기기를 연결할 수 없습니다. 이미 연결된 기기는 키가 비활성화, 폐기 또는 만료될 때까지 계속 사용할 수 있습니다.',
-        saveSecret: '지금 키를 복사하여 저장하세요. 닫으면 일반 키 관리에서 전체 키를 다시 표시할 수 없습니다.',
-        saved: '키를 저장했습니다',
-        alreadyCreated:
-            '이 키는 이미 생성되어 다시 표시할 수 없습니다. 원래 응답을 잃었다면 폐기 후 다시 만들거나 허용된 QR 연결을 사용하세요.',
         uncertain:
             '요청 결과를 확인할 수 없습니다. 중복 생성을 피하려면 같은 설정으로 재시도하거나 닫고 목록을 확인하세요.',
         legacyHelp:

@@ -2,6 +2,12 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Papar rahsia',
+        hideSecret: 'Sembunyikan rahsia',
+        revealHelp:
+            'Simpan rahsia ini dengan selamat. Memaparkannya tidak mengaktifkan semula kunci yang dinyahdayakan atau tamat tempoh.',
+        deleteConfirm:
+            'Padam “{0}”? Rahsianya akan dimusnahkan dan kunci dibuang daripada senarai. Permintaan baharu akan ditolak dan terminal berkaitan ditutup. Rekod audit dikekalkan; tugas yang sedang berjalan tidak dibatalkan. Tindakan ini tidak boleh dibuat asal.',
         title: 'API Key',
         manage: 'Urus kunci API',
         personalEntry: 'Urus kunci, syarat akses dan pautan APP anda dalam Tetapan.',
@@ -23,11 +29,6 @@ const message = {
         allowAppBinding: 'Benarkan pautan APP melalui QR',
         bindingDisableHelp:
             'Menyahdayakan pautan QR menghalang pautan peranti baharu. Peranti yang telah dipautkan boleh terus digunakan sehingga kunci dinyahdayakan, dibatalkan atau tamat tempoh.',
-        saveSecret:
-            'Salin dan simpan kunci sekarang. Selepas ditutup, pengurusan biasa tidak dapat memaparkan kunci penuh lagi.',
-        saved: 'Saya telah menyimpan kunci',
-        alreadyCreated:
-            'Kunci ini telah dicipta dan tidak akan dipaparkan semula. Jika respons asal hilang, batalkan dan cipta semula atau gunakan QR jika dibenarkan.',
         uncertain:
             'Hasil permintaan belum pasti. Cuba semula dengan butiran sama untuk mengelakkan pendua, atau tutup dan semak senarai sebelum mencipta lagi.',
         legacyHelp:
