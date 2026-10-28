@@ -2075,6 +2075,13 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdates: '이미지 업데이트 확인',
+        imageCheckUpdateNow: '지금 확인',
+        imageCheckUpdateSchedule: '정기 확인',
+        imageCheckUpdateDisable: '정기 확인 끄기',
+        imageCheckUpdateStarted: '현재 노드의 모든 컨테이너에서 사용하는 이미지의 업데이트를 확인하고 있습니다',
+        imageCheckUpdateResult: '확인 완료: 성공 {checked}, 업데이트 가능 {updates}, 실패 {failed}, 건너뜀 {skipped}',
+
         createByCommand: '명령으로 생성',
         importContainerBackupTip: '컨테이너 백업 파일 가져오기, .tar.gz 형식만 지원합니다',
         importComposeBackupTip: 'Compose 백업 파일 가져오기, .tar.gz 형식만 지원합니다',

@@ -2093,6 +2093,14 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdates: 'بررسی به‌روزرسانی ایمیج‌ها',
+        imageCheckUpdateNow: 'بررسی اکنون',
+        imageCheckUpdateSchedule: 'بررسی زمان‌بندی‌شده',
+        imageCheckUpdateDisable: 'غیرفعال‌کردن بررسی زمان‌بندی‌شده',
+        imageCheckUpdateStarted: 'در حال بررسی به‌روزرسانی ایمیج‌های همه کانتینرهای این گره',
+        imageCheckUpdateResult:
+            'بررسی پایان یافت: بررسی‌شده {checked}، قابل ارتقا {updates}، ناموفق {failed}، ردشده {skipped}',
+
         createByCommand: 'ایجاد با دستور',
         importContainerBackupTip: 'واردات فایل پشتیبان کانتینر، فقط .tar.gz پشتیبانی می‌شود',
         importComposeBackupTip: 'واردات فایل پشتیبان compose، فقط .tar.gz پشتیبانی می‌شود',

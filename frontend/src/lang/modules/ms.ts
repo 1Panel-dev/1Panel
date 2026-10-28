@@ -2131,6 +2131,14 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdates: 'Semak kemas kini imej',
+        imageCheckUpdateNow: 'Semak sekarang',
+        imageCheckUpdateSchedule: 'Semakan berjadual',
+        imageCheckUpdateDisable: 'Matikan semakan berjadual',
+        imageCheckUpdateStarted: 'Menyemak kemas kini imej yang digunakan oleh semua kontena pada nod ini',
+        imageCheckUpdateResult:
+            'Semakan selesai: disemak {checked}, boleh dikemas kini {updates}, gagal {failed}, dilangkau {skipped}',
+
         createByCommand: 'Cipta melalui perintah',
         importContainerBackupTip: 'Import fail sandaran kontena, hanya format .tar.gz disokong',
         importComposeBackupTip: 'Import fail sandaran compose, hanya format .tar.gz disokong',

@@ -1997,6 +1997,13 @@ const message = {
         batchUpgradeWaiting: '等待執行',
         batchUpgradeRunning: '正在升級',
         batchUpgradeSubmitted: '已提交升級任務',
+        imageCheckUpdates: '檢查更新映像',
+        imageCheckUpdateNow: '立即檢查',
+        imageCheckUpdateSchedule: '定時檢查',
+        imageCheckUpdateDisable: '關閉定時檢查',
+        imageCheckUpdateStarted: '已開始檢查目前節點全部容器的映像更新',
+        imageCheckUpdateResult: '檢查完成：成功 {checked}，可升級 {updates}，失敗 {failed}，略過 {skipped}',
+
         createByCommand: '指令建立',
         importContainerBackupTip: '匯入容器備份檔案，僅支援 .tar.gz 格式',
         importComposeBackupTip: '匯入編排備份檔案，僅支援 .tar.gz 格式',

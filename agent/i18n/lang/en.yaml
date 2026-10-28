@@ -802,3 +802,13 @@ ErrFeishuUpgradeMounts: "These mounts cannot be fully backed up or restored. Use
 AgentFeishuRecoveryDisabled: "Gateway recovered with Feishu disabled; the original configuration backup is retained."
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "Check for image updates"
+ContainerImageCheckScope: "Checking all {{ .count }} containers on this node, regardless of pagination or filters"
+ContainerImageCheckItem: "Checking container {{ .name }}, image {{ .image }}"
+ContainerImageCheckFailed: "Container {{ .name }} check failed: {{ .error }}; retaining previous results matching the current image"
+ContainerImageCheckSkipped: "Skipping {{ .name }}: not a tagged Docker Hub image, a local image, or pinned digest"
+ContainerImageCheckAvailable: "Container {{ .name }} has an update: {{ .image }} -> {{ .target }}"
+ContainerImageCheckCurrent: "No update found for container {{ .name }}"
+ContainerImageCheckChanged: "Container {{ .name }} was removed or its image changed; result was not saved"
+ContainerImageCheckSummary: "Check finished: {{ .checked }} checked, {{ .updates }} upgradable, {{ .failed }} failed, {{ .skipped }} skipped"
+ContainerImageCheckFailures: "{{ .count }} container checks failed; see the task log"

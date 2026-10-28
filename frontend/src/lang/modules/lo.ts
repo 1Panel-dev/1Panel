@@ -2060,6 +2060,14 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdates: 'ກວດສອບການອັບເດດອິມເມຈ',
+        imageCheckUpdateNow: 'ກວດສອບຕອນນີ້',
+        imageCheckUpdateSchedule: 'ກວດສອບຕາມຕາຕະລາງ',
+        imageCheckUpdateDisable: 'ປິດການກວດສອບຕາມຕາຕະລາງ',
+        imageCheckUpdateStarted: 'ກຳລັງກວດສອບການອັບເດດອິມເມຈຂອງທຸກຄອນເທນເນີໃນໂນດນີ້',
+        imageCheckUpdateResult:
+            'ກວດສອບສຳເລັດ: ກວດແລ້ວ {checked}, ອັບເກຣດໄດ້ {updates}, ລົ້ມເຫຼວ {failed}, ຂ້າມ {skipped}',
+
         createByCommand: 'ສ້າງດ້ວຍຄຳສັ່ງ',
         importContainerBackupTip: 'ນຳເຂົ້າໄຟລ໌ສຳຮອງຄອນເທນເນີ, ຮອງຮັບສະເພາະ .tar.gz',
         importComposeBackupTip: 'ນຳເຂົ້າໄຟລ໌ສຳຮອງ compose, ຮອງຮັບສະເພາະ .tar.gz',

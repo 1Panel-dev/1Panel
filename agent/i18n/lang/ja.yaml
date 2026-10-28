@@ -802,3 +802,13 @@ ErrFeishuUpgradeMounts: "現在のマウントは完全なバックアップ・�
 AgentFeishuRecoveryDisabled: "ゲートウェイを復旧しました。Feishu は無効のままで、元の設定のバックアップは保持しています。"
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "イメージの更新を確認"
+ContainerImageCheckScope: "ページ分割やフィルターに関係なく、このノードの全 {{ .count }} コンテナを確認します"
+ContainerImageCheckItem: "コンテナ {{ .name }}、イメージ {{ .image }} を確認しています"
+ContainerImageCheckFailed: "コンテナ {{ .name }} の確認に失敗しました：{{ .error }}。現在のイメージに対応する前回の結果を保持します"
+ContainerImageCheckSkipped: "{{ .name }} をスキップ：タグ付きの Docker Hub イメージではないか、ローカルイメージまたは digest 固定のイメージです"
+ContainerImageCheckAvailable: "コンテナ {{ .name }} は更新可能です：{{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "コンテナ {{ .name }} の更新は見つかりませんでした"
+ContainerImageCheckChanged: "コンテナ {{ .name }} が削除されたか、イメージが変更されたため、結果は保存されませんでした"
+ContainerImageCheckSummary: "確認終了：成功 {{ .checked }}、更新可能 {{ .updates }}、失敗 {{ .failed }}、スキップ {{ .skipped }}"
+ContainerImageCheckFailures: "{{ .count }} コンテナの確認に失敗しました。タスクログを確認してください"

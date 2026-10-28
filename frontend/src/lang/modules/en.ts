@@ -2116,6 +2116,14 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdates: 'Check for image updates',
+        imageCheckUpdateNow: 'Check now',
+        imageCheckUpdateSchedule: 'Scheduled checks',
+        imageCheckUpdateDisable: 'Disable scheduled checks',
+        imageCheckUpdateStarted: 'Checking images used by all containers on this node',
+        imageCheckUpdateResult:
+            'Check complete: {checked} checked, {updates} upgradable, {failed} failed, {skipped} skipped',
+
         createByCommand: 'Create by command',
         importContainerBackupTip: 'Import container backup file, only .tar.gz is supported',
         importComposeBackupTip: 'Import compose backup file, only .tar.gz is supported',

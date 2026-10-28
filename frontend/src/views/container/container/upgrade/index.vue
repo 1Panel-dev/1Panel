@@ -112,6 +112,8 @@ interface DialogProps {
     container: string;
     image: string;
     fromApp: boolean;
+    targetImage?: string;
+    hasUpdate?: boolean;
 }
 const isBatch = ref(false);
 const isGroupEditable = (group: UpgradeGroup) => ['draft', 'failed'].includes(group.state);
@@ -137,7 +139,15 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
     isBatch.value = Array.isArray(props);
     const containers = Array.isArray(props)
         ? props
-        : [{ name: props.container, imageName: props.image, isFromApp: props.fromApp }];
+        : [
+              {
+                  name: props.container,
+                  imageName: props.image,
+                  isFromApp: props.fromApp,
+                  targetImage: props.targetImage,
+                  hasUpdate: props.hasUpdate,
+              },
+          ];
     operateNode = GlobalStore().currentNode;
     clearTimeout(timer);
     generation++;
@@ -158,6 +168,7 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
             };
             groups.set(item.imageName, group);
         }
+        if (item.hasUpdate && item.targetImage) group.targetImage = item.targetImage;
         if (!group.names.includes(item.name)) {
             group.names.push(item.name);
             group.options.push({ name: item.name, state: '' });
@@ -165,7 +176,7 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
         if (item.isFromApp && !group.appNames.includes(item.name)) group.appNames.push(item.name);
     }
     form.groups = [...groups.values()];
-    form.forcePull = false;
+    form.forcePull = containers.some((item) => item.hasUpdate);
     started.value = false;
     visible.value = true;
     formRef.value?.clearValidate();

@@ -803,3 +803,13 @@ ErrFeishuUpgradeMounts: "این اتصال‌های ذخیره‌سازی کام
 AgentFeishuRecoveryDisabled: "دروازه بازیابی شد و Feishu غیرفعال است؛ پشتیبان تنظیمات اصلی حفظ شد."
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "بررسی به‌روزرسانی ایمیج‌ها"
+ContainerImageCheckScope: "در حال بررسی همه {{ .count }} کانتینر این گره، بدون توجه به صفحه‌بندی و فیلترها"
+ContainerImageCheckItem: "در حال بررسی کانتینر {{ .name }}، ایمیج {{ .image }}"
+ContainerImageCheckFailed: "بررسی کانتینر {{ .name }} ناموفق بود: {{ .error }}؛ نتایج قبلیِ منطبق با ایمیج فعلی حفظ می‌شوند"
+ContainerImageCheckSkipped: "کانتینر {{ .name }} رد شد: ایمیج تگ‌دار Docker Hub نیست، ایمیج محلی است یا digest ثابت دارد"
+ContainerImageCheckAvailable: "برای کانتینر {{ .name }} به‌روزرسانی موجود است: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "به‌روزرسانی برای کانتینر {{ .name }} یافت نشد"
+ContainerImageCheckChanged: "کانتینر {{ .name }} حذف شده یا ایمیج آن تغییر کرده است؛ نتیجه ذخیره نشد"
+ContainerImageCheckSummary: "بررسی پایان یافت: بررسی‌شده {{ .checked }}، قابل ارتقا {{ .updates }}، ناموفق {{ .failed }}، ردشده {{ .skipped }}"
+ContainerImageCheckFailures: "بررسی {{ .count }} کانتینر ناموفق بود؛ گزارش وظیفه را مشاهده کنید"
