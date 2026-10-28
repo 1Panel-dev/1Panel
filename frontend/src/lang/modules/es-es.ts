@@ -2105,9 +2105,8 @@ const message = {
         downloadTokenizer: 'Descargar tokenizador',
         onlineDownload: 'Descarga en línea',
         content: 'Contenido de descarga',
-        deleteFiles: 'Eliminar también los archivos',
-        deleteFilesHelp:
-            'Al seleccionar esta opción, se eliminarán el directorio del tokenizador y todos sus archivos.',
+        deleteFiles: 'Eliminar también {0}',
+        deleteFilesPath: 'Eliminar archivos de {0}: {1}',
     },
     benchmarkTokenizer: {
         title: 'Gestión de tokenizadores',
@@ -2119,7 +2118,7 @@ const message = {
             'Al seleccionar esta opción, también se eliminarán permanentemente el directorio {0} y todos sus archivos.',
         deleteNameConfirm: 'Introduzca el nombre del tokenizador para confirmar la eliminación: ',
         deleteDirectoryWarning:
-            'Se eliminarán permanentemente el directorio mostrado y todo su contenido, incluidos los pesos del modelo, la configuración y los scripts. Esta acción no se puede deshacer. Si el directorio se comparte con un modelo, este podría dejar de cargarse o ejecutarse.',
+            'Este tokenizador hace referencia a un directorio existente. Al eliminar los archivos, se eliminará todo el directorio y su contenido, incluidos los archivos del modelo. Para eliminar solo el registro del tokenizador, desmarque la casilla.',
         deleteWarning: 'Eliminar los archivos puede hacer fallar las pruebas que estén usando este tokenizador.',
         exists: 'Existe',
         missing: 'No existe',

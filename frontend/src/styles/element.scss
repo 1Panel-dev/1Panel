@@ -175,6 +175,13 @@ html {
     }
 }
 
+.el-table .el-table__body {
+    tr.el-table__row:hover > td.el-table__cell,
+    tr.el-table__row.hover-row > td.el-table__cell {
+        background-color: var(--el-table-row-hover-bg-color);
+    }
+}
+
 .el-drawer {
     .el-drawer__header {
         padding: 15px 20px 14px;

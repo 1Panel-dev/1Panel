@@ -1969,8 +1969,8 @@ const message = {
         downloadTokenizer: '下載分詞器',
         onlineDownload: '線上下載',
         content: '下載內容',
-        deleteFiles: '同時刪除檔案',
-        deleteFilesHelp: '勾選後將刪除分詞器目錄及全部檔案。',
+        deleteFiles: '同時刪除{0}',
+        deleteFilesPath: '刪除{0}檔案：{1}',
     },
     benchmarkTokenizer: {
         title: '分詞器管理',
@@ -1980,7 +1980,7 @@ const message = {
         deleteFilesHelp: '勾選後將同時永久刪除目錄 {0} 及其全部檔案。',
         deleteNameConfirm: '請輸入分詞器名稱以確認刪除：',
         deleteDirectoryWarning:
-            '將永久刪除所示目錄及其全部內容，包括其中的模型權重、設定和指令碼，且無法復原。若與模型共用目錄，模型可能無法載入或執行。',
+            '此分詞器引用既有目錄。刪除檔案將刪除整個目錄及其全部內容；如果目錄中包含模型檔案，模型也會一併刪除。若只要移除分詞器記錄，請取消勾選。',
         deleteWarning: '刪除檔案可能導致正在使用該分詞器的測試失敗。',
         exists: '存在',
         missing: '不存在',

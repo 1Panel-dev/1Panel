@@ -2102,8 +2102,8 @@ const message = {
         downloadTokenizer: 'Muat turun tokenizer',
         onlineDownload: 'Muat turun dalam talian',
         content: 'Kandungan muat turun',
-        deleteFiles: 'Padam fail juga',
-        deleteFilesHelp: 'Jika ditandakan, direktori tokenizer dan semua failnya akan dipadam.',
+        deleteFiles: 'Padam {0} juga',
+        deleteFilesPath: 'Padam fail {0}: {1}',
     },
     benchmarkTokenizer: {
         title: 'Pengurusan tokenizer',
@@ -2114,7 +2114,7 @@ const message = {
         deleteFilesHelp: 'Jika ditandakan, direktori {0} dan semua failnya juga akan dipadam secara kekal.',
         deleteNameConfirm: 'Masukkan nama tokenizer untuk mengesahkan pemadaman: ',
         deleteDirectoryWarning:
-            'Direktori yang dipaparkan dan semua kandungannya, termasuk pemberat model, konfigurasi dan skrip, akan dipadam secara kekal. Tindakan ini tidak boleh dibatalkan. Jika direktori dikongsi dengan model, model mungkin tidak lagi dapat dimuatkan atau dijalankan.',
+            'Tokenizer ini merujuk kepada direktori sedia ada. Memadam fail akan memadam seluruh direktori dan semua kandungannya, termasuk fail model. Untuk membuang rekod tokenizer sahaja, nyahpilih kotak semak.',
         deleteWarning: 'Memadam fail boleh menyebabkan ujian yang sedang menggunakan tokenizer ini gagal.',
         exists: 'Wujud',
         missing: 'Tiada',
