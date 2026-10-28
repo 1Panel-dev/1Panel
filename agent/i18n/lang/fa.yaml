@@ -801,3 +801,5 @@ ErrFeishuUpgradeBackup: "ارتقای سازگاری Feishu به پشتیبان 
 ErrFeishuUpgradeMounts: "این اتصال‌های ذخیره‌سازی کاملاً قابل پشتیبان‌گیری و بازیابی نیستند. از مسیرهای استاندارد داده در پوشه برنامه استفاده کنید."
 
 AgentFeishuRecoveryDisabled: "دروازه بازیابی شد و Feishu غیرفعال است؛ پشتیبان تنظیمات اصلی حفظ شد."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

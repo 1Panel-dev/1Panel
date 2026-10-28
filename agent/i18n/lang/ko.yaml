@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "Feishu 호환 업그레이드에는 전체 앱 백업�
 ErrFeishuUpgradeMounts: "현재 마운트는 전체 백업 및 복원을 지원하지 않습니다. 앱 디렉터리 내부의 표준 데이터 마운트를 사용하세요."
 
 AgentFeishuRecoveryDisabled: "게이트웨이가 복구되었습니다. Feishu는 비활성 상태이며 원본 설정 백업은 유지됩니다."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

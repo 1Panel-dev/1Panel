@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "A full application backup is required for the Feishu co
 ErrFeishuUpgradeMounts: "These mounts cannot be fully backed up or restored. Use standard data mounts inside the application directory."
 
 AgentFeishuRecoveryDisabled: "Gateway recovered with Feishu disabled; the original configuration backup is retained."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

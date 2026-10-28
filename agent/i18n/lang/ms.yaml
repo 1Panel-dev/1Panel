@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "Naik taraf keserasian Feishu memerlukan sandaran aplika
 ErrFeishuUpgradeMounts: "Lekapan ini tidak boleh disandar dan dipulihkan sepenuhnya. Gunakan lekapan data standard dalam direktori aplikasi."
 
 AgentFeishuRecoveryDisabled: "Gerbang dipulihkan dengan Feishu dinyahaktifkan; sandaran konfigurasi asal dikekalkan."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

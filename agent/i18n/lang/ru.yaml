@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "Для обновления совместимости 
 ErrFeishuUpgradeMounts: "Эти монтирования не поддерживают полное резервное копирование и восстановление. Используйте стандартные данные внутри каталога приложения."
 
 AgentFeishuRecoveryDisabled: "Шлюз восстановлен, Feishu отключён; исходная резервная копия конфигурации сохранена."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

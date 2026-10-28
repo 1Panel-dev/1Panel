@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "飛書相容升級必須開啟完整應用程式備份�
 ErrFeishuUpgradeMounts: "目前掛載無法完整備份或還原，請使用應用程式目錄內的標準資料掛載。"
 
 AgentFeishuRecoveryDisabled: "閘道已恢復，飛書保持停用；原設定備份已保留。"
+
+ContainerUpgradeWaiting: "等待容器升級任務執行名額"

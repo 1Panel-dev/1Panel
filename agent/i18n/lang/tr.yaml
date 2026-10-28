@@ -800,3 +800,5 @@ ErrFeishuUpgradeBackup: "Feishu uyumluluk yükseltmesi tam uygulama yedeği gere
 ErrFeishuUpgradeMounts: "Bu bağlamalar tam yedeklenip geri yüklenemiyor. Uygulama dizinindeki standart veri bağlamalarını kullanın."
 
 AgentFeishuRecoveryDisabled: "Ağ geçidi kurtarıldı, Feishu kapalı; özgün yapılandırma yedeği korundu."
+
+ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"

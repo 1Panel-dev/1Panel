@@ -356,6 +356,7 @@
                                         @change="toggleSelection"
                                     ></el-checkbox>
                                 </template>
+                                <el-option :label="$t('commons.button.upgrade')" value="upgrade" />
                                 <el-option
                                     :label="$t('container.start')"
                                     value="start"
@@ -910,6 +911,10 @@ const checkStatus = (operation: string, row: Container.ContainerInfo | null) => 
 };
 
 const onOperate = async (op: string, row: Container.ContainerInfo | null) => {
+    if (op === 'upgrade') {
+        dialogUpgradeRef.value.acceptParams(selects.value);
+        return;
+    }
     let opList = row ? [row] : selects.value;
     let msg = i18n.global.t('container.operatorHelper', [i18n.global.t('container.' + op)]);
     batchNames.value = [];
