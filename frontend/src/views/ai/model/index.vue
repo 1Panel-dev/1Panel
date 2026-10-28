@@ -16,7 +16,11 @@
                     <el-button v-permission type="primary" @click="createRef.open()">
                         {{ $t(isLocal ? 'aiTools.model.addEngine' : 'aiTools.model.addService') }}
                     </el-button>
-                    <el-button v-if="isLocal && isProductPro && vllmAvailable" v-permission @click="openTemplates">
+                    <el-button
+                        v-if="isLocal && isProductPro && vllmAvailable"
+                        v-permission
+                        @click="routerToName('VllmCommandTemplates')"
+                    >
                         {{ $t('aiTools.model.deploymentTemplates') }}
                     </el-button>
                 </template>
@@ -305,12 +309,11 @@
         <ModelPool ref="poolRef" @updated="search" />
         <TerminalDialog :key="`terminal:${currentNode}:${route.fullPath}`" ref="terminalRef" />
         <SyncService ref="syncRef" @search="search" />
-        <component :is="templateView" v-if="templateView" ref="templateRef" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, reactive, ref, shallowRef, toRef, watch } from 'vue';
+import { computed, defineAsyncComponent, nextTick, reactive, ref, toRef, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
 import type { AI } from '@/api/interface/ai';
@@ -330,6 +333,7 @@ import { newUUID } from '@/utils/id';
 import { dateFormat } from '@/utils/date';
 import { useSearchState } from '@/utils/search-reset';
 import { MsgError } from '@/utils/message';
+import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import LocalView from './local/index.vue';
 import CreateService from './components/create/index.vue';
@@ -370,8 +374,6 @@ const appResourcesRef = ref();
 const poolRef = ref();
 const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
-const templateRef = ref();
-const templateView = shallowRef();
 const loading = ref(false);
 const loadFailed = ref(false);
 const connections = ref<AI.AgentAccountItem[]>([]);
@@ -685,11 +687,6 @@ const deploymentButtons = [
         click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
     },
 ];
-const openTemplates = async () => {
-    templateView.value = await loadOptionalComponent('/src/xpack/views/vllm/template/index.vue');
-    await nextTick();
-    templateRef.value.acceptParams();
-};
 watch(
     [
         () => route.path,
