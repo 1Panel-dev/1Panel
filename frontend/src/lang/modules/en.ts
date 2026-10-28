@@ -774,6 +774,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                'Legacy Feishu must be handled before upgrading. A full application backup is required; failure restores the old image and matching data. An unconfigured legacy plugin is only disabled.',
+            feishuRecoveryNotice:
+                'If switching fails, recovery will attempt to restore the Gateway with Feishu disabled. The legacy plugin will not be re-enabled. The original config backup is retained.',
+            feishuRecover: 'Disable legacy plugin and recover startup',
+            feishuRecoverConfirm:
+                'Back up the config, disable the unconfigured legacy Feishu plugin and restart this instance? All channels will be briefly interrupted. Plugin files are retained.',
+            feishuBuiltin: 'Built-in Feishu',
+            feishuImageRequired: 'Use an image containing bundled Feishu.',
+            feishuLegacy:
+                'The legacy plugin is no longer maintained. Review the session, streaming and mention settings below before switching.',
+            feishuBuiltinHint: 'This plugin is updated with the OpenClaw image.',
+            feishuSessionTopic: 'Separate by group topic',
+            feishuSessionTopicSender: 'Separate by group topic and sender',
+            feishuSwitch: 'Switch to built-in plugin',
+            feishuMentionChoice: 'Choose explicitly whether a mention is required before switching.',
+            feishuSwitchConfirm:
+                'Switch to bundled Feishu and restart this instance? All channels will be briefly interrupted. Legacy-only tools become unavailable; streaming and topic behavior follow your choices, and some chats may start new sessions. Credentials, bindings and pairing storage are retained.',
+
             deepSeekAccessHostHelper:
                 "Enter the IPv4 address or hostname used in your browser, without a scheme, port or path. HTTPS uses the application's local certificate.",
             deepSeekAuthHelper:

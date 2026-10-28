@@ -777,6 +777,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                'Antes de actualizar se debe tratar el complemento Feishu antiguo. Se requiere una copia completa; si falla, se restauran la imagen anterior y sus datos. Un complemento sin configurar solo se desactiva.',
+            feishuRecoveryNotice:
+                'Si el cambio falla, se intentará recuperar la puerta de enlace con Feishu desactivado. No se reactivará el complemento antiguo. Se conserva la copia de configuración.',
+            feishuRecover: 'Desactivar complemento antiguo y recuperar inicio',
+            feishuRecoverConfirm:
+                '¿Guardar la configuración, desactivar el complemento Feishu antiguo sin configurar y reiniciar? Todos los canales se interrumpirán brevemente. Se conservan los archivos del complemento.',
+            feishuBuiltin: 'Feishu integrado',
+            feishuImageRequired: 'Use una imagen que incluya Feishu.',
+            feishuLegacy:
+                'El complemento anterior ya no se mantiene. Revise las sesiones, la transmisión y las menciones antes de cambiar.',
+            feishuBuiltinHint: 'Este complemento se actualiza con la imagen de OpenClaw.',
+            feishuSessionTopic: 'Separar por tema del grupo',
+            feishuSessionTopicSender: 'Separar por tema del grupo y remitente',
+            feishuSwitch: 'Cambiar al complemento integrado',
+            feishuMentionChoice: 'Elija explícitamente si se requiere una mención antes de cambiar.',
+            feishuSwitchConfirm:
+                '¿Cambiar a Feishu integrado y reiniciar? Todos los canales se interrumpirán brevemente. Las herramientas exclusivas del complemento antiguo dejarán de funcionar; la transmisión y los temas seguirán sus opciones y algunas conversaciones podrán iniciar sesiones nuevas. Se conservan credenciales, vínculos y emparejamientos.',
+
             deepSeekAccessHostHelper:
                 'Introduzca la IPv4 o el nombre de host usado en el navegador, sin protocolo, puerto ni ruta. HTTPS usa el certificado local de la aplicación.',
             deepSeekAuthHelper:

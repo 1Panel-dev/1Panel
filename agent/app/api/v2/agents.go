@@ -827,6 +827,26 @@ func (b *BaseApi) UpdateAgentFeishuConfig(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Switch to the bundled OpenClaw Feishu plugin
+// @Accept json
+// @Param request body dto.AgentFeishuSwitchReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/agents/channel/feishu/switch [post]
+func (b *BaseApi) SwitchAgentFeishuPlugin(c *gin.Context) {
+	var req dto.AgentFeishuSwitchReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.SwitchFeishuPlugin(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Get Agent Telegram channel config
 // @Accept json
 // @Param request body dto.AgentTelegramConfigReq true "request"

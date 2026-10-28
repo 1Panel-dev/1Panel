@@ -91,6 +91,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/agents/agent/md/update", baseApi.UpdateAgentRoleMarkdownFile)
 		aiToolsRouter.POST("/agents/channel/feishu/get", baseApi.GetAgentFeishuConfig)
 		aiToolsRouter.POST("/agents/channel/feishu/update", baseApi.UpdateAgentFeishuConfig)
+		aiToolsRouter.POST("/agents/channel/feishu/switch", baseApi.SwitchAgentFeishuPlugin)
 		aiToolsRouter.POST("/agents/channel/telegram/get", baseApi.GetAgentTelegramConfig)
 		aiToolsRouter.POST("/agents/channel/telegram/update", baseApi.UpdateAgentTelegramConfig)
 		aiToolsRouter.POST("/agents/channel/discord/get", baseApi.GetAgentDiscordConfig)

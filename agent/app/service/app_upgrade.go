@@ -60,10 +60,16 @@ type upgradeFileSnapshot struct {
 }
 
 type appUpgradeContext struct {
-	req       request.AppInstallUpgrade
-	original  model.AppInstall
-	candidate model.AppInstall
-	detail    model.AppDetail
+	openclawOriginal []byte
+	feishuOriginal   []byte
+	feishuImage      string
+	feishuOldImage   string
+	feishuEnabled    bool
+	feishuLockPath   string
+	req              request.AppInstallUpgrade
+	original         model.AppInstall
+	candidate        model.AppInstall
+	detail           model.AppDetail
 
 	phase         appUpgradePhase
 	stopAttempted bool
@@ -102,6 +108,19 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		}
 	}()
 
+	feishuLockPath := ""
+	if install.App.Key == constant.AppOpenclaw {
+		feishuLockPath = path.Join(install.GetPath(), "data/conf/openclaw.json")
+		if _, busy := feishuSwitches.LoadOrStore(feishuLockPath, true); busy {
+			return buserr.New("TaskIsExecuting")
+		}
+		defer func() {
+			if releaseLock {
+				feishuSwitches.Delete(feishuLockPath)
+			}
+		}()
+	}
+
 	detail, err := appDetailRepo.GetFirst(repo.WithByID(req.DetailID))
 	if err != nil {
 		return err
@@ -129,6 +148,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		return err
 	}
 	ctx := &appUpgradeContext{
+		feishuLockPath:   feishuLockPath,
 		req:              req,
 		original:         install,
 		candidate:        install,
@@ -220,6 +240,10 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 	}
 	if u.original.App.Key == constant.AppOpenclaw {
 		if err = copyUpgradeStageFile(u.original.GetPath(), u.stageDir, path.Join("data", "conf", "openclaw.json")); err != nil {
+			return err
+		}
+		u.openclawOriginal, err = os.ReadFile(path.Join(u.stageDir, "data/conf/openclaw.json"))
+		if err != nil {
 			return err
 		}
 	}
@@ -330,6 +354,9 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 	if u.original.App.Resource == constant.AppResourceRemote {
 		go RequestDownloadCallBack(u.detail.DownloadCallBackUrl)
 	}
+	if err = u.prepareFeishuUpgrade(); err != nil {
+		return err
+	}
 	u.phase = appUpgradePrepared
 	return nil
 }
@@ -387,6 +414,9 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 	}
 	t.LogSuccess(i18n.GetMsgByKey("UpgradeStop"))
 	u.phase = appUpgradeStopped
+	if err := u.checkFeishuUpgradeSource(); err != nil {
+		return err
+	}
 
 	var err error
 	if u.original.App.Key == constant.AppOpenresty {
@@ -453,6 +483,9 @@ func (u *appUpgradeContext) cutover(t *task.Task) error {
 		u.candidate.ContainerName = strings.Join(containerNames, ",")
 	} else {
 		t.Log("WARNING: no containers found for the upgraded application")
+	}
+	if err = u.verifyFeishuUpgrade(t); err != nil {
+		return err
 	}
 	u.candidate.Status = constant.StatusRunning
 	u.candidate.Message = ""
@@ -579,7 +612,33 @@ func (u *appUpgradeContext) rollback(t *task.Task) (rollbackErr error) {
 		if out != "" {
 			err = fmt.Errorf("%s: %w", out, err)
 		}
+		if u.feishuOriginal != nil {
+			return err
+		}
 		rollbackErr = err
+	}
+	if u.feishuOriginal != nil {
+		if u.backupFile == "" {
+			return buserr.New("ErrFeishuUpgradeBackup")
+		}
+		if err := u.restoreManagedFiles(); err != nil {
+			return err
+		}
+		if err := handleAppRecover(&u.original, t, u.backupFile, true, "", "", false); err != nil {
+			return err
+		}
+		if err := pinFeishuRollbackImage(u.original.GetComposePath(), u.feishuOldImage); err != nil {
+			return err
+		}
+		restoredCompose, err := os.ReadFile(u.original.GetComposePath())
+		if err != nil {
+			return err
+		}
+		u.original.DockerCompose = string(restoredCompose)
+		if _, err := compose.UpWithoutBuild(u.original.GetComposePath()); err != nil {
+			return err
+		}
+		return u.finishRollback()
 	}
 	if u.backupFile != "" {
 		_ = u.restoreManagedFiles()
@@ -602,6 +661,11 @@ func (u *appUpgradeContext) rollback(t *task.Task) (rollbackErr error) {
 }
 
 func (u *appUpgradeContext) finishRollback() error {
+	if u.feishuOriginal != nil {
+		if err := waitOpenclawReady(u.original.ContainerName); err != nil {
+			return err
+		}
+	}
 	restored := u.original
 	if err := appInstallRepo.Save(context.Background(), &restored); err != nil {
 		return err
@@ -643,6 +707,12 @@ func (u *appUpgradeContext) deleteOldImages(t *task.Task) {
 }
 
 func (u *appUpgradeContext) cleanup() {
+	if u.feishuLockPath != "" {
+		feishuSwitches.Delete(u.feishuLockPath)
+	}
+	if u.feishuOriginal != nil && u.rollbackErr != nil {
+		return
+	}
 	if u.snapshot != nil {
 		u.snapshot.Cleanup()
 	}

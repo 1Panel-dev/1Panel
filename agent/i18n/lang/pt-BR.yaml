@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "Excluir snapshot da máquina virtual [{{ .snapshot }}]"
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "Corrija a configuração incompatível antes de continuar: {{ .detail }}"
+ErrFeishuConfigChanged: "A configuração mudou durante a troca. Recarregue e tente novamente."
+ErrFeishuImageRequired: "Use uma imagem com Feishu integrado."
+ErrFeishuAlreadySwitched: "O Feishu já usa o plugin integrado."
+ErrFeishuSwitchRequired: "Primeiro troque para o plugin integrado na página do canal Feishu."
+ErrFeishuManaged: "Gerencie o Feishu pela página do canal; o plugin é atualizado com a imagem."
+ErrFeishuRestore: "Falha ao restaurar a configuração do Feishu: {{ .err }}"
+ErrFeishuActivation: "Falha ao iniciar o plugin Feishu integrado ou o gateway."
+AgentFeishuSwitch: "Trocar plugin Feishu"
+AgentFeishuBackup: "Backup da configuração: {{ .name }}"
+AgentFeishuRestored: "Configuração anterior restaurada."
+AgentFeishuProbeWarning: "Falha na verificação de conexão do Feishu. Verifique a rede e as credenciais; a troca foi mantida."
+AgentFeishuVerifyMessages: "Ativação local concluída. Verifique pareamento, conversas, grupos, rotas de bots e streaming no Feishu."
+
+ErrFeishuUpgradeConfirm: "Confirme as opções de transição do Feishu na página de atualização."
+
+ErrFeishuUpgradeBackup: "A atualização de compatibilidade do Feishu exige backup completo do aplicativo."
+
+ErrFeishuUpgradeMounts: "Estas montagens não permitem backup e restauração completos. Use montagens de dados padrão dentro do diretório do aplicativo."
+
+AgentFeishuRecoveryDisabled: "Gateway recuperado com Feishu desativado; o backup da configuração original foi mantido."

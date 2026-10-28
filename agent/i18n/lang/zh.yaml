@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "删除虚拟机快照 [{{ .snapshot }}]"
 ErrCAUpload: "请上传包含有效自签根证书 ca.crt 及匹配私钥 ca.key 的 ZIP 文件（最大 10 MB），密钥算法须为支持的 RSA 或 EC。"
 
 ErrCAImport: "请提供有效的自签根证书及匹配私钥（每个最大 1 MB），密钥算法须为支持的 RSA 或 EC。"
+
+# Built-in Feishu
+ErrFeishuConfig: "请先处理不兼容的配置：{{ .detail }}"
+ErrFeishuConfigChanged: "切换期间配置已改变，请刷新后重试。"
+ErrFeishuImageRequired: "请使用包含内置飞书插件的镜像。"
+ErrFeishuAlreadySwitched: "飞书已切换到内置插件。"
+ErrFeishuSwitchRequired: "请先在飞书渠道页面切换到内置插件。"
+ErrFeishuManaged: "请在飞书渠道页面管理，插件随镜像更新。"
+ErrFeishuRestore: "恢复飞书配置失败：{{ .err }}"
+ErrFeishuActivation: "内置飞书插件或网关启动失败。"
+AgentFeishuSwitch: "切换飞书插件"
+AgentFeishuBackup: "配置备份：{{ .name }}"
+AgentFeishuRestored: "已恢复切换前的配置。"
+AgentFeishuProbeWarning: "飞书连接检查未通过，请检查网络和凭据；已保留切换结果。"
+AgentFeishuVerifyMessages: "本地启用完成，请在飞书中验证配对、私聊、群聊、机器人路由和流式回复。"
+
+ErrFeishuUpgradeConfirm: "请在升级页面确认飞书切换选项后重试。"
+
+ErrFeishuUpgradeBackup: "飞书兼容升级必须开启完整应用备份。"
+
+ErrFeishuUpgradeMounts: "当前挂载无法完整备份或恢复，请使用应用目录内的标准数据挂载后重试。"
+
+AgentFeishuRecoveryDisabled: "网关已恢复，飞书保持停用；原配置备份已保留。"

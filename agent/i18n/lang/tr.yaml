@@ -777,3 +777,26 @@ VMSnapshotDeleteStep: "Sanal makine anlık görüntüsü [{{ .snapshot }}] sil"
 ErrCAUpload: "Upload a ZIP (up to 10 MB) containing a valid self-signed CA certificate ca.crt and its matching private key ca.key, with a supported RSA or EC algorithm."
 
 ErrCAImport: "Provide a valid self-signed root CA certificate and matching private key (up to 1 MB each), using a supported RSA or EC algorithm."
+
+# Built-in Feishu
+ErrFeishuConfig: "Devam etmeden önce uyumsuz ayarları düzeltin: {{ .detail }}"
+ErrFeishuConfigChanged: "Geçiş sırasında ayarlar değişti. Yenileyip tekrar deneyin."
+ErrFeishuImageRequired: "Yerleşik Feishu içeren bir imaj kullanın."
+ErrFeishuAlreadySwitched: "Feishu zaten yerleşik eklentiye geçti."
+ErrFeishuSwitchRequired: "Önce Feishu kanal sayfasından yerleşik eklentiye geçin."
+ErrFeishuManaged: "Feishu kanal sayfasından yönetin; eklenti imajla güncellenir."
+ErrFeishuRestore: "Feishu ayarları geri yüklenemedi: {{ .err }}"
+ErrFeishuActivation: "Yerleşik Feishu eklentisi veya ağ geçidi başlatılamadı."
+AgentFeishuSwitch: "Feishu eklentisini değiştir"
+AgentFeishuBackup: "Ayar yedeği: {{ .name }}"
+AgentFeishuRestored: "Önceki ayarlar geri yüklendi."
+AgentFeishuProbeWarning: "Feishu bağlantı kontrolü başarısız. Ağı ve kimlik bilgilerini kontrol edin; geçiş korundu."
+AgentFeishuVerifyMessages: "Yerel etkinleştirme tamamlandı. Feishu üzerinden eşleştirmeyi, özel ve grup mesajlarını, bot yönlendirmesini ve akışı doğrulayın."
+
+ErrFeishuUpgradeConfirm: "Yükseltme sayfasında Feishu geçiş seçeneklerini onaylayın."
+
+ErrFeishuUpgradeBackup: "Feishu uyumluluk yükseltmesi tam uygulama yedeği gerektirir."
+
+ErrFeishuUpgradeMounts: "Bu bağlamalar tam yedeklenip geri yüklenemiyor. Uygulama dizinindeki standart veri bağlamalarını kullanın."
+
+AgentFeishuRecoveryDisabled: "Ağ geçidi kurtarıldı, Feishu kapalı; özgün yapılandırma yedeği korundu."

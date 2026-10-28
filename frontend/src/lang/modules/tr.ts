@@ -778,6 +778,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                'Yükseltmeden önce eski Feishu eklentisi ele alınmalıdır. Tam yedek gerekir; hata durumunda eski imaj ve verileri geri yüklenir. Yapılandırılmamış eklenti yalnızca devre dışı bırakılır.',
+            feishuRecoveryNotice:
+                'Geçiş başarısız olursa Feishu kapalı tutularak ağ geçidi kurtarılmaya çalışılır. Eski eklenti yeniden etkinleştirilmez. Özgün yapılandırma yedeği korunur.',
+            feishuRecover: 'Eski eklentiyi kapat ve başlatmayı kurtar',
+            feishuRecoverConfirm:
+                'Yapılandırma yedeklensin, yapılandırılmamış eski Feishu eklentisi kapatılsın ve örnek yeniden başlatılsın mı? Tüm kanallar kısa süre kesilir. Eklenti dosyaları korunur.',
+            feishuBuiltin: 'Yerleşik Feishu',
+            feishuImageRequired: 'Yerleşik Feishu içeren bir imaj kullanın.',
+            feishuLegacy:
+                'Eski eklenti artık bakımlı değil. Geçişten önce oturum, akış ve bahsetme ayarlarını gözden geçirin.',
+            feishuBuiltinHint: 'Bu eklenti OpenClaw imajıyla birlikte güncellenir.',
+            feishuSessionTopic: 'Grup konusuna göre ayır',
+            feishuSessionTopicSender: 'Grup konusu ve gönderene göre ayır',
+            feishuSwitch: 'Yerleşik eklentiye geç',
+            feishuMentionChoice: 'Geçişten önce bahsetmenin gerekli olup olmadığını açıkça seçin.',
+            feishuSwitchConfirm:
+                'Yerleşik Feishu eklentisine geçilip yeniden başlatılsın mı? Tüm kanallar kısa süre kesilir. Eski eklentiye özel araçlar kullanılamaz; akış ve konular seçimlerinize göre çalışır, bazı sohbetler yeni oturum açabilir. Kimlik bilgileri, bağlamalar ve eşleştirmeler korunur.',
+
             deepSeekAccessHostHelper:
                 'Tarayıcıda kullanılan IPv4 adresini veya ana bilgisayar adını protokol, bağlantı noktası veya yol olmadan girin. HTTPS, uygulamanın yerel sertifikasını kullanır.',
             deepSeekAuthHelper:

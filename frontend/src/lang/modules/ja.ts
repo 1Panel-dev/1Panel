@@ -773,6 +773,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                '更新前に旧 Feishu プラグインを処理します。アプリ全体のバックアップが必要です。失敗時は旧イメージと対応するデータを復元します。未設定の旧プラグインは無効化のみ行います。',
+            feishuRecoveryNotice:
+                '切り替え失敗時は Feishu を無効にした状態でゲートウェイの復旧を試みます。旧プラグインは再有効化しません。元の設定のバックアップは保持します。',
+            feishuRecover: '旧プラグインを無効化して起動を復旧',
+            feishuRecoverConfirm:
+                '設定をバックアップし、未設定の旧 Feishu プラグインを無効化して再起動しますか？全チャネルが一時中断されます。プラグインのファイルは保持します。',
+            feishuBuiltin: '組み込み Feishu',
+            feishuImageRequired: 'Feishu を内蔵したイメージを使用してください。',
+            feishuLegacy:
+                '旧プラグインの保守は終了しました。切り替え前にセッション分離、ストリーミング、メンション設定を確認してください。',
+            feishuBuiltinHint: 'このプラグインは OpenClaw イメージとともに更新されます。',
+            feishuSessionTopic: 'グループのトピック別',
+            feishuSessionTopicSender: 'グループのトピックと送信者別',
+            feishuSwitch: '組み込みプラグインに切り替え',
+            feishuMentionChoice: '切り替え前にメンションが必要か選択してください。',
+            feishuSwitchConfirm:
+                '内蔵 Feishu に切り替えて再起動しますか？全チャネルが一時中断され、旧プラグイン専用ツールは利用できなくなります。ストリーミングとトピックは選択した設定に従い、一部の会話は新しいセッションになります。認証情報、紐付け、ペアリング情報は保持します。',
+
             deepSeekAccessHostHelper:
                 'ブラウザーで使用する IPv4 アドレスまたはホスト名を、スキーム・ポート・パスなしで入力してください。HTTPS はアプリのローカル証明書を使用します。',
             deepSeekAuthHelper:

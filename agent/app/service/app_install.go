@@ -305,13 +305,14 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return syncAppInstallStatus(&install, true)
 	case constant.Upgrade:
 		upgradeReq := request.AppInstallUpgrade{
-			InstallID:     install.ID,
-			DetailID:      req.DetailId,
-			Backup:        req.Backup,
-			PullImage:     req.PullImage,
-			DeleteImage:   req.DeleteImage,
-			DockerCompose: req.DockerCompose,
-			TaskID:        req.TaskID,
+			FeishuTransition: req.FeishuTransition,
+			InstallID:        install.ID,
+			DetailID:         req.DetailId,
+			Backup:           req.Backup,
+			PullImage:        req.PullImage,
+			DeleteImage:      req.DeleteImage,
+			DockerCompose:    req.DockerCompose,
+			TaskID:           req.TaskID,
 		}
 		return upgradeInstall(upgradeReq)
 	case constant.Reload:
@@ -716,6 +717,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 	if err != nil {
 		return versions, err
 	}
+	var feishuLegacy, feishuConfigured, feishuChecked bool
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
 		return versions, err
@@ -740,6 +742,18 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 			canUpgrade = isVllmUpgradeCandidate(install.Version, detail.Version, currentImage)
 		}
 		if canUpgrade {
+			feishuTarget := app.Key == constant.AppOpenclaw && isOpenclawBundledFeishuVersion(detail.Version)
+			if feishuTarget && !feishuChecked {
+				conf, readErr := readOpenclawConfig(path.Join(install.GetPath(), "data/conf/openclaw.json"))
+				if readErr != nil {
+					return versions, readErr
+				}
+				feishuLegacy, feishuConfigured, err = classifyLegacyFeishu(conf, install.GetPath())
+				if err != nil {
+					return versions, err
+				}
+				feishuChecked = true
+			}
 			var newCompose string
 			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
 				filename := filepath.Base(detail.DownloadUrl)
@@ -774,9 +788,11 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 				}
 			}
 			versions = append(versions, dto.AppVersion{
-				Version:       detail.Version,
-				DetailId:      detail.ID,
-				DockerCompose: newCompose,
+				FeishuLegacy:     feishuTarget && feishuLegacy,
+				FeishuConfigured: feishuTarget && feishuConfigured,
+				Version:          detail.Version,
+				DetailId:         detail.ID,
+				DockerCompose:    newCompose,
 			})
 		}
 	}

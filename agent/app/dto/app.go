@@ -43,9 +43,11 @@ type AppOssConfig struct {
 }
 
 type AppVersion struct {
-	Version       string `json:"version"`
-	DetailId      uint   `json:"detailId"`
-	DockerCompose string `json:"dockerCompose"`
+	FeishuLegacy     bool   `json:"feishuLegacy,omitempty"`
+	FeishuConfigured bool   `json:"feishuConfigured,omitempty"`
+	Version          string `json:"version"`
+	DetailId         uint   `json:"detailId"`
+	DockerCompose    string `json:"dockerCompose"`
 }
 
 type AppList struct {

@@ -757,6 +757,23 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                '升级前需要处理旧飞书插件。此次升级必须完整备份；失败时恢复原镜像及配套数据。未配置飞书时仅禁用旧插件。',
+            feishuRecoveryNotice: '切换失败时将尝试恢复网关，但飞书保持停用，不会重新启用旧插件。原配置备份会保留。',
+            feishuRecover: '禁用旧插件并恢复启动',
+            feishuRecoverConfirm:
+                '将备份配置、禁用未配置的旧飞书插件并重启当前实例，短暂中断所有渠道。插件文件将保留。是否继续？',
+            feishuBuiltin: '内置飞书插件',
+            feishuImageRequired: '请使用包含内置飞书插件的镜像。',
+            feishuLegacy: '旧插件已停止维护。切换前请确认下方的会话隔离、流式回复和 @ 设置。',
+            feishuBuiltinHint: '插件随 OpenClaw 镜像一起更新。',
+            feishuSessionTopic: '按群话题隔离',
+            feishuSessionTopicSender: '按群话题和发送者隔离',
+            feishuSwitch: '切换到内置插件',
+            feishuMentionChoice: '切换前请明确选择是否需要 @。',
+            feishuSwitchConfirm:
+                '将切换到内置飞书并重启实例，短暂中断所有渠道。旧插件独有工具不再可用；流式回复和话题行为按所选设置执行，部分聊天可能产生新会话。凭据、绑定和配对存储会保留。是否继续？',
+
             deepSeekAccessHostHelper:
                 '填写浏览器实际访问的 IPv4 地址或主机名，不含协议、端口或路径。HTTPS 使用应用的本地证书。',
             deepSeekAuthHelper: '用户名仅支持字母、数字、点、下划线和连字符；密码至少 12 位，不含首尾空格或换行。',

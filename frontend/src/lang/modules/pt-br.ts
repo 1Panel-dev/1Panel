@@ -775,6 +775,25 @@ const message = {
     },
     aiTools: {
         agents: {
+            feishuUpgradeNotice:
+                'O plugin Feishu antigo deve ser tratado antes da atualização. É necessário um backup completo; em caso de falha, a imagem anterior e seus dados serão restaurados. Um plugin não configurado será apenas desativado.',
+            feishuRecoveryNotice:
+                'Se a troca falhar, será tentada a recuperação do gateway com Feishu desativado. O plugin antigo não será reativado. O backup original será mantido.',
+            feishuRecover: 'Desativar plugin antigo e recuperar inicialização',
+            feishuRecoverConfirm:
+                'Fazer backup, desativar o plugin Feishu antigo não configurado e reiniciar? Todos os canais serão interrompidos brevemente. Os arquivos do plugin serão mantidos.',
+            feishuBuiltin: 'Feishu integrado',
+            feishuImageRequired: 'Use uma imagem com Feishu integrado.',
+            feishuLegacy:
+                'O plugin antigo não é mais mantido. Revise as sessões, o streaming e as menções antes de trocar.',
+            feishuBuiltinHint: 'Este plugin é atualizado com a imagem do OpenClaw.',
+            feishuSessionTopic: 'Separar por tópico do grupo',
+            feishuSessionTopicSender: 'Separar por tópico do grupo e remetente',
+            feishuSwitch: 'Trocar para o plugin integrado',
+            feishuMentionChoice: 'Escolha explicitamente se uma menção é necessária antes de trocar.',
+            feishuSwitchConfirm:
+                'Mudar para Feishu integrado e reiniciar? Todos os canais serão interrompidos brevemente. As ferramentas exclusivas do plugin antigo deixarão de funcionar; streaming e tópicos seguirão suas escolhas e algumas conversas poderão iniciar novas sessões. Credenciais, vínculos e pareamentos serão mantidos.',
+
             deepSeekAccessHostHelper:
                 'Informe o IPv4 ou nome do host usado no navegador, sem protocolo, porta ou caminho. O HTTPS usa o certificado local do aplicativo.',
             deepSeekAuthHelper:

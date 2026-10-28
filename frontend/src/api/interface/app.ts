@@ -1,3 +1,4 @@
+import { AI } from './ai';
 import { ReqPage, CommonModel } from '.';
 
 export namespace App {
@@ -260,6 +261,7 @@ export namespace App {
     }
 
     export interface AppInstalledOp {
+        feishuTransition?: AI.AgentFeishuTransition;
         installId: number;
         operate: string;
         backupId?: number;
@@ -285,6 +287,8 @@ export namespace App {
     }
 
     export interface VersionDetail {
+        feishuLegacy?: boolean;
+        feishuConfigured?: boolean;
         version: string;
         detailId: number;
     }
