@@ -800,3 +800,14 @@ ErrFeishuUpgradeBackup: "飛書相容升級必須開啟完整應用程式備份�
 ErrFeishuUpgradeMounts: "目前掛載無法完整備份或還原，請使用應用程式目錄內的標準資料掛載。"
 
 AgentFeishuRecoveryDisabled: "閘道已恢復，飛書保持停用；原設定備份已保留。"
+
+ContainerImageCheckUpdate: "檢查更新映像"
+ContainerImageCheckScope: "檢查目前節點全部 {{ .count }} 個容器，不受分頁和篩選影響"
+ContainerImageCheckItem: "檢查容器 {{ .name }}，映像 {{ .image }}"
+ContainerImageCheckFailed: "容器 {{ .name }} 檢查失敗：{{ .error }}；保留符合目前映像的上次結果"
+ContainerImageCheckSkipped: "略過 {{ .name }}：非 Docker Hub 標籤映像、本機映像或固定 digest"
+ContainerImageCheckAvailable: "容器 {{ .name }} 可升級：{{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "容器 {{ .name }} 未發現更新"
+ContainerImageCheckChanged: "容器 {{ .name }} 已刪除或映像已變更，未儲存本次結果"
+ContainerImageCheckSummary: "檢查結束：成功 {{ .checked }}，可升級 {{ .updates }}，失敗 {{ .failed }}，略過 {{ .skipped }}"
+ContainerImageCheckFailures: "{{ .count }} 個容器檢查失敗，請查看任務日誌"

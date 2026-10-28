@@ -2110,6 +2110,14 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        imageCheckUpdates: 'İmaj güncellemelerini denetle',
+        imageCheckUpdateNow: 'Şimdi denetle',
+        imageCheckUpdateSchedule: 'Zamanlanmış denetim',
+        imageCheckUpdateDisable: 'Zamanlanmış denetimi kapat',
+        imageCheckUpdateStarted: 'Bu düğümdeki tüm konteynerlerin imaj güncellemeleri denetleniyor',
+        imageCheckUpdateResult:
+            'Denetim tamamlandı: denetlenen {checked}, güncellenebilir {updates}, başarısız {failed}, atlanan {skipped}',
+
         createByCommand: 'Komutla oluştur',
         importContainerBackupTip: 'Konteyner yedek dosyasını içe aktar, yalnızca .tar.gz desteklenir',
         importComposeBackupTip: 'Compose yedek dosyasını içe aktar, yalnızca .tar.gz desteklenir',

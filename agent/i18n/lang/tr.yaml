@@ -800,3 +800,14 @@ ErrFeishuUpgradeBackup: "Feishu uyumluluk yükseltmesi tam uygulama yedeği gere
 ErrFeishuUpgradeMounts: "Bu bağlamalar tam yedeklenip geri yüklenemiyor. Uygulama dizinindeki standart veri bağlamalarını kullanın."
 
 AgentFeishuRecoveryDisabled: "Ağ geçidi kurtarıldı, Feishu kapalı; özgün yapılandırma yedeği korundu."
+
+ContainerImageCheckUpdate: "İmaj güncellemelerini denetle"
+ContainerImageCheckScope: "Sayfalama ve filtrelerden bağımsız olarak bu düğümdeki {{ .count }} konteynerin tümü denetleniyor"
+ContainerImageCheckItem: "Konteyner {{ .name }}, imaj {{ .image }} denetleniyor"
+ContainerImageCheckFailed: "{{ .name }} konteyneri denetlenemedi: {{ .error }}; mevcut imajla eşleşen önceki sonuçlar korunuyor"
+ContainerImageCheckSkipped: "{{ .name }} atlanıyor: etiketli bir Docker Hub imajı değil, yerel bir imaj veya digest değeri sabitlenmiş"
+ContainerImageCheckAvailable: "{{ .name }} konteyneri için güncelleme mevcut: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "{{ .name }} konteyneri için güncelleme bulunamadı"
+ContainerImageCheckChanged: "{{ .name }} konteyneri silindi veya imajı değişti; sonuç kaydedilmedi"
+ContainerImageCheckSummary: "Denetim tamamlandı: denetlenen {{ .checked }}, güncellenebilir {{ .updates }}, başarısız {{ .failed }}, atlanan {{ .skipped }}"
+ContainerImageCheckFailures: "{{ .count }} konteyner denetlenemedi; görev günlüğünü inceleyin"

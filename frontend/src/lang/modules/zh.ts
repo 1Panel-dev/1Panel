@@ -1988,6 +1988,13 @@ const message = {
         missing: '不存在',
     },
     container: {
+        imageCheckUpdates: '检查更新镜像',
+        imageCheckUpdateNow: '立即检查',
+        imageCheckUpdateSchedule: '定时检查',
+        imageCheckUpdateDisable: '关闭定时检查',
+        imageCheckUpdateStarted: '已开始检查当前节点全部容器的镜像更新',
+        imageCheckUpdateResult: '检查完成：成功 {checked}，可升级 {updates}，失败 {failed}，跳过 {skipped}',
+
         createByCommand: '命令创建',
         importContainerBackupTip: '导入容器备份文件，仅支持 .tar.gz 格式',
         importComposeBackupTip: '导入编排备份文件，仅支持 .tar.gz 格式',

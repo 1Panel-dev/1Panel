@@ -23,6 +23,7 @@ export interface FuTableOperationButton<Row = any> {
     type?: string;
     icon?: any;
     divided?: boolean;
+    dot?: boolean | ((row: Row) => boolean);
 }
 
 export const FU_TABLE_STORAGE_PREFIX = 'FU-T-';

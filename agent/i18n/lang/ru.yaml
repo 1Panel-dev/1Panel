@@ -800,3 +800,14 @@ ErrFeishuUpgradeBackup: "Для обновления совместимости 
 ErrFeishuUpgradeMounts: "Эти монтирования не поддерживают полное резервное копирование и восстановление. Используйте стандартные данные внутри каталога приложения."
 
 AgentFeishuRecoveryDisabled: "Шлюз восстановлен, Feishu отключён; исходная резервная копия конфигурации сохранена."
+
+ContainerImageCheckUpdate: "Проверить обновления образов"
+ContainerImageCheckScope: "Проверка всех контейнеров на текущем узле ({{ .count }}) независимо от страниц и фильтров"
+ContainerImageCheckItem: "Проверка контейнера {{ .name }}, образ {{ .image }}"
+ContainerImageCheckFailed: "Ошибка проверки контейнера {{ .name }}: {{ .error }}; сохранены предыдущие результаты, соответствующие текущему образу"
+ContainerImageCheckSkipped: "Пропуск {{ .name }}: это не образ Docker Hub с тегом, локальный образ или образ с фиксированным digest"
+ContainerImageCheckAvailable: "Доступно обновление контейнера {{ .name }}: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "Обновлений для контейнера {{ .name }} не найдено"
+ContainerImageCheckChanged: "Контейнер {{ .name }} удалён или его образ изменился; результат не сохранён"
+ContainerImageCheckSummary: "Проверка завершена: проверено {{ .checked }}, доступны обновления {{ .updates }}, ошибок {{ .failed }}, пропущено {{ .skipped }}"
+ContainerImageCheckFailures: "Не удалось проверить контейнеры: {{ .count }}. Подробности в журнале задачи"

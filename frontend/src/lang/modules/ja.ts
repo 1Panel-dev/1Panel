@@ -2079,6 +2079,13 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        imageCheckUpdates: 'イメージの更新を確認',
+        imageCheckUpdateNow: '今すぐ確認',
+        imageCheckUpdateSchedule: '定期チェック',
+        imageCheckUpdateDisable: '定期チェックを無効にする',
+        imageCheckUpdateStarted: 'このノードのすべてのコンテナで使用されているイメージの更新を確認しています',
+        imageCheckUpdateResult: '確認完了：成功 {checked}、更新可能 {updates}、失敗 {failed}、スキップ {skipped}',
+
         createByCommand: 'コマンドで作成',
         importContainerBackupTip: 'コンテナバックアップファイルをインポートします。.tar.gz のみ対応です',
         importComposeBackupTip: 'Compose バックアップファイルをインポートします。.tar.gz のみ対応です',

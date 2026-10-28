@@ -791,3 +791,14 @@ ErrFeishuUpgradeBackup: "ການອັບເກຣດ Feishu ຕ້ອງສ�
 ErrFeishuUpgradeMounts: "ຈຸດເຊື່ອມຂໍ້ມູນນີ້ບໍ່ສາມາດສຳຮອງແລະກູ້ຄືນທັງໝົດໄດ້. ໃຊ້ຈຸດເຊື່ອມມາດຕະຖານພາຍໃນໂຟນເດີແອັບ."
 
 AgentFeishuRecoveryDisabled: "ເກດເວກູ້ຄືນແລ້ວ ແຕ່ Feishu ຍັງປິດ; ສຳຮອງການຕັ້ງຄ່າເດີມຍັງຖືກເກັບໄວ້."
+
+ContainerImageCheckUpdate: "ກວດສອບການອັບເດດອິມເມຈ"
+ContainerImageCheckScope: "ກຳລັງກວດສອບທັງໝົດ {{ .count }} ຄອນເທນເນີໃນໂນດນີ້ ໂດຍບໍ່ຂຶ້ນກັບການແບ່ງໜ້າ ຫຼື ຕົວກອງ"
+ContainerImageCheckItem: "ກຳລັງກວດສອບຄອນເທນເນີ {{ .name }}, ອິມເມຈ {{ .image }}"
+ContainerImageCheckFailed: "ກວດສອບຄອນເທນເນີ {{ .name }} ລົ້ມເຫຼວ: {{ .error }}; ເກັບຜົນກ່ອນໜ້າທີ່ກົງກັບອິມເມຈປັດຈຸບັນໄວ້"
+ContainerImageCheckSkipped: "ຂ້າມ {{ .name }}: ບໍ່ແມ່ນອິມເມຈ Docker Hub ທີ່ມີແທັກ, ເປັນອິມເມຈພາຍໃນ ຫຼື ກຳນົດ digest ຄົງທີ່"
+ContainerImageCheckAvailable: "ຄອນເທນເນີ {{ .name }} ມີອັບເດດ: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "ບໍ່ພົບອັບເດດສຳລັບຄອນເທນເນີ {{ .name }}"
+ContainerImageCheckChanged: "ຄອນເທນເນີ {{ .name }} ຖືກລຶບ ຫຼື ອິມເມຈປ່ຽນແປງ; ບໍ່ໄດ້ບັນທຶກຜົນ"
+ContainerImageCheckSummary: "ກວດສອບສິ້ນສຸດ: ກວດແລ້ວ {{ .checked }}, ອັບເກຣດໄດ້ {{ .updates }}, ລົ້ມເຫຼວ {{ .failed }}, ຂ້າມ {{ .skipped }}"
+ContainerImageCheckFailures: "ກວດສອບ {{ .count }} ຄອນເທນເນີລົ້ມເຫຼວ; ກະລຸນາເບິ່ງບັນທຶກວຽກ"

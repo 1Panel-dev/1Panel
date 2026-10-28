@@ -99,15 +99,18 @@ interface DialogProps {
     container: string;
     image: string;
     fromApp: boolean;
+    targetImage?: string;
+    hasUpdate?: boolean;
 }
 const acceptParams = (props: DialogProps): void => {
     form.names = [props.container];
     isIndeterminate.value = true;
     form.oldImageName = props.image;
     form.fromApp = props.fromApp;
+    form.forcePull = Boolean(props.hasUpdate);
     form.hasName = props.image.indexOf('sha256:') === -1;
     if (form.hasName) {
-        form.newImageName = props.image;
+        form.newImageName = props.hasUpdate && props.targetImage ? props.targetImage : props.image;
     } else {
         form.newImageName = '';
     }

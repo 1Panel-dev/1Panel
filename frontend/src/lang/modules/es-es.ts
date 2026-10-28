@@ -2113,6 +2113,14 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        imageCheckUpdates: 'Buscar actualizaciones de imágenes',
+        imageCheckUpdateNow: 'Comprobar ahora',
+        imageCheckUpdateSchedule: 'Comprobación programada',
+        imageCheckUpdateDisable: 'Desactivar comprobación programada',
+        imageCheckUpdateStarted: 'Buscando actualizaciones de las imágenes de todos los contenedores de este nodo',
+        imageCheckUpdateResult:
+            'Comprobación finalizada: comprobados {checked}, actualizables {updates}, fallidos {failed}, omitidos {skipped}',
+
         createByCommand: 'Crear por comando',
         importContainerBackupTip: 'Importar archivo de copia de seguridad de contenedor, solo se admite .tar.gz',
         importComposeBackupTip: 'Importar archivo de copia de seguridad de compose, solo se admite .tar.gz',
