@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	contract "github.com/1Panel-dev/1Panel/core/utils/mcp"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
@@ -97,7 +98,7 @@ func (s *MCPService) Admit(c *gin.Context, token string, req contract.Admission)
 		if known, ok := err.(*contract.Error); ok {
 			record.Code = known.Code
 		}
-		if auditErr := s.DB.Create(&record).Error; auditErr != nil {
+		if auditErr := (repo.MCPRepo{DB: s.DB}).CreateInvocation(&record); auditErr != nil {
 			return nil, contract.Fail("MCP_EXECUTION_FAILED", 503, "Admission audit is unavailable")
 		}
 		if known, ok := err.(*contract.Error); ok {
@@ -164,15 +165,16 @@ func newMCPAdmissionID() string { return uuid.NewString() }
 
 func (s *MCPService) validateMCPAdmission(key model.MCPCredential, now time.Time) error {
 	return s.DB.Transaction(func(tx *gorm.DB) error {
-		var latest model.MCPCredential
-		if err := tx.Where("id = ? AND revision = ? AND status = ? AND revoked_at IS NULL", key.ID, key.Revision, "Enable").Take(&latest).Error; err != nil {
+		data := repo.MCPRepo{DB: tx}
+		latest, err := data.AdmissionCredential(key.ID, key.Revision)
+		if err != nil {
 			return contract.Forbidden()
 		}
 		if latest.ExpiresAt != nil && !now.Before(*latest.ExpiresAt) {
 			return contract.Forbidden()
 		}
-		var setting model.MCPSetting
-		if err := tx.Select("enabled").Take(&setting, 1).Error; err != nil || !setting.Enabled {
+		enabled, err := data.AdmissionEnabled()
+		if err != nil || !enabled {
 			return contract.Fail("MCP_DISABLED", 503, "MCP access is disabled")
 		}
 
@@ -236,7 +238,7 @@ func (s *MCPService) CompleteWithOutcome(token string, req contract.Completion) 
 		now := s.Now()
 		outcome.Status, outcome.Code = "failed", mcpCompletionErrorCode(req.ErrorCode)
 		outcome.FinishedAt, outcome.DurationMs = &now, now.Sub(outcome.StartedAt).Milliseconds()
-		if err := s.DB.Create(outcome).Error; err != nil {
+		if err := (repo.MCPRepo{DB: s.DB}).CreateInvocation(outcome); err != nil {
 			return nil, contract.Fail("MCP_AUDIT_UNAVAILABLE", 503, "Invocation outcome could not be recorded; do not retry a write automatically")
 		}
 		result.InvocationID = outcome.ID

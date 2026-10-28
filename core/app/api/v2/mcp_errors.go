@@ -31,6 +31,12 @@ func mcpManagementMessage(code string) string {
 		key = "ErrMCPAuditUnavailable"
 	case "MCP_ENDPOINT_UNAVAILABLE":
 		key = "ErrMCPEndpointUnavailable"
+	case "MCP_WEBSITE_PENDING":
+		key = "ErrMCPWebsitePending"
+	case "MCP_WEBSITE_UNAVAILABLE":
+		key = "ErrMCPWebsiteUnavailable"
+	case "MCP_WEBSITE_SERVICE_REQUIRED":
+		key = "ErrMCPWebsiteServiceRequired"
 	}
 	return i18n.GetMsgWithMap(key, nil)
 }

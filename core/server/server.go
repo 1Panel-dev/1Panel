@@ -90,12 +90,20 @@ func Start() {
 	} else if err := router.StartMCPBridge(); err != nil {
 		global.LOG.Errorf("MCP runtime bridge is unavailable: %v", err)
 	}
+	if err := service.NewMCPRuntimeService().RecoverInstallationTasks(processStartedAt); err != nil {
+		global.LOG.Errorf("MCP installation task recovery failed: %v", err)
+	}
 	if runtime.GOOS == "linux" {
 		go func() {
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 			if err := service.NewMCPRuntimeService().PrepareOnStartup(ctx); err != nil {
 				global.LOG.Warnf("MCP Docker runtime preparation failed: %v", err)
+			}
+			websiteCtx, websiteCancel := context.WithTimeout(context.Background(), 20*time.Second)
+			defer websiteCancel()
+			if err := service.NewMCPRuntimeService().SyncWebsite(websiteCtx); err != nil {
+				global.LOG.Warnf("MCP website proxy synchronization failed: %v", err)
 			}
 		}()
 	}

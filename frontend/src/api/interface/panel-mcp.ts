@@ -96,12 +96,60 @@ export namespace PanelMCP {
         endpoint: string;
         internalEndpoint: string;
         canManageService: boolean;
+        installing: boolean;
+        installTaskID: string;
+        website?: WebsiteBinding;
+    }
+    export interface WebsiteDraft {
+        requested: boolean;
+        domain: string;
+        enableSSL: boolean;
+        sslID: number;
+    }
+    export interface WebsitePendingRequest {
+        operation: 'bind' | 'update' | 'unbind';
+        requestId: string;
+        domain?: string;
+        enableSSL?: boolean;
+        sslID?: number;
+    }
+    export interface WebsiteBinding {
+        state: 'unbound' | 'pending' | 'bound' | 'unavailable';
+        websiteId: number;
+        domain: string;
+        endpoint: string;
+        sslID: number;
+        enableSSL: boolean;
+        websiteStatus: string;
+        requestId: string;
+        revision: number;
+        reason?: string;
+        pendingRequest?: WebsitePendingRequest;
+    }
+    export interface WebsiteMutation {
+        requestId: string;
+        revision: number;
+    }
+    export interface WebsiteBind extends WebsiteMutation {
+        domain: string;
+        enableSSL: boolean;
+        sslID: number;
+    }
+    export interface WebsiteUpdate extends WebsiteMutation {
+        enableSSL: boolean;
+        sslID: number;
     }
     export interface Installation {
         dockerImage: string;
         listenPort: number;
         externalUrl: string;
         revision: number;
+        accessPolicy: Settings['accessPolicy'];
+        allowedIPs: string[];
+        website?: Pick<WebsiteDraft, 'domain' | 'enableSSL' | 'sslID'>;
+    }
+    export interface InstallationTask {
+        taskID: string;
     }
     export type Operation = 'start' | 'stop' | 'restart';
     export interface Invocation {

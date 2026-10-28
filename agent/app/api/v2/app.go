@@ -8,7 +8,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
-	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 	"github.com/gin-gonic/gin"
 )
 
@@ -161,24 +160,9 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 // @Router /apps/install [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"安装应用 [name]","formatEN":"Install app [name]"}
 func (b *BaseApi) InstallApp(c *gin.Context) {
-	mcpRequest, trustedMCP := mcpapi.Check(c.Request)
-	if mcpRequest && !trustedMCP {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
 	var req request.AppInstallCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
-	}
-	if mcpRequest {
-		req.MCPPreserveWebsiteDir = true
-		if value, exists := req.Params["WEBSITE_DIR"]; exists {
-			directory, ok := value.(string)
-			if !ok || directory == "" || directory != settingService.GetWebsiteDir() {
-				c.AbortWithStatus(http.StatusForbidden)
-				return
-			}
-		}
 	}
 	install, err := appService.Install(req, true)
 	if err != nil {

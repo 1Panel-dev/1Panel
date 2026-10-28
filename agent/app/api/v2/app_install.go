@@ -1,11 +1,7 @@
 package v2
 
 import (
-	"net/http"
-
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
-	"github.com/1Panel-dev/1Panel/agent/app/service"
-	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -340,23 +336,9 @@ func (b *BaseApi) UpdateAppConfig(c *gin.Context) {
 // @Security Timestamp
 // @Router /apps/installed/info/:appInstallId [get]
 func (b *BaseApi) GetAppInstallInfo(c *gin.Context) {
-	mcpRequest, trustedMCP := mcpapi.Check(c.Request)
-	if mcpRequest && !trustedMCP {
-		c.AbortWithStatus(http.StatusForbidden)
-		return
-	}
 	appInstallId, err := helper.GetIntParamByKey(c, "appInstallId")
 	if err != nil {
 		helper.BadRequest(c, err)
-		return
-	}
-	if mcpRequest {
-		info, err := (&service.AppInstallService{}).GetAppInstallInfoForMCP(c.Request.Context(), appInstallId)
-		if err != nil {
-			helper.InternalServer(c, err)
-			return
-		}
-		helper.SuccessWithData(c, info)
 		return
 	}
 	info, err := appInstallService.GetAppInstallInfo(appInstallId)

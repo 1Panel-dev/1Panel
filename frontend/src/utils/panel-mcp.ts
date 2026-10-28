@@ -1,12 +1,29 @@
 import type { PanelMCP } from '@/api/interface/panel-mcp';
 import { isAxiosError } from 'axios';
 
-export const DEFAULT_MCP_DOCKER_IMAGE = '1panel/1panel-mcp-server:v0.0.1';
-const releaseVersionPattern =
-    'v?(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z]+(?:[.-][0-9A-Za-z]+)*)?';
-export const isMCPDockerImage = (image: string) =>
-    image.length <= 180 &&
-    new RegExp(`^1panel/1panel-mcp-server(?::${releaseVersionPattern}|@sha256:[a-f0-9]{64})$`).test(image);
+export const DEFAULT_MCP_DOCKER_IMAGE = '1panel/mcp-server:v1.0.0';
+const dockerPathComponent = '[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*';
+const dockerDomainComponent = '(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])';
+const dockerRegistryHost = `(?:${dockerDomainComponent}(?:\\.${dockerDomainComponent})*|\\[[a-fA-F0-9:]+\\])`;
+const dockerImagePattern = new RegExp(
+    `^((?:${dockerRegistryHost}(?::[0-9]+)?/)?${dockerPathComponent}(?:/${dockerPathComponent})*)(?::([A-Za-z0-9_][A-Za-z0-9_.-]{0,127}))?(?:@(sha256:[a-f0-9]{64}))?$`,
+);
+
+export const isMCPDockerImage = (image: string) => {
+    if (!image || image.length > 512 || /[\s\x00-\x1f\x7f-\x9f]/.test(image)) return false;
+    const match = dockerImagePattern.exec(image);
+    if (!match || (!match[2] && !match[3])) return false;
+    const name = match[1];
+    const slash = name.indexOf('/');
+    const first = slash < 0 ? '' : name.slice(0, slash);
+    const explicitRegistry = first === 'localhost' || /[.:A-Z]/.test(first);
+    const registry = explicitRegistry ? first : 'docker.io';
+    let repository = explicitRegistry ? name.slice(slash + 1) : name;
+    if ((registry === 'docker.io' || registry === 'index.docker.io') && !repository.includes('/')) {
+        repository = `library/${repository}`;
+    }
+    return repository.length <= 255;
+};
 
 export const copyMCPSettings = (settings: PanelMCP.Settings): PanelMCP.Settings => ({
     runtimeType: settings.runtimeType,
@@ -271,3 +288,48 @@ export const isUsableMCPNodes = (nodes: unknown): nodes is PanelMCP.Node[] =>
             node.isLocal === (node.id === 'local'),
     ) &&
     new Set(nodes.map((node) => node.id)).size === nodes.length;
+
+export const defaultMCPWebsiteDraft = (): PanelMCP.WebsiteDraft => ({
+    requested: false,
+    domain: '',
+    enableSSL: true,
+    sslID: 0,
+});
+
+export const getMCPWebsiteHostname = (domain: string): string => {
+    if (!domain || /[\s/@?#\\*]/.test(domain) || domain.includes('://')) return '';
+    try {
+        const value = new URL(`http://${domain}`);
+        if (value.pathname !== '/' || value.username || value.password || value.search || value.hash) return '';
+        if (value.port && (!Number.isInteger(Number(value.port)) || Number(value.port) < 1)) return '';
+        const hostname = value.hostname.toLowerCase().replace(/\.$/, '');
+        if (hostname.includes(':') || /^\d+\.\d+\.\d+\.\d+$/.test(hostname)) return '';
+        if (hostname.split('.').some((label) => !/^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$/.test(label))) return '';
+        return hostname;
+    } catch {
+        return '';
+    }
+};
+
+export const isMCPWebsiteCertificateMatch = (
+    domain: string,
+    certificate: { primaryDomain: string; otherDomains?: string; expireDate?: string },
+    now = Date.now(),
+) => {
+    const hostname = getMCPWebsiteHostname(domain);
+    if (!hostname) return false;
+    if (
+        certificate.expireDate &&
+        (!Number.isFinite(Date.parse(certificate.expireDate)) || Date.parse(certificate.expireDate) <= now)
+    ) {
+        return false;
+    }
+    return [certificate.primaryDomain, certificate.otherDomains || '']
+        .flatMap((value) => value.split(/[\s,;]+/))
+        .some((name) => {
+            const normalized = name.toLowerCase().replace(/\.$/, '');
+            if (!normalized.startsWith('*.')) return hostname === normalized;
+            const suffix = normalized.slice(2);
+            return hostname.endsWith(`.${suffix}`) && hostname.split('.').length === suffix.split('.').length + 1;
+        });
+};

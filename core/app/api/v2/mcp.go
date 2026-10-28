@@ -1,6 +1,7 @@
 package v2
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
@@ -31,6 +32,41 @@ func mcpRead(c *gin.Context, value any) bool {
 			}
 			if json.Unmarshal(data, &fields) != nil || len(fields.ExpiresAt) == 0 {
 				err = contract.Invalid()
+			}
+		case *dto.MCPWebsiteBind, *dto.MCPWebsiteUpdate:
+			var fields struct {
+				EnableSSL json.RawMessage `json:"enableSSL"`
+				SSLID     json.RawMessage `json:"sslID"`
+			}
+			if json.Unmarshal(data, &fields) != nil || len(fields.EnableSSL) == 0 || len(fields.SSLID) == 0 ||
+				bytes.Equal(bytes.TrimSpace(fields.EnableSSL), []byte("null")) || bytes.Equal(bytes.TrimSpace(fields.SSLID), []byte("null")) {
+				err = contract.Invalid()
+			}
+		case *dto.MCPRuntimeInstall:
+			var fields struct {
+				AccessPolicy json.RawMessage `json:"accessPolicy"`
+				AllowedIPs   json.RawMessage `json:"allowedIPs"`
+				Website      *struct {
+					Domain    json.RawMessage `json:"domain"`
+					EnableSSL json.RawMessage `json:"enableSSL"`
+					SSLID     json.RawMessage `json:"sslID"`
+				} `json:"website"`
+			}
+			if json.Unmarshal(data, &fields) != nil {
+				err = contract.Invalid()
+			} else {
+				for _, field := range []json.RawMessage{fields.AccessPolicy, fields.AllowedIPs} {
+					if len(field) == 0 || bytes.Equal(bytes.TrimSpace(field), []byte("null")) {
+						err = contract.Invalid()
+					}
+				}
+			}
+			if fields.Website != nil {
+				for _, field := range []json.RawMessage{fields.Website.Domain, fields.Website.EnableSSL, fields.Website.SSLID} {
+					if len(field) == 0 || bytes.Equal(bytes.TrimSpace(field), []byte("null")) {
+						err = contract.Invalid()
+					}
+				}
 			}
 		}
 	}
@@ -179,6 +215,21 @@ func (b *BaseApi) RevokeMCPCredential(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+func (b *BaseApi) DeleteMCPCredential(c *gin.Context) {
+	s, owner, ok := mcpManagement(c, true, false)
+	if !ok {
+		return
+	}
+	var req dto.MCPCredentialMutation
+	if !mcpRead(c, &req) {
+		return
+	}
+	if err := s.Delete(owner, req); err != nil {
+		mcpManagementError(c, err)
+		return
+	}
+	helper.Success(c)
+}
 func (b *BaseApi) SearchMCPInvocations(c *gin.Context) {
 	s, owner, ok := mcpManagement(c, false, false)
 	if !ok {
@@ -207,8 +258,17 @@ func (b *BaseApi) MCPServiceStatus(c *gin.Context) {
 		mcpManagementError(c, err)
 		return
 	}
-	result.Endpoint = mcpPublicEndpoint(c, result.Endpoint)
+	if result.Website == nil {
+		result.Endpoint = mcpPublicEndpoint(c, result.Endpoint)
+	}
 	result.CanManageService = owner.IsSuperAdmin
+	if owner.IsSuperAdmin {
+		result.InstallTaskID, result.Installing, err = service.NewMCPRuntimeService().InstallationTask(ctx)
+		if err != nil {
+			mcpManagementError(c, err)
+			return
+		}
+	}
 	helper.SuccessWithData(c, result)
 }
 func (b *BaseApi) MCPSettings(c *gin.Context) {
@@ -268,9 +328,9 @@ func (b *BaseApi) InstallMCPService(c *gin.Context) {
 	if !mcpRead(c, &req) {
 		return
 	}
-	ctx, cancel := context.WithTimeout(c.Request.Context(), 6*time.Minute)
+	ctx, cancel := context.WithTimeout(c.Request.Context(), 10*time.Second)
 	defer cancel()
-	result, err := service.NewMCPRuntimeService().Install(ctx, req)
+	result, err := service.NewMCPRuntimeService().SubmitInstall(ctx, req)
 	if err != nil {
 		mcpServiceError(c, err)
 		return

@@ -52,13 +52,16 @@ type MCPInvocation struct {
 }
 
 type MCPSetting struct {
-	RuntimeType  string `gorm:"not null;default:docker"`
-	DockerImage  string `gorm:"not null;default:1panel/1panel-mcp-server:v0.0.1"`
-	ID           uint   `gorm:"primaryKey"`
-	Enabled      bool   `gorm:"not null;default:false"`
-	ListenPort   int    `gorm:"not null;default:18081"`
-	ExternalURL  string
-	AccessPolicy string `gorm:"not null;default:inherit"`
-	AllowedIPs   string `gorm:"type:text;not null;default:'[]'"`
-	Revision     uint64 `gorm:"not null;default:1"`
+	RuntimeType      string `gorm:"not null;default:docker"`
+	DockerImage      string `gorm:"not null;default:1panel/mcp-server:v1.0.0"`
+	ID               uint   `gorm:"primaryKey"`
+	Enabled          bool   `gorm:"not null;default:false"`
+	ListenPort       int    `gorm:"not null;default:18081"`
+	ExternalURL      string
+	AccessPolicy     string `gorm:"not null;default:inherit"`
+	AllowedIPs       string `gorm:"type:text;not null;default:'[]'"`
+	Revision         uint64 `gorm:"not null;default:1"`
+	WebsiteID        uint   `gorm:"not null;default:0"`
+	WebsiteBindingID string `gorm:"not null;default:''"`
+	WebsiteOperation string `gorm:"type:text;not null;default:''"`
 }

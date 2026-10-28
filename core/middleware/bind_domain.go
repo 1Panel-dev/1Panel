@@ -5,16 +5,21 @@ import (
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/core/app/repo"
-	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/1Panel-dev/1Panel/core/utils/security"
 	"github.com/gin-gonic/gin"
 )
 
-func BindDomain() gin.HandlerFunc {
+// DomainPolicy is configured by the router and must only trust server-verified state.
+type DomainPolicy func(*gin.Context) bool
+
+func BindDomain(policies ...DomainPolicy) gin.HandlerFunc {
+	policies = append([]DomainPolicy(nil), policies...)
 	return func(c *gin.Context) {
-		if mcpapi.IsRequest(c.Request) && c.GetBool("MCP_API_AUTH") {
-			c.Next()
-			return
+		for _, policy := range policies {
+			if policy != nil && policy(c) {
+				c.Next()
+				return
+			}
 		}
 		localRequest := c.GetBool("LOCAL_REQUEST")
 		if localRequest {

@@ -18,6 +18,7 @@ type IMysqlRepo interface {
 	List(opts ...DBOption) ([]model.DatabaseMysql, error)
 	Page(limit, offset int, opts ...DBOption) (int64, []model.DatabaseMysql, error)
 	Create(ctx context.Context, mysql *model.DatabaseMysql) error
+	CreateMetadata(ctx context.Context, mysql *model.DatabaseMysql) error
 	Delete(ctx context.Context, opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
 	DeleteLocal(ctx context.Context) error
@@ -92,6 +93,10 @@ func (u *MysqlRepo) Create(ctx context.Context, mysql *model.DatabaseMysql) erro
 	}
 	mysql.Password = pass
 	return getTx(ctx).Create(mysql).Error
+}
+
+func (u *MysqlRepo) CreateMetadata(ctx context.Context, mysql *model.DatabaseMysql) error {
+	return getTx(ctx).WithContext(ctx).Create(mysql).Error
 }
 
 func (u *MysqlRepo) Delete(ctx context.Context, opts ...DBOption) error {

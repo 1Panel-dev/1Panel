@@ -55,7 +55,16 @@ func (b *BaseApi) ExportMCPCredential(c *gin.Context) {
 		mcpManagementError(c, err)
 		return
 	}
-	result, err := s.ExportMarkdown(owner, req, mcpPublicEndpoint(c, settings.ExternalURL), c.GetHeader("Accept-Language"))
+	endpoint := mcpPublicEndpoint(c, settings.ExternalURL)
+	website, err := service.NewMCPRuntimeService().WebsiteStatus(c.Request.Context())
+	if err != nil {
+		mcpManagementError(c, err)
+		return
+	}
+	if website.State != "unbound" {
+		endpoint = website.Endpoint
+	}
+	result, err := s.ExportMarkdown(owner, req, endpoint, c.GetHeader("Accept-Language"))
 	if err != nil {
 		mcpManagementError(c, err)
 		return

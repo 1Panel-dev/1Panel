@@ -8,8 +8,9 @@
     >
         <template v-if="created">
             <el-alert
-                :title="$t(secret ? 'panelMCP.saveSecret' : 'panelMCP.alreadyCreated')"
-                :type="secret ? 'warning' : 'info'"
+                v-if="!secret"
+                :title="$t('panelMCP.alreadyCreated')"
+                type="info"
                 :closable="false"
                 show-icon
                 class="!mb-4"
@@ -35,9 +36,6 @@
                 </el-form-item>
                 <p v-if="!endpoint" class="input-help mt-0 leading-5">{{ $t('panelMCP.endpointUnavailable') }}</p>
             </el-form>
-            <el-checkbox v-if="secret" v-model="saved" class="!mr-0 !h-auto max-w-full !items-start !whitespace-normal">
-                <span class="whitespace-normal break-words leading-5">{{ $t('panelMCP.tokenSaved') }}</span>
-            </el-checkbox>
         </template>
         <el-form
             v-else
@@ -370,7 +368,7 @@
                 <el-button v-if="!created" :disabled="busy" @click="beforeClose(discard)">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
-                <el-button v-if="created" type="primary" :disabled="!!secret && !saved" @click="discard">
+                <el-button v-if="created" type="primary" :disabled="busy" @click="discard">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
                 <el-button v-else type="primary" :loading="busy" :disabled="!canSubmit" @click="submit">
@@ -383,7 +381,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onDeactivated, reactive, ref, watch } from 'vue';
-import { ElMessageBox, type FormInstance } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import { onBeforeRouteLeave } from 'vue-router';
 import { v4 as uuidv4 } from 'uuid';
 import type { PanelMCP } from '@/api/interface/panel-mcp';
@@ -488,7 +486,6 @@ const changeFilteredGrants = (action: 'select' | 'clear' | 'readOnly') => {
     form.tools = changeVisibleMCPGrants(form.tools, filteredTools.value, action);
 };
 const secret = ref('');
-const saved = ref(false);
 const created = ref<PanelMCP.Credential>();
 const item = ref<PanelMCP.Credential>();
 const neverExpires = ref(false);
@@ -595,7 +592,7 @@ const open = (existing?: PanelMCP.Credential) => {
         return;
     discard();
     item.value = existing;
-    saved.value = uncertain.value = conflict.value = policyConflict.value = policyAccepted.value = false;
+    uncertain.value = conflict.value = policyConflict.value = policyAccepted.value = false;
     toolSearch.value = '';
     toolFilter.value = 'all';
     activeCategory.value = 'all';
@@ -634,12 +631,8 @@ const open = (existing?: PanelMCP.Credential) => {
     visible.value = true;
     nextTick(() => formRef.value?.clearValidate());
 };
-const beforeClose = async (done: () => void) => {
+const beforeClose = (done: () => void) => {
     if (busy.value) return;
-    if (secret.value && !saved.value) {
-        await ElMessageBox.alert(i18n.global.t('panelMCP.saveSecret'), i18n.global.t('panelMCP.title'));
-        return;
-    }
     if (uncertain.value) emit('changed');
     discard();
     done();
@@ -700,7 +693,7 @@ watch(
 );
 onDeactivated(discard);
 onBeforeUnmount(discard);
-onBeforeRouteLeave(async (to) => {
+onBeforeRouteLeave((to) => {
     if (
         !globalStore.isLogin ||
         !canManageCredential.value ||
@@ -710,10 +703,6 @@ onBeforeRouteLeave(async (to) => {
         return true;
     }
     if (busy.value) return false;
-    if (secret.value && !saved.value) {
-        await ElMessageBox.alert(i18n.global.t('panelMCP.saveSecret'), i18n.global.t('panelMCP.title'));
-        return false;
-    }
     discard();
     return true;
 });

@@ -9,16 +9,17 @@ import (
 	"net"
 	"net/http"
 	"regexp"
-	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	contract "github.com/1Panel-dev/1Panel/core/utils/mcp"
+	"github.com/distribution/reference"
 )
 
 const (
-	DockerImageRepository = "1panel/1panel-mcp-server"
-	DefaultDockerImage    = DockerImageRepository + ":v0.0.1"
+	DockerImageRepository = "1panel/mcp-server"
+	DefaultDockerImage    = DockerImageRepository + ":v1.0.0"
 	DockerContainerName   = "1panel-mcp"
 	dockerAgentEndpoint   = "http://agent/internal/mcp/docker"
 )
@@ -26,17 +27,32 @@ const (
 var dockerDigestPattern = regexp.MustCompile(`^sha256:[a-f0-9]{64}$`)
 
 func ValidateDockerImage(value string) error {
-	if len(value) > 180 {
-		return errors.New("invalid MCP Docker image")
+	invalid := errors.New("MCP Docker image must be a valid image reference with an explicit tag or SHA256 digest")
+	if value == "" || len(value) > 512 {
+		return invalid
 	}
-	if strings.HasPrefix(value, DockerImageRepository+"@") && dockerDigestPattern.MatchString(strings.TrimPrefix(value, DockerImageRepository+"@")) {
+	for _, char := range value {
+		if unicode.IsSpace(char) || unicode.IsControl(char) {
+			return invalid
+		}
+	}
+	named, err := reference.ParseNormalizedNamed(value)
+	if err != nil {
+		return invalid
+	}
+	if digested, ok := named.(reference.Digested); ok {
+		if !ValidDockerImageID(digested.Digest().String()) {
+			return invalid
+		}
 		return nil
 	}
-	if strings.HasPrefix(value, DockerImageRepository+":") && versionPattern.MatchString(strings.TrimPrefix(value, DockerImageRepository+":")) {
-		return nil
+	if _, tagged := named.(reference.Tagged); !tagged {
+		return invalid
 	}
-	return errors.New("MCP Docker image must use the official repository with a fixed semantic version or SHA256 digest")
+	return nil
 }
+
+func ValidDockerImageID(value string) bool { return dockerDigestPattern.MatchString(value) }
 
 type DockerManager struct {
 	port           int
@@ -47,12 +63,13 @@ type DockerManager struct {
 }
 
 type dockerRequest struct {
-	Operation string `json:"operation"`
-	Image     string `json:"image"`
-	Port      int    `json:"port"`
-	Enabled   bool   `json:"enabled"`
-	Restart   bool   `json:"restart"`
-	ImageID   string `json:"imageID,omitempty"`
+	Operation      string `json:"operation"`
+	Image          string `json:"image"`
+	Port           int    `json:"port"`
+	Enabled        bool   `json:"enabled"`
+	Restart        bool   `json:"restart"`
+	ImageID        string `json:"imageID,omitempty"`
+	StreamProgress bool   `json:"streamProgress,omitempty"`
 }
 
 type dockerResponse struct {
@@ -86,7 +103,7 @@ func (m *DockerManager) call(ctx context.Context, operation string, enabled, res
 		return dockerResponse{}, errors.New("MCP listen port must be between 1024 and 65535")
 	}
 	timeout := 65 * time.Second
-	if operation == "catalog" || operation == "candidate_catalog" || operation == "logs" || operation == "prepare" {
+	if operation == "catalog" || operation == "apply_catalog" || operation == "candidate_catalog" || operation == "logs" || operation == "prepare" {
 		timeout = 5 * time.Second
 	}
 	if operation == "status" {
@@ -126,7 +143,7 @@ func (m *DockerManager) call(ctx context.Context, operation string, enabled, res
 		if len(result.Error) > 1024 {
 			return dockerResponse{}, errors.New("MCP Docker operation failed")
 		}
-		return dockerResponse{}, errors.New(result.Error)
+		return dockerResponse{}, operationError(result.Error)
 	}
 	if response.StatusCode != http.StatusOK {
 		return dockerResponse{}, errors.New("MCP Docker operation was rejected by the local agent")
@@ -182,7 +199,7 @@ func (m *DockerManager) Apply(ctx context.Context, enabled, restart bool) error 
 	var imageID string
 	if enabled {
 		var err error
-		if _, imageID, err = m.readCatalog(ctx, "candidate_catalog"); err != nil {
+		if _, imageID, err = m.readCatalog(ctx, "apply_catalog"); err != nil {
 			return err
 		}
 	}
@@ -194,9 +211,10 @@ func (m *DockerManager) InstallImage(ctx context.Context, enabled bool) error {
 	m.installMu.Lock()
 	m.installImageID = ""
 	m.installMu.Unlock()
-	if _, err := m.call(ctx, "pull", false, false, ""); err != nil {
+	if err := m.pull(ctx); err != nil {
 		return err
 	}
+	ReportProgress(ctx, Progress{Status: "catalog"})
 	_, imageID, err := m.readCatalog(ctx, "candidate_catalog")
 	if err != nil {
 		return err
@@ -204,6 +222,7 @@ func (m *DockerManager) InstallImage(ctx context.Context, enabled bool) error {
 	m.installMu.Lock()
 	m.installImageID = imageID
 	m.installMu.Unlock()
+	ReportProgress(ctx, Progress{Status: "starting"})
 	_, err = m.call(ctx, "install", enabled, true, imageID)
 	return err
 }

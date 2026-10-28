@@ -7,6 +7,7 @@ replace github.com/go-acme/lego/v5 => github.com/1Panel-dev/lego/v5 v5.3.1
 require (
 	github.com/aliyun/aliyun-oss-go-sdk v3.0.2+incompatible
 	github.com/compose-spec/compose-go/v2 v2.15.0
+	github.com/containerd/errdefs v1.0.0
 	github.com/creack/pty v1.1.24
 	github.com/docker/cli v29.9.0+incompatible
 	github.com/docker/docker v28.5.2+incompatible
@@ -104,7 +105,6 @@ require (
 	github.com/clbanning/mxj v1.8.4 // indirect
 	github.com/clbanning/mxj/v2 v2.7.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
-	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/distribution/reference v0.6.0 // indirect

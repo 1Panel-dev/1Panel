@@ -37,7 +37,11 @@ func WhiteAllow() gin.HandlerFunc {
 			helper.InternalServer(c, err)
 			return
 		}
-		clientIP := common.ResolveClientIP(c, trustedProxies)
+		clientIP, err := resolveMCPWebsiteClientIP(c, trustedProxies)
+		if err != nil {
+			rejectMCPWebsiteSource(c, err)
+			return
+		}
 		if c.Request.URL.Path == "/mcp" {
 			c.Set("MCP_CLIENT_IP", clientIP)
 			var policy model.MCPSetting
