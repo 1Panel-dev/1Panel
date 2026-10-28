@@ -802,3 +802,15 @@ ErrFeishuUpgradeMounts: "Estos montajes no permiten una copia y restauración co
 AgentFeishuRecoveryDisabled: "Puerta de enlace recuperada con Feishu desactivado; se conserva la copia de configuración original."
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "Buscar actualizaciones de imágenes"
+ContainerImageCheckScope: "Comprobando los {{ .count }} contenedores de este nodo, sin aplicar paginación ni filtros"
+ContainerImageCheckItem: "Comprobando el contenedor {{ .name }}, imagen {{ .image }}"
+ContainerImageCheckFailed: "Error al comprobar el contenedor {{ .name }}: {{ .error }}; se conservan los resultados anteriores correspondientes a la imagen actual"
+ContainerImageCheckSkipped: "Se omite {{ .name }}: no es una imagen de Docker Hub con etiqueta, es una imagen local o tiene un digest fijo"
+ContainerImageCheckAvailable: "El contenedor {{ .name }} tiene una actualización: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "No se encontraron actualizaciones para el contenedor {{ .name }}"
+ContainerImageCheckChanged: "El contenedor {{ .name }} se eliminó o su imagen cambió; no se guardó el resultado"
+ContainerImageCheckSummary: "Comprobación finalizada: comprobados {{ .checked }}, actualizables {{ .updates }}, fallidos {{ .failed }}, omitidos {{ .skipped }}"
+ContainerImageCheckFailures: "Falló la comprobación de {{ .count }} contenedores; consulte el registro de la tarea"
+
+ErrImageCheckProxyRequired: "Para comprobar actualizaciones de imágenes en el entorno actual, configura primero un servidor proxy."

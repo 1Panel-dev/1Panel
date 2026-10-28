@@ -802,3 +802,15 @@ ErrFeishuUpgradeMounts: "当前挂载无法完整备份或恢复，请使用应�
 AgentFeishuRecoveryDisabled: "网关已恢复，飞书保持停用；原配置备份已保留。"
 
 ContainerUpgradeWaiting: "等待容器升级任务执行名额"
+ContainerImageCheckUpdate: "检查更新镜像"
+ContainerImageCheckScope: "检查当前节点全部 {{ .count }} 个容器，不受分页和筛选影响"
+ContainerImageCheckItem: "检查容器 {{ .name }}，镜像 {{ .image }}"
+ContainerImageCheckFailed: "容器 {{ .name }} 检查失败：{{ .error }}；保留匹配当前镜像的上次结果"
+ContainerImageCheckSkipped: "跳过 {{ .name }}：非 Docker Hub 标签镜像、本地镜像或固定 digest"
+ContainerImageCheckAvailable: "容器 {{ .name }} 可升级：{{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "容器 {{ .name }} 未发现更新"
+ContainerImageCheckChanged: "容器 {{ .name }} 已删除或镜像发生变化，未保存本次结果"
+ContainerImageCheckSummary: "检查结束：成功 {{ .checked }}，可升级 {{ .updates }}，失败 {{ .failed }}，跳过 {{ .skipped }}"
+ContainerImageCheckFailures: "{{ .count }} 个容器检查失败，请查看任务日志"
+
+ErrImageCheckProxyRequired: "当前运行环境下，如需检查镜像是否更新，请优先配置代理服务器"
