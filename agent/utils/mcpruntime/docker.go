@@ -3,6 +3,7 @@ package mcpruntime
 import (
 	"bytes"
 	"context"
+	_ "crypto/sha256"
 	"encoding/binary"
 	"encoding/json"
 	"errors"
@@ -15,19 +16,21 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/containerd/errdefs"
+	"github.com/distribution/reference"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/system"
 	"github.com/docker/docker/client"
-	"github.com/docker/docker/errdefs"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 )
 
 const (
-	ImageRepository = "1panel/1panel-mcp-server"
+	ImageRepository = "1panel/mcp-server"
 	ContainerName   = "1panel-mcp"
 	previousName    = "1panel-mcp-previous"
 	SocketDirectory = "/etc/1panel/mcp-runtime"
@@ -48,12 +51,13 @@ var digestPattern = regexp.MustCompile(`^sha256:[a-f0-9]{64}$`)
 var ErrUnsupported = errors.New("MCP Docker runtime requires a local rootful Linux Docker daemon without user namespace remapping")
 
 type Request struct {
-	Operation string `json:"operation"`
-	Image     string `json:"image"`
-	Port      int    `json:"port"`
-	Enabled   bool   `json:"enabled"`
-	Restart   bool   `json:"restart"`
-	ImageID   string `json:"imageID,omitempty"`
+	Operation      string `json:"operation"`
+	Image          string `json:"image"`
+	Port           int    `json:"port"`
+	Enabled        bool   `json:"enabled"`
+	Restart        bool   `json:"restart"`
+	ImageID        string `json:"imageID,omitempty"`
+	StreamProgress bool   `json:"streamProgress,omitempty"`
 }
 
 type State struct {
@@ -106,6 +110,7 @@ type Controller struct {
 	platform       string
 	health         func(context.Context, int) (metadata, error)
 	checkDirectory func() error
+	registryAuth   func(string) (string, bool)
 	mutation       chan struct{}
 	probes         chan struct{}
 	cacheMu        sync.Mutex
@@ -118,25 +123,40 @@ func New() *Controller {
 
 func newController(factory func() (DockerClient, error)) *Controller {
 	return &Controller{newClient: factory, platform: runtime.GOOS, health: readHealth,
-		checkDirectory: checkSocketDirectory, mutation: make(chan struct{}, 1), probes: make(chan struct{}, 8), cache: make(map[string]verifiedImage)}
+		checkDirectory: checkSocketDirectory, registryAuth: docker.RegistryAuthForImage,
+		mutation: make(chan struct{}, 1), probes: make(chan struct{}, 8), cache: make(map[string]verifiedImage)}
 }
 
 func ValidateImage(value string) error {
-	if len(value) > 180 {
+	if value == "" || len(value) > 512 || strings.IndexFunc(value, func(ch rune) bool { return unicode.IsSpace(ch) || unicode.IsControl(ch) }) >= 0 {
 		return errors.New("invalid MCP Docker image")
 	}
-	if strings.HasPrefix(value, ImageRepository+"@") && digestPattern.MatchString(strings.TrimPrefix(value, ImageRepository+"@")) {
+	parsed, err := reference.ParseNormalizedNamed(value)
+	if err != nil {
+		return errors.New("invalid MCP Docker image")
+	}
+	if digested, ok := parsed.(reference.Digested); ok {
+		if digestPattern.MatchString(digested.Digest().String()) {
+			return nil
+		}
+		return errors.New("MCP Docker image must use a SHA256 digest")
+	}
+	if _, ok := parsed.(reference.Tagged); ok {
 		return nil
 	}
-	if strings.HasPrefix(value, ImageRepository+":") && semanticVersion.MatchString(strings.TrimPrefix(value, ImageRepository+":")) {
-		return nil
-	}
-	return errors.New("MCP Docker image must use the official repository with a fixed semantic version or SHA256 digest")
+	return errors.New("MCP Docker image must include a tag or SHA256 digest")
 }
 
 func (c *Controller) Handle(ctx context.Context, req Request) (Response, error) {
+	return c.HandleWithProgress(ctx, req, nil)
+}
+
+func (c *Controller) HandleWithProgress(ctx context.Context, req Request, progress func(PullProgress) error) (Response, error) {
+	if req.StreamProgress && req.Operation != "pull" {
+		return Response{}, errors.New("MCP Docker progress is only available when pulling an image")
+	}
 	switch req.Operation {
-	case "prepare", "catalog", "candidate_catalog", "status", "apply", "install", "rollback", "rollback_absent", "pull", "logs":
+	case "prepare", "catalog", "apply_catalog", "candidate_catalog", "status", "apply", "install", "rollback", "rollback_absent", "pull", "logs":
 	default:
 		return Response{}, errors.New("invalid MCP Docker operation")
 	}
@@ -147,7 +167,7 @@ func (c *Controller) Handle(ctx context.Context, req Request) (Response, error) 
 		return Response{}, errors.New("MCP listen port must be between 1024 and 65535")
 	}
 	timeout := 60 * time.Second
-	if req.Operation == "catalog" || req.Operation == "candidate_catalog" || req.Operation == "logs" || req.Operation == "prepare" {
+	if req.Operation == "catalog" || req.Operation == "apply_catalog" || req.Operation == "candidate_catalog" || req.Operation == "logs" || req.Operation == "prepare" {
 		timeout = 5 * time.Second
 	}
 	if req.Operation == "status" {
@@ -176,19 +196,23 @@ func (c *Controller) Handle(ctx context.Context, req Request) (Response, error) 
 	}
 	switch req.Operation {
 	case "prepare":
-	case "catalog", "candidate_catalog":
+	case "catalog", "apply_catalog", "candidate_catalog":
 		var img image.InspectResponse
-		img, err = c.resolve(ctx, cli, req.Image)
-		if err == nil && req.Operation == "catalog" {
+		if req.Operation != "candidate_catalog" {
 			var current *container.InspectResponse
 			current, err = c.owned(ctx, cli, ContainerName)
-			if err == nil && current != nil && isRunning(current) && current.Config.Labels[imageLabel] == req.Image && current.Image != img.ID {
-				err = errors.New("MCP image reference changed; restart the adapter before reading its catalog")
+			if err == nil && req.Operation == "catalog" && current != nil && current.Config.Labels[imageLabel] != req.Image {
+				err = errors.New("MCP installed runtime does not match the configured image")
 			}
+			if err == nil {
+				img, err = c.resolveActiveImage(ctx, cli, req.Image, current)
+			}
+		} else {
+			img, err = c.resolve(ctx, cli, req.Image)
 		}
 		if err == nil {
 			var verified verifiedImage
-			verified, err = c.verify(ctx, cli, img.ID, req.Image)
+			verified, err = c.verify(ctx, cli, img.ID)
 			if err == nil {
 				return Response{Catalog: append(json.RawMessage(nil), verified.catalog...), ImageID: img.ID}, nil
 			}
@@ -204,7 +228,7 @@ func (c *Controller) Handle(ctx context.Context, req Request) (Response, error) 
 	case "rollback_absent":
 		err = c.rollbackAbsent(ctx, cli, req)
 	case "pull":
-		err = c.pullImage(ctx, cli, req)
+		err = c.pullImage(ctx, cli, req, progress)
 	case "logs":
 		var current *container.InspectResponse
 		current, err = c.owned(ctx, cli, ContainerName)
@@ -259,6 +283,20 @@ func (c *Controller) resolve(ctx context.Context, cli DockerClient, ref string) 
 	return img, nil
 }
 
+func (c *Controller) resolveActiveImage(ctx context.Context, cli DockerClient, ref string, current *container.InspectResponse) (image.InspectResponse, error) {
+	if current == nil || current.Config.Labels[imageLabel] != ref {
+		return c.resolve(ctx, cli, ref)
+	}
+	if !digestPattern.MatchString(current.Image) {
+		return image.InspectResponse{}, errors.New("invalid MCP installed image identity")
+	}
+	img, err := c.resolve(ctx, cli, current.Image)
+	if err != nil || img.ID != current.Image {
+		return image.InspectResponse{}, errors.New("MCP installed image is unavailable or changed")
+	}
+	return img, nil
+}
+
 func (c *Controller) owned(ctx context.Context, cli DockerClient, name string) (*container.InspectResponse, error) {
 	info, err := cli.ContainerInspect(ctx, name)
 	if errdefs.IsNotFound(err) {
@@ -279,10 +317,6 @@ func isRunning(info *container.InspectResponse) bool {
 
 func (c *Controller) status(ctx context.Context, cli DockerClient, req Request) Response {
 	state := &State{Status: "not_installed", Image: req.Image}
-	img, err := c.resolve(ctx, cli, req.Image)
-	if err == nil {
-		state.ImageID = img.ID
-	}
 	current, inspectErr := c.owned(ctx, cli, ContainerName)
 	if inspectErr != nil {
 		state.Status = "unhealthy"
@@ -290,9 +324,11 @@ func (c *Controller) status(ctx context.Context, cli DockerClient, req Request) 
 		return Response{State: state}
 	}
 	if current == nil {
+		img, err := c.resolve(ctx, cli, req.Image)
 		if err != nil {
 			state.Reason = err.Error()
 		} else {
+			state.ImageID = img.ID
 			state.Reason = "MCP image is loaded; install it to create the managed container"
 		}
 		return Response{State: state}
@@ -312,12 +348,13 @@ func (c *Controller) status(ctx context.Context, cli DockerClient, req Request) 
 		state.Reason = "MCP access is disabled"
 		return Response{State: state}
 	}
-	if err != nil || current.Image != img.ID {
+	img, err := c.resolveActiveImage(ctx, cli, req.Image, current)
+	if err != nil || current.Config.Labels[imageLabel] != req.Image {
 		state.Status = "unhealthy"
 		state.Reason = "MCP container does not match the configured image or listen port"
 		return Response{State: state}
 	}
-	verified, verifyErr := c.verify(ctx, cli, current.Image, req.Image)
+	verified, verifyErr := c.verify(ctx, cli, current.Image)
 	if verifyErr != nil || !matchesRuntimeWithCapabilities(ctx, cli, current, img.ID, req, verified.metadata.AdapterVersion) {
 		state.Status = "unhealthy"
 		state.Reason = "MCP container configuration or metadata does not match the verified image"
@@ -334,7 +371,7 @@ func (c *Controller) status(ctx context.Context, cli DockerClient, req Request) 
 	return Response{State: state}
 }
 
-func (c *Controller) verify(ctx context.Context, cli DockerClient, id, ref string) (verifiedImage, error) {
+func (c *Controller) verify(ctx context.Context, cli DockerClient, id string) (verifiedImage, error) {
 	c.cacheMu.Lock()
 	cached, ok := c.cache[id]
 	c.cacheMu.Unlock()
@@ -365,9 +402,6 @@ func (c *Controller) verify(ctx context.Context, cli DockerClient, id, ref strin
 		}
 		c.cache[id] = cached
 		c.cacheMu.Unlock()
-	}
-	if strings.HasPrefix(ref, ImageRepository+":") && strings.TrimPrefix(cached.metadata.AdapterVersion, "v") != strings.TrimPrefix(strings.TrimPrefix(ref, ImageRepository+":"), "v") {
-		return verifiedImage{}, errors.New("MCP image version does not match its selected tag")
 	}
 	return cached, nil
 }

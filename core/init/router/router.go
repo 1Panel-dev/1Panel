@@ -74,7 +74,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.MCPAPIIdentity())
 	Router.Use(i18n.UseI18n())
 	Router.Use(middleware.WhiteAllow())
-	Router.Use(middleware.BindDomain())
+	Router.Use(middleware.BindDomain(middleware.MCPDomainPolicy))
 
 	swaggerRouter := Router.Group("1panel")
 	docs.SwaggerInfo.BasePath = "/api/v2"
@@ -98,7 +98,7 @@ func Routers() *gin.Engine {
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.CSRFTokenGuard())
 	Router.Use(xpack.AuthProvider.CoreRBACMiddlewares()...)
-	Router.Use(Proxy())
+	Router.Use(Proxy(panelMCPTaskProxyPolicy()))
 
 	PrivateGroup := Router.Group("/api/v2/core")
 	PrivateGroup.Use(middleware.SetPasswordPublicKey())

@@ -7,6 +7,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	contract "github.com/1Panel-dev/1Panel/core/utils/mcp"
 	"github.com/google/uuid"
@@ -29,7 +30,7 @@ func mcpEnrollmentAuditCode(err error) string {
 
 func (s *MCPService) auditEnrollment(db *gorm.DB, owner auth.APIKeyOwner, action string, req dto.MCPCredentialMutation, outcome error) error {
 	failed := contract.Fail("MCP_AUDIT_UNAVAILABLE", 503, "Credential access could not be audited; no secret was returned")
-	if action != "create" && action != "reveal" && action != "rotate" && action != "export" {
+	if action != "create" && action != "reveal" && action != "rotate" && action != "export" && action != "delete" {
 		return failed
 	}
 	id := "invalid"
@@ -58,7 +59,7 @@ func (s *MCPService) auditEnrollment(db *gorm.DB, owner auth.APIKeyOwner, action
 	if s.EnrollmentAudit != nil {
 		err = s.EnrollmentAudit(db, record)
 	} else {
-		err = db.Create(record).Error
+		err = (repo.MCPRepo{DB: db}).CreateEnrollmentAudit(record)
 	}
 	if err != nil {
 		return failed

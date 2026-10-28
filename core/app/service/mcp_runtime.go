@@ -8,19 +8,34 @@ import (
 	"reflect"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/global"
 	contract "github.com/1Panel-dev/1Panel/core/utils/mcp"
 	"github.com/1Panel-dev/1Panel/core/utils/mcpruntime"
 	"gorm.io/gorm"
-	"gorm.io/gorm/clause"
 )
 
 var mcpRuntimeMutation sync.Mutex
+var mcpInstalling atomic.Bool
 var ErrMCPSettingsRevision = errors.New("MCP settings changed; reload the page before saving")
+
+func lockMCPRuntimeMutation() error {
+	conflict := func() error { return contract.Fail("MCP_CONFLICT", 409, "An MCP service operation is already running") }
+	if mcpInstalling.Load() {
+		return conflict()
+	}
+	mcpRuntimeMutation.Lock()
+	if mcpInstalling.Load() {
+		mcpRuntimeMutation.Unlock()
+		return conflict()
+	}
+	return nil
+}
 
 type mcpRuntimeManager interface {
 	Prepare(context.Context) error
@@ -40,6 +55,14 @@ type mcpRuntimeSnapshot struct {
 	unavailable bool
 }
 
+type mcpRuntimeRecoveryError struct{ cause error }
+
+func (e *mcpRuntimeRecoveryError) Error() string {
+	return "MCP runtime recovery is incomplete; check the service state before retrying"
+}
+
+func (e *mcpRuntimeRecoveryError) Unwrap() error { return e.cause }
+
 func (s *MCPRuntimeService) snapshot(ctx context.Context, settings dto.MCPRuntimeSettings) (mcpRuntimeSnapshot, error) {
 	snapshot := mcpRuntimeSnapshot{settings: settings}
 	state := s.manager(settings).Status(ctx, settings.Enabled)
@@ -51,7 +74,7 @@ func (s *MCPRuntimeService) snapshot(ctx context.Context, settings dto.MCPRuntim
 	}
 	snapshot.installed = state.Installed
 	if state.Installed {
-		if state.AdapterVersion == "" || mcpruntime.ValidateDockerImage(mcpruntime.DockerImageRepository+"@"+state.ImageID) != nil {
+		if state.AdapterVersion == "" || !mcpruntime.ValidDockerImageID(state.ImageID) {
 			snapshot.unavailable = true
 			return snapshot, errors.New("the existing MCP Docker instance has invalid metadata or image identity")
 		}
@@ -65,6 +88,7 @@ func (s *MCPRuntimeService) snapshot(ctx context.Context, settings dto.MCPRuntim
 
 type MCPRuntimeService struct {
 	newRuntimeManager func(dto.MCPRuntimeSettings) mcpRuntimeManager
+	websiteTransport  mcpWebsiteTransport
 }
 
 func (s *MCPRuntimeService) manager(settings dto.MCPRuntimeSettings) mcpRuntimeManager {
@@ -96,8 +120,7 @@ func (s *MCPRuntimeService) settings(ctx context.Context) (dto.MCPRuntimeSetting
 		ListenPort: mcpruntime.DefaultPort, Revision: 1,
 		AccessPolicy: "inherit", AllowedIPs: []string{},
 	}
-	var saved model.MCPSetting
-	err := global.DB.WithContext(ctx).First(&saved, 1).Error
+	saved, err := (repo.MCPRepo{DB: global.DB.WithContext(ctx)}).Setting()
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return settings, nil
 	}
@@ -121,7 +144,9 @@ func (s *MCPRuntimeService) Catalog(ctx context.Context) ([]contract.Tool, error
 }
 
 func (s *MCPRuntimeService) Update(req dto.MCPRuntimeSettingsUpdate) (dto.MCPRuntimeSettings, error) {
-	mcpRuntimeMutation.Lock()
+	if err := lockMCPRuntimeMutation(); err != nil {
+		return dto.MCPRuntimeSettings{}, err
+	}
 	defer mcpRuntimeMutation.Unlock()
 	ctx, cancel := context.WithTimeout(context.Background(), 50*time.Second)
 	defer cancel()
@@ -135,6 +160,13 @@ func (s *MCPRuntimeService) update(ctx context.Context, req dto.MCPRuntimeSettin
 	}
 	if req.Revision != old.Revision {
 		return old, ErrMCPSettingsRevision
+	}
+	if req.ExternalURL != old.ExternalURL {
+		if row, loadErr := s.websiteSetting(ctx); loadErr != nil {
+			return old, loadErr
+		} else if row.WebsiteID != 0 || row.WebsiteBindingID != "" {
+			return old, contract.Fail("MCP_CONFLICT", 409, "The website controls the MCP endpoint")
+		}
 	}
 	if err := validateMCPRuntimeSettings(req); err != nil {
 		return old, contract.Fail("MCP_INVALID_ARGUMENTS", 400, err.Error())
@@ -166,19 +198,20 @@ func (s *MCPRuntimeService) update(ctx context.Context, req dto.MCPRuntimeSettin
 
 func (s *MCPRuntimeService) persist(req dto.MCPRuntimeSettings, revision uint64) error {
 	return global.DB.Transaction(func(tx *gorm.DB) error {
+		store := repo.MCPRepo{DB: tx}
 		seed := model.MCPSetting{ID: 1, RuntimeType: "docker", DockerImage: mcpruntime.DefaultDockerImage, ListenPort: mcpruntime.DefaultPort, Revision: 1}
-		if err := tx.Clauses(clause.OnConflict{DoNothing: true}).Create(&seed).Error; err != nil {
+		if err := store.CreateSettingIfAbsent(&seed); err != nil {
 			return err
 		}
-		result := tx.Model(&model.MCPSetting{}).Where("id = ? AND revision = ?", 1, revision).Updates(map[string]interface{}{
-			"runtime_type": "docker", "docker_image": req.DockerImage,
-			"enabled": req.Enabled, "listen_port": req.ListenPort, "external_url": req.ExternalURL, "revision": revision + 1,
-			"access_policy": req.AccessPolicy, "allowed_ips": encodeMCPIPs(req.AllowedIPs),
-		})
-		if result.Error != nil {
-			return result.Error
+		rowsAffected, err := store.UpdateRuntimeSetting(model.MCPSetting{
+			RuntimeType: "docker", DockerImage: req.DockerImage,
+			Enabled: req.Enabled, ListenPort: req.ListenPort, ExternalURL: req.ExternalURL, Revision: revision + 1,
+			AccessPolicy: req.AccessPolicy, AllowedIPs: encodeMCPIPs(req.AllowedIPs),
+		}, revision)
+		if err != nil {
+			return err
 		}
-		if result.RowsAffected != 1 {
+		if rowsAffected != 1 {
 			return ErrMCPSettingsRevision
 		}
 		return nil
@@ -212,16 +245,27 @@ func (s *MCPRuntimeService) Status(ctx context.Context) (dto.MCPRuntimeStatus, e
 	}
 	state := s.manager(settings).Status(ctx, settings.Enabled)
 
-	return dto.MCPRuntimeStatus{
+	result := dto.MCPRuntimeStatus{
 		RuntimeType: "docker", DockerImage: settings.DockerImage, ContainerName: mcpruntime.DockerContainerName, ImageID: state.ImageID,
 		Enabled: settings.Enabled, Installed: state.Installed, Status: state.Status, Ready: state.Ready, Reason: state.Reason,
 		AdapterVersion: state.AdapterVersion, ContractVersion: mcpruntime.ContractVersion, Protocol: mcpruntime.Protocol, Endpoint: settings.ExternalURL,
 		InternalEndpoint: fmt.Sprintf("http://127.0.0.1:%d/mcp", settings.ListenPort),
-	}, nil
+	}
+	website, websiteErr := s.WebsiteStatus(ctx)
+	if websiteErr != nil {
+		return result, websiteErr
+	}
+	if website.State != "unbound" {
+		result.Website = &website
+		result.Endpoint = website.Endpoint
+	}
+	return result, nil
 }
 
 func (s *MCPRuntimeService) Operate(ctx context.Context, operation string) (dto.MCPRuntimeStatus, error) {
-	mcpRuntimeMutation.Lock()
+	if err := lockMCPRuntimeMutation(); err != nil {
+		return dto.MCPRuntimeStatus{}, err
+	}
 	defer mcpRuntimeMutation.Unlock()
 	settings, err := s.Settings()
 	if err != nil {
@@ -242,26 +286,61 @@ func (s *MCPRuntimeService) Operate(ctx context.Context, operation string) (dto.
 }
 
 func (s *MCPRuntimeService) Install(ctx context.Context, req dto.MCPRuntimeInstall) (dto.MCPRuntimeStatus, error) {
-	mcpRuntimeMutation.Lock()
+	if err := lockMCPRuntimeMutation(); err != nil {
+		return dto.MCPRuntimeStatus{}, err
+	}
 	defer mcpRuntimeMutation.Unlock()
-	old, err := s.settings(ctx)
+	return s.install(ctx, req)
+}
+
+func (s *MCPRuntimeService) installSettings(ctx context.Context, req dto.MCPRuntimeInstall) (old, next dto.MCPRuntimeSettings, err error) {
+	old, err = s.settings(ctx)
+	if err != nil {
+		return old, next, err
+	}
+	if req.Revision != old.Revision {
+		return old, next, ErrMCPSettingsRevision
+	}
+	next = old
+	next.RuntimeType, next.DockerImage, next.ListenPort, next.ExternalURL = "docker", req.DockerImage, req.ListenPort, req.ExternalURL
+	next.AccessPolicy, next.AllowedIPs = req.AccessPolicy, append([]string{}, req.AllowedIPs...)
+	if next.ExternalURL != old.ExternalURL {
+		if row, loadErr := s.websiteSetting(ctx); loadErr != nil {
+			return old, next, loadErr
+		} else if row.WebsiteID != 0 || row.WebsiteBindingID != "" {
+			return old, next, contract.Fail("MCP_CONFLICT", 409, "The website controls the MCP endpoint")
+		}
+	}
+	if err := validateMCPRuntimeSettings(next); err != nil {
+		return old, next, contract.Fail("MCP_INVALID_ARGUMENTS", 400, err.Error())
+	}
+	if err := normalizeMCPAccessSettings(&next); err != nil {
+		return old, next, contract.Fail("MCP_INVALID_ARGUMENTS", 400, err.Error())
+	}
+	return old, next, nil
+}
+
+func (s *MCPRuntimeService) install(ctx context.Context, req dto.MCPRuntimeInstall) (dto.MCPRuntimeStatus, error) {
+	old, next, err := s.installSettings(ctx, req)
 	if err != nil {
 		return dto.MCPRuntimeStatus{}, err
 	}
-	if req.Revision != old.Revision {
-		return dto.MCPRuntimeStatus{}, ErrMCPSettingsRevision
-	}
-	next := old
-	next.RuntimeType, next.DockerImage, next.ListenPort, next.ExternalURL = "docker", req.DockerImage, req.ListenPort, req.ExternalURL
-	if err := validateMCPRuntimeSettings(next); err != nil {
-		return dto.MCPRuntimeStatus{}, contract.Fail("MCP_INVALID_ARGUMENTS", 400, err.Error())
-	}
+	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "snapshot"})
 	snapshot, err := s.snapshot(ctx, old)
 	if err != nil {
 		return dto.MCPRuntimeStatus{}, err
 	}
 	if !snapshot.installed {
 		next.Enabled = true
+	}
+	prepared := old
+	policyPrepared := !snapshot.installed || next.AccessPolicy != old.AccessPolicy || !reflect.DeepEqual(next.AllowedIPs, old.AllowedIPs)
+	if policyPrepared {
+		prepared.AccessPolicy, prepared.AllowedIPs = next.AccessPolicy, next.AllowedIPs
+		if err := s.persist(prepared, old.Revision); err != nil {
+			return dto.MCPRuntimeStatus{}, err
+		}
+		prepared.Revision++
 	}
 	manager := s.manager(next)
 	rollback := func(authoritative dto.MCPRuntimeSettings) error {
@@ -273,19 +352,47 @@ func (s *MCPRuntimeService) Install(ctx context.Context, req dto.MCPRuntimeInsta
 		return s.restore(authoritative, snapshot)
 	}
 	recoverFailure := func(operationErr error) error {
+		mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "rollback"})
 		current, loadErr := s.Settings()
 		if loadErr != nil {
-			return errors.Join(operationErr, loadErr, errors.New("MCP settings are unavailable; runtime recovery requires retrying after the database is available"))
+			mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "recovery_failed"})
+			return &mcpRuntimeRecoveryError{cause: errors.Join(operationErr, loadErr)}
 		}
-		return errors.Join(operationErr, rollback(current))
+		if policyPrepared && current.Revision == prepared.Revision {
+			if recoveryErr := rollback(old); recoveryErr != nil {
+				mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "recovery_failed"})
+				return &mcpRuntimeRecoveryError{cause: errors.Join(operationErr, recoveryErr)}
+			}
+			if recoveryErr := s.persist(old, prepared.Revision); recoveryErr != nil {
+				mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "recovery_failed"})
+				return &mcpRuntimeRecoveryError{cause: errors.Join(operationErr, recoveryErr)}
+			}
+			return operationErr
+		}
+		if recoveryErr := rollback(current); recoveryErr != nil {
+			mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "recovery_failed"})
+			return &mcpRuntimeRecoveryError{cause: errors.Join(operationErr, recoveryErr)}
+		}
+		return operationErr
 	}
-	if err := manager.InstallImage(ctx, next.Enabled); err != nil {
+	if err := installMCPRuntimeImage(ctx, manager, next.Enabled); err != nil {
 		return dto.MCPRuntimeStatus{}, recoverFailure(err)
 	}
-	if err := s.persist(next, old.Revision); err != nil {
+	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "saving"})
+	if err := s.persist(next, prepared.Revision); err != nil {
 		return dto.MCPRuntimeStatus{}, recoverFailure(err)
 	}
+	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "installed"})
 	return s.Status(ctx)
+}
+
+func installMCPRuntimeImage(ctx context.Context, manager mcpRuntimeManager, enabled bool) (err error) {
+	defer func() {
+		if recover() != nil {
+			err = errors.New("MCP Docker image installation failed")
+		}
+	}()
+	return manager.InstallImage(ctx, enabled)
 }
 
 func (s *MCPRuntimeService) Logs(ctx context.Context) (dto.MCPRuntimeLogs, error) {

@@ -15,10 +15,13 @@ type SettingRepo struct{}
 type ISettingRepo interface {
 	GetList(opts ...DBOption) ([]model.Setting, error)
 	Get(opts ...DBOption) (model.Setting, error)
+	GetWithContext(ctx context.Context, opts ...DBOption) (model.Setting, error)
 	GetValueByKey(key string) (string, error)
 	GetCoreValueByKey(key string) (string, error)
 	Create(key, value string) error
+	CreateWithContext(ctx context.Context, setting *model.Setting) error
 	Update(key, value string) error
+	UpdateIfMatch(ctx context.Context, id uint, expectedValue, value string) (int64, error)
 	WithByKey(key string) DBOption
 
 	UpdateOrCreate(key, value string) error
@@ -65,6 +68,22 @@ func (s *SettingRepo) Get(opts ...DBOption) (model.Setting, error) {
 	}
 	err := db.First(&settings).Error
 	return settings, err
+}
+
+func (s *SettingRepo) GetWithContext(ctx context.Context, opts ...DBOption) (model.Setting, error) {
+	var setting model.Setting
+	err := getTx(ctx, opts...).WithContext(ctx).First(&setting).Error
+	return setting, err
+}
+
+func (s *SettingRepo) CreateWithContext(ctx context.Context, setting *model.Setting) error {
+	return getTx(ctx).WithContext(ctx).Create(setting).Error
+}
+
+func (s *SettingRepo) UpdateIfMatch(ctx context.Context, id uint, expectedValue, value string) (int64, error) {
+	result := getTx(ctx).WithContext(ctx).Model(&model.Setting{}).
+		Where("id = ? AND value = ?", id, expectedValue).Update("value", value)
+	return result.RowsAffected, result.Error
 }
 
 func (s *SettingRepo) GetValueByKey(key string) (string, error) {

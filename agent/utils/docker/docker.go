@@ -13,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/distribution/reference"
 	"github.com/docker/cli/cli/config"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -320,7 +321,7 @@ func (c Client) BuildImageWithProcessAndOptions(task *task.Task, tar io.ReadClos
 
 func (c Client) PullImageWithProcess(task *task.Task, imageName string) error {
 	options := image.PullOptions{}
-	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
+	if authStr, ok := RegistryAuthForImage(imageName); ok {
 		options.RegistryAuth = authStr
 	}
 	return c.PullImageWithProcessAndOptions(task, imageName, options)
@@ -342,7 +343,7 @@ func PullImage(imageName string) error {
 	}
 	defer cli.Close()
 	options := image.PullOptions{}
-	if authStr, ok := loadRegistryAuthFromDockerConfig(imageName); ok {
+	if authStr, ok := RegistryAuthForImage(imageName); ok {
 		options.RegistryAuth = authStr
 	}
 	out, err := cli.ImagePull(context.Background(), imageName, options)
@@ -353,17 +354,20 @@ func PullImage(imageName string) error {
 	return handlePullImageProcess(out, nil)
 }
 
-func loadRegistryAuthFromDockerConfig(imageName string) (string, bool) {
-	registryHost, hasRegistry := extractRegistryHost(imageName)
+func RegistryAuthForImage(imageName string) (string, bool) {
+	named, err := reference.ParseNormalizedNamed(imageName)
+	if err != nil {
+		return "", false
+	}
+	registryHost := normalizeRegistryHost(reference.Domain(named))
 	cfg := config.LoadDefaultConfigFile(io.Discard)
 	if cfg == nil {
 		return "", false
 	}
 	candidates := make([]string, 0)
-	if hasRegistry {
+	if !isDockerHubRegistry(registryHost) {
 		candidates = append(candidates, registryHost, "https://"+registryHost, "http://"+registryHost)
-	}
-	if !hasRegistry || isDockerHubRegistry(registryHost) {
+	} else {
 		candidates = append(candidates,
 			"https://index.docker.io/v1/",
 			"index.docker.io",
@@ -411,18 +415,6 @@ func isDockerHubRegistry(host string) bool {
 	default:
 		return false
 	}
-}
-
-func extractRegistryHost(imageName string) (string, bool) {
-	parts := strings.Split(imageName, "/")
-	if len(parts) < 2 {
-		return "", false
-	}
-	first := parts[0]
-	if strings.Contains(first, ".") || strings.Contains(first, ":") || first == "localhost" {
-		return normalizeRegistryHost(first), true
-	}
-	return "", false
 }
 
 func normalizeRegistryHost(registryKey string) string {

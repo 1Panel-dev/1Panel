@@ -7,8 +7,11 @@ import (
 )
 
 var AddPanelMCP = &gormigrate.Migration{
-	ID: "20261008-panel-mcp",
+	ID: "20261009-panel-mcp",
 	Migrate: func(tx *gorm.DB) error {
+		if err := tx.Migrator().DropTable(&model.MCPSetting{}); err != nil {
+			return err
+		}
 		return tx.AutoMigrate(&model.MCPCredential{}, &model.MCPGrant{}, &model.MCPInvocation{}, &model.MCPSetting{})
 	},
 }

@@ -45,8 +45,9 @@ const handleClose = () => {
 
 const acceptParams = (mcpServer: AI.McpServer) => {
     jsonObj.value.mcpServers = {};
+    const path = mcpServer.outputTransport === 'sse' ? mcpServer.ssePath : mcpServer.streamableHttpPath;
     jsonObj.value.mcpServers[mcpServer.name] = {
-        url: mcpServer.baseUrl + mcpServer.ssePath,
+        url: mcpServer.baseUrl + path,
     };
     prettyJson.value = JSON.stringify(jsonObj.value, null, 2);
     open.value = true;

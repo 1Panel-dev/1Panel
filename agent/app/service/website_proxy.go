@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"path"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -22,6 +24,63 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
+
+func websiteProxyPathAllowed(directory, name string) bool {
+	if name == "" || name == "." || name == ".." || strings.ContainsAny(name, "/\\\x00") {
+		return false
+	}
+	resolvedDirectory, err := websiteProxyResolvePath(directory)
+	if err != nil || !websiteManagedConfigs.pathAllowed(resolvedDirectory) {
+		return false
+	}
+	for _, extension := range []string{".conf", ".bak"} {
+		filename := filepath.Join(directory, name+extension)
+		if info, statErr := os.Lstat(filename); statErr == nil && info.Mode()&os.ModeSymlink != 0 {
+			return false
+		}
+		resolved, resolveErr := websiteProxyResolvePath(filename)
+		if resolveErr != nil || !websiteProxyPathWithin(resolved, resolvedDirectory) || !websiteManagedConfigs.pathAllowed(resolved) {
+			return false
+		}
+	}
+	return true
+}
+
+func websiteProxyDirectoryAllowed(directory string) bool {
+	resolved, err := websiteProxyResolvePath(directory)
+	return err == nil && websiteManagedConfigs.pathAllowed(resolved)
+}
+
+func websiteProxyPathWithin(target, directory string) bool {
+	resolvedDirectory, err := websiteProxyResolvePath(directory)
+	if err != nil {
+		return false
+	}
+	relative, err := filepath.Rel(resolvedDirectory, target)
+	return err == nil && relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator))
+}
+
+func websiteProxyResolvePath(target string) (string, error) {
+	absolute, err := filepath.Abs(target)
+	if err != nil {
+		return "", err
+	}
+	resolved, err := filepath.EvalSymlinks(absolute)
+	if err == nil {
+		return resolved, nil
+	}
+	if !os.IsNotExist(err) || filepath.Dir(absolute) == absolute {
+		return "", err
+	}
+	if info, statErr := os.Lstat(absolute); statErr == nil && info.Mode()&os.ModeSymlink != 0 {
+		return "", errors.New("invalid proxy symlink")
+	}
+	parent, err := websiteProxyResolvePath(filepath.Dir(absolute))
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(parent, filepath.Base(absolute)), nil
+}
 
 func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error) {
 	switch req.Operate {
@@ -51,6 +110,9 @@ func (w WebsiteService) OperateProxy(req request.WebsiteProxyConfig) (err error)
 	}
 	fileOp := files.NewFileOp()
 	includeDir := GetSitePath(website, SiteProxyDir)
+	if !websiteProxyPathAllowed(includeDir, req.Name) {
+		return errors.New("invalid proxy path")
+	}
 	if !fileOp.Stat(includeDir) {
 		_ = fileOp.CreateDir(includeDir, constant.DirPerm)
 	}
@@ -270,6 +332,9 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 	}
 	includeDir := GetSitePath(website, SiteProxyDir)
 	fileOp := files.NewFileOp()
+	if !websiteProxyDirectoryAllowed(includeDir) {
+		return nil, errors.New("invalid proxy path")
+	}
 	if !fileOp.Stat(includeDir) {
 		return
 	}
@@ -282,12 +347,16 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		config  *components.Config
 	)
 	for _, configFile := range fileList.Items {
+		extension := filepath.Ext(configFile.Name)
+		name := strings.TrimSuffix(configFile.Name, extension)
+		if configFile.IsDir || (extension != ".conf" && extension != ".bak") || !websiteProxyPathAllowed(includeDir, name) {
+			continue
+		}
 		proxyConfig := request.WebsiteProxyConfig{
 			ID: website.ID,
 		}
-		parts := strings.Split(configFile.Name, ".")
-		proxyConfig.Name = parts[0]
-		if parts[1] == "conf" {
+		proxyConfig.Name = name
+		if extension == ".conf" {
 			proxyConfig.Enable = true
 		} else {
 			proxyConfig.Enable = false
@@ -360,6 +429,9 @@ func (w WebsiteService) UpdateProxyFile(req request.NginxProxyUpdate) (err error
 	if err != nil {
 		return err
 	}
+	if !websiteProxyPathAllowed(GetSitePath(website, SiteProxyDir), req.Name) {
+		return errors.New("invalid proxy path")
+	}
 	absolutePath := fmt.Sprintf("%s/%s.conf", GetSitePath(website, SiteProxyDir), req.Name)
 	fileOp := files.NewFileOp()
 	oldRewriteContent, err = fileOp.GetContent(absolutePath)
@@ -405,6 +477,9 @@ func (w WebsiteService) DeleteProxy(req request.WebsiteProxyDel) (err error) {
 		return
 	}
 	includeDir := GetSitePath(website, SiteProxyDir)
+	if !websiteProxyPathAllowed(includeDir, req.Name) {
+		return errors.New("invalid proxy path")
+	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		return
@@ -425,6 +500,9 @@ func (w WebsiteService) UpdateProxyStatus(req request.WebsiteProxyStatusUpdate) 
 		return
 	}
 	includeDir := GetSitePath(website, SiteProxyDir)
+	if !websiteProxyPathAllowed(includeDir, req.Name) {
+		return errors.New("invalid proxy path")
+	}
 	fileOp := files.NewFileOp()
 	if !fileOp.Stat(includeDir) {
 		return

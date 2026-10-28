@@ -261,7 +261,7 @@ func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, f
 		return err
 	}
 	nginxConfFile := GetWebsiteConfigPath(*website)
-	if err := fileOp.CopyFile(nginxConfFile, tmpDir); err != nil {
+	if err := exportWebsiteNginxConfig(*website, nginxConfFile, tmpDir); err != nil {
 		return err
 	}
 	parentTask.Log(i18n.GetMsgByKey("BackupNginxConfig"))

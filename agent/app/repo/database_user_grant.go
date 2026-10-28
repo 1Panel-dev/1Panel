@@ -14,6 +14,7 @@ type IDatabaseUserGrantRepo interface {
 	Get(opts ...DBOption) (model.DatabaseUserGrant, error)
 	List(opts ...DBOption) ([]model.DatabaseUserGrant, error)
 	Save(grant *model.DatabaseUserGrant) error
+	CreateIfAbsent(ctx context.Context, grant *model.DatabaseUserGrant) error
 	Replace(dbType, database string, grants []model.DatabaseUserGrant) error
 	Delete(opts ...DBOption) error
 	DeleteBy(ctx context.Context, opts ...DBOption) error
@@ -50,6 +51,12 @@ func (u *DatabaseUserGrantRepo) List(opts ...DBOption) ([]model.DatabaseUserGran
 
 func (u *DatabaseUserGrantRepo) Save(grant *model.DatabaseUserGrant) error {
 	return global.DB.Save(grant).Error
+}
+
+func (u *DatabaseUserGrantRepo) CreateIfAbsent(ctx context.Context, grant *model.DatabaseUserGrant) error {
+	return getTx(ctx).WithContext(ctx).
+		Where("type = ? AND database = ? AND db_name = ? AND username = ? AND host = ?", grant.Type, grant.Database, grant.DBName, grant.Username, grant.Host).
+		FirstOrCreate(grant).Error
 }
 
 func (u *DatabaseUserGrantRepo) Replace(dbType, database string, grants []model.DatabaseUserGrant) error {

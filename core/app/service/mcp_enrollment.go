@@ -17,6 +17,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/auth"
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
+	"github.com/1Panel-dev/1Panel/core/app/repo"
 	paneli18n "github.com/1Panel-dev/1Panel/core/i18n"
 	contract "github.com/1Panel-dev/1Panel/core/utils/mcp"
 	"github.com/google/uuid"
@@ -92,7 +93,9 @@ func (s *MCPService) enrollmentKey(owner auth.APIKeyOwner, req dto.MCPCredential
 	if err := s.authorize(owner, "mcp_access_manage"); err != nil {
 		return key, err
 	}
-	if err := mcpOwnerQuery(s.DB, owner).Where("id = ?", req.ID).First(&key).Error; err != nil {
+	var err error
+	key, err = (repo.MCPRepo{DB: s.DB}).Credential(owner.Type, owner.ID, req.ID)
+	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return key, contract.Forbidden()
 		}

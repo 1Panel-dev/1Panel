@@ -59,7 +59,8 @@ type IAppService interface {
 }
 
 type appInstallHooks struct {
-	AfterCopyData func(appInstall *model.AppInstall) error
+	AfterCopyData  func(appInstall *model.AppInstall) error
+	PrepareSiteDir func(model.App, model.AppDetail, request.AppInstallCreate, *task.Task) error
 }
 
 func NewIAppService() IAppService {
@@ -614,7 +615,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 			}
 		}
 		if app.Key == "openresty" {
-			if err = handleSiteDir(app, appDetail, req, t); err != nil {
+			if err = prepareAppInstallSiteDirectory(app, appDetail, req, t, hooks); err != nil {
 				return err
 			}
 			if err = handleOpenrestyFile(appInstall); err != nil {

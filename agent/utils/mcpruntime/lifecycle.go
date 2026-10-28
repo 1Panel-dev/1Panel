@@ -10,49 +10,90 @@ import (
 	"strings"
 	"time"
 
+	"github.com/containerd/errdefs"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
 	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/errdefs"
 )
 
-func (c *Controller) pullImage(ctx context.Context, cli DockerClient, req Request) error {
+func (c *Controller) pullImage(ctx context.Context, cli DockerClient, req Request, progress func(PullProgress) error) error {
+	if err := reportPullProgress(ctx, progress, PullProgress{Status: "checking_image"}); err != nil {
+		return err
+	}
 	_, err := cli.ImageInspect(ctx, req.Image)
 	if err != nil && !errdefs.IsNotFound(err) {
 		return errors.New("MCP Docker image inspection failed")
 	}
 	if errdefs.IsNotFound(err) {
+		if err = reportPullProgress(ctx, progress, PullProgress{Status: "pulling"}); err != nil {
+			return err
+		}
 		pullCtx, cancel := context.WithTimeout(ctx, 3*time.Minute)
 		defer cancel()
-		reader, pullErr := cli.ImagePull(pullCtx, req.Image, image.PullOptions{})
+		options := image.PullOptions{}
+		if auth, ok := c.registryAuth(req.Image); ok {
+			options.RegistryAuth = auth
+		}
+		reader, pullErr := cli.ImagePull(pullCtx, req.Image, options)
 		if pullErr != nil {
+			if errdefs.IsUnauthorized(pullErr) || errdefs.IsPermissionDenied(pullErr) {
+				return errors.New("MCP Docker image registry authentication failed")
+			}
 			return errors.New("MCP Docker image download failed")
 		}
 		defer reader.Close()
-		decoder := json.NewDecoder(io.LimitReader(reader, 16<<20))
+		limited := &io.LimitedReader{R: reader, N: (16 << 20) + 1}
+		decoder := json.NewDecoder(limited)
 		for {
 			var message struct {
+				Status         string `json:"status"`
+				ID             string `json:"id"`
+				ProgressDetail struct {
+					Current int64 `json:"current"`
+					Total   int64 `json:"total"`
+				} `json:"progressDetail"`
 				Error       string `json:"error"`
 				ErrorDetail *struct {
+					Code    int    `json:"code"`
 					Message string `json:"message"`
 				} `json:"errorDetail"`
 			}
-			if err = decoder.Decode(&message); err == io.EOF {
+			err = decoder.Decode(&message)
+			if limited.N == 0 {
+				return errors.New("MCP Docker image download progress exceeds permitted size")
+			}
+			if err == io.EOF {
 				break
 			} else if err != nil {
 				return errors.New("MCP Docker image download was interrupted")
 			}
 			if message.Error != "" || message.ErrorDetail != nil {
+				if message.ErrorDetail != nil && (message.ErrorDetail.Code == 401 || message.ErrorDetail.Code == 403) {
+					return errors.New("MCP Docker image registry authentication failed")
+				}
 				return errors.New("MCP Docker image download failed")
 			}
+			if normalized, ok := normalizePullProgress(message.Status, message.ID, message.ProgressDetail.Current, message.ProgressDetail.Total); ok {
+				if err = reportPullProgress(ctx, progress, normalized); err != nil {
+					return err
+				}
+			}
 		}
+	} else if err = reportPullProgress(ctx, progress, PullProgress{Status: "local_image"}); err != nil {
+		return err
+	}
+	if err = reportPullProgress(ctx, progress, PullProgress{Status: "verifying_image"}); err != nil {
+		return err
 	}
 	img, err := c.resolve(ctx, cli, req.Image)
 	if err != nil {
 		return err
 	}
-	_, err = c.verify(ctx, cli, img.ID, req.Image)
-	return err
+	_, err = c.verify(ctx, cli, img.ID)
+	if err != nil {
+		return err
+	}
+	return reportPullProgress(ctx, progress, PullProgress{Status: "verified_image"})
 }
 
 func (c *Controller) installRuntime(ctx context.Context, cli DockerClient, req Request) error {
@@ -176,14 +217,19 @@ func (c *Controller) apply(ctx context.Context, cli DockerClient, req Request) e
 	if err = c.checkDirectory(); err != nil {
 		return err
 	}
-	img, err := c.resolve(ctx, cli, req.Image)
+	var img image.InspectResponse
+	if req.Operation == "install" {
+		img, err = c.resolve(ctx, cli, req.Image)
+	} else {
+		img, err = c.resolveActiveImage(ctx, cli, req.Image, current)
+	}
 	if err != nil {
 		return err
 	}
 	if !digestPattern.MatchString(req.ImageID) || img.ID != req.ImageID {
 		return errors.New("MCP image identity changed after catalog validation; retry the operation")
 	}
-	verified, err := c.verify(ctx, cli, img.ID, req.Image)
+	verified, err := c.verify(ctx, cli, img.ID)
 	if err != nil {
 		return err
 	}
@@ -354,7 +400,7 @@ func (c *Controller) rollback(ctx context.Context, cli DockerClient, req Request
 		}
 		return errors.New("the previous MCP runtime instance is unavailable for rollback")
 	}
-	verified, err := c.verify(ctx, cli, target.Image, req.Image)
+	verified, err := c.verify(ctx, cli, target.Image)
 	if err != nil {
 		return err
 	}
@@ -402,7 +448,7 @@ func (c *Controller) rollbackAbsent(ctx context.Context, cli DockerClient, req R
 	if _, err = c.resolve(ctx, cli, current.Image); err != nil {
 		return err
 	}
-	verified, err := c.verify(ctx, cli, current.Image, req.Image)
+	verified, err := c.verify(ctx, cli, current.Image)
 	if err != nil {
 		return err
 	}

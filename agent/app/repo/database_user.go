@@ -14,8 +14,10 @@ type DatabaseUserRepo struct{}
 
 type IDatabaseUserRepo interface {
 	Get(opts ...DBOption) (model.DatabaseUser, error)
+	GetEncryptedWithContext(ctx context.Context, opts ...DBOption) (model.DatabaseUser, error)
 	List(opts ...DBOption) ([]model.DatabaseUser, error)
 	Save(user *model.DatabaseUser) error
+	SaveEncryptedWithContext(ctx context.Context, user *model.DatabaseUser) error
 	Delete(opts ...DBOption) error
 	DeleteBy(ctx context.Context, opts ...DBOption) error
 	Update(vars map[string]interface{}, opts ...DBOption) error
@@ -43,6 +45,13 @@ func (u *DatabaseUserRepo) Get(opts ...DBOption) (model.DatabaseUser, error) {
 	}
 	user.Password = password
 	return user, nil
+}
+
+// GetEncryptedWithContext leaves credential transformation to the caller.
+func (u *DatabaseUserRepo) GetEncryptedWithContext(ctx context.Context, opts ...DBOption) (model.DatabaseUser, error) {
+	var user model.DatabaseUser
+	err := getTx(ctx, opts...).WithContext(ctx).First(&user).Error
+	return user, err
 }
 
 func (u *DatabaseUserRepo) List(opts ...DBOption) ([]model.DatabaseUser, error) {
@@ -73,6 +82,10 @@ func (u *DatabaseUserRepo) Save(user *model.DatabaseUser) error {
 		user.Password = password
 	}
 	return global.DB.Save(user).Error
+}
+
+func (u *DatabaseUserRepo) SaveEncryptedWithContext(ctx context.Context, user *model.DatabaseUser) error {
+	return getTx(ctx).WithContext(ctx).Save(user).Error
 }
 
 func (u *DatabaseUserRepo) Delete(opts ...DBOption) error {

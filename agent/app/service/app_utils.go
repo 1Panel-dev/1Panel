@@ -2033,11 +2033,19 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 	return res, nil
 }
 
+func prepareAppInstallSiteDirectory(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task, hooks *appInstallHooks) error {
+	if hooks != nil && hooks.PrepareSiteDir != nil {
+		return hooks.PrepareSiteDir(app, appDetail, req, t)
+	}
+	return handleSiteDir(app, appDetail, req, t)
+}
+
+func managesOpenrestySiteDirectory(app model.App, appDetail model.AppDetail) bool {
+	return app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27")
+}
+
 func handleSiteDir(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task) error {
-	if app.Key == "openresty" && (app.Resource == "remote" || app.Resource == "custom") && common.CompareVersion(appDetail.Version, "1.27") {
-		if req.MCPPreserveWebsiteDir {
-			return prepareMCPWebsiteDirectory(req)
-		}
+	if managesOpenrestySiteDirectory(app, appDetail) {
 		if dir, ok := req.Params["WEBSITE_DIR"]; ok {
 			siteDir := dir.(string)
 			if siteDir == "" || !strings.HasPrefix(siteDir, "/") {

@@ -96,12 +96,11 @@ var NewMCPService = func() *MCPService {
 		defer cancel()
 		return NewMCPRuntimeService().Catalog(ctx)
 	}, Enabled: func() (bool, error) {
-		var setting struct{ Enabled bool }
-		err := global.DB.Table("mcp_settings").Where("id = ?", 1).Take(&setting).Error
+		enabled, err := (repo.MCPRepo{DB: global.DB}).Enabled()
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return false, nil
 		}
-		return setting.Enabled, err
+		return enabled, err
 	}}
 }
 
@@ -148,9 +147,6 @@ func (s *MCPService) ManagementOwner(c *gin.Context, write bool) (auth.APIKeyOwn
 		return auth.APIKeyOwner{}, err
 	}
 	return owner, nil
-}
-func mcpOwnerQuery(db *gorm.DB, owner auth.APIKeyOwner) *gorm.DB {
-	return db.Where("owner_type = ? AND owner_id = ?", owner.Type, owner.ID)
 }
 func validMCPPage(page, size int) bool { return page > 0 && page <= 1000000 && size > 0 && size <= 100 }
 func (s *MCPService) catalog() ([]contract.Tool, error) {
@@ -294,16 +290,8 @@ func (s *MCPService) Search(owner auth.APIKeyOwner, req dto.MCPCredentialSearch)
 	if !validMCPPage(req.Page, req.PageSize) {
 		return nil, contract.Invalid()
 	}
-	q := mcpOwnerQuery(s.DB.Model(&model.MCPCredential{}), owner)
-	if req.ExcludeRevoked {
-		q = q.Where("status <> ?", "Revoked")
-	}
-	var total int64
-	if err := q.Count(&total).Error; err != nil {
-		return nil, err
-	}
-	keys := []model.MCPCredential{}
-	if err := q.Order("created_at DESC, id DESC").Offset((req.Page - 1) * req.PageSize).Limit(req.PageSize).Find(&keys).Error; err != nil {
+	keys, total, err := (repo.MCPRepo{DB: s.DB}).SearchCredentials(owner.Type, owner.ID, req.Page, req.PageSize, req.ExcludeRevoked)
+	if err != nil {
 		return nil, err
 	}
 	items := []dto.MCPCredentialItem{}
@@ -344,7 +332,9 @@ func (s *MCPService) Create(owner auth.APIKeyOwner, req dto.MCPCredentialCreate)
 	repeated := false
 	mcpMutationMu.Lock()
 	err = s.DB.Transaction(func(tx *gorm.DB) error {
-		err := mcpOwnerQuery(tx, owner).Where("request_id = ?", req.RequestID).First(&key).Error
+		store := repo.MCPRepo{DB: tx}
+		var err error
+		key, err = store.CredentialByRequest(owner.Type, owner.ID, req.RequestID)
 		if err == nil {
 			if key.RequestHash != requestHash {
 				return contract.Fail("MCP_CONFLICT", 409, "Creation request already used")
@@ -355,8 +345,8 @@ func (s *MCPService) Create(owner auth.APIKeyOwner, req dto.MCPCredentialCreate)
 		if !errors.Is(err, gorm.ErrRecordNotFound) {
 			return err
 		}
-		var count int64
-		if err = mcpOwnerQuery(tx.Model(&model.MCPCredential{}), owner).Where("active_name = ?", req.Name).Count(&count).Error; err != nil {
+		count, err := store.CountActiveName(owner.Type, owner.ID, req.Name, "")
+		if err != nil {
 			return err
 		}
 		if count > 0 {
@@ -371,10 +361,10 @@ func (s *MCPService) Create(owner auth.APIKeyOwner, req dto.MCPCredentialCreate)
 		if err = s.sealCredentialToken(&key, token); err != nil {
 			return err
 		}
-		if err = tx.Create(&key).Error; err != nil {
+		if err = store.CreateCredential(&key); err != nil {
 			return err
 		}
-		if err = (repo.MCPRepo{DB: tx}).ReplaceTools(key.ID, grants); err != nil {
+		if err = store.ReplaceTools(key.ID, grants); err != nil {
 			return err
 		}
 		return s.auditEnrollment(tx, owner, "create", dto.MCPCredentialMutation{ID: key.ID, Revision: key.Revision}, nil)
@@ -397,8 +387,9 @@ func (s *MCPService) mutate(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 	mcpMutationMu.Lock()
 	defer mcpMutationMu.Unlock()
 	return s.DB.Transaction(func(tx *gorm.DB) error {
-		var key model.MCPCredential
-		if err := mcpOwnerQuery(tx, owner).Where("id = ?", req.ID).First(&key).Error; err != nil {
+		store := repo.MCPRepo{DB: tx}
+		key, err := store.Credential(owner.Type, owner.ID, req.ID)
+		if err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return contract.Forbidden()
 			}
@@ -415,11 +406,11 @@ func (s *MCPService) mutate(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 			key.SecretVersion = 0
 		}
 		key.Revision++
-		result := tx.Model(&model.MCPCredential{}).Where("id = ? AND revision = ?", key.ID, req.Revision).Select("name", "active_name", "description", "node_ids", "status", "expires_at", "revision", "revoked_at", "secret_ciphertext", "secret_version", "token_hash", "key_hint").Updates(&key)
-		if result.Error != nil {
-			return result.Error
+		affected, err := store.UpdateCredential(&key, req.Revision)
+		if err != nil {
+			return err
 		}
-		if result.RowsAffected != 1 {
+		if affected != 1 {
 			return contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
 		}
 		return nil
@@ -434,8 +425,8 @@ func (s *MCPService) Update(owner auth.APIKeyOwner, req dto.MCPCredentialUpdate)
 		return err
 	}
 	return s.mutate(owner, req.MCPCredentialMutation, func(tx *gorm.DB, key *model.MCPCredential) error {
-		var count int64
-		if err := mcpOwnerQuery(tx.Model(&model.MCPCredential{}), owner).Where("active_name = ? AND id <> ?", req.Name, key.ID).Count(&count).Error; err != nil {
+		count, err := (repo.MCPRepo{DB: tx}).CountActiveName(owner.Type, owner.ID, req.Name, key.ID)
+		if err != nil {
 			return err
 		}
 		if count > 0 {
@@ -628,7 +619,7 @@ func (s *MCPService) Invoke(c *gin.Context, token string, req contract.Invoke) (
 		record.Revision = key.Revision
 	}
 	record.Status = "running"
-	if err := s.DB.Create(&record).Error; err != nil {
+	if err := (repo.MCPRepo{DB: s.DB}).CreateInvocation(&record); err != nil {
 		return nil, contract.Fail("MCP_EXECUTION_FAILED", 503, "Invocation audit is unavailable")
 	}
 	record.Status = "denied"
@@ -707,10 +698,7 @@ func (s *MCPService) Invoke(c *gin.Context, token string, req contract.Invoke) (
 	if enabledErr != nil || !enabled {
 		return finish(contract.Fail("MCP_DISABLED", 503, "MCP access is disabled"), nil)
 	}
-	var admitted model.MCPCredential
-	admissionErr := s.DB.Select("expires_at").
-		Where("id = ? AND revision = ? AND status = ? AND revoked_at IS NULL", key.ID, key.Revision, "Enable").
-		Where("EXISTS (SELECT 1 FROM mcp_settings WHERE id = ? AND enabled = ?)", 1, true).Take(&admitted).Error
+	admitted, admissionErr := (repo.MCPRepo{DB: s.DB}).InvocationCredential(key.ID, key.Revision)
 	if errors.Is(admissionErr, gorm.ErrRecordNotFound) {
 		return finish(contract.Forbidden(), nil)
 	}
@@ -753,25 +741,13 @@ func (s *MCPService) Invocations(owner auth.APIKeyOwner, req dto.MCPInvocationSe
 	if !validMCPPage(req.Page, req.PageSize) {
 		return nil, contract.Invalid()
 	}
-	q := mcpOwnerQuery(s.DB.Model(&model.MCPInvocation{}), owner)
-	if req.CredentialID != "" {
-		q = q.Where("credential_id = ?", req.CredentialID)
-	}
-	if req.ToolID != "" {
-		q = q.Where("tool_id = ?", req.ToolID)
-	}
 	if req.Status != "" {
 		if req.Status != "success" && req.Status != "denied" && req.Status != "failed" && req.Status != "running" {
 			return nil, contract.Invalid()
 		}
-		q = q.Where("status = ?", req.Status)
 	}
-	var total int64
-	if err := q.Count(&total).Error; err != nil {
-		return nil, err
-	}
-	items := []model.MCPInvocation{}
-	if err := q.Order(mcpInvocationSecond + " DESC, " + mcpInvocationNanosecond + " DESC, id DESC").Offset((req.Page - 1) * req.PageSize).Limit(req.PageSize).Find(&items).Error; err != nil {
+	items, total, err := (repo.MCPRepo{DB: s.DB}).SearchInvocations(owner.Type, owner.ID, req.Page, req.PageSize, req.CredentialID, req.ToolID, req.Status)
+	if err != nil {
 		return nil, err
 	}
 	return map[string]any{"items": items, "total": total}, nil

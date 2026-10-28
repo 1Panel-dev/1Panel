@@ -8,9 +8,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/taskscope"
 )
 
-type TaskLogService struct{}
+type TaskLogService struct {
+	grantedScopes []string
+}
 
 type ITaskLogService interface {
 	Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, error)
@@ -19,13 +22,18 @@ type ITaskLogService interface {
 	CountExecutingTask() (int64, error)
 }
 
-func NewITaskService() ITaskLogService {
-	return &TaskLogService{}
+func NewITaskService(grantedScopes ...string) ITaskLogService {
+	return &TaskLogService{grantedScopes: append([]string(nil), grantedScopes...)}
 }
 
 func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, error) {
+	excluded, err := taskscope.ReadExclusions(u.grantedScopes...)
+	if err != nil {
+		return 0, nil, err
+	}
 	opts := []repo.DBOption{
 		repo.WithOrderDesc("created_at"),
+		taskRepo.WithoutScopes(excluded...),
 	}
 	if req.TaskID != "" {
 		opts = append(opts, taskRepo.WithByID(req.TaskID))
@@ -53,7 +61,11 @@ func (u *TaskLogService) Page(req dto.SearchTaskLogReq) (int64, []dto.TaskDTO, e
 }
 
 func (u *TaskLogService) ReadByLine(req request.TaskLogReadReq) (*response.FileLineContent, error) {
-	opts := []repo.DBOption{}
+	excluded, err := taskscope.ReadExclusions(u.grantedScopes...)
+	if err != nil {
+		return nil, err
+	}
+	opts := []repo.DBOption{taskRepo.WithoutScopes(excluded...)}
 	if req.TaskID != "" {
 		opts = append(opts, taskRepo.WithByID(req.TaskID))
 	} else {
@@ -112,9 +124,17 @@ func (u *TaskLogService) ReadByLine(req request.TaskLogReadReq) (*response.FileL
 }
 
 func (u *TaskLogService) SyncForRestart() error {
-	return taskRepo.UpdateRunningTaskToFailed()
+	excluded, err := taskscope.RecoveryExclusions()
+	if err != nil {
+		return err
+	}
+	return taskRepo.UpdateRunningTaskToFailed(taskRepo.WithoutScopes(excluded...))
 }
 
 func (u *TaskLogService) CountExecutingTask() (int64, error) {
-	return taskRepo.CountExecutingTask()
+	excluded, err := taskscope.ReadExclusions(u.grantedScopes...)
+	if err != nil {
+		return 0, err
+	}
+	return taskRepo.CountExecutingTask(taskRepo.WithoutScopes(excluded...))
 }

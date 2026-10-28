@@ -32,10 +32,21 @@ var loadLocalTerminalCapabilities = func(ctx context.Context) (interface{}, erro
 	return proxy_local.NewLocalClientWithContext(ctx, terminalsession.CapabilityPath, http.MethodGet, nil, nil, 5*time.Second)
 }
 
-func Proxy() gin.HandlerFunc {
+type agentProxyPolicy struct {
+	clear func(*http.Request)
+	grant func(*gin.Context, bool)
+}
+
+func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
+	policies = append([]agentProxyPolicy(nil), policies...)
 	return func(c *gin.Context) {
 		terminalsession.ClearForwardedHeaders(c)
 		mcpapi.ClearForwardedHeaders(c.Request.Header)
+		for _, policy := range policies {
+			if policy.clear != nil {
+				policy.clear(c.Request)
+			}
+		}
 		if mcpapi.HasIdentity(c.Request) && !mcpapi.IsRequest(c.Request) {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
@@ -104,6 +115,11 @@ func Proxy() gin.HandlerFunc {
 		if isInternalOnlyAgentEndpoint(reqPath) {
 			helper.ErrorWithDetail(c, http.StatusForbidden, "ErrProxy", errInternalOnlyAgentEndpoint)
 			return
+		}
+		for _, policy := range policies {
+			if policy.grant != nil {
+				policy.grant(c, useLocalAgent)
+			}
 		}
 
 		if reqPath == "/api/v2/hosts/terminal/local" && useLocalAgent {

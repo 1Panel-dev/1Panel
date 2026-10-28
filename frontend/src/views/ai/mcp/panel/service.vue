@@ -1,5 +1,5 @@
 <template>
-    <div v-if="status?.installed" class="app-status" v-loading="busy">
+    <div v-if="status?.installed || (canManageService && status?.installTaskID)" class="app-status" v-loading="busy">
         <el-card>
             <div class="flex w-full min-w-0 flex-col gap-4 md:flex-row">
                 <div class="ml-3 flex min-w-0 flex-wrap items-start gap-4">
@@ -33,12 +33,18 @@
                                 {{ $t('commons.operate.restart') }}
                             </el-button>
                             <el-divider direction="vertical" class="!hidden md:!inline-block" />
-                            <el-button type="primary" link @click="openSettings">
+                            <el-button type="primary" link :disabled="installing" @click="openSettings">
                                 {{ $t('commons.button.set') }}
                             </el-button>
                             <el-divider direction="vertical" class="!hidden md:!inline-block" />
                             <el-button type="primary" link @click="openLogs">{{ $t('commons.button.log') }}</el-button>
                         </template>
+                    </template>
+                    <template v-if="canManageService && status?.installTaskID">
+                        <el-divider direction="vertical" class="!hidden md:!inline-block" />
+                        <el-button type="primary" link @click="openInstallLogs">
+                            {{ $t('panelMCP.installTaskLog') }}
+                        </el-button>
                     </template>
                     <el-divider v-if="status?.installed" direction="vertical" class="!hidden md:!inline-block" />
                     <el-button v-if="status?.installed" type="primary" link @click="$emit('connection')">
@@ -138,13 +144,21 @@
                     show-icon
                     class="!mb-5"
                 />
+                <el-alert
+                    v-if="installing"
+                    class="!mb-5"
+                    type="info"
+                    :closable="false"
+                    :title="$t('commons.status.installing')"
+                    show-icon
+                />
                 <el-form
                     v-if="settingsTab === 'configuration'"
                     ref="settingsRef"
                     :model="settings"
                     :rules="settingsRules"
                     label-position="top"
-                    :disabled="busy || conflict || !canManageService"
+                    :disabled="busy || conflict || !canEditService"
                     @validate="onSettingsValidate"
                 >
                     <el-form-item :label="$t('panelMCP.listenPort')" prop="listenPort">
@@ -157,8 +171,18 @@
                         />
                     </el-form-item>
                     <el-form-item :label="$t('panelMCP.endpoint')" prop="externalUrl">
-                        <el-input v-model.trim="settings.externalUrl" :placeholder="endpoint" :maxlength="2048" />
-                        <span class="input-help mt-2 leading-5">{{ $t('panelMCP.externalUrlHelp') }}</span>
+                        <el-input
+                            :model-value="websiteAssociated ? websiteBinding?.endpoint || '' : settings.externalUrl"
+                            :disabled="websiteAssociated"
+                            :placeholder="endpoint"
+                            :maxlength="2048"
+                            @update:model-value="settings.externalUrl = $event.trim()"
+                        />
+                        <span class="input-help mt-2 leading-5">
+                            {{
+                                $t(websiteAssociated ? 'panelMCP.websiteBoundAddressHelp' : 'panelMCP.externalUrlHelp')
+                            }}
+                        </span>
                     </el-form-item>
                     <el-collapse v-model="advancedSettings" class="mt-4">
                         <el-collapse-item :title="$t('app.advanced')" name="source">
@@ -183,6 +207,16 @@
                                     :placeholder="$t('panelMCP.allowedIPsPlaceholder')"
                                 />
                             </el-form-item>
+                            <MCPWebsiteBinding
+                                ref="websiteRef"
+                                :draft="websiteDraft"
+                                mode="settings"
+                                :can-manage="canManageService"
+                                :disabled="operationBusy || installing"
+                                @busy="bindingBusy = $event"
+                                @binding="acceptWebsiteBinding"
+                                @changed="websiteChanged"
+                            />
                         </el-collapse-item>
                     </el-collapse>
                 </el-form>
@@ -206,22 +240,16 @@
                     :model="installation"
                     :rules="installRules"
                     label-position="top"
-                    :disabled="busy || installConflict || !canManageService"
+                    :disabled="busy || installConflict || !canEditService"
                 >
                     <el-form-item :label="$t('panelMCP.dockerImage')" prop="dockerImage">
                         <el-input
                             v-model.trim="installation.dockerImage"
                             :placeholder="DEFAULT_MCP_DOCKER_IMAGE"
-                            :maxlength="180"
+                            :maxlength="512"
                         />
-                        <span class="input-help mt-2 leading-5">{{ $t('panelMCP.dockerImageHelp') }}</span>
                     </el-form-item>
                 </el-form>
-                <el-collapse class="mt-4">
-                    <el-collapse-item :title="$t('panelMCP.offlineInstall')" name="offline">
-                        <p class="input-help !my-0 leading-5">{{ $t('panelMCP.dockerOfflineHelp') }}</p>
-                    </el-collapse-item>
-                </el-collapse>
             </el-tab-pane>
         </el-tabs>
         <template v-else>
@@ -242,15 +270,15 @@
                 :model="installation"
                 :rules="installRules"
                 label-position="top"
-                :disabled="busy || installConflict || !canManageService"
+                :disabled="busy || installConflict || !canEditService"
+                @validate="onInstallationValidate"
             >
                 <el-form-item :label="$t('panelMCP.dockerImage')" prop="dockerImage">
                     <el-input
                         v-model.trim="installation.dockerImage"
                         :placeholder="DEFAULT_MCP_DOCKER_IMAGE"
-                        :maxlength="180"
+                        :maxlength="512"
                     />
-                    <span class="input-help mt-2 leading-5">{{ $t('panelMCP.dockerImageHelp') }}</span>
                 </el-form-item>
                 <el-form-item v-if="!installIsUpgrade" :label="$t('panelMCP.listenPort')" prop="listenPort">
                     <el-input-number
@@ -262,15 +290,50 @@
                     />
                 </el-form-item>
                 <el-form-item v-if="!installIsUpgrade" :label="$t('panelMCP.endpoint')" prop="externalUrl">
-                    <el-input v-model.trim="installation.externalUrl" :placeholder="endpoint" :maxlength="2048" />
+                    <el-input
+                        v-model.trim="installation.externalUrl"
+                        :disabled="websiteDraft.requested || websiteAssociated"
+                        :placeholder="endpoint"
+                        :maxlength="2048"
+                    />
                     <span class="input-help mt-2 leading-5">{{ $t('panelMCP.externalUrlHelp') }}</span>
                 </el-form-item>
+                <el-collapse v-if="!installIsUpgrade" v-model="advancedInstallation" class="mt-4">
+                    <el-collapse-item :title="$t('app.advanced')" name="website">
+                        <el-form-item :label="$t('panelMCP.accessPolicy')" prop="accessPolicy">
+                            <el-select v-model="installation.accessPolicy" class="w-full">
+                                <el-option :label="$t('panelMCP.accessInherit')" value="inherit" />
+                                <el-option :label="$t('panelMCP.accessRestricted')" value="restricted" />
+                                <el-option :label="$t('panelMCP.accessAll')" value="all" />
+                            </el-select>
+                            <span class="input-help mt-2 leading-5">{{ $t('panelMCP.accessPolicyHelp') }}</span>
+                        </el-form-item>
+                        <el-form-item
+                            v-if="installation.accessPolicy === 'restricted'"
+                            :label="$t('panelMCP.allowedIPs')"
+                            prop="allowedIPs"
+                        >
+                            <el-input
+                                v-model="installAllowedIPsText"
+                                type="textarea"
+                                :rows="3"
+                                :maxlength="4160"
+                                :placeholder="$t('panelMCP.allowedIPsPlaceholder')"
+                            />
+                        </el-form-item>
+                        <MCPWebsiteBinding
+                            ref="websiteRef"
+                            :draft="websiteDraft"
+                            mode="installation"
+                            :can-manage="canManageService"
+                            :disabled="operationBusy || installing"
+                            @busy="bindingBusy = $event"
+                            @binding="acceptWebsiteBinding"
+                            @changed="websiteChanged"
+                        />
+                    </el-collapse-item>
+                </el-collapse>
             </el-form>
-            <el-collapse class="mt-4">
-                <el-collapse-item :title="$t('panelMCP.offlineInstall')" name="offline">
-                    <p class="input-help !my-0 leading-5">{{ $t('panelMCP.dockerOfflineHelp') }}</p>
-                </el-collapse-item>
-            </el-collapse>
         </template>
         <template #footer>
             <div class="flex flex-wrap items-center justify-end gap-2 [&>.el-button]:!ml-0">
@@ -281,7 +344,7 @@
                     v-if="drawerMode === 'settings' && settingsTab === 'configuration'"
                     type="primary"
                     :loading="busy"
-                    :disabled="conflict || !canManageService"
+                    :disabled="conflict || !canEditService"
                     @click="saveSettings"
                 >
                     {{ $t('commons.button.save') }}
@@ -290,7 +353,7 @@
                     v-else
                     type="primary"
                     :loading="busy"
-                    :disabled="installConflict || !canManageService"
+                    :disabled="installConflict || !canEditService"
                     @click="install"
                 >
                     {{ $t(installIsUpgrade ? 'panelMCP.upgradeTitle' : 'panelMCP.installEnable') }}
@@ -329,16 +392,24 @@
             <el-button @click="logsVisible = false">{{ $t('commons.button.cancel') }}</el-button>
         </template>
     </DrawerPro>
+    <TaskLog
+        v-if="canManageService"
+        ref="installTaskLog"
+        width="min(960px, calc(100vw - 24px))"
+        @close="refreshService"
+    />
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref, watch } from 'vue';
 import { ElMessageBox, type FormInstance } from 'element-plus';
 import type { PanelMCP } from '@/api/interface/panel-mcp';
+import type { Container } from '@/api/interface/container';
 import {
     getPanelMCPLogs,
     getPanelMCPSettings,
     getPanelMCPStatus,
+    getPanelMCPDockerStatus,
     installPanelMCPService,
     operatePanelMCPService,
     savePanelMCPSettings,
@@ -355,12 +426,16 @@ import {
     copyMCPSettings,
     parseMCPAllowedIPs,
     isMCPAllowedIPList,
+    defaultMCPWebsiteDraft,
 } from '@/utils/panel-mcp';
 import i18n from '@/lang';
+import MCPWebsiteBinding from './website-binding.vue';
+import TaskLog from '@/components/log/task/index.vue';
 
 const emit = defineEmits<{
     endpoint: [value: string];
     status: [value: PanelMCP.ServiceStatus | undefined];
+    dockerStatus: [value: Container.DockerStatus | undefined];
     connection: [];
     changed: [];
 }>();
@@ -369,18 +444,37 @@ const status = ref<PanelMCP.ServiceStatus>();
 const canManageService = computed(
     () => globalStore.isLogin && globalStore.isAdmin && status.value?.canManageService === true,
 );
+const installing = computed(() => status.value?.installing === true);
+const canEditService = computed(() => canManageService.value && !installing.value);
+const installTaskLog = ref<InstanceType<typeof TaskLog>>();
 const serviceStatusType = computed(() => {
+    if (installing.value) return 'warning';
     if (status.value?.ready) return 'success';
     if (status.value?.status === 'stopped' || status.value?.status === 'unhealthy') return 'danger';
     return 'warning';
 });
-const busy = ref(false);
+const operationBusy = ref(false);
+const bindingBusy = ref(false);
+const busy = computed({
+    get: () => operationBusy.value || bindingBusy.value,
+    set: (value: boolean) => {
+        operationBusy.value = value;
+    },
+});
 const statusVisible = ref(false);
 const settingsVisible = ref(false);
 const installVisible = ref(false);
 const drawerMode = ref<'installation' | 'settings'>('settings');
 const settingsTab = ref<'configuration' | 'upgrade'>('configuration');
 const advancedSettings = ref<string[]>([]);
+const advancedInstallation = ref<string[]>([]);
+const websiteDraft = reactive(defaultMCPWebsiteDraft());
+const websiteBinding = ref<PanelMCP.WebsiteBinding>();
+const websiteRef = ref<InstanceType<typeof MCPWebsiteBinding>>();
+const websiteAssociated = computed(() => !!websiteBinding.value && websiteBinding.value.state !== 'unbound');
+const acceptWebsiteBinding = (value: PanelMCP.WebsiteBinding | undefined) => {
+    if (value) websiteBinding.value = value;
+};
 const configurationVisible = computed({
     get: () => settingsVisible.value || installVisible.value,
     set: (value: boolean) => {
@@ -401,6 +495,8 @@ const installation = reactive<PanelMCP.Installation>({
     listenPort: 18081,
     externalUrl: '',
     revision: 0,
+    accessPolicy: 'inherit',
+    allowedIPs: [],
 });
 const installDraft = ref(false);
 const installSnapshot = ref<PanelMCP.Settings>();
@@ -418,11 +514,27 @@ const defaultSettings = (): PanelMCP.Settings => ({
 });
 const settings = reactive(defaultSettings());
 const settingsDirty = computed(() => savedSettings.value && hasMCPSettingsChanges(settings, savedSettings.value));
+const installationDirty = computed(() => {
+    const snapshot = installSnapshot.value;
+    if (!snapshot) return false;
+    return (
+        installation.dockerImage !== snapshot.dockerImage ||
+        (!installIsUpgrade.value && hasMCPSettingsChanges({ ...snapshot, ...installation }, snapshot))
+    );
+});
 const allowedIPsText = ref('');
+const installAllowedIPsText = ref('');
 watch(
     allowedIPsText,
     (value) => {
         settings.allowedIPs = parseMCPAllowedIPs(value);
+    },
+    { flush: 'sync' },
+);
+watch(
+    installAllowedIPsText,
+    (value) => {
+        installation.allowedIPs = parseMCPAllowedIPs(value);
     },
     { flush: 'sync' },
 );
@@ -440,6 +552,7 @@ const serviceOperation = computed<PanelMCP.Operation>(() =>
 const canOperateService = computed(
     () =>
         canManageService.value &&
+        !installing.value &&
         status.value?.installed &&
         ['stopped', 'running', 'unhealthy', 'incompatible'].includes(status.value.status),
 );
@@ -451,19 +564,26 @@ const statusKeys: Record<PanelMCP.ServiceStatus['status'], string> = {
     unhealthy: 'statusUnhealthy',
     incompatible: 'statusIncompatible',
 };
-const statusLabel = computed(() => i18n.global.t(`panelMCP.${statusKeys[status.value?.status] || 'statusUnknown'}`));
+const statusLabel = computed(() =>
+    i18n.global.t(
+        installing.value
+            ? 'commons.status.installing'
+            : `panelMCP.${statusKeys[status.value?.status] || 'statusUnknown'}`,
+    ),
+);
+const allowedIPsRules = (model: Pick<PanelMCP.Settings, 'accessPolicy'>) => [
+    {
+        validator: (_rule: unknown, value: string[], done: (error?: Error) => void) =>
+            done(
+                model.accessPolicy !== 'restricted' || (value.length > 0 && isMCPAllowedIPList(value))
+                    ? undefined
+                    : new Error(i18n.global.t('panelMCP.allowedIPsInvalid')),
+            ),
+        trigger: 'blur',
+    },
+];
 const settingsRules = {
-    allowedIPs: [
-        {
-            validator: (_rule: unknown, value: string[], done: (error?: Error) => void) =>
-                done(
-                    settings.accessPolicy !== 'restricted' || (value.length > 0 && isMCPAllowedIPList(value))
-                        ? undefined
-                        : new Error(i18n.global.t('panelMCP.allowedIPsInvalid')),
-                ),
-            trigger: 'blur',
-        },
-    ],
+    allowedIPs: allowedIPsRules(settings),
     listenPort: [
         Rules.requiredInput,
         {
@@ -504,6 +624,7 @@ const settingsRules = {
 };
 const installRules = {
     ...settingsRules,
+    allowedIPs: allowedIPsRules(installation),
     dockerImage: [
         {
             validator: (_rule: unknown, value: string, done: (error?: Error) => void) =>
@@ -517,6 +638,12 @@ const onSettingsValidate = async (prop: string | string[], valid: boolean) => {
     advancedSettings.value = ['source'];
     await nextTick();
     settingsRef.value?.scrollToField(prop);
+};
+const onInstallationValidate = async (prop: string | string[], valid: boolean) => {
+    if (valid || prop !== 'allowedIPs') return;
+    advancedInstallation.value = ['website'];
+    await nextTick();
+    installRef.value?.scrollToField(prop);
 };
 let active = false;
 let pageVersion = 0;
@@ -532,12 +659,36 @@ const refresh = async () => {
     try {
         const response = await getPanelMCPStatus();
         if (!active || !globalStore.isLogin || ticket !== requestVersion) return;
+        let dockerStatus: Container.DockerStatus | undefined;
+        if (response.data?.status === 'unsupported' && response.data.canManageService && globalStore.isAdmin) {
+            try {
+                const docker = await getPanelMCPDockerStatus();
+                if (typeof docker.data?.isExist === 'boolean' && typeof docker.data.isActive === 'boolean') {
+                    dockerStatus = docker.data;
+                }
+            } catch {}
+        }
+        if (!active || !globalStore.isLogin || ticket !== requestVersion) return;
+        const installationFinished = installing.value && response.data.installing === false;
         status.value = response.data;
+        if (response.data.website) websiteBinding.value = response.data.website;
+        emit('dockerStatus', dockerStatus);
         emit('endpoint', endpoint.value);
         emit('status', status.value);
+        if (installationFinished) {
+            emit('changed');
+            if (!settingsDirty.value && canEditService.value) {
+                try {
+                    await reloadSettings(pageVersion);
+                } catch {
+                    /* Keep the confirmed runtime status when settings cannot be refreshed. */
+                }
+            }
+        }
     } catch {
         if (active && globalStore.isLogin && ticket === requestVersion) {
             status.value = undefined;
+            emit('dockerStatus', undefined);
             emit('endpoint', '');
             emit('status', undefined);
         }
@@ -599,15 +750,23 @@ const reloadSettings = async (version = pageVersion) => {
     conflict.value = false;
 };
 const copyInstallation = (source: PanelMCP.Settings, upgrading: boolean) => {
-    installSnapshot.value = { ...source };
+    installSnapshot.value = copyMCPSettings(source);
     installIsUpgrade.value = upgrading;
-    const { dockerImage, listenPort, externalUrl, revision } = source;
-    Object.assign(installation, { dockerImage, listenPort, externalUrl, revision });
+    const { dockerImage, listenPort, externalUrl, revision, accessPolicy } = source;
+    Object.assign(installation, {
+        dockerImage,
+        listenPort,
+        externalUrl,
+        revision,
+        accessPolicy,
+        allowedIPs: [...source.allowedIPs],
+    });
+    installAllowedIPsText.value = source.allowedIPs.join('\n');
     installDraft.value = true;
     installConflict.value = false;
 };
 const openInstall = async () => {
-    if (busy.value || !canManageService.value) return;
+    if (busy.value || !canEditService.value) return;
     const version = pageVersion;
     busy.value = true;
     try {
@@ -617,7 +776,7 @@ const openInstall = async () => {
             if (!isCurrentPage(version)) return;
             copyInstallation(copyMCPSettings(response.data), upgrading);
         }
-        if (!isCurrentPage(version) || !canManageService.value) return;
+        if (!isCurrentPage(version) || !canEditService.value) return;
         drawerMode.value = installIsUpgrade.value ? 'settings' : 'installation';
         settingsTab.value = 'upgrade';
         settingsVisible.value = false;
@@ -627,19 +786,21 @@ const openInstall = async () => {
     }
 };
 const reloadInstallation = async () => {
-    if (busy.value || !canManageService.value) return;
+    if (busy.value || !canEditService.value) return;
     const version = pageVersion;
-    try {
-        await ElMessageBox.confirm(i18n.global.t('panelMCP.reloadInstallConfirm'), installTitle.value);
-    } catch {
-        return;
+    if (installationDirty.value) {
+        try {
+            await ElMessageBox.confirm(i18n.global.t('panelMCP.reloadInstallConfirm'), installTitle.value);
+        } catch {
+            return;
+        }
     }
-    if (!isCurrentPage(version) || busy.value || !canManageService.value) return;
+    if (!isCurrentPage(version) || busy.value || !canEditService.value) return;
     busy.value = true;
     try {
         const upgrading = !!status.value?.installed;
         const response = await getPanelMCPSettings();
-        if (isCurrentPage(version)) {
+        if (isCurrentPage(version) && canEditService.value) {
             copyInstallation(copyMCPSettings(response.data), upgrading);
             drawerMode.value = upgrading ? 'settings' : 'installation';
             settingsTab.value = 'upgrade';
@@ -649,7 +810,7 @@ const reloadInstallation = async () => {
     }
 };
 const openSettings = async () => {
-    if (busy.value || !canManageService.value || !status.value?.installed) return;
+    if (busy.value || !canEditService.value || !status.value?.installed) return;
     const version = pageVersion;
     busy.value = true;
     try {
@@ -664,8 +825,24 @@ const openSettings = async () => {
         busy.value = false;
     }
 };
+const websiteChanged = async (value: PanelMCP.WebsiteBinding) => {
+    websiteBinding.value = value;
+    if (installSnapshot.value && installSnapshot.value.revision !== value.revision) installConflict.value = true;
+    if (settingsDirty.value) conflict.value = true;
+    if (operationBusy.value) return;
+    const version = pageVersion;
+    operationBusy.value = true;
+    try {
+        if (!settingsDirty.value) await reloadSettings(version);
+        if (!isCurrentPage(version)) return;
+        emit('changed');
+        await refresh();
+    } finally {
+        operationBusy.value = false;
+    }
+};
 const saveSettings = async () => {
-    if (busy.value || conflict.value || !canManageService.value || !savedSettings.value) return;
+    if (busy.value || conflict.value || !canEditService.value || !savedSettings.value) return;
     const version = pageVersion;
     busy.value = true;
     try {
@@ -677,7 +854,7 @@ const saveSettings = async () => {
                 i18n.global.t('panelMCP.accessPolicy'),
             );
         }
-        if (!isCurrentPage(version) || !canManageService.value) return;
+        if (!isCurrentPage(version) || !canEditService.value) return;
         const { runtimeType, dockerImage, enabled, revision } = savedSettings.value;
         const { listenPort, externalUrl, accessPolicy } = settings;
         const allowedIPs = accessPolicy === 'restricted' ? [...settings.allowedIPs] : [];
@@ -728,28 +905,70 @@ const operate = async (operation: PanelMCP.Operation) => {
     }
 };
 const install = async () => {
-    if (busy.value || installConflict.value || !canManageService.value || !installSnapshot.value) return;
+    if (busy.value || installConflict.value || !canEditService.value || !installSnapshot.value) return;
     const version = pageVersion;
     busy.value = true;
     try {
         if (!(await installRef.value?.validate().catch(() => false))) return;
-        if (!isCurrentPage(version) || !canManageService.value) return;
+        if (!installIsUpgrade.value && websiteDraft.requested) {
+            advancedInstallation.value = ['website'];
+            await nextTick();
+            if (!(await websiteRef.value?.validate())) return;
+        }
+        if (!isCurrentPage(version) || !canEditService.value) return;
         const { dockerImage } = installation;
-        const { listenPort, externalUrl, revision } = installIsUpgrade.value ? installSnapshot.value : installation;
-        await installPanelMCPService({ dockerImage, listenPort, externalUrl, revision });
+        const source = installIsUpgrade.value ? installSnapshot.value : installation;
+        const { listenPort, externalUrl, revision, accessPolicy } = source;
+        const allowedIPs = accessPolicy === 'restricted' ? [...source.allowedIPs] : [];
+        if (accessPolicy === 'all' && installSnapshot.value.accessPolicy !== 'all') {
+            await ElMessageBox.confirm(
+                i18n.global.t('panelMCP.accessAllConfirm'),
+                i18n.global.t('panelMCP.accessPolicy'),
+            );
+        }
+        if (!isCurrentPage(version) || !canEditService.value) return;
+        const website =
+            !installIsUpgrade.value && websiteDraft.requested
+                ? {
+                      domain: websiteDraft.domain,
+                      enableSSL: websiteDraft.enableSSL,
+                      sslID: websiteDraft.enableSSL ? websiteDraft.sslID : 0,
+                  }
+                : undefined;
+        const response = await installPanelMCPService({
+            dockerImage,
+            listenPort,
+            externalUrl,
+            revision,
+            accessPolicy,
+            allowedIPs,
+            ...(website ? { website } : {}),
+        });
         if (!isCurrentPage(version)) return;
+        if (!canManageService.value) return;
+        if (!response.data?.taskID || typeof response.data.taskID !== 'string') {
+            throw new Error('Invalid MCP installation task response');
+        }
+        requestVersion++;
+        status.value = { ...status.value!, installing: true, installTaskID: response.data.taskID };
+        emit('status', status.value);
         emit('changed');
         installVisible.value = false;
         installDraft.value = false;
         installSnapshot.value = undefined;
-        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        if (!settingsDirty.value) await reloadSettings(version);
+        websiteDraft.requested = false;
+        await nextTick();
+        if (isCurrentPage(version)) openInstallLogs();
     } catch (error) {
         if (isCurrentPage(version)) installConflict.value = isMCPRevisionConflict(error);
     } finally {
         busy.value = false;
         if (isCurrentPage(version)) await refresh();
     }
+};
+const openInstallLogs = () => {
+    if (!active || !canManageService.value || !status.value?.installTaskID) return;
+    installTaskLog.value?.openWithTaskID(status.value.installTaskID, true, 'local');
 };
 const loadLogs = async () => {
     if (!active || !canManageService.value || !logsVisible.value || logsBusy.value) return;
@@ -812,16 +1031,21 @@ const activate = () => {
 const clearManagementState = () => {
     pageVersion++;
     clearLogState();
+    installTaskLog.value?.handleClose();
     settingsVisible.value = installVisible.value = logsVisible.value = false;
     savedSettings.value = installSnapshot.value = undefined;
     installDraft.value = installIsUpgrade.value = conflict.value = installConflict.value = false;
     drawerMode.value = 'settings';
     settingsTab.value = 'configuration';
     advancedSettings.value = [];
+    advancedInstallation.value = [];
+    websiteBinding.value = undefined;
+    Object.assign(websiteDraft, defaultMCPWebsiteDraft());
     Object.assign(settings, defaultSettings());
     allowedIPsText.value = '';
-    const { dockerImage, listenPort, externalUrl, revision } = settings;
-    Object.assign(installation, { dockerImage, listenPort, externalUrl, revision });
+    installAllowedIPsText.value = '';
+    const { dockerImage, listenPort, externalUrl, revision, accessPolicy } = settings;
+    Object.assign(installation, { dockerImage, listenPort, externalUrl, revision, accessPolicy, allowedIPs: [] });
 };
 watch(
     logsVisible,
@@ -834,6 +1058,7 @@ const clearStatus = () => {
     requestVersion++;
     status.value = undefined;
     statusVisible.value = false;
+    emit('dockerStatus', undefined);
 };
 watch(
     () => [globalStore.isLogin, globalStore.isAdmin],
@@ -867,7 +1092,7 @@ onActivated(activate);
 onDeactivated(deactivate);
 onBeforeUnmount(deactivate);
 
-defineExpose({ openInstall, openStatus, refreshService, operate, busy });
+defineExpose({ openInstall, openStatus, openInstallLogs, refreshService, operate, busy });
 </script>
 
 <style scoped lang="scss">

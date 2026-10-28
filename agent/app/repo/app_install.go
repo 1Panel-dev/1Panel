@@ -38,6 +38,7 @@ type IAppInstallRepo interface {
 	LoadBaseInfo(key string, name string) (*RootInfo, error)
 	LoadInstallAppByKeyAndName(key string, name string) (*model.AppInstall, error)
 	GetFirstByCtx(ctx context.Context, opts ...DBOption) (model.AppInstall, error)
+	GetSnapshot(ctx context.Context, id uint) (model.AppInstall, error)
 }
 
 func NewIAppInstallRepo() IAppInstallRepo {
@@ -128,6 +129,12 @@ func (a *AppInstallRepo) GetFirstByCtx(ctx context.Context, opts ...DBOption) (m
 	var install model.AppInstall
 	db := getTx(ctx, opts...).Model(&model.AppInstall{})
 	err := db.Preload("App").First(&install).Error
+	return install, err
+}
+
+func (a *AppInstallRepo) GetSnapshot(ctx context.Context, id uint) (model.AppInstall, error) {
+	var install model.AppInstall
+	err := getTx(ctx).WithContext(ctx).Preload("App").Where("id = ?", id).First(&install).Error
 	return install, err
 }
 

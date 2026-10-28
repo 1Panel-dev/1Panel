@@ -5,6 +5,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
+	"github.com/1Panel-dev/1Panel/agent/utils/taskscope"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,7 +23,7 @@ func (b *BaseApi) PageTasks(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	total, list, err := taskService.Page(req)
+	total, list, err := taskServiceForRequest(c).Page(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -45,7 +47,7 @@ func (b *BaseApi) ReadTaskLogByLine(c *gin.Context) {
 		return
 	}
 	var res *response.FileLineContent
-	res, err := taskService.ReadByLine(req)
+	res, err := taskServiceForRequest(c).ReadByLine(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
@@ -64,10 +66,17 @@ func (b *BaseApi) ReadTaskLogByLine(c *gin.Context) {
 // @Security Timestamp
 // @Router /logs/tasks/executing/count [get]
 func (b *BaseApi) CountExecutingTasks(c *gin.Context) {
-	count, err := taskService.CountExecutingTask()
+	count, err := taskServiceForRequest(c).CountExecutingTask()
 	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
 	helper.SuccessWithData(c, count)
+}
+
+func taskServiceForRequest(c *gin.Context) service.ITaskLogService {
+	if granted := taskscope.Grants(c.Request.Context()); len(granted) != 0 {
+		return service.NewITaskService(granted...)
+	}
+	return taskService
 }

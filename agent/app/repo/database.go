@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"gorm.io/gorm"
@@ -20,6 +21,8 @@ type IDatabaseRepo interface {
 	Update(id uint, vars map[string]interface{}) error
 	Delete(ctx context.Context, opts ...DBOption) error
 	Get(opts ...DBOption) (model.Database, error)
+	ListInstalledLocalMysql(ctx context.Context) ([]InstalledLocalMysql, error)
+	GetInstalledLocalMysql(ctx context.Context, name string) (InstalledLocalMysql, error)
 	WithoutByFrom(from string) DBOption
 	WithAppInstallID(appInstallID uint) DBOption
 	WithTypeList(dbType string) DBOption
@@ -27,6 +30,32 @@ type IDatabaseRepo interface {
 
 func NewIDatabaseRepo() IDatabaseRepo {
 	return &DatabaseRepo{}
+}
+
+type InstalledLocalMysql struct {
+	ID                          uint
+	Type, From, Database        string
+	ContainerName, Version, Env string
+}
+
+func installedLocalMysqlQuery(ctx context.Context) *gorm.DB {
+	return getTx(ctx).WithContext(ctx).Table("databases AS d").
+		Joins("JOIN app_installs AS ai ON ai.id = d.app_install_id AND ai.name = d.name").
+		Joins("JOIN apps AS a ON a.id = ai.app_id").
+		Where("d.type = ? AND d.\"from\" = ? AND a.key = ?", constant.AppMysql, "local", constant.AppMysql).
+		Where("ai.status <> ? AND ai.container_name <> ?", constant.StatusDeleted, "")
+}
+
+func (d *DatabaseRepo) ListInstalledLocalMysql(ctx context.Context) ([]InstalledLocalMysql, error) {
+	result := make([]InstalledLocalMysql, 0)
+	err := installedLocalMysqlQuery(ctx).Select("d.id, d.type, d.\"from\", d.name AS database, ai.version").Order("d.id").Scan(&result).Error
+	return result, err
+}
+
+func (d *DatabaseRepo) GetInstalledLocalMysql(ctx context.Context, name string) (InstalledLocalMysql, error) {
+	var result InstalledLocalMysql
+	err := installedLocalMysqlQuery(ctx).Where("d.name = ?", name).Select("d.id, ai.container_name, ai.version, ai.env").Take(&result).Error
+	return result, err
 }
 
 func (d *DatabaseRepo) Get(opts ...DBOption) (model.Database, error) {

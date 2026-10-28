@@ -433,10 +433,45 @@ func (u *MysqlService) ListDBOption() ([]dto.MysqlOption, error) {
 }
 
 func (u *MysqlService) Create(ctx context.Context, req dto.MysqlDBCreate) (*model.DatabaseMysql, error) {
-	return u.create(ctx, req, false)
+	creation, err := prepareMysqlCreation(req)
+	if err != nil {
+		return nil, err
+	}
+	req = creation.request
+	cli, version, err := LoadMysqlClientByFrom(req.Database)
+	if err != nil {
+		return nil, err
+	}
+	defer cli.Close()
+	if err := cli.Create(creation.createInfo(version)); err != nil {
+		return nil, err
+	}
+	if len(req.Username) != 0 {
+		if err := saveDatabaseUserCredentials(creation.dbType, req.Database, req.Username, req.Permission, req.Password, req.Description); err != nil {
+			return nil, err
+		}
+		for _, host := range creation.permissionHosts {
+			if err := saveDatabaseUserGrant(creation.dbType, req.Database, req.Name, req.Username, host); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	global.LOG.Infof("create database %s successful!", req.Name)
+	if err := mysqlRepo.Create(ctx, &creation.item); err != nil {
+		return nil, err
+	}
+	return &creation.item, nil
 }
 
-func (u *MysqlService) create(ctx context.Context, req dto.MysqlDBCreate, mcpBounded bool) (*model.DatabaseMysql, error) {
+type mysqlCreation struct {
+	request         dto.MysqlDBCreate
+	dbType          string
+	permissionHosts []string
+	item            model.DatabaseMysql
+}
+
+func prepareMysqlCreation(req dto.MysqlDBCreate) (*mysqlCreation, error) {
 	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format, req.Collation, req.Permission) || strings.Contains(req.Password, " ") {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
@@ -474,13 +509,13 @@ func (u *MysqlService) create(ctx context.Context, req dto.MysqlDBCreate, mcpBou
 		return nil, errors.New("cannot set root as user name")
 	}
 
-	cli, version, err := loadMysqlClientByFrom(req.Database, mcpBounded)
-	if err != nil {
-		return nil, err
-	}
 	createItem.MysqlName = req.Database
-	defer cli.Close()
-	createInfo := client.CreateInfo{
+	return &mysqlCreation{request: req, dbType: dbType, permissionHosts: permissionHosts, item: createItem}, nil
+}
+
+func (creation *mysqlCreation) createInfo(version string) client.CreateInfo {
+	req := creation.request
+	return client.CreateInfo{
 		Name:       req.Name,
 		Format:     req.Format,
 		Collation:  req.Collation,
@@ -490,55 +525,16 @@ func (u *MysqlService) create(ctx context.Context, req dto.MysqlDBCreate, mcpBou
 		Version:    version,
 		Timeout:    300,
 	}
-	if mcpBounded {
-		local, ok := cli.(*client.Local)
-		if !ok {
-			return nil, errors.New("an installed local MySQL instance is required")
-		}
-		deadline := time.Now().Add(300 * time.Second)
-		if writeDeadline, ok := ctx.Deadline(); ok && writeDeadline.Add(-10*time.Second).Before(deadline) {
-			deadline = writeDeadline.Add(-10 * time.Second)
-		}
-		sqlContext, cancel := context.WithDeadline(ctx, deadline)
-		err = local.CreateWithContext(sqlContext, createInfo)
-		cancel()
-	} else {
-		err = cli.Create(createInfo)
-	}
-	if err != nil {
-		return nil, err
-	}
-	if mcpBounded {
-		if err := persistMCPMysqlMetadata(ctx, req, permissionHosts, &createItem); err != nil {
-			return nil, err
-		}
-		return &createItem, nil
-	}
-	if len(req.Username) != 0 {
-		if err := saveDatabaseUserCredentials(dbType, req.Database, req.Username, req.Permission, req.Password, req.Description); err != nil {
-			return nil, err
-		}
-		for _, host := range permissionHosts {
-			if err := saveDatabaseUserGrant(dbType, req.Database, req.Name, req.Username, host); err != nil {
-				return nil, err
-			}
-		}
-	}
-
-	global.LOG.Infof("create database %s successful!", req.Name)
-	if err := mysqlRepo.Create(ctx, &createItem); err != nil {
-		return nil, err
-	}
-	return &createItem, nil
 }
 
-func persistMCPMysqlMetadata(ctx context.Context, req dto.MysqlDBCreate, hosts []string, item *model.DatabaseMysql) error {
+func saveMysqlCreationMetadata(ctx context.Context, req dto.MysqlDBCreate, hosts []string, item *model.DatabaseMysql) error {
 	return global.DB.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		txCtx := context.WithValue(ctx, constant.DB, tx)
 		if req.Username != "" {
 			key := global.CONF.Base.EncryptKey
 			if key == "" {
-				var setting model.Setting
-				if err := tx.Where("key = ?", "EncryptKey").First(&setting).Error; err != nil {
+				setting, err := settingRepo.GetWithContext(txCtx, repo.WithByKey("EncryptKey"))
+				if err != nil {
 					return err
 				}
 				key = setting.Value
@@ -548,8 +544,7 @@ func persistMCPMysqlMetadata(ctx context.Context, req dto.MysqlDBCreate, hosts [
 				return err
 			}
 			for _, host := range hosts {
-				var user model.DatabaseUser
-				err := tx.Where("type = ? AND database = ? AND username = ? AND host = ?", "mysql", req.Database, req.Username, host).First(&user).Error
+				user, err := databaseUserRepo.GetEncryptedWithContext(txCtx, repo.WithByType("mysql"), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, host))
 				if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 					return err
 				}
@@ -558,16 +553,16 @@ func persistMCPMysqlMetadata(ctx context.Context, req dto.MysqlDBCreate, hosts [
 				if req.Description != "" {
 					user.Description = req.Description
 				}
-				if err := tx.Save(&user).Error; err != nil {
+				if err := databaseUserRepo.SaveEncryptedWithContext(txCtx, &user); err != nil {
 					return err
 				}
 				grant := model.DatabaseUserGrant{Type: "mysql", Database: req.Database, DBName: req.Name, Username: req.Username, Host: host}
-				if err := tx.Where("type = ? AND database = ? AND db_name = ? AND username = ? AND host = ?", grant.Type, grant.Database, grant.DBName, grant.Username, grant.Host).FirstOrCreate(&grant).Error; err != nil {
+				if err := databaseUserGrantRepo.CreateIfAbsent(txCtx, &grant); err != nil {
 					return err
 				}
 			}
 		}
-		return tx.Create(item).Error
+		return mysqlRepo.CreateMetadata(txCtx, item)
 	})
 }
 
@@ -1603,10 +1598,34 @@ func updateMyCnf(oldFiles []string, group string, param string, value interface{
 }
 
 func LoadMysqlClientByFrom(database string) (mysql.MysqlClient, string, error) {
-	return loadMysqlClientByFrom(database, false)
+	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
+	if err != nil {
+		return nil, "", err
+	}
+	return newMysqlClientForDatabase(databaseItem, database)
 }
 
-func loadMysqlClientByFrom(database string, mcpLocalOnly bool) (mysql.MysqlClient, string, error) {
+func loadInstalledLocalMysqlClient(database string) (*client.Local, string, error) {
+	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
+	if err != nil {
+		return nil, "", err
+	}
+	if databaseItem.ID == 0 || databaseItem.From != "local" || databaseItem.Type != "mysql" || databaseItem.AppInstallID == 0 {
+		return nil, "", errors.New("an installed local MySQL instance is required")
+	}
+	cli, version, err := newMysqlClientForDatabase(databaseItem, database)
+	if err != nil {
+		return nil, "", err
+	}
+	local, ok := cli.(*client.Local)
+	if !ok {
+		cli.Close()
+		return nil, "", errors.New("an installed local MySQL instance is required")
+	}
+	return local, version, nil
+}
+
+func newMysqlClientForDatabase(databaseItem model.Database, database string) (mysql.MysqlClient, string, error) {
 	var (
 		dbInfo  client.DBInfo
 		version string
@@ -1614,13 +1633,6 @@ func loadMysqlClientByFrom(database string, mcpLocalOnly bool) (mysql.MysqlClien
 	)
 
 	dbInfo.Timeout = 300
-	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
-	if err != nil {
-		return nil, "", err
-	}
-	if mcpLocalOnly && (databaseItem.ID == 0 || databaseItem.From != "local" || databaseItem.Type != "mysql" || databaseItem.AppInstallID == 0) {
-		return nil, "", errors.New("an installed local MySQL instance is required")
-	}
 	dbInfo.Type = databaseItem.Type
 	dbInfo.From = databaseItem.From
 	dbInfo.Database = database
