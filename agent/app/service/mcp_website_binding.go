@@ -539,7 +539,7 @@ func (s *MCPWebsiteBindingService) status(req request.MCPWebsiteBinding, site mo
 		result.State, result.Reason = "unavailable", "proxy_not_loaded"
 		return result
 	}
-	host, port, err := mcpWebsiteDomain(site.PrimaryDomain)
+	host, _, err := mcpWebsiteDomain(site.PrimaryDomain)
 	if err != nil {
 		result.State, result.Reason = "unavailable", "website_modified"
 		return result
@@ -569,7 +569,7 @@ func (s *MCPWebsiteBindingService) status(req request.MCPWebsiteBinding, site mo
 		result.State, result.Reason = "unavailable", "website_modified"
 		return result
 	}
-	port = matching
+	port := matching
 	if result.EnableSSL {
 		port = matchingSSL
 		if port == 0 {
