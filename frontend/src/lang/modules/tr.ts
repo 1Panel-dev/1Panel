@@ -1096,7 +1096,7 @@ const message = {
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
             customAddress: 'Özel adres',
-            downloader: 'İndirici',
+            downloader: 'İndirme yönetimi',
             modelDir: 'Model dizini',
             modelSource: 'Model kaynağı',
             repoID: 'Depo ID',
@@ -7094,7 +7094,7 @@ const message = {
                 'HuggingFace model depolarını doğrudan arayın; indirme sayısı, beğeni, model ayrıntıları ve dosya listesini görüntüleyin.',
             modelDownloaderTitle2: 'Hızlandırılmış İndirme',
             modelDownloaderContent2:
-                'Resmi site, aynalar ve özel modeller için HuggingFace hızlandırma endpointi ve HF Token yapılandırın.',
+                'Resmi site, aynalar ve özel modeller için HuggingFace hızlandırma endpointi ve HuggingFace Token yapılandırın.',
             modelDownloaderTitle3: 'Görev Takibi',
             modelDownloaderContent3:
                 'İndirme kuyruğunu, görev durumunu, ilerlemeyi ve hataları görüntüleyin; iptal, yeniden deneme ve kayıt temizlemeyi destekler.',

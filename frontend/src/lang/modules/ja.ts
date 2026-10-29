@@ -1075,7 +1075,7 @@ const message = {
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',
             customAddress: 'カスタムアドレス',
-            downloader: 'ダウンローダー',
+            downloader: 'ダウンロード管理',
             modelDir: 'モデルディレクトリ',
             modelSource: 'モデルソース',
             repoID: 'リポジトリ ID',
@@ -6967,7 +6967,7 @@ const message = {
                 'HuggingFace のモデルリポジトリを直接検索し、ダウンロード数、いいね、モデル詳細、ファイル一覧を確認できます。',
             modelDownloaderTitle2: '高速ダウンロード',
             modelDownloaderContent2:
-                'HuggingFace アクセラレーションエンドポイントと HF Token を設定し、公式サイト、ミラー、プライベートモデルに対応します。',
+                'HuggingFace アクセラレーションエンドポイントと HuggingFace Token を設定し、公式サイト、ミラー、プライベートモデルに対応します。',
             modelDownloaderTitle3: 'タスク追跡',
             modelDownloaderContent3:
                 'ダウンロードキュー、タスク状態、進捗、エラーを一元確認し、キャンセル、再試行、記録の削除を行えます。',
