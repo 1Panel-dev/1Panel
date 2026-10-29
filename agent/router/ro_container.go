@@ -67,6 +67,7 @@ func (s *ContainerRouter) InitRouter(Router *gin.RouterGroup) {
 		baRouter.POST("/template", baseApi.CreateComposeTemplate)
 		baRouter.POST("/template/del", baseApi.DeleteComposeTemplate)
 
+		baRouter.GET("/image/remote/check", baseApi.GetImageRemoteCheckStatus)
 		baRouter.GET("/image", baseApi.ListImage)
 		baRouter.GET("/image/all", baseApi.ListAllImage)
 		baRouter.POST("/image/search", baseApi.SearchImage)

@@ -505,6 +505,7 @@ import { ElMessageBox } from 'element-plus';
 import { ArrowDown } from '@element-plus/icons-vue';
 import {
     getContainerImageCheckUpdateStatus,
+    getImageRemoteCheckStatus,
     runContainerImageCheckUpdate,
     setContainerImageCheckUpdateSchedule,
     type ContainerImageCheckUpdateStatus,
@@ -878,7 +879,10 @@ const onImageCheckUpdateCommand = async (command: string) => {
         if (generation !== imageCheckUpdateGeneration || node !== currentNode.value) return;
         imageCheckUpdateStatus.value = status.data;
         // Disabling an existing schedule must remain possible without a proxy.
-        if ((command === 'check' || !status.data.enabled) && status.data.proxyRequired) {
+        const proxyStatus =
+            command === 'check' || !status.data.enabled ? await getImageRemoteCheckStatus(node) : undefined;
+        if (generation !== imageCheckUpdateGeneration || node !== currentNode.value) return;
+        if (proxyStatus?.data.proxyRequired) {
             try {
                 await ElMessageBox.confirm(i18n.global.t('container.imageCheckUpdateProxyRequired'), '', {
                     confirmButtonText: i18n.global.t('container.imageCheckUpdateConfigureProxy'),

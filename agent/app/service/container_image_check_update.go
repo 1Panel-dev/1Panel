@@ -11,7 +11,6 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
@@ -28,16 +27,15 @@ import (
 const imageCheckUpdateSetting = "ContainerImageUpdateEnabled"
 
 type ImageCheckUpdateStatus struct {
-	ProxyRequired bool   `json:"proxyRequired"`
-	TaskID        string `json:"taskID"`
-	Enabled       bool   `json:"enabled"`
-	Running       bool   `json:"running"`
-	Checked       int    `json:"checked"`
-	Updates       int    `json:"updates"`
-	Failed        int    `json:"failed"`
-	Skipped       int    `json:"skipped"`
-	Error         string `json:"error"`
-	FinishedAt    int64  `json:"finishedAt"`
+	TaskID     string `json:"taskID"`
+	Enabled    bool   `json:"enabled"`
+	Running    bool   `json:"running"`
+	Checked    int    `json:"checked"`
+	Updates    int    `json:"updates"`
+	Failed     int    `json:"failed"`
+	Skipped    int    `json:"skipped"`
+	Error      string `json:"error"`
+	FinishedAt int64  `json:"finishedAt"`
 }
 
 var imageCheckUpdateState struct {
@@ -50,23 +48,10 @@ func GetContainerImageCheckUpdateStatus() (ImageCheckUpdateStatus, error) {
 	if err := global.DB.Where("key = ?", imageCheckUpdateSetting).First(&setting).Error; err != nil {
 		return ImageCheckUpdateStatus{}, err
 	}
-	httpClient, proxyErr := dockerhub.NewHTTPClient()
-	proxyRequired := false
-	if proxyErr != nil {
-		if business, ok := proxyErr.(buserr.BusinessError); ok && business.Msg == "ErrImageCheckProxyRequired" {
-			proxyRequired = true
-		} else {
-			return ImageCheckUpdateStatus{}, proxyErr
-		}
-	}
-	if httpClient != nil && httpClient.Transport != nil {
-		httpClient.CloseIdleConnections()
-	}
 	imageCheckUpdateState.Lock()
 	defer imageCheckUpdateState.Unlock()
 	status := imageCheckUpdateState.status
 	status.Enabled = setting.Value == "Enable"
-	status.ProxyRequired = proxyRequired
 	return status, nil
 }
 func SetContainerImageCheckUpdateSchedule(enabled bool) error {
