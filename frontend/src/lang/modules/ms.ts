@@ -1097,7 +1097,7 @@ const message = {
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',
             customAddress: 'Alamat tersuai',
-            downloader: 'Pemuat Turun',
+            downloader: 'Pengurusan muat turun',
             modelDir: 'Direktori Model',
             modelSource: 'Sumber model',
             repoID: 'ID Repositori',
@@ -7074,7 +7074,7 @@ const message = {
                 'Cari repositori model HuggingFace secara langsung dan lihat muat turun, suka, butiran model dan senarai fail.',
             modelDownloaderTitle2: 'Muat Turun Dipercepat',
             modelDownloaderContent2:
-                'Konfigurasikan titik akhir pecutan HuggingFace dan HF Token untuk laman rasmi, cermin dan model persendirian.',
+                'Konfigurasikan titik akhir pecutan HuggingFace dan HuggingFace Token untuk laman rasmi, cermin dan model persendirian.',
             modelDownloaderTitle3: 'Penjejakan Tugas',
             modelDownloaderContent3:
                 'Semak baris gilir muat turun, status tugas, kemajuan dan ralat, dengan sokongan batal, cuba semula dan bersihkan rekod.',

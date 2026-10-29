@@ -1060,7 +1060,7 @@ const message = {
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
             containerAddress: 'ທີ່ຢູ່ຄອນເທນເນີ',
             customAddress: 'ທີ່ຢູ່ກຳນົດເອງ',
-            downloader: 'ຕົວດາວໂຫຼດ',
+            downloader: 'ຈັດການການດາວໂຫຼດ',
             modelDir: 'ໄດເຣັກທໍຣີໂມເດວ',
             modelSource: 'ແຫຼ່ງທີ່ມາໂມເດວ',
             repoID: 'ID ຄັງເກັບ',
@@ -6767,7 +6767,8 @@ const message = {
             modelDownloaderTitle1: 'ຄົ້ນຫາມໍເດລ',
             modelDownloaderContent1: 'ຄົ້ນຫາຄັງມໍເດລ HuggingFace ໂດຍກົງ ແລະ ເບິ່ງຍອດດາວໂຫຼດ, ໄລ້ ແລະ ລາຍລະອຽດໄຟລ໌.',
             modelDownloaderTitle2: 'ດາວໂຫຼດເລັ່ງດ່ວນ',
-            modelDownloaderContent2: 'ຕັ້ງຄ່າ HuggingFace acceleration endpoint ແລະ Token ສຳລັບມໍເດລສ່ວນຕົວ.',
+            modelDownloaderContent2:
+                'ຕັ້ງຄ່າ ຈຸດເຊື່ອມຕໍ່ເລັ່ງຄວາມໄວ HuggingFace ແລະ HuggingFace Token ສຳລັບມໍເດລສ່ວນຕົວ.',
             modelDownloaderTitle3: 'ຕິດຕາມງານ',
             modelDownloaderContent3: 'ກວດສອບຄິວດາວໂຫຼດ, ສະຖານະ, ຄວາມຄືບໜ້າ ແລະ ຂໍ້ຜິດພາດ.',
             modelDownloaderTitle4: 'ຈັດການໃນເຄື່ອງ',

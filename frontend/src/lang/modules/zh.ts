@@ -1038,7 +1038,7 @@ const message = {
                 '容器地址适合智能体容器调用；127.0.0.1、本机 IP 或自定义地址适合 AI 网关或外部服务调用。',
             containerAddress: '容器地址',
             customAddress: '自定义地址',
-            downloader: '下载器',
+            downloader: '下载管理',
             modelDir: '模型目录',
             modelSource: '模型来源',
             repoID: '仓库 ID',
@@ -5442,7 +5442,8 @@ const message = {
             modelDownloaderTitle1: '模型发现',
             modelDownloaderContent1: '直接搜索 HuggingFace 模型仓库，查看下载量、点赞数、模型详情与文件列表。',
             modelDownloaderTitle2: '加速下载',
-            modelDownloaderContent2: '支持配置 HuggingFace 加速地址与 HF Token，适配官方站、镜像站和私有模型访问。',
+            modelDownloaderContent2:
+                '支持配置 HuggingFace 加速地址与 HuggingFace Token，适配官方站、镜像站和私有模型访问。',
             modelDownloaderTitle3: '任务追踪',
             modelDownloaderContent3: '统一查看下载队列、任务状态、进度、错误信息，并支持取消、重试和记录清理。',
             modelDownloaderTitle4: '本地管理',

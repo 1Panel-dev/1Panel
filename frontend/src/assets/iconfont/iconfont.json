@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "38704691",
+      "name": "huggingface",
+      "font_class": "huggingface1",
+      "unicode": "e656",
+      "unicode_decimal": 58966
+    },
+    {
+      "icon_id": "45461892",
+      "name": "modelscope",
+      "font_class": "modelscope",
+      "unicode": "e6be",
+      "unicode_decimal": 59070
+    },
+    {
       "icon_id": "12903469",
       "name": "本地数据",
       "font_class": "shuju",

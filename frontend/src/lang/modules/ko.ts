@@ -1064,7 +1064,7 @@ const message = {
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
             containerAddress: '컨테이너 주소',
             customAddress: '사용자 지정 주소',
-            downloader: '다운로더',
+            downloader: '다운로드 관리',
             modelDir: '모델 디렉토리',
             modelSource: '모델 소스',
             repoID: '저장소 ID',
@@ -6824,7 +6824,7 @@ const message = {
                 'HuggingFace 모델 저장소를 직접 검색하고 다운로드 수, 좋아요, 모델 상세 정보, 파일 목록을 확인합니다.',
             modelDownloaderTitle2: '가속 다운로드',
             modelDownloaderContent2:
-                'HuggingFace 가속 엔드포인트와 HF Token을 설정하여 공식 사이트, 미러, 비공개 모델에 대응합니다.',
+                'HuggingFace 가속 엔드포인트와 HuggingFace Token을 설정하여 공식 사이트, 미러, 비공개 모델에 대응합니다.',
             modelDownloaderTitle3: '작업 추적',
             modelDownloaderContent3:
                 '다운로드 대기열, 작업 상태, 진행률, 오류를 한곳에서 확인하고 취소, 재시도, 기록 정리를 지원합니다.',

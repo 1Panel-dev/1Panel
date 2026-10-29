@@ -1088,7 +1088,7 @@ const message = {
                 'La dirección del contenedor es para contenedores de agentes; 127.0.0.1, IP del sistema o dirección personalizada es para AI Gateway o servicios externos.',
             containerAddress: 'Dirección del contenedor',
             customAddress: 'Dirección personalizada',
-            downloader: 'Descargador',
+            downloader: 'Gestión de descargas',
             modelDir: 'Directorio del modelo',
             modelSource: 'Fuente del modelo',
             repoID: 'ID del repositorio',
@@ -7093,7 +7093,7 @@ const message = {
                 'Busca repositorios de modelos de HuggingFace directamente y consulta descargas, me gusta, detalles y archivos.',
             modelDownloaderTitle2: 'Descargas aceleradas',
             modelDownloaderContent2:
-                'Configura un endpoint de aceleración de HuggingFace y HF Token para el sitio oficial, espejos y modelos privados.',
+                'Configura un endpoint de aceleración de HuggingFace y HuggingFace Token para el sitio oficial, espejos y modelos privados.',
             modelDownloaderTitle3: 'Seguimiento de tareas',
             modelDownloaderContent3:
                 'Consulta la cola, el estado, el progreso y los errores de descarga, con soporte para cancelar, reintentar y limpiar registros.',

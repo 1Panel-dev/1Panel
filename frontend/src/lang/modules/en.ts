@@ -1086,7 +1086,7 @@ const message = {
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',
             customAddress: 'Custom address',
-            downloader: 'Downloader',
+            downloader: 'Downloads',
             modelDir: 'Model directory',
             modelSource: 'Model source',
             repoID: 'Repository ID',
@@ -6992,7 +6992,7 @@ const message = {
                 'Search HuggingFace model repositories directly and view downloads, likes, model details, and file lists.',
             modelDownloaderTitle2: 'Accelerated Downloads',
             modelDownloaderContent2:
-                'Configure a HuggingFace acceleration endpoint and HF Token for the official site, mirrors, and private models.',
+                'Configure a HuggingFace acceleration endpoint and HuggingFace Token for the official site, mirrors, and private models.',
             modelDownloaderTitle3: 'Task Tracking',
             modelDownloaderContent3:
                 'Review download queues, task status, progress, and errors, with support for canceling, retrying, and clearing records.',
