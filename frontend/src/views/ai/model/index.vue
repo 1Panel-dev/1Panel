@@ -80,13 +80,6 @@
                     />
                 </template>
                 <template #main>
-                    <el-alert
-                        v-if="loadFailed"
-                        type="error"
-                        :closable="false"
-                        :title="$t('aiTools.model.loadFailed')"
-                        class="mb-4"
-                    />
                     <ComplexTable
                         v-if="!isLocal"
                         :data="connections"
@@ -381,7 +374,6 @@ const poolRef = ref();
 const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
 const loading = ref(false);
-const loadFailed = ref(false);
 const connections = ref<AI.AgentAccountItem[]>([]);
 const accountColumns = ref<FuTableColumnConfig[]>([]);
 const providers = ref<AI.ProviderInfo[]>([]);
@@ -507,7 +499,6 @@ const search = async () => {
     const version = ++searchVersion;
     if (!isCurrentPage.value || isFiles || isManagement.value) return;
     loading.value = true;
-    loadFailed.value = false;
     try {
         if (isLocal) {
             const data = await loadModelOverview(isProductPro.value, isFxplay.value);
@@ -533,7 +524,6 @@ const search = async () => {
         connections.value = [];
         pagination.total = 0;
         deployments.value = [];
-        loadFailed.value = true;
     } finally {
         if (version === searchVersion) loading.value = false;
     }

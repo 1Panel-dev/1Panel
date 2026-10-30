@@ -61,6 +61,13 @@ const (
 	AcceleratorMetricValuePattern      = `^\s*([+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+))\s*(.*?)\s*$`
 	AscendVersionPattern               = `(?i)\bVersion:\s*([^\s|]+)`
 	AscendMemoryPattern                = `([0-9]+(?:\.[0-9]+)?)\s*/\s*([0-9]+(?:\.[0-9]+)?)`
+	NvidiaGPUUUIDPattern               = `^GPU-[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$`
+	NvidiaGPUDeviceIDPattern           = `^([0-9]+|GPU-[a-zA-Z0-9-]+|MIG-[a-zA-Z0-9/-]+)$`
+	IntelGPURenderNamePattern          = `^renderD[0-9]+$`
+	IntelGPUDevicePathPattern          = `^/dev/dri/renderD[0-9]+$`
+	AscendGPUDeviceNamePattern         = `^davinci[0-9]+$`
+	AscendGPUDevicePathPattern         = `^/dev/davinci[0-9]+$`
+	AscendGPUDeviceIDPattern           = `^[0-9]+$`
 )
 
 var regexMap = make(map[string]*regexp.Regexp)
@@ -122,6 +129,13 @@ func Init() {
 		AcceleratorMetricValuePattern,
 		AscendVersionPattern,
 		AscendMemoryPattern,
+		NvidiaGPUUUIDPattern,
+		NvidiaGPUDeviceIDPattern,
+		IntelGPURenderNamePattern,
+		IntelGPUDevicePathPattern,
+		AscendGPUDeviceNamePattern,
+		AscendGPUDevicePathPattern,
+		AscendGPUDeviceIDPattern,
 	}
 
 	for _, pattern := range patterns {

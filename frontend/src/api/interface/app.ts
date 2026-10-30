@@ -137,6 +137,7 @@ export namespace App {
     }
 
     export interface AppInstall {
+        gpu?: AI.ModelGPUConfig;
         syncModelAccount?: boolean;
         modelAccountBaseURLType?: string;
         modelAccountBaseURL?: string;
@@ -310,6 +311,7 @@ export namespace App {
     }
 
     export interface AppConfig {
+        gpu?: AI.ModelGPUConfig;
         appKey: string;
         name: string;
         httpPort: number;

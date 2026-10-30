@@ -22,6 +22,9 @@ type AppInstallCreate struct {
 	Name        string                 `json:"name" validate:"required"`
 	Services    map[string]string      `json:"services"`
 	TaskID      string                 `json:"taskID"`
+	GPU         *dto.ModelGPUConfig    `json:"gpu"`
+
+	GPUImageType string `json:"-"`
 
 	SyncModelAccount        *bool  `json:"syncModelAccount"`
 	ModelAccountBaseURLType string `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
@@ -128,6 +131,7 @@ type AppInstallDelete struct {
 }
 
 type AppInstalledUpdate struct {
+	GPU                     *dto.ModelGPUConfig    `json:"gpu"`
 	SyncModelAccount        *bool                  `json:"syncModelAccount"`
 	ModelAccountBaseURLType string                 `json:"modelAccountBaseURLType" validate:"omitempty,oneof=container localhost systemIP custom"`
 	ModelAccountBaseURL     string                 `json:"modelAccountBaseURL"`

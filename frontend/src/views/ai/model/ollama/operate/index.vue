@@ -5,15 +5,30 @@
         @update:model-value="open = $event"
         @close="handleClose"
     >
-        <AppInstallForm ref="formRef" v-model="form" :loading="loading">
+        <AppInstallForm ref="formRef" v-model="form" :loading="loading" sectioned hide-gpu-config>
             <template #after-params>
-                <AccountAddress
-                    ref="accountRef"
-                    show-sync
-                    :form="form"
-                    :host-port="Number(form.params.PANEL_APP_PORT_HTTP) || 11434"
-                    container-port="11434"
-                />
+                <GPUConfig ref="gpuRef" v-model="form.gpu" />
+                <details open class="form-section">
+                    <summary class="form-section-header">
+                        <span>{{ $t('aiTools.model.syncModelAccount') }}</span>
+                        <el-switch
+                            @click.stop
+                            @keydown.stop
+                            v-model="form.syncModelAccount"
+                            :aria-label="$t('aiTools.model.syncModelAccount')"
+                        />
+                    </summary>
+                    <div v-show="form.syncModelAccount" class="form-section-body">
+                        <AccountAddress
+                            ref="accountRef"
+                            show-sync
+                            hide-sync-toggle
+                            :form="form"
+                            :host-port="Number(form.params.PANEL_APP_PORT_HTTP) || 11434"
+                            container-port="11434"
+                        />
+                    </div>
+                </details>
             </template>
         </AppInstallForm>
         <template v-if="!inline" #footer>
@@ -22,7 +37,7 @@
                 v-permission
                 type="primary"
                 :loading="loading"
-                :disabled="loading || !form.appDetailId"
+                :disabled="loading || gpuRef?.loading || !form.appDetailId"
                 @click="submit"
             >
                 {{ $t('commons.button.confirm') }}
@@ -40,6 +55,8 @@ import i18n from '@/lang';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import AppInstallForm from '@/views/app-store/detail/form/index.vue';
 import AccountAddress from '../../components/account-address/index.vue';
+import { AI } from '@/api/interface/ai';
+import GPUConfig from '../../components/gpu-config/index.vue';
 
 const props = defineProps({ inline: Boolean });
 const emit = defineEmits(['search', 'task', 'close']);
@@ -47,7 +64,14 @@ const open = ref(false);
 const loading = ref(false);
 const formRef = ref<InstanceType<typeof AppInstallForm>>();
 const accountRef = ref();
+const gpuRef = ref<InstanceType<typeof GPUConfig>>();
 const form = ref({
+    gpu: {
+        enabled: true,
+        mode: 'all',
+        deviceIDs: [],
+        capabilities: ['gpu', 'utility', 'compute'],
+    } as AI.ModelGPUConfig,
     appDetailId: 0,
     name: '',
     params: {} as Record<string, any>,
@@ -69,12 +93,15 @@ const openCreate = async () => {
         if (!open.value) return;
         formRef.value.resetForm();
         formRef.value.setFormData({
+            gpu: { enabled: true, mode: 'all', deviceIDs: [], capabilities: ['gpu', 'utility', 'compute'] },
             restartPolicy: 'unless-stopped',
             syncModelAccount: true,
             modelAccountBaseURLType: 'container',
             modelAccountBaseURL: '',
         });
         await formRef.value.initForm('ollama', true);
+        if (!open.value) return;
+        await gpuRef.value?.init(true);
         await nextTick();
         formRef.value?.clearValidate();
     } finally {
@@ -82,7 +109,7 @@ const openCreate = async () => {
     }
 };
 const submit = async () => {
-    if (!form.value.appDetailId || !(await formRef.value?.validate())) return;
+    if (loading.value || gpuRef.value?.loading || !form.value.appDetailId || !(await formRef.value?.validate())) return;
     const data = formRef.value.getFormData();
     if (data.editCompose && !data.dockerCompose.trim()) {
         MsgError(i18n.global.t('app.composeNullErr'));
@@ -112,5 +139,14 @@ watch(
 watch(open, (value) => {
     if (props.inline && !value) handleClose();
 });
-defineExpose({ openCreate, submit, loading, disabled: computed(() => !form.value.appDetailId) });
+defineExpose({
+    openCreate,
+    submit,
+    loading,
+    disabled: computed(() => !form.value.appDetailId || gpuRef.value?.loading),
+});
 </script>
+
+<style lang="scss" scoped>
+@use '@/views/ai/model/components/form-section.scss';
+</style>

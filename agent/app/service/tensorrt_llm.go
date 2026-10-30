@@ -57,12 +57,31 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 		serverDTO.Dir = path.Join(global.Dir.TensorRTLLMDir, item.Name)
 		serverDTO.Image = envs["IMAGE"]
 		serverDTO.Command = getCommand(item.Env)
+		var project map[string]interface{}
+		if yaml.Unmarshal([]byte(item.DockerCompose), &project) == nil {
+			services, _ := project["services"].(map[string]interface{})
+			if service, ok := services[item.Name].(map[string]interface{}); ok {
+				params := make(map[string]interface{}, len(envs))
+				for key, value := range envs {
+					params[key] = value
+				}
+				serverDTO.GPU = ReadModelGPU(service, params, "nvidia")
+			}
+		}
 
 		serverDTO.ExposedPorts, _ = loadComposeExposedPortsFromEnv(envs, "0.0.0.0", false)
 
 		composeByte, err := files.NewFileOp().GetContent(path.Join(global.Dir.TensorRTLLMDir, item.Name, "docker-compose.yml"))
 		if err == nil {
 			serverDTO.Environments, _ = getDockerComposeEnvironments(composeByte)
+			environments := make([]request.Environment, 0, len(serverDTO.Environments))
+			for _, item := range serverDTO.Environments {
+				if item.Key == "MODEL_PATH" || (serverDTO.GPU != nil && (item.Key == "NVIDIA_VISIBLE_DEVICES" || item.Key == "NVIDIA_DRIVER_CAPABILITIES")) {
+					continue
+				}
+				environments = append(environments, item)
+			}
+			serverDTO.Environments = environments
 		}
 		volumes, err := getDockerComposeVolumes(composeByte)
 		if err == nil {
@@ -133,6 +152,9 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 	var environments []interface{}
 	environments = append(environments, fmt.Sprintf("MODEL_PATH=%s", create.ModelDir))
 	for _, e := range create.Environments {
+		if e.Key == "MODEL_PATH" {
+			continue
+		}
 		environments = append(environments, fmt.Sprintf("%s=%s", e.Key, e.Value))
 	}
 	serviceValue["environment"] = environments
@@ -148,6 +170,18 @@ func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) e
 		volumes = append(volumes, formatComposeVolume(volume.Source, volume.Target, volume.Mode))
 	}
 	serviceValue["volumes"] = volumes
+	gpuParams := map[string]interface{}{}
+	existingEnv, err := gotenv.Unmarshal(llm.Env)
+	if err != nil {
+		return err
+	}
+	for key, value := range existingEnv {
+		gpuParams[key] = value
+	}
+	gpuParams["MODEL_PATH"] = create.ModelDir
+	if err := ApplyModelGPU(serviceValue, create.GPU, gpuParams, "nvidia"); err != nil {
+		return err
+	}
 
 	services[llm.Name] = serviceValue
 	composeByte, err := yaml.Marshal(composeMap)
