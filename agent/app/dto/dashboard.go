@@ -177,6 +177,7 @@ type DiskInfo struct {
 }
 
 type GPUInfo struct {
+	SharedMemory     bool   `json:"sharedMemory"`
 	Type             string `json:"type"`
 	Index            uint   `json:"index"`
 	NPUIndex         uint   `json:"npuIndex"`

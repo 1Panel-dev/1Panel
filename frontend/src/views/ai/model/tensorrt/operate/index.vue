@@ -55,10 +55,16 @@
                     <el-form-item :label="$t('aiTools.tensorRT.modelDir')" prop="modelDir">
                         <el-input v-model="tensorRTLLM.modelDir">
                             <template #prepend>
-                                <el-button icon="Folder" @click="modelDirRef.acceptParams({ dir: true })" />
+                                <el-button icon="Folder" @click="selectModelDir" />
                             </template>
                         </el-input>
                     </el-form-item>
+                </div>
+            </details>
+            <GPUConfig ref="gpuRef" v-model="tensorRTLLM.gpu" />
+            <details open class="form-section">
+                <summary class="form-section-header">{{ $t('runtime.runScript') }}</summary>
+                <div class="form-section-body">
                     <el-form-item :label="$t('runtime.runScript')" prop="command">
                         <el-input v-model="tensorRTLLM.command"></el-input>
                         <span class="input-help">
@@ -67,7 +73,6 @@
                     </el-form-item>
                 </div>
             </details>
-            <GPUConfig ref="gpuRef" v-model="tensorRTLLM.gpu" />
             <details open class="form-section">
                 <summary class="form-section-header">{{ $t('app.advanced') }}</summary>
                 <div class="form-section-body">
@@ -103,7 +108,7 @@ import { ElForm, FormInstance } from 'element-plus';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isFxplay, isMobile } = useGlobalStore();
+const { isFxplay, isMobile, isProductPro } = useGlobalStore();
 
 const loading = ref(false);
 const gpuRef = ref<InstanceType<typeof GPUConfig>>();
@@ -187,6 +192,24 @@ const openEdit = async (rowData: any) => {
 const handleClose = () => {
     drawerVisiable.value = false;
     emit('close');
+};
+
+const downloaderModules = import.meta.glob<{
+    getModelDownloaderSettings: () => Promise<{ data: { modelDir: string } }>;
+}>('/src/xpack/api/modules/model-downloader.ts');
+const selectModelDir = async () => {
+    let path = tensorRTLLM.value.modelDir;
+    const loadDownloader = Object.values(downloaderModules)[0];
+    if (isProductPro.value && loadDownloader) {
+        try {
+            const { getModelDownloaderSettings } = await loadDownloader();
+            const { data } = await getModelDownloaderSettings();
+            path = data.modelDir;
+        } catch {
+            path = '/';
+        }
+    }
+    modelDirRef.value.acceptParams({ dir: true, path });
 };
 
 const getModelDir = (path: string) => {

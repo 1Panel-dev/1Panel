@@ -65,7 +65,7 @@
                     ? { highlightDiff: 210 }
                     : view === TaskLog
                       ? { width: '70%' }
-                      : actionName === 'config'
+                      : ['config', 'monitor'].includes(actionName)
                         ? {}
                         : { dialog: true }
         "
