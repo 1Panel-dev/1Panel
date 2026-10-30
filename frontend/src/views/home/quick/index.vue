@@ -59,7 +59,7 @@ const onChangeShow = async () => {
         MsgInfo(i18n.global.t('home.minQuickJump'));
         return;
     }
-    if (i > 4) {
+    if (i > 5) {
         MsgInfo(i18n.global.t('home.maxQuickJump'));
         return;
     }

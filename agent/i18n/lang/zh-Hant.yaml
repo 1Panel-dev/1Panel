@@ -46,7 +46,7 @@ ErrHttpReqNotFound: '無法找到要求的資源{{ .err }}'
 
 # 快速跳轉
 ErrMinQuickJump: '請至少設定一個快速跳轉入口！'
-ErrMaxQuickJump: '最多可設定四個快速跳轉入口！'
+ErrMaxQuickJump: '最多可設定五個快速跳轉入口！'
 
 # 通用
 ErrShutDown: '指令被手動結束！'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: '憑證檔案不存在'
 ErrSSLKeyFormat: '私鑰檔案驗證失敗'
 ErrSSLCertificateFormat: '憑證檔案格式錯誤，請使用 pem 格式'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid 或 EabHmacKey 不可為空'
+ErrOpenrestyInstall: "請先在應用程式商店安裝 OpenResty"
 ErrOpenrestyNotFound: 'HTTP 模式需要先安裝 OpenResty'
 ApplySSLStart: '開始申請憑證，網域名稱[{{ .domain }}] 申請方式[{{ .type }}]'
 dnsAccount: 'DNS 自動'

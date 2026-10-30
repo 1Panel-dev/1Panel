@@ -318,7 +318,11 @@
                 <span class="input-help">{{ computeSize(item.used) }} / {{ computeSize(item.total) }}</span>
             </el-col>
         </template>
-        <GPUStatus v-if="view === 'gpu'" :current="currentInfo" @open="routerToName('GPU')" />
+        <GPUStatus
+            v-if="view === 'gpu'"
+            :current="currentInfo"
+            @open="routerToNameWithQuery('GPUHistory', { uncached: 'true' })"
+        />
         <el-col
             :xs="6"
             :sm="6"
@@ -348,7 +352,7 @@ import i18n from '@/lang';
 import { nextTick, onBeforeUnmount, ref, watch } from 'vue';
 import GPUStatus from './gpu.vue';
 import { useMediaQuery } from '@vueuse/core';
-import { routerToFileWithPath, routerToName } from '@/utils/router';
+import { routerToFileWithPath, routerToNameWithQuery } from '@/utils/router';
 import { stopProcess } from '@/api/modules/process';
 import { loadTopCPU, loadTopMem } from '@/api/modules/dashboard';
 import { MsgSuccess } from '@/utils/message';

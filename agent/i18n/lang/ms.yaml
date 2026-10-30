@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'Sumber yang diminta {{ .err }} tidak dapat ditemui'
 
 # lompat pantas
 ErrMinQuickJump: 'Tambah sekurang-kurangnya satu pintasan pantas'
-ErrMaxQuickJump: 'Maksimum 4 pintasan pantas'
+ErrMaxQuickJump: 'Maksimum 5 pintasan pantas'
 
 # umum
 ErrShutDown: 'Arahan diberhentikan manual'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'Fail sijil tidak wujud'
 ErrSSLKeyFormat: 'Pengesahan fail kunci peribadi gagal'
 ErrSSLCertificateFormat: 'Format fail sijil tidak betul, sila gunakan format pem'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid atau EabHmacKey tidak boleh kosong'
+ErrOpenrestyInstall: "Sila pasang OpenResty daripada gedung aplikasi terlebih dahulu"
 ErrOpenrestyNotFound: 'Mod HTTP memerlukan OpenResty dipasang terlebih dahulu'
 ApplySSLStart: 'Mula memohon sijil, nama domain [{{ .domain }}] kaedah permohonan [{{ .type }}]'
 dnsAccount: 'DNS automatik'
