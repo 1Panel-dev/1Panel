@@ -1039,6 +1039,23 @@ const message = {
             validateImageAvailabilityHelper: 'Genera una imagen mínima antes de guardar y puede generar costes',
         },
         model: {
+            gpuAcceleration: 'Aceleración GPU',
+            gpuMode: 'Selección de aceleradores',
+            gpuAll: 'Todos los aceleradores',
+            gpuCount: 'Especificar cantidad',
+            gpuSpecific: 'Seleccionar dispositivos',
+            gpuAllHelper: 'Usar todos los aceleradores disponibles de este tipo en el nodo actual.',
+            gpuCountHelper:
+                'El entorno de ejecución asigna la cantidad solicitada sin vincular dispositivos específicos.',
+            gpuSpecificHelper: 'Seleccione manualmente los aceleradores específicos.',
+            gpuCountRequired: 'Introduzca un entero mayor que 0',
+            gpuDevices: 'Dispositivos GPU',
+            gpuCapabilitiesHelper:
+                'El acceso a la GPU es obligatorio; active la supervisión y gestión (utility) y el cálculo (compute) según sea necesario.',
+            gpuSelectRequired: 'Seleccione al menos un dispositivo GPU disponible.',
+            gpuUnsupported: 'No compatible',
+            gpuNotDetected: 'No se detectaron aceleradores compatibles',
+            gpuMissing: 'No disponible',
             modelCategory: 'Categoría del modelo',
             modelName: 'Nombre del modelo',
             modelArchitecture: 'Tipo de modelo',
@@ -1077,7 +1094,7 @@ const message = {
             container_conn_helper: 'Utilice esta dirección para el acceso o conexión entre contenedores',
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
-            vllmVersionHelper: 'Para servidores FusionXpark GB 10, seleccione la versión -cu130.',
+            vllmVersionHelper: 'Para servidores FusionXpark GB10, seleccione la versión -cu130.',
             vllmDeployProfile: 'Modelo de despliegue',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
@@ -1745,8 +1762,8 @@ const message = {
             migModeHelper:
                 'Se utiliza para crear instancias MIG, implementando aislamiento físico de GPU en la capa de usuario.',
             migModeNA: 'No Compatible',
-            current: 'Monitoreo en Tiempo Real',
-            history: 'Registros Históricos',
+            current: 'Estado en tiempo real',
+            history: 'Datos de monitoreo',
             notSupport: 'La versión actual o el controlador no admiten mostrar este parámetro.',
             processCount: 'Procesos',
         },
@@ -2061,8 +2078,6 @@ const message = {
         retry: 'Repetir puntos seleccionados',
         environment: 'Entorno',
         plan: 'Configuración fijada',
-        clientHelp:
-            'El contenedor cliente se ejecuta en el nodo principal y envía solicitudes a un servicio existente. No inicia inferencia ni requiere GPU.',
         retryHelp: 'Solo se repiten los puntos anómalos seleccionados, con los mismos parámetros y nuevas semillas.',
         secretHelp: 'Las copias no incluyen claves API ni cabeceras. Vuelva a introducirlas si es necesario.',
         resultHelp:

@@ -1037,6 +1037,23 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            gpuAcceleration: 'GPU acceleration',
+            gpuMode: 'Accelerator selection',
+            gpuAll: 'All accelerators',
+            gpuCount: 'Specify count',
+            gpuSpecific: 'Select devices',
+            gpuAllHelper: 'Use all available accelerators of this type on the current node.',
+            gpuCountHelper:
+                'Let the runtime allocate the requested number of accelerators without binding specific devices.',
+            gpuSpecificHelper: 'Manually select specific accelerators.',
+            gpuCountRequired: 'Enter an integer greater than 0',
+            gpuDevices: 'GPU devices',
+            gpuCapabilitiesHelper:
+                'GPU access is required; enable monitoring and management (utility) and computing support (compute) as needed.',
+            gpuSelectRequired: 'Select at least one available GPU device.',
+            gpuUnsupported: 'Unsupported',
+            gpuNotDetected: 'No supported accelerators detected',
+            gpuMissing: 'Unavailable',
             modelCategory: 'Model category',
             modelName: 'Model name',
             modelArchitecture: 'Model type',
@@ -1075,7 +1092,7 @@ const message = {
             container_conn_helper: 'Use this address for inter-container access or connection',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
-            vllmVersionHelper: 'For FusionXpark GB 10 servers, please select the -cu130 version.',
+            vllmVersionHelper: 'For FusionXpark GB10 servers, please select the -cu130 version.',
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
@@ -1734,8 +1751,8 @@ const message = {
             prohibitedHelper: 'Prohibited: Concurrent process execution is not allowed',
             migModeHelper: 'Used to create MIG instances, implementing physical GPU isolation at the user layer.',
             migModeNA: 'Not Supported',
-            current: 'Real-time Monitoring',
-            history: 'Historical Records',
+            current: 'Real-time Status',
+            history: 'Monitoring Data',
             notSupport: 'The current version or driver does not support displaying this parameter.',
         },
         mcp: {
@@ -2043,8 +2060,6 @@ const message = {
         retry: 'Retry selected points',
         environment: 'Environment',
         plan: 'Frozen configuration',
-        clientHelp:
-            'The client container runs on the main node and sends requests to an existing service. It does not start inference or require a GPU.',
         retryHelp: 'Only selected abnormal points are retried, with the same parameters and new seeds.',
         secretHelp: 'API keys and headers are excluded from copies. Enter them again if needed.',
         resultHelp:

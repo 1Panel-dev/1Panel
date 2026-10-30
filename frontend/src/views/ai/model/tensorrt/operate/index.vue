@@ -1,66 +1,84 @@
 <template>
     <component
-        :is="inline ? 'div' : dialog ? DialogPro : DrawerPro"
+        :is="inline ? 'div' : DrawerPro"
         v-bind="
             inline
                 ? {}
                 : {
                       modelValue: drawerVisiable,
                       header: $t('commons.button.' + mode),
-                      title: $t('commons.button.' + mode),
-                      size: 'large',
+                      size: isMobile ? 'full' : 'large',
                   }
         "
         @update:model-value="drawerVisiable = $event"
         @close="handleClose"
     >
         <el-alert :title="$t('aiTools.tensorRT.imageAlert')" class="common-prompt" :closable="false" type="warning" />
-        <el-form ref="formRef" label-position="top" :model="tensorRTLLM" :rules="rules" v-loading="loading">
-            <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input clearable v-model.trim="tensorRTLLM.name" :disabled="mode == 'edit'" />
-            </el-form-item>
-            <el-form-item :label="$t('app.containerName')" prop="containerName">
-                <el-input v-model.trim="tensorRTLLM.containerName"></el-input>
-            </el-form-item>
-            <el-form-item :label="$t('container.image')" prop="image">
-                <el-input v-model.trim="tensorRTLLM.image" />
-            </el-form-item>
-            <el-form-item :label="$t('app.version')" prop="version">
-                <el-input v-model.trim="tensorRTLLM.version" />
-            </el-form-item>
-            <div v-if="isFxplay">
-                <el-form-item :label="$t('aiTools.tensorRT.modelSpeedup')" prop="modelSpeedup">
-                    <el-switch v-model="tensorRTLLM.modelSpeedup" @change="changeModelSpeedup"></el-switch>
-                </el-form-item>
-                <el-form-item
-                    :label="$t('aiTools.tensorRT.modelType')"
-                    prop="modelType"
-                    v-if="tensorRTLLM.modelSpeedup"
-                >
-                    <el-select v-model="tensorRTLLM.modelType">
-                        <el-option label="Qwen3" value="Qwen3" />
-                    </el-select>
-                </el-form-item>
-            </div>
-            <el-form-item :label="$t('aiTools.tensorRT.modelDir')" prop="modelDir">
-                <el-input v-model="tensorRTLLM.modelDir">
-                    <template #prepend>
-                        <el-button icon="Folder" @click="modelDirRef.acceptParams({ dir: true })" />
-                    </template>
-                </el-input>
-            </el-form-item>
-            <el-form-item :label="$t('runtime.runScript')" prop="command">
-                <el-input v-model="tensorRTLLM.command"></el-input>
-                <span class="input-help">
-                    {{ $t('aiTools.tensorRT.commandHelper') }}
-                </span>
-            </el-form-item>
-            <NodeConfig v-model="tensorRTLLM" />
+        <el-form
+            @validate="(prop, valid) => expandInvalidFormSection(formRef, prop, valid)"
+            scroll-to-error
+            ref="formRef"
+            label-position="top"
+            :model="tensorRTLLM"
+            :rules="rules"
+            v-loading="loading"
+        >
+            <details open class="form-section">
+                <summary class="form-section-header">{{ $t('home.baseInfo') }}</summary>
+                <div class="form-section-body">
+                    <el-form-item :label="$t('commons.table.name')" prop="name">
+                        <el-input clearable v-model.trim="tensorRTLLM.name" :disabled="mode == 'edit'" />
+                    </el-form-item>
+                    <el-form-item :label="$t('app.containerName')" prop="containerName">
+                        <el-input v-model.trim="tensorRTLLM.containerName"></el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('container.image')" prop="image">
+                        <el-input v-model.trim="tensorRTLLM.image" />
+                    </el-form-item>
+                    <el-form-item :label="$t('app.version')" prop="version">
+                        <el-input v-model.trim="tensorRTLLM.version" />
+                    </el-form-item>
+                    <div v-if="isFxplay">
+                        <el-form-item :label="$t('aiTools.tensorRT.modelSpeedup')" prop="modelSpeedup">
+                            <el-switch v-model="tensorRTLLM.modelSpeedup" @change="changeModelSpeedup"></el-switch>
+                        </el-form-item>
+                        <el-form-item
+                            :label="$t('aiTools.tensorRT.modelType')"
+                            prop="modelType"
+                            v-if="tensorRTLLM.modelSpeedup"
+                        >
+                            <el-select v-model="tensorRTLLM.modelType">
+                                <el-option label="Qwen3" value="Qwen3" />
+                            </el-select>
+                        </el-form-item>
+                    </div>
+                    <el-form-item :label="$t('aiTools.tensorRT.modelDir')" prop="modelDir">
+                        <el-input v-model="tensorRTLLM.modelDir">
+                            <template #prepend>
+                                <el-button icon="Folder" @click="modelDirRef.acceptParams({ dir: true })" />
+                            </template>
+                        </el-input>
+                    </el-form-item>
+                    <el-form-item :label="$t('runtime.runScript')" prop="command">
+                        <el-input v-model="tensorRTLLM.command"></el-input>
+                        <span class="input-help">
+                            {{ $t('aiTools.tensorRT.commandHelper') }}
+                        </span>
+                    </el-form-item>
+                </div>
+            </details>
+            <GPUConfig ref="gpuRef" v-model="tensorRTLLM.gpu" />
+            <details open class="form-section">
+                <summary class="form-section-header">{{ $t('app.advanced') }}</summary>
+                <div class="form-section-body">
+                    <NodeConfig v-model="tensorRTLLM" />
+                </div>
+            </details>
         </el-form>
         <template v-if="!inline" #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisiable = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading" type="primary" @click="onSubmit">
+                <el-button v-permission :disabled="loading || gpuRef?.loading" type="primary" @click="onSubmit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -70,26 +88,35 @@
 </template>
 
 <script lang="ts" setup>
-import DialogPro from '@/components/dialog-pro/index.vue';
-const props = defineProps({ dialog: Boolean, inline: Boolean });
+import { expandInvalidFormSection } from '@/views/ai/model/components/form-section';
+const props = defineProps({ inline: Boolean });
 import NodeConfig from '@/views/website/runtime//components/node-config.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import FileList from '@/components/file-list/index.vue';
 
-import { reactive, ref } from 'vue';
+import { computed, nextTick, reactive, ref } from 'vue';
+import { AI } from '@/api/interface/ai';
+import GPUConfig from '../../components/gpu-config/index.vue';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isFxplay } = useGlobalStore();
+const { isFxplay, isMobile } = useGlobalStore();
 
 const loading = ref(false);
+const gpuRef = ref<InstanceType<typeof GPUConfig>>();
 const mode = ref('create');
 const drawerVisiable = ref(false);
 const newTensorRTLLM = () => {
     return {
+        gpu: {
+            enabled: true,
+            mode: 'all',
+            deviceIDs: [],
+            capabilities: ['gpu', 'utility', 'compute'],
+        } as AI.ModelGPUConfig,
         name: '',
         containerName: '',
         version: '1.2.0rc0',
@@ -108,15 +135,32 @@ const modelDirRef = ref();
 const tensorRTLLM = ref(newTensorRTLLM());
 const emit = defineEmits(['search', 'close']);
 
-const openCreate = (): void => {
+const openCreate = async () => {
     mode.value = 'create';
     drawerVisiable.value = true;
     tensorRTLLM.value = newTensorRTLLM();
+    loading.value = true;
+    try {
+        await nextTick();
+        await gpuRef.value?.init(true);
+    } finally {
+        loading.value = false;
+    }
 };
 
-const openEdit = (rowData: any): void => {
+const openEdit = async (rowData: any) => {
     mode.value = 'edit';
-    tensorRTLLM.value = { ...rowData };
+    tensorRTLLM.value = {
+        ...rowData,
+        gpu: {
+            ...rowData.gpu,
+            mode: rowData.gpu?.mode || 'devices',
+            error: rowData.gpu ? rowData.gpu.error : i18n.global.t('aiTools.model.loadFailed'),
+            enabled: rowData.gpu?.enabled ?? false,
+            deviceIDs: [...(rowData.gpu?.deviceIDs || [])],
+            capabilities: [...(rowData.gpu?.capabilities || ['gpu', 'utility', 'compute'])],
+        },
+    };
     if (tensorRTLLM.value.environments == null) {
         tensorRTLLM.value.environments = [];
     }
@@ -131,6 +175,13 @@ const openEdit = (rowData: any): void => {
         tensorRTLLM.value.extraHosts = [];
     }
     drawerVisiable.value = true;
+    loading.value = true;
+    try {
+        await nextTick();
+        await gpuRef.value?.init(false);
+    } finally {
+        loading.value = false;
+    }
 };
 
 const handleClose = () => {
@@ -164,6 +215,7 @@ const rules = reactive({
 const formRef = ref<FormInstance>();
 
 const onSubmit = async () => {
+    if (loading.value || gpuRef.value?.loading) return;
     formRef.value?.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
@@ -212,5 +264,10 @@ defineExpose({
     submit: onSubmit,
     loading,
     openEdit,
+    disabled: computed(() => gpuRef.value?.loading),
 });
 </script>
+
+<style lang="scss" scoped>
+@use '@/views/ai/model/components/form-section.scss';
+</style>

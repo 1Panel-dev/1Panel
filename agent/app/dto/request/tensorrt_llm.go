@@ -8,14 +8,15 @@ type TensorRTLLMSearch struct {
 }
 
 type TensorRTLLMCreate struct {
-	Name          string `json:"name" validate:"required"`
-	ContainerName string `json:"containerName"  validate:"required"`
-	Version       string `json:"version"  validate:"required"`
-	ModelDir      string `json:"modelDir" validate:"required"`
-	Image         string `json:"image"  validate:"required"`
-	Command       string `json:"command" validate:"required"`
-	ModelType     string `json:"modelType"`
-	ModelSpeedup  bool   `json:"modelSpeedup"`
+	Name          string              `json:"name" validate:"required"`
+	ContainerName string              `json:"containerName"  validate:"required"`
+	Version       string              `json:"version"  validate:"required"`
+	ModelDir      string              `json:"modelDir" validate:"required"`
+	Image         string              `json:"image"  validate:"required"`
+	Command       string              `json:"command" validate:"required"`
+	ModelType     string              `json:"modelType"`
+	ModelSpeedup  bool                `json:"modelSpeedup"`
+	GPU           *dto.ModelGPUConfig `json:"gpu"`
 	DockerConfig
 }
 

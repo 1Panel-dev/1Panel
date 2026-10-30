@@ -57,13 +57,17 @@
         v-if="visible && view && view !== VllmPlaceholder && !failed && !missing"
         ref="contentRef"
         v-bind="
-            view === EngineConnection || view === AppParams
-                ? {}
-                : view === ContainerLogs
-                  ? { highlightDiff: 210 }
-                  : view === TaskLog
-                    ? { width: '70%' }
-                    : { dialog: true }
+            view === AppParams
+                ? { modelGPU: true }
+                : view === EngineConnection
+                  ? {}
+                  : view === ContainerLogs
+                    ? { highlightDiff: 210 }
+                    : view === TaskLog
+                      ? { width: '70%' }
+                      : actionName === 'config'
+                        ? {}
+                        : { dialog: true }
         "
         @close="returnToManagement"
         @search="emit('search')"

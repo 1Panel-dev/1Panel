@@ -1,5 +1,5 @@
 <template>
-    <el-form-item prop="advanced">
+    <el-form-item v-if="showToggle" prop="advanced">
         <el-checkbox v-model="form.advanced" :label="$t('app.advanced')" size="large" />
     </el-form-item>
     <div v-if="form.advanced">
@@ -83,6 +83,7 @@ const props = withDefaults(
             editCompose: boolean;
             dockerCompose: string;
         };
+        showToggle?: boolean;
         showAllowPort?: boolean;
         showSpecifyIP?: boolean;
         showContainerName?: boolean;
@@ -93,6 +94,7 @@ const props = withDefaults(
         autoLoadLimit?: boolean;
     }>(),
     {
+        showToggle: true,
         showAllowPort: true,
         showSpecifyIP: true,
         showContainerName: true,

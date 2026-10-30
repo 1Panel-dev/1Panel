@@ -493,9 +493,10 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	}
 
 	backupDockerCompose := installed.DockerCompose
-	if req.Advanced {
+	updateGPU := installed.App.Key == "ollama" && req.GPU != nil
+	if req.Advanced || updateGPU {
 		composeMap := make(map[string]interface{})
-		if req.EditCompose {
+		if req.Advanced && req.EditCompose {
 			if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
 				return err
 			}
@@ -504,8 +505,25 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return err
 			}
 		}
-		if !req.SkipComposeCommonConfig {
+		if req.Advanced && !req.SkipComposeCommonConfig {
 			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+				return err
+			}
+		}
+		if updateGPU {
+			services, _ := composeMap["services"].(map[string]interface{})
+			service, ok := services[installed.ServiceName].(map[string]interface{})
+			if !ok {
+				return buserr.New("ErrFileParse")
+			}
+			gpuParams := map[string]interface{}{}
+			if err := json.Unmarshal([]byte(installed.Env), &gpuParams); err != nil {
+				return err
+			}
+			for key, value := range req.Params {
+				gpuParams[key] = value
+			}
+			if err := ApplyModelGPU(service, req.GPU, gpuParams, "nvidia"); err != nil {
 				return err
 			}
 		}
@@ -514,6 +532,8 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			return err
 		}
 		installed.DockerCompose = string(composeByte)
+	}
+	if req.Advanced {
 		if req.ContainerName == "" {
 			req.Params[constant.ContainerName] = installed.ContainerName
 		} else {
@@ -1013,6 +1033,16 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.ModelAccountBaseURLType = install.ModelAccountBaseURLType
 	res.ModelAccountBaseURL = install.ModelAccountBaseURL
 	if install.App.Key == "ollama" {
+		var project map[string]interface{}
+		if err := yaml.Unmarshal([]byte(install.DockerCompose), &project); err != nil {
+			return nil, err
+		}
+		services, _ := project["services"].(map[string]interface{})
+		service, ok := services[install.ServiceName].(map[string]interface{})
+		if !ok {
+			return nil, buserr.New("ErrFileParse")
+		}
+		res.GPU = ReadModelGPU(service, envs, "nvidia")
 		res.ModelAccountBaseURLType, res.ModelAccountBaseURL, err = loadOllamaModelAccountAddress(install)
 		if err != nil {
 			return nil, err

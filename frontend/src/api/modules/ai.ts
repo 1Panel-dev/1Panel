@@ -43,6 +43,10 @@ export const updateBindDomain = (req: AI.BindDomain) => {
     return http.post(`/ai/domain/update`, req);
 };
 
+export const loadModelGPUDevices = () => {
+    return http.get<{ devices: AI.ModelGPUDevice[]; warnings: string[] }>('/ai/model/gpu/devices');
+};
+
 export const loadGPUInfo = () => {
     return http.get<AI.Info>(`/ai/gpu/load`);
 };
