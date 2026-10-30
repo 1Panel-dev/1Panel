@@ -49,6 +49,7 @@ export namespace AI {
         xpu: XpuInfo['xpu'];
     }
     export interface GPU {
+        sharedMemory?: boolean;
         eccPending?: string;
         eccErrors?: { scope: string; correctable: string; uncorrectable: string }[];
         memoryActivity?: string;
@@ -139,6 +140,7 @@ export namespace AI {
         chartHide: Array<ChartHide>;
     }
     export interface ChartHide {
+        sharedMemory?: boolean;
         deviceID?: string;
         legacy?: boolean;
         productName: string;

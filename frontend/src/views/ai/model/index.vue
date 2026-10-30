@@ -357,8 +357,8 @@ const isManagement = computed(
     () => isCurrentPage.value && isLocal && ['vllm', 'tensorrt'].includes(String(route.query.tab)),
 );
 const tabs = computed(() => [
-    { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
     { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
+    { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
     { label: i18n.global.t('aiTools.model.engines'), path: '/ai/model/local' },
 ]);
 const downloaderModules = import.meta.glob('/src/xpack/views/model-downloader/index.vue');

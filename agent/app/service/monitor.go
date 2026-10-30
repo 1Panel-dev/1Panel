@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"sort"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -19,6 +20,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/gpu"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/psutil"
 	"github.com/robfig/cron/v3"
@@ -205,7 +207,14 @@ func (m *MonitorService) LoadGPUOptions() dto.MonitorGPUOptions {
 			continue
 		}
 		seen[key] = true
-		data.ChartHide = append(data.ChartHide, dto.GPUChartHide{DeviceID: device.DeviceID, ProductName: device.ProductName, Type: device.DeviceType, Legacy: device.DeviceID == ""})
+		_, productName, _ := strings.Cut(device.ProductName, " - ")
+		data.ChartHide = append(data.ChartHide, dto.GPUChartHide{
+			DeviceID:     device.DeviceID,
+			ProductName:  device.ProductName,
+			Type:         device.DeviceType,
+			Legacy:       device.DeviceID == "",
+			SharedMemory: strings.HasPrefix(device.DeviceID, "nvidia:") && gpu.UsesSystemMemory(productName),
+		})
 		data.Options = append(data.Options, device.ProductName)
 	}
 	return data
@@ -800,9 +809,10 @@ func loadGPUOptions(snapshot *accelerator.Snapshot) dto.MonitorGPUOptions {
 	})
 	for _, item := range snapshot.Devices {
 		chartHide := dto.GPUChartHide{
-			DeviceID:    item.ID,
-			ProductName: item.Label,
-			Type:        string(item.Kind),
+			SharedMemory: item.GPU != nil && item.GPU.SharedMemory,
+			DeviceID:     item.ID,
+			ProductName:  item.Label,
+			Type:         string(item.Kind),
 		}
 		data.ChartHide = append(data.ChartHide, chartHide)
 		data.Options = append(data.Options, chartHide.ProductName)

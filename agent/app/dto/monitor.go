@@ -56,17 +56,18 @@ type MonitorGPUOptions struct {
 	Options   []string       `json:"options"`
 }
 type GPUChartHide struct {
-	DeviceID    string `json:"deviceID"`
-	Legacy      bool   `json:"legacy"`
-	ProductName string `json:"productName"`
-	Type        string `json:"type"`
-	Process     bool   `json:"process"`
-	GPU         bool   `json:"gpu"`
-	Memory      bool   `json:"memory"`
-	Power       bool   `json:"power"`
-	PowerLimit  bool   `json:"powerLimit"`
-	Temperature bool   `json:"temperature"`
-	Speed       bool   `json:"speed"`
+	SharedMemory bool   `json:"sharedMemory"`
+	DeviceID     string `json:"deviceID"`
+	Legacy       bool   `json:"legacy"`
+	ProductName  string `json:"productName"`
+	Type         string `json:"type"`
+	Process      bool   `json:"process"`
+	GPU          bool   `json:"gpu"`
+	Memory       bool   `json:"memory"`
+	Power        bool   `json:"power"`
+	PowerLimit   bool   `json:"powerLimit"`
+	Temperature  bool   `json:"temperature"`
+	Speed        bool   `json:"speed"`
 }
 type MonitorGPUSearch struct {
 	Aggregation string    `json:"aggregation" validate:"omitempty,oneof=avg max"`

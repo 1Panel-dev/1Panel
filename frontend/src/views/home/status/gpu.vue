@@ -18,10 +18,17 @@
                     <span v-for="model in modelGroups" :key="model.name">{{ model.name }} × {{ model.count }}</span>
                 </div>
             </div>
-            <div class="summary-memory">
+            <div v-if="dedicatedMemoryDevices.length" class="summary-memory">
                 <span class="metric-label">{{ $t('aiTools.gpu.memoryTotal') }}</span>
                 <strong>{{ formatMemory(totalMemory) }}</strong>
                 <span class="metric-label">{{ $t('home.used') }} {{ formatMemory(usedMemory) }}</span>
+            </div>
+            <div v-if="sharedMemoryDevice" class="summary-memory" :title="$t('aiTools.gpu.systemMemoryHelper')">
+                <span class="metric-label">{{ $t('aiTools.gpu.systemMemory') }}</span>
+                <strong>{{ formatMemory(sharedMemoryDevice.memoryTotal) }}</strong>
+                <span class="metric-label">
+                    {{ $t('home.used') }} {{ formatMemory(sharedMemoryDevice.memoryUsed) }}
+                </span>
             </div>
         </div>
 
@@ -59,7 +66,12 @@
                 </div>
                 <div class="device-metric">
                     <div class="metric-heading">
-                        <span class="metric-label">{{ $t('aiTools.gpu.memoryUsed') }}</span>
+                        <span
+                            class="metric-label"
+                            :title="device.sharedMemory ? $t('aiTools.gpu.systemMemoryHelper') : undefined"
+                        >
+                            {{ $t(device.sharedMemory ? 'aiTools.gpu.systemMemory' : 'aiTools.gpu.memoryUsed') }}
+                        </span>
                         <strong>
                             {{ formatMemory(device.memoryUsed) }}
                             <span class="metric-total">/ {{ formatMemory(device.memoryTotal) }}</span>
@@ -139,6 +151,7 @@ const devices = computed(() =>
         ...(props.current.gpuData || []).map((item) => ({
             key: `gpu-${item.type}-${item.busID || item.index}`,
             type: 'GPU',
+            sharedMemory: !!item.sharedMemory,
             card: `${item.type}-${item.busID || item.index}`,
             id: `GPU ${item.index}`,
             name: item.productName || 'GPU',
@@ -157,6 +170,7 @@ const devices = computed(() =>
         ...(props.current.npuData || []).map((item) => ({
             key: `npu-${item.npuIndex}-${item.chipIndex}`,
             type: 'NPU',
+            sharedMemory: false,
             card: item.npuIndex,
             id: `NPU ${item.npuIndex} · Chip ${item.chipIndex}`,
             name: item.productName || 'NPU',
@@ -176,6 +190,7 @@ const devices = computed(() =>
         ...(props.current.xpuData || []).map((item) => ({
             key: `xpu-${item.deviceID}`,
             type: 'XPU',
+            sharedMemory: false,
             card: item.deviceID,
             id: `XPU ${item.deviceID}`,
             name: item.deviceName || 'XPU',
@@ -222,15 +237,17 @@ const modelGroups = computed(() => {
     }
     return Array.from(models, ([name, cards]) => ({ name, count: cards.size }));
 });
+const sharedMemoryDevice = computed(() => devices.value.find((item) => item.sharedMemory));
+const dedicatedMemoryDevices = computed(() => devices.value.filter((item) => !item.sharedMemory));
 const totalMemory = computed(() =>
-    devices.value.some((item) => item.memoryTotal === null)
+    dedicatedMemoryDevices.value.some((item) => item.memoryTotal === null)
         ? null
-        : devices.value.reduce((sum, item) => sum + item.memoryTotal!, 0),
+        : dedicatedMemoryDevices.value.reduce((sum, item) => sum + item.memoryTotal!, 0),
 );
 const usedMemory = computed(() =>
-    devices.value.some((item) => item.memoryUsed === null)
+    dedicatedMemoryDevices.value.some((item) => item.memoryUsed === null)
         ? null
-        : devices.value.reduce((sum, item) => sum + item.memoryUsed!, 0),
+        : dedicatedMemoryDevices.value.reduce((sum, item) => sum + item.memoryUsed!, 0),
 );
 </script>
 
