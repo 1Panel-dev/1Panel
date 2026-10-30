@@ -45,6 +45,8 @@ func Build(c *gin.Context, event Event) (*model.OperationLog, error) {
 		"enable":      {"启用 API Key", "Enable API key"},
 		"disable":     {"停用 API Key", "Disable API key"},
 		"revoke":      {"撤销 API Key", "Revoke API key"},
+		"delete":      {"删除 API Key", "Delete API key"},
+		"reveal":      {"查看 API Key", "Reveal API key"},
 		"app_binding": {"向 APP 交付 API Key", "Deliver API key to APP"},
 	}
 	label, ok := labels[event.Action]
@@ -79,6 +81,17 @@ func Build(c *gin.Context, event Event) (*model.OperationLog, error) {
 			record.Method = strings.ToLower(c.Request.Method)
 			record.UserAgent = c.Request.UserAgent()
 			record.IP = c.ClientIP()
+		}
+		if c.GetBool("API_AUTH") && event.Action != "app_binding" {
+			record.AuthMethod = "api_key"
+			record.APIKeyID = c.GetString("API_AUTH_KEY_ID")
+			record.APIKeyName = c.GetString("API_AUTH_KEY_NAME")
+			if c.GetString("API_AUTH_KEY_KIND") == "legacy" {
+				record.APIKeyID = "legacy:" + c.GetString("API_AUTH_OWNER_TYPE") + ":" + c.GetString("API_AUTH_OWNER_ID")
+			}
+			if clientIP := c.GetString("API_AUTH_CLIENT_IP"); clientIP != "" {
+				record.IP = clientIP
+			}
 		}
 	}
 	if event.ClientIP != "" {

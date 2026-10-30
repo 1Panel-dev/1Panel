@@ -52,6 +52,27 @@ func (s *APIKeyService) owner(c *gin.Context) (auth.APIKeyOwner, error) {
 	return s.Provider.CurrentAPIKeyOwner(c)
 }
 
+func (s *APIKeyService) managementOwner(c *gin.Context) (auth.APIKeyOwner, error) {
+	if _, err := auth.RequireAPIKeyManagement(c); err != nil {
+		return auth.APIKeyOwner{}, err
+	}
+	if s.Provider == nil {
+		return auth.APIKeyOwner{}, buserr.New("ErrApiConfigStatusInvalid")
+	}
+	if !c.GetBool("API_AUTH") {
+		return s.Provider.CurrentAPIKeyOwner(c)
+	}
+	ownerType, ownerID := c.GetString("API_AUTH_OWNER_TYPE"), c.GetString("API_AUTH_OWNER_ID")
+	owner, err := s.Provider.ResolveAPIKeyOwner(c, ownerType, ownerID)
+	if err != nil {
+		return auth.APIKeyOwner{}, err
+	}
+	if owner.Type != ownerType || owner.ID != ownerID {
+		return auth.APIKeyOwner{}, buserr.New("ErrNotLogin")
+	}
+	return owner, nil
+}
+
 func apiKeyItem(key model.APIKey) dto.APIKeyItem {
 	status := key.Status
 	if status != "Revoked" && key.ExpiresAt != nil && !time.Now().Before(*key.ExpiresAt) {
@@ -75,7 +96,7 @@ func (s *APIKeyService) legacy(owner auth.APIKeyOwner) (dto.APIKeyItem, auth.API
 }
 
 func (s *APIKeyService) Search(c *gin.Context, req dto.APIKeySearch) (*dto.APIKeyPage, error) {
-	owner, err := s.owner(c)
+	owner, err := s.managementOwner(c)
 	if err != nil {
 		return nil, err
 	}
@@ -146,11 +167,13 @@ func keyHint(secret string) string {
 }
 
 func (s *APIKeyService) Create(c *gin.Context, req dto.APIKeyCreate) (*dto.APIKeyCreated, error) {
-	owner, err := s.owner(c)
+	owner, err := s.managementOwner(c)
 	if err != nil {
 		return nil, err
 	}
-	if _, err = uuid.Parse(req.RequestID); err != nil {
+	if req.RequestID == "" {
+		req.RequestID = uuid.NewString()
+	} else if _, err = uuid.Parse(req.RequestID); err != nil {
 		return nil, buserr.New("ErrInvalidParams")
 	}
 	expires, err := validateAPIKeyFields(&req.APIKeyFields, true)
@@ -172,6 +195,9 @@ func (s *APIKeyService) Create(c *gin.Context, req dto.APIKeyCreate) (*dto.APIKe
 		q := repo.APIKeyOwnerQuery(tx, owner.Type, owner.ID)
 		err := q.Where("request_id = ?", req.RequestID).First(&key).Error
 		if err == nil {
+			if key.DeletedAt != nil {
+				return buserr.New("ErrAPIKeyNotFound")
+			}
 			if key.RequestHash != requestHash {
 				return buserr.New("ErrAPIKeyConflict")
 			}
@@ -219,7 +245,7 @@ func ensureAPIKeyName(tx *gorm.DB, owner auth.APIKeyOwner, name, id string) erro
 }
 
 func (s *APIKeyService) Update(c *gin.Context, req dto.APIKeyUpdate) error {
-	owner, err := s.owner(c)
+	owner, err := s.managementOwner(c)
 	if err != nil {
 		return err
 	}
@@ -247,7 +273,7 @@ func (s *APIKeyService) Update(c *gin.Context, req dto.APIKeyUpdate) error {
 }
 
 func (s *APIKeyService) Status(c *gin.Context, req dto.APIKeyStatus) error {
-	owner, err := s.owner(c)
+	owner, err := s.managementOwner(c)
 	if err != nil {
 		return err
 	}
@@ -271,7 +297,7 @@ func (s *APIKeyService) Status(c *gin.Context, req dto.APIKeyStatus) error {
 }
 
 func (s *APIKeyService) Revoke(c *gin.Context, req dto.APIKeyMutation) error {
-	owner, err := s.owner(c)
+	owner, err := s.managementOwner(c)
 	if err != nil {
 		return err
 	}
@@ -289,21 +315,75 @@ func (s *APIKeyService) Revoke(c *gin.Context, req dto.APIKeyMutation) error {
 	})
 }
 
+func (s *APIKeyService) Delete(c *gin.Context, req dto.APIKeyMutation) error {
+	owner, err := s.managementOwner(c)
+	if err != nil {
+		return err
+	}
+	if req.ID == "legacy" {
+		return buserr.New("ErrInvalidParams")
+	}
+	return s.mutate(c, owner, req, "delete", func(_ *gorm.DB, key *model.APIKey) error {
+		now := time.Now()
+		key.Status = "Revoked"
+		if key.RevokedAt == nil {
+			key.RevokedAt = &now
+		}
+		key.DeletedAt = &now
+		key.ActiveName = nil
+		key.SecretCiphertext = ""
+		key.KeyHint = ""
+		key.AllowAppBinding = false
+		return nil
+	})
+}
+
+func (s *APIKeyService) Reveal(c *gin.Context, req dto.APIKeyMutation) (*dto.APIKeyRevealed, error) {
+	owner, err := s.owner(c)
+	if err != nil {
+		return nil, err
+	}
+	if req.ID == "" || req.ID == "legacy" || req.Revision == 0 {
+		return nil, buserr.New("ErrInvalidParams")
+	}
+	// Serialize the snapshot and disclosure audit with revocation/deletion.
+	apiKeyMutationMu.Lock()
+	defer apiKeyMutationMu.Unlock()
+	var key model.APIKey
+	if err = repo.APIKeyOwnerQuery(global.DB, owner.Type, owner.ID).Where("id = ? AND deleted_at IS NULL", req.ID).First(&key).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, buserr.New("ErrAPIKeyNotFound")
+		}
+		return nil, err
+	}
+	if key.Revision != req.Revision || key.Status == "Revoked" {
+		return nil, buserr.New("ErrAPIKeyConflict")
+	}
+	secret, err := auth.APIKeySecret(key)
+	if err != nil {
+		return nil, buserr.New("ErrApiConfigKeyInvalid")
+	}
+	if err = apikey_audit.Record(c, apikey_audit.Event{OwnerType: owner.Type, OwnerID: owner.ID, KeyID: key.ID, KeyName: key.Name, Action: "reveal", Status: constant.StatusSuccess}); err != nil {
+		return nil, err
+	}
+	return &dto.APIKeyRevealed{APIKeyMutation: req, APIKey: secret}, nil
+}
+
 func (s *APIKeyService) mutate(c *gin.Context, owner auth.APIKeyOwner, req dto.APIKeyMutation, action string, change func(*gorm.DB, *model.APIKey) error) error {
 	if req.ID == "" || req.Revision == 0 {
 		return buserr.New("ErrInvalidParams")
 	}
 	apiKeyMutationMu.Lock()
 	var key model.APIKey
-	closeTerminals := action == "disable" || action == "revoke"
+	closeTerminals := action == "disable" || action == "revoke" || action == "delete"
 	err := global.DB.Transaction(func(tx *gorm.DB) error {
-		if err := repo.APIKeyOwnerQuery(tx, owner.Type, owner.ID).Where("id = ?", req.ID).First(&key).Error; err != nil {
+		if err := repo.APIKeyOwnerQuery(tx, owner.Type, owner.ID).Where("id = ? AND deleted_at IS NULL", req.ID).First(&key).Error; err != nil {
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				return buserr.New("ErrAPIKeyNotFound")
 			}
 			return err
 		}
-		if key.Revision != req.Revision || key.Status == "Revoked" {
+		if key.Revision != req.Revision || (key.Status == "Revoked" && action != "delete") {
 			return buserr.New("ErrAPIKeyConflict")
 		}
 		before := key

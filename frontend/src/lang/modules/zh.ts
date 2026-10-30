@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: '查看密钥',
+        hideSecret: '隐藏密钥',
+        revealHelp: '请妥善保管密钥。查看不会恢复已停用或已过期密钥的使用权限。',
+        deleteConfirm:
+            '确定删除“{0}”吗？密钥将被销毁并从列表移除，拒绝后续请求并关闭关联终端。审计记录仍保留，运行中的任务不会取消，此操作不可恢复。',
         title: 'API Key',
         manage: '管理 API Key',
         personalEntry: '前往设置管理自己的密钥、访问条件和 APP 扫码绑定。',
@@ -22,10 +27,6 @@ const message = {
         futureExpiry: '请选择晚于当前时间的到期时间。',
         allowAppBinding: '允许 APP 扫码绑定',
         bindingDisableHelp: '关闭扫码绑定后，将停止接受新的绑定；已绑定设备可继续使用，直至密钥被停用、撤销或到期。',
-        saveSecret: '请立即复制并保存密钥。关闭后，普通密钥管理无法再次显示完整密钥。',
-        saved: '我已保存密钥',
-        alreadyCreated:
-            '这把密钥已创建，无法再次展示明文。若原响应丢失，请撤销后重新创建；允许扫码绑定时，也可通过扫码交付。',
         uncertain: '请求结果尚不确定。请保持原配置重试，避免重复创建；或关闭并检查列表后再创建其他密钥。',
         legacyHelp: '旧版 Key 用于兼容历史 API 连接，启用、停用和重置操作仅对该 Key 生效。',
         showLegacy: '查看旧版密钥',

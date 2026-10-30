@@ -6,7 +6,7 @@ const prefix = '/core/auth/api/keys';
 export const searchAPIKeys = (params: { page: number; pageSize: number; excludeRevoked?: boolean }) => {
     return http.post<APIKey.Search>(`${prefix}/search`, params);
 };
-export const createAPIKey = (params: APIKey.Editable & { requestID: string }) => {
+export const createAPIKey = (params: APIKey.Editable & { requestID?: string }) => {
     return http.post<APIKey.Created>(`${prefix}/create`, params);
 };
 export const updateAPIKey = (params: APIKey.Editable & APIKey.Reference) => {
@@ -17,4 +17,10 @@ export const setAPIKeyStatus = (params: APIKey.Reference & { status: 'Enable' | 
 };
 export const revokeAPIKey = (params: APIKey.Reference) => {
     return http.post<{ terminalClosePending: boolean }>(`${prefix}/revoke`, params);
+};
+export const deleteAPIKey = (params: APIKey.Reference) => {
+    return http.post<{ terminalClosePending: boolean }>(`${prefix}/delete`, params);
+};
+export const revealAPIKey = (params: APIKey.Reference) => {
+    return http.post<APIKey.Revealed>(`${prefix}/reveal`, params);
 };

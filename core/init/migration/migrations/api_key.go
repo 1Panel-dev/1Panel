@@ -15,3 +15,8 @@ var AddOperationLogAPIKey = &gormigrate.Migration{
 	ID:      "20260915-add-operation-log-api-key",
 	Migrate: func(tx *gorm.DB) error { return tx.AutoMigrate(&model.OperationLog{}) },
 }
+
+var AddAPIKeyDeletedAt = &gormigrate.Migration{
+	ID:      "20261028-api-key-deleted-at",
+	Migrate: func(tx *gorm.DB) error { return tx.AutoMigrate(&model.APIKey{}) },
+}
