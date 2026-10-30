@@ -357,7 +357,9 @@ const deploymentButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        disabled: (row: Deployment) => operationDisabled(row) && row.status !== 'Uninstalling',
+        disabled: (row: Deployment) =>
+            deleteLoading.value ||
+            (operationDisabled(row) && !['Uninstalling', 'ReStarting', 'Restarting'].includes(row.status)),
         click: (row: Deployment) => {
             deleting.value = row;
             forceDelete.value = false;

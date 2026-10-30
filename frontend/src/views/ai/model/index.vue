@@ -230,8 +230,13 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" min-width="150">
                             <template #default="{ row }">
-                                <el-dropdown placement="bottom" :disabled="statusDisabled(row)">
-                                    <Status v-permission :status="row.status" operate :disabled="statusDisabled(row)" />
+                                <el-dropdown placement="bottom" :disabled="statusDisabled(row, 'stop')">
+                                    <Status
+                                        v-permission
+                                        :status="row.status"
+                                        operate
+                                        :disabled="statusDisabled(row, 'stop')"
+                                    />
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item
@@ -242,7 +247,8 @@
                                             </el-dropdown-item>
                                             <el-dropdown-item
                                                 :disabled="
-                                                    statusDisabled(row) || ['Stopped', 'Exited'].includes(row.status)
+                                                    statusDisabled(row, 'stop') ||
+                                                    ['Stopped', 'Exited'].includes(row.status)
                                                 "
                                                 @click="operate(row, 'stop')"
                                             >
@@ -570,22 +576,23 @@ const accountButtons = [
 ];
 const taskRef = ref();
 const pending = ref('');
-const operationDisabled = (row: Deployment) =>
+const operationDisabled = (row: Deployment, operation = '') =>
     Boolean(pending.value) ||
-    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(
-        row.status,
-    );
-const statusDisabled = (row: Deployment) =>
-    operationDisabled(row) || !hasManagePermissionAccess() || (row.engine === 'ollama' && !hasPermission('app_manage'));
+    ['Installing', 'Starting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(row.status) ||
+    (['ReStarting', 'Restarting'].includes(row.status) && !['stop', 'delete'].includes(operation));
+const statusDisabled = (row: Deployment, operation = '') =>
+    operationDisabled(row, operation) ||
+    !hasManagePermissionAccess() ||
+    (row.engine === 'ollama' && !hasPermission('app_manage'));
 const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
-    if (statusDisabled(row)) return;
+    if (statusDisabled(row, operation)) return;
     const node = currentNode.value;
     await ElMessageBox.confirm(
         i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
         i18n.global.t('commons.operate.' + operation),
         { type: 'warning' },
     );
-    if (node !== currentNode.value || statusDisabled(row)) return;
+    if (node !== currentNode.value || statusDisabled(row, operation)) return;
     pending.value = `${row.engine}:${row.id}`;
     try {
         if (row.engine === 'ollama') {
@@ -653,7 +660,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'ollama' && hasPermission('app_manage'),
-        disabled: operationDisabled,
+        disabled: (row: Deployment) => operationDisabled(row, 'delete'),
         click: async (row: Deployment) => {
             const node = currentNode.value;
             const path = route.fullPath;
@@ -683,7 +690,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'vllm',
-        disabled: (row: Deployment) => operationDisabled(row) && row.status !== 'Uninstalling',
+        disabled: (row: Deployment) => operationDisabled(row, 'delete') && row.status !== 'Uninstalling',
         click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
     },
 ];
