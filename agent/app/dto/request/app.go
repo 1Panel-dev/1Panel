@@ -156,6 +156,7 @@ type PortUpdate struct {
 type AppUpdateVersion struct {
 	AppInstallID  uint   `json:"appInstallID" validate:"required"`
 	UpdateVersion string `json:"updateVersion"`
+	LoadCompose   *bool  `json:"loadCompose,omitempty"`
 }
 
 type AppInstallSortItem struct {

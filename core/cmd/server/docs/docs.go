@@ -4593,6 +4593,9 @@ const docTemplate = `{
 						"schema": {
 							"type": "file"
 						}
+					},
+					"302": {
+						"description": "redirect to the official icon URL"
 					}
 				},
 				"security": [
@@ -5389,6 +5392,17 @@ const docTemplate = `{
 			"post": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.AppUpdateVersion"
+						}
+					}
 				],
 				"responses": {
 					"200": {
@@ -49266,6 +49280,23 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"request.AppUpdateVersion": {
+			"properties": {
+				"appInstallID": {
+					"type": "integer"
+				},
+				"loadCompose": {
+					"type": "boolean"
+				},
+				"updateVersion": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"appInstallID"
+			],
+			"type": "object"
+		},
 		"response.AppConfig": {
 			"properties": {
 				"advanced": {
@@ -49297,6 +49328,9 @@ const docTemplate = `{
 				},
 				"httpPort": {
 					"type": "integer"
+				},
+				"isEdit": {
+					"type": "boolean"
 				},
 				"memoryLimit": {
 					"type": "number"
@@ -49575,6 +49609,9 @@ const docTemplate = `{
 				},
 				"gpuSupport": {
 					"type": "boolean"
+				},
+				"icon": {
+					"type": "string"
 				},
 				"id": {
 					"type": "integer"

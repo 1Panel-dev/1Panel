@@ -6,6 +6,7 @@
                     <AppIcon
                         @open-detail="$emit('openDetail')"
                         :appKey="installed.appKey"
+                        :icon="installed.icon"
                         :currentNode="currentNode"
                     ></AppIcon>
                 </el-col>

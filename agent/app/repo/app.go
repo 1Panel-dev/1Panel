@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 )
@@ -30,6 +31,7 @@ type IAppRepo interface {
 	BatchCreate(ctx context.Context, apps []model.App) error
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
+	UpdateIcon(id uint, icon string) error
 	BatchDelete(ctx context.Context, apps []model.App) error
 	DeleteByIDs(ctx context.Context, ids []uint) error
 	DeleteBy(opts ...DBOption) error
@@ -39,6 +41,10 @@ type IAppRepo interface {
 
 func NewIAppRepo() IAppRepo {
 	return &AppRepo{}
+}
+
+func (a AppRepo) UpdateIcon(id uint, icon string) error {
+	return getDb(WithByID(id), a.WithResource(constant.AppResourceRemote)).Model(&model.App{}).UpdateColumn("icon", icon).Error
 }
 
 func (a AppRepo) WithByLikeName(name string) DBOption {

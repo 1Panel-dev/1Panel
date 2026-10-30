@@ -31,6 +31,7 @@ type AppDTO struct {
 type AppItem struct {
 	Name                string   `json:"name"`
 	Key                 string   `json:"key"`
+	Icon                string   `json:"icon,omitempty"`
 	ID                  uint     `json:"id"`
 	Description         string   `json:"description"`
 	Status              string   `json:"status"`
@@ -194,5 +195,6 @@ type AppConfig struct {
 	ModelAccountBaseURL     string     `json:"modelAccountBaseURL"`
 	Params                  []AppParam `json:"params"`
 	RawCompose              string     `json:"rawCompose"`
+	IsEdit                  bool       `json:"isEdit"`
 	request.AppContainerConfig
 }
