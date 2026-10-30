@@ -297,7 +297,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 			TaskID:              req.TaskID,
 			UseLifecycleScripts: req.UseLifecycleScripts,
 		}
-		if err = deleteAppInstall(deleteReq); err != nil {
+		if err = deleteAppInstall(deleteReq); err != nil && !req.ForceDelete {
 			return err
 		}
 		return nil

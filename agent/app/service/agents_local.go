@@ -1,7 +1,6 @@
 package service
 
 import (
-	"context"
 	"errors"
 	"fmt"
 	"strings"
@@ -9,8 +8,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"gorm.io/gorm"
 )
@@ -21,9 +20,6 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 	}
 	agentAccountMutationMu.Lock()
 	defer agentAccountMutationMu.Unlock()
-	if _, err := appInstallRepo.GetFirst(repo.WithByID(install.ID)); err != nil {
-		return nil, err
-	}
 	account, err := agentAccountRepo.GetFirst(repo.WithByAppInstallID(install.ID))
 	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 		return nil, err
@@ -164,15 +160,20 @@ func loadOllamaModelAccountAddress(install model.AppInstall) (string, string, er
 	return addressType, account.BaseURL, nil
 }
 
-func checkLocalModelAccountDelete(ctx context.Context, installID uint) error {
-	reason, err := agentAccountRepo.CheckDeleteLocal(ctx, installID)
+func CleanupLocalModelAccount(installID uint) {
+	if installID == 0 {
+		return
+	}
+	accounts, err := agentAccountRepo.List(repo.WithByAppInstallID(installID))
 	if err != nil {
-		return err
+		global.LOG.Errorf("load local model accounts: %v", err)
+		return
 	}
-	if reason != "" {
-		return buserr.New(reason)
+	for _, account := range accounts {
+		if err := (AgentService{}).DeleteAccount(dto.AgentAccountDeleteReq{ID: account.ID}); err != nil {
+			global.LOG.Warnf("keep local model account %d after uninstall: %v", account.ID, err)
+		}
 	}
-	return nil
 }
 
 func ResolveLocalModelAccountBaseURL(addressType, customURL, containerName, containerPort string, hostPort int) (string, error) {
