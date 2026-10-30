@@ -2,6 +2,8 @@ module github.com/1Panel-dev/1Panel/core
 
 go 1.27.3
 
+godebug multipathtcp=0
+
 require (
 	github.com/beevik/etree v1.7.0
 	github.com/coreos/go-oidc/v3 v3.20.0
