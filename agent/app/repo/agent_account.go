@@ -20,7 +20,7 @@ type IAgentAccountRepo interface {
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	Count() (int64, error)
 	CountTextByProviders(providers []string) (map[string]int64, error)
-	SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error
+	SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
 
 func NewIAgentAccountRepo() IAgentAccountRepo {
@@ -106,7 +106,7 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 	return counts, nil
 }
 
-func (a AgentAccountRepo) SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error {
+func (a AgentAccountRepo) SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error {
 	return global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(account).Error; err != nil {
 			return err

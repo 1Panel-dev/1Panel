@@ -8,7 +8,7 @@
         <AppInstallForm ref="formRef" v-model="form" :loading="loading" sectioned hide-gpu-config>
             <template #after-params>
                 <GPUConfig ref="gpuRef" v-model="form.gpu" />
-                <details open class="form-section">
+                <details ref="syncSectionRef" open class="form-section">
                     <summary class="form-section-header">
                         <span>{{ $t('aiTools.model.syncModelAccount') }}</span>
                         <el-switch
@@ -16,6 +16,7 @@
                             @keydown.stop
                             v-model="form.syncModelAccount"
                             :aria-label="$t('aiTools.model.syncModelAccount')"
+                            @change="(enabled) => enabled && syncSectionRef && (syncSectionRef.open = true)"
                         />
                     </summary>
                     <div v-show="form.syncModelAccount" class="form-section-body">
@@ -64,6 +65,7 @@ const open = ref(false);
 const loading = ref(false);
 const formRef = ref<InstanceType<typeof AppInstallForm>>();
 const accountRef = ref();
+const syncSectionRef = ref<HTMLDetailsElement>();
 const gpuRef = ref<InstanceType<typeof GPUConfig>>();
 const form = ref({
     gpu: {

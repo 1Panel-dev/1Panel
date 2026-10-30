@@ -13,7 +13,12 @@
                 <template v-else-if="visible && instance && !loading && view !== VllmPlaceholder">
                     <div v-if="instance.engine !== 'ollama'" class="service-card">
                         <div class="flex flex-wrap gap-3 items-center mb-4">
-                            <strong>{{ engineLabels[instance.engine] }} {{ instance.version }}</strong>
+                            <strong>
+                                {{ engineLabels[instance.engine] }}
+                                {{
+                                    instance.engine === 'vllm' ? formatVllmVersion(instance.version) : instance.version
+                                }}
+                            </strong>
                             <Status :status="instance.status" />
                         </div>
                         <div class="service-actions">
@@ -110,7 +115,7 @@ import TensorForm from '../../tensorrt/operate/index.vue';
 import VllmPlaceholder from '../../vllm/index.vue';
 import ContainerLogs from '@/components/log/container-drawer/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { readPages, loadVllmAPI, vllmAvailable, type Deployment } from '../../deployment';
+import { formatVllmVersion, readPages, loadVllmAPI, vllmAvailable, type Deployment } from '../../deployment';
 
 const emit = defineEmits(['search', 'upgrade']);
 const { isMobile, currentNode, isProductPro, isFxplay } = useGlobalStore();

@@ -347,17 +347,18 @@ type AgentAccountCreateReq struct {
 }
 
 type AgentAccountUpdateReq struct {
-	ID                   uint   `json:"id" validate:"required"`
-	Name                 string `json:"name" validate:"required"`
-	APIKey               string `json:"apiKey" validate:"required"`
-	RememberAPIKey       bool   `json:"rememberApiKey"`
-	BaseURL              string `json:"baseURL"`
-	APIType              string `json:"apiType" validate:"required"`
-	AuthMode             string `json:"authMode"`
-	VerifyModel          string `json:"verifyModel"`
-	ValidateAvailability *bool  `json:"validateAvailability"`
-	Remark               string `json:"remark"`
-	SyncAgents           bool   `json:"syncAgents"`
+	ID                   uint                `json:"id" validate:"required"`
+	Name                 string              `json:"name" validate:"required"`
+	APIKey               string              `json:"apiKey" validate:"required"`
+	RememberAPIKey       bool                `json:"rememberApiKey"`
+	BaseURL              string              `json:"baseURL"`
+	APIType              string              `json:"apiType" validate:"required"`
+	AuthMode             string              `json:"authMode"`
+	VerifyModel          string              `json:"verifyModel"`
+	ValidateAvailability *bool               `json:"validateAvailability"`
+	Remark               string              `json:"remark"`
+	SyncAgents           bool                `json:"syncAgents"`
+	Models               []AgentAccountModel `json:"models"`
 }
 
 type AgentAccountVerifyReq struct {

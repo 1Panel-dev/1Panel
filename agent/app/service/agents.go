@@ -1105,9 +1105,23 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
+	if req.Models != nil {
+		if account.AppInstallID != 0 {
+			return buserr.WithDetail("ErrInvalidParams", "local model pool is managed by the deployment", nil)
+		}
+		models, err = normalizeAgentAccountModels(account, req.Models)
+		if err != nil {
+			return err
+		}
+		if err := ensureAccountModelsNotBound(account, models); err != nil {
+			return err
+		}
+	}
 	requestedVerifyModel := req.VerifyModel
 	if strings.TrimSpace(requestedVerifyModel) == "" {
-		requestedVerifyModel = account.VerifyModel
+		if _, ok := findAgentAccountModelForProvider(provider, models, account.VerifyModel); ok {
+			requestedVerifyModel = account.VerifyModel
+		}
 	}
 	verifyModel := ""
 	if account.AppInstallID == 0 || len(models) > 0 {
@@ -1131,7 +1145,16 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.Remark = req.Remark
 	account.Verified = true
 
-	if err := agentAccountRepo.Save(account); err != nil {
+	if req.Models != nil {
+		rows := make([]model.AgentAccountModel, 0, len(models))
+		for _, item := range models {
+			rows = append(rows, model.AgentAccountModel{Model: item.ID, Name: item.Name})
+		}
+		err = agentAccountRepo.SaveWithModels(account, rows)
+	} else {
+		err = agentAccountRepo.Save(account)
+	}
+	if err != nil {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()

@@ -71,6 +71,7 @@ var WebUrlMap = map[string]struct{}{
 	"/ai/skills-hub":            {},
 	"/ai/skills-hub/targets":    {},
 	"/ai/benchmark":             {},
+	"/ai/model":                 {},
 	"/ai/model/account":         {},
 	"/ai/model/local":           {},
 	"/ai/model/local/templates": {},

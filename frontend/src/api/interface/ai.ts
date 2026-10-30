@@ -737,6 +737,7 @@ export namespace AI {
         baseURL: string;
         apiType: string;
         authMode: string;
+        models?: AgentAccountModel[];
         verifyModel: string;
         validateAvailability: boolean;
         remark: string;

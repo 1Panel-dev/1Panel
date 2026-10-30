@@ -92,12 +92,15 @@ const expiresInfo = ref(0);
 const expiresAlertVisible = ref(false);
 const expiresAlertKey = computed(() => (isEnterprise.value ? 'xpack.expiresEnterpriseAlert' : 'xpack.expiresProAlert'));
 
-const handleChange = (label: string) => {
+const handleChange = async (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);
     if (!btn) return;
-    if (btn.path) routerToPathWithQuery(btn.path, { uncached: 'true' });
-    else if (btn.name) routerToNameWithQuery(btn.name, { uncached: 'true' });
-    activeName.value = btn.label;
+    try {
+        if (btn.path) await routerToPathWithQuery(btn.path, { uncached: 'true' });
+        else if (btn.name) await routerToNameWithQuery(btn.name, { uncached: 'true' });
+    } finally {
+        syncActiveName();
+    }
 };
 
 onMounted(() => {
@@ -154,7 +157,9 @@ function syncActiveName() {
     if (buttonArray.value.length) {
         let isPathExist = false;
         const btn = buttonArray.value.find((btn) => {
-            return btn.path && router.currentRoute.value.path.startsWith(btn.path);
+            return btn.path
+                ? router.currentRoute.value.path.startsWith(btn.path)
+                : btn.name && router.currentRoute.value.name === btn.name;
         });
         if (btn) {
             isPathExist = true;

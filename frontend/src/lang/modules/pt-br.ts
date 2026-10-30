@@ -1098,14 +1098,19 @@ const message = {
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
-            vllmVersionHelper: 'Para servidores FusionXpark GB10, selecione a versão -cu130.',
+            vllmVersionHelper: {
+                default: 'Versão padrão oficial com CUDA 13.0, para drivers recentes e GPUs de novas arquiteturas.',
+                cuda: 'Versão de compatibilidade com arquiteturas antigas com CUDA 12.9, para GPUs antigas que usam versões do CUDA inferiores à 13.0.',
+                ubuntu: 'Versão padrão do NVIDIA GB10 com CUDA 13.0, para dispositivos NVIDIA GB10.',
+                dspark: 'Versão personalizada do NVIDIA GB10 para dois dispositivos, com uma imagem mantida pelo 1Panel.',
+            },
             vllmDeployProfile: 'Modelo de implantação',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Sincronizar com conta de modelo',
+            syncModelAccount: 'Sincronizar com serviço de modelo',
             modelAccountAddressHelper:
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
             containerAddress: 'Endereço do contêiner',
