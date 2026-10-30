@@ -79,7 +79,11 @@
                         </el-radio-group>
                     </template>
                     <template #body>
-                        <SystemStatus ref="statusRef" :view="statusView" style="margin-bottom: 33px" />
+                        <SystemStatus
+                            ref="statusRef"
+                            :view="statusView"
+                            :style="{ marginBottom: statusView === 'gpu' ? '0' : '33px' }"
+                        />
                     </template>
                 </CardWithHeader>
                 <CardWithHeader
