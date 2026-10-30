@@ -849,6 +849,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'Modeller alınamadı. Varsayılan modeller kullanılıyor.',
             accountModelsDuplicate: 'Katalogda yinelenen modeller bulundu',
             modelPool: 'Model kataloğu',
+            ollamaRegisterOnly: 'Yalnızca bu Ollama hizmetinde mevcut modeller kaydedilir. İndirme başlatılmaz.',
+            deleteModelFiles: 'Model dosyalarını da Ollama hizmetinden sil',
             fallbackModels: 'Yedek modeller',
             addFallbackModel: 'Yedek model ekle',
             fallbackModelsEmpty: 'Yapılandırılmış yedek model yok',

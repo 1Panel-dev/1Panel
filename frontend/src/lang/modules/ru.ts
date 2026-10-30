@@ -841,6 +841,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Не удалось получить модели. Используются модели по умолчанию.',
             accountModelsDuplicate: 'В каталоге обнаружены повторяющиеся модели',
             modelPool: 'Каталог моделей',
+            ollamaRegisterOnly:
+                'Регистрируются только модели, уже доступные в этом сервисе Ollama. Загрузка не запускается.',
+            deleteModelFiles: 'Также удалить файлы модели из сервиса Ollama',
             fallbackModels: 'Резервные модели',
             addFallbackModel: 'Добавить резервную модель',
             fallbackModelsEmpty: 'Резервные модели не настроены',

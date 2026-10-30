@@ -1,13 +1,19 @@
 package service
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
@@ -136,6 +142,62 @@ func syncOllamaModelAccount(install model.AppInstall, baseURL string, updateBase
 	return err
 }
 
+func updateOllamaModelPool(modelName string, remove bool) error {
+	install, err := appInstallRepo.LoadInstallAppByKeyAndName("ollama", "")
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	if !install.SyncModelAccount {
+		return nil
+	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	account, err := agentAccountRepo.GetFirst(repo.WithByAppInstallID(install.ID), repo.WithByProvider("ollama"))
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	if remove {
+		for _, item := range models {
+			if !sameProviderModelID("ollama", item.ID, modelName) {
+				continue
+			}
+			if err := agentAccountModelRepo.DeleteByID(item.RecordID); err != nil {
+				return err
+			}
+		}
+		if sameProviderModelID("ollama", account.VerifyModel, modelName) {
+			account.VerifyModel = ""
+			if err := agentAccountRepo.Save(account); err != nil {
+				return err
+			}
+		}
+		if err := compactPersistedAgentAccountModelSortOrder(account.ID); err != nil {
+			return err
+		}
+	} else {
+		if _, exists := findAgentAccountModelForProvider("ollama", models, modelName); exists {
+			return nil
+		}
+		record := &model.AgentAccountModel{AccountID: account.ID, Model: modelName, Name: modelName, SortOrder: len(models) + 1}
+		if err := agentAccountModelRepo.Create(record); err != nil {
+			return err
+		}
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return nil
+}
+
 func loadOllamaModelAccountAddress(install model.AppInstall) (string, string, error) {
 	addressType := install.ModelAccountBaseURLType
 	if addressType == "" {
@@ -199,4 +261,40 @@ func ResolveLocalModelAccountBaseURL(addressType, customURL, containerName, cont
 	default:
 		return fmt.Sprintf("http://%s:%s/v1", containerName, containerPort), nil
 	}
+}
+
+func deleteRemoteOllamaModel(account *model.AgentAccount, modelName string) error {
+	body, err := json.Marshal(map[string]string{"model": modelName})
+	if err != nil {
+		return err
+	}
+	baseURL := strings.TrimSuffix(strings.TrimRight(account.BaseURL, "/"), "/v1")
+	req, err := http.NewRequest(http.MethodDelete, baseURL+"/api/delete", bytes.NewReader(body))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer "+account.APIKey)
+	resp, err := (&http.Client{Timeout: 30 * time.Second}).Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return fmt.Errorf("delete Ollama model failed: %s", resp.Status)
+	}
+	return nil
+}
+
+func resolveExistingOllamaModel(account *model.AgentAccount, modelID string) (string, error) {
+	available, err := providercatalog.DiscoverModels(account.BaseURL, account.APIKey)
+	if err != nil {
+		return "", buserr.WithErr("ErrAgentAccountUnavailable", err)
+	}
+	for _, id := range available {
+		if sameProviderModelID("ollama", id, modelID) {
+			return id, nil
+		}
+	}
+	return "", buserr.New("ErrRecordNotFound")
 }

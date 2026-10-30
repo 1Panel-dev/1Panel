@@ -843,6 +843,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'モデルを取得できませんでした。デフォルトモデルを使用しています。',
             accountModelsDuplicate: 'カタログに重複したモデルがあります',
             modelPool: 'モデルプール',
+            ollamaRegisterOnly: 'この Ollama サービスに存在するモデルのみを登録します。ダウンロードは開始されません。',
+            deleteModelFiles: 'Ollama サービス上のモデルファイルも削除する',
             fallbackModels: 'フォールバックモデル',
             addFallbackModel: 'フォールバックモデルを追加',
             fallbackModelsEmpty: 'フォールバックモデルは未設定です',

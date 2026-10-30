@@ -831,6 +831,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'ດຶງລາຍການໂມເດວບໍ່ສຳເລັດ. ກຳລັງໃຊ້ໂມເດວເລີ່ມຕົ້ນ.',
             accountModelsDuplicate: 'ພົບໂມເດວທີ່ຊ້ຳກັນໃນລາຍການ',
             modelPool: 'ກຸ່ມໂມເດວ (Model Pool)',
+            ollamaRegisterOnly: 'ລົງທະບຽນສະເພາະໂມເດວທີ່ມີຢູ່ໃນບໍລິການ Ollama ນີ້ແລ້ວ. ຈະບໍ່ເລີ່ມດາວໂຫຼດ.',
+            deleteModelFiles: 'ລຶບໄຟລ໌ໂມເດວອອກຈາກບໍລິການ Ollama ນຳ',
             fallbackModels: 'ໂມເດວສຳຮອງ (Fallback)',
             addFallbackModel: 'ເພີ່ມໂມເດວສຳຮອງ',
             fallbackModelsEmpty: 'ຍັງບໍ່ໄດ້ຕັ້ງຄ່າໂມເດວສຳຮອງ',

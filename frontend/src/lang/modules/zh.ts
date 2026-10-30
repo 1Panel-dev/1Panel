@@ -821,6 +821,8 @@ const message = {
             discoverModelsFailedUseDefaults: '获取模型失败，已使用默认模型',
             accountModelsDuplicate: '模型池中存在重复模型，请检查后重试',
             modelPool: '模型池',
+            ollamaRegisterOnly: '仅登记此 Ollama 服务上已存在的模型，不会触发下载。',
+            deleteModelFiles: '同时删除 Ollama 服务上的模型文件',
             fallbackModels: '备用模型',
             addFallbackModel: '新增备用模型',
             fallbackModelsEmpty: '尚未配置备用模型',

@@ -849,6 +849,9 @@ const message = {
                 'No se pudieron obtener los modelos. Se usarán los modelos predeterminados.',
             accountModelsDuplicate: 'Existen modelos duplicados en el catálogo',
             modelPool: 'Pool de modelos',
+            ollamaRegisterOnly:
+                'Solo se registran modelos ya disponibles en este servicio Ollama. No se iniciará ninguna descarga.',
+            deleteModelFiles: 'Eliminar también los archivos del modelo del servicio Ollama',
             fallbackModels: 'Modelos de respaldo',
             addFallbackModel: 'Agregar modelo de respaldo',
             fallbackModelsEmpty: 'No hay modelos de respaldo configurados',

@@ -839,6 +839,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'دریافت مدل‌ها ناموفق بود. از مدل‌های پیش‌فرض استفاده می‌شود.',
             accountModelsDuplicate: 'مدل‌های تکراری در کاتالوگ یافت شد',
             modelPool: 'مجموعه مدل‌ها',
+            ollamaRegisterOnly: 'فقط مدل‌های موجود در این سرویس Ollama ثبت می‌شوند. دانلودی آغاز نخواهد شد.',
+            deleteModelFiles: 'فایل‌های مدل نیز از سرویس Ollama حذف شوند',
             fallbackModels: 'مدل‌های جایگزین',
             addFallbackModel: 'افزودن مدل جایگزین',
             fallbackModelsEmpty: 'هیچ مدل جایگزینی پیکربندی نشده است',

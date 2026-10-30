@@ -853,6 +853,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Gagal mendapatkan model. Model lalai sedang digunakan.',
             accountModelsDuplicate: 'Terdapat model pendua dalam katalog',
             modelPool: 'Katalog model',
+            ollamaRegisterOnly:
+                'Daftar hanya model yang sudah tersedia pada perkhidmatan Ollama ini. Tiada muat turun akan dimulakan.',
+            deleteModelFiles: 'Padam juga fail model daripada perkhidmatan Ollama',
             fallbackModels: 'Model fallback',
             addFallbackModel: 'Tambah model fallback',
             fallbackModelsEmpty: 'Tiada model fallback dikonfigurasikan',
