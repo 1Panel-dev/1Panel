@@ -318,6 +318,7 @@ type AgentAccountModelDiscoverReq struct {
 }
 
 type AgentAccountModelCreateReq struct {
+	TaskID    string            `json:"taskID"`
 	AccountID uint              `json:"accountId" validate:"required"`
 	Model     AgentAccountModel `json:"model" validate:"required"`
 }
@@ -328,8 +329,9 @@ type AgentAccountModelUpdateReq struct {
 }
 
 type AgentAccountModelDeleteReq struct {
-	AccountID uint `json:"accountId" validate:"required"`
-	RecordID  uint `json:"recordId" validate:"required"`
+	DeleteFiles bool `json:"deleteFiles"`
+	AccountID   uint `json:"accountId" validate:"required"`
+	RecordID    uint `json:"recordId" validate:"required"`
 }
 
 type AgentAccountCreateReq struct {

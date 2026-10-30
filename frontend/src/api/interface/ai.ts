@@ -677,6 +677,7 @@ export namespace AI {
     }
 
     export interface AgentAccountModelCreateReq {
+        taskID?: string;
         accountId: number;
         model: AgentAccountModel;
     }
@@ -687,6 +688,7 @@ export namespace AI {
     }
 
     export interface AgentAccountModelDeleteReq {
+        deleteFiles?: boolean;
         accountId: number;
         recordId: number;
     }

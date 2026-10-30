@@ -41,8 +41,9 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { MsgSuccess } from '@/utils/message';
-import { createOllamaModel } from '@/api/modules/ai';
+import { createAgentAccountModel, createOllamaModel } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
+const props = defineProps<{ accountId?: number }>();
 const drawerVisible = ref(false);
 const form = reactive({
     name: '',
@@ -63,7 +64,14 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         let itemName = form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', '');
-        await createOllamaModel(itemName, taskID).then(() => {
+        const request = props.accountId
+            ? createAgentAccountModel({
+                  accountId: props.accountId,
+                  model: { recordId: 0, id: itemName, name: itemName },
+                  taskID,
+              })
+            : createOllamaModel(itemName, taskID);
+        await request.then(() => {
             drawerVisible.value = false;
             emit('search');
             emit('log', { logFileExist: true, name: itemName, from: 'local', taskID: taskID });

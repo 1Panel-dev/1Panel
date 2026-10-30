@@ -833,6 +833,8 @@ const message = {
             discoverModelsFailedUseDefaults: '모델을 가져오지 못했습니다. 기본 모델을 사용합니다.',
             accountModelsDuplicate: '카탈로그에 중복된 모델이 있습니다',
             modelPool: '모델 풀',
+            ollamaRegisterOnly: '이 Ollama 서비스에 이미 있는 모델만 등록합니다. 다운로드는 시작되지 않습니다.',
+            deleteModelFiles: 'Ollama 서비스의 모델 파일도 삭제',
             fallbackModels: '폴백 모델',
             addFallbackModel: '폴백 모델 추가',
             fallbackModelsEmpty: '구성된 폴백 모델이 없습니다',

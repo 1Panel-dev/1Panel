@@ -844,6 +844,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Failed to get models. Default models are being used.',
             accountModelsDuplicate: 'Duplicate models were found in the catalog',
             modelPool: 'Model Pool',
+            ollamaRegisterOnly:
+                'Only register models already available on this Ollama service. No download will be started.',
+            deleteModelFiles: 'Also delete model files from the Ollama service',
             fallbackModels: 'Fallback Models',
             addFallbackModel: 'Add Fallback Model',
             fallbackModelsEmpty: 'No fallback models configured',
