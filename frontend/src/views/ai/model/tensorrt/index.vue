@@ -211,7 +211,7 @@ const buttons = [
         label: i18n.global.t('commons.button.stop'),
         permission: true,
         disabled: (row: AI.TensorRTLLM) => {
-            return row.status !== 'Running';
+            return !['Running', 'ReStarting', 'Restarting'].includes(row.status);
         },
         click: (row: AI.TensorRTLLM) => {
             operate(row, 'stop');

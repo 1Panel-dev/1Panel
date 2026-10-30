@@ -259,6 +259,15 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	if err != nil {
 		return err
 	}
+	if install.Status == constant.StatusRestarting && (req.Operate == constant.Stop || req.Operate == constant.Delete) && !req.ForceDelete {
+		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(install.ID), taskRepo.WithOperate(task.TaskRestart))
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return buserr.New("TaskIsExecuting")
+		}
+	}
 	if !req.ForceDelete && !files.NewFileOp().Stat(install.GetPath()) {
 		return buserr.New("ErrInstallDirNotFound")
 	}
@@ -342,9 +351,6 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		return errors.New("lifecycle script operation not supported")
 	}
 	install.Message = ""
-	if err := appInstallRepo.Save(context.Background(), &install); err != nil {
-		return err
-	}
 
 	operationTask, err := task.NewTaskWithOps(install.Name, taskType, task.TaskScopeApp, req.TaskID, install.ID)
 	if err != nil {
@@ -355,10 +361,17 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		}
 		return err
 	}
+	ready := make(chan error, 1)
+	started := make(chan struct{})
 	operation := string(req.Operate)
 	operationTask.AddSubTaskWithOps(
 		task.GetTaskName(install.Name, taskType, task.TaskScopeApp),
 		func(t *task.Task) error {
+			if err := appInstallRepo.Save(context.Background(), &install); err != nil {
+				return err
+			}
+			close(started)
+			ready <- nil
 			if err := runScript(t, &install, operation); err != nil {
 				return err
 			}
@@ -385,6 +398,12 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 	)
 	go func() {
 		if taskErr := operationTask.Execute(); taskErr != nil {
+			select {
+			case <-started:
+			default:
+				ready <- taskErr
+				return
+			}
 			if onFailure != nil {
 				onFailure(taskErr)
 				return
@@ -394,7 +413,7 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 			_ = appInstallRepo.Save(context.Background(), &install)
 		}
 	}()
-	return nil
+	return <-ready
 }
 
 func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
@@ -1036,8 +1055,16 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	}
 	switch appInstall.Status {
 	case constant.StatusInstalling, constant.StatusRebuilding, constant.StatusUpgrading, constant.StatusUninstalling,
-		constant.StatusStarting, constant.StatusRestarting, constant.StatusWaiting:
+		constant.StatusStarting, constant.StatusWaiting:
 		return nil
+	case constant.StatusRestarting:
+		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(appInstall.ID), taskRepo.WithOperate(task.TaskRestart))
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return nil
+		}
 	case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
 		if !force {
 			return nil
