@@ -59,7 +59,7 @@
                             class="mr-2 flex-shrink-0"
                         ></svg-icon>
                         <el-tooltip :content="item.path" placement="top">
-                            <span class="truncate text-sm">{{ item.name }}</span>
+                            <span class="dialog-object-name text-sm">{{ item.name }}</span>
                         </el-tooltip>
                     </div>
                 </div>

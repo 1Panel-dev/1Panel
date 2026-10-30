@@ -358,9 +358,8 @@ html {
     background: var(--panel-main-bg-color-10);
     pre {
         margin: 0;
-        width: 350px;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
     }
 }
 

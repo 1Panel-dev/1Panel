@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="w-60" class="file-delete-dialog">
         <div v-loading="loading">
             <el-row>
                 <el-col :span="22" :offset="1">
@@ -34,7 +34,7 @@
                                     :iconName="getIconName(row.extension)"
                                 ></svg-icon>
                             </div>
-                            <span class="sle">{{ row.name }}</span>
+                            <span class="dialog-object-name">{{ row.name }}</span>
                         </div>
                     </div>
                 </el-col>
@@ -150,6 +150,11 @@ defineExpose({
 </script>
 
 <style scoped>
+:global(.el-dialog.file-delete-dialog:not(.is-fullscreen)) {
+    width: 60vw !important;
+    min-width: 0;
+}
+
 .resource {
     margin-top: 10px;
     max-height: 400px;

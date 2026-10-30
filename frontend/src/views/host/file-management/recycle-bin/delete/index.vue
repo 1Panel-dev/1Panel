@@ -1,5 +1,5 @@
 <template>
-    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="small">
+    <DialogPro v-model="open" :title="$t('commons.button.delete')" size="w-60" class="recycle-file-dialog">
         <el-row>
             <el-col :span="20" :offset="2">
                 <el-alert :title="$t('file.deleteRecycleHelper')" show-icon type="error" :closable="false"></el-alert>
@@ -8,7 +8,7 @@
                         <svg-icon v-if="row.isDir" className="table-icon mr-1 " iconName="p-file-folder"></svg-icon>
                         <svg-icon v-else className="table-icon mr-1" :iconName="getIconName(row.extension)"></svg-icon>
                     </div>
-                    <span class="sle">{{ row.name }}</span>
+                    <span class="dialog-object-name">{{ row.name }}</span>
                 </div>
             </el-col>
         </el-row>
@@ -72,6 +72,11 @@ defineExpose({
 </script>
 
 <style scoped>
+:global(.el-dialog.recycle-file-dialog:not(.is-fullscreen)) {
+    width: 60vw !important;
+    min-width: 0;
+}
+
 .resource {
     margin-top: 10px;
     max-height: 400px;
