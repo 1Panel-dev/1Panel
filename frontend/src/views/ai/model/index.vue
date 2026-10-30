@@ -556,7 +556,6 @@ const accountButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        show: (row: AI.AgentAccountItem) => !row.appInstallId || row.provider === 'ollama',
         click: async (row: AI.AgentAccountItem) => {
             await ElMessageBox.confirm(
                 i18n.global.t('commons.msg.delete', [row.name]),

@@ -1,9 +1,12 @@
 package repo
 
 import (
+	"context"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
 )
@@ -17,6 +20,8 @@ type IAgentAccountRepo interface {
 	Create(account *model.AgentAccount) error
 	Save(account *model.AgentAccount) error
 	DeleteByID(id uint) error
+	CheckDeleteLocal(ctx context.Context, installID uint) (string, error)
+	DeleteLocal(ctx context.Context, installID uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	CountTextByProviders(providers []string) (map[string]int64, error)
 	SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error
@@ -116,6 +121,63 @@ func (a AgentAccountRepo) SaveLocal(account *model.AgentAccount, models []model.
 		}
 		return tx.Create(&models).Error
 	})
+}
+
+func (a AgentAccountRepo) CheckDeleteLocal(ctx context.Context, installID uint) (string, error) {
+	if installID == 0 {
+		return "", nil
+	}
+	var accountIDs []uint
+	db := getTx(ctx)
+	if err := db.Model(&model.AgentAccount{}).Where("app_install_id = ?", installID).Pluck("id", &accountIDs).Error; err != nil {
+		return "", err
+	}
+	if len(accountIDs) == 0 {
+		return "", nil
+	}
+	var agentCount int64
+	if err := db.Model(&model.Agent{}).Where("account_id IN ?", accountIDs).Count(&agentCount).Error; err != nil {
+		return "", err
+	}
+	if agentCount > 0 {
+		return "ErrAgentAccountBound", nil
+	}
+	var settings []model.Setting
+	if err := db.Where("key IN ?", []string{"AIStatus", "AIAccountID", "FileAIStatus", "FileAIAccountID"}).Find(&settings).Error; err != nil {
+		return "", err
+	}
+	values := make(map[string]string, len(settings))
+	for _, setting := range settings {
+		values[setting.Key] = strings.TrimSpace(setting.Value)
+	}
+	for _, accountID := range accountIDs {
+		id := strconv.FormatUint(uint64(accountID), 10)
+		if strings.EqualFold(values["AIStatus"], constant.StatusEnable) && values["AIAccountID"] == id {
+			return "ErrTerminalAIAccountInUse", nil
+		}
+		if strings.EqualFold(values["FileAIStatus"], constant.StatusEnable) && values["FileAIAccountID"] == id {
+			return "ErrFileAIAccountInUse", nil
+		}
+	}
+	return "", nil
+}
+
+func (a AgentAccountRepo) DeleteLocal(ctx context.Context, installID uint) error {
+	if installID == 0 {
+		return nil
+	}
+	db := getTx(ctx)
+	var accountIDs []uint
+	if err := db.Model(&model.AgentAccount{}).Where("app_install_id = ?", installID).Pluck("id", &accountIDs).Error; err != nil {
+		return err
+	}
+	if len(accountIDs) == 0 {
+		return nil
+	}
+	if err := db.Where("account_id IN ?", accountIDs).Delete(&model.AgentAccountModel{}).Error; err != nil {
+		return err
+	}
+	return db.Where("id IN ?", accountIDs).Delete(&model.AgentAccount{}).Error
 }
 
 func normalizeProviders(providers []string) []string {

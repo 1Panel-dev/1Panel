@@ -38,6 +38,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	terminalai "github.com/1Panel-dev/1Panel/agent/utils/terminal/ai"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 	"github.com/compose-spec/compose-go/v2/types"
 	"github.com/docker/docker/api/types/container"
@@ -338,6 +339,12 @@ func createLink(ctx context.Context, installTask *task.Task, app model.App, appI
 
 func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 	install := deleteReq.Install
+	isLocalModel := install.App.Key == "ollama" || install.App.Key == "vllm"
+	if isLocalModel {
+		if err := checkLocalModelAccountDelete(context.Background(), install.ID); err != nil {
+			return err
+		}
+	}
 	op := files.NewFileOp()
 	appDir := install.GetPath()
 
@@ -395,8 +402,20 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 			ollamaModelMu.Lock()
 			defer ollamaModelMu.Unlock()
 		}
+		if isLocalModel {
+			agentAccountMutationMu.Lock()
+			defer agentAccountMutationMu.Unlock()
+		}
 		tx, ctx := helper.GetTxAndContext()
 		defer tx.Rollback()
+		if isLocalModel {
+			if err = checkLocalModelAccountDelete(ctx, install.ID); err != nil {
+				return err
+			}
+			if err = agentAccountRepo.DeleteLocal(ctx, install.ID); err != nil {
+				return err
+			}
+		}
 		if err = appInstallRepo.Delete(ctx, install); err != nil {
 			return err
 		}
@@ -487,8 +506,9 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		if err := tx.Commit().Error; err != nil {
 			return err
 		}
-		if install.App.Key == "ollama" || install.App.Key == "vllm" {
-			CleanupLocalModelAccount(install.ID)
+		if isLocalModel {
+			terminalai.InvalidateTerminalRuntimeCache()
+			terminalai.InvalidateFileAIRuntimeCache()
 		}
 
 		existApps, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(install.AppId))
