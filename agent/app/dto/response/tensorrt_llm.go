@@ -1,6 +1,7 @@
 package response
 
 import (
+	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 )
@@ -12,12 +13,13 @@ type TensorRTLLMsRes struct {
 
 type TensorRTLLMDTO struct {
 	model.TensorRTLLM
-	Version  string `json:"version"`
-	Model    string `json:"model"`
-	Dir      string `json:"dir"`
-	ModelDir string `json:"modelDir"`
-	Image    string `json:"image"`
-	Command  string `json:"command"`
+	Version  string              `json:"version"`
+	Model    string              `json:"model"`
+	Dir      string              `json:"dir"`
+	ModelDir string              `json:"modelDir"`
+	Image    string              `json:"image"`
+	Command  string              `json:"command"`
+	GPU      *dto.ModelGPUConfig `json:"gpu"`
 
 	ExposedPorts []request.ExposedPort `json:"exposedPorts"`
 	Environments []request.Environment `json:"environments"`

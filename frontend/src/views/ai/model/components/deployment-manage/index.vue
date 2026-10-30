@@ -57,13 +57,17 @@
         v-if="visible && view && view !== VllmPlaceholder && !failed && !missing"
         ref="contentRef"
         v-bind="
-            view === EngineConnection || view === AppParams
-                ? {}
-                : view === ContainerLogs
-                  ? { highlightDiff: 210 }
-                  : view === TaskLog
-                    ? { width: '70%' }
-                    : { dialog: true }
+            view === AppParams
+                ? { modelGPU: true }
+                : view === EngineConnection
+                  ? {}
+                  : view === ContainerLogs
+                    ? { highlightDiff: 210 }
+                    : view === TaskLog
+                      ? { width: '70%' }
+                      : ['config', 'monitor'].includes(actionName)
+                        ? {}
+                        : { dialog: true }
         "
         @close="returnToManagement"
         @search="emit('search')"
@@ -357,7 +361,9 @@ const deploymentButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        disabled: (row: Deployment) => operationDisabled(row) && row.status !== 'Uninstalling',
+        disabled: (row: Deployment) =>
+            deleteLoading.value ||
+            (operationDisabled(row) && !['Uninstalling', 'ReStarting', 'Restarting'].includes(row.status)),
         click: (row: Deployment) => {
             deleting.value = row;
             forceDelete.value = false;

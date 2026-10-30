@@ -256,6 +256,15 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	if err != nil {
 		return err
 	}
+	if install.Status == constant.StatusRestarting && (req.Operate == constant.Stop || req.Operate == constant.Delete) && !req.ForceDelete {
+		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(install.ID), taskRepo.WithOperate(task.TaskRestart))
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return buserr.New("TaskIsExecuting")
+		}
+	}
 	if !req.ForceDelete && !files.NewFileOp().Stat(install.GetPath()) {
 		return buserr.New("ErrInstallDirNotFound")
 	}
@@ -339,9 +348,6 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		return errors.New("lifecycle script operation not supported")
 	}
 	install.Message = ""
-	if err := appInstallRepo.Save(context.Background(), &install); err != nil {
-		return err
-	}
 
 	operationTask, err := task.NewTaskWithOps(install.Name, taskType, task.TaskScopeApp, req.TaskID, install.ID)
 	if err != nil {
@@ -352,10 +358,17 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		}
 		return err
 	}
+	ready := make(chan error, 1)
+	started := make(chan struct{})
 	operation := string(req.Operate)
 	operationTask.AddSubTaskWithOps(
 		task.GetTaskName(install.Name, taskType, task.TaskScopeApp),
 		func(t *task.Task) error {
+			if err := appInstallRepo.Save(context.Background(), &install); err != nil {
+				return err
+			}
+			close(started)
+			ready <- nil
 			if err := runScript(t, &install, operation); err != nil {
 				return err
 			}
@@ -382,6 +395,12 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 	)
 	go func() {
 		if taskErr := operationTask.Execute(); taskErr != nil {
+			select {
+			case <-started:
+			default:
+				ready <- taskErr
+				return
+			}
 			if onFailure != nil {
 				onFailure(taskErr)
 				return
@@ -391,7 +410,7 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 			_ = appInstallRepo.Save(context.Background(), &install)
 		}
 	}()
-	return nil
+	return <-ready
 }
 
 func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
@@ -471,9 +490,10 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	}
 
 	backupDockerCompose := installed.DockerCompose
-	if req.Advanced {
+	updateGPU := installed.App.Key == "ollama" && req.GPU != nil
+	if req.Advanced || updateGPU {
 		composeMap := make(map[string]interface{})
-		if req.EditCompose {
+		if req.Advanced && req.EditCompose {
 			if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
 				return err
 			}
@@ -482,8 +502,25 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 				return err
 			}
 		}
-		if !req.SkipComposeCommonConfig {
+		if req.Advanced && !req.SkipComposeCommonConfig {
 			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+				return err
+			}
+		}
+		if updateGPU {
+			services, _ := composeMap["services"].(map[string]interface{})
+			service, ok := services[installed.ServiceName].(map[string]interface{})
+			if !ok {
+				return buserr.New("ErrFileParse")
+			}
+			gpuParams := map[string]interface{}{}
+			if err := json.Unmarshal([]byte(installed.Env), &gpuParams); err != nil {
+				return err
+			}
+			for key, value := range req.Params {
+				gpuParams[key] = value
+			}
+			if err := ApplyModelGPU(service, req.GPU, gpuParams, "nvidia"); err != nil {
 				return err
 			}
 		}
@@ -492,6 +529,8 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			return err
 		}
 		installed.DockerCompose = string(composeByte)
+	}
+	if req.Advanced {
 		if req.ContainerName == "" {
 			req.Params[constant.ContainerName] = installed.ContainerName
 		} else {
@@ -997,6 +1036,16 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.ModelAccountBaseURLType = install.ModelAccountBaseURLType
 	res.ModelAccountBaseURL = install.ModelAccountBaseURL
 	if install.App.Key == "ollama" {
+		var project map[string]interface{}
+		if err := yaml.Unmarshal([]byte(install.DockerCompose), &project); err != nil {
+			return nil, err
+		}
+		services, _ := project["services"].(map[string]interface{})
+		service, ok := services[install.ServiceName].(map[string]interface{})
+		if !ok {
+			return nil, buserr.New("ErrFileParse")
+		}
+		res.GPU = ReadModelGPU(service, envs, "nvidia")
 		res.ModelAccountBaseURLType, res.ModelAccountBaseURL, err = loadOllamaModelAccountAddress(install)
 		if err != nil {
 			return nil, err
@@ -1052,8 +1101,16 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 	}
 	switch appInstall.Status {
 	case constant.StatusInstalling, constant.StatusRebuilding, constant.StatusUpgrading, constant.StatusUninstalling,
-		constant.StatusStarting, constant.StatusRestarting, constant.StatusWaiting:
+		constant.StatusStarting, constant.StatusWaiting:
 		return nil
+	case constant.StatusRestarting:
+		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(appInstall.ID), taskRepo.WithOperate(task.TaskRestart))
+		if err != nil {
+			return err
+		}
+		if count > 0 {
+			return nil
+		}
 	case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
 		if !force {
 			return nil

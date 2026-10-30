@@ -316,6 +316,8 @@ func (t *Task) ExecuteQueued(slots chan struct{}, waitingStep string, onFinish f
 
 func (t *Task) Execute() error {
 	if err := t.taskRepo.Save(context.Background(), t.Task); err != nil {
+		_ = t.logFile.Close()
+		global.RemoveTaskCancel(t.TaskID)
 		return err
 	}
 	return t.executeRegistered()

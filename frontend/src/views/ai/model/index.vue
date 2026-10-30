@@ -80,13 +80,6 @@
                     />
                 </template>
                 <template #main>
-                    <el-alert
-                        v-if="loadFailed"
-                        type="error"
-                        :closable="false"
-                        :title="$t('aiTools.model.loadFailed')"
-                        class="mb-4"
-                    />
                     <ComplexTable
                         v-if="!isLocal"
                         :data="connections"
@@ -230,8 +223,13 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" min-width="150">
                             <template #default="{ row }">
-                                <el-dropdown placement="bottom" :disabled="statusDisabled(row)">
-                                    <Status v-permission :status="row.status" operate :disabled="statusDisabled(row)" />
+                                <el-dropdown placement="bottom" :disabled="statusDisabled(row, 'stop')">
+                                    <Status
+                                        v-permission
+                                        :status="row.status"
+                                        operate
+                                        :disabled="statusDisabled(row, 'stop')"
+                                    />
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item
@@ -242,7 +240,8 @@
                                             </el-dropdown-item>
                                             <el-dropdown-item
                                                 :disabled="
-                                                    statusDisabled(row) || ['Stopped', 'Exited'].includes(row.status)
+                                                    statusDisabled(row, 'stop') ||
+                                                    ['Stopped', 'Exited'].includes(row.status)
                                                 "
                                                 @click="operate(row, 'stop')"
                                             >
@@ -358,8 +357,8 @@ const isManagement = computed(
     () => isCurrentPage.value && isLocal && ['vllm', 'tensorrt'].includes(String(route.query.tab)),
 );
 const tabs = computed(() => [
-    { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
     { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
+    { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
     { label: i18n.global.t('aiTools.model.engines'), path: '/ai/model/local' },
 ]);
 const downloaderModules = import.meta.glob('/src/xpack/views/model-downloader/index.vue');
@@ -375,7 +374,6 @@ const poolRef = ref();
 const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
 const loading = ref(false);
-const loadFailed = ref(false);
 const connections = ref<AI.AgentAccountItem[]>([]);
 const accountColumns = ref<FuTableColumnConfig[]>([]);
 const providers = ref<AI.ProviderInfo[]>([]);
@@ -501,7 +499,6 @@ const search = async () => {
     const version = ++searchVersion;
     if (!isCurrentPage.value || isFiles || isManagement.value) return;
     loading.value = true;
-    loadFailed.value = false;
     try {
         if (isLocal) {
             const data = await loadModelOverview(isProductPro.value, isFxplay.value);
@@ -527,7 +524,6 @@ const search = async () => {
         connections.value = [];
         pagination.total = 0;
         deployments.value = [];
-        loadFailed.value = true;
     } finally {
         if (version === searchVersion) loading.value = false;
     }
@@ -556,7 +552,6 @@ const accountButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        show: (row: AI.AgentAccountItem) => !row.appInstallId || row.provider === 'ollama',
         click: async (row: AI.AgentAccountItem) => {
             await ElMessageBox.confirm(
                 i18n.global.t('commons.msg.delete', [row.name]),
@@ -570,22 +565,23 @@ const accountButtons = [
 ];
 const taskRef = ref();
 const pending = ref('');
-const operationDisabled = (row: Deployment) =>
+const operationDisabled = (row: Deployment, operation = '') =>
     Boolean(pending.value) ||
-    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(
-        row.status,
-    );
-const statusDisabled = (row: Deployment) =>
-    operationDisabled(row) || !hasManagePermissionAccess() || (row.engine === 'ollama' && !hasPermission('app_manage'));
+    ['Installing', 'Starting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(row.status) ||
+    (['ReStarting', 'Restarting'].includes(row.status) && !['stop', 'delete'].includes(operation));
+const statusDisabled = (row: Deployment, operation = '') =>
+    operationDisabled(row, operation) ||
+    !hasManagePermissionAccess() ||
+    (row.engine === 'ollama' && !hasPermission('app_manage'));
 const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
-    if (statusDisabled(row)) return;
+    if (statusDisabled(row, operation)) return;
     const node = currentNode.value;
     await ElMessageBox.confirm(
         i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
         i18n.global.t('commons.operate.' + operation),
         { type: 'warning' },
     );
-    if (node !== currentNode.value || statusDisabled(row)) return;
+    if (node !== currentNode.value || statusDisabled(row, operation)) return;
     pending.value = `${row.engine}:${row.id}`;
     try {
         if (row.engine === 'ollama') {
@@ -653,7 +649,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'ollama' && hasPermission('app_manage'),
-        disabled: operationDisabled,
+        disabled: (row: Deployment) => operationDisabled(row, 'delete'),
         click: async (row: Deployment) => {
             const node = currentNode.value;
             const path = route.fullPath;
@@ -683,7 +679,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'vllm',
-        disabled: (row: Deployment) => operationDisabled(row) && row.status !== 'Uninstalling',
+        disabled: (row: Deployment) => operationDisabled(row, 'delete') && row.status !== 'Uninstalling',
         click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
     },
 ];

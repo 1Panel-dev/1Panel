@@ -187,14 +187,15 @@ type AppParam struct {
 }
 
 type AppConfig struct {
-	AppKey                  string     `json:"appKey"`
-	Name                    string     `json:"name"`
-	HttpPort                int        `json:"httpPort"`
-	SyncModelAccount        bool       `json:"syncModelAccount"`
-	ModelAccountBaseURLType string     `json:"modelAccountBaseURLType"`
-	ModelAccountBaseURL     string     `json:"modelAccountBaseURL"`
-	Params                  []AppParam `json:"params"`
-	RawCompose              string     `json:"rawCompose"`
-	IsEdit                  bool       `json:"isEdit"`
+	GPU                     *dto.ModelGPUConfig `json:"gpu,omitempty"`
+	AppKey                  string              `json:"appKey"`
+	Name                    string              `json:"name"`
+	HttpPort                int                 `json:"httpPort"`
+	SyncModelAccount        bool                `json:"syncModelAccount"`
+	ModelAccountBaseURLType string              `json:"modelAccountBaseURLType"`
+	ModelAccountBaseURL     string              `json:"modelAccountBaseURL"`
+	Params                  []AppParam          `json:"params"`
+	RawCompose              string              `json:"rawCompose"`
+	IsEdit                  bool                `json:"isEdit"`
 	request.AppContainerConfig
 }

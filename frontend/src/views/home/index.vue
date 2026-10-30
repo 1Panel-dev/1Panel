@@ -72,8 +72,18 @@
                     </template>
                 </CardWithHeader>
                 <CardWithHeader :header="$t('commons.table.status')" class="card-interval">
+                    <template #header-r>
+                        <el-radio-group v-if="hasGPU" v-model="statusView">
+                            <el-radio-button value="system">{{ $t('menu.system') }}</el-radio-button>
+                            <el-radio-button value="gpu">GPU</el-radio-button>
+                        </el-radio-group>
+                    </template>
                     <template #body>
-                        <SystemStatus ref="statusRef" style="margin-bottom: 33px" />
+                        <SystemStatus
+                            ref="statusRef"
+                            :view="statusView"
+                            :style="{ marginBottom: statusView === 'gpu' ? '0' : '33px' }"
+                        />
                     </template>
                 </CardWithHeader>
                 <CardWithHeader
@@ -544,6 +554,7 @@ const welcomeOpen = ref();
 const shadowContainer = ref();
 
 const chartOption = ref('network');
+const statusOption = ref(localStorage.getItem('dashboard_status_view') === 'gpu' ? 'gpu' : 'system');
 let timer: ReturnType<typeof setInterval> | null = null;
 let initialSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let isInit = ref<boolean>(true);
@@ -677,6 +688,16 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     topMemItems: [],
 
     shotTime: new Date(),
+});
+const hasGPU = computed(() =>
+    [currentInfo.value.gpuData, currentInfo.value.npuData, currentInfo.value.xpuData].some((items) => items?.length),
+);
+const statusView = computed({
+    get: () => (hasGPU.value && statusOption.value === 'gpu' ? 'gpu' : 'system'),
+    set: (value: 'system' | 'gpu') => {
+        statusOption.value = value;
+        localStorage.setItem('dashboard_status_view', value);
+    },
 });
 const currentChartInfo = reactive({
     ioReadBytes: 0,

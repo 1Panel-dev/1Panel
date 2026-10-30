@@ -525,6 +525,26 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		composeByte []byte
 		paramByte   []byte
 	)
+	if (app.Key == "ollama" || app.Key == "vllm") && req.GPU != nil {
+		gpuServiceName := appInstall.ServiceName
+		imageType := "nvidia"
+		if app.Key == "vllm" {
+			imageType = req.GPUImageType
+			if len(servicesMap) > 1 {
+				gpuServiceName = "vllm"
+				if _, ok := servicesMap[gpuServiceName]; !ok {
+					gpuServiceName = "vllm-dspark"
+				}
+			}
+		}
+		service, ok := servicesMap[gpuServiceName].(map[string]interface{})
+		if !ok {
+			return nil, buserr.New("ErrFileParse")
+		}
+		if err = ApplyModelGPU(service, req.GPU, req.Params, imageType); err != nil {
+			return
+		}
+	}
 
 	composeByte, err = yaml.Marshal(composeMap)
 	if err != nil {

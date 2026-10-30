@@ -1,5 +1,10 @@
 <template>
-    <DrawerPro v-model="open" :header="$t('app.param')" @close="handleClose" size="normal">
+    <DrawerPro
+        v-model="open"
+        :header="$t('app.param')"
+        @close="handleClose"
+        :size="isMobile ? 'full' : appKey === 'ollama' ? 'large' : 'normal'"
+    >
         <template #buttons>
             <el-button type="primary" plain @click="editParam" :disabled="loading" :icon="edit ? '' : 'Edit'">
                 {{ edit ? $t('app.detail') : $t('commons.button.edit') }}
@@ -60,127 +65,168 @@
         </div>
         <div v-else v-loading="loading">
             <el-alert :title="$t('app.updateHelper')" type="warning" :closable="false" class="common-prompt" />
-            <el-form @submit.prevent ref="paramForm" :model="paramModel" label-position="top" :rules="rules">
-                <div v-for="(p, index) in params" :key="index">
-                    <el-form-item :prop="'params.' + p.key" :label="getLabel(p)">
-                        <el-input
-                            v-if="p.type == 'number'"
-                            type="number"
-                            v-model.number="paramModel.params[p.key]"
-                            :disabled="!p.edit"
-                        ></el-input>
-                        <el-input
-                            v-else-if="p.type == 'password'"
-                            :type="p.showPassword ? 'text' : 'password'"
-                            v-model="paramModel.params[p.key]"
-                            :disabled="!p.edit"
-                        >
-                            <template #append>
-                                <el-button
-                                    :icon="p.showPassword ? 'Hide' : 'View'"
-                                    @click="p.showPassword = !p.showPassword"
-                                />
-                            </template>
-                        </el-input>
-                        <el-select
-                            v-model="paramModel.params[p.key]"
-                            v-else-if="p.type == 'select'"
-                            :multiple="p.multiple"
-                        >
-                            <el-option
-                                v-for="value in p.values"
-                                :key="value.label"
-                                :value="value.value"
-                                :label="value.label"
-                                :disabled="!p.edit"
-                            ></el-option>
-                        </el-select>
-                        <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
-                    </el-form-item>
-                </div>
-                <AccountAddress
-                    v-if="appKey === 'ollama'"
-                    ref="accountRef"
-                    show-sync
-                    :form="paramModel"
-                    :host-port="Number(paramModel.params.PANEL_APP_PORT_HTTP) || paramModel.httpPort"
-                    container-port="11434"
-                    :host-mode="paramModel.isHostMode"
-                />
-                <el-form-item prop="advanced">
-                    <el-checkbox v-model="paramModel.advanced" :label="$t('app.advanced')" size="large" />
-                </el-form-item>
-                <div v-if="paramModel.advanced">
-                    <el-form-item :label="$t('app.containerName')" prop="containerName">
-                        <el-input
-                            v-model.trim="paramModel.containerName"
-                            :placeholder="$t('app.containerNameHelper')"
-                        ></el-input>
-                    </el-form-item>
-                    <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
-                        <el-checkbox
-                            v-model="paramModel.allowPort"
-                            :label="$t('app.allowPort')"
-                            size="large"
-                            @change="changeAllowPort"
-                        />
-                        <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('app.specifyIP')" v-if="paramModel.allowPort" prop="specifyIP">
-                        <el-input v-model="paramModel.specifyIP"></el-input>
-                        <span class="input-help">{{ $t('app.specifyIPHelper') }}</span>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
-                        <el-select v-model="paramModel.restartPolicy" class="p-w-300">
-                            <el-option :label="$t('container.no')" value="no"></el-option>
-                            <el-option :label="$t('container.always')" value="always"></el-option>
-                            <el-option :label="$t('container.onFailure')" value="on-failure"></el-option>
-                            <el-option :label="$t('container.unlessStopped')" value="unless-stopped"></el-option>
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
-                        <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
-                            <template #append>{{ $t('app.cpuCore') }}</template>
-                        </el-input>
-                        <span class="input-help">
-                            {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
-                        </span>
-                    </el-form-item>
-                    <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
-                        <el-input class="!w-2/5" v-model.number="paramModel.memoryLimit" maxlength="10">
-                            <template #append>
-                                <el-select
-                                    v-model="paramModel.memoryUnit"
-                                    placeholder="Select"
-                                    class="!w-[85px]"
-                                    @change="changeUnit"
+            <el-form
+                @validate="(prop, valid) => expandInvalidFormSection(paramForm, prop, valid)"
+                scroll-to-error
+                @submit.prevent
+                ref="paramForm"
+                :model="paramModel"
+                label-position="top"
+                :rules="rules"
+            >
+                <component
+                    :is="appKey === 'ollama' ? 'details' : 'section'"
+                    :open="appKey === 'ollama'"
+                    :class="{ 'form-section': appKey === 'ollama' }"
+                >
+                    <summary v-if="appKey === 'ollama'" class="form-section-header">{{ $t('home.baseInfo') }}</summary>
+                    <div :class="{ 'form-section-body': appKey === 'ollama' }">
+                        <div v-for="(p, index) in params" :key="index">
+                            <el-form-item :prop="'params.' + p.key" :label="getLabel(p)">
+                                <el-input
+                                    v-if="p.type == 'number'"
+                                    type="number"
+                                    v-model.number="paramModel.params[p.key]"
+                                    :disabled="!p.edit"
+                                ></el-input>
+                                <el-input
+                                    v-else-if="p.type == 'password'"
+                                    :type="p.showPassword ? 'text' : 'password'"
+                                    v-model="paramModel.params[p.key]"
+                                    :disabled="!p.edit"
                                 >
-                                    <el-option label="MB" value="M" />
-                                    <el-option label="GB" value="G" />
+                                    <template #append>
+                                        <el-button
+                                            :icon="p.showPassword ? 'Hide' : 'View'"
+                                            @click="p.showPassword = !p.showPassword"
+                                        />
+                                    </template>
+                                </el-input>
+                                <el-select
+                                    v-model="paramModel.params[p.key]"
+                                    v-else-if="p.type == 'select'"
+                                    :multiple="p.multiple"
+                                >
+                                    <el-option
+                                        v-for="value in p.values"
+                                        :key="value.label"
+                                        :value="value.value"
+                                        :label="value.label"
+                                        :disabled="!p.edit"
+                                    ></el-option>
                                 </el-select>
-                            </template>
-                        </el-input>
-                        <span class="input-help">
-                            {{ $t('container.limitHelper', [limits.memory]) }}{{ paramModel.memoryUnit }}B
-                        </span>
-                    </el-form-item>
-
-                    <el-form-item prop="editCompose">
-                        <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
-                        <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
-                    </el-form-item>
-                    <div v-if="paramModel.editCompose">
-                        <el-button @click="openDiff()" type="primary" class="!mb-2">
-                            {{ $t('app.showDiff') }}
-                        </el-button>
-                        <CodemirrorPro v-model="paramModel.dockerCompose" mode="yaml"></CodemirrorPro>
+                                <el-input v-else v-model.trim="paramModel.params[p.key]" :disabled="!p.edit"></el-input>
+                            </el-form-item>
+                        </div>
                     </div>
-                </div>
+                </component>
+                <GPUConfig v-if="showModelGPU" ref="gpuRef" v-model="paramModel.gpu" />
+                <details v-if="appKey === 'ollama'" open class="form-section">
+                    <summary class="form-section-header">
+                        <span>{{ $t('aiTools.model.syncModelAccount') }}</span>
+                        <el-switch
+                            @click.stop
+                            @keydown.stop
+                            v-model="paramModel.syncModelAccount"
+                            :aria-label="$t('aiTools.model.syncModelAccount')"
+                        />
+                    </summary>
+                    <div v-show="paramModel.syncModelAccount" class="form-section-body">
+                        <AccountAddress
+                            ref="accountRef"
+                            show-sync
+                            hide-sync-toggle
+                            :form="paramModel"
+                            :host-port="Number(paramModel.params.PANEL_APP_PORT_HTTP) || paramModel.httpPort"
+                            container-port="11434"
+                            :host-mode="paramModel.isHostMode"
+                        />
+                    </div>
+                </details>
+                <component
+                    :is="appKey === 'ollama' ? 'details' : 'section'"
+                    :open="appKey === 'ollama'"
+                    :class="{ 'form-section': appKey === 'ollama' }"
+                >
+                    <summary v-if="appKey === 'ollama'" class="form-section-header">{{ $t('app.advanced') }}</summary>
+                    <el-form-item v-if="appKey !== 'ollama'" prop="advanced">
+                        <el-checkbox v-model="paramModel.advanced" :label="$t('app.advanced')" size="large" />
+                    </el-form-item>
+                    <div
+                        v-if="appKey === 'ollama' || paramModel.advanced"
+                        :class="{ 'form-section-body': appKey === 'ollama' }"
+                    >
+                        <el-form-item :label="$t('app.containerName')" prop="containerName">
+                            <el-input
+                                v-model.trim="paramModel.containerName"
+                                :placeholder="$t('app.containerNameHelper')"
+                            ></el-input>
+                        </el-form-item>
+                        <el-form-item prop="allowPort" v-if="!paramModel.isHostMode">
+                            <el-checkbox
+                                v-model="paramModel.allowPort"
+                                :label="$t('app.allowPort')"
+                                size="large"
+                                @change="changeAllowPort"
+                            />
+                            <span class="input-help">{{ $t('app.allowPortHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('app.specifyIP')" v-if="paramModel.allowPort" prop="specifyIP">
+                            <el-input v-model="paramModel.specifyIP"></el-input>
+                            <span class="input-help">{{ $t('app.specifyIPHelper') }}</span>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.restartPolicy')" prop="restartPolicy">
+                            <el-select v-model="paramModel.restartPolicy" class="p-w-300">
+                                <el-option :label="$t('container.no')" value="no"></el-option>
+                                <el-option :label="$t('container.always')" value="always"></el-option>
+                                <el-option :label="$t('container.onFailure')" value="on-failure"></el-option>
+                                <el-option :label="$t('container.unlessStopped')" value="unless-stopped"></el-option>
+                            </el-select>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.cpuQuota')" prop="cpuQuota">
+                            <el-input type="number" class="!w-2/5" v-model.number="paramModel.cpuQuota" maxlength="5">
+                                <template #append>{{ $t('app.cpuCore') }}</template>
+                            </el-input>
+                            <span class="input-help">
+                                {{ $t('container.limitHelper', [limits.cpu]) }}{{ $t('commons.units.core') }}
+                            </span>
+                        </el-form-item>
+                        <el-form-item :label="$t('container.memoryLimit')" prop="memoryLimit">
+                            <el-input class="!w-2/5" v-model.number="paramModel.memoryLimit" maxlength="10">
+                                <template #append>
+                                    <el-select
+                                        v-model="paramModel.memoryUnit"
+                                        placeholder="Select"
+                                        class="!w-[85px]"
+                                        @change="changeUnit"
+                                    >
+                                        <el-option label="MB" value="M" />
+                                        <el-option label="GB" value="G" />
+                                    </el-select>
+                                </template>
+                            </el-input>
+                            <span class="input-help">
+                                {{ $t('container.limitHelper', [limits.memory]) }}{{ paramModel.memoryUnit }}B
+                            </span>
+                        </el-form-item>
+
+                        <el-form-item prop="editCompose">
+                            <el-checkbox v-model="paramModel.editCompose" :label="$t('app.editCompose')" size="large" />
+                            <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
+                        </el-form-item>
+                        <div v-if="paramModel.editCompose">
+                            <el-button @click="openDiff()" type="primary" class="!mb-2">
+                                {{ $t('app.showDiff') }}
+                            </el-button>
+                            <CodemirrorPro v-model="paramModel.dockerCompose" mode="yaml"></CodemirrorPro>
+                        </div>
+                    </div>
+                </component>
             </el-form>
         </div>
         <template #footer v-if="edit">
             <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :disabled="loading" @click="submit(paramForm)">
+            <el-button type="primary" :disabled="loading || gpuRef?.loading" @click="submit(paramForm)">
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
@@ -188,12 +234,14 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
+import { expandInvalidFormSection } from '@/views/ai/model/components/form-section';
 import AccountAddress from '@/views/ai/model/components/account-address/index.vue';
+import GPUConfig from '@/views/ai/model/components/gpu-config/index.vue';
 import Diff from '@/views/app-store/installed/upgrade/diff/index.vue';
 
 import { App } from '@/api/interface/app';
 import { getAppInstallParams, updateAppInstallParams, updateInstallConfig } from '@/api/modules/app';
-import { onBeforeUnmount, reactive, ref } from 'vue';
+import { computed, nextTick, onBeforeUnmount, reactive, ref } from 'vue';
 import { FormInstance } from 'element-plus';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError, MsgSuccess } from '@/utils/message';
@@ -218,8 +266,9 @@ interface EditForm extends App.InstallParams {
     default: any;
 }
 
+const props = defineProps({ modelGPU: Boolean });
 const emit = defineEmits(['close']);
-const { currentNode } = useGlobalStore();
+const { currentNode, isMobile } = useGlobalStore();
 const open = ref(false);
 const loading = ref(false);
 const params = ref<EditForm[]>();
@@ -228,6 +277,16 @@ const paramForm = ref<FormInstance>();
 const paramModel = reactive<any>({
     params: {},
 });
+const advancedFields = [
+    'memoryLimit',
+    'cpuQuota',
+    'memoryUnit',
+    'allowPort',
+    'specifyIP',
+    'containerName',
+    'restartPolicy',
+];
+let initialAdvancedConfig: Record<string, unknown> = {};
 const rules = reactive({
     params: {},
     cpuQuota: [Rules.requiredInput, checkNumberRange(0, 999)],
@@ -237,7 +296,9 @@ const rules = reactive({
 });
 const appType = ref('');
 const appKey = ref('');
+const showModelGPU = computed(() => props.modelGPU && appKey.value === 'ollama');
 const accountRef = ref<InstanceType<typeof AccountAddress>>();
+const gpuRef = ref<InstanceType<typeof GPUConfig>>();
 const appConfigUpdate = ref<App.AppConfigUpdate>({
     installID: 0,
     webUI: '',
@@ -305,19 +366,24 @@ const acceptParams = async (props: ParamProps) => {
     if (!(await get())) return;
     open.value = true;
     openConfig.value = false;
-    if (props.edit) editParam();
+    if (props.edit) await editParam();
 };
 
 const handleClose = () => {
     emit('close');
     open.value = false;
 };
-const editParam = () => {
+const editParam = async () => {
     params.value.forEach((param: EditForm) => {
         paramModel.params[param.key] = param.value;
     });
+
     edit.value = !edit.value;
     loadLimit();
+    if (edit.value && showModelGPU.value) {
+        await nextTick();
+        await gpuRef.value?.init(false);
+    }
 };
 
 const changeAllowPort = () => {
@@ -386,11 +452,21 @@ const get = async () => {
         }
         appType.value = res.data.type;
         appKey.value = res.data.appKey;
+        if (showModelGPU.value) {
+            paramModel.gpu = res.data.gpu || {
+                enabled: false,
+                mode: 'devices',
+                deviceIDs: [],
+                capabilities: ['gpu', 'utility', 'compute'],
+                error: i18n.global.t('aiTools.model.loadFailed'),
+            };
+        }
         paramModel.name = res.data.name;
         paramModel.httpPort = res.data.httpPort;
         paramModel.syncModelAccount = res.data.syncModelAccount;
         paramModel.modelAccountBaseURLType = res.data.modelAccountBaseURLType || 'container';
         paramModel.modelAccountBaseURL = res.data.modelAccountBaseURL;
+        initialAdvancedConfig = Object.fromEntries(advancedFields.map((key) => [key, paramModel[key]]));
         return true;
     } catch (error) {
         return false;
@@ -400,13 +476,11 @@ const get = async () => {
 };
 
 const submit = async (formEl: FormInstance) => {
-    if (!formEl) return;
+    if (!formEl || loading.value || gpuRef.value?.loading) return;
     const node = currentNode.value;
     const installId = paramData.value.id;
     await formEl.validate((valid) => {
-        if (!valid) {
-            return;
-        }
+        if (!valid) return;
         ElMessageBox.confirm(i18n.global.t('app.updateWarn'), i18n.global.t('commons.button.update'), {
             confirmButtonText: i18n.global.t('commons.button.confirm'),
             cancelButtonText: i18n.global.t('commons.button.cancel'),
@@ -414,24 +488,26 @@ const submit = async (formEl: FormInstance) => {
         }).then(async () => {
             if (!open.value || node !== currentNode.value || installId !== paramData.value.id) return;
             const submitModel: Record<string, any> = { installId, params: paramModel.params };
+            if (showModelGPU.value) submitModel.gpu = paramModel.gpu;
             if (appKey.value === 'ollama') {
                 submitModel.syncModelAccount = paramModel.syncModelAccount;
                 submitModel.modelAccountBaseURLType = paramModel.modelAccountBaseURLType;
                 submitModel.modelAccountBaseURL = accountRef.value.baseURL;
             }
-            if (paramModel.advanced) {
-                submitModel.advanced = paramModel.advanced;
-                submitModel.memoryLimit = paramModel.memoryLimit;
-                submitModel.cpuQuota = paramModel.cpuQuota;
-                submitModel.memoryUnit = paramModel.memoryUnit;
-                submitModel.allowPort = paramModel.allowPort;
-                submitModel.specifyIP = paramModel.specifyIP;
-                submitModel.containerName = paramModel.containerName;
+            const updateAdvanced =
+                appKey.value === 'ollama'
+                    ? paramModel.editCompose ||
+                      advancedFields.some((key) => paramModel[key] !== initialAdvancedConfig[key])
+                    : paramModel.advanced;
+            if (updateAdvanced) {
+                submitModel.advanced = true;
+                for (const key of advancedFields) {
+                    submitModel[key] = paramModel[key];
+                }
                 if (paramModel.editCompose) {
                     submitModel.editCompose = paramModel.editCompose;
                     submitModel.dockerCompose = paramModel.dockerCompose;
                 }
-                submitModel.restartPolicy = paramModel.restartPolicy;
             }
             try {
                 loading.value = true;
@@ -505,6 +581,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
+@use '@/views/ai/model/components/form-section.scss';
 .change-button {
     margin-top: 5px;
 }

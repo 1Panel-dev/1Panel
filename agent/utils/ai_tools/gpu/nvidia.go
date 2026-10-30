@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/xml"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
+	"github.com/shirou/gopsutil/v4/mem"
 )
 
 const nvidiaSMICommand = "nvidia-smi"
@@ -20,7 +22,31 @@ func (n nvidiaSMI) LoadInfo(ctx context.Context) (*Info, error) {
 	if err != nil {
 		return nil, fmt.Errorf("calling %s failed: %w", nvidiaSMICommand, err)
 	}
-	return parseNvidiaSMI([]byte(itemData))
+	info, err := parseNvidiaSMI([]byte(itemData))
+	if err != nil {
+		return nil, err
+	}
+	if slices.ContainsFunc(info.Devices, func(device Device) bool { return device.SharedMemory }) {
+		memory, err := mem.VirtualMemoryWithContext(ctx)
+		if err != nil {
+			info.Warnings = append(info.Warnings, fmt.Sprintf("read system shared memory: %v", err))
+		} else {
+			for index := range info.Devices {
+				device := &info.Devices[index]
+				if !device.SharedMemory {
+					continue
+				}
+				device.MemUsed = fmt.Sprintf("%d B", memory.Used)
+				device.MemTotal = fmt.Sprintf("%d B", memory.Total)
+				device.MemoryFree = fmt.Sprintf("%.2f MiB", float64(memory.Available)/(1024*1024))
+			}
+		}
+	}
+	return info, nil
+}
+
+func UsesSystemMemory(productName string) bool {
+	return strings.EqualFold(strings.TrimSpace(productName), "NVIDIA GB10")
 }
 
 func parseNvidiaSMI(buf []byte) (*Info, error) {
@@ -38,6 +64,7 @@ func parseNvidiaSMI(buf []byte) (*Info, error) {
 	for i := range s.Gpu {
 		gpuItem := Device{
 			Type:              "nvidia",
+			SharedMemory:      UsesSystemMemory(s.Gpu[i].ProductName),
 			MemoryActivity:    s.Gpu[i].Utilization.MemoryUtil,
 			EncoderUtil:       s.Gpu[i].Utilization.EncoderUtil,
 			DecoderUtil:       s.Gpu[i].Utilization.DecoderUtil,
@@ -71,6 +98,12 @@ func parseNvidiaSMI(buf []byte) (*Info, error) {
 			GPUUtil:           s.Gpu[i].Utilization.GpuUtil,
 			ComputeMode:       s.Gpu[i].ComputeMode,
 			MigMode:           s.Gpu[i].MigMode.CurrentMig,
+		}
+		if gpuItem.SharedMemory {
+			gpuItem.MemUsed = "N/A"
+			gpuItem.MemTotal = "N/A"
+			gpuItem.MemoryFree = "N/A"
+			gpuItem.MemoryReserved = "N/A"
 		}
 		gpuItem.ECCPending = s.Gpu[i].EccMode.PendingEcc
 		gpuItem.ECCErrors = []ECCError{

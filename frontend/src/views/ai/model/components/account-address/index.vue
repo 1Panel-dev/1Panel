@@ -1,5 +1,5 @@
 <template>
-    <el-form-item v-if="showSync">
+    <el-form-item v-if="showSync && !hideSyncToggle">
         <el-checkbox v-model="form.syncModelAccount">{{ $t('aiTools.model.syncModelAccount') }}</el-checkbox>
     </el-form-item>
     <template v-if="!showSync || form.syncModelAccount">
@@ -52,6 +52,7 @@ const props = defineProps<{
     containerPort: string;
     hostMode?: boolean;
     showSync?: boolean;
+    hideSyncToggle?: boolean;
 }>();
 const systemIP = ref('');
 const addressTypes = computed(() => [
