@@ -17,6 +17,8 @@ type IAppDetailRepo interface {
 	WithIgnored() DBOption
 	GetFirst(opts ...DBOption) (model.AppDetail, error)
 	Update(ctx context.Context, detail model.AppDetail) error
+	CacheCompose(detail model.AppDetail, compose string) (bool, error)
+	MarkDownloaded(detail model.AppDetail) (bool, error)
 	BatchCreate(ctx context.Context, details []model.AppDetail) error
 	DeleteByAppIds(ctx context.Context, appIds []uint) error
 	DeleteByIDs(ctx context.Context, appIds []uint) error
@@ -55,6 +57,20 @@ func (a AppDetailRepo) GetFirst(opts ...DBOption) (model.AppDetail, error) {
 
 func (a AppDetailRepo) Update(ctx context.Context, detail model.AppDetail) error {
 	return getTx(ctx).Save(&detail).Error
+}
+
+func (a AppDetailRepo) CacheCompose(detail model.AppDetail, compose string) (bool, error) {
+	result := getDb().Model(&model.AppDetail{}).
+		Where("id = ? AND last_modified = ? AND params = ? AND download_url = ?", detail.ID, detail.LastModified, detail.Params, detail.DownloadUrl).
+		UpdateColumn("docker_compose", compose)
+	return result.RowsAffected > 0, result.Error
+}
+
+func (a AppDetailRepo) MarkDownloaded(detail model.AppDetail) (bool, error) {
+	result := getDb().Model(&model.AppDetail{}).
+		Where("id = ? AND last_modified = ? AND params = ? AND download_url = ?", detail.ID, detail.LastModified, detail.Params, detail.DownloadUrl).
+		UpdateColumn("update", false)
+	return result.RowsAffected > 0, result.Error
 }
 
 func (a AppDetailRepo) BatchCreate(ctx context.Context, details []model.AppDetail) error {

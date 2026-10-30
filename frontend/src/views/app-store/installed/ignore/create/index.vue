@@ -65,7 +65,7 @@ const acceptParams = (apppInstall: App.AppInstalled) => {
 
 const getVersions = async () => {
     try {
-        const res = await getAppUpdateVersions({ appInstallID: appInstallID.value });
+        const res = await getAppUpdateVersions({ appInstallID: appInstallID.value, loadCompose: false });
         versions.value = res.data || [];
         if (versions.value.length > 0) {
             req.appDetailID = versions.value[0].detailId;

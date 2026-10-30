@@ -216,8 +216,9 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		if err != nil {
 			return err
 		}
-		u.detail.DockerCompose = string(composeContent)
-		_ = appDetailRepo.Update(context.Background(), u.detail)
+		if err := cacheAppDetailCompose(&u.detail, composeContent); err != nil {
+			return err
+		}
 	}
 	if strings.TrimSpace(u.detail.DockerCompose) == "" && strings.TrimSpace(u.req.DockerCompose) == "" {
 		return buserr.WithName("ErrFileNotFound", "docker-compose.yml")

@@ -33,7 +33,9 @@
                         <el-row :gutter="5">
                             <el-col :span="5" class="h-app-media-col">
                                 <div class="h-app-media">
-                                    <el-avatar shape="square" :size="55" :src="getAppIconSrc(app)" />
+                                    <el-avatar shape="square" :size="55" :src="getAppIconSrc(app)">
+                                        <SvgIcon iconName="p-appstore" />
+                                    </el-avatar>
                                 </div>
                             </el-col>
                             <el-col :span="16" class="h-app-main-col">
@@ -149,6 +151,7 @@ import { ref } from 'vue';
 import { jumpToInstall } from '@/utils/app';
 import { routerToName, routerToNameWithQuery } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { isRemoteAppIcon } from '@/utils/app-icon';
 
 const { isMobile, isAdminOrNodeAdmin } = useGlobalStore();
 let loading = ref(false);
@@ -232,8 +235,8 @@ const loadOption = async () => {
 
 const getAppIconSrc = (app: any) => {
     const icon = app?.icon || '';
-    if (icon.startsWith('app_') || icon === '') {
-        return getAppIconUrl(app.key);
+    if (isRemoteAppIcon(icon) || icon.startsWith('app_') || icon === '') {
+        return getAppIconUrl(app.key, undefined, icon);
     }
     return `data:image/png;base64,${icon}`;
 };

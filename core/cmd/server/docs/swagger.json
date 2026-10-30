@@ -4542,6 +4542,9 @@
 						"schema": {
 							"type": "file"
 						}
+					},
+					"302": {
+						"description": "redirect to the official icon URL"
 					}
 				},
 				"security": [
@@ -5338,6 +5341,17 @@
 			"post": {
 				"consumes": [
 					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/request.AppUpdateVersion"
+						}
+					}
 				],
 				"responses": {
 					"200": {
@@ -47477,6 +47491,23 @@
 			],
 			"type": "object"
 		},
+		"request.AppUpdateVersion": {
+			"properties": {
+				"appInstallID": {
+					"type": "integer"
+				},
+				"loadCompose": {
+					"type": "boolean"
+				},
+				"updateVersion": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"appInstallID"
+			],
+			"type": "object"
+		},
 		"response.AppConfig": {
 			"properties": {
 				"advanced": {
@@ -47501,6 +47532,9 @@
 					"type": "boolean"
 				},
 				"hostMode": {
+					"type": "boolean"
+				},
+				"isEdit": {
 					"type": "boolean"
 				},
 				"memoryLimit": {
@@ -47762,6 +47796,9 @@
 				},
 				"gpuSupport": {
 					"type": "boolean"
+				},
+				"icon": {
+					"type": "string"
 				},
 				"id": {
 					"type": "integer"

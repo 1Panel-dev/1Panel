@@ -207,6 +207,7 @@ func (b *BaseApi) GetAppListUpdate(c *gin.Context) {
 // @Accept json
 // @Param key path string true "app key"
 // @Success 200 {file} file "app icon"
+// @Success 302 "redirect to the official icon URL"
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/icon/:key [get]
@@ -216,9 +217,15 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 		helper.BadRequest(c, err)
 		return
 	}
-	iconBytes, filename, etag, err := appService.GetAppIcon(appKey)
+	iconBytes, source, etag, err := appService.GetAppIcon(appKey)
 	if err != nil {
 		helper.InternalServer(c, err)
+		return
+	}
+
+	if appicon.IsRemoteURL(source) {
+		c.Header("Cache-Control", "no-cache")
+		c.Redirect(http.StatusFound, source)
 		return
 	}
 
@@ -229,7 +236,7 @@ func (b *BaseApi) GetAppIcon(c *gin.Context) {
 
 	c.Header("Cache-Control", "public, max-age=2592000")
 
-	if etag != "" && filename != "" {
+	if etag != "" && source != "" {
 		c.Header("ETag", etag)
 		if c.GetHeader("If-None-Match") == etag {
 			c.Status(http.StatusNotModified)

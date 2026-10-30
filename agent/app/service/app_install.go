@@ -6,10 +6,8 @@ import (
 	"fmt"
 	"maps"
 	"math"
-	"net/http"
 	"os"
 	"path"
-	"path/filepath"
 	"reflect"
 	"sort"
 	"strconv"
@@ -31,7 +29,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/docker/api/types/container"
 	"github.com/joho/godotenv"
 	"github.com/pkg/errors"
@@ -782,7 +779,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		}
 		if canUpgrade {
 			feishuTarget := app.Key == constant.AppOpenclaw && isOpenclawBundledFeishuVersion(detail.Version)
-			if feishuTarget && !feishuChecked {
+			if feishuTarget && !feishuChecked && (req.LoadCompose == nil || *req.LoadCompose) {
 				conf, readErr := readOpenclawConfig(path.Join(install.GetPath(), "data/conf/openclaw.json"))
 				if readErr != nil {
 					return versions, readErr
@@ -792,33 +789,6 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 					return versions, err
 				}
 				feishuChecked = true
-			}
-			var newCompose string
-			if req.UpdateVersion != "" && req.UpdateVersion == detail.Version && detail.DockerCompose == "" && !app.IsLocalApp() {
-				filename := filepath.Base(detail.DownloadUrl)
-				dockerComposeUrl := fmt.Sprintf("%s%s", strings.TrimSuffix(detail.DownloadUrl, filename), "docker-compose.yml")
-				if app.Resource == constant.AppResourceRemote {
-					dockerComposeUrl, err = currentAppDownloadURL(dockerComposeUrl)
-					if err != nil {
-						return versions, err
-					}
-				}
-				statusCode, composeRes, err := req_helper.HandleRequest(dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
-				if statusCode == http.StatusNotFound {
-					return versions, buserr.New("ErrAppVersionUnavailable")
-				}
-				if err != nil {
-					return versions, err
-				}
-				if statusCode > 200 {
-					return versions, err
-				}
-				detail.DockerCompose = string(composeRes)
-				_ = appDetailRepo.Update(context.Background(), detail)
-			}
-			newCompose, err = getUpgradeCompose(install, detail)
-			if err != nil {
-				return versions, err
 			}
 			if app.Key == constant.AppMysql {
 				majorVersion := getMajorVersion(install.Version)
@@ -831,13 +801,46 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 				FeishuConfigured: feishuTarget && feishuConfigured,
 				Version:          detail.Version,
 				DetailId:         detail.ID,
-				DockerCompose:    newCompose,
 			})
 		}
 	}
 	sort.Slice(versions, func(i, j int) bool {
 		return appVersionSortBefore(app.Key, versions[i].Version, versions[j].Version)
 	})
+	if len(versions) == 0 || (req.LoadCompose != nil && !*req.LoadCompose) {
+		return versions, nil
+	}
+	target := 0
+	if req.UpdateVersion != "" {
+		target = -1
+		for i := range versions {
+			if versions[i].Version == req.UpdateVersion {
+				target = i
+				break
+			}
+		}
+		if target == -1 {
+			return versions, buserr.New("ErrAppVersionUnavailable")
+		}
+	}
+	if app.Key == vllmAppKeyForUpgrade {
+		versions[target].DockerCompose = install.DockerCompose
+		return versions, nil
+	}
+	for _, detail := range details {
+		if detail.ID != versions[target].DetailId {
+			continue
+		}
+		if err := ensureAppDetailCompose(app, &detail); err != nil {
+			return versions, err
+		}
+		content, err := getUpgradeCompose(install, detail)
+		if err != nil {
+			return versions, err
+		}
+		versions[target].DockerCompose = content
+		break
+	}
 	return versions, nil
 }
 
@@ -1056,9 +1059,22 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
-	if rawCompose, err := getUpgradeCompose(install, detail); err == nil {
-		res.RawCompose = rawCompose
+	rawCompose := install.DockerCompose
+	if install.App.Key != vllmAppKeyForUpgrade {
+		if err := ensureAppDetailCompose(install.App, &detail); err != nil {
+			return nil, err
+		}
+		rawCompose, err = getUpgradeCompose(install, detail)
+		if err != nil {
+			return nil, err
+		}
 	}
+	equal, err := composeEqualExceptImage(rawCompose, install.DockerCompose)
+	if err != nil {
+		return nil, err
+	}
+	res.RawCompose = rawCompose
+	res.IsEdit = !equal
 	return &res, nil
 }
 

@@ -53,6 +53,7 @@ export namespace App {
 
     export interface AppItem {
         name: string;
+        icon?: string;
         key: string;
         id: number;
         description: string;
@@ -292,6 +293,7 @@ export namespace App {
         feishuConfigured?: boolean;
         version: string;
         detailId: number;
+        dockerCompose?: string;
     }
 
     export interface InstallParams {
@@ -320,6 +322,7 @@ export namespace App {
         modelAccountBaseURL: string;
         params: InstallParams[];
         rawCompose?: string;
+        isEdit?: boolean;
         cpuQuota: number;
         memoryLimit: number;
         memoryUnit: string;
@@ -343,6 +346,7 @@ export namespace App {
     export interface AppUpdateVersionReq {
         appInstallID: number;
         updateVersion?: string;
+        loadCompose?: boolean;
     }
 
     export interface AppIgnoreReq {
