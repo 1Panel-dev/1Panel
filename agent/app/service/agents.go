@@ -1394,18 +1394,9 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	agentAccountMutationMu.Lock()
 	defer agentAccountMutationMu.Unlock()
-	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
+	_, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
-	}
-	if account.AppInstallID != 0 && account.Provider != "ollama" {
-		_, err := appInstallRepo.GetFirst(repo.WithByID(account.AppInstallID))
-		if err == nil {
-			return buserr.WithDetail("ErrInvalidParams", "Delete the local inference engine instead", nil)
-		}
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
 	}
 
 	if err := global.DB.Transaction(func(tx *gorm.DB) error {
