@@ -2091,6 +2091,9 @@ const message = {
         missing: '없음',
     },
     container: {
+        imageRemoteSearch: '원격 검색',
+        imageRemoteSearchHelper: 'Docker Hub 저장소 이미지만 검색할 수 있습니다',
+        imageRemoteSearchProxyRequired: '현재 실행 환경에서 원격 이미지를 검색하려면 먼저 프록시 서버를 설정하세요.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

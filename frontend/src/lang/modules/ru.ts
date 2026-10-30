@@ -2146,6 +2146,9 @@ const message = {
         missing: 'Отсутствует',
     },
     container: {
+        imageRemoteSearch: 'Удалённый поиск',
+        imageRemoteSearchHelper: 'Поддерживается поиск образов только в репозиториях Docker Hub',
+        imageRemoteSearchProxyRequired: 'Для поиска удалённых образов в текущей среде сначала настройте прокси-сервер.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

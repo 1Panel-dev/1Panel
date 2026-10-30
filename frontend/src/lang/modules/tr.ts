@@ -2149,6 +2149,10 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        imageRemoteSearch: 'Uzak arama',
+        imageRemoteSearchHelper: 'Yalnızca Docker Hub deposu imajları aranabilir',
+        imageRemoteSearchProxyRequired:
+            'Geçerli çalışma ortamında uzak imajları aramak için önce bir proxy sunucusu yapılandırın.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

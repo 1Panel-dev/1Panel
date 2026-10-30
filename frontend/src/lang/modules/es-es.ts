@@ -2155,6 +2155,10 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        imageRemoteSearch: 'Búsqueda remota',
+        imageRemoteSearchHelper: 'Solo se pueden buscar imágenes de repositorios de Docker Hub',
+        imageRemoteSearchProxyRequired:
+            'Para buscar imágenes remotas en el entorno actual, configura primero un servidor proxy.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

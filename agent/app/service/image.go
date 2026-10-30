@@ -24,6 +24,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/dockerhub"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/docker/api/types/build"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -35,6 +37,7 @@ import (
 type ImageService struct{}
 
 type IImageService interface {
+	SearchRemoteImages(ctx context.Context, req dto.ImageRemoteSearch) (dockerhub.SearchResult, error)
 	Page(req dto.PageImage) (int64, interface{}, error)
 	List() ([]dto.Options, error)
 	ListAll() ([]dto.ImageInfo, error)
@@ -559,4 +562,18 @@ func checkUsed(imageID string, containers []container.Summary) bool {
 		}
 	}
 	return false
+}
+
+func (u *ImageService) SearchRemoteImages(ctx context.Context, req dto.ImageRemoteSearch) (dockerhub.SearchResult, error) {
+	client, err := req_helper.NewRuntimeHTTPClient()
+	if err != nil {
+		if errors.Is(err, req_helper.ErrProxyRequired) {
+			return dockerhub.SearchResult{Items: []dockerhub.SearchItem{}, ProxyRequired: true}, nil
+		}
+		return dockerhub.SearchResult{}, err
+	}
+	if client.Transport != nil {
+		defer client.CloseIdleConnections()
+	}
+	return dockerhub.Search(ctx, client, req.Query, req.Page, req.PageSize)
 }

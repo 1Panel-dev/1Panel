@@ -2014,6 +2014,9 @@ const message = {
         missing: '不存在',
     },
     container: {
+        imageRemoteSearch: '遠端搜尋',
+        imageRemoteSearchHelper: '僅支援搜尋 Docker Hub 倉庫映像',
+        imageRemoteSearchProxyRequired: '目前運行環境下，如需搜尋遠端映像，請先設定代理伺服器',
         batchUpgrade: '批次升級',
         batchUpgradeLog: '查看日誌',
         batchUpgradeCheck: '核對任務',

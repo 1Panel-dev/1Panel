@@ -1,8 +1,12 @@
 package v2
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	_ "github.com/1Panel-dev/1Panel/agent/utils/dockerhub" // Swagger response schema.
 	"github.com/gin-gonic/gin"
 )
 
@@ -224,4 +228,31 @@ func (b *BaseApi) ImageLoad(c *gin.Context) {
 	}
 
 	helper.Success(c)
+}
+
+// @Tags Container Image
+// @Summary Search Docker Hub images
+// @Accept json
+// @Param request body dto.ImageRemoteSearch true "request"
+// @Produce json
+// @Success 200 {object} dockerhub.SearchResult
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /containers/image/remote/search [post]
+func (b *BaseApi) SearchRemoteImages(c *gin.Context) {
+	var req dto.ImageRemoteSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	req.Query = strings.TrimSpace(req.Query)
+	if req.Query == "" {
+		helper.BadRequest(c, fmt.Errorf("search query is required"))
+		return
+	}
+	result, err := imageService.SearchRemoteImages(c.Request.Context(), req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
 }

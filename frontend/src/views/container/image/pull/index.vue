@@ -48,7 +48,7 @@ const form = reactive({
     taskID: '',
     fromRepo: true,
     repoID: null as number,
-    imageName: [],
+    imageName: [] as string[],
 });
 const verifyImage = (rule: any, value: any, callback: any) => {
     if (!value || value.length === 0) {
@@ -77,20 +77,25 @@ const taskLogRef = ref();
 
 interface DialogProps {
     repos: Array<Container.RepoOptions>;
+    imageName?: string;
 }
 const repos = ref();
 
 const acceptParams = async (params: DialogProps): Promise<void> => {
     drawerVisible.value = true;
     form.fromRepo = true;
-    form.imageName = [];
-    repos.value = params.repos;
-    form.repoID = 1;
+    form.imageName = params.imageName ? [params.imageName] : [];
+    repos.value = params.repos || [];
+    form.repoID = params.imageName ? null : 1;
     for (const item of repos.value) {
         if (item.name === 'Docker Hub' && item.downloadUrl === 'docker.io') {
             form.repoID = item.id;
             break;
         }
+    }
+    if (params.imageName && form.repoID === null) {
+        form.fromRepo = false;
+        form.imageName = [`docker.io/${params.imageName}`];
     }
 };
 const emit = defineEmits<{ (e: 'search'): void }>();

@@ -2109,6 +2109,9 @@ const message = {
         missing: 'ناموجود',
     },
     container: {
+        imageRemoteSearch: 'جستجوی راه دور',
+        imageRemoteSearchHelper: 'فقط جستجوی تصاویر مخزن Docker Hub پشتیبانی می\u200cشود',
+        imageRemoteSearchProxyRequired: 'برای جستجوی تصاویر راه دور در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

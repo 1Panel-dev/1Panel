@@ -2023,6 +2023,9 @@ const message = {
         missing: '不存在',
     },
     container: {
+        imageRemoteSearch: '远程搜索',
+        imageRemoteSearchHelper: '仅支持搜索 Docker Hub 仓库镜像',
+        imageRemoteSearchProxyRequired: '当前运行环境下，如需搜索远程镜像，请优先配置代理服务器',
         batchUpgrade: '批量升级',
         batchUpgradeLog: '查看日志',
         batchUpgradeCheck: '核对任务',

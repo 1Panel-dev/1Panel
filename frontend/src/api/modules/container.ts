@@ -291,6 +291,21 @@ export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile)
     return http.post(`/containers/daemonjson/update/byfile`, params, TimeoutEnum.T_3M);
 };
 
+export interface RemoteImage {
+    name: string;
+    description: string;
+}
+export const searchRemoteImages = (
+    params: { query: string; page: number; pageSize: number },
+    node: string,
+    signal?: AbortSignal,
+) =>
+    http.postWithConfig<ResPage<RemoteImage> & { proxyRequired: boolean }>('/containers/image/remote/search', params, {
+        headers: { CurrentNode: node },
+        signal,
+        timeout: TimeoutEnum.T_40S,
+    });
+
 export interface ContainerImageCheckUpdateStatus {
     taskID: string;
     enabled: boolean;
