@@ -2076,6 +2076,19 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdateProxyRequired:
+            'ເພື່ອກວດສອບການອັບເດດອິມເມຈໃນສະພາບແວດລ້ອມປັດຈຸບັນ ກະລຸນາຕັ້ງຄ່າພຣັອກຊີເຊີບເວີກ່ອນ.',
+        imageCheckUpdateConfigureProxy: 'ໄປຕັ້ງຄ່າ',
+        imageCheckUpdateAvailableVersion: 'ເວີຊັນທີ່ອັບເກຣດໄດ້ “{version}”',
+        imageCheckUpdateContentChanged: '(ເນື້ອຫາອິມເມຈປ່ຽນແປງ)',
+        imageCheckUpdates: 'ກວດສອບການອັບເດດອິມເມຈ',
+        imageCheckUpdateNow: 'ກວດສອບຕອນນີ້',
+        imageCheckUpdateSchedule: 'ກວດສອບຕາມຕາຕະລາງ',
+        imageCheckUpdateDisable: 'ປິດການກວດສອບຕາມຕາຕະລາງ',
+        imageCheckUpdateStarted: 'ກຳລັງກວດສອບການອັບເດດອິມເມຈຂອງທຸກຄອນເທນເນີໃນໂນດນີ້',
+        imageCheckUpdateResult:
+            'ກວດສອບສຳເລັດ: ກວດແລ້ວ {checked}, ອັບເກຣດໄດ້ {updates}, ລົ້ມເຫຼວ {failed}, ຂ້າມ {skipped}',
+
         createByCommand: 'ສ້າງດ້ວຍຄຳສັ່ງ',
         importContainerBackupTip: 'ນຳເຂົ້າໄຟລ໌ສຳຮອງຄອນເທນເນີ, ຮອງຮັບສະເພາະ .tar.gz',
         importComposeBackupTip: 'ນຳເຂົ້າໄຟລ໌ສຳຮອງ compose, ຮອງຮັບສະເພາະ .tar.gz',

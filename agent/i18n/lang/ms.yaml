@@ -802,3 +802,15 @@ ErrFeishuUpgradeMounts: "Lekapan ini tidak boleh disandar dan dipulihkan sepenuh
 AgentFeishuRecoveryDisabled: "Gerbang dipulihkan dengan Feishu dinyahaktifkan; sandaran konfigurasi asal dikekalkan."
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "Semak kemas kini imej"
+ContainerImageCheckScope: "Menyemak kesemua {{ .count }} kontena pada nod ini tanpa mengira pembahagian halaman atau penapis"
+ContainerImageCheckItem: "Menyemak kontena {{ .name }}, imej {{ .image }}"
+ContainerImageCheckFailed: "Semakan kontena {{ .name }} gagal: {{ .error }}; keputusan terdahulu yang sepadan dengan imej semasa dikekalkan"
+ContainerImageCheckSkipped: "Melangkau {{ .name }}: bukan imej Docker Hub bertag, imej setempat atau digest ditetapkan"
+ContainerImageCheckAvailable: "Kontena {{ .name }} mempunyai kemas kini: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "Tiada kemas kini ditemui untuk kontena {{ .name }}"
+ContainerImageCheckChanged: "Kontena {{ .name }} telah dipadam atau imejnya berubah; keputusan tidak disimpan"
+ContainerImageCheckSummary: "Semakan selesai: disemak {{ .checked }}, boleh dikemas kini {{ .updates }}, gagal {{ .failed }}, dilangkau {{ .skipped }}"
+ContainerImageCheckFailures: "Semakan {{ .count }} kontena gagal; lihat log tugas"
+
+ErrImageCheckProxyRequired: "Untuk menyemak kemas kini imej dalam persekitaran semasa, sila konfigurasikan pelayan proksi terlebih dahulu."

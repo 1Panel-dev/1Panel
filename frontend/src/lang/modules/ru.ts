@@ -2142,6 +2142,19 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdateProxyRequired:
+            'Для проверки обновлений образов в текущей среде сначала настройте прокси-сервер.',
+        imageCheckUpdateConfigureProxy: 'Настроить',
+        imageCheckUpdateAvailableVersion: 'Доступна версия «{version}»',
+        imageCheckUpdateContentChanged: '(содержимое образа изменилось)',
+        imageCheckUpdates: 'Проверить обновления образов',
+        imageCheckUpdateNow: 'Проверить сейчас',
+        imageCheckUpdateSchedule: 'Проверка по расписанию',
+        imageCheckUpdateDisable: 'Отключить проверку по расписанию',
+        imageCheckUpdateStarted: 'Проверка обновлений образов всех контейнеров на текущем узле',
+        imageCheckUpdateResult:
+            'Проверка завершена: проверено {checked}, доступны обновления {updates}, ошибок {failed}, пропущено {skipped}',
+
         createByCommand: 'Создать с помощью команды',
         importContainerBackupTip: 'Импорт файла резервной копии контейнера, поддерживается только .tar.gz',
         importComposeBackupTip: 'Импорт файла резервной копии compose, поддерживается только .tar.gz',

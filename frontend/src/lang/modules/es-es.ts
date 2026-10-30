@@ -2151,6 +2151,19 @@ const message = {
         batchUpgradeWaiting: 'Queued',
         batchUpgradeRunning: 'Upgrading',
         batchUpgradeSubmitted: 'Upgrade task submitted',
+        imageCheckUpdateProxyRequired:
+            'Para comprobar actualizaciones de imágenes en el entorno actual, configura primero un servidor proxy.',
+        imageCheckUpdateConfigureProxy: 'Configurar',
+        imageCheckUpdateAvailableVersion: 'Versión disponible «{version}»',
+        imageCheckUpdateContentChanged: '(el contenido de la imagen ha cambiado)',
+        imageCheckUpdates: 'Buscar actualizaciones de imágenes',
+        imageCheckUpdateNow: 'Comprobar ahora',
+        imageCheckUpdateSchedule: 'Comprobación programada',
+        imageCheckUpdateDisable: 'Desactivar comprobación programada',
+        imageCheckUpdateStarted: 'Buscando actualizaciones de las imágenes de todos los contenedores de este nodo',
+        imageCheckUpdateResult:
+            'Comprobación finalizada: comprobados {checked}, actualizables {updates}, fallidos {failed}, omitidos {skipped}',
+
         createByCommand: 'Crear por comando',
         importContainerBackupTip: 'Importar archivo de copia de seguridad de contenedor, solo se admite .tar.gz',
         importComposeBackupTip: 'Importar archivo de copia de seguridad de compose, solo se admite .tar.gz',

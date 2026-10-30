@@ -7,13 +7,17 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
+	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 )
 
 func HandleGet(url string) (*http.Response, error) {
@@ -161,4 +165,68 @@ func loadRequestTransport() *http.Transport {
 		ResponseHeaderTimeout: 10 * time.Second,
 		IdleConnTimeout:       15 * time.Second,
 	}
+}
+
+var ErrProxyRequired = errors.New("runtime environment requires a configured proxy")
+
+// LoadRuntimeProxyURL reads and validates local configuration without creating an HTTP client.
+// A nil URL preserves the default network behavior in the global environment.
+func LoadRuntimeProxyURL() (*url.URL, error) {
+	var rows []model.Setting
+	if err := global.DB.Where("key IN ?", []string{"Edition", "ProxyType", "ProxyUrl", "ProxyPort", "ProxyUser", "ProxyPasswd"}).Find(&rows).Error; err != nil {
+		return nil, err
+	}
+	settings := make(map[string]string, len(rows))
+	for _, row := range rows {
+		settings[row.Key] = row.Value
+	}
+	if settings["Edition"] == "intl" {
+		return nil, nil
+	}
+	kind, host, port := settings["ProxyType"], strings.TrimSpace(settings["ProxyUrl"]), settings["ProxyPort"]
+	if kind == "" || kind == "close" || host == "" || port == "" {
+		return nil, ErrProxyRequired
+	}
+	if kind != "http" && kind != "https" && kind != "socks5" {
+		return nil, ErrProxyRequired
+	}
+	number, err := strconv.Atoi(port)
+	if err != nil || number < 1 || number > 65535 {
+		return nil, ErrProxyRequired
+	}
+	if !strings.Contains(host, "://") {
+		host = kind + "://" + host
+	}
+	address, err := url.Parse(host)
+	if err != nil || address.Scheme != kind || address.Hostname() == "" || address.User != nil || address.RawQuery != "" || address.Fragment != "" || (address.Path != "" && address.Path != "/") {
+		return nil, ErrProxyRequired
+	}
+	address.Host = net.JoinHostPort(address.Hostname(), port)
+	address.Path = ""
+	if settings["ProxyUser"] != "" {
+		password, err := encrypt.StringDecrypt(settings["ProxyPasswd"])
+		if err != nil {
+			return nil, ErrProxyRequired
+		}
+		address.User = url.UserPassword(settings["ProxyUser"], password)
+	}
+	return address, nil
+}
+
+// NewRuntimeHTTPClient builds a client for requests using the validated runtime proxy configuration.
+func NewRuntimeHTTPClient() (*http.Client, error) {
+	address, err := LoadRuntimeProxyURL()
+	if err != nil {
+		return nil, err
+	}
+	client := &http.Client{Timeout: 30 * time.Second}
+	if address == nil {
+		return client, nil
+	}
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	// Explicit proxy selection prevents NO_PROXY from bypassing the panel proxy.
+	// net/http also supports SOCKS5 URLs and proxy authentication.
+	transport.Proxy = http.ProxyURL(address)
+	client.Transport = transport
+	return client, nil
 }

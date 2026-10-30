@@ -802,3 +802,15 @@ ErrFeishuUpgradeMounts: "현재 마운트는 전체 백업 및 복원을 지원�
 AgentFeishuRecoveryDisabled: "게이트웨이가 복구되었습니다. Feishu는 비활성 상태이며 원본 설정 백업은 유지됩니다."
 
 ContainerUpgradeWaiting: "Waiting for a container upgrade execution slot"
+ContainerImageCheckUpdate: "이미지 업데이트 확인"
+ContainerImageCheckScope: "페이지 및 필터와 관계없이 현재 노드의 모든 컨테이너 {{ .count }}개를 확인합니다"
+ContainerImageCheckItem: "컨테이너 {{ .name }}, 이미지 {{ .image }} 확인 중"
+ContainerImageCheckFailed: "컨테이너 {{ .name }} 확인 실패: {{ .error }}. 현재 이미지와 일치하는 이전 결과를 유지합니다"
+ContainerImageCheckSkipped: "{{ .name }} 건너뜀: 태그가 있는 Docker Hub 이미지가 아니거나 로컬 이미지 또는 digest가 고정된 이미지입니다"
+ContainerImageCheckAvailable: "컨테이너 {{ .name }} 업데이트 가능: {{ .image }} → {{ .target }}"
+ContainerImageCheckCurrent: "컨테이너 {{ .name }}의 업데이트를 찾지 못했습니다"
+ContainerImageCheckChanged: "컨테이너 {{ .name }}이 삭제되었거나 이미지가 변경되어 결과를 저장하지 않았습니다"
+ContainerImageCheckSummary: "확인 종료: 성공 {{ .checked }}, 업데이트 가능 {{ .updates }}, 실패 {{ .failed }}, 건너뜀 {{ .skipped }}"
+ContainerImageCheckFailures: "컨테이너 {{ .count }}개 확인에 실패했습니다. 작업 로그를 확인하세요"
+
+ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트를 확인하려면 먼저 프록시 서버를 설정하세요."

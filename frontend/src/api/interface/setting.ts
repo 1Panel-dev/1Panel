@@ -97,6 +97,7 @@ export namespace Setting {
         complexityVerification: string;
         noAuthSetting: string;
         proxyType: string;
+        proxyEnabled: boolean;
 
         scriptSync: string;
         dashboardMemoVisible: string;
