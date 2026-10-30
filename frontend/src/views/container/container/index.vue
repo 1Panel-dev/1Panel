@@ -501,11 +501,10 @@ import DockerStatus from '@/views/container/docker-status/index.vue';
 import ContainerLogDialog from '@/components/log/container-drawer/index.vue';
 import Status from '@/components/status/index.vue';
 import { toRef, computed, onMounted, onActivated, onBeforeUnmount, onDeactivated, reactive, ref, watch } from 'vue';
-import { ElMessageBox } from 'element-plus';
+import { showImageProxyRequired, isRuntimeProxyRequired } from '@/utils/image-remote';
 import { ArrowDown } from '@element-plus/icons-vue';
 import {
     getContainerImageCheckUpdateStatus,
-    getImageRemoteCheckStatus,
     runContainerImageCheckUpdate,
     setContainerImageCheckUpdateSchedule,
     type ContainerImageCheckUpdateStatus,
@@ -525,7 +524,7 @@ import router from '@/routers';
 import { computeSize2 } from '@/utils/size';
 import ContainerResource from '@/components/container-resource/index.vue';
 import { newUUID } from '@/utils/id';
-import { updateCommonDescription } from '@/api/modules/setting';
+import { updateCommonDescription, getSettingBaseInfo } from '@/api/modules/setting';
 
 const { currentNode, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
 
@@ -880,19 +879,10 @@ const onImageCheckUpdateCommand = async (command: string) => {
         imageCheckUpdateStatus.value = status.data;
         // Disabling an existing schedule must remain possible without a proxy.
         const proxyStatus =
-            command === 'check' || !status.data.enabled ? await getImageRemoteCheckStatus(node) : undefined;
+            node === 'local' && (command === 'check' || !status.data.enabled) ? await getSettingBaseInfo() : undefined;
         if (generation !== imageCheckUpdateGeneration || node !== currentNode.value) return;
-        if (proxyStatus?.data.proxyRequired) {
-            try {
-                await ElMessageBox.confirm(i18n.global.t('container.imageCheckUpdateProxyRequired'), '', {
-                    confirmButtonText: i18n.global.t('container.imageCheckUpdateConfigureProxy'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                    type: 'warning',
-                });
-                if (node === currentNode.value) routerToName('Panel');
-            } catch {
-                // Cancellation leaves the check and schedule untouched.
-            }
+        if (proxyStatus && isRuntimeProxyRequired(proxyStatus.data)) {
+            await showImageProxyRequired('container.imageCheckUpdateProxyRequired', () => node === currentNode.value);
             return;
         }
         const res =

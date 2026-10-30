@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -11,10 +12,12 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/dockerhub"
+	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/docker/cli/cli/config"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/image"
@@ -57,12 +60,12 @@ func GetContainerImageCheckUpdateStatus() (ImageCheckUpdateStatus, error) {
 func SetContainerImageCheckUpdateSchedule(enabled bool) error {
 	value := "Disable"
 	if enabled {
-		httpClient, err := dockerhub.NewHTTPClient()
+		_, err := req_helper.LoadRuntimeProxyURL()
+		if errors.Is(err, req_helper.ErrProxyRequired) {
+			return buserr.New("ErrImageCheckProxyRequired")
+		}
 		if err != nil {
 			return err
-		}
-		if httpClient.Transport != nil {
-			httpClient.CloseIdleConnections()
 		}
 		value = "Enable"
 	}
@@ -157,7 +160,10 @@ type imageCheckUpdateCache struct {
 }
 
 func runContainerImageCheckUpdate(ctx context.Context, result *ImageCheckUpdateStatus, logger func(string)) error {
-	httpClient, err := dockerhub.NewHTTPClient()
+	httpClient, err := req_helper.NewRuntimeHTTPClient()
+	if errors.Is(err, req_helper.ErrProxyRequired) {
+		return buserr.New("ErrImageCheckProxyRequired")
+	}
 	if err != nil {
 		return err
 	}

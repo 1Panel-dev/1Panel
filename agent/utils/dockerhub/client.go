@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"net"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -15,10 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/1Panel-dev/1Panel/agent/app/model"
-	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/distribution/reference"
 )
 
@@ -271,53 +266,4 @@ func normalizedVariant(architecture, variant string) string {
 		return "v8"
 	}
 	return variant
-}
-
-// NewHTTPClient reads the synchronized panel settings for each check, including cron.
-func NewHTTPClient() (*http.Client, error) {
-	var rows []model.Setting
-	if err := global.DB.Where("key IN ?", []string{"Edition", "ProxyType", "ProxyUrl", "ProxyPort", "ProxyUser", "ProxyPasswd"}).Find(&rows).Error; err != nil {
-		return nil, err
-	}
-	settings := make(map[string]string, len(rows))
-	for _, row := range rows {
-		settings[row.Key] = row.Value
-	}
-	client := &http.Client{Timeout: 30 * time.Second}
-	if settings["Edition"] == "intl" {
-		return client, nil
-	}
-	kind, host, port := settings["ProxyType"], strings.TrimSpace(settings["ProxyUrl"]), settings["ProxyPort"]
-	if kind == "" || kind == "close" || host == "" || port == "" {
-		return nil, buserr.New("ErrImageCheckProxyRequired")
-	}
-	if kind != "http" && kind != "https" && kind != "socks5" {
-		return nil, buserr.New("ErrImageCheckProxyRequired")
-	}
-	number, err := strconv.Atoi(port)
-	if err != nil || number < 1 || number > 65535 {
-		return nil, buserr.New("ErrImageCheckProxyRequired")
-	}
-	if !strings.Contains(host, "://") {
-		host = kind + "://" + host
-	}
-	address, err := url.Parse(host)
-	if err != nil || address.Scheme != kind || address.Hostname() == "" || address.User != nil || address.RawQuery != "" || address.Fragment != "" || (address.Path != "" && address.Path != "/") {
-		return nil, buserr.New("ErrImageCheckProxyRequired")
-	}
-	address.Host = net.JoinHostPort(address.Hostname(), port)
-	address.Path = ""
-	if settings["ProxyUser"] != "" {
-		password, err := encrypt.StringDecrypt(settings["ProxyPasswd"])
-		if err != nil {
-			return nil, buserr.New("ErrImageCheckProxyRequired")
-		}
-		address.User = url.UserPassword(settings["ProxyUser"], password)
-	}
-	transport := http.DefaultTransport.(*http.Transport).Clone()
-	// Explicit proxy selection prevents NO_PROXY from bypassing the panel proxy.
-	// net/http also supports SOCKS5 URLs and proxy authentication.
-	transport.Proxy = http.ProxyURL(address)
-	client.Transport = transport
-	return client, nil
 }

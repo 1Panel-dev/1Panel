@@ -291,16 +291,6 @@ export const updateDaemonJsonByfile = (params: Container.DaemonJsonUpdateByFile)
     return http.post(`/containers/daemonjson/update/byfile`, params, TimeoutEnum.T_3M);
 };
 
-export interface ImageRemoteCheckStatus {
-    proxyRequired: boolean;
-}
-export const getImageRemoteCheckStatus = (node: string, signal?: AbortSignal) =>
-    http.get<ImageRemoteCheckStatus>(
-        '/containers/image/remote/check',
-        {},
-        { headers: { CurrentNode: node }, signal },
-    );
-
 export interface ContainerImageCheckUpdateStatus {
     taskID: string;
     enabled: boolean;
