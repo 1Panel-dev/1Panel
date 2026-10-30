@@ -498,7 +498,7 @@ const message = {
         quickDirDelete: 'Delete ({0})?',
         quickDir: 'Quick Access',
         minQuickJump: 'Add at least one quick access entry',
-        maxQuickJump: 'You can add up to four quick access entries',
+        maxQuickJump: 'You can add up to five quick access entries',
         database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
@@ -1757,6 +1757,7 @@ const message = {
             migModeNA: 'Not Supported',
             current: 'Real-time Status',
             history: 'Monitoring Data',
+            viewHistory: 'View monitoring data',
             notSupport: 'The current version or driver does not support displaying this parameter.',
         },
         mcp: {

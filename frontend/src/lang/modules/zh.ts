@@ -477,7 +477,7 @@ const message = {
         quickDirDelete: '确定删除（{0}）',
         quickDir: '快捷目录',
         minQuickJump: '请至少设置一个快速跳转入口！',
-        maxQuickJump: '最多可设置四个快速跳转入口！',
+        maxQuickJump: '最多可设置五个快速跳转入口！',
         database: '数据库 - 所有',
         restart_1panel: '重启面板',
         restart_system: '重启服务器',
@@ -1679,6 +1679,7 @@ const message = {
             migModeNA: '不支持',
             current: '实时状态',
             history: '监控数据',
+            viewHistory: '查看监控数据',
             notSupport: '当前版本或驱动不支持显示该参数。',
         },
         mcp: {

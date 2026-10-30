@@ -18,6 +18,7 @@ type IAgentAccountRepo interface {
 	Save(account *model.AgentAccount) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
+	Count() (int64, error)
 	CountTextByProviders(providers []string) (map[string]int64, error)
 	SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
@@ -67,6 +68,12 @@ func (a AgentAccountRepo) List(opts ...DBOption) ([]model.AgentAccount, error) {
 		return nil, err
 	}
 	return accounts, nil
+}
+
+func (a AgentAccountRepo) Count() (int64, error) {
+	var count int64
+	err := getDb().Model(&model.AgentAccount{}).Count(&count).Error
+	return count, err
 }
 
 func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]int64, error) {

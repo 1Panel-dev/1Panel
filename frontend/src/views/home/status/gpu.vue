@@ -16,7 +16,7 @@
                         </el-icon>
                     </el-button>
                     <el-button link type="primary" size="small" @click="$emit('open')">
-                        {{ $t('aiTools.gpu.gpu') }}
+                        {{ $t('aiTools.gpu.viewHistory') }}
                         <el-icon><ArrowRight /></el-icon>
                     </el-button>
                 </div>

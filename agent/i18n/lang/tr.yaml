@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'İstenen kaynak {{ .err }} bulunamadı'
 
 # hızlı geçiş
 ErrMinQuickJump: 'En az bir hızlı erişim ekle'
-ErrMaxQuickJump: '4 hızlı erişim hakkı var'
+ErrMaxQuickJump: '5 hızlı erişim hakkı var'
 
 # genel
 ErrShutDown: 'Komut manuel durduruldu'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'Sertifika dosyası mevcut değil'
 ErrSSLKeyFormat: 'Özel anahtar dosyası doğrulama başarısız'
 ErrSSLCertificateFormat: 'Sertifika dosyası formatı yanlış, lütfen pem formatını kullanın'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid veya EabHmacKey boş olamaz'
+ErrOpenrestyInstall: "Lütfen önce uygulama mağazasından OpenResty yükleyin"
 ErrOpenrestyNotFound: 'HTTP modu için OpenResty gereklidir'
 ApplySSLStart: 'Sertifika başvurusu başlatılıyor, alan adı [{{ .domain }}] başvuru yöntemi [{{ .type }}]'
 dnsAccount: 'DNS Otomatik'

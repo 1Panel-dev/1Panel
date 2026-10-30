@@ -119,6 +119,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddQuickDirectory,
 		migrations.AddLocalModelAccountLink,
 		migrations.AddOllamaModelAccountSync,
+		migrations.AddModelQuickJump,
 	}
 }
 
