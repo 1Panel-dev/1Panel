@@ -88,7 +88,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		}
 	}
 	if modelsChanged {
-		err = agentAccountRepo.SaveLocal(account, rows)
+		err = agentAccountRepo.SaveWithModels(account, rows)
 	} else if accountChanged {
 		err = agentAccountRepo.Save(account)
 	} else {

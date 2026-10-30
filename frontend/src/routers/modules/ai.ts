@@ -6,30 +6,20 @@ const aiRouter = {
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,
-    redirect: '/ai/model/account',
+    redirect: '/ai/model',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.aiTools',
     },
     children: [
         {
-            path: '/ai/model/account',
+            path: '/ai/model',
             name: 'AIModel',
-            component: () => import('@/views/ai/model/index.vue'),
+            redirect: '/ai/model/files',
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.model',
-                permission: 'ai_model_view',
-            },
-        },
-        {
-            path: '/ai/model/local',
-            hidden: true,
-            name: 'LocalModel',
-            component: () => import('@/views/ai/model/index.vue'),
-            meta: {
-                title: 'aiTools.model.deployments',
-                activeMenu: '/ai/model/account',
+                activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },
         },
@@ -40,7 +30,29 @@ const aiRouter = {
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
                 title: 'aiTools.model.files',
-                activeMenu: '/ai/model/account',
+                activeMenu: '/ai/model',
+                permission: 'ai_model_view',
+            },
+        },
+        {
+            path: '/ai/model/account',
+            hidden: true,
+            name: 'ModelServices',
+            component: () => import('@/views/ai/model/index.vue'),
+            meta: {
+                title: 'aiTools.model.services',
+                activeMenu: '/ai/model',
+                permission: 'ai_model_view',
+            },
+        },
+        {
+            path: '/ai/model/local',
+            hidden: true,
+            name: 'LocalModel',
+            component: () => import('@/views/ai/model/index.vue'),
+            meta: {
+                title: 'aiTools.model.deployments',
+                activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },
         },

@@ -1080,14 +1080,20 @@ const message = {
             container_conn_helper: 'コンテナ間のアクセスまたは接続にこのアドレスを使用',
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
-            vllmVersionHelper: 'FusionXpark GB10 サーバーでは -cu130 バージョンを選択してください。',
+            vllmVersionHelper: {
+                default:
+                    '公式の標準バージョン。CUDA 13.0 を使用し、新しいドライバーと新しい GPU アーキテクチャに対応します。',
+                cuda: '旧アーキテクチャ向け互換バージョン。CUDA 12.9 を使用し、CUDA 13.0 未満を使用する旧世代 GPU に対応します。',
+                ubuntu: 'NVIDIA GB10 標準版。CUDA 13.0 を使用し、NVIDIA GB10 デバイスに対応します。',
+                dspark: 'NVIDIA GB10 の 2 台構成向けカスタム版。1Panel が独自に保守するカスタムイメージです。',
+            },
             vllmDeployProfile: 'デプロイモデル',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 '起動コマンドではポート {0} を使用する必要があります。使用しない場合、サービスにアクセスできません。',
             ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',
-            syncModelAccount: 'モデルアカウントに同期',
+            syncModelAccount: 'モデルサービスに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',

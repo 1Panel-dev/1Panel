@@ -1091,13 +1091,19 @@ const message = {
             container_conn_helper: 'Используйте этот адрес для доступа или подключения между контейнерами',
             from_remote: 'Эта модель не была загружена через 1Panel, нет связанных журналов извлечения.',
             no_logs: 'Журналы извлечения для этой модели были удалены и не могут быть просмотрены.',
-            vllmVersionHelper: 'Для серверов FusionXpark GB10 выберите версию -cu130.',
+            vllmVersionHelper: {
+                default:
+                    'Официальная стандартная версия с CUDA 13.0 для новых драйверов и видеокарт с новой архитектурой.',
+                cuda: 'Версия совместимости со старыми архитектурами с CUDA 12.9 для видеокарт, использующих версии CUDA ниже 13.0.',
+                ubuntu: 'Стандартная версия NVIDIA GB10 с CUDA 13.0 для устройств NVIDIA GB10.',
+                dspark: 'Специальная версия NVIDIA GB10 для двух устройств с образом, поддерживаемым 1Panel.',
+            },
             vllmDeployProfile: 'Модель развертывания',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper: 'Команда запуска должна использовать порт {0}, иначе сервис будет недоступен.',
             ascendVisibleDevices: 'Видимые устройства Ascend (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Синхронизировать с аккаунтом модели',
+            syncModelAccount: 'Синхронизировать с сервисом модели',
             modelAccountAddressHelper:
                 'Адрес контейнера подходит для контейнеров агентов; 127.0.0.1, системный IP или пользовательский адрес подходит для AI Gateway или внешних сервисов.',
             containerAddress: 'Адрес контейнера',

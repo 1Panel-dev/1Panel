@@ -44,6 +44,12 @@ interface VllmAPI {
 const vllmModules = import.meta.glob<VllmAPI>('@/xpack/api/modules/vllm.ts');
 export const vllmAvailable = Object.keys(vllmModules).length > 0;
 
+export function formatVllmVersion(version: string) {
+    return String(version || '')
+        .trim()
+        .replace(/^(nvidia|intel|ascend)-/i, '');
+}
+
 export async function loadVllmAPI() {
     return Object.values(vllmModules)[0]();
 }

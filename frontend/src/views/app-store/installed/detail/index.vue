@@ -121,7 +121,7 @@
                     </div>
                 </component>
                 <GPUConfig v-if="showModelGPU" ref="gpuRef" v-model="paramModel.gpu" />
-                <details v-if="appKey === 'ollama'" open class="form-section">
+                <details v-if="appKey === 'ollama'" ref="syncSectionRef" open class="form-section">
                     <summary class="form-section-header">
                         <span>{{ $t('aiTools.model.syncModelAccount') }}</span>
                         <el-switch
@@ -129,6 +129,7 @@
                             @keydown.stop
                             v-model="paramModel.syncModelAccount"
                             :aria-label="$t('aiTools.model.syncModelAccount')"
+                            @change="(enabled) => enabled && syncSectionRef && (syncSectionRef.open = true)"
                         />
                     </summary>
                     <div v-show="paramModel.syncModelAccount" class="form-section-body">
@@ -298,6 +299,7 @@ const appType = ref('');
 const appKey = ref('');
 const showModelGPU = computed(() => props.modelGPU && appKey.value === 'ollama');
 const accountRef = ref<InstanceType<typeof AccountAddress>>();
+const syncSectionRef = ref<HTMLDetailsElement>();
 const gpuRef = ref<InstanceType<typeof GPUConfig>>();
 const appConfigUpdate = ref<App.AppConfigUpdate>({
     installID: 0,

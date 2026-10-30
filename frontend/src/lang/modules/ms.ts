@@ -1102,14 +1102,19 @@ const message = {
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
-            vllmVersionHelper: 'Untuk pelayan FusionXpark GB10, sila pilih versi -cu130.',
+            vllmVersionHelper: {
+                default: 'Versi standard rasmi dengan CUDA 13.0, untuk pemacu baharu dan seni bina GPU baharu.',
+                cuda: 'Versi keserasian seni bina lama dengan CUDA 12.9, untuk GPU lama yang menggunakan versi CUDA di bawah 13.0.',
+                ubuntu: 'Versi standard NVIDIA GB10 dengan CUDA 13.0, untuk peranti NVIDIA GB10.',
+                dspark: 'Versi tersuai NVIDIA GB10 untuk dua peranti, menggunakan imej tersuai yang diselenggara oleh 1Panel.',
+            },
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Segerakkan ke akaun model',
+            syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',

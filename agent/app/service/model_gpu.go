@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/compose-spec/compose-go/v2/interpolation"
 	"github.com/compose-spec/compose-go/v2/template"
@@ -16,76 +18,72 @@ import (
 
 func LoadModelGPUDevices() dto.ModelGPUDevices {
 	result := dto.ModelGPUDevices{Devices: []dto.ModelGPUDevice{}, Warnings: []string{}}
-	uuidPattern := re.GetRegex(re.NvidiaGPUUUIDPattern)
-	renderPattern := re.GetRegex(re.IntelGPURenderNamePattern)
-	ascendPattern := re.GetRegex(re.AscendGPUDeviceNamePattern)
-	for _, directory := range []string{"/proc/driver/nvidia/gpus", "/sys/class/drm", "/dev"} {
-		entries, err := os.ReadDir(directory)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				result.Warnings = append(result.Warnings, err.Error())
-			}
+	ok, client := accelerator.New()
+	if !ok {
+		return result
+	}
+	snapshot, err := client.Collect(context.Background())
+	if err != nil {
+		result.Warnings = append(result.Warnings, err.Error())
+		return result
+	}
+	result.Warnings = append(result.Warnings, snapshot.Info.Warnings...)
+	for _, monitored := range snapshot.Devices {
+		if monitored.ParentID != "" {
 			continue
 		}
-		for _, entry := range entries {
-			var device dto.ModelGPUDevice
-			var devicePath string
-			switch directory {
-			case "/proc/driver/nvidia/gpus":
-				informationPath := filepath.Join(directory, entry.Name(), "information")
-				content, err := os.ReadFile(informationPath)
+		device := dto.ModelGPUDevice{Available: true}
+		devicePath := ""
+		switch {
+		case monitored.GPU != nil:
+			if monitored.Vendor == "nvidia" && !re.GetRegex(re.NvidiaGPUUUIDPattern).MatchString(monitored.GPU.UUID) {
+				result.Warnings = append(result.Warnings, fmt.Sprintf("invalid NVIDIA GPU UUID from nvidia-smi: %s", monitored.GPU.UUID))
+				continue
+			}
+			device.ID = monitored.ID
+			device.Name = fmt.Sprintf("GPU %d · %s", monitored.Index, monitored.Name)
+			device.Type = monitored.Vendor
+			device.UUID = monitored.GPU.UUID
+		case monitored.XPU != nil:
+			devicePath = monitored.XPU.Basic.DrmDevice
+			if !re.GetRegex(re.IntelGPUDevicePathPattern).MatchString(devicePath) {
+				directory := filepath.Join("/sys/bus/pci/devices", filepath.Base(monitored.BusID), "drm")
+				entries, err := os.ReadDir(directory)
 				if err != nil {
-					result.Warnings = append(result.Warnings, err.Error())
+					result.Warnings = append(result.Warnings, fmt.Sprintf("resolve Intel GPU %d render device: %v", monitored.Index, err))
 					continue
 				}
-				fields := map[string]string{}
-				for _, line := range strings.Split(string(content), "\n") {
-					key, value, found := strings.Cut(line, ":")
-					if found {
-						fields[strings.TrimSpace(key)] = strings.TrimSpace(value)
+				devicePath = ""
+				for _, entry := range entries {
+					if re.GetRegex(re.IntelGPURenderNamePattern).MatchString(entry.Name()) {
+						devicePath = filepath.Join("/dev/dri", entry.Name())
+						break
 					}
 				}
-				uuid := fields["GPU UUID"]
-				minor, err := strconv.Atoi(fields["Device Minor"])
-				if !uuidPattern.MatchString(uuid) || err != nil || minor < 0 {
-					result.Warnings = append(result.Warnings, fmt.Sprintf("invalid NVIDIA GPU UUID or device minor in %s", informationPath))
+				if devicePath == "" {
+					result.Warnings = append(result.Warnings, fmt.Sprintf("Intel GPU %d has no render device", monitored.Index))
 					continue
 				}
-				name := fields["Model"]
-				if name == "" {
-					name = "NVIDIA"
-				}
-				device = dto.ModelGPUDevice{ID: "nvidia:" + uuid, Name: name + " · " + entry.Name(), Type: "nvidia", UUID: uuid}
-				devicePath = filepath.Join("/dev", "nvidia"+strconv.Itoa(minor))
-			case "/sys/class/drm":
-				if !renderPattern.MatchString(entry.Name()) {
-					continue
-				}
-				vendor, err := os.ReadFile(filepath.Join(directory, entry.Name(), "device/vendor"))
-				if err != nil {
-					result.Warnings = append(result.Warnings, err.Error())
-					continue
-				}
-				if strings.TrimSpace(string(vendor)) != "0x8086" {
-					continue
-				}
-				devicePath = filepath.Join("/dev/dri", entry.Name())
-				device = dto.ModelGPUDevice{ID: "intel:" + devicePath, Name: "Intel · " + entry.Name(), Type: "intel"}
-			case "/dev":
-				if !ascendPattern.MatchString(entry.Name()) {
-					continue
-				}
-				devicePath = filepath.Join(directory, entry.Name())
-				device = dto.ModelGPUDevice{ID: "ascend:" + strings.TrimPrefix(entry.Name(), "davinci"), Name: "Ascend · " + entry.Name(), Type: "ascend"}
 			}
+			device.ID = "intel:" + devicePath
+			device.Name = fmt.Sprintf("XPU %d · %s", monitored.Index, monitored.Name)
+			device.Type = "intel"
+		case monitored.NPU != nil:
+			device.ID = fmt.Sprintf("ascend:%d", monitored.Index)
+			device.Name = fmt.Sprintf("NPU %d · Chip %d · %s", monitored.NPUIndex, monitored.ChipIndex, monitored.Name)
+			device.Type = "ascend"
+			devicePath = fmt.Sprintf("/dev/davinci%d", monitored.Index)
+		default:
+			continue
+		}
+		if devicePath != "" {
 			info, err := os.Stat(devicePath)
+			device.Available = err == nil && info.Mode()&os.ModeCharDevice != 0
 			if err != nil {
 				result.Warnings = append(result.Warnings, err.Error())
-			} else {
-				device.Available = info.Mode()&os.ModeCharDevice != 0
 			}
-			result.Devices = append(result.Devices, device)
 		}
+		result.Devices = append(result.Devices, device)
 	}
 	return result
 }
@@ -649,9 +647,17 @@ func resolveModelGPUValue(value string, params map[string]interface{}) (string, 
 
 func loadModelAscendDeviceIDs() []string {
 	ids := []string{}
-	for _, device := range LoadModelGPUDevices().Devices {
-		if device.Type == "ascend" && device.Available {
-			ids = append(ids, strings.TrimPrefix(device.ID, "ascend:"))
+	entries, err := os.ReadDir("/dev")
+	if err != nil {
+		return ids
+	}
+	for _, entry := range entries {
+		if !re.GetRegex(re.AscendGPUDeviceNamePattern).MatchString(entry.Name()) {
+			continue
+		}
+		info, err := os.Stat(filepath.Join("/dev", entry.Name()))
+		if err == nil && info.Mode()&os.ModeCharDevice != 0 {
+			ids = append(ids, strings.TrimPrefix(entry.Name(), "davinci"))
 		}
 	}
 	slices.SortFunc(ids, func(a, b string) int {

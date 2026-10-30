@@ -1,5 +1,5 @@
 <template>
-    <details open class="form-section">
+    <details ref="sectionRef" open class="form-section">
         <summary class="form-section-header">
             <span>{{ $t('aiTools.model.gpuAcceleration') }}</span>
             <el-switch
@@ -126,6 +126,7 @@ import i18n from '@/lang';
 const gpuTypeLabels: Record<string, string> = { nvidia: 'NVIDIA', intel: 'Intel', ascend: 'Ascend', amd: 'AMD' };
 const props = withDefaults(defineProps<{ imageType?: string }>(), { imageType: 'nvidia' });
 const model = defineModel<AI.ModelGPUConfig>({ required: true });
+const sectionRef = ref<HTMLDetailsElement>();
 const loading = ref(false);
 const gpuWarnings = ref<string[]>([]);
 const gpuDevices = ref<AI.ModelGPUDevice[]>();
@@ -200,6 +201,9 @@ const changeMode = () => {
 
 const changeEnabled = () => {
     model.value.error = undefined;
+    if (model.value.enabled && sectionRef.value) {
+        sectionRef.value.open = true;
+    }
     if (!model.value.enabled) {
         model.value.mode = 'all';
         model.value.count = undefined;

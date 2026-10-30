@@ -131,13 +131,25 @@
                                 >
                                     <span class="cell-ellipsis" :title="model.id">{{ model.id }}</span>
                                     <el-button
-                                        v-if="index === 1 && row.models.length > 2"
+                                        v-if="!row.appInstallId && index === 1 && row.models.length > 2"
                                         size="small"
                                         class="model-more"
                                         @click="poolRef.open(row)"
                                     >
                                         +{{ row.models.length - 2 }}
                                     </el-button>
+                                    <el-tooltip
+                                        v-if="row.appInstallId && index === 1 && row.models.length > 2"
+                                        :content="
+                                            row.models
+                                                .slice(2)
+                                                .map((item) => item.id)
+                                                .join(', ')
+                                        "
+                                        placement="top"
+                                    >
+                                        <el-tag size="small" class="model-more">+{{ row.models.length - 2 }}</el-tag>
+                                    </el-tooltip>
                                 </div>
                                 <span v-if="!row.models?.length">—</span>
                             </template>
@@ -169,6 +181,7 @@
                         <fu-table-operations
                             :buttons="accountButtons"
                             :label="$t('commons.table.operate')"
+                            align="left"
                             fixed="right"
                             :ellipsis="3"
                             width="220"
@@ -190,7 +203,12 @@
                         <el-table-column :label="$t('app.version')" min-width="150">
                             <template #default="{ row }">
                                 <div class="flex items-center gap-2">
-                                    <span>{{ row.version || '—' }}</span>
+                                    <span>
+                                        {{
+                                            (row.engine === 'vllm' ? formatVllmVersion(row.version) : row.version) ||
+                                            '—'
+                                        }}
+                                    </span>
                                     <el-button
                                         v-if="row.upgradable && hasPermission('app_manage')"
                                         v-permission
@@ -344,7 +362,14 @@ import ModelPool from './components/model-pool/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import SyncService from './components/sync/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
-import { loadModelOverview, loadVllmAPI, readPages, vllmAvailable, type Deployment } from './deployment';
+import {
+    formatVllmVersion,
+    loadModelOverview,
+    loadVllmAPI,
+    readPages,
+    vllmAvailable,
+    type Deployment,
+} from './deployment';
 
 const route = useRoute();
 const router = useRouter();
@@ -547,6 +572,7 @@ const accountButtons = [
     },
     {
         label: i18n.global.t('aiTools.agents.modelPool'),
+        disabled: (row: AI.AgentAccountItem) => row.provider === 'vllm',
         click: (row: AI.AgentAccountItem) => poolRef.value.open(row),
     },
     {
@@ -592,7 +618,7 @@ const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart')
             const taskID = newUUID();
             await (await loadVllmAPI()).operateVllm({ id: row.id, operate: operation, taskID });
             if (node !== currentNode.value) return;
-            if (row.version.toLowerCase().startsWith('nvidia-gb10-dspark-')) {
+            if (row.version.trim().toLowerCase().startsWith('nvidia-gb10-dspark-')) {
                 await search();
                 taskRef.value.openWithTaskID(taskID);
                 return;

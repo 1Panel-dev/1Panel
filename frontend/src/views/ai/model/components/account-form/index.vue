@@ -91,7 +91,7 @@
                 <div class="model-discovery">
                     <div class="model-discovery__header">
                         <el-radio-group v-model="modelConfigMode" size="small" @change="handleModelConfigModeChange">
-                            <el-radio-button value="discover">
+                            <el-radio-button v-if="supportsModelDiscovery || defaultModels.length" value="discover">
                                 {{
                                     $t(
                                         supportsModelDiscovery
@@ -284,6 +284,7 @@ const { isIntl } = useGlobalStore();
 
 const form = reactive({
     id: 0,
+    appInstallId: 0,
     provider: 'custom',
     name: '',
     baseURL: '',
@@ -308,14 +309,16 @@ const selectedAPIConfig = computed(() =>
 );
 const isImageAPIType = computed(() => form.apiType.endsWith('-images'));
 const isEmbeddingAPIType = computed(() => form.apiType === 'openai-embeddings');
-const supportsModelDiscovery = computed(() => !form.id && Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
+const supportsModelDiscovery = computed(() => Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
 const defaultModels = computed(() => {
     if (selectedAPIConfig.value?.models.length) {
         return selectedAPIConfig.value.models;
     }
     return isImageAPIType.value ? [] : selectedProvider.value?.models || [];
 });
-const showModelDiscovery = computed(() => !form.id && (supportsModelDiscovery.value || defaultModels.value.length > 0));
+const showModelDiscovery = computed(
+    () => !form.appInstallId && (Boolean(form.id) || supportsModelDiscovery.value || defaultModels.value.length > 0),
+);
 const showInitialModel = computed(
     () =>
         !form.id &&
@@ -330,7 +333,8 @@ const showVerifyModelSelect = computed(
     () =>
         requiresVerifyModel.value &&
         verifyModelOptions.value.length > 0 &&
-        (Boolean(form.id) || (!showModelDiscovery.value && !showInitialModel.value)),
+        !showModelDiscovery.value &&
+        !showInitialModel.value,
 );
 const apiTypeOptions = computed(() => selectedProvider.value?.apiTypes.map((item) => item.apiType) || []);
 const authModeOptions = computed(() => selectedAPIConfig.value?.authModes || []);
@@ -580,20 +584,18 @@ const submit = async () => {
         return;
     }
     let accountModels = initialModel ? [initialModel] : [];
-    if (!form.id) {
-        if (showModelDiscovery.value && modelConfigMode.value === 'manual') {
-            const models = normalizeManualModels();
-            if (!models) {
-                return;
-            }
-            accountModels = models;
-        } else if (showModelDiscovery.value) {
-            accountModels = discoveredModels.value;
-        }
-        if (accountModels.length === 0) {
-            MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+    if (showModelDiscovery.value && modelConfigMode.value === 'manual') {
+        const models = normalizeManualModels();
+        if (!models) {
             return;
         }
+        accountModels = models;
+    } else if (showModelDiscovery.value) {
+        accountModels = discoveredModels.value;
+    }
+    if ((!form.id || showModelDiscovery.value) && accountModels.length === 0) {
+        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+        return;
     }
     let verifyModel = '';
     if (requiresVerifyModel.value) {
@@ -623,6 +625,7 @@ const submit = async () => {
                 validateAvailability: form.validateAvailability,
                 remark: form.remark,
                 syncAgents: form.syncAgents,
+                models: showModelDiscovery.value ? accountModels : undefined,
             });
         } else {
             await createAgentAccount({
@@ -653,6 +656,7 @@ const handleClose = () => {
     formRef.value?.resetFields();
     loading.value = false;
     form.id = 0;
+    form.appInstallId = 0;
     form.provider = 'custom';
     form.name = '';
     form.baseURL = '';
@@ -671,6 +675,7 @@ const handleClose = () => {
 
 interface OpenParams {
     id?: number;
+    appInstallId?: number;
     provider?: string;
     name?: string;
     baseURL?: string;
@@ -691,6 +696,7 @@ const openDrawer = async (params?: OpenParams) => {
     }
     if (params?.id) {
         form.id = params.id;
+        form.appInstallId = params.appInstallId || 0;
         form.provider = params.provider || '';
         form.name = params.name || '';
         form.baseURL = params.baseURL || '';
@@ -703,12 +709,19 @@ const openDrawer = async (params?: OpenParams) => {
             ? String(params.apiType)
             : provider?.defaultApiType || '';
         form.authMode = params.authMode || selectedAPIConfig.value?.defaultAuthMode || '';
+        resetModelDiscovery();
+        modelConfigMode.value = 'manual';
+        manualModels.value = editModels.value.length
+            ? editModels.value.map((item) => ({ ...item }))
+            : [buildInitialModel()];
         form.verifyModel = params.verifyModel || editModels.value[0]?.id || '';
+        manualVerifyIndex.value = manualModels.value.findIndex((item) => item.id === form.verifyModel);
         form.remark = params.remark || '';
         form.syncAgents = false;
         return;
     }
     form.id = 0;
+    form.appInstallId = 0;
     form.name = '';
     form.baseURL = '';
     form.apiKey = '';
@@ -773,7 +786,7 @@ const handleAPITypeChange = () => {
 };
 
 watch([() => form.apiKey, () => form.baseURL], () => {
-    if (showModelDiscovery.value) {
+    if (!form.id && showModelDiscovery.value) {
         loadDefaultModels();
     }
 });

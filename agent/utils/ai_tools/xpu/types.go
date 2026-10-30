@@ -72,7 +72,8 @@ type Device struct {
 }
 
 type Basic struct {
-	UUID string `json:"uuid"`
+	DrmDevice string `json:"-"`
+	UUID      string `json:"uuid"`
 
 	DeviceID      int    `json:"deviceID"`
 	DeviceName    string `json:"deviceName"`

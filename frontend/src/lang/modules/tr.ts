@@ -1101,14 +1101,19 @@ const message = {
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
-            vllmVersionHelper: 'FusionXpark GB10 sunucuları için lütfen -cu130 sürümünü seçin.',
+            vllmVersionHelper: {
+                default: 'Yeni sürücüler ve yeni GPU mimarileri için CUDA 13.0 içeren resmi standart sürüm.',
+                cuda: '13.0 altındaki CUDA sürümlerini kullanan eski GPU mimarileri için CUDA 12.9 içeren uyumluluk sürümü.',
+                ubuntu: 'NVIDIA GB10 cihazları için CUDA 13.0 içeren NVIDIA GB10 standart sürümü.',
+                dspark: '1Panel tarafından bakımı yapılan özel imajı kullanan, iki cihaz için NVIDIA GB10 özel sürümü.',
+            },
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Model hesabına senkronize et',
+            syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
