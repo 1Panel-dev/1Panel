@@ -7,7 +7,7 @@ import (
 )
 
 func TestMarshalKeepsValuesExactly(t *testing.T) {
-	values := []string{"3306", "0", "-1", "007", "+123456", "-0123", "+0", "-0", "a'b", `a"b`, `a\b`}
+	values := []string{"3306", "0", "-1", "007", "+123456", "-0123", "+0", "-0", "a'b", `a"b`, `a\b`, "$X'"}
 	for _, v := range values {
 		envMap := map[string]string{"PANEL_DB_ROOT_PASSWORD": v}
 		for name, marshal := range map[string]func(map[string]string) (string, error){
