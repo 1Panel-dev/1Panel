@@ -276,6 +276,13 @@
                                 </el-dropdown>
                             </template>
                         </el-table-column>
+                        <el-table-column :label="$t('commons.button.log')" min-width="90">
+                            <template #default="{ row }">
+                                <el-button @click="manageRef.open(row, 'log', true)" link type="primary">
+                                    {{ $t('website.check') }}
+                                </el-button>
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('container.source')" min-width="170">
                             <template #default="{ row }">
                                 <template v-if="row.status === 'Running' && row.containerName">
@@ -666,10 +673,6 @@ const deploymentButtons = [
         show: (row: Deployment) => row.engine === 'ollama' || row.engine === 'vllm',
         disabled: operationDisabled,
         click: (row: Deployment) => syncRef.value.open(row),
-    },
-    {
-        label: i18n.global.t('commons.button.log'),
-        click: (row: Deployment) => manageRef.value.open(row, 'log', true),
     },
     {
         label: i18n.global.t('commons.button.delete'),

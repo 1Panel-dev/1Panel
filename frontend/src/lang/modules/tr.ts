@@ -1060,7 +1060,7 @@ const message = {
             gpuCountRequired: '0’dan büyük bir tam sayı girin',
             gpuDevices: 'GPU aygıtları',
             gpuCapabilitiesHelper:
-                'GPU erişimi zorunludur; izleme ve yönetimi (utility) ve hesaplama desteğini (compute) gerektiğinde etkinleştirin.',
+                'Kapsayıcı için NVIDIA GPU yeteneklerini yapılandırın. Genellikle varsayılan seçenekleri korumanız önerilir.\n• gpu: Kapsayıcının GPU erişimine izin verir. Zorunludur.\n• utility: nvidia-smi gibi araçlarla GPU durum sorgularını ve izlemeyi destekler.\n• compute: CUDA dahil GPU hesaplamalarını destekler. Genellikle model çıkarımı için gereklidir.',
             gpuSelectRequired: 'En az bir kullanılabilir GPU aygıtı seçin.',
             gpuUnsupported: 'Desteklenmiyor',
             gpuNotDetected: 'Desteklenen hızlandırıcı algılanmadı',

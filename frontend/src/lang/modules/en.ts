@@ -1052,7 +1052,7 @@ const message = {
             gpuCountRequired: 'Enter an integer greater than 0',
             gpuDevices: 'GPU devices',
             gpuCapabilitiesHelper:
-                'GPU access is required; enable monitoring and management (utility) and computing support (compute) as needed.',
+                'Configure NVIDIA GPU capabilities for the container. Keeping the default options is generally recommended.\n• gpu: Allows the container to access the GPU. Required.\n• utility: Supports GPU status queries and monitoring, such as nvidia-smi.\n• compute: Supports GPU computing, including CUDA. Usually needed for model inference.',
             gpuSelectRequired: 'Select at least one available GPU device.',
             gpuUnsupported: 'Unsupported',
             gpuNotDetected: 'No supported accelerators detected',

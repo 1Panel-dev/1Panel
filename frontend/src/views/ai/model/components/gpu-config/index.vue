@@ -104,12 +104,26 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item v-if="imageType === 'nvidia'" label="Capabilities" prop="gpu.capabilities">
+                    <template #label>
+                        <span class="gpu-capabilities-label">
+                            Capabilities
+                            <el-tooltip placement="top">
+                                <template #content>
+                                    <div class="gpu-capabilities-help">
+                                        {{ $t('aiTools.model.gpuCapabilitiesHelper') }}
+                                    </div>
+                                </template>
+                                <el-icon tabindex="0" :aria-label="$t('aiTools.model.gpuCapabilitiesHelper')">
+                                    <InfoFilled />
+                                </el-icon>
+                            </el-tooltip>
+                        </span>
+                    </template>
                     <el-checkbox-group v-model="model.capabilities">
                         <el-checkbox value="gpu" disabled>gpu</el-checkbox>
                         <el-checkbox value="utility">utility</el-checkbox>
                         <el-checkbox value="compute">compute</el-checkbox>
                     </el-checkbox-group>
-                    <span class="input-help">{{ $t('aiTools.model.gpuCapabilitiesHelper') }}</span>
                 </el-form-item>
             </template>
             <span v-if="selectingDevices && gpuWarnings.length" class="input-help">{{ gpuWarnings.join('; ') }}</span>
@@ -119,6 +133,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue';
+import { InfoFilled } from '@element-plus/icons-vue';
 import { AI } from '@/api/interface/ai';
 import { loadModelGPUDevices } from '@/api/modules/ai';
 import i18n from '@/lang';
@@ -244,6 +259,21 @@ defineExpose({ init, loading });
 
 <style lang="scss" scoped>
 @use '@/views/ai/model/components/form-section.scss';
+.gpu-capabilities-label {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 4px;
+
+    .el-icon {
+        font-size: 12px;
+        color: var(--el-text-color-secondary);
+        cursor: help;
+    }
+}
+.gpu-capabilities-help {
+    max-width: 360px;
+    white-space: pre-line;
+}
 :global(.model-gpu-device-select .el-select-dropdown__item.is-selected::after) {
     display: none;
 }

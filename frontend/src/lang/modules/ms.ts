@@ -1062,7 +1062,7 @@ const message = {
             gpuCountRequired: 'Masukkan integer yang lebih besar daripada 0',
             gpuDevices: 'Peranti GPU',
             gpuCapabilitiesHelper:
-                'Akses GPU diperlukan; dayakan pemantauan dan pengurusan (utility) serta sokongan pengiraan (compute) mengikut keperluan.',
+                'Konfigurasikan keupayaan NVIDIA GPU untuk bekas. Biasanya disyorkan untuk mengekalkan pilihan lalai.\n• gpu: Membenarkan bekas mengakses GPU. Wajib dipilih.\n• utility: Menyokong semakan status dan pemantauan GPU, seperti nvidia-smi.\n• compute: Menyokong pengiraan GPU, termasuk CUDA. Biasanya diperlukan untuk inferens model.',
             gpuSelectRequired: 'Pilih sekurang-kurangnya satu peranti GPU yang tersedia.',
             gpuUnsupported: 'Tidak disokong',
             gpuNotDetected: 'Tiada pemecut yang disokong dikesan',
