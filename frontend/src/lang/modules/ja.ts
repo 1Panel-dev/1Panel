@@ -1039,7 +1039,7 @@ const message = {
             gpuCountRequired: '0 より大きい整数を入力してください',
             gpuDevices: 'GPU デバイス',
             gpuCapabilitiesHelper:
-                'GPU アクセスは必須です。必要に応じて監視と管理（utility）や計算サポート（compute）を有効にしてください。',
+                'コンテナーで使用する NVIDIA GPU の機能を設定します。通常は既定の設定を維持することを推奨します。\n• gpu：コンテナーによる GPU へのアクセスを許可します。必須です。\n• utility：nvidia-smi などによる GPU の状態確認と監視をサポートします。\n• compute：CUDA などの GPU 計算をサポートします。通常、モデル推論に必要です。',
             gpuSelectRequired: '使用可能な GPU を少なくとも 1 つ選択してください。',
             gpuUnsupported: '非対応',
             gpuNotDetected: '対応するアクセラレーターが検出されませんでした',

@@ -1029,7 +1029,7 @@ const message = {
             gpuCountRequired: '0보다 큰 정수를 입력하세요',
             gpuDevices: 'GPU 장치',
             gpuCapabilitiesHelper:
-                'GPU 접근은 필수이며, 필요에 따라 모니터링 및 관리(utility)와 연산 지원(compute)을 활성화할 수 있습니다.',
+                '컨테이너에서 사용할 NVIDIA GPU 기능을 설정합니다. 일반적으로 기본 옵션을 유지하는 것이 좋습니다.\n• gpu: 컨테이너의 GPU 접근을 허용합니다. 필수 항목입니다.\n• utility: nvidia-smi 등을 통한 GPU 상태 조회 및 모니터링을 지원합니다.\n• compute: CUDA 등의 GPU 연산을 지원합니다. 일반적으로 모델 추론에 필요합니다.',
             gpuSelectRequired: '사용 가능한 GPU 장치를 하나 이상 선택하세요.',
             gpuUnsupported: '지원 안 됨',
             gpuNotDetected: '지원되는 가속기가 감지되지 않았습니다',

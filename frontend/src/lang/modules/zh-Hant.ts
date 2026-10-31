@@ -989,7 +989,8 @@ const message = {
             gpuSpecificHelper: '手動選擇特定加速卡。',
             gpuCountRequired: '請輸入大於 0 的整數',
             gpuDevices: 'GPU 裝置',
-            gpuCapabilitiesHelper: 'GPU 存取為必選項，可依需求啟用監控管理（utility）和運算支援（compute）。',
+            gpuCapabilitiesHelper:
+                '設定容器使用 NVIDIA GPU 的能力，通常建議保留預設選項。\n• gpu：允許容器存取 GPU，必選。\n• utility：支援 GPU 狀態查詢和監控，例如 nvidia-smi。\n• compute：支援 CUDA 等 GPU 運算，模型推論通常需要啟用。',
             gpuSelectRequired: '請選擇至少一個目前可用的 GPU 裝置',
             gpuUnsupported: '不支援',
             gpuNotDetected: '未偵測到可用加速卡',

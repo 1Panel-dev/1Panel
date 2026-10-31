@@ -1002,7 +1002,8 @@ const message = {
             gpuSpecificHelper: '手动选择具体加速卡。',
             gpuCountRequired: '请输入大于 0 的整数',
             gpuDevices: 'GPU 设备',
-            gpuCapabilitiesHelper: 'GPU 访问为必选项，可按需启用监控管理（utility）和计算支持（compute）。',
+            gpuCapabilitiesHelper:
+                '配置容器使用 NVIDIA GPU 的能力，通常建议保留默认选项。\n• gpu：允许容器访问 GPU，必选。\n• utility：支持 GPU 状态查询和监控，例如 nvidia-smi。\n• compute：支持 CUDA 等 GPU 计算，模型推理通常需要启用。',
             gpuSelectRequired: '请选择至少一个当前可用的 GPU 设备',
             gpuUnsupported: '不支持',
             gpuNotDetected: '未检测到可用加速卡',

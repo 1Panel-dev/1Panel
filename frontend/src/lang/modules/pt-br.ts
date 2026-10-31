@@ -1058,7 +1058,7 @@ const message = {
             gpuCountRequired: 'Insira um número inteiro maior que 0',
             gpuDevices: 'Dispositivos GPU',
             gpuCapabilitiesHelper:
-                'O acesso à GPU é obrigatório; habilite o monitoramento e gerenciamento (utility) e o suporte a cálculos (compute) conforme necessário.',
+                'Configure os recursos da NVIDIA GPU para o contêiner. Em geral, recomenda-se manter as opções padrão.\n• gpu: Permite que o contêiner acesse a GPU. Obrigatório.\n• utility: Permite consultar e monitorar o estado da GPU, por exemplo, com nvidia-smi.\n• compute: Permite cálculos na GPU, incluindo CUDA. Geralmente necessário para a inferência de modelos.',
             gpuSelectRequired: 'Selecione pelo menos um dispositivo GPU disponível.',
             gpuUnsupported: 'Não suportado',
             gpuNotDetected: 'Nenhum acelerador compatível detectado',
