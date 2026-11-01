@@ -102,6 +102,7 @@
                 inline
                 @search="emit('search')"
                 @close="visible = false"
+                @task="openTask"
             />
             <template v-if="selected === 'vllm' && (!isProductPro || !vllmAvailable)">
                 <el-alert :title="$t('license.vllm')" type="info" :closable="false" />

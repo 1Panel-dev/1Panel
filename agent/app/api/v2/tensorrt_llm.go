@@ -19,7 +19,11 @@ func (b *BaseApi) PageTensorRTLLMs(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	list := tensorrtLLMService.Page(req)
+	list, err := tensorrtLLMService.Page(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
 	helper.SuccessWithData(c, list)
 }
 
@@ -81,7 +85,7 @@ func (b *BaseApi) DeleteTensorRTLLM(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	err := tensorrtLLMService.Delete(req.ID)
+	err := tensorrtLLMService.Delete(req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

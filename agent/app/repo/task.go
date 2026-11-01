@@ -17,6 +17,7 @@ type TaskRepo struct {
 type ITaskRepo interface {
 	Save(ctx context.Context, task *model.Task) error
 	GetFirst(opts ...DBOption) (model.Task, error)
+	GetExecutingTask(scope string, resourceID uint) (model.Task, error)
 	Page(page, size int, opts ...DBOption) (int64, []model.Task, error)
 	Update(ctx context.Context, task *model.Task) error
 	UpdateRunningTaskToFailed(opts ...DBOption) error
@@ -96,6 +97,12 @@ func (t TaskRepo) GetFirst(opts ...DBOption) (model.Task, error) {
 		return task, err
 	}
 	return task, nil
+}
+
+func (t TaskRepo) GetExecutingTask(scope string, resourceID uint) (model.Task, error) {
+	var item model.Task
+	err := getTaskDb(WithByType(scope), t.WithResourceID(resourceID), t.WithByStatus(constant.StatusExecuting)).Order("created_at DESC").Limit(1).Find(&item).Error
+	return item, err
 }
 
 func (t TaskRepo) Page(page, size int, opts ...DBOption) (int64, []model.Task, error) {

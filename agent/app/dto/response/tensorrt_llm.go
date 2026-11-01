@@ -12,6 +12,7 @@ type TensorRTLLMsRes struct {
 }
 
 type TensorRTLLMDTO struct {
+	TaskID string `json:"taskID"`
 	model.TensorRTLLM
 	Version  string              `json:"version"`
 	Model    string              `json:"model"`

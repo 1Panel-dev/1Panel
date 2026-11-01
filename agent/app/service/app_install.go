@@ -12,7 +12,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -123,7 +122,10 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 		}
 	}
 
-	installDTOs, _ := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
+	installDTOs, err := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
+	if err != nil {
+		return 0, nil, err
+	}
 	if req.Update {
 		total = int64(len(installDTOs))
 	}
@@ -168,6 +170,7 @@ func (a *AppInstallService) CheckExist(req request.AppInstalledInfo) (*response.
 	res.Version = appInstall.Version
 	res.CreatedAt = appInstall.CreatedAt
 	res.Status = appInstall.Status
+	res.TaskID = appInstall.TaskID
 	res.AppInstallID = appInstall.ID
 	res.IsExist = true
 	res.InstallPath = path.Join(global.Dir.AppInstallDir, appInstall.App.Key, appInstall.Name)
@@ -256,6 +259,21 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	if err != nil {
 		return err
 	}
+	if install.App.Key == "ollama" || install.App.Key == "vllm" {
+		if req.Operate != constant.Upgrade {
+			if _, loaded := appUpgradeLocks.LoadOrStore(install.ID, struct{}{}); loaded {
+				return buserr.New("TaskIsExecuting")
+			}
+			defer appUpgradeLocks.Delete(install.ID)
+		}
+		operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeApp, install.ID)
+		if err != nil {
+			return err
+		}
+		if operationTask.ID != "" && req.Operate != constant.Sync {
+			return buserr.New("TaskIsExecuting")
+		}
+	}
 	if install.Status == constant.StatusRestarting && (req.Operate == constant.Stop || req.Operate == constant.Delete) && !req.ForceDelete {
 		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(install.ID), taskRepo.WithOperate(task.TaskRestart))
 		if err != nil {
@@ -269,8 +287,8 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 		return buserr.New("ErrInstallDirNotFound")
 	}
 	dockerComposePath := install.GetComposePath()
-	if req.UseLifecycleScripts && (req.Operate == constant.Start || req.Operate == constant.Stop || req.Operate == constant.Restart) {
-		return operateAppWithLifecycleScripts(install, req, nil)
+	if (req.UseLifecycleScripts || install.App.Key == "ollama" || install.App.Key == "vllm") && (req.Operate == constant.Start || req.Operate == constant.Stop || req.Operate == constant.Restart) {
+		return operateAppTask(install, req, nil)
 	}
 	switch req.Operate {
 	case constant.Rebuild:
@@ -303,10 +321,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 			TaskID:              req.TaskID,
 			UseLifecycleScripts: req.UseLifecycleScripts,
 		}
-		if err = deleteAppInstall(deleteReq); err != nil && !req.ForceDelete {
-			return err
-		}
-		return nil
+		return deleteAppInstall(deleteReq)
 	case constant.Sync:
 		return syncAppInstallStatus(&install, true)
 	case constant.Upgrade:
@@ -334,7 +349,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	}
 }
 
-func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppInstalledOperate, onFailure func(error)) error {
+func operateAppTask(install model.AppInstall, req request.AppInstalledOperate, onFailure func(error)) error {
 	taskType := task.TaskUpdate
 	switch req.Operate {
 	case constant.Start:
@@ -348,6 +363,9 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		return errors.New("lifecycle script operation not supported")
 	}
 	install.Message = ""
+	if err := appInstallRepo.Save(context.Background(), &install); err != nil {
+		return err
+	}
 
 	operationTask, err := task.NewTaskWithOps(install.Name, taskType, task.TaskScopeApp, req.TaskID, install.ID)
 	if err != nil {
@@ -358,19 +376,29 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		}
 		return err
 	}
-	ready := make(chan error, 1)
-	started := make(chan struct{})
 	operation := string(req.Operate)
 	operationTask.AddSubTaskWithOps(
 		task.GetTaskName(install.Name, taskType, task.TaskScopeApp),
 		func(t *task.Task) error {
-			if err := appInstallRepo.Save(context.Background(), &install); err != nil {
-				return err
-			}
-			close(started)
-			ready <- nil
-			if err := runScript(t, &install, operation); err != nil {
-				return err
+			if req.UseLifecycleScripts {
+				if err := runScript(t, &install, operation); err != nil {
+					return err
+				}
+			} else {
+				var out string
+				var err error
+				switch req.Operate {
+				case constant.Start:
+					out, err = compose.Up(install.GetComposePath())
+				case constant.Stop:
+					out, err = compose.Stop(install.GetComposePath())
+				case constant.Restart:
+					out, err = compose.Restart(install.GetComposePath())
+				}
+				t.Log(out)
+				if err != nil {
+					return err
+				}
 			}
 			if req.Operate == constant.Stop {
 				install.Status = constant.StatusStopped
@@ -391,26 +419,22 @@ func operateAppWithLifecycleScripts(install model.AppInstall, req request.AppIns
 		},
 		nil,
 		0,
-		time.Hour,
+		0,
 	)
 	go func() {
-		if taskErr := operationTask.Execute(); taskErr != nil {
-			select {
-			case <-started:
-			default:
-				ready <- taskErr
-				return
-			}
-			if onFailure != nil {
-				onFailure(taskErr)
-				return
-			}
-			install.Status = constant.StatusUpErr
-			install.Message = taskErr.Error()
-			_ = appInstallRepo.Save(context.Background(), &install)
+		taskErr := operationTask.Execute()
+		if taskErr == nil {
+			return
 		}
+		if onFailure != nil {
+			onFailure(taskErr)
+			return
+		}
+		install.Status = constant.StatusUpErr
+		install.Message = taskErr.Error()
+		_ = appInstallRepo.Save(context.Background(), &install)
 	}()
-	return <-ready
+	return nil
 }
 
 func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
@@ -438,6 +462,19 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
+	}
+	if installed.App.Key == "ollama" || installed.App.Key == "vllm" {
+		if _, loaded := appUpgradeLocks.LoadOrStore(installed.ID, struct{}{}); loaded {
+			return buserr.New("TaskIsExecuting")
+		}
+		defer appUpgradeLocks.Delete(installed.ID)
+		operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeApp, installed.ID)
+		if err != nil {
+			return err
+		}
+		if operationTask.ID != "" {
+			return buserr.New("TaskIsExecuting")
+		}
 	}
 	oldInstalled := installed
 	port, ok := req.Params["PANEL_APP_PORT_HTTP"]
@@ -578,7 +615,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		_ = appInstallRepo.Save(context.Background(), &failed)
 	}
 	if req.UseLifecycleScripts {
-		err = operateAppWithLifecycleScripts(installed, request.AppInstalledOperate{
+		err = operateAppTask(installed, request.AppInstalledOperate{
 			InstallId:           installed.ID,
 			Operate:             constant.Restart,
 			TaskID:              req.TaskID,
@@ -590,10 +627,6 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	if err != nil {
 		restoreConfig(err)
 		return err
-	}
-	if !req.UseLifecycleScripts {
-		installed.Status = constant.StatusRunning
-		_ = appInstallRepo.Save(context.Background(), &installed)
 	}
 
 	proxyChanged := hasAppInstallProxyPassChanged(&oldInstalled, &installed)
@@ -1079,41 +1112,54 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 }
 
 func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
-	operation := ""
-	switch appInstall.Status {
-	case constant.StatusInstalling:
-		operation = task.TaskInstall
-	case constant.StatusUpgrading:
-		operation = task.TaskUpgrade
-	case constant.StatusRebuilding:
-		operation = task.TaskBuild
-	case constant.StatusUninstalling:
-		operation = task.TaskUninstall
-	case constant.StatusStarting, constant.StatusWaiting:
-		operation = task.TaskUpdate
-	case constant.StatusRestarting:
-		operation = task.TaskRestart
-	}
-	if operation != "" {
-		if err := reconcileAppInstallTaskFailure(appInstall, operation, global.DB, global.TaskDB); err != nil {
-			return err
-		}
-	}
-	switch appInstall.Status {
-	case constant.StatusInstalling, constant.StatusRebuilding, constant.StatusUpgrading, constant.StatusUninstalling,
-		constant.StatusStarting, constant.StatusWaiting:
-		return nil
-	case constant.StatusRestarting:
-		count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(appInstall.ID), taskRepo.WithOperate(task.TaskRestart))
+	if appInstall.App.Key == "ollama" || appInstall.App.Key == "vllm" {
+		operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeApp, appInstall.ID)
 		if err != nil {
 			return err
 		}
-		if count > 0 {
+		appInstall.TaskID = operationTask.ID
+		if operationTask.ID != "" {
+			appInstall.Status = localEngineTaskStatus(operationTask.Operate, appInstall.Status)
 			return nil
 		}
-	case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
-		if !force {
+		force = true
+	} else {
+		operation := ""
+		switch appInstall.Status {
+		case constant.StatusInstalling:
+			operation = task.TaskInstall
+		case constant.StatusUpgrading:
+			operation = task.TaskUpgrade
+		case constant.StatusRebuilding:
+			operation = task.TaskBuild
+		case constant.StatusUninstalling:
+			operation = task.TaskUninstall
+		case constant.StatusStarting, constant.StatusWaiting:
+			operation = task.TaskUpdate
+		case constant.StatusRestarting:
+			operation = task.TaskRestart
+		}
+		if operation != "" {
+			if err := reconcileAppInstallTaskFailure(appInstall, operation, global.DB, global.TaskDB); err != nil {
+				return err
+			}
+		}
+		switch appInstall.Status {
+		case constant.StatusInstalling, constant.StatusRebuilding, constant.StatusUpgrading, constant.StatusUninstalling,
+			constant.StatusStarting, constant.StatusWaiting:
 			return nil
+		case constant.StatusRestarting:
+			count, err := taskRepo.CountExecutingTask(repo.WithByType(task.TaskScopeApp), taskRepo.WithResourceID(appInstall.ID), taskRepo.WithOperate(task.TaskRestart))
+			if err != nil {
+				return err
+			}
+			if count > 0 {
+				return nil
+			}
+		case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
+			if !force {
+				return nil
+			}
 		}
 	}
 	cli, err := docker.NewClient()
