@@ -6,10 +6,12 @@ import (
 	"fmt"
 	"math/big"
 	"net/http"
+	"net/url"
 	"os"
 	"path"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/app/model"
@@ -255,7 +257,8 @@ func (u *ScriptService) sync(req dto.OperateByTaskID, versionRes []byte) error {
 			}
 		}
 
-		dataUrl := fmt.Sprintf("%s/scripts/data.yaml", global.ResourceURL())
+		version := url.QueryEscape(strings.TrimSpace(string(versionRes)))
+		dataUrl := fmt.Sprintf("%s/scripts/data.yaml?version=%s", global.ResourceURL(), version)
 		_, dataRes, err := req_helper.HandleRequestWithProxy(dataUrl, http.MethodGet, constant.TimeOut20s)
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadData"), err)
 		if err != nil {
@@ -271,7 +274,7 @@ func (u *ScriptService) sync(req dto.OperateByTaskID, versionRes []byte) error {
 		if _, err := os.Stat(tmpDir); err != nil {
 			_ = os.MkdirAll(tmpDir, 0755)
 		}
-		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz", global.ResourceURL())
+		scriptsUrl := fmt.Sprintf("%s/scripts/scripts.tar.gz?version=%s", global.ResourceURL(), version)
 		err = files.DownloadFileWithProxyStream(scriptsUrl, tmpDir+"/scripts.tar.gz")
 		syncTask.LogWithStatus(i18n.GetMsgByKey("DownloadPackage"), err)
 		if err != nil {
@@ -317,7 +320,7 @@ func (u *ScriptService) sync(req dto.OperateByTaskID, versionRes []byte) error {
 }
 
 func loadRemoteScriptVersion() ([]byte, bool, error) {
-	versionURL := fmt.Sprintf("%s/scripts/version.txt", global.ResourceURL())
+	versionURL := fmt.Sprintf("%s/scripts/version.txt?t=%d", global.ResourceURL(), time.Now().UnixNano())
 	_, remoteVersion, err := req_helper.HandleRequestWithProxy(versionURL, http.MethodGet, constant.TimeOut20s)
 	if err != nil {
 		return nil, false, fmt.Errorf("load scripts version from remote failed, err: %v", err)
