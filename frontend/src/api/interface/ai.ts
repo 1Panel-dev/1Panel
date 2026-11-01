@@ -409,6 +409,7 @@ export namespace AI {
     }
 
     export interface TensorRTLLM {
+        taskID?: string;
         gpu?: ModelGPUConfig;
         id?: number;
         name: string;
@@ -433,10 +434,12 @@ export namespace AI {
     }
 
     export interface TensorRTLLMDelete {
+        taskID?: string;
         id: number;
     }
 
     export interface TensorRTLLMOperate {
+        taskID?: string;
         id: number;
         operate: string;
     }

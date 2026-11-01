@@ -8,6 +8,7 @@ type TensorRTLLMSearch struct {
 }
 
 type TensorRTLLMCreate struct {
+	TaskID        string              `json:"taskID"`
 	Name          string              `json:"name" validate:"required"`
 	ContainerName string              `json:"containerName"  validate:"required"`
 	Version       string              `json:"version"  validate:"required"`
@@ -26,12 +27,14 @@ type TensorRTLLMUpdate struct {
 }
 
 type TensorRTLLMDelete struct {
-	ID uint `json:"id" validate:"required"`
+	ID     uint   `json:"id" validate:"required"`
+	TaskID string `json:"taskID"`
 }
 
 type TensorRTLLMOperate struct {
+	TaskID  string `json:"taskID"`
 	ID      uint   `json:"id" validate:"required"`
-	Operate string `json:"operate" validate:"required"`
+	Operate string `json:"operate" validate:"required,oneof=start stop restart"`
 }
 
 type DockerConfig struct {

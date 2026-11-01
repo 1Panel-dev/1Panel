@@ -46,7 +46,7 @@ export const jumpToInstall = (type: string, key: string) => {
                 router.push({
                     path: '/ai/model/local',
                     query: {
-                        tab: 'vllm',
+                        engine: 'vllm',
                         uncached: 'true',
                         open: 'create',
                     },

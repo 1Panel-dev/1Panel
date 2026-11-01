@@ -9,7 +9,6 @@
         <LayoutContent v-else-if="isFiles">
             <template #main><el-empty :description="$t('license.levelUpPro')" /></template>
         </LayoutContent>
-        <LocalView v-else-if="isManagement" />
         <template v-else>
             <LayoutContent v-loading="loading">
                 <template #leftToolBar>
@@ -241,13 +240,8 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" min-width="150">
                             <template #default="{ row }">
-                                <el-dropdown placement="bottom" :disabled="statusDisabled(row, 'stop')">
-                                    <Status
-                                        v-permission
-                                        :status="row.status"
-                                        operate
-                                        :disabled="statusDisabled(row, 'stop')"
-                                    />
+                                <el-dropdown placement="bottom" :disabled="statusDisabled(row)">
+                                    <Status v-permission :status="row.status" operate :disabled="statusDisabled(row)" />
                                     <template #dropdown>
                                         <el-dropdown-menu>
                                             <el-dropdown-item
@@ -258,8 +252,7 @@
                                             </el-dropdown-item>
                                             <el-dropdown-item
                                                 :disabled="
-                                                    statusDisabled(row, 'stop') ||
-                                                    ['Stopped', 'Exited'].includes(row.status)
+                                                    statusDisabled(row) || ['Stopped', 'Exited'].includes(row.status)
                                                 "
                                                 @click="operate(row, 'stop')"
                                             >
@@ -359,7 +352,6 @@ import { useSearchState } from '@/utils/search-reset';
 import { MsgError } from '@/utils/message';
 import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
-import LocalView from './local/index.vue';
 import CreateService from './components/create/index.vue';
 import ManageDeployment from './components/deployment-manage/index.vue';
 import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
@@ -385,9 +377,6 @@ const isCurrentPage = computed(() => route.path === pagePath);
 const { isProductPro, isFxplay, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 const isFiles = pagePath === '/ai/model/files';
 const isLocal = pagePath === '/ai/model/local';
-const isManagement = computed(
-    () => isCurrentPage.value && isLocal && ['vllm', 'tensorrt'].includes(String(route.query.tab)),
-);
 const tabs = computed(() => [
     { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
     { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
@@ -479,14 +468,14 @@ const deploymentPage = computed(() =>
 );
 const resourceStats = ref<Record<string, Container.ContainerListStats | null>>({});
 watch(
-    [deploymentPage, isCurrentPage, isManagement, currentNode],
-    async ([rows, active, management, node], _, onCleanup) => {
+    [deploymentPage, isCurrentPage, currentNode],
+    async ([rows, active, node], _, onCleanup) => {
         resourceStats.value = {};
         const controller = new AbortController();
         onCleanup(() => {
             controller.abort();
         });
-        if (!active || !isLocal || management) return;
+        if (!active || !isLocal) return;
         const names = [
             ...new Set(
                 rows.filter((row) => row.status === 'Running' && row.containerName).map((row) => row.containerName),
@@ -529,7 +518,7 @@ watch(filteredDeployments, () => {
 let searchVersion = 0;
 const search = async () => {
     const version = ++searchVersion;
-    if (!isCurrentPage.value || isFiles || isManagement.value) return;
+    if (!isCurrentPage.value || isFiles) return;
     loading.value = true;
     try {
         if (isLocal) {
@@ -598,38 +587,35 @@ const accountButtons = [
 ];
 const taskRef = ref();
 const pending = ref('');
-const operationDisabled = (row: Deployment, operation = '') =>
-    Boolean(pending.value) ||
-    ['Installing', 'Starting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(row.status) ||
-    (['ReStarting', 'Restarting'].includes(row.status) && !['stop', 'delete'].includes(operation));
-const statusDisabled = (row: Deployment, operation = '') =>
-    operationDisabled(row, operation) ||
-    !hasManagePermissionAccess() ||
-    (row.engine === 'ollama' && !hasPermission('app_manage'));
+const operationDisabled = (row: Deployment) => Boolean(pending.value || row.taskID);
+const statusDisabled = (row: Deployment) =>
+    operationDisabled(row) || !hasManagePermissionAccess() || (row.engine === 'ollama' && !hasPermission('app_manage'));
 const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
-    if (statusDisabled(row, operation)) return;
+    if (statusDisabled(row)) return;
     const node = currentNode.value;
     await ElMessageBox.confirm(
         i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
         i18n.global.t('commons.operate.' + operation),
         { type: 'warning' },
     );
-    if (node !== currentNode.value || statusDisabled(row, operation)) return;
+    if (node !== currentNode.value || statusDisabled(row)) return;
     pending.value = `${row.engine}:${row.id}`;
     try {
         if (row.engine === 'ollama') {
-            await installedOp({ installId: row.id, operate: operation });
+            const taskID = newUUID();
+            await installedOp({ installId: row.id, operate: operation, taskID });
+            if (node !== currentNode.value) return;
+            taskRef.value.openWithTaskID(taskID);
         } else if (row.engine === 'tensorrt') {
-            await operateTensorRTLLM({ id: row.id, operate: operation });
+            const taskID = newUUID();
+            await operateTensorRTLLM({ id: row.id, operate: operation, taskID });
+            if (node !== currentNode.value) return;
+            taskRef.value.openWithTaskID(taskID);
         } else {
             const taskID = newUUID();
             await (await loadVllmAPI()).operateVllm({ id: row.id, operate: operation, taskID });
             if (node !== currentNode.value) return;
-            if (row.version.trim().toLowerCase().startsWith('nvidia-gb10-dspark-')) {
-                await search();
-                taskRef.value.openWithTaskID(taskID);
-                return;
-            }
+            taskRef.value.openWithTaskID(taskID);
         }
         if (node !== currentNode.value) return;
         await search();
@@ -678,7 +664,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'ollama' && hasPermission('app_manage'),
-        disabled: (row: Deployment) => operationDisabled(row, 'delete'),
+        disabled: (row: Deployment) => operationDisabled(row),
         click: async (row: Deployment) => {
             const node = currentNode.value;
             const path = route.fullPath;
@@ -708,7 +694,7 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         show: (row: Deployment) => row.engine === 'vllm',
-        disabled: (row: Deployment) => operationDisabled(row, 'delete') && row.status !== 'Uninstalling',
+        disabled: (row: Deployment) => operationDisabled(row),
         click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
     },
 ];
@@ -718,6 +704,7 @@ watch(
         () => route.query.tab,
         () => route.query.name,
         () => route.query.open,
+        () => route.query.engine,
         currentNode,
         isProductPro,
         isFxplay,
@@ -753,11 +740,11 @@ watch(
             isCurrentPage.value &&
             isLocal &&
             route.query.open === 'create' &&
-            (route.query.engine === 'ollama' || route.query.tab === 'ollama')
+            (route.query.engine === 'ollama' || route.query.engine === 'vllm' || route.query.tab === 'ollama')
         ) {
             await nextTick();
             if (cancelled) return;
-            await createRef.value.open('ollama');
+            await createRef.value.open(route.query.engine === 'vllm' ? 'vllm' : 'ollama');
             if (cancelled) return;
             const query = { ...route.query };
             delete query.open;

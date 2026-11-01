@@ -17,6 +17,7 @@ type AppInstall struct {
 	Param         string `json:"param"`
 	Env           string `json:"env"`
 	DockerCompose string `json:"dockerCompose" `
+	TaskID        string `json:"taskID" gorm:"-"`
 	Status        string `json:"status" gorm:"not null"`
 	Description   string `json:"description"`
 	Message       string `json:"message"`

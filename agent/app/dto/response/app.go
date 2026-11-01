@@ -51,6 +51,7 @@ type TagDTO struct {
 }
 
 type AppInstalledCheck struct {
+	TaskID                  string    `json:"taskID"`
 	ModelAccountBaseURLType string    `json:"modelAccountBaseURLType"`
 	ModelAccountBaseURL     string    `json:"modelAccountBaseURL"`
 	IsExist                 bool      `json:"isExist"`
@@ -107,6 +108,7 @@ type AppDetail struct {
 }
 
 type AppInstallDTO struct {
+	TaskID        string                 `json:"taskID"`
 	ID            uint                   `json:"id"`
 	Name          string                 `json:"name"`
 	AppID         uint                   `json:"appID"`

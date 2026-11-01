@@ -498,7 +498,11 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		}
 		return nil
 	}
-	uninstallTask.AddSubTask(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil)
+	uninstallTimeout := 30 * time.Minute
+	if install.App.Key == "ollama" || install.App.Key == "vllm" {
+		uninstallTimeout = 0
+	}
+	uninstallTask.AddSubTaskWithOps(task.GetTaskName(install.Name, task.TaskUninstall, task.TaskScopeApp), uninstall, nil, 0, uninstallTimeout)
 	go func() {
 		if err := uninstallTask.Execute(); err != nil {
 			install.Status = constant.StatusError
@@ -1226,28 +1230,36 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages, useLifecyc
 
 func rebuildApp(appInstall model.AppInstall) error {
 	appInstall.Status = constant.StatusRebuilding
-	_ = appInstallRepo.Save(context.Background(), &appInstall)
-	go func() {
-		dockerComposePath := appInstall.GetComposePath()
-		out, err := compose.Down(dockerComposePath)
+	if err := appInstallRepo.Save(context.Background(), &appInstall); err != nil {
+		return err
+	}
+	buildTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskBuild, task.TaskScopeApp, "", appInstall.ID)
+	if err != nil {
+		return handleErr(appInstall, err, "")
+	}
+	buildTask.AddSubTaskWithOps(buildTask.Name, func(t *task.Task) error {
+		out, err := compose.Down(appInstall.GetComposePath())
+		t.Log(out)
 		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
+			return handleErr(appInstall, err, out)
 		}
 		out, err = compose.Up(appInstall.GetComposePath())
+		t.Log(out)
 		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
+			return handleErr(appInstall, err, out)
 		}
 		containerNames, err := getContainerNames(appInstall)
 		if err != nil {
-			_ = handleErr(appInstall, err, out)
-			return
+			return handleErr(appInstall, err, out)
 		}
 		appInstall.ContainerName = strings.Join(containerNames, ",")
-
 		appInstall.Status = constant.StatusRunning
-		_ = appInstallRepo.Save(context.Background(), &appInstall)
+		return appInstallRepo.Save(context.Background(), &appInstall)
+	}, nil, 0, 0)
+	go func() {
+		if err := buildTask.Execute(); err != nil {
+			_ = handleErr(appInstall, err, "")
+		}
 	}()
 	return nil
 }
@@ -1477,7 +1489,11 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		}
 		appInstall.Status = constant.StatusError
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
-		_ = appInstallRepo.Save(context.Background(), appInstall)
+		if appInstall.App.Key == "ollama" || appInstall.App.Key == "vllm" {
+			_ = appInstallRepo.UpdateStatus(appInstall)
+		} else {
+			_ = appInstallRepo.Save(context.Background(), appInstall)
+		}
 		return
 	}
 	notFoundNames := make([]string, 0)
@@ -1536,7 +1552,11 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		appInstall.Message = msg
 		appInstall.Status = constant.StatusUnHealthy
 	}
-	_ = appInstallRepo.Save(context.Background(), appInstall)
+	if appInstall.App.Key == "ollama" || appInstall.App.Key == "vllm" {
+		_ = appInstallRepo.UpdateStatus(appInstall)
+	} else {
+		_ = appInstallRepo.Save(context.Background(), appInstall)
+	}
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
@@ -1544,22 +1564,43 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		res           []response.AppInstallDTO
 		containersMap map[string]container.Summary
 	)
-	if sync {
+	syncContainers := sync
+	for _, installed := range appInstallList {
+		if installed.App.Key == "ollama" || installed.App.Key == "vllm" {
+			syncContainers = true
+			break
+		}
+	}
+	if syncContainers {
 		cli, err := docker.NewClient()
-		if err == nil {
-			defer cli.Close()
-			containers, err := cli.ListAllContainers()
-			if err == nil {
-				containersMap = make(map[string]container.Summary, len(containers))
-				for _, contain := range containers {
-					containersMap[contain.Names[0]] = contain
-				}
-			}
+		if err != nil {
+			return nil, err
+		}
+		defer cli.Close()
+		containers, err := cli.ListAllContainers()
+		if err != nil {
+			return nil, err
+		}
+		containersMap = make(map[string]container.Summary, len(containers))
+		for _, contain := range containers {
+			containersMap[contain.Names[0]] = contain
 		}
 	}
 
 	for _, installed := range appInstallList {
-		if sync && appInstallOperationPending(installed.Status) {
+		localEngine := installed.App.Key == "ollama" || installed.App.Key == "vllm"
+		if localEngine {
+			operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeApp, installed.ID)
+			if err != nil {
+				return nil, err
+			}
+			installed.TaskID = operationTask.ID
+			if operationTask.ID != "" {
+				installed.Status = localEngineTaskStatus(operationTask.Operate, installed.Status)
+			} else {
+				synAppInstall(containersMap, &installed, true)
+			}
+		} else if sync && appInstallOperationPending(installed.Status) {
 			if err := syncAppInstallStatus(&installed, false); err != nil {
 				return nil, err
 			}
@@ -1568,7 +1609,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			continue
 		}
 
-		if sync && !doNotNeedSync(installed) {
+		if sync && !localEngine && !doNotNeedSync(installed) {
 			synAppInstall(containersMap, &installed, false)
 		}
 
@@ -1582,6 +1623,7 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 			AppDetailID: installed.AppDetailId,
 			Version:     installed.Version,
 			Status:      installed.Status,
+			TaskID:      installed.TaskID,
 			Message:     installed.Message,
 			HttpPort:    installed.HttpPort,
 			HttpsPort:   installed.HttpsPort,

@@ -106,7 +106,7 @@ import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
-import { MsgSuccess } from '@/utils/message';
+import { newUUID } from '@/utils/id';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isFxplay, isMobile, isProductPro } = useGlobalStore();
 
@@ -138,7 +138,7 @@ const newTensorRTLLM = () => {
 };
 const modelDirRef = ref();
 const tensorRTLLM = ref(newTensorRTLLM());
-const emit = defineEmits(['search', 'close']);
+const emit = defineEmits(['search', 'close', 'task']);
 
 const openCreate = async () => {
     mode.value = 'create';
@@ -242,29 +242,21 @@ const onSubmit = async () => {
     formRef.value?.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        if (mode.value === 'edit') {
-            await updateTensorRTLLM(tensorRTLLM.value)
-                .then(() => {
-                    loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                    emit('search');
-                    drawerVisiable.value = false;
-                })
-                .catch(() => {
-                    loading.value = false;
-                });
-            return;
+        const taskID = newUUID();
+        const params = { ...tensorRTLLM.value, taskID };
+        try {
+            if (mode.value === 'edit') {
+                await updateTensorRTLLM(params);
+            } else {
+                await createTensorRTLLM(params);
+            }
+            emit('search');
+            emit('task', taskID);
+            drawerVisiable.value = false;
+        } catch (error) {
+        } finally {
+            loading.value = false;
         }
-        await createTensorRTLLM(tensorRTLLM.value)
-            .then(() => {
-                loading.value = false;
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                emit('search');
-                drawerVisiable.value = false;
-            })
-            .catch(() => {
-                loading.value = false;
-            });
     });
 };
 

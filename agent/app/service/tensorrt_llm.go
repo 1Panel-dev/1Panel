@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
@@ -15,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/ai"
 	"github.com/1Panel-dev/1Panel/agent/constant"
@@ -25,13 +27,15 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 )
 
+var tensorRTLLMMu sync.Mutex
+
 type TensorRTLLMService struct{}
 
 type ITensorRTLLMService interface {
-	Page(req request.TensorRTLLMSearch) response.TensorRTLLMsRes
+	Page(req request.TensorRTLLMSearch) (response.TensorRTLLMsRes, error)
 	Create(create request.TensorRTLLMCreate) error
 	Update(req request.TensorRTLLMUpdate) error
-	Delete(id uint) error
+	Delete(req request.TensorRTLLMDelete) error
 	Operate(req request.TensorRTLLMOperate) error
 }
 
@@ -39,17 +43,29 @@ func NewITensorRTLLMService() ITensorRTLLMService {
 	return &TensorRTLLMService{}
 }
 
-func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorRTLLMsRes {
+func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) (response.TensorRTLLMsRes, error) {
 	var (
 		res   response.TensorRTLLMsRes
 		items []response.TensorRTLLMDTO
 	)
 
-	total, data, _ := tensorrtLLMRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
+	total, data, err := tensorrtLLMRepo.Page(req.PageInfo.Page, req.PageInfo.PageSize)
+	if err != nil {
+		return res, err
+	}
 	for _, item := range data {
-		_ = syncTensorRTLLMContainerStatus(&item)
+		operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeTensorRT, item.ID)
+		if err != nil {
+			return res, err
+		}
+		if operationTask.ID != "" {
+			item.Status = localEngineTaskStatus(operationTask.Operate, item.Status)
+		} else if err := syncTensorRTLLMContainerStatus(&item); err != nil {
+			return res, err
+		}
 		serverDTO := response.TensorRTLLMDTO{
 			TensorRTLLM: item,
+			TaskID:      operationTask.ID,
 		}
 		envs, _ := gotenv.Unmarshal(item.Env)
 		serverDTO.Version = envs["VERSION"]
@@ -105,7 +121,7 @@ func (t TensorRTLLMService) Page(req request.TensorRTLLMSearch) response.TensorR
 	}
 	res.Total = total
 	res.Items = items
-	return res
+	return res, nil
 }
 
 func handleLLMParams(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) error {
@@ -213,6 +229,8 @@ func handleLLMEnv(llm *model.TensorRTLLM, create request.TensorRTLLMCreate) gote
 }
 
 func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
+	tensorRTLLMMu.Lock()
+	defer tensorRTLLMMu.Unlock()
 	servers, _ := tensorrtLLMRepo.List()
 	for _, server := range servers {
 		if server.ContainerName == create.ContainerName {
@@ -235,11 +253,6 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	filesOp := files.NewFileOp()
 	if !filesOp.Stat(tensorrtLLMDir) {
 		_ = filesOp.CreateDir(tensorrtLLMDir, 0644)
-	}
-	if create.ModelSpeedup {
-		if err := handleModelArchive(create.ModelType, create.ModelDir); err != nil {
-			return err
-		}
 	}
 	tensorrtLLM := &model.TensorRTLLM{
 		Name:          create.Name,
@@ -267,14 +280,22 @@ func (t TensorRTLLMService) Create(create request.TensorRTLLMCreate) error {
 	if err := tensorrtLLMRepo.Create(tensorrtLLM); err != nil {
 		return err
 	}
-	go startTensorRTLLM(tensorrtLLM)
-	return nil
+	return runTensorRTLLMTask(tensorrtLLM, task.TaskCreate, "create", create.TaskID)
 }
 
 func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
+	tensorRTLLMMu.Lock()
+	defer tensorRTLLMMu.Unlock()
 	tensorrtLLM, err := tensorrtLLMRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
+	}
+	operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeTensorRT, tensorrtLLM.ID)
+	if err != nil {
+		return err
+	}
+	if operationTask.ID != "" {
+		return buserr.New("TaskIsExecuting")
 	}
 	if tensorrtLLM.ContainerName != req.ContainerName {
 		if err := checkContainerName(req.ContainerName); err != nil {
@@ -305,59 +326,107 @@ func (t TensorRTLLMService) Update(req request.TensorRTLLMUpdate) error {
 	if err := tensorrtLLMRepo.Save(tensorrtLLM); err != nil {
 		return err
 	}
-	go startTensorRTLLM(tensorrtLLM)
-	return nil
+	return runTensorRTLLMTask(tensorrtLLM, task.TaskUpdate, "update", req.TaskID)
 }
 
-func (t TensorRTLLMService) Delete(id uint) error {
-	tensorrtLLM, err := tensorrtLLMRepo.GetFirst(repo.WithByID(id))
-	if err != nil {
-		return err
-	}
-	composePath := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name, "docker-compose.yml")
-	_, _ = compose.Down(composePath)
-	_ = files.NewFileOp().DeleteDir(path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name))
-	return tensorrtLLMRepo.DeleteBy(repo.WithByID(id))
-}
-
-func (t TensorRTLLMService) Operate(req request.TensorRTLLMOperate) error {
+func (t TensorRTLLMService) Delete(req request.TensorRTLLMDelete) error {
+	tensorRTLLMMu.Lock()
+	defer tensorRTLLMMu.Unlock()
 	tensorrtLLM, err := tensorrtLLMRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
 	}
-	composePath := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name, "docker-compose.yml")
-	var out string
-	switch req.Operate {
-	case "start":
-		out, err = compose.Up(composePath)
-		tensorrtLLM.Status = constant.StatusRunning
-	case "stop":
-		out, err = compose.Down(composePath)
-		tensorrtLLM.Status = constant.StatusStopped
-	case "restart":
-		out, err = compose.Restart(composePath)
-		tensorrtLLM.Status = constant.StatusRunning
-	}
-	if err != nil {
-		tensorrtLLM.Status = constant.StatusError
-		tensorrtLLM.Message = out
-	}
-	return tensorrtLLMRepo.Save(tensorrtLLM)
+	return runTensorRTLLMTask(tensorrtLLM, task.TaskDelete, "delete", req.TaskID)
 }
 
-func startTensorRTLLM(tensorrtLLM *model.TensorRTLLM) {
-	composePath := path.Join(global.Dir.TensorRTLLMDir, tensorrtLLM.Name, "docker-compose.yml")
-	if tensorrtLLM.Status != constant.StatusNormal {
-		_, _ = compose.Down(composePath)
+func (t TensorRTLLMService) Operate(req request.TensorRTLLMOperate) error {
+	tensorRTLLMMu.Lock()
+	defer tensorRTLLMMu.Unlock()
+	tensorrtLLM, err := tensorrtLLMRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
 	}
-	if out, err := compose.Up(composePath); err != nil {
-		tensorrtLLM.Status = constant.StatusError
-		tensorrtLLM.Message = out
-	} else {
-		tensorrtLLM.Status = constant.StatusRunning
-		tensorrtLLM.Message = ""
+	operation := task.TaskUpdate
+	if req.Operate == "restart" {
+		operation = task.TaskRestart
 	}
-	_ = syncTensorRTLLMContainerStatus(tensorrtLLM)
+	return runTensorRTLLMTask(tensorrtLLM, operation, req.Operate, req.TaskID)
+}
+
+func runTensorRTLLMTask(llm *model.TensorRTLLM, operation, action, taskID string) error {
+	currentTask, err := taskRepo.GetExecutingTask(task.TaskScopeTensorRT, llm.ID)
+	if err != nil {
+		return err
+	}
+	if currentTask.ID != "" {
+		return buserr.New("TaskIsExecuting")
+	}
+	operationTask, err := task.NewTaskWithOps(llm.Name, operation, task.TaskScopeTensorRT, taskID, llm.ID)
+	if err != nil {
+		return err
+	}
+	operationTask.AddSubTaskWithOps(operationTask.Name, func(t *task.Task) error {
+		if action == "stop" {
+			llm.Status = constant.StatusWaiting
+		} else {
+			llm.Status = localEngineTaskStatus(operation, constant.StatusStarting)
+		}
+		if err := tensorrtLLMRepo.Save(llm); err != nil {
+			return err
+		}
+		composePath := path.Join(global.Dir.TensorRTLLMDir, llm.Name, "docker-compose.yml")
+		var out string
+		var err error
+		switch action {
+		case "create":
+			if llm.ModelSpeedup {
+				envs, err := gotenv.Unmarshal(llm.Env)
+				if err != nil {
+					return err
+				}
+				if err := handleModelArchive(llm.ModelType, envs["MODEL_PATH"]); err != nil {
+					return err
+				}
+			}
+			out, err = compose.Up(composePath)
+		case "start":
+			out, err = compose.Up(composePath)
+		case "update":
+			out, err = compose.Down(composePath)
+			t.Log(out)
+			if err != nil {
+				return err
+			}
+			out, err = compose.Up(composePath)
+		case "stop":
+			out, err = compose.Stop(composePath)
+		case "restart":
+			out, err = compose.Restart(composePath)
+		case "delete":
+			out, err = compose.Down(composePath)
+		default:
+			return fmt.Errorf("unsupported TensorRT operation: %s", action)
+		}
+		t.Log(out)
+		if err != nil {
+			return err
+		}
+		if action == "delete" {
+			if err := files.NewFileOp().DeleteDir(path.Join(global.Dir.TensorRTLLMDir, llm.Name)); err != nil {
+				return err
+			}
+			return tensorrtLLMRepo.DeleteBy(repo.WithByID(llm.ID))
+		}
+		if err := syncTensorRTLLMContainerStatus(llm); err != nil {
+			return err
+		}
+		llm.Message = ""
+		return tensorrtLLMRepo.Save(llm)
+	}, nil, 0, 0)
+	go func() {
+		_ = operationTask.Execute()
+	}()
+	return nil
 }
 
 func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
@@ -372,28 +441,24 @@ func syncTensorRTLLMContainerStatus(tensorrtLLM *model.TensorRTLLM) error {
 		return err
 	}
 	if len(containers) == 0 {
-		if tensorrtLLM.Status == constant.StatusStarting {
-			return nil
-		}
-		tensorrtLLM.Status = constant.StatusStopped
-		return tensorrtLLMRepo.Save(tensorrtLLM)
+		tensorrtLLM.Status = constant.StatusError
+		tensorrtLLM.Message = buserr.WithName("ErrContainerNotFound", tensorrtLLM.ContainerName).Error()
+		return nil
 	}
 	container := containers[0]
 	switch container.State {
 	case "exited":
-		tensorrtLLM.Status = constant.StatusError
+		tensorrtLLM.Status = constant.StatusStopped
 	case "running":
 		tensorrtLLM.Status = constant.StatusRunning
 	case "paused":
-		tensorrtLLM.Status = constant.StatusStopped
+		tensorrtLLM.Status = constant.StatusPaused
 	case "restarting":
 		tensorrtLLM.Status = constant.StatusRestarting
 	default:
-		if tensorrtLLM.Status != constant.StatusStarting {
-			tensorrtLLM.Status = constant.StatusStopped
-		}
+		tensorrtLLM.Status = constant.StatusUnHealthy
 	}
-	return tensorrtLLMRepo.Save(tensorrtLLM)
+	return nil
 }
 
 func findModelArchive(modelType string) (string, error) {

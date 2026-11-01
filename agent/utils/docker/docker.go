@@ -202,6 +202,8 @@ func (c Client) PullImageWithProcessAndOptions(task *task.Task, imageName string
 }
 
 func (c Client) PullImageWithProcessAndOptionsContext(ctx context.Context, task *task.Task, imageName string, options image.PullOptions) error {
+	ctx, cancel := context.WithTimeout(ctx, 24*time.Hour)
+	defer cancel()
 	out, err := c.cli.ImagePull(ctx, imageName, options)
 	if err != nil {
 		return err

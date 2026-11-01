@@ -197,6 +197,7 @@ export namespace App {
     }
 
     export interface AppInstallDto {
+        taskID?: string;
         id: number;
         name: string;
         appID: number;
@@ -230,6 +231,7 @@ export namespace App {
     }
 
     export interface CheckInstalled {
+        taskID?: string;
         name: string;
         version: string;
         isExist: boolean;

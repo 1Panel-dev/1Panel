@@ -200,8 +200,13 @@ const open = async (
                 id: data.appInstallId,
                 version: data.version,
                 status: data.status,
+                taskID: data.taskID,
                 containerName: data.containerName,
             };
+            if (data.taskID && ['config', 'upgrade', 'log'].includes(action)) {
+                await openTask(data.taskID);
+                return;
+            }
             if (action === 'upgrade') {
                 await openUpgrade(data.appInstallId, version);
                 return;
@@ -237,11 +242,16 @@ const open = async (
         instance.value = {
             ...instance.value,
             status: detail.status,
+            taskID: detail.taskID,
             containerName: detail.containerName,
             modelDir: detail.modelDir,
             version: 'appVersion' in detail ? detail.appVersion : detail.version,
             upgradable: 'upgradable' in detail && detail.upgradable,
         };
+        if (detail.taskID && ['config', 'upgrade', 'delete'].includes(action)) {
+            await openTask(detail.taskID);
+            return;
+        }
         if (action === 'connection') {
             view.value = markRaw(EngineConnection);
             await nextTick();
@@ -280,15 +290,10 @@ const open = async (
         } else if (action === 'upgrade' && 'appInstallId' in detail) {
             await openUpgrade(detail.appInstallId, version);
         } else if (action === 'log') {
-            const task = 'appInstallId' in detail && ['Installing', 'Uninstalling'].includes(detail.status);
-            view.value = markRaw(task ? TaskLog : ContainerLogs);
+            view.value = markRaw(detail.taskID ? TaskLog : ContainerLogs);
             await nextTick();
-            if (task) {
-                contentRef.value?.openWithResourceID(
-                    'App',
-                    detail.status === 'Installing' ? 'TaskInstall' : 'TaskUninstall',
-                    detail.appInstallId,
-                );
+            if (detail.taskID) {
+                contentRef.value?.openWithTaskID(detail.taskID);
             } else {
                 contentRef.value?.acceptParams({
                     containerID: detail.containerName,
@@ -314,32 +319,27 @@ watch([currentNode, () => route.fullPath, isProductPro, isFxplay], () => {
     deleteVisible.value = false;
     deleting.value = undefined;
 });
-const operationDisabled = (row: Deployment) =>
-    deleteLoading.value ||
-    ['Installing', 'Starting', 'ReStarting', 'Restarting', 'Rebuilding', 'Waiting', 'Uninstalling'].includes(
-        row.status,
-    );
+const operationDisabled = (row: Deployment) => Boolean(deleteLoading.value || row.taskID);
 const deleteDeployment = async () => {
     const version = request;
     const row = deleting.value;
     if (!row) return;
     deleteLoading.value = true;
     try {
+        const taskID = newUUID();
         if (row.engine === 'tensorrt') {
-            await deleteTensorRTLLM({ id: row.id });
+            await deleteTensorRTLLM({ id: row.id, taskID });
         } else {
-            const taskID = newUUID();
             await (
                 await loadVllmAPI()
             ).operateVllm({ id: row.id, operate: 'delete', taskID, forceDelete: forceDelete.value });
-            if (version !== request || !visible.value) return;
-            await openTask(taskID);
         }
+        if (version !== request || !visible.value) return;
+        await openTask(taskID);
         if (version !== request || !visible.value) return;
         deleted.value = true;
         deleteVisible.value = false;
         emit('search');
-        if (row.engine === 'tensorrt') visible.value = false;
     } finally {
         deleteLoading.value = false;
     }
@@ -366,9 +366,7 @@ const deploymentButtons = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        disabled: (row: Deployment) =>
-            deleteLoading.value ||
-            (operationDisabled(row) && !['Uninstalling', 'ReStarting', 'Restarting'].includes(row.status)),
+        disabled: (row: Deployment) => operationDisabled(row),
         click: (row: Deployment) => {
             deleting.value = row;
             forceDelete.value = false;

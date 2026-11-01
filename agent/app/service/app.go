@@ -642,7 +642,11 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		_ = appInstallRepo.Save(context.Background(), appInstall)
 	}
 
-	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, time.Hour)
+	installTimeout := time.Hour
+	if app.Key == "ollama" || app.Key == "vllm" {
+		installTimeout = 0
+	}
+	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, installTimeout)
 
 	go func() {
 		if taskErr := installTask.Execute(); taskErr != nil {
