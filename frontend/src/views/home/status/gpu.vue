@@ -1,6 +1,6 @@
 <template>
-    <div class="gpu-status">
-        <div class="gpu-summary">
+    <div class="gpu-status" :class="{ 'gpu-status-single': devices.length === 1 }">
+        <div v-if="devices.length !== 1" class="gpu-summary">
             <div class="gpu-summary-header">
                 <div class="device-counts">
                     <strong v-for="group in deviceGroups" :key="group.type">
@@ -56,6 +56,10 @@
                             <el-button link type="primary" size="small">{{ $t('commons.button.view') }}</el-button>
                         </template>
                     </el-popover>
+                    <el-button v-if="devices.length === 1" link type="primary" size="small" @click="$emit('open')">
+                        {{ $t('aiTools.gpu.viewHistory') }}
+                        <el-icon><ArrowRight /></el-icon>
+                    </el-button>
                 </div>
                 <div class="device-metrics">
                     <div class="device-metric metric-utilization">
@@ -380,9 +384,111 @@ const usedMemory = computed(() =>
     font-size: 12px;
     font-weight: 500;
 }
+.gpu-status-single {
+    .gpu-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gpu-card {
+        display: grid;
+        grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.35fr);
+        gap: 24px;
+        min-height: 174px;
+        padding: 18px 20px;
+    }
+
+    .device-header {
+        grid-column: 1 / -1;
+        margin-bottom: 0;
+    }
+
+    .device-identity {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .device-id {
+        flex-shrink: 0;
+        margin-bottom: 0;
+        padding: 4px 7px;
+        border-radius: 4px;
+        background: var(--el-fill-color-light);
+    }
+
+    .device-metrics {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+        gap: 24px;
+    }
+
+    .metric-heading strong {
+        font-size: 23px;
+        line-height: 32px;
+    }
+
+    .device-footer {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 20px;
+        margin: 0;
+        padding: 0;
+        border-top: 0;
+    }
+
+    .device-footer > div {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+        padding-left: 20px;
+        border-left: 1px solid var(--el-border-color-extra-light);
+        min-width: 0;
+    }
+
+    .device-footer strong {
+        font-size: 23px;
+        line-height: 32px;
+        font-variant-numeric: tabular-nums;
+        overflow-wrap: anywhere;
+    }
+}
 @container (max-width: 560px) {
     .gpu-grid {
         grid-template-columns: minmax(0, 1fr);
+    }
+
+    .gpu-status-single {
+        .gpu-card {
+            grid-template-columns: minmax(0, 1fr);
+            gap: 16px;
+            padding: 14px 16px;
+        }
+
+        .device-header {
+            flex-wrap: wrap;
+        }
+
+        .device-identity {
+            flex: 0 0 100%;
+        }
+
+        .metric-heading strong {
+            font-size: 18px;
+        }
+
+        .device-footer {
+            padding-top: 12px;
+            border-top: 1px solid var(--el-border-color-extra-light);
+        }
+
+        .device-footer > div {
+            padding-left: 0;
+            border-left: 0;
+        }
+
+        .device-footer strong {
+            font-size: 18px;
+        }
     }
 }
 </style>

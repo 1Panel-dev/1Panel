@@ -86,6 +86,92 @@
                         />
                     </template>
                 </CardWithHeader>
+                <CardWithHeader
+                    :header="$t('menu.monitor')"
+                    class="card-interval chart-card"
+                    @mouseenter="refreshOptionsOnHover"
+                >
+                    <template #header-r>
+                        <el-radio-group
+                            style="float: right; margin-left: 5px"
+                            v-model="chartOption"
+                            @change="changeOption"
+                        >
+                            <el-radio-button value="network">{{ $t('home.network') }}</el-radio-button>
+                            <el-radio-button value="io">{{ $t('home.io') }}</el-radio-button>
+                        </el-radio-group>
+                        <el-select
+                            v-if="chartOption === 'network'"
+                            @change="onLoadBaseInfo(false, 'network')"
+                            v-model="searchInfo.netOption"
+                            class="p-w-200 float-right"
+                        >
+                            <template #prefix>{{ $t('home.networkCard') }}</template>
+                            <el-option
+                                v-for="item in netOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
+                                :value="item"
+                            />
+                        </el-select>
+                        <el-select
+                            v-if="chartOption === 'io'"
+                            v-model="searchInfo.ioOption"
+                            @change="onLoadBaseInfo(false, 'io')"
+                            class="p-w-200 float-right"
+                        >
+                            <template #prefix>{{ $t('home.disk') }}</template>
+                            <el-option
+                                v-for="item in ioOptions"
+                                :key="item"
+                                :label="item == 'all' ? $t('commons.table.all') : item"
+                                :value="item"
+                            />
+                        </el-select>
+                    </template>
+                    <template #body>
+                        <div class="monitor-chart-content">
+                            <div class="monitor-tags" :style="monitorTagsStyle" v-if="chartOption === 'network'">
+                                <el-tag>
+                                    {{ $t('monitor.up') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesSent) }}
+                                </el-tag>
+                                <el-tag>
+                                    {{ $t('monitor.down') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesRecv) }}
+                                </el-tag>
+                                <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
+                                <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
+                            </div>
+                            <div class="monitor-tags" :style="monitorTagsStyle" v-if="chartOption === 'io'">
+                                <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
+                                <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
+                                <el-tag>
+                                    {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }}
+                                    {{ $t('commons.units.time') }}/s
+                                </el-tag>
+                                <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
+                            </div>
+
+                            <div v-if="chartOption === 'io'" class="mobile-monitor-chart">
+                                <v-charts
+                                    height="383px"
+                                    id="ioChart"
+                                    type="line"
+                                    :option="chartsOption['ioChart']"
+                                    :dataZoom="true"
+                                />
+                            </div>
+                            <div v-if="chartOption === 'network'" class="mobile-monitor-chart">
+                                <v-charts
+                                    height="383px"
+                                    id="networkChart"
+                                    type="line"
+                                    :option="chartsOption['networkChart']"
+                                    :dataZoom="true"
+                                />
+                            </div>
+                        </div>
+                    </template>
+                </CardWithHeader>
             </el-col>
             <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8" class="dashboard-right">
                 <el-carousel
@@ -352,82 +438,6 @@
             </el-col>
         </el-row>
 
-        <CardWithHeader :header="$t('menu.monitor')" class="card-interval" @mouseenter="refreshOptionsOnHover">
-            <template #body>
-                <div class="monitor-grid">
-                    <section class="monitor-panel">
-                        <div class="monitor-panel-header">
-                            <span>{{ $t('home.network') }}</span>
-                            <el-select
-                                @change="onLoadBaseInfo(false, 'network')"
-                                v-model="searchInfo.netOption"
-                                class="monitor-select"
-                            >
-                                <template #prefix>{{ $t('home.networkCard') }}</template>
-                                <el-option
-                                    v-for="item in netOptions"
-                                    :key="item"
-                                    :label="item == 'all' ? $t('commons.table.all') : item"
-                                    :value="item"
-                                />
-                            </el-select>
-                        </div>
-                        <div class="monitor-tags">
-                            <el-tag>
-                                {{ $t('monitor.up') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesSent) }}
-                            </el-tag>
-                            <el-tag>
-                                {{ $t('monitor.down') }}: {{ computeSizeFromKBs(currentChartInfo.netBytesRecv) }}
-                            </el-tag>
-                            <el-tag>{{ $t('home.totalSend') }}: {{ computeSize(currentInfo.netBytesSent) }}</el-tag>
-                            <el-tag>{{ $t('home.totalRecv') }}: {{ computeSize(currentInfo.netBytesRecv) }}</el-tag>
-                        </div>
-                        <v-charts
-                            height="383px"
-                            id="networkChart"
-                            type="line"
-                            :option="chartsOption['networkChart']"
-                            :dataZoom="true"
-                        />
-                    </section>
-                    <section class="monitor-panel">
-                        <div class="monitor-panel-header">
-                            <span>{{ $t('home.io') }}</span>
-                            <el-select
-                                v-model="searchInfo.ioOption"
-                                @change="onLoadBaseInfo(false, 'io')"
-                                class="monitor-select"
-                            >
-                                <template #prefix>{{ $t('home.disk') }}</template>
-                                <el-option
-                                    v-for="item in ioOptions"
-                                    :key="item"
-                                    :label="item == 'all' ? $t('commons.table.all') : item"
-                                    :value="item"
-                                />
-                            </el-select>
-                        </div>
-                        <div class="monitor-tags">
-                            <el-tag>{{ $t('monitor.read') }}: {{ currentChartInfo.ioReadBytes }} MB</el-tag>
-                            <el-tag>{{ $t('monitor.write') }}: {{ currentChartInfo.ioWriteBytes }} MB</el-tag>
-                            <el-tag>
-                                {{ $t('home.rwPerSecond') }}: {{ currentChartInfo.ioCount }}
-                                {{ $t('commons.units.time') }}/s
-                            </el-tag>
-                            <el-tag>{{ $t('home.ioDelay') }}: {{ currentChartInfo.ioTime }} ms</el-tag>
-                        </div>
-                        <v-charts
-                            height="383px"
-                            id="ioChart"
-                            type="line"
-                            :option="chartsOption['ioChart']"
-                            :dataZoom="true"
-                        />
-                    </section>
-                </div>
-            </template>
-        </CardWithHeader>
-
         <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
 
         <DialogPro v-model="welcomeOpen" size="w-70" id="welcomeDialog">
@@ -491,8 +501,12 @@ const DASHBOARD_CACHE_TTL = {
     netOptions: 60 * 60 * 1000,
     ioOptions: 60 * 60 * 1000,
 };
-const monitorChartGrid = { left: 55, right: 25, bottom: '20%' };
+const monitorChartGrid = { left: 65, right: 65, bottom: '20%' };
 const monitorChartLegend = { top: 0, bottom: 'auto' };
+const monitorTagsStyle = {
+    left: `${monitorChartGrid.left}px`,
+    right: `${monitorChartGrid.right}px`,
+};
 const monitorChartEmptyLength = 20;
 const loadMonitorEmptyData = () => Array.from({ length: monitorChartEmptyLength }, () => null);
 const loadMonitorEmptyTime = () => Array.from({ length: monitorChartEmptyLength }, () => '');
@@ -539,9 +553,11 @@ const isSafety = ref();
 const welcomeOpen = ref();
 const shadowContainer = ref();
 
+const chartOption = ref('network');
 const statusOption = ref(localStorage.getItem('dashboard_status_view') === 'gpu' ? 'gpu' : 'system');
 let timer: ReturnType<typeof setInterval> | null = null;
 let initialSampleTimer: ReturnType<typeof setTimeout> | null = null;
+let isInit = ref<boolean>(true);
 let isStatusInit = ref<boolean>(true);
 let isActive = ref(true);
 let isCurrentActive = ref(true);
@@ -706,6 +722,11 @@ const updateCurrentInfo = (data: Dashboard.CurrentInfo) => {
         topCPUItems: currentInfo.value.topCPUItems || [],
         topMemItems: currentInfo.value.topMemItems || [],
     };
+};
+
+const changeOption = async () => {
+    isInit.value = true;
+    loadData();
 };
 
 const applyDefaultNetOption = () => {
@@ -1012,9 +1033,12 @@ const saveMemo = async () => {
     }
 };
 
-const loadData = () => {
-    chartsOption.value['ioChart'] = loadIOChartOption();
-    chartsOption.value['networkChart'] = loadNetworkChartOption();
+const loadData = async () => {
+    if (chartOption.value === 'io') {
+        chartsOption.value['ioChart'] = loadIOChartOption();
+    } else {
+        chartsOption.value['networkChart'] = loadNetworkChartOption();
+    }
 };
 
 const hideEntrance = () => {
@@ -1182,6 +1206,15 @@ onBeforeUnmount(() => {
     font-size: 12px;
 }
 
+.monitor-chart-content {
+    position: relative;
+    margin-top: 60px;
+}
+
+.mobile-monitor-chart {
+    margin-top: 40px;
+}
+
 @media only screen and (max-width: 767px) {
     .dashboard-entrance-alert {
         padding-right: 40px;
@@ -1328,54 +1361,49 @@ onBeforeUnmount(() => {
     border-top: var(--panel-border);
 }
 
-.monitor-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 24px;
-}
-
-.monitor-panel {
-    min-width: 0;
-}
-
-.monitor-panel-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 12px;
-    font-weight: 500;
-}
-
-.monitor-select {
-    width: 200px;
-    max-width: 100%;
-}
-
 .monitor-tags {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    margin-bottom: 16px;
+    position: absolute;
+    top: -10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
 
-    :deep(.el-tag) {
+@media only screen and (max-width: 1024px) {
+    .monitor-chart-content {
+        margin-top: 20px;
+    }
+
+    .monitor-chart-content .monitor-tags {
+        position: static;
+        display: grid;
         width: 100%;
-        max-width: 100%;
-        height: auto;
-        min-height: 24px;
-        justify-content: center;
-        padding-block: 3px;
-        line-height: 1.3;
-        text-align: center;
-        white-space: normal;
-        overflow-wrap: anywhere;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        margin-bottom: 12px;
+
+        :deep(.el-tag) {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            min-height: 24px;
+            justify-content: center;
+            padding-block: 3px;
+            line-height: 1.3;
+            text-align: center;
+            white-space: normal;
+            overflow-wrap: anywhere;
+        }
+    }
+
+    .mobile-monitor-chart {
+        margin-top: 0;
     }
 }
 
-@media only screen and (max-width: 991px) {
-    .monitor-grid {
-        grid-template-columns: minmax(0, 1fr);
+@media only screen and (min-width: 768px) and (max-width: 1024px) {
+    .monitor-chart-content .monitor-tags {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
@@ -1396,6 +1424,10 @@ onBeforeUnmount(() => {
     span {
         line-height: 20px;
     }
+}
+
+.chart-card {
+    min-height: 383px;
 }
 
 .memo-container {
