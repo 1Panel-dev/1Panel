@@ -1816,6 +1816,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: '1Panel MCP Erişimi',
+        servicesTitle: 'MCP Hizmetleri',
         websiteCancelPendingBind: 'Bağlamayı iptal et',
         websiteBinding: 'Web sitesi bağlama',
         websiteBind: 'Web sitesi bağla',

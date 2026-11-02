@@ -1762,6 +1762,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: 'ການເຂົ້າເຖິງ 1Panel MCP',
+        servicesTitle: 'ບໍລິການ MCP',
         websiteCancelPendingBind: 'ຍົກເລີກການຜູກ',
         websiteBinding: 'ການຜູກເວັບໄຊ',
         websiteBind: 'ຜູກເວັບໄຊ',

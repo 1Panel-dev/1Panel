@@ -1822,6 +1822,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: 'Acceso a 1Panel MCP',
+        servicesTitle: 'Servicios MCP',
         websiteCancelPendingBind: 'Cancelar vinculación',
         websiteBinding: 'Vinculación de sitio web',
         websiteBind: 'Vincular sitio web',

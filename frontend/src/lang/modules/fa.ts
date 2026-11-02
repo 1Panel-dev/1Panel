@@ -1786,6 +1786,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: 'دسترسی به 1Panel MCP',
+        servicesTitle: 'سرویس‌های MCP',
         websiteCancelPendingBind: 'لغو اتصال',
         websiteBinding: 'اتصال وب‌سایت',
         websiteBind: 'اتصال وب‌سایت',
