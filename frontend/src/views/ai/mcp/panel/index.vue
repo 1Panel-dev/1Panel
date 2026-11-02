@@ -95,7 +95,7 @@
                                 :pagination-config="pagination"
                                 :page-sizes="[10, 20, 50, 100]"
                                 :scrollbar-always-on="isCompactTable"
-                                :height-diff="410"
+                                :height-diff="310"
                                 @search="search"
                             >
                                 <el-table-column
