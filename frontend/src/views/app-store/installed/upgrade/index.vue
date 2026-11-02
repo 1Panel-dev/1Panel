@@ -292,44 +292,50 @@ const getVersions = async (version: string) => {
     const request = ++versionRequest;
     const upgrading = operateReq.operate === 'upgrade';
     composeReady.value = false;
+    if (upgrading) operateReq.detailId = 0;
     loadingVersions.value = true;
     const req: App.AppUpdateVersionReq = {
         appInstallID: appInstallID.value,
-        loadCompose: upgrading,
+        loadCompose: false,
     };
-    if (version !== '') {
-        req.updateVersion = version;
-    }
     try {
-        if (upgrading && !currentComposeReady.value) {
+        if (!versions.value || version === '') {
+            const res = await getAppUpdateVersions(req, node.value);
+            if (request !== versionRequest) return;
+            versions.value = res.data || [];
+        }
+        let item = version ? versions.value.find((v) => v.version === version) : versions.value[0];
+        if (!item) {
+            if (upgrading && version) MsgError(i18n.global.t('container.contentEmpty'));
+            return;
+        }
+        operateReq.version = item.version;
+        if (!upgrading) {
+            operateReq.detailId = item.detailId;
+            return;
+        }
+        if (!currentComposeReady.value) {
             const config = await getAppInstallParams(appInstallID.value, node.value);
             if (request !== versionRequest) return;
             if (typeof config.data.isEdit === 'boolean') isEdit.value = config.data.isEdit;
             oldContent.value = config.data.dockerCompose;
             currentComposeReady.value = true;
         }
-        const res = await getAppUpdateVersions(req, node.value);
+        const res = await getAppUpdateVersions({ ...req, loadCompose: true, updateVersion: item.version }, node.value);
         if (request !== versionRequest) return;
-        versions.value = res.data || [];
-        if (versions.value.length > 0) {
-            let item = res.data[0];
-            if (version != '') {
-                item = res.data.find((v) => v.version === version);
-            }
-            if (!item || (upgrading && !item.dockerCompose?.trim())) {
-                if (upgrading) MsgError(i18n.global.t('container.contentEmpty'));
-                return;
-            }
-            feishuLegacy.value = Boolean(item.feishuLegacy);
-            feishuConfigured.value = Boolean(item.feishuConfigured);
-            if (feishuLegacy.value) operateReq.backup = true;
-            operateReq.detailId = item.detailId;
-            operateReq.version = item.version;
-            newContent.value = item.dockerCompose;
-            newCompose.value = item.dockerCompose;
-            useNewCompose.value = false;
-            composeReady.value = upgrading;
+        item = res.data?.find((v) => v.version === operateReq.version);
+        if (!item?.dockerCompose?.trim()) {
+            MsgError(i18n.global.t('container.contentEmpty'));
+            return;
         }
+        feishuLegacy.value = Boolean(item.feishuLegacy);
+        feishuConfigured.value = Boolean(item.feishuConfigured);
+        if (feishuLegacy.value) operateReq.backup = true;
+        operateReq.detailId = item.detailId;
+        newContent.value = item.dockerCompose;
+        newCompose.value = item.dockerCompose;
+        useNewCompose.value = false;
+        composeReady.value = true;
     } catch (error) {
     } finally {
         if (request === versionRequest) loadingVersions.value = false;

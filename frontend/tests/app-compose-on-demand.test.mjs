@@ -84,12 +84,15 @@ const button = findNode(template, (node) =>
 const disabled = button.props.find((prop) => prop.name === 'bind' && prop.arg.content === 'disabled').exp.content;
 const isDisabled = (state) => new Function('state', `with (state) { return (${disabled}); }`)(proxyRefs(state));
 
-test('upgrade validates the current template and loads only the default target on the selected node', async () => {
+test('upgrade lists versions independently and loads only the default target on the selected node', async () => {
     const state = drawer();
     assert.equal(isDisabled(state), true);
     await state.getVersions('');
     assert.deepEqual(state.calls.params, [[17, 'child & node']]);
-    assert.deepEqual(state.calls.versions, [[{ appInstallID: 17, loadCompose: true }, 'child & node']]);
+    assert.deepEqual(state.calls.versions, [
+        [{ appInstallID: 17, loadCompose: false }, 'child & node'],
+        [{ appInstallID: 17, loadCompose: true, updateVersion: '2.0' }, 'child & node'],
+    ]);
     assert.equal(state.isEdit.value, true, 'authoritative configuration overrides the stale list flag');
     assert.equal(state.oldContent.value, 'original custom instance compose');
     assert.equal(state.operateReq.detailId, 2);
@@ -107,14 +110,20 @@ test('older agents without isEdit retain the existing custom Compose warning', a
     assert.equal(state.composeReady.value, true);
 });
 
-test('current-template failure blocks preview and submission without changing the saved Compose', async () => {
+test('current-template failure preserves selectable versions while blocking preview and submission', async () => {
     const state = drawer({
         getAppInstallParams: async () => {
             throw new Error('template unavailable');
         },
     });
     await state.getVersions('');
-    assert.equal(state.calls.versions.length, 0);
+    assert.equal(state.calls.versions.length, 1);
+    assert.equal(state.calls.versions[0][0].loadCompose, false);
+    assert.deepEqual(
+        state.versions.value.map((item) => item.version),
+        ['2.0'],
+    );
+    assert.equal(state.operateReq.version, '2.0');
     assert.equal(state.oldContent.value, 'saved instance compose');
     assert.equal(state.currentComposeReady.value, false);
     assert.equal(state.loadingVersions.value, false);
@@ -123,6 +132,65 @@ test('current-template failure blocks preview and submission without changing th
     await state.operate();
     assert.equal(state.calls.confirmations.length, 0);
     assert.equal(state.calls.operations.length, 0);
+});
+
+test('versions are available before current configuration finishes loading', async () => {
+    let reject;
+    const state = drawer({
+        getAppInstallParams: () => new Promise((resolve, fail) => (reject = fail)),
+    });
+    const request = state.getVersions('');
+    await Promise.resolve();
+    assert.deepEqual(
+        state.versions.value.map((item) => item.version),
+        ['2.0'],
+    );
+    assert.equal(state.currentComposeReady.value, false);
+    reject(new Error('current template unavailable'));
+    await request;
+    assert.deepEqual(
+        state.versions.value.map((item) => item.version),
+        ['2.0'],
+    );
+    assert.equal(isDisabled(state), true);
+});
+
+test('an unavailable default target leaves other versions selectable and able to upgrade', async () => {
+    const candidates = [target('3.0', 3), target()];
+    const requests = [];
+    const state = drawer({
+        getAppUpdateVersions: async (req) => {
+            requests.push(req);
+            if (req.loadCompose && req.updateVersion === '3.0') throw new Error('404 target removed');
+            return { data: candidates };
+        },
+    });
+    await state.getVersions('');
+    assert.deepEqual(
+        state.versions.value.map((item) => item.version),
+        ['3.0', '2.0'],
+    );
+    assert.equal(state.operateReq.version, '3.0');
+    assert.equal(state.operateReq.detailId, 0);
+    assert.equal(isDisabled(state), true);
+    await state.onOperate();
+    assert.equal(state.calls.confirmations.length, 0);
+
+    state.operateReq.version = '2.0';
+    await state.getVersions('2.0');
+    assert.deepEqual(requests, [
+        { appInstallID: 17, loadCompose: false },
+        { appInstallID: 17, loadCompose: true, updateVersion: '3.0' },
+        { appInstallID: 17, loadCompose: true, updateVersion: '2.0' },
+    ]);
+    assert.deepEqual(
+        state.versions.value.map((item) => item.version),
+        ['3.0', '2.0'],
+    );
+    assert.equal(state.operateReq.detailId, 2);
+    assert.equal(state.composeReady.value, true);
+    assert.equal(isDisabled(state), false);
+    assert.equal(state.calls.params.length, 1);
 });
 
 test('a failed target switch cannot submit the previous target and can be retried', async () => {
@@ -136,7 +204,7 @@ test('a failed target switch cannot submit the previous target and can be retrie
     await state.getVersions('');
     state.operateReq.version = '3.0';
     await state.getVersions('3.0');
-    assert.equal(state.operateReq.detailId, 2);
+    assert.equal(state.operateReq.detailId, 0);
     assert.equal(state.oldContent.value, 'original custom instance compose');
     assert.equal(isDisabled(state), true);
     await state.onOperate();
@@ -151,7 +219,9 @@ test('a failed target switch cannot submit the previous target and can be retrie
 
 test('empty and missing target Compose cannot become valid previews', async () => {
     for (const data of [[target('2.0', 2, '')], [target('2.0', 2, '  ')], [target('different', 3)]]) {
-        const state = drawer({ getAppUpdateVersions: async () => ({ data }) });
+        const state = drawer({
+            getAppUpdateVersions: async (req) => ({ data: req.loadCompose ? data : [target()] }),
+        });
         await state.getVersions('2.0');
         assert.equal(state.composeReady.value, false);
         assert.equal(state.operateReq.detailId, 0);
@@ -166,6 +236,7 @@ test('out-of-order responses cannot overwrite the latest selection or enable it 
         getAppUpdateVersions: (req) => new Promise((resolve) => pending.set(req.updateVersion, resolve)),
     });
     state.currentComposeReady.value = true;
+    state.versions.value = [target(), target('3.0', 3)];
     const first = state.getVersions('2.0');
     const latest = state.getVersions('3.0');
     pending.get('2.0')({ data: [target()] });
@@ -183,6 +254,7 @@ test('closing a drawer invalidates in-flight template responses', async () => {
     let resolve;
     const state = drawer({ getAppUpdateVersions: () => new Promise((done) => (resolve = done)) });
     state.currentComposeReady.value = true;
+    state.versions.value = [target()];
     const request = state.getVersions('2.0');
     state.handleClose();
     resolve({ data: [target()] });
