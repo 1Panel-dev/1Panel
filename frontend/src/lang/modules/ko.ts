@@ -1775,6 +1775,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: '1Panel MCP 연결',
+        servicesTitle: 'MCP 서비스',
         websiteCancelPendingBind: '연결 취소',
         websiteBinding: '웹사이트 연결',
         websiteBind: '웹사이트 연결',

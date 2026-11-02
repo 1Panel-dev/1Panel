@@ -1810,6 +1810,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: '1Panel MCP Access',
+        servicesTitle: 'MCP Services',
         websiteCancelPendingBind: 'Cancel binding',
         websiteBinding: 'Website binding',
         websiteBind: 'Bind website',

@@ -81,7 +81,7 @@ const aiRouter = {
         {
             path: '/ai/mcp',
             name: 'MCPServer',
-            redirect: () => (GlobalStore().hasPermission('ai_mcp_view') ? '/ai/mcp/server' : '/ai/mcp/1panel'),
+            redirect: () => (GlobalStore().hasPermission('mcp_access_view') ? '/ai/mcp/1panel' : '/ai/mcp/server'),
             meta: {
                 icon: 'p-mcp-menu',
                 title: 'menu.mcp',
@@ -94,7 +94,7 @@ const aiRouter = {
             hidden: true,
             component: () => import('@/views/ai/mcp/server/index.vue'),
             meta: {
-                title: 'menu.mcp',
+                title: 'panelMCP.servicesTitle',
                 activeMenu: '/ai/mcp',
                 permission: 'ai_mcp_view',
             },
@@ -105,7 +105,7 @@ const aiRouter = {
             hidden: true,
             component: () => import('@/views/ai/mcp/panel/index.vue'),
             meta: {
-                title: 'panelMCP.title',
+                title: 'panelMCP.accessTitle',
                 activeMenu: '/ai/mcp',
                 permission: 'mcp_access_view',
             },

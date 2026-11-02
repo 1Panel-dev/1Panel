@@ -1714,6 +1714,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: '1Panel MCP 接入',
+        servicesTitle: 'MCP 服務',
         websiteCancelPendingBind: '取消綁定',
         websiteBinding: '網站綁定',
         websiteBind: '綁定網站',

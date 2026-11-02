@@ -1793,6 +1793,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: '1Panel MCP 接続',
+        servicesTitle: 'MCP サービス',
         websiteCancelPendingBind: '関連付けを取り消す',
         websiteBinding: 'ウェブサイトの関連付け',
         websiteBind: 'ウェブサイトを関連付け',

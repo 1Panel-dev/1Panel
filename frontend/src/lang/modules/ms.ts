@@ -1823,6 +1823,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: 'Akses 1Panel MCP',
+        servicesTitle: 'Perkhidmatan MCP',
         websiteCancelPendingBind: 'Batalkan pautan',
         websiteBinding: 'Pautan laman web',
         websiteBind: 'Pautkan laman web',

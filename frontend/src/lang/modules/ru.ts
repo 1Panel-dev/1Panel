@@ -1813,6 +1813,8 @@ const message = {
         },
     },
     panelMCP: {
+        accessTitle: 'Подключение к 1Panel MCP',
+        servicesTitle: 'Сервисы MCP',
         websiteCancelPendingBind: 'Отменить привязку',
         websiteBinding: 'Привязка сайта',
         websiteBind: 'Привязать сайт',
