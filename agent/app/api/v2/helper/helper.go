@@ -12,7 +12,6 @@ import (
 	"sync"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/mcpapi"
 	"gorm.io/gorm"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -23,7 +22,7 @@ import (
 )
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
-	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
+	applyErrorMetadata(ctx, code, msgKey, err)
 	res := dto.Response{
 		Code:    code,
 		Message: "",
@@ -34,7 +33,7 @@ func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
 }
 
 func ErrorWithBusinessCode(ctx *gin.Context, code int, businessCode, msgKey string, err error) {
-	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
+	applyErrorMetadata(ctx, code, msgKey, err)
 	res := dto.Response{
 		Code:      code,
 		ErrorCode: businessCode,
@@ -45,7 +44,7 @@ func ErrorWithBusinessCode(ctx *gin.Context, code int, businessCode, msgKey stri
 }
 
 func ErrorWithDetailAndData(ctx *gin.Context, code int, msgKey string, err error, data interface{}) {
-	mcpapi.SetBusinessErrorHeader(ctx.Request, ctx.Writer.Header(), err)
+	applyErrorMetadata(ctx, code, msgKey, err)
 	res := dto.Response{
 		Code: code,
 		Data: data,
@@ -207,5 +206,28 @@ func SetOperationLogValues(c *gin.Context, values map[string]string) {
 	data, err := json.Marshal(resolved)
 	if err == nil {
 		c.Header(header, base64.RawURLEncoding.EncodeToString(data))
+	}
+}
+
+const errorMetadataKey = "error_response_metadata_policies"
+
+// ErrorMetadataPolicy adds transport metadata before the existing error response is written.
+type ErrorMetadataPolicy func(*gin.Context, int, string, error)
+
+func WithErrorMetadata(policies ...ErrorMetadataPolicy) gin.HandlerFunc {
+	configured := append([]ErrorMetadataPolicy(nil), policies...)
+	return func(c *gin.Context) {
+		c.Set(errorMetadataKey, configured)
+		c.Next()
+	}
+}
+
+func applyErrorMetadata(c *gin.Context, code int, messageKey string, err error) {
+	value, _ := c.Get(errorMetadataKey)
+	policies, _ := value.([]ErrorMetadataPolicy)
+	for _, policy := range policies {
+		if policy != nil {
+			policy(c, code, messageKey, err)
+		}
 	}
 }

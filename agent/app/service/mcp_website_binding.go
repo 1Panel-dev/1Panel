@@ -17,14 +17,17 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/docker/docker/api/types/container"
@@ -52,6 +55,7 @@ func init() {
 
 type MCPWebsiteBindingService struct {
 	createWebsite func(request.WebsiteCreate) error
+	deleteWebsite func(request.WebsiteDelete) error
 	updateHTTPS   func(context.Context, request.WebsiteHTTPSOp) error
 	applyInclude  func(model.Website) error
 	removeInclude func(model.Website) error
@@ -63,6 +67,7 @@ type MCPWebsiteBindingService struct {
 func NewMCPWebsiteBindingService() *MCPWebsiteBindingService {
 	s := &MCPWebsiteBindingService{
 		createWebsite: func(req request.WebsiteCreate) error { return NewIWebsiteService().CreateWebsite(req) },
+		deleteWebsite: func(req request.WebsiteDelete) error { return NewIWebsiteService().DeleteWebsite(req) },
 		updateHTTPS: func(ctx context.Context, req request.WebsiteHTTPSOp) error {
 			if req.Enable {
 				current, err := NewIWebsiteService().GetWebsiteHTTPS(req.WebsiteID)
@@ -140,14 +145,22 @@ func mcpWebsiteHasWWWMount(mounts []container.MountPoint, root string) bool {
 }
 
 type mcpWebsiteOwner struct {
-	BindingID   string `json:"bindingId"`
-	WebsiteID   uint   `json:"websiteId"`
-	KeyHash     string `json:"keyHash"`
-	BindHash    string `json:"bindHash"`
-	ProxyHash   string `json:"proxyHash"`
-	RequestID   string `json:"requestId"`
-	RequestHash string `json:"requestHash"`
-	Operation   string `json:"operation"`
+	BindingID   string                 `json:"bindingId"`
+	WebsiteID   uint                   `json:"websiteId"`
+	KeyHash     string                 `json:"keyHash"`
+	BindHash    string                 `json:"bindHash"`
+	ProxyHash   string                 `json:"proxyHash"`
+	RequestID   string                 `json:"requestId"`
+	RequestHash string                 `json:"requestHash"`
+	Operation   string                 `json:"operation"`
+	DeleteRoot  string                 `json:"deleteRoot,omitempty"`
+	DeletePaths []mcpWebsiteDeletePath `json:"deletePaths,omitempty"`
+}
+
+type mcpWebsiteDeletePath struct {
+	Kind   string `json:"kind"`
+	Device uint64 `json:"device"`
+	Inode  uint64 `json:"inode"`
 }
 
 func mcpWebsiteHash(value string) string {
@@ -235,6 +248,9 @@ func mcpWebsiteFailure(reason string, definitive, conflict bool) response.MCPWeb
 	}
 	if conflict {
 		code, message = "MCP_WEBSITE_CONFLICT", "MCP website configuration changed"
+	}
+	if definitive && reason == "http_port_requires_default" {
+		code, message = "MCP_WEBSITE_HTTP_PORT_REQUIRED", "Use the OpenResty HTTP port before enabling HTTPS"
 	}
 	return response.MCPWebsiteBinding{State: "unavailable", Reason: reason, Code: code, Error: message, Definitive: definitive}
 }
@@ -461,11 +477,188 @@ func mcpWebsiteReadProxy(path string) ([]byte, error) {
 }
 
 func mcpWebsitePayloadHash(req request.MCPWebsiteBinding) string {
-	return mcpWebsiteHash(fmt.Sprintf("%s\n%s\n%t\n%d", req.Operation, req.Domain, req.EnableSSL, req.SSLID))
+	payload := fmt.Sprintf("%s\n%s\n%t\n%d", req.Operation, req.Domain, req.EnableSSL, req.SSLID)
+	if req.DeleteWebsite {
+		payload += "\ndeleteWebsite=true"
+	}
+	return mcpWebsiteHash(payload)
 }
 
 func mcpWebsiteBindHash(req request.MCPWebsiteBinding) string {
 	return mcpWebsiteHash(fmt.Sprintf("%s\n%t\n%d", req.Domain, req.EnableSSL, req.SSLID))
+}
+
+func mcpWebsiteDeleteLocations(site model.Website) map[string]string {
+	return map[string]string{"site": GetSitePath(site, SiteDir), "config": GetSitePath(site, SiteConf)}
+}
+
+func mcpWebsiteDeleteParents() error {
+	root := filepath.Clean(GetWebSiteRootDir())
+	if !filepath.IsAbs(root) {
+		return errors.New("invalid managed website root")
+	}
+	for _, directory := range []string{root, filepath.Join(root, "sites"), filepath.Join(root, "conf.d")} {
+		info, err := os.Lstat(directory)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil || !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
+			return errors.New("managed website directory changed")
+		}
+	}
+	return nil
+}
+
+func mcpWebsiteDeleteIdentity(kind, location string) (mcpWebsiteDeletePath, bool, error) {
+	info, err := os.Lstat(location)
+	if os.IsNotExist(err) {
+		return mcpWebsiteDeletePath{}, false, nil
+	}
+	if err != nil || info.Mode()&os.ModeSymlink != 0 || kind == "site" && !info.IsDir() || kind == "config" && !info.Mode().IsRegular() {
+		return mcpWebsiteDeletePath{}, false, errors.New("managed website path changed")
+	}
+	stat, ok := info.Sys().(*syscall.Stat_t)
+	if !ok {
+		return mcpWebsiteDeletePath{}, false, errors.New("managed website path identity is unavailable")
+	}
+	return mcpWebsiteDeletePath{Kind: kind, Device: uint64(stat.Dev), Inode: uint64(stat.Ino)}, true, nil
+}
+
+func mcpWebsiteRecordDeletePaths(site model.Website, owner *mcpWebsiteOwner) error {
+	if err := mcpWebsiteDeleteParents(); err != nil {
+		return err
+	}
+	owner.DeleteRoot, owner.DeletePaths = filepath.Clean(GetWebSiteRootDir()), nil
+	for kind, location := range mcpWebsiteDeleteLocations(site) {
+		identity, exists, err := mcpWebsiteDeleteIdentity(kind, location)
+		if err != nil {
+			return err
+		}
+		if exists {
+			owner.DeletePaths = append(owner.DeletePaths, identity)
+		}
+	}
+	return nil
+}
+
+func mcpWebsiteVerifyDeletePaths(site model.Website, owner mcpWebsiteOwner) (map[string]string, error) {
+	if owner.DeleteRoot == "" || owner.DeleteRoot != filepath.Clean(GetWebSiteRootDir()) {
+		return nil, errors.New("managed website root changed")
+	}
+	if err := mcpWebsiteDeleteParents(); err != nil {
+		return nil, err
+	}
+	expected := make(map[string]mcpWebsiteDeletePath)
+	for _, identity := range owner.DeletePaths {
+		if identity.Kind != "site" && identity.Kind != "config" || expected[identity.Kind].Kind != "" {
+			return nil, errors.New("invalid managed website deletion journal")
+		}
+		expected[identity.Kind] = identity
+	}
+	remaining := make(map[string]string)
+	for kind, location := range mcpWebsiteDeleteLocations(site) {
+		actual, exists, err := mcpWebsiteDeleteIdentity(kind, location)
+		if err != nil {
+			return nil, err
+		}
+		if exists {
+			if expected[kind] != actual {
+				return nil, errors.New("managed website path was replaced")
+			}
+			remaining[kind] = location
+		}
+	}
+	return remaining, nil
+}
+
+func mcpWebsiteCleanupDeletedPrivate(site model.Website) error {
+	if err := mcpWebsitePrivateDirectory(site, false); err != nil {
+		if _, statErr := os.Lstat(filepath.Dir(mcpWebsitePrivatePath(site, mcpWebsiteOwnerName))); os.IsNotExist(statErr) {
+			return nil
+		}
+		return err
+	}
+	if _, err := os.Lstat(mcpWebsitePrivatePath(site, mcpWebsiteProxyName)); !os.IsNotExist(err) {
+		return errors.New("managed proxy remains after website deletion")
+	}
+	if err := os.Remove(mcpWebsitePrivatePath(site, mcpWebsiteOwnerName)); err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	directory := filepath.Dir(mcpWebsitePrivatePath(site, mcpWebsiteOwnerName))
+	entries, err := os.ReadDir(directory)
+	if err != nil {
+		return err
+	}
+	if len(entries) == 0 {
+		return os.Remove(directory)
+	}
+	return nil
+}
+
+func (s *MCPWebsiteBindingService) deletedWebsite(req request.MCPWebsiteBinding, site model.Website, owner mcpWebsiteOwner, recoverFiles bool) response.MCPWebsiteBinding {
+	if replacement, err := websiteRepo.GetFirst(websiteRepo.WithAlias(site.Alias)); err == nil || !errors.Is(err, gorm.ErrRecordNotFound) {
+		if err == nil && replacement.ID == site.ID {
+			return mcpWebsiteFailure("website_delete_unconfirmed", false, false)
+		}
+		return mcpWebsiteFailure("website_ownership_changed", false, true)
+	}
+	remaining, err := mcpWebsiteVerifyDeletePaths(site, owner)
+	if err != nil {
+		return mcpWebsiteFailure("website_directory_changed", false, true)
+	}
+	if len(remaining) > 0 && !recoverFiles {
+		return mcpWebsiteFailure("website_delete_unconfirmed", false, false)
+	}
+	for kind, location := range remaining {
+		fileOp := files.NewFileOp()
+		if kind == "site" {
+			err = fileOp.DeleteDir(location)
+		} else {
+			err = fileOp.DeleteFile(location)
+		}
+		if err != nil {
+			return mcpWebsiteFailure("website_delete_failed", false, false)
+		}
+	}
+	remaining, err = mcpWebsiteVerifyDeletePaths(site, owner)
+	if err != nil || len(remaining) != 0 {
+		return mcpWebsiteFailure("website_delete_unconfirmed", false, false)
+	}
+	if err = mcpWebsiteCleanupDeletedPrivate(site); err != nil {
+		return mcpWebsiteFailure("ownership_cleanup_failed", false, false)
+	}
+	return response.MCPWebsiteBinding{State: "unbound", WebsiteID: site.ID, BindingID: req.BindingID, RequestID: req.RequestID, WebsiteDeleted: true}
+}
+
+func (s *MCPWebsiteBindingService) missingDeletedWebsite(req request.MCPWebsiteBinding) response.MCPWebsiteBinding {
+	site := model.Website{BaseModel: model.BaseModel{ID: req.WebsiteID}, Alias: mcpWebsiteAlias(req.BindingID)}
+	if _, err := websiteRepo.GetFirst(websiteRepo.WithAlias(site.Alias)); err == nil || !errors.Is(err, gorm.ErrRecordNotFound) {
+		return mcpWebsiteFailure("website_ownership_changed", false, true)
+	}
+	owner, ownerErr := mcpWebsiteReadOwner(site)
+	if ownerErr == nil && owner.BindingID == req.BindingID && (req.WebsiteID == 0 || owner.WebsiteID == req.WebsiteID) && owner.KeyHash == mcpWebsiteHash(req.ProxyKey) &&
+		owner.Operation == "unbind" && owner.RequestID == req.RequestID && owner.RequestHash == mcpWebsitePayloadHash(req) {
+		site.ID = owner.WebsiteID
+		if _, err := websiteRepo.GetFirst(repo.WithByID(site.ID)); !errors.Is(err, gorm.ErrRecordNotFound) {
+			return mcpWebsiteFailure("website_ownership_changed", false, true)
+		}
+		return s.deletedWebsite(req, site, owner, true)
+	}
+	if _, err := os.Lstat(mcpWebsitePrivatePath(site, mcpWebsiteOwnerName)); !os.IsNotExist(err) {
+		return mcpWebsiteFailure("website_ownership_changed", false, true)
+	}
+	if _, err := os.Lstat(mcpWebsitePrivatePath(site, mcpWebsiteProxyName)); !os.IsNotExist(err) {
+		return mcpWebsiteFailure("proxy_modified", false, true)
+	}
+	if err := mcpWebsiteDeleteParents(); err != nil {
+		return mcpWebsiteFailure("website_directory_changed", false, true)
+	}
+	for _, location := range mcpWebsiteDeleteLocations(site) {
+		if _, err := os.Lstat(location); !os.IsNotExist(err) {
+			return mcpWebsiteFailure("website_delete_unconfirmed", false, false)
+		}
+	}
+	return response.MCPWebsiteBinding{State: "unbound", WebsiteID: req.WebsiteID, BindingID: req.BindingID, RequestID: req.RequestID, WebsiteDeleted: true}
 }
 
 func (s *MCPWebsiteBindingService) matchesInitialSite(req request.MCPWebsiteBinding, site model.Website) bool {
@@ -479,12 +672,9 @@ func (s *MCPWebsiteBindingService) matchesInitialSite(req request.MCPWebsiteBind
 			return false
 		}
 		port = installed.HttpPort
-		if req.EnableSSL {
-			port = installed.HttpsPort
-		}
 	}
 	for _, domain := range site.Domains {
-		if domain.Domain == host && domain.Port == port {
+		if domain.Domain == host && domain.Port == port && !domain.SSL {
 			return true
 		}
 	}
@@ -617,6 +807,9 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 	if req.Operation != "status" && req.Operation != "bind" && req.Operation != "update" && req.Operation != "unbind" && req.Operation != "sync" {
 		return mcpWebsiteFailure("invalid_operation", true, false)
 	}
+	if req.DeleteWebsite && req.Operation != "unbind" {
+		return mcpWebsiteFailure("invalid_operation", true, false)
+	}
 	if req.BindingID == "" && req.WebsiteID == 0 && req.Operation == "status" {
 		return response.MCPWebsiteBinding{State: "unbound"}
 	}
@@ -639,6 +832,9 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 	site, err := s.load(req)
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		if req.Operation == "status" || req.Operation == "unbind" {
+			if req.DeleteWebsite {
+				return s.missingDeletedWebsite(req)
+			}
 			if req.WebsiteID == 0 || req.Operation == "unbind" {
 				return response.MCPWebsiteBinding{State: "unbound", BindingID: req.BindingID, RequestID: req.RequestID}
 			}
@@ -658,19 +854,31 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 		domain, port, _ := mcpWebsiteDomain(req.Domain)
 		if port == 0 {
 			port = installed.HttpPort
-			if req.EnableSSL {
-				port = installed.HttpsPort
-			}
 		}
-		if existing, conflictErr := websiteDomainRepo.GetFirst(websiteDomainRepo.WithDomain(domain), websiteDomainRepo.WithPort(port)); conflictErr == nil && existing.ID > 0 {
-			return mcpWebsiteFailure("domain_conflict", true, true)
-		} else if conflictErr != nil && !errors.Is(conflictErr, gorm.ErrRecordNotFound) {
+		if req.EnableSSL && port != installed.HttpPort {
+			return mcpWebsiteFailure("http_port_requires_default", true, false)
+		}
+		candidate := model.Website{Protocol: constant.ProtocolHTTP, Domains: []model.WebsiteDomain{{Domain: domain, Port: port}}}
+		if req.EnableSSL {
+			candidate.Protocol = constant.ProtocolHTTPS
+		}
+		if conflictErr := checkWebsiteListenConflict(candidate, installed.HttpPort, installed.HttpsPort); conflictErr != nil {
+			var business buserr.BusinessError
+			if errors.As(conflictErr, &business) && business.Msg == "ErrDomainIsUsed" {
+				return mcpWebsiteFailure("domain_conflict", true, true)
+			}
 			return mcpWebsiteFailure("website_unavailable", false, false)
 		}
 		create := request.WebsiteCreate{Alias: mcpWebsiteAlias(req.BindingID), Type: constant.Static, Remark: mcpWebsiteRemark(req), WebsiteGroupID: group.ID,
-			Domains: []request.WebsiteDomain{{Domain: domain, Port: port, SSL: req.EnableSSL}}, SSLConfig: request.SSLConfig{EnableSSL: req.EnableSSL, WebsiteSSLID: req.SSLID}}
+			Domains: []request.WebsiteDomain{{Domain: domain, Port: port}}, SSLConfig: request.SSLConfig{EnableSSL: req.EnableSSL, WebsiteSSLID: req.SSLID}}
+		previousMutation := mutationStarted
 		mutationStarted = true
 		if createErr := s.createWebsite(create); createErr != nil {
+			var business buserr.BusinessError
+			if errors.As(createErr, &business) && business.Msg == "ErrDomainIsUsed" {
+				mutationStarted = previousMutation
+				return mcpWebsiteFailure("domain_conflict", true, true)
+			}
 			return mcpWebsiteFailure("website_create_failed", false, false)
 		}
 		site, err = s.load(req)
@@ -701,6 +909,9 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 		return mcpWebsiteFailure("website_unavailable", false, false)
 	}
 	if ownerErr != nil {
+		if req.DeleteWebsite {
+			return mcpWebsiteFailure("website_ownership_changed", false, true)
+		}
 		if (req.Operation != "bind" && req.Operation != "unbind") || site.Remark != mcpWebsiteRemark(req) {
 			return mcpWebsiteFailure("website_ownership_changed", true, true)
 		}
@@ -711,15 +922,44 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 	} else if owner.BindingID != req.BindingID || owner.WebsiteID != site.ID || owner.KeyHash != mcpWebsiteHash(req.ProxyKey) {
 		return mcpWebsiteFailure("website_ownership_changed", true, true)
 	}
+	if req.DeleteWebsite {
+		if site.Type != constant.Static || site.AppInstallID != 0 || site.RuntimeID != 0 || site.DbID != 0 || site.DbType != "" || site.ParentWebsiteID != 0 {
+			return mcpWebsiteFailure("website_modified", true, true)
+		}
+		if err = mcpWebsiteDeleteParents(); err != nil {
+			return mcpWebsiteFailure("website_directory_changed", true, true)
+		}
+		for kind, location := range mcpWebsiteDeleteLocations(site) {
+			if _, _, err = mcpWebsiteDeleteIdentity(kind, location); err != nil {
+				return mcpWebsiteFailure("website_directory_changed", true, true)
+			}
+		}
+		children, childErr := websiteRepo.GetBy(websiteRepo.WithParentID(site.ID))
+		if childErr != nil {
+			return mcpWebsiteFailure("website_unavailable", false, false)
+		}
+		if len(children) != 0 {
+			return mcpWebsiteFailure("website_modified", true, true)
+		}
+	}
 	if req.Operation == "status" {
 		return s.status(req, site, owner)
 	}
 	operationHash := mcpWebsitePayloadHash(req)
+	deleteRetry := req.DeleteWebsite && owner.Operation == "unbind" && owner.RequestID == req.RequestID && owner.RequestHash == operationHash && owner.DeleteRoot != ""
+	if owner.DeleteRoot != "" && req.Operation != "status" && (owner.RequestID != req.RequestID || owner.RequestHash != operationHash) {
+		return mcpWebsiteFailure("operation_request_changed", false, true)
+	}
+	if deleteRetry {
+		if _, err = mcpWebsiteVerifyDeletePaths(site, owner); err != nil {
+			return mcpWebsiteFailure("website_directory_changed", false, true)
+		}
+	}
 	if owner.RequestID == req.RequestID && req.RequestID != "" {
 		if owner.RequestHash != operationHash {
 			return mcpWebsiteFailure("operation_request_changed", true, true)
 		}
-		if owner.Operation == "unbind" || owner.ProxyHash == mcpWebsiteHash(string(mcpWebsiteProxy(req))) {
+		if owner.Operation == "unbind" && !req.DeleteWebsite || owner.Operation != "unbind" && owner.ProxyHash == mcpWebsiteHash(string(mcpWebsiteProxy(req))) {
 			return s.status(req, site, owner)
 		}
 	}
@@ -774,16 +1014,47 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 				return mcpWebsiteFailure("proxy_remove_failed", false, false)
 			}
 		}
+		if req.DeleteWebsite && !deleteRetry {
+			if err = mcpWebsiteRecordDeletePaths(site, &owner); err != nil {
+				return mcpWebsiteFailure("website_directory_changed", false, true)
+			}
+		}
 		owner.Operation, owner.RequestID, owner.RequestHash = "unbind", req.RequestID, operationHash
 		mutationStarted = true
 		if err = mcpWebsiteWriteOwner(site, owner); err != nil {
 			return mcpWebsiteFailure("ownership_write_failed", false, false)
+		}
+		if req.DeleteWebsite {
+			if err = s.deleteWebsite(request.WebsiteDelete{ID: site.ID}); err != nil {
+				return mcpWebsiteFailure("website_delete_failed", false, false)
+			}
+			if _, err = websiteRepo.GetFirst(repo.WithByID(site.ID)); !errors.Is(err, gorm.ErrRecordNotFound) {
+				return mcpWebsiteFailure("website_delete_unconfirmed", false, false)
+			}
+			return s.deletedWebsite(req, site, owner, false)
 		}
 		return s.status(req, site, owner)
 	}
 	if req.Operation == "update" {
 		if req.Domain != site.PrimaryDomain {
 			return mcpWebsiteFailure("domain_changed", true, true)
+		}
+		if req.EnableSSL {
+			installed, installErr := s.openresty()
+			if installErr != nil || installed.ID == 0 || installed.Status != constant.StatusRunning {
+				return mcpWebsiteFailure("openresty_unavailable", true, false)
+			}
+			host, _, _ := mcpWebsiteDomain(site.PrimaryDomain)
+			usesHTTPPort := false
+			for _, domain := range site.Domains {
+				if domain.Domain == host && domain.Port == installed.HttpPort && !domain.SSL {
+					usesHTTPPort = true
+					break
+				}
+			}
+			if !usesHTTPPort {
+				return mcpWebsiteFailure("http_port_requires_default", true, false)
+			}
 		}
 		if site.Protocol == constant.ProtocolHTTPS && !req.EnableSSL || site.Protocol != constant.ProtocolHTTPS && req.EnableSSL || req.EnableSSL && site.WebsiteSSLID != req.SSLID {
 			mutationStarted = true

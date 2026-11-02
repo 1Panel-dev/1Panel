@@ -14,13 +14,14 @@ type MCPRuntimeSettings struct {
 type MCPRuntimeSettingsUpdate = MCPRuntimeSettings
 
 type MCPRuntimeInstall struct {
-	DockerImage  string                    `json:"dockerImage"`
-	ListenPort   int                       `json:"listenPort"`
-	ExternalURL  string                    `json:"externalUrl"`
-	Revision     uint64                    `json:"revision"`
-	AccessPolicy string                    `json:"accessPolicy"`
-	AllowedIPs   []string                  `json:"allowedIPs"`
-	Website      *MCPRuntimeInstallWebsite `json:"website,omitempty"`
+	DockerImage    string                    `json:"dockerImage"`
+	DeleteOldImage bool                      `json:"deleteOldImage"`
+	ListenPort     int                       `json:"listenPort"`
+	ExternalURL    string                    `json:"externalUrl"`
+	Revision       uint64                    `json:"revision"`
+	AccessPolicy   string                    `json:"accessPolicy"`
+	AllowedIPs     []string                  `json:"allowedIPs"`
+	Website        *MCPRuntimeInstallWebsite `json:"website,omitempty"`
 }
 
 type MCPRuntimeInstallWebsite struct {

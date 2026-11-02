@@ -28,32 +28,34 @@ import (
 )
 
 type mcpWebsiteAgentRequest struct {
-	Operation string `json:"operation"`
-	WebsiteID uint   `json:"websiteId"`
-	BindingID string `json:"bindingId"`
-	RequestID string `json:"requestId"`
-	Domain    string `json:"domain"`
-	EnableSSL bool   `json:"enableSSL"`
-	SSLID     uint   `json:"sslID"`
-	Upstream  string `json:"upstream"`
-	CoreHost  string `json:"coreHost"`
-	ProxyKey  string `json:"proxyKey"`
-}
-
-type mcpWebsiteAgentResponse struct {
-	State         string `json:"state"`
+	Operation     string `json:"operation"`
 	WebsiteID     uint   `json:"websiteId"`
 	BindingID     string `json:"bindingId"`
 	RequestID     string `json:"requestId"`
 	Domain        string `json:"domain"`
-	Endpoint      string `json:"endpoint"`
 	EnableSSL     bool   `json:"enableSSL"`
 	SSLID         uint   `json:"sslID"`
-	WebsiteStatus string `json:"websiteStatus"`
-	Reason        string `json:"reason,omitempty"`
-	Error         string `json:"error,omitempty"`
-	Code          string `json:"code,omitempty"`
-	Definitive    bool   `json:"definitive,omitempty"`
+	Upstream      string `json:"upstream"`
+	CoreHost      string `json:"coreHost"`
+	ProxyKey      string `json:"proxyKey"`
+	DeleteWebsite bool   `json:"deleteWebsite,omitempty"`
+}
+
+type mcpWebsiteAgentResponse struct {
+	State          string `json:"state"`
+	WebsiteID      uint   `json:"websiteId"`
+	BindingID      string `json:"bindingId"`
+	RequestID      string `json:"requestId"`
+	Domain         string `json:"domain"`
+	Endpoint       string `json:"endpoint"`
+	EnableSSL      bool   `json:"enableSSL"`
+	SSLID          uint   `json:"sslID"`
+	WebsiteStatus  string `json:"websiteStatus"`
+	Reason         string `json:"reason,omitempty"`
+	Error          string `json:"error,omitempty"`
+	Code           string `json:"code,omitempty"`
+	Definitive     bool   `json:"definitive,omitempty"`
+	WebsiteDeleted bool   `json:"websiteDeleted,omitempty"`
 }
 
 type mcpWebsiteTransport interface {
@@ -97,10 +99,11 @@ func (mcpWebsiteHTTPTransport) Call(ctx context.Context, request mcpWebsiteAgent
 
 type mcpWebsiteOperation struct {
 	dto.MCPWebsitePendingRequest
-	Hash      string `json:"hash"`
-	BindingID string `json:"bindingId"`
-	State     string `json:"state"`
-	ErrorCode string `json:"errorCode,omitempty"`
+	Hash        string `json:"hash"`
+	BindingID   string `json:"bindingId"`
+	State       string `json:"state"`
+	ErrorCode   string `json:"errorCode,omitempty"`
+	ErrorReason string `json:"errorReason,omitempty"`
 }
 
 func (s *MCPRuntimeService) websiteAgent() mcpWebsiteTransport {
@@ -126,7 +129,8 @@ func decodeMCPWebsiteOperation(value string) (*mcpWebsiteOperation, error) {
 	if json.Unmarshal([]byte(value), &operation) != nil || !validMCPWebsiteRequestID(operation.RequestID) ||
 		!validMCPWebsiteRequestID(operation.BindingID) || len(operation.Hash) != 64 ||
 		(operation.State != "pending" && operation.State != "succeeded" && operation.State != "failed") ||
-		(operation.Operation != "bind" && operation.Operation != "update" && operation.Operation != "unbind") {
+		(operation.Operation != "bind" && operation.Operation != "update" && operation.Operation != "unbind") ||
+		(operation.DeleteWebsite && operation.Operation != "unbind") {
 		return nil, contract.Fail("MCP_WEBSITE_UNAVAILABLE", 503, "MCP website state is unavailable")
 	}
 	return &operation, nil
@@ -181,7 +185,7 @@ func normalizeMCPWebsiteDomain(domain string) (string, error) {
 }
 
 func validMCPWebsiteMetadata(response mcpWebsiteAgentResponse) bool {
-	if !mcpDocumentEndpoint(response.Endpoint) || response.EnableSSL && response.SSLID == 0 || !response.EnableSSL && response.SSLID != 0 {
+	if !validMCPExternalEndpoint(response.Endpoint) || response.EnableSSL && response.SSLID == 0 || !response.EnableSSL && response.SSLID != 0 {
 		return false
 	}
 	domain, err := normalizeMCPWebsiteDomain(response.Domain)
@@ -190,7 +194,7 @@ func validMCPWebsiteMetadata(response mcpWebsiteAgentResponse) bool {
 	}
 	domainURL, _ := url.Parse("http://" + domain)
 	endpoint, _ := url.Parse(response.Endpoint)
-	return strings.EqualFold(domainURL.Hostname(), endpoint.Hostname()) && (endpoint.Scheme == "https") == response.EnableSSL
+	return endpoint.Path == "/mcp" && strings.EqualFold(domainURL.Hostname(), endpoint.Hostname()) && (endpoint.Scheme == "https") == response.EnableSSL
 }
 
 func (s *MCPRuntimeService) websiteAgentRequest(ctx context.Context, row model.MCPSetting, operation string, operationID string) (mcpWebsiteAgentRequest, error) {
@@ -249,6 +253,7 @@ func (s *MCPRuntimeService) websiteStatus(ctx context.Context, row model.MCPSett
 	}
 	if operation != nil {
 		result.RequestID = operation.RequestID
+		result.WebsiteDeleted = operation.Operation == "unbind" && operation.State == "succeeded" && operation.DeleteWebsite
 	}
 	if row.WebsiteID == 0 && row.WebsiteBindingID == "" && (operation == nil || operation.State != "pending") {
 		return result, nil
@@ -301,18 +306,45 @@ func (s *MCPRuntimeService) UpdateWebsite(ctx context.Context, req dto.MCPWebsit
 }
 
 func (s *MCPRuntimeService) UnbindWebsite(ctx context.Context, req dto.MCPWebsiteUnbind) (dto.MCPWebsiteStatus, error) {
-	return s.mutateWebsite(ctx, dto.MCPWebsitePendingRequest{Operation: "unbind", RequestID: req.RequestID}, req.Revision)
+	return s.mutateWebsite(ctx, dto.MCPWebsitePendingRequest{Operation: "unbind", RequestID: req.RequestID, DeleteWebsite: req.DeleteWebsite}, req.Revision)
 }
 
-func mcpWebsiteOperationError(code string, uncertain bool) error {
+func mcpWebsiteConflictReason(reason string) string {
+	switch reason {
+	case "domain_conflict":
+		return "website_domain_conflict"
+	case "website_ownership_changed":
+		return "website_ownership_changed"
+	case "domain_changed":
+		return "website_domain_changed"
+	case "website_directory_changed", "proxy_directory_changed":
+		return "website_directory_changed"
+	case "proxy_modified", "proxy_already_exists":
+		return "website_proxy_modified"
+	case "website_modified":
+		return "website_modified"
+	case "binding_request_changed", "operation_request_changed":
+		return "website_request_changed"
+	case "proxy_not_loaded":
+		return "website_proxy_not_loaded"
+	case "website_missing":
+		return "website_missing"
+	default:
+		return ""
+	}
+}
+
+func mcpWebsiteOperationError(code, reason string, uncertain bool) error {
 	if uncertain {
 		return contract.Fail("MCP_WEBSITE_PENDING", 503, "MCP website operation could not be confirmed")
 	}
 	switch code {
 	case "MCP_INVALID_ARGUMENTS", "MCP_WEBSITE_INVALID", "MCP_WEBSITE_INVALID_ARGUMENTS":
 		return contract.Invalid()
+	case "MCP_WEBSITE_HTTP_PORT_REQUIRED":
+		return contract.Fail("MCP_WEBSITE_HTTP_PORT_REQUIRED", 400, "Use the OpenResty HTTP port as the website base port before enabling HTTPS")
 	case "MCP_CONFLICT", "MCP_WEBSITE_CONFLICT":
-		return contract.Fail("MCP_CONFLICT", 409, "MCP website configuration changed")
+		return contract.Conflict(reason, "MCP website configuration changed")
 	case "MCP_FORBIDDEN":
 		return contract.Forbidden()
 	default:
@@ -330,6 +362,7 @@ func (s *MCPRuntimeService) mutateWebsite(ctx context.Context, pending dto.MCPWe
 
 func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto.MCPWebsitePendingRequest, revision uint64) (dto.MCPWebsiteStatus, error) {
 	if !validMCPWebsiteRequestID(pending.RequestID) || revision == 0 ||
+		(pending.DeleteWebsite && pending.Operation != "unbind") ||
 		(pending.Operation != "unbind" && (pending.EnableSSL && pending.SSLID == 0 || !pending.EnableSSL && pending.SSLID != 0)) {
 		return dto.MCPWebsiteStatus{}, contract.Invalid()
 	}
@@ -347,24 +380,40 @@ func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto
 	operation := mcpWebsiteOperation{MCPWebsitePendingRequest: pending, Hash: hash, State: "pending", BindingID: row.WebsiteBindingID}
 	if previous != nil && previous.RequestID == pending.RequestID {
 		if previous.Hash != hash {
-			return dto.MCPWebsiteStatus{}, contract.Fail("MCP_CONFLICT", 409, "MCP website request was already used")
+			return dto.MCPWebsiteStatus{}, contract.Conflict("request_reused", "MCP website request was already used")
 		}
 		if previous.State == "succeeded" {
 			return s.websiteStatus(ctx, row)
 		}
 		if previous.State == "failed" {
-			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError(previous.ErrorCode, false)
+			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError(previous.ErrorCode, previous.ErrorReason, false)
 		}
 		operation = *previous
 	} else {
 		cancelPendingChange := previous != nil && previous.State == "pending" &&
 			(previous.Operation == "bind" || previous.Operation == "update") && pending.Operation == "unbind"
-		if previous != nil && previous.State == "pending" && !cancelPendingChange || row.Revision != revision {
+		if row.Revision != revision {
 			return dto.MCPWebsiteStatus{}, ErrMCPSettingsRevision
+		}
+		if previous != nil && previous.State == "pending" && !cancelPendingChange {
+			return dto.MCPWebsiteStatus{}, contract.Conflict("website_operation_pending", "An MCP website operation is still pending")
+		}
+		if cancelPendingChange && previous.Operation == "bind" && row.WebsiteID == 0 && pending.DeleteWebsite {
+			// Keep the original bind retryable until the Agent can identify its website.
+			probe, probeErr := s.websiteAgentRequest(ctx, row, "status", previous.RequestID)
+			if probeErr != nil {
+				return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("MCP_CONFLICT", "website_state_unconfirmed", false)
+			}
+			status, statusErr := s.websiteAgent().Call(ctx, probe)
+			if statusErr != nil || status.Error != "" || status.BindingID != row.WebsiteBindingID ||
+				(status.State != "unbound" && status.State != "bound" && status.State != "unavailable") ||
+				(status.WebsiteID == 0 && status.State != "unbound") {
+				return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("MCP_CONFLICT", "website_state_unconfirmed", false)
+			}
 		}
 		if pending.Operation == "bind" {
 			if row.WebsiteID != 0 {
-				return dto.MCPWebsiteStatus{}, contract.Fail("MCP_CONFLICT", 409, "MCP already has a bound website")
+				return dto.MCPWebsiteStatus{}, contract.Conflict("website_already_bound", "MCP already has a bound website")
 			}
 			settings, err := s.settings(ctx)
 			if err != nil {
@@ -376,7 +425,7 @@ func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto
 			operation.BindingID = pending.RequestID
 			row.WebsiteBindingID = operation.BindingID
 		} else if row.WebsiteID == 0 && !cancelPendingChange || !validMCPWebsiteRequestID(row.WebsiteBindingID) {
-			return dto.MCPWebsiteStatus{}, contract.Fail("MCP_CONFLICT", 409, "MCP has no bound website")
+			return dto.MCPWebsiteStatus{}, contract.Conflict("website_not_bound", "MCP has no bound website")
 		}
 		if _, err := s.websiteAgentRequest(ctx, row, pending.Operation, pending.RequestID); err != nil {
 			return dto.MCPWebsiteStatus{}, err
@@ -387,33 +436,36 @@ func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto
 	}
 	request, err := s.websiteAgentRequest(ctx, row, pending.Operation, pending.RequestID)
 	if err != nil {
-		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 	}
 	request.Domain, request.EnableSSL, request.SSLID = pending.Domain, pending.EnableSSL, pending.SSLID
+	request.DeleteWebsite = pending.DeleteWebsite
 	response, callErr := s.websiteAgent().Call(ctx, request)
 	if callErr != nil {
-		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 	}
 	if response.Error != "" {
 		if !response.Definitive || pending.Operation == "unbind" && row.WebsiteID == 0 && row.WebsiteBindingID != "" {
-			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 		}
 		operation.State, operation.ErrorCode = "failed", response.Code
+		operation.ErrorReason = mcpWebsiteConflictReason(response.Reason)
 		bindingID := row.WebsiteBindingID
 		if pending.Operation == "bind" && row.WebsiteID == 0 {
 			bindingID = ""
 		}
 		if err := s.saveWebsiteOperation(ctx, &row, operation, row.WebsiteID, bindingID); err != nil {
-			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+			return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 		}
-		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError(response.Code, false)
+		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError(response.Code, operation.ErrorReason, false)
 	}
 	if response.BindingID != operation.BindingID || response.RequestID != pending.RequestID ||
 		(pending.Operation != "unbind" && (response.State != "bound" || response.WebsiteID == 0 || !validMCPWebsiteMetadata(response))) ||
 		(pending.Operation != "unbind" && (response.EnableSSL != pending.EnableSSL || response.SSLID != pending.SSLID)) ||
 		(pending.Operation == "update" && response.WebsiteID != row.WebsiteID) ||
-		(pending.Operation == "unbind" && response.State != "unbound") {
-		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+		(pending.Operation == "unbind" && response.State != "unbound") ||
+		(pending.Operation == "unbind" && pending.DeleteWebsite && (!response.WebsiteDeleted || (row.WebsiteID != 0 && response.WebsiteID != row.WebsiteID))) {
+		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 	}
 	websiteID, bindingID := response.WebsiteID, operation.BindingID
 	if pending.Operation == "unbind" {
@@ -421,10 +473,10 @@ func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto
 	}
 	operation.State = "succeeded"
 	if err := s.saveWebsiteOperation(ctx, &row, operation, websiteID, bindingID); err != nil {
-		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", true)
+		return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("", "", true)
 	}
 	if pending.Operation == "unbind" {
-		return dto.MCPWebsiteStatus{State: "unbound", Revision: row.Revision, RequestID: pending.RequestID}, nil
+		return dto.MCPWebsiteStatus{State: "unbound", Revision: row.Revision, RequestID: pending.RequestID, WebsiteDeleted: pending.DeleteWebsite}, nil
 	}
 	return dto.MCPWebsiteStatus{State: "bound", Revision: row.Revision, WebsiteID: response.WebsiteID, Domain: response.Domain,
 		Endpoint: response.Endpoint, EnableSSL: response.EnableSSL, SSLID: response.SSLID, WebsiteStatus: response.WebsiteStatus, RequestID: pending.RequestID}, nil

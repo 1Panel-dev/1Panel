@@ -60,16 +60,32 @@ type DockerManager struct {
 	client         *http.Client
 	installMu      sync.Mutex
 	installImageID string
+	installEnabled bool
+	installCleanup *cleanupReference
 }
 
 type dockerRequest struct {
-	Operation      string `json:"operation"`
-	Image          string `json:"image"`
-	Port           int    `json:"port"`
-	Enabled        bool   `json:"enabled"`
-	Restart        bool   `json:"restart"`
-	ImageID        string `json:"imageID,omitempty"`
-	StreamProgress bool   `json:"streamProgress,omitempty"`
+	Operation      string            `json:"operation"`
+	Image          string            `json:"image"`
+	Port           int               `json:"port"`
+	Enabled        bool              `json:"enabled"`
+	Restart        bool              `json:"restart"`
+	ImageID        string            `json:"imageID,omitempty"`
+	StreamProgress bool              `json:"streamProgress,omitempty"`
+	Cleanup        *cleanupReference `json:"cleanup,omitempty"`
+	DeleteOldImage bool              `json:"deleteOldImage,omitempty"`
+}
+
+type cleanupReference struct {
+	ContainerID         string `json:"containerID"`
+	PreviousContainerID string `json:"previousContainerID"`
+	PreviousImageID     string `json:"previousImageID"`
+}
+
+type cleanupResult struct {
+	ContainerRemoved    bool   `json:"containerRemoved,omitempty"`
+	ImageRemoved        bool   `json:"imageRemoved,omitempty"`
+	ImageRetainedReason string `json:"imageRetainedReason,omitempty"`
 }
 
 type dockerResponse struct {
@@ -82,10 +98,12 @@ type dockerResponse struct {
 		Image          string `json:"image"`
 		ImageID        string `json:"imageID"`
 	} `json:"state"`
-	Catalog json.RawMessage `json:"catalog"`
-	Logs    string          `json:"logs"`
-	Error   string          `json:"error"`
-	ImageID string          `json:"imageID"`
+	Catalog       json.RawMessage   `json:"catalog"`
+	Logs          string            `json:"logs"`
+	Error         string            `json:"error"`
+	ImageID       string            `json:"imageID"`
+	Cleanup       *cleanupReference `json:"cleanup,omitempty"`
+	CleanupResult *cleanupResult    `json:"cleanupResult,omitempty"`
 }
 
 func NewDocker(port int, image string) *DockerManager {
@@ -96,12 +114,17 @@ func NewDocker(port int, image string) *DockerManager {
 }
 
 func (m *DockerManager) call(ctx context.Context, operation string, enabled, restart bool, imageID string) (dockerResponse, error) {
+	return m.send(ctx, dockerRequest{Operation: operation, Image: m.image, Port: m.port, Enabled: enabled, Restart: restart, ImageID: imageID})
+}
+
+func (m *DockerManager) send(ctx context.Context, request dockerRequest) (dockerResponse, error) {
 	if err := ValidateDockerImage(m.image); err != nil {
 		return dockerResponse{}, err
 	}
 	if m.port < 1024 || m.port > 65535 {
 		return dockerResponse{}, errors.New("MCP listen port must be between 1024 and 65535")
 	}
+	operation := request.Operation
 	timeout := 65 * time.Second
 	if operation == "catalog" || operation == "apply_catalog" || operation == "candidate_catalog" || operation == "logs" || operation == "prepare" {
 		timeout = 5 * time.Second
@@ -114,7 +137,6 @@ func (m *DockerManager) call(ctx context.Context, operation string, enabled, res
 	}
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	request := dockerRequest{Operation: operation, Image: m.image, Port: m.port, Enabled: enabled, Restart: restart, ImageID: imageID}
 	data, err := json.Marshal(request)
 	if err != nil {
 		return dockerResponse{}, err
@@ -210,6 +232,8 @@ func (m *DockerManager) Apply(ctx context.Context, enabled, restart bool) error 
 func (m *DockerManager) InstallImage(ctx context.Context, enabled bool) error {
 	m.installMu.Lock()
 	m.installImageID = ""
+	m.installCleanup = nil
+	m.installEnabled = enabled
 	m.installMu.Unlock()
 	if err := m.pull(ctx); err != nil {
 		return err
@@ -223,13 +247,26 @@ func (m *DockerManager) InstallImage(ctx context.Context, enabled bool) error {
 	m.installImageID = imageID
 	m.installMu.Unlock()
 	ReportProgress(ctx, Progress{Status: "starting"})
-	_, err = m.call(ctx, "install", enabled, true, imageID)
-	return err
+	response, err := m.call(ctx, "install", enabled, true, imageID)
+	if err != nil {
+		return err
+	}
+	if response.Cleanup != nil {
+		if !validCleanupReference(response.Cleanup) {
+			return errors.New("MCP installation cleanup reference is invalid")
+		}
+		m.installMu.Lock()
+		value := *response.Cleanup
+		m.installCleanup = &value
+		m.installMu.Unlock()
+	}
+	return nil
 }
 
 func (m *DockerManager) RestoreAbsent(ctx context.Context) error {
 	m.installMu.Lock()
 	imageID := m.installImageID
+	m.installCleanup = nil
 	m.installMu.Unlock()
 	if imageID == "" {
 		return nil
@@ -245,6 +282,9 @@ func (m *DockerManager) Restore(ctx context.Context, imageID string, enabled boo
 	if enabled && imageID == "" {
 		return errors.New("MCP rollback requires the previous image identity")
 	}
+	m.installMu.Lock()
+	m.installCleanup = nil
+	m.installMu.Unlock()
 	_, err := m.call(ctx, "rollback", enabled, false, imageID)
 	return err
 }

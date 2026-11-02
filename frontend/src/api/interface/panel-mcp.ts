@@ -109,6 +109,7 @@ export namespace PanelMCP {
     export interface WebsitePendingRequest {
         operation: 'bind' | 'update' | 'unbind';
         requestId: string;
+        deleteWebsite?: boolean;
         domain?: string;
         enableSSL?: boolean;
         sslID?: number;
@@ -123,12 +124,16 @@ export namespace PanelMCP {
         websiteStatus: string;
         requestId: string;
         revision: number;
+        websiteDeleted?: boolean;
         reason?: string;
         pendingRequest?: WebsitePendingRequest;
     }
     export interface WebsiteMutation {
         requestId: string;
         revision: number;
+    }
+    export interface WebsiteUnbind extends WebsiteMutation {
+        deleteWebsite?: boolean;
     }
     export interface WebsiteBind extends WebsiteMutation {
         domain: string;
@@ -141,6 +146,7 @@ export namespace PanelMCP {
     }
     export interface Installation {
         dockerImage: string;
+        deleteOldImage: boolean;
         listenPort: number;
         externalUrl: string;
         revision: number;

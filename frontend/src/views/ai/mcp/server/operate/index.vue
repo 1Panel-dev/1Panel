@@ -344,3 +344,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.input-help {
+    color: var(--el-text-color-regular);
+}
+</style>

@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/url"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/core/app/auth"
@@ -102,7 +101,7 @@ func (s *MCPService) enrollmentKey(owner auth.APIKeyOwner, req dto.MCPCredential
 		return key, err
 	}
 	if key.Revision != req.Revision {
-		return key, contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
+		return key, contract.Conflict("credential_revision_changed", "Credential changed; refresh and retry")
 	}
 	if err := s.enrollmentActive(key, false); err != nil {
 		return key, err
@@ -184,13 +183,6 @@ func (s *MCPService) Rotate(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 	return &dto.MCPCredentialCreated{Item: item, Token: token}, nil
 }
 
-func mcpDocumentEndpoint(endpoint string) bool {
-	u, err := url.Parse(endpoint)
-	return err == nil && len(endpoint) <= 2048 && !strings.ContainsAny(endpoint, "\r\n\x00") &&
-		(u.Scheme == "https" || u.Scheme == "http") && u.Host != "" && u.User == nil && u.Path == "/mcp" &&
-		u.RawQuery == "" && u.Fragment == "" && u.Opaque == ""
-}
-
 func mcpDocumentJSON(value any) string {
 	data, _ := json.MarshalIndent(value, "", "  ")
 	return strings.ReplaceAll(string(data), "`", "\\u0060")
@@ -220,7 +212,7 @@ func mcpEnrollmentDocument(locale, client, syntax, config, endpoint string) (str
 		"MCPDocumentTitle", "MCPDocumentIntro", "MCPDocumentTaskTitle", "MCPDocumentTask", clientKey,
 		"MCPDocumentSteps", "MCPDocumentConfigTitle", "MCPDocumentNotes",
 	}
-	if strings.HasPrefix(endpoint, "http://") {
+	if strings.HasPrefix(strings.ToLower(endpoint), "http://") {
 		keys = append(keys, "MCPDocumentHTTPWarning")
 	}
 	texts := make([]string, len(keys))
@@ -247,7 +239,7 @@ func (s *MCPService) ExportMarkdown(owner auth.APIKeyOwner, req dto.MCPEnrollmen
 	if req.Client != "generic" && req.Client != "codex" && req.Client != "claude" {
 		return nil, contract.Invalid()
 	}
-	if !mcpDocumentEndpoint(endpoint) {
+	if !validMCPExternalEndpoint(endpoint) {
 		return nil, contract.Fail("MCP_ENDPOINT_UNAVAILABLE", 409, "Configure an MCP external endpoint before exporting")
 	}
 	mcpMutationMu.Lock()

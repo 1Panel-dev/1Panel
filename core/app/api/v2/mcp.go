@@ -80,21 +80,23 @@ func mcpManagementError(c *gin.Context, err error) {
 	code := http.StatusInternalServerError
 	errorCode := "MCP_OPERATION_FAILED"
 	invocationID := ""
+	reason := ""
 	var known *contract.Error
 	if errors.As(err, &known) {
 		code = known.Status
 		errorCode = known.Code
 		invocationID = known.InvocationID
-	} else if errors.Is(err, service.ErrMCPSettingsRevision) {
-		code = 409
-		errorCode = "MCP_CONFLICT"
+		if errorCode == "MCP_CONFLICT" && mcpConflictMessageKey(known.ManagementReason) != "" {
+			reason = known.ManagementReason
+		}
 	}
 	c.Header("Cache-Control", "no-store")
 	c.JSON(200, struct {
 		dto.Response
 		ErrorCode    string `json:"errorCode"`
 		InvocationID string `json:"invocationId,omitempty"`
-	}{Response: dto.Response{Code: code, Message: mcpManagementMessage(errorCode)}, ErrorCode: errorCode, InvocationID: invocationID})
+		Reason       string `json:"reason,omitempty"`
+	}{Response: dto.Response{Code: code, Message: mcpManagementMessage(errorCode, reason)}, ErrorCode: errorCode, InvocationID: invocationID, Reason: reason})
 	c.Abort()
 }
 func mcpManagement(c *gin.Context, write bool, admin bool) (*service.MCPService, auth.APIKeyOwner, bool) {

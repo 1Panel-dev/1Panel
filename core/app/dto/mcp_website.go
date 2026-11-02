@@ -16,16 +16,18 @@ type MCPWebsiteUpdate struct {
 }
 
 type MCPWebsiteUnbind struct {
-	RequestID string `json:"requestId"`
-	Revision  uint64 `json:"revision"`
+	RequestID     string `json:"requestId"`
+	Revision      uint64 `json:"revision"`
+	DeleteWebsite bool   `json:"deleteWebsite,omitempty"`
 }
 
 type MCPWebsitePendingRequest struct {
-	Operation string `json:"operation"`
-	RequestID string `json:"requestId"`
-	Domain    string `json:"domain"`
-	EnableSSL bool   `json:"enableSSL"`
-	SSLID     uint   `json:"sslID"`
+	Operation     string `json:"operation"`
+	RequestID     string `json:"requestId"`
+	Domain        string `json:"domain"`
+	EnableSSL     bool   `json:"enableSSL"`
+	SSLID         uint   `json:"sslID"`
+	DeleteWebsite bool   `json:"deleteWebsite,omitempty"`
 }
 
 type MCPWebsiteStatus struct {
@@ -40,4 +42,5 @@ type MCPWebsiteStatus struct {
 	Revision       uint64                    `json:"revision"`
 	Reason         string                    `json:"reason,omitempty"`
 	PendingRequest *MCPWebsitePendingRequest `json:"pendingRequest,omitempty"`
+	WebsiteDeleted bool                      `json:"websiteDeleted,omitempty"`
 }

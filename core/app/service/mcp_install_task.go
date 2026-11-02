@@ -24,11 +24,11 @@ import (
 
 func (s *MCPRuntimeService) SubmitInstall(ctx context.Context, req dto.MCPRuntimeInstall) (dto.MCPRuntimeInstallTask, error) {
 	if !mcpInstalling.CompareAndSwap(false, true) {
-		return dto.MCPRuntimeInstallTask{}, contract.Fail("MCP_CONFLICT", 409, "An MCP installation is already running")
+		return dto.MCPRuntimeInstallTask{}, contract.Conflict("installation_running", "An MCP installation is already running")
 	}
 	if !mcpRuntimeMutation.TryLock() {
 		mcpInstalling.Store(false)
-		return dto.MCPRuntimeInstallTask{}, contract.Fail("MCP_CONFLICT", 409, "An MCP service operation is already running")
+		return dto.MCPRuntimeInstallTask{}, contract.Conflict("service_operation_running", "An MCP service operation is already running")
 	}
 	accepted := false
 	defer func() {
@@ -58,8 +58,19 @@ func (s *MCPRuntimeService) SubmitInstall(ctx context.Context, req dto.MCPRuntim
 		if err != nil {
 			return dto.MCPRuntimeInstallTask{}, err
 		}
-		if row.WebsiteID != 0 || row.WebsiteBindingID != "" || row.WebsiteOperation != "" {
-			return dto.MCPRuntimeInstallTask{}, contract.Fail("MCP_CONFLICT", 409, "Review the existing MCP website configuration before installation")
+		operation, err := decodeMCPWebsiteOperation(row.WebsiteOperation)
+		if err != nil {
+			return dto.MCPRuntimeInstallTask{}, err
+		}
+		// Completed operations remain for request replay after a binding is gone.
+		unbound := operation == nil ||
+			operation.Operation == "unbind" && operation.State == "succeeded" ||
+			operation.Operation == "bind" && operation.State == "failed"
+		if row.WebsiteID != 0 || row.WebsiteBindingID != "" || operation != nil && operation.State == "pending" {
+			return dto.MCPRuntimeInstallTask{}, contract.Conflict("website_configuration_exists", "Review the existing MCP website configuration before installation")
+		}
+		if !unbound {
+			return dto.MCPRuntimeInstallTask{}, contract.Conflict("website_state_unconfirmed", "MCP website state could not be confirmed")
 		}
 		website.Domain = domain
 		req.Website = &website
@@ -107,7 +118,7 @@ func (s *MCPRuntimeService) executeInstallTask(ctx context.Context, req dto.MCPR
 	report := mcpInstallProgressLogger(t)
 	ctx = mcpruntime.WithProgress(ctx, report)
 	installCtx, cancel := context.WithTimeout(ctx, 6*time.Minute)
-	_, err := s.install(installCtx, req)
+	err := s.install(installCtx, req)
 	cancel()
 	if err != nil {
 		return safeMCPInstallTaskError(err)
@@ -165,6 +176,10 @@ func mcpInstallProgressLogger(t *task.Task) func(mcpruntime.Progress) {
 			"local_image": "MCPInstallLocalImage", "verifying_image": "MCPInstallVerifyImage", "verified_image": "MCPInstallVerifiedImage",
 			"catalog": "MCPInstallCatalog", "starting": "MCPInstallStarting",
 			"saving": "MCPInstallSaving", "installed": "MCPInstallCompleted", "rollback": "MCPInstallRollback",
+			"cleanup": "MCPInstallCleanup", "cleanup_complete": "MCPInstallOldContainerRemoved",
+			"old_image_removed": "MCPInstallOldImageRemoved", "old_image_kept": "MCPInstallOldImageKept",
+			"old_image_retained": "MCPInstallOldImageRetained", "cleanup_skipped": "MCPInstallCleanupSkipped",
+			"cleanup_failed":  "MCPInstallCleanupFailed",
 			"recovery_failed": "MCPInstallRecoveryFailed",
 		}[progress.Status]
 		if stage != "" {

@@ -17,7 +17,7 @@
             />
             <el-form label-position="top" class="min-w-0">
                 <el-form-item :label="$t('commons.table.name')">
-                    <span class="break-words">{{ created.name }}</span>
+                    <span class="break-words text-[var(--el-text-color-regular)]">{{ created.name }}</span>
                 </el-form-item>
                 <el-form-item v-if="secret" label="Token">
                     <el-input :model-value="secret" readonly autocomplete="off" class="[&_input]:!font-mono">
@@ -30,7 +30,7 @@
                             <CopyButton :content="clientConfig" :is-icon="false" />
                         </div>
                         <pre
-                            class="m-0 max-h-80 overflow-auto whitespace-pre-wrap break-all rounded border border-solid border-[var(--el-border-color-light)] bg-[var(--el-fill-color-light)] p-3 font-mono text-xs leading-5"
+                            class="mcp-client-config m-0 max-h-80 overflow-auto whitespace-pre-wrap break-all rounded border border-solid border-[var(--el-border-color-light)] bg-[var(--el-fill-color-light)] p-3 font-mono text-xs leading-5"
                             >{{ clientConfig }}</pre>
                     </div>
                 </el-form-item>
@@ -90,7 +90,7 @@
                 <div
                     v-for="id in unavailableNodes"
                     :key="id"
-                    class="mt-2 flex w-full min-w-0 flex-wrap items-center gap-2 rounded border border-solid border-[var(--el-color-warning-light-5)] bg-[var(--el-color-warning-light-9)] p-3"
+                    class="mcp-unavailable-grant mt-2 flex w-full min-w-0 flex-wrap items-center gap-2 rounded border border-solid border-[var(--el-color-warning-light-5)] bg-[var(--el-color-warning-light-9)] p-3"
                 >
                     <span class="min-w-0 flex-1 break-all">{{ $t('panelMCP.nodeUnavailable', [id]) }}</span>
                     <el-button type="danger" link @click="form.nodeIds = form.nodeIds.filter((node) => node !== id)">
@@ -113,7 +113,9 @@
                         <el-option :label="$t('panelMCP.write')" value="write" />
                     </el-select>
                 </div>
-                <div class="mb-2 w-full min-w-0 text-xs leading-5 text-[var(--el-text-color-secondary)]">
+                <div
+                    class="mcp-tool-summary mb-2 w-full min-w-0 text-xs leading-5 text-[var(--el-text-color-secondary)]"
+                >
                     <span>{{ $t('panelMCP.selectedTools', [form.tools.length, nodeTools.length]) }}</span>
                     <span>· {{ $t('panelMCP.filteredTools', [filteredTools.length]) }}</span>
                     <span v-if="hiddenSelectedCount" class="block">
@@ -121,14 +123,9 @@
                     </span>
                 </div>
                 <div class="mcp-grant-toolbar mb-2 flex w-full min-w-0 flex-wrap items-center justify-between gap-2">
-                    <label class="inline-flex min-h-8 cursor-pointer items-center gap-2 text-sm leading-5">
-                        <input
-                            v-model="selectedOnly"
-                            type="checkbox"
-                            class="mcp-selected-only h-3.5 w-3.5 shrink-0 accent-[var(--el-color-primary)]"
-                        />
-                        <span>{{ $t('panelMCP.selectedOnly') }}</span>
-                    </label>
+                    <el-checkbox v-model="selectedOnly" class="mcp-selected-only !mr-0">
+                        {{ $t('panelMCP.selectedOnly') }}
+                    </el-checkbox>
                     <el-dropdown
                         trigger="click"
                         placement="bottom-end"
@@ -166,13 +163,15 @@
                         </template>
                     </el-dropdown>
                 </div>
-                <p class="mb-3 mt-0 w-full text-xs leading-5 text-[var(--el-text-color-secondary)]">
+                <p class="mcp-tool-help mb-3 mt-0 w-full text-xs leading-5 text-[var(--el-text-color-secondary)]">
                     {{ $t('panelMCP.bulkHelp') }}
                 </p>
                 <div
                     class="mcp-tool-picker grid w-full min-w-0 overflow-hidden rounded border border-solid border-[var(--el-border-color-light)] md:grid-cols-[10rem_minmax(0,1fr)]"
                 >
-                    <div class="border-0 border-b border-solid border-[var(--el-border-color-light)] p-3 md:hidden">
+                    <div
+                        class="mcp-tool-category-filter border-0 border-b border-solid border-[var(--el-border-color-light)] p-3 md:hidden"
+                    >
                         <label for="mcp-tool-category" class="mb-1 block text-xs text-[var(--el-text-color-secondary)]">
                             {{ $t('panelMCP.toolCategory') }}
                         </label>
@@ -190,7 +189,7 @@
                     </div>
                     <nav
                         :aria-label="$t('panelMCP.toolCategory')"
-                        class="hidden min-w-0 flex-col gap-1 border-0 border-r border-solid border-[var(--el-border-color-light)] bg-[var(--el-fill-color-lighter)] p-2 md:flex"
+                        class="mcp-tool-sidebar hidden min-w-0 flex-col gap-1 border-0 border-r border-solid border-[var(--el-border-color-light)] bg-[var(--el-fill-color-lighter)] p-2 md:flex"
                     >
                         <button
                             type="button"
@@ -244,7 +243,7 @@
                         <el-checkbox-group v-model="form.tools" class="w-full min-w-0">
                             <section v-for="group in toolGroups" :key="group.id" class="min-w-0">
                                 <div
-                                    class="flex flex-wrap items-center justify-between gap-2 bg-[var(--el-fill-color-lighter)] px-3 py-2 text-xs leading-5 text-[var(--el-text-color-secondary)]"
+                                    class="mcp-tool-group-header flex flex-wrap items-center justify-between gap-2 bg-[var(--el-fill-color-lighter)] px-3 py-2 text-xs leading-5 text-[var(--el-text-color-secondary)]"
                                 >
                                     <span class="min-w-0 break-words font-medium">
                                         {{ categoryLabel(group.id, group.name) }}
@@ -287,14 +286,14 @@
                                     </div>
                                     <p
                                         v-if="tool.description && !expandedToolIds.includes(tool.toolId)"
-                                        class="mb-0 mt-1 truncate pl-6 text-xs leading-5 text-[var(--el-text-color-secondary)]"
+                                        class="mcp-tool-description mb-0 mt-1 truncate pl-6 text-xs leading-5 text-[var(--el-text-color-secondary)]"
                                     >
                                         {{ tool.description }}
                                     </p>
                                     <div
                                         v-if="expandedToolIds.includes(tool.toolId)"
                                         :id="`mcp-tool-detail-${tool.toolId}`"
-                                        class="mt-2 space-y-1 pl-6 text-xs leading-5 text-[var(--el-text-color-secondary)]"
+                                        class="mcp-tool-description mt-2 space-y-1 pl-6 text-xs leading-5 text-[var(--el-text-color-secondary)]"
                                     >
                                         <div v-if="tool.name !== tool.toolId" class="break-all font-mono">
                                             {{ tool.toolId }}
@@ -319,7 +318,7 @@
                     <div
                         v-for="id in unavailableTools"
                         :key="id"
-                        class="mt-2 flex w-full min-w-0 flex-wrap items-center gap-2 rounded border border-solid border-[var(--el-color-warning-light-5)] bg-[var(--el-color-warning-light-9)] p-3"
+                        class="mcp-unavailable-grant mt-2 flex w-full min-w-0 flex-wrap items-center gap-2 rounded border border-solid border-[var(--el-color-warning-light-5)] bg-[var(--el-color-warning-light-9)] p-3"
                     >
                         <span class="min-w-0 flex-1 break-all font-mono">{{ id }}</span>
                         <el-button type="danger" link @click="removeUnavailableTool(id)">
@@ -355,7 +354,10 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <p v-if="!created" class="mb-3 mt-0 text-xs leading-5 text-[var(--el-text-color-secondary)]">
+            <p
+                v-if="!created"
+                class="mcp-selection-summary mb-3 mt-0 text-xs leading-5 text-[var(--el-text-color-secondary)]"
+            >
                 {{
                     $t('panelMCP.selectionSummary', [
                         selectedToolSummary.read,
@@ -672,7 +674,7 @@ const submit = async () => {
         emit('changed');
     } catch (error) {
         if (ticket !== version) return;
-        if (isMCPRevisionConflict(error)) {
+        if (isMCPRevisionConflict(error) || isMCPPolicyChanged(error)) {
             conflict.value = true;
             policyConflict.value = isMCPPolicyChanged(error);
             emit('changed');
@@ -710,9 +712,73 @@ defineExpose({ open });
 </script>
 
 <style scoped lang="scss">
+.input-help {
+    color: var(--el-text-color-regular);
+}
+
 .mcp-tool-picker :deep(.el-checkbox__label) {
     min-width: 0;
     flex: 1;
     line-height: 1.5;
+}
+
+html.dark {
+    .mcp-grant-toolbar,
+    .mcp-tool-summary,
+    .mcp-tool-help,
+    .mcp-tool-description,
+    .mcp-selection-summary {
+        color: var(--el-text-color-regular);
+    }
+
+    #mcp-tool-category {
+        color-scheme: dark;
+    }
+
+    .mcp-tool-picker,
+    .mcp-client-config {
+        color: var(--el-text-color-regular);
+        border-color: var(--el-border-color);
+    }
+
+    .mcp-tool-picker {
+        background-color: var(--el-fill-color-blank);
+    }
+
+    .mcp-tool-sidebar,
+    .mcp-tool-category-filter {
+        border-color: var(--el-border-color);
+        background-color: var(--el-bg-color);
+    }
+
+    #mcp-tool-category {
+        border-color: var(--el-border-color);
+    }
+
+    .mcp-category-button {
+        &[aria-pressed='true'] {
+            color: var(--el-text-color-primary);
+            background-color: var(--el-fill-color-dark);
+            box-shadow: inset 3px 0 0 var(--el-color-primary);
+        }
+
+        &[aria-pressed='false']:hover {
+            background-color: var(--el-fill-color-dark);
+        }
+    }
+
+    .mcp-tool-group-header {
+        color: var(--el-text-color-regular);
+        background-color: var(--el-bg-color);
+    }
+
+    .mcp-tool-row {
+        border-color: var(--el-border-color);
+    }
+
+    .mcp-unavailable-grant {
+        color: var(--el-text-color-regular);
+        border-color: var(--el-color-warning);
+    }
 }
 </style>

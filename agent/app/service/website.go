@@ -280,6 +280,8 @@ func newWebsiteCreateHTTPSOp(sslID uint) request.WebsiteHTTPSOp {
 }
 
 func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) {
+	websiteListenMutation.Lock()
+	defer websiteListenMutation.Unlock()
 	alias := create.Alias
 	if alias == "default" {
 		return buserr.New("ErrDefaultAlias")
@@ -376,6 +378,11 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 			website.WebsiteSSLID = websiteSSL.ID
 			website.HttpConfig = sslReq.HttpConfig
 			initialSSL = &websiteInitialSSL{certificate: *websiteSSL, request: sslReq}
+		}
+		candidate := *website
+		candidate.Domains = domains
+		if err = checkWebsiteListenConflict(candidate, defaultHttpPort, nginxInstall.HttpsPort); err != nil {
+			return err
 		}
 	}
 
@@ -1004,6 +1011,8 @@ func applyWebsiteHTTPSParams(res *response.WebsiteHTTPS, params []response.Nginx
 }
 
 func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteHTTPSOp) (*response.WebsiteHTTPS, error) {
+	websiteListenMutation.Lock()
+	defer websiteListenMutation.Unlock()
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
@@ -1012,6 +1021,18 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 		res        response.WebsiteHTTPS
 		websiteSSL model.WebsiteSSL
 	)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	candidate := website
+	candidate.Protocol, candidate.HttpConfig = constant.ProtocolHTTP, req.HttpConfig
+	if req.Enable {
+		candidate.Protocol = constant.ProtocolHTTPS
+	}
+	if err = checkWebsiteListenConflict(candidate, nginxInstall.HttpPort, nginxInstall.HttpsPort); err != nil {
+		return nil, err
+	}
 	if err = ChangeHSTSConfig(req.Hsts, req.HstsIncludeSubDomains, req.Http3, website); err != nil {
 		return nil, err
 	}

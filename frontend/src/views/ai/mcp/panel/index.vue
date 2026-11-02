@@ -29,162 +29,167 @@
             </template>
             <template v-if="!showInstallEmpty" #rightToolBar><TableRefresh @search="refresh" /></template>
             <template v-if="!showInstallEmpty" #main>
-                <el-card
-                    v-if="serviceChecked && !serviceReady"
-                    :class="credentialTableMasked ? 'mask-prompt' : '!mb-4'"
-                    role="status"
-                >
-                    <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
-                        <template v-if="dockerStopped">
-                            <span>{{ $t('container.serviceUnavailable') }}</span>
+                <div class="relative min-w-0">
+                    <el-card
+                        v-if="serviceChecked && !serviceReady"
+                        :class="credentialTableMasked ? 'mask-prompt mcp-service-prompt' : '!mb-4'"
+                        role="status"
+                    >
+                        <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2">
+                            <template v-if="dockerStopped">
+                                <span>{{ $t('container.serviceUnavailable') }}</span>
+                                <el-button
+                                    type="primary"
+                                    link
+                                    :disabled="!canManageService || service?.busy"
+                                    @click="goDocker('ContainerSetting')"
+                                >
+                                    【 {{ $t('container.setting') }} 】
+                                </el-button>
+                                <span>{{ $t('container.startIn') }}</span>
+                            </template>
+                            <span v-else>{{ servicePrompt }}</span>
                             <el-button
+                                v-if="canInstallService || (dockerMissing && canManageService)"
                                 type="primary"
                                 link
-                                :disabled="!canManageService || service?.busy"
-                                @click="goDocker('ContainerSetting')"
+                                icon="Download"
+                                :disabled="service?.busy"
+                                @click="openInstallation"
                             >
-                                【 {{ $t('container.setting') }} 】
+                                {{ $t('panelMCP.installNow') }}
                             </el-button>
-                            <span>{{ $t('container.startIn') }}</span>
-                        </template>
-                        <span v-else>{{ servicePrompt }}</span>
-                        <el-button
-                            v-if="canInstallService || (dockerMissing && canManageService)"
-                            type="primary"
-                            link
-                            icon="Download"
-                            :disabled="service?.busy"
-                            @click="openInstallation"
+                            <el-button v-else-if="serviceStatus" type="primary" link @click="service?.openStatus()">
+                                {{ $t('commons.table.status') }}
+                            </el-button>
+                            <el-button type="primary" link :disabled="service?.busy" @click="service?.refreshService()">
+                                {{ $t('commons.button.refresh') }}
+                            </el-button>
+                        </div>
+                        <p v-if="serviceStatus && !serviceStatus.canManageService" class="input-help">
+                            {{ $t('panelMCP.serviceAdminOnly') }}
+                        </p>
+                    </el-card>
+                    <div :class="{ mask: credentialTableMasked }" :inert="credentialTableMasked">
+                        <el-alert
+                            v-if="serviceReady && !catalogAvailable && !catalogLoading"
+                            :title="$t('panelMCP.catalogUnavailable')"
+                            type="warning"
+                            :closable="false"
+                            class="!mb-4"
                         >
-                            {{ $t('panelMCP.installNow') }}
-                        </el-button>
-                        <el-button v-else-if="serviceStatus" type="primary" link @click="service?.openStatus()">
-                            {{ $t('commons.table.status') }}
-                        </el-button>
-                        <el-button type="primary" link :disabled="service?.busy" @click="service?.refreshService()">
-                            {{ $t('commons.button.refresh') }}
-                        </el-button>
-                    </div>
-                    <p v-if="serviceStatus && !serviceStatus.canManageService" class="input-help">
-                        {{ $t('panelMCP.serviceAdminOnly') }}
-                    </p>
-                </el-card>
-                <div :class="{ mask: credentialTableMasked }" :inert="credentialTableMasked">
-                    <el-alert
-                        v-if="serviceReady && !catalogAvailable && !catalogLoading"
-                        :title="$t('panelMCP.catalogUnavailable')"
-                        type="warning"
-                        :closable="false"
-                        class="!mb-4"
-                    >
-                        <el-button link type="primary" @click="loadCatalog">
-                            {{ $t('commons.button.refresh') }}
-                        </el-button>
-                    </el-alert>
-                    <el-alert
-                        v-else-if="serviceReady && catalogAvailable && !tools.length"
-                        :title="$t('panelMCP.catalogEmpty')"
-                        type="info"
-                        :closable="false"
-                        class="!mb-4"
-                    />
-                    <div class="w-full min-w-0 overflow-x-auto">
-                        <ComplexTable
-                            :data="displayItems"
-                            :pagination-config="pagination"
-                            :page-sizes="[10, 20, 50, 100]"
-                            :scrollbar-always-on="isCompactTable"
-                            :height-diff="410"
-                            @search="search"
-                        >
-                            <el-table-column
-                                :label="$t('commons.table.name')"
-                                prop="name"
-                                :width="isCompactTable ? 160 : 220"
+                            <el-button link type="primary" @click="loadCatalog">
+                                {{ $t('commons.button.refresh') }}
+                            </el-button>
+                        </el-alert>
+                        <el-alert
+                            v-else-if="serviceReady && catalogAvailable && !tools.length"
+                            :title="$t('panelMCP.catalogEmpty')"
+                            type="info"
+                            :closable="false"
+                            class="!mb-4"
+                        />
+                        <div class="w-full min-w-0 overflow-x-auto">
+                            <ComplexTable
+                                :data="displayItems"
+                                :pagination-config="pagination"
+                                :page-sizes="[10, 20, 50, 100]"
+                                :scrollbar-always-on="isCompactTable"
+                                :height-diff="310"
+                                @search="search"
                             >
-                                <template #default="{ row }">
-                                    <el-button
-                                        type="primary"
-                                        link
-                                        class="min-w-0 max-w-full !whitespace-normal !text-left break-all"
-                                        @click="showConnection(row)"
-                                    >
-                                        {{ row.name }}
-                                    </el-button>
-                                    <div class="break-all text-xs text-[var(--el-text-color-secondary)]">
-                                        {{ row.keyHint }}
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('commons.table.status')" width="120">
-                                <template #default="{ row }">
-                                    <el-tag
-                                        size="small"
-                                        round
-                                        effect="light"
-                                        :type="
-                                            row.status === 'Enable'
-                                                ? 'success'
-                                                : row.status === 'Disable'
-                                                  ? 'warning'
-                                                  : 'info'
-                                        "
-                                    >
-                                        {{ $t('apiKeyManagement.status' + row.status) }}
-                                    </el-tag>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('panelMCP.tools')" :min-width="isCompactTable ? 280 : 360">
-                                <template #default="{ row }">
-                                    <div class="flex min-w-0 max-w-full max-h-28 flex-wrap gap-1 overflow-y-auto">
-                                        <el-tag
-                                            v-for="tool in row.tools"
-                                            :key="tool"
-                                            size="small"
-                                            class="!h-auto min-h-5 max-w-full !whitespace-normal break-all"
-                                            :type="isReadOnly(tool) ? 'info' : 'warning'"
+                                <el-table-column
+                                    :label="$t('commons.table.name')"
+                                    prop="name"
+                                    :width="isCompactTable ? 160 : 220"
+                                >
+                                    <template #default="{ row }">
+                                        <el-button
+                                            type="primary"
+                                            link
+                                            class="min-w-0 max-w-full !whitespace-normal !text-left break-all"
+                                            @click="showConnection(row)"
                                         >
-                                            {{ toolLabel(tool) }}
-                                        </el-tag>
-                                        <span v-if="!row.tools.length">{{ $t('panelMCP.noTools') }}</span>
-                                    </div>
-                                    <div v-if="needsReview(row)" class="mt-1 text-xs text-[var(--el-color-warning)]">
-                                        {{ $t('panelMCP.grantsNeedReview') }}
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('panelMCP.nodes')" width="160">
-                                <template #default="{ row }">
-                                    <div class="flex min-w-0 max-w-full max-h-28 flex-wrap gap-1 overflow-y-auto">
+                                            {{ row.name }}
+                                        </el-button>
+                                        <div class="break-all text-xs text-[var(--el-text-color-secondary)]">
+                                            {{ row.keyHint }}
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('commons.table.status')" width="120">
+                                    <template #default="{ row }">
                                         <el-tag
-                                            v-for="id in row.nodeIds"
-                                            :key="id"
                                             size="small"
-                                            class="!h-auto min-h-5 max-w-full !whitespace-normal break-all"
+                                            round
+                                            effect="light"
+                                            :type="
+                                                row.status === 'Enable'
+                                                    ? 'success'
+                                                    : row.status === 'Disable'
+                                                      ? 'warning'
+                                                      : 'info'
+                                            "
                                         >
-                                            {{ nodeLabel(id) }}
+                                            {{ $t('apiKeyManagement.status' + row.status) }}
                                         </el-tag>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('apiKeyManagement.expiresAt')" width="180">
-                                <template #default="{ row }">
-                                    {{
-                                        row.expiresAt
-                                            ? dateFormat(null, null, row.expiresAt)
-                                            : $t('apiKeyManagement.never')
-                                    }}
-                                </template>
-                            </el-table-column>
-                            <fu-table-operations
-                                :buttons="buttons"
-                                :ellipsis="isCompactTable ? 0 : 2"
-                                :width="isCompactTable ? 100 : undefined"
-                                :min-width="isCompactTable ? 'auto' : 230"
-                                :label="$t('commons.table.operate')"
-                                :fixed="isCompactTable ? false : 'right'"
-                            />
-                        </ComplexTable>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('panelMCP.tools')" :min-width="isCompactTable ? 280 : 360">
+                                    <template #default="{ row }">
+                                        <div class="flex min-w-0 max-w-full max-h-28 flex-wrap gap-1 overflow-y-auto">
+                                            <el-tag
+                                                v-for="tool in row.tools"
+                                                :key="tool"
+                                                size="small"
+                                                class="!h-auto min-h-5 max-w-full !whitespace-normal break-all"
+                                                :type="isReadOnly(tool) ? 'info' : 'warning'"
+                                            >
+                                                {{ toolLabel(tool) }}
+                                            </el-tag>
+                                            <span v-if="!row.tools.length">{{ $t('panelMCP.noTools') }}</span>
+                                        </div>
+                                        <div
+                                            v-if="needsReview(row)"
+                                            class="mt-1 text-xs text-[var(--el-color-warning)]"
+                                        >
+                                            {{ $t('panelMCP.grantsNeedReview') }}
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('panelMCP.nodes')" width="160">
+                                    <template #default="{ row }">
+                                        <div class="flex min-w-0 max-w-full max-h-28 flex-wrap gap-1 overflow-y-auto">
+                                            <el-tag
+                                                v-for="id in row.nodeIds"
+                                                :key="id"
+                                                size="small"
+                                                class="!h-auto min-h-5 max-w-full !whitespace-normal break-all"
+                                            >
+                                                {{ nodeLabel(id) }}
+                                            </el-tag>
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                                <el-table-column :label="$t('apiKeyManagement.expiresAt')" width="180">
+                                    <template #default="{ row }">
+                                        {{
+                                            row.expiresAt
+                                                ? dateFormat(null, null, row.expiresAt)
+                                                : $t('apiKeyManagement.never')
+                                        }}
+                                    </template>
+                                </el-table-column>
+                                <fu-table-operations
+                                    :buttons="buttons"
+                                    :ellipsis="isCompactTable ? 0 : 2"
+                                    :width="isCompactTable ? 100 : undefined"
+                                    :min-width="isCompactTable ? 'auto' : 230"
+                                    :label="$t('commons.table.operate')"
+                                    :fixed="isCompactTable ? false : 'right'"
+                                />
+                            </ComplexTable>
+                        </div>
                     </div>
                 </div>
             </template>
@@ -204,6 +209,7 @@
             </NoSuchService>
         </LayoutContent>
         <CredentialEditor
+            v-if="!credentialsUnavailable"
             ref="editor"
             :tools="tools"
             :tool-node-ids="toolNodeIds"
@@ -356,13 +362,16 @@
                     </span>
                 </el-form-item>
             </el-form>
-            <div v-if="clientConfig" class="mt-5 flex flex-wrap items-center justify-between gap-2">
+            <div
+                v-if="clientConfig"
+                class="mcp-client-config-title mt-5 flex flex-wrap items-center justify-between gap-2"
+            >
                 <span>{{ $t('panelMCP.clientConfig') }}</span>
                 <CopyButton :content="clientConfig" :is-icon="false" />
             </div>
             <pre
                 v-if="clientConfig"
-                class="mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-all rounded border border-solid border-[var(--el-border-color)] bg-[var(--el-fill-color-light)] p-3 font-mono text-xs leading-5"
+                class="mcp-client-config mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-all rounded border border-solid border-[var(--el-border-color)] bg-[var(--el-fill-color-light)] p-3 font-mono text-xs leading-5"
                 >{{ clientConfig }}</pre>
             <template #footer>
                 <div class="flex flex-wrap items-center justify-end gap-2 [&>.el-button]:!ml-0">
@@ -461,6 +470,7 @@ const serviceReady = computed(
         serviceStatus.value.status === 'running' &&
         serviceStatus.value.ready,
 );
+const credentialsUnavailable = computed(() => serviceChecked.value && !serviceStatus.value?.installed);
 const canInstallService = computed(
     () =>
         serviceStatus.value?.status === 'not_installed' &&
@@ -475,7 +485,7 @@ const servicePrompt = computed(() => {
     if (dockerMissing.value) return i18n.global.t('cronjob.library.noSuchApp', ['Docker']);
     if (dockerStopped.value) return i18n.global.t('container.serviceUnavailable');
     if (current.status === 'not_installed' && !current.installed) {
-        return i18n.global.t('panelMCP.installEmpty');
+        return i18n.global.t(hasStoredCredentials.value ? 'panelMCP.installWithCredentials' : 'panelMCP.installEmpty');
     }
     if (current.status === 'unsupported') return i18n.global.t('panelMCP.serviceUnsupported');
     if (current.installed && (current.status === 'stopped' || !current.enabled)) {
@@ -507,10 +517,14 @@ const canManageCredential = computed(() => hasManagePermissionAccess('mcp_access
 const deletingCredentialID = ref('');
 const canReveal = computed(
     () =>
-        canManageCredential.value && detailStatus.value === 'Enable' && detail.value?.id !== deletingCredentialID.value,
+        !credentialsUnavailable.value &&
+        canManageCredential.value &&
+        detailStatus.value === 'Enable' &&
+        detail.value?.id !== deletingCredentialID.value,
 );
 const canRotate = computed(
     () =>
+        !credentialsUnavailable.value &&
         canManageCredential.value &&
         !!detail.value &&
         detail.value.id !== deletingCredentialID.value &&
@@ -530,6 +544,7 @@ const editor = ref<InstanceType<typeof CredentialEditor>>();
 const invocations = ref<InstanceType<typeof Invocations>>();
 const now = ref(Date.now());
 const pagination = reactive({ currentPage: 1, pageSize: 20, total: 0, cacheSizeKey: 'panel-mcp-credentials-page' });
+const hasStoredCredentials = computed(() => credentialsLoaded.value && pagination.total > 0);
 const showInstallEmpty = computed(
     () =>
         serviceChecked.value &&
@@ -542,7 +557,7 @@ const showInstallEmpty = computed(
 );
 const pageLoading = computed(() => !serviceChecked.value || (loading.value && !showInstallEmpty.value));
 const credentialTableMasked = computed(
-    () => !serviceReady.value && (!credentialsLoaded.value || pagination.total === 0),
+    () => credentialsUnavailable.value || (!serviceReady.value && !hasStoredCredentials.value),
 );
 const clientConfig = computed(() =>
     !connectionVisible.value || (detail.value && !connectionToken.value)
@@ -656,6 +671,7 @@ const refresh = () => {
     if (serviceReady.value) void loadCatalog();
 };
 const showConnection = (entry?: PanelMCP.Credential) => {
+    if (credentialsUnavailable.value) return;
     clearConnectionSecret();
     detail.value = entry;
     selectedClient.value = 'generic';
@@ -663,6 +679,7 @@ const showConnection = (entry?: PanelMCP.Credential) => {
 };
 const currentConnection = (ticket: number, reference: PanelMCP.Reference) =>
     ticket === connectionVersion &&
+    !credentialsUnavailable.value &&
     connectionVisible.value &&
     globalStore.isLogin &&
     canManageCredential.value &&
@@ -806,8 +823,9 @@ const exportConnection = async () => {
     }
 };
 const operate = async (entry: PanelMCP.Credential, revoke = false) => {
-    if (mutating.value) return;
+    if (credentialsUnavailable.value || mutating.value) return;
     const version = pageVersion;
+    const accessVersion = credentialAccessVersion;
     const currentStatus = getMCPCredentialStatus(entry);
     if (!revoke && currentStatus !== 'Enable' && currentStatus !== 'Disable') {
         await search();
@@ -823,7 +841,13 @@ const operate = async (entry: PanelMCP.Credential, revoke = false) => {
     } catch {
         return;
     }
-    if (!isCurrentPage(version) || mutating.value) return;
+    if (
+        !isCurrentPage(version) ||
+        accessVersion !== credentialAccessVersion ||
+        credentialsUnavailable.value ||
+        mutating.value
+    )
+        return;
     mutating.value = true;
     try {
         const reference = { id: entry.id, revision: entry.revision };
@@ -841,7 +865,8 @@ const operate = async (entry: PanelMCP.Credential, revoke = false) => {
     }
 };
 const deleteCredential = async (entry: PanelMCP.Credential) => {
-    if (!active || !globalStore.isLogin || !canManageCredential.value || mutating.value) return;
+    if (credentialsUnavailable.value || !active || !globalStore.isLogin || !canManageCredential.value || mutating.value)
+        return;
     const version = pageVersion;
     const accessVersion = credentialAccessVersion;
     const reference = { id: entry.id, revision: entry.revision };
@@ -860,6 +885,7 @@ const deleteCredential = async (entry: PanelMCP.Credential) => {
         if (
             !isCurrentPage(version) ||
             accessVersion !== credentialAccessVersion ||
+            credentialsUnavailable.value ||
             !globalStore.isLogin ||
             !canManageCredential.value
         )
@@ -892,40 +918,48 @@ const deleteCredential = async (entry: PanelMCP.Credential) => {
     }
 };
 const buttons = computed<FuTableOperationButton<PanelMCP.Credential>[]>(() => [
-    { label: i18n.global.t('panelMCP.connection'), click: showConnection },
+    {
+        label: i18n.global.t('panelMCP.connection'),
+        disabled: () => credentialsUnavailable.value,
+        click: showConnection,
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         permission: 'mcp_access_manage',
         show: (row) => row.status !== 'Revoked',
-        disabled: () => mutating.value || !catalogAvailable.value,
-        click: (row) => editor.value?.open(row),
+        disabled: () => credentialsUnavailable.value || mutating.value || !catalogAvailable.value,
+        click: (row) => {
+            if (!credentialsUnavailable.value) editor.value?.open(row);
+        },
     },
     { label: i18n.global.t('panelMCP.invocations'), click: (row) => invocations.value?.open(row) },
     {
         label: i18n.global.t('commons.button.disable'),
         permission: 'mcp_access_manage',
         show: (row) => row.status === 'Enable',
-        disabled: () => mutating.value,
+        disabled: () => credentialsUnavailable.value || mutating.value,
         click: (row) => operate(row),
     },
     {
         label: i18n.global.t('commons.button.enable'),
         permission: 'mcp_access_manage',
         show: (row) => row.status === 'Disable',
-        disabled: (row) => mutating.value || !catalogAvailable.value || needsReview(row),
+        disabled: (row) =>
+            credentialsUnavailable.value || mutating.value || !catalogAvailable.value || needsReview(row),
         click: (row) => operate(row),
     },
     {
         label: i18n.global.t('apiKeyManagement.revoke'),
         permission: 'mcp_access_manage',
         show: (row) => row.status !== 'Revoked',
-        disabled: () => mutating.value,
+        disabled: () => credentialsUnavailable.value || mutating.value,
         click: (row) => operate(row, true),
     },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: 'mcp_access_manage',
-        disabled: () => mutating.value || !globalStore.isLogin || !canManageCredential.value,
+        disabled: () =>
+            credentialsUnavailable.value || mutating.value || !globalStore.isLogin || !canManageCredential.value,
         click: deleteCredential,
     },
 ]);
@@ -985,6 +1019,18 @@ watch(
 );
 watch(canManageService, () => navigationVersion++, { flush: 'sync' });
 watch(
+    credentialsUnavailable,
+    (value) => {
+        if (value) {
+            credentialAccessVersion++;
+            clearConnectionSecret();
+            connectionVisible.value = false;
+            detail.value = undefined;
+        }
+    },
+    { flush: 'sync' },
+);
+watch(
     detailStatus,
     (value) => {
         if (value !== 'Enable') clearConnectionSecret();
@@ -1003,6 +1049,16 @@ onBeforeUnmount(deactivate);
 </script>
 
 <style scoped lang="scss">
+.input-help {
+    color: var(--el-text-color-regular);
+}
+
+.mcp-service-prompt {
+    top: 50%;
+    left: 50%;
+    width: max-content;
+}
+
 .connection-details {
     :deep(.el-descriptions__table) {
         table-layout: fixed;
@@ -1013,6 +1069,17 @@ onBeforeUnmount(deactivate);
     }
     :deep(.el-descriptions__content) {
         overflow-wrap: anywhere;
+    }
+}
+
+html.dark {
+    .mcp-client-config-title,
+    .mcp-client-config {
+        color: var(--el-text-color-regular);
+    }
+
+    .mcp-client-config {
+        border-color: var(--el-border-color);
     }
 }
 </style>

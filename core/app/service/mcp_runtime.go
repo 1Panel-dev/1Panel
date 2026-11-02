@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/url"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -22,10 +23,12 @@ import (
 
 var mcpRuntimeMutation sync.Mutex
 var mcpInstalling atomic.Bool
-var ErrMCPSettingsRevision = errors.New("MCP settings changed; reload the page before saving")
+var ErrMCPSettingsRevision = contract.Conflict("settings_revision_changed", "MCP settings changed; reload the page before saving")
 
 func lockMCPRuntimeMutation() error {
-	conflict := func() error { return contract.Fail("MCP_CONFLICT", 409, "An MCP service operation is already running") }
+	conflict := func() error {
+		return contract.Conflict("installation_running", "An MCP installation is already running")
+	}
 	if mcpInstalling.Load() {
 		return conflict()
 	}
@@ -43,6 +46,7 @@ type mcpRuntimeManager interface {
 	Status(context.Context, bool) mcpruntime.State
 	Apply(context.Context, bool, bool) error
 	InstallImage(context.Context, bool) error
+	Finalize(context.Context, bool) error
 	Restore(context.Context, string, bool) error
 	RestoreAbsent(context.Context) error
 	Logs(context.Context) (string, error)
@@ -165,7 +169,7 @@ func (s *MCPRuntimeService) update(ctx context.Context, req dto.MCPRuntimeSettin
 		if row, loadErr := s.websiteSetting(ctx); loadErr != nil {
 			return old, loadErr
 		} else if row.WebsiteID != 0 || row.WebsiteBindingID != "" {
-			return old, contract.Fail("MCP_CONFLICT", 409, "The website controls the MCP endpoint")
+			return old, contract.Conflict("endpoint_managed_by_website", "The website controls the MCP endpoint")
 		}
 	}
 	if err := validateMCPRuntimeSettings(req); err != nil {
@@ -290,7 +294,10 @@ func (s *MCPRuntimeService) Install(ctx context.Context, req dto.MCPRuntimeInsta
 		return dto.MCPRuntimeStatus{}, err
 	}
 	defer mcpRuntimeMutation.Unlock()
-	return s.install(ctx, req)
+	if err := s.install(ctx, req); err != nil {
+		return dto.MCPRuntimeStatus{}, err
+	}
+	return s.Status(ctx)
 }
 
 func (s *MCPRuntimeService) installSettings(ctx context.Context, req dto.MCPRuntimeInstall) (old, next dto.MCPRuntimeSettings, err error) {
@@ -308,7 +315,7 @@ func (s *MCPRuntimeService) installSettings(ctx context.Context, req dto.MCPRunt
 		if row, loadErr := s.websiteSetting(ctx); loadErr != nil {
 			return old, next, loadErr
 		} else if row.WebsiteID != 0 || row.WebsiteBindingID != "" {
-			return old, next, contract.Fail("MCP_CONFLICT", 409, "The website controls the MCP endpoint")
+			return old, next, contract.Conflict("endpoint_managed_by_website", "The website controls the MCP endpoint")
 		}
 	}
 	if err := validateMCPRuntimeSettings(next); err != nil {
@@ -320,15 +327,15 @@ func (s *MCPRuntimeService) installSettings(ctx context.Context, req dto.MCPRunt
 	return old, next, nil
 }
 
-func (s *MCPRuntimeService) install(ctx context.Context, req dto.MCPRuntimeInstall) (dto.MCPRuntimeStatus, error) {
+func (s *MCPRuntimeService) install(ctx context.Context, req dto.MCPRuntimeInstall) error {
 	old, next, err := s.installSettings(ctx, req)
 	if err != nil {
-		return dto.MCPRuntimeStatus{}, err
+		return err
 	}
 	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "snapshot"})
 	snapshot, err := s.snapshot(ctx, old)
 	if err != nil {
-		return dto.MCPRuntimeStatus{}, err
+		return err
 	}
 	if !snapshot.installed {
 		next.Enabled = true
@@ -338,7 +345,7 @@ func (s *MCPRuntimeService) install(ctx context.Context, req dto.MCPRuntimeInsta
 	if policyPrepared {
 		prepared.AccessPolicy, prepared.AllowedIPs = next.AccessPolicy, next.AllowedIPs
 		if err := s.persist(prepared, old.Revision); err != nil {
-			return dto.MCPRuntimeStatus{}, err
+			return err
 		}
 		prepared.Revision++
 	}
@@ -376,14 +383,28 @@ func (s *MCPRuntimeService) install(ctx context.Context, req dto.MCPRuntimeInsta
 		return operationErr
 	}
 	if err := installMCPRuntimeImage(ctx, manager, next.Enabled); err != nil {
-		return dto.MCPRuntimeStatus{}, recoverFailure(err)
+		return recoverFailure(err)
 	}
 	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "saving"})
 	if err := s.persist(next, prepared.Revision); err != nil {
-		return dto.MCPRuntimeStatus{}, recoverFailure(err)
+		return recoverFailure(err)
 	}
+	cleanupCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	if cleanupErr := finalizeMCPRuntime(cleanupCtx, manager, req.DeleteOldImage); cleanupErr != nil {
+		mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "cleanup_failed"})
+	}
+	cancel()
 	mcpruntime.ReportProgress(ctx, mcpruntime.Progress{Status: "installed"})
-	return s.Status(ctx)
+	return nil
+}
+
+func finalizeMCPRuntime(ctx context.Context, manager mcpRuntimeManager, deleteOldImage bool) (err error) {
+	defer func() {
+		if recover() != nil {
+			err = errors.New("MCP old resources could not be cleaned up")
+		}
+	}()
+	return manager.Finalize(ctx, deleteOldImage)
 }
 
 func installMCPRuntimeImage(ctx context.Context, manager mcpRuntimeManager, enabled bool) (err error) {
@@ -423,12 +444,36 @@ func validateMCPRuntimeSettings(req dto.MCPRuntimeSettings) error {
 	if req.ExternalURL == "" {
 		return nil
 	}
-	if len(req.ExternalURL) > 2048 || strings.ContainsAny(req.ExternalURL, "\r\n") {
-		return errors.New("invalid MCP external URL")
-	}
-	u, err := url.Parse(req.ExternalURL)
-	if err != nil || (u.Scheme != "https" && u.Scheme != "http") || u.Host == "" || u.User != nil || u.RawQuery != "" || u.Fragment != "" || u.Path != "/mcp" {
-		return errors.New("MCP external URL must be an HTTP or HTTPS URL ending in /mcp without credentials or query parameters")
+	if !validMCPExternalEndpoint(req.ExternalURL) {
+		return errors.New("MCP external URL must be a valid HTTP or HTTPS URL without credentials, query parameters or fragments")
 	}
 	return nil
+}
+
+func validMCPExternalEndpoint(endpoint string) bool {
+	if endpoint == "" || len(endpoint) > 2048 || strings.TrimSpace(endpoint) != endpoint || strings.ContainsAny(endpoint, "\\?#") {
+		return false
+	}
+	for _, char := range endpoint {
+		if char <= 0x20 || char == 0x7f {
+			return false
+		}
+	}
+	u, err := url.Parse(endpoint)
+	if err != nil || (!strings.EqualFold(u.Scheme, "http") && !strings.EqualFold(u.Scheme, "https")) ||
+		u.Hostname() == "" || u.User != nil || u.RawQuery != "" || u.ForceQuery || u.Fragment != "" || u.Opaque != "" {
+		return false
+	}
+	for _, char := range u.Path {
+		if char < 0x20 || char == 0x7f || char == '\\' {
+			return false
+		}
+	}
+	if port := u.Port(); port != "" {
+		value, err := strconv.Atoi(port)
+		if err != nil || value < 0 || value > 65535 {
+			return false
+		}
+	}
+	return true
 }

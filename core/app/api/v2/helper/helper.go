@@ -3,21 +3,19 @@ package helper
 import (
 	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 	"net/http"
 	"strconv"
+
+	"github.com/1Panel-dev/1Panel/core/cmd/server/res"
 
 	"github.com/1Panel-dev/1Panel/core/app/dto"
 	"github.com/1Panel-dev/1Panel/core/global"
 	"github.com/1Panel-dev/1Panel/core/i18n"
-	mcpmeta "github.com/1Panel-dev/1Panel/core/utils/mcpapi/metadata"
 	"github.com/gin-gonic/gin"
 )
 
 func ErrorWithDetail(ctx *gin.Context, code int, msgKey string, err error) {
-	if msgKey == "ErrProxy" && ctx.GetBool("MCP_API_AUTH") && ctx.Request != nil && mcpmeta.TrustedRequest(ctx.Request) {
-		ctx.Header(mcpmeta.BusinessCodeHeader, "ErrProxy")
-	}
+	applyErrorMetadata(ctx, code, msgKey, err)
 	res := dto.Response{
 		Code:    code,
 		Message: "",
@@ -112,4 +110,26 @@ func GetParamID(c *gin.Context) (uint, error) {
 	}
 	intNum, _ := strconv.Atoi(idParam)
 	return uint(intNum), nil
+}
+
+const errorMetadataKey = "error_response_metadata_policies"
+
+type ErrorMetadataPolicy func(*gin.Context, int, string, error)
+
+func WithErrorMetadata(policies ...ErrorMetadataPolicy) gin.HandlerFunc {
+	configured := append([]ErrorMetadataPolicy(nil), policies...)
+	return func(c *gin.Context) {
+		c.Set(errorMetadataKey, configured)
+		c.Next()
+	}
+}
+
+func applyErrorMetadata(c *gin.Context, code int, messageKey string, err error) {
+	value, _ := c.Get(errorMetadataKey)
+	policies, _ := value.([]ErrorMetadataPolicy)
+	for _, policy := range policies {
+		if policy != nil {
+			policy(c, code, messageKey, err)
+		}
+	}
 }

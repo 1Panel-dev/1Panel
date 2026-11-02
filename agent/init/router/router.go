@@ -20,6 +20,7 @@ func Routers() *gin.Engine {
 	}
 	Router = gin.Default()
 	Router.Use(i18n.UseI18n())
+	Router.Use(middleware.MCPErrorMetadata())
 	registerMCPRuntime(Router)
 
 	PrivateGroup := Router.Group("/api/v2")
