@@ -77,7 +77,7 @@ ErrAgentProviderNotSupported: "不支持该智能体提供商"
 ErrAgentAccountRequired: "请选择智能体账号后重试"
 ErrAgentAccountNotVerified: "账号未通过验证"
 ErrAgentAccountModelsRequired: "请至少配置一个模型"
-ErrAgentAccountSingleInitialModel: "创建账号时只能配置一个初始模型"
+ErrAgentAccountSingleInitialModel: '当前提供商最多配置一个模型'
 ErrAgentModelNotInAccount: "所选模型未配置在当前账号中"
 ErrAgentVerifyModelInUse: "该模型正用于验证账号，请先选择其他验证模型后再删除"
 ErrAgentFallbackModelDuplicate: "备用模型不能重复"

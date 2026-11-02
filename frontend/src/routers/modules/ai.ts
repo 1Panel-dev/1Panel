@@ -57,6 +57,18 @@ const aiRouter = {
             },
         },
         {
+            path: '/ai/model/local/ollama',
+            hidden: true,
+            name: 'OllamaModels',
+            component: () => import('@/views/ai/model/ollama/index.vue'),
+            meta: {
+                title: 'aiTools.model.engines',
+                detail: 'aiTools.model.modelManagement',
+                activeMenu: '/ai/model',
+                permission: 'ai_model_view',
+            },
+        },
+        {
             path: '/ai/agents/agent',
             name: 'Agents',
             component: () => import('@/views/ai/agents/agent/index.vue'),

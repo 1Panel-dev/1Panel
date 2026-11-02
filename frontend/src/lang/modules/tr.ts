@@ -836,6 +836,7 @@ const message = {
             accountModelsHelper:
                 "Bu hesabın OpenClaw'a sunacağı modelleri yapılandırın; seçim ve ayarlarda kullanılacaktır.",
             accountModelsRequired: 'En az bir model seçin',
+            accountModelsSingle: 'Bu sağlayıcı için en fazla bir model yapılandırılabilir',
             verifyModel: 'Doğrulama Modeli',
             verifyModelHelper:
                 'Bu hesabın erişebildiği bir model seçin. Kaydederken bağlantıyı doğrulamak için en küçük istek gönderilir.',
@@ -1104,9 +1105,11 @@ const message = {
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
             vllmVersionHelper: {
+                ascend: 'Ascend A2 serisi cihazlar için resmi Ascend standart sürümü.',
+                ascendA3: 'Ascend A3 serisi cihazlar için resmi Ascend A3 sürümü.',
+                ascendA5: '950DT cihazları için resmi Ascend A5 sürümü.',
+                ascend310P: 'Atlas 300I DUO ve Atlas 200I Pro cihazları için resmi Ascend 310P sürümü.',
                 default: 'Yeni sürücüler ve yeni GPU mimarileri için CUDA 13.0 içeren resmi standart sürüm.',
-                cuda: '13.0 altındaki CUDA sürümlerini kullanan eski GPU mimarileri için CUDA 12.9 içeren uyumluluk sürümü.',
-                ubuntu: 'NVIDIA GB10 cihazları için CUDA 13.0 içeren NVIDIA GB10 standart sürümü.',
                 dspark: '1Panel tarafından bakımı yapılan özel imajı kullanan, iki cihaz için NVIDIA GB10 özel sürümü.',
             },
             vllmDeployProfile: 'Dağıtım modeli',

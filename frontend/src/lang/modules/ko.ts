@@ -821,6 +821,7 @@ const message = {
             provider: '모델 제공자',
             accountModelsHelper: '이 계정이 OpenClaw에 제공할 모델을 설정합니다. 모델 전환 및 설정에 사용됩니다.',
             accountModelsRequired: '모델을 하나 이상 설정하세요.',
+            accountModelsSingle: '이 제공업체에는 모델을 최대 하나만 설정할 수 있습니다',
             verifyModel: '검증 모델',
             verifyModelHelper:
                 '이 계정으로 사용할 수 있는 모델을 선택하세요. 저장할 때 최소 요청을 보내 연결을 검증합니다.',
@@ -1073,9 +1074,11 @@ const message = {
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
             vllmVersionHelper: {
+                ascend: 'Ascend A2 시리즈 장치용 Ascend 공식 표준 버전입니다.',
+                ascendA3: 'Ascend A3 시리즈 장치용 Ascend 공식 A3 버전입니다.',
+                ascendA5: '950DT 장치용 Ascend 공식 A5 버전입니다.',
+                ascend310P: 'Atlas 300I DUO 및 Atlas 200I Pro 장치용 Ascend 공식 310P 버전입니다.',
                 default: '공식 표준 버전으로, CUDA 13.0을 사용하며 최신 드라이버와 새로운 GPU 아키텍처에 적합합니다.',
-                cuda: '이전 아키텍처 호환 버전으로, CUDA 12.9를 사용하며 CUDA 13.0 미만을 사용하는 이전 GPU 아키텍처에 적합합니다.',
-                ubuntu: 'NVIDIA GB10 표준 버전으로, CUDA 13.0을 사용하며 NVIDIA GB10 장치에 적합합니다.',
                 dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, 1Panel이 자체 유지 관리하는 맞춤 이미지입니다.',
             },
             vllmDeployProfile: '배포 모델',

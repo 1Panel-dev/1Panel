@@ -62,7 +62,7 @@ ErrAgentProviderNotSupported: 'ບໍ່ຮອງຮັບຜູ້ໃຫ້ບ�
 ErrAgentAccountRequired: 'ກະລຸນາເລືອກບັນຊີຕົວແທນກ່ອນ'
 ErrAgentAccountNotVerified: 'ບັນຊີຕົວແທນຍັງບໍ່ໄດ້ຮັບການຢືນຢັນ'
 ErrAgentAccountModelsRequired: 'ກະລຸນາກຳນົດຄ່າໂມເດລຢ່າງໜ້ອຍໜຶ່ງຕົວ'
-ErrAgentAccountSingleInitialModel: 'ສາມາດກຳນົດຄ່າໂມເດລເລີ່ມຕົ້ນໄດ້ພຽງຕົວດຽວໃນລະຫວ່າງການສ້າງບັນຊີ'
+ErrAgentAccountSingleInitialModel: 'ຜູ້ໃຫ້ບໍລິການນີ້ສາມາດກຳນົດຄ່າໄດ້ສູງສຸດໜຶ່ງໂມເດວ'
 ErrAgentModelNotInAccount: 'ໂມເດລບໍ່ໄດ້ຖືກກຳນົດຄ່າໃນບັນຊີທີ່ເລືອກ'
 ErrAgentVerifyModelInUse: 'ໂມເດລນີ້ຖືກໃຊ້ສຳລັບກວດສອບບັນຊີ. ກະລຸນາເລືອກໂມເດລກວດສອບອື່ນກ່ອນລຶບ.'
 ErrAgentFallbackModelDuplicate: 'ໂມເດລສຳຮອງ (Fallback) ບໍ່ສາມາດຊ້ຳກັນໄດ້'

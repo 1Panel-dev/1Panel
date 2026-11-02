@@ -1328,7 +1328,7 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 	if account == nil {
 		return nil, fmt.Errorf("account is required")
 	}
-	if account.Provider != "custom" && requiresInitialAgentAccountModels(account.Provider) && len(requested) > 1 {
+	if (account.Provider == "vllm" || account.Provider == "llmman") && len(requested) > 1 {
 		return nil, buserr.New("ErrAgentAccountSingleInitialModel")
 	}
 	if len(requested) > 0 {
