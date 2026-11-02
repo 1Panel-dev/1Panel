@@ -4038,7 +4038,6 @@ const message = {
         setting: 'Actualizar a la edición comercial permite personalizar logo, mensaje de bienvenida y más.',
         monitor: 'La edición comercial permite ver estado web en tiempo real, tendencias, logs, etc.',
         alert: 'La edición comercial permite recibir alertas SMS y ver logs, control total de eventos clave.',
-        vm: 'Actualice a la edición comercial para gestionar máquinas virtuales, imágenes, plantillas, redes virtuales y recursos de almacenamiento en 1Panel.',
         node: 'Actualizar a la edición comercial permite administrar varios servidores Linux con 1Panel.',
         nodeApp:
             'Actualizar a la edición comercial permite actualizar versiones de aplicaciones multinodo sin cambiar de nodo manualmente.',
@@ -7657,8 +7656,7 @@ const message = {
             submitSuccess: 'La tarea de sincronización se ha enviado correctamente.',
         },
         vm: {
-            countLimitHelper:
-                'La edición Professional permite crear hasta {0} máquinas virtuales. Enterprise no limita la cantidad.',
+            countLimitHelper: 'La edición actual permite crear hasta {0} máquinas virtuales.',
             vm: 'Máquina virtual',
             title: 'Gestión de máquinas virtuales',
             healthCheck: 'Comprobación de estado',

@@ -736,7 +736,7 @@ ErrSSHKeyMismatch: "The SSH public and private keys do not match"
 # virtual machine
 ErrVMNotFound: "Virtual machine does not exist"
 ErrVMAlreadyExists: "Virtual machine already exists"
-ErrVMCountLimit: "The Professional edition supports up to {{ .limit }} virtual machines. Delete an existing VM or upgrade to Enterprise to create more."
+ErrVMCountLimit: "The current edition supports up to {{ .limit }} virtual machines. Delete an existing VM or upgrade your edition and try again."
 ErrVMImageAlreadyExists: "Virtual machine image already exists: {{ .detail }}"
 ErrVMStoragePathInUse: "Storage pool path is already used by [{{ .name }}]"
 ErrVMHelperNotFound: "1panel-kvm not found"

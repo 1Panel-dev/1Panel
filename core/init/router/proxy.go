@@ -40,6 +40,7 @@ type agentProxyPolicy struct {
 func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 	policies = append([]agentProxyPolicy(nil), policies...)
 	return func(c *gin.Context) {
+		c.Request.Header.Del("X-1Panel-VM-Limit")
 		terminalsession.ClearForwardedHeaders(c)
 		mcpapi.ClearForwardedHeaders(c.Request.Header)
 		for _, policy := range policies {
@@ -120,6 +121,10 @@ func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 			if policy.grant != nil {
 				policy.grant(c, useLocalAgent)
 			}
+		}
+
+		if reqPath == "/api/v2/vms" || strings.HasPrefix(reqPath, "/api/v2/vms/") {
+			c.Request.Header.Set("X-1Panel-VM-Limit", strconv.Itoa(xpack.VMCountLimit(c)))
 		}
 
 		if reqPath == "/api/v2/hosts/terminal/local" && useLocalAgent {

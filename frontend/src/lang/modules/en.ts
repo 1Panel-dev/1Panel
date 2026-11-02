@@ -3962,7 +3962,6 @@ const message = {
         monitor:
             'Upgrade to Commercial Edition to view real-time website status, visitor trends, traffic sources, request logs, and more.',
         alert: 'Upgrade to Commercial Edition to receive SMS alerts, review alert logs, and stay on top of key events.',
-        vm: 'Upgrade to the commercial edition to manage virtual machines, images, templates, virtual networks, and storage resources in 1Panel.',
         node: 'Upgrade to Commercial Edition to manage multiple Linux servers in 1Panel.',
         nodeApp: 'Upgrade to Commercial Edition to upgrade multi-node app versions without switching nodes manually.',
         nodeDashboard:
@@ -7537,8 +7536,7 @@ const message = {
             submitSuccess: 'Sync task submitted.',
         },
         vm: {
-            countLimitHelper:
-                'The Professional edition supports up to {0} virtual machines. Enterprise has no VM count limit.',
+            countLimitHelper: 'The current edition supports up to {0} virtual machines.',
             vm: 'VM',
             title: 'Virtual Machines',
             healthCheck: 'Health Check',

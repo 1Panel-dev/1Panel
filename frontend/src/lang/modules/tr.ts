@@ -4021,7 +4021,6 @@ const message = {
         monitor:
             'Ticari sürüme yükselterek web sitesinin gerçek zamanlı durumunu, ziyaretçi eğilimlerini, kaynaklarını ve istek günlüklerini görüntüleyebilirsiniz.',
         alert: 'Ticari sürüme yükselterek SMS uyarıları alabilir, uyarı günlüklerini görüntüleyebilir ve kritik olayları takip edebilirsiniz.',
-        vm: '1Panel ile sanal makineleri, imajları, şablonları, sanal ağları ve depolama kaynaklarını yönetmek için ticari sürüme yükseltin.',
         node: 'Ticari sürüme yükselterek 1Panel ile birden fazla Linux sunucusunu yönetebilirsiniz.',
         nodeApp:
             'Ticari sürüme yükselterek düğümleri manuel değiştirmeden çok düğümlü uygulama sürümlerini toplu olarak yükseltebilirsiniz.',
@@ -7659,8 +7658,7 @@ const message = {
             submitSuccess: 'Senkronizasyon görevi başarıyla gönderildi.',
         },
         vm: {
-            countLimitHelper:
-                'Professional sürümü en fazla {0} sanal makine oluşturulmasına izin verir. Enterprise sürümünde sayı sınırı yoktur.',
+            countLimitHelper: 'Mevcut sürüm en fazla {0} sanal makine oluşturulmasına izin verir.',
             vm: 'Sanal Makine',
             title: 'Sanal Makine Yönetimi',
             healthCheck: 'Sağlık kontrolü',

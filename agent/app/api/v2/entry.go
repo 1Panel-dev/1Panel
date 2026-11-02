@@ -11,6 +11,7 @@ var ApiGroupApp = new(ApiGroup)
 type BaseApi struct{}
 
 var (
+	vmService        = service.NewIVMService()
 	dashboardService = service.NewIDashboardService()
 
 	appService              = service.NewIAppService()

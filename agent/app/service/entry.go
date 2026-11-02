@@ -3,6 +3,7 @@ package service
 import "github.com/1Panel-dev/1Panel/agent/app/repo"
 
 var (
+	vmRepo                 = repo.NewIVMRepo()
 	modelDownloadTaskRepo  = repo.NewIModelDownloadTaskRepo()
 	featuredModelRepo      = repo.NewIFeaturedModelRepo()
 	appRepo                = repo.NewIAppRepo()

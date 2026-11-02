@@ -736,7 +736,7 @@ ErrSSHKeyMismatch: "SSH 公鑰與私鑰不相符"
 # 虛擬機
 ErrVMNotFound: "虛擬機不存在"
 ErrVMAlreadyExists: "虛擬機已存在"
-ErrVMCountLimit: "專業版最多可建立 {{ .limit }} 台虛擬機，請刪除現有虛擬機或升級企業版後重試。"
+ErrVMCountLimit: "目前版本最多可建立 {{ .limit }} 台虛擬機。 請刪除現有虛擬機或升級版本後重試。"
 ErrVMImageAlreadyExists: "虛擬機映像檔已存在: {{ .detail }}"
 ErrVMStoragePathInUse: "儲存池路徑已被 [{{ .name }}] 使用"
 ErrVMHelperNotFound: "1panel-kvm 不存在"

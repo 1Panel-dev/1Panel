@@ -27330,6 +27330,1876 @@ const docTemplate = `{
 				}
 			}
 		},
+		"/vms": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Creates a VM from ISO images or a template. The target node allows 1 VM in Community, 5 in Professional, and unlimited VMs in Enterprise. All VM records count toward the quota, regardless of state; creation fails with ErrVMCountLimit when the quota is reached.\nReturns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMCreate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "create VM [name]",
+					"formatZH": "创建虚拟机 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/console": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMGraphics"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load virtual machine console information",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/console/ws": {
+			"get": {
+				"description": "Upgrades the connection to WebSocket and forwards VNC traffic.",
+				"parameters": [
+					{
+						"description": "virtual machine name",
+						"in": "query",
+						"name": "name",
+						"required": true,
+						"type": "string"
+					}
+				],
+				"responses": {
+					"101": {
+						"description": "Switching Protocols"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Connect virtual machine VNC console over WebSocket",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "virtual_machines",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete VM [name]",
+					"formatZH": "删除虚拟机 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/disks/resize": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMDiskResize"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Expand virtual machine disk",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"target",
+						"sizeGiB"
+					],
+					"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB",
+					"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/environment": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMEnvironment"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check virtual machine environment",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/environment/enable": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Enable virtual machine environment",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "enable VM runtime environment",
+					"formatZH": "启用虚拟机运行环境",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/health/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMHealthCheckResult"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check virtual machine health",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/info": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMInfoReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load virtual machine details",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/iso": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMIsoCreate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine ISO image record",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "create VM ISO [name] [type]",
+					"formatZH": "创建虚拟机镜像 [name] [type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/iso/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMIsoDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine ISO image",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_isos",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete VM ISO [name]",
+					"formatZH": "删除虚拟机镜像 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/iso/import/start": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Creates an import record and returns its id.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMIsoImportStart"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"additionalProperties": {
+								"type": "integer"
+							},
+							"type": "object"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Start virtual machine ISO image import",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/iso/import/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMIsoImportUpdate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update virtual machine ISO image import status",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/iso/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMIsoInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List virtual machine ISO images",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/iso/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchPageWithType"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.PageResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.VMIsoInfo"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page virtual machine ISO images",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/iso/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMIsoUpdate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update virtual machine ISO image record",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "update VM ISO [name] [type]",
+					"formatZH": "更新虚拟机镜像 [name] [type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/networks": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMNetworkCreate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine network",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "create VM network [name] [type]",
+					"formatZH": "创建虚拟机网络 [name] [type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/networks/bridges": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMNetworkBridgeItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List host network bridges for virtual machines",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/networks/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMResourceDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine network",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_networks",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete VM network [name]",
+					"formatZH": "删除虚拟机网络 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/networks/interfaces": {
+			"get": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMNetworkInterfaceItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List host network interfaces for virtual machines",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/networks/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMNetworkItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List virtual machine networks",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/networks/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMNetworkUpdate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update virtual machine network",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_networks",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "update VM network [name]",
+					"formatZH": "更新虚拟机网络 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/operate": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMOperate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Operate virtual machine",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"operate"
+					],
+					"formatEN": "operate VM [name] [operate]",
+					"formatZH": "操作虚拟机 [name] [operate]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/orphans/clean": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMOrphanClean"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMOrphanItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Clean orphaned virtual machine data",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "clean VM orphaned data",
+					"formatZH": "清理虚拟机孤立数据",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/orphans/scan": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMOrphanItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Scan orphaned virtual machine data",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/rename": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMRename"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Rename virtual machine",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"newName"
+					],
+					"formatEN": "rename VM [name] to [newName]",
+					"formatZH": "重命名虚拟机 [name] 为 [newName]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns the VM list and the target node quota: 1 for Community, 5 for Professional, and 0 for unlimited Enterprise.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.SearchWithPage"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.VMSearchResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.VMInfo"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page virtual machines",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/snapshots": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMSnapshotReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine snapshot",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"snapshotName"
+					],
+					"formatEN": "create VM [name] snapshot [snapshotName]",
+					"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/snapshots/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMSnapshotReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine snapshot",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"snapshotName"
+					],
+					"formatEN": "delete VM [name] snapshot [snapshotName]",
+					"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/snapshots/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMSnapshotSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMSnapshotInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List virtual machine snapshots",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/snapshots/recover": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMSnapshotReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Recover virtual machine snapshot",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"snapshotName"
+					],
+					"formatEN": "recover VM [name] snapshot [snapshotName]",
+					"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/stats": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMStats"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Load virtual machine statistics",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/storages": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMStorageCreate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine storage pool",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"type"
+					],
+					"formatEN": "create VM storage [name] [type]",
+					"formatZH": "创建虚拟机存储 [name] [type]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/storages/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMResourceDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine storage pool",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_storages",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete VM storage [name]",
+					"formatZH": "删除虚拟机存储 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/storages/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMStorageItem"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List virtual machine storage pools",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/storages/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMStorageUpdate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update virtual machine storage pool",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_storages",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "update VM storage [name]",
+					"formatZH": "更新虚拟机存储 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/sync": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Sync virtual machines",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [],
+					"formatEN": "sync virtual machines",
+					"formatZH": "同步虚拟机",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/templates": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMTemplateCreate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Create virtual machine template",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name",
+						"templateName"
+					],
+					"formatEN": "create VM [name] template [templateName]",
+					"formatZH": "创建虚拟机 [name] 模板 [templateName]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/templates/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMTemplateDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete virtual machine template",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "vm_templates",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "name",
+							"output_value": "name"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "delete VM template [name]",
+					"formatZH": "删除虚拟机模板 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/vms/templates/list": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.VMTemplateInfo"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "List virtual machine templates",
+				"tags": [
+					"VirtualMachine"
+				]
+			}
+		},
+		"/vms/update": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Returns taskID for tracking the asynchronous operation.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.VMUpdate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.VMTaskResp"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update virtual machine",
+				"tags": [
+					"VirtualMachine"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "update VM [name]",
+					"formatZH": "更新虚拟机 [name]",
+					"paramKeys": []
+				}
+			}
+		},
 		"/websites": {
 			"post": {
 				"consumes": [
@@ -44820,6 +46690,1244 @@ const docTemplate = `{
 					"type": "string"
 				}
 			},
+			"type": "object"
+		},
+		"dto.VMCreate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"bootOrder": {
+					"type": "string"
+				},
+				"cpu": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"description": {
+					"type": "string"
+				},
+				"diskBus": {
+					"enum": [
+						"sata",
+						"virtio"
+					],
+					"type": "string"
+				},
+				"diskPath": {
+					"type": "string"
+				},
+				"diskSize": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"imagePath": {
+					"type": "string"
+				},
+				"isoPaths": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"memory": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
+				},
+				"osType": {
+					"enum": [
+						"windows",
+						"linux",
+						"other"
+					],
+					"type": "string"
+				},
+				"startAfterCreate": {
+					"type": "boolean"
+				},
+				"storagePool": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"templateID": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"cpu",
+				"diskSize",
+				"memory",
+				"name",
+				"network"
+			],
+			"type": "object"
+		},
+		"dto.VMDelete": {
+			"properties": {
+				"force": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMDisk": {
+			"properties": {
+				"bus": {
+					"type": "string"
+				},
+				"capacity": {
+					"type": "integer"
+				},
+				"device": {
+					"type": "string"
+				},
+				"format": {
+					"type": "string"
+				},
+				"readOnly": {
+					"type": "boolean"
+				},
+				"resizeBlocked": {
+					"type": "string"
+				},
+				"shareable": {
+					"type": "boolean"
+				},
+				"source": {
+					"type": "string"
+				},
+				"target": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMDiskResize": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"sizeGiB": {
+					"maximum": 8388607,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"target": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"sizeGiB",
+				"target"
+			],
+			"type": "object"
+		},
+		"dto.VMDiskStats": {
+			"properties": {
+				"readBytes": {
+					"type": "integer"
+				},
+				"readReqs": {
+					"type": "integer"
+				},
+				"writeBytes": {
+					"type": "integer"
+				},
+				"writeReqs": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMEnvironment": {
+			"properties": {
+				"arch": {
+					"type": "string"
+				},
+				"archSupported": {
+					"type": "boolean"
+				},
+				"helperExist": {
+					"type": "boolean"
+				},
+				"helperMessage": {
+					"type": "string"
+				},
+				"kvmExist": {
+					"type": "boolean"
+				},
+				"kvmMessage": {
+					"type": "string"
+				},
+				"libvirtActive": {
+					"type": "boolean"
+				},
+				"libvirtExist": {
+					"type": "boolean"
+				},
+				"libvirtMessage": {
+					"type": "string"
+				},
+				"ready": {
+					"type": "boolean"
+				},
+				"storageExist": {
+					"type": "boolean"
+				},
+				"storageMessage": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMGraphics": {
+			"properties": {
+				"listen": {
+					"type": "string"
+				},
+				"port": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMHealthCheckItem": {
+			"properties": {
+				"check": {
+					"type": "string"
+				},
+				"detail": {
+					"type": "string"
+				},
+				"fixCommand": {
+					"type": "string"
+				},
+				"level": {
+					"type": "string"
+				},
+				"params": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"type": "object"
+				},
+				"reason": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMHealthCheckResult": {
+			"properties": {
+				"fail": {
+					"type": "integer"
+				},
+				"items": {
+					"items": {
+						"$ref": "#/definitions/dto.VMHealthCheckItem"
+					},
+					"type": "array"
+				},
+				"pass": {
+					"type": "integer"
+				},
+				"warn": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMInfo": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"bootOrder": {
+					"type": "string"
+				},
+				"cpu": {
+					"type": "integer"
+				},
+				"createTaskID": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"diskBus": {
+					"type": "string"
+				},
+				"diskPath": {
+					"type": "string"
+				},
+				"diskSize": {
+					"type": "integer"
+				},
+				"disks": {
+					"items": {
+						"$ref": "#/definitions/dto.VMDisk"
+					},
+					"type": "array"
+				},
+				"graphics": {
+					"$ref": "#/definitions/dto.VMGraphics"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"imagePath": {
+					"type": "string"
+				},
+				"interfaces": {
+					"items": {
+						"$ref": "#/definitions/dto.VMInterface"
+					},
+					"type": "array"
+				},
+				"isoPaths": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"memory": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"storagePool": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"uuid": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMInfoReq": {
+			"properties": {
+				"checkDisks": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.VMInterface": {
+			"properties": {
+				"ip": {
+					"type": "string"
+				},
+				"mac": {
+					"type": "string"
+				},
+				"model": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMIsoCreate": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"path",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMIsoDelete": {
+			"properties": {
+				"deleteFile": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMIsoImportStart": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"enum": [
+						"uploading",
+						"downloading"
+					],
+					"type": "string"
+				},
+				"tempFileID": {
+					"type": "string"
+				},
+				"tempFileType": {
+					"enum": [
+						"upload",
+						"download"
+					],
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"path",
+				"status",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMIsoImportUpdate": {
+			"properties": {
+				"error": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"status": {
+					"enum": [
+						"uploading",
+						"downloading",
+						"ready",
+						"failed"
+					],
+					"type": "string"
+				},
+				"tempFileID": {
+					"type": "string"
+				},
+				"tempFileType": {
+					"enum": [
+						"upload",
+						"download"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"status"
+			],
+			"type": "object"
+		},
+		"dto.VMIsoInfo": {
+			"properties": {
+				"createdAt": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"error": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"isExist": {
+					"type": "boolean"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				},
+				"tempFileID": {
+					"type": "string"
+				},
+				"tempFileType": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMIsoUpdate": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"name",
+				"path",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMMemoryStats": {
+			"properties": {
+				"actualKiB": {
+					"type": "integer"
+				},
+				"availableKiB": {
+					"type": "integer"
+				},
+				"rssKiB": {
+					"type": "integer"
+				},
+				"unusedKiB": {
+					"type": "integer"
+				},
+				"usableKiB": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkBridgeItem": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"recommended": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkCreate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"bridgeName": {
+					"type": "string"
+				},
+				"cidr": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"dhcpEnd": {
+					"type": "string"
+				},
+				"dhcpStart": {
+					"type": "string"
+				},
+				"gateway": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"sourceInterface": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"nat",
+						"bridge",
+						"macvtap"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMNetworkIPUsage": {
+			"properties": {
+				"ip": {
+					"type": "string"
+				},
+				"mac": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"vmName": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkInterfaceItem": {
+			"properties": {
+				"addresses": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkItem": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"bridgeName": {
+					"type": "string"
+				},
+				"cidr": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"dhcpEnd": {
+					"type": "string"
+				},
+				"dhcpStart": {
+					"type": "string"
+				},
+				"error": {
+					"type": "string"
+				},
+				"gateway": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"registered": {
+					"type": "boolean"
+				},
+				"sourceInterface": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"usedIPs": {
+					"items": {
+						"$ref": "#/definitions/dto.VMNetworkIPUsage"
+					},
+					"type": "array"
+				},
+				"vmCount": {
+					"type": "integer"
+				},
+				"vms": {
+					"items": {
+						"$ref": "#/definitions/dto.VMResourceRef"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkStats": {
+			"properties": {
+				"rxBytes": {
+					"type": "integer"
+				},
+				"rxPackets": {
+					"type": "integer"
+				},
+				"txBytes": {
+					"type": "integer"
+				},
+				"txPackets": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMNetworkUpdate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMOperate": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"operate": {
+					"enum": [
+						"start",
+						"shutdown",
+						"reboot",
+						"destroy",
+						"suspend",
+						"resume"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"operate"
+			],
+			"type": "object"
+		},
+		"dto.VMOrphanClean": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/definitions/dto.VMOrphanItem"
+					},
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"items"
+			],
+			"type": "object"
+		},
+		"dto.VMOrphanItem": {
+			"properties": {
+				"modifiedAt": {
+					"type": "integer"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"type": {
+					"enum": [
+						"orphan_domain_disk",
+						"orphan_snapshot",
+						"partial_file"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"path",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMRename": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"newName": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"newName"
+			],
+			"type": "object"
+		},
+		"dto.VMReq": {
+			"properties": {
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.VMResourceDelete": {
+			"properties": {
+				"force": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMResourceRef": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMSearchResult": {
+			"properties": {
+				"items": {},
+				"limit": {
+					"description": "Maximum VM count for the target node; 0 means unlimited.",
+					"type": "integer"
+				},
+				"total": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMSnapshotInfo": {
+			"properties": {
+				"children": {
+					"type": "integer"
+				},
+				"createdAt": {
+					"type": "integer"
+				},
+				"current": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"parent": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"state": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMSnapshotReq": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"snapshotName": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"snapshotName"
+			],
+			"type": "object"
+		},
+		"dto.VMSnapshotSearch": {
+			"properties": {
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.VMStats": {
+			"properties": {
+				"cpuTime": {
+					"type": "integer"
+				},
+				"disk": {
+					"$ref": "#/definitions/dto.VMDiskStats"
+				},
+				"memory": {
+					"$ref": "#/definitions/dto.VMMemoryStats"
+				},
+				"name": {
+					"type": "string"
+				},
+				"network": {
+					"$ref": "#/definitions/dto.VMNetworkStats"
+				},
+				"status": {
+					"type": "string"
+				},
+				"timestamp": {
+					"type": "integer"
+				},
+				"vcpu": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMStorageCreate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"type": {
+					"enum": [
+						"dir"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"path",
+				"type"
+			],
+			"type": "object"
+		},
+		"dto.VMStorageItem": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"available": {
+					"type": "integer"
+				},
+				"capacity": {
+					"type": "integer"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"error": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"type": {
+					"type": "string"
+				},
+				"vmCount": {
+					"type": "integer"
+				},
+				"vms": {
+					"items": {
+						"$ref": "#/definitions/dto.VMResourceRef"
+					},
+					"type": "array"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMStorageUpdate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"description": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMTaskResp": {
+			"properties": {
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMTemplateCreate": {
+			"properties": {
+				"description": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"storagePool": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				},
+				"templateName": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"name",
+				"templateName"
+			],
+			"type": "object"
+		},
+		"dto.VMTemplateDelete": {
+			"properties": {
+				"deleteDisk": {
+					"type": "boolean"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.VMTemplateInfo": {
+			"properties": {
+				"bootOrder": {
+					"type": "string"
+				},
+				"cpu": {
+					"type": "integer"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"description": {
+					"type": "string"
+				},
+				"diskBus": {
+					"type": "string"
+				},
+				"diskPath": {
+					"type": "string"
+				},
+				"diskSize": {
+					"type": "integer"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"isExist": {
+					"type": "boolean"
+				},
+				"memory": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"sourceVM": {
+					"type": "string"
+				},
+				"storagePool": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.VMUpdate": {
+			"properties": {
+				"autoStart": {
+					"type": "boolean"
+				},
+				"bootOrder": {
+					"type": "string"
+				},
+				"cpu": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"description": {
+					"type": "string"
+				},
+				"isoPaths": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"memory": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"network": {
+					"type": "string"
+				},
+				"taskID": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"cpu",
+				"memory",
+				"name",
+				"network"
+			],
 			"type": "object"
 		},
 		"dto.VolumeCreate": {
