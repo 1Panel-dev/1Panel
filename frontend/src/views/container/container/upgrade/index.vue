@@ -54,6 +54,13 @@
                         :disabled="loading || !group.names.length || !isGroupEditable(group)"
                     />
                     <span class="input-help">{{ $t('container.upgradeHelper') }}</span>
+                    <div v-if="group.availableVersion" class="input-help">
+                        {{ $t('container.imageCheckUpdateAvailableVersion', { version: group.availableVersion }) }}
+                        <span v-if="imageTag(group.currentImage) === group.availableVersion">
+                            {{ $t('container.imageCheckUpdateContentChanged') }}
+                        </span>
+                        <CopyButton :content="group.availableVersion" />
+                    </div>
                 </el-form-item>
                 <div v-if="group.state !== 'draft'" class="mb-3">
                     <el-tag :type="statusType(group)">{{ statusLabel(group) }}</el-tag>
@@ -100,6 +107,7 @@ import { GlobalStore } from '@/store';
 interface UpgradeGroup {
     currentImage: string;
     targetImage: string;
+    availableVersion: string;
     names: string[];
     appNames: string[];
     options: Container.ContainerOption[];
@@ -112,7 +120,14 @@ interface DialogProps {
     container: string;
     image: string;
     fromApp: boolean;
+    latestVersion?: string;
+    hasUpdate?: boolean;
 }
+const imageTag = (image: string) => {
+    const name = image.slice(image.lastIndexOf('/') + 1);
+    const separator = name.lastIndexOf(':');
+    return separator < 0 ? 'latest' : name.slice(separator + 1);
+};
 const isBatch = ref(false);
 const isGroupEditable = (group: UpgradeGroup) => ['draft', 'failed'].includes(group.state);
 const isGroupChecked = (group: UpgradeGroup) => group.options.length > 0 && group.names.length === group.options.length;
@@ -137,7 +152,15 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
     isBatch.value = Array.isArray(props);
     const containers = Array.isArray(props)
         ? props
-        : [{ name: props.container, imageName: props.image, isFromApp: props.fromApp }];
+        : [
+              {
+                  name: props.container,
+                  imageName: props.image,
+                  isFromApp: props.fromApp,
+                  latestVersion: props.latestVersion,
+                  hasUpdate: props.hasUpdate,
+              },
+          ];
     operateNode = GlobalStore().currentNode;
     clearTimeout(timer);
     generation++;
@@ -148,6 +171,7 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
             group = {
                 currentImage: item.imageName,
                 targetImage: item.imageName.includes('sha256:') ? '' : item.imageName,
+                availableVersion: '',
                 names: [],
                 appNames: [],
                 options: [],
@@ -158,6 +182,7 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
             };
             groups.set(item.imageName, group);
         }
+        if (item.hasUpdate && item.latestVersion) group.availableVersion = item.latestVersion;
         if (!group.names.includes(item.name)) {
             group.names.push(item.name);
             group.options.push({ name: item.name, state: '' });
@@ -165,7 +190,7 @@ const acceptParams = async (props: DialogProps | Container.ContainerInfo[]) => {
         if (item.isFromApp && !group.appNames.includes(item.name)) group.appNames.push(item.name);
     }
     form.groups = [...groups.values()];
-    form.forcePull = false;
+    form.forcePull = containers.some((item) => item.hasUpdate);
     started.value = false;
     visible.value = true;
     formRef.value?.clearValidate();

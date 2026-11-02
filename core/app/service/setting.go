@@ -179,6 +179,8 @@ func (u *SettingService) GetSettingBaseInfo() (*dto.SettingBaseInfo, error) {
 		_ = settingRepo.UpdateOrCreate("MenuAccordion", info.MenuAccordion)
 	}
 
+	info.ProxyEnabled = info.ProxyType == "http" || info.ProxyType == "https" || info.ProxyType == "socks5"
+
 	return &info, err
 }
 

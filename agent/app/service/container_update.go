@@ -163,6 +163,11 @@ func (u *ContainerService) ContainerUpgrade(req dto.ContainerUpgrade) error {
 				upgradeErrors = append(upgradeErrors, upgradeErr)
 				return upgradeErr
 			}
+			if updated, inspectErr := client.ContainerInspect(ctx, item); inspectErr == nil {
+				if cacheErr := reconcileContainerImageCheckUpdate(oldContainer.ID, updated.ID, updated.Image, updated.Config.Image); cacheErr != nil {
+					global.LOG.Warnf("refresh container image update state: %v", cacheErr)
+				}
+			}
 			if cleanupErr != nil {
 				t.Log(i18n.GetWithNameAndErr("ContainerCleanupWarning", containerSwitchBackupName(oldContainer.ID), cleanupErr))
 			}
@@ -306,7 +311,6 @@ func switchContainer(
 ) (cleanupErr error, err error) {
 	return switchContainerWithRecovery(ctx, cli, name, oldContainer, createNew, tty, logger, false)
 }
-
 
 const (
 	containerUpgradePullTimeout     = 30 * time.Minute

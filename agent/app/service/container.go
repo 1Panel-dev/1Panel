@@ -140,6 +140,29 @@ func (u *ContainerService) Page(ctx context.Context, req dto.PageContainer) (int
 		backData = records[start:end]
 	}
 
+	// Batch-load persisted checks; never contact Docker Hub while rendering the list.
+	ids := make([]string, 0, len(backData))
+	for _, row := range backData {
+		ids = append(ids, row.ContainerID)
+	}
+	if len(ids) > 0 {
+		var checks []model.ContainerImageCheckUpdate
+		if err := global.DB.Where("container_id IN ?", ids).Find(&checks).Error; err != nil {
+			return 0, nil, err
+		}
+		byID := make(map[string]model.ContainerImageCheckUpdate, len(checks))
+		for _, check := range checks {
+			byID[check.ContainerID] = check
+		}
+		for i := range backData {
+			check, ok := byID[backData[i].ContainerID]
+			if ok && sameContainerImage(check.ImageID, backData[i].ImageId) && check.ImageName == backData[i].ImageName {
+				backData[i].LatestVersion = check.LatestVersion
+				backData[i].TargetImage = check.TargetImage
+				backData[i].HasUpdate = check.HasUpdate
+			}
+		}
+	}
 	for i := 0; i < len(backData); i++ {
 		install, _ := appInstallRepo.GetFirst(appInstallRepo.WithContainerName(backData[i].Name))
 		if install.ID > 0 {

@@ -13,14 +13,16 @@
                 @click.stop="handleButtonClick(button)"
             >
                 <el-icon v-if="button.icon" class="mr-1"><component :is="button.icon" /></el-icon>
-                <span>{{ button.label }}</span>
+                <el-badge is-dot :hidden="!hasDot(button)">
+                    <span>{{ button.label }}</span>
+                </el-badge>
             </el-button>
         </span>
         <span v-if="actions.more.length" class="fu-table-operations__action">
             <el-dropdown class="fu-table-more-button" :trigger="trigger" @command="handleButtonClick">
                 <span class="fu-table-operations__dropdown-trigger">
                     <el-button class="fu-table-operations__button" link type="primary">
-                        {{ t('fu.table.more') }}
+                        <el-badge is-dot :hidden="!actions.more.some(hasDot)">{{ t('fu.table.more') }}</el-badge>
                     </el-button>
                 </span>
                 <template #dropdown>
@@ -33,7 +35,9 @@
                             :divided="button.divided"
                         >
                             <el-icon v-if="button.icon" class="mr-1"><component :is="button.icon" /></el-icon>
-                            <span>{{ button.label }}</span>
+                            <el-badge is-dot :hidden="!hasDot(button)">
+                                <span>{{ button.label }}</span>
+                            </el-badge>
                         </el-dropdown-item>
                     </el-dropdown-menu>
                 </template>
@@ -74,6 +78,9 @@ const actions = computed(() => {
         more: visible.slice(limit),
     };
 });
+
+const hasDot = (button: FuTableOperationButton) =>
+    typeof button.dot === 'function' ? button.dot(props.row) : Boolean(button.dot);
 
 const handleButtonClick = (button: FuTableOperationButton) => {
     if (!isOperationDisabled(button, props.row)) {

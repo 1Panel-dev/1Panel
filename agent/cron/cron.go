@@ -77,7 +77,11 @@ func Run() {
 		global.LOG.Errorf("generate random hour failed: %v", err)
 		hourRand = big.NewInt(0)
 	}
-	if _, err := global.Cron.AddJob(fmt.Sprintf("%v %v * * *", minuteRand.Int64(), hourRand.Int64()), job.NewAppStoreJob()); err != nil {
+	appSyncSchedule := fmt.Sprintf("%v %v * * *", minuteRand.Int64(), hourRand.Int64())
+	if _, err := global.Cron.AddJob(appSyncSchedule, job.NewContainerImageCheckUpdateJob()); err != nil {
+		global.LOG.Errorf("cannot add container image update cron job: %v", err)
+	}
+	if _, err := global.Cron.AddJob(appSyncSchedule, job.NewAppStoreJob()); err != nil {
 		global.LOG.Errorf("can not add  appstore corn job: %s", err.Error())
 	}
 	if _, err := global.Cron.AddJob("0 3 */31 * *", job.NewBackupJob()); err != nil {
