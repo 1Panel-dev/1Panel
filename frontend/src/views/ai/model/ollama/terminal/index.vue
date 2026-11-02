@@ -1,6 +1,8 @@
 <template>
-    <DialogPro v-model="open" :title="$t('menu.terminal')" size="w-70" @close="handleClose">
-        <Terminal class="mt-2" style="height: 55vh" ref="terminalRef"></Terminal>
+    <DrawerPro v-model="open" :header="$t('menu.terminal')" size="70%" @close="handleClose">
+        <template #content>
+            <Terminal class="mt-2" style="height: 70vh" ref="terminalRef"></Terminal>
+        </template>
 
         <template #footer>
             <span class="dialog-footer">
@@ -9,7 +11,7 @@
                 </el-button>
             </span>
         </template>
-    </DialogPro>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -24,10 +26,10 @@ const itemName = ref();
 const terminalRef = ref();
 let operateNode = '';
 
-interface DialogProps {
+interface DrawerProps {
     name: string;
 }
-const acceptParams = async (params: DialogProps): Promise<void> => {
+const acceptParams = async (params: DrawerProps): Promise<void> => {
     operateNode = currentNode.value;
     itemName.value = params.name;
     open.value = true;

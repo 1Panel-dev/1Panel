@@ -42,7 +42,31 @@
                     :loading="loadingEngines"
                     @change="handleLocalEngineChange"
                 >
-                    <el-option v-for="item in localEngines" :key="item.id" :label="item.name" :value="item.id" />
+                    <el-option v-for="item in localEngines" :key="item.id" :label="item.name" :value="item.id">
+                        <div class="local-engine-option">
+                            <span class="local-engine-option__name" :title="item.name">{{ item.name }}</span>
+                            <el-tag
+                                v-if="item.models.length"
+                                size="small"
+                                type="info"
+                                class="local-engine-option__model"
+                            >
+                                <span :title="item.models[0]">{{ item.models[0] }}</span>
+                            </el-tag>
+                            <el-popover v-if="item.models.length > 1" trigger="click" placement="bottom" :width="320">
+                                <template #reference>
+                                    <el-button link type="primary" class="local-engine-option__more" @click.stop>
+                                        +{{ item.models.length - 1 }}
+                                    </el-button>
+                                </template>
+                                <div class="local-engine-models">
+                                    <el-tag v-for="model in item.models.slice(1)" :key="model" size="small" type="info">
+                                        {{ model }}
+                                    </el-tag>
+                                </div>
+                            </el-popover>
+                        </div>
+                    </el-option>
                 </el-select>
                 <el-alert
                     v-if="enginesLoadFailed"
@@ -116,13 +140,7 @@
             </el-form-item>
             <template v-if="showModelPool">
                 <el-divider content-position="left">{{ $t('aiTools.agents.modelPool') }}</el-divider>
-                <div v-loading="loadingLocalModels" class="model-discovery">
-                    <el-alert
-                        v-if="localModelsLoadFailed"
-                        type="error"
-                        :closable="false"
-                        :title="$t('aiTools.model.loadFailed')"
-                    />
+                <div class="model-discovery">
                     <div class="model-discovery__header">
                         <el-radio-group v-model="modelConfigMode" size="small" @change="handleModelConfigModeChange">
                             <el-radio-button v-if="supportsModelDiscovery || defaultModels.length" value="discover">
@@ -228,7 +246,12 @@
                                     <el-input v-model="row.name" />
                                 </template>
                             </el-table-column>
-                            <el-table-column :label="$t('commons.table.operate')" width="90" align="center">
+                            <el-table-column
+                                v-if="!singleModelOnly"
+                                :label="$t('commons.table.operate')"
+                                width="90"
+                                align="center"
+                            >
                                 <template #default="{ $index }">
                                     <el-button type="primary" link @click="removeManualModel($index)">
                                         {{ $t('commons.button.delete') }}
@@ -236,21 +259,15 @@
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-tooltip
-                            :disabled="!singleModelOnly || manualModels.length === 0"
-                            :content="$t('aiTools.agents.accountModelsSingle')"
+                        <el-button
+                            v-if="!singleModelOnly"
+                            class="model-discovery__add"
+                            type="primary"
+                            plain
+                            @click="addManualModel"
                         >
-                            <span class="model-discovery__add">
-                                <el-button
-                                    type="primary"
-                                    plain
-                                    :disabled="singleModelOnly && manualModels.length > 0"
-                                    @click="addManualModel"
-                                >
-                                    {{ $t('commons.button.add') }}
-                                </el-button>
-                            </span>
-                        </el-tooltip>
+                            {{ $t('commons.button.add') }}
+                        </el-button>
                     </template>
                 </div>
             </template>
@@ -330,8 +347,6 @@ const { isIntl, isProductPro } = useGlobalStore();
 const connectionMode = ref<'manual' | 'local'>('manual');
 const loadingEngines = ref(false);
 const enginesLoadFailed = ref(false);
-const loadingLocalModels = ref(false);
-const localModelsLoadFailed = ref(false);
 const localEngines = ref<Array<{ id: number; name: string; baseURL: string; models: string[] }>>([]);
 
 const form = reactive({
@@ -366,10 +381,7 @@ const localModelOptions = computed(() =>
 const disabled = computed(
     () =>
         connectionMode.value === 'local' &&
-        (loadingEngines.value ||
-            loadingLocalModels.value ||
-            localModelsLoadFailed.value ||
-            !localEngines.value.some((item) => item.id === form.localEngineId)),
+        (loadingEngines.value || !localEngines.value.some((item) => item.id === form.localEngineId)),
 );
 const selectedAPIConfig = computed(() =>
     selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
@@ -858,12 +870,14 @@ watch([open, () => form.provider, connectionMode], async ([visible, provider, mo
             const { data: item } = await checkAppInstalled('ollama', '');
             if (cancelled) return;
             if (item.isExist) {
+                const models = await readPages<AI.OllamaModelInfo>((page) => searchOllamaModel(page));
+                if (cancelled) return;
                 engines = [
                     {
                         id: item.appInstallId,
                         name: item.name,
                         baseURL: item.modelAccountBaseURL || `http://${item.containerName}:11434/v1`,
-                        models: [],
+                        models: models.filter((model) => model.status === 'Success').map((model) => model.name),
                     },
                 ];
             }
@@ -875,31 +889,6 @@ watch([open, () => form.provider, connectionMode], async ([visible, provider, mo
         if (!cancelled) loadingEngines.value = false;
     }
 });
-
-watch(
-    [open, () => form.provider, connectionMode, () => form.localEngineId],
-    async ([visible, provider, mode, engineId], _, onCleanup) => {
-        let cancelled = false;
-        onCleanup(() => (cancelled = true));
-        loadingLocalModels.value = false;
-        localModelsLoadFailed.value = false;
-        if (!visible || provider !== 'ollama' || mode !== 'local') return;
-        const engine = localEngines.value.find((item) => item.id === engineId);
-        if (!engine) return;
-        loadingLocalModels.value = true;
-        try {
-            const models = await readPages<AI.OllamaModelInfo>((page) => searchOllamaModel(page));
-            if (cancelled) return;
-            engine.models = models.filter((model) => model.status === 'Success').map((model) => model.name);
-            resetManualModels();
-        } catch {
-            if (!cancelled) localModelsLoadFailed.value = true;
-        } finally {
-            if (!cancelled) loadingLocalModels.value = false;
-        }
-    },
-    { flush: 'sync' },
-);
 
 const handleAPITypeChange = () => {
     const config = selectedAPIConfig.value;
@@ -948,6 +937,50 @@ defineExpose({
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+    }
+}
+
+.local-engine-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+
+    &__name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    &__model {
+        max-width: 55%;
+        min-width: 0;
+
+        :deep(.el-tag__content) {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    }
+
+    &__more {
+        flex-shrink: 0;
+    }
+}
+
+.local-engine-models {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: 240px;
+    overflow: auto;
+
+    .el-tag {
+        height: auto;
+        padding: 4px 6px;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        max-width: 100%;
     }
 }
 

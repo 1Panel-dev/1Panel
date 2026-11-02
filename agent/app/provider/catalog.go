@@ -48,7 +48,7 @@ var catalog = map[string]Meta{
 	},
 	// llmman (https://github.com/llmmanorg/llmman): local runner with Ollama/OpenAI-compatible routes on 127.0.0.1:17434.
 	"llmman": {
-		Key: "llmman", DisplayName: "llmman", Sort: 16, DefaultAPIType: "openai-responses",
+		Key: "llmman", DisplayName: "llmman", Sort: 75, DefaultAPIType: "openai-responses",
 		APIConfigs: []APIConfig{
 			{APIType: "openai-responses", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
 			{APIType: "openai-completions", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},

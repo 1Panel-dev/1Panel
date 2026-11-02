@@ -120,11 +120,13 @@
         </OpDialog>
         <AddDialog ref="addRef" @search="search" @log="onLoadLog" />
         <Terminal ref="terminalRef" />
-        <DialogPro v-model="detailVisible" :title="$t('commons.button.view')" size="large">
-            <CodemirrorPro v-model="detailInfo" :height-diff="300" readonly mode="json" />
-        </DialogPro>
+        <DrawerPro v-model="detailVisible" :header="$t('commons.button.view')" size="large">
+            <template #content>
+                <CodemirrorPro v-model="detailInfo" :height-diff="180" readonly mode="json" />
+            </template>
+        </DrawerPro>
         <BindDomain ref="bindDomainRef" />
-        <TaskLog ref="taskLogRef" width="70%" @close="refresh" />
+        <TaskLog ref="taskLogRef" width="50%" @close="refresh" />
     </div>
 </template>
 
