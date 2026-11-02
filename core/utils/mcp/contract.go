@@ -34,11 +34,17 @@ type Error struct {
 	InvocationID      string `json:"invocationId,omitempty"`
 	Status            int    `json:"-"`
 	RetryAfterSeconds int    `json:"retryAfterSeconds,omitempty"`
+	ManagementReason  string `json:"-"`
 }
 
 func (e *Error) Error() string { return e.Code }
 func Fail(code string, status int, message string) *Error {
 	return &Error{Code: code, Status: status, Message: message}
+}
+func Conflict(reason, message string) *Error {
+	err := Fail("MCP_CONFLICT", http.StatusConflict, message)
+	err.ManagementReason = reason
+	return err
 }
 func Invalid() *Error { return Fail("MCP_INVALID_ARGUMENTS", 400, "Invalid tool arguments") }
 func Forbidden() *Error {

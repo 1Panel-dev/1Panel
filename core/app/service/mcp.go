@@ -337,7 +337,7 @@ func (s *MCPService) Create(owner auth.APIKeyOwner, req dto.MCPCredentialCreate)
 		key, err = store.CredentialByRequest(owner.Type, owner.ID, req.RequestID)
 		if err == nil {
 			if key.RequestHash != requestHash {
-				return contract.Fail("MCP_CONFLICT", 409, "Creation request already used")
+				return contract.Conflict("request_reused", "Creation request already used")
 			}
 			repeated = true
 			return nil
@@ -350,7 +350,7 @@ func (s *MCPService) Create(owner auth.APIKeyOwner, req dto.MCPCredentialCreate)
 			return err
 		}
 		if count > 0 {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential name already exists")
+			return contract.Conflict("credential_name_exists", "Credential name already exists")
 		}
 		secret := make([]byte, 32)
 		if _, err = rand.Read(secret); err != nil {
@@ -395,8 +395,11 @@ func (s *MCPService) mutate(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 			}
 			return err
 		}
-		if key.Revision != req.Revision || key.Status == "Revoked" {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
+		if key.Revision != req.Revision {
+			return contract.Conflict("credential_revision_changed", "Credential changed; refresh and retry")
+		}
+		if key.Status == "Revoked" {
+			return contract.Conflict("credential_revoked", "Credential was revoked")
 		}
 		if err := change(tx, &key); err != nil {
 			return err
@@ -411,7 +414,7 @@ func (s *MCPService) mutate(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 			return err
 		}
 		if affected != 1 {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
+			return contract.Conflict("credential_revision_changed", "Credential changed; refresh and retry")
 		}
 		return nil
 	})
@@ -430,7 +433,7 @@ func (s *MCPService) Update(owner auth.APIKeyOwner, req dto.MCPCredentialUpdate)
 			return err
 		}
 		if count > 0 {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential name already exists")
+			return contract.Conflict("credential_name_exists", "Credential name already exists")
 		}
 		key.Name = req.Name
 		key.ActiveName = &req.Name

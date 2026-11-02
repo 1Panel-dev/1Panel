@@ -184,7 +184,7 @@
                             }}
                         </span>
                     </el-form-item>
-                    <el-collapse v-model="advancedSettings" class="mt-4">
+                    <el-collapse v-model="advancedSettings" class="mcp-advanced-settings mt-4">
                         <el-collapse-item :title="$t('app.advanced')" name="source">
                             <el-form-item :label="$t('panelMCP.accessPolicy')" prop="accessPolicy">
                                 <el-select v-model="settings.accessPolicy" class="w-full">
@@ -249,6 +249,12 @@
                             :maxlength="512"
                         />
                     </el-form-item>
+                    <el-form-item v-if="installIsUpgrade" prop="deleteOldImage">
+                        <el-checkbox v-model="installation.deleteOldImage">
+                            {{ $t('panelMCP.deleteOldImage') }}
+                        </el-checkbox>
+                        <span class="input-help mt-1 leading-5">{{ $t('panelMCP.deleteOldImageHelp') }}</span>
+                    </el-form-item>
                 </el-form>
             </el-tab-pane>
         </el-tabs>
@@ -298,7 +304,7 @@
                     />
                     <span class="input-help mt-2 leading-5">{{ $t('panelMCP.externalUrlHelp') }}</span>
                 </el-form-item>
-                <el-collapse v-if="!installIsUpgrade" v-model="advancedInstallation" class="mt-4">
+                <el-collapse v-if="!installIsUpgrade" v-model="advancedInstallation" class="mcp-advanced-settings mt-4">
                     <el-collapse-item :title="$t('app.advanced')" name="website">
                         <el-form-item :label="$t('panelMCP.accessPolicy')" prop="accessPolicy">
                             <el-select v-model="installation.accessPolicy" class="w-full">
@@ -492,6 +498,7 @@ const settingsRef = ref<FormInstance>();
 const installRef = ref<FormInstance>();
 const installation = reactive<PanelMCP.Installation>({
     dockerImage: DEFAULT_MCP_DOCKER_IMAGE,
+    deleteOldImage: false,
     listenPort: 18081,
     externalUrl: '',
     revision: 0,
@@ -519,11 +526,14 @@ const installationDirty = computed(() => {
     if (!snapshot) return false;
     return (
         installation.dockerImage !== snapshot.dockerImage ||
+        (installIsUpgrade.value && installation.deleteOldImage) ||
         (!installIsUpgrade.value && hasMCPSettingsChanges({ ...snapshot, ...installation }, snapshot))
     );
 });
 const allowedIPsText = ref('');
 const installAllowedIPsText = ref('');
+let settingsDraftVersion = 0;
+watch([settings, allowedIPsText], () => settingsDraftVersion++, { deep: true, flush: 'sync' });
 watch(
     allowedIPsText,
     (value) => {
@@ -602,11 +612,17 @@ const settingsRules = {
                 if (!value) return done();
                 try {
                     const url = new URL(value);
+                    const authority = /^https?:\/\/([^/]+)/i.exec(value)?.[1];
                     if (
+                        authority &&
+                        !/[%@]/.test(authority) &&
                         ['http:', 'https:'].includes(url.protocol) &&
+                        !/^[\s\u0085]|[\s\u0085]$/u.test(value) &&
                         new TextEncoder().encode(value).length <= 2048 &&
-                        !/[\r\n]/.test(value) &&
-                        url.pathname === '/mcp' &&
+                        Array.from(value).every((char) => char.charCodeAt(0) > 0x20 && char.charCodeAt(0) !== 0x7f) &&
+                        !/[\\?#]/.test(value) &&
+                        !/%(?![0-9a-f]{2})/i.test(value) &&
+                        !/%(?:0[0-9a-f]|1[0-9a-f]|7f|5c)/i.test(value) &&
                         !url.username &&
                         !url.password &&
                         !url.search &&
@@ -648,6 +664,7 @@ const onInstallationValidate = async (prop: string | string[], valid: boolean) =
 let active = false;
 let pageVersion = 0;
 let requestVersion = 0;
+let settingsReadVersion = 0;
 let logVersion = 0;
 let timer: ReturnType<typeof setInterval> | undefined;
 let logTimer: ReturnType<typeof setInterval> | undefined;
@@ -709,8 +726,10 @@ const closeWhenIdle = (done: () => void) => {
 };
 const cancelSettings = () => {
     if (busy.value) return;
-    if (savedSettings.value) Object.assign(settings, savedSettings.value);
+    settingsReadVersion++;
+    if (savedSettings.value) Object.assign(settings, copyMCPSettings(savedSettings.value));
     allowedIPsText.value = settings.allowedIPs.join('\n');
+    conflict.value = false;
     settingsVisible.value = false;
 };
 const closeSettingsWhenIdle = (done: () => void) => {
@@ -740,14 +759,23 @@ const changeSettingsTab = async (name: string | number) => {
         return false;
     }
 };
-const reloadSettings = async (version = pageVersion) => {
+const reloadSettings = async (version = pageVersion, savedDraftVersion?: number) => {
+    if (!isCurrentPage(version) || !canEditService.value) return false;
+    const ticket = ++settingsReadVersion;
+    const draftVersion = savedDraftVersion ?? settingsDraftVersion;
+    const preserveDraft = savedDraftVersion === undefined && settingsDirty.value;
     const response = await getPanelMCPSettings();
-    if (!isCurrentPage(version)) return;
+    if (!isCurrentPage(version) || !canEditService.value || ticket !== settingsReadVersion) return false;
     const loaded = copyMCPSettings(response.data);
-    savedSettings.value = { ...loaded };
+    if (preserveDraft || settingsDraftVersion !== draftVersion) {
+        if (savedSettings.value && loaded.revision !== savedSettings.value.revision) conflict.value = true;
+        return false;
+    }
+    savedSettings.value = copyMCPSettings(loaded);
     Object.assign(settings, loaded);
     allowedIPsText.value = settings.allowedIPs.join('\n');
     conflict.value = false;
+    return true;
 };
 const copyInstallation = (source: PanelMCP.Settings, upgrading: boolean) => {
     installSnapshot.value = copyMCPSettings(source);
@@ -755,6 +783,7 @@ const copyInstallation = (source: PanelMCP.Settings, upgrading: boolean) => {
     const { dockerImage, listenPort, externalUrl, revision, accessPolicy } = source;
     Object.assign(installation, {
         dockerImage,
+        deleteOldImage: false,
         listenPort,
         externalUrl,
         revision,
@@ -843,6 +872,7 @@ const websiteChanged = async (value: PanelMCP.WebsiteBinding) => {
 };
 const saveSettings = async () => {
     if (busy.value || conflict.value || !canEditService.value || !savedSettings.value) return;
+    settingsReadVersion++;
     const version = pageVersion;
     busy.value = true;
     try {
@@ -858,6 +888,7 @@ const saveSettings = async () => {
         const { runtimeType, dockerImage, enabled, revision } = savedSettings.value;
         const { listenPort, externalUrl, accessPolicy } = settings;
         const allowedIPs = accessPolicy === 'restricted' ? [...settings.allowedIPs] : [];
+        const savedDraftVersion = settingsDraftVersion;
         await savePanelMCPSettings({
             runtimeType,
             dockerImage,
@@ -869,8 +900,8 @@ const saveSettings = async () => {
             allowedIPs,
         });
         if (!isCurrentPage(version)) return;
-        await reloadSettings(version);
-        if (!isCurrentPage(version)) return;
+        const synchronized = await reloadSettings(version, savedDraftVersion);
+        if (!isCurrentPage(version) || !synchronized) return;
         emit('changed');
         settingsVisible.value = false;
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
@@ -916,7 +947,7 @@ const install = async () => {
             if (!(await websiteRef.value?.validate())) return;
         }
         if (!isCurrentPage(version) || !canEditService.value) return;
-        const { dockerImage } = installation;
+        const { dockerImage, deleteOldImage } = installation;
         const source = installIsUpgrade.value ? installSnapshot.value : installation;
         const { listenPort, externalUrl, revision, accessPolicy } = source;
         const allowedIPs = accessPolicy === 'restricted' ? [...source.allowedIPs] : [];
@@ -937,6 +968,7 @@ const install = async () => {
                 : undefined;
         const response = await installPanelMCPService({
             dockerImage,
+            deleteOldImage: installIsUpgrade.value && deleteOldImage,
             listenPort,
             externalUrl,
             revision,
@@ -1030,6 +1062,7 @@ const activate = () => {
 };
 const clearManagementState = () => {
     pageVersion++;
+    settingsReadVersion++;
     clearLogState();
     installTaskLog.value?.handleClose();
     settingsVisible.value = installVisible.value = logsVisible.value = false;
@@ -1045,7 +1078,15 @@ const clearManagementState = () => {
     allowedIPsText.value = '';
     installAllowedIPsText.value = '';
     const { dockerImage, listenPort, externalUrl, revision, accessPolicy } = settings;
-    Object.assign(installation, { dockerImage, listenPort, externalUrl, revision, accessPolicy, allowedIPs: [] });
+    Object.assign(installation, {
+        dockerImage,
+        deleteOldImage: false,
+        listenPort,
+        externalUrl,
+        revision,
+        accessPolicy,
+        allowedIPs: [],
+    });
 };
 watch(
     logsVisible,
@@ -1096,6 +1137,10 @@ defineExpose({ openInstall, openStatus, openInstallLogs, refreshService, operate
 </script>
 
 <style scoped lang="scss">
+.input-help {
+    color: var(--el-text-color-regular);
+}
+
 .mcp-details {
     :deep(.el-descriptions__table) {
         table-layout: fixed;
@@ -1105,6 +1150,25 @@ defineExpose({ openInstall, openStatus, openInstallLogs, refreshService, operate
     }
     :deep(.el-descriptions__cell) {
         overflow-wrap: anywhere;
+    }
+}
+
+html.dark .mcp-advanced-settings {
+    --el-collapse-content-bg-color: transparent;
+    --el-collapse-border-color: var(--el-border-color);
+
+    :deep(.el-collapse-item__content) {
+        padding: 16px 12px 20px;
+        color: var(--el-text-color-regular);
+    }
+
+    :deep(.mcp-website-binding) {
+        margin-top: 4px;
+        padding-top: 20px;
+    }
+
+    :deep(.mcp-website-details .el-descriptions__label) {
+        width: 104px;
     }
 }
 </style>

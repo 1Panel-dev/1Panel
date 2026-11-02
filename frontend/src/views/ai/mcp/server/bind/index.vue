@@ -227,6 +227,10 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
+.input-help {
+    color: var(--el-text-color-regular);
+}
+
 .pageRoute {
     font-size: 12px;
     margin-left: 5px;

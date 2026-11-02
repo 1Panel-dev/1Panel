@@ -23,7 +23,6 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
-	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -34,23 +33,18 @@ const (
 	headerOperationResolved    = "X-Op-Resolved"
 )
 
-func OperationLog() gin.HandlerFunc {
+type OperationLogPolicy func(*gin.Context) bool
+
+func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
+	policies = append([]OperationLogPolicy(nil), policies...)
 	return func(c *gin.Context) {
 		c.Request.Header.Del(headerNeedOperationResolve)
-		if mcpapi.IsRequest(c.Request) && c.GetBool("MCP_API_AUTH") {
-			c.Next()
-			return
+		for _, policy := range policies {
+			if policy != nil && policy(c) {
+				c.Next()
+				return
+			}
 		}
-		switch c.Request.URL.Path {
-		case "/api/v2/core/auth/api/keys/reveal":
-			// Disclosure has its own audit and must not enter response-body capture.
-			c.Next()
-			return
-		case "/api/v2/core/mcp/credentials/create", "/api/v2/core/mcp/credentials/reveal", "/api/v2/core/mcp/credentials/rotate", "/api/v2/core/mcp/credentials/export":
-			c.Next()
-			return
-		}
-
 		if strings.Contains(c.Request.URL.Path, "search") || c.Request.Method == http.MethodGet {
 			c.Next()
 			return

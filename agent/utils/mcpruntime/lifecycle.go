@@ -96,20 +96,20 @@ func (c *Controller) pullImage(ctx context.Context, cli DockerClient, req Reques
 	return reportPullProgress(ctx, progress, PullProgress{Status: "verified_image"})
 }
 
-func (c *Controller) installRuntime(ctx context.Context, cli DockerClient, req Request) error {
+func (c *Controller) installRuntime(ctx context.Context, cli DockerClient, req Request) (*CleanupReference, error) {
 	before, err := c.owned(ctx, cli, ContainerName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	wasRunning := isRunning(before)
 	activate := req
 	activate.Enabled = true
 	activate.Restart = true
 	if err = c.apply(ctx, cli, activate); err != nil {
-		return err
+		return nil, err
 	}
 	if req.Enabled {
-		return nil
+		return c.installationCleanup(ctx, cli, before)
 	}
 	current, err := c.owned(ctx, cli, ContainerName)
 	if err == nil && current == nil {
@@ -119,7 +119,7 @@ func (c *Controller) installRuntime(ctx context.Context, cli DockerClient, req R
 		err = stopContainer(ctx, cli, current.ID)
 	}
 	if err == nil {
-		return nil
+		return c.installationCleanup(ctx, cli, before)
 	}
 	rollbackCtx, cancel := context.WithTimeout(context.Background(), 40*time.Second)
 	defer cancel()
@@ -136,7 +136,7 @@ func (c *Controller) installRuntime(ctx context.Context, cli DockerClient, req R
 	} else if current != nil {
 		restoreErr = cli.ContainerRemove(rollbackCtx, current.ID, container.RemoveOptions{Force: true})
 	}
-	return errors.Join(errors.New("installed MCP container could not be left stopped"), restoreErr)
+	return nil, errors.Join(errors.New("installed MCP container could not be left stopped"), restoreErr)
 }
 
 func runtimeConfig(id string, req Request, version string) (*container.Config, *container.HostConfig) {

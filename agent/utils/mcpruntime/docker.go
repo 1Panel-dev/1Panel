@@ -51,13 +51,27 @@ var digestPattern = regexp.MustCompile(`^sha256:[a-f0-9]{64}$`)
 var ErrUnsupported = errors.New("MCP Docker runtime requires a local rootful Linux Docker daemon without user namespace remapping")
 
 type Request struct {
-	Operation      string `json:"operation"`
-	Image          string `json:"image"`
-	Port           int    `json:"port"`
-	Enabled        bool   `json:"enabled"`
-	Restart        bool   `json:"restart"`
-	ImageID        string `json:"imageID,omitempty"`
-	StreamProgress bool   `json:"streamProgress,omitempty"`
+	Operation      string            `json:"operation"`
+	Image          string            `json:"image"`
+	Port           int               `json:"port"`
+	Enabled        bool              `json:"enabled"`
+	Restart        bool              `json:"restart"`
+	ImageID        string            `json:"imageID,omitempty"`
+	StreamProgress bool              `json:"streamProgress,omitempty"`
+	Cleanup        *CleanupReference `json:"cleanup,omitempty"`
+	DeleteOldImage bool              `json:"deleteOldImage,omitempty"`
+}
+
+type CleanupReference struct {
+	ContainerID         string `json:"containerID"`
+	PreviousContainerID string `json:"previousContainerID"`
+	PreviousImageID     string `json:"previousImageID"`
+}
+
+type CleanupResult struct {
+	ContainerRemoved    bool   `json:"containerRemoved,omitempty"`
+	ImageRemoved        bool   `json:"imageRemoved,omitempty"`
+	ImageRetainedReason string `json:"imageRetainedReason,omitempty"`
 }
 
 type State struct {
@@ -71,11 +85,13 @@ type State struct {
 }
 
 type Response struct {
-	State   *State          `json:"state,omitempty"`
-	Catalog json.RawMessage `json:"catalog,omitempty"`
-	Logs    string          `json:"logs,omitempty"`
-	Error   string          `json:"error,omitempty"`
-	ImageID string          `json:"imageID,omitempty"`
+	State         *State            `json:"state,omitempty"`
+	Catalog       json.RawMessage   `json:"catalog,omitempty"`
+	Logs          string            `json:"logs,omitempty"`
+	Error         string            `json:"error,omitempty"`
+	ImageID       string            `json:"imageID,omitempty"`
+	Cleanup       *CleanupReference `json:"cleanup,omitempty"`
+	CleanupResult *CleanupResult    `json:"cleanupResult,omitempty"`
 }
 
 type DockerClient interface {
@@ -84,6 +100,7 @@ type DockerClient interface {
 	Info(context.Context) (system.Info, error)
 	ImageInspect(context.Context, string, ...client.ImageInspectOption) (image.InspectResponse, error)
 	ImagePull(context.Context, string, image.PullOptions) (io.ReadCloser, error)
+	ImageRemove(context.Context, string, image.RemoveOptions) ([]image.DeleteResponse, error)
 	ContainerInspect(context.Context, string) (container.InspectResponse, error)
 	ContainerCreate(context.Context, *container.Config, *container.HostConfig, *network.NetworkingConfig, *ocispec.Platform, string) (container.CreateResponse, error)
 	ContainerStart(context.Context, string, container.StartOptions) error
@@ -156,9 +173,12 @@ func (c *Controller) HandleWithProgress(ctx context.Context, req Request, progre
 		return Response{}, errors.New("MCP Docker progress is only available when pulling an image")
 	}
 	switch req.Operation {
-	case "prepare", "catalog", "apply_catalog", "candidate_catalog", "status", "apply", "install", "rollback", "rollback_absent", "pull", "logs":
+	case "prepare", "catalog", "apply_catalog", "candidate_catalog", "status", "apply", "install", "rollback", "rollback_absent", "pull", "logs", "finalize":
 	default:
 		return Response{}, errors.New("invalid MCP Docker operation")
+	}
+	if req.Operation != "finalize" && (req.Cleanup != nil || req.DeleteOldImage) {
+		return Response{}, errors.New("MCP cleanup is only available after installation")
 	}
 	if err := ValidateImage(req.Image); err != nil {
 		return Response{}, err
@@ -178,7 +198,7 @@ func (c *Controller) HandleWithProgress(ctx context.Context, req Request, progre
 	}
 	ctx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	if req.Operation == "apply" || req.Operation == "install" || req.Operation == "rollback" || req.Operation == "rollback_absent" || req.Operation == "pull" {
+	if req.Operation == "apply" || req.Operation == "install" || req.Operation == "rollback" || req.Operation == "rollback_absent" || req.Operation == "pull" || req.Operation == "finalize" {
 		select {
 		case c.mutation <- struct{}{}:
 			defer func() { <-c.mutation }()
@@ -222,7 +242,17 @@ func (c *Controller) HandleWithProgress(ctx context.Context, req Request, progre
 	case "apply":
 		err = c.apply(ctx, cli, req)
 	case "install":
-		err = c.installRuntime(ctx, cli, req)
+		var cleanup *CleanupReference
+		cleanup, err = c.installRuntime(ctx, cli, req)
+		if err == nil {
+			return Response{Cleanup: cleanup}, nil
+		}
+	case "finalize":
+		var result *CleanupResult
+		result, err = c.finalize(ctx, cli, req)
+		if err == nil {
+			return Response{CleanupResult: result}, nil
+		}
 	case "rollback":
 		err = c.rollback(ctx, cli, req)
 	case "rollback_absent":

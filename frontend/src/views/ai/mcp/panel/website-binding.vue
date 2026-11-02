@@ -1,5 +1,5 @@
 <template>
-    <section class="min-w-0 border-t border-[var(--el-border-color-lighter)] pt-4">
+    <section class="mcp-website-binding min-w-0 border-t border-[var(--el-border-color-lighter)] pt-4">
         <div class="mb-4 flex min-w-0 flex-wrap items-center justify-between gap-2">
             <span class="font-medium">{{ $t('panelMCP.websiteBinding') }}</span>
             <el-tag
@@ -147,7 +147,7 @@
                     {{ $t('commons.button.cancel') }}
                 </el-button>
             </template>
-            <el-button :loading="reading" :disabled="disabled || !canManage || busy" @click="load">
+            <el-button :loading="reading" :disabled="disabled || !canManage || busy" @click="refresh">
                 {{ $t('commons.button.refresh') }}
             </el-button>
         </div>
@@ -167,6 +167,7 @@ import {
 } from '@/api/modules/panel-mcp';
 import { listLocalNodeSSL } from '@/api/modules/website';
 import {
+    getMCPConflict,
     getMCPWebsiteHostname,
     isMCPMutationUncertain,
     isMCPRevisionConflict,
@@ -238,9 +239,9 @@ let certificateVersion = 0;
 let certificatePromise: Promise<void> | undefined;
 const current = (version: number) => active && props.canManage && globalStore.isLogin && version === generation;
 
-const acceptBinding = (value: PanelMCP.WebsiteBinding) => {
+const acceptBinding = (value: PanelMCP.WebsiteBinding, syncDraft = true) => {
     binding.value = value;
-    if (value.pendingRequest) {
+    if (syncDraft && value.pendingRequest) {
         const request = value.pendingRequest;
         if (request.domain !== undefined) props.draft.domain = request.domain;
         if (request.enableSSL !== undefined) props.draft.enableSSL = request.enableSSL;
@@ -264,37 +265,44 @@ const validBinding = (value: unknown): value is PanelMCP.WebsiteBinding => {
         Number.isSafeInteger(item.sslID) &&
         item.sslID >= 0 &&
         typeof item.requestId === 'string' &&
+        (item.websiteDeleted === undefined || typeof item.websiteDeleted === 'boolean') &&
         (item.state !== 'pending' || !!item.pendingRequest) &&
         (!item.pendingRequest ||
             (['bind', 'update', 'unbind'].includes(item.pendingRequest.operation) &&
                 typeof item.pendingRequest.requestId === 'string' &&
-                !!item.pendingRequest.requestId))
+                !!item.pendingRequest.requestId &&
+                (item.pendingRequest.deleteWebsite === undefined ||
+                    typeof item.pendingRequest.deleteWebsite === 'boolean')))
     );
 };
-const read = async (version: number) => {
+const read = async (version: number, syncDraft = true) => {
     const ticket = ++readVersion;
     const response = await getPanelMCPWebsite();
     if (!current(version) || ticket !== readVersion) return;
     if (!validBinding(response.data)) throw new Error('Invalid MCP website status');
-    acceptBinding(response.data);
+    acceptBinding(response.data, syncDraft);
     return response.data;
 };
-const load = async () => {
+const load = async (refreshCertificates = false) => {
     if (!active || !props.canManage || busy.value || props.disabled) return;
     const version = generation;
     reading.value = true;
     try {
-        await read(version);
-        if (current(version)) errorKey.value = '';
-    } catch {
-        if (current(version)) errorKey.value = 'panelMCP.websiteStatusLoadFailed';
+        const requests: Promise<unknown>[] = [read(version, !refreshCertificates)];
+        if (refreshCertificates) requests.push(loadCertificates(true));
+        const [status] = await Promise.allSettled(requests);
+        if (current(version)) {
+            errorKey.value = status.status === 'fulfilled' ? '' : 'panelMCP.websiteStatusLoadFailed';
+        }
     } finally {
         if (current(version)) reading.value = false;
     }
 };
-const loadCertificates = async () => {
-    if (!active || !props.canManage || certificatesLoaded.value) return;
-    if (certificatePromise) return certificatePromise;
+const refresh = () => load(true);
+const loadCertificates = async (force = false) => {
+    if (!active || !props.canManage) return;
+    if (certificatePromise && !force) return certificatePromise;
+    if (certificatesLoaded.value && !force) return;
     const version = generation;
     const ticket = ++certificateVersion;
     certificatesBusy.value = true;
@@ -309,8 +317,11 @@ const loadCertificates = async () => {
                 expireDate: item.expireDate,
             }));
             certificatesLoaded.value = true;
+            certificateError.value = '';
         } catch {
-            if (current(version)) certificateError.value = i18n.global.t('panelMCP.websiteCertificateRequired');
+            if (current(version) && ticket === certificateVersion) {
+                certificateError.value = i18n.global.t('panelMCP.websiteCertificateRequired');
+            }
         } finally {
             if (ticket === certificateVersion) certificatesBusy.value = false;
         }
@@ -343,6 +354,7 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
     emit('busy', true);
     errorKey.value = '';
     localPending.value = { ...operation };
+    const deletesWebsite = operation.operation === 'unbind' && operation.deleteWebsite === true;
     try {
         const latest = binding.value || (await read(version));
         if (!current(version) || !latest) return false;
@@ -361,9 +373,13 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
                         enableSSL: operation.enableSSL === true,
                         sslID: operation.enableSSL ? operation.sslID || 0 : 0,
                     })
-                  : await unbindPanelMCPWebsite(request);
+                  : await unbindPanelMCPWebsite({
+                        ...request,
+                        ...(deletesWebsite ? { deleteWebsite: true } : {}),
+                    });
         if (!current(version)) return false;
         if (!validBinding(response.data)) throw { code: 503 };
+        if (deletesWebsite && response.data.websiteDeleted !== true) throw { code: 503 };
         acceptBinding(response.data);
         if (response.data.state !== (operation.operation === 'unbind' ? 'unbound' : 'bound')) throw { code: 503 };
         localPending.value = undefined;
@@ -381,6 +397,11 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
                 : uncertain.value
                   ? 'panelMCP.websiteUncertain'
                   : 'panelMCP.websiteOperationFailed';
+            const conflict = getMCPConflict(error);
+            if (conflict?.reason === 'website_domain_conflict' && typeof conflict.message === 'string') {
+                domainError.value = conflict.message;
+                errorKey.value = '';
+            }
             if (!uncertain.value) localPending.value = undefined;
             try {
                 const verified = await read(version);
@@ -389,6 +410,7 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
                     verified &&
                     verified.requestId === operation.requestId &&
                     !verified.pendingRequest &&
+                    (!deletesWebsite || verified.websiteDeleted === true) &&
                     verified.state === (operation.operation === 'unbind' ? 'unbound' : 'bound')
                 ) {
                     localPending.value = undefined;
@@ -448,12 +470,13 @@ const requestUnbind = async (cancelPending: boolean) => {
         await ElMessageBox.confirm(
             i18n.global.t('panelMCP.websiteUnbindConfirm'),
             i18n.global.t('panelMCP.websiteUnbind'),
+            { type: 'warning', confirmButtonType: 'danger' },
         );
     } catch {
         return;
     }
     if (!current(version) || busy.value || props.disabled) return;
-    await perform({ operation: 'unbind', requestId: uuidv4() });
+    await perform({ operation: 'unbind', requestId: uuidv4(), deleteWebsite: true });
 };
 const unbind = () => requestUnbind(false);
 const cancelPending = () => requestUnbind(true);
@@ -533,6 +556,14 @@ defineExpose({ validate, load, busy, binding });
 </script>
 
 <style scoped>
+.input-help {
+    color: var(--el-text-color-regular);
+}
+
+html.dark .mcp-website-binding {
+    border-color: var(--el-border-color-lighter);
+}
+
 .mcp-website-details :deep(.el-descriptions__table) {
     table-layout: fixed;
 }

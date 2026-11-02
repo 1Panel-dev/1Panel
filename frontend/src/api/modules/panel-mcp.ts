@@ -15,7 +15,7 @@ export const bindPanelMCPWebsite = (params: PanelMCP.WebsiteBind) =>
     http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/bind`, params, { ...local, timeout: 120000 });
 export const updatePanelMCPWebsite = (params: PanelMCP.WebsiteUpdate) =>
     http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/update`, params, { ...local, timeout: 120000 });
-export const unbindPanelMCPWebsite = (params: PanelMCP.WebsiteMutation) =>
+export const unbindPanelMCPWebsite = (params: PanelMCP.WebsiteUnbind) =>
     http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/unbind`, params, { ...local, timeout: 120000 });
 export const savePanelMCPSettings = (params: PanelMCP.Settings) =>
     http.postWithConfig(`${prefix}/settings`, params, { ...local, timeout: 60000 });

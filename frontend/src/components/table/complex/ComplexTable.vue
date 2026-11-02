@@ -775,6 +775,11 @@ onBeforeUnmount(() => {
     flex: 1;
     @include flex-row(flex-end);
 
+    :deep(.el-pagination:not(.is-background)) {
+        --el-pagination-bg-color: transparent;
+        --el-pagination-button-disabled-bg-color: transparent;
+    }
+
     :deep(.el-pagination__sizes .el-select) {
         width: 128px;
         min-width: 128px;

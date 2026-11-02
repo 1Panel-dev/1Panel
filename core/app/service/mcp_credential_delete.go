@@ -40,7 +40,7 @@ func (s *MCPService) Delete(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 			return err
 		}
 		if key.Revision != req.Revision {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
+			return contract.Conflict("credential_revision_changed", "Credential changed; refresh and retry")
 		}
 		if err := data.DeleteGrants(key.ID); err != nil {
 			return err
@@ -50,7 +50,7 @@ func (s *MCPService) Delete(owner auth.APIKeyOwner, req dto.MCPCredentialMutatio
 			return err
 		}
 		if deleted != 1 {
-			return contract.Fail("MCP_CONFLICT", 409, "Credential changed; refresh and retry")
+			return contract.Conflict("credential_revision_changed", "Credential changed; refresh and retry")
 		}
 		return s.auditEnrollment(tx, owner, "delete", req, nil)
 	})

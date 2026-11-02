@@ -1,6 +1,8 @@
 <template>
     <DrawerPro v-model="open" :header="$t('menu.config')" @close="handleClose" size="normal">
-        <div class="w-full min-w-0 overflow-hidden rounded border border-solid border-[var(--el-border-color)]">
+        <div
+            class="mcp-server-config w-full min-w-0 overflow-hidden rounded border border-solid border-[var(--el-border-color)]"
+        >
             <codemirror
                 :autofocus="true"
                 :placeholder="$t('commons.msg.noneData')"
@@ -9,7 +11,6 @@
                 style="height: 300px"
                 :lineWrapping="true"
                 :matchBrackets="true"
-                theme="cobalt"
                 :styleActiveLine="true"
                 :extensions="extensions"
                 v-model="prettyJson"
@@ -27,12 +28,19 @@
 
 <script lang="ts" setup>
 import { AI } from '@/api/interface/ai';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { Codemirror } from 'vue-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { oneDark } from '@codemirror/theme-one-dark';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+import { usePreferredDark } from '@vueuse/core';
 
-const extensions = [javascript(), oneDark];
+const { themeConfig } = useGlobalStore();
+const prefersDark = usePreferredDark();
+const extensions = computed(() => {
+    const dark = themeConfig.value.theme === 'dark' || (themeConfig.value.theme === 'auto' && prefersDark.value);
+    return [javascript(), ...(dark ? [oneDark] : [])];
+});
 
 const open = ref(false);
 const jsonObj = ref({
@@ -57,3 +65,9 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+html.dark .mcp-server-config {
+    border-color: var(--el-border-color);
+}
+</style>

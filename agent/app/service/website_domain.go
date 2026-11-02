@@ -14,6 +14,8 @@ import (
 )
 
 func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) ([]model.WebsiteDomain, error) {
+	websiteListenMutation.Lock()
+	defer websiteListenMutation.Unlock()
 	var (
 		domainModels []model.WebsiteDomain
 		addPorts     []int
@@ -29,6 +31,15 @@ func (w WebsiteService) CreateWebsiteDomain(create request.WebsiteDomainCreate) 
 
 	domainModels, addPorts, _, err = getWebsiteDomains(create.Domains, httpPort, httpsPort, create.WebsiteID)
 	if err != nil {
+		return nil, err
+	}
+	ports := websiteListenPorts(website, httpPort, httpsPort)
+	candidate := website
+	candidate.Domains = append(append([]model.WebsiteDomain(nil), website.Domains...), domainModels...)
+	for _, domain := range domainModels {
+		ports[domain.Port] = struct{}{}
+	}
+	if err = checkWebsiteListenPorts(candidate, ports, httpPort, httpsPort); err != nil {
 		return nil, err
 	}
 	go func() {
