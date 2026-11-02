@@ -1,5 +1,10 @@
 <template>
-    <DialogPro v-model="open" :title="$t('aiTools.proxy.proxy')" @close="handleClose" size="large">
+    <DrawerPro
+        v-model="open"
+        :header="$t('aiTools.proxy.proxy')"
+        @close="handleClose"
+        :size="isMobile ? 'full' : 'large'"
+    >
         <div v-loading="loading">
             <el-form ref="formRef" label-position="top" @submit.prevent :model="req" :rules="rules">
                 <el-alert class="common-prompt" :closable="false" type="warning">
@@ -89,7 +94,7 @@
                 {{ $t('commons.button.add') }}
             </el-button>
         </template>
-    </DialogPro>
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
@@ -103,10 +108,12 @@ import { dateFormatSimple } from '@/utils/date';
 import { bindDomain, getBindDomain, updateBindDomain } from '@/api/modules/ai';
 import { MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 type SSLItem = Website.SSL & { organization?: string };
 
 const open = ref(false);
+const { isMobile } = useGlobalStore();
 const operate = ref('create');
 const loading = ref(false);
 const ssls = ref<SSLItem[]>([]);

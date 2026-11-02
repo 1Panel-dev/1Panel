@@ -1,16 +1,15 @@
 <template>
-    <div v-loading="loading">
-        <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
-            {{ $t('aiTools.proxy.proxy') }}
-        </el-button>
-        <el-divider />
-        <div class="model-section-heading">
-            <h3 class="section-title">{{ $t('aiTools.model.modelManagement') }}</h3>
-        </div>
-        <LayoutContent title="Ollama">
+    <div v-loading="loading || initializing">
+        <LayoutContent back-name="LocalModel" :title="'Ollama ' + $t('aiTools.model.modelManagement')">
             <template #leftToolBar>
                 <el-button v-permission :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate">
                     {{ $t('commons.button.add') }}
+                </el-button>
+                <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="search">
+                    {{ $t('database.loadFromRemote') }}
+                </el-button>
+                <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
+                    {{ $t('aiTools.proxy.proxy') }}
                 </el-button>
                 <el-button v-permission :disabled="selects.length === 0" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
@@ -18,11 +17,25 @@
             </template>
             <template #rightToolBar>
                 <TableSearch @search="search" v-model:searchName="searchName" />
-                <TableRefresh @search="search" />
-                <TableSetting title="model-refresh" @search="!loading && search()" />
+                <TableRefresh @search="refresh" />
+                <TableSetting title="model-refresh" @search="!loading && !initializing && search()" />
             </template>
             <template #main>
+                <el-alert v-if="loadFailed" :title="$t('aiTools.model.loadFailed')" type="error" :closable="false" />
+                <el-empty
+                    v-else-if="!initializing && !modelInstalled"
+                    :description="$t('app.checkInstalledWarn', ['Ollama'])"
+                >
+                    <el-button
+                        v-permission
+                        type="primary"
+                        @click="routerToNameWithQuery('LocalModel', { open: 'create', engine: 'ollama' })"
+                    >
+                        {{ $t('commons.button.install') }}
+                    </el-button>
+                </el-empty>
                 <ComplexTable
+                    v-else-if="modelInstalled"
                     :selection-context="() => [searchName]"
                     row-key="id"
                     :pagination-config="paginationConfig"
@@ -130,10 +143,13 @@ import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
 import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { routerToNameWithQuery } from '@/utils/router';
 
-const props = defineProps({ instanceName: String });
 const { isMobile } = useGlobalStore();
 const loading = ref(false);
+const initializing = ref(true);
+const loadFailed = ref(false);
+const modelInstalled = ref(false);
 const selects = ref<any>([]);
 const addRef = ref();
 const detailVisible = ref(false);
@@ -151,7 +167,7 @@ const searchName = ref();
 useSearchState(
     'ai/model/ollama/index',
     { search: searchName, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
-    { onRevisit: () => search() },
+    { onRevisit: () => refresh() },
 );
 const appInstallID = ref(0);
 
@@ -166,6 +182,7 @@ function selectable(row) {
 }
 
 const search = async () => {
+    if (!modelInstalled.value) return;
     let params = {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
@@ -309,22 +326,26 @@ const buttons = [
 ];
 
 const refresh = async () => {
-    const { data } = await checkAppInstalled('ollama', props.instanceName || '');
-    appInstallID.value = data.appInstallId;
-    modelInfo.status = data.status;
-    await search();
+    initializing.value = true;
+    loadFailed.value = false;
+    selects.value = [];
+    try {
+        const { data: installed } = await checkAppInstalled('ollama', '');
+        appInstallID.value = installed.appInstallId;
+        modelInstalled.value = installed.isExist;
+        modelInfo.status = installed.status;
+        if (installed.isExist) {
+            await search();
+        } else {
+            data.value = [];
+            paginationConfig.total = 0;
+        }
+    } catch {
+        modelInfo.status = '';
+        loadFailed.value = true;
+    } finally {
+        initializing.value = false;
+    }
 };
 onMounted(refresh);
 </script>
-
-<style lang="scss" scoped>
-.section-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-}
-.model-section-heading {
-    margin-bottom: 16px;
-}
-</style>

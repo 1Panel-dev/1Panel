@@ -77,7 +77,7 @@ ErrAgentProviderNotSupported: 'ارائه‌دهنده عامل پشتیبانی
 ErrAgentAccountRequired: 'ابتدا یک حساب عامل انتخاب کنید'
 ErrAgentAccountNotVerified: 'حساب عامل تأیید نشده است'
 ErrAgentAccountModelsRequired: 'لطفاً حداقل یک مدل پیکربندی کنید'
-ErrAgentAccountSingleInitialModel: 'فقط یک مدل اولیه می‌تواند در هنگام ایجاد حساب پیکربندی شود'
+ErrAgentAccountSingleInitialModel: 'برای این ارائه‌دهنده حداکثر یک مدل می‌توان پیکربندی کرد'
 ErrAgentModelNotInAccount: 'مدل در حساب انتخاب شده پیکربندی نشده است'
 ErrAgentVerifyModelInUse: 'این مدل برای بررسی حساب استفاده می‌شود. پیش از حذف، مدل بررسی دیگری انتخاب کنید'
 ErrAgentFallbackModelDuplicate: 'مدل‌های جایگزین نمی‌توانند تکراری باشند'

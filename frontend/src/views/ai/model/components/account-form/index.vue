@@ -24,6 +24,34 @@
                     </el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item v-if="canSelectLocalEngine" :label="$t('ssh.createMode')">
+                <el-radio-group v-model="connectionMode" @change="handleConnectionModeChange">
+                    <el-radio-button value="manual">{{ $t('ssh.input') }}</el-radio-button>
+                    <el-radio-button value="local">{{ $t('commons.button.select') }}</el-radio-button>
+                </el-radio-group>
+            </el-form-item>
+            <el-form-item
+                v-if="connectionMode === 'local'"
+                :label="$t('aiTools.model.engines')"
+                prop="localEngineId"
+                :rules="[Rules.requiredSelect]"
+            >
+                <el-select
+                    v-model="form.localEngineId"
+                    filterable
+                    :loading="loadingEngines"
+                    @change="handleLocalEngineChange"
+                >
+                    <el-option v-for="item in localEngines" :key="item.id" :label="item.name" :value="item.id" />
+                </el-select>
+                <el-alert
+                    v-if="enginesLoadFailed"
+                    class="mt-2"
+                    type="error"
+                    :closable="false"
+                    :title="$t('aiTools.model.loadFailed')"
+                />
+            </el-form-item>
             <el-form-item :label="'API ' + $t('commons.table.type')" prop="apiType">
                 <el-select
                     v-model="form.apiType"
@@ -86,9 +114,15 @@
                     }}
                 </span>
             </el-form-item>
-            <template v-if="showModelDiscovery">
+            <template v-if="showModelPool">
                 <el-divider content-position="left">{{ $t('aiTools.agents.modelPool') }}</el-divider>
-                <div class="model-discovery">
+                <div v-loading="loadingLocalModels" class="model-discovery">
+                    <el-alert
+                        v-if="localModelsLoadFailed"
+                        type="error"
+                        :closable="false"
+                        :title="$t('aiTools.model.loadFailed')"
+                    />
                     <div class="model-discovery__header">
                         <el-radio-group v-model="modelConfigMode" size="small" @change="handleModelConfigModeChange">
                             <el-radio-button v-if="supportsModelDiscovery || defaultModels.length" value="discover">
@@ -172,7 +206,21 @@
                             </el-table-column>
                             <el-table-column :label="$t('aiTools.model.model')" min-width="220">
                                 <template #default="{ row }">
-                                    <el-input v-model="row.id" />
+                                    <el-select
+                                        v-if="localModelOptions.length"
+                                        v-model="row.id"
+                                        filterable
+                                        allow-create
+                                        default-first-option
+                                    >
+                                        <el-option
+                                            v-for="model in localModelOptions"
+                                            :key="model"
+                                            :label="model"
+                                            :value="model"
+                                        />
+                                    </el-select>
+                                    <el-input v-else v-model="row.id" />
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.name')" min-width="180">
@@ -182,33 +230,29 @@
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.operate')" width="90" align="center">
                                 <template #default="{ $index }">
-                                    <el-button
-                                        type="primary"
-                                        link
-                                        :disabled="manualModels.length === 1"
-                                        @click="removeManualModel($index)"
-                                    >
+                                    <el-button type="primary" link @click="removeManualModel($index)">
                                         {{ $t('commons.button.delete') }}
                                     </el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
-                        <el-button class="model-discovery__add" type="primary" plain @click="addManualModel">
-                            {{ $t('commons.button.add') }}
-                        </el-button>
+                        <el-tooltip
+                            :disabled="!singleModelOnly || manualModels.length === 0"
+                            :content="$t('aiTools.agents.accountModelsSingle')"
+                        >
+                            <span class="model-discovery__add">
+                                <el-button
+                                    type="primary"
+                                    plain
+                                    :disabled="singleModelOnly && manualModels.length > 0"
+                                    @click="addManualModel"
+                                >
+                                    {{ $t('commons.button.add') }}
+                                </el-button>
+                            </span>
+                        </el-tooltip>
                     </template>
                 </div>
-            </template>
-            <template v-if="showInitialModel">
-                <el-divider v-if="!showModelDiscovery" content-position="left">
-                    {{ $t('aiTools.agents.modelPool') }}
-                </el-divider>
-                <el-form-item :label="$t('aiTools.model.model')" prop="initialModel.id" :rules="[Rules.noSpace]">
-                    <el-input v-model="form.initialModel.id" />
-                </el-form-item>
-                <el-form-item :label="$t('commons.table.name')" prop="initialModel.name">
-                    <el-input v-model="form.initialModel.name" />
-                </el-form-item>
             </template>
             <el-form-item
                 v-if="showVerifyModelSelect"
@@ -237,7 +281,7 @@
         <template v-if="!inline" #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading" type="primary" @click="submit">
+                <el-button v-permission :disabled="loading || disabled" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -254,8 +298,10 @@ import {
     createAgentAccount,
     discoverAgentAccountModels,
     getAgentProviders,
+    searchOllamaModel,
     updateAgentAccount,
 } from '@/api/modules/ai';
+import { checkAppInstalled } from '@/api/modules/app';
 import i18n from '@/lang';
 import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
 import { MsgError } from '@/utils/message';
@@ -263,6 +309,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 
 import DrawerPro from '@/components/drawer-pro/index.vue';
+import { loadVllmAPI, readPages, vllmAvailable } from '../../deployment';
 
 const props = defineProps({ inline: Boolean });
 const emit = defineEmits(['search', 'close']);
@@ -279,12 +326,18 @@ const manualVerifyIndex = ref(-1);
 const editModels = ref<AI.AgentAccountModel[]>([]);
 const modelConfigMode = ref<'discover' | 'manual'>('discover');
 const modelDiscoveryFailed = ref(false);
-const initialModelProviders = ['custom', 'vllm', 'ollama', 'llmman'];
-const { isIntl } = useGlobalStore();
+const { isIntl, isProductPro } = useGlobalStore();
+const connectionMode = ref<'manual' | 'local'>('manual');
+const loadingEngines = ref(false);
+const enginesLoadFailed = ref(false);
+const loadingLocalModels = ref(false);
+const localModelsLoadFailed = ref(false);
+const localEngines = ref<Array<{ id: number; name: string; baseURL: string; models: string[] }>>([]);
 
 const form = reactive({
     id: 0,
     appInstallId: 0,
+    localEngineId: undefined as number | undefined,
     provider: 'custom',
     name: '',
     baseURL: '',
@@ -294,7 +347,6 @@ const form = reactive({
     rememberApiKey: false,
     verifyModel: '',
     validateAvailability: true,
-    initialModel: {} as AI.AgentAccountModel,
     remark: '',
     syncAgents: false,
 });
@@ -304,6 +356,21 @@ const headerTitle = computed(() =>
 );
 
 const selectedProvider = computed(() => providers.value[form.provider]);
+const singleModelOnly = computed(() => !form.id && ['vllm', 'llmman'].includes(form.provider));
+const canSelectLocalEngine = computed(() => !form.id && ['ollama', 'vllm'].includes(form.provider));
+const localModelOptions = computed(() =>
+    connectionMode.value === 'local'
+        ? localEngines.value.find((item) => item.id === form.localEngineId)?.models || []
+        : [],
+);
+const disabled = computed(
+    () =>
+        connectionMode.value === 'local' &&
+        (loadingEngines.value ||
+            loadingLocalModels.value ||
+            localModelsLoadFailed.value ||
+            !localEngines.value.some((item) => item.id === form.localEngineId)),
+);
 const selectedAPIConfig = computed(() =>
     selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
 );
@@ -316,25 +383,13 @@ const defaultModels = computed(() => {
     }
     return isImageAPIType.value ? [] : selectedProvider.value?.models || [];
 });
-const showModelDiscovery = computed(
-    () => !form.appInstallId && (Boolean(form.id) || supportsModelDiscovery.value || defaultModels.value.length > 0),
-);
-const showInitialModel = computed(
-    () =>
-        !form.id &&
-        (initialModelProviders.includes(form.provider) || (isImageAPIType.value && defaultModels.value.length === 0)) &&
-        !showModelDiscovery.value,
-);
+const showModelPool = computed(() => !form.appInstallId);
 const requiresVerifyModel = computed(
     () => form.validateAvailability && (isEmbeddingAPIType.value || !isAgentAccountVerificationSkipped(form.provider)),
 );
 const verifyModelOptions = computed(() => (form.id ? editModels.value : defaultModels.value));
 const showVerifyModelSelect = computed(
-    () =>
-        requiresVerifyModel.value &&
-        verifyModelOptions.value.length > 0 &&
-        !showModelDiscovery.value &&
-        !showInitialModel.value,
+    () => requiresVerifyModel.value && verifyModelOptions.value.length > 0 && !showModelPool.value,
 );
 const apiTypeOptions = computed(() => selectedProvider.value?.apiTypes.map((item) => item.apiType) || []);
 const authModeOptions = computed(() => selectedAPIConfig.value?.authModes || []);
@@ -438,36 +493,19 @@ const rules = reactive({
     apiType: [Rules.requiredSelect],
 });
 
-const isInitialModelProvider = (provider: string) => initialModelProviders.includes(provider);
-
 const buildInitialModel = (): AI.AgentAccountModel => ({
     recordId: 0,
     id: '',
     name: '',
 });
 
-const normalizeInitialModel = () => {
-    const item = {
-        recordId: 0,
-        id: String(form.initialModel.id || '').trim(),
-        name: String(form.initialModel.name || '').trim(),
-    };
-    if (item.id === '') {
-        return null;
-    }
-    return item;
-};
-
-const resetInitialModel = () => {
-    form.initialModel =
-        isInitialModelProvider(form.provider) || isImageAPIType.value
-            ? buildInitialModel()
-            : ({} as AI.AgentAccountModel);
-};
-
 const resetManualModels = () => {
-    manualModels.value = [buildInitialModel()];
-    manualVerifyIndex.value = -1;
+    manualModels.value = localModelOptions.value.length
+        ? localModelOptions.value
+              .slice(0, singleModelOnly.value ? 1 : undefined)
+              .map((id) => ({ recordId: 0, id, name: id }))
+        : [buildInitialModel()];
+    manualVerifyIndex.value = singleModelOnly.value ? 0 : -1;
 };
 
 const loadDefaultModels = () => {
@@ -482,7 +520,7 @@ const loadDefaultModels = () => {
 
 const resetModelDiscovery = () => {
     discovering.value = false;
-    modelConfigMode.value = 'discover';
+    modelConfigMode.value = supportsModelDiscovery.value || defaultModels.value.length ? 'discover' : 'manual';
     resetManualModels();
     loadDefaultModels();
 };
@@ -493,13 +531,16 @@ const handleModelConfigModeChange = () => {
 };
 
 const addManualModel = () => {
+    if (singleModelOnly.value && manualModels.value.length > 0) {
+        return;
+    }
     manualModels.value.push(buildInitialModel());
+    if (singleModelOnly.value) {
+        manualVerifyIndex.value = 0;
+    }
 };
 
 const removeManualModel = (index: number) => {
-    if (manualModels.value.length === 1) {
-        return;
-    }
     manualModels.value.splice(index, 1);
     if (manualVerifyIndex.value === index) {
         manualVerifyIndex.value = -1;
@@ -574,36 +615,33 @@ const discoverModels = async () => {
 };
 
 const submit = async () => {
-    if (!formRef.value) {
+    if (!formRef.value || disabled.value) {
         return;
     }
     await formRef.value.validate();
-    const initialModel = showInitialModel.value ? normalizeInitialModel() : null;
-    if (showInitialModel.value && !initialModel) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
-        return;
-    }
-    let accountModels = initialModel ? [initialModel] : [];
-    if (showModelDiscovery.value && modelConfigMode.value === 'manual') {
+    let accountModels: AI.AgentAccountModel[] = [];
+    if (showModelPool.value && modelConfigMode.value === 'manual') {
         const models = normalizeManualModels();
         if (!models) {
             return;
         }
         accountModels = models;
-    } else if (showModelDiscovery.value) {
+    } else if (showModelPool.value) {
         accountModels = discoveredModels.value;
     }
-    if ((!form.id || showModelDiscovery.value) && accountModels.length === 0) {
+    if ((!form.id || showModelPool.value) && accountModels.length === 0) {
         MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
+        return;
+    }
+    if (singleModelOnly.value && accountModels.length > 1) {
+        MsgError(i18n.global.t('aiTools.agents.accountModelsSingle'));
         return;
     }
     let verifyModel = '';
     if (requiresVerifyModel.value) {
         verifyModel = form.verifyModel;
-        if (modelConfigMode.value === 'manual' && showModelDiscovery.value) {
+        if (modelConfigMode.value === 'manual' && showModelPool.value) {
             verifyModel = accountModels[manualVerifyIndex.value]?.id || '';
-        } else if (showInitialModel.value) {
-            verifyModel = initialModel?.id || '';
         }
     }
     if (requiresVerifyModel.value && !verifyModel) {
@@ -625,7 +663,7 @@ const submit = async () => {
                 validateAvailability: form.validateAvailability,
                 remark: form.remark,
                 syncAgents: form.syncAgents,
-                models: showModelDiscovery.value ? accountModels : undefined,
+                models: showModelPool.value ? accountModels : undefined,
             });
         } else {
             await createAgentAccount({
@@ -666,7 +704,6 @@ const handleClose = () => {
     form.rememberApiKey = false;
     form.validateAvailability = true;
     form.verifyModel = '';
-    form.initialModel = {} as AI.AgentAccountModel;
     editModels.value = [];
     form.remark = '';
     form.syncAgents = false;
@@ -689,6 +726,8 @@ interface OpenParams {
 }
 
 const openDrawer = async (params?: OpenParams) => {
+    connectionMode.value = 'manual';
+    form.localEngineId = undefined;
     open.value = true;
     loading.value = false;
     if (providerOptions.value.length === 0) {
@@ -731,7 +770,6 @@ const openDrawer = async (params?: OpenParams) => {
     editModels.value = [];
     form.apiType = 'openai-completions';
     form.authMode = '';
-    form.initialModel = {} as AI.AgentAccountModel;
     form.remark = '';
     form.syncAgents = false;
     resetModelDiscovery();
@@ -760,16 +798,108 @@ const loadProviders = async () => {
 };
 
 const handleProviderChange = () => {
+    if (connectionMode.value === 'local') {
+        form.apiKey = '';
+        form.rememberApiKey = false;
+        form.validateAvailability = true;
+    }
+    connectionMode.value = 'manual';
+    form.localEngineId = undefined;
     const provider = selectedProvider.value;
     form.apiType = provider?.defaultApiType || '';
     const config = provider?.apiTypes.find((item) => item.apiType === form.apiType);
     form.baseURL = config?.baseUrl || '';
     form.authMode = config?.defaultAuthMode || '';
-    if (!form.id) {
-        resetInitialModel();
-    }
     resetModelDiscovery();
 };
+
+const handleConnectionModeChange = () => {
+    form.validateAvailability = connectionMode.value !== 'local';
+    form.localEngineId = undefined;
+    form.baseURL = selectedAPIConfig.value?.baseUrl || '';
+    form.apiKey = '';
+    form.rememberApiKey = false;
+    resetModelDiscovery();
+    formRef.value?.clearValidate();
+};
+
+const handleLocalEngineChange = () => {
+    const engine = localEngines.value.find((item) => item.id === form.localEngineId);
+    if (!engine) return;
+    if (!form.name) form.name = engine.name;
+    form.baseURL = engine.baseURL;
+    form.apiKey = `${form.provider}-local`;
+    form.rememberApiKey = true;
+    resetModelDiscovery();
+    formRef.value?.clearValidate();
+};
+
+watch([open, () => form.provider, connectionMode], async ([visible, provider, mode], _, onCleanup) => {
+    let cancelled = false;
+    onCleanup(() => (cancelled = true));
+    localEngines.value = [];
+    enginesLoadFailed.value = false;
+    loadingEngines.value = false;
+    if (!visible || mode !== 'local') return;
+    loadingEngines.value = true;
+    try {
+        let engines: typeof localEngines.value = [];
+        if (provider === 'vllm' && isProductPro.value && vllmAvailable) {
+            const api = await loadVllmAPI();
+            if (cancelled) return;
+            const items = await readPages((page) => api.pageVllm({ ...page, info: '' }));
+            engines = items.map((item) => ({
+                id: item.id,
+                name: item.name,
+                baseURL: item.modelAccountBaseURL,
+                models: item.servedModelName ? [item.servedModelName] : [],
+            }));
+        } else if (provider === 'ollama') {
+            const { data: item } = await checkAppInstalled('ollama', '');
+            if (cancelled) return;
+            if (item.isExist) {
+                engines = [
+                    {
+                        id: item.appInstallId,
+                        name: item.name,
+                        baseURL: item.modelAccountBaseURL || `http://${item.containerName}:11434/v1`,
+                        models: [],
+                    },
+                ];
+            }
+        }
+        if (!cancelled) localEngines.value = engines;
+    } catch {
+        if (!cancelled) enginesLoadFailed.value = true;
+    } finally {
+        if (!cancelled) loadingEngines.value = false;
+    }
+});
+
+watch(
+    [open, () => form.provider, connectionMode, () => form.localEngineId],
+    async ([visible, provider, mode, engineId], _, onCleanup) => {
+        let cancelled = false;
+        onCleanup(() => (cancelled = true));
+        loadingLocalModels.value = false;
+        localModelsLoadFailed.value = false;
+        if (!visible || provider !== 'ollama' || mode !== 'local') return;
+        const engine = localEngines.value.find((item) => item.id === engineId);
+        if (!engine) return;
+        loadingLocalModels.value = true;
+        try {
+            const models = await readPages<AI.OllamaModelInfo>((page) => searchOllamaModel(page));
+            if (cancelled) return;
+            engine.models = models.filter((model) => model.status === 'Success').map((model) => model.name);
+            resetManualModels();
+        } catch {
+            if (!cancelled) localModelsLoadFailed.value = true;
+        } finally {
+            if (!cancelled) loadingLocalModels.value = false;
+        }
+    },
+    { flush: 'sync' },
+);
 
 const handleAPITypeChange = () => {
     const config = selectedAPIConfig.value;
@@ -781,12 +911,11 @@ const handleAPITypeChange = () => {
     if (!config.editableBaseUrl || !form.baseURL || providerURLs.includes(form.baseURL)) {
         form.baseURL = config.baseUrl || '';
     }
-    resetInitialModel();
     resetModelDiscovery();
 };
 
 watch([() => form.apiKey, () => form.baseURL], () => {
-    if (!form.id && showModelDiscovery.value) {
+    if (!form.id && showModelPool.value) {
         loadDefaultModels();
     }
 });
@@ -803,6 +932,7 @@ defineExpose({
     open: openDrawer,
     submit,
     loading,
+    disabled,
 });
 </script>
 
@@ -850,6 +980,7 @@ defineExpose({
 }
 
 .model-discovery__add {
+    display: inline-block;
     margin-top: 12px;
 }
 </style>

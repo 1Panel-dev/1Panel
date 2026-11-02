@@ -4,20 +4,7 @@
         :header="$t(enginesOnly ? 'aiTools.model.addEngine' : 'aiTools.model.addService')"
         :size="isMobile ? 'full' : '50%'"
     >
-        <div class="engine-options">
-            <el-button
-                v-if="!enginesOnly && !vllmOnly"
-                class="engine-option"
-                :class="{ 'is-selected': selected === 'account' }"
-                :aria-pressed="selected === 'account'"
-                @click="selected = 'account'"
-            >
-                <el-icon><Cloudy /></el-icon>
-                <span class="engine-content">
-                    <span class="engine-name">{{ $t('aiTools.model.onlineModel') }}</span>
-                    <span class="engine-description">{{ $t('aiTools.model.cloudAccount') }}</span>
-                </span>
-            </el-button>
+        <div v-if="selected !== 'account' && !vllmOnly" class="engine-options">
             <el-button
                 class="engine-option"
                 :class="{ 'is-selected': selected === 'vllm' }"
@@ -63,10 +50,9 @@
                 </span>
             </el-button>
         </div>
-        <el-divider />
+        <el-divider v-if="selected !== 'account' && !vllmOnly" />
         <DockerStatus
-            v-if="visible"
-            v-show="selected !== 'account'"
+            v-if="visible && selected !== 'account'"
             v-model:is-active="dockerActive"
             v-model:is-exist="dockerExists"
         />
@@ -110,11 +96,62 @@
                     {{ $t('license.levelUpPro') }}
                 </el-button>
             </template>
-            <template v-if="selected === 'ollama' && ollama?.isExist">
-                <el-button type="primary" :disabled="!ollama" @click="openOllama">
-                    {{ $t(ollama?.isExist ? 'aiTools.model.manage' : 'commons.button.install') }}
-                </el-button>
-            </template>
+            <section v-if="selected === 'ollama' && ollama?.isExist" class="installed-engine">
+                <div
+                    class="installed-engine-overview"
+                    role="link"
+                    tabindex="0"
+                    :aria-label="$t('aiTools.model.modelManagement')"
+                    @click="openOllama"
+                    @keydown.enter.self.prevent="openOllama"
+                    @keydown.space.self.prevent="openOllama"
+                >
+                    <div class="installed-engine-heading">
+                        <ProviderLogo provider="ollama" :size="40" />
+                        <div class="installed-engine-identity">
+                            <h3>{{ ollama.name }}</h3>
+                            <span>Ollama · {{ ollama.version }}</span>
+                        </div>
+                        <Status :status="ollama.status" />
+                    </div>
+                    <div class="installed-engine-actions" @click.stop>
+                        <el-button type="primary" plain @click="openOllamaConnection">
+                            {{ $t('database.databaseConnInfo') }}
+                        </el-button>
+                        <el-button :loading="openingWebUI" @click="openWebUI">OpenWebUI</el-button>
+                        <el-button @click="openOllama">
+                            {{ $t('aiTools.model.modelManagement') }}
+                        </el-button>
+                    </div>
+                </div>
+                <h4 class="installed-engine-title">{{ $t('aiTools.model.serviceDetails') }}</h4>
+                <el-descriptions :column="1" border>
+                    <el-descriptions-item :label="$t('app.containerName')">
+                        <div class="installed-engine-value">
+                            <code>{{ ollama.containerName }}</code>
+                            <CopyButton :content="ollama.containerName" />
+                        </div>
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('commons.table.port')">
+                        {{ ollama.httpPort || '—' }}
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('aiTools.model.endpoint')">
+                        <div class="installed-engine-value">
+                            <code>{{ ollama.modelAccountBaseURL || '—' }}</code>
+                            <CopyButton v-if="ollama.modelAccountBaseURL" :content="ollama.modelAccountBaseURL" />
+                        </div>
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('xpack.node.baseDir')">
+                        <div class="installed-engine-value">
+                            <code>{{ ollama.installPath || '—' }}</code>
+                            <CopyButton v-if="ollama.installPath" :content="ollama.installPath" />
+                        </div>
+                    </el-descriptions-item>
+                    <el-descriptions-item :label="$t('commons.table.createdAt')">
+                        {{ ollama.createdAt ? dateFormatSimple(ollama.createdAt) : '—' }}
+                    </el-descriptions-item>
+                </el-descriptions>
+            </section>
         </div>
         <template v-if="activeForm" #footer>
             <el-button :disabled="currentForm?.loading" @click="visible = false">
@@ -130,14 +167,20 @@
                 {{ $t('commons.button.confirm') }}
             </el-button>
         </template>
+        <template v-else-if="selected === 'ollama' && ollama?.isExist" #footer>
+            <el-button @click="visible = false">{{ $t('commons.button.close') }}</el-button>
+        </template>
     </DrawerPro>
+    <EngineConnection ref="connectionRef" />
+    <PortJumpDialog ref="portRef" />
     <AccountForm ref="editAccountRef" @search="emit('search')" />
     <TaskLog ref="taskRef" @close="emit('search')" />
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, ref, shallowRef, watch } from 'vue';
-import { Cloudy } from '@element-plus/icons-vue';
+import { ElMessageBox } from 'element-plus';
+import { useRouter } from 'vue-router';
 import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 import type { AI } from '@/api/interface/ai';
 import type { App } from '@/api/interface/app';
@@ -148,12 +191,17 @@ import TensorForm from '@/views/ai/model/tensorrt/operate/index.vue';
 import OllamaForm from '@/views/ai/model/ollama/operate/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { checkAppInstalled } from '@/api/modules/app';
+import { checkAppInstalled, getAppPort } from '@/api/modules/app';
+import { dateFormatSimple } from '@/utils/date';
+import i18n from '@/lang';
+import EngineConnection from '../connection/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
 import { vllmAvailable } from '../../deployment';
 
 const props = defineProps({ enginesOnly: Boolean, vllmOnly: Boolean });
 const emit = defineEmits(['search', 'manage']);
-const { isProductPro, isFxplay, isMobile } = useGlobalStore();
+const { isProductPro, isFxplay, isMobile, currentNode } = useGlobalStore();
+const router = useRouter();
 const visible = ref(false);
 const selected = ref<'account' | 'vllm' | 'ollama' | 'tensorrt'>('account');
 const modelDir = ref('');
@@ -166,6 +214,9 @@ const tensorRef = ref();
 const ollamaRef = ref();
 const vllmRef = ref();
 const taskRef = ref();
+const connectionRef = ref();
+const portRef = ref();
+const openingWebUI = ref(false);
 const vllmForm = shallowRef();
 const initializing = ref(false);
 const loadFailed = ref(false);
@@ -224,7 +275,7 @@ const open = async (engine?: 'ollama' | 'vllm' | 'tensorrt', defaultModelDir = '
     dockerExists.value = true;
     ollama.value = undefined;
     visible.value = true;
-    if (props.vllmOnly) return;
+    if (selected.value === 'account' || props.vllmOnly) return;
     const { data } = await checkAppInstalled('ollama', '');
     if (visible.value) ollama.value = data;
 };
@@ -237,6 +288,43 @@ const openOllama = async () => {
     if (!ollama.value) return;
     visible.value = false;
     emit('manage', { engine: 'ollama', id: ollama.value.appInstallId, name: ollama.value.name });
+};
+
+const openOllamaConnection = () => {
+    if (!ollama.value?.isExist) return;
+    connectionRef.value.acceptParams({
+        name: ollama.value.name,
+        engine: 'ollama',
+        port: ollama.value.httpPort,
+        containerName: ollama.value.containerName,
+        appinstallID: ollama.value.appInstallId,
+    });
+};
+
+const openWebUI = async () => {
+    const node = currentNode.value;
+    openingWebUI.value = true;
+    try {
+        const { data } = await getAppPort('ollama-webui', '');
+        if (node !== currentNode.value || !visible.value || selected.value !== 'ollama') return;
+        if (data) {
+            await portRef.value.acceptParams({ port: data });
+            return;
+        }
+        const confirmed = await ElMessageBox.confirm(
+            i18n.global.t('app.checkInstalledWarn', ['OpenWebUI']),
+            'OpenWebUI',
+            {
+                confirmButtonText: i18n.global.t('database.goInstall'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+            },
+        ).catch(() => false);
+        if (!confirmed || node !== currentNode.value || !visible.value || selected.value !== 'ollama') return;
+        visible.value = false;
+        await router.push({ name: 'AppAll', query: { install: 'ollama-webui' } });
+    } finally {
+        openingWebUI.value = false;
+    }
 };
 
 const openVllmLicense = () => {
@@ -306,6 +394,73 @@ defineExpose({ open, openAccount });
 }
 .service-form {
     min-height: 100px;
+}
+.installed-engine-overview {
+    padding: 20px;
+    border: 1px solid var(--el-border-color-light);
+    border-radius: 8px;
+    background: var(--el-fill-color-extra-light);
+    cursor: pointer;
+    &:hover {
+        border-color: var(--el-color-primary);
+    }
+    &:focus-visible {
+        outline: 2px solid var(--el-color-primary);
+        outline-offset: 2px;
+    }
+}
+.installed-engine-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+.installed-engine-identity {
+    flex: 1;
+    min-width: 0;
+    h3 {
+        margin: 0 0 6px;
+        font-size: 16px;
+        overflow-wrap: anywhere;
+    }
+    span {
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+    }
+}
+.installed-engine-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+    .el-button {
+        margin-left: 0;
+    }
+}
+.installed-engine-title {
+    margin: 24px 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
+.installed-engine {
+    :deep(.el-descriptions__table) {
+        table-layout: fixed;
+    }
+    :deep(.el-descriptions__label) {
+        width: 110px;
+    }
+}
+.installed-engine-value {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    code {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+    :deep(.el-button) {
+        flex-shrink: 0;
+    }
 }
 @media (max-width: 600px) {
     .engine-options {

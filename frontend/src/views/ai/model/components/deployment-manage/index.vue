@@ -48,11 +48,6 @@
                         </el-descriptions-item>
                     </el-descriptions>
                 </template>
-                <OllamaModels
-                    v-if="visible && !standalone && instance?.engine === 'ollama' && !failed && !missing"
-                    :key="instance.id"
-                    :instance-name="instance.name"
-                />
                 <VllmPlaceholder v-if="visible && view === VllmPlaceholder" />
             </div>
         </template>
@@ -108,7 +103,7 @@ import { MsgError } from '@/utils/message';
 import { hasPermission } from '@/utils/rbac';
 import { hasManagePermissionAccess } from '@/utils/permission';
 import { newUUID } from '@/utils/id';
-import OllamaModels from '../../ollama/models/index.vue';
+import { routerToName } from '@/utils/router';
 import AppParams from '@/views/app-store/installed/detail/index.vue';
 import EngineConnection from '../connection/index.vue';
 import TensorForm from '../../tensorrt/operate/index.vue';
@@ -170,6 +165,11 @@ const open = async (
     action = 'manage',
     outside = false,
 ) => {
+    if (row.engine === 'ollama' && action === 'manage') {
+        visible.value = false;
+        await routerToName('OllamaModels');
+        return;
+    }
     const version = ++request;
     standalone.value = outside;
     if (row.engine === 'tensorrt' && !isFxplay.value) return;

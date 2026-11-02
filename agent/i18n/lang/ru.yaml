@@ -77,7 +77,7 @@ ErrAgentProviderNotSupported: 'Провайдер агента не поддер
 ErrAgentAccountRequired: 'Выберите аккаунт агента'
 ErrAgentAccountNotVerified: 'Аккаунт не подтверждён'
 ErrAgentAccountModelsRequired: 'Настройте хотя бы одну модель'
-ErrAgentAccountSingleInitialModel: 'При создании аккаунта можно указать только одну начальную модель'
+ErrAgentAccountSingleInitialModel: 'Для этого провайдера можно настроить не более одной модели'
 ErrAgentModelNotInAccount: 'Модель не настроена в выбранном аккаунте'
 ErrAgentVerifyModelInUse: 'Эта модель используется для проверки аккаунта. Перед удалением выберите другую модель проверки'
 ErrAgentFallbackModelDuplicate: 'Резервные модели не могут дублироваться'

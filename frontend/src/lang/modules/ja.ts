@@ -831,6 +831,7 @@ const message = {
             accountModelsHelper:
                 'このアカウントが OpenClaw に提供するモデルを設定します。モデルの切り替えや設定に使用されます',
             accountModelsRequired: '少なくとも 1 つのモデルを設定してください',
+            accountModelsSingle: 'このプロバイダーで設定できるモデルは最大 1 つです',
             verifyModel: '検証モデル',
             verifyModelHelper:
                 'このアカウントで利用できるモデルを選択してください。保存時に最小リクエストを送信して接続を検証します。',
@@ -1083,10 +1084,12 @@ const message = {
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
             vllmVersionHelper: {
+                ascend: 'Ascend A2 シリーズ向けの Ascend 公式標準版です。',
+                ascendA3: 'Ascend A3 シリーズ向けの Ascend 公式 A3 版です。',
+                ascendA5: '950DT 向けの Ascend 公式 A5 版です。',
+                ascend310P: 'Atlas 300I DUO および Atlas 200I Pro 向けの Ascend 公式 310P 版です。',
                 default:
                     '公式の標準バージョン。CUDA 13.0 を使用し、新しいドライバーと新しい GPU アーキテクチャに対応します。',
-                cuda: '旧アーキテクチャ向け互換バージョン。CUDA 12.9 を使用し、CUDA 13.0 未満を使用する旧世代 GPU に対応します。',
-                ubuntu: 'NVIDIA GB10 標準版。CUDA 13.0 を使用し、NVIDIA GB10 デバイスに対応します。',
                 dspark: 'NVIDIA GB10 の 2 台構成向けカスタム版。1Panel が独自に保守するカスタムイメージです。',
             },
             vllmDeployProfile: 'デプロイモデル',

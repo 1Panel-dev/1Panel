@@ -835,6 +835,7 @@ const message = {
             accountModelsHelper:
                 'Configure los modelos que esta cuenta expone a OpenClaw para el cambio y la configuración',
             accountModelsRequired: 'Configure al menos un modelo',
+            accountModelsSingle: 'Este proveedor permite configurar como máximo un modelo',
             verifyModel: 'Modelo de verificación',
             verifyModelHelper:
                 'Seleccione un modelo al que esta cuenta tenga acceso. Se usará para enviar una solicitud mínima al guardar y verificar la conexión.',
@@ -1098,10 +1099,12 @@ const message = {
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
             vllmVersionHelper: {
+                ascend: 'Versión estándar oficial de Ascend para dispositivos de la serie Ascend A2.',
+                ascendA3: 'Versión oficial Ascend A3 para dispositivos de la serie Ascend A3.',
+                ascendA5: 'Versión oficial Ascend A5 para dispositivos 950DT.',
+                ascend310P: 'Versión oficial Ascend 310P para dispositivos Atlas 300I DUO y Atlas 200I Pro.',
                 default:
                     'Versión oficial estándar con CUDA 13.0, para controladores recientes y GPU de nuevas arquitecturas.',
-                cuda: 'Versión compatible con arquitecturas antiguas con CUDA 12.9, para GPU antiguas que utilizan versiones de CUDA anteriores a 13.0.',
-                ubuntu: 'Versión estándar de NVIDIA GB10 con CUDA 13.0, para dispositivos NVIDIA GB10.',
                 dspark: 'Versión personalizada de NVIDIA GB10 para dos dispositivos, con una imagen mantenida por 1Panel.',
             },
             vllmDeployProfile: 'Modelo de despliegue',
