@@ -529,6 +529,14 @@ const waitDownloadComplete = async (key: string) => {
             }
             const progress = list?.[0];
             if (progress) {
+                if (progress.status === 'Failed' || progress.status === 'Canceled') {
+                    const error = progress.error || i18n.global.t('commons.msg.operationFailed');
+                    if (!cancelRequested.value) {
+                        MsgError(error);
+                    }
+                    finish(new Error(error));
+                    return;
+                }
                 hasProgress = true;
                 emptyCount = 0;
                 downloadPercent.value = Math.min(Math.round(Number(progress.percent) || 0), 100);
