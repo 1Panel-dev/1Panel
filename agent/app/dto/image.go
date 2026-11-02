@@ -2,6 +2,12 @@ package dto
 
 import "time"
 
+type ImageRemoteSearch struct {
+	Query    string `json:"query" validate:"required,max=256"`
+	Page     int    `json:"page" validate:"required,min=1"`
+	PageSize int    `json:"pageSize" validate:"required,min=1,max=100"`
+}
+
 type PageImage struct {
 	PageInfo
 	Name    string `json:"name"`

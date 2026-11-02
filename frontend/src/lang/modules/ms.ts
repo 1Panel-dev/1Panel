@@ -2149,6 +2149,10 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        imageRemoteSearch: 'Carian jauh',
+        imageRemoteSearchHelper: 'Hanya imej repositori Docker Hub boleh dicari',
+        imageRemoteSearchProxyRequired:
+            'Untuk mencari imej jauh dalam persekitaran semasa, sila konfigurasikan pelayan proksi terlebih dahulu.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

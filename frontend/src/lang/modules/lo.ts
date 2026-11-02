@@ -2077,6 +2077,9 @@ const message = {
         missing: 'ບໍ່ມີ',
     },
     container: {
+        imageRemoteSearch: 'ຄົ້ນຫາທາງໄກ',
+        imageRemoteSearchHelper: 'ຮອງຮັບການຄົ້ນຫາອິມເມຈໃນ Docker Hub ເທົ່ານັ້ນ',
+        imageRemoteSearchProxyRequired: 'ເພື່ອຄົ້ນຫາອິມເມຈທາງໄກໃນສະພາບແວດລ້ອມປັດຈຸບັນ ກະລຸນາຕັ້ງຄ່າພຣັອກຊີເຊີບເວີກ່ອນ.',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',

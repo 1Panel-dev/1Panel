@@ -13,6 +13,9 @@
                 <el-button v-permission type="primary" plain @click="onOpenPull">
                     {{ $t('container.imagePull') }}
                 </el-button>
+                <el-button v-permission type="primary" plain @click="remoteSearchRef.open()">
+                    {{ $t('container.imageRemoteSearch') }}
+                </el-button>
                 <el-button v-permission type="primary" plain @click="onOpenLoad">
                     {{ $t('container.importImage') }}
                 </el-button>
@@ -145,6 +148,7 @@
 
         <OpDialog ref="opRef" @submit="onSubmitDelete" />
         <Pull ref="dialogPullRef" @search="search" />
+        <RemoteSearch ref="remoteSearchRef" @pull="onRemotePull" />
         <Tag ref="dialogTagRef" @search="search" />
         <Push ref="dialogPushRef" @search="search" />
         <Save ref="dialogSaveRef" @search="search" />
@@ -158,12 +162,13 @@
 
 <script lang="ts" setup>
 import { useSearchState } from '@/utils/search-reset';
-import { toRef, reactive, ref, computed } from 'vue';
+import { toRef, reactive, ref, computed, watch, onBeforeUnmount } from 'vue';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { computeSize2 } from '@/utils/size';
 import { Container } from '@/api/interface/container';
 import Pull from '@/views/container/image/pull/index.vue';
+import RemoteSearch from '@/views/container/image/remote/index.vue';
 import Tag from '@/views/container/image/tag/index.vue';
 import Push from '@/views/container/image/push/index.vue';
 import Save from '@/views/container/image/save/index.vue';
@@ -181,7 +186,7 @@ import { updateCommonDescription } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile } = useGlobalStore();
+const { isMobile, currentNode } = useGlobalStore();
 const taskLogRef = ref();
 
 const loading = ref(false);
@@ -256,9 +261,28 @@ const search = async (column?: any) => {
             loading.value = false;
         });
 };
-const loadRepos = async () => {
-    const res = await listImageRepo();
-    repos.value = res.data || [];
+let repoRequest: Promise<void> | undefined;
+let repoGeneration = 0;
+let pullGeneration = 0;
+const resetRepos = () => {
+    repoGeneration++;
+    pullGeneration++;
+    repoRequest = undefined;
+    repos.value = undefined;
+};
+watch(currentNode, resetRepos, { flush: 'sync' });
+onBeforeUnmount(resetRepos);
+const loadRepos = () => {
+    if (repoRequest) return repoRequest;
+    const version = repoGeneration;
+    repoRequest = listImageRepo()
+        .then((res) => {
+            if (version === repoGeneration) repos.value = res.data || [];
+        })
+        .finally(() => {
+            if (version === repoGeneration) repoRequest = undefined;
+        });
+    return repoRequest;
 };
 
 const onDelete = (row: Container.ImageInfo) => {
@@ -315,6 +339,18 @@ const onInspect = async (id: string) => {
         mode: 'json',
     };
     myDetail.value!.acceptParams(param);
+};
+
+const remoteSearchRef = ref();
+const onRemotePull = async (imageName: string) => {
+    const version = ++pullGeneration;
+    try {
+        if (!repos.value) await loadRepos();
+        if (version !== pullGeneration) return;
+        dialogPullRef.value!.acceptParams({ repos: repos.value, imageName });
+    } catch {
+        // The request interceptor displays errors.
+    }
 };
 
 const onOpenPull = () => {

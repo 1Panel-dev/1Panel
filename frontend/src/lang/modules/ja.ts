@@ -2117,6 +2117,10 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        imageRemoteSearch: 'リモート検索',
+        imageRemoteSearchHelper: 'Docker Hub リポジトリのイメージのみ検索できます',
+        imageRemoteSearchProxyRequired:
+            '現在の実行環境でリモートイメージを検索するには、先にプロキシサーバーを設定してください。',
         batchUpgrade: 'Batch upgrade',
         batchUpgradeLog: 'View log',
         batchUpgradeCheck: 'Check task',
