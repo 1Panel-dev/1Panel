@@ -93,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import { getModelDownloaderSettings } from '@/api/modules/model-downloader';
 import { expandInvalidFormSection } from '@/views/ai/model/components/form-section';
 const props = defineProps({ inline: Boolean });
 import NodeConfig from '@/views/website/runtime//components/node-config.vue';
@@ -108,7 +109,7 @@ import { ElForm, FormInstance } from 'element-plus';
 import { createTensorRTLLM, updateTensorRTLLM } from '@/api/modules/ai';
 import { newUUID } from '@/utils/id';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { isFxplay, isMobile, isProductPro } = useGlobalStore();
+const { isFxplay, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const gpuRef = ref<InstanceType<typeof GPUConfig>>();
@@ -194,20 +195,13 @@ const handleClose = () => {
     emit('close');
 };
 
-const downloaderModules = import.meta.glob<{
-    getModelDownloaderSettings: () => Promise<{ data: { modelDir: string } }>;
-}>('/src/xpack/api/modules/model-downloader.ts');
 const selectModelDir = async () => {
     let path = tensorRTLLM.value.modelDir;
-    const loadDownloader = Object.values(downloaderModules)[0];
-    if (isProductPro.value && loadDownloader) {
-        try {
-            const { getModelDownloaderSettings } = await loadDownloader();
-            const { data } = await getModelDownloaderSettings();
-            path = data.modelDir;
-        } catch {
-            path = '/';
-        }
+    try {
+        const { data } = await getModelDownloaderSettings();
+        path = data.modelDir;
+    } catch {
+        path = '/';
     }
     modelDirRef.value.acceptParams({ dir: true, path });
 };
