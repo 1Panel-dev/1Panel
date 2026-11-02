@@ -4021,7 +4021,6 @@ const message = {
         monitor:
             'Naik taraf ke Edisi Komersial untuk melihat status laman web masa nyata, trend pelawat, sumber trafik, log permintaan dan lain-lain.',
         alert: 'Naik taraf ke Edisi Komersial untuk menerima amaran SMS dan melihat log amaran.',
-        vm: 'Naik taraf kepada edisi komersial untuk mengurus mesin maya, imej, templat, rangkaian maya dan sumber storan dalam 1Panel.',
         node: 'Naik taraf ke Edisi Komersial untuk mengurus berbilang pelayan Linux dengan 1Panel.',
         nodeApp:
             'Naik taraf ke Edisi Komersial untuk menaik taraf versi aplikasi berbilang nod tanpa menukar nod secara manual.',
@@ -7642,8 +7641,7 @@ const message = {
             submitSuccess: 'Tugas penyegerakan berjaya dihantar.',
         },
         vm: {
-            countLimitHelper:
-                'Edisi Professional membenarkan penciptaan sehingga {0} mesin maya. Edisi Enterprise tidak mengehadkan bilangannya.',
+            countLimitHelper: 'Edisi semasa membenarkan penciptaan sehingga {0} mesin maya.',
             vm: 'Mesin Maya',
             title: 'Pengurusan Mesin Maya',
             healthCheck: 'Pemeriksaan kesihatan',

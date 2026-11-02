@@ -4034,7 +4034,6 @@ const message = {
         monitor:
             'Faça upgrade para a edição comercial para acompanhar o status do site em tempo real, tendências de visitantes, origens de tráfego, logs de requisições e mais.',
         alert: 'Faça upgrade para a edição comercial para receber alertas por SMS e consultar os logs de alertas.',
-        vm: 'Atualize para a edição comercial para gerenciar máquinas virtuais, imagens, modelos, redes virtuais e recursos de armazenamento no 1Panel.',
         node: 'Atualize para a edição comercial para gerenciar vários servidores Linux com o 1Panel.',
         nodeApp:
             'Atualize para a edição comercial para atualizar versões de aplicativos multi-nó sem alternar manualmente entre os nós.',
@@ -7687,8 +7686,7 @@ const message = {
             submitSuccess: 'Tarefa de sincronização enviada com sucesso.',
         },
         vm: {
-            countLimitHelper:
-                'A edição Professional permite criar até {0} máquinas virtuais. A edição Enterprise não limita a quantidade.',
+            countLimitHelper: 'A edição atual permite criar até {0} máquinas virtuais.',
             vm: 'Máquina virtual',
             title: 'Gerenciamento de Máquinas Virtuais',
             healthCheck: 'Verificação de integridade',

@@ -233,13 +233,13 @@ var WebUrlMap = map[string]struct{}{
 	"/enterprise/ops-report/alert":    {},
 	"/enterprise/ops-report/history":  {},
 	"/enterprise/ops-report/settings": {},
-	"/xpack/vm":                       {},
-	"/xpack/vm/overview":              {},
-	"/xpack/vm/list":                  {},
-	"/xpack/vm/isos":                  {},
-	"/xpack/vm/templates":             {},
-	"/xpack/vm/networks":              {},
-	"/xpack/vm/storage-pools":         {},
+	"/vm":                             {},
+	"/vm/overview":                    {},
+	"/vm/list":                        {},
+	"/vm/isos":                        {},
+	"/vm/templates":                   {},
+	"/vm/networks":                    {},
+	"/vm/storage-pools":               {},
 }
 
 var DynamicRoutes = []string{

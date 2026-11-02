@@ -2,6 +2,7 @@ package router
 
 func commonGroups() []CommonRouter {
 	return []CommonRouter{
+		&VMRouter{},
 		&DashboardRouter{},
 		&HostRouter{},
 		&ContainerRouter{},

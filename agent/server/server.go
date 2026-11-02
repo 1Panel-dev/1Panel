@@ -22,6 +22,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/init/dir"
 	"github.com/1Panel-dev/1Panel/agent/init/firewall"
 	"github.com/1Panel-dev/1Panel/agent/init/hook"
+	"github.com/1Panel-dev/1Panel/agent/init/kvm"
 	"github.com/1Panel-dev/1Panel/agent/init/lang"
 	"github.com/1Panel-dev/1Panel/agent/init/log"
 	"github.com/1Panel-dev/1Panel/agent/init/migration"
@@ -122,6 +123,7 @@ func Start() {
 	global.LOG.Info("agent startup: firewall init scheduled")
 	InitOthers()
 	global.LOG.Info("agent startup: edition initialized")
+	kvm.Init()
 
 	rootRouter := router.Routers()
 	global.LOG.Info("agent startup: router initialized")

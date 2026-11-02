@@ -736,7 +736,7 @@ ErrSSHKeyMismatch: "Las claves pública y privada SSH no coinciden"
 # máquina virtual
 ErrVMNotFound: "La máquina virtual no existe"
 ErrVMAlreadyExists: "La máquina virtual ya existe"
-ErrVMCountLimit: "La edición Professional permite crear hasta {{ .limit }} máquinas virtuales. Elimina una máquina virtual existente o actualiza a Enterprise y vuelve a intentarlo."
+ErrVMCountLimit: "La edición actual permite crear hasta {{ .limit }} máquinas virtuales. Elimina una máquina virtual existente o cambia a una edición superior y vuelve a intentarlo."
 ErrVMImageAlreadyExists: "La imagen de la máquina virtual ya existe: {{ .detail }}"
 ErrVMStoragePathInUse: "La ruta del pool de almacenamiento ya está usada por [{{ .name }}]"
 ErrVMHelperNotFound: "No se encontró 1panel-kvm"
