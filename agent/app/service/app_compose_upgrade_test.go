@@ -223,6 +223,79 @@ func TestExplicitConfigComposeDetectsCustomAndReusesCurrentCache(t *testing.T) {
 	}
 }
 
+func TestRemovedCurrentComposeDoesNotBlockUpgrade(t *testing.T) {
+	for _, custom := range []bool{false, true} {
+		t.Run(fmt.Sprintf("custom=%v", custom), func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				if r.URL.Path == "/demo/1.0/docker-compose.yml" {
+					w.WriteHeader(http.StatusNotFound)
+					return
+				}
+				version := strings.Split(r.URL.Path, "/")[2]
+				_, _ = fmt.Fprintf(w, "services:\n  source:\n    image: demo:%s\n", version)
+			}))
+			t.Cleanup(server.Close)
+			db, _, install, details := composeUpgradeDB(t, server.URL)
+			if err := db.Model(&details[1]).UpdateColumn("status", constant.AppTakeDown).Error; err != nil {
+				t.Fatal(err)
+			}
+			if custom {
+				install.DockerCompose += "    environment:\n      USER_SETTING: preserve\n"
+				if err := db.Omit(clause.Associations).Save(&install).Error; err != nil {
+					t.Fatal(err)
+				}
+			}
+			service := NewIAppInstalledService()
+			config, err := service.GetParams(install.ID)
+			if err != nil || config.RawCompose != install.DockerCompose || config.DockerCompose != install.DockerCompose || !config.IsEdit {
+				t.Fatalf("removed template must preserve the instance and warn about custom configuration: %+v, %v", config, err)
+			}
+			var current model.AppDetail
+			if err := db.First(&current, details[1].ID).Error; err != nil || current.DockerCompose != "" {
+				t.Fatalf("instance Compose was cached as the official template: %+v, %v", current, err)
+			}
+			noCompose := false
+			versions, err := service.GetUpdateVersions(request.AppUpdateVersion{AppInstallID: install.ID, LoadCompose: &noCompose})
+			if err != nil || len(versions) != 2 {
+				t.Fatalf("removed current version blocked available versions: %+v, %v", versions, err)
+			}
+			for _, version := range versions {
+				previews, err := service.GetUpdateVersions(request.AppUpdateVersion{AppInstallID: install.ID, UpdateVersion: version.Version})
+				if err != nil {
+					t.Fatal(err)
+				}
+				for _, preview := range previews {
+					if preview.Version == version.Version && !strings.Contains(preview.DockerCompose, "demo:"+version.Version) {
+						t.Fatalf("upgrade did not use the selected new template: %+v", preview)
+					}
+				}
+			}
+			var stored model.AppInstall
+			if err := db.First(&stored, install.ID).Error; err != nil || stored.DockerCompose != install.DockerCompose || stored.Version != install.Version || stored.Status != install.Status {
+				t.Fatalf("upgrade preview modified the running instance: %+v, %v", stored, err)
+			}
+		})
+	}
+}
+
+func TestRemovedCurrentComposeRejectsInvalidInstanceCompose(t *testing.T) {
+	for _, compose := range []string{"", "services: []", "services: ["} {
+		t.Run(compose, func(t *testing.T) {
+			server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusNotFound)
+			}))
+			t.Cleanup(server.Close)
+			db, _, install, _ := composeUpgradeDB(t, server.URL)
+			if err := db.Model(&install).UpdateColumn("docker_compose", compose).Error; err != nil {
+				t.Fatal(err)
+			}
+			if config, err := NewIAppInstalledService().GetParams(install.ID); err == nil || config != nil {
+				t.Fatalf("invalid instance Compose was accepted: %+v, %v", config, err)
+			}
+		})
+	}
+}
+
 func TestVllmManagedComposeDoesNotRequireOfficialTemplate(t *testing.T) {
 	var calls atomic.Int32
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

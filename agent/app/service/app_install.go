@@ -1099,7 +1099,17 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	rawCompose := install.DockerCompose
 	if install.App.Key != vllmAppKeyForUpgrade {
 		if err := ensureAppDetailCompose(install.App, &detail); err != nil {
-			return nil, err
+			var businessErr buserr.BusinessError
+			if !errors.As(err, &businessErr) || businessErr.Msg != "ErrAppVersionUnavailable" {
+				return nil, err
+			}
+			if err := validateAppDetailCompose([]byte(install.DockerCompose)); err != nil {
+				return nil, err
+			}
+			// A removed template cannot prove the instance is unmodified.
+			res.RawCompose = install.DockerCompose
+			res.IsEdit = true
+			return &res, nil
 		}
 		rawCompose, err = getUpgradeCompose(install, detail)
 		if err != nil {
