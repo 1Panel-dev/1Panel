@@ -1,6 +1,21 @@
 import { ReqPage } from '.';
 
 export namespace AI {
+    export interface ModelGPUDevice {
+        id: string;
+        name: string;
+        type: string;
+        uuid?: string;
+        available: boolean;
+    }
+    export interface ModelGPUConfig {
+        mode: 'all' | 'count' | 'devices';
+        count?: number;
+        error?: string;
+        enabled: boolean;
+        deviceIDs: string[];
+        capabilities: string[];
+    }
     export interface ModelAccountSync {
         id: number;
         modelAccountBaseURLType: 'container' | 'localhost' | 'systemIP' | 'custom';
@@ -34,6 +49,7 @@ export namespace AI {
         xpu: XpuInfo['xpu'];
     }
     export interface GPU {
+        sharedMemory?: boolean;
         eccPending?: string;
         eccErrors?: { scope: string; correctable: string; uncorrectable: string }[];
         memoryActivity?: string;
@@ -124,6 +140,7 @@ export namespace AI {
         chartHide: Array<ChartHide>;
     }
     export interface ChartHide {
+        sharedMemory?: boolean;
         deviceID?: string;
         legacy?: boolean;
         productName: string;
@@ -392,6 +409,8 @@ export namespace AI {
     }
 
     export interface TensorRTLLM {
+        taskID?: string;
+        gpu?: ModelGPUConfig;
         id?: number;
         name: string;
         containerName: string;
@@ -415,10 +434,12 @@ export namespace AI {
     }
 
     export interface TensorRTLLMDelete {
+        taskID?: string;
         id: number;
     }
 
     export interface TensorRTLLMOperate {
+        taskID?: string;
         id: number;
         operate: string;
     }
@@ -659,6 +680,7 @@ export namespace AI {
     }
 
     export interface AgentAccountModelCreateReq {
+        taskID?: string;
         accountId: number;
         model: AgentAccountModel;
     }
@@ -669,6 +691,7 @@ export namespace AI {
     }
 
     export interface AgentAccountModelDeleteReq {
+        deleteFiles?: boolean;
         accountId: number;
         recordId: number;
     }
@@ -719,6 +742,7 @@ export namespace AI {
         baseURL: string;
         apiType: string;
         authMode: string;
+        models?: AgentAccountModel[];
         verifyModel: string;
         validateAvailability: boolean;
         remark: string;

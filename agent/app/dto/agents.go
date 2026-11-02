@@ -318,6 +318,7 @@ type AgentAccountModelDiscoverReq struct {
 }
 
 type AgentAccountModelCreateReq struct {
+	TaskID    string            `json:"taskID"`
 	AccountID uint              `json:"accountId" validate:"required"`
 	Model     AgentAccountModel `json:"model" validate:"required"`
 }
@@ -328,8 +329,9 @@ type AgentAccountModelUpdateReq struct {
 }
 
 type AgentAccountModelDeleteReq struct {
-	AccountID uint `json:"accountId" validate:"required"`
-	RecordID  uint `json:"recordId" validate:"required"`
+	DeleteFiles bool `json:"deleteFiles"`
+	AccountID   uint `json:"accountId" validate:"required"`
+	RecordID    uint `json:"recordId" validate:"required"`
 }
 
 type AgentAccountCreateReq struct {
@@ -347,17 +349,18 @@ type AgentAccountCreateReq struct {
 }
 
 type AgentAccountUpdateReq struct {
-	ID                   uint   `json:"id" validate:"required"`
-	Name                 string `json:"name" validate:"required"`
-	APIKey               string `json:"apiKey" validate:"required"`
-	RememberAPIKey       bool   `json:"rememberApiKey"`
-	BaseURL              string `json:"baseURL"`
-	APIType              string `json:"apiType" validate:"required"`
-	AuthMode             string `json:"authMode"`
-	VerifyModel          string `json:"verifyModel"`
-	ValidateAvailability *bool  `json:"validateAvailability"`
-	Remark               string `json:"remark"`
-	SyncAgents           bool   `json:"syncAgents"`
+	ID                   uint                `json:"id" validate:"required"`
+	Name                 string              `json:"name" validate:"required"`
+	APIKey               string              `json:"apiKey" validate:"required"`
+	RememberAPIKey       bool                `json:"rememberApiKey"`
+	BaseURL              string              `json:"baseURL"`
+	APIType              string              `json:"apiType" validate:"required"`
+	AuthMode             string              `json:"authMode"`
+	VerifyModel          string              `json:"verifyModel"`
+	ValidateAvailability *bool               `json:"validateAvailability"`
+	Remark               string              `json:"remark"`
+	SyncAgents           bool                `json:"syncAgents"`
+	Models               []AgentAccountModel `json:"models"`
 }
 
 type AgentAccountVerifyReq struct {

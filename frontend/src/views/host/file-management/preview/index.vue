@@ -37,7 +37,7 @@
                         <template v-for="(item, index) in imageFiles" :key="index">
                             <el-tooltip :content="item.path" placement="right">
                                 <div
-                                    class="text-sm truncate mb-1 rounded p-1 left-item"
+                                    class="text-sm dialog-object-name mb-1 rounded p-1 left-item"
                                     @click="changeImg(item.path)"
                                     :class="item.path === filePath ? 'left-item-default' : ''"
                                 >

@@ -42,6 +42,10 @@ func OperationLog() gin.HandlerFunc {
 			return
 		}
 		switch c.Request.URL.Path {
+		case "/api/v2/core/auth/api/keys/reveal":
+			// Disclosure has its own audit and must not enter response-body capture.
+			c.Next()
+			return
 		case "/api/v2/core/mcp/credentials/create", "/api/v2/core/mcp/credentials/reveal", "/api/v2/core/mcp/credentials/rotate", "/api/v2/core/mcp/credentials/export":
 			c.Next()
 			return

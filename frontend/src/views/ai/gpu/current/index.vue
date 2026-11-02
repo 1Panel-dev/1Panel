@@ -79,6 +79,9 @@
                                                 >
                                                     {{ $t('commons.button.view') }}
                                                 </el-button>
+                                                <el-button type="primary" link @click="openHistory(item)">
+                                                    {{ $t('aiTools.gpu.history') }}
+                                                </el-button>
                                             </div>
                                         </div>
                                     </template>
@@ -97,7 +100,21 @@
                                             />
                                         </div>
                                         <div class="metric-item metric-primary metric-memory">
-                                            <span>{{ $t('aiTools.gpu.memoryUsed') }}</span>
+                                            <span>
+                                                {{
+                                                    $t(
+                                                        item.type !== 'ascend' && item.sharedMemory
+                                                            ? 'aiTools.gpu.systemMemory'
+                                                            : 'aiTools.gpu.memoryUsed',
+                                                    )
+                                                }}
+                                                <el-tooltip
+                                                    v-if="item.type !== 'ascend' && item.sharedMemory"
+                                                    :content="$t('aiTools.gpu.systemMemoryHelper')"
+                                                >
+                                                    <el-icon><InfoFilled /></el-icon>
+                                                </el-tooltip>
+                                            </span>
                                             <strong>{{ formatMemory(item.memUsed, item.memTotal) }}</strong>
                                             <el-progress
                                                 v-if="memoryPercentage(item) !== null"
@@ -190,6 +207,9 @@
                                                     @click="detailDeviceKey = `xpu-${item.basic.deviceID}`"
                                                 >
                                                     {{ $t('commons.button.view') }}
+                                                </el-button>
+                                                <el-button type="primary" link @click="openHistory(item)">
+                                                    {{ $t('aiTools.gpu.history') }}
                                                 </el-button>
                                             </div>
                                         </div>
@@ -321,6 +341,8 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { InfoFilled } from '@element-plus/icons-vue';
 import { loadGPUInfo } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { AI } from '@/api/interface/ai';
@@ -328,6 +350,7 @@ import i18n from '@/lang';
 import { MsgWarning } from '@/utils/message';
 import DeviceDetails, { type DetailSection } from './components/DeviceDetails.vue';
 
+const router = useRouter();
 const loading = ref();
 const processDrawerVisible = ref(false);
 const processDeviceKey = ref('');
@@ -574,10 +597,14 @@ const deviceDetailSections = (item: AcceleratorDevice): DetailSection[] => {
         },
         {
             id: 'memory',
-            title: t('aiTools.gpu.memory'),
+            title: t(item.sharedMemory ? 'aiTools.gpu.systemMemory' : 'aiTools.gpu.memory'),
             items: [
                 { label: t('aiTools.gpu.memoryActivity'), value: item.memoryActivity },
-                { label: t('aiTools.gpu.freeMemory'), value: item.memoryFree },
+                {
+                    label: t(item.sharedMemory ? 'aiTools.gpu.systemMemoryAvailable' : 'aiTools.gpu.freeMemory'),
+                    value: item.memoryFree,
+                    help: item.sharedMemory ? t('aiTools.gpu.systemMemoryHelper') : undefined,
+                },
                 { label: t('aiTools.gpu.memoryReserved'), value: item.memoryReserved },
             ],
         },
@@ -731,6 +758,26 @@ const openXPUProcesses = (deviceID: number) => {
     processDeviceKey.value = '';
     processXPUId.value = deviceID;
     processDrawerVisible.value = true;
+};
+
+const stableDeviceID = (vendor: string, identifier: string | undefined, fallback: string) => {
+    return `${vendor}:${identifier && identifier.toUpperCase() !== 'N/A' ? identifier : fallback}`;
+};
+
+const openHistory = (item: AcceleratorDevice | AI.XpuInfo['xpu'][number]) => {
+    let deviceID: string;
+    if ('basic' in item) {
+        deviceID = stableDeviceID(
+            'xpu',
+            item.basic.uuid,
+            stableDeviceID('pci', item.basic.pciBdfAddress, String(item.basic.deviceID)),
+        );
+    } else if (item.type === 'ascend') {
+        deviceID = `${stableDeviceID('ascend', item.busID, String(item.npuIndex))}:${item.chipIndex}`;
+    } else {
+        deviceID = stableDeviceID(item.type, item.uuid, stableDeviceID('pci', item.busID, String(item.index)));
+    }
+    void router.push({ path: '/ai/gpu/history', query: { deviceID } });
 };
 
 const deviceTitle = (item: AcceleratorDevice) => {

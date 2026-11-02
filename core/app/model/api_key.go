@@ -24,6 +24,7 @@ type APIKey struct {
 	CreatedAt          time.Time  `json:"-"`
 	UpdatedAt          time.Time  `json:"-"`
 	RevokedAt          *time.Time `json:"-"`
+	DeletedAt          *time.Time `json:"-"`
 }
 
 type LegacyAPIKeyPolicy struct {

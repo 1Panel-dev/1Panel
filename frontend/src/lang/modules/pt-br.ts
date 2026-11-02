@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Mostrar segredo',
+        hideSecret: 'Ocultar segredo',
+        revealHelp: 'Guarde o segredo com segurança. Exibi-lo não reativa chaves desabilitadas ou expiradas.',
+        deleteConfirm:
+            'Excluir “{0}”? O segredo será destruído e a chave removida da lista. Novas solicitações serão rejeitadas e os terminais associados serão fechados. Os registros de auditoria serão mantidos; tarefas em execução não serão canceladas. Esta ação é irreversível.',
         title: 'API Key',
         manage: 'Gerenciar chaves API',
         personalEntry: 'Gerencie suas chaves, condições de acesso e vínculo do APP nas Configurações.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'Permitir vínculo do APP por QR',
         bindingDisableHelp:
             'Desativar a vinculação por QR impede novas vinculações. Os dispositivos já vinculados podem continuar usando a chave até que ela seja desativada, revogada ou expire.',
-        saveSecret: 'Copie e salve a chave agora. Após fechar, o gerenciamento normal não poderá exibi-la novamente.',
-        saved: 'Salvei a chave',
-        alreadyCreated:
-            'Esta chave já foi criada e não será exibida novamente. Se a resposta original foi perdida, revogue e recrie a chave ou use o QR, se permitido.',
         uncertain:
             'O resultado é incerto. Tente novamente com os mesmos dados para evitar duplicações ou feche e verifique a lista antes de criar outra.',
         legacyHelp:
@@ -495,7 +496,7 @@ const message = {
         quickDirDelete: 'Confirmar a exclusão de ({0})?',
         quickDir: 'Acesso rápido',
         minQuickJump: 'Adicione pelo menos uma entrada de acesso rápido',
-        maxQuickJump: 'Você pode adicionar até quatro entradas de acesso rápido',
+        maxQuickJump: 'Você pode adicionar até cinco entradas de acesso rápido',
         database: 'Banco de Dados - Todos',
         restart_1panel: 'Reiniciar painel',
         restart_system: 'Reiniciar servidor',
@@ -845,6 +846,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Não foi possível obter os modelos. Os modelos padrão estão em uso.',
             accountModelsDuplicate: 'Há modelos duplicados no catálogo',
             modelPool: 'Catálogo de modelos',
+            ollamaRegisterOnly:
+                'Registre apenas modelos já disponíveis neste serviço Ollama. Nenhum download será iniciado.',
+            deleteModelFiles: 'Excluir também os arquivos do modelo do serviço Ollama',
             fallbackModels: 'Modelos de fallback',
             addFallbackModel: 'Adicionar modelo de fallback',
             fallbackModelsEmpty: 'Nenhum modelo de fallback configurado',
@@ -1042,6 +1046,23 @@ const message = {
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
         model: {
+            gpuAcceleration: 'Aceleração de GPU',
+            gpuMode: 'Seleção de aceleradores',
+            gpuAll: 'Todos os aceleradores',
+            gpuCount: 'Especificar quantidade',
+            gpuSpecific: 'Selecionar dispositivos',
+            gpuAllHelper: 'Usar todos os aceleradores disponíveis deste tipo no nó atual.',
+            gpuCountHelper:
+                'O ambiente de execução aloca a quantidade solicitada sem vincular dispositivos específicos.',
+            gpuSpecificHelper: 'Selecione manualmente os aceleradores específicos.',
+            gpuCountRequired: 'Insira um número inteiro maior que 0',
+            gpuDevices: 'Dispositivos GPU',
+            gpuCapabilitiesHelper:
+                'Configure os recursos da NVIDIA GPU para o contêiner. Em geral, recomenda-se manter as opções padrão.\n• gpu: Permite que o contêiner acesse a GPU. Obrigatório.\n• utility: Permite consultar e monitorar o estado da GPU, por exemplo, com nvidia-smi.\n• compute: Permite cálculos na GPU, incluindo CUDA. Geralmente necessário para a inferência de modelos.',
+            gpuSelectRequired: 'Selecione pelo menos um dispositivo GPU disponível.',
+            gpuUnsupported: 'Não suportado',
+            gpuNotDetected: 'Nenhum acelerador compatível detectado',
+            gpuMissing: 'Indisponível',
             modelCategory: 'Categoria do modelo',
             modelName: 'Nome do modelo',
             modelArchitecture: 'Tipo de modelo',
@@ -1059,11 +1080,11 @@ const message = {
             onlineModel: 'Modelos online',
             instanceDeployment: 'Implantação por instância',
             nvidiaDeployment: 'Implantação otimizada para NVIDIA',
-            engines: 'Mecanismos de inferência',
+            engines: 'Mecanismos de inferência locais',
             modelManagement: 'Gerenciamento de modelos',
             serviceDetails: 'Detalhes do serviço',
             deployments: 'Implantações locais',
-            files: 'Arquivos de modelos',
+            files: 'Central de modelos',
             connectExternal: 'Conectar serviço externo',
             deploymentTemplates: 'Modelos de comandos de inicialização do vLLM',
             engineProvider: 'Mecanismo / Provedor',
@@ -1080,14 +1101,19 @@ const message = {
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
-            vllmVersionHelper: 'Para servidores FusionXpark GB 10, selecione a versão -cu130.',
+            vllmVersionHelper: {
+                default: 'Versão padrão oficial com CUDA 13.0, para drivers recentes e GPUs de novas arquiteturas.',
+                cuda: 'Versão de compatibilidade com arquiteturas antigas com CUDA 12.9, para GPUs antigas que usam versões do CUDA inferiores à 13.0.',
+                ubuntu: 'Versão padrão do NVIDIA GB10 com CUDA 13.0, para dispositivos NVIDIA GB10.',
+                dspark: 'Versão personalizada do NVIDIA GB10 para dois dispositivos, com uma imagem mantida pelo 1Panel.',
+            },
             vllmDeployProfile: 'Modelo de implantação',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Sincronizar com conta de modelo',
+            syncModelAccount: 'Sincronizar com serviço de modelo',
             modelAccountAddressHelper:
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
             containerAddress: 'Endereço do contêiner',
@@ -1636,6 +1662,12 @@ const message = {
             timePerOutputTokenChart: 'Latência entre tokens',
         },
         gpu: {
+            systemMemory: 'Memória compartilhada do sistema',
+            systemMemoryUsed: 'Memória do sistema em uso',
+            systemMemoryTotal: 'Memória total do sistema',
+            systemMemoryAvailable: 'Memória disponível do sistema',
+            systemMemoryHelper:
+                'Compartilhada pela CPU e GPU. Exibe o uso de memória de todo o sistema, não apenas da GPU.',
             memoryActivity: 'Atividade de leitura/escrita da memória',
             hotspotTemperature: 'Temperatura do ponto quente',
             fanRPM: 'Rotação da ventoinha (RPM)',
@@ -1671,7 +1703,6 @@ const message = {
             historyPeak: 'Pico',
             historyAggregated:
                 '{count} amostras agregadas em intervalos de {seconds} segundos; processos exibem apenas contagens.',
-            historyRaw: '{count} amostras originais.',
             historyMetricEmpty: 'Sem dados desta métrica no período selecionado',
             historyLoadFailed: 'Falha ao carregar o histórico. Tente novamente.',
             collectedAt: 'Data da coleta',
@@ -1745,8 +1776,9 @@ const message = {
             migModeHelper:
                 'Usado para criar instâncias MIG, implementando isolamento físico da GPU na camada do usuário.',
             migModeNA: 'Não Suportado',
-            current: 'Monitoramento em Tempo Real',
-            history: 'Registros Históricos',
+            current: 'Status em tempo real',
+            history: 'Dados de monitoramento',
+            viewHistory: 'Ver dados de monitoramento',
             notSupport: 'A versão atual ou o driver não suportam exibir este parâmetro.',
             processCount: 'Qtd. de processos',
         },
@@ -2058,8 +2090,6 @@ const message = {
         retry: 'Repetir pontos selecionados',
         environment: 'Ambiente',
         plan: 'Configuração fixada',
-        clientHelp:
-            'O contêiner cliente roda no nó principal e envia requisições a um serviço existente. Não inicia inferência nem exige GPU.',
         retryHelp: 'Apenas os pontos anormais selecionados são repetidos, com os mesmos parâmetros e novas sementes.',
         secretHelp: 'As cópias não incluem chaves de API nem cabeçalhos. Informe-os novamente se necessário.',
         resultHelp:

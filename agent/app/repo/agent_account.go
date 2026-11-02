@@ -18,8 +18,9 @@ type IAgentAccountRepo interface {
 	Save(account *model.AgentAccount) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
+	Count() (int64, error)
 	CountTextByProviders(providers []string) (map[string]int64, error)
-	SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error
+	SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
 
 func NewIAgentAccountRepo() IAgentAccountRepo {
@@ -69,6 +70,12 @@ func (a AgentAccountRepo) List(opts ...DBOption) ([]model.AgentAccount, error) {
 	return accounts, nil
 }
 
+func (a AgentAccountRepo) Count() (int64, error) {
+	var count int64
+	err := getDb().Model(&model.AgentAccount{}).Count(&count).Error
+	return count, err
+}
+
 func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]int64, error) {
 	normalizedProviders := normalizeProviders(providers)
 	counts := make(map[string]int64, len(normalizedProviders))
@@ -99,7 +106,7 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 	return counts, nil
 }
 
-func (a AgentAccountRepo) SaveLocal(account *model.AgentAccount, models []model.AgentAccountModel) error {
+func (a AgentAccountRepo) SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error {
 	return global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Save(account).Error; err != nil {
 			return err

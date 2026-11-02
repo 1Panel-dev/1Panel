@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'نمایش کلید محرمانه',
+        hideSecret: 'پنهان کردن کلید محرمانه',
+        revealHelp: 'کلید را در جای امن نگه دارید. نمایش آن، کلید غیرفعال یا منقضی‌شده را قابل استفاده نمی‌کند.',
+        deleteConfirm:
+            '«{0}» حذف شود؟ کلید محرمانه نابود و از فهرست حذف می‌شود. درخواست‌های جدید رد و اتصال‌های ترمینال مرتبط بسته می‌شوند. سوابق حسابرسی حفظ و کارهای در حال اجرا لغو نمی‌شوند. این عملیات برگشت‌پذیر نیست.',
         title: 'API Key',
         manage: 'مدیریت کلیدهای API',
         personalEntry: 'کلیدها، شرایط دسترسی و اتصال برنامه را در تنظیمات مدیریت کنید.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'اجازه اتصال برنامه با QR',
         bindingDisableHelp:
             'با غیرفعال کردن اتصال از طریق QR، اتصال دستگاه‌های جدید متوقف می‌شود. دستگاه‌های متصل می‌توانند تا زمان غیرفعال‌سازی، لغو یا انقضای کلید به استفاده از آن ادامه دهند.',
-        saveSecret: 'اکنون کلید را کپی و ذخیره کنید. پس از بستن، مدیریت عادی نمی‌تواند کلید کامل را دوباره نشان دهد.',
-        saved: 'کلید را ذخیره کردم',
-        alreadyCreated:
-            'این کلید قبلاً ایجاد شده و دوباره نمایش داده نمی‌شود. اگر پاسخ اصلی گم شده است، کلید را لغو و دوباره ایجاد کنید یا در صورت اجازه از QR استفاده کنید.',
         uncertain:
             'نتیجه درخواست نامشخص است. برای جلوگیری از تکرار، با همان اطلاعات دوباره تلاش کنید یا ببندید و پیش از ایجاد کلید دیگر فهرست را بررسی کنید.',
         legacyHelp:
@@ -492,7 +493,7 @@ const message = {
         quickDirDelete: 'حذف ({0}) را تأیید می‌کنید؟',
         quickDir: 'دسترسی سریع',
         minQuickJump: 'حداقل یک ورودی دسترسی سریع اضافه کنید',
-        maxQuickJump: 'می‌توانید حداکثر چهار ورودی دسترسی سریع اضافه کنید',
+        maxQuickJump: 'می‌توانید حداکثر پنج ورودی دسترسی سریع اضافه کنید',
         database: 'پایگاه داده - همه',
         restart_1panel: 'راه‌اندازی مجدد پنل',
         restart_system: 'راه‌اندازی مجدد سرور',
@@ -838,6 +839,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'دریافت مدل‌ها ناموفق بود. از مدل‌های پیش‌فرض استفاده می‌شود.',
             accountModelsDuplicate: 'مدل‌های تکراری در کاتالوگ یافت شد',
             modelPool: 'مجموعه مدل‌ها',
+            ollamaRegisterOnly: 'فقط مدل‌های موجود در این سرویس Ollama ثبت می‌شوند. دانلودی آغاز نخواهد شد.',
+            deleteModelFiles: 'فایل‌های مدل نیز از سرویس Ollama حذف شوند',
             fallbackModels: 'مدل‌های جایگزین',
             addFallbackModel: 'افزودن مدل جایگزین',
             fallbackModelsEmpty: 'هیچ مدل جایگزینی پیکربندی نشده است',
@@ -1021,6 +1024,22 @@ const message = {
             validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
         model: {
+            gpuAcceleration: 'شتاب‌دهی GPU',
+            gpuMode: 'انتخاب شتاب‌دهنده',
+            gpuAll: 'همه شتاب‌دهنده‌ها',
+            gpuCount: 'تعیین تعداد',
+            gpuSpecific: 'انتخاب دستگاه‌ها',
+            gpuAllHelper: 'از همه شتاب‌دهنده‌های موجود از این نوع در گره فعلی استفاده شود.',
+            gpuCountHelper: 'محیط اجرا تعداد درخواستی شتاب‌دهنده‌ها را بدون اتصال به دستگاه‌های مشخص تخصیص می‌دهد.',
+            gpuSpecificHelper: 'شتاب‌دهنده‌های مشخص را به‌صورت دستی انتخاب کنید.',
+            gpuCountRequired: 'یک عدد صحیح بزرگ‌تر از صفر وارد کنید',
+            gpuDevices: 'دستگاه‌های GPU',
+            gpuCapabilitiesHelper:
+                'قابلیت‌های NVIDIA GPU را برای کانتینر تنظیم کنید. معمولاً توصیه می‌شود گزینه‌های پیش‌فرض را حفظ کنید.\n• gpu: دسترسی کانتینر به GPU را مجاز می‌کند. انتخاب آن الزامی است.\n• utility: از بررسی وضعیت و پایش GPU، مانند nvidia-smi، پشتیبانی می‌کند.\n• compute: از محاسبات GPU، از جمله CUDA، پشتیبانی می‌کند. معمولاً برای استنتاج مدل لازم است.',
+            gpuSelectRequired: 'حداقل یک دستگاه GPU موجود را انتخاب کنید.',
+            gpuUnsupported: 'پشتیبانی نمی‌شود',
+            gpuNotDetected: 'هیچ شتاب‌دهنده پشتیبانی‌شده‌ای شناسایی نشد',
+            gpuMissing: 'در دسترس نیست',
             modelCategory: 'دسته‌بندی مدل',
             modelName: 'نام مدل',
             modelArchitecture: 'نوع مدل',
@@ -1038,11 +1057,11 @@ const message = {
             onlineModel: 'مدل‌های آنلاین',
             instanceDeployment: 'استقرار بر اساس نمونه',
             nvidiaDeployment: 'استقرار بهینه‌شده برای NVIDIA',
-            engines: 'موتورهای استنتاج',
+            engines: 'موتورهای استنتاج محلی',
             modelManagement: 'مدیریت مدل‌ها',
             serviceDetails: 'جزئیات سرویس',
             deployments: 'استقرارهای محلی',
-            files: 'فایل‌های مدل',
+            files: 'مرکز مدل‌ها',
             connectExternal: 'اتصال به سرویس خارجی',
             deploymentTemplates: 'الگوهای فرمان راه‌اندازی vLLM',
             engineProvider: 'موتور / ارائه‌دهنده',
@@ -1059,14 +1078,19 @@ const message = {
             container_conn_helper: 'از این آدرس برای دسترسی بین کانتینرها یا اتصال استفاده کنید',
             from_remote: 'این مدل از طریق 1Panel دانلود نشده است، لاگ مربوط به دریافت وجود ندارد.',
             no_logs: 'لاگ دریافت این مدل حذف شده است و قابل مشاهده نیست.',
-            vllmVersionHelper: 'برای سرورهای FusionXpark GB 10، لطفاً نسخه -cu130 را انتخاب کنید.',
+            vllmVersionHelper: {
+                default: 'نسخه استاندارد رسمی با CUDA 13.0، مناسب درایورهای جدید و معماری‌های جدید GPU.',
+                cuda: 'نسخه سازگار با معماری‌های قدیمی با CUDA 12.9، مناسب GPUهای قدیمی که از نسخه‌های CUDA پایین‌تر از 13.0 استفاده می‌کنند.',
+                ubuntu: 'نسخه استاندارد NVIDIA GB10 با CUDA 13.0، مناسب دستگاه‌های NVIDIA GB10.',
+                dspark: 'نسخه سفارشی NVIDIA GB10 برای دو دستگاه، با ایمیج سفارشی که توسط 1Panel نگهداری می‌شود.',
+            },
             vllmDeployProfile: 'مدل استقرار',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'همگام‌سازی با حساب مدل',
+            syncModelAccount: 'همگام‌سازی با سرویس مدل',
             modelAccountAddressHelper:
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
             containerAddress: 'آدرس کانتینر',
@@ -1608,6 +1632,11 @@ const message = {
             timePerOutputTokenChart: 'تأخیر بین توکن‌ها',
         },
         gpu: {
+            systemMemory: 'حافظهٔ مشترک سیستم',
+            systemMemoryUsed: 'حافظهٔ مصرف‌شدهٔ سیستم',
+            systemMemoryTotal: 'کل حافظهٔ سیستم',
+            systemMemoryAvailable: 'حافظهٔ در دسترس سیستم',
+            systemMemoryHelper: 'بین CPU و GPU مشترک است. مصرف حافظهٔ کل سیستم را نشان می‌دهد، نه فقط مصرف GPU.',
             memoryActivity: 'فعالیت خواندن/نوشتن حافظه',
             hotspotTemperature: 'دمای نقطه داغ',
             fanRPM: 'سرعت فن (RPM)',
@@ -1643,7 +1672,6 @@ const message = {
             historyPeak: 'بیشینه',
             historyAggregated:
                 '{count} نمونه در بازه‌های {seconds} ثانیه‌ای تجمیع شده‌اند؛ فقط تعداد فرایندها نمایش داده می‌شود.',
-            historyRaw: '{count} نمونه اصلی.',
             historyMetricEmpty: 'در بازه زمانی انتخاب‌شده داده‌ای برای این شاخص وجود ندارد',
             historyLoadFailed: 'بارگیری سابقه ناموفق بود. دوباره تلاش کنید.',
             collectedAt: 'زمان گردآوری',
@@ -1716,8 +1744,9 @@ const message = {
             migModeHelper:
                 'برای ایجاد نمونه‌های MIG استفاده می‌شود و ایزوله‌سازی فیزیکی GPU را در لایه کاربر پیاده‌سازی می‌کند.',
             migModeNA: 'پشتیبانی نمی‌شود',
-            current: 'نظارت بلادرنگ',
-            history: 'سوابق تاریخی',
+            current: 'وضعیت بلادرنگ',
+            history: 'داده‌های نظارتی',
+            viewHistory: 'مشاهده داده‌های نظارتی',
             notSupport: 'نسخه فعلی یا درایور از نمایش این پارامتر پشتیبانی نمی‌کند.',
         },
         mcp: {
@@ -2020,8 +2049,6 @@ const message = {
         retry: 'تکرار نقاط انتخاب‌شده',
         environment: 'محیط اجرا',
         plan: 'پیکربندی ثابت',
-        clientHelp:
-            'کانتینر کلاینت در گره اصلی به سرویس موجود درخواست می‌فرستد. سرویس استنتاج راه‌اندازی نمی‌کند و به GPU نیاز ندارد.',
         retryHelp: 'فقط نقاط غیرعادی انتخاب‌شده با همان پارامترها و بذرهای جدید تکرار می‌شوند.',
         secretHelp: 'کپی‌ها شامل کلید API و سرآیندها نیستند. در صورت نیاز دوباره وارد کنید.',
         resultHelp:

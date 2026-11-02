@@ -17,6 +17,7 @@ type ECCError struct {
 }
 
 type Device struct {
+	SharedMemory       bool       `json:"sharedMemory"`
 	ECCPending         string     `json:"eccPending"`
 	ECCErrors          []ECCError `json:"eccErrors"`
 	MemoryActivity     string     `json:"memoryActivity"`

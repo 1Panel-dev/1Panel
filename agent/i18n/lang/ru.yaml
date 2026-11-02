@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'Запрошенный ресурс {{ .err }} не най�
 
 # быстрый переход
 ErrMinQuickJump: 'Добавьте хотя бы одну быструю ссылку'
-ErrMaxQuickJump: 'Не более 4 быстрых ссылок'
+ErrMaxQuickJump: 'Не более 5 быстрых ссылок'
 
 # общее
 ErrShutDown: 'Команда остановлена вручную'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'Файл сертификата не существ�
 ErrSSLKeyFormat: 'Проверка файла закрытого ключа не удалась'
 ErrSSLCertificateFormat: 'Неверный формат файла сертификата, используйте формат pem'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid или EabHmacKey не могут быть пустыми'
+ErrOpenrestyInstall: "Сначала установите OpenResty из магазина приложений"
 ErrOpenrestyNotFound: 'Для режима HTTP требуется OpenResty'
 ApplySSLStart: 'Начать подачу заявки на сертификат, доменное имя [{{ .domain }}], метод подачи заявки [{{ .type }}]'
 dnsAccount: 'DNS Авто'

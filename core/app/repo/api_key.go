@@ -14,12 +14,12 @@ func APIKeyOwnerQuery(db *gorm.DB, ownerType, ownerID string) *gorm.DB {
 }
 func (r *APIKeyRepo) Get(id string) (model.APIKey, error) {
 	var key model.APIKey
-	err := global.DB.Where("id = ?", id).First(&key).Error
+	err := global.DB.Where("id = ? AND deleted_at IS NULL", id).First(&key).Error
 	return key, err
 }
 func (r *APIKeyRepo) List(ownerType, ownerID string, excludeRevoked bool) ([]model.APIKey, error) {
 	items := make([]model.APIKey, 0)
-	q := APIKeyOwnerQuery(global.DB, ownerType, ownerID)
+	q := APIKeyOwnerQuery(global.DB, ownerType, ownerID).Where("deleted_at IS NULL")
 	if excludeRevoked {
 		q = q.Where("status <> ?", "Revoked")
 	}

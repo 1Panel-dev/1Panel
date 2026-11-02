@@ -18,7 +18,10 @@ import (
 // @schemes http https
 
 // @securityDefinitions.apikey ApiKeyAuth
-// @description Custom Token Format, Format: md5('1panel' + API-Key + UnixTimestamp).
+// @description Signed API Key authentication. Send the signature, never the plaintext API Key, in 1Panel-Token.
+// @description Supported formats: hex(HMAC-SHA256(API-Key, '1panel:' + UnixTimestamp)) or md5('1panel' + API-Key + UnixTimestamp).
+// @description Send the matching Unix timestamp in 1Panel-Timestamp. Optionally set 1Panel-Signature-Version to hmac-sha256, v1 or md5; omission accepts either algorithm.
+// @description Independent keys may include their ID in 1Panel-Key-ID to select the credential; omit that header for a legacy key.
 // @description ```
 // @description eg:
 // @description curl -X GET "http://{host}:{port}/api/v2/toolbox/device/base" \
@@ -27,7 +30,7 @@ import (
 // @description ```
 // @description - `1Panel-Token` is the key for the panel API Key.
 // @type apiKey
-// @in Header
+// @in header
 // @name 1Panel-Token
 // @securityDefinitions.apikey Timestamp
 // @type apiKey

@@ -93,6 +93,7 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 	xpu := Device{
 		ProcessStatus: "unavailable",
 		Basic: Basic{
+			DrmDevice:     device.DrmDevice,
 			UUID:          device.UUID,
 			DeviceID:      device.DeviceID,
 			DeviceName:    device.DeviceName,
@@ -137,6 +138,9 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 		return
 	}
 
+	if info.DrmDevice != "" {
+		xpu.Basic.DrmDevice = info.DrmDevice
+	}
 	xpu.Basic.DriverVersion = info.DriverVersion
 
 	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)

@@ -2,6 +2,8 @@ module github.com/1Panel-dev/1Panel/agent
 
 go 1.27.3
 
+godebug multipathtcp=0
+
 replace github.com/go-acme/lego/v5 => github.com/1Panel-dev/lego/v5 v5.3.1
 
 require (

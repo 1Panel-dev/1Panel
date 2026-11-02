@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'Requested resource not found: {{ .err }}'
 
 # quick jump
 ErrMinQuickJump: 'Set at least one quick jump entry'
-ErrMaxQuickJump: 'At most 4 quick jump entries'
+ErrMaxQuickJump: 'At most 5 quick jump entries'
 
 # common
 ErrShutDown: 'Command stopped manually'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'The certificate file does not exist'
 ErrSSLKeyFormat: 'Private key file verification failed'
 ErrSSLCertificateFormat: 'Invalid certificate format; use PEM'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid or EabHmacKey cannot be blank'
+ErrOpenrestyInstall: "Please install OpenResty from the App Store first"
 ErrOpenrestyNotFound: 'HTTP mode requires OpenResty'
 ApplySSLStart: 'Starting certificate request. Domain: [{{ .domain }}], method: [{{ .type }}]'
 dnsAccount: 'DNS Auto'

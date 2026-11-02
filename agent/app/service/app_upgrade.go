@@ -92,11 +92,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err != nil {
 		return err
 	}
-	if install.Status == constant.StatusUpgrading {
+	if install.Status == constant.StatusUpgrading && install.App.Key != "ollama" && install.App.Key != "vllm" {
 		return buserr.New("TaskIsExecuting")
-	}
-	if err = task.CheckScopeTaskIsExecuting(task.TaskScopeApp, install.ID); err != nil {
-		return err
 	}
 	if _, loaded := appUpgradeLocks.LoadOrStore(install.ID, struct{}{}); loaded {
 		return buserr.New("TaskIsExecuting")
@@ -107,6 +104,9 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 			appUpgradeLocks.Delete(install.ID)
 		}
 	}()
+	if err = task.CheckScopeTaskIsExecuting(task.TaskScopeApp, install.ID); err != nil {
+		return err
+	}
 
 	feishuLockPath := ""
 	if install.App.Key == constant.AppOpenclaw {
@@ -185,7 +185,7 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 		if ctx.rollbackErr != nil {
 			taskErr = fmt.Errorf("%w; %s: %v", taskErr, i18n.GetMsgByKey("UpgradeRollbackFailed"), ctx.rollbackErr)
 			upgradeTask.Task.ErrorMsg = taskErr.Error()
-			_ = repo.NewITaskRepo().Update(context.Background(), upgradeTask.Task)
+			_ = taskRepo.Update(context.Background(), upgradeTask.Task)
 		}
 		if !ctx.stopAttempted || ctx.rollbackErr == nil {
 			restored := ctx.original
@@ -216,8 +216,9 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		if err != nil {
 			return err
 		}
-		u.detail.DockerCompose = string(composeContent)
-		_ = appDetailRepo.Update(context.Background(), u.detail)
+		if err := cacheAppDetailCompose(&u.detail, composeContent); err != nil {
+			return err
+		}
 	}
 	if strings.TrimSpace(u.detail.DockerCompose) == "" && strings.TrimSpace(u.req.DockerCompose) == "" {
 		return buserr.WithName("ErrFileNotFound", "docker-compose.yml")

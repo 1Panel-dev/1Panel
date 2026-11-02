@@ -2,6 +2,12 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Gizli anahtarı göster',
+        hideSecret: 'Gizli anahtarı gizle',
+        revealHelp:
+            'Gizli anahtarı güvenli tutun. Görüntülemek, devre dışı veya süresi dolmuş anahtarı kullanılabilir yapmaz.',
+        deleteConfirm:
+            '“{0}” silinsin mi? Gizli anahtar yok edilecek ve listeden kaldırılacaktır. Yeni istekler reddedilecek ve ilgili terminaller kapatılacaktır. Denetim kayıtları korunur; çalışan işler iptal edilmez. Bu işlem geri alınamaz.',
         title: 'API Key',
         manage: 'API anahtarlarını yönet',
         personalEntry: 'Ayarlar bölümünde anahtarlarınızı, erişim koşullarını ve uygulama QR bağlantısını yönetin.',
@@ -23,11 +29,6 @@ const message = {
         allowAppBinding: 'Uygulama QR bağlantısına izin ver',
         bindingDisableHelp:
             'QR eşleştirmesini devre dışı bırakmak yeni eşleştirmeleri engeller. Eşleştirilmiş cihazlar, anahtar devre dışı bırakılana, iptal edilene veya süresi dolana kadar kullanılmaya devam edebilir.',
-        saveSecret:
-            'Anahtarı şimdi kopyalayıp kaydedin. Kapattıktan sonra normal anahtar yönetimi tam anahtarı yeniden gösteremez.',
-        saved: 'Anahtarı kaydettim',
-        alreadyCreated:
-            'Bu anahtar zaten oluşturuldu ve yeniden gösterilmez. İlk yanıt kaybolduysa iptal edip yeniden oluşturun veya izin veriliyorsa QR bağlantısını kullanın.',
         uncertain:
             'İstek sonucu belirsiz. Tekrarları önlemek için aynı bilgilerle yeniden deneyin veya kapatıp yeni anahtar oluşturmadan listeyi kontrol edin.',
         legacyHelp:
@@ -498,7 +499,7 @@ const message = {
         quickDirDelete: '({0}) silinsin mi?',
         quickDir: 'Hızlı Erişim',
         minQuickJump: 'En az bir hızlı erişim girdisi ekleyin',
-        maxQuickJump: 'En fazla dört hızlı erişim girdisi ekleyebilirsiniz',
+        maxQuickJump: 'En fazla beş hızlı erişim girdisi ekleyebilirsiniz',
         database: 'Veritabanı - Tümü',
         restart_1panel: 'Paneli yeniden başlat',
         restart_system: 'Sunucuyu yeniden başlat',
@@ -848,6 +849,8 @@ const message = {
             discoverModelsFailedUseDefaults: 'Modeller alınamadı. Varsayılan modeller kullanılıyor.',
             accountModelsDuplicate: 'Katalogda yinelenen modeller bulundu',
             modelPool: 'Model kataloğu',
+            ollamaRegisterOnly: 'Yalnızca bu Ollama hizmetinde mevcut modeller kaydedilir. İndirme başlatılmaz.',
+            deleteModelFiles: 'Model dosyalarını da Ollama hizmetinden sil',
             fallbackModels: 'Yedek modeller',
             addFallbackModel: 'Yedek model ekle',
             fallbackModelsEmpty: 'Yapılandırılmış yedek model yok',
@@ -1046,6 +1049,22 @@ const message = {
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
+            gpuAcceleration: 'GPU hızlandırma',
+            gpuMode: 'Hızlandırıcı seçimi',
+            gpuAll: 'Tüm hızlandırıcılar',
+            gpuCount: 'Sayı belirt',
+            gpuSpecific: 'Cihaz seç',
+            gpuAllHelper: 'Geçerli düğümde bu türdeki tüm kullanılabilir hızlandırıcıları kullanın.',
+            gpuCountHelper: 'Çalışma zamanı, belirli cihazlara bağlamadan istenen sayıda hızlandırıcı tahsis eder.',
+            gpuSpecificHelper: 'Belirli hızlandırıcıları elle seçin.',
+            gpuCountRequired: '0’dan büyük bir tam sayı girin',
+            gpuDevices: 'GPU aygıtları',
+            gpuCapabilitiesHelper:
+                'Kapsayıcı için NVIDIA GPU yeteneklerini yapılandırın. Genellikle varsayılan seçenekleri korumanız önerilir.\n• gpu: Kapsayıcının GPU erişimine izin verir. Zorunludur.\n• utility: nvidia-smi gibi araçlarla GPU durum sorgularını ve izlemeyi destekler.\n• compute: CUDA dahil GPU hesaplamalarını destekler. Genellikle model çıkarımı için gereklidir.',
+            gpuSelectRequired: 'En az bir kullanılabilir GPU aygıtı seçin.',
+            gpuUnsupported: 'Desteklenmiyor',
+            gpuNotDetected: 'Desteklenen hızlandırıcı algılanmadı',
+            gpuMissing: 'Kullanılamıyor',
             modelCategory: 'Model kategorisi',
             modelName: 'Model adı',
             modelArchitecture: 'Model türü',
@@ -1063,11 +1082,11 @@ const message = {
             onlineModel: 'Çevrimiçi modeller',
             instanceDeployment: 'Örnek bazında dağıtım',
             nvidiaDeployment: 'NVIDIA için optimize edilmiş dağıtım',
-            engines: 'Çıkarım motorları',
+            engines: 'Yerel çıkarım motorları',
             modelManagement: 'Model yönetimi',
             serviceDetails: 'Hizmet ayrıntıları',
             deployments: 'Yerel dağıtımlar',
-            files: 'Model dosyaları',
+            files: 'Model merkezi',
             connectExternal: 'Harici hizmete bağlan',
             deploymentTemplates: 'vLLM başlatma komutu şablonları',
             engineProvider: 'Motor / Sağlayıcı',
@@ -1084,14 +1103,19 @@ const message = {
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
-            vllmVersionHelper: 'FusionXpark GB 10 sunucuları için lütfen -cu130 sürümünü seçin.',
+            vllmVersionHelper: {
+                default: 'Yeni sürücüler ve yeni GPU mimarileri için CUDA 13.0 içeren resmi standart sürüm.',
+                cuda: '13.0 altındaki CUDA sürümlerini kullanan eski GPU mimarileri için CUDA 12.9 içeren uyumluluk sürümü.',
+                ubuntu: 'NVIDIA GB10 cihazları için CUDA 13.0 içeren NVIDIA GB10 standart sürümü.',
+                dspark: '1Panel tarafından bakımı yapılan özel imajı kullanan, iki cihaz için NVIDIA GB10 özel sürümü.',
+            },
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Model hesabına senkronize et',
+            syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
@@ -1635,6 +1659,12 @@ const message = {
             timePerOutputTokenChart: 'Token arası gecikme',
         },
         gpu: {
+            systemMemory: 'Paylaşılan sistem belleği',
+            systemMemoryUsed: 'Kullanılan sistem belleği',
+            systemMemoryTotal: 'Toplam sistem belleği',
+            systemMemoryAvailable: 'Kullanılabilir sistem belleği',
+            systemMemoryHelper:
+                'CPU ve GPU tarafından paylaşılır. Yalnızca GPU kullanımını değil, tüm sistemin bellek kullanımını gösterir.',
             memoryActivity: 'Bellek okuma/yazma etkinliği',
             hotspotTemperature: 'Sıcak nokta sıcaklığı',
             fanRPM: 'Fan hızı (RPM)',
@@ -1670,7 +1700,6 @@ const message = {
             historyPeak: 'En yüksek',
             historyAggregated:
                 '{count} örnek {seconds} saniyelik aralıklarla toplandı; işlemler için yalnızca sayılar gösterilir.',
-            historyRaw: '{count} ham örnek.',
             historyMetricEmpty: 'Seçilen zaman aralığında bu metriğe ait veri yok',
             historyLoadFailed: 'Geçmiş yüklenemedi. Lütfen tekrar deneyin.',
             collectedAt: 'Toplanma zamanı',
@@ -1742,8 +1771,9 @@ const message = {
             migModeHelper:
                 "MIG örnekleri oluşturmak için kullanılır, GPU'nun kullanıcı katmanında fiziksel izolasyonunu uygular.",
             migModeNA: 'Desteklenmiyor',
-            current: 'Gerçek Zamanlı İzleme',
-            history: 'Geçmiş Kayıtlar',
+            current: 'Gerçek Zamanlı Durum',
+            history: 'İzleme Verileri',
+            viewHistory: 'İzleme verilerini görüntüle',
             notSupport: 'Mevcut sürüm veya sürücü bu parametrenin görüntülenmesini desteklemiyor.',
             processCount: 'Süreç sayısı',
         },
@@ -2057,8 +2087,6 @@ const message = {
         retry: 'Seçili ölçümleri yinele',
         environment: 'Çalışma ortamı',
         plan: 'Sabitlenmiş yapılandırma',
-        clientHelp:
-            'İstemci konteyneri ana düğümde çalışır ve mevcut hizmete istek gönderir. Çıkarım hizmeti başlatmaz ve GPU gerektirmez.',
         retryHelp: 'Yalnızca seçili sorunlu ölçümler aynı parametreler ve yeni tohumlarla yinelenir.',
         secretHelp: 'Kopyalar API anahtarlarını ve başlıkları içermez. Gerekiyorsa yeniden girin.',
         resultHelp:

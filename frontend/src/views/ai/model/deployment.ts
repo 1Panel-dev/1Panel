@@ -4,6 +4,7 @@ import { pageTensorRTLLM, searchOllamaModel } from '@/api/modules/ai';
 import { checkAppInstalled, searchAppInstalled } from '@/api/modules/app';
 
 export interface Deployment {
+    taskID?: string;
     id: number;
     engine: 'vllm' | 'ollama' | 'tensorrt';
     name: string;
@@ -16,6 +17,7 @@ export interface Deployment {
 }
 
 interface VllmItem {
+    taskID?: string;
     appInstallId: number;
     agentAccountId: number;
     path: string;
@@ -43,6 +45,12 @@ interface VllmAPI {
 
 const vllmModules = import.meta.glob<VllmAPI>('@/xpack/api/modules/vllm.ts');
 export const vllmAvailable = Object.keys(vllmModules).length > 0;
+
+export function formatVllmVersion(version: string) {
+    return String(version || '')
+        .trim()
+        .replace(/^(nvidia|intel|ascend)-/i, '');
+}
 
 export async function loadVllmAPI() {
     return Object.values(vllmModules)[0]();
@@ -78,6 +86,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
         modelDir: item.modelDir,
         models: item.servedModelName ? [item.servedModelName] : [],
         status: item.status,
+        taskID: item.taskID,
     }));
     deployments.push(
         ...tensors.map((item): Deployment => ({
@@ -89,6 +98,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
             modelDir: item.modelDir,
             models: [],
             status: item.status || '',
+            taskID: item.taskID,
         })),
     );
     if (ollama.data.isExist) {
@@ -106,6 +116,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
             modelDir: '',
             models: models.filter((model) => model.status === 'Success').map((model) => model.name),
             status: ollama.data.status,
+            taskID: ollama.data.taskID,
         });
     }
     return deployments;

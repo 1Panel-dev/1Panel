@@ -1939,3 +1939,16 @@ var AddOllamaModelAccountSync = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddModelQuickJump = &gormigrate.Migration{
+	ID: "20261030-add-model-quick-jump",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Where("name = ?", "ModelServices").FirstOrCreate(&model.QuickJump{
+			Name:      "ModelServices",
+			Title:     "aiTools.model.model",
+			Recommend: 0,
+			IsShow:    true,
+			Router:    "/ai/model",
+		}).Error
+	},
+}

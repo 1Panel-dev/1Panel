@@ -6,27 +6,14 @@
         :confirm-before-close="true"
         @before-close="beforeClose"
     >
-        <template v-if="created">
-            <el-alert
-                :title="$t(secret ? 'apiKeyManagement.saveSecret' : 'apiKeyManagement.alreadyCreated')"
-                :type="secret ? 'warning' : 'info'"
-                :closable="false"
-                show-icon
-                class="mb-4"
-            />
-            <el-form label-position="top">
-                <el-form-item :label="$t('commons.table.name')">{{ created.name }}</el-form-item>
-                <el-form-item v-if="secret" :label="$t('setting.apiKey')">
-                    <el-input :model-value="secret" readonly autocomplete="off">
-                        <template #append>
-                            <CopyButton :content="secret" :is-icon="false" />
-                        </template>
-                    </el-input>
-                </el-form-item>
-            </el-form>
-            <el-checkbox v-if="secret" v-model="saved">{{ $t('apiKeyManagement.saved') }}</el-checkbox>
-        </template>
-        <el-form v-else ref="formRef" :model="form" :rules="rules" label-position="top" @submit.prevent="submit">
+        <el-form
+            ref="formRef"
+            :model="form"
+            :rules="rules"
+            label-position="top"
+            class="text-[var(--el-text-color-regular)]"
+            @submit.prevent="submit"
+        >
             <el-alert v-if="!item" type="warning" :closable="false" class="!mb-4">
                 <ul class="m-0 list-disc space-y-1 pl-4 break-words leading-6">
                     <li>
@@ -139,13 +126,10 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <el-button v-if="!created" :disabled="busy" @click="beforeClose(() => (visible = false))">
+            <el-button :disabled="busy" @click="beforeClose(() => (visible = false))">
                 {{ $t('commons.button.cancel') }}
             </el-button>
-            <el-button v-if="created" type="primary" :disabled="!!secret && !saved" @click="finish">
-                {{ $t('commons.button.confirm') }}
-            </el-button>
-            <el-button v-else type="primary" :loading="busy" @click="submit">
+            <el-button type="primary" :loading="busy" @click="submit">
                 {{ $t(item ? 'commons.button.save' : 'apiKeyManagement.create') }}
             </el-button>
         </template>
@@ -154,7 +138,7 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, reactive, ref, watch } from 'vue';
-import { ElMessageBox, type FormInstance } from 'element-plus';
+import type { FormInstance } from 'element-plus';
 import { isAxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import { onBeforeRouteLeave } from 'vue-router';
@@ -174,9 +158,6 @@ const visible = ref(false);
 const busy = ref(false);
 const uncertain = ref(false);
 const item = ref<APIKey.Item>();
-const created = ref<APIKey.Item>();
-const secret = ref('');
-const saved = ref(false);
 const formRef = ref<FormInstance>();
 const ipMode = ref('restricted');
 const neverExpires = ref(false);
@@ -196,8 +177,6 @@ let editorVersion = 0;
 
 const discardEditor = () => {
     editorVersion++;
-    secret.value = '';
-    created.value = undefined;
     visible.value = false;
     busy.value = false;
 };
@@ -240,9 +219,6 @@ const rules = {
 const open = (existing?: APIKey.Item, fromApp = false) => {
     editorVersion++;
     item.value = existing;
-    created.value = undefined;
-    secret.value = '';
-    saved.value = false;
     uncertain.value = false;
     pendingCreate = undefined;
     requestID = uuidv4();
@@ -269,19 +245,9 @@ const open = (existing?: APIKey.Item, fromApp = false) => {
     nextTick(() => formRef.value?.clearValidate());
 };
 
-const finish = () => {
-    secret.value = '';
-    visible.value = false;
-    if (created.value) emit('created', created.value);
-};
-const beforeClose = async (done: () => void) => {
+const beforeClose = (done: () => void) => {
     if (busy.value) return;
-    if (secret.value && !saved.value) {
-        await ElMessageBox.alert(i18n.global.t('apiKeyManagement.saveSecret'), i18n.global.t('apiKeyManagement.title'));
-        return;
-    }
-    if (created.value) finish();
-    else if (uncertain.value) emit('changed');
+    if (uncertain.value) emit('changed');
     done();
 };
 
@@ -310,9 +276,13 @@ const submit = async () => {
             pendingCreate ??= { ...payload, requestID };
             const response = await createAPIKey(pendingCreate);
             if (ticket !== editorVersion) return;
-            created.value = response.data.item;
-            secret.value = response.data.apiKey;
             uncertain.value = false;
+            pendingCreate = undefined;
+            MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+            visible.value = false;
+            emit('changed');
+            emit('created', response.data.item);
+            return;
         }
         emit('changed');
     } catch (error) {
@@ -341,16 +311,12 @@ watch(
     { flush: 'sync' },
 );
 onBeforeUnmount(discardEditor);
-onBeforeRouteLeave(async (to) => {
+onBeforeRouteLeave((to) => {
     if (!globalStore.isLogin || ['entrance', 'Expired', 'EnterpriseLicenseRequired'].includes(String(to.name))) {
         discardEditor();
         return true;
     }
     if (busy.value) return false;
-    if (secret.value && !saved.value) {
-        await ElMessageBox.alert(i18n.global.t('apiKeyManagement.saveSecret'), i18n.global.t('apiKeyManagement.title'));
-        return false;
-    }
     discardEditor();
     return true;
 });

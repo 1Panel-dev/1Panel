@@ -40,6 +40,8 @@ func (s *BaseRouter) InitRouter(Router *gin.RouterGroup) {
 		authRouter.POST("/api/keys/update", baseApi.UpdateAPIKey)
 		authRouter.POST("/api/keys/status", baseApi.SetAPIKeyStatus)
 		authRouter.POST("/api/keys/revoke", baseApi.RevokeAPIKey)
+		authRouter.POST("/api/keys/delete", baseApi.DeleteAPIKey)
+		authRouter.POST("/api/keys/reveal", baseApi.RevealAPIKey)
 
 		authRouter.GET("/current", baseApi.GetCurrentUser)
 		authRouter.POST("/current/update", baseApi.UpdateCurrentUser)

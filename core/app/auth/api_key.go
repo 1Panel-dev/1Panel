@@ -66,6 +66,26 @@ func RequireAPIKeySession(c *gin.Context) (psession.SessionUser, error) {
 	return u, nil
 }
 
+func RequireAPIKeyManagement(c *gin.Context) (psession.SessionUser, error) {
+	if c == nil || !c.GetBool("API_AUTH") {
+		return RequireAPIKeySession(c)
+	}
+	if c.GetBool("LOCAL_REQUEST") {
+		return psession.SessionUser{}, buserr.New("ErrNotLogin")
+	}
+	kind, keyID := c.GetString("API_AUTH_KEY_KIND"), c.GetString("API_AUTH_KEY_ID")
+	if (kind != "apiKey" && kind != "legacy") || keyID == "" || (kind == "legacy") != (keyID == "legacy") {
+		return psession.SessionUser{}, buserr.New("ErrNotLogin")
+	}
+	ownerType, ownerID := c.GetString("API_AUTH_OWNER_TYPE"), c.GetString("API_AUTH_OWNER_ID")
+	value, _ := c.Get(psession.GinContextSessionUserKey)
+	u, ok := value.(psession.SessionUser)
+	if (ownerType != APIKeyOwnerPanelAdmin && ownerType != APIKeyOwnerEnterpriseUser) || ownerID == "" || !ok || u.ID != ownerID || u.Name == "" {
+		return psession.SessionUser{}, buserr.New("ErrNotLogin")
+	}
+	return u, nil
+}
+
 func HasAPICredentials(c *gin.Context) bool {
 	return c.GetHeader("1Panel-Token") != "" || c.GetHeader("1Panel-Timestamp") != "" || c.GetHeader("1Panel-Key-ID") != "" || c.GetHeader("1Panel-Signature-Version") != ""
 }
@@ -87,7 +107,7 @@ func LegacyAPIKeyFingerprint(owner APIKeyOwner, config APIAuthConfig, policy mod
 }
 
 func APIKeySecret(key model.APIKey) (string, error) {
-	if key.SecretVersion != 1 || key.SecretCiphertext == "" {
+	if key.DeletedAt != nil || key.Status == "Revoked" || key.SecretVersion != 1 || key.SecretCiphertext == "" {
 		return "", buserr.New("ErrApiConfigKeyInvalid")
 	}
 	master, err := encrypt.APIKeyEncryptionKey()
@@ -98,7 +118,7 @@ func APIKeySecret(key model.APIKey) (string, error) {
 }
 
 func ValidateAPIKeyState(key model.APIKey, now time.Time) error {
-	if key.Status != constant.StatusEnable {
+	if key.DeletedAt != nil || key.Status != constant.StatusEnable {
 		return buserr.New("ErrApiConfigStatusInvalid")
 	}
 	if key.ExpiresAt != nil && !now.Before(*key.ExpiresAt) {
@@ -113,7 +133,7 @@ func configForAPIKey(key model.APIKey, secret string, owner APIKeyOwner) APIAuth
 
 func loadMultiAPIKeyConfig(c *gin.Context, legacy APIAuthConfigLoader, provider APIKeyOwnerProvider) (APIAuthConfig, error) {
 	keyID := c.GetHeader("1Panel-Key-ID")
-	q := global.DB.Model(&model.APIKey{}).Select("id", "secret_ciphertext", "secret_version", "revision")
+	q := global.DB.Model(&model.APIKey{}).Where("deleted_at IS NULL").Select("id", "secret_ciphertext", "secret_version", "revision")
 	if keyID != "" {
 		q = q.Where("id = ?", keyID)
 	} else {

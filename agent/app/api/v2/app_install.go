@@ -203,6 +203,7 @@ func (b *BaseApi) GetServices(c *gin.Context) {
 // @Tags App
 // @Summary Search app update version by install id
 // @Accept json
+// @Param request body request.AppUpdateVersion true "request"
 // @Success 200 {array} dto.AppVersion
 // @Security ApiKeyAuth
 // @Security Timestamp

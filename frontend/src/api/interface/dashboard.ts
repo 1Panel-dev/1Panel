@@ -151,6 +151,7 @@ export namespace Dashboard {
         inodesUsedPercent: number;
     }
     export interface GPUInfo {
+        sharedMemory?: boolean;
         type: string;
         index: number;
         npuIndex: number;

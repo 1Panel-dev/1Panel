@@ -2,6 +2,11 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Show secret',
+        hideSecret: 'Hide secret',
+        revealHelp: 'Keep this secret secure. Disabled or expired keys remain unusable even when displayed.',
+        deleteConfirm:
+            'Delete “{0}”? Its secret will be destroyed and the key removed from the list. New requests will be rejected and terminal connections closed. Audit records are retained; running jobs are not cancelled. This cannot be undone.',
         title: 'API Key',
         manage: 'Manage API Keys',
         personalEntry: 'Manage your keys, access conditions, and APP binding in Settings.',
@@ -23,10 +28,6 @@ const message = {
         allowAppBinding: 'Allow APP QR binding',
         bindingDisableHelp:
             'Disabling QR binding prevents new device bindings. Devices already bound can continue to use the key until it is disabled, revoked, or expires.',
-        saveSecret: 'Copy and save this secret now. After closing, ordinary key management cannot display it again.',
-        saved: 'I have saved the secret',
-        alreadyCreated:
-            'This key was already created. Its secret will not be shown again. If the original response was lost, revoke and recreate it, or use QR binding if allowed.',
         uncertain:
             'The request result is uncertain. Retry with the same details to avoid duplicate keys, or close and check the list before creating another.',
         legacyHelp:
@@ -497,7 +498,7 @@ const message = {
         quickDirDelete: 'Delete ({0})?',
         quickDir: 'Quick Access',
         minQuickJump: 'Add at least one quick access entry',
-        maxQuickJump: 'You can add up to four quick access entries',
+        maxQuickJump: 'You can add up to five quick access entries',
         database: 'Database - All',
         restart_1panel: 'Restart panel',
         restart_system: 'Restart server',
@@ -843,6 +844,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Failed to get models. Default models are being used.',
             accountModelsDuplicate: 'Duplicate models were found in the catalog',
             modelPool: 'Model Pool',
+            ollamaRegisterOnly:
+                'Only register models already available on this Ollama service. No download will be started.',
+            deleteModelFiles: 'Also delete model files from the Ollama service',
             fallbackModels: 'Fallback Models',
             addFallbackModel: 'Add Fallback Model',
             fallbackModelsEmpty: 'No fallback models configured',
@@ -1036,6 +1040,23 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            gpuAcceleration: 'GPU acceleration',
+            gpuMode: 'Accelerator selection',
+            gpuAll: 'All accelerators',
+            gpuCount: 'Specify count',
+            gpuSpecific: 'Select devices',
+            gpuAllHelper: 'Use all available accelerators of this type on the current node.',
+            gpuCountHelper:
+                'Let the runtime allocate the requested number of accelerators without binding specific devices.',
+            gpuSpecificHelper: 'Manually select specific accelerators.',
+            gpuCountRequired: 'Enter an integer greater than 0',
+            gpuDevices: 'GPU devices',
+            gpuCapabilitiesHelper:
+                'Configure NVIDIA GPU capabilities for the container. Keeping the default options is generally recommended.\n• gpu: Allows the container to access the GPU. Required.\n• utility: Supports GPU status queries and monitoring, such as nvidia-smi.\n• compute: Supports GPU computing, including CUDA. Usually needed for model inference.',
+            gpuSelectRequired: 'Select at least one available GPU device.',
+            gpuUnsupported: 'Unsupported',
+            gpuNotDetected: 'No supported accelerators detected',
+            gpuMissing: 'Unavailable',
             modelCategory: 'Model category',
             modelName: 'Model name',
             modelArchitecture: 'Model type',
@@ -1053,11 +1074,11 @@ const message = {
             onlineModel: 'Online models',
             instanceDeployment: 'Deploy by instance',
             nvidiaDeployment: 'NVIDIA-optimized deployment',
-            engines: 'Inference engines',
+            engines: 'Local inference engines',
             modelManagement: 'Model management',
             serviceDetails: 'Service details',
             deployments: 'Local deployments',
-            files: 'Model files',
+            files: 'Model hub',
             connectExternal: 'Connect external service',
             deploymentTemplates: 'vLLM startup command templates',
             engineProvider: 'Engine / Provider',
@@ -1074,14 +1095,19 @@ const message = {
             container_conn_helper: 'Use this address for inter-container access or connection',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
-            vllmVersionHelper: 'For FusionXpark GB 10 servers, please select the -cu130 version.',
+            vllmVersionHelper: {
+                default: 'Official standard version with CUDA 13.0, for newer drivers and newer GPU architectures.',
+                cuda: 'Legacy architecture compatibility version with CUDA 12.9, for older GPU architectures using CUDA versions below 13.0.',
+                ubuntu: 'NVIDIA GB10 standard version with CUDA 13.0, for NVIDIA GB10 devices.',
+                dspark: 'NVIDIA GB10 dual-device custom version, using a custom image maintained by 1Panel.',
+            },
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'The startup command must use port {0}; otherwise, the service will be inaccessible.',
             ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Sync to model account',
+            syncModelAccount: 'Sync to model service',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',
@@ -1625,6 +1651,11 @@ const message = {
             timePerOutputTokenChart: 'Inter-token latency',
         },
         gpu: {
+            systemMemory: 'Shared system memory',
+            systemMemoryUsed: 'System memory used',
+            systemMemoryTotal: 'Total system memory',
+            systemMemoryAvailable: 'Available system memory',
+            systemMemoryHelper: 'Shared by the CPU and GPU. Shows system-wide memory usage, not GPU-only usage.',
             memoryActivity: 'Memory read/write activity',
             hotspotTemperature: 'Hotspot temperature',
             fanRPM: 'Fan speed (RPM)',
@@ -1660,7 +1691,6 @@ const message = {
             historyPeak: 'Peak',
             historyAggregated:
                 '{count} samples aggregated into {seconds}-second intervals; processes show counts only.',
-            historyRaw: '{count} original samples.',
             historyMetricEmpty: 'No data for this metric in the selected time range',
             historyLoadFailed: 'Failed to load history. Please retry.',
             collectedAt: 'Collected at',
@@ -1733,8 +1763,9 @@ const message = {
             prohibitedHelper: 'Prohibited: Concurrent process execution is not allowed',
             migModeHelper: 'Used to create MIG instances, implementing physical GPU isolation at the user layer.',
             migModeNA: 'Not Supported',
-            current: 'Real-time Monitoring',
-            history: 'Historical Records',
+            current: 'Real-time Status',
+            history: 'Monitoring Data',
+            viewHistory: 'View monitoring data',
             notSupport: 'The current version or driver does not support displaying this parameter.',
         },
         mcp: {
@@ -2042,8 +2073,6 @@ const message = {
         retry: 'Retry selected points',
         environment: 'Environment',
         plan: 'Frozen configuration',
-        clientHelp:
-            'The client container runs on the main node and sends requests to an existing service. It does not start inference or require a GPU.',
         retryHelp: 'Only selected abnormal points are retried, with the same parameters and new seeds.',
         secretHelp: 'API keys and headers are excluded from copies. Enter them again if needed.',
         resultHelp:

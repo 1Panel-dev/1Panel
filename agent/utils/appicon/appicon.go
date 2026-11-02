@@ -6,12 +6,41 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 )
 
 const IconPrefix = "app_"
+
+func IsRemoteURL(icon string) bool {
+	for _, ch := range icon {
+		if unicode.IsSpace(ch) || unicode.IsControl(ch) || ch == '\\' {
+			return false
+		}
+	}
+	u, err := url.Parse(icon)
+	if err != nil || (!strings.EqualFold(u.Scheme, "http") && !strings.EqualFold(u.Scheme, "https")) || u.Hostname() == "" || u.User != nil {
+		return false
+	}
+	if u.Port() != "" {
+		port, err := strconv.Atoi(u.Port())
+		if err != nil || port > 65535 {
+			return false
+		}
+	}
+	_, err = url.QueryUnescape(u.RawQuery)
+	return err == nil
+}
+
+func RemoteURL(icon string) string {
+	if IsRemoteURL(icon) {
+		return icon
+	}
+	return ""
+}
 
 func IsIconFile(icon string) bool {
 	return strings.HasPrefix(icon, IconPrefix)

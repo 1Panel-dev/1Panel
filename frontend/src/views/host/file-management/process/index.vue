@@ -11,7 +11,7 @@
                     <div class="flex items-center gap-3">
                         <div class="flex-1 min-w-0">
                             <el-tooltip :content="value.name" placement="top">
-                                <div class="truncate text-gray-700">{{ value.name }}</div>
+                                <div class="dialog-object-name text-gray-700">{{ value.name }}</div>
                             </el-tooltip>
                             <div class="text-gray-500">
                                 {{ getStatusText(value) }}

@@ -1105,9 +1105,23 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
+	if req.Models != nil {
+		if account.AppInstallID != 0 {
+			return buserr.WithDetail("ErrInvalidParams", "local model pool is managed by the deployment", nil)
+		}
+		models, err = normalizeAgentAccountModels(account, req.Models)
+		if err != nil {
+			return err
+		}
+		if err := ensureAccountModelsNotBound(account, models); err != nil {
+			return err
+		}
+	}
 	requestedVerifyModel := req.VerifyModel
 	if strings.TrimSpace(requestedVerifyModel) == "" {
-		requestedVerifyModel = account.VerifyModel
+		if _, ok := findAgentAccountModelForProvider(provider, models, account.VerifyModel); ok {
+			requestedVerifyModel = account.VerifyModel
+		}
 	}
 	verifyModel := ""
 	if account.AppInstallID == 0 || len(models) > 0 {
@@ -1131,7 +1145,16 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.Remark = req.Remark
 	account.Verified = true
 
-	if err := agentAccountRepo.Save(account); err != nil {
+	if req.Models != nil {
+		rows := make([]model.AgentAccountModel, 0, len(models))
+		for _, item := range models {
+			rows = append(rows, model.AgentAccountModel{Model: item.ID, Name: item.Name})
+		}
+		err = agentAccountRepo.SaveWithModels(account, rows)
+	} else {
+		err = agentAccountRepo.Save(account)
+	}
+	if err != nil {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
@@ -1275,6 +1298,31 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 	if _, ok := findAgentAccountModelForProvider(account.Provider, models, nextModel.ID); ok {
 		return buserr.New("ErrRecordExist")
 	}
+	if account.Provider == "ollama" {
+		if account.AppInstallID != 0 {
+			install, err := appInstallRepo.GetFirst(repo.WithByID(account.AppInstallID))
+			if err != nil {
+				return err
+			}
+			if install.App.Key != "ollama" || !install.SyncModelAccount {
+				return buserr.New("ErrAgentAccountUnavailable")
+			}
+			localModels, err := aiRepo.List()
+			if err != nil {
+				return err
+			}
+			for _, item := range localModels {
+				if sameProviderModelID("ollama", item.Name, nextModel.ID) {
+					return (&AIToolService{}).Recreate(dto.OllamaModelName{Name: item.Name, TaskID: req.TaskID})
+				}
+			}
+			return (&AIToolService{}).Create(dto.OllamaModelName{Name: nextModel.ID, TaskID: req.TaskID})
+		}
+		nextModel.ID, err = resolveExistingOllamaModel(account, nextModel.ID)
+		if err != nil {
+			return err
+		}
+	}
 	sortOrder := len(models) + 1
 	record := &model.AgentAccountModel{
 		AccountID: account.ID,
@@ -1304,6 +1352,15 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	nextModel, err := normalizeAgentAccountModel(account, req.Model)
 	if err != nil {
 		return err
+	}
+	if account.Provider == "ollama" && !sameProviderModelID("ollama", record.Model, nextModel.ID) {
+		if account.AppInstallID != 0 {
+			return buserr.New("ErrInvalidParams")
+		}
+		nextModel.ID, err = resolveExistingOllamaModel(account, nextModel.ID)
+		if err != nil {
+			return err
+		}
 	}
 	nextModel.RecordID = req.Model.RecordID
 	for _, item := range models {
@@ -1343,6 +1400,10 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 }
 
 func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) error {
+	ollamaModelMu.Lock()
+	defer ollamaModelMu.Unlock()
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
 	if err != nil {
 		return err
@@ -1367,6 +1428,44 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 	}
 	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
 		return err
+	}
+	if req.DeleteFiles && account.Provider != "ollama" {
+		return buserr.New("ErrAgentProviderNotSupported")
+	}
+	if req.DeleteFiles {
+		if account.AppInstallID != 0 {
+			install, err := appInstallRepo.GetFirst(repo.WithByID(account.AppInstallID))
+			if err != nil {
+				return err
+			}
+			if install.App.Key != "ollama" {
+				return buserr.New("ErrAgentAccountUnavailable")
+			}
+			localModels, err := aiRepo.List()
+			if err != nil {
+				return err
+			}
+			localIDs := make([]uint, 0)
+			for _, item := range localModels {
+				if !sameProviderModelID("ollama", item.Name, record.Model) {
+					continue
+				}
+				if item.Status == constant.StatusWaiting {
+					return buserr.New("TaskIsExecuting")
+				}
+				localIDs = append(localIDs, item.ID)
+			}
+			if err := cmd.NewCommandMgr().Run("docker", "exec", install.ContainerName, "ollama", "rm", record.Model); err != nil {
+				return err
+			}
+			if len(localIDs) > 0 {
+				if err := aiRepo.Delete(repo.WithByIDs(localIDs)); err != nil {
+					return err
+				}
+			}
+		} else if err := deleteRemoteOllamaModel(account, record.Model); err != nil {
+			return err
+		}
 	}
 	if err := agentAccountModelRepo.DeleteByID(req.RecordID); err != nil {
 		return err
@@ -1394,18 +1493,9 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {
 	agentAccountMutationMu.Lock()
 	defer agentAccountMutationMu.Unlock()
-	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
+	_, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
-	}
-	if account.AppInstallID != 0 && account.Provider != "ollama" {
-		_, err := appInstallRepo.GetFirst(repo.WithByID(account.AppInstallID))
-		if err == nil {
-			return buserr.WithDetail("ErrInvalidParams", "Delete the local inference engine instead", nil)
-		}
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
-			return err
-		}
 	}
 
 	if err := global.DB.Transaction(func(tx *gorm.DB) error {

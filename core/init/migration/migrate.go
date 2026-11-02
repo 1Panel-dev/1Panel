@@ -72,5 +72,6 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.UpdateAiMenuOrder,
 		migrations.UpdateAiMenuOrderV2,
 		migrations.AddPanelMCP,
+		migrations.AddAPIKeyDeletedAt,
 	}
 }

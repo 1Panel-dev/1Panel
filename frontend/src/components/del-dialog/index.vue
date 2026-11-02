@@ -11,14 +11,14 @@
                     <el-col :span="22">
                         <el-alert class="mt-2" :show-icon="true" type="warning" :closable="false">
                             <div v-for="(item, index) in form.msgs" :key="index">
-                                <div style="line-height: 20px; word-wrap: break-word">
+                                <div class="dialog-object-name" style="line-height: 20px">
                                     <span>{{ item }}</span>
                                 </div>
                             </div>
                         </el-alert>
                         <slot name="content"></slot>
                         <ul v-for="(item, index) in form.names" :key="index">
-                            <div style="word-wrap: break-word">
+                            <div class="dialog-object-name">
                                 <li>{{ item }}</li>
                             </div>
                         </ul>

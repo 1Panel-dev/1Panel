@@ -10,7 +10,7 @@
         <template #header>
             <div ref="dialogHeader" class="flex items-center justify-between code-header px-4 rounded-t">
                 <div class="code-title">
-                    <span class="truncate-text">{{ $t('home.dir') + ' - ' + currentEditorPath }}</span>
+                    <span class="dialog-object-name">{{ $t('home.dir') + ' - ' + currentEditorPath }}</span>
                     <el-tooltip v-if="currentEditorPath" :content="$t('file.copyDir')" placement="top">
                         <CopyButton class="code-title-copy" :content="currentEditorPath" />
                     </el-tooltip>
@@ -2175,13 +2175,6 @@ defineExpose({ acceptParams });
     flex-shrink: 0;
 }
 
-.truncate-text {
-    display: block;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
 .code-title {
     display: inline-flex;
     align-items: center;

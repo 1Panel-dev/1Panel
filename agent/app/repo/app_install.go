@@ -31,6 +31,7 @@ type IAppInstallRepo interface {
 	GetFirst(opts ...DBOption) (model.AppInstall, error)
 	Create(ctx context.Context, install *model.AppInstall) error
 	Save(ctx context.Context, install *model.AppInstall) error
+	UpdateStatus(install *model.AppInstall) error
 	DeleteBy(opts ...DBOption) error
 	Delete(ctx context.Context, install model.AppInstall) error
 	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
@@ -43,6 +44,11 @@ type IAppInstallRepo interface {
 
 func NewIAppInstallRepo() IAppInstallRepo {
 	return &AppInstallRepo{}
+}
+
+func (a *AppInstallRepo) UpdateStatus(install *model.AppInstall) error {
+	return getDb().Model(&model.AppInstall{}).Where("id = ? AND updated_at = ?", install.ID, install.UpdatedAt).
+		Updates(map[string]interface{}{"status": install.Status, "message": install.Message}).Error
 }
 
 func (a *AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {

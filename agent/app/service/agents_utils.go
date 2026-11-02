@@ -1517,6 +1517,14 @@ func sameProviderModelID(provider, left, right string) bool {
 	}
 	leftComparable := providercatalog.NormalizeModelID(provider, leftTrimmed)
 	rightComparable := providercatalog.NormalizeModelID(provider, rightTrimmed)
+	if provider == "ollama" {
+		if leftComparable != "" && !strings.Contains(path.Base(leftComparable), ":") {
+			leftComparable += ":latest"
+		}
+		if rightComparable != "" && !strings.Contains(path.Base(rightComparable), ":") {
+			rightComparable += ":latest"
+		}
+	}
 	return leftComparable != "" && leftComparable == rightComparable
 }
 

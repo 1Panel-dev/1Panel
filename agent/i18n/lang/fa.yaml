@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'منبع درخواستی یافت نشد: {{ .err }}'
 
 # پرش سریع
 ErrMinQuickJump: 'حداقل یک ورودی پرش سریع تنظیم کنید'
-ErrMaxQuickJump: 'حداکثر ۴ ورودی پرش سریع'
+ErrMaxQuickJump: 'حداکثر ۵ ورودی پرش سریع'
 
 # عمومی
 ErrShutDown: 'دستور به صورت دستی متوقف شد'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'فایل گواهی وجود ندارد'
 ErrSSLKeyFormat: 'تأیید فایل کلید خصوصی ناموفق بود'
 ErrSSLCertificateFormat: 'فرمت گواهی نامعتبر است؛ از PEM استفاده کنید'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid یا EabHmacKey نمی‌توانند خالی باشند'
+ErrOpenrestyInstall: "لطفاً ابتدا OpenResty را از فروشگاه برنامه‌ها نصب کنید"
 ErrOpenrestyNotFound: 'حالت HTTP نیاز به OpenResty دارد'
 ApplySSLStart: 'شروع درخواست گواهی. دامنه: [{{ .domain }}]، روش: [{{ .type }}]'
 dnsAccount: 'خودکار DNS'

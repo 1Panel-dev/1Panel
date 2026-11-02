@@ -4,6 +4,7 @@ import (
 	"errors"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"gorm.io/gorm"
 )
@@ -73,4 +74,26 @@ func reconcileAppInstallTaskFailure(install *model.AppInstall, operation string,
 		install.Message = message
 	}
 	return nil
+}
+
+func localEngineTaskStatus(operation, status string) string {
+	switch operation {
+	case task.TaskInstall, task.TaskCreate:
+		return constant.StatusInstalling
+	case task.TaskUpgrade:
+		return constant.StatusUpgrading
+	case task.TaskUninstall, task.TaskDelete:
+		return constant.StatusUninstalling
+	case task.TaskBuild:
+		return constant.StatusRebuilding
+	case task.TaskRestart:
+		return constant.StatusRestarting
+	case task.TaskUpdate:
+		if status == constant.StatusWaiting {
+			return constant.StatusWaiting
+		}
+		return constant.StatusStarting
+	default:
+		return constant.StatusWaiting
+	}
 }

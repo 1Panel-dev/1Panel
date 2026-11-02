@@ -26,6 +26,7 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/domain/update", baseApi.UpdateBindDomain)
 
 		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
+		aiToolsRouter.GET("/model/gpu/devices", baseApi.LoadModelGPUDevices)
 		aiToolsRouter.POST("/gpu/search", baseApi.LoadGPUMonitor)
 		aiToolsRouter.GET("/gpu/options", baseApi.GetCPUOptions)
 		aiToolsRouter.POST("/vllm/monitor/search", baseApi.LoadVLLMMonitor)

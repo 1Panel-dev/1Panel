@@ -3,10 +3,15 @@ package v2
 import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/gin-gonic/gin"
 )
+
+func (b *BaseApi) LoadModelGPUDevices(c *gin.Context) {
+	helper.SuccessWithData(c, service.LoadModelGPUDevices())
+}
 
 // @Tags AI
 // @Summary Load gpu / xpu info

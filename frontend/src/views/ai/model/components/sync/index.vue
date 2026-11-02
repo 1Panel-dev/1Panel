@@ -102,7 +102,7 @@ const open = async (row: Deployment) => {
                 MsgError(i18n.global.t('commons.res.notFound'));
                 return;
             }
-            const hostMode = item.appVersion.toLowerCase().startsWith('nvidia-gb10-dspark-');
+            const hostMode = item.appVersion.trim().toLowerCase().startsWith('nvidia-gb10-dspark-');
             Object.assign(form, {
                 id: item.id,
                 containerName: item.containerName,

@@ -46,7 +46,7 @@ ErrHttpReqNotFound: '要求されたリソース {{ .err }} が見つかりま�
 
 # クイックジャンプ
 ErrMinQuickJump: 'クイックアクセスを1件以上追加'
-ErrMaxQuickJump: '最大4件のクイックアクセス'
+ErrMaxQuickJump: '最大5件のクイックアクセス'
 
 # 共通
 ErrShutDown: 'コマンドは手動で停止されました'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: '証明書ファイルが存在しません'
 ErrSSLKeyFormat: '秘密鍵ファイルの検証に失敗しました'
 ErrSSLCertificateFormat: '証明書ファイルの形式が正しくありません。pem 形式を使用してください'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid または EabHmacKey は空白にできません'
+ErrOpenrestyInstall: "先にアプリストアから OpenResty をインストールしてください"
 ErrOpenrestyNotFound: 'HTTP モードでは OpenResty が必要です'
 ApplySSLStart: '証明書の申請を開始します。ドメイン名 [{{ .domain }}] 申請方法 [{{ .type }}]'
 dnsAccount: 'DNS 自動'

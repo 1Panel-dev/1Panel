@@ -417,11 +417,13 @@ func (b *BaseApi) MFAClose(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary generate api key
+// @Summary Generate or reset the legacy API key
+// @Description Requires a panel login session and CSRF token. API Key authentication is not supported. This replaces the current account's legacy secret; existing clients using the previous secret must be updated. Independent API keys are unaffected.
 // @Accept json
-// @Success 200 {string} key
-// @Security ApiKeyAuth
-// @Security Timestamp
+// @Produce json
+// @Success 200 {object} dto.Response{data=string} "code=200 with the new secret; authentication and business errors use envelope code 400, 401 or 500"
+// @Header 200 {string} Cache-Control "no-store"
+// @Security PanelSession || CSRFToken
 // @Router /core/auth/api/generate [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"生成 API 接口密钥","formatEN":"generate api key"}
 func (b *BaseApi) GenerateApiKey(c *gin.Context) {
@@ -440,12 +442,13 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary Update api config
+// @Summary Update the legacy API key configuration
+// @Description Requires a panel login session and CSRF token. API Key authentication is not supported. This updates only the current account's legacy API configuration.
 // @Accept json
+// @Produce json
 // @Param request body dto.ApiInterfaceConfig true "request"
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
+// @Success 200 {object} dto.Response "code=200 on success; authentication and business errors use envelope code 400, 401 or 500"
+// @Security PanelSession || CSRFToken
 // @Router /core/auth/api/update [post]
 // @x-panel-log {"bodyKeys":["ipWhiteList","apiTrustedProxies"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"更新 API 接口配置 => IP 白名单: [ipWhiteList], API 可信代理: [apiTrustedProxies]","formatEN":"update api config => IP Allowlist: [ipWhiteList], API Trusted Proxies: [apiTrustedProxies]"}
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {

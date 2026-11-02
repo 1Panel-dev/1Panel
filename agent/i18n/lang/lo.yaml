@@ -32,7 +32,7 @@ ErrApiConfigKeyTimeInvalid: 'ເວລາ (Timestamp) ຂອງ API ບໍ່ຖ
 ErrShutDown: 'ຄຳສັ່ງຖືກຢຸດດ້ວຍຕົນເອງ'
 
 ErrMinQuickJump: 'ກະລຸນາຕັ້ງຄ່າລາຍການທາງລັດຢ່າງໜ້ອຍໜຶ່ງລາຍການ'
-ErrMaxQuickJump: 'ສາມາດຕັ້ງຄ່າລາຍການທາງລັດໄດ້ສູງສຸດ 4 ລາຍການ'
+ErrMaxQuickJump: 'ສາມາດຕັ້ງຄ່າລາຍການທາງລັດໄດ້ສູງສຸດ 5 ລາຍການ'
 
 #common
 ErrUsernameIsExist: 'ຊື່ຜູ້ໃຊ້ມີຢູ່ໃນລະບົບແລ້ວ'
@@ -242,6 +242,7 @@ ErrSSLCertificateNotFound: 'ບໍ່ມີໄຟລ໌ໃບຮັບຮອງ�
 ErrSSLKeyFormat: 'ການກວດສອບໄຟລ໌ກຸນແຈສ່ວນຕົວລົ້ມເຫຼວ'
 ErrSSLCertificateFormat: 'ຮູບແບບໃບຮັບຮອງບໍ່ຖືກຕ້ອງ; ກະລຸນາໃຊ້ PEM'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid ຫຼື EabHmacKey ບໍ່ສາມາດປະຫວ່າງໄດ້'
+ErrOpenrestyInstall: "ກະລຸນາຕິດຕັ້ງ OpenResty ຈາກຮ້ານແອັບກ່ອນ"
 ErrOpenrestyNotFound: 'ໂໝດ HTTP ຕ້ອງການ OpenResty'
 ApplySSLStart: 'ກຳລັງເລີ່ມການຮ້ອງຂໍໃບຮັບຮອງ. ໂດເມນ: [{{ .domain }}], ວິທີການ: [{{ .type }}]'
 dnsAccount: 'DNS ອັດຕະໂນມັດ'

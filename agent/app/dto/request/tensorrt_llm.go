@@ -8,14 +8,16 @@ type TensorRTLLMSearch struct {
 }
 
 type TensorRTLLMCreate struct {
-	Name          string `json:"name" validate:"required"`
-	ContainerName string `json:"containerName"  validate:"required"`
-	Version       string `json:"version"  validate:"required"`
-	ModelDir      string `json:"modelDir" validate:"required"`
-	Image         string `json:"image"  validate:"required"`
-	Command       string `json:"command" validate:"required"`
-	ModelType     string `json:"modelType"`
-	ModelSpeedup  bool   `json:"modelSpeedup"`
+	TaskID        string              `json:"taskID"`
+	Name          string              `json:"name" validate:"required"`
+	ContainerName string              `json:"containerName"  validate:"required"`
+	Version       string              `json:"version"  validate:"required"`
+	ModelDir      string              `json:"modelDir" validate:"required"`
+	Image         string              `json:"image"  validate:"required"`
+	Command       string              `json:"command" validate:"required"`
+	ModelType     string              `json:"modelType"`
+	ModelSpeedup  bool                `json:"modelSpeedup"`
+	GPU           *dto.ModelGPUConfig `json:"gpu"`
 	DockerConfig
 }
 
@@ -25,12 +27,14 @@ type TensorRTLLMUpdate struct {
 }
 
 type TensorRTLLMDelete struct {
-	ID uint `json:"id" validate:"required"`
+	ID     uint   `json:"id" validate:"required"`
+	TaskID string `json:"taskID"`
 }
 
 type TensorRTLLMOperate struct {
+	TaskID  string `json:"taskID"`
 	ID      uint   `json:"id" validate:"required"`
-	Operate string `json:"operate" validate:"required"`
+	Operate string `json:"operate" validate:"required,oneof=start stop restart"`
 }
 
 type DockerConfig struct {

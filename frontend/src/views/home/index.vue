@@ -47,7 +47,7 @@
                     <template #body>
                         <div class="h-overview">
                             <el-row>
-                                <el-col :span="6" v-for="item in baseInfo.quickJump" :key="item.name">
+                                <el-col class="overview-item" v-for="item in baseInfo.quickJump" :key="item.name">
                                     <span>{{ $t(item.title, 2) }}</span>
                                     <div class="count">
                                         <QuickDirectories
@@ -72,8 +72,18 @@
                     </template>
                 </CardWithHeader>
                 <CardWithHeader :header="$t('commons.table.status')" class="card-interval">
+                    <template #header-r>
+                        <el-radio-group v-if="hasGPU" v-model="statusView">
+                            <el-radio-button value="system">{{ $t('menu.system') }}</el-radio-button>
+                            <el-radio-button value="gpu">GPU</el-radio-button>
+                        </el-radio-group>
+                    </template>
                     <template #body>
-                        <SystemStatus ref="statusRef" style="margin-bottom: 33px" />
+                        <SystemStatus
+                            ref="statusRef"
+                            :view="statusView"
+                            :style="{ marginBottom: statusView === 'gpu' ? '0' : '33px' }"
+                        />
                     </template>
                 </CardWithHeader>
                 <CardWithHeader
@@ -544,6 +554,7 @@ const welcomeOpen = ref();
 const shadowContainer = ref();
 
 const chartOption = ref('network');
+const statusOption = ref(localStorage.getItem('dashboard_status_view') === 'gpu' ? 'gpu' : 'system');
 let timer: ReturnType<typeof setInterval> | null = null;
 let initialSampleTimer: ReturnType<typeof setTimeout> | null = null;
 let isInit = ref<boolean>(true);
@@ -576,6 +587,7 @@ const quickJumpPermissionMap = Object.fromEntries(
         ['Cronjob', 'cronjob_view'],
         ['AppInstalled', 'app_view'],
         ['File', 'host_file_view'],
+        ['ModelServices', 'ai_model_view'],
     ].map(([name, permission]) => [name, useCan(permission)]),
 ) as Record<string, ReturnType<typeof useCan>>;
 
@@ -677,6 +689,16 @@ const currentInfo = ref<Dashboard.CurrentInfo>({
     topMemItems: [],
 
     shotTime: new Date(),
+});
+const hasGPU = computed(() =>
+    [currentInfo.value.gpuData, currentInfo.value.npuData, currentInfo.value.xpuData].some((items) => items?.length),
+);
+const statusView = computed({
+    get: () => (hasGPU.value && statusOption.value === 'gpu' ? 'gpu' : 'system'),
+    set: (value: 'system' | 'gpu') => {
+        statusOption.value = value;
+        localStorage.setItem('dashboard_status_view', value);
+    },
 });
 const currentChartInfo = reactive({
     ioReadBytes: 0,
@@ -1233,6 +1255,11 @@ onBeforeUnmount(() => {
 
 .h-overview {
     text-align: center;
+
+    .overview-item {
+        flex: 1;
+        min-width: 0;
+    }
 
     span:first-child {
         font-size: 14px;

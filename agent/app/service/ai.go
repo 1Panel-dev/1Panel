@@ -117,6 +117,7 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 	}
 	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("ollama-model-%s", req.Name), task.TaskPull, task.TaskScopeAI, req.TaskID, info.ID)
 	if err != nil {
+		_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return err
 	}
@@ -126,18 +127,16 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 		}, nil)
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
 			itemSize, err := loadModelSize(info.Name, containerName)
-			if len(itemSize) != 0 {
-				_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
-			} else {
-				_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			if err != nil {
+				return err
 			}
-			return nil
+			return aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
+		}, nil)
+		taskItem.AddSubTask(i18n.GetMsgByKey("TaskSync"), func(t *task.Task) error {
+			return updateOllamaModelPool(info.Name, false)
 		}, nil)
 		if err := taskItem.Execute(); err != nil {
 			_ = aiRepo.Update(info.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
-		}
-		if err := SyncOllamaModelAccount(false); err != nil {
-			global.LOG.Errorf("sync Ollama model account after pull: %v", err)
 		}
 	}()
 	return nil
@@ -167,6 +166,9 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 	if modelInfo.ID == 0 {
 		return buserr.New("ErrRecordNotFound")
 	}
+	if modelInfo.Status == constant.StatusWaiting {
+		return buserr.New("TaskIsExecuting")
+	}
 	containerName, err := LoadContainerName()
 	if err != nil {
 		return err
@@ -176,6 +178,7 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 	}
 	taskItem, err := task.NewTaskWithOps(fmt.Sprintf("ollama-model-%s", req.Name), task.TaskPull, task.TaskScopeAI, req.TaskID, modelInfo.ID)
 	if err != nil {
+		_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
 		global.LOG.Errorf("new task for exec shell failed, err: %v", err)
 		return err
 	}
@@ -185,18 +188,16 @@ func (u *AIToolService) Recreate(req dto.OllamaModelName) error {
 		}, nil)
 		taskItem.AddSubTask(i18n.GetWithName("OllamaModelSize", req.Name), func(t *task.Task) error {
 			itemSize, err := loadModelSize(modelInfo.Name, containerName)
-			if len(itemSize) != 0 {
-				_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
-			} else {
-				_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
+			if err != nil {
+				return err
 			}
-			return nil
+			return aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusSuccess, "size": itemSize})
+		}, nil)
+		taskItem.AddSubTask(i18n.GetMsgByKey("TaskSync"), func(t *task.Task) error {
+			return updateOllamaModelPool(modelInfo.Name, false)
 		}, nil)
 		if err := taskItem.Execute(); err != nil {
 			_ = aiRepo.Update(modelInfo.ID, map[string]interface{}{"status": constant.StatusFailed, "message": err.Error()})
-		}
-		if err := SyncOllamaModelAccount(false); err != nil {
-			global.LOG.Errorf("sync Ollama model account after pull: %v", err)
 		}
 	}()
 	return nil
@@ -219,11 +220,16 @@ func (u *AIToolService) Delete(req dto.ForceDelete) error {
 				return fmt.Errorf("handle ollama rm %s failed, %v", item.Name, err)
 			}
 		}
-		_ = aiRepo.Delete(repo.WithByID(item.ID))
+		if err := aiRepo.Delete(repo.WithByID(item.ID)); err != nil {
+			return err
+		}
+		if err := updateOllamaModelPool(item.Name, true); err != nil {
+			return err
+		}
 		logItem := path.Join(global.Dir.DataDir, "log", "AITools", item.Name)
 		_ = os.Remove(logItem)
 	}
-	return SyncOllamaModelAccount(false)
+	return nil
 }
 
 func (u *AIToolService) SyncAccount(req dto.OllamaModelAccountSync) error {

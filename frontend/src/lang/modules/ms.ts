@@ -2,6 +2,12 @@ import { getFuLocaleMessage } from '@/lang/fu';
 
 const message = {
     apiKeyManagement: {
+        reveal: 'Papar rahsia',
+        hideSecret: 'Sembunyikan rahsia',
+        revealHelp:
+            'Simpan rahsia ini dengan selamat. Memaparkannya tidak mengaktifkan semula kunci yang dinyahdayakan atau tamat tempoh.',
+        deleteConfirm:
+            'Padam “{0}”? Rahsianya akan dimusnahkan dan kunci dibuang daripada senarai. Permintaan baharu akan ditolak dan terminal berkaitan ditutup. Rekod audit dikekalkan; tugas yang sedang berjalan tidak dibatalkan. Tindakan ini tidak boleh dibuat asal.',
         title: 'API Key',
         manage: 'Urus kunci API',
         personalEntry: 'Urus kunci, syarat akses dan pautan APP anda dalam Tetapan.',
@@ -23,11 +29,6 @@ const message = {
         allowAppBinding: 'Benarkan pautan APP melalui QR',
         bindingDisableHelp:
             'Menyahdayakan pautan QR menghalang pautan peranti baharu. Peranti yang telah dipautkan boleh terus digunakan sehingga kunci dinyahdayakan, dibatalkan atau tamat tempoh.',
-        saveSecret:
-            'Salin dan simpan kunci sekarang. Selepas ditutup, pengurusan biasa tidak dapat memaparkan kunci penuh lagi.',
-        saved: 'Saya telah menyimpan kunci',
-        alreadyCreated:
-            'Kunci ini telah dicipta dan tidak akan dipaparkan semula. Jika respons asal hilang, batalkan dan cipta semula atau gunakan QR jika dibenarkan.',
         uncertain:
             'Hasil permintaan belum pasti. Cuba semula dengan butiran sama untuk mengelakkan pendua, atau tutup dan semak senarai sebelum mencipta lagi.',
         legacyHelp:
@@ -502,7 +503,7 @@ const message = {
         quickDirDelete: 'Sahkan pemadaman ({0})?',
         quickDir: 'Akses Pantas',
         minQuickJump: 'Tambah sekurang-kurangnya satu entri akses pantas',
-        maxQuickJump: 'Anda boleh menambah sehingga empat entri akses pantas',
+        maxQuickJump: 'Anda boleh menambah sehingga lima entri akses pantas',
         database: 'Pangkalan Data - Semua',
         restart_1panel: 'Mulakan semula panel',
         restart_system: 'Mulakan semula pelayan',
@@ -852,6 +853,9 @@ const message = {
             discoverModelsFailedUseDefaults: 'Gagal mendapatkan model. Model lalai sedang digunakan.',
             accountModelsDuplicate: 'Terdapat model pendua dalam katalog',
             modelPool: 'Katalog model',
+            ollamaRegisterOnly:
+                'Daftar hanya model yang sudah tersedia pada perkhidmatan Ollama ini. Tiada muat turun akan dimulakan.',
+            deleteModelFiles: 'Padam juga fail model daripada perkhidmatan Ollama',
             fallbackModels: 'Model fallback',
             addFallbackModel: 'Tambah model fallback',
             fallbackModelsEmpty: 'Tiada model fallback dikonfigurasikan',
@@ -1047,6 +1051,22 @@ const message = {
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
+            gpuAcceleration: 'Pecutan GPU',
+            gpuMode: 'Pemilihan pemecut',
+            gpuAll: 'Semua pemecut',
+            gpuCount: 'Nyatakan bilangan',
+            gpuSpecific: 'Pilih peranti',
+            gpuAllHelper: 'Gunakan semua pemecut jenis ini yang tersedia pada nod semasa.',
+            gpuCountHelper: 'Masa jalan memperuntukkan bilangan pemecut yang diminta tanpa mengikat peranti tertentu.',
+            gpuSpecificHelper: 'Pilih pemecut tertentu secara manual.',
+            gpuCountRequired: 'Masukkan integer yang lebih besar daripada 0',
+            gpuDevices: 'Peranti GPU',
+            gpuCapabilitiesHelper:
+                'Konfigurasikan keupayaan NVIDIA GPU untuk bekas. Biasanya disyorkan untuk mengekalkan pilihan lalai.\n• gpu: Membenarkan bekas mengakses GPU. Wajib dipilih.\n• utility: Menyokong semakan status dan pemantauan GPU, seperti nvidia-smi.\n• compute: Menyokong pengiraan GPU, termasuk CUDA. Biasanya diperlukan untuk inferens model.',
+            gpuSelectRequired: 'Pilih sekurang-kurangnya satu peranti GPU yang tersedia.',
+            gpuUnsupported: 'Tidak disokong',
+            gpuNotDetected: 'Tiada pemecut yang disokong dikesan',
+            gpuMissing: 'Tidak tersedia',
             modelCategory: 'Kategori model',
             modelName: 'Nama model',
             modelArchitecture: 'Jenis model',
@@ -1064,11 +1084,11 @@ const message = {
             onlineModel: 'Model dalam talian',
             instanceDeployment: 'Pengerahan mengikut instans',
             nvidiaDeployment: 'Pengerahan dioptimumkan untuk NVIDIA',
-            engines: 'Enjin inferens',
+            engines: 'Enjin inferens setempat',
             modelManagement: 'Pengurusan model',
             serviceDetails: 'Butiran perkhidmatan',
             deployments: 'Pengerahan setempat',
-            files: 'Fail model',
+            files: 'Hab model',
             connectExternal: 'Sambungkan perkhidmatan luaran',
             deploymentTemplates: 'Templat arahan permulaan vLLM',
             engineProvider: 'Enjin / Pembekal',
@@ -1085,14 +1105,19 @@ const message = {
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
-            vllmVersionHelper: 'Untuk pelayan FusionXpark GB 10, sila pilih versi -cu130.',
+            vllmVersionHelper: {
+                default: 'Versi standard rasmi dengan CUDA 13.0, untuk pemacu baharu dan seni bina GPU baharu.',
+                cuda: 'Versi keserasian seni bina lama dengan CUDA 12.9, untuk GPU lama yang menggunakan versi CUDA di bawah 13.0.',
+                ubuntu: 'Versi standard NVIDIA GB10 dengan CUDA 13.0, untuk peranti NVIDIA GB10.',
+                dspark: 'Versi tersuai NVIDIA GB10 untuk dua peranti, menggunakan imej tersuai yang diselenggara oleh 1Panel.',
+            },
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             vllmCommandPortHelper:
                 'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
-            syncModelAccount: 'Segerakkan ke akaun model',
+            syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',
@@ -1638,6 +1663,12 @@ const message = {
             timePerOutputTokenChart: 'Kependaman antara token',
         },
         gpu: {
+            systemMemory: 'Memori sistem dikongsi',
+            systemMemoryUsed: 'Memori sistem digunakan',
+            systemMemoryTotal: 'Jumlah memori sistem',
+            systemMemoryAvailable: 'Memori sistem tersedia',
+            systemMemoryHelper:
+                'Dikongsi oleh CPU dan GPU. Memaparkan penggunaan memori seluruh sistem, bukan GPU sahaja.',
             memoryActivity: 'Aktiviti baca/tulis memori',
             hotspotTemperature: 'Suhu titik panas',
             fanRPM: 'Kelajuan kipas (RPM)',
@@ -1673,7 +1704,6 @@ const message = {
             historyPeak: 'Puncak',
             historyAggregated:
                 '{count} sampel diagregatkan dalam sela {seconds} saat; proses hanya memaparkan bilangan.',
-            historyRaw: '{count} sampel asal.',
             historyMetricEmpty: 'Tiada data untuk metrik ini dalam julat masa yang dipilih',
             historyLoadFailed: 'Gagal memuatkan sejarah. Sila cuba lagi.',
             collectedAt: 'Masa pengumpulan',
@@ -1746,8 +1776,9 @@ const message = {
             migModeHelper:
                 'Digunakan untuk mencipta contoh MIG, melaksanakan pengasingan fizikal GPU pada lapisan pengguna.',
             migModeNA: 'Tidak Disokong',
-            current: 'Pemantauan Masa Nyata',
-            history: 'Rekod Sejarah',
+            current: 'Status Masa Nyata',
+            history: 'Data Pemantauan',
+            viewHistory: 'Lihat data pemantauan',
             notSupport: 'Versi atau pemacu semasa tidak menyokong paparan parameter ini.',
             processCount: 'Bilangan proses',
         },
@@ -2057,8 +2088,6 @@ const message = {
         retry: 'Ulang titik terpilih',
         environment: 'Persekitaran',
         plan: 'Konfigurasi dibekukan',
-        clientHelp:
-            'Kontena klien berjalan pada nod utama dan menghantar permintaan kepada perkhidmatan sedia ada. Ia tidak memulakan inferens atau memerlukan GPU.',
         retryHelp: 'Hanya titik bermasalah yang dipilih diulang, dengan parameter sama dan benih baharu.',
         secretHelp: 'Salinan tidak mengandungi kunci API atau pengepala. Masukkan semula jika perlu.',
         resultHelp:

@@ -46,7 +46,7 @@ ErrHttpReqNotFound: 'O recurso solicitado {{ .err }} não pôde ser encontrado'
 
 # atalho rápido
 ErrMinQuickJump: 'Adicione pelo menos um atalho rápido'
-ErrMaxQuickJump: 'Máximo 4 atalhos rápidos'
+ErrMaxQuickJump: 'Máximo 5 atalhos rápidos'
 
 # comum
 ErrShutDown: 'Comando parado manualmente'
@@ -252,6 +252,7 @@ ErrSSLCertificateNotFound: 'O arquivo de certificado não existe'
 ErrSSLKeyFormat: 'Falha na verificação do arquivo de chave privada'
 ErrSSLCertificateFormat: 'O formato do arquivo de certificado está incorreto, use o formato pem'
 ErrEabKidOrEabHmacKeyCannotBlank: 'EabKid ou EabHmacKey não podem estar em branco'
+ErrOpenrestyInstall: "Instale primeiro o OpenResty pela loja de aplicativos"
 ErrOpenrestyNotFound: 'O modo HTTP requer o OpenResty instalado'
 ApplySSLStart: 'Comece a solicitar um certificado, nome de domínio [{{ .domain }}] método de solicitação [{{ .type }}]'
 dnsAccount: 'DNS Automático'

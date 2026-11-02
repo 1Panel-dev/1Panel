@@ -53,6 +53,7 @@ export namespace App {
 
     export interface AppItem {
         name: string;
+        icon?: string;
         key: string;
         id: number;
         description: string;
@@ -137,6 +138,7 @@ export namespace App {
     }
 
     export interface AppInstall {
+        gpu?: AI.ModelGPUConfig;
         syncModelAccount?: boolean;
         modelAccountBaseURLType?: string;
         modelAccountBaseURL?: string;
@@ -195,6 +197,7 @@ export namespace App {
     }
 
     export interface AppInstallDto {
+        taskID?: string;
         id: number;
         name: string;
         appID: number;
@@ -228,6 +231,7 @@ export namespace App {
     }
 
     export interface CheckInstalled {
+        taskID?: string;
         name: string;
         version: string;
         isExist: boolean;
@@ -291,6 +295,7 @@ export namespace App {
         feishuConfigured?: boolean;
         version: string;
         detailId: number;
+        dockerCompose?: string;
     }
 
     export interface InstallParams {
@@ -310,6 +315,7 @@ export namespace App {
     }
 
     export interface AppConfig {
+        gpu?: AI.ModelGPUConfig;
         appKey: string;
         name: string;
         httpPort: number;
@@ -318,6 +324,7 @@ export namespace App {
         modelAccountBaseURL: string;
         params: InstallParams[];
         rawCompose?: string;
+        isEdit?: boolean;
         cpuQuota: number;
         memoryLimit: number;
         memoryUnit: string;
@@ -341,6 +348,7 @@ export namespace App {
     export interface AppUpdateVersionReq {
         appInstallID: number;
         updateVersion?: string;
+        loadCompose?: boolean;
     }
 
     export interface AppIgnoreReq {

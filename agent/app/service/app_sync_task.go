@@ -4,12 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
 	"strconv"
-	"strings"
-	"sync"
-	"sync/atomic"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
@@ -17,15 +12,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
-	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
-	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
-	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 type appSyncContext struct {
 	task           *task.Task
-	httpClient     http.Client
 	baseRemoteUrl  string
 	systemVersion  string
 	appsMap        map[string]model.App
@@ -34,7 +25,6 @@ type appSyncContext struct {
 	oldAppIds      []uint
 	appTags        []*model.AppTag
 	skipMetaSync   bool
-	pendingIcons   map[string]string
 }
 
 func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *task.Task) error {
@@ -50,6 +40,10 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 			if updateRes.IsSyncing {
 				t.Log(i18n.GetMsgByKey("AppStoreIsSyncing"))
 				return nil
+			}
+			if err := refreshOfficialAppIcons(updateRes.AppList, t); err != nil {
+				t.LogFailedWithErr(i18n.GetMsgByKey("PersistApps"), err)
+				return err
 			}
 			global.LOG.Infof("[AppStore] Appstore is up to date")
 			t.Log(i18n.GetMsgByKey("AppStoreIsUpToDate"))
@@ -82,13 +76,11 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 
 		ctx := &appSyncContext{
 			task:           t,
-			httpClient:     http.Client{Timeout: time.Duration(constant.TimeOut20s) * time.Second, Transport: xpack.MultiNodeProvider.LoadRequestTransport()},
 			baseRemoteUrl:  fmt.Sprintf("%s/%s/1panel", global.AppRepoURL(), global.CONF.Base.Mode),
 			systemVersion:  setting.SystemVersion,
 			settingService: settingService,
 			list:           list,
 			appTags:        make([]*model.AppTag, 0),
-			pendingIcons:   make(map[string]string),
 		}
 
 		if err = SyncTags(list.Extra); err != nil {
@@ -107,7 +99,7 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 			ctx.oldAppIds = append(ctx.oldAppIds, old.ID)
 		}
 
-		ctx.appsMap, ctx.pendingIcons = getApps(oldApps, list.Apps, setting.SystemVersion, t)
+		ctx.appsMap = getApps(oldApps, list.Apps, setting.SystemVersion, t)
 
 		var addCount, updateCount, deleteCount int
 		if err = ctx.classifyAndPersistAppsWithStats(&addCount, &updateCount, &deleteCount); err != nil {
@@ -129,40 +121,39 @@ func (a AppService) createSyncAppStoreTask(sharedCtx **appSyncContext) func(t *t
 	}
 }
 
-type appWorkItem struct {
-	appDef  dto.AppDefine
-	app     model.App
-	iconUrl string
-	hadIcon bool
-}
-
-type appWorkResult struct {
-	appKey     string
-	app        model.App
-	iconStatus int
-	hadIcon    bool
-	httpFailed bool
-}
-
-func (c *appSyncContext) processOneApp(item appWorkItem) appWorkResult {
-	app := item.app
-	l := item.appDef
-	result := appWorkResult{
-		appKey:  l.AppProperty.Key,
-		hadIcon: item.hadIcon,
+func refreshOfficialAppIcons(list *dto.AppList, t *task.Task) error {
+	if list == nil {
+		return nil
 	}
-
-	if item.hadIcon {
-		status, iconField := c.downloadAppIcon(item.iconUrl, l.AppProperty.Key, app.Icon)
-		result.iconStatus = status
-		switch status {
-		case http.StatusOK:
-			app.Icon = iconField
-		case http.StatusNotModified:
-		default:
-			result.httpFailed = true
+	apps, err := appRepo.GetBy(appRepo.WithResource(constant.AppResourceRemote))
+	if err != nil {
+		return err
+	}
+	systemVersion, err := settingRepo.GetValueByKey("SystemVersion")
+	if err != nil {
+		return err
+	}
+	updated := getApps(apps, list.Apps, systemVersion, t)
+	for _, app := range apps {
+		candidate := updated[app.Key]
+		if app.Status != constant.AppNormal || candidate.Status != constant.AppNormal || candidate.Icon == app.Icon {
+			continue
+		}
+		if err := appRepo.UpdateIcon(app.ID, candidate.Icon); err != nil {
+			return err
 		}
 	}
+	return nil
+}
+
+type appWorkItem struct {
+	appDef dto.AppDefine
+	app    model.App
+}
+
+func (c *appSyncContext) processOneApp(item appWorkItem) model.App {
+	app := item.app
+	l := item.appDef
 
 	app.TagsKey = l.AppProperty.Tags
 	if l.AppProperty.Recommend > 0 {
@@ -189,24 +180,12 @@ func (c *appSyncContext) processOneApp(item appWorkItem) appWorkResult {
 			continue
 		}
 
-		if _, ok := InitTypes[app.Type]; ok {
-			dockerComposeUrl := fmt.Sprintf("%s/%s", versionUrl, "docker-compose.yml")
-			dockerComposeUrl, err := appDownloadURL(dockerComposeUrl, strconv.Itoa(c.list.LastModified))
-			var composeRes []byte
-			if err == nil {
-				_, composeRes, err = req_helper.HandleRequestWithClient(&c.httpClient, dockerComposeUrl, http.MethodGet, constant.TimeOut20s)
-			}
-			if err == nil {
-				detail.DockerCompose = string(composeRes)
-			} else {
-				result.httpFailed = true
-			}
-		} else {
+		downloadURL := fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
+		if v.LastModified <= 0 || detail.LastModified != v.LastModified || detail.Params != string(paramByte) || detail.DownloadUrl != downloadURL {
 			detail.DockerCompose = ""
 		}
-
 		detail.Params = string(paramByte)
-		detail.DownloadUrl = fmt.Sprintf("%s/%s", versionUrl, app.Key+"-"+version+".tar.gz")
+		detail.DownloadUrl = downloadURL
 		detail.DownloadCallBackUrl = v.DownloadCallBackUrl
 		detail.Update = true
 		detail.LastModified = v.LastModified
@@ -219,168 +198,23 @@ func (c *appSyncContext) processOneApp(item appWorkItem) appWorkResult {
 	}
 	app.Details = newDetails
 
-	result.app = app
-	return result
+	return app
 }
 
-func (c *appSyncContext) syncAppIconsAndDetails() error {
+func (c *appSyncContext) syncAppDetails() error {
 	total := len(c.list.Apps)
 	global.LOG.Infof("[AppStore] sync app detail start, total apps: %d", total)
-
-	workItems := make([]appWorkItem, 0, total)
-	for _, l := range c.list.Apps {
-		app, ok := c.appsMap[l.AppProperty.Key]
-		if !ok {
-			continue
+	for i, definition := range c.list.Apps {
+		app, ok := c.appsMap[definition.AppProperty.Key]
+		if ok {
+			c.appsMap[app.Key] = c.processOneApp(appWorkItem{appDef: definition, app: app})
 		}
-		iconUrl, hasPending := c.pendingIcons[l.AppProperty.Key]
-		workItems = append(workItems, appWorkItem{
-			appDef:  l,
-			app:     app,
-			iconUrl: iconUrl,
-			hadIcon: hasPending,
-		})
-	}
-
-	totalWork := len(workItems)
-	if totalWork == 0 {
-		return nil
-	}
-
-	const maxWorkers = 4
-	var (
-		failFlag atomic.Bool
-		workCh   = make(chan int, maxWorkers)
-		resultCh = make(chan appWorkResult, maxWorkers)
-		wg       sync.WaitGroup
-	)
-
-	wg.Add(maxWorkers)
-	for range maxWorkers {
-		go func() {
-			defer wg.Done()
-			for idx := range workCh {
-				result := c.processOneApp(workItems[idx])
-				resultCh <- result
-				if result.httpFailed {
-					failFlag.Store(true)
-				}
-			}
-		}()
-	}
-	go func() { wg.Wait(); close(resultCh) }()
-
-	var fed atomic.Int32
-	go func() {
-		for i := range workItems {
-			if failFlag.Load() {
-				break
-			}
-			workCh <- i
-			fed.Store(int32(i + 1))
-		}
-		close(workCh)
-	}()
-
-	var (
-		completed     int
-		icon200Count  int
-		icon304Count  int
-		iconFailCount int
-	)
-	milestones := [4]int{totalWork / 4, totalWork / 2, totalWork * 3 / 4, totalWork}
-	nextMS := 0
-	checkProgress := func() {
-		if nextMS < len(milestones) && completed >= milestones[nextMS] {
-			c.task.LogWithProgress(i18n.GetMsgByKey("SyncAppDetail"), completed, totalWork)
-			nextMS++
+		if (i+1)%max(1, total/4) == 0 || i+1 == total {
+			c.task.LogWithProgress(i18n.GetMsgByKey("SyncAppDetail"), i+1, total)
 		}
 	}
-
-	applyResult := func(result appWorkResult) {
-		c.appsMap[result.appKey] = result.app
-		if result.hadIcon {
-			switch result.iconStatus {
-			case http.StatusOK:
-				icon200Count++
-			case http.StatusNotModified:
-				icon304Count++
-			default:
-				iconFailCount++
-			}
-		}
-		completed++
-		checkProgress()
-	}
-
-	for result := range resultCh {
-		applyResult(result)
-	}
-
-	fedCount := int(fed.Load())
-	if failFlag.Load() && fedCount < len(workItems) {
-		global.LOG.Warnf("[AppStore] HTTP failure detected, falling back to serial for remaining %d apps", len(workItems)-fedCount)
-		for i := fedCount; i < len(workItems); i++ {
-			result := c.processOneApp(workItems[i])
-			applyResult(result)
-		}
-	}
-
-	global.LOG.Infof("[AppStore] icon download completed - total: %d, success(200): %d, cached(304): %d, failed: %d",
-		total, icon200Count, icon304Count, iconFailCount)
-
+	global.LOG.Infof("[AppStore] app detail sync completed, total: %d", total)
 	return nil
-}
-
-func (c *appSyncContext) downloadAppIcon(iconUrl, appKey, oldIcon string) (status int, iconField string) {
-	iconFileName, existingEtag := appicon.ParseIconField(oldIcon)
-
-	reqHeaders := make(map[string]string)
-	if existingEtag != "" && iconFileName != "" && appicon.IconFileExists(iconFileName) {
-		reqHeaders["If-None-Match"] = existingEtag
-	}
-
-	resp, err := req_helper.HandleRequestWithHeaders(&c.httpClient, iconUrl, http.MethodGet, constant.TimeOut20s, reqHeaders)
-	if err != nil {
-		global.LOG.Warnf("[AppStore] request icon failed url=%s, err=%v", iconUrl, err)
-		return 0, ""
-	}
-
-	if resp.StatusCode == http.StatusNotModified {
-		return http.StatusNotModified, ""
-	}
-
-	if resp.StatusCode != http.StatusOK {
-		global.LOG.Warnf("[AppStore] download icon failed url=%s, status=%d", iconUrl, resp.StatusCode)
-		return 0, ""
-	}
-
-	if len(resp.Body) == 0 {
-		global.LOG.Warnf("[AppStore] download icon empty body url=%s", iconUrl)
-		return 0, ""
-	}
-
-	if resp.Body[0] == '<' {
-		global.LOG.Warnf("[AppStore] download icon got HTML response url=%s", iconUrl)
-		return 0, ""
-	}
-
-	contentType := resp.Header.Get("Content-Type")
-	ct := strings.TrimSpace(strings.Split(contentType, ";")[0])
-	if strings.ToLower(ct) != "image/png" {
-		global.LOG.Warnf("[AppStore] unexpected icon content-type: %s, expected image/png, url=%s", ct, iconUrl)
-	}
-
-	fileName, err := appicon.WriteIconFile(appKey, resp.Body)
-	if err != nil {
-		global.LOG.Warnf("[AppStore] write icon file failed appKey=%s, err=%v", appKey, err)
-		return 0, ""
-	}
-
-	newEtag := resp.Header.Get("ETag")
-	iconField = appicon.BuildIconField(fileName, newEtag)
-
-	return http.StatusOK, iconField
 }
 
 func (a AppService) createSyncAppStoreMetaTask(sharedCtx **appSyncContext) func(t *task.Task) error {
@@ -411,7 +245,7 @@ func (a AppService) createSyncAppStoreMetaTask(sharedCtx **appSyncContext) func(
 		ctx.task = t
 		ctx.appTags = make([]*model.AppTag, 0)
 
-		if err = ctx.syncAppIconsAndDetails(); err != nil {
+		if err = ctx.syncAppDetails(); err != nil {
 			t.LogFailedWithErr(i18n.GetMsgByKey("SyncAppDetail"), err)
 			return err
 		}

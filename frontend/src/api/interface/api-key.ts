@@ -30,4 +30,7 @@ export namespace APIKey {
         id: string;
         revision: number;
     }
+    export interface Revealed extends Reference {
+        apiKey: string;
+    }
 }
