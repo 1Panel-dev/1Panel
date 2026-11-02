@@ -88,6 +88,10 @@ func localEngineTaskStatus(operation, status string) string {
 		return constant.StatusRebuilding
 	case task.TaskRestart:
 		return constant.StatusRestarting
+	case "Run":
+		return constant.StatusStarting
+	case "Stop":
+		return constant.StatusWaiting
 	case task.TaskUpdate:
 		if status == constant.StatusWaiting {
 			return constant.StatusWaiting
