@@ -66,8 +66,13 @@ type ModelDownloaderService struct {
 	client         *http.Client
 	downloadClient *http.Client
 	mu             sync.Mutex
-	cancels        map[uint]context.CancelFunc
+	workers        map[uint]*modelDownloadWorker
 	downloadSem    chan struct{}
+}
+
+type modelDownloadWorker struct {
+	cancel context.CancelFunc
+	done   chan struct{}
 }
 
 type modelDownloaderInputError struct {
@@ -105,7 +110,7 @@ func NewIModelDownloaderService() IModelDownloaderService {
 	return &ModelDownloaderService{
 		client:         &http.Client{Timeout: 30 * time.Second},
 		downloadClient: &http.Client{},
-		cancels:        make(map[uint]context.CancelFunc),
+		workers:        make(map[uint]*modelDownloadWorker),
 		downloadSem:    make(chan struct{}, 1),
 	}
 }
@@ -212,8 +217,8 @@ func (m *ModelDownloaderService) startDownload(source string, req dto.ModelDownl
 		m.mu.Unlock()
 		return nil, err
 	}
+	m.startTaskLocked(task.ID)
 	m.mu.Unlock()
-	m.startTask(task.ID)
 	return mapDownloadTask(*task), nil
 }
 
@@ -277,6 +282,8 @@ func (m *ModelDownloaderService) PageTasks(req dto.ModelDownloadTaskSearch) (int
 }
 
 func (m *ModelDownloaderService) CancelTask(req dto.ModelDownloadTaskOperate) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
 	task, err := modelDownloadTaskRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -284,11 +291,8 @@ func (m *ModelDownloaderService) CancelTask(req dto.ModelDownloadTaskOperate) er
 	if task.Status != constant.StatusWaiting && task.Status != statusDownloading {
 		return newModelDownloaderInputError("task is not cancellable")
 	}
-	m.mu.Lock()
-	cancel := m.cancels[req.ID]
-	m.mu.Unlock()
-	if cancel != nil {
-		cancel()
+	if worker := m.workers[req.ID]; worker != nil {
+		worker.cancel()
 	}
 	now := time.Now()
 	return modelDownloadTaskRepo.Update(req.ID, map[string]interface{}{
@@ -298,20 +302,30 @@ func (m *ModelDownloaderService) CancelTask(req dto.ModelDownloadTaskOperate) er
 }
 
 func (m *ModelDownloaderService) RetryTask(req dto.ModelDownloadTaskRetry) (*dto.ModelDownloadTaskItem, error) {
-	task, err := modelDownloadTaskRepo.GetFirst(repo.WithByID(req.ID))
-	if err != nil {
-		return nil, err
-	}
-	if task.Status != constant.StatusFailed && task.Status != constant.StatusCanceled {
-		return nil, newModelDownloaderInputError("task is not retryable")
-	}
 	m.mu.Lock()
-	if err := ensureTargetDirAvailable(task.TargetDir); err != nil {
+	defer m.mu.Unlock()
+	var task model.ModelDownloadTask
+	for {
+		var err error
+		task, err = modelDownloadTaskRepo.GetFirst(repo.WithByID(req.ID))
+		if err != nil {
+			return nil, err
+		}
+		if task.Status != constant.StatusFailed && task.Status != constant.StatusCanceled {
+			return nil, newModelDownloaderInputError("task is not retryable")
+		}
+		worker := m.workers[req.ID]
+		if worker == nil {
+			break
+		}
 		m.mu.Unlock()
+		<-worker.done
+		m.mu.Lock()
+	}
+	if err := ensureTargetDirAvailable(task.TargetDir); err != nil {
 		return nil, err
 	}
 	if err := m.ensureNoActiveDownload(task.Source, task.RepoID, task.TargetDir, task.DownloadType); err != nil {
-		m.mu.Unlock()
 		return nil, err
 	}
 	if err := modelDownloadTaskRepo.Update(task.ID, map[string]interface{}{
@@ -322,11 +336,9 @@ func (m *ModelDownloaderService) RetryTask(req dto.ModelDownloadTaskRetry) (*dto
 		"started_at":      nil,
 		"completed_at":    nil,
 	}); err != nil {
-		m.mu.Unlock()
 		return nil, err
 	}
-	m.mu.Unlock()
-	m.startTask(task.ID)
+	m.startTaskLocked(task.ID)
 	task.Status = constant.StatusWaiting
 	task.Progress = 0
 	task.DownloadedSize = 0
@@ -600,15 +612,16 @@ func (m *ModelDownloaderService) ensureNoActiveDownload(source, repoID, targetDi
 	return nil
 }
 
-func (m *ModelDownloaderService) startTask(taskID uint) {
+func (m *ModelDownloaderService) startTaskLocked(taskID uint) {
 	ctx, cancel := context.WithCancel(context.Background())
-	m.mu.Lock()
-	m.cancels[taskID] = cancel
-	m.mu.Unlock()
+	worker := &modelDownloadWorker{cancel: cancel, done: make(chan struct{})}
+	m.workers[taskID] = worker
 	go func() {
 		defer func() {
+			cancel()
 			m.mu.Lock()
-			delete(m.cancels, taskID)
+			delete(m.workers, taskID)
+			close(worker.done)
 			m.mu.Unlock()
 		}()
 		m.downloadTask(ctx, taskID)
