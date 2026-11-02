@@ -155,11 +155,6 @@ func (v *VMService) DeleteIso(req dto.VMIsoDelete) error {
 			return err
 		}
 	}
-	if isoItem.Status == "downloading" || isoItem.Status == "failed" {
-		if err := os.Remove(isoItem.Path); err != nil && !os.IsNotExist(err) {
-			return err
-		}
-	}
 	return vmRepo.DeleteIso(repo.WithByID(req.ID))
 }
 
