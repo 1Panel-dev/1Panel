@@ -173,7 +173,7 @@ const open = async (
     const version = ++request;
     standalone.value = outside;
     if (row.engine === 'tensorrt' && !isFxplay.value) return;
-    instance.value = { version: '', containerName: '', status: '', modelDir: '', models: [], ...row };
+    instance.value = { version: '', ports: [], containerName: '', status: '', modelDir: '', models: [], ...row };
     actionName.value = action;
     deleted.value = false;
     header.value = `${engineLabels[row.engine]} ${i18n.global.t('aiTools.model.manage')}`;

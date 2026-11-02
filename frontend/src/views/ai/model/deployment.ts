@@ -9,6 +9,7 @@ export interface Deployment {
     engine: 'vllm' | 'ollama' | 'tensorrt';
     name: string;
     version: string;
+    ports: number[];
     containerName: string;
     modelDir: string;
     models: string[];
@@ -82,6 +83,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
         upgradable: item.upgradable,
         name: item.name,
         version: item.appVersion,
+        ports: item.port > 0 ? [item.port] : [],
         containerName: item.containerName,
         modelDir: item.modelDir,
         models: item.servedModelName ? [item.servedModelName] : [],
@@ -94,6 +96,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
             engine: 'tensorrt',
             name: item.name,
             version: item.version,
+            ports: (item.exposedPorts || []).map((port) => port.hostPort).filter((port) => port > 0),
             containerName: item.containerName,
             modelDir: item.modelDir,
             models: [],
@@ -111,6 +114,7 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
             engine: 'ollama',
             name: ollama.data.name || 'Ollama',
             version: ollama.data.version,
+            ports: ollama.data.httpPort > 0 ? [ollama.data.httpPort] : [],
             upgradable: updates.some((app) => app.id === ollama.data.appInstallId && app.canUpdate),
             containerName: ollama.data.containerName,
             modelDir: '',
