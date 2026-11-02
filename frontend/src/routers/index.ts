@@ -31,15 +31,8 @@ const clearLoginStatus = () => {
 };
 
 router.beforeEach(async (to, from) => {
-    const {
-        entrance,
-        isEnterprise,
-        isEnterpriseLicenseLoaded,
-        isEnterpriseLicensed,
-        isProductPro,
-        isLogin,
-        isOnRestart,
-    } = useGlobalStore();
+    const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin, isOnRestart } =
+        useGlobalStore();
     NProgress.start();
     axiosCanceler.removeAllPending();
 
@@ -121,6 +114,7 @@ router.beforeEach(async (to, from) => {
     const cachedRoute = readPanelCache<string>('tabs', activeMenuKey);
     if (
         to.meta.activeMenu &&
+        to.name !== 'ModelFiles' &&
         to.meta.activeMenu != from.meta.activeMenu &&
         typeof cachedRoute === 'string' &&
         cachedRoute &&
@@ -138,23 +132,6 @@ router.beforeEach(async (to, from) => {
             return cachedRoute;
         }
         removePanelCache('tabs', activeMenuKey);
-    }
-
-    if (to.name === 'ModelFiles') {
-        if (!isEnterprise.value) {
-            try {
-                await loadProductProFromDB();
-            } catch (error) {
-                console.warn('Failed to refresh model marketplace license status', error);
-            }
-        }
-        if (!isProductPro.value) {
-            if (cachedRoute === to.path) {
-                removePanelCache('tabs', activeMenuKey);
-            }
-            NProgress.done();
-            return { path: '/ai/model/account', query: to.query, replace: true };
-        }
     }
 
     if (!hasRouteAccess(to)) {

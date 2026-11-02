@@ -17,10 +17,11 @@ var (
 	appInstallService       = service.NewIAppInstalledService()
 	appIgnoreUpgradeService = service.NewIAppIgnoreUpgradeService()
 
-	aiToolService      = service.NewIAIToolService()
-	mcpServerService   = service.NewIMcpServerService()
-	tensorrtLLMService = service.NewITensorRTLLMService()
-	agentService       = service.NewIAgentService()
+	modelDownloaderService = service.NewIModelDownloaderService()
+	aiToolService          = service.NewIAIToolService()
+	mcpServerService       = service.NewIMcpServerService()
+	tensorrtLLMService     = service.NewITensorRTLLMService()
+	agentService           = service.NewIAgentService()
 
 	containerService       = service.NewIContainerService()
 	composeTemplateService = service.NewIComposeTemplateService()

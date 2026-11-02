@@ -121,6 +121,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddOllamaModelAccountSync,
 		migrations.AddContainerImageCheckUpdates,
 		migrations.AddModelQuickJump,
+		migrations.MigrateModelDownloader,
 	}
 }
 

@@ -1,14 +1,7 @@
 <template>
     <div class="model-page">
         <RouterButton :buttons="tabs" />
-        <component
-            :is="downloaderView"
-            v-if="isFiles && downloaderView"
-            @deploy="(modelDir) => createRef.open('vllm', modelDir)"
-        />
-        <LayoutContent v-else-if="isFiles">
-            <template #main><el-empty :description="$t('license.levelUpPro')" /></template>
-        </LayoutContent>
+        <component :is="downloaderView" v-if="isFiles" @deploy="(modelDir) => createRef.open('vllm', modelDir)" />
         <template v-else>
             <LayoutContent v-loading="loading">
                 <template #leftToolBar>
@@ -384,7 +377,6 @@ import type { FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, operateTensorRTLLM } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
-import { loadOptionalComponent } from '@/extensions/optional';
 import i18n from '@/lang';
 import { appInstalledDeleteCheck, installedOp, searchAppInstalled } from '@/api/modules/app';
 import { hasPermission } from '@/utils/rbac';
@@ -425,10 +417,7 @@ const tabs = computed(() => [
     { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
     { label: i18n.global.t('aiTools.model.engines'), path: '/ai/model/local' },
 ]);
-const downloaderModules = import.meta.glob('/src/xpack/views/model-downloader/index.vue');
-const downloaderView = Object.keys(downloaderModules).length
-    ? defineAsyncComponent(() => loadOptionalComponent('/src/xpack/views/model-downloader/index.vue'))
-    : null;
+const downloaderView = defineAsyncComponent(() => import('@/views/model-downloader/index.vue'));
 const createRef = ref();
 const manageRef = ref();
 const upgradeRef = ref();

@@ -3337,6 +3337,843 @@ const docTemplate = `{
 				]
 			}
 		},
+		"/ai/model/downloader/featured/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.FeaturedModelSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.FeaturedModelPage"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.FeaturedModel"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page featured models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/featured/sync": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Synchronizes the featured model catalog immediately, independently of the automatic synchronization setting. Does nothing in offline mode.",
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Synchronize featured models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/featured/sync/status": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Set value to Enable or Disable. This updates the automatic synchronization setting without triggering an immediate synchronization.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloaderSyncSetting"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update featured model automatic synchronization",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"value"
+					],
+					"formatEN": "update featured model automatic synchronization [value]",
+					"formatZH": "更新推荐模型自动同步 [value]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/hf/download": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Creates an asynchronous download task. Query /ai/model/downloader/tasks/search for progress.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownload"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download Hugging Face model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"repoID",
+						"revision"
+					],
+					"formatEN": "download Hugging Face model [repoID]",
+					"formatZH": "下载 Hugging Face 模型 [repoID]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/hf/info": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelInfoReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get Hugging Face model details",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/hf/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.PageResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.ModelItem"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search Hugging Face models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/local/delete": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.LocalModelDelete"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Delete locally downloaded model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"name"
+					],
+					"formatEN": "delete local model [name]",
+					"formatZH": "删除本地模型 [name]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/local/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.LocalModelSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.PageResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.LocalModelItem"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page locally downloaded models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/modelscope/download": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Creates an asynchronous download task. Query /ai/model/downloader/tasks/search for progress.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownload"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Download ModelScope model",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"repoID",
+						"revision"
+					],
+					"formatEN": "download ModelScope model [repoID]",
+					"formatZH": "下载 ModelScope 模型 [repoID]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/modelscope/info": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelInfoReq"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelInfo"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get ModelScope model details",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/modelscope/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.PageResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.ModelItem"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Search ModelScope models",
+				"tags": [
+					"AI"
+				]
+			}
+		},
+		"/ai/model/downloader/settings": {
+			"get": {
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloaderSetting"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get model downloader settings",
+				"tags": [
+					"AI"
+				]
+			},
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Updates the download directory, source endpoints and tokens. The featuredModelsSync field is ignored; use /ai/model/downloader/featured/sync/status to update automatic synchronization.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloaderSetting"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Update model downloader settings",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"modelDir"
+					],
+					"formatEN": "update model downloader settings [modelDir]",
+					"formatZH": "更新模型下载设置 [modelDir]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/tasks/cancel": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Only waiting or downloading tasks can be canceled. The withFile field is ignored.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskOperate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Cancel model download task",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "model_download_tasks",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "repo_id",
+							"output_value": "repoID"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "cancel model download task [repoID]",
+					"formatZH": "取消模型下载任务 [repoID]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/tasks/remove": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Waiting or downloading tasks cannot be removed. Set withFile to true to also delete downloaded files.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskOperate"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Remove model download task",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "model_download_tasks",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "repo_id",
+							"output_value": "repoID"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "remove model download task [repoID]",
+					"formatZH": "移除模型下载任务 [repoID]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/tasks/retry": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Only failed or canceled tasks can be retried. Returns the task while the download runs asynchronously.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskRetry"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskItem"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Retry model download task",
+				"tags": [
+					"AI"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [
+						{
+							"db": "model_download_tasks",
+							"input_column": "id",
+							"input_value": "id",
+							"isList": false,
+							"output_column": "repo_id",
+							"output_value": "repoID"
+						}
+					],
+					"bodyKeys": [
+						"id"
+					],
+					"formatEN": "retry model download task [repoID]",
+					"formatZH": "重试模型下载任务 [repoID]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/ai/model/downloader/tasks/search": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"description": "Set includeLocal to true to include locally downloaded models.",
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.ModelDownloadTaskSearch"
+						}
+					}
+				],
+				"produces": [
+					"application/json"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"allOf": [
+								{
+									"$ref": "#/definitions/dto.PageResult"
+								},
+								{
+									"properties": {
+										"items": {
+											"items": {
+												"$ref": "#/definitions/dto.ModelDownloadTaskItem"
+											},
+											"type": "array"
+										}
+									},
+									"type": "object"
+								}
+							]
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Page model download tasks",
+				"tags": [
+					"AI"
+				]
+			}
+		},
 		"/ai/ollama/close": {
 			"post": {
 				"consumes": [
@@ -37824,6 +38661,92 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.FeaturedModel": {
+			"properties": {
+				"activeParams": {
+					"type": "string"
+				},
+				"architecture": {
+					"type": "string"
+				},
+				"backboneParams": {
+					"type": "string"
+				},
+				"description": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"type": "object"
+				},
+				"engram": {
+					"type": "string"
+				},
+				"family": {
+					"type": "string"
+				},
+				"key": {
+					"type": "string"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"sort": {
+					"type": "integer"
+				},
+				"sourceModelIds": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"type": "object"
+				},
+				"sources": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"weightGB": {
+					"type": "number"
+				}
+			},
+			"type": "object"
+		},
+		"dto.FeaturedModelPage": {
+			"properties": {
+				"families": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"items": {},
+				"total": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.FeaturedModelSearch": {
+			"properties": {
+				"family": {
+					"type": "string"
+				},
+				"info": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
 		"dto.FileDownloadPreference": {
 			"properties": {
 				"useServerFilename": {
@@ -39337,6 +40260,84 @@ const docTemplate = `{
 			],
 			"type": "object"
 		},
+		"dto.LocalModelDelete": {
+			"properties": {
+				"downloadType": {
+					"enum": [
+						"all",
+						"tokenizer"
+					],
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"withFile": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"name"
+			],
+			"type": "object"
+		},
+		"dto.LocalModelItem": {
+			"properties": {
+				"createdAt": {
+					"type": "string"
+				},
+				"downloadType": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"path": {
+					"type": "string"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"revision": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"sizeFormatted": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.LocalModelSearch": {
+			"properties": {
+				"downloadType": {
+					"enum": [
+						"all",
+						"tokenizer"
+					],
+					"type": "string"
+				},
+				"info": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
 		"dto.Locale": {
 			"properties": {
 				"en": {
@@ -39516,6 +40517,303 @@ const docTemplate = `{
 				"interval",
 				"secret"
 			],
+			"type": "object"
+		},
+		"dto.ModelDownload": {
+			"properties": {
+				"downloadType": {
+					"enum": [
+						"all",
+						"tokenizer"
+					],
+					"type": "string"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"revision": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"repoID"
+			],
+			"type": "object"
+		},
+		"dto.ModelDownloadTaskItem": {
+			"properties": {
+				"canCancel": {
+					"type": "boolean"
+				},
+				"canRemoveRecord": {
+					"type": "boolean"
+				},
+				"canRetry": {
+					"type": "boolean"
+				},
+				"completedAt": {
+					"type": "string"
+				},
+				"createdAt": {
+					"type": "string"
+				},
+				"downloadType": {
+					"type": "string"
+				},
+				"downloadedSize": {
+					"type": "integer"
+				},
+				"errorMessage": {
+					"type": "string"
+				},
+				"id": {
+					"type": "integer"
+				},
+				"localModel": {
+					"$ref": "#/definitions/dto.LocalModelItem"
+				},
+				"modelName": {
+					"type": "string"
+				},
+				"progress": {
+					"type": "number"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"revision": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"startedAt": {
+					"type": "string"
+				},
+				"status": {
+					"type": "string"
+				},
+				"targetDir": {
+					"type": "string"
+				},
+				"totalSize": {
+					"type": "integer"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ModelDownloadTaskOperate": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				},
+				"withFile": {
+					"type": "boolean"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.ModelDownloadTaskRetry": {
+			"properties": {
+				"id": {
+					"type": "integer"
+				}
+			},
+			"required": [
+				"id"
+			],
+			"type": "object"
+		},
+		"dto.ModelDownloadTaskSearch": {
+			"properties": {
+				"downloadType": {
+					"enum": [
+						"all",
+						"tokenizer"
+					],
+					"type": "string"
+				},
+				"includeLocal": {
+					"type": "boolean"
+				},
+				"info": {
+					"type": "string"
+				},
+				"page": {
+					"type": "integer"
+				},
+				"pageSize": {
+					"type": "integer"
+				},
+				"status": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"page",
+				"pageSize"
+			],
+			"type": "object"
+		},
+		"dto.ModelDownloaderSetting": {
+			"properties": {
+				"featuredModelsSync": {
+					"type": "string"
+				},
+				"hfEndpoint": {
+					"type": "string"
+				},
+				"hfToken": {
+					"type": "string"
+				},
+				"modelDir": {
+					"type": "string"
+				},
+				"modelScopeEndpoint": {
+					"type": "string"
+				},
+				"modelScopeToken": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"modelDir"
+			],
+			"type": "object"
+		},
+		"dto.ModelDownloaderSyncSetting": {
+			"properties": {
+				"value": {
+					"enum": [
+						"Enable",
+						"Disable"
+					],
+					"type": "string"
+				}
+			},
+			"required": [
+				"value"
+			],
+			"type": "object"
+		},
+		"dto.ModelFile": {
+			"properties": {
+				"name": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"sizeFormatted": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ModelInfo": {
+			"properties": {
+				"downloads": {
+					"type": "integer"
+				},
+				"files": {
+					"items": {
+						"$ref": "#/definitions/dto.ModelFile"
+					},
+					"type": "array"
+				},
+				"likes": {
+					"type": "integer"
+				},
+				"modelCard": {
+					"type": "string"
+				},
+				"name": {
+					"type": "string"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"sizeFormatted": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ModelInfoReq": {
+			"properties": {
+				"repoID": {
+					"type": "string"
+				},
+				"revision": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"repoID"
+			],
+			"type": "object"
+		},
+		"dto.ModelItem": {
+			"properties": {
+				"downloads": {
+					"type": "integer"
+				},
+				"likes": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"repoID": {
+					"type": "string"
+				},
+				"size": {
+					"type": "integer"
+				},
+				"sizeFormatted": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.ModelSearch": {
+			"properties": {
+				"limit": {
+					"maximum": 100,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"page": {
+					"minimum": 1,
+					"type": "integer"
+				},
+				"pageSize": {
+					"maximum": 100,
+					"minimum": 1,
+					"type": "integer"
+				},
+				"query": {
+					"type": "string"
+				},
+				"sort": {
+					"enum": [
+						"trending",
+						"downloads",
+						"updated",
+						"created",
+						"likes",
+						"most_params",
+						"least_params"
+					],
+					"type": "string"
+				}
+			},
 			"type": "object"
 		},
 		"dto.MongodbBind": {
