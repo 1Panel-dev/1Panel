@@ -222,6 +222,47 @@
                                 </div>
                             </template>
                         </el-table-column>
+                        <el-table-column :label="$t('commons.table.port')" min-width="120">
+                            <template #default="{ row }">
+                                <span v-if="!row.ports.length">—</span>
+                                <div v-else class="space-y-1">
+                                    <div
+                                        v-for="(port, index) in row.ports.slice(0, 2)"
+                                        :key="index"
+                                        class="flex items-center gap-2"
+                                    >
+                                        <span v-if="row.engine === 'tensorrt'">{{ port }}</span>
+                                        <el-button
+                                            v-else
+                                            icon="Position"
+                                            plain
+                                            size="small"
+                                            @click="portJumpRef.acceptParams({ port, ip: '', protocol: 'http' })"
+                                        >
+                                            {{ port }}
+                                        </el-button>
+                                        <el-popover
+                                            v-if="index === 1 && row.ports.length > 2"
+                                            placement="bottom"
+                                            trigger="click"
+                                            :title="$t('commons.table.port')"
+                                            :width="160"
+                                        >
+                                            <template #reference>
+                                                <el-button size="small" class="shrink-0">
+                                                    +{{ row.ports.length - 2 }}
+                                                </el-button>
+                                            </template>
+                                            <div class="max-h-60 overflow-y-auto space-y-1">
+                                                <div v-for="(item, portIndex) in row.ports" :key="portIndex">
+                                                    {{ item }}
+                                                </div>
+                                            </div>
+                                        </el-popover>
+                                    </div>
+                                </div>
+                            </template>
+                        </el-table-column>
                         <el-table-column :label="$t('aiTools.model.model')" min-width="200">
                             <template #default="{ row }">
                                 <div v-for="(model, index) in row.models.slice(0, 2)" :key="model" class="model-line">
@@ -326,6 +367,7 @@
         <ModelPool ref="poolRef" @updated="search" />
         <TerminalDialog :key="`terminal:${currentNode}:${route.fullPath}`" ref="terminalRef" />
         <SyncService ref="syncRef" @search="search" />
+        <PortJump ref="portJumpRef" />
     </div>
 </template>
 
@@ -337,6 +379,7 @@ import type { AI } from '@/api/interface/ai';
 import type { Container } from '@/api/interface/container';
 import { containerListStats } from '@/api/modules/container';
 import ContainerResource from '@/components/container-resource/index.vue';
+import PortJump from '@/components/port-jump/index.vue';
 import type { FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, operateTensorRTLLM } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -394,6 +437,7 @@ const appResourcesRef = ref();
 const poolRef = ref();
 const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
+const portJumpRef = ref<InstanceType<typeof PortJump>>();
 const loading = ref(false);
 const connections = ref<AI.AgentAccountItem[]>([]);
 const accountColumns = ref<FuTableColumnConfig[]>([]);
