@@ -350,14 +350,16 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 }
 
 func operateAppTask(install model.AppInstall, req request.AppInstalledOperate, onFailure func(error)) error {
-	taskType := task.TaskUpdate
+	var taskType string
 	switch req.Operate {
 	case constant.Start:
+		taskType = "Run"
 		install.Status = constant.StatusStarting
 	case constant.Restart:
 		taskType = task.TaskRestart
 		install.Status = constant.StatusRestarting
 	case constant.Stop:
+		taskType = "Stop"
 		install.Status = constant.StatusWaiting
 	default:
 		return errors.New("lifecycle script operation not supported")
@@ -395,7 +397,9 @@ func operateAppTask(install model.AppInstall, req request.AppInstalledOperate, o
 				case constant.Restart:
 					out, err = compose.Restart(install.GetComposePath())
 				}
-				t.Log(out)
+				if strings.TrimSpace(out) != "" {
+					t.Log(out)
+				}
 				if err != nil {
 					return err
 				}
@@ -1134,8 +1138,10 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 			operation = task.TaskBuild
 		case constant.StatusUninstalling:
 			operation = task.TaskUninstall
-		case constant.StatusStarting, constant.StatusWaiting:
-			operation = task.TaskUpdate
+		case constant.StatusStarting:
+			operation = "Run"
+		case constant.StatusWaiting:
+			operation = "Stop"
 		case constant.StatusRestarting:
 			operation = task.TaskRestart
 		}

@@ -346,9 +346,16 @@ func (t TensorRTLLMService) Operate(req request.TensorRTLLMOperate) error {
 	if err != nil {
 		return err
 	}
-	operation := task.TaskUpdate
-	if req.Operate == "restart" {
+	var operation string
+	switch req.Operate {
+	case "start":
+		operation = "Run"
+	case "stop":
+		operation = "Stop"
+	case "restart":
 		operation = task.TaskRestart
+	default:
+		return fmt.Errorf("unsupported TensorRT operation: %s", req.Operate)
 	}
 	return runTensorRTLLMTask(tensorrtLLM, operation, req.Operate, req.TaskID)
 }
@@ -393,7 +400,9 @@ func runTensorRTLLMTask(llm *model.TensorRTLLM, operation, action, taskID string
 			out, err = compose.Up(composePath)
 		case "update":
 			out, err = compose.Down(composePath)
-			t.Log(out)
+			if strings.TrimSpace(out) != "" {
+				t.Log(out)
+			}
 			if err != nil {
 				return err
 			}
@@ -407,7 +416,9 @@ func runTensorRTLLMTask(llm *model.TensorRTLLM, operation, action, taskID string
 		default:
 			return fmt.Errorf("unsupported TensorRT operation: %s", action)
 		}
-		t.Log(out)
+		if strings.TrimSpace(out) != "" {
+			t.Log(out)
+		}
 		if err != nil {
 			return err
 		}
