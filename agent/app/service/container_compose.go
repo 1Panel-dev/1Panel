@@ -608,10 +608,11 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 	if err != nil {
 		return err
 	}
+	projectName := loadComposeProjectNameForLog(list, req.Name, req.Path)
 	ctx := context.Background()
 	for _, item := range list {
 		if name, ok := item.Labels[composeProjectLabel]; ok {
-			if name != req.Name {
+			if name != projectName {
 				continue
 			}
 			containerItem, err := client.ContainerInspect(ctx, item.ID)
@@ -638,10 +639,33 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 		}
 	}
 	return u.ComposeOperation(dto.ComposeOperation{
-		Name:      req.Name,
+		Name:      projectName,
 		Path:      req.Path,
 		Operation: "restart",
 	})
+}
+
+// loadComposeProjectNameForLog returns the project name that Compose uses for
+// the containers of composePath. Apps and runtimes pass their display name,
+// which can differ from the project name, for example in letter case.
+func loadComposeProjectNameForLog(list []container.Summary, name, composePath string) string {
+	for _, item := range list {
+		if item.Labels[composeProjectLabel] == name {
+			return name
+		}
+	}
+	target := filepath.Clean(strings.TrimSpace(primaryComposePath(composePath)))
+	for _, item := range list {
+		projectName := item.Labels[composeProjectLabel]
+		if projectName == "" {
+			continue
+		}
+		configFile := strings.TrimSpace(primaryComposePath(item.Labels[composeConfigLabel]))
+		if configFile != "" && filepath.Clean(configFile) == target {
+			return projectName
+		}
+	}
+	return name
 }
 
 func (u *ContainerService) LoadComposeEnv(name string) (string, error) {
