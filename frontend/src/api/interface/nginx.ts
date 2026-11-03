@@ -10,6 +10,7 @@ export namespace Nginx {
     export interface NginxBrotliRes {
         params: NginxParam[];
         managedExternally: boolean;
+        managedPending: boolean;
         managedUnavailable: boolean;
     }
 

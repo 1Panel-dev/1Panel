@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"strings"
 	"testing"
 )
@@ -83,8 +84,14 @@ func TestInsertNginxHTTPIncludeFallsBackToHTTPBlock(t *testing.T) {
 }
 
 func TestInsertNginxHTTPIncludeRejectsConfigWithoutHTTPBlock(t *testing.T) {
-	if _, err := insertNginxHTTPInclude("events {}\n"); err == nil {
+	_, err := insertNginxHTTPInclude("events {}\n")
+	if err == nil {
 		t.Fatal("a config without an http block must be rejected so callers can degrade")
+	}
+	// The save path maps this error to an actionable message and must be able
+	// to tell it apart from an I/O failure.
+	if !errors.Is(err, errNginxHTTPIncludeNoInsertionPoint) {
+		t.Fatalf("unexpected error: %v", err)
 	}
 }
 

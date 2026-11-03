@@ -4650,6 +4650,7 @@ const message = {
         brotliCompLevelHelper: 'Tasa de compresión brotli, de 0 a 11',
         brotliManagedExternallyHelper:
             'Brotli está configurado manualmente en nginx.conf; el panel muestra los valores en vigor y no los sobrescribe.',
+        brotliManagedPendingHelper: 'La configuración de brotli aún no está en vigor; se aplicará al guardar.',
         brotliManagedUnavailableHelper:
             'El panel no pudo añadir automáticamente la configuración brotli gestionada a nginx.conf; los valores siguientes no tendrán efecto.',
         brotliMinLengthHelper: 'Tamaño mínimo de respuesta para comprimir con brotli',

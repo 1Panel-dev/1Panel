@@ -4649,6 +4649,7 @@ const message = {
         brotliCompLevelHelper: 'Степень сжатия brotli, от 0 до 11',
         brotliManagedExternallyHelper:
             'Brotli настроен вручную в nginx.conf; панель показывает действующие значения и не перезаписывает их.',
+        brotliManagedPendingHelper: 'Настройки brotli ещё не действуют; они вступят в силу после сохранения.',
         brotliManagedUnavailableHelper:
             'Панель не смогла автоматически добавить управляемую конфигурацию brotli в nginx.conf; значения ниже не вступят в силу.',
         brotliMinLengthHelper: 'Минимальный размер ответа для сжатия brotli',

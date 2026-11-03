@@ -4574,6 +4574,7 @@ const message = {
         brotliCompLevelHelper: 'brotli 圧縮率、0 から 11',
         brotliManagedExternallyHelper:
             'brotli は nginx.conf で手動設定されています。パネルは現在の有効な値を表示するだけで、上書きしません。',
+        brotliManagedPendingHelper: 'brotli 設定はまだ有効になっていません。保存すると有効になります。',
         brotliManagedUnavailableHelper:
             'パネルは管理対象の brotli 設定を nginx.conf に自動で追加できませんでした。以下の設定は有効になりません。',
         brotliMinLengthHelper: 'brotli で圧縮する最小レスポンスサイズ',

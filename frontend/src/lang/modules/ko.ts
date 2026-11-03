@@ -4492,6 +4492,7 @@ const message = {
         brotliCompLevelHelper: 'brotli 압축률, 0에서 11까지',
         brotliManagedExternallyHelper:
             'brotli가 nginx.conf에 수동으로 구성되어 있습니다. 패널은 적용 중인 값만 표시하며 덮어쓰지 않습니다.',
+        brotliManagedPendingHelper: 'brotli 설정이 아직 적용되지 않았습니다. 저장하면 적용됩니다.',
         brotliManagedUnavailableHelper:
             '패널이 관리되는 brotli 구성을 nginx.conf에 자동으로 추가할 수 없습니다. 아래 설정은 적용되지 않습니다.',
         brotliMinLengthHelper: 'brotli로 압축할 최소 응답 크기',

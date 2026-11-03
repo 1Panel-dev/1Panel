@@ -4659,6 +4659,7 @@ const message = {
         brotliCompLevelHelper: 'Kadar pemampatan brotli, 0 hingga 11',
         brotliManagedExternallyHelper:
             'Brotli dikonfigurasikan secara manual dalam nginx.conf; panel memaparkan nilai yang berkuat kuasa dan tidak akan menimpanya.',
+        brotliManagedPendingHelper: 'Tetapan brotli belum berkuat kuasa; ia akan berkuat kuasa selepas disimpan.',
         brotliManagedUnavailableHelper:
             'Panel tidak dapat menambahkan konfigurasi brotli terurus ke nginx.conf secara automatik; nilai di bawah tidak akan berkuat kuasa.',
         brotliMinLengthHelper: 'Saiz respons minimum untuk dimampatkan dengan brotli',

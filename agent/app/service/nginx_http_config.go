@@ -45,6 +45,10 @@ var (
 	// nginxHTTPBlockStartRe locates the http block opening, the fallback
 	// insertion point, and captures its indentation.
 	nginxHTTPBlockStartRe = regexp.MustCompile(`(?m)^([ \t]*)http[ \t]*\{[ \t]*\r?$`)
+
+	// errNginxHTTPIncludeNoInsertionPoint tells a config the panel cannot edit
+	// safely apart from an I/O failure while editing it.
+	errNginxHTTPIncludeNoInsertionPoint = errors.New("no insertion point for the http.d include in nginx.conf")
 )
 
 // nginxHTTPIncludePresent reports whether nginx.conf already loads http.d.
@@ -96,7 +100,19 @@ func insertNginxHTTPInclude(content string) (string, error) {
 		indent := content[m[2]:m[3]] + "    "
 		return content[:m[1]] + eol + indent + nginxHTTPIncludeDirective + content[m[1]:], nil
 	}
-	return "", errors.New("no insertion point for the http.d include in nginx.conf")
+	return "", errNginxHTTPIncludeNoInsertionPoint
+}
+
+// nginxHTTPIncludeInsertable reports whether nginx.conf already loads http.d
+// or the include can be added automatically. Nothing is written: the
+// insertion is computed in memory and discarded.
+func nginxHTTPIncludeInsertable(install model.AppInstall) bool {
+	content, err := os.ReadFile(nginxMainConfigPath(install))
+	if err != nil {
+		return false
+	}
+	_, err = insertNginxHTTPInclude(string(content))
+	return err == nil
 }
 
 // ensureNginxHTTPIncludeActive makes nginx.conf load http.d, inserting the

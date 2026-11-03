@@ -229,3 +229,85 @@ func TestValidateNginxBrotliValues(t *testing.T) {
 		}
 	}
 }
+
+// newBrotliStateInstall lays out an OpenResty install whose nginx.conf holds
+// conf, or that has no nginx.conf at all when conf is empty.
+func newBrotliStateInstall(t *testing.T, conf string) model.AppInstall {
+	t.Helper()
+	installRoot := t.TempDir()
+	confDir := path.Join(installRoot, "openresty", "openresty", "conf")
+	if err := os.MkdirAll(confDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if conf != "" {
+		if err := os.WriteFile(path.Join(confDir, "nginx.conf"), []byte(conf), 0o644); err != nil {
+			t.Fatal(err)
+		}
+	}
+	previous := global.Dir.AppInstallDir
+	global.Dir.AppInstallDir = installRoot
+	t.Cleanup(func() { global.Dir.AppInstallDir = previous })
+	install := model.AppInstall{Name: "openresty"}
+	install.App.Key = constant.AppOpenresty
+	return install
+}
+
+// Installs that enabled brotli before the panel managed its directives have
+// no http.d include. Saving inserts it, so the settings page must report the
+// values as pending rather than as something the panel can never apply.
+func TestNginxBrotliManagedState(t *testing.T) {
+	withInclude, err := insertNginxHTTPInclude(plainNginxConf)
+	if err != nil {
+		t.Fatal(err)
+	}
+	managedFile := nginxHTTPConfigFileName(nginxModuleRuntimeOrder(nginxBrotliModuleName), nginxBrotliModuleName)
+	cases := []struct {
+		name            string
+		conf            string
+		managedFile     bool
+		wantPending     bool
+		wantUnavailable bool
+	}{
+		{"include missing but insertable", plainNginxConf, false, true, false},
+		{"no insertion point", "events {}\n", false, false, true},
+		{"nginx.conf unreadable", "", false, false, true},
+		{"include present, managed file missing", withInclude, false, true, false},
+		{"include present and managed file written", withInclude, true, false, false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			install := newBrotliStateInstall(t, tc.conf)
+			if tc.managedFile {
+				configDir := nginxHTTPConfigDir(install)
+				if err := os.MkdirAll(configDir, 0o755); err != nil {
+					t.Fatal(err)
+				}
+				if err := os.WriteFile(path.Join(configDir, managedFile), []byte("brotli on;\n"), 0o644); err != nil {
+					t.Fatal(err)
+				}
+			}
+			pending, unavailable := nginxBrotliManagedState(install)
+			if pending != tc.wantPending || unavailable != tc.wantUnavailable {
+				t.Fatalf("expected pending=%v unavailable=%v, got pending=%v unavailable=%v",
+					tc.wantPending, tc.wantUnavailable, pending, unavailable)
+			}
+		})
+	}
+}
+
+// The state is computed on every visit to the settings page; only an explicit
+// save may change the configuration.
+func TestNginxBrotliManagedStateDoesNotWrite(t *testing.T) {
+	install := newBrotliStateInstall(t, plainNginxConf)
+	nginxBrotliManagedState(install)
+	content, err := os.ReadFile(nginxMainConfigPath(install))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(content) != plainNginxConf {
+		t.Fatal("checking the state must not edit nginx.conf")
+	}
+	if _, err := os.Stat(nginxHTTPConfigDir(install)); !os.IsNotExist(err) {
+		t.Fatal("checking the state must not create the http.d directory")
+	}
+}
