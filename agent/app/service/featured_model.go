@@ -19,7 +19,7 @@ import (
 var featuredModelsSyncMu sync.Mutex
 
 func (m *ModelDownloaderService) PageFeaturedModels(req dto.FeaturedModelSearch) (*dto.FeaturedModelPage, error) {
-	total, models, err := featuredModelRepo.Page(req.Page, req.PageSize, strings.TrimSpace(req.Family), strings.TrimSpace(req.Info))
+	total, models, err := featuredModelRepo.Page(req.Page, req.PageSize, strings.TrimSpace(req.Family), strings.TrimSpace(req.WeightProvider), strings.TrimSpace(req.Info))
 	if err != nil {
 		return nil, err
 	}
@@ -31,8 +31,8 @@ func (m *ModelDownloaderService) PageFeaturedModels(req dto.FeaturedModelSearch)
 		}
 		items = append(items, dto.FeaturedModel{
 			Key: item.Key, Sort: item.Sort, Family: item.Family, RepoID: item.RepoID, Sources: item.Sources,
-			SourceModelIDs: item.SourceModelIDs,
-			Architecture:   item.Architecture, BackboneParams: item.BackboneParams,
+			SourceModelIDs: item.SourceModelIDs, WeightProvider: item.WeightProvider,
+			Architecture: item.Architecture, BackboneParams: item.BackboneParams,
 			ActiveParams: item.ActiveParams, Engram: item.Engram, WeightGB: item.WeightGB,
 			Description: description,
 		})
@@ -41,7 +41,11 @@ func (m *ModelDownloaderService) PageFeaturedModels(req dto.FeaturedModelSearch)
 	if err != nil {
 		return nil, err
 	}
-	return &dto.FeaturedModelPage{PageResult: dto.PageResult{Total: total, Items: items}, Families: families}, nil
+	weightProviders, err := featuredModelRepo.WeightProviders()
+	if err != nil {
+		return nil, err
+	}
+	return &dto.FeaturedModelPage{PageResult: dto.PageResult{Total: total, Items: items}, Families: families, WeightProviders: weightProviders}, nil
 }
 
 func (m *ModelDownloaderService) SyncFeaturedModels() error {
@@ -74,6 +78,12 @@ func (m *ModelDownloaderService) SyncFeaturedModels() error {
 		item.Key = strings.TrimSpace(item.Key)
 		item.Family = strings.TrimSpace(item.Family)
 		item.RepoID = strings.TrimSpace(item.RepoID)
+		item.WeightProvider = strings.TrimSpace(item.WeightProvider)
+		if item.WeightProvider == "" {
+			if provider, _, ok := strings.Cut(item.RepoID, "/"); ok {
+				item.WeightProvider = provider
+			}
+		}
 		if item.Key == "" || item.Family == "" || item.RepoID == "" || (item.Architecture != "MoE" && item.Architecture != "Dense") || item.WeightGB < 0 {
 			return fmt.Errorf("invalid featured model: %s", item.Key)
 		}
@@ -95,8 +105,8 @@ func (m *ModelDownloaderService) SyncFeaturedModels() error {
 		}
 		models = append(models, model.FeaturedModel{
 			Key: item.Key, Sort: item.Sort, Family: item.Family, RepoID: item.RepoID, Sources: item.Sources,
-			SourceModelIDs: item.SourceModelIDs,
-			Architecture:   item.Architecture, BackboneParams: item.BackboneParams,
+			SourceModelIDs: item.SourceModelIDs, WeightProvider: item.WeightProvider,
+			Architecture: item.Architecture, BackboneParams: item.BackboneParams,
 			ActiveParams: item.ActiveParams, Engram: item.Engram, WeightGB: item.WeightGB,
 			Description: string(description),
 		})

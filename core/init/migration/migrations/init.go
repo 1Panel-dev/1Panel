@@ -1406,6 +1406,46 @@ var UpdateAiMenuOrderV2 = &gormigrate.Migration{
 	},
 }
 
+var UpdateAiModelManagementMenus = &gormigrate.Migration{
+	ID: "20261103-update-ai-model-management-menus",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+			for i := range menus {
+				if menus[i].Label != "AI-Menu" {
+					continue
+				}
+				menus[i].Path = "/ai/model/files"
+				children := menus[i].Children
+				showOllama := true
+				hasOllama := false
+				insertIndex := 0
+				for j := range children {
+					switch children[j].Label {
+					case "AIModel":
+						children[j].Title = "aiTools.model.vllmManagement"
+						children[j].Path = "/ai/model/files"
+						showOllama = children[j].IsShow
+						insertIndex = j
+					case "OllamaModels":
+						hasOllama = true
+					}
+				}
+				if !hasOllama {
+					children = append(children, dto.ShowMenu{})
+					copy(children[insertIndex+1:], children[insertIndex:])
+					children[insertIndex] = dto.ShowMenu{
+						ID: "48", Title: "aiTools.model.ollamaManagement", IsShow: showOllama,
+						Label: "OllamaModels", Path: "/ai/model/local/ollama", Sort: 25,
+					}
+				}
+				menus[i].Children = children
+				break
+			}
+			return menus
+		})
+	},
+}
+
 var UpdateFirewallMenuPath = &gormigrate.Migration{
 	ID: "20260819-update-firewall-menu-path",
 	Migrate: func(tx *gorm.DB) error {

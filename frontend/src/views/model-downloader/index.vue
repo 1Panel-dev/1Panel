@@ -58,6 +58,23 @@
                             <ProviderLabel :provider="familyProviders[family] || family" :display-name="family" />
                         </el-option>
                     </el-select>
+                    <el-select
+                        v-model="featuredWeightProvider"
+                        clearable
+                        filterable
+                        placeholder=""
+                        class="model-filter"
+                        :aria-label="$t('aiTools.model.weightProvider')"
+                        @change="handleFeaturedSearch"
+                    >
+                        <template #prefix>{{ $t('aiTools.model.weightProvider') }}</template>
+                        <el-option
+                            v-for="provider in featuredWeightProviders"
+                            :key="provider"
+                            :label="provider"
+                            :value="provider"
+                        />
+                    </el-select>
                     <TableSearch
                         v-model:searchName="featuredSearchName"
                         class="model-search"
@@ -116,20 +133,40 @@
                         :prop="field.prop"
                         :label="$t('aiTools.model.' + field.label)"
                         :min-width="field.width"
-                        :card-type="field.prop === 'repoID' ? 'name' : 'content'"
+                        :card-type="
+                            field.prop === 'repoID' ? 'name' : field.prop === 'weightProvider' ? 'status' : 'content'
+                        "
                     >
                         <template #default="{ row }">
                             <template v-if="field.prop === 'repoID'">
                                 <span v-if="featuredViewMode === 'card'" class="featured-name-label">
                                     {{ $t('aiTools.model.modelName') }}
                                 </span>
-                                <el-button link type="primary" class="featured-name" @click="openFeaturedModel(row)">
-                                    {{ row.repoID }}
+                                <el-button
+                                    link
+                                    type="primary"
+                                    class="featured-name"
+                                    :title="row.repoID"
+                                    @click="openFeaturedModel(row)"
+                                >
+                                    {{ row.repoID?.slice(row.repoID.indexOf('/') + 1) || '-' }}
                                 </el-button>
                                 <div v-if="featuredViewMode === 'card' && row.description" class="featured-description">
                                     {{ row.description[language.toLowerCase()] || row.description.en }}
                                 </div>
                             </template>
+                            <el-tag
+                                v-else-if="
+                                    field.prop === 'weightProvider' && featuredViewMode === 'card' && row.weightProvider
+                                "
+                                class="featured-provider"
+                                type="info"
+                                effect="plain"
+                                size="small"
+                                :title="$t('aiTools.model.weightProvider') + ': ' + row.weightProvider"
+                            >
+                                {{ row.weightProvider }}
+                            </el-tag>
                             <ProviderLabel
                                 v-else-if="field.prop === 'family'"
                                 :provider="familyProviders[row.family]"
@@ -473,6 +510,7 @@ const savingSettings = ref(false);
 const currentTab = ref<DownloaderTab>('featured');
 const featuredViewMode = ref<'table' | 'card'>('table');
 const featuredFamily = ref('');
+const featuredWeightProvider = ref('');
 const featuredSearchName = ref('');
 const familyProviders: Record<string, string> = {
     Qwen: 'bailian',
@@ -484,12 +522,14 @@ const autoSync = ref<'Enable' | 'Disable'>();
 const featuredModels = ref<ModelDownloader.FeaturedModel[]>([]);
 const featuredColumns = ref<FuTableColumnConfig[]>([]);
 const featuredFamilies = ref<string[]>([]);
+const featuredWeightProviders = ref<string[]>([]);
 const featuredPagination = reactive({ currentPage: 1, pageSize: 20, total: 0 });
 const featuredLoading = ref(false);
 let featuredRequest = 0;
 const featuredFields = [
     { prop: 'repoID', label: 'modelName', width: 400 },
     { prop: 'family', label: 'modelCategory', width: 140 },
+    { prop: 'weightProvider', label: 'weightProvider', width: 180 },
     { prop: 'architecture', label: 'modelArchitecture', width: 140 },
     { prop: 'backboneParams', label: 'backboneParams', width: 170 },
     { prop: 'activeParams', label: 'activeParams', width: 170 },
@@ -747,12 +787,14 @@ const loadFeaturedModels = async () => {
             page: featuredPagination.currentPage,
             pageSize: featuredPagination.pageSize,
             family: featuredFamily.value,
+            weightProvider: featuredWeightProvider.value,
             info: featuredSearchName.value,
         });
         if (node !== currentNode.value || request !== featuredRequest) return;
         featuredModels.value = res.data.items;
         featuredPagination.total = res.data.total;
         featuredFamilies.value = res.data.families;
+        featuredWeightProviders.value = res.data.weightProviders;
     } finally {
         if (request === featuredRequest) featuredLoading.value = false;
     }
@@ -848,6 +890,7 @@ watch(currentNode, async () => {
     featuredLoading.value = false;
     featuredModels.value = [];
     featuredFamilies.value = [];
+    featuredWeightProviders.value = [];
     featuredPagination.currentPage = 1;
     featuredPagination.total = 0;
     autoSync.value = undefined;
@@ -904,6 +947,14 @@ onMounted(() => {
         min-height: 0;
     }
 
+    :deep(.complex-table__card-header) {
+        align-items: flex-start;
+    }
+
+    :deep(.complex-table__card-status) {
+        max-width: 40%;
+    }
+
     :deep(.complex-table__card-value) {
         white-space: normal;
         overflow-wrap: anywhere;
@@ -913,6 +964,14 @@ onMounted(() => {
         padding-top: 12px;
         margin-top: 16px;
     }
+}
+
+.featured-provider {
+    max-width: 100%;
+    height: auto;
+    min-height: 20px;
+    white-space: normal;
+    overflow-wrap: anywhere;
 }
 
 .featured-name-label {

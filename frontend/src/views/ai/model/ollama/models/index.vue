@@ -1,15 +1,30 @@
 <template>
     <div v-loading="loading || initializing">
-        <LayoutContent back-name="LocalModel" :title="'Ollama ' + $t('aiTools.model.modelManagement')">
+        <LayoutContent :title="$t('aiTools.model.ollamaManagement')">
+            <template #app>
+                <AppStatus
+                    ref="appStatusRef"
+                    app-key="ollama"
+                    :hide-setting="true"
+                    v-model:loading="loading"
+                    @is-exist="checkExist"
+                />
+            </template>
+            <template #prompt>
+                <el-alert type="info" :closable="false" :title="$t('runtime.systemRestartHelper')" />
+            </template>
             <template #leftToolBar>
                 <el-button v-permission :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate">
                     {{ $t('commons.button.add') }}
                 </el-button>
-                <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="search">
-                    {{ $t('database.loadFromRemote') }}
-                </el-button>
                 <el-button v-permission :disabled="modelInfo.status !== 'Running'" @click="bindDomain">
                     {{ $t('aiTools.proxy.proxy') }}
+                </el-button>
+                <el-button :disabled="modelInfo.status !== 'Running'" @click="onLoadConn">
+                    {{ $t('database.databaseConnInfo') }}
+                </el-button>
+                <el-button :disabled="modelInfo.status !== 'Running'" icon="Position" @click="openWebUI">
+                    OpenWebUI
                 </el-button>
                 <el-button v-permission :disabled="selects.length === 0" @click="onDelete(null)">
                     {{ $t('commons.button.delete') }}
@@ -26,11 +41,7 @@
                     v-else-if="!initializing && !modelInstalled"
                     :description="$t('app.checkInstalledWarn', ['Ollama'])"
                 >
-                    <el-button
-                        v-permission
-                        type="primary"
-                        @click="routerToNameWithQuery('LocalModel', { open: 'create', engine: 'ollama' })"
-                    >
+                    <el-button v-permission type="primary" @click="installRef.openCreate()">
                         {{ $t('commons.button.install') }}
                     </el-button>
                 </el-empty>
@@ -126,6 +137,9 @@
             </template>
         </DrawerPro>
         <BindDomain ref="bindDomainRef" />
+        <Connection ref="connectionRef" />
+        <OllamaInstall ref="installRef" @search="refresh" @task="openTaskLog" />
+        <PortJumpDialog ref="portRef" />
         <TaskLog ref="taskLogRef" width="50%" @close="refresh" />
     </div>
 </template>
@@ -135,11 +149,17 @@ import { useSearchState } from '@/utils/search-reset';
 import AddDialog from '@/views/ai/model/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
-import { toRef, onMounted, reactive, ref } from 'vue';
+import { toRef, reactive, ref } from 'vue';
+import { ElMessageBox } from 'element-plus';
+import AppStatus from '@/components/app-status/index.vue';
+import OllamaInstall from '@/views/ai/model/ollama/operate/index.vue';
+import Connection from '@/views/ai/model/components/connection/index.vue';
+import PortJumpDialog from '@/components/port-jump/index.vue';
+import { App } from '@/api/interface/app';
 import i18n from '@/lang';
 import { deleteOllamaModel, loadOllamaModel, recreateOllamaModel, searchOllamaModel } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
-import { checkAppInstalled } from '@/api/modules/app';
+import { getAppPort } from '@/api/modules/app';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
@@ -147,7 +167,11 @@ import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToNameWithQuery } from '@/utils/router';
 
-const { isMobile } = useGlobalStore();
+const { isMobile, currentNode } = useGlobalStore();
+const appStatusRef = ref();
+const installRef = ref();
+const connectionRef = ref();
+const portRef = ref();
 const loading = ref(false);
 const initializing = ref(true);
 const loadFailed = ref(false);
@@ -177,7 +201,7 @@ const opRef = ref();
 const operateIDs = ref();
 const forceDelete = ref();
 
-const modelInfo = reactive({ status: '' });
+const modelInfo = reactive({ status: '', name: '', containerName: '', httpPort: 0 });
 
 function selectable(row) {
     return row.status !== 'Waiting';
@@ -327,27 +351,57 @@ const buttons = [
     },
 ];
 
+const onLoadConn = () => {
+    connectionRef.value.acceptParams({
+        name: modelInfo.name,
+        engine: 'ollama',
+        port: modelInfo.httpPort,
+        containerName: modelInfo.containerName,
+        appinstallID: appInstallID.value,
+    });
+};
+
+const openWebUI = async () => {
+    const node = currentNode.value;
+    const { data: port } = await getAppPort('ollama-webui', '');
+    if (node !== currentNode.value) return;
+    if (port) {
+        portRef.value.acceptParams({ port });
+        return;
+    }
+    const confirmed = await ElMessageBox.confirm(i18n.global.t('app.checkInstalledWarn', ['OpenWebUI']), 'OpenWebUI', {
+        confirmButtonText: i18n.global.t('database.goInstall'),
+        cancelButtonText: i18n.global.t('commons.button.cancel'),
+    }).catch(() => false);
+    if (!confirmed || node !== currentNode.value) return;
+    await routerToNameWithQuery('AppAll', { install: 'ollama-webui' });
+};
+
+const checkExist = async (installed: App.CheckInstalled | false) => {
+    loadFailed.value = !installed;
+    selects.value = [];
+    if (!installed) {
+        modelInfo.status = '';
+        initializing.value = false;
+        return;
+    }
+    appInstallID.value = installed.appInstallId;
+    modelInstalled.value = installed.isExist;
+    modelInfo.status = installed.status;
+    modelInfo.name = installed.name;
+    modelInfo.containerName = installed.containerName;
+    modelInfo.httpPort = installed.httpPort;
+    if (installed.isExist) {
+        await search();
+    } else {
+        data.value = [];
+        paginationConfig.total = 0;
+    }
+    initializing.value = false;
+};
+
 const refresh = async () => {
     initializing.value = true;
-    loadFailed.value = false;
-    selects.value = [];
-    try {
-        const { data: installed } = await checkAppInstalled('ollama', '');
-        appInstallID.value = installed.appInstallId;
-        modelInstalled.value = installed.isExist;
-        modelInfo.status = installed.status;
-        if (installed.isExist) {
-            await search();
-        } else {
-            data.value = [];
-            paginationConfig.total = 0;
-        }
-    } catch {
-        modelInfo.status = '';
-        loadFailed.value = true;
-    } finally {
-        initializing.value = false;
-    }
+    await appStatusRef.value?.onCheck('ollama', '');
 };
-onMounted(refresh);
 </script>

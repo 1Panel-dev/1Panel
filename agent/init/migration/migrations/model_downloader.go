@@ -21,6 +21,21 @@ var MigrateModelDownloader = &gormigrate.Migration{
 	},
 }
 
+var AddFeaturedModelWeightProvider = &gormigrate.Migration{
+	ID: "20261103-add-featured-model-weight-provider",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.FeaturedModel{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.FeaturedModel{}).
+			Where("(weight_provider IS NULL OR weight_provider = '') AND instr(repo_id, '/') > 0").
+			Update("weight_provider", gorm.Expr("substr(repo_id, 1, instr(repo_id, '/') - 1)")).Error; err != nil {
+			return err
+		}
+		return tx.Model(&model.Setting{}).Where("key = ?", "FeaturedModelsVersion").Update("value", "").Error
+	},
+}
+
 func migrateModelDownloader(db *gorm.DB, legacyPath string) error {
 	var legacy *gorm.DB
 	if _, err := os.Stat(legacyPath); err == nil {
