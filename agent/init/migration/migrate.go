@@ -121,6 +121,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddModelQuickJump,
 		migrations.MigrateModelDownloader,
 		migrations.MigrateVMDatabase,
+		migrations.AddFeaturedModelWeightProvider,
 	}
 }
 

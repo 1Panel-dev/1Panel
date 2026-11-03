@@ -3,17 +3,20 @@ import { ReqPage, ResPage } from '@/api/interface';
 export namespace ModelDownloader {
     export interface FeaturedModelSearch extends ReqPage {
         family: string;
+        weightProvider: string;
         info: string;
     }
 
     export interface FeaturedModelPage extends ResPage<FeaturedModel> {
         families: string[];
+        weightProviders: string[];
     }
 
     export interface FeaturedModel {
         description: Record<string, string> | null;
         family: string;
         repoID: string;
+        weightProvider: string;
         sources: Source[];
         sourceModelIds?: Partial<Record<Source, string>> | null;
         architecture: 'MoE' | 'Dense';
@@ -108,6 +111,12 @@ export namespace ModelDownloader {
         canCancel: boolean;
         canRetry: boolean;
         canRemoveRecord: boolean;
+    }
+
+    export interface LocalModelOption {
+        name: string;
+        organization: string;
+        path: string;
     }
 
     export interface LocalModelSearch extends ReqPage {

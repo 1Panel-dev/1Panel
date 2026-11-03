@@ -1066,6 +1066,7 @@ const message = {
             backboneParams: 'Parámetros base de MoE',
             activeParams: 'Parámetros activos',
             engram: 'Engram',
+            weightProvider: 'Proveedor de pesos',
             weightFootprint: 'Tamaño de los pesos',
             undisclosed: 'No divulgado',
             featuredModels: 'Modelos destacados',
@@ -1078,10 +1079,25 @@ const message = {
             instanceDeployment: 'Despliegue por instancia',
             engines: 'Motores de inferencia locales',
             modelManagement: 'Gestión de modelos',
+            ollamaManagement: 'Gestión de Ollama',
+            vllmManagement: 'Gestión de vLLM',
             serviceDetails: 'Detalles del servicio',
-            deployments: 'Despliegues locales',
-            files: 'Catálogo de modelos',
+            deployments: 'Despliegue de modelos',
+            files: 'Preparación de modelos',
             connectExternal: 'Conectar servicio externo',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Crear Recipe',
+            recipeHelper:
+                'Recipe = modelo + hardware + argumentos de inicio. Importe desde {link} o cree una a partir de un modelo descargado.',
+            recipeFormHelper: 'Pegue un comando de {link} o complete los campos manualmente.',
+            recipeArguments: 'Argumentos de inicio',
+            recipeImportCommand: 'Importar comando',
+            recipeImportPlaceholder:
+                'Pegue comandos Docker, pip/uv o vllm serve para completar la Recipe automáticamente',
+            recipeVariablesNotSupported:
+                'No se admiten referencias a variables en los comandos. Use valores concretos; configure las variables de entorno en su campo correspondiente.',
+            recipeImportError:
+                'No se puede convertir. Incluya un comando de inicio Docker o vllm serve con un modelo; pegue los comandos de instalación pip/uv junto con el comando de inicio.',
             deploymentTemplates: 'Plantillas de comandos de inicio de vLLM',
             engineProvider: 'Motor / Proveedor',
             endpoint: 'Punto de conexión',
@@ -1109,8 +1125,6 @@ const message = {
             vllmDeployProfile: 'Modelo de despliegue',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'El comando de inicio debe usar el puerto {0}; de lo contrario, no se podrá acceder al servicio.',
             ascendVisibleDevices: 'Dispositivos Ascend visibles (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sincronizar con servicio de modelo',
             modelAccountAddressHelper:
@@ -1118,6 +1132,8 @@ const message = {
             containerAddress: 'Dirección del contenedor',
             customAddress: 'Dirección personalizada',
             downloader: 'Gestión de descargas',
+            modelDirectoryPlaceholder: 'Buscar modelos o introducir una ruta completa',
+            selectModelDirectory: 'Seleccionar directorio',
             modelDir: 'Directorio del modelo',
             modelSource: 'Fuente del modelo',
             repoID: 'ID del repositorio',

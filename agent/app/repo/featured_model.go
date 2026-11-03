@@ -11,8 +11,9 @@ import (
 type FeaturedModelRepo struct{}
 
 type IFeaturedModelRepo interface {
-	Page(page, size int, family, info string) (int64, []model.FeaturedModel, error)
+	Page(page, size int, family, weightProvider, info string) (int64, []model.FeaturedModel, error)
 	Families() ([]string, error)
+	WeightProviders() ([]string, error)
 	SyncAll(models []model.FeaturedModel, version string) error
 }
 
@@ -20,12 +21,15 @@ func NewIFeaturedModelRepo() IFeaturedModelRepo {
 	return &FeaturedModelRepo{}
 }
 
-func (r *FeaturedModelRepo) Page(page, size int, family, info string) (int64, []model.FeaturedModel, error) {
+func (r *FeaturedModelRepo) Page(page, size int, family, weightProvider, info string) (int64, []model.FeaturedModel, error) {
 	var total int64
 	var items []model.FeaturedModel
 	db := global.DB.Model(&model.FeaturedModel{})
 	if family != "" {
 		db = db.Where("family = ?", family)
+	}
+	if weightProvider != "" {
+		db = db.Where("weight_provider = ?", weightProvider)
 	}
 	if info != "" {
 		db = db.Where("LOWER(repo_id) LIKE ?", "%"+strings.ToLower(info)+"%")
@@ -43,6 +47,12 @@ func (r *FeaturedModelRepo) Families() ([]string, error) {
 	families := make([]string, 0)
 	err := global.DB.Model(&model.FeaturedModel{}).Distinct("family").Order("family asc").Pluck("family", &families).Error
 	return families, err
+}
+
+func (r *FeaturedModelRepo) WeightProviders() ([]string, error) {
+	providers := make([]string, 0)
+	err := global.DB.Model(&model.FeaturedModel{}).Where("weight_provider <> ?", "").Distinct("weight_provider").Order("weight_provider asc").Pluck("weight_provider", &providers).Error
+	return providers, err
 }
 
 func (r *FeaturedModelRepo) SyncAll(models []model.FeaturedModel, version string) error {

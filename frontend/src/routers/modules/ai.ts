@@ -13,12 +13,22 @@ const aiRouter = {
     },
     children: [
         {
+            path: '/ai/model/local/ollama',
+            name: 'OllamaModels',
+            component: () => import('@/views/ai/model/ollama/index.vue'),
+            meta: {
+                icon: 'p-moxing-menu',
+                title: 'aiTools.model.ollamaManagement',
+                permission: 'ai_model_view',
+            },
+        },
+        {
             path: '/ai/model',
             name: 'AIModel',
             redirect: '/ai/model/files',
             meta: {
                 icon: 'p-moxing-menu',
-                title: 'aiTools.model.model',
+                title: 'aiTools.model.vllmManagement',
                 activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },
@@ -52,18 +62,6 @@ const aiRouter = {
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
                 title: 'aiTools.model.deployments',
-                activeMenu: '/ai/model',
-                permission: 'ai_model_view',
-            },
-        },
-        {
-            path: '/ai/model/local/ollama',
-            hidden: true,
-            name: 'OllamaModels',
-            component: () => import('@/views/ai/model/ollama/index.vue'),
-            meta: {
-                title: 'aiTools.model.engines',
-                detail: 'aiTools.model.modelManagement',
                 activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },

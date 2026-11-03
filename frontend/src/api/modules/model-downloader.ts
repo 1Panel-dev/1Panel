@@ -59,6 +59,10 @@ export const pageLocalDownloadedModels = (req: ModelDownloader.LocalModelSearch)
     return http.post<ResPage<ModelDownloader.LocalModelItem>>('/ai/model/downloader/local/search', req);
 };
 
+export const listLocalModelOptions = () => {
+    return http.get<ModelDownloader.LocalModelOption[]>('/ai/model/downloader/local/options');
+};
+
 export const deleteLocalDownloadedModel = (req: ModelDownloader.LocalModelDelete) => {
     return http.post('/ai/model/downloader/local/delete', req);
 };

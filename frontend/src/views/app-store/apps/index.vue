@@ -258,7 +258,7 @@ onMounted(async () => {
                 key: installKey.value,
             },
         };
-        if (!['ollama', 'vllm'].includes(installKey.value) || !jumpToInstall('', installKey.value)) {
+        if (installKey.value !== 'vllm' || !jumpToInstall('', installKey.value)) {
             installRef.value.acceptParams(params);
         }
     }

@@ -305,6 +305,15 @@ func (b *BaseApi) PageLocalDownloadedModels(c *gin.Context) {
 	helper.SuccessWithData(c, dto.PageResult{Items: items, Total: total})
 }
 
+func (b *BaseApi) ListLocalModelOptions(c *gin.Context) {
+	items, err := modelDownloaderService.ListLocalModelOptions()
+	if err != nil {
+		handleModelDownloaderError(c, err)
+		return
+	}
+	helper.SuccessWithData(c, items)
+}
+
 // @Tags AI
 // @Summary Delete locally downloaded model
 // @Accept json

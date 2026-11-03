@@ -6,6 +6,7 @@ type FeaturedModel struct {
 	Sort           int               `json:"sort"`
 	Family         string            `json:"family"`
 	RepoID         string            `json:"repoID"`
+	WeightProvider string            `json:"weightProvider"`
 	Sources        []string          `json:"sources" gorm:"serializer:json"`
 	SourceModelIDs map[string]string `json:"sourceModelIds" gorm:"serializer:json"`
 	Architecture   string            `json:"architecture"`

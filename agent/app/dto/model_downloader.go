@@ -92,6 +92,12 @@ type ModelDownloadTaskItem struct {
 	CanRemoveRecord bool            `json:"canRemoveRecord"`
 }
 
+type LocalModelOption struct {
+	Name         string `json:"name"`
+	Organization string `json:"organization"`
+	Path         string `json:"path"`
+}
+
 type LocalModelSearch struct {
 	DownloadType string `json:"downloadType" validate:"omitempty,oneof=all tokenizer"`
 	PageInfo
@@ -121,6 +127,7 @@ type FeaturedModel struct {
 	Sort           int               `json:"sort" yaml:"sort"`
 	Family         string            `json:"family" yaml:"category"`
 	RepoID         string            `json:"repoID" yaml:"name"`
+	WeightProvider string            `json:"weightProvider" yaml:"weightProvider"`
 	Sources        []string          `json:"sources" yaml:"sources"`
 	SourceModelIDs map[string]string `json:"sourceModelIds" yaml:"sourceModelIds"`
 	Architecture   string            `json:"architecture" yaml:"modelType"`
@@ -133,11 +140,13 @@ type FeaturedModel struct {
 
 type FeaturedModelSearch struct {
 	PageInfo
-	Family string `json:"family"`
-	Info   string `json:"info"`
+	Family         string `json:"family"`
+	WeightProvider string `json:"weightProvider"`
+	Info           string `json:"info"`
 }
 
 type FeaturedModelPage struct {
 	PageResult
-	Families []string `json:"families"`
+	Families        []string `json:"families"`
+	WeightProviders []string `json:"weightProviders"`
 }

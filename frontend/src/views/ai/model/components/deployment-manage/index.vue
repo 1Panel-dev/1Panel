@@ -11,14 +11,9 @@
                 <el-alert v-if="failed" :title="$t('aiTools.model.loadFailed')" type="error" :closable="false" />
                 <el-empty v-else-if="missing" :description="$t('commons.res.notFound')" />
                 <template v-else-if="visible && instance && !loading && view !== VllmPlaceholder">
-                    <div v-if="instance.engine !== 'ollama'" class="service-card">
+                    <div class="service-card">
                         <div class="flex flex-wrap gap-3 items-center mb-4">
-                            <strong>
-                                {{ engineLabels[instance.engine] }}
-                                {{
-                                    instance.engine === 'vllm' ? formatVllmVersion(instance.version) : instance.version
-                                }}
-                            </strong>
+                            <strong>vLLM {{ formatVllmVersion(instance.appVersion) }}</strong>
                             <Status :status="instance.status" />
                         </div>
                         <div class="service-actions">
@@ -36,7 +31,7 @@
                             </el-button>
                         </div>
                     </div>
-                    <el-descriptions v-if="instance.engine !== 'ollama'" :column="1" border>
+                    <el-descriptions :column="1" border>
                         <el-descriptions-item :label="$t('commons.table.name')">
                             {{ instance.name }}
                         </el-descriptions-item>
@@ -57,17 +52,15 @@
         v-if="visible && view && view !== VllmPlaceholder && !failed && !missing"
         ref="contentRef"
         v-bind="
-            view === AppParams
-                ? { modelGPU: true }
-                : view === EngineConnection
-                  ? {}
-                  : view === ContainerLogs
-                    ? { highlightDiff: 210 }
-                    : view === TaskLog
-                      ? { width: '70%' }
-                      : ['config', 'monitor'].includes(actionName)
-                        ? {}
-                        : { dialog: true }
+            view === EngineConnection
+                ? {}
+                : view === ContainerLogs
+                  ? { highlightDiff: 210 }
+                  : view === TaskLog
+                    ? { width: '70%' }
+                    : ['config', 'monitor'].includes(actionName)
+                      ? {}
+                      : { dialog: true }
         "
         @close="returnToManagement"
         @search="emit('search')"
@@ -79,7 +72,7 @@
         size="small"
     >
         <p>{{ $t('commons.msg.delete', [deleting?.name || '']) }}</p>
-        <el-checkbox v-if="deleting?.engine === 'vllm'" v-model="forceDelete" :label="$t('website.forceDelete')" />
+        <el-checkbox v-model="forceDelete" :label="$t('website.forceDelete')" />
         <template #footer>
             <el-button :disabled="deleteLoading" @click="deleteVisible = false">
                 {{ $t('commons.button.cancel') }}
@@ -96,14 +89,12 @@ import { computed, markRaw, nextTick, ref, shallowRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
-import { checkAppInstalled, searchAppInstalled } from '@/api/modules/app';
+import { searchAppInstalled } from '@/api/modules/app';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { hasPermission } from '@/utils/rbac';
 import { hasManagePermissionAccess } from '@/utils/permission';
 import { newUUID } from '@/utils/id';
-import { routerToName } from '@/utils/router';
-import AppParams from '@/views/app-store/installed/detail/index.vue';
 import EngineConnection from '../connection/index.vue';
 import VllmPlaceholder from '../../vllm/index.vue';
 import ContainerLogs from '@/components/log/container-drawer/index.vue';
@@ -125,14 +116,14 @@ const loading = ref(false);
 const failed = ref(false);
 const missing = ref(false);
 const header = ref('');
-const instance = ref<Deployment>();
+type DeploymentDetails = Pick<Deployment, 'id' | 'name'> & Partial<Deployment>;
+const instance = ref<DeploymentDetails>();
 const actionName = ref('manage');
 const deleteVisible = ref(false);
-const deleting = ref<Deployment>();
+const deleting = ref<DeploymentDetails>();
 const forceDelete = ref(false);
 const deleteLoading = ref(false);
 const deleted = ref(false);
-const engineLabels = { vllm: 'vLLM', ollama: 'Ollama' };
 const view = shallowRef();
 const contentRef = ref();
 let request = 0;
@@ -158,74 +149,26 @@ const openUpgrade = async (installId: number, version: number) => {
     if (standalone.value) visible.value = false;
     emit('upgrade', app);
 };
-const open = async (
-    row: Pick<Deployment, 'engine' | 'id' | 'name'> & Partial<Deployment>,
-    action = 'manage',
-    outside = false,
-) => {
-    if (row.engine === 'ollama' && action === 'manage') {
-        visible.value = false;
-        await routerToName('OllamaModels');
-        return;
-    }
+const open = async (row: DeploymentDetails, action = 'manage', outside = false) => {
     const version = ++request;
     standalone.value = outside;
-    instance.value = { version: '', ports: [], containerName: '', status: '', modelDir: '', models: [], ...row };
+    instance.value = { ...row };
     actionName.value = action;
     deleted.value = false;
-    header.value = `${engineLabels[row.engine]} ${i18n.global.t('aiTools.model.manage')}`;
+    header.value = `vLLM ${i18n.global.t('aiTools.model.manage')}`;
     view.value = undefined;
     failed.value = false;
     missing.value = false;
     visible.value = true;
     loading.value = true;
     try {
-        if (row.engine === 'vllm' && (!isProductPro.value || !vllmAvailable)) {
+        if (!isProductPro.value || !vllmAvailable) {
             view.value = markRaw(VllmPlaceholder);
             return;
         }
-        if (row.engine === 'ollama') {
-            const { data } = await checkAppInstalled('ollama', row.name);
-            if (version !== request || !visible.value) return;
-            if (!data.isExist) {
-                missing.value = true;
-                if (standalone.value) MsgError(i18n.global.t('commons.res.notFound'));
-                return;
-            }
-            instance.value = {
-                ...instance.value,
-                id: data.appInstallId,
-                version: data.version,
-                status: data.status,
-                taskID: data.taskID,
-                containerName: data.containerName,
-            };
-            if (data.taskID && ['config', 'upgrade', 'log'].includes(action)) {
-                await openTask(data.taskID);
-                return;
-            }
-            if (action === 'upgrade') {
-                await openUpgrade(data.appInstallId, version);
-                return;
-            }
-            const component = { config: AppParams, connection: EngineConnection, log: ContainerLogs }[action];
-            view.value = component ? markRaw(component) : undefined;
-            await nextTick();
-            if (version !== request || !visible.value) return;
-            if (action === 'config') await contentRef.value?.acceptParams({ id: data.appInstallId, edit: true });
-            if (action === 'connection')
-                contentRef.value?.acceptParams({
-                    name: data.name,
-                    engine: 'ollama',
-                    port: data.httpPort,
-                    containerName: data.containerName,
-                    appinstallID: data.appInstallId,
-                });
-            if (action === 'log')
-                contentRef.value?.acceptParams({ containerID: data.containerName, container: data.containerName });
-            return;
-        }
-        const items = await readPages((page) => loadVllmAPI().then((api) => api.pageVllm({ ...page, info: row.name })));
+        const api = await loadVllmAPI();
+        if (version !== request || !visible.value) return;
+        const items = await readPages((page) => api.pageVllm({ ...page, info: row.name }));
         const detail = items.find((item) => item.id === row.id);
         if (version !== request || !visible.value) return;
         if (!detail) {
@@ -233,15 +176,7 @@ const open = async (
             if (standalone.value) MsgError(i18n.global.t('commons.res.notFound'));
             return;
         }
-        instance.value = {
-            ...instance.value,
-            status: detail.status,
-            taskID: detail.taskID,
-            containerName: detail.containerName,
-            modelDir: detail.modelDir,
-            version: detail.appVersion,
-            upgradable: detail.upgradable,
-        };
+        instance.value = detail;
         if (detail.taskID && ['config', 'upgrade', 'delete'].includes(action)) {
             await openTask(detail.taskID);
             return;
@@ -254,7 +189,7 @@ const open = async (
                 port: detail.port,
                 containerPort: '',
                 endpoint: detail.modelAccountBaseURL,
-                engine: row.engine,
+                engine: 'vllm',
                 name: row.name,
                 modelDir: detail.modelDir,
             });
@@ -306,7 +241,7 @@ watch([currentNode, () => route.fullPath, isProductPro], () => {
     deleteVisible.value = false;
     deleting.value = undefined;
 });
-const operationDisabled = (row: Deployment) => Boolean(deleteLoading.value || row.taskID);
+const operationDisabled = (row: DeploymentDetails) => Boolean(deleteLoading.value || row.taskID);
 const deleteDeployment = async () => {
     const version = request;
     const row = deleting.value;
@@ -332,25 +267,24 @@ const deploymentButtons = [
         label: i18n.global.t('commons.button.edit'),
         permission: true,
         disabled: operationDisabled,
-        click: (row: Deployment) => open(row, 'config'),
+        click: (row: DeploymentDetails) => open(row, 'config'),
     },
     {
         label: i18n.global.t('menu.monitor'),
-        show: (row: Deployment) => row.engine === 'vllm',
-        click: (row: Deployment) => open(row, 'monitor'),
+        click: (row: DeploymentDetails) => open(row, 'monitor'),
     },
     {
         label: i18n.global.t('commons.button.upgrade'),
         permission: true,
-        show: (row: Deployment) => row.upgradable && hasPermission('app_manage'),
+        show: (row: DeploymentDetails) => row.upgradable && hasPermission('app_manage'),
         disabled: operationDisabled,
-        click: (row: Deployment) => open(row, 'upgrade'),
+        click: (row: DeploymentDetails) => open(row, 'upgrade'),
     },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        disabled: (row: Deployment) => operationDisabled(row),
-        click: (row: Deployment) => {
+        disabled: (row: DeploymentDetails) => operationDisabled(row),
+        click: (row: DeploymentDetails) => {
             deleting.value = row;
             forceDelete.value = false;
             deleteVisible.value = true;

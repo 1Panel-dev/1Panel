@@ -1070,6 +1070,7 @@ const message = {
             backboneParams: 'Parâmetros base do MoE',
             activeParams: 'Parâmetros ativos',
             engram: 'Engram',
+            weightProvider: 'Provedor de pesos',
             weightFootprint: 'Tamanho dos pesos',
             undisclosed: 'Não divulgado',
             featuredModels: 'Modelos em destaque',
@@ -1082,10 +1083,25 @@ const message = {
             instanceDeployment: 'Implantação por instância',
             engines: 'Mecanismos de inferência locais',
             modelManagement: 'Gerenciamento de modelos',
+            ollamaManagement: 'Gerenciamento do Ollama',
+            vllmManagement: 'Gerenciamento do vLLM',
             serviceDetails: 'Detalhes do serviço',
-            deployments: 'Implantações locais',
-            files: 'Central de modelos',
+            deployments: 'Implantação de modelos',
+            files: 'Preparação de modelos',
             connectExternal: 'Conectar serviço externo',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Criar Recipe',
+            recipeHelper:
+                'Recipe = modelo + hardware + argumentos de inicialização. Importe de {link} ou crie a partir de um modelo baixado.',
+            recipeFormHelper: 'Cole um comando de {link} ou preencha os campos manualmente.',
+            recipeArguments: 'Argumentos de inicialização',
+            recipeImportCommand: 'Importar comando',
+            recipeImportPlaceholder:
+                'Cole comandos Docker, pip/uv ou vllm serve para preencher a Recipe automaticamente',
+            recipeVariablesNotSupported:
+                'Referências a variáveis não são aceitas nos comandos. Use valores explícitos; configure as variáveis de ambiente no campo correspondente.',
+            recipeImportError:
+                'Não foi possível converter. Inclua um comando de inicialização Docker ou vllm serve com um modelo; cole os comandos de instalação pip/uv junto com o comando de inicialização.',
             deploymentTemplates: 'Modelos de comandos de inicialização do vLLM',
             engineProvider: 'Mecanismo / Provedor',
             endpoint: 'Endpoint',
@@ -1112,8 +1128,6 @@ const message = {
             vllmDeployProfile: 'Modelo de implantação',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'O comando de inicialização deve usar a porta {0}; caso contrário, o serviço ficará inacessível.',
             ascendVisibleDevices: 'Dispositivos Ascend visíveis (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sincronizar com serviço de modelo',
             modelAccountAddressHelper:
@@ -1121,6 +1135,8 @@ const message = {
             containerAddress: 'Endereço do contêiner',
             customAddress: 'Endereço personalizado',
             downloader: 'Gerenciamento de downloads',
+            modelDirectoryPlaceholder: 'Buscar modelos ou inserir um caminho completo',
+            selectModelDirectory: 'Selecionar diretório',
             modelDir: 'Diretório do modelo',
             modelSource: 'Fonte do modelo',
             repoID: 'ID do repositório',

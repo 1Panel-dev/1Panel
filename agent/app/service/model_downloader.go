@@ -59,6 +59,7 @@ type IModelDownloaderService interface {
 	RemoveTask(req dto.ModelDownloadTaskOperate) error
 	RecoverInterruptedTasks() error
 	ListLocalModels(req dto.LocalModelSearch) (int64, []dto.LocalModelItem, error)
+	ListLocalModelOptions() ([]dto.LocalModelOption, error)
 	DeleteLocalModel(req dto.LocalModelDelete) error
 }
 
@@ -391,6 +392,10 @@ func (m *ModelDownloaderService) ListLocalModels(req dto.LocalModelSearch) (int6
 		return items[i].CreatedAt > items[j].CreatedAt
 	})
 	return int64(len(items)), pageLocalModels(items, req.Page, req.PageSize), nil
+}
+
+func (m *ModelDownloaderService) ListLocalModelOptions() ([]dto.LocalModelOption, error) {
+	return listLocalModelOptions(loadModelDownloaderDir())
 }
 
 func (m *ModelDownloaderService) DeleteLocalModel(req dto.LocalModelDelete) error {

@@ -1074,6 +1074,7 @@ const message = {
             backboneParams: 'Parameter teras MoE',
             activeParams: 'Parameter aktif',
             engram: 'Engram',
+            weightProvider: 'Penyedia pemberat',
             weightFootprint: 'Saiz pemberat',
             undisclosed: 'Tidak didedahkan',
             featuredModels: 'Model pilihan',
@@ -1086,10 +1087,25 @@ const message = {
             instanceDeployment: 'Pengerahan mengikut instans',
             engines: 'Enjin inferens setempat',
             modelManagement: 'Pengurusan model',
+            ollamaManagement: 'Pengurusan Ollama',
+            vllmManagement: 'Pengurusan vLLM',
             serviceDetails: 'Butiran perkhidmatan',
-            deployments: 'Pengerahan setempat',
-            files: 'Hab model',
+            deployments: 'Pengerahan model',
+            files: 'Penyediaan model',
             connectExternal: 'Sambungkan perkhidmatan luaran',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Cipta Recipe',
+            recipeHelper:
+                'Recipe = model + perkakasan + argumen pelancaran. Import daripada {link} atau cipta daripada model yang dimuat turun.',
+            recipeFormHelper: 'Tampal arahan daripada {link} atau isi medan secara manual.',
+            recipeArguments: 'Argumen pelancaran',
+            recipeImportCommand: 'Import arahan',
+            recipeImportPlaceholder:
+                'Tampal arahan Docker, pip/uv atau vllm serve untuk mengisi Recipe secara automatik',
+            recipeVariablesNotSupported:
+                'Rujukan pemboleh ubah tidak disokong dalam arahan. Masukkan nilai khusus; tetapkan pemboleh ubah persekitaran dalam medan yang berkenaan.',
+            recipeImportError:
+                'Tidak dapat menukar. Sertakan arahan pelancaran Docker atau vllm serve dengan model; tampal arahan pemasangan pip/uv bersama arahan pelancaran.',
             deploymentTemplates: 'Templat arahan permulaan vLLM',
             engineProvider: 'Enjin / Pembekal',
             endpoint: 'Titik akhir',
@@ -1116,8 +1132,6 @@ const message = {
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'Perintah permulaan mesti menggunakan port {0}; jika tidak, perkhidmatan tidak dapat diakses.',
             ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
@@ -1125,6 +1139,8 @@ const message = {
             containerAddress: 'Alamat kontena',
             customAddress: 'Alamat tersuai',
             downloader: 'Pengurusan muat turun',
+            modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
+            selectModelDirectory: 'Pilih direktori',
             modelDir: 'Direktori Model',
             modelSource: 'Sumber model',
             repoID: 'ID Repositori',
