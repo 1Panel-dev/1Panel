@@ -54,7 +54,7 @@
 
         <div v-if="form.isExist">
             <LayoutContent title="Fail2ban" :divider="true">
-                <template #promp v-if="!isFxplay">
+                <template #promp>
                     <el-alert type="info" :closable="false">
                         <template #title>
                             {{ $t('toolbox.common.toolboxHelper') }}
@@ -231,7 +231,7 @@ import { ElMessageBox } from 'element-plus';
 import { transTimeUnit } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { docsUrl, isFxplay } = useGlobalStore();
+const { docsUrl } = useGlobalStore();
 
 const loading = ref(false);
 const formRef = ref();

@@ -152,7 +152,6 @@
                                     </span>
                                     <div>
                                         <span
-                                            v-if="!isFxplay"
                                             class="custom-link"
                                             @click="openLink(docsUrl + '/user_manual/websites/php/#php_1')"
                                         >
@@ -219,7 +218,7 @@ import { reactive, ref } from 'vue';
 import { getLabel } from '@/utils/app-store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { resolveRuntimeAppResource } from '@/utils/runtime-app-resource';
-const { docsUrl, isFxplay, isIntl, isOffline, isXpackOrEE } = useGlobalStore();
+const { docsUrl, isIntl, isOffline, isXpackOrEE } = useGlobalStore();
 
 interface OperateRrops {
     id?: number;

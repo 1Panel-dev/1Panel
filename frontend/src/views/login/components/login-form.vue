@@ -130,7 +130,7 @@
                             {{ $t('commons.login.passkeyToPassword') }}
                         </el-link>
                     </el-form-item>
-                    <el-form-item v-if="!isIntl && !isEnterprise && !isFxplay">
+                    <el-form-item v-if="!isIntl && !isEnterprise">
                         <el-checkbox v-model="loginForm.agreeLicense">
                             <template #default>
                                 <span class="agree-title">
@@ -312,7 +312,7 @@
                         <el-text v-if="isDemo" type="danger" class="demo">
                             {{ $t('commons.login.username') }}:demo {{ $t('commons.login.password') }}:1panel
                         </el-text>
-                        <el-form-item prop="agreeLicense" v-if="!isIntl && !isEnterprise && !isFxplay">
+                        <el-form-item prop="agreeLicense" v-if="!isIntl && !isEnterprise">
                             <el-checkbox v-model="loginForm.agreeLicense">
                                 <template #default>
                                     <span class="agree-title">
@@ -403,7 +403,6 @@ const {
     isAdmin,
     isEnterprise,
     isEnterpriseLicenseLoaded,
-    isFxplay,
     isIntl,
     isLogin,
     isOffline,
@@ -633,7 +632,7 @@ const login = (formEl: FormInstance | undefined) => {
     errCaptcha.value = false;
     formEl.validate(async (valid) => {
         if (!valid) return;
-        if (isIntl.value || isFxplay.value || isEnterprise.value) {
+        if (isIntl.value || isEnterprise.value) {
             loginForm.agreeLicense = true;
         }
         if (!loginForm.agreeLicense) {
@@ -729,7 +728,7 @@ const passkeyLogin = async () => {
         MsgError(i18n.t('commons.login.passkeyNotSupported'));
         return;
     }
-    if (!isIntl.value && !isEnterprise.value && !isFxplay.value && !loginForm.agreeLicense) {
+    if (!isIntl.value && !isEnterprise.value && !loginForm.agreeLicense) {
         if (_isMobile() || showPasskeyOnly.value) {
             pendingLoginMethod.value = 'passkey';
             open.value = true;
@@ -915,7 +914,6 @@ const getSetting = async () => {
         const language = res.data.language || loginForm.language;
         await handleCommand(language);
         isIntl.value = res.data.isIntl;
-        isFxplay.value = res.data.isFxplay;
         isOffline.value = res.data.isOffline;
         isEnterprise.value = res.data.isEnterprise;
         isEnterpriseLicenseLoaded.value = !res.data.isEnterprise;
@@ -932,7 +930,7 @@ const getSetting = async () => {
         applyPanelCacheSettings(res.data.panelCache);
         themeConfig.value = { ...themeConfig.value, theme: res.data.theme, panelName: res.data.panelName };
 
-        if (res.data.passkeySetting && !isIntl.value && !isFxplay.value) {
+        if (res.data.passkeySetting && !isIntl.value) {
             loginForm.agreeLicense = true;
         }
         if (passkeySetting.value && passkeySupported.value && isAutoPasskeyEnabled() && !hasPendingExternalTicket) {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <DrawerPro v-model="drawerVisible" header="IPv6" @close="handleClose" size="small">
-            <el-alert class="common-prompt" :closable="false" type="warning" v-if="!isFxplay">
+            <el-alert class="common-prompt" :closable="false" type="warning">
                 <template #default>
                     <span class="input-help">
                         {{ $t('container.ipv6Helper') }}
@@ -55,7 +55,7 @@ import { FormInstance } from 'element-plus';
 import { updateIpv6Option } from '@/api/modules/container';
 import { checkIpV6 } from '@/utils/validate';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { docsUrl, isFxplay } = useGlobalStore();
+const { docsUrl } = useGlobalStore();
 
 const loading = ref();
 const drawerVisible = ref();

@@ -224,9 +224,7 @@
                                         :key="index"
                                         class="flex items-center gap-2"
                                     >
-                                        <span v-if="row.engine === 'tensorrt'">{{ port }}</span>
                                         <el-button
-                                            v-else
                                             icon="Position"
                                             plain
                                             size="small"
@@ -374,7 +372,7 @@ import { containerListStats } from '@/api/modules/container';
 import ContainerResource from '@/components/container-resource/index.vue';
 import PortJump from '@/components/port-jump/index.vue';
 import type { FuTableColumnConfig } from '@/components/table/shared';
-import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, operateTensorRTLLM } from '@/api/modules/ai';
+import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
 import i18n from '@/lang';
@@ -409,7 +407,7 @@ const route = useRoute();
 const router = useRouter();
 const pagePath = route.path;
 const isCurrentPage = computed(() => route.path === pagePath);
-const { isProductPro, isFxplay, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
+const { isProductPro, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 const isFiles = pagePath === '/ai/model/files';
 const isLocal = pagePath === '/ai/model/local';
 const tabs = computed(() => [
@@ -555,7 +553,7 @@ const search = async () => {
     loading.value = true;
     try {
         if (isLocal) {
-            const data = await loadModelOverview(isProductPro.value, isFxplay.value);
+            const data = await loadModelOverview(isProductPro.value);
             if (version !== searchVersion) return;
             deployments.value = data;
         } else {
@@ -637,11 +635,6 @@ const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart')
         if (row.engine === 'ollama') {
             const taskID = newUUID();
             await installedOp({ installId: row.id, operate: operation, taskID });
-            if (node !== currentNode.value) return;
-            taskRef.value.openWithTaskID(taskID);
-        } else if (row.engine === 'tensorrt') {
-            const taskID = newUUID();
-            await operateTensorRTLLM({ id: row.id, operate: operation, taskID });
             if (node !== currentNode.value) return;
             taskRef.value.openWithTaskID(taskID);
         } else {
@@ -740,7 +733,6 @@ watch(
         () => route.query.engine,
         currentNode,
         isProductPro,
-        isFxplay,
     ],
     async (_, previous, onCleanup) => {
         let cancelled = false;

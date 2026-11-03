@@ -1025,7 +1025,6 @@ const message = {
             addEngine: '添加推理引擎',
             onlineModel: '在线模型',
             instanceDeployment: '按实例部署',
-            nvidiaDeployment: 'NVIDIA 优化部署',
             engines: '本地推理引擎',
             modelManagement: '模型管理',
             serviceDetails: '服务详情',
@@ -1717,14 +1716,6 @@ const message = {
             testConnection: '测试连接',
             connectionSuccess: '连接成功',
             connectionFailed: '连接失败',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: '模型目录',
-            commandHelper: '若需外部访问，请将命令中的端口设置为与应用端口相同',
-            imageAlert: '由于镜像较大，建议先手动将镜像下载到服务器后再进行安装',
-            modelSpeedup: '启用模型加速',
-            modelType: '模型类型',
         },
     },
     panelMCP: {

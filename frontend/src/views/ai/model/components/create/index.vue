@@ -36,19 +36,6 @@
                     </span>
                 </span>
             </el-button>
-            <el-button
-                v-if="isFxplay && !vllmOnly"
-                class="engine-option"
-                :class="{ 'is-selected': selected === 'tensorrt' }"
-                :aria-pressed="selected === 'tensorrt'"
-                @click="selected = 'tensorrt'"
-            >
-                <ProviderLogo provider="nvidia" :size="18" />
-                <span class="engine-content">
-                    <span class="engine-name">TensorRT LLM</span>
-                    <span class="engine-description">{{ $t('aiTools.model.nvidiaDeployment') }}</span>
-                </span>
-            </el-button>
         </div>
         <el-divider v-if="selected !== 'account' && !vllmOnly" />
         <DockerStatus
@@ -77,14 +64,6 @@
             <OllamaForm
                 v-if="activeForm === 'ollama'"
                 ref="ollamaRef"
-                inline
-                @search="emit('search')"
-                @close="visible = false"
-                @task="openTask"
-            />
-            <TensorForm
-                v-if="activeForm === 'tensorrt'"
-                ref="tensorRef"
                 inline
                 @search="emit('search')"
                 @close="visible = false"
@@ -187,7 +166,6 @@ import type { App } from '@/api/interface/app';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
 import AccountForm from '../account-form/index.vue';
-import TensorForm from '@/views/ai/model/tensorrt/operate/index.vue';
 import OllamaForm from '@/views/ai/model/ollama/operate/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
@@ -200,17 +178,16 @@ import { vllmAvailable } from '../../deployment';
 
 const props = defineProps({ enginesOnly: Boolean, vllmOnly: Boolean });
 const emit = defineEmits(['search', 'manage']);
-const { isProductPro, isFxplay, isMobile, currentNode } = useGlobalStore();
+const { isProductPro, isMobile, currentNode } = useGlobalStore();
 const router = useRouter();
 const visible = ref(false);
-const selected = ref<'account' | 'vllm' | 'ollama' | 'tensorrt'>('account');
+const selected = ref<'account' | 'vllm' | 'ollama'>('account');
 const modelDir = ref('');
 const dockerActive = ref(false);
 const dockerExists = ref(true);
 const ollama = ref<App.CheckInstalled>();
 const accountRef = ref();
 const editAccountRef = ref();
-const tensorRef = ref();
 const ollamaRef = ref();
 const vllmRef = ref();
 const taskRef = ref();
@@ -226,7 +203,6 @@ const activeForm = computed(() => {
     if (!dockerActive.value || !dockerExists.value) return '';
     if (selected.value === 'vllm' && isProductPro.value && vllmAvailable) return 'vllm';
     if (selected.value === 'ollama' && ollama.value && !ollama.value.isExist) return 'ollama';
-    if (selected.value === 'tensorrt' && isFxplay.value) return 'tensorrt';
     return '';
 });
 
@@ -234,7 +210,6 @@ const currentForm = computed(() => {
     if (activeForm.value === 'account') return accountRef.value;
     if (activeForm.value === 'vllm') return vllmRef.value;
     if (activeForm.value === 'ollama') return ollamaRef.value;
-    if (activeForm.value === 'tensorrt') return tensorRef.value;
     return undefined;
 });
 
@@ -257,7 +232,6 @@ watch(
             if (form === 'account') await accountRef.value.open();
             if (form === 'vllm') await vllmRef.value.openCreate(modelDir.value);
             if (form === 'ollama') await ollamaRef.value.openCreate();
-            if (form === 'tensorrt') tensorRef.value.openCreate();
         } catch {
             if (!cancelled) loadFailed.value = true;
         } finally {
@@ -267,7 +241,7 @@ watch(
     { flush: 'post' },
 );
 
-const open = async (engine?: 'ollama' | 'vllm' | 'tensorrt', defaultModelDir = '') => {
+const open = async (engine?: 'ollama' | 'vllm', defaultModelDir = '') => {
     loadFailed.value = false;
     modelDir.value = defaultModelDir;
     selected.value = props.vllmOnly ? 'vllm' : engine || (props.enginesOnly ? 'vllm' : 'account');

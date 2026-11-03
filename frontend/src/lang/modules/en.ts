@@ -1074,7 +1074,6 @@ const message = {
             addEngine: 'Add inference engine',
             onlineModel: 'Online models',
             instanceDeployment: 'Deploy by instance',
-            nvidiaDeployment: 'NVIDIA-optimized deployment',
             engines: 'Local inference engines',
             modelManagement: 'Model management',
             serviceDetails: 'Service details',
@@ -1797,16 +1796,6 @@ const message = {
             testConnection: 'Test Connection',
             connectionSuccess: 'Connection succeeded',
             connectionFailed: 'Connection failed',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Model Directory',
-            commandHelper:
-                'If external access is needed, set the port in the command to be the same as the application port',
-            imageAlert:
-                'Due to the large image size, it is recommended to manually download the image to the server before installation',
-            modelSpeedup: 'Enable model acceleration',
-            modelType: 'Model type',
         },
     },
     panelMCP: {

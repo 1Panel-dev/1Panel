@@ -97,7 +97,6 @@ import { useRoute } from 'vue-router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { loadOptionalComponent } from '@/extensions/optional';
 import { checkAppInstalled, searchAppInstalled } from '@/api/modules/app';
-import { pageTensorRTLLM, deleteTensorRTLLM } from '@/api/modules/ai';
 import i18n from '@/lang';
 import { MsgError } from '@/utils/message';
 import { hasPermission } from '@/utils/rbac';
@@ -106,14 +105,13 @@ import { newUUID } from '@/utils/id';
 import { routerToName } from '@/utils/router';
 import AppParams from '@/views/app-store/installed/detail/index.vue';
 import EngineConnection from '../connection/index.vue';
-import TensorForm from '../../tensorrt/operate/index.vue';
 import VllmPlaceholder from '../../vllm/index.vue';
 import ContainerLogs from '@/components/log/container-drawer/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import { formatVllmVersion, readPages, loadVllmAPI, vllmAvailable, type Deployment } from '../../deployment';
 
 const emit = defineEmits(['search', 'upgrade']);
-const { isMobile, currentNode, isProductPro, isFxplay } = useGlobalStore();
+const { isMobile, currentNode, isProductPro } = useGlobalStore();
 const route = useRoute();
 const visible = ref(false);
 const standalone = ref(false);
@@ -134,7 +132,7 @@ const deleting = ref<Deployment>();
 const forceDelete = ref(false);
 const deleteLoading = ref(false);
 const deleted = ref(false);
-const engineLabels = { vllm: 'vLLM', ollama: 'Ollama', tensorrt: 'TensorRT LLM' };
+const engineLabels = { vllm: 'vLLM', ollama: 'Ollama' };
 const view = shallowRef();
 const contentRef = ref();
 let request = 0;
@@ -172,7 +170,6 @@ const open = async (
     }
     const version = ++request;
     standalone.value = outside;
-    if (row.engine === 'tensorrt' && !isFxplay.value) return;
     instance.value = { version: '', ports: [], containerName: '', status: '', modelDir: '', models: [], ...row };
     actionName.value = action;
     deleted.value = false;
@@ -228,10 +225,7 @@ const open = async (
                 contentRef.value?.acceptParams({ containerID: data.containerName, container: data.containerName });
             return;
         }
-        const items =
-            row.engine === 'vllm'
-                ? await readPages((page) => loadVllmAPI().then((api) => api.pageVllm({ ...page, info: row.name })))
-                : await readPages((page) => pageTensorRTLLM({ ...page, name: row.name }));
+        const items = await readPages((page) => loadVllmAPI().then((api) => api.pageVllm({ ...page, info: row.name })));
         const detail = items.find((item) => item.id === row.id);
         if (version !== request || !visible.value) return;
         if (!detail) {
@@ -245,8 +239,8 @@ const open = async (
             taskID: detail.taskID,
             containerName: detail.containerName,
             modelDir: detail.modelDir,
-            version: 'appVersion' in detail ? detail.appVersion : detail.version,
-            upgradable: 'upgradable' in detail && detail.upgradable,
+            version: detail.appVersion,
+            upgradable: detail.upgradable,
         };
         if (detail.taskID && ['config', 'upgrade', 'delete'].includes(action)) {
             await openTask(detail.taskID);
@@ -257,13 +251,9 @@ const open = async (
             await nextTick();
             contentRef.value?.acceptParams({
                 containerName: detail.containerName,
-                port:
-                    'port' in detail
-                        ? detail.port
-                        : (detail.exposedPorts || []).map((item) => item.hostPort).join(', '),
-                containerPort:
-                    'port' in detail ? '' : (detail.exposedPorts || []).map((item) => item.containerPort).join(', '),
-                endpoint: 'modelAccountBaseURL' in detail ? detail.modelAccountBaseURL : '',
+                port: detail.port,
+                containerPort: '',
+                endpoint: detail.modelAccountBaseURL,
                 engine: row.engine,
                 name: row.name,
                 modelDir: detail.modelDir,
@@ -273,10 +263,7 @@ const open = async (
             forceDelete.value = false;
             deleteVisible.value = true;
         } else if (action === 'config') {
-            const component =
-                row.engine === 'vllm'
-                    ? await loadOptionalComponent('/src/xpack/views/vllm/operate/index.vue')
-                    : TensorForm;
+            const component = await loadOptionalComponent('/src/xpack/views/vllm/operate/index.vue');
             if (version !== request || !visible.value) return;
             view.value = markRaw(component);
             await nextTick();
@@ -287,7 +274,7 @@ const open = async (
             view.value = markRaw(component);
             await nextTick();
             contentRef.value?.acceptParams(detail);
-        } else if (action === 'upgrade' && 'appInstallId' in detail) {
+        } else if (action === 'upgrade') {
             await openUpgrade(detail.appInstallId, version);
         } else if (action === 'log') {
             view.value = markRaw(detail.taskID ? TaskLog : ContainerLogs);
@@ -313,7 +300,7 @@ const open = async (
 watch(visible, (value) => {
     if (!value) request++;
 });
-watch([currentNode, () => route.fullPath, isProductPro, isFxplay], () => {
+watch([currentNode, () => route.fullPath, isProductPro], () => {
     request++;
     visible.value = false;
     deleteVisible.value = false;
@@ -327,13 +314,9 @@ const deleteDeployment = async () => {
     deleteLoading.value = true;
     try {
         const taskID = newUUID();
-        if (row.engine === 'tensorrt') {
-            await deleteTensorRTLLM({ id: row.id, taskID });
-        } else {
-            await (
-                await loadVllmAPI()
-            ).operateVllm({ id: row.id, operate: 'delete', taskID, forceDelete: forceDelete.value });
-        }
+        await (
+            await loadVllmAPI()
+        ).operateVllm({ id: row.id, operate: 'delete', taskID, forceDelete: forceDelete.value });
         if (version !== request || !visible.value) return;
         await openTask(taskID);
         if (version !== request || !visible.value) return;

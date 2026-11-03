@@ -1084,7 +1084,6 @@ const message = {
             addEngine: 'Tambah enjin inferens',
             onlineModel: 'Model dalam talian',
             instanceDeployment: 'Pengerahan mengikut instans',
-            nvidiaDeployment: 'Pengerahan dioptimumkan untuk NVIDIA',
             engines: 'Enjin inferens setempat',
             modelManagement: 'Pengurusan model',
             serviceDetails: 'Butiran perkhidmatan',
@@ -1811,15 +1810,6 @@ const message = {
             testConnection: 'Uji Sambungan',
             connectionSuccess: 'Sambungan berjaya',
             connectionFailed: 'Sambungan gagal',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Direktori Model',
-            commandHelper: 'Jika akses luar diperlukan, tetapkan port dalam arahan sama dengan port aplikasi',
-            imageAlert:
-                'Disebabkan saiz imej yang besar, disyorkan untuk memuat turun imej secara manual ke pelayan sebelum pemasangan',
-            modelSpeedup: 'Dayakan pecutan model',
-            modelType: 'Jenis model',
         },
     },
     panelMCP: {

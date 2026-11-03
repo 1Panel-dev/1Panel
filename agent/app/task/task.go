@@ -81,7 +81,6 @@ const (
 const (
 	TaskScopeWebsite          = "Website"
 	TaskScopeAI               = "AI"
-	TaskScopeTensorRT         = "TensorRT"
 	TaskScopeApp              = "App"
 	TaskScopeRuntime          = "Runtime"
 	TaskScopeDatabase         = "Database"

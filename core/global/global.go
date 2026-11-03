@@ -38,9 +38,6 @@ func RepoURL() string {
 	if CONF.Base.IsEnterprise {
 		return "https://resource.fit2cloud.com/1panel/package/enterprise"
 	}
-	if CONF.Base.IsFxplay {
-		return "https://resource.fit2cloud.com/1panel/package/fusionxplay"
-	}
 	if CONF.Base.Edition != "intl" {
 		return "https://resource.fit2cloud.com/1panel/package/v2"
 	}
@@ -50,9 +47,6 @@ func ResourceURL() string {
 	if CONF.Base.IsEnterprise {
 		return "https://resource.fit2cloud.com/1panel/resource/v2"
 	}
-	if CONF.Base.IsFxplay {
-		return "https://resource.fit2cloud.com/1panel/resource/fusionxplay"
-	}
 	if CONF.Base.Edition != "intl" {
 		return "https://resource.fit2cloud.com/1panel/resource/v2"
 	}
@@ -60,9 +54,6 @@ func ResourceURL() string {
 }
 func AppRepoURL() string {
 	if CONF.Base.IsEnterprise {
-		return "https://apps-assets.fit2cloud.com"
-	}
-	if CONF.Base.IsFxplay {
 		return "https://apps-assets.fit2cloud.com"
 	}
 	if CONF.Base.Edition != "intl" {

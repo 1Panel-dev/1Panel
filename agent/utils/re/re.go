@@ -26,7 +26,6 @@ const (
 	ProxyCacheMaxSizeValidationPattern = `max_size=\d+(\.\d+)?[kmgt]?`
 	ProxyCacheInactivePattern          = `inactive=(\d+)([smhd])`
 	NumberWordPattern                  = `^(\d+)(\w+)$`
-	TrailingDigitsPattern              = `_(\d+)$`
 	AlertIPPattern                     = `from\s+([0-9.]+)\s+port\s+(\d+)`
 	CosDualStackPattern                = `.*cos-dualstack\..*`
 	VersionPattern                     = `v(\d+\.\d+\.\d+)`
@@ -94,7 +93,6 @@ func Init() {
 		ProxyCacheMaxSizeValidationPattern,
 		ProxyCacheInactivePattern,
 		NumberWordPattern,
-		TrailingDigitsPattern,
 		AlertIPPattern,
 		CosDualStackPattern,
 		VersionPattern,

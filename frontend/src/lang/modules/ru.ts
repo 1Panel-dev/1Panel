@@ -1073,7 +1073,6 @@ const message = {
             addEngine: 'Добавить движок инференса',
             onlineModel: 'Онлайн-модели',
             instanceDeployment: 'Развертывание по экземплярам',
-            nvidiaDeployment: 'Развертывание с оптимизацией для NVIDIA',
             engines: 'Локальные движки инференса',
             modelManagement: 'Управление моделями',
             serviceDetails: 'Сведения о сервисе',
@@ -1801,15 +1800,6 @@ const message = {
             testConnection: 'Проверить подключение',
             connectionSuccess: 'Подключение успешно',
             connectionFailed: 'Ошибка подключения',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Каталог модели',
-            commandHelper: 'Если требуется внешний доступ, установите порт в команде таким же, как порт приложения',
-            imageAlert:
-                'Из-за большого размера образа рекомендуется вручную загрузить образ на сервер перед установкой',
-            modelSpeedup: 'Включить ускорение модели',
-            modelType: 'Тип модели',
         },
     },
     panelMCP: {

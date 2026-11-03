@@ -12,7 +12,7 @@
                 <TableSetting title="backup-account-refresh" @search="search()" />
             </template>
             <template #main>
-                <el-alert type="info" :closable="false" class="common-div" v-if="!isFxplay">
+                <el-alert type="info" :closable="false" class="common-div">
                     <template #title>
                         <span>
                             {{ $t('setting.backupAlert') }}
@@ -132,7 +132,7 @@ import { MsgSuccess } from '@/utils/message';
 import { Base64 } from 'js-base64';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isProductPro, isFxplay, docsUrl, isMobile } = useGlobalStore();
+const { isProductPro, docsUrl, isMobile } = useGlobalStore();
 const loading = ref();
 const data = ref();
 const paginationConfig = reactive({

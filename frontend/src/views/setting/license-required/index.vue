@@ -137,7 +137,6 @@ const {
     isEnterprise,
     isEnterpriseLicenseLoaded,
     isEnterpriseLicensed,
-    isFxplay,
     isIntl,
     isLogin,
     isMasterProductPro,
@@ -226,7 +225,6 @@ const loadLoginTheme = async () => {
     isEnterprise.value = res.data.isEnterprise;
     isEnterpriseLicenseLoaded.value = !res.data.isEnterprise;
     isIntl.value = res.data.isIntl;
-    isFxplay.value = res.data.isFxplay;
     isOffline.value = res.data.isOffline;
     openMenuTabs.value = res.data.menuTabs === 'Enable';
     menuAccordion.value = res.data.menuAccordion === 'Enable';

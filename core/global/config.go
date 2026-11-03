@@ -13,7 +13,6 @@ type Base struct {
 	Language       string `mapstructure:"language"`
 	IsDemo         bool   `mapstructure:"is_demo"`
 	IsOffline      bool   `mapstructure:"is_offline"`
-	IsFxplay       bool   `mapstructure:"is_fxplay"`
 	Edition        string `mapstructure:"edition"`
 	IsEnterprise   bool   `mapstructure:"is_enterprise"`
 	Version        string `mapstructure:"version"`

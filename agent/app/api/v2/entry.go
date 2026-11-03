@@ -21,7 +21,6 @@ var (
 	modelDownloaderService = service.NewIModelDownloaderService()
 	aiToolService          = service.NewIAIToolService()
 	mcpServerService       = service.NewIMcpServerService()
-	tensorrtLLMService     = service.NewITensorRTLLMService()
 	agentService           = service.NewIAgentService()
 
 	containerService       = service.NewIContainerService()

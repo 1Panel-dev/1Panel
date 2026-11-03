@@ -1048,7 +1048,6 @@ const message = {
             addEngine: 'ເພີ່ມເຄື່ອງຈັກອະນຸມານ',
             onlineModel: 'ໂມເດວອອນລາຍ',
             instanceDeployment: 'ນຳໃຊ້ຕາມອິນສະແຕນ',
-            nvidiaDeployment: 'ການນຳໃຊ້ທີ່ປັບໃຫ້ເໝາະກັບ NVIDIA',
             engines: 'ເຄື່ອງຈັກອະນຸມານພາຍໃນ',
             modelManagement: 'ຈັດການໂມເດວ',
             serviceDetails: 'ລາຍລະອຽດບໍລິການ',
@@ -1754,14 +1753,6 @@ const message = {
             testConnection: 'ທົດສອບການເຊື່ອມຕໍ່',
             connectionSuccess: 'ເຊື່ອມຕໍ່ສຳເລັດ',
             connectionFailed: 'ເຊື່ອມຕໍ່ລົ້ມເຫຼວ',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'ໂຟນເດີໂມເດວ',
-            commandHelper: 'ຖ້າຕ້ອງການເຂົ້າເຖິງຈາກພາຍນອກ ໃຫ້ກຳນົດພອດໃນຄຳສັ່ງໃຫ້ກົງກັບພອດຂອງແອັບພລິເຄຊັນ',
-            imageAlert: 'ເນື່ອງຈາກ Image ມີຂະໜາດໃຫຍ່ ແນະນຳໃຫ້ດາວໂຫຼດ Image ມາວາງໄວ້ໃນ server ກ່ອນການຕິດຕັ້ງ',
-            modelSpeedup: 'ເປີດໃຊ້ການເລັ່ງຄວາມໄວໂມເດວ',
-            modelType: 'ປະເພດໂມເດວ',
         },
     },
     panelMCP: {

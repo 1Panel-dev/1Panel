@@ -439,10 +439,6 @@
         </el-row>
 
         <QuickJump @search="onLoadBaseInfo(false, 'all')" ref="quickJumpRef" />
-
-        <DialogPro v-model="welcomeOpen" size="w-70" id="welcomeDialog">
-            <div ref="shadowContainer" />
-        </DialogPro>
     </div>
 </template>
 
@@ -474,7 +470,6 @@ import {
     updateSetting,
 } from '@/api/modules/setting';
 import { routerToNameWithQuery, routerToPath } from '@/utils/router';
-import { getWelcomePage } from '@/api/modules/auth';
 import {
     clearDashboardCache,
     clearDashboardCacheByPrefix,
@@ -549,9 +544,6 @@ const statusRef = ref();
 const appRef = ref();
 
 const isSafety = ref();
-
-const welcomeOpen = ref();
-const shadowContainer = ref();
 
 const chartOption = ref('network');
 const statusOption = ref(localStorage.getItem('dashboard_status_view') === 'gpu' ? 'gpu' : 'system');
@@ -1143,21 +1135,6 @@ const fetchData = async () => {
     }, 2000);
 };
 
-const loadWelcome = async () => {
-    await getWelcomePage().then((res) => {
-        if (res.data) {
-            welcomeOpen.value = true;
-            nextTick(() => {
-                const shadowRoot = shadowContainer.value.attachShadow({ mode: 'open' });
-                shadowRoot.innerHTML = res.data;
-            });
-            localStorage.setItem('welcomeShow', 'false');
-        } else {
-            localStorage.setItem('welcomeShow', 'false');
-        }
-    });
-};
-
 onBeforeRouteUpdate((to, from, next) => {
     if (to.name === 'home') {
         clearTimer();
@@ -1176,9 +1153,6 @@ const clearTimer = () => {
 onMounted(() => {
     fetchData();
     loadMemo();
-    if (localStorage.getItem('welcomeShow') !== 'false') {
-        loadWelcome();
-    }
 });
 
 onBeforeUnmount(() => {
