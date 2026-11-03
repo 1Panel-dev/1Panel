@@ -1076,7 +1076,6 @@ const message = {
             addEngine: 'Añadir motor de inferencia',
             onlineModel: 'Modelos en línea',
             instanceDeployment: 'Despliegue por instancia',
-            nvidiaDeployment: 'Despliegue optimizado para NVIDIA',
             engines: 'Motores de inferencia locales',
             modelManagement: 'Gestión de modelos',
             serviceDetails: 'Detalles del servicio',
@@ -1812,16 +1811,6 @@ const message = {
             testConnection: 'Probar conexión',
             connectionSuccess: 'Conexión correcta',
             connectionFailed: 'Error de conexión',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Directorio del Modelo',
-            commandHelper:
-                'Si se necesita acceso externo, establezca el puerto en el comando para que sea el mismo que el puerto de la aplicación',
-            imageAlert:
-                'Debido al gran tamaño de la imagen, se recomienda descargar manualmente la imagen al servidor antes de la instalación',
-            modelSpeedup: 'Habilitar aceleración de modelo',
-            modelType: 'Tipo de modelo',
         },
     },
     panelMCP: {

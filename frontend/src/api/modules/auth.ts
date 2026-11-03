@@ -59,10 +59,6 @@ export const getLoginSetting = () => {
     return http.get<Login.LoginSetting>('/core/auth/setting');
 };
 
-export const getWelcomePage = () => {
-    return http.get<string>('/core/auth/welcome');
-};
-
 export const getUserInfo = () => {
     return http.get<Login.AuthInfo>('/core/auth/current');
 };

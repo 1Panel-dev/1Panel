@@ -8,7 +8,7 @@
         <div class="connection-details">
             <div v-if="form.name" class="service-heading">
                 <el-tag effect="plain">
-                    {{ engine === 'ollama' ? 'Ollama' : engine === 'vllm' ? 'vLLM' : 'TensorRT LLM' }}
+                    {{ engine === 'ollama' ? 'Ollama' : 'vLLM' }}
                 </el-tag>
                 <strong>{{ form.name }}</strong>
             </div>
@@ -93,7 +93,7 @@ const { currentNode, isMobile } = useGlobalStore();
 const emit = defineEmits(['close']);
 const router = useRouter();
 const portRef = ref();
-const engine = ref('ollama');
+const engine = ref<'ollama' | 'vllm'>('ollama');
 
 const drawerVisible = ref(false);
 const form = reactive({
@@ -101,7 +101,7 @@ const form = reactive({
     modelDir: '',
     systemIP: '',
     containerName: '',
-    port: 0 as number | string,
+    port: 0,
     containerPort: '11434',
     endpoint: '',
 });
@@ -119,10 +119,10 @@ const externalAddress = computed(() => {
 interface DialogProps {
     name?: string;
     modelDir?: string;
-    port: number | string;
+    port: number;
     containerPort?: string;
     endpoint?: string;
-    engine?: string;
+    engine?: 'ollama' | 'vllm';
     containerName: string;
     appinstallID?: number;
 }

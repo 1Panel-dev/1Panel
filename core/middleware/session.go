@@ -66,8 +66,7 @@ func isAnonymousAuthPath(path string) bool {
 		"/api/v2/core/auth/mfalogin",
 		"/api/v2/core/auth/login",
 		"/api/v2/core/auth/logout",
-		"/api/v2/core/auth/setting",
-		"/api/v2/core/auth/welcome":
+		"/api/v2/core/auth/setting":
 		return true
 	default:
 		return false

@@ -127,7 +127,7 @@
                                                 {{ $t('setting.apiInterfaceAlert3') }}
                                             </el-link>
                                         </li>
-                                        <li v-if="!isFxplay">
+                                        <li>
                                             <el-link :href="panelURL" target="_blank" class="tooltip-help-link">
                                                 {{ $t('setting.apiInterfaceAlert4') }}
                                             </el-link>
@@ -354,7 +354,7 @@ const props = defineProps<{ currentUser?: Login.AuthInfo }>();
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const complexityVerification = ref(false);
-const { globalStore, docsUrl, entrance, isFxplay } = useGlobalStore();
+const { globalStore, docsUrl, entrance } = useGlobalStore();
 const open = ref(false);
 const loading = ref(false);
 const userRef = ref<FormInstance>();

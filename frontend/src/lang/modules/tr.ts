@@ -1082,7 +1082,6 @@ const message = {
             addEngine: 'Çıkarım motoru ekle',
             onlineModel: 'Çevrimiçi modeller',
             instanceDeployment: 'Örnek bazında dağıtım',
-            nvidiaDeployment: 'NVIDIA için optimize edilmiş dağıtım',
             engines: 'Yerel çıkarım motorları',
             modelManagement: 'Model yönetimi',
             serviceDetails: 'Hizmet ayrıntıları',
@@ -1806,16 +1805,6 @@ const message = {
             testConnection: 'Bağlantıyı Test Et',
             connectionSuccess: 'Bağlantı başarılı',
             connectionFailed: 'Bağlantı başarısız',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Model Dizini',
-            commandHelper:
-                'Harici erişim gerekiyorsa, komuttaki bağlantı noktasını uygulama bağlantı noktasıyla aynı olacak şekilde ayarlayın',
-            imageAlert:
-                'Görüntü boyutu büyük olduğundan, kurulumdan önce görüntüyü sunucuya manuel olarak indirmeniz önerilir',
-            modelSpeedup: 'Model hızlandırmayı etkinleştir',
-            modelType: 'Model türü',
         },
     },
     panelMCP: {

@@ -66,7 +66,6 @@ export interface GlobalState {
     isEnterprise: boolean;
     isIntl: boolean;
     docWithRegion: boolean;
-    isFxplay: boolean;
     isOffline: boolean;
     // license
     isProductPro: boolean;

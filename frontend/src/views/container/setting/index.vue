@@ -77,7 +77,7 @@
                                     </template>
                                 </el-input>
                                 <span class="input-help">{{ $t('container.mirrorsHelper') }}</span>
-                                <span class="input-help flex min-w-0 flex-wrap flx-align-center" v-if="!isFxplay">
+                                <span class="input-help flex min-w-0 flex-wrap flx-align-center">
                                     {{ $t('container.mirrorsHelper2') }}
                                     <el-link class="p-ml-5 text-xs" icon="Position" @click="toDoc()" type="primary">
                                         {{ $t('firewall.quickJump') }}
@@ -270,7 +270,7 @@ import { MsgSuccess } from '@/utils/message';
 import { checkNumberRange } from '@/global/form-rules';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { docsUrl, isFxplay, isMobile, openMenuTabs } = useGlobalStore();
+const { docsUrl, isMobile, openMenuTabs } = useGlobalStore();
 
 const unset = ref(i18n.global.t('setting.unSetting'));
 const submitInput = ref();

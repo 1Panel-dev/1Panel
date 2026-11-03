@@ -11,7 +11,7 @@
 import { computed } from 'vue';
 import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { globalStore, isOffline, isFxplay, isAdmin, isEnterprise } = useGlobalStore();
+const { globalStore, isOffline, isAdmin, isEnterprise } = useGlobalStore();
 
 const buttons = computed<RouterButton[]>(() => {
     const items = [
@@ -65,7 +65,7 @@ const buttons = computed<RouterButton[]>(() => {
             label: i18n.global.t('apiKeyManagement.title'),
             path: '/settings/apikeys',
         },
-        ...(isFxplay.value || !isAdmin.value
+        ...(!isAdmin.value
             ? []
             : [
                   {

@@ -4,7 +4,7 @@
             <span>{{ $t('tool.supervisor.notStartWarn') }}</span>
         </el-card>
         <LayoutContent :title="$t('tool.supervisor.list', 2)" v-loading="loading">
-            <template #prompt v-if="!isFxplay">
+            <template #prompt>
                 <el-alert type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.common.toolboxHelper') }}
@@ -189,7 +189,7 @@ import { HostTool } from '@/api/interface/host-tool';
 import { MsgSuccess } from '@/utils/message';
 import { routerToFileWithPath } from '@/utils/router';
 
-const { docsUrl, isFxplay, isMobile } = useGlobalStore();
+const { docsUrl, isMobile } = useGlobalStore();
 
 const loading = ref(false);
 const setSuperVisor = ref(false);

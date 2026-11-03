@@ -296,7 +296,6 @@ type LoginSetting struct {
 	IsDemo         bool   `json:"isDemo"`
 	IsIntl         bool   `json:"isIntl"`
 	IsOffline      bool   `json:"isOffline"`
-	IsFxplay       bool   `json:"isFxplay"`
 	IsEnterprise   bool   `json:"isEnterprise"`
 	Language       string `json:"language"`
 	MenuTabs       string `json:"menuTabs"`

@@ -5,7 +5,7 @@
                 <el-alert class="clam-helper-alert" type="info" :closable="false">
                     <template #title>
                         {{ $t('toolbox.clam.clamHelper') }}
-                        <el-link class="ml-1 text-xs" v-if="!isFxplay" @click="toDoc()" type="primary">
+                        <el-link class="ml-1 text-xs" @click="toDoc()" type="primary">
                             {{ $t('commons.button.helpDoc') }}
                         </el-link>
                     </template>
@@ -207,7 +207,7 @@ import { routerToFileWithPath, routerToName } from '@/utils/router';
 const loading = ref();
 const selects = ref<any>([]);
 
-const { docsUrl, isFxplay, isProductPro, isMobile } = useGlobalStore();
+const { docsUrl, isProductPro, isMobile } = useGlobalStore();
 const data = ref();
 const paginationConfig = reactive({
     currentPage: 1,

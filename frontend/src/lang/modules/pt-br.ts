@@ -1080,7 +1080,6 @@ const message = {
             addEngine: 'Adicionar mecanismo de inferência',
             onlineModel: 'Modelos online',
             instanceDeployment: 'Implantação por instância',
-            nvidiaDeployment: 'Implantação otimizada para NVIDIA',
             engines: 'Mecanismos de inferência locais',
             modelManagement: 'Gerenciamento de modelos',
             serviceDetails: 'Detalhes do serviço',
@@ -1811,16 +1810,6 @@ const message = {
             testConnection: 'Testar Conexão',
             connectionSuccess: 'Conexão bem-sucedida',
             connectionFailed: 'Falha na conexão',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'Diretório do Modelo',
-            commandHelper:
-                'Se for necessário acesso externo, defina a porta no comando para ser a mesma que a porta do aplicativo',
-            imageAlert:
-                'Devido ao grande tamanho da imagem, recomenda-se baixar manualmente a imagem para o servidor antes da instalação',
-            modelSpeedup: 'Ativar aceleração de modelo',
-            modelType: 'Tipo de modelo',
         },
     },
     panelMCP: {

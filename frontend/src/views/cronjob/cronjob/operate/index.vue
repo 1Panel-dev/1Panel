@@ -223,7 +223,7 @@
                                         </el-button>
                                         <el-divider v-if="form.specs.length > 1" class="divider" />
                                     </div>
-                                    <span class="input-help logText" v-if="!isFxplay">
+                                    <span class="input-help logText">
                                         {{ $t('cronjob.cronSpecDoc') }}
                                         <el-link class="link" icon="Position" @click="toDoc" type="primary">
                                             {{ $t('firewall.quickJump') }}
@@ -886,7 +886,7 @@ import { getAlertConfigDisplayName } from '@/views/setting/alert/setting/drawer/
 import { cronjobAlertModes, normalizeCronjobAlertMode } from '@/utils/cronjob-alert';
 const router = useRouter();
 
-const { docsUrl, isFxplay, isProductPro } = useGlobalStore();
+const { docsUrl, isProductPro } = useGlobalStore();
 const licenseRef = ref();
 const scriptFileRef = ref();
 const dirRef = ref();

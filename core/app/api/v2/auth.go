@@ -3,8 +3,6 @@ package v2
 import (
 	"encoding/base64"
 	"net/http"
-	"os"
-	"path"
 
 	"github.com/1Panel-dev/1Panel/core/app/api/v2/helper"
 	appauth "github.com/1Panel-dev/1Panel/core/app/auth"
@@ -226,26 +224,6 @@ func (b *BaseApi) Captcha(c *gin.Context) {
 }
 
 // @Tags Auth
-// @Summary Get welcome page
-// @Success 200
-// @Security ApiKeyAuth
-// @Security Timestamp
-// @Router /core/auth/welcome [get]
-func (b *BaseApi) GetWelcomePage(c *gin.Context) {
-	count, _, _ := logService.PageLoginLog(c, dto.SearchLgLogWithPage{PageInfo: dto.PageInfo{Page: 1, PageSize: 10}})
-	if count != 1 {
-		helper.Success(c)
-		return
-	}
-	file, err := os.ReadFile(path.Join(global.CONF.Base.InstallDir, "1panel/welcome/index.html"))
-	if err != nil {
-		helper.Success(c)
-		return
-	}
-	helper.SuccessWithData(c, string(file))
-}
-
-// @Tags Auth
 // @Summary Get Setting For Login
 // @Success 200 {object} dto.LoginSetting
 // @Router /core/auth/setting [get]
@@ -260,7 +238,6 @@ func (b *BaseApi) GetLoginSetting(c *gin.Context) {
 	res := &dto.LoginSetting{
 		IsDemo:        global.CONF.Base.IsDemo,
 		IsIntl:        global.CONF.Base.Edition == "intl",
-		IsFxplay:      global.CONF.Base.IsFxplay,
 		IsOffline:     global.CONF.Base.IsOffline,
 		IsEnterprise:  global.CONF.Base.IsEnterprise,
 		Language:      settingInfo.Language,

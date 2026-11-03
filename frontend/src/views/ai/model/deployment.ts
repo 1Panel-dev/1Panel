@@ -1,12 +1,12 @@
 import type { ReqPage, ResPage, ResultData } from '@/api/interface';
 import type { AI } from '@/api/interface/ai';
-import { pageTensorRTLLM, searchOllamaModel } from '@/api/modules/ai';
+import { searchOllamaModel } from '@/api/modules/ai';
 import { checkAppInstalled, searchAppInstalled } from '@/api/modules/app';
 
 export interface Deployment {
     taskID?: string;
     id: number;
-    engine: 'vllm' | 'ollama' | 'tensorrt';
+    engine: 'vllm' | 'ollama';
     name: string;
     version: string;
     ports: number[];
@@ -69,12 +69,11 @@ export async function readPages<T>(search: (page: ReqPage) => Promise<ResultData
     }
 }
 
-export async function loadModelOverview(pro: boolean, fxplay: boolean) {
-    const [vllm, tensors, ollama] = await Promise.all([
+export async function loadModelOverview(pro: boolean) {
+    const [vllm, ollama] = await Promise.all([
         pro && vllmAvailable
             ? loadVllmAPI().then((api) => readPages((page) => api.pageVllm({ ...page, info: '' })))
             : Promise.resolve([]),
-        fxplay ? readPages<AI.TensorRTLLMDTO>((page) => pageTensorRTLLM({ ...page, name: '' })) : Promise.resolve([]),
         checkAppInstalled('ollama', ''),
     ]);
     const deployments: Deployment[] = vllm.map((item) => ({
@@ -90,20 +89,6 @@ export async function loadModelOverview(pro: boolean, fxplay: boolean) {
         status: item.status,
         taskID: item.taskID,
     }));
-    deployments.push(
-        ...tensors.map((item): Deployment => ({
-            id: item.id!,
-            engine: 'tensorrt',
-            name: item.name,
-            version: item.version,
-            ports: (item.exposedPorts || []).map((port) => port.hostPort).filter((port) => port > 0),
-            containerName: item.containerName,
-            modelDir: item.modelDir,
-            models: [],
-            status: item.status || '',
-            taskID: item.taskID,
-        })),
-    );
     if (ollama.data.isExist) {
         const [models, updates] = await Promise.all([
             readPages<AI.OllamaModelInfo>((page) => searchOllamaModel(page)),

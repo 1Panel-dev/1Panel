@@ -1057,7 +1057,6 @@ const message = {
             addEngine: 'افزودن موتور استنتاج',
             onlineModel: 'مدل‌های آنلاین',
             instanceDeployment: 'استقرار بر اساس نمونه',
-            nvidiaDeployment: 'استقرار بهینه‌شده برای NVIDIA',
             engines: 'موتورهای استنتاج محلی',
             modelManagement: 'مدیریت مدل‌ها',
             serviceDetails: 'جزئیات سرویس',
@@ -1778,14 +1777,6 @@ const message = {
             testConnection: 'تست اتصال',
             connectionSuccess: 'اتصال با موفقیت برقرار شد',
             connectionFailed: 'اتصال ناموفق بود',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'دایرکتوری مدل',
-            commandHelper: 'در صورت نیاز به دسترسی خارجی، پورت را در دستور به همان پورت برنامه تنظیم کنید',
-            imageAlert: 'به دلیل حجم زیاد تصویر، توصیه می‌شود تصویر را به صورت دستی قبل از نصب به سرور دانلود کنید',
-            modelSpeedup: 'فعال‌سازی شتاب مدل',
-            modelType: 'نوع مدل',
         },
     },
     panelMCP: {

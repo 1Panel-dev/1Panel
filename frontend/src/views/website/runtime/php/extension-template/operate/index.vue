@@ -19,12 +19,7 @@
                             v-model="extensions.extensions"
                         />
                     </el-form-item>
-                    <el-link
-                        target="_blank"
-                        type="primary"
-                        v-if="!isFxplay"
-                        :href="docsUrl + '/user_manual/websites/php/#php_1'"
-                    >
+                    <el-link target="_blank" type="primary" :href="docsUrl + '/user_manual/websites/php/#php_1'">
                         {{ $t('php.toExtensionsList') }}
                     </el-link>
                 </el-form>
@@ -52,7 +47,7 @@ import { CreatePHPExtensions, UpdatePHPExtensions } from '@/api/modules/runtime'
 import i18n from '@/lang';
 import { Runtime } from '@/api/interface/runtime';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-const { docsUrl, isFxplay } = useGlobalStore();
+const { docsUrl } = useGlobalStore();
 
 const open = ref(false);
 const operate = ref('create');

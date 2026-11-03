@@ -65,7 +65,6 @@ const GlobalStore = defineStore('GlobalState', {
         isEnterprise: false,
         isIntl: false,
         docWithRegion: true,
-        isFxplay: false,
         isOffline: false,
         // license
         isProductPro: false,

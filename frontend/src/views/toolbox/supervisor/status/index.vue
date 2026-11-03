@@ -65,7 +65,7 @@
 
                         <template v-else-if="data.init">
                             <span>{{ $t('tool.supervisor.initHelper') }}</span>
-                            <span v-if="!isFxplay" class="flex items-center justify-center gap-0.5" @click="toDoc()">
+                            <span class="flex items-center justify-center gap-0.5" @click="toDoc()">
                                 <el-icon><Position /></el-icon>
                                 {{ $t('commons.button.helpDoc') }}
                             </span>
@@ -100,7 +100,7 @@ import InitPage from './init/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToNameWithQuery } from '@/utils/router';
 
-const { docsUrl, isFxplay } = useGlobalStore();
+const { docsUrl } = useGlobalStore();
 
 let operateReq = reactive({
     installId: 0,

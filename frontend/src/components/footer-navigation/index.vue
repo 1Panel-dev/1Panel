@@ -23,7 +23,7 @@ import {
 import type { FooterNavigationKey, FooterNavigationSetting } from './model';
 import { FOOTER_NAVIGATION_REFRESH_EVENT } from './event';
 
-const { docsUrl, isEE, isFxplay, isIntl } = useGlobalStore();
+const { docsUrl, isEE, isIntl } = useGlobalStore();
 const setting = ref<FooterNavigationSetting | null>(null);
 let loadGeneration = 0;
 
@@ -38,12 +38,7 @@ const labels: Record<FooterNavigationKey, string> = {
 
 const visibleLinks = computed(() => {
     return footerNavigationKeys
-        .filter((key) => {
-            if (isFxplay.value && key !== 'documentation') {
-                return false;
-            }
-            return links.value[key].visible;
-        })
+        .filter((key) => links.value[key].visible)
         .map((key) => ({
             key,
             label: labels[key],

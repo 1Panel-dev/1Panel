@@ -154,44 +154,6 @@
 		"formatZH": "添加 Ollama 模型重试 [name]",
 		"formatEN": "re-add Ollama model [name]"
 	},
-	"/ai/tensorrt/create": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建 TensorRT LLM [name]",
-		"formatEN": "create TensorRT LLM [name]"
-	},
-	"/ai/tensorrt/delete": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除 TensorRT LLM [id]",
-		"formatEN": "delete TensorRT LLM [id]"
-	},
-	"/ai/tensorrt/operate": {
-		"bodyKeys": [
-			"id",
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "操作 TensorRT LLM [id][operate]",
-		"formatEN": "operate TensorRT LLM [id][operate]"
-	},
-	"/ai/tensorrt/update": {
-		"bodyKeys": [
-			"id",
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新 TensorRT LLM [id][name]",
-		"formatEN": "update TensorRT LLM [id][name]"
-	},
 	"/alert": {
 		"bodyKeys": [
 			"title"

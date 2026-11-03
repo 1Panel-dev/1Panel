@@ -17,7 +17,6 @@ var (
 
 	aiRepo                = repo.NewIAiRepo()
 	mcpServerRepo         = repo.NewIMcpServerRepo()
-	tensorrtLLMRepo       = repo.NewITensorRTLLMRepo()
 	agentRepo             = repo.NewIAgentRepo()
 	agentAccountRepo      = repo.NewIAgentAccountRepo()
 	agentAccountModelRepo = repo.NewIAgentAccountModelRepo()

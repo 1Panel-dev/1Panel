@@ -1061,7 +1061,6 @@ const message = {
             addEngine: '推論エンジンを追加',
             onlineModel: 'オンラインモデル',
             instanceDeployment: 'インスタンス単位でデプロイ',
-            nvidiaDeployment: 'NVIDIA 向け最適化デプロイ',
             engines: 'ローカル推論エンジン',
             modelManagement: 'モデル管理',
             serviceDetails: 'サービス詳細',
@@ -1780,16 +1779,6 @@ const message = {
             testConnection: '接続テスト',
             connectionSuccess: '接続に成功しました',
             connectionFailed: '接続に失敗しました',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: 'モデルディレクトリ',
-            commandHelper:
-                '外部アクセスが必要な場合は、コマンド内のポートをアプリケーションポートと同じに設定してください',
-            imageAlert:
-                'イメージサイズが大きいため、インストール前にサーバーにイメージを手動でダウンロードすることをお勧めします',
-            modelSpeedup: 'モデル加速を有効化',
-            modelType: 'モデルタイプ',
         },
     },
     panelMCP: {

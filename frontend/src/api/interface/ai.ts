@@ -290,6 +290,7 @@ export namespace AI {
     export interface Volume {
         source: string;
         target: string;
+        mode: string;
     }
 
     export interface McpServer {
@@ -384,64 +385,6 @@ export namespace AI {
         ssePath: string;
         containerName: string;
         environments: Environment[];
-    }
-
-    export interface ExposedPort {
-        hostPort: number;
-        containerPort: number;
-        hostIP: string;
-        protocol?: string;
-    }
-
-    export interface Environment {
-        key: string;
-        value: string;
-    }
-    export interface Volume {
-        source: string;
-        target: string;
-        mode: string;
-    }
-
-    export interface ExtraHosts {
-        hostname: string;
-        ip: string;
-    }
-
-    export interface TensorRTLLM {
-        taskID?: string;
-        gpu?: ModelGPUConfig;
-        id?: number;
-        name: string;
-        containerName: string;
-        version: string;
-        modelDir: string;
-        status?: string;
-        message?: string;
-        createdAt?: string;
-        exposedPorts?: ExposedPort[];
-        environments?: Environment[];
-        volumes?: Volume[];
-        extraHosts?: ExtraHosts[];
-    }
-
-    export interface TensorRTLLMDTO extends TensorRTLLM {
-        dir?: string;
-    }
-
-    export interface TensorRTLLMSearch extends ReqPage {
-        name: string;
-    }
-
-    export interface TensorRTLLMDelete {
-        taskID?: string;
-        id: number;
-    }
-
-    export interface TensorRTLLMOperate {
-        taskID?: string;
-        id: number;
-        operate: string;
     }
 
     export interface AgentCreateReq {

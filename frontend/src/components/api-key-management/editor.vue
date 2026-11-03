@@ -36,7 +36,7 @@
                             {{ $t('setting.apiInterfaceAlert3') }}
                         </el-link>
                     </li>
-                    <li v-if="!isFxplay">
+                    <li>
                         <el-link
                             :href="`${docsUrl}/dev_manual/api_manual/`"
                             target="_blank"
@@ -153,7 +153,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 
 const emit = defineEmits<{ changed: []; created: [item: APIKey.Item] }>();
-const { globalStore, docsUrl, isFxplay } = useGlobalStore();
+const { globalStore, docsUrl } = useGlobalStore();
 const visible = ref(false);
 const busy = ref(false);
 const uncertain = ref(false);

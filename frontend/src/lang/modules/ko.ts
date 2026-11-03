@@ -1051,7 +1051,6 @@ const message = {
             addEngine: '추론 엔진 추가',
             onlineModel: '온라인 모델',
             instanceDeployment: '인스턴스별 배포',
-            nvidiaDeployment: 'NVIDIA 최적화 배포',
             engines: '로컬 추론 엔진',
             modelManagement: '모델 관리',
             serviceDetails: '서비스 상세 정보',
@@ -1764,14 +1763,6 @@ const message = {
             testConnection: '연결 테스트',
             connectionSuccess: '연결 성공',
             connectionFailed: '연결 실패',
-        },
-        tensorRT: {
-            llm: 'TensorRT LLM',
-            modelDir: '모델 디렉토리',
-            commandHelper: '외부 액세스가 필요한 경우 명령에서 포트를 애플리케이션 포트와 동일하게 설정하십시오',
-            imageAlert: '이미지 크기가 크므로 설치 전에 서버에 이미지를 수동으로 다운로드하는 것이 좋습니다',
-            modelSpeedup: '모델 가속 활성화',
-            modelType: '모델 유형',
         },
     },
     panelMCP: {
