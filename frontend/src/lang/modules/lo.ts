@@ -4474,6 +4474,7 @@ const message = {
         brotliCompLevelHelper: 'ອັດຕາການບີບອັດ brotli, 0 ຫາ 11',
         brotliManagedExternallyHelper:
             'brotli ຖືກຕັ້ງຄ່າດ້ວຍມືໃນ nginx.conf; ແຜງຄວບຄຸມຈະສະແດງຄ່າທີ່ກຳລັງໃຊ້ຢູ່ ແລະ ຈະບໍ່ຂຽບທັບ.',
+        brotliManagedPendingHelper: 'ການຕັ້ງຄ່າ brotli ຍັງບໍ່ມີຜົນ; ຈະມີຜົນຫຼັງຈາກບັນທຶກ.',
         brotliManagedUnavailableHelper:
             'ແຜງຄວບຄຸມບໍ່ສາມາດເພີ່ມການຕັ້ງຄ່າ brotli ທີ່ຈັດການໄປຍັງ nginx.conf ໂດຍອັດຕະໂນມັດໄດ້; ຄ່າຂ້າງລຸ່ມນີ້ຈະບໍ່ມີຜົນ.',
         brotliMinLengthHelper: 'ຂະໜາດຕອບສະໜອງຂັ້ນຕ່ຳທີ່ຈະບີບອັດດ້ວຍ brotli',

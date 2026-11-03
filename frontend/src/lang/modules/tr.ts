@@ -4675,6 +4675,7 @@ const message = {
         brotliCompLevelHelper: 'Brotli sıkıştırma oranı, 0 ile 11 arası',
         brotliManagedExternallyHelper:
             'Brotli, nginx.conf dosyasında elle yapılandırıldı; panel yalnızca geçerli değerleri gösterir ve üzerine yazmaz.',
+        brotliManagedPendingHelper: 'Brotli ayarları henüz etkin değil; kaydettikten sonra etkinleşir.',
         brotliManagedUnavailableHelper:
             'Panel, yönetilen brotli yapılandırmasını nginx.conf dosyasına otomatik olarak ekleyemedi; aşağıdaki değerler etkin olmayacak.',
         brotliMinLengthHelper: 'brotli ile sıkıştırılacak minimum yanıt boyutu',

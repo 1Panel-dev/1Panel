@@ -4562,6 +4562,7 @@ const message = {
         brotliCompLevelHelper: 'نرخ فشرده‌سازی brotli، از 0 تا 11',
         brotliManagedExternallyHelper:
             'brotli به‌صورت دستی در nginx.conf پیکربندی شده است؛ پنل فقط مقادیر در حال اجرا را نشان می‌دهد و آن‌ها را بازنویسی نمی‌کند.',
+        brotliManagedPendingHelper: 'تنظیمات brotli هنوز اعمال نشده است؛ پس از ذخیره اعمال می‌شود.',
         brotliManagedUnavailableHelper:
             'پنل نتوانست پیکربندی مدیریت‌شده brotli را به‌صورت خودکار به nginx.conf اضافه کند؛ مقادیر زیر اعمال نخواهند شد.',
         brotliMinLengthHelper: 'حداقل اندازه پاسخ برای فشرده‌سازی با brotli',

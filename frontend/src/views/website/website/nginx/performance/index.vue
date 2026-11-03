@@ -54,6 +54,11 @@
                         {{ $t('nginx.brotliManagedExternallyHelper') }}
                     </el-alert>
                 </el-col>
+                <el-col :span="24" v-if="brotliManagedPending">
+                    <el-alert type="info" :closable="false" class="mb-2">
+                        {{ $t('nginx.brotliManagedPendingHelper') }}
+                    </el-alert>
+                </el-col>
                 <el-col :span="24" v-if="brotliManagedUnavailable">
                     <el-alert type="warning" :closable="false" class="mb-2">
                         {{ $t('nginx.brotliManagedUnavailableHelper') }}
@@ -127,6 +132,8 @@ let loading = ref(false);
 // disappear together with the module.
 const brotliAvailable = ref(false);
 const brotliManagedExternally = ref(false);
+// Pending: nginx does not load the managed file yet, and saving wires it in.
+const brotliManagedPending = ref(false);
 const brotliManagedUnavailable = ref(false);
 
 const variablesRules = reactive({
@@ -201,6 +208,7 @@ const getBrotliParams = async () => {
     }
     const res = await getNginxConfigByScope<Nginx.NginxBrotliRes>({ scope: 'brotli' });
     brotliManagedExternally.value = !!res.data?.managedExternally;
+    brotliManagedPending.value = !!res.data?.managedPending;
     brotliManagedUnavailable.value = !!res.data?.managedUnavailable;
     for (const param of res.data?.params ?? []) {
         if (param.params.length === 0) {
