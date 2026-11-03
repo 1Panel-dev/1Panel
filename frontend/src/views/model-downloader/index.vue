@@ -1,6 +1,6 @@
 <template>
     <div>
-        <LayoutContent :title="currentTitle">
+        <LayoutContent v-if="currentTab !== 'recipes'" :title="currentTitle">
             <template #search>
                 <el-button
                     v-for="button in buttons"
@@ -291,7 +291,7 @@
                         <template #default="{ row }">{{ row.localModel?.sizeFormatted || '-' }}</template>
                     </el-table-column>
                     <el-table-column prop="createdAt" :label="$t('commons.table.date')" width="180" />
-                    <el-table-column :label="$t('commons.table.operate')" width="140" fixed="right">
+                    <el-table-column :label="$t('commons.table.operate')" width="240" fixed="right">
                         <template #default="{ row }">
                             <el-button v-permission v-if="row.canCancel" link type="primary" @click="cancelTask(row)">
                                 {{ $t('commons.button.cancel') }}
@@ -307,6 +307,24 @@
                                 @click="emit('deploy', row.localModel.path)"
                             >
                                 {{ $t('aiTools.model.deploy') }}
+                            </el-button>
+                            <el-button
+                                v-if="
+                                    recipesView &&
+                                    isProductPro &&
+                                    row.downloadType === 'all' &&
+                                    row.status === 'Success' &&
+                                    row.localModel
+                                "
+                                v-permission
+                                link
+                                type="primary"
+                                @click="
+                                    recipeModelPath = row.localModel.path;
+                                    currentTab = 'recipes';
+                                "
+                            >
+                                {{ $t('aiTools.model.createRecipe') }}
                             </el-button>
                             <el-button
                                 v-permission
@@ -457,13 +475,29 @@
                 </ComplexTable>
             </div>
         </DrawerPro>
+        <component :is="recipesView" v-if="currentTab === 'recipes' && recipesView" :model-path="recipeModelPath">
+            <template #search>
+                <el-button
+                    v-for="button in buttons"
+                    :key="button.value"
+                    class="tag-button"
+                    :class="{ 'no-active': currentTab !== button.value }"
+                    :type="currentTab === button.value ? 'primary' : undefined"
+                    :aria-pressed="currentTab === button.value"
+                    @click="currentTab = button.value"
+                >
+                    {{ button.label }}
+                </el-button>
+            </template>
+        </component>
         <Download ref="downloadRef" @search="handleDownloadQueued" />
         <DownloadDelete ref="downloadDeleteRef" @search="loadDownloads" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, watch } from 'vue';
+import { computed, defineAsyncComponent, onMounted, reactive, ref, watch, type Component } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { checkFile } from '@/api/modules/files';
 import i18n from '@/lang';
@@ -492,10 +526,10 @@ import {
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const emit = defineEmits<{ deploy: [modelDir: string] }>();
-const { currentNode, isMobile, isOffline, language } = useGlobalStore();
+const { currentNode, isMobile, isOffline, language, isProductPro } = useGlobalStore();
 const downloadTypeFilter = ref<ModelDownloader.DownloadType | ''>('');
 
-type DownloaderTab = 'featured' | 'downloader' | 'settings';
+type DownloaderTab = 'featured' | 'downloader' | 'recipes' | 'settings';
 type DownloaderSource = ModelDownloader.Source;
 type SortValue = ModelDownloader.ModelSearch['sort'];
 
@@ -507,6 +541,13 @@ interface SortOption {
 const searchCardLoading = ref(false);
 let searchRequest = 0;
 const savingSettings = ref(false);
+const route = useRoute();
+const router = useRouter();
+const pagePath = route.path;
+const recipeModules = import.meta.glob<{ default: Component }>('@/xpack/views/vllm/template/index.vue');
+const recipeLoader = Object.values(recipeModules)[0];
+const recipesView = recipeLoader ? defineAsyncComponent(recipeLoader) : undefined;
+const recipeModelPath = ref('');
 const currentTab = ref<DownloaderTab>('featured');
 const featuredViewMode = ref<'table' | 'card'>('table');
 const featuredFamily = ref('');
@@ -560,11 +601,14 @@ const openFeaturedModel = (row: ModelDownloader.FeaturedModel) => {
     );
 };
 
-const buttons: Array<{ label: string; value: DownloaderTab }> = [
+const buttons = computed<Array<{ label: string; value: DownloaderTab }>>(() => [
     { label: i18n.global.t('aiTools.model.featuredModels'), value: 'featured' },
     { label: i18n.global.t('aiTools.model.downloader'), value: 'downloader' },
+    ...(recipesView && isProductPro.value
+        ? [{ label: i18n.global.t('aiTools.model.recipes'), value: 'recipes' as const }]
+        : []),
     { label: i18n.global.t('commons.button.set'), value: 'settings' },
-];
+]);
 
 const settings = reactive<ModelDownloader.Setting>({
     modelDir: '/opt/1panel/ai/models',
@@ -596,7 +640,10 @@ const downloadPagination = reactive({
 });
 
 const currentTitle = computed(() => {
-    return buttons.find((item) => item.value === currentTab.value)?.label || i18n.global.t('aiTools.model.downloader');
+    return (
+        buttons.value.find((item) => item.value === currentTab.value)?.label ||
+        i18n.global.t('aiTools.model.downloader')
+    );
 });
 
 const huggingFaceSortOptions = computed<SortOption[]>(() => [
@@ -881,11 +928,24 @@ const formatSizePair = (downloaded: number, total: number) => {
     return `${formatBytes(downloaded)} / ${formatBytes(total)}`;
 };
 
+watch(
+    [() => route.query.tab, () => route.path, buttons],
+    ([tab, path]) => {
+        if (path !== pagePath) return;
+        currentTab.value = buttons.value.some((button) => button.value === tab) ? (tab as DownloaderTab) : 'featured';
+    },
+    { immediate: true },
+);
+
 watch(currentTab, async (value) => {
+    if (value !== 'recipes') recipeModelPath.value = '';
+    if (route.path === pagePath && route.query.tab !== value)
+        await router.replace({ query: { ...route.query, tab: value } });
     if (value !== 'settings') await refreshCurrent();
 });
 
 watch(currentNode, async () => {
+    recipeModelPath.value = '';
     featuredRequest++;
     featuredLoading.value = false;
     featuredModels.value = [];

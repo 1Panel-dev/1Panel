@@ -27,6 +27,7 @@ func (m *ModelDownloaderRouter) InitRouter(Router *gin.RouterGroup) {
 		router.POST("/tasks/retry", baseApi.RetryModelDownloadTask)
 		router.POST("/tasks/remove", baseApi.RemoveModelDownloadTask)
 		router.POST("/local/search", baseApi.PageLocalDownloadedModels)
+		router.GET("/local/options", baseApi.ListLocalModelOptions)
 		router.POST("/local/delete", baseApi.DeleteLocalDownloadedModel)
 	}
 }

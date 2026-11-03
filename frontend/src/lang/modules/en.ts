@@ -1083,6 +1083,18 @@ const message = {
             deployments: 'Model deployment',
             files: 'Model preparation',
             connectExternal: 'Connect external service',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Create Recipe',
+            recipeHelper:
+                'Recipe = model + hardware + launch arguments. Import from {link} or create from a downloaded model.',
+            recipeFormHelper: 'Paste a command from {link}, or fill in the fields manually.',
+            recipeArguments: 'Launch arguments',
+            recipeImportCommand: 'Import command',
+            recipeImportPlaceholder: 'Paste Docker, pip/uv or vllm serve commands to fill in the Recipe automatically',
+            recipeVariablesNotSupported:
+                'Variable references are not supported in commands. Use explicit values; configure environment variables in the environment field.',
+            recipeImportError:
+                'Unable to convert. Include a Docker or vllm serve launch command with a model; paste pip/uv installation commands together with the launch command.',
             deploymentTemplates: 'vLLM startup command templates',
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
@@ -1109,8 +1121,6 @@ const message = {
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'The startup command must use port {0}; otherwise, the service will be inaccessible.',
             ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sync to model service',
             modelAccountAddressHelper:
@@ -1118,6 +1128,8 @@ const message = {
             containerAddress: 'Container address',
             customAddress: 'Custom address',
             downloader: 'Downloads',
+            modelDirectoryPlaceholder: 'Search models or enter a full path',
+            selectModelDirectory: 'Select directory',
             modelDir: 'Model directory',
             modelSource: 'Model source',
             repoID: 'Repository ID',

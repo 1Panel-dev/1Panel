@@ -41,7 +41,11 @@
                     v-else-if="!initializing && !modelInstalled"
                     :description="$t('app.checkInstalledWarn', ['Ollama'])"
                 >
-                    <el-button v-permission type="primary" @click="installRef.openCreate()">
+                    <el-button
+                        v-permission
+                        type="primary"
+                        @click="routerToNameWithQuery('AppAll', { install: 'ollama' })"
+                    >
                         {{ $t('commons.button.install') }}
                     </el-button>
                 </el-empty>
@@ -138,7 +142,6 @@
         </DrawerPro>
         <BindDomain ref="bindDomainRef" />
         <Connection ref="connectionRef" />
-        <OllamaInstall ref="installRef" @search="refresh" @task="openTaskLog" />
         <PortJumpDialog ref="portRef" />
         <TaskLog ref="taskLogRef" width="50%" @close="refresh" />
     </div>
@@ -152,7 +155,6 @@ import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
 import { toRef, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import AppStatus from '@/components/app-status/index.vue';
-import OllamaInstall from '@/views/ai/model/ollama/operate/index.vue';
 import Connection from '@/views/ai/model/components/connection/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { App } from '@/api/interface/app';
@@ -169,7 +171,6 @@ import { routerToNameWithQuery } from '@/utils/router';
 
 const { isMobile, currentNode } = useGlobalStore();
 const appStatusRef = ref();
-const installRef = ref();
 const connectionRef = ref();
 const portRef = ref();
 const loading = ref(false);

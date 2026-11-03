@@ -1057,6 +1057,18 @@ const message = {
             deployments: 'ການນຳໃຊ້ໂມເດວ',
             files: 'ການກະກຽມໂມເດວ',
             connectExternal: 'ເຊື່ອມຕໍ່ບໍລິການພາຍນອກ',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'ສ້າງ Recipe',
+            recipeHelper:
+                'Recipe = ໂມເດວ + ຮາດແວ + ພາລາມິເຕີເລີ່ມຕົ້ນ. ນຳເຂົ້າຈາກ {link} ຫຼືສ້າງຈາກໂມເດວທີ່ດາວໂຫຼດແລ້ວ.',
+            recipeFormHelper: 'ວາງຄຳສັ່ງຈາກ {link} ຫຼືປ້ອນຂໍ້ມູນເອງ.',
+            recipeArguments: 'ພາລາມິເຕີເລີ່ມຕົ້ນ',
+            recipeImportCommand: 'ນຳເຂົ້າຄຳສັ່ງ',
+            recipeImportPlaceholder: 'ວາງຄຳສັ່ງ Docker, pip/uv ຫຼື vllm serve ເພື່ອຕື່ມ Recipe ອັດຕະໂນມັດ',
+            recipeVariablesNotSupported:
+                'ຄຳສັ່ງບໍ່ຮອງຮັບການອ້າງອີງຕົວແປ. ກະລຸນາປ້ອນຄ່າໂດຍກົງ ແລະຕັ້ງຄ່າຕົວແປສະພາບແວດລ້ອມໃນຊ່ອງທີ່ກ່ຽວຂ້ອງ.',
+            recipeImportError:
+                'ບໍ່ສາມາດແປງໄດ້. ກະລຸນາໃສ່ຄຳສັ່ງເລີ່ມຕົ້ນ Docker ຫຼື vllm serve ທີ່ມີໂມເດວ; ວາງຄຳສັ່ງຕິດຕັ້ງ pip/uv ພ້ອມກັບຄຳສັ່ງເລີ່ມຕົ້ນ.',
             deploymentTemplates: 'ແມ່ແບບຄຳສັ່ງເລີ່ມຕົ້ນ vLLM',
             engineProvider: 'ເຄື່ອງຈັກ / ຜູ້ໃຫ້ບໍລິການ',
             endpoint: 'ຈຸດເຊື່ອມຕໍ່',
@@ -1083,7 +1095,6 @@ const message = {
             vllmDeployProfile: 'ໂມເດວສຳລັບຕິດຕັ້ງ',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper: 'ຄຳສັ່ງເລີ່ມຕົ້ນຕ້ອງໃຊ້ພອດ {0}; ບໍ່ດັ່ງນັ້ນຈະບໍ່ສາມາດເຂົ້າເຖິງບໍລິການໄດ້.',
             ascendVisibleDevices: 'ອຸປະກອນ Ascend ທີ່ເຫັນໄດ້ (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບໍລິການໂມເດວ',
             modelAccountAddressHelper:
@@ -1091,6 +1102,8 @@ const message = {
             containerAddress: 'ທີ່ຢູ່ຄອນເທນເນີ',
             customAddress: 'ທີ່ຢູ່ກຳນົດເອງ',
             downloader: 'ຈັດການການດາວໂຫຼດ',
+            modelDirectoryPlaceholder: 'ຄົ້ນຫາໂມເດວ ຫຼື ປ້ອນເສັ້ນທາງເຕັມ',
+            selectModelDirectory: 'ເລືອກໄດເຣັກທໍຣີ',
             modelDir: 'ໄດເຣັກທໍຣີໂມເດວ',
             modelSource: 'ແຫຼ່ງທີ່ມາໂມເດວ',
             repoID: 'ID ຄັງເກັບ',

@@ -92,6 +92,12 @@ type ModelDownloadTaskItem struct {
 	CanRemoveRecord bool            `json:"canRemoveRecord"`
 }
 
+type LocalModelOption struct {
+	Name         string `json:"name"`
+	Organization string `json:"organization"`
+	Path         string `json:"path"`
+}
+
 type LocalModelSearch struct {
 	DownloadType string `json:"downloadType" validate:"omitempty,oneof=all tokenizer"`
 	PageInfo

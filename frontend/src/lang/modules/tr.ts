@@ -1091,6 +1091,19 @@ const message = {
             deployments: 'Model dağıtımı',
             files: 'Model hazırlığı',
             connectExternal: 'Harici hizmete bağlan',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Recipe oluştur',
+            recipeHelper:
+                'Recipe = model + donanım + başlatma parametreleri. {link} üzerinden içe aktarın veya indirilen bir modelden oluşturun.',
+            recipeFormHelper: '{link} üzerinden bir komut yapıştırın veya alanları elle doldurun.',
+            recipeArguments: 'Başlatma parametreleri',
+            recipeImportCommand: 'Komut içe aktar',
+            recipeImportPlaceholder:
+                'Recipe alanlarını otomatik doldurmak için Docker, pip/uv veya vllm serve komutlarını yapıştırın',
+            recipeVariablesNotSupported:
+                'Komutlarda değişken başvuruları desteklenmez. Açık değerler girin; ortam değişkenlerini ilgili alanda yapılandırın.',
+            recipeImportError:
+                'Dönüştürülemedi. Model içeren bir Docker veya vllm serve başlatma komutu ekleyin; pip/uv kurulum komutlarını başlatma komutuyla birlikte yapıştırın.',
             deploymentTemplates: 'vLLM başlatma komutu şablonları',
             engineProvider: 'Motor / Sağlayıcı',
             endpoint: 'Uç nokta',
@@ -1117,8 +1130,6 @@ const message = {
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'Başlatma komutu {0} numaralı bağlantı noktasını kullanmalıdır; aksi halde hizmete erişilemez.',
             ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
@@ -1126,6 +1137,8 @@ const message = {
             containerAddress: 'Konteyner adresi',
             customAddress: 'Özel adres',
             downloader: 'İndirme yönetimi',
+            modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
+            selectModelDirectory: 'Dizin seç',
             modelDir: 'Model dizini',
             modelSource: 'Model kaynağı',
             repoID: 'Depo ID',

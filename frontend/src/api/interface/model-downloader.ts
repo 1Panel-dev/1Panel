@@ -113,6 +113,12 @@ export namespace ModelDownloader {
         canRemoveRecord: boolean;
     }
 
+    export interface LocalModelOption {
+        name: string;
+        organization: string;
+        path: string;
+    }
+
     export interface LocalModelSearch extends ReqPage {
         downloadType?: DownloadType | '';
         info: string;

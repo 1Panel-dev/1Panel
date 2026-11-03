@@ -1060,6 +1060,18 @@ const message = {
             deployments: '모델 배포',
             files: '모델 준비',
             connectExternal: '외부 서비스 연결',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Recipe 만들기',
+            recipeHelper:
+                'Recipe = 모델 + 하드웨어 + 시작 인수. {link}에서 가져오거나 다운로드한 모델로 만들 수 있습니다.',
+            recipeFormHelper: '{link}의 명령을 붙여넣거나 직접 입력하세요.',
+            recipeArguments: '시작 인수',
+            recipeImportCommand: '명령 가져오기',
+            recipeImportPlaceholder: 'Docker, pip/uv 또는 vllm serve 명령을 붙여넣어 Recipe 자동 입력',
+            recipeVariablesNotSupported:
+                '명령에서 변수 참조는 지원되지 않습니다. 구체적인 값을 입력하고 환경 변수는 환경 변수 필드에서 설정하세요.',
+            recipeImportError:
+                '변환할 수 없습니다. 모델이 포함된 Docker 또는 vllm serve 시작 명령을 입력하세요. pip/uv 설치 명령은 시작 명령과 함께 붙여넣으세요.',
             deploymentTemplates: 'vLLM 시작 명령 템플릿',
             engineProvider: '엔진 / 공급자',
             endpoint: '엔드포인트',
@@ -1086,7 +1098,6 @@ const message = {
             vllmDeployProfile: '배포 모델',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper: '시작 명령은 {0} 포트를 사용해야 하며, 그렇지 않으면 서비스에 접근할 수 없습니다.',
             ascendVisibleDevices: 'Ascend 표시 장치 (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: '모델 서비스에 동기화',
             modelAccountAddressHelper:
@@ -1094,6 +1105,8 @@ const message = {
             containerAddress: '컨테이너 주소',
             customAddress: '사용자 지정 주소',
             downloader: '다운로드 관리',
+            modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
+            selectModelDirectory: '디렉터리 선택',
             modelDir: '모델 디렉토리',
             modelSource: '모델 소스',
             repoID: '저장소 ID',

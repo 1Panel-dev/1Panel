@@ -1066,6 +1066,19 @@ const message = {
             deployments: 'استقرار مدل',
             files: 'آماده‌سازی مدل',
             connectExternal: 'اتصال به سرویس خارجی',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'ایجاد Recipe',
+            recipeHelper:
+                'Recipe = مدل + سخت‌افزار + آرگومان‌های راه‌اندازی. از {link} وارد کنید یا از مدل دانلودشده بسازید.',
+            recipeFormHelper: 'فرمان را از {link} جای‌گذاری کنید یا فیلدها را دستی پر کنید.',
+            recipeArguments: 'آرگومان‌های راه‌اندازی',
+            recipeImportCommand: 'وارد کردن فرمان',
+            recipeImportPlaceholder:
+                'فرمان‌های Docker، pip/uv یا vllm serve را برای تکمیل خودکار Recipe جای‌گذاری کنید',
+            recipeVariablesNotSupported:
+                'ارجاع به متغیرها در دستور پشتیبانی نمی‌شود. مقادیر مشخص وارد کنید؛ متغیرهای محیطی را در بخش مربوط به آن‌ها تنظیم کنید.',
+            recipeImportError:
+                'تبدیل ممکن نیست. فرمان راه‌اندازی Docker یا vllm serve همراه با مدل را وارد کنید؛ فرمان‌های نصب pip/uv را همراه با فرمان راه‌اندازی جای‌گذاری کنید.',
             deploymentTemplates: 'الگوهای فرمان راه‌اندازی vLLM',
             engineProvider: 'موتور / ارائه‌دهنده',
             endpoint: 'نقطه پایانی',
@@ -1092,8 +1105,6 @@ const message = {
             vllmDeployProfile: 'مدل استقرار',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper:
-                'فرمان راه‌اندازی باید از پورت {0} استفاده کند؛ در غیر این صورت سرویس قابل دسترسی نخواهد بود.',
             ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'همگام‌سازی با سرویس مدل',
             modelAccountAddressHelper:
@@ -1101,6 +1112,8 @@ const message = {
             containerAddress: 'آدرس کانتینر',
             customAddress: 'آدرس سفارشی',
             downloader: 'مدیریت دانلودها',
+            modelDirectoryPlaceholder: 'جستجوی مدل یا وارد کردن مسیر کامل',
+            selectModelDirectory: 'انتخاب پوشه',
             modelDir: 'دایرکتوری مدل',
             modelSource: 'منبع مدل',
             repoID: 'شناسه مخزن',

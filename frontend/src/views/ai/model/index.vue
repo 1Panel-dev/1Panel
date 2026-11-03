@@ -6,14 +6,7 @@
             <LayoutContent v-loading="loading">
                 <template #leftToolBar>
                     <el-button v-permission type="primary" @click="createRef.open()">
-                        {{ $t(isLocal ? 'aiTools.model.addEngine' : 'aiTools.model.addService') }}
-                    </el-button>
-                    <el-button
-                        v-if="isLocal && isProductPro && vllmAvailable"
-                        v-permission
-                        @click="routerToName('VllmCommandTemplates')"
-                    >
-                        {{ $t('aiTools.model.deploymentTemplates') }}
+                        {{ $t(isLocal ? 'commons.button.add' : 'aiTools.model.addService') }}
                     </el-button>
                 </template>
                 <template #rightToolBar>
@@ -30,19 +23,7 @@
                         <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item" />
                     </el-select>
                     <el-select
-                        v-if="isLocal"
-                        v-model="engine"
-                        clearable
-                        placeholder=""
-                        class="model-filter"
-                        @change="resetPageAndSearch"
-                    >
-                        <template #prefix>{{ $t('aiTools.model.engines') }}</template>
-                        <el-option label="Ollama" value="ollama" />
-                        <el-option label="vLLM" value="vllm" />
-                    </el-select>
-                    <el-select
-                        v-else
+                        v-if="!isLocal"
                         v-model="provider"
                         clearable
                         filterable
@@ -179,12 +160,7 @@
                             width="220"
                         />
                     </ComplexTable>
-                    <ComplexTable
-                        v-else
-                        :data="deploymentPage"
-                        :pagination-config="pagination"
-                        @search="resetPageIfNeeded"
-                    >
+                    <ComplexTable v-else :data="deployments" :pagination-config="pagination" @search="search">
                         <el-table-column :label="$t('commons.table.name')" min-width="190">
                             <template #default="{ row }">
                                 <el-button link type="primary" @click="manageRef.open(row, 'connection', true)">
@@ -195,12 +171,7 @@
                         <el-table-column :label="$t('app.version')" min-width="150">
                             <template #default="{ row }">
                                 <div class="flex items-center gap-2">
-                                    <span>
-                                        {{
-                                            (row.engine === 'vllm' ? formatVllmVersion(row.version) : row.version) ||
-                                            '—'
-                                        }}
-                                    </span>
+                                    <span>{{ formatVllmVersion(row.appVersion) || '—' }}</span>
                                     <el-button
                                         v-if="row.upgradable && hasPermission('app_manage')"
                                         v-permission
@@ -217,57 +188,23 @@
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.port')" min-width="120">
                             <template #default="{ row }">
-                                <span v-if="!row.ports.length">—</span>
-                                <div v-else class="space-y-1">
-                                    <div
-                                        v-for="(port, index) in row.ports.slice(0, 2)"
-                                        :key="index"
-                                        class="flex items-center gap-2"
-                                    >
-                                        <el-button
-                                            icon="Position"
-                                            plain
-                                            size="small"
-                                            @click="portJumpRef.acceptParams({ port, ip: '', protocol: 'http' })"
-                                        >
-                                            {{ port }}
-                                        </el-button>
-                                        <el-popover
-                                            v-if="index === 1 && row.ports.length > 2"
-                                            placement="bottom"
-                                            trigger="click"
-                                            :title="$t('commons.table.port')"
-                                            :width="160"
-                                        >
-                                            <template #reference>
-                                                <el-button size="small" class="shrink-0">
-                                                    +{{ row.ports.length - 2 }}
-                                                </el-button>
-                                            </template>
-                                            <div class="max-h-60 overflow-y-auto space-y-1">
-                                                <div v-for="(item, portIndex) in row.ports" :key="portIndex">
-                                                    {{ item }}
-                                                </div>
-                                            </div>
-                                        </el-popover>
-                                    </div>
-                                </div>
+                                <el-button
+                                    v-if="row.port > 0"
+                                    icon="Position"
+                                    plain
+                                    size="small"
+                                    @click="portJumpRef.acceptParams({ port: row.port, ip: '', protocol: 'http' })"
+                                >
+                                    {{ row.port }}
+                                </el-button>
+                                <span v-else>—</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('aiTools.model.model')" min-width="200">
                             <template #default="{ row }">
-                                <div v-for="(model, index) in row.models.slice(0, 2)" :key="model" class="model-line">
-                                    <span class="cell-ellipsis" :title="model">{{ model }}</span>
-                                    <el-button
-                                        v-if="row.engine === 'ollama' && index === 1 && row.models.length > 2"
-                                        size="small"
-                                        class="model-more"
-                                        @click="manageDeployment(row)"
-                                    >
-                                        +{{ row.models.length - 2 }}
-                                    </el-button>
+                                <div class="cell-ellipsis" :title="row.servedModelName">
+                                    {{ row.servedModelName || '—' }}
                                 </div>
-                                <span v-if="!row.models.length">—</span>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('commons.table.status')" min-width="150">
@@ -339,21 +276,13 @@
                 </template>
             </LayoutContent>
         </template>
-        <CreateService
-            ref="createRef"
-            :engines-only="isLocal || isFiles"
-            :vllm-only="isFiles"
-            @search="search"
-            @manage="manageDeployment"
-        />
+        <CreateService ref="createRef" :engines-only="isLocal || isFiles" @search="search" @manage="manageDeployment" />
         <ManageDeployment
             ref="manageRef"
             @search="search"
             @upgrade="(app) => upgradeRef.acceptParams(app, 'upgrade')"
         />
         <AppUpgrade ref="upgradeRef" @close="search" />
-        <AppDelete :key="`delete:${currentNode}:${route.fullPath}`" ref="appDeleteRef" @close="search" />
-        <AppResources :key="`resources:${currentNode}:${route.fullPath}`" ref="appResourcesRef" @close="search" />
         <TaskLog ref="taskRef" width="70%" @close="search" />
         <ModelPool ref="poolRef" @updated="search" />
         <TerminalDialog :key="`terminal:${currentNode}:${route.fullPath}`" ref="terminalRef" />
@@ -376,32 +305,20 @@ import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
 import i18n from '@/lang';
-import { appInstalledDeleteCheck, installedOp, searchAppInstalled } from '@/api/modules/app';
 import { hasPermission } from '@/utils/rbac';
 import { hasManagePermissionAccess } from '@/utils/permission';
 import { newUUID } from '@/utils/id';
 import { dateFormat } from '@/utils/date';
 import { useSearchState } from '@/utils/search-reset';
-import { MsgError } from '@/utils/message';
-import { routerToName } from '@/utils/router';
 import TaskLog from '@/components/log/task/index.vue';
 import CreateService from './components/create/index.vue';
 import ManageDeployment from './components/deployment-manage/index.vue';
 import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
-import AppDelete from '@/views/app-store/installed/delete/index.vue';
-import AppResources from '@/views/app-store/installed/check/index.vue';
 import ModelPool from './components/model-pool/index.vue';
 import TerminalDialog from '@/views/container/container/terminal/index.vue';
 import SyncService from './components/sync/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
-import {
-    formatVllmVersion,
-    loadModelOverview,
-    loadVllmAPI,
-    readPages,
-    vllmAvailable,
-    type Deployment,
-} from './deployment';
+import { formatVllmVersion, loadVllmAPI, vllmAvailable, type Deployment } from './deployment';
 
 const route = useRoute();
 const router = useRouter();
@@ -419,8 +336,6 @@ const downloaderView = defineAsyncComponent(() => import('@/views/model-download
 const createRef = ref();
 const manageRef = ref();
 const upgradeRef = ref();
-const appDeleteRef = ref();
-const appResourcesRef = ref();
 const poolRef = ref();
 const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
 const syncRef = ref<InstanceType<typeof SyncService>>();
@@ -447,7 +362,6 @@ watch(
 );
 const deployments = ref<Deployment[]>([]);
 const apiType = ref('');
-const engine = ref('');
 const provider = ref('');
 const searchName = ref('');
 const pagination = reactive({ currentPage: 1, pageSize: 10, total: 0 });
@@ -483,23 +397,9 @@ const providerOptions = computed(() =>
             label: getAgentProviderDisplayName(item.provider, item.displayName),
         })),
 );
-const filteredDeployments = computed(() => {
-    const keyword = searchName.value.trim().toLowerCase();
-    return deployments.value.filter(
-        (row) =>
-            (!engine.value || row.engine === engine.value) &&
-            (!keyword || [row.name, row.modelDir, ...row.models].join(' ').toLowerCase().includes(keyword)),
-    );
-});
-const deploymentPage = computed(() =>
-    filteredDeployments.value.slice(
-        (pagination.currentPage - 1) * pagination.pageSize,
-        pagination.currentPage * pagination.pageSize,
-    ),
-);
 const resourceStats = ref<Record<string, Container.ContainerListStats | null>>({});
 watch(
-    [deploymentPage, isCurrentPage, currentNode],
+    [deployments, isCurrentPage, currentNode],
     async ([rows, active, node], _, onCleanup) => {
         resourceStats.value = {};
         const controller = new AbortController();
@@ -540,12 +440,6 @@ const resetPageIfNeeded = () => {
         Math.max(1, Math.ceil(pagination.total / pagination.pageSize)),
     );
 };
-watch(filteredDeployments, () => {
-    if (!isLocal) return;
-    pagination.total = filteredDeployments.value.length;
-    resetPageIfNeeded();
-});
-
 let searchVersion = 0;
 const search = async () => {
     const version = ++searchVersion;
@@ -553,9 +447,21 @@ const search = async () => {
     loading.value = true;
     try {
         if (isLocal) {
-            const data = await loadModelOverview(isProductPro.value);
+            if (!isProductPro.value || !vllmAvailable) {
+                deployments.value = [];
+                pagination.total = 0;
+                return;
+            }
+            const api = await loadVllmAPI();
             if (version !== searchVersion) return;
-            deployments.value = data;
+            const { data } = await api.pageVllm({
+                page: pagination.currentPage,
+                pageSize: pagination.pageSize,
+                info: searchName.value,
+            });
+            if (version !== searchVersion) return;
+            deployments.value = data.items || [];
+            pagination.total = data.total;
         } else {
             const result = await pageAgentAccounts({
                 page: pagination.currentPage,
@@ -567,10 +473,10 @@ const search = async () => {
             if (version !== searchVersion) return;
             connections.value = result.data.items || [];
             pagination.total = result.data.total;
-            const previousPage = pagination.currentPage;
-            resetPageIfNeeded();
-            if (previousPage !== pagination.currentPage) await search();
         }
+        const previousPage = pagination.currentPage;
+        resetPageIfNeeded();
+        if (previousPage !== pagination.currentPage) await search();
     } catch {
         if (version !== searchVersion) return;
         connections.value = [];
@@ -617,10 +523,9 @@ const accountButtons = [
     },
 ];
 const taskRef = ref();
-const pending = ref('');
+const pending = ref(false);
 const operationDisabled = (row: Deployment) => Boolean(pending.value || row.taskID);
-const statusDisabled = (row: Deployment) =>
-    operationDisabled(row) || !hasManagePermissionAccess() || (row.engine === 'ollama' && !hasPermission('app_manage'));
+const statusDisabled = (row: Deployment) => operationDisabled(row) || !hasManagePermissionAccess();
 const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
     if (statusDisabled(row)) return;
     const node = currentNode.value;
@@ -630,46 +535,30 @@ const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart')
         { type: 'warning' },
     );
     if (node !== currentNode.value || statusDisabled(row)) return;
-    pending.value = `${row.engine}:${row.id}`;
+    pending.value = true;
     try {
-        if (row.engine === 'ollama') {
-            const taskID = newUUID();
-            await installedOp({ installId: row.id, operate: operation, taskID });
-            if (node !== currentNode.value) return;
-            taskRef.value.openWithTaskID(taskID);
-        } else {
-            const taskID = newUUID();
-            await (await loadVllmAPI()).operateVllm({ id: row.id, operate: operation, taskID });
-            if (node !== currentNode.value) return;
-            taskRef.value.openWithTaskID(taskID);
-        }
+        const taskID = newUUID();
+        await (await loadVllmAPI()).operateVllm({ id: row.id, operate: operation, taskID });
         if (node !== currentNode.value) return;
+        taskRef.value.openWithTaskID(taskID);
         await search();
     } finally {
-        pending.value = '';
+        pending.value = false;
     }
 };
 const deploymentButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
-        show: (row: Deployment) => row.engine === 'vllm' || (row.engine === 'ollama' && hasPermission('app_manage')),
         disabled: operationDisabled,
         click: (row: Deployment) => manageRef.value.open(row, 'config', true),
     },
     {
-        label: i18n.global.t('aiTools.model.manage'),
-        show: (row: Deployment) => row.engine !== 'vllm',
-        click: manageDeployment,
-    },
-    {
         label: i18n.global.t('menu.monitor'),
-        show: (row: Deployment) => row.engine === 'vllm',
         click: (row: Deployment) => manageRef.value.open(row, 'monitor', true),
     },
     {
         label: i18n.global.t('menu.terminal'),
-        show: (row: Deployment) => row.engine === 'ollama' || row.engine === 'vllm',
         disabled: (row: Deployment) =>
             operationDisabled(row) || row.status !== 'Running' || !row.containerName || !isAdminOrNodeAdmin.value,
         click: (row: Deployment) =>
@@ -682,44 +571,12 @@ const deploymentButtons = [
     {
         label: i18n.global.t('commons.button.sync'),
         permission: true,
-        show: (row: Deployment) => row.engine === 'ollama' || row.engine === 'vllm',
         disabled: operationDisabled,
         click: (row: Deployment) => syncRef.value.open(row),
     },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
-        show: (row: Deployment) => row.engine === 'ollama' && hasPermission('app_manage'),
-        disabled: (row: Deployment) => operationDisabled(row),
-        click: async (row: Deployment) => {
-            const node = currentNode.value;
-            const path = route.fullPath;
-            pending.value = `${row.engine}:${row.id}`;
-            try {
-                const [apps, resources] = await Promise.all([
-                    readPages((page) => searchAppInstalled({ ...page, name: row.name, update: false }, node)),
-                    appInstalledDeleteCheck(row.id, node),
-                ]);
-                if (node !== currentNode.value || path !== route.fullPath) return;
-                const app = apps.find((item) => item.id === row.id && item.appKey === 'ollama');
-                if (!app) {
-                    MsgError(i18n.global.t('commons.res.notFound'));
-                    return;
-                }
-                if (resources.data?.length) {
-                    appResourcesRef.value.acceptParams({ items: resources.data, key: app.appKey, installID: app.id });
-                } else {
-                    await appDeleteRef.value.acceptParams(app);
-                }
-            } finally {
-                pending.value = '';
-            }
-        },
-    },
-    {
-        label: i18n.global.t('commons.button.delete'),
-        permission: true,
-        show: (row: Deployment) => row.engine === 'vllm',
         disabled: (row: Deployment) => operationDisabled(row),
         click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
     },
@@ -746,9 +603,17 @@ watch(
             await router.replace('/ai/model/files');
             return;
         }
+        if (
+            isLocal &&
+            route.query.open === 'create' &&
+            route.query.engine !== 'vllm' &&
+            (route.query.engine === 'ollama' || route.query.tab === 'ollama')
+        ) {
+            await router.replace({ name: 'AppAll', query: { install: 'ollama' } });
+            return;
+        }
         if (isLocal || isFiles) {
             apiType.value = '';
-            engine.value = '';
             provider.value = '';
             searchName.value = '';
             resetPage();
@@ -761,15 +626,10 @@ watch(
         }
         await search();
         if (cancelled) return;
-        if (
-            isCurrentPage.value &&
-            isLocal &&
-            route.query.open === 'create' &&
-            (route.query.engine === 'ollama' || route.query.engine === 'vllm' || route.query.tab === 'ollama')
-        ) {
+        if (isCurrentPage.value && isLocal && route.query.open === 'create' && route.query.engine === 'vllm') {
             await nextTick();
             if (cancelled) return;
-            await createRef.value.open(route.query.engine === 'vllm' ? 'vllm' : 'ollama');
+            await createRef.value.open('vllm');
             if (cancelled) return;
             const query = { ...route.query };
             delete query.open;

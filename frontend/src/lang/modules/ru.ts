@@ -1082,6 +1082,19 @@ const message = {
             deployments: 'Развертывание моделей',
             files: 'Подготовка моделей',
             connectExternal: 'Подключить внешний сервис',
+            recipes: 'vLLM Recipes',
+            createRecipe: 'Создать Recipe',
+            recipeHelper:
+                'Recipe = модель + оборудование + параметры запуска. Импортируйте с {link} или создайте из загруженной модели.',
+            recipeFormHelper: 'Вставьте команду с {link} или заполните поля вручную.',
+            recipeArguments: 'Параметры запуска',
+            recipeImportCommand: 'Импорт команды',
+            recipeImportPlaceholder:
+                'Вставьте команды Docker, pip/uv или vllm serve для автоматического заполнения Recipe',
+            recipeVariablesNotSupported:
+                'Ссылки на переменные в командах не поддерживаются. Укажите конкретные значения; переменные окружения настройте в соответствующем поле.',
+            recipeImportError:
+                'Не удалось преобразовать. Добавьте команду запуска Docker или vllm serve с моделью; вставляйте команды установки pip/uv вместе с командой запуска.',
             deploymentTemplates: 'Шаблоны команд запуска vLLM',
             engineProvider: 'Движок / Поставщик',
             endpoint: 'Конечная точка',
@@ -1109,7 +1122,6 @@ const message = {
             vllmDeployProfile: 'Модель развертывания',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            vllmCommandPortHelper: 'Команда запуска должна использовать порт {0}, иначе сервис будет недоступен.',
             ascendVisibleDevices: 'Видимые устройства Ascend (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Синхронизировать с сервисом модели',
             modelAccountAddressHelper:
@@ -1117,6 +1129,8 @@ const message = {
             containerAddress: 'Адрес контейнера',
             customAddress: 'Пользовательский адрес',
             downloader: 'Управление загрузками',
+            modelDirectoryPlaceholder: 'Найти модель или ввести полный путь',
+            selectModelDirectory: 'Выбрать каталог',
             modelDir: 'Каталог модели',
             modelSource: 'Источник модели',
             repoID: 'ID репозитория',
