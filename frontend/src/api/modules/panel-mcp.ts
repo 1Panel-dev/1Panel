@@ -5,18 +5,19 @@ import type { Container } from '@/api/interface/container';
 
 const prefix = '/core/mcp';
 const local = { headers: { CurrentNode: 'local' } };
+const website = { ...local, errorMessageMode: 'manual' as const };
 
 export const getPanelMCPStatus = () => http.get<PanelMCP.ServiceStatus>(`${prefix}/status`, {}, local);
 export const getPanelMCPDockerStatus = () =>
     http.get<Container.DockerStatus>('/containers/docker/status', {}, { ...local, timeout: 5000 });
 export const getPanelMCPSettings = () => http.get<PanelMCP.Settings>(`${prefix}/settings`, {}, local);
-export const getPanelMCPWebsite = () => http.get<PanelMCP.WebsiteBinding>(`${prefix}/website/status`, {}, local);
+export const getPanelMCPWebsite = () => http.get<PanelMCP.WebsiteBinding>(`${prefix}/website/status`, {}, website);
 export const bindPanelMCPWebsite = (params: PanelMCP.WebsiteBind) =>
-    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/bind`, params, { ...local, timeout: 120000 });
+    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/bind`, params, { ...website, timeout: 120000 });
 export const updatePanelMCPWebsite = (params: PanelMCP.WebsiteUpdate) =>
-    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/update`, params, { ...local, timeout: 120000 });
+    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/update`, params, { ...website, timeout: 120000 });
 export const unbindPanelMCPWebsite = (params: PanelMCP.WebsiteUnbind) =>
-    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/unbind`, params, { ...local, timeout: 120000 });
+    http.postWithConfig<PanelMCP.WebsiteBinding>(`${prefix}/website/unbind`, params, { ...website, timeout: 120000 });
 export const savePanelMCPSettings = (params: PanelMCP.Settings) =>
     http.postWithConfig(`${prefix}/settings`, params, { ...local, timeout: 60000 });
 export const operatePanelMCPService = (operation: PanelMCP.Operation) =>

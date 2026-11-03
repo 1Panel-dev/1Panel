@@ -1826,6 +1826,7 @@ const message = {
         websiteUnavailable: 'Vinculación no disponible',
         websiteDomainInvalid: 'Introduzca un dominio válido, con un puerto opcional.',
         websiteCertificateRequired: 'Seleccione un certificado válido que cubra este dominio.',
+        websiteCertificatesLoadFailed: 'No se pueden cargar los certificados. Actualice para reintentar.',
         websiteCertificateEmpty: 'No hay un certificado coincidente. Solicite o importe uno.',
         websiteUnbind: 'Desvincular y eliminar sitio web',
         websiteUnbindConfirm:

@@ -410,6 +410,7 @@ func (s *MCPRuntimeService) mutateWebsiteLocked(ctx context.Context, pending dto
 				(status.WebsiteID == 0 && status.State != "unbound") {
 				return dto.MCPWebsiteStatus{}, mcpWebsiteOperationError("MCP_CONFLICT", "website_state_unconfirmed", false)
 			}
+			row.WebsiteID = status.WebsiteID
 		}
 		if pending.Operation == "bind" {
 			if row.WebsiteID != 0 {

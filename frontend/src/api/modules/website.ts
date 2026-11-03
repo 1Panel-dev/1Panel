@@ -1,4 +1,4 @@
-import http from '@/api';
+import http, { type RequestConfig } from '@/api';
 import { ReqPage, ResPage } from '../interface';
 import { Website } from '../interface/website';
 import { File } from '../interface/file';
@@ -124,8 +124,8 @@ export const listSSL = (req: Website.SSLReq) => {
     return http.post<Website.SSLDTO[]>(`/websites/ssl/list`, req);
 };
 
-export const listLocalNodeSSL = (req: Website.SSLReq) => {
-    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/list`, req);
+export const listLocalNodeSSL = (req: Website.SSLReq, config?: RequestConfig) => {
+    return http.postLocalNode<Website.SSLDTO[]>(`/websites/ssl/list`, req, undefined, config);
 };
 
 export const createSSL = (req: Website.SSLCreate) => {

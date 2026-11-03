@@ -1731,6 +1731,7 @@ const message = {
         websiteUnavailable: '绑定不可用',
         websiteDomainInvalid: '请输入有效域名，可包含端口。',
         websiteCertificateRequired: '请选择覆盖该域名且有效的证书。',
+        websiteCertificatesLoadFailed: '证书列表读取失败，请刷新重试。',
         websiteCertificateEmpty: '暂无匹配证书，请先申请或导入。',
         websiteUnbind: '解绑并删除网站',
         websiteUnbindConfirm: '解绑并删除网站及目录？证书保留，重新绑定将新建网站。',

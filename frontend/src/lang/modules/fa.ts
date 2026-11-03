@@ -1792,6 +1792,7 @@ const message = {
         websiteUnavailable: 'اتصال در دسترس نیست',
         websiteDomainInvalid: 'یک دامنه معتبر وارد کنید؛ می‌توانید پورت را نیز مشخص کنید.',
         websiteCertificateRequired: 'یک گواهی معتبر برای این دامنه انتخاب کنید.',
+        websiteCertificatesLoadFailed: 'بارگیری فهرست گواهی‌ها ناموفق بود. تازه‌سازی کرده و دوباره تلاش کنید.',
         websiteCertificateEmpty: 'گواهی منطبق وجود ندارد. گواهی درخواست یا وارد کنید.',
         websiteUnbind: 'قطع اتصال و حذف وب‌سایت',
         websiteUnbindConfirm: 'اتصال قطع و سایت و پوشه آن حذف شود؟ گواهی حفظ می‌شود. اتصال مجدد سایت تازه‌ای می‌سازد.',
