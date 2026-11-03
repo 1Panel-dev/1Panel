@@ -1,6 +1,6 @@
 <template>
     <div>
-        <RouterButton :buttons="buttons" :show-expires-at="isProductPro" />
+        <RouterButton :buttons="buttons" />
         <EnvironmentCheck :key="currentNode" v-slot="{ vmUnavailable, vmEnvironmentLoaded }">
             <RouterViewCache
                 :route-props="{
@@ -17,7 +17,7 @@ import i18n from '@/lang';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import EnvironmentCheck from '@/views/vm/status/index.vue';
 
-const { isProductPro, currentNode } = useGlobalStore();
+const { currentNode } = useGlobalStore();
 
 const buttons = [
     {

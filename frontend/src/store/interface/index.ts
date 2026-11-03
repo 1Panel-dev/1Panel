@@ -83,6 +83,9 @@ export interface GlobalState {
 export interface MenuState {
     isCollapse: boolean;
     menuList: RouteRecordRaw[];
+    isMenuLoaded: boolean;
+    menuRequestId: number;
+    systemVersion: string;
     withoutAnimation: boolean;
 }
 

@@ -386,6 +386,7 @@ import { routerToName } from '@/utils/router';
 import { Key } from '@element-plus/icons-vue';
 import { changeToLocal } from '@/utils/node';
 import { syncAuthInfo } from '@/utils/rbac';
+import { loadMenuList } from '@/utils/menu';
 import { adjustColorToRGBA } from '@/utils/color';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { submitSAML2Navigation } from '@/utils/saml2';
@@ -598,11 +599,12 @@ const navigateAfterLogin = async () => {
 const completeLogin = async (result: LoginModel.ResLogin) => {
     isLogin.value = true;
     agreeLicense.value = true;
-    menuStore.setMenuList([]);
+    menuStore.resetMenuList();
     tabsStore.removeAllTabs();
     isAdmin.value = result.role === 'ADMIN';
     await changeToLocal();
     await syncAuthInfo(currentNode.value);
+    await loadMenuList();
     MsgSuccess(i18n.t('commons.msg.loginSuccess'));
     localStorage.removeItem('dashboardCache');
     localStorage.removeItem('upgradeChecked');

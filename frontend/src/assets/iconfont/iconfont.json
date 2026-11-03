@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "35139945",
+      "name": "虚拟机",
+      "font_class": "xuniji",
+      "unicode": "e62f",
+      "unicode_decimal": 58927
+    },
+    {
       "icon_id": "38704691",
       "name": "huggingface",
       "font_class": "huggingface1",

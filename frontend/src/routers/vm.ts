@@ -1,12 +1,12 @@
 const vmRouter = {
-    sort: 550,
     path: '/vm',
-    name: 'VirtualMachine',
+    name: 'VirtualMachineView',
+    hidden: true,
     component: () => import('@/views/vm/index.vue'),
     redirect: '/vm/overview',
     meta: {
-        icon: 'p-disk-menu',
-        title: 'xpack.vm.title',
+        icon: 'p-xuniji',
+        title: 'xpack.vm.vm',
         requiresAuth: true,
         permission: 'xpack_vm_view',
     },
