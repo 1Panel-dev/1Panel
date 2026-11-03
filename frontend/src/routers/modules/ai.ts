@@ -2,7 +2,7 @@ import { Layout } from '@/routers/constant';
 import { GlobalStore } from '@/store';
 
 const aiRouter = {
-    sort: 4,
+    sort: 3,
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,

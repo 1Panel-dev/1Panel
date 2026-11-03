@@ -118,7 +118,7 @@ const props = defineProps({
 
 const defaultNodeLimit = 8;
 
-const emit = defineEmits(['openTask', 'refresh', 'userChange']);
+const emit = defineEmits(['openTask', 'nodeSwitching', 'userChange']);
 bus.on('refreshTask', () => {
     checkTask();
 });
@@ -184,6 +184,7 @@ const changeNode = async (command: string) => {
         return;
     }
     switchingNode.value = true;
+    emit('nodeSwitching', true);
     try {
         for (const item of nodes.value) {
             if (item.name == command) {
@@ -196,8 +197,6 @@ const changeNode = async (command: string) => {
                     currentNodeAddr.value = item.addr;
                     localStorage.removeItem('dashboardCache');
                     localStorage.removeItem('upgradeChecked');
-                    menuStore.setMenuList([]);
-                    emit('refresh');
                     loadProductProFromDB();
                     routerToNameWithQuery('home', { t: Date.now() });
                     return;
@@ -222,8 +221,6 @@ const changeNode = async (command: string) => {
                 if (isEnterprise.value) {
                     await loadCurrentUser(command);
                 }
-                menuStore.setMenuList([]);
-                emit('refresh');
                 loadProductProFromDB();
                 routerToNameWithQuery('home', { t: Date.now() });
                 return;
@@ -231,6 +228,7 @@ const changeNode = async (command: string) => {
         }
     } finally {
         switchingNode.value = false;
+        emit('nodeSwitching', false);
     }
 };
 

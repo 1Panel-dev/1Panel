@@ -1,5 +1,4 @@
 import { Layout } from '@/routers/constant';
-import vmRouter from '@/routers/vm';
 
 const hostRouter = {
     sort: 7,
@@ -175,7 +174,6 @@ const hostRouter = {
                 permission: 'host_ssh_view',
             },
         },
-        vmRouter,
     ],
 };
 

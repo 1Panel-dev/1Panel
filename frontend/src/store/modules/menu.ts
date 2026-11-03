@@ -9,6 +9,9 @@ export const MenuStore = defineStore('MenuState', {
     state: (): MenuState => ({
         isCollapse: false,
         menuList: [],
+        isMenuLoaded: false,
+        menuRequestId: 0,
+        systemVersion: '',
         withoutAnimation: false,
     }),
     getters: {},
@@ -23,12 +26,21 @@ export const MenuStore = defineStore('MenuState', {
             });
             this.menuList = menus;
         },
+        resetMenuList() {
+            this.menuRequestId++;
+            this.menuList = [];
+            this.isMenuLoaded = false;
+            this.systemVersion = '';
+        },
         closeSidebar(withoutAnimation: boolean) {
             this.isCollapse = true;
             this.withoutAnimation = withoutAnimation;
         },
     },
-    persist: piniaPersistConfig('MenuStore'),
+    persist: {
+        ...piniaPersistConfig('MenuStore'),
+        pick: ['isCollapse', 'withoutAnimation'],
+    },
 }) as StoreDefinition<'MenuState', MenuState, any, any>;
 
 export default MenuStore;

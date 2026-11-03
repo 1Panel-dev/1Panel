@@ -11,7 +11,9 @@
         </div>
         <Logo :isCollapse="isCollapse" />
         <el-scrollbar>
+            <el-skeleton v-if="!menuStore.isMenuLoaded" :rows="8" animated class="p-4" />
             <el-menu
+                v-else
                 :default-active="activeMenu"
                 :router="true"
                 :collapse="isCollapse"
@@ -26,9 +28,9 @@
         <Collapse
             ref="nodeSelectorRef"
             class="node-selector"
-            :version="version"
+            :version="menuStore.systemVersion"
             @open-task="openTask"
-            @refresh="search"
+            @node-switching="handleNodeSwitching"
             @user-change="currentUser = $event"
         />
         <div class="user-actions" :class="{ 'is-collapsed': isCollapse }">
@@ -55,26 +57,22 @@
 </template>
 
 <script setup lang="ts">
-import { applyPanelCacheSettings } from '@/utils/panel-cache';
 import { ref, computed, onBeforeUnmount, onMounted, watch } from 'vue';
 import { RouteRecordRaw, useRoute, useRouter } from 'vue-router';
 import { loadingSvg } from '@/utils/svg';
 import Logo from './components/Logo.vue';
 import Collapse from './components/Collapse.vue';
 import SubItem from './components/SubItem.vue';
-import { menuList } from '@/routers/router';
 import { MenuStore } from '@/store';
-import { getSettingBaseInfo } from '@/api/modules/setting';
+import { loadMenuList } from '@/utils/menu';
 import PrimaryMenu from '@/assets/images/menu-bg.svg?component';
-import { hasPermissionMetaAccess, hasRouteRoleAccess } from '@/utils/rbac';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import type { Login } from '@/api/interface/auth';
 
 const route = useRoute();
 const router = useRouter();
 const menuStore = MenuStore();
-const { currentNode, isAdmin, menuAccordion, permissions } = useGlobalStore();
-const version = ref();
+const { currentNode, isAdmin, isNodeAdmin, menuAccordion, permissions, masterOnlyPermissions } = useGlobalStore();
 const nodeSelectorRef = ref<InstanceType<typeof Collapse>>();
 const currentUser = ref<Login.AuthInfo>();
 
@@ -120,219 +118,47 @@ const handleMenuClick = (path) => {
     emit('menuClick', path);
 };
 
-function getCheckedLabels(menu: any, showSet: Set<string>) {
-    for (const item of menu) {
-        if (item.isShow) {
-            showSet.add(item.label);
-        }
-        if (item.children) {
-            getCheckedLabels(item.children, showSet);
-        }
-    }
-}
-
 const openTask = () => {
     emit('openTask');
 };
-
-const search = async () => {
-    let settingInfo: { systemVersion: string; hideMenu?: string; menuAccordion?: string } | null = null;
-    try {
-        const res = await getSettingBaseInfo();
-        settingInfo = res.data;
-        version.value = res.data.systemVersion;
-        menuAccordion.value = res.data.menuAccordion === 'Enable';
-        applyPanelCacheSettings(res.data.panelCache);
-    } catch (error) {
-        version.value = '';
-    }
-
-    if (!settingInfo?.hideMenu) {
-        setDefaultMenuList();
-        return;
-    }
-
-    try {
-        const rstMenuList = buildMenuListFromSettings(settingInfo.hideMenu);
-        if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
-            menuStore.setMenuList(rstMenuList);
-        }
-    } catch (error) {
-        setDefaultMenuList();
-    }
-};
-
-function isSameMenuList(source: RouteRecordRaw[], target: RouteRecordRaw[]) {
-    return JSON.stringify(source) === JSON.stringify(target);
-}
-
-function setDefaultMenuList() {
-    const rstMenuList = buildAuthVisibleMenuList(menuList);
-    if (!isSameMenuList(menuStore.menuList as RouteRecordRaw[], rstMenuList)) {
-        menuStore.setMenuList(rstMenuList);
-    }
-}
-
-function allowMenuItem(item: RouteRecordRaw) {
-    if (!hasRouteRoleAccess(item.meta)) {
-        return false;
-    }
-    return hasPermissionMetaAccess(item.meta?.permission as string | string[] | undefined);
-}
-
-function buildMenuListFromSettings(hideMenuValue?: string) {
-    const hideMenu = JSON.parse(hideMenuValue || '[]');
-    const showSet = new Set<string>();
-    getCheckedLabels(hideMenu, showSet);
-    const rstMenuList: RouteRecordRaw[] = [];
-    const resMenuList = adjustAndCleanMenu(hideMenu, menuList);
-    for (const menu of resMenuList) {
-        const menuItem = buildVisibleMenu(menu, showSet);
-        if (menuItem) {
-            rstMenuList.push(menuItem);
-        }
-    }
-    return rstMenuList;
-}
-
-function buildAuthVisibleMenuList(source: RouteRecordRaw[]) {
-    return source
-        .map((item) => {
-            if (!allowMenuItem(item)) {
-                return null;
-            }
-            const menuItem = JSON.parse(JSON.stringify(item));
-            const children = Array.isArray(menuItem.children) ? menuItem.children : [];
-            if (children.length === 0) {
-                return menuItem;
-            }
-            menuItem.children = buildAuthVisibleMenuList(children).filter(Boolean);
-            if (menuItem.children.length === 0) {
-                return null;
-            }
-            if (menuItem.children.length === 1) {
-                const onlyChild = menuItem.children[0];
-                if (onlyChild.meta?.icon) {
-                    menuItem.meta.icon = onlyChild.meta.icon;
-                }
-                if (onlyChild.meta?.title) {
-                    menuItem.meta.title = onlyChild.meta.title;
-                }
-            }
-            if (menuItem.name === 'Xpack-Menu') {
-                menuItem.meta.hideInSidebar = false;
-            }
-            return menuItem;
-        })
-        .filter(Boolean) as RouteRecordRaw[];
-}
-
-function buildVisibleMenu(menu: RouteRecordRaw, showSet: Set<string>): RouteRecordRaw | null {
-    const menuItem = JSON.parse(JSON.stringify(menu));
-    if (!menuItem?.name || !showSet.has(menuItem.name as string)) {
-        return null;
-    }
-    if (!allowMenuItem(menuItem)) {
-        return null;
-    }
-
-    const children = Array.isArray(menuItem.children) ? menuItem.children : [];
-    if (children.length === 0) {
-        return menuItem;
-    }
-
-    const visibleChildren = children.map((item) => buildVisibleMenu(item, showSet)).filter(Boolean) as RouteRecordRaw[];
-
-    menuItem.children = visibleChildren;
-    if (menuItem.children.length === 0) {
-        return null;
-    }
-
-    if (menuItem.children.length === 1) {
-        const onlyChild = menuItem.children[0];
-        if (onlyChild.meta?.icon) {
-            menuItem.meta.icon = onlyChild.meta.icon;
-        }
-        if (onlyChild.meta?.title) {
-            menuItem.meta.title = onlyChild.meta.title;
-        }
-    }
-    if (menuItem.name === 'Xpack-Menu') {
-        menuItem.meta.hideInSidebar = false;
-    }
-    return menuItem;
-}
-
-function adjustAndCleanMenu(menuItem, list) {
-    const menuList = JSON.parse(JSON.stringify(list));
-    const itemMap = new Map();
-    for (const parent of menuList) {
-        itemMap.set(parent.name, parent);
-        if (Array.isArray(parent.children)) {
-            for (const child of parent.children) {
-                itemMap.set(child.name, child);
-            }
-        }
-    }
-
-    function buildTree(refList) {
-        const result = [];
-
-        for (const ref of refList) {
-            const refName = ref.label;
-            const matched = itemMap.get(refName);
-
-            if (!matched) continue;
-
-            if (Array.isArray(ref.children) && ref.children.length > 0) {
-                matched.children = buildTree(ref.children);
-            } else {
-                delete matched.children;
-            }
-
-            result.push(matched);
-        }
-
-        return result;
-    }
-
-    const newMenu = buildTree(menuItem);
-    for (const menu of newMenu) {
-        if (menu.children?.length === 1) {
-            const onlyChild = menu.children[0];
-            if (onlyChild.meta?.icon) {
-                menu.meta.icon = onlyChild.meta.icon;
-            }
-            if (onlyChild.meta?.title) {
-                menu.meta.title = onlyChild.meta.title;
-            }
-        }
-    }
-
-    return newMenu;
-}
 
 onMounted(() => {
     screenWidth.value = document.body.clientWidth;
     if (!isCollapse.value && screenWidth.value < 1200) {
         menuStore.setCollapse();
     }
-    if (!menuStore.menuList || menuStore.menuList.length === 0) {
-        menuStore.setMenuList(buildAuthVisibleMenuList(menuList));
+    if (!menuStore.isMenuLoaded) {
+        loadMenuList();
     }
-    search();
 });
 
 onBeforeUnmount(() => {
     window.removeEventListener('resize', handleWindowResize);
 });
 
-watch(
-    () => [currentNode.value, isAdmin.value, permissions.value.join('|')],
-    () => {
-        search();
+const menuWatcher = watch(
+    [
+        () => currentNode.value,
+        () => isAdmin.value,
+        () => isNodeAdmin.value,
+        () => [...permissions.value].sort().join('|'),
+        () => [...masterOnlyPermissions.value].sort().join('|'),
+    ],
+    (values, previousValues) => {
+        if (values[0] !== previousValues[0]) {
+            menuStore.resetMenuList();
+        }
+        loadMenuList();
     },
 );
+
+const handleNodeSwitching = (switching: boolean) => {
+    if (switching) {
+        menuWatcher.pause();
+    } else {
+        menuWatcher.resume();
+    }
+};
 </script>
 
 <style lang="scss" scoped>
