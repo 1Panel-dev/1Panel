@@ -42,7 +42,12 @@ type Client struct {
 }
 
 type Platform struct{ OS, Architecture, Variant string }
-type Target struct{ Tag, Digest, ConfigDigest string }
+type Target struct {
+	Tag             string
+	Digest          string // Platform-specific manifest digest.
+	ReferenceDigest string // Tag target: an image index or a single-platform manifest.
+	ConfigDigest    string // Image configuration digest used by the classic Docker image store.
+}
 
 func New(ctx context.Context, repository, username, password string, httpClient *http.Client) (*Client, error) {
 	if httpClient == nil {
@@ -151,7 +156,8 @@ func (c *Client) Resolve(ctx context.Context, tag string, platform Platform) (Ta
 	if err != nil {
 		return Target{}, false, err
 	}
-	digest := headers.Get("Docker-Content-Digest")
+	referenceDigest := headers.Get("Docker-Content-Digest")
+	digest := referenceDigest
 	if len(m.Manifests) > 0 {
 		digest = ""
 		for _, item := range m.Manifests {
@@ -171,7 +177,7 @@ func (c *Client) Resolve(ctx context.Context, tag string, platform Platform) (Ta
 	if m.Config.Digest == "" {
 		return Target{}, false, fmt.Errorf("unsupported Docker Hub manifest")
 	}
-	// Validate single-platform manifests too; the config digest is the Docker Image ID.
+	// Validate single-platform manifests too; classic Docker image IDs use the config digest.
 	var config struct {
 		OS           string `json:"os"`
 		Architecture string `json:"architecture"`
@@ -183,7 +189,7 @@ func (c *Client) Resolve(ctx context.Context, tag string, platform Platform) (Ta
 	if config.OS != platform.OS || config.Architecture != platform.Architecture || (platform.Variant != "" && config.Variant != "" && config.Variant != platform.Variant) {
 		return Target{}, false, nil
 	}
-	return Target{Tag: tag, Digest: digest, ConfigDigest: m.Config.Digest}, true, nil
+	return Target{Tag: tag, Digest: digest, ReferenceDigest: referenceDigest, ConfigDigest: m.Config.Digest}, true, nil
 }
 
 var versionPattern = regexp.MustCompile(`^v?(\d+)\.(\d+)(?:\.(\d+))?(-[a-zA-Z][a-zA-Z0-9_.-]*)?$`)
