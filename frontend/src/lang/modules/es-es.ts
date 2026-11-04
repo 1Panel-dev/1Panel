@@ -1073,8 +1073,8 @@ const message = {
             deploy: 'Desplegar',
             approxWeightSize: 'Aprox. {0} GB',
             services: 'Servicios de modelos',
+            addInstance: 'Añadir instancia',
             addService: 'Añadir servicio de modelo',
-            addEngine: 'Añadir motor de inferencia',
             onlineModel: 'Modelos en línea',
             instanceDeployment: 'Despliegue por instancia',
             engines: 'Motores de inferencia locales',
@@ -1086,19 +1086,21 @@ const message = {
             files: 'Preparación de modelos',
             connectExternal: 'Conectar servicio externo',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Configuración de Recipe',
+            selectRecipe: 'Seleccionar Recipe',
             createRecipe: 'Crear Recipe',
             recipeHelper:
-                'Recipe = modelo + hardware + argumentos de inicio. Importe desde {link} o cree una a partir de un modelo descargado.',
-            recipeFormHelper: 'Pegue un comando de {link} o complete los campos manualmente.',
+                'Una Recipe describe cómo iniciar un modelo en un hardware específico e incluye el modelo, el hardware y los argumentos de inicio. Permite importar comandos desde {link}.',
+            recipeFormHelper:
+                'Vaya a {link}, seleccione el proveedor del modelo y luego el modelo de destino. Configure el hardware, la variante de cuantización, la estrategia de despliegue y otras opciones para generar el comando de inicio final.',
             recipeArguments: 'Argumentos de inicio',
             recipeImportCommand: 'Importar comando',
             recipeImportPlaceholder:
-                'Pegue comandos Docker, pip/uv o vllm serve para completar la Recipe automáticamente',
+                'Pegue aquí un comando de inicio en formato pip/uv o Docker. 1Panel lo analizará y completará la Recipe automáticamente.',
             recipeVariablesNotSupported:
                 'No se admiten referencias a variables en los comandos. Use valores concretos; configure las variables de entorno en su campo correspondiente.',
             recipeImportError:
                 'No se puede convertir. Incluya un comando de inicio Docker o vllm serve con un modelo; pegue los comandos de instalación pip/uv junto con el comando de inicio.',
-            deploymentTemplates: 'Plantillas de comandos de inicio de vLLM',
             engineProvider: 'Motor / Proveedor',
             endpoint: 'Punto de conexión',
             cloudAccount: 'Cuenta en la nube',
@@ -1125,13 +1127,14 @@ const message = {
             vllmDeployProfile: 'Modelo de despliegue',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Dispositivos Ascend visibles (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sincronizar con servicio de modelo',
             modelAccountAddressHelper:
                 'La dirección del contenedor es para contenedores de agentes; 127.0.0.1, IP del sistema o dirección personalizada es para AI Gateway o servicios externos.',
             containerAddress: 'Dirección del contenedor',
             customAddress: 'Dirección personalizada',
             downloader: 'Gestión de descargas',
+            modelDirectoryHelper:
+                'La lista muestra de forma predeterminada los modelos descargados en el directorio configurado en Preparación de modelos > Configuración.',
             modelDirectoryPlaceholder: 'Buscar modelos o introducir una ruta completa',
             selectModelDirectory: 'Seleccionar directorio',
             modelDir: 'Directorio del modelo',

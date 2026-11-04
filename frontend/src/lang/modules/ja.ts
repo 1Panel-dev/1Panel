@@ -1058,8 +1058,8 @@ const message = {
             deploy: 'デプロイ',
             approxWeightSize: '約 {0} GB',
             services: 'モデルサービス',
+            addInstance: 'インスタンスを追加',
             addService: 'モデルサービスを追加',
-            addEngine: '推論エンジンを追加',
             onlineModel: 'オンラインモデル',
             instanceDeployment: 'インスタンス単位でデプロイ',
             engines: 'ローカル推論エンジン',
@@ -1071,18 +1071,21 @@ const message = {
             files: 'モデル準備',
             connectExternal: '外部サービスに接続',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Recipe 設定',
+            selectRecipe: 'Recipe を選択',
             createRecipe: 'Recipe を作成',
             recipeHelper:
-                'Recipe = モデル + ハードウェア + 起動引数。{link} からインポートするか、ダウンロード済みモデルから作成できます。',
-            recipeFormHelper: '{link} のコマンドを貼り付けるか、手動で入力してください。',
+                'Recipe は、指定したハードウェアでモデルを起動する方法を記述し、モデル、ハードウェア、起動引数を含みます。{link} からコマンドをインポートできます。',
+            recipeFormHelper:
+                '{link} にアクセスし、モデルの提供元を選択してから、対象のモデルを選択します。 ハードウェア、量子化バージョン、デプロイ戦略などを設定すると、最終的な起動コマンドが生成されます。',
             recipeArguments: '起動引数',
             recipeImportCommand: 'コマンドをインポート',
-            recipeImportPlaceholder: 'Docker、pip/uv、または vllm serve コマンドを貼り付けて Recipe に自動入力',
+            recipeImportPlaceholder:
+                'ここに pip/uv または Docker 形式の起動コマンドを貼り付けると、1Panel が自動的に解析し、Recipe に入力します。',
             recipeVariablesNotSupported:
                 'コマンド内の変数参照はサポートされていません。具体的な値を入力し、環境変数は環境変数欄で設定してください。',
             recipeImportError:
                 '変換できません。モデルを含む Docker または vllm serve の起動コマンドを入力してください。pip/uv のインストールコマンドは起動コマンドと一緒に貼り付けてください。',
-            deploymentTemplates: 'vLLM 起動コマンドテンプレート',
             engineProvider: 'エンジン / プロバイダー',
             endpoint: 'エンドポイント',
             cloudAccount: 'クラウドアカウント',
@@ -1109,13 +1112,14 @@ const message = {
             vllmDeployProfile: 'デプロイモデル',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Ascend 可視デバイス（ASCEND_RT_VISIBLE_DEVICES）',
             syncModelAccount: 'モデルサービスに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',
             customAddress: 'カスタムアドレス',
             downloader: 'ダウンロード管理',
+            modelDirectoryHelper:
+                'モデル一覧には、デフォルトで「モデル準備 > 設定」で指定したモデルディレクトリにダウンロード済みのモデルが表示されます。',
             modelDirectoryPlaceholder: 'モデルを検索するかフルパスを入力',
             selectModelDirectory: 'ディレクトリを選択',
             modelDir: 'モデルディレクトリ',

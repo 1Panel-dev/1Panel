@@ -1054,8 +1054,8 @@ const message = {
             deploy: 'استقرار',
             approxWeightSize: 'حدود {0} گیگابایت',
             services: 'سرویس‌های مدل',
+            addInstance: 'افزودن نمونه',
             addService: 'افزودن سرویس مدل',
-            addEngine: 'افزودن موتور استنتاج',
             onlineModel: 'مدل‌های آنلاین',
             instanceDeployment: 'استقرار بر اساس نمونه',
             engines: 'موتورهای استنتاج محلی',
@@ -1067,19 +1067,21 @@ const message = {
             files: 'آماده‌سازی مدل',
             connectExternal: 'اتصال به سرویس خارجی',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'پیکربندی Recipe',
+            selectRecipe: 'انتخاب Recipe',
             createRecipe: 'ایجاد Recipe',
             recipeHelper:
-                'Recipe = مدل + سخت‌افزار + آرگومان‌های راه‌اندازی. از {link} وارد کنید یا از مدل دانلودشده بسازید.',
-            recipeFormHelper: 'فرمان را از {link} جای‌گذاری کنید یا فیلدها را دستی پر کنید.',
+                'Recipe نحوه اجرای مدل روی سخت‌افزار مشخص را توصیف می‌کند و شامل مدل، سخت‌افزار و آرگومان‌های اجرا است؛ وارد کردن فرمان از {link} پشتیبانی می‌شود.',
+            recipeFormHelper:
+                'به {link} بروید، ابتدا ارائه‌دهنده مدل و سپس مدل موردنظر را انتخاب کنید. سخت‌افزار، نسخه کوانتیزه‌سازی، راهبرد استقرار و سایر گزینه‌ها را تنظیم کنید تا فرمان نهایی اجرا تولید شود.',
             recipeArguments: 'آرگومان‌های راه‌اندازی',
             recipeImportCommand: 'وارد کردن فرمان',
             recipeImportPlaceholder:
-                'فرمان‌های Docker، pip/uv یا vllm serve را برای تکمیل خودکار Recipe جای‌گذاری کنید',
+                'فرمان اجرا را با قالب pip/uv یا Docker اینجا جای‌گذاری کنید تا 1Panel آن را به‌طور خودکار تحلیل و Recipe را تکمیل کند.',
             recipeVariablesNotSupported:
                 'ارجاع به متغیرها در دستور پشتیبانی نمی‌شود. مقادیر مشخص وارد کنید؛ متغیرهای محیطی را در بخش مربوط به آن‌ها تنظیم کنید.',
             recipeImportError:
                 'تبدیل ممکن نیست. فرمان راه‌اندازی Docker یا vllm serve همراه با مدل را وارد کنید؛ فرمان‌های نصب pip/uv را همراه با فرمان راه‌اندازی جای‌گذاری کنید.',
-            deploymentTemplates: 'الگوهای فرمان راه‌اندازی vLLM',
             engineProvider: 'موتور / ارائه‌دهنده',
             endpoint: 'نقطه پایانی',
             cloudAccount: 'حساب ابری',
@@ -1105,13 +1107,14 @@ const message = {
             vllmDeployProfile: 'مدل استقرار',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'دستگاه‌های قابل مشاهده Ascend (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'همگام‌سازی با سرویس مدل',
             modelAccountAddressHelper:
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
             containerAddress: 'آدرس کانتینر',
             customAddress: 'آدرس سفارشی',
             downloader: 'مدیریت دانلودها',
+            modelDirectoryHelper:
+                'فهرست مدل‌ها به‌طور پیش‌فرض مدل‌های دانلودشده در پوشه تنظیم‌شده در «آماده‌سازی مدل > تنظیمات» را نمایش می‌دهد.',
             modelDirectoryPlaceholder: 'جستجوی مدل یا وارد کردن مسیر کامل',
             selectModelDirectory: 'انتخاب پوشه',
             modelDir: 'دایرکتوری مدل',

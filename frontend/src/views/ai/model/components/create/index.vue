@@ -1,7 +1,7 @@
 <template>
     <DrawerPro
         v-model="visible"
-        :header="$t(enginesOnly ? 'commons.button.add' : 'aiTools.model.addService')"
+        :header="$t(enginesOnly ? 'aiTools.model.addInstance' : 'aiTools.model.addService')"
         :size="isMobile ? 'full' : '50%'"
     >
         <DockerStatus

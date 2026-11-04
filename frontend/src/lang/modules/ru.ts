@@ -1070,8 +1070,8 @@ const message = {
             deploy: 'Развернуть',
             approxWeightSize: 'Около {0} ГБ',
             services: 'Сервисы моделей',
+            addInstance: 'Добавить экземпляр',
             addService: 'Добавить сервис модели',
-            addEngine: 'Добавить движок инференса',
             onlineModel: 'Онлайн-модели',
             instanceDeployment: 'Развертывание по экземплярам',
             engines: 'Локальные движки инференса',
@@ -1083,19 +1083,21 @@ const message = {
             files: 'Подготовка моделей',
             connectExternal: 'Подключить внешний сервис',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Настройка Recipe',
+            selectRecipe: 'Выбрать Recipe',
             createRecipe: 'Создать Recipe',
             recipeHelper:
-                'Recipe = модель + оборудование + параметры запуска. Импортируйте с {link} или создайте из загруженной модели.',
-            recipeFormHelper: 'Вставьте команду с {link} или заполните поля вручную.',
+                'Recipe описывает способ запуска модели на определённом оборудовании и включает модель, оборудование и параметры запуска. Поддерживается импорт команд с {link}.',
+            recipeFormHelper:
+                'Перейдите на {link}, выберите поставщика модели, затем нужную модель. Укажите оборудование, вариант квантования, стратегию развёртывания и другие параметры, чтобы получить итоговую команду запуска.',
             recipeArguments: 'Параметры запуска',
             recipeImportCommand: 'Импорт команды',
             recipeImportPlaceholder:
-                'Вставьте команды Docker, pip/uv или vllm serve для автоматического заполнения Recipe',
+                'Вставьте сюда команду запуска в формате pip/uv или Docker. 1Panel автоматически разберёт её и заполнит Recipe.',
             recipeVariablesNotSupported:
                 'Ссылки на переменные в командах не поддерживаются. Укажите конкретные значения; переменные окружения настройте в соответствующем поле.',
             recipeImportError:
                 'Не удалось преобразовать. Добавьте команду запуска Docker или vllm serve с моделью; вставляйте команды установки pip/uv вместе с командой запуска.',
-            deploymentTemplates: 'Шаблоны команд запуска vLLM',
             engineProvider: 'Движок / Поставщик',
             endpoint: 'Конечная точка',
             cloudAccount: 'Облачная учетная запись',
@@ -1122,13 +1124,14 @@ const message = {
             vllmDeployProfile: 'Модель развертывания',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Видимые устройства Ascend (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Синхронизировать с сервисом модели',
             modelAccountAddressHelper:
                 'Адрес контейнера подходит для контейнеров агентов; 127.0.0.1, системный IP или пользовательский адрес подходит для AI Gateway или внешних сервисов.',
             containerAddress: 'Адрес контейнера',
             customAddress: 'Пользовательский адрес',
             downloader: 'Управление загрузками',
+            modelDirectoryHelper:
+                'По умолчанию список показывает модели, загруженные в каталог, указанный в разделе «Подготовка моделей > Настройки».',
             modelDirectoryPlaceholder: 'Найти модель или ввести полный путь',
             selectModelDirectory: 'Выбрать каталог',
             modelDir: 'Каталог модели',

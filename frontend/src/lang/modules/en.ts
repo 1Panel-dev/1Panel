@@ -1071,8 +1071,8 @@ const message = {
             deploy: 'Deploy',
             approxWeightSize: 'Approx. {0} GB',
             services: 'Model services',
+            addInstance: 'Add instance',
             addService: 'Add model service',
-            addEngine: 'Add inference engine',
             onlineModel: 'Online models',
             instanceDeployment: 'Deploy by instance',
             engines: 'Local inference engines',
@@ -1084,18 +1084,21 @@ const message = {
             files: 'Model preparation',
             connectExternal: 'Connect external service',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Recipe configuration',
+            selectRecipe: 'Select Recipe',
             createRecipe: 'Create Recipe',
             recipeHelper:
-                'Recipe = model + hardware + launch arguments. Import from {link} or create from a downloaded model.',
-            recipeFormHelper: 'Paste a command from {link}, or fill in the fields manually.',
+                'A Recipe describes how to launch a model on specific hardware, including the model, hardware, and launch arguments. Commands can be imported from {link}.',
+            recipeFormHelper:
+                'Go to {link}, select the model provider, then select the target model. Configure the hardware, quantization variant, deployment strategy, and other options to generate the final launch command.',
             recipeArguments: 'Launch arguments',
             recipeImportCommand: 'Import command',
-            recipeImportPlaceholder: 'Paste Docker, pip/uv or vllm serve commands to fill in the Recipe automatically',
+            recipeImportPlaceholder:
+                'Paste a pip/uv or Docker launch command here. 1Panel will automatically parse it and fill in the Recipe.',
             recipeVariablesNotSupported:
                 'Variable references are not supported in commands. Use explicit values; configure environment variables in the environment field.',
             recipeImportError:
                 'Unable to convert. Include a Docker or vllm serve launch command with a model; paste pip/uv installation commands together with the launch command.',
-            deploymentTemplates: 'vLLM startup command templates',
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
             cloudAccount: 'Cloud account',
@@ -1121,13 +1124,14 @@ const message = {
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Ascend visible devices (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Sync to model service',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',
             customAddress: 'Custom address',
             downloader: 'Downloads',
+            modelDirectoryHelper:
+                'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
             modelDirectoryPlaceholder: 'Search models or enter a full path',
             selectModelDirectory: 'Select directory',
             modelDir: 'Model directory',
