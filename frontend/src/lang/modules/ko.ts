@@ -1140,6 +1140,7 @@ const message = {
             modelDirectoryHelper:
                 '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
             modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
+            selectModel: '모델 선택',
             selectModelDirectory: '디렉터리 선택',
             modelDir: '모델 디렉토리',
             modelSource: '모델 소스',

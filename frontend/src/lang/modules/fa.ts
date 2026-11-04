@@ -1145,6 +1145,7 @@ const message = {
             modelDirectoryHelper:
                 'فهرست مدل‌ها به‌طور پیش‌فرض مدل‌های دانلودشده در پوشه تنظیم‌شده در «آماده‌سازی مدل > تنظیمات» را نمایش می‌دهد.',
             modelDirectoryPlaceholder: 'جستجوی مدل یا وارد کردن مسیر کامل',
+            selectModel: 'انتخاب مدل',
             selectModelDirectory: 'انتخاب پوشه',
             modelDir: 'دایرکتوری مدل',
             modelSource: 'منبع مدل',

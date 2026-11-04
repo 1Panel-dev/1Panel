@@ -1169,6 +1169,7 @@ const message = {
             modelDirectoryHelper:
                 'Por padrão, a lista exibe os modelos baixados no diretório configurado em Preparação de modelos > Configurações.',
             modelDirectoryPlaceholder: 'Buscar modelos ou inserir um caminho completo',
+            selectModel: 'Selecionar modelo',
             selectModelDirectory: 'Selecionar diretório',
             modelDir: 'Diretório do modelo',
             modelSource: 'Fonte do modelo',

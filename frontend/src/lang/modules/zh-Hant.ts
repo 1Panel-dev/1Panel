@@ -1094,6 +1094,7 @@ const message = {
             downloader: '模型下載',
             modelDirectoryHelper: '模型列表預設來自「模型準備 > 設定」中配置的模型目錄，顯示該目錄下已下載的模型。',
             modelDirectoryPlaceholder: '搜尋模型或輸入完整路徑',
+            selectModel: '選擇模型',
             selectModelDirectory: '選擇目錄',
             modelDir: '模型目錄',
             modelSource: '模型來源',

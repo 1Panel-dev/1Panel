@@ -1172,6 +1172,7 @@ const message = {
             modelDirectoryHelper:
                 'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
             modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
+            selectModel: 'Model seç',
             selectModelDirectory: 'Dizin seç',
             modelDir: 'Model dizini',
             modelSource: 'Model kaynağı',

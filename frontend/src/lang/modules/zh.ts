@@ -1107,6 +1107,7 @@ const message = {
             downloader: '模型下载',
             modelDirectoryHelper: '模型列表默认来自“模型准备 > 设置”中配置的模型目录，展示该目录下已下载的模型。',
             modelDirectoryPlaceholder: '搜索模型或输入完整路径',
+            selectModel: '选择模型',
             selectModelDirectory: '选择目录',
             modelDir: '模型目录',
             modelSource: '模型来源',

@@ -1163,6 +1163,7 @@ const message = {
             modelDirectoryHelper:
                 'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
             modelDirectoryPlaceholder: 'Search models or enter a full path',
+            selectModel: 'Select model',
             selectModelDirectory: 'Select directory',
             modelDir: 'Model directory',
             modelSource: 'Model source',

@@ -1166,6 +1166,7 @@ const message = {
             modelDirectoryHelper:
                 'La lista muestra de forma predeterminada los modelos descargados en el directorio configurado en Preparación de modelos > Configuración.',
             modelDirectoryPlaceholder: 'Buscar modelos o introducir una ruta completa',
+            selectModel: 'Seleccionar modelo',
             selectModelDirectory: 'Seleccionar directorio',
             modelDir: 'Directorio del modelo',
             modelSource: 'Fuente del modelo',

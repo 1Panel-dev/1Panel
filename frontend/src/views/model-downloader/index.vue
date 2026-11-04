@@ -309,7 +309,21 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="recipeCount" label="Recipes" width="90" align="center">
-                        <template #default="{ row }">{{ row.recipeCount ?? '—' }}</template>
+                        <template #default="{ row }">
+                            <el-button
+                                v-if="recipesView && isProductPro && row.recipeCount > 0"
+                                link
+                                type="primary"
+                                @click="
+                                    recipeSearch =
+                                        (row.repoID || row.targetDir).replace(/\/+$/, '').split('/').pop() || '';
+                                    currentTab = 'recipes';
+                                "
+                            >
+                                {{ row.recipeCount }}
+                            </el-button>
+                            <span v-else>{{ row.recipeCount ?? '—' }}</span>
+                        </template>
                     </el-table-column>
                     <el-table-column prop="createdAt" :label="$t('commons.table.date')" width="180" />
                     <el-table-column :label="$t('commons.table.operate')" width="240" fixed="right">
@@ -539,7 +553,12 @@
                 </ComplexTable>
             </div>
         </DrawerPro>
-        <component :is="recipesView" v-if="currentTab === 'recipes' && recipesView" :model-path="recipeModelPath">
+        <component
+            :is="recipesView"
+            v-if="currentTab === 'recipes' && recipesView"
+            :model-path="recipeModelPath"
+            :search-info="recipeSearch"
+        >
             <template #search>
                 <el-button
                     v-for="button in buttons"
@@ -613,6 +632,7 @@ const recipeModules = import.meta.glob<{ default: Component }>('@/xpack/views/vl
 const recipeLoader = Object.values(recipeModules)[0];
 const recipesView = recipeLoader ? defineAsyncComponent(recipeLoader) : undefined;
 const recipeModelPath = ref('');
+const recipeSearch = ref('');
 const currentTab = ref<DownloaderTab>('featured');
 const featuredViewMode = ref<'table' | 'card'>('table');
 const featuredFamily = ref('');
@@ -1060,7 +1080,10 @@ watch(
 );
 
 watch(currentTab, async (value) => {
-    if (value !== 'recipes') recipeModelPath.value = '';
+    if (value !== 'recipes') {
+        recipeModelPath.value = '';
+        recipeSearch.value = '';
+    }
     if (route.path === pagePath && route.query.tab !== value)
         await router.replace({ query: { ...route.query, tab: value } });
     if (value !== 'settings') await refreshCurrent();
@@ -1070,6 +1093,7 @@ watch(currentNode, async () => {
     downloadRequest++;
     downloads.value = [];
     recipeModelPath.value = '';
+    recipeSearch.value = '';
     featuredRequest++;
     featuredLoading.value = false;
     featuredModels.value = [];
