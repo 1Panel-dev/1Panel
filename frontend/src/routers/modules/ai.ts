@@ -46,12 +46,12 @@ const aiRouter = {
         },
         {
             path: '/ai/model/account',
-            hidden: true,
             name: 'ModelServices',
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
+                icon: 'p-moxing-menu',
                 title: 'aiTools.model.services',
-                activeMenu: '/ai/model',
+                activeMenu: '/ai/model/account',
                 permission: 'ai_model_view',
             },
         },

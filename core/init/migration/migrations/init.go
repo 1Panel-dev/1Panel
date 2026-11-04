@@ -1446,6 +1446,34 @@ var UpdateAiModelManagementMenus = &gormigrate.Migration{
 	},
 }
 
+var AddModelServicesMenu = &gormigrate.Migration{
+	ID: "20261104-add-model-services-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+			for i := range menus {
+				if menus[i].Label != "AI-Menu" {
+					continue
+				}
+				isShow := true
+				for _, child := range menus[i].Children {
+					if child.Label == "ModelServices" {
+						return menus
+					}
+					if child.Label == "AIModel" {
+						isShow = child.IsShow
+					}
+				}
+				menus[i].Children = helper.UpsertMenuByLabel(menus[i].Children, dto.ShowMenu{
+					ID: "49", Title: "aiTools.model.services", IsShow: isShow,
+					Label: "ModelServices", Path: "/ai/model/account", Sort: 75,
+				}, "AIModel")
+				break
+			}
+			return menus
+		})
+	},
+}
+
 var UpdateFirewallMenuPath = &gormigrate.Migration{
 	ID: "20260819-update-firewall-menu-path",
 	Migrate: func(tx *gorm.DB) error {
