@@ -75,5 +75,6 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.AddAPIKeyDeletedAt,
 		migrations.MoveVirtualMachineMenuToTopLevel,
 		migrations.UpdateAiModelManagementMenus,
+		migrations.AddModelServicesMenu,
 	}
 }

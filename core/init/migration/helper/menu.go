@@ -100,6 +100,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "48", Disabled: false, Title: "aiTools.model.ollamaManagement", IsShow: true, Label: "OllamaModels", Path: "/ai/model/local/ollama", Sort: 25},
 				{ID: "41", Disabled: false, Title: "aiTools.model.vllmManagement", IsShow: true, Label: "AIModel", Path: "/ai/model/files", Sort: 50},
+				{ID: "49", Disabled: false, Title: "aiTools.model.services", IsShow: true, Label: "ModelServices", Path: "/ai/model/account", Sort: 75},
 				{ID: "44", Disabled: false, Title: "aiTools.agents.agent", IsShow: true, Label: "Agents", Path: "/ai/agents/agent", Sort: 100},
 				{ID: "42", Disabled: false, Title: "menu.mcp", IsShow: true, Label: "MCPServer", Path: "/ai/mcp", Sort: 200},
 				{ID: "43", Disabled: false, Title: "aiTools.gpu.gpu", IsShow: true, Label: "GPU", Path: "/ai/gpu", Sort: 300},
@@ -207,6 +208,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "AI-Menu", Sort: 300},
 		{Label: "OllamaModels", Sort: 25},
 		{Label: "AIModel", Sort: 50},
+		{Label: "ModelServices", Sort: 75},
 		{Label: "Agents", Sort: 100},
 		{Label: "AIProxyManagement", Sort: 150},
 		{Label: "SkillsHub", Sort: 175},

@@ -342,11 +342,14 @@ const isCurrentPage = computed(() => route.path === pagePath);
 const { isProductPro, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
 const isFiles = pagePath === '/ai/model/files';
 const isLocal = pagePath === '/ai/model/local';
-const tabs = computed(() => [
-    { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
-    { label: i18n.global.t('aiTools.model.deployments'), path: '/ai/model/local' },
-    { label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' },
-]);
+const tabs = computed(() =>
+    isFiles || isLocal
+        ? [
+              { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
+              { label: i18n.global.t('aiTools.model.deployments'), path: '/ai/model/local' },
+          ]
+        : [{ label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' }],
+);
 const downloaderView = defineAsyncComponent(() => import('@/views/model-downloader/index.vue'));
 const createRef = ref();
 const manageRef = ref();
