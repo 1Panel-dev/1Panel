@@ -88,7 +88,7 @@
                             :percentage="device.memoryPercent ?? 0"
                             :show-text="false"
                             :stroke-width="5"
-                            color="var(--el-color-success)"
+                            color="var(--el-color-primary)"
                         />
                     </div>
                 </div>
