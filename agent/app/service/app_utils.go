@@ -1238,13 +1238,19 @@ func rebuildApp(appInstall model.AppInstall) error {
 		return handleErr(appInstall, err, "")
 	}
 	buildTask.AddSubTaskWithOps(buildTask.Name, func(t *task.Task) error {
+		t.Log(task.GetTaskName(appInstall.Name, "Stop", task.TaskScopeApp))
 		out, err := compose.Down(appInstall.GetComposePath())
-		t.Log(out)
+		if strings.TrimSpace(out) != "" {
+			t.Log(out)
+		}
 		if err != nil {
 			return handleErr(appInstall, err, out)
 		}
+		t.Log(task.GetTaskName(appInstall.Name, "Run", task.TaskScopeApp))
 		out, err = compose.Up(appInstall.GetComposePath())
-		t.Log(out)
+		if strings.TrimSpace(out) != "" {
+			t.Log(out)
+		}
 		if err != nil {
 			return handleErr(appInstall, err, out)
 		}

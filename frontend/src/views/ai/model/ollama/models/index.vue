@@ -10,9 +10,6 @@
                     @is-exist="checkExist"
                 />
             </template>
-            <template #prompt>
-                <el-alert type="info" :closable="false" :title="$t('runtime.systemRestartHelper')" />
-            </template>
             <template #leftToolBar>
                 <el-button v-permission :disabled="modelInfo.status !== 'Running'" type="primary" @click="onCreate">
                     {{ $t('commons.button.add') }}
@@ -89,9 +86,14 @@
                             <el-tooltip v-if="row.status === 'Unknown'" :content="row.message" placement="top">
                                 <el-tag type="warning">{{ $t('commons.status.unknown') }}</el-tag>
                             </el-tooltip>
-                            <el-tag v-if="row.status === 'Canceled'" type="danger">
-                                {{ $t('commons.status.systemrestart') }}
-                            </el-tag>
+                            <el-tooltip
+                                v-if="row.status === 'Canceled'"
+                                :content="row.message"
+                                :disabled="!row.message"
+                                placement="top"
+                            >
+                                <el-tag type="danger">{{ $t('commons.status.systemrestart') }}</el-tag>
+                            </el-tooltip>
                             <el-tag v-if="row.status === 'Failed'" type="danger">
                                 {{ $t('commons.status.failed') }}
                             </el-tag>

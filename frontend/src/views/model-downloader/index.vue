@@ -108,9 +108,22 @@
                         v-if="currentTab === 'downloader'"
                         title="model-download-refresh"
                         :rate="5"
-                        @search="loadDownloads"
+                        @search="refreshDownloadProgress"
                     />
                 </div>
+            </template>
+            <template v-if="currentTab === 'featured' || currentTab === 'downloader'" #prompt>
+                <el-alert
+                    type="info"
+                    :closable="false"
+                    :title="
+                        $t(
+                            currentTab === 'featured'
+                                ? 'aiTools.model.featuredModelsHelper'
+                                : 'aiTools.model.downloadHelper',
+                        )
+                    "
+                />
             </template>
             <template #main>
                 <ComplexTable
@@ -214,18 +227,20 @@
                     :pagination-config="downloadPagination"
                     @search="loadDownloads"
                 >
-                    <el-table-column prop="source" :label="$t('aiTools.model.modelSource')" width="120">
+                    <el-table-column prop="repoID" :label="$t('aiTools.model.repoID')" min-width="280">
                         <template #default="{ row }">
-                            {{ sourceLabel(row.source) }}
+                            <div class="download-repo-id" :title="row.repoID">{{ row.repoID }}</div>
+                            <div class="download-source">
+                                <svg-icon
+                                    v-if="row.source === 'modelscope' || row.source === 'huggingface'"
+                                    :iconName="row.source === 'modelscope' ? 'p-modelscope' : 'p-huggingface1'"
+                                    class="download-source-icon"
+                                />
+                                <span>{{ sourceLabel(row.source) }}</span>
+                            </div>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        prop="repoID"
-                        :label="$t('aiTools.model.repoID')"
-                        min-width="240"
-                        show-overflow-tooltip
-                    />
-                    <el-table-column :label="$t('modelDownloadExtra.content')" width="140">
+                    <el-table-column :label="$t('commons.table.type')" width="140">
                         <template #default="{ row }">
                             {{
                                 $t(
@@ -236,59 +251,65 @@
                             }}
                         </template>
                     </el-table-column>
-                    <el-table-column prop="status" :label="$t('commons.table.status')" width="120">
-                        <template #default="{ row }">
-                            <el-tooltip :content="row.errorMessage" :disabled="!row.errorMessage" placement="top">
-                                <el-tag :type="statusTagType(row.status)" round effect="light" size="small">
-                                    <span class="status-tag-content">
-                                        <span>{{ statusText(row.status) }}</span>
-                                        <el-icon v-if="row.status === 'Downloading'" class="is-loading">
-                                            <Loading />
-                                        </el-icon>
-                                    </span>
-                                </el-tag>
-                            </el-tooltip>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('aiTools.model.progress')" min-width="220">
+                    <el-table-column prop="status" :label="$t('aiTools.model.downloadStatus')" min-width="260">
                         <template #default="{ row }">
                             <div class="progress-cell">
-                                <el-progress
-                                    class="progress-bar"
-                                    :percentage="formatProgress(row.progress)"
-                                    :stroke-width="6"
-                                />
-                                <span
-                                    v-if="formatSizePair(row.downloadedSize, row.totalSize)"
-                                    class="progress-size"
-                                    :title="formatSizePair(row.downloadedSize, row.totalSize)"
-                                >
-                                    {{ formatSizePair(row.downloadedSize, row.totalSize) }}
-                                </span>
+                                <div class="progress-track">
+                                    <el-progress
+                                        :percentage="formatProgress(row.progress)"
+                                        :show-text="false"
+                                        :stroke-width="4"
+                                    />
+                                    <span class="progress-percentage">{{ formatProgress(row.progress) }}%</span>
+                                </div>
+                                <div class="download-size-row">
+                                    <span class="progress-size">
+                                        {{
+                                            row.status === 'Success'
+                                                ? row.localModel
+                                                    ? row.localModel.sizeFormatted || formatBytes(row.localModel.size)
+                                                    : '—'
+                                                : formatSizePair(row.downloadedSize, row.totalSize) || '—'
+                                        }}
+                                    </span>
+                                    <el-tooltip :content="statusText(row, true)" placement="top">
+                                        <span class="download-status" :aria-label="statusText(row, true)" tabindex="0">
+                                            <el-icon
+                                                class="download-status-icon"
+                                                :class="{ 'is-loading': row.status === 'Downloading' }"
+                                                aria-hidden="true"
+                                            >
+                                                <Loading v-if="row.status === 'Downloading'" />
+                                                <Warning v-else-if="row.status === 'Success' && !row.localModel" />
+                                                <Select v-else-if="row.status === 'Success'" />
+                                                <Close v-else-if="row.status === 'Failed'" />
+                                                <Minus v-else-if="row.status === 'Canceled'" />
+                                                <Clock v-else />
+                                            </el-icon>
+                                            <span class="download-status-text">{{ statusText(row) }}</span>
+                                        </span>
+                                    </el-tooltip>
+                                </div>
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column
-                        prop="targetDir"
-                        :label="$t('aiTools.model.modelDir')"
-                        min-width="260"
-                        show-overflow-tooltip
-                    >
+                    <el-table-column prop="targetDir" :label="$t('aiTools.model.modelDir')" width="110" align="center">
                         <template #default="{ row }">
-                            <el-button
-                                v-permission:view="'host_file_view'"
-                                link
-                                type="primary"
-                                class="model-path-link"
-                                :title="row.targetDir"
-                                @click="openLocalModelPath(row.targetDir)"
-                            >
-                                {{ row.targetDir }}
-                            </el-button>
+                            <el-tooltip :content="row.targetDir" placement="top">
+                                <el-button
+                                    v-permission:view="'host_file_view'"
+                                    link
+                                    type="primary"
+                                    :aria-label="$t('aiTools.model.modelDir') + ': ' + row.targetDir"
+                                    @click="openLocalModelPath(row.targetDir)"
+                                >
+                                    <el-icon><Folder /></el-icon>
+                                </el-button>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('file.size')" width="120">
-                        <template #default="{ row }">{{ row.localModel?.sizeFormatted || '-' }}</template>
+                    <el-table-column prop="recipeCount" label="Recipes" width="90" align="center">
+                        <template #default="{ row }">{{ row.recipeCount ?? '—' }}</template>
                     </el-table-column>
                     <el-table-column prop="createdAt" :label="$t('commons.table.date')" width="180" />
                     <el-table-column :label="$t('commons.table.operate')" width="240" fixed="right">
@@ -300,8 +321,9 @@
                                 {{ $t('commons.button.retry') }}
                             </el-button>
                             <el-button
-                                v-if="row.downloadType === 'all' && row.status === 'Success' && row.localModel"
+                                v-if="row.status === 'Success' && row.localModel"
                                 v-permission
+                                :disabled="row.downloadType === 'tokenizer'"
                                 link
                                 type="primary"
                                 @click="emit('deploy', row.localModel.path)"
@@ -309,14 +331,9 @@
                                 {{ $t('aiTools.model.deploy') }}
                             </el-button>
                             <el-button
-                                v-if="
-                                    recipesView &&
-                                    isProductPro &&
-                                    row.downloadType === 'all' &&
-                                    row.status === 'Success' &&
-                                    row.localModel
-                                "
+                                v-if="recipesView && isProductPro && row.status === 'Success' && row.localModel"
                                 v-permission
+                                :disabled="row.downloadType === 'tokenizer'"
                                 link
                                 type="primary"
                                 @click="
@@ -352,6 +369,7 @@
                         <el-col :xs="24" :sm="20" :md="15" :lg="12" :xl="12">
                             <el-form-item :label="$t('aiTools.model.modelDir')" prop="modelDir">
                                 <el-input v-model="settings.modelDir" />
+                                <span class="input-help">{{ $t('aiTools.model.modelDirHelper') }}</span>
                             </el-form-item>
                             <el-form-item
                                 :label="$t('aiTools.model.acceleratedEndpointLabel', ['HuggingFace'])"
@@ -362,6 +380,7 @@
                             </el-form-item>
                             <el-form-item :label="$t('aiTools.model.tokenLabel', ['HuggingFace'])" prop="hfToken">
                                 <el-input v-model="settings.hfToken" show-password />
+                                <span class="input-help">{{ $t('aiTools.model.modelTokenHelper') }}</span>
                             </el-form-item>
                             <el-form-item
                                 :label="$t('aiTools.model.endpointLabel', ['ModelScope'])"
@@ -371,12 +390,14 @@
                                     v-model="settings.modelScopeEndpoint"
                                     placeholder="https://www.modelscope.cn"
                                 />
+                                <span class="input-help">{{ $t('aiTools.model.modelScopeEndpointHelper') }}</span>
                             </el-form-item>
                             <el-form-item
                                 :label="$t('aiTools.model.tokenLabel', ['ModelScope'])"
                                 prop="modelScopeToken"
                             >
                                 <el-input v-model="settings.modelScopeToken" show-password />
+                                <span class="input-help">{{ $t('aiTools.model.modelTokenHelper') }}</span>
                             </el-form-item>
                             <el-form-item>
                                 <el-button
@@ -395,23 +416,57 @@
             </template>
         </LayoutContent>
 
-        <DrawerPro v-model="searchOpen" :header="$t('commons.button.search')" size="50%" :full-screen="true">
+        <DrawerPro
+            v-model="searchOpen"
+            :header="$t('aiTools.model.searchTitle')"
+            :size="isMobile ? 'full' : 'min(1100px, 90vw)'"
+            :full-screen="true"
+        >
+            <el-alert class="search-intro" type="info" :closable="false" :title="$t('aiTools.model.searchHelper')" />
             <div class="source-switch">
                 <SourceSelect
                     v-model="currentSource"
                     :sources="['modelscope', 'huggingface']"
+                    show-description
                     @update:model-value="handleSourceChange"
                 />
             </div>
+            <form class="search-row" @submit.prevent="handleSearchSubmit">
+                <el-input
+                    v-model="searchForm.query"
+                    class="search-input"
+                    clearable
+                    :placeholder="$t('aiTools.model.searchPlaceholder')"
+                    :aria-label="$t('aiTools.model.searchPlaceholder')"
+                />
+                <el-button type="primary" native-type="submit" :loading="searchCardLoading">
+                    {{ $t('commons.button.search') }}
+                </el-button>
+            </form>
+            <div class="popular-searches">
+                <span>{{ $t('aiTools.model.popularSearches') }}</span>
+                <el-button
+                    v-for="keyword in ['Qwen3', 'DeepSeek', 'GLM', 'embedding']"
+                    :key="keyword"
+                    link
+                    type="primary"
+                    @click="
+                        searchForm.query = keyword;
+                        handleSearchSubmit();
+                    "
+                >
+                    {{ keyword }}
+                </el-button>
+            </div>
             <div v-loading="searchCardLoading">
-                <div class="search-row">
-                    <TableSearch
-                        v-model:searchName="searchForm.query"
-                        class="search-input"
-                        placeholder="Qwen"
-                        @search="handleSearchSubmit"
-                    />
-                    <el-select v-model="searchForm.sort" class="sort-select" @change="handleSortChange">
+                <div class="search-results-toolbar">
+                    <el-select
+                        v-model="searchForm.sort"
+                        class="sort-select"
+                        :aria-label="$t('aiTools.model.searchSort')"
+                        @change="handleSortChange"
+                    >
+                        <template #prefix>{{ $t('aiTools.model.searchSort') }}</template>
                         <el-option
                             v-for="item in sortOptions"
                             :key="item.value"
@@ -448,9 +503,18 @@
                             </el-button>
                         </template>
                     </el-table-column>
+                    <el-table-column :label="$t('file.size')" width="110">
+                        <template #default="{ row }">
+                            {{ row.size > 0 ? row.sizeFormatted || formatBytes(row.size) : '—' }}
+                        </template>
+                    </el-table-column>
                     <el-table-column prop="downloads" :label="$t('aiTools.model.downloadsCount')" width="130" />
                     <el-table-column prop="likes" :label="$t('aiTools.model.likes')" width="90" />
-                    <el-table-column :label="$t('commons.table.operate')" width="200" fixed="right">
+                    <el-table-column
+                        :label="$t('commons.table.operate')"
+                        min-width="240"
+                        :fixed="isMobile ? false : 'right'"
+                    >
                         <template #default="{ row }">
                             <el-button
                                 v-permission
@@ -459,7 +523,7 @@
                                 icon="Download"
                                 @click="downloadRef?.acceptParams(row.repoID, 'all', [currentSource])"
                             >
-                                {{ $t('aiTools.model.model') }}
+                                {{ $t('commons.button.download') }}
                             </el-button>
                             <el-button
                                 v-permission
@@ -468,7 +532,7 @@
                                 icon="Download"
                                 @click="downloadRef?.acceptParams(row.repoID, 'tokenizer', [currentSource])"
                             >
-                                {{ $t('aiTools.benchmark.tokenizer') }}
+                                {{ $t('aiTools.model.onlyTokenizer') }}
                             </el-button>
                         </template>
                     </el-table-column>
@@ -524,6 +588,7 @@ import {
     updateFeaturedModelsSync,
 } from '@/api/modules/model-downloader';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { loadVllmAPI, matchesModelRecipe } from '@/views/ai/model/deployment';
 
 const emit = defineEmits<{ deploy: [modelDir: string] }>();
 const { currentNode, isMobile, isOffline, language, isProductPro } = useGlobalStore();
@@ -579,7 +644,7 @@ const featuredFields = [
 ] as const;
 const currentSource = ref<DownloaderSource>('modelscope');
 const models = ref<ModelDownloader.ModelItem[]>([]);
-const downloads = ref<ModelDownloader.TaskItem[]>([]);
+const downloads = ref<Array<ModelDownloader.TaskItem & { recipeCount?: number }>>([]);
 const searchOpen = ref(false);
 watch(
     [currentSource, currentNode, searchOpen],
@@ -629,7 +694,7 @@ const searchForm = reactive<ModelDownloader.ModelSearch>({
 
 const searchPagination = reactive({
     currentPage: 1,
-    pageSize: 50,
+    pageSize: 10,
     total: 0,
 });
 
@@ -751,9 +816,58 @@ const changeDownloadType = async () => {
 };
 
 let downloadRequest = 0;
+let refreshingProgress = false;
+const refreshDownloadProgress = async () => {
+    if (refreshingProgress || currentTab.value !== 'downloader') return;
+    const ids = downloads.value
+        .filter((row) => row.id && ['Waiting', 'Downloading'].includes(row.status))
+        .map((row) => row.id);
+    if (!ids.length) return;
+    const request = downloadRequest;
+    const node = currentNode.value;
+    refreshingProgress = true;
+    try {
+        const { data } = await pageModelDownloadTasks({
+            ids,
+            page: 1,
+            pageSize: ids.length,
+            info: '',
+            status: '',
+            includeLocal: true,
+        });
+        if (node !== currentNode.value || request !== downloadRequest || currentTab.value !== 'downloader') return;
+        const tasks = new Map((data.items || []).map((item) => [item.id, item]));
+        for (const row of downloads.value) {
+            const task = tasks.get(row.id);
+            if (!task) continue;
+            row.status = task.status;
+            row.progress = task.progress;
+            row.totalSize = task.totalSize;
+            row.downloadedSize = task.downloadedSize;
+            row.errorMessage = task.errorMessage;
+            row.startedAt = task.startedAt;
+            row.completedAt = task.completedAt;
+            row.canCancel = task.canCancel;
+            row.canRetry = task.canRetry;
+            row.canRemoveRecord = task.canRemoveRecord;
+            row.localModel = task.localModel;
+        }
+    } finally {
+        refreshingProgress = false;
+    }
+};
+
 const loadDownloads = async () => {
     const request = ++downloadRequest;
     const node = currentNode.value;
+    const recipeResult = Promise.allSettled([
+        recipesView && isProductPro.value
+            ? loadVllmAPI().then((api) => {
+                  if (node !== currentNode.value || request !== downloadRequest) return;
+                  return api.listVllmCommandTemplates();
+              })
+            : Promise.resolve(undefined),
+    ]);
     const res = await pageModelDownloadTasks({
         page: downloadPagination.currentPage,
         pageSize: downloadPagination.pageSize,
@@ -769,6 +883,16 @@ const loadDownloads = async () => {
     if (downloadPagination.currentPage > lastPage) {
         downloadPagination.currentPage = lastPage;
         await loadDownloads();
+        return;
+    }
+    const [result] = await recipeResult;
+    if (node !== currentNode.value || request !== downloadRequest) return;
+    const recipes = result.status === 'fulfilled' ? result.value?.data : undefined;
+    for (const row of downloads.value) {
+        row.recipeCount =
+            row.downloadType === 'tokenizer'
+                ? 0
+                : recipes?.filter((recipe) => matchesModelRecipe(recipe.model, row.targetDir, row.repoID)).length;
     }
 };
 
@@ -861,34 +985,32 @@ const refreshCurrent = async () => {
     }
 };
 
-const statusTagType = (status: string) => {
-    switch (status) {
-        case 'Success':
-            return 'success';
+const statusText = (row: ModelDownloader.TaskItem, withDetail = false) => {
+    let key = 'commons.status.waiting';
+    switch (row.status) {
         case 'Downloading':
-            return 'primary';
+            key = 'aiTools.model.downloading';
+            break;
+        case 'Success':
+            key = !row.localModel
+                ? 'aiTools.model.downloadCompleted'
+                : row.id
+                  ? 'aiTools.model.downloaded'
+                  : 'aiTools.model.alreadyExists';
+            break;
         case 'Failed':
+            key = 'commons.status.failed';
+            break;
         case 'Canceled':
-            return 'danger';
-        default:
-            return 'info';
+            key = 'aiTools.model.canceled';
+            break;
     }
-};
-
-const statusText = (status: string) => {
-    if (status === 'Downloading') {
-        return i18n.global.t('aiTools.model.downloading');
-    }
-    if (status === 'Success') {
-        return i18n.global.t('commons.status.success');
-    }
-    if (status === 'Failed') {
-        return i18n.global.t('commons.status.failed');
-    }
-    if (status === 'Canceled') {
-        return i18n.global.t('aiTools.model.canceled');
-    }
-    return i18n.global.t('commons.status.waiting');
+    if (!withDetail) return i18n.global.t(key);
+    const detail =
+        row.status === 'Success' && !row.localModel
+            ? i18n.global.t('aiTools.model.localFilesMissing')
+            : row.errorMessage;
+    return [i18n.global.t(key), detail].filter(Boolean).join('：');
 };
 
 const sourceLabel = (source: string) => {
@@ -903,7 +1025,7 @@ const sourceLabel = (source: string) => {
 
 const formatBytes = (value: number) => {
     if (!value) {
-        return '-';
+        return '0 B';
     }
     if (value < 1024 * 1024) {
         return `${(value / 1024).toFixed(1)} KB`;
@@ -945,6 +1067,8 @@ watch(currentTab, async (value) => {
 });
 
 watch(currentNode, async () => {
+    downloadRequest++;
+    downloads.value = [];
     recipeModelPath.value = '';
     featuredRequest++;
     featuredLoading.value = false;
@@ -1062,6 +1186,10 @@ onMounted(() => {
     overflow-wrap: anywhere;
 }
 
+.search-intro {
+    margin-bottom: 20px;
+}
+
 .source-switch {
     margin-bottom: 16px;
 }
@@ -1075,63 +1203,123 @@ onMounted(() => {
 .search-input {
     flex: 1;
     min-width: 0;
+}
 
-    :deep(.search-button) {
-        width: 100%;
+.popular-searches {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-top: 12px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+
+    .el-button {
+        margin-left: 0;
+        font-size: 12px;
     }
 }
 
+.search-results-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-top: 16px;
+}
+
 .sort-select {
-    flex: 0 0 160px;
-    width: 160px;
+    width: 220px;
+}
+
+.download-repo-id {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 20px;
+}
+
+.download-source {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.download-source-icon {
+    width: 14px;
+    height: 14px;
+    padding: 0;
+    flex-shrink: 0;
 }
 
 .progress-cell {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    display: grid;
+    grid-template-rows: 16px 16px;
     gap: 2px;
     width: 100%;
 }
 
-.status-tag-content {
+.progress-track {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+
+    :deep(.el-progress) {
+        flex: 1;
+        min-width: 0;
+    }
+}
+
+.progress-percentage {
+    flex-shrink: 0;
+    width: 42px;
+    text-align: right;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 16px;
+}
+
+.download-size-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+
+.download-status {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    margin-left: auto;
+    min-width: 0;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 16px;
 }
 
-.progress-bar {
-    flex: 1;
-    min-width: 110px;
+.download-status-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
 
-    :deep(.el-progress__text) {
-        min-width: 36px;
-        margin-left: 6px;
-        font-size: 12px !important;
-    }
+.download-status-icon {
+    flex-shrink: 0;
+    color: var(--el-text-color-secondary);
+    font-size: 14px;
 }
 
 .progress-size {
     min-width: 0;
     color: var(--el-text-color-secondary);
     font-size: 12px;
-    line-height: 14px;
+    line-height: 16px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.model-path-link {
-    max-width: 100%;
-    justify-content: flex-start;
-
-    :deep(> span) {
-        display: block;
-        min-width: 0;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-        text-align: left;
-    }
 }
 </style>

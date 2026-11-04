@@ -2,17 +2,24 @@
     <DrawerPro size="normal" v-model="drawerVisible" :header="$t('commons.button.add')" @close="handleClose">
         <el-alert type="info" :closable="false">
             <template #title>
-                <span class="flx-align-center">
-                    {{ $t('aiTools.model.ollama_doc') }}
-                    <el-button link class="ml-5" icon="Position" @click="goSearch()" type="primary">
-                        {{ $t('firewall.quickJump') }}
-                    </el-button>
-                </span>
+                <i18n-t keypath="aiTools.model.ollama_doc" tag="span" class="ollama-hint-text">
+                    <template #link>
+                        <a
+                            class="ollama-link"
+                            href="https://ollama.com/search"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            ollama.com
+                        </a>
+                    </template>
+                </i18n-t>
             </template>
         </el-alert>
         <el-form ref="formRef" label-position="top" class="mt-5" :model="form">
             <el-form-item :label="$t('commons.table.name')" :rules="Rules.requiredInput" prop="name">
-                <el-input v-model.trim="form.name" />
+                <el-input v-model.trim="form.name" placeholder="qwen3.6:35b" />
+                <span class="input-help">{{ $t('aiTools.model.ollamaNameHelper') }}</span>
                 <span class="input-help" v-if="form.name">
                     {{
                         $t('aiTools.model.create_helper', [
@@ -80,10 +87,6 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
     });
 };
 
-const goSearch = () => {
-    window.open('https://ollama.com/search', '_blank', 'noopener,noreferrer');
-};
-
 const handleClose = () => {
     drawerVisible.value = false;
 };
@@ -92,3 +95,23 @@ defineExpose({
     acceptParams,
 });
 </script>
+
+<style scoped>
+.ollama-hint-text {
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.7;
+}
+
+.ollama-link {
+    color: var(--el-color-primary);
+    font: inherit;
+    vertical-align: baseline;
+    text-decoration: none;
+}
+
+.ollama-link:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+</style>

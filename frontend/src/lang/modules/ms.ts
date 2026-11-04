@@ -1052,6 +1052,29 @@ const message = {
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
+            searchTitle: 'Cari dan muat turun model',
+            searchHelper:
+                'Cari model di ModelScope atau Hugging Face, kemudian gunakan model atau cipta Recipe dalam Persediaan Model.',
+            modelScopeSearchHelper: 'Akses stabil di tanah besar China',
+            huggingFaceSearchHelper: 'Koleksi model yang luas',
+            searchPlaceholder: 'Masukkan nama model atau ID repositori, cth. Qwen/Qwen3-8B',
+            popularSearches: 'Carian popular',
+            searchSort: 'Susun mengikut',
+            onlyTokenizer: 'Pentoken sahaja',
+            downloadStatus: 'Status muat turun',
+            downloaded: 'Telah dimuat turun',
+            alreadyExists: 'Sudah wujud',
+            downloadCompleted: 'Muat turun selesai',
+            localFilesMissing: 'Fail setempat tidak ditemui',
+            ollamaNameHelper:
+                'Masukkan nama model penuh daripada pustaka Ollama. Jika tag tidak dinyatakan, latest akan digunakan.',
+            downloadHelper: 'Klik “Cari” untuk mencari dan memuat turun model daripada ModelScope dan Hugging Face.',
+            serviceHelper:
+                'Sambungkan perkhidmatan model daripada awan awam, enjin inferens setempat dan gerbang AI untuk digunakan oleh ejen terbina dalam 1Panel serta ejen luaran seperti WorkBuddy.',
+            gpuType: 'Jenis GPU',
+            vllmVersion: 'Versi vLLM',
+            vllmImage: 'Imej vLLM',
+            servicePort: 'Port perkhidmatan',
             gpuAcceleration: 'Pecutan GPU',
             gpuMode: 'Pemilihan pemecut',
             gpuAll: 'Semua pemecut',
@@ -1082,7 +1105,15 @@ const message = {
             approxWeightSize: 'Kira-kira {0} GB',
             services: 'Perkhidmatan model',
             addInstance: 'Tambah instans',
-            addService: 'Tambah perkhidmatan model',
+            modelScopeEndpointHelper:
+                'Untuk mencari dan memuat turun model ModelScope. Menggunakan URL rasmi secara lalai.',
+            modelTokenHelper: 'Pilihan. Gunakan token dengan kebenaran akses untuk model peribadi atau terhad.',
+            modelDirHelper: 'Direktori muat turun model dan sumber senarai model setempat.',
+            featuredModelsHelper:
+                'Katalog model pilihan rasmi 1Panel. Muat semula secara manual atau aktifkan penyegerakan automatik setiap 24 jam. Hanya katalog dikemas kini, tanpa memuat turun fail model.',
+            addInstanceHelper:
+                'Cipta instans vLLM untuk menyediakan model yang dimuat turun sebagai perkhidmatan model.',
+            addService: 'Tambah',
             onlineModel: 'Model dalam talian',
             instanceDeployment: 'Pengerahan mengikut instans',
             engines: 'Enjin inferens setempat',
@@ -1104,11 +1135,11 @@ const message = {
             recipeArguments: 'Argumen pelancaran',
             recipeImportCommand: 'Import arahan',
             recipeImportPlaceholder:
-                'Tampal arahan pelancaran dalam format pip/uv atau Docker di sini. 1Panel akan menghuraikan dan mengisi Recipe secara automatik.',
+                'Tampal arahan pelancaran dalam format pip/uv atau docker di sini. 1Panel akan menghuraikan dan mengisi borang secara automatik.',
             recipeVariablesNotSupported:
                 'Rujukan pemboleh ubah tidak disokong dalam arahan. Masukkan nilai khusus; tetapkan pemboleh ubah persekitaran dalam medan yang berkenaan.',
             recipeImportError:
-                'Tidak dapat menukar. Sertakan arahan pelancaran Docker atau vllm serve dengan model; tampal arahan pemasangan pip/uv bersama arahan pelancaran.',
+                'Tiada arahan pelancaran yang sah dikesan. Tampal arahan pip/uv atau docker yang mengandungi model.',
             engineProvider: 'Enjin / Pembekal',
             endpoint: 'Titik akhir',
             cloudAccount: 'Akaun awan',
@@ -1119,7 +1150,8 @@ const message = {
             model: 'Model',
             localModel: 'Model Tempatan',
             create_helper: 'Tarik "{0}"',
-            ollama_doc: 'Anda boleh melawat laman web rasmi Ollama untuk mencari dan menemui lebih banyak model.',
+            ollama_doc:
+                'Cari model di {link}. Model akan dimuat turun secara automatik selepas ditambah. Pastikan perkhidmatan Ollama berjalan dan ruang cakera mencukupi.',
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
@@ -1139,7 +1171,7 @@ const message = {
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',
             customAddress: 'Alamat tersuai',
-            downloader: 'Pengurusan muat turun',
+            downloader: 'Muat turun model',
             modelDirectoryHelper:
                 'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
             modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
@@ -1150,8 +1182,7 @@ const message = {
             endpointLabel: 'Endpoint {0}',
             acceleratedEndpointLabel: 'Titik akhir pecutan {0}',
             tokenLabel: 'Token {0}',
-            hfEndpointHelper:
-                'Konfigurasikan titik akhir pecutan apabila akses HuggingFace tidak stabil. Carian, butiran dan muat turun akan menggunakannya.',
+            hfEndpointHelper: 'URL cermin pilihan untuk carian, butiran dan muat turun model HuggingFace.',
             sortDefault: 'Isihan lalai',
             sortMostParameters: 'Parameter terbanyak',
             sortLeastParameters: 'Parameter paling sedikit',
@@ -5120,7 +5151,6 @@ const message = {
         customScriptHelper:
             'Sila masukkan arahan permulaan penuh, contoh: npm run start. Untuk arahan permulaan PM2, sila gantikan dengan pm2-runtime, jika tidak ia akan gagal bermula.',
         portError: 'Jangan ulangi port yang sama.',
-        systemRestartHelper: 'Huraian status: Gangguan - status gagal diperoleh kerana sistem dimulakan semula',
         javaScriptHelper: 'Sediakan arahan permulaan penuh. Contohnya, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'Direktori mesti mengandungi fail jar, subdirektori juga diterima',
         goHelper: 'Sediakan arahan permulaan penuh. Contohnya, "go run main.go" atau "./main".',

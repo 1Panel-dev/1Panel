@@ -10,7 +10,22 @@
             @click="modelValue = source"
         >
             <svg-icon :iconName="source === 'modelscope' ? 'p-modelscope' : 'p-huggingface1'" class="source-icon" />
-            <span class="source-name">{{ source === 'modelscope' ? 'ModelScope' : 'HuggingFace' }}</span>
+            <span class="source-content">
+                <span class="source-heading">
+                    <span class="source-name">{{ source === 'modelscope' ? 'ModelScope' : 'Hugging Face' }}</span>
+                    <el-tag v-if="showDescription && source === 'modelscope'" size="small" effect="plain">
+                        {{ $t('home.recommend') }}
+                    </el-tag>
+                </span>
+                <span v-if="showDescription" class="source-description">
+                    {{
+                        $t(
+                            'aiTools.model.' +
+                                (source === 'modelscope' ? 'modelScopeSearchHelper' : 'huggingFaceSearchHelper'),
+                        )
+                    }}
+                </span>
+            </span>
         </el-button>
     </div>
 </template>
@@ -18,7 +33,7 @@
 <script setup lang="ts">
 import type { ModelDownloader } from '@/api/interface/model-downloader';
 
-defineProps<{ sources: ModelDownloader.Source[]; disabled?: boolean }>();
+defineProps<{ sources: ModelDownloader.Source[]; disabled?: boolean; showDescription?: boolean }>();
 const modelValue = defineModel<ModelDownloader.Source>({ required: true });
 </script>
 
@@ -67,5 +82,24 @@ const modelValue = defineModel<ModelDownloader.Source>({ required: true });
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+.source-content {
+    min-width: 0;
+}
+
+.source-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.source-description {
+    display: block;
+    margin-top: 6px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 1.5;
 }
 </style>

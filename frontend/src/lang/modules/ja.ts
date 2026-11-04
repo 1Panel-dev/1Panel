@@ -1029,6 +1029,30 @@ const message = {
             validateImageAvailabilityHelper: '保存前に最小画像を1枚生成するため、料金が発生する場合があります',
         },
         model: {
+            searchTitle: 'モデルを検索してダウンロード',
+            searchHelper:
+                'ModelScope または Hugging Face でモデルを検索し、ダウンロード後にモデル準備でデプロイまたは Recipe を作成できます。',
+            modelScopeSearchHelper: '中国本土から安定したアクセス',
+            huggingFaceSearchHelper: '豊富なモデル',
+            searchPlaceholder: 'モデル名またはリポジトリ ID を入力（例：Qwen/Qwen3-8B）',
+            popularSearches: '人気の検索',
+            searchSort: '並び順',
+            onlyTokenizer: 'トークナイザーのみ',
+            downloadStatus: 'ダウンロード状態',
+            downloaded: 'ダウンロード済み',
+            alreadyExists: '既存',
+            downloadCompleted: 'ダウンロード完了',
+            localFilesMissing: 'ローカルファイルが見つかりません',
+            ollamaNameHelper:
+                'Ollama ライブラリの完全なモデル名を入力してください。タグを省略すると latest が使用されます。',
+            downloadHelper:
+                '「検索」をクリックすると、ModelScope や Hugging Face のモデルを検索してダウンロードできます。',
+            serviceHelper:
+                'パブリッククラウド、ローカル推論エンジン、AI ゲートウェイなどのモデルサービスを統合し、1Panel 内蔵エージェントや WorkBuddy などの外部エージェントから利用できます。',
+            gpuType: 'GPU タイプ',
+            vllmVersion: 'vLLM バージョン',
+            vllmImage: 'vLLM イメージ',
+            servicePort: 'サービスポート',
             gpuAcceleration: 'GPU アクセラレーション',
             gpuMode: 'アクセラレーターの選択',
             gpuAll: 'すべてのアクセラレーター',
@@ -1059,7 +1083,13 @@ const message = {
             approxWeightSize: '約 {0} GB',
             services: 'モデルサービス',
             addInstance: 'インスタンスを追加',
-            addService: 'モデルサービスを追加',
+            modelScopeEndpointHelper: 'ModelScope モデルの検索とダウンロードに使用します。既定は公式 URL です。',
+            modelTokenHelper: '任意。非公開・制限付きモデルにはアクセス権のあるトークンが必要です。',
+            modelDirHelper: 'モデルの保存先とローカルモデル一覧の読み込み先です。',
+            featuredModelsHelper:
+                '1Panel 公式のおすすめモデル一覧です。手動更新または 24 時間ごとの自動同期が可能です。同期は一覧のみを更新し、モデルファイルはダウンロードしません。',
+            addInstanceHelper: 'vLLM インスタンスを作成し、ダウンロード済みモデルをモデルサービスとして公開します。',
+            addService: '追加',
             onlineModel: 'オンラインモデル',
             instanceDeployment: 'インスタンス単位でデプロイ',
             engines: 'ローカル推論エンジン',
@@ -1081,11 +1111,11 @@ const message = {
             recipeArguments: '起動引数',
             recipeImportCommand: 'コマンドをインポート',
             recipeImportPlaceholder:
-                'ここに pip/uv または Docker 形式の起動コマンドを貼り付けると、1Panel が自動的に解析し、Recipe に入力します。',
+                'ここに pip/uv または docker 形式の起動コマンドを貼り付けると、1Panel が自動的に解析し、フォームに入力します。',
             recipeVariablesNotSupported:
                 'コマンド内の変数参照はサポートされていません。具体的な値を入力し、環境変数は環境変数欄で設定してください。',
             recipeImportError:
-                '変換できません。モデルを含む Docker または vllm serve の起動コマンドを入力してください。pip/uv のインストールコマンドは起動コマンドと一緒に貼り付けてください。',
+                '有効な起動コマンドが見つかりません。モデルを含む pip/uv または docker コマンドを貼り付けてください。',
             engineProvider: 'エンジン / プロバイダー',
             endpoint: 'エンドポイント',
             cloudAccount: 'クラウドアカウント',
@@ -1096,7 +1126,8 @@ const message = {
             model: 'モデル',
             localModel: 'ローカルモデル',
             create_helper: 'を取得 "{0}"',
-            ollama_doc: 'Ollama の公式ウェブサイトを訪れて、さらに多くのモデルを検索して見つけることができます。',
+            ollama_doc:
+                '{link} でモデルを検索できます。追加後、モデルは自動的に取得されます。Ollama が正常に動作し、十分なディスク容量があることを確認してください。',
             container_conn_helper: 'コンテナ間のアクセスまたは接続にこのアドレスを使用',
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
@@ -1117,7 +1148,7 @@ const message = {
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
             containerAddress: 'コンテナアドレス',
             customAddress: 'カスタムアドレス',
-            downloader: 'ダウンロード管理',
+            downloader: 'モデルのダウンロード',
             modelDirectoryHelper:
                 'モデル一覧には、デフォルトで「モデル準備 > 設定」で指定したモデルディレクトリにダウンロード済みのモデルが表示されます。',
             modelDirectoryPlaceholder: 'モデルを検索するかフルパスを入力',
@@ -1128,8 +1159,7 @@ const message = {
             endpointLabel: '{0} エンドポイント',
             acceleratedEndpointLabel: '{0} アクセラレーションエンドポイント',
             tokenLabel: '{0} Token',
-            hfEndpointHelper:
-                'HuggingFace へのアクセスが不安定な場合はアクセラレーションエンドポイントを設定してください。検索、詳細、ダウンロードで使用されます。',
+            hfEndpointHelper: '任意。HuggingFace モデルの検索・詳細取得・ダウンロード用のミラー URL です。',
             sortDefault: '標準の並び順',
             sortMostParameters: 'パラメータ数が多い順',
             sortLeastParameters: 'パラメータ数が少ない順',
@@ -5027,7 +5057,6 @@ const message = {
         customScriptHelper:
             '完全な起動コマンドを入力してください。例：npm run start。PM2の起動コマンドはpm2-runtimeに置き換えてください。そうしないと起動に失敗します。',
         portError: '同じポートを繰り返さないでください。',
-        systemRestartHelper: 'ステータスの説明:中断 - システムの再起動によりステータスの取得が失敗しました',
         javaScriptHelper: '完全な起動コマンドを提供します。たとえば、「Java -Jar Halo.Jar -XMX1024M -XMS256M」。',
         javaDirHelper: 'ディレクトリにはjarファイルが含まれている必要があり、サブディレクトリも受け入れられます',
         goHelper: '完全な起動コマンドを提供します。たとえば、「Go Run Main.go」または「./Main」。',
