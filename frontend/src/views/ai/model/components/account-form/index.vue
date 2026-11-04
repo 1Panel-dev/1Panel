@@ -55,7 +55,7 @@
                             </el-tag>
                             <el-popover v-if="item.models.length > 1" trigger="click" placement="bottom" :width="320">
                                 <template #reference>
-                                    <el-button link type="primary" class="local-engine-option__more" @click.stop>
+                                    <el-button size="small" class="local-engine-option__more" @click.stop>
                                         +{{ item.models.length - 1 }}
                                     </el-button>
                                 </template>

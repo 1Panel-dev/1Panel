@@ -121,7 +121,9 @@
                                         "
                                         placement="top"
                                     >
-                                        <el-tag size="small" class="model-more">+{{ row.models.length - 2 }}</el-tag>
+                                        <el-button size="small" class="model-more">
+                                            +{{ row.models.length - 2 }}
+                                        </el-button>
                                     </el-tooltip>
                                 </div>
                                 <span v-if="!row.models?.length">—</span>
