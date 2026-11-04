@@ -815,3 +815,5 @@ ContainerImageCheckSummary: "Проверка завершена: провере
 ContainerImageCheckFailures: "Не удалось проверить контейнеры: {{ .count }}. Подробности в журнале задачи"
 
 ErrImageCheckProxyRequired: "Для проверки обновлений образов в текущей среде сначала настройте прокси-сервер."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

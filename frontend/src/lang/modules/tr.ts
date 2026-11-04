@@ -7673,6 +7673,13 @@ const message = {
             imageBatchConfirmPrefix: '{0} imaj {1} düğüme aktarılacak, toplam {2} görev oluşturulacak.',
 
             ssl: 'Sertifika Senkronizasyonu',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc:
                 'Kaynak düğüm seçildikten sonra belirtilen sertifikalar mevcut panel ortamına senkronize edilebilir.',
             sslBatchConfirmPrefix: '{0} sertifika {1} düğüme senkronize edilecek, toplam {2} görev oluşturulacak.',

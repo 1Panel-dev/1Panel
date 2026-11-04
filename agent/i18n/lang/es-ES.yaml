@@ -815,3 +815,5 @@ ContainerImageCheckSummary: "Comprobación finalizada: comprobados {{ .checked }
 ContainerImageCheckFailures: "Falló la comprobación de {{ .count }} contenedores; consulte el registro de la tarea"
 
 ErrImageCheckProxyRequired: "Para comprobar actualizaciones de imágenes en el entorno actual, configura primero un servidor proxy."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

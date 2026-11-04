@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "Pemasangan gagal dan pemulihan tidak lengkap. Sahkan 
 MCPInstallLocalImage: "Imej sudah tersedia secara setempat; langkau muat turun"
 MCPInstallVerifyImage: "Sahkan versi imej dan kontrak perkhidmatan terurus"
 MCPInstallVerifiedImage: "Pengesahan imej berjaya"
+
+PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
+PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
+PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
 MCPInstallCleanup: "Bersihkan bekas terdahulu"
 MCPInstallOldContainerRemoved: "Bekas terdahulu dipadam"
 MCPInstallOldImageRemoved: "Imej terdahulu dipadam"

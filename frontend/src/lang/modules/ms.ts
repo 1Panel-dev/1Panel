@@ -7660,6 +7660,13 @@ const message = {
             imageBatchConfirmPrefix: 'Akan memindahkan {0} imej ke {1} nod, dengan jumlah {2} tugasan.',
 
             ssl: 'Penyegerakan Sijil',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc:
                 'Selepas memilih nod sumber, sijil yang ditentukan boleh disegerakkan ke persekitaran panel semasa.',
             sslBatchConfirmPrefix: 'Akan menyegerakkan {0} sijil ke {1} nod, dengan jumlah {2} tugasan.',

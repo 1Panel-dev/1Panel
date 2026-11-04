@@ -7676,6 +7676,13 @@ const message = {
             imageBatchConfirmPrefix: 'Будет передано {0} образов на {1} узлов, всего {2} задач.',
 
             ssl: 'Синхронизация сертификатов',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc:
                 'После выбора исходного узла указанные сертификаты можно синхронизировать с текущей средой панели.',
             sslBatchConfirmPrefix: 'Будет синхронизировано {0} сертификатов на {1} узлов, всего {2} задач.',

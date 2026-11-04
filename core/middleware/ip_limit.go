@@ -98,7 +98,7 @@ func isLocalSyncRequest(reqPath, clientIP, token string) bool {
 	}
 
 	switch reqPath {
-	case "/api/v2/core/xpack/sync/ssl":
+	case "/api/v2/core/xpack/sync/ssl", "/api/v2/core/xpack/sync/php/extensions":
 		return token != ""
 	case "/api/v2/core/settings/ssl/reload":
 		return token != ""

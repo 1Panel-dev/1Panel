@@ -7390,6 +7390,13 @@ const message = {
             imageBatchConfirmPrefix: '{0}개의 이미지를 {1}개 노드로 전달합니다. 총 {2}개의 작업이 생성됩니다.',
 
             ssl: '인증서 동기화',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc: '원본 노드를 선택한 후 지정된 인증서를 현재 패널 환경으로 동기화할 수 있습니다.',
             sslBatchConfirmPrefix: '{0}개의 인증서를 {1}개 노드로 동기화합니다. 총 {2}개의 작업이 생성됩니다.',
 

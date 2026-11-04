@@ -815,3 +815,5 @@ ContainerImageCheckSummary: "Denetim tamamlandı: denetlenen {{ .checked }}, gü
 ContainerImageCheckFailures: "{{ .count }} konteyner denetlenemedi; görev günlüğünü inceleyin"
 
 ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemelerini kontrol etmek için önce bir proxy sunucusu yapılandırın."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

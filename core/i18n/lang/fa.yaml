@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "نصب ناموفق و بازیابی سرویس نا
 MCPInstallLocalImage: "تصویر به‌صورت محلی موجود است؛ دریافت انجام نمی‌شود"
 MCPInstallVerifyImage: "اعتبارسنجی نسخه تصویر و قرارداد سرویس مدیریت‌شده"
 MCPInstallVerifiedImage: "اعتبارسنجی تصویر موفق بود"
+
+PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
+PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
+PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
 MCPInstallCleanup: "پاک‌سازی کانتینر قبلی"
 MCPInstallOldContainerRemoved: "کانتینر قبلی حذف شد"
 MCPInstallOldImageRemoved: "ایمیج قبلی حذف شد"

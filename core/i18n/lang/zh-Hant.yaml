@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "安裝失敗且原服務還原不完整，請核對�
 MCPInstallLocalImage: "本機映像已存在，略過下載"
 MCPInstallVerifyImage: "驗證映像版本及受管契約"
 MCPInstallVerifiedImage: "映像驗證通過"
+
+PHPExtensionsNoTargets: "排除來源節點後，沒有可同步的目標節點"
+PHPExtensionsSyncTask: "同步 PHP 擴充模版 [{{ .name }}]"
+PHPExtensionsSyncSkipped: "節點 [{{ .node }}] 已存在相同模版，略過"
 MCPInstallCleanup: "正在清理舊容器"
 MCPInstallOldContainerRemoved: "舊容器已刪除"
 MCPInstallOldImageRemoved: "舊映像已刪除"

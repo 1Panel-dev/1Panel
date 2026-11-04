@@ -815,3 +815,5 @@ ContainerImageCheckSummary: "확인 종료: 성공 {{ .checked }}, 업데이트 
 ContainerImageCheckFailures: "컨테이너 {{ .count }}개 확인에 실패했습니다. 작업 로그를 확인하세요"
 
 ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트를 확인하려면 먼저 프록시 서버를 설정하세요."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

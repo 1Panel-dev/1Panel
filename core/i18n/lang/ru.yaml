@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "Установка не удалась, служба 
 MCPInstallLocalImage: "Образ уже есть локально; пропустить загрузку"
 MCPInstallVerifyImage: "Проверить версию образа и контракт управляемой службы"
 MCPInstallVerifiedImage: "Образ успешно проверен"
+
+PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
+PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
+PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
 MCPInstallCleanup: "Очистка предыдущего контейнера"
 MCPInstallOldContainerRemoved: "Предыдущий контейнер удалён"
 MCPInstallOldImageRemoved: "Предыдущий образ удалён"

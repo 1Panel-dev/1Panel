@@ -7508,6 +7508,13 @@ const message = {
             imageBatchConfirmPrefix: 'در حال انتقال {0} تصویر به {1} گره، مجموعاً {2} وظیفه.',
 
             ssl: 'همگام‌سازی گواهی',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc: 'پس از انتخاب یک گره منبع، گواهی مشخص شده را به محیط پنل فعلی همگام‌سازی کنید.',
             sslBatchConfirmPrefix: 'در حال همگام‌سازی {0} گواهی به {1} گره، مجموعاً {2} وظیفه.',
 

@@ -7302,6 +7302,13 @@ const message = {
             imageBatchConfirmPrefix: 'ກຳລັງຈະໂອນ {0} images ໄປຫາ {1} ໂນດ, ລວມທັງໝົດ {2} ງານ.',
 
             ssl: 'ຊິງໂຄຣໄນໃບຢັ້ງຢືນ',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc: 'ເລືອກໂນດຕົ້ນທາງ ແລະ ຊິງໂຄຣໄນໃບຢັ້ງຢືນທີ່ກຳນົດເຂົ້າມາໃນພາແນລປັດຈຸບັນ.',
             sslBatchConfirmPrefix: 'ກຳລັງຈະຊິງໂຄຣໄນ {0} ໃບຢັ້ງຢືນ ໄປຫາ {1} ໂນດ, ລວມທັງໝົດ {2} ງານ.',
 

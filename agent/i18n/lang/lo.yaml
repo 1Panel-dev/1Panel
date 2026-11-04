@@ -806,3 +806,5 @@ ContainerImageCheckSummary: "ກວດສອບສິ້ນສຸດ: ກວດ�
 ContainerImageCheckFailures: "ກວດສອບ {{ .count }} ຄອນເທນເນີລົ້ມເຫຼວ; ກະລຸນາເບິ່ງບັນທຶກວຽກ"
 
 ErrImageCheckProxyRequired: "ເພື່ອກວດສອບການອັບເດດອິມເມຈໃນສະພາບແວດລ້ອມປັດຈຸບັນ ກະລຸນາຕັ້ງຄ່າພຣັອກຊີເຊີບເວີກ່ອນ."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

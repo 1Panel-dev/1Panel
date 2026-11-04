@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "インストールに失敗し、サービスの復�
 MCPInstallLocalImage: "ローカルにイメージが存在するため、ダウンロードをスキップ"
 MCPInstallVerifyImage: "イメージのバージョンと管理対象サービスの契約を検証"
 MCPInstallVerifiedImage: "イメージの検証に成功しました"
+
+PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
+PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
+PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
 MCPInstallCleanup: "以前のコンテナーをクリーンアップ"
 MCPInstallOldContainerRemoved: "以前のコンテナーを削除しました"
 MCPInstallOldImageRemoved: "以前のイメージを削除しました"

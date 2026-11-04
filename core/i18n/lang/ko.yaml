@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "설치에 실패했고 서비스 복원이 불완전�
 MCPInstallLocalImage: "로컬 이미지가 있어 다운로드를 건너뜁니다"
 MCPInstallVerifyImage: "이미지 버전 및 관리형 서비스 계약 검증"
 MCPInstallVerifiedImage: "이미지 검증 통과"
+
+PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
+PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
+PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
 MCPInstallCleanup: "이전 컨테이너 정리"
 MCPInstallOldContainerRemoved: "이전 컨테이너가 삭제되었습니다"
 MCPInstallOldImageRemoved: "이전 이미지가 삭제되었습니다"

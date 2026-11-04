@@ -816,3 +816,5 @@ ContainerImageCheckSummary: "بررسی پایان یافت: بررسی‌شده
 ContainerImageCheckFailures: "بررسی {{ .count }} کانتینر ناموفق بود؛ گزارش وظیفه را مشاهده کنید"
 
 ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصاویر در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

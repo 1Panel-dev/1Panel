@@ -4,7 +4,8 @@ import "github.com/1Panel-dev/1Panel/agent/app/dto"
 
 type PHPExtensionsSearch struct {
 	dto.PageInfo
-	All bool `json:"all"`
+	All  bool   `json:"all"`
+	Name string `json:"name"`
 }
 
 type PHPExtensionsCreate struct {

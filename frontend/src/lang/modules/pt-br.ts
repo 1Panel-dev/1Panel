@@ -7697,6 +7697,13 @@ const message = {
             imageBatchConfirmPrefix: 'Serão encaminhadas {0} imagens para {1} nós, totalizando {2} tarefas.',
 
             ssl: 'Sincronização de Certificados',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc:
                 'Após selecionar o nó de origem, os certificados especificados podem ser sincronizados com o ambiente atual do painel.',
             sslBatchConfirmPrefix: 'Serão sincronizados {0} certificados para {1} nós, totalizando {2} tarefas.',

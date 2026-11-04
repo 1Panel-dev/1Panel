@@ -72,3 +72,7 @@ func (m *multiNodeHelper) PushSSLToNode(websiteSSL *model.WebsiteSSL) error {
 func (m *multiNodeHelper) GetAgentInfo() (*dto.AgentInfo, error) {
 	return nil, nil
 }
+
+func (m *multiNodeHelper) PushPHPExtensionsToNode(req dto.PHPExtensionsPush) error {
+	return buserr.New("ErrXpackNotFound")
+}
