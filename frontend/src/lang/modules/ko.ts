@@ -1660,6 +1660,8 @@ const message = {
             timeToFirstToken: '평균 첫 토큰 지연',
             timePerOutputToken: '평균 토큰 간 지연',
             requestLatency: '평균 요청 지연',
+            noMetrics:
+                '메트릭 엔드포인트에 접근할 수 있지만 아직 지원되는 vLLM 메트릭이 없습니다. 일부 메트릭은 첫 추론 요청 후에만 생성될 수 있습니다.',
             unavailable: '지표를 수집할 수 없습니다. 인스턴스 실행 상태와 /metrics 접근 가능 여부를 확인하세요.',
             loadFailed: '모니터링 데이터를 불러오지 못했습니다. 다시 시도하세요.',
             helper: '수집 활성화, 간격 및 보존 기간은 모니터링 설정에서 조정합니다.',

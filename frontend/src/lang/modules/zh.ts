@@ -1609,6 +1609,7 @@ const message = {
             timeToFirstToken: '平均首 Token 延迟',
             timePerOutputToken: '平均 Token 间延迟',
             requestLatency: '平均请求延迟',
+            noMetrics: '指标接口可访问，但暂无可用的 vLLM 指标；部分指标可能在首次推理请求后才会产生。',
             unavailable: '无法采集指标，请确认实例已启动且 /metrics 可访问。',
             loadFailed: '监控数据加载失败，请重试。',
             helper: '采集开关、频率和保存天数在监控设置的 vLLM 监控中独立调整。',

@@ -1698,6 +1698,8 @@ const message = {
             timeToFirstToken: 'Ortalama ilk token gecikmesi',
             timePerOutputToken: 'Ortalama token arası gecikme',
             requestLatency: 'Ortalama istek gecikmesi',
+            noMetrics:
+                'Metrik uç noktasına erişilebiliyor, ancak henüz desteklenen vLLM metrikleri yok. Bazı metrikler yalnızca ilk çıkarım isteğinden sonra görünebilir.',
             unavailable:
                 'Metrikler kullanılamıyor. Örneğin çalıştığını ve /metrics yolunun erişilebilir olduğunu kontrol edin.',
             loadFailed: 'İzleme verileri yüklenemedi. Tekrar deneyin.',
