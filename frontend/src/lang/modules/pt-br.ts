@@ -1047,6 +1047,29 @@ const message = {
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
         model: {
+            searchTitle: 'Pesquisar e baixar modelos',
+            searchHelper:
+                'Encontre modelos no ModelScope ou Hugging Face e depois implante-os ou crie uma Recipe em Preparação de modelos.',
+            modelScopeSearchHelper: 'Acesso estável na China continental',
+            huggingFaceSearchHelper: 'Ampla coleção de modelos',
+            searchPlaceholder: 'Digite o nome ou ID do repositório, ex.: Qwen/Qwen3-8B',
+            popularSearches: 'Buscas populares',
+            searchSort: 'Ordenar por',
+            onlyTokenizer: 'Somente tokenizador',
+            downloadStatus: 'Status do download',
+            downloaded: 'Baixado',
+            alreadyExists: 'Já existe',
+            downloadCompleted: 'Download concluído',
+            localFilesMissing: 'Arquivos locais não encontrados',
+            ollamaNameHelper:
+                'Insira o nome completo do modelo da biblioteca do Ollama. Se nenhuma tag for especificada, será usada latest.',
+            downloadHelper: 'Clique em “Pesquisar” para encontrar e baixar modelos do ModelScope e do Hugging Face.',
+            serviceHelper:
+                'Conecte serviços de modelos de nuvens públicas, mecanismos de inferência locais e gateways de IA para uso pelos agentes integrados do 1Panel e agentes externos, como o WorkBuddy.',
+            gpuType: 'Tipo de GPU',
+            vllmVersion: 'Versão do vLLM',
+            vllmImage: 'Imagem do vLLM',
+            servicePort: 'Porta do serviço',
             gpuAcceleration: 'Aceleração de GPU',
             gpuMode: 'Seleção de aceleradores',
             gpuAll: 'Todos os aceleradores',
@@ -1078,7 +1101,13 @@ const message = {
             approxWeightSize: 'Aprox. {0} GB',
             services: 'Serviços de modelos',
             addInstance: 'Adicionar instância',
-            addService: 'Adicionar serviço de modelo',
+            modelScopeEndpointHelper: 'Para buscar e baixar modelos do ModelScope. Usa a URL oficial por padrão.',
+            modelTokenHelper: 'Opcional. Use um token com permissão para acessar modelos privados ou restritos.',
+            modelDirHelper: 'Diretório de download e listagem dos modelos locais.',
+            featuredModelsHelper:
+                'Catálogo oficial de modelos em destaque do 1Panel. Atualize manualmente ou ative a sincronização automática a cada 24 horas. Apenas o catálogo é atualizado, sem baixar modelos.',
+            addInstanceHelper: 'Crie uma instância do vLLM para servir os modelos baixados.',
+            addService: 'Adicionar',
             onlineModel: 'Modelos online',
             instanceDeployment: 'Implantação por instância',
             engines: 'Mecanismos de inferência locais',
@@ -1100,11 +1129,11 @@ const message = {
             recipeArguments: 'Argumentos de inicialização',
             recipeImportCommand: 'Importar comando',
             recipeImportPlaceholder:
-                'Cole um comando de inicialização no formato pip/uv ou Docker aqui. O 1Panel irá analisar e preencher a Recipe automaticamente.',
+                'Cole um comando de inicialização no formato pip/uv ou docker aqui. O 1Panel irá analisar e preencher o formulário automaticamente.',
             recipeVariablesNotSupported:
                 'Referências a variáveis não são aceitas nos comandos. Use valores explícitos; configure as variáveis de ambiente no campo correspondente.',
             recipeImportError:
-                'Não foi possível converter. Inclua um comando de inicialização Docker ou vllm serve com um modelo; cole os comandos de instalação pip/uv junto com o comando de inicialização.',
+                'Nenhum comando de inicialização válido foi detectado. Cole um comando pip/uv ou docker que inclua um modelo.',
             engineProvider: 'Mecanismo / Provedor',
             endpoint: 'Endpoint',
             cloudAccount: 'Conta na nuvem',
@@ -1115,7 +1144,8 @@ const message = {
             model: 'Modelo',
             localModel: 'Modelos locais',
             create_helper: 'Puxar "{0}"',
-            ollama_doc: 'Você pode visitar o site oficial da Ollama para pesquisar e encontrar mais modelos.',
+            ollama_doc:
+                'Busque modelos em {link}. O modelo será baixado automaticamente após ser adicionado. Verifique se o Ollama está em execução e se há espaço suficiente em disco.',
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
@@ -1135,7 +1165,7 @@ const message = {
                 'Use o endereço do contêiner para agentes; 127.0.0.1, IP do sistema ou endereço personalizado para AI Gateway ou serviços externos.',
             containerAddress: 'Endereço do contêiner',
             customAddress: 'Endereço personalizado',
-            downloader: 'Gerenciamento de downloads',
+            downloader: 'Download de modelos',
             modelDirectoryHelper:
                 'Por padrão, a lista exibe os modelos baixados no diretório configurado em Preparação de modelos > Configurações.',
             modelDirectoryPlaceholder: 'Buscar modelos ou inserir um caminho completo',
@@ -1146,8 +1176,7 @@ const message = {
             endpointLabel: 'Endpoint do {0}',
             acceleratedEndpointLabel: 'Endpoint de aceleração do {0}',
             tokenLabel: 'Token do {0}',
-            hfEndpointHelper:
-                'Configure um endpoint de aceleração quando o acesso ao HuggingFace estiver instável. A pesquisa, os detalhes e os downloads usarão esse endereço.',
+            hfEndpointHelper: 'URL de espelho opcional para buscas, detalhes e downloads de modelos do HuggingFace.',
             sortDefault: 'Ordenação padrão',
             sortMostParameters: 'Mais parâmetros',
             sortLeastParameters: 'Menos parâmetros',
@@ -5145,8 +5174,6 @@ const message = {
         customScriptHelper:
             'Por favor, insira o comando de inicialização completo, por exemplo: npm run start. Para comandos de inicialização do PM2, substitua por pm2-runtime, caso contrário irá falhar ao iniciar.',
         portError: 'Evite repetir a mesma porta.',
-        systemRestartHelper:
-            'Descrição do status: Interrupção - falha ao adquirir status devido à reinicialização do sistema.',
         javaScriptHelper:
             'Forneça um comando completo de inicialização. Por exemplo, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'O diretório deve conter arquivos jar, subdiretórios também são aceitos.',

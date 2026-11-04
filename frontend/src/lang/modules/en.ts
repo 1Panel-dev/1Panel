@@ -1041,6 +1041,29 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            searchTitle: 'Search and download models',
+            searchHelper:
+                'Find models on ModelScope or Hugging Face, then deploy them or create a Recipe in Model Preparation.',
+            modelScopeSearchHelper: 'Reliable access in mainland China',
+            huggingFaceSearchHelper: 'Extensive model collection',
+            searchPlaceholder: 'Enter a model name or repository ID, e.g. Qwen/Qwen3-8B',
+            popularSearches: 'Popular searches',
+            searchSort: 'Sort by',
+            onlyTokenizer: 'Tokenizer only',
+            downloadStatus: 'Download Status',
+            downloaded: 'Downloaded',
+            alreadyExists: 'Already exists',
+            downloadCompleted: 'Download completed',
+            localFilesMissing: 'Local files not found',
+            ollamaNameHelper:
+                'Enter the full model name from the Ollama library. If no tag is specified, latest is used.',
+            downloadHelper: 'Click “Search” to find and download models from ModelScope and Hugging Face.',
+            serviceHelper:
+                'Connect model services from public clouds, local inference engines, and AI gateways for use by built-in 1Panel agents and external agents such as WorkBuddy.',
+            gpuType: 'GPU Type',
+            vllmVersion: 'vLLM Version',
+            vllmImage: 'vLLM Image',
+            servicePort: 'Service Port',
             gpuAcceleration: 'GPU acceleration',
             gpuMode: 'Accelerator selection',
             gpuAll: 'All accelerators',
@@ -1072,7 +1095,13 @@ const message = {
             approxWeightSize: 'Approx. {0} GB',
             services: 'Model services',
             addInstance: 'Add instance',
-            addService: 'Add model service',
+            modelScopeEndpointHelper: 'Used to search and download ModelScope models. Defaults to the official URL.',
+            modelTokenHelper: 'Optional. Use a token with access permissions for private or restricted models.',
+            modelDirHelper: 'Directory for model downloads and the local model list.',
+            featuredModelsHelper:
+                'Official 1Panel featured model catalog. Refresh manually or enable auto-sync every 24 hours. Sync updates only the catalog, without downloading model files.',
+            addInstanceHelper: 'Create a vLLM instance to serve downloaded models.',
+            addService: 'Add',
             onlineModel: 'Online models',
             instanceDeployment: 'Deploy by instance',
             engines: 'Local inference engines',
@@ -1094,11 +1123,11 @@ const message = {
             recipeArguments: 'Launch arguments',
             recipeImportCommand: 'Import command',
             recipeImportPlaceholder:
-                'Paste a pip/uv or Docker launch command here. 1Panel will automatically parse it and fill in the Recipe.',
+                'Paste a pip/uv or docker launch command here. 1Panel will automatically parse it and fill in the form.',
             recipeVariablesNotSupported:
                 'Variable references are not supported in commands. Use explicit values; configure environment variables in the environment field.',
             recipeImportError:
-                'Unable to convert. Include a Docker or vllm serve launch command with a model; paste pip/uv installation commands together with the launch command.',
+                'No valid launch command detected. Paste a pip/uv or docker command that includes a model.',
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
             cloudAccount: 'Cloud account',
@@ -1109,7 +1138,8 @@ const message = {
             model: 'Models',
             localModel: 'Local Models',
             create_helper: 'Pull "{0}"',
-            ollama_doc: 'You can visit the Ollama official website to search and find more models.',
+            ollama_doc:
+                'Find models at {link}. The model will be pulled automatically after adding it. Make sure Ollama is running and sufficient disk space is available.',
             container_conn_helper: 'Use this address for inter-container access or connection',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
@@ -1129,7 +1159,7 @@ const message = {
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
             containerAddress: 'Container address',
             customAddress: 'Custom address',
-            downloader: 'Downloads',
+            downloader: 'Model Downloads',
             modelDirectoryHelper:
                 'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
             modelDirectoryPlaceholder: 'Search models or enter a full path',
@@ -1140,8 +1170,7 @@ const message = {
             endpointLabel: '{0} endpoint',
             acceleratedEndpointLabel: '{0} acceleration endpoint',
             tokenLabel: '{0} Token',
-            hfEndpointHelper:
-                'Configure an acceleration endpoint when HuggingFace access is unstable. Search, details, and downloads will use it.',
+            hfEndpointHelper: 'Optional mirror URL for HuggingFace model searches, details, and downloads.',
             sortDefault: 'Default sort',
             sortMostParameters: 'Most parameters',
             sortLeastParameters: 'Least parameters',
@@ -5046,7 +5075,6 @@ const message = {
         customScriptHelper:
             'Enter the complete startup command, for example: npm run start. For PM2 startup commands, please replace with pm2-runtime, otherwise it will fail to start.',
         portError: "Don't repeat the same port.",
-        systemRestartHelper: 'Status description: Interruption - status acquisition failed due to system restart',
         javaScriptHelper: 'Provide a full startup command. For example, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'The directory must contain jar files, subdirectories are also acceptable',
         goHelper: 'Provide a full startup command. For example, "go run main.go" or "./main".',

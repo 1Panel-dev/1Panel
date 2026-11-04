@@ -1019,6 +1019,29 @@ const message = {
             validateImageAvailabilityHelper: '저장 전에 최소 이미지 한 장을 생성하며 비용이 발생할 수 있습니다',
         },
         model: {
+            searchTitle: '모델 검색 및 다운로드',
+            searchHelper:
+                'ModelScope 또는 Hugging Face에서 모델을 찾아 다운로드한 후 모델 준비에서 배포하거나 Recipe를 만들 수 있습니다.',
+            modelScopeSearchHelper: '중국 본토에서 안정적인 접속',
+            huggingFaceSearchHelper: '풍부한 모델 컬렉션',
+            searchPlaceholder: '모델 이름 또는 저장소 ID 입력, 예: Qwen/Qwen3-8B',
+            popularSearches: '인기 검색어',
+            searchSort: '정렬',
+            onlyTokenizer: '토크나이저만 다운로드',
+            downloadStatus: '다운로드 상태',
+            downloaded: '다운로드됨',
+            alreadyExists: '이미 존재함',
+            downloadCompleted: '다운로드 완료',
+            localFilesMissing: '로컬 파일을 찾을 수 없습니다',
+            ollamaNameHelper: 'Ollama 라이브러리의 전체 모델 이름을 입력하세요. 태그를 생략하면 latest가 사용됩니다.',
+            downloadHelper:
+                '“검색” 버튼을 클릭하여 ModelScope 및 Hugging Face의 모델을 검색하고 다운로드할 수 있습니다.',
+            serviceHelper:
+                '퍼블릭 클라우드, 로컬 추론 엔진, AI 게이트웨이 등의 모델 서비스를 통합하여 1Panel 내장 에이전트와 WorkBuddy 같은 외부 에이전트에서 사용할 수 있습니다.',
+            gpuType: 'GPU 유형',
+            vllmVersion: 'vLLM 버전',
+            vllmImage: 'vLLM 이미지',
+            servicePort: '서비스 포트',
             gpuAcceleration: 'GPU 가속',
             gpuMode: '가속기 선택',
             gpuAll: '모든 가속기',
@@ -1049,7 +1072,13 @@ const message = {
             approxWeightSize: '약 {0} GB',
             services: '모델 서비스',
             addInstance: '인스턴스 추가',
-            addService: '모델 서비스 추가',
+            modelScopeEndpointHelper: 'ModelScope 모델 검색 및 다운로드에 사용하며, 기본값은 공식 URL입니다.',
+            modelTokenHelper: '선택 사항. 비공개 또는 제한된 모델에는 접근 권한이 있는 토큰이 필요합니다.',
+            modelDirHelper: '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다.',
+            featuredModelsHelper:
+                '1Panel 공식 추천 모델 목록입니다. 수동으로 새로 고치거나 24시간마다 자동 동기화를 설정할 수 있습니다. 목록만 갱신하며 모델 파일은 다운로드하지 않습니다.',
+            addInstanceHelper: 'vLLM 인스턴스를 생성하여 다운로드한 모델을 모델 서비스로 배포합니다.',
+            addService: '추가',
             onlineModel: '온라인 모델',
             instanceDeployment: '인스턴스별 배포',
             engines: '로컬 추론 엔진',
@@ -1071,11 +1100,11 @@ const message = {
             recipeArguments: '시작 인수',
             recipeImportCommand: '명령 가져오기',
             recipeImportPlaceholder:
-                '여기에 pip/uv 또는 Docker 형식의 실행 명령을 붙여넣으면 1Panel이 자동으로 분석하여 Recipe를 채웁니다.',
+                '여기에 pip/uv 또는 docker 형식의 실행 명령을 붙여넣으면 1Panel이 자동으로 분석하여 양식을 채웁니다.',
             recipeVariablesNotSupported:
                 '명령에서 변수 참조는 지원되지 않습니다. 구체적인 값을 입력하고 환경 변수는 환경 변수 필드에서 설정하세요.',
             recipeImportError:
-                '변환할 수 없습니다. 모델이 포함된 Docker 또는 vllm serve 시작 명령을 입력하세요. pip/uv 설치 명령은 시작 명령과 함께 붙여넣으세요.',
+                '유효한 실행 명령을 찾지 못했습니다. 모델이 포함된 pip/uv 또는 docker 명령을 붙여넣으세요.',
             engineProvider: '엔진 / 공급자',
             endpoint: '엔드포인트',
             cloudAccount: '클라우드 계정',
@@ -1086,7 +1115,8 @@ const message = {
             model: '모델',
             localModel: '로컬 모델',
             create_helper: '가져오기 "{0}"',
-            ollama_doc: 'Ollama 공식 웹사이트를 방문하여 더 많은 모델을 검색하고 찾을 수 있습니다.',
+            ollama_doc:
+                '{link}에서 모델을 검색하세요. 추가 후 모델을 자동으로 가져옵니다. Ollama 서비스가 정상적으로 실행 중이고 디스크 공간이 충분한지 확인하세요.',
             container_conn_helper: '컨테이너 간 접근 또는 연결에 이 주소를 사용',
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
@@ -1106,7 +1136,7 @@ const message = {
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
             containerAddress: '컨테이너 주소',
             customAddress: '사용자 지정 주소',
-            downloader: '다운로드 관리',
+            downloader: '모델 다운로드',
             modelDirectoryHelper:
                 '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
             modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
@@ -1117,8 +1147,7 @@ const message = {
             endpointLabel: '{0} 엔드포인트',
             acceleratedEndpointLabel: '{0} 가속 엔드포인트',
             tokenLabel: '{0} Token',
-            hfEndpointHelper:
-                'HuggingFace 접속이 불안정할 때 가속 엔드포인트를 설정하세요. 검색, 상세 정보, 다운로드에 사용됩니다.',
+            hfEndpointHelper: '선택 사항. HuggingFace 모델 검색, 상세 정보 조회 및 다운로드용 미러 URL입니다.',
             sortDefault: '기본 정렬',
             sortMostParameters: '매개변수 많은 순',
             sortLeastParameters: '매개변수 적은 순',
@@ -4937,7 +4966,6 @@ const message = {
         customScriptHelper:
             '전체 시작 명령어를 입력해 주세요. 예: npm run start. PM2 시작 명령어는 pm2-runtime로 변경해 주세요. 그렇지 않으면 시작에 실패합니다.',
         portError: '포트를 중복 사용하지 마세요.',
-        systemRestartHelper: '상태 설명: 중단 - 시스템 재시작으로 인해 상태 가져오기가 실패했습니다.',
         javaScriptHelper: '전체 시작 명령을 제공하세요. 예: "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: '디렉터리는 jar 파일을 포함해야 하며, 하위 디렉터리도 허용됩니다.',
         goHelper: '전체 시작 명령을 제공하세요. 예: "go run main.go" 또는 "./main".',

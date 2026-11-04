@@ -52,6 +52,13 @@
                         :only-icon="true"
                     />
                 </template>
+                <template #prompt>
+                    <el-alert
+                        type="info"
+                        :closable="false"
+                        :title="$t(isLocal ? 'aiTools.model.addInstanceHelper' : 'aiTools.model.serviceHelper')"
+                    />
+                </template>
                 <template #main>
                     <ComplexTable
                         v-if="!isLocal"

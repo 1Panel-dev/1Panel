@@ -54,6 +54,7 @@ type ModelInfo struct {
 }
 
 type ModelDownloadTaskSearch struct {
+	IDs          []uint `json:"ids"`
 	IncludeLocal bool   `json:"includeLocal"`
 	DownloadType string `json:"downloadType" validate:"omitempty,oneof=all tokenizer"`
 	PageInfo

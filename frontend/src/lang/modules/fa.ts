@@ -1025,6 +1025,29 @@ const message = {
             validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
         model: {
+            searchTitle: 'جستجو و دانلود مدل‌ها',
+            searchHelper:
+                'مدل‌ها را در ModelScope یا Hugging Face پیدا کنید، سپس در آماده‌سازی مدل آن‌ها را مستقر کنید یا یک Recipe بسازید.',
+            modelScopeSearchHelper: 'دسترسی پایدار در سرزمین اصلی چین',
+            huggingFaceSearchHelper: 'مجموعه گسترده مدل‌ها',
+            searchPlaceholder: 'نام مدل یا شناسه مخزن را وارد کنید، مانند Qwen/Qwen3-8B',
+            popularSearches: 'جستجوهای محبوب',
+            searchSort: 'مرتب‌سازی',
+            onlyTokenizer: 'فقط توکن‌ساز',
+            downloadStatus: 'وضعیت دانلود',
+            downloaded: 'دانلود شده',
+            alreadyExists: 'از قبل موجود',
+            downloadCompleted: 'دانلود تکمیل شد',
+            localFilesMissing: 'فایل‌های محلی یافت نشد',
+            ollamaNameHelper:
+                'نام کامل مدل را از کتابخانه Ollama وارد کنید. اگر برچسب مشخص نشود، latest استفاده می‌شود.',
+            downloadHelper: 'برای یافتن و دانلود مدل‌ها از ModelScope و Hugging Face روی «جستجو» کلیک کنید.',
+            serviceHelper:
+                'سرویس‌های مدل از ابرهای عمومی، موتورهای استنتاج محلی و درگاه‌های هوش مصنوعی را برای استفاده عامل‌های داخلی 1Panel و عامل‌های خارجی مانند WorkBuddy متصل کنید.',
+            gpuType: 'نوع GPU',
+            vllmVersion: 'نسخه vLLM',
+            vllmImage: 'ایمیج vLLM',
+            servicePort: 'پورت سرویس',
             gpuAcceleration: 'شتاب‌دهی GPU',
             gpuMode: 'انتخاب شتاب‌دهنده',
             gpuAll: 'همه شتاب‌دهنده‌ها',
@@ -1055,7 +1078,13 @@ const message = {
             approxWeightSize: 'حدود {0} گیگابایت',
             services: 'سرویس‌های مدل',
             addInstance: 'افزودن نمونه',
-            addService: 'افزودن سرویس مدل',
+            modelScopeEndpointHelper: 'برای جستجو و دانلود مدل‌های ModelScope؛ پیش‌فرض، نشانی رسمی است.',
+            modelTokenHelper: 'اختیاری. برای مدل‌های خصوصی یا محدود از توکن دارای مجوز دسترسی استفاده کنید.',
+            modelDirHelper: 'پوشهٔ دانلود مدل‌ها و منبع فهرست مدل‌های محلی.',
+            featuredModelsHelper:
+                'فهرست رسمی مدل‌های منتخب 1Panel. به‌صورت دستی به‌روز کنید یا همگام‌سازی خودکار هر ۲۴ ساعت را فعال کنید. فقط فهرست به‌روز می‌شود و فایل مدل‌ها دانلود نمی‌شود.',
+            addInstanceHelper: 'برای ارائهٔ مدل‌های دانلودشده، یک نمونهٔ vLLM ایجاد کنید.',
+            addService: 'افزودن',
             onlineModel: 'مدل‌های آنلاین',
             instanceDeployment: 'استقرار بر اساس نمونه',
             engines: 'موتورهای استنتاج محلی',
@@ -1077,11 +1106,10 @@ const message = {
             recipeArguments: 'آرگومان‌های راه‌اندازی',
             recipeImportCommand: 'وارد کردن فرمان',
             recipeImportPlaceholder:
-                'فرمان اجرا را با قالب pip/uv یا Docker اینجا جای‌گذاری کنید تا 1Panel آن را به‌طور خودکار تحلیل و Recipe را تکمیل کند.',
+                'فرمان اجرا را با قالب pip/uv یا docker اینجا جای‌گذاری کنید تا 1Panel آن را به‌طور خودکار تحلیل و فرم را تکمیل کند.',
             recipeVariablesNotSupported:
                 'ارجاع به متغیرها در دستور پشتیبانی نمی‌شود. مقادیر مشخص وارد کنید؛ متغیرهای محیطی را در بخش مربوط به آن‌ها تنظیم کنید.',
-            recipeImportError:
-                'تبدیل ممکن نیست. فرمان راه‌اندازی Docker یا vllm serve همراه با مدل را وارد کنید؛ فرمان‌های نصب pip/uv را همراه با فرمان راه‌اندازی جای‌گذاری کنید.',
+            recipeImportError: 'فرمان اجرای معتبری شناسایی نشد. یک فرمان pip/uv یا docker شامل مدل را جای‌گذاری کنید.',
             engineProvider: 'موتور / ارائه‌دهنده',
             endpoint: 'نقطه پایانی',
             cloudAccount: 'حساب ابری',
@@ -1092,7 +1120,8 @@ const message = {
             model: 'مدل‌ها',
             localModel: 'مدل‌های محلی',
             create_helper: 'دریافت "{0}"',
-            ollama_doc: 'می‌توانید از وب‌سایت رسمی Ollama دیدن کنید و مدل‌های بیشتری را جستجو کنید.',
+            ollama_doc:
+                'مدل‌ها را در {link} بیابید. مدل پس از افزودن به‌طور خودکار دانلود می‌شود. مطمئن شوید سرویس Ollama در حال اجرا است و فضای دیسک کافی وجود دارد.',
             container_conn_helper: 'از این آدرس برای دسترسی بین کانتینرها یا اتصال استفاده کنید',
             from_remote: 'این مدل از طریق 1Panel دانلود نشده است، لاگ مربوط به دریافت وجود ندارد.',
             no_logs: 'لاگ دریافت این مدل حذف شده است و قابل مشاهده نیست.',
@@ -1112,7 +1141,7 @@ const message = {
                 'آدرس کانتینر برای کانتینرهای عامل است؛ 127.0.0.1، IP سیستم یا آدرس سفارشی برای دروازه AI یا خدمات خارجی است.',
             containerAddress: 'آدرس کانتینر',
             customAddress: 'آدرس سفارشی',
-            downloader: 'مدیریت دانلودها',
+            downloader: 'دانلود مدل',
             modelDirectoryHelper:
                 'فهرست مدل‌ها به‌طور پیش‌فرض مدل‌های دانلودشده در پوشه تنظیم‌شده در «آماده‌سازی مدل > تنظیمات» را نمایش می‌دهد.',
             modelDirectoryPlaceholder: 'جستجوی مدل یا وارد کردن مسیر کامل',
@@ -1123,8 +1152,7 @@ const message = {
             endpointLabel: 'نقطه پایانی {0}',
             acceleratedEndpointLabel: 'نقطه پایانی شتاب‌دهنده {0}',
             tokenLabel: 'توکن {0}',
-            hfEndpointHelper:
-                'هنگامی که دسترسی به HuggingFace ناپایدار است، یک نقطه پایانی شتاب‌دهنده پیکربندی کنید. جستجو، جزئیات و دانلود از آن استفاده خواهند کرد.',
+            hfEndpointHelper: 'نشانی آینهٔ اختیاری برای جستجو، دریافت جزئیات و دانلود مدل‌های HuggingFace.',
             sortDefault: 'مرتب‌سازی پیش‌فرض',
             sortMostParameters: 'بیشترین پارامتر',
             sortLeastParameters: 'کمترین پارامتر',
@@ -5007,7 +5035,6 @@ const message = {
         customScriptHelper:
             'دستور راه‌اندازی کامل را وارد کنید، مثلاً: npm run start. برای دستورات راه‌اندازی PM2، لطفاً با pm2-runtime جایگزین کنید، در غیر این صورت راه‌اندازی ناموفق خواهد بود.',
         portError: 'پورت تکراری نباشد.',
-        systemRestartHelper: 'توضیح وضعیت: وقفه - به دلیل راه‌اندازی مجدد سیستم، وضعیت قابل دریافت نیست',
         javaScriptHelper: 'یک دستور راه‌اندازی کامل ارائه دهید. مثلاً "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'دایرکتوری باید شامل فایل‌های jar باشد، زیردایرکتوری‌ها نیز مجاز هستند',
         goHelper: 'یک دستور راه‌اندازی کامل ارائه دهید. مثلاً "go run main.go" یا "./main".',

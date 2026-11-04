@@ -22,6 +22,7 @@ export interface Deployment {
 }
 
 interface VllmAPI {
+    listVllmCommandTemplates: () => Promise<ResultData<Array<{ model: string }>>>;
     pageVllm: (req: ReqPage & { info: string }) => Promise<ResultData<ResPage<Deployment>>>;
     operateVllm: (
         req: { id: number; operate: string; taskID: string; forceDelete?: boolean } & Partial<AI.ModelAccountSync>,
@@ -51,4 +52,13 @@ export async function readPages<T>(search: (page: ReqPage) => Promise<ResultData
             return items;
         }
     }
+}
+
+export function matchesModelRecipe(recipeModel: string, modelPath: string, repoID = '') {
+    const path = modelPath.replace(/\/+$/, '');
+    const name = path.split('/').pop() || '';
+    const model = recipeModel.trim().replace(/\/+$/, '');
+    return Boolean(
+        model && [repoID || path.split('/').slice(-2).join('/'), path, name, `/models/${name}`].includes(model),
+    );
 }

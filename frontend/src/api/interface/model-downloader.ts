@@ -76,6 +76,7 @@ export namespace ModelDownloader {
     }
 
     export interface TaskSearch extends ReqPage {
+        ids?: number[];
         includeLocal?: boolean;
         downloadType?: DownloadType | '';
         info: string;

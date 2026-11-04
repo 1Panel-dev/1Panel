@@ -1050,6 +1050,29 @@ const message = {
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
+            searchTitle: 'Model ara ve indir',
+            searchHelper:
+                'ModelScope veya Hugging Face üzerinde model bulun, ardından Model Hazırlığı bölümünde dağıtın veya bir Recipe oluşturun.',
+            modelScopeSearchHelper: 'Çin ana karasında kararlı erişim',
+            huggingFaceSearchHelper: 'Geniş model koleksiyonu',
+            searchPlaceholder: 'Model adı veya depo kimliği girin, ör. Qwen/Qwen3-8B',
+            popularSearches: 'Popüler aramalar',
+            searchSort: 'Sırala',
+            onlyTokenizer: 'Yalnızca belirteç ayırıcı',
+            downloadStatus: 'İndirme durumu',
+            downloaded: 'İndirildi',
+            alreadyExists: 'Zaten mevcut',
+            downloadCompleted: 'İndirme tamamlandı',
+            localFilesMissing: 'Yerel dosyalar bulunamadı',
+            ollamaNameHelper: 'Ollama kütüphanesindeki tam model adını girin. Etiket belirtilmezse latest kullanılır.',
+            downloadHelper:
+                'ModelScope ve Hugging Face üzerindeki modelleri bulup indirmek için “Ara” düğmesine tıklayın.',
+            serviceHelper:
+                'Genel bulutlardan, yerel çıkarım motorlarından ve AI ağ geçitlerinden model hizmetlerini bağlayarak yerleşik 1Panel ajanları ve WorkBuddy gibi harici ajanlar için kullanıma sunun.',
+            gpuType: 'GPU türü',
+            vllmVersion: 'vLLM sürümü',
+            vllmImage: 'vLLM imajı',
+            servicePort: 'Hizmet portu',
             gpuAcceleration: 'GPU hızlandırma',
             gpuMode: 'Hızlandırıcı seçimi',
             gpuAll: 'Tüm hızlandırıcılar',
@@ -1080,7 +1103,14 @@ const message = {
             approxWeightSize: 'Yaklaşık {0} GB',
             services: 'Model hizmetleri',
             addInstance: 'Örnek ekle',
-            addService: 'Model hizmeti ekle',
+            modelScopeEndpointHelper:
+                'ModelScope modellerini aramak ve indirmek için kullanılır. Varsayılan, resmî URL adresidir.',
+            modelTokenHelper: 'İsteğe bağlı. Özel veya kısıtlı modeller için erişim yetkili bir token kullanın.',
+            modelDirHelper: 'Modellerin indirildiği ve yerel model listesinin okunduğu dizin.',
+            featuredModelsHelper:
+                '1Panel resmî öne çıkan model kataloğu. Elle yenileyin veya 24 saatte bir otomatik eşitlemeyi etkinleştirin. Yalnızca katalog güncellenir; model dosyaları indirilmez.',
+            addInstanceHelper: 'İndirilen modelleri sunmak için bir vLLM örneği oluşturun.',
+            addService: 'Ekle',
             onlineModel: 'Çevrimiçi modeller',
             instanceDeployment: 'Örnek bazında dağıtım',
             engines: 'Yerel çıkarım motorları',
@@ -1102,11 +1132,11 @@ const message = {
             recipeArguments: 'Başlatma parametreleri',
             recipeImportCommand: 'Komut içe aktar',
             recipeImportPlaceholder:
-                'pip/uv veya Docker biçimindeki başlatma komutunu buraya yapıştırın. 1Panel komutu otomatik olarak ayrıştırıp Recipe alanlarını doldurur.',
+                'pip/uv veya docker biçimindeki başlatma komutunu buraya yapıştırın. 1Panel komutu otomatik olarak ayrıştırıp form alanlarını doldurur.',
             recipeVariablesNotSupported:
                 'Komutlarda değişken başvuruları desteklenmez. Açık değerler girin; ortam değişkenlerini ilgili alanda yapılandırın.',
             recipeImportError:
-                'Dönüştürülemedi. Model içeren bir Docker veya vllm serve başlatma komutu ekleyin; pip/uv kurulum komutlarını başlatma komutuyla birlikte yapıştırın.',
+                'Geçerli bir başlatma komutu algılanmadı. Model içeren bir pip/uv veya docker komutu yapıştırın.',
             engineProvider: 'Motor / Sağlayıcı',
             endpoint: 'Uç nokta',
             cloudAccount: 'Bulut hesabı',
@@ -1117,7 +1147,8 @@ const message = {
             model: 'Model',
             localModel: 'Yerel Modeller',
             create_helper: '"{0}" çek',
-            ollama_doc: 'Daha fazla model aramak ve bulmak için Ollama resmi web sitesini ziyaret edebilirsiniz.',
+            ollama_doc:
+                'Modelleri {link} adresinde bulun. Model eklendikten sonra otomatik olarak indirilir. Ollama hizmetinin çalıştığından ve yeterli disk alanı olduğundan emin olun.',
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
@@ -1137,7 +1168,7 @@ const message = {
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
             customAddress: 'Özel adres',
-            downloader: 'İndirme yönetimi',
+            downloader: 'Model indirme',
             modelDirectoryHelper:
                 'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
             modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
@@ -1149,7 +1180,7 @@ const message = {
             acceleratedEndpointLabel: '{0} hızlandırma endpointi',
             tokenLabel: '{0} Token',
             hfEndpointHelper:
-                'HuggingFace erişimi kararsız olduğunda bir hızlandırma endpointi yapılandırın. Arama, ayrıntılar ve indirmeler bunu kullanır.',
+                'HuggingFace model aramaları, ayrıntıları ve indirmeleri için isteğe bağlı ayna URL adresi.',
             sortDefault: 'Varsayılan sıralama',
             sortMostParameters: 'En çok parametre',
             sortLeastParameters: 'En az parametre',
@@ -5127,8 +5158,6 @@ const message = {
         customScriptHelper:
             'Lütfen tam başlatma komutunu girin, örneğin: npm run start. PM2 başlatma komutları için lütfen pm2-runtime ile değiştirin, aksi takdirde başlatma başarısız olacaktır.',
         portError: 'Aynı portu tekrarlamayın.',
-        systemRestartHelper:
-            'Durum açıklaması: Kesinti - sistem yeniden başlatılması nedeniyle durum alımı başarısız oldu',
         javaScriptHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "java -jar halo.jar -Xmx1024M -Xms256M".',
         javaDirHelper: 'Dizin, jar dosyalarını içermeli, alt dizinler de kabul edilir',
         goHelper: 'Tam bir başlatma komutu sağlayın. Örneğin, "go run main.go" veya "./main".',

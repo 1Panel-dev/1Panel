@@ -268,6 +268,9 @@ func (m *ModelDownloaderService) PageTasks(req dto.ModelDownloadTaskSearch) (int
 		return pageModelDownloads(req)
 	}
 	var opts []repo.DBOption
+	if len(req.IDs) > 0 {
+		opts = append(opts, repo.WithByIDs(req.IDs))
+	}
 	if req.DownloadType != "" {
 		opts = append(opts, modelDownloadTaskRepo.WithByDownloadType(req.DownloadType))
 	}
@@ -469,6 +472,9 @@ func (m *ModelDownloaderService) deleteLocalModel(target, downloadType string, w
 
 func pageModelDownloads(req dto.ModelDownloadTaskSearch) (int64, []dto.ModelDownloadTaskItem, error) {
 	var opts []repo.DBOption
+	if len(req.IDs) > 0 {
+		opts = append(opts, repo.WithByIDs(req.IDs))
+	}
 	if req.DownloadType != "" {
 		opts = append(opts, modelDownloadTaskRepo.WithByDownloadType(req.DownloadType))
 	}
@@ -502,24 +508,27 @@ func pageModelDownloads(req dto.ModelDownloadTaskSearch) (int64, []dto.ModelDown
 		}
 		items = append(items, item)
 	}
-	for _, local := range localByPath {
-		repoID := local.RepoID
-		if repoID == "" {
-			repoID = local.Name
+	if len(req.IDs) == 0 {
+		for _, local := range localByPath {
+			repoID := local.RepoID
+			if repoID == "" {
+				repoID = local.Name
+			}
+			items = append(items, dto.ModelDownloadTaskItem{
+				DownloadType:   local.DownloadType,
+				Source:         local.Source,
+				RepoID:         repoID,
+				TargetDir:      local.Path,
+				Status:         constant.StatusSuccess,
+				Progress:       100,
+				TotalSize:      local.Size,
+				DownloadedSize: local.Size,
+				CreatedAt:      local.CreatedAt,
+				LocalModel:     &local,
+			})
 		}
-		items = append(items, dto.ModelDownloadTaskItem{
-			DownloadType:   local.DownloadType,
-			Source:         local.Source,
-			RepoID:         repoID,
-			TargetDir:      local.Path,
-			Status:         constant.StatusSuccess,
-			Progress:       100,
-			TotalSize:      local.Size,
-			DownloadedSize: local.Size,
-			CreatedAt:      local.CreatedAt,
-			LocalModel:     &local,
-		})
 	}
+
 	filtered := items[:0]
 	for _, item := range items {
 		if req.Status != "" && item.Status != req.Status {
