@@ -1703,6 +1703,8 @@ const message = {
             timeToFirstToken: 'Purata kependaman token pertama',
             timePerOutputToken: 'Purata kependaman antara token',
             requestLatency: 'Purata kependaman permintaan',
+            noMetrics:
+                'Titik akhir metrik boleh dicapai, tetapi belum ada metrik vLLM yang disokong. Sesetengah metrik mungkin hanya muncul selepas permintaan inferens pertama.',
             unavailable: 'Metrik tidak tersedia. Pastikan tika sedang berjalan dan /metrics boleh dicapai.',
             loadFailed: 'Gagal memuatkan data pemantauan. Sila cuba lagi.',
             helper: 'Urus pengumpulan, sela dan tempoh penyimpanan dalam tetapan pemantauan.',

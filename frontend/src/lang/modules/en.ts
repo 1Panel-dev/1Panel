@@ -1689,6 +1689,8 @@ const message = {
             timeToFirstToken: 'Mean time to first token',
             timePerOutputToken: 'Mean inter-token latency',
             requestLatency: 'Mean request latency',
+            noMetrics:
+                'The metrics endpoint is reachable, but no supported vLLM metrics are available yet. Some metrics may appear only after the first inference request.',
             unavailable: 'Metrics are unavailable. Check that the instance is running and /metrics is accessible.',
             loadFailed: 'Failed to load monitoring data. Please retry.',
             helper: 'Manage collection, interval and retention in monitoring settings.',

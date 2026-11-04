@@ -1596,6 +1596,7 @@ const message = {
             timeToFirstToken: '平均首 Token 延遲',
             timePerOutputToken: '平均 Token 間延遲',
             requestLatency: '平均請求延遲',
+            noMetrics: '指標介面可存取，但暫無可用的 vLLM 指標；部分指標可能在首次推論請求後才會產生。',
             unavailable: '無法採集指標，請確認實例已啟動且 /metrics 可存取。',
             loadFailed: '監控資料載入失敗，請重試。',
             helper: '採集開關、頻率和儲存天數統一在監控設定中調整。',

@@ -286,6 +286,11 @@ func collectVLLMMetrics(ctx context.Context, install model.AppInstall, previous 
 		return point, err
 	}
 	point.CreatedAt = time.Now()
+	if len(metrics) == 0 {
+		point.Status = "no_data"
+		point.RawMetrics = "{}"
+		return point, nil
+	}
 	raw, err := json.Marshal(metrics)
 	if err != nil {
 		return point, err

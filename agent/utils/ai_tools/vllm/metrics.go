@@ -29,12 +29,19 @@ func Parse(reader io.Reader) (Metrics, error) {
 	scanner.Buffer(make([]byte, 4096), 1024*1024)
 	for scanner.Scan() {
 		line := strings.TrimSpace(scanner.Text())
-		if !strings.HasPrefix(line, "vllm:") {
+		if line == "" || strings.HasPrefix(line, "#") {
 			continue
 		}
 		match := re.GetRegex(re.VLLMMetricSamplePattern).FindStringSubmatch(line)
 		if match == nil {
 			return nil, fmt.Errorf("invalid vLLM metric sample")
+		}
+		value, err := strconv.ParseFloat(match[3], 64)
+		if err != nil {
+			return nil, fmt.Errorf("invalid vLLM metric value: %w", err)
+		}
+		if !strings.HasPrefix(match[1], "vllm:") {
+			continue
 		}
 		name := strings.TrimPrefix(match[1], "vllm:")
 		switch name {
@@ -52,10 +59,6 @@ func Parse(reader io.Reader) (Metrics, error) {
 				continue
 			}
 		}
-		value, err := strconv.ParseFloat(match[3], 64)
-		if err != nil {
-			return nil, fmt.Errorf("invalid vLLM metric value: %w", err)
-		}
 		if math.IsNaN(value) || math.IsInf(value, 0) || value < 0 {
 			continue
 		}
@@ -72,9 +75,6 @@ func Parse(reader io.Reader) (Metrics, error) {
 	}
 	if err := scanner.Err(); err != nil {
 		return nil, err
-	}
-	if len(metrics) == 0 {
-		return nil, fmt.Errorf("no supported vLLM metrics")
 	}
 	return metrics, nil
 }

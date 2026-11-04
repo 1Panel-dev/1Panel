@@ -1699,6 +1699,8 @@ const message = {
             timeToFirstToken: 'Latencia media del primer token',
             timePerOutputToken: 'Latencia media entre tokens',
             requestLatency: 'Latencia media de solicitud',
+            noMetrics:
+                'El endpoint de métricas es accesible, pero aún no hay métricas de vLLM compatibles. Algunas pueden aparecer solo después de la primera solicitud de inferencia.',
             unavailable:
                 'Métricas no disponibles. Compruebe que la instancia esté en ejecución y que /metrics sea accesible.',
             loadFailed: 'No se pudieron cargar los datos. Inténtelo de nuevo.',
