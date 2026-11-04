@@ -1134,6 +1134,7 @@ const message = {
             modelDirectoryHelper:
                 'ໂດຍຄ່າເລີ່ມຕົ້ນ ລາຍຊື່ໂມເດວຈະສະແດງໂມເດວທີ່ດາວໂຫຼດໄວ້ໃນໄດເຣັກທໍຣີທີ່ກຳນົດໃນ “ການກະກຽມໂມເດວ > ການຕັ້ງຄ່າ”.',
             modelDirectoryPlaceholder: 'ຄົ້ນຫາໂມເດວ ຫຼື ປ້ອນເສັ້ນທາງເຕັມ',
+            selectModel: 'ເລືອກໂມເດວ',
             selectModelDirectory: 'ເລືອກໄດເຣັກທໍຣີ',
             modelDir: 'ໄດເຣັກທໍຣີໂມເດວ',
             modelSource: 'ແຫຼ່ງທີ່ມາໂມເດວ',

@@ -1175,6 +1175,7 @@ const message = {
             modelDirectoryHelper:
                 'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
             modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
+            selectModel: 'Pilih model',
             selectModelDirectory: 'Pilih direktori',
             modelDir: 'Direktori Model',
             modelSource: 'Sumber model',

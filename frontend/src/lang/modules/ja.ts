@@ -1152,6 +1152,7 @@ const message = {
             modelDirectoryHelper:
                 'モデル一覧には、デフォルトで「モデル準備 > 設定」で指定したモデルディレクトリにダウンロード済みのモデルが表示されます。',
             modelDirectoryPlaceholder: 'モデルを検索するかフルパスを入力',
+            selectModel: 'モデルを選択',
             selectModelDirectory: 'ディレクトリを選択',
             modelDir: 'モデルディレクトリ',
             modelSource: 'モデルソース',

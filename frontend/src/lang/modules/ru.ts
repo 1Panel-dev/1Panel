@@ -1164,6 +1164,7 @@ const message = {
             modelDirectoryHelper:
                 'По умолчанию список показывает модели, загруженные в каталог, указанный в разделе «Подготовка моделей > Настройки».',
             modelDirectoryPlaceholder: 'Найти модель или ввести полный путь',
+            selectModel: 'Выбрать модель',
             selectModelDirectory: 'Выбрать каталог',
             modelDir: 'Каталог модели',
             modelSource: 'Источник модели',
