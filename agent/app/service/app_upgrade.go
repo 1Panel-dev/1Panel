@@ -136,8 +136,8 @@ func upgradeInstall(req request.AppInstallUpgrade) error {
 	if err = checkVllmVersionAccess(install.App.Key, detail.Version); err != nil {
 		return err
 	}
-	if install.App.Key == vllmAppKeyForUpgrade && !isVllmUpgradeVersionAllowed(install.Version, detail.Version, loadVllmImageFromEnv(install.Env)) {
-		return errors.New("vLLM can only upgrade within the same image type")
+	if install.App.Key == vllmAppKeyForUpgrade && !isVllmUpgradeCandidate(install.Version, detail.Version, loadVllmImageFromEnv(install.Env)) {
+		return errors.New("vLLM upgrade version is not supported")
 	}
 	if install.Version == detail.Version {
 		return errors.New("two version is same")
@@ -271,6 +271,9 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		}
 		image := buildVllmUpgradeImage(loadVllmImageFromEnv(stagedInstall.Env), u.original.Version, u.detail.Version)
 		envs[vllmImageEnvKey] = image
+		if strings.HasPrefix(strings.ToLower(strings.TrimSpace(u.detail.Version)), vllmGB10VersionPrefix) {
+			envs["DSPARK_VLLM_IMAGE"] = image
+		}
 		paramBytes, marshalErr := json.Marshal(envs)
 		if marshalErr != nil {
 			return marshalErr

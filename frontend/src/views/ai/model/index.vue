@@ -6,7 +6,7 @@
             <LayoutContent v-loading="loading">
                 <template #leftToolBar>
                     <el-button v-permission type="primary" @click="createRef.open()">
-                        {{ $t(isLocal ? 'commons.button.add' : 'aiTools.model.addService') }}
+                        {{ $t(isLocal ? 'aiTools.model.addInstance' : 'aiTools.model.addService') }}
                     </el-button>
                 </template>
                 <template #rightToolBar>
@@ -162,7 +162,13 @@
                             width="220"
                         />
                     </ComplexTable>
-                    <ComplexTable v-else :data="deployments" :pagination-config="pagination" @search="search">
+                    <ComplexTable
+                        v-else
+                        :data="deployments"
+                        :pagination-config="pagination"
+                        :row-style="{ height: '63px' }"
+                        @search="search"
+                    >
                         <el-table-column :label="$t('commons.table.name')" min-width="190">
                             <template #default="{ row }">
                                 <el-button link type="primary" @click="manageRef.open(row, 'connection', true)">

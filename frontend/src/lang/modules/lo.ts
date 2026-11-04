@@ -1045,8 +1045,8 @@ const message = {
             deploy: 'ນຳໃຊ້',
             approxWeightSize: 'ປະມານ {0} GB',
             services: 'ບໍລິການໂມເດວ',
+            addInstance: 'ເພີ່ມອິນສະແຕນ',
             addService: 'ເພີ່ມບໍລິການໂມເດວ',
-            addEngine: 'ເພີ່ມເຄື່ອງຈັກອະນຸມານ',
             onlineModel: 'ໂມເດວອອນລາຍ',
             instanceDeployment: 'ນຳໃຊ້ຕາມອິນສະແຕນ',
             engines: 'ເຄື່ອງຈັກອະນຸມານພາຍໃນ',
@@ -1058,18 +1058,21 @@ const message = {
             files: 'ການກະກຽມໂມເດວ',
             connectExternal: 'ເຊື່ອມຕໍ່ບໍລິການພາຍນອກ',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'ການຕັ້ງຄ່າ Recipe',
+            selectRecipe: 'ເລືອກ Recipe',
             createRecipe: 'ສ້າງ Recipe',
             recipeHelper:
-                'Recipe = ໂມເດວ + ຮາດແວ + ພາລາມິເຕີເລີ່ມຕົ້ນ. ນຳເຂົ້າຈາກ {link} ຫຼືສ້າງຈາກໂມເດວທີ່ດາວໂຫຼດແລ້ວ.',
-            recipeFormHelper: 'ວາງຄຳສັ່ງຈາກ {link} ຫຼືປ້ອນຂໍ້ມູນເອງ.',
+                'Recipe ອະທິບາຍວິທີເລີ່ມຕົ້ນໂມເດວເທິງຮາດແວທີ່ກຳນົດ ໂດຍປະກອບມີໂມເດວ, ຮາດແວ ແລະພາລາມິເຕີເລີ່ມຕົ້ນ; ຮອງຮັບການນຳເຂົ້າຄຳສັ່ງຈາກ {link}.',
+            recipeFormHelper:
+                'ໄປທີ່ {link}, ເລືອກຜູ້ໃຫ້ບໍລິການໂມເດວກ່ອນ ແລ້ວເລືອກໂມເດວທີ່ຕ້ອງການ. ກຳນົດຮາດແວ, ຮຸ່ນການຫຼຸດຄວາມລະອຽດ, ກົນລະຍຸດການນຳໃຊ້ ແລະຕົວເລືອກອື່ນໆ ເພື່ອສ້າງຄຳສັ່ງເລີ່ມຕົ້ນສຸດທ້າຍ.',
             recipeArguments: 'ພາລາມິເຕີເລີ່ມຕົ້ນ',
             recipeImportCommand: 'ນຳເຂົ້າຄຳສັ່ງ',
-            recipeImportPlaceholder: 'ວາງຄຳສັ່ງ Docker, pip/uv ຫຼື vllm serve ເພື່ອຕື່ມ Recipe ອັດຕະໂນມັດ',
+            recipeImportPlaceholder:
+                'ວາງຄຳສັ່ງເລີ່ມຕົ້ນໃນຮູບແບບ pip/uv ຫຼື Docker ທີ່ນີ້. 1Panel ຈະວິເຄາະແລະຕື່ມ Recipe ອັດຕະໂນມັດ.',
             recipeVariablesNotSupported:
                 'ຄຳສັ່ງບໍ່ຮອງຮັບການອ້າງອີງຕົວແປ. ກະລຸນາປ້ອນຄ່າໂດຍກົງ ແລະຕັ້ງຄ່າຕົວແປສະພາບແວດລ້ອມໃນຊ່ອງທີ່ກ່ຽວຂ້ອງ.',
             recipeImportError:
                 'ບໍ່ສາມາດແປງໄດ້. ກະລຸນາໃສ່ຄຳສັ່ງເລີ່ມຕົ້ນ Docker ຫຼື vllm serve ທີ່ມີໂມເດວ; ວາງຄຳສັ່ງຕິດຕັ້ງ pip/uv ພ້ອມກັບຄຳສັ່ງເລີ່ມຕົ້ນ.',
-            deploymentTemplates: 'ແມ່ແບບຄຳສັ່ງເລີ່ມຕົ້ນ vLLM',
             engineProvider: 'ເຄື່ອງຈັກ / ຜູ້ໃຫ້ບໍລິການ',
             endpoint: 'ຈຸດເຊື່ອມຕໍ່',
             cloudAccount: 'ບັນຊີຄລາວ',
@@ -1095,13 +1098,14 @@ const message = {
             vllmDeployProfile: 'ໂມເດວສຳລັບຕິດຕັ້ງ',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'ອຸປະກອນ Ascend ທີ່ເຫັນໄດ້ (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບໍລິການໂມເດວ',
             modelAccountAddressHelper:
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
             containerAddress: 'ທີ່ຢູ່ຄອນເທນເນີ',
             customAddress: 'ທີ່ຢູ່ກຳນົດເອງ',
             downloader: 'ຈັດການການດາວໂຫຼດ',
+            modelDirectoryHelper:
+                'ໂດຍຄ່າເລີ່ມຕົ້ນ ລາຍຊື່ໂມເດວຈະສະແດງໂມເດວທີ່ດາວໂຫຼດໄວ້ໃນໄດເຣັກທໍຣີທີ່ກຳນົດໃນ “ການກະກຽມໂມເດວ > ການຕັ້ງຄ່າ”.',
             modelDirectoryPlaceholder: 'ຄົ້ນຫາໂມເດວ ຫຼື ປ້ອນເສັ້ນທາງເຕັມ',
             selectModelDirectory: 'ເລືອກໄດເຣັກທໍຣີ',
             modelDir: 'ໄດເຣັກທໍຣີໂມເດວ',

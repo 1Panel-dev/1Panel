@@ -1,7 +1,7 @@
 <template>
-    <DialogPro
+    <DrawerPro
         v-model="drawerVisible"
-        :title="$t(engine === 'vllm' ? 'aiTools.model.serviceDetails' : 'database.databaseConnInfo')"
+        :header="$t(engine === 'vllm' ? 'aiTools.model.serviceDetails' : 'database.databaseConnInfo')"
         :size="isMobile ? 'full' : 'normal'"
         @close="handleClose"
     >
@@ -67,32 +67,24 @@
                 </div>
                 <p class="detail-help">{{ $t('database.remoteConnHelper2') }}</p>
             </section>
-            <el-button v-if="engine === 'ollama'" @click="openWebUI">OpenWebUI</el-button>
         </div>
         <template #footer>
             <el-button @click="handleClose">
                 {{ $t('commons.button.close') }}
             </el-button>
         </template>
-    </DialogPro>
-    <PortJumpDialog ref="portRef" />
+    </DrawerPro>
 </template>
 
 <script lang="ts" setup>
 import { computed, reactive, ref } from 'vue';
 import { Connection, FolderOpened, Link } from '@element-plus/icons-vue';
 import i18n from '@/lang';
-import { ElMessageBox } from 'element-plus';
-import { getAppPort } from '@/api/modules/app';
-import { useRouter } from 'vue-router';
-import PortJumpDialog from '@/components/port-jump/index.vue';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { getBindDomain } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNode, isMobile } = useGlobalStore();
 const emit = defineEmits(['close']);
-const router = useRouter();
-const portRef = ref();
 const engine = ref<'ollama' | 'vllm'>('ollama');
 
 const drawerVisible = ref(false);
@@ -139,22 +131,6 @@ const acceptParams = (param: DialogProps): void => {
     loadSystemIP();
     loadBindDomain(param.appinstallID);
     drawerVisible.value = true;
-};
-
-const openWebUI = async () => {
-    const node = currentNode.value;
-    const { data } = await getAppPort('ollama-webui', '');
-    if (node !== currentNode.value || !drawerVisible.value) return;
-    if (data) {
-        portRef.value.acceptParams({ port: data });
-        return;
-    }
-    await ElMessageBox.confirm(i18n.global.t('app.checkInstalledWarn', ['OpenWebUI']), 'OpenWebUI', {
-        confirmButtonText: i18n.global.t('database.goInstall'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-    });
-    if (node !== currentNode.value || !drawerVisible.value) return;
-    await router.push({ name: 'AppAll', query: { install: 'ollama-webui' } });
 };
 
 const handleClose = () => {

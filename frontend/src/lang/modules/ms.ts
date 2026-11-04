@@ -1081,8 +1081,8 @@ const message = {
             deploy: 'Kerahkan',
             approxWeightSize: 'Kira-kira {0} GB',
             services: 'Perkhidmatan model',
+            addInstance: 'Tambah instans',
             addService: 'Tambah perkhidmatan model',
-            addEngine: 'Tambah enjin inferens',
             onlineModel: 'Model dalam talian',
             instanceDeployment: 'Pengerahan mengikut instans',
             engines: 'Enjin inferens setempat',
@@ -1094,19 +1094,21 @@ const message = {
             files: 'Penyediaan model',
             connectExternal: 'Sambungkan perkhidmatan luaran',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Konfigurasi Recipe',
+            selectRecipe: 'Pilih Recipe',
             createRecipe: 'Cipta Recipe',
             recipeHelper:
-                'Recipe = model + perkakasan + argumen pelancaran. Import daripada {link} atau cipta daripada model yang dimuat turun.',
-            recipeFormHelper: 'Tampal arahan daripada {link} atau isi medan secara manual.',
+                'Recipe menerangkan cara melancarkan model pada perkakasan tertentu, termasuk model, perkakasan dan argumen pelancaran. Arahan boleh diimport daripada {link}.',
+            recipeFormHelper:
+                'Pergi ke {link}, pilih penyedia model, kemudian pilih model sasaran. Konfigurasikan perkakasan, varian pengkuantuman, strategi penggunaan dan pilihan lain untuk menjana arahan pelancaran akhir.',
             recipeArguments: 'Argumen pelancaran',
             recipeImportCommand: 'Import arahan',
             recipeImportPlaceholder:
-                'Tampal arahan Docker, pip/uv atau vllm serve untuk mengisi Recipe secara automatik',
+                'Tampal arahan pelancaran dalam format pip/uv atau Docker di sini. 1Panel akan menghuraikan dan mengisi Recipe secara automatik.',
             recipeVariablesNotSupported:
                 'Rujukan pemboleh ubah tidak disokong dalam arahan. Masukkan nilai khusus; tetapkan pemboleh ubah persekitaran dalam medan yang berkenaan.',
             recipeImportError:
                 'Tidak dapat menukar. Sertakan arahan pelancaran Docker atau vllm serve dengan model; tampal arahan pemasangan pip/uv bersama arahan pelancaran.',
-            deploymentTemplates: 'Templat arahan permulaan vLLM',
             engineProvider: 'Enjin / Pembekal',
             endpoint: 'Titik akhir',
             cloudAccount: 'Akaun awan',
@@ -1132,13 +1134,14 @@ const message = {
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Peranti Ascend boleh dilihat (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
             containerAddress: 'Alamat kontena',
             customAddress: 'Alamat tersuai',
             downloader: 'Pengurusan muat turun',
+            modelDirectoryHelper:
+                'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
             modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
             selectModelDirectory: 'Pilih direktori',
             modelDir: 'Direktori Model',

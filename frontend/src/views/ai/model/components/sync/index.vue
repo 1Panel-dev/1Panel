@@ -53,7 +53,7 @@ const form = reactive({
     hostPort: 0,
     containerPort: '',
     hostMode: false,
-    modelAccountBaseURLType: 'container' as AI.ModelAccountSync['modelAccountBaseURLType'],
+    modelAccountBaseURLType: 'systemIP' as AI.ModelAccountSync['modelAccountBaseURLType'],
     modelAccountBaseURL: '',
 });
 let request = 0;
@@ -90,7 +90,7 @@ const open = async (row: Deployment) => {
             modelAccountBaseURLType:
                 hostMode && item.modelAccountBaseURLType === 'container'
                     ? 'systemIP'
-                    : item.modelAccountBaseURLType || (hostMode ? 'systemIP' : 'container'),
+                    : item.modelAccountBaseURLType || 'systemIP',
             modelAccountBaseURL: item.modelAccountBaseURL || '',
         });
     } finally {

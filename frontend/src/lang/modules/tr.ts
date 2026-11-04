@@ -1079,8 +1079,8 @@ const message = {
             deploy: 'Dağıt',
             approxWeightSize: 'Yaklaşık {0} GB',
             services: 'Model hizmetleri',
+            addInstance: 'Örnek ekle',
             addService: 'Model hizmeti ekle',
-            addEngine: 'Çıkarım motoru ekle',
             onlineModel: 'Çevrimiçi modeller',
             instanceDeployment: 'Örnek bazında dağıtım',
             engines: 'Yerel çıkarım motorları',
@@ -1092,19 +1092,21 @@ const message = {
             files: 'Model hazırlığı',
             connectExternal: 'Harici hizmete bağlan',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Recipe yapılandırması',
+            selectRecipe: 'Recipe seç',
             createRecipe: 'Recipe oluştur',
             recipeHelper:
-                'Recipe = model + donanım + başlatma parametreleri. {link} üzerinden içe aktarın veya indirilen bir modelden oluşturun.',
-            recipeFormHelper: '{link} üzerinden bir komut yapıştırın veya alanları elle doldurun.',
+                'Recipe, bir modelin belirli bir donanımda nasıl başlatılacağını açıklar; model, donanım ve başlatma parametrelerini içerir. {link} üzerinden komut içe aktarılabilir.',
+            recipeFormHelper:
+                '{link} adresine gidin, önce model sağlayıcısını, ardından hedef modeli seçin. Son başlatma komutunu oluşturmak için donanımı, kuantizasyon sürümünü, dağıtım stratejisini ve diğer seçenekleri yapılandırın.',
             recipeArguments: 'Başlatma parametreleri',
             recipeImportCommand: 'Komut içe aktar',
             recipeImportPlaceholder:
-                'Recipe alanlarını otomatik doldurmak için Docker, pip/uv veya vllm serve komutlarını yapıştırın',
+                'pip/uv veya Docker biçimindeki başlatma komutunu buraya yapıştırın. 1Panel komutu otomatik olarak ayrıştırıp Recipe alanlarını doldurur.',
             recipeVariablesNotSupported:
                 'Komutlarda değişken başvuruları desteklenmez. Açık değerler girin; ortam değişkenlerini ilgili alanda yapılandırın.',
             recipeImportError:
                 'Dönüştürülemedi. Model içeren bir Docker veya vllm serve başlatma komutu ekleyin; pip/uv kurulum komutlarını başlatma komutuyla birlikte yapıştırın.',
-            deploymentTemplates: 'vLLM başlatma komutu şablonları',
             engineProvider: 'Motor / Sağlayıcı',
             endpoint: 'Uç nokta',
             cloudAccount: 'Bulut hesabı',
@@ -1130,13 +1132,14 @@ const message = {
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Görünür Ascend cihazları (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
             containerAddress: 'Konteyner adresi',
             customAddress: 'Özel adres',
             downloader: 'İndirme yönetimi',
+            modelDirectoryHelper:
+                'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
             modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
             selectModelDirectory: 'Dizin seç',
             modelDir: 'Model dizini',

@@ -58,6 +58,9 @@ func resolveVllmVersionFamily(version, image string) string {
 func trimVllmVersionFamily(version string) string {
 	trimmed := strings.TrimSpace(version)
 	normalized := strings.ToLower(trimmed)
+	if strings.HasPrefix(normalized, vllmGB10VersionPrefix) {
+		return strings.TrimSpace(trimmed[len(vllmGB10VersionPrefix):])
+	}
 	for _, family := range []string{vllmImageTypeNvidia, vllmImageTypeIntel, vllmImageTypeAscend} {
 		prefix := family + "-"
 		if strings.HasPrefix(normalized, prefix) {
@@ -69,6 +72,9 @@ func trimVllmVersionFamily(version string) string {
 
 func buildDefaultVllmImageByVersion(version string) string {
 	tag := trimVllmVersionFamily(version)
+	if strings.HasPrefix(strings.ToLower(strings.TrimSpace(version)), vllmGB10VersionPrefix) {
+		return "1panel/vllm-gb10-dspark:" + tag
+	}
 	family := resolveVllmVersionFamily(version, "")
 	if family == vllmImageTypeIntel {
 		return "intel/llm-scaler-vllm:" + tag
@@ -83,6 +89,11 @@ func buildDefaultVllmImageByVersion(version string) string {
 }
 
 func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage string) bool {
+	currentGB10 := strings.HasPrefix(strings.ToLower(strings.TrimSpace(currentVersion)), vllmGB10VersionPrefix)
+	targetGB10 := strings.HasPrefix(strings.ToLower(strings.TrimSpace(targetVersion)), vllmGB10VersionPrefix)
+	if currentGB10 != targetGB10 {
+		return false
+	}
 	currentFamily := resolveVllmVersionFamily(currentVersion, currentImage)
 	targetFamily := resolveVllmVersionFamily(targetVersion, "")
 	return currentFamily == targetFamily
@@ -102,7 +113,7 @@ func isVllmUpgradeCandidate(currentVersion, targetVersion, currentImage string) 
 	if !isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage) {
 		return false
 	}
-	if common.CompareVersion(targetVersion, currentVersion) {
+	if common.CompareVersion(trimVllmVersionFamily(targetVersion), trimVllmVersionFamily(currentVersion)) {
 		return true
 	}
 	return !hasVllmVersionFamilyPrefix(currentVersion) &&

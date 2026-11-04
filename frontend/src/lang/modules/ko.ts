@@ -1048,8 +1048,8 @@ const message = {
             deploy: '배포',
             approxWeightSize: '약 {0} GB',
             services: '모델 서비스',
+            addInstance: '인스턴스 추가',
             addService: '모델 서비스 추가',
-            addEngine: '추론 엔진 추가',
             onlineModel: '온라인 모델',
             instanceDeployment: '인스턴스별 배포',
             engines: '로컬 추론 엔진',
@@ -1061,18 +1061,21 @@ const message = {
             files: '모델 준비',
             connectExternal: '외부 서비스 연결',
             recipes: 'vLLM Recipes',
+            recipeConfig: 'Recipe 설정',
+            selectRecipe: 'Recipe 선택',
             createRecipe: 'Recipe 만들기',
             recipeHelper:
-                'Recipe = 모델 + 하드웨어 + 시작 인수. {link}에서 가져오거나 다운로드한 모델로 만들 수 있습니다.',
-            recipeFormHelper: '{link}의 명령을 붙여넣거나 직접 입력하세요.',
+                'Recipe는 특정 하드웨어에서 모델을 실행하는 방법을 설명하며 모델, 하드웨어 및 실행 인수를 포함합니다. {link}에서 명령을 가져올 수 있습니다.',
+            recipeFormHelper:
+                '{link}에서 모델 제공업체를 먼저 선택한 다음 대상 모델을 선택하세요. 하드웨어, 양자화 버전, 배포 전략 등을 설정하면 최종 실행 명령이 생성됩니다.',
             recipeArguments: '시작 인수',
             recipeImportCommand: '명령 가져오기',
-            recipeImportPlaceholder: 'Docker, pip/uv 또는 vllm serve 명령을 붙여넣어 Recipe 자동 입력',
+            recipeImportPlaceholder:
+                '여기에 pip/uv 또는 Docker 형식의 실행 명령을 붙여넣으면 1Panel이 자동으로 분석하여 Recipe를 채웁니다.',
             recipeVariablesNotSupported:
                 '명령에서 변수 참조는 지원되지 않습니다. 구체적인 값을 입력하고 환경 변수는 환경 변수 필드에서 설정하세요.',
             recipeImportError:
                 '변환할 수 없습니다. 모델이 포함된 Docker 또는 vllm serve 시작 명령을 입력하세요. pip/uv 설치 명령은 시작 명령과 함께 붙여넣으세요.',
-            deploymentTemplates: 'vLLM 시작 명령 템플릿',
             engineProvider: '엔진 / 공급자',
             endpoint: '엔드포인트',
             cloudAccount: '클라우드 계정',
@@ -1098,13 +1101,14 @@ const message = {
             vllmDeployProfile: '배포 모델',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
             vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
-            ascendVisibleDevices: 'Ascend 표시 장치 (ASCEND_RT_VISIBLE_DEVICES)',
             syncModelAccount: '모델 서비스에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
             containerAddress: '컨테이너 주소',
             customAddress: '사용자 지정 주소',
             downloader: '다운로드 관리',
+            modelDirectoryHelper:
+                '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
             modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
             selectModelDirectory: '디렉터리 선택',
             modelDir: '모델 디렉토리',
