@@ -1809,6 +1809,7 @@ const message = {
         websiteUnavailable: '関連付けを利用できません',
         websiteDomainInvalid: '有効なドメインを入力してください。ポートも指定できます。',
         websiteCertificateRequired: 'このドメインを対象とする有効な証明書を選択してください。',
+        websiteCertificatesLoadFailed: '証明書一覧を読み込めません。更新して再試行してください。',
         websiteCertificateEmpty: '一致する証明書がありません。申請またはインポートしてください。',
         websiteUnbind: '関連付けを解除してサイトを削除',
         websiteUnbindConfirm:

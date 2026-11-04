@@ -666,15 +666,59 @@ func (s *MCPWebsiteBindingService) matchesInitialSite(req request.MCPWebsiteBind
 	if err != nil || (site.Protocol == constant.ProtocolHTTPS) != req.EnableSSL || site.WebsiteSSLID != req.SSLID {
 		return false
 	}
-	if port == 0 {
+	explicitPort := port != 0
+	if !explicitPort || req.EnableSSL {
 		installed, installErr := s.openresty()
 		if installErr != nil {
 			return false
 		}
-		port = installed.HttpPort
+		if !explicitPort {
+			port = installed.HttpPort
+		}
+		if req.EnableSSL && port == installed.HttpPort {
+			for _, domain := range site.Domains {
+				if domain.Domain == host && domain.Port == installed.HttpPort && !domain.SSL {
+					return true // Complete an interrupted bind against its existing HTTP base.
+				}
+			}
+		}
 	}
 	for _, domain := range site.Domains {
-		if domain.Domain == host && domain.Port == port && !domain.SSL {
+		if domain.Domain == host && domain.Port == port && domain.SSL == (req.EnableSSL && explicitPort) {
+			return true
+		}
+	}
+	return false
+}
+
+func mcpWebsiteListenConflict(candidate model.Website, installed model.AppInstall) error {
+	if err := checkWebsiteListenConflict(candidate, installed.HttpPort, installed.HttpsPort); err != nil {
+		return err
+	}
+	sites, err := websiteRepo.List()
+	if err != nil {
+		return err
+	}
+	ports := websiteListenPorts(candidate, installed.HttpPort, installed.HttpsPort)
+	isTLS := func(site model.Website, port int) bool {
+		return site.Protocol == constant.ProtocolHTTPS && slices.Contains(buildWebsiteTLSPlan(site.Domains, installed.HttpPort, installed.HttpsPort).httpsPorts, port)
+	}
+	for _, site := range sites {
+		if site.ID == candidate.ID || site.Type == constant.Stream {
+			continue
+		}
+		for port := range websiteListenPorts(site, installed.HttpPort, installed.HttpsPort) {
+			if _, exists := ports[port]; exists && isTLS(candidate, port) != isTLS(site, port) {
+				return buserr.WithName("ErrDomainIsUsed", site.PrimaryDomain)
+			}
+		}
+	}
+	return nil
+}
+
+func mcpWebsiteTLSUsesHTTPPort(site model.Website, installed model.AppInstall) bool {
+	for _, domain := range site.Domains {
+		if domain.SSL && domain.Port == installed.HttpPort {
 			return true
 		}
 	}
@@ -835,6 +879,14 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 			if req.DeleteWebsite {
 				return s.missingDeletedWebsite(req)
 			}
+			if req.Operation == "status" && req.WebsiteID == 0 {
+				partial := model.Website{Alias: mcpWebsiteAlias(req.BindingID)}
+				for _, location := range []string{GetSitePath(partial, SiteDir), GetSitePath(partial, SiteConf), mcpWebsitePrivatePath(partial, mcpWebsiteOwnerName), mcpWebsitePrivatePath(partial, mcpWebsiteProxyName)} {
+					if _, err := os.Lstat(location); !os.IsNotExist(err) {
+						return response.MCPWebsiteBinding{State: "unavailable", BindingID: req.BindingID, RequestID: req.RequestID, Reason: "website_missing"}
+					}
+				}
+			}
 			if req.WebsiteID == 0 || req.Operation == "unbind" {
 				return response.MCPWebsiteBinding{State: "unbound", BindingID: req.BindingID, RequestID: req.RequestID}
 			}
@@ -842,6 +894,12 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 		}
 		if req.Operation != "bind" {
 			return mcpWebsiteFailure("website_missing", true, true)
+		}
+		if req.WebsiteID != 0 {
+			return mcpWebsiteFailure("website_missing", true, true)
+		}
+		if _, ownerErr := os.Lstat(mcpWebsitePrivatePath(model.Website{Alias: mcpWebsiteAlias(req.BindingID)}, mcpWebsiteOwnerName)); !os.IsNotExist(ownerErr) {
+			return mcpWebsiteFailure("website_ownership_changed", false, true)
 		}
 		installed, installErr := s.openresty()
 		if installErr != nil || installed.ID == 0 || installed.Status != constant.StatusRunning {
@@ -852,17 +910,19 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 			return mcpWebsiteFailure("website_group_unavailable", true, false)
 		}
 		domain, port, _ := mcpWebsiteDomain(req.Domain)
+		explicitPort := port != 0
 		if port == 0 {
 			port = installed.HttpPort
 		}
-		if req.EnableSSL && port != installed.HttpPort {
-			return mcpWebsiteFailure("http_port_requires_default", true, false)
-		}
-		candidate := model.Website{Protocol: constant.ProtocolHTTP, Domains: []model.WebsiteDomain{{Domain: domain, Port: port}}}
+		domainSSL := req.EnableSSL && explicitPort
+		candidate := model.Website{Protocol: constant.ProtocolHTTP, Domains: []model.WebsiteDomain{{Domain: domain, Port: port, SSL: domainSSL}}}
 		if req.EnableSSL {
 			candidate.Protocol = constant.ProtocolHTTPS
+			if mcpWebsiteTLSUsesHTTPPort(candidate, installed) {
+				return mcpWebsiteFailure("invalid_https_port", true, false)
+			}
 		}
-		if conflictErr := checkWebsiteListenConflict(candidate, installed.HttpPort, installed.HttpsPort); conflictErr != nil {
+		if conflictErr := mcpWebsiteListenConflict(candidate, installed); conflictErr != nil {
 			var business buserr.BusinessError
 			if errors.As(conflictErr, &business) && business.Msg == "ErrDomainIsUsed" {
 				return mcpWebsiteFailure("domain_conflict", true, true)
@@ -870,7 +930,7 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 			return mcpWebsiteFailure("website_unavailable", false, false)
 		}
 		create := request.WebsiteCreate{Alias: mcpWebsiteAlias(req.BindingID), Type: constant.Static, Remark: mcpWebsiteRemark(req), WebsiteGroupID: group.ID,
-			Domains: []request.WebsiteDomain{{Domain: domain, Port: port}}, SSLConfig: request.SSLConfig{EnableSSL: req.EnableSSL, WebsiteSSLID: req.SSLID}}
+			Domains: []request.WebsiteDomain{{Domain: domain, Port: port, SSL: domainSSL}}, SSLConfig: request.SSLConfig{EnableSSL: req.EnableSSL, WebsiteSSLID: req.SSLID}}
 		previousMutation := mutationStarted
 		mutationStarted = true
 		if createErr := s.createWebsite(create); createErr != nil {
@@ -966,6 +1026,27 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 	if req.Operation == "bind" && owner.BindHash != mcpWebsiteBindHash(req) {
 		return mcpWebsiteFailure("binding_request_changed", true, true)
 	}
+	if req.Operation == "update" && (site.Protocol == constant.ProtocolHTTPS) != req.EnableSSL {
+		installed, installErr := s.openresty()
+		if installErr != nil || installed.ID == 0 || installed.Status != constant.StatusRunning {
+			return mcpWebsiteFailure("openresty_unavailable", true, false)
+		}
+		candidate := site
+		candidate.Protocol = constant.ProtocolHTTP
+		if req.EnableSSL {
+			candidate.Protocol = constant.ProtocolHTTPS
+			if mcpWebsiteTLSUsesHTTPPort(candidate, installed) {
+				return mcpWebsiteFailure("invalid_https_port", true, false)
+			}
+		}
+		if conflictErr := mcpWebsiteListenConflict(candidate, installed); conflictErr != nil {
+			var business buserr.BusinessError
+			if errors.As(conflictErr, &business) && business.Msg == "ErrDomainIsUsed" {
+				return mcpWebsiteFailure("domain_conflict", true, true)
+			}
+			return mcpWebsiteFailure("website_unavailable", false, false)
+		}
+	}
 	if owner.ProxyHash != "" && owner.Operation != "unbind" && req.Operation != "unbind" && !mcpWebsiteProxyIncluded(site) {
 		return mcpWebsiteFailure("proxy_not_loaded", true, true)
 	}
@@ -1038,23 +1119,6 @@ func (s *MCPWebsiteBindingService) Handle(ctx context.Context, req request.MCPWe
 	if req.Operation == "update" {
 		if req.Domain != site.PrimaryDomain {
 			return mcpWebsiteFailure("domain_changed", true, true)
-		}
-		if req.EnableSSL {
-			installed, installErr := s.openresty()
-			if installErr != nil || installed.ID == 0 || installed.Status != constant.StatusRunning {
-				return mcpWebsiteFailure("openresty_unavailable", true, false)
-			}
-			host, _, _ := mcpWebsiteDomain(site.PrimaryDomain)
-			usesHTTPPort := false
-			for _, domain := range site.Domains {
-				if domain.Domain == host && domain.Port == installed.HttpPort && !domain.SSL {
-					usesHTTPPort = true
-					break
-				}
-			}
-			if !usesHTTPPort {
-				return mcpWebsiteFailure("http_port_requires_default", true, false)
-			}
 		}
 		if site.Protocol == constant.ProtocolHTTPS && !req.EnableSSL || site.Protocol != constant.ProtocolHTTPS && req.EnableSSL || req.EnableSSL && site.WebsiteSSLID != req.SSLID {
 			mutationStarted = true

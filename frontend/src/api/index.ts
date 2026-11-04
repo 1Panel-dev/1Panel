@@ -23,8 +23,9 @@ const isCsrfForbidden = (response?: AxiosResponse<any>) => {
     return typeof message === 'string' && message.toLowerCase().includes('csrf token invalid');
 };
 
-type RequestConfig = AxiosRequestConfig & {
+export type RequestConfig = AxiosRequestConfig & {
     skipErrorMessage?: boolean;
+    errorMessageMode?: 'default' | 'manual';
 };
 
 class RequestHttp {
@@ -79,7 +80,8 @@ class RequestHttp {
             async (response: AxiosResponse) => {
                 const globalStore = GlobalStore();
                 const { data } = response;
-                const authResult = handleAuthResponseCode(data, { showRBACMessage: true });
+                const manualErrorMessage = (response.config as RequestConfig)?.errorMessageMode === 'manual';
+                const authResult = handleAuthResponseCode(data, { showRBACMessage: !manualErrorMessage });
                 if (authResult.handled) {
                     if (authResult.action === 'return') {
                         return;
@@ -117,12 +119,14 @@ class RequestHttp {
                     return data;
                 }
                 if (data.code && data.code !== ResultEnum.SUCCESS) {
-                    if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
-                        MsgError(i18n.global.t('license.tamperHelper'));
-                        return Promise.reject(data);
-                    }
-                    if (!(response.config as RequestConfig).skipErrorMessage) {
-                        MsgError(data.message);
+                    if (!manualErrorMessage) {
+                        if (data.message.toLowerCase().indexOf('operation not permitted') !== -1) {
+                            MsgError(i18n.global.t('license.tamperHelper'));
+                            return Promise.reject(data);
+                        }
+                        if (!(response.config as RequestConfig).skipErrorMessage) {
+                            MsgError(data.message);
+                        }
                     }
                     return Promise.reject(data);
                 }
@@ -130,8 +134,11 @@ class RequestHttp {
             },
             async (error: AxiosError) => {
                 const { response } = error;
+                const manualErrorMessage =
+                    ((error.config ?? response?.config) as RequestConfig | undefined)?.errorMessageMode === 'manual';
 
-                if (error.message.indexOf('timeout') !== -1) MsgError(i18n.global.t('commons.msg.requestTimeout'));
+                if (!manualErrorMessage && error.message.indexOf('timeout') !== -1)
+                    MsgError(i18n.global.t('commons.msg.requestTimeout'));
                 if (response) {
                     switch (response.status) {
                         case 313:
@@ -141,20 +148,24 @@ class RequestHttp {
                             if (isCsrfForbidden(response)) {
                                 return Promise.reject(error);
                             }
-                            if (response.data && response.data['message']) {
-                                MsgError(response.data['message']);
-                            } else {
-                                MsgError(i18n.global.t('commons.res.forbidden'));
+                            if (!manualErrorMessage) {
+                                if (response.data && response.data['message']) {
+                                    MsgError(response.data['message']);
+                                } else {
+                                    MsgError(i18n.global.t('commons.res.forbidden'));
+                                }
                             }
                             return Promise.reject(error);
                         case 500:
                         case 502:
                         case 524:
                         case 407:
-                            checkStatus(
-                                response.status,
-                                response.data && response.data['message'] ? response.data['message'] : '',
-                            );
+                            if (!manualErrorMessage) {
+                                checkStatus(
+                                    response.status,
+                                    response.data && response.data['message'] ? response.data['message'] : '',
+                                );
+                            }
                             return Promise.reject(error);
                         default:
                             return Promise.reject(error);
@@ -189,12 +200,14 @@ class RequestHttp {
             ...config,
         });
     }
-    postLocalNode<T>(url: string, params?: object, timeout?: number): Promise<ResultData<T>> {
+    postLocalNode<T>(url: string, params?: object, timeout?: number, config?: RequestConfig): Promise<ResultData<T>> {
         return this.service.post(url, params, {
             baseURL: import.meta.env.VITE_API_URL as string,
             timeout: timeout ? timeout : (ResultEnum.TIMEOUT as number),
             withCredentials: true,
+            ...config,
             headers: {
+                ...config?.headers,
                 CurrentNode: 'local',
             },
         });

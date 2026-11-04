@@ -1832,6 +1832,7 @@ const message = {
         websiteUnavailable: 'Привязка недоступна',
         websiteDomainInvalid: 'Введите допустимый домен, при необходимости с портом.',
         websiteCertificateRequired: 'Выберите действующий сертификат для этого домена.',
+        websiteCertificatesLoadFailed: 'Не удалось загрузить список сертификатов. Обновите и повторите попытку.',
         websiteCertificateEmpty: 'Нет подходящего сертификата. Выпустите или импортируйте его.',
         websiteUnbind: 'Отвязать и удалить сайт',
         websiteUnbindConfirm:

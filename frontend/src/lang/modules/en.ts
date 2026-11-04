@@ -1826,6 +1826,7 @@ const message = {
         websiteUnavailable: 'Binding unavailable',
         websiteDomainInvalid: 'Enter a valid domain, optionally including a port.',
         websiteCertificateRequired: 'Select a valid certificate covering this domain.',
+        websiteCertificatesLoadFailed: 'Cannot load certificates. Refresh to retry.',
         websiteCertificateEmpty: 'No matching certificate. Apply for or import one.',
         websiteUnbind: 'Unbind and delete website',
         websiteUnbindConfirm:

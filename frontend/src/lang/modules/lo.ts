@@ -1784,6 +1784,7 @@ const message = {
         websiteUnavailable: 'ການຜູກບໍ່ພ້ອມໃຊ້',
         websiteDomainInvalid: 'ປ້ອນໂດເມນທີ່ຖືກຕ້ອງ ໂດຍສາມາດລະບຸພອດໄດ້.',
         websiteCertificateRequired: 'ເລືອກໃບຢັ້ງຢືນທີ່ຍັງໃຊ້ໄດ້ ແລະຄອບຄຸມໂດເມນນີ້.',
+        websiteCertificatesLoadFailed: 'ບໍ່ສາມາດໂຫຼດລາຍການໃບຮັບຮອງໄດ້. ກະລຸນາໂຫຼດໜ້າໃໝ່ແລ້ວລອງອີກຄັ້ງ.',
         websiteCertificateEmpty: 'ບໍ່ມີໃບຮັບຮອງທີ່ກົງກັນ. ຂໍ ຫຼືນຳເຂົ້າໃບຮັບຮອງ.',
         websiteUnbind: 'ຍົກເລີກການຜູກ ແລະ ລຶບເວັບໄຊ',
         websiteUnbindConfirm: 'ຍົກເລີກການຜູກ ແລະລຶບເວັບໄຊພ້ອມໂຟນເດີບໍ? ເກັບໃບຮັບຮອງໄວ້. ຜູກໃໝ່ຈະສ້າງເວັບໄຊໃໝ່.',

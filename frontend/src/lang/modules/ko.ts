@@ -1794,6 +1794,7 @@ const message = {
         websiteUnavailable: '연결 사용 불가',
         websiteDomainInvalid: '유효한 도메인을 입력하세요. 포트를 포함할 수 있습니다.',
         websiteCertificateRequired: '이 도메인에 유효한 인증서를 선택하세요.',
+        websiteCertificatesLoadFailed: '인증서 목록을 불러올 수 없습니다. 새로 고침 후 다시 시도하세요.',
         websiteCertificateEmpty: '일치하는 인증서가 없습니다. 신청하거나 가져오세요.',
         websiteUnbind: '연결 해제 및 웹사이트 삭제',
         websiteUnbindConfirm:

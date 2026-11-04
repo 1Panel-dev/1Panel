@@ -4,23 +4,22 @@
             <span class="font-medium">{{ $t('panelMCP.websiteBinding') }}</span>
             <el-tag
                 v-if="binding"
-                :type="binding.state === 'bound' ? 'success' : binding.state === 'unbound' ? 'info' : 'warning'"
+                :type="
+                    pending
+                        ? 'warning'
+                        : binding.state === 'bound'
+                          ? 'success'
+                          : binding.state === 'unbound'
+                            ? 'info'
+                            : 'warning'
+                "
                 size="small"
             >
-                {{ $t(`panelMCP.${stateLabels[binding.state]}`) }}
+                {{ $t(`panelMCP.${stateLabels[pending ? 'pending' : binding.state]}`) }}
             </el-tag>
         </div>
-        <el-alert v-if="errorKey" class="!mb-4" type="warning" :closable="false" :title="$t(errorKey)" show-icon />
         <el-alert
-            v-else-if="binding?.state === 'pending' || uncertain"
-            class="!mb-4"
-            type="warning"
-            :closable="false"
-            :title="$t('panelMCP.websiteUncertain')"
-            show-icon
-        />
-        <el-alert
-            v-else-if="binding?.state === 'unavailable'"
+            v-if="binding?.state === 'unavailable'"
             class="!mb-4"
             type="warning"
             :closable="false"
@@ -109,8 +108,6 @@
                 </el-button>
                 <el-button
                     v-if="pendingOperation?.operation === 'bind' || pendingOperation?.operation === 'update'"
-                    type="danger"
-                    plain
                     :disabled="disabled || !canManage || busy"
                     @click="cancelPending"
                 >
@@ -130,7 +127,7 @@
                 <el-button :disabled="disabled || !canManage || busy" @click="editCertificate">
                     {{ $t('panelMCP.websiteCertificateUpdate') }}
                 </el-button>
-                <el-button type="danger" plain :disabled="disabled || !canManage || busy" @click="unbind">
+                <el-button :disabled="disabled || !canManage || busy" @click="unbind">
                     {{ $t('panelMCP.websiteUnbind') }}
                 </el-button>
             </template>
@@ -157,6 +154,7 @@
 <script setup lang="ts">
 import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
+import { isAxiosError } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 import type { PanelMCP } from '@/api/interface/panel-mcp';
 import {
@@ -166,18 +164,12 @@ import {
     updatePanelMCPWebsite,
 } from '@/api/modules/panel-mcp';
 import { listLocalNodeSSL } from '@/api/modules/website';
-import {
-    getMCPConflict,
-    getMCPWebsiteHostname,
-    isMCPMutationUncertain,
-    isMCPRevisionConflict,
-    isMCPWebsiteCertificateMatch,
-} from '@/utils/panel-mcp';
+import { getMCPWebsiteHostname, isMCPMutationUncertain, isMCPWebsiteCertificateMatch } from '@/utils/panel-mcp';
 import { dateFormatSimple } from '@/utils/date';
 import { listNodes } from '@/utils/node';
 import { routerToNameWithParams } from '@/utils/router';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 
 const props = defineProps<{
@@ -193,7 +185,7 @@ const emit = defineEmits<{
 }>();
 const { globalStore } = useGlobalStore();
 type Certificate = { id: number; primaryDomain: string; otherDomains: string; expireDate: string };
-type PendingOperation = PanelMCP.WebsitePendingRequest;
+type PendingOperation = PanelMCP.WebsitePendingRequest & { revision?: number };
 const stateLabels: Record<PanelMCP.WebsiteBinding['state'], string> = {
     unbound: 'websiteUnbound',
     pending: 'websitePending',
@@ -208,13 +200,14 @@ const certificatesLoaded = ref(false);
 const certificates = ref<Certificate[]>([]);
 const editing = ref(false);
 const uncertain = ref(false);
-const errorKey = ref('');
 const domainError = ref('');
 const certificateError = ref('');
 const localPending = ref<PendingOperation>();
 const busy = computed(() => reading.value || writing.value);
 const associated = computed(() => !!binding.value && binding.value.state !== 'unbound');
-const pendingOperation = computed(() => localPending.value || binding.value?.pendingRequest);
+const pendingOperation = computed<PendingOperation | undefined>(
+    () => localPending.value || binding.value?.pendingRequest,
+);
 const pending = computed(() => binding.value?.state === 'pending' || !!pendingOperation.value || uncertain.value);
 const showEditor = computed(
     () => (!associated.value && (props.mode === 'settings' || props.draft.requested)) || editing.value,
@@ -236,9 +229,37 @@ let generation = 0;
 let readVersion = 0;
 let navigationVersion = 0;
 let certificateVersion = 0;
-let certificatePromise: Promise<void> | undefined;
+let certificatePromise: Promise<boolean> | undefined;
 const current = (version: number) => active && props.canManage && globalStore.isLogin && version === generation;
 
+const notifyFailure = (error: unknown, key: string) => {
+    const requestError = isAxiosError(error);
+    if (requestError && /timeout/i.test(error.message)) {
+        MsgError(i18n.global.t('commons.msg.requestTimeout'));
+        return;
+    }
+    const data = (requestError ? error.response?.data : error) as { code?: unknown; message?: unknown } | undefined;
+    const message =
+        data && (requestError || typeof data.code === 'number') && typeof data.message === 'string'
+            ? data.message.trim()
+            : '';
+    MsgError(
+        message.toLowerCase().includes('operation not permitted')
+            ? i18n.global.t('license.tamperHelper')
+            : message || i18n.global.t(key),
+    );
+};
+const completed = (value: PanelMCP.WebsiteBinding, operation: PendingOperation) =>
+    value.requestId === operation.requestId &&
+    !value.pendingRequest &&
+    value.state === (operation.operation === 'unbind' ? 'unbound' : 'bound') &&
+    (operation.operation !== 'unbind' || operation.deleteWebsite !== true || value.websiteDeleted === true);
+const finish = (value: PanelMCP.WebsiteBinding) => {
+    localPending.value = undefined;
+    uncertain.value = editing.value = false;
+    props.draft.requested = false;
+    emit('changed', value);
+};
 const acceptBinding = (value: PanelMCP.WebsiteBinding, syncDraft = true) => {
     binding.value = value;
     if (syncDraft && value.pendingRequest) {
@@ -277,39 +298,62 @@ const validBinding = (value: unknown): value is PanelMCP.WebsiteBinding => {
 };
 const read = async (version: number, syncDraft = true) => {
     const ticket = ++readVersion;
+    const operation = pendingOperation.value;
     const response = await getPanelMCPWebsite();
     if (!current(version) || ticket !== readVersion) return;
-    if (!validBinding(response.data)) throw new Error('Invalid MCP website status');
+    if (!validBinding(response?.data)) throw new Error('Invalid MCP website status');
     acceptBinding(response.data, syncDraft);
+    if (operation && completed(response.data, operation)) finish(response.data);
     return response.data;
 };
 const load = async (refreshCertificates = false) => {
     if (!active || !props.canManage || busy.value || props.disabled) return;
     const version = generation;
     reading.value = true;
+    const request = read(version, !refreshCertificates);
+    const ticket = readVersion;
+    const activeRead = () => current(version) && ticket === readVersion;
     try {
-        const requests: Promise<unknown>[] = [read(version, !refreshCertificates)];
-        if (refreshCertificates) requests.push(loadCertificates(true));
-        const [status] = await Promise.allSettled(requests);
-        if (current(version)) {
-            errorKey.value = status.status === 'fulfilled' ? '' : 'panelMCP.websiteStatusLoadFailed';
+        const status = request
+            .catch((error) => {
+                if (activeRead()) notifyFailure(error, 'panelMCP.websiteStatusLoadFailed');
+                throw error;
+            })
+            .finally(() => {
+                if (!refreshCertificates && activeRead()) reading.value = false;
+            });
+        const requests: Promise<unknown>[] = [status];
+        if (refreshCertificates || (props.draft.enableSSL && showEditor.value)) {
+            requests.push(loadCertificates(refreshCertificates, false));
+        }
+        const [result, certificate] = await Promise.allSettled(requests);
+        if (
+            activeRead() &&
+            result.status === 'fulfilled' &&
+            certificate?.status === 'fulfilled' &&
+            certificate.value === false &&
+            (refreshCertificates || (props.draft.enableSSL && showEditor.value))
+        ) {
+            notifyFailure(undefined, 'panelMCP.websiteCertificatesLoadFailed');
         }
     } finally {
-        if (current(version)) reading.value = false;
+        if (activeRead()) reading.value = false;
     }
 };
 const refresh = () => load(true);
-const loadCertificates = async (force = false) => {
-    if (!active || !props.canManage) return;
+const loadCertificates = async (force = false, notify = true): Promise<boolean> => {
+    if (!active || !props.canManage || !globalStore.isLogin) return false;
     if (certificatePromise && !force) return certificatePromise;
-    if (certificatesLoaded.value && !force) return;
+    if (certificatesLoaded.value && !force) return true;
     const version = generation;
     const ticket = ++certificateVersion;
     certificatesBusy.value = true;
+    certificateError.value = '';
     const loading = (async () => {
         try {
-            const response = await listLocalNodeSSL({});
-            if (!current(version) || ticket !== certificateVersion) return;
+            const response = await listLocalNodeSSL({}, { errorMessageMode: 'manual' });
+            if (!current(version) || ticket !== certificateVersion) return false;
+            if (!Array.isArray(response?.data)) throw new Error('Invalid MCP certificate list');
             certificates.value = response.data.map((item) => ({
                 id: item.id,
                 primaryDomain: item.primaryDomain,
@@ -318,17 +362,23 @@ const loadCertificates = async (force = false) => {
             }));
             certificatesLoaded.value = true;
             certificateError.value = '';
-        } catch {
+            return true;
+        } catch (error) {
             if (current(version) && ticket === certificateVersion) {
-                certificateError.value = i18n.global.t('panelMCP.websiteCertificateRequired');
+                certificatesLoaded.value = false;
+                if (notify && props.draft.enableSSL && showEditor.value) {
+                    notifyFailure(error, 'panelMCP.websiteCertificatesLoadFailed');
+                }
             }
+            return false;
         } finally {
             if (ticket === certificateVersion) certificatesBusy.value = false;
         }
     })();
     certificatePromise = loading;
-    await loading;
+    const loaded = await loading;
     if (certificatePromise === loading) certificatePromise = undefined;
+    return loaded;
 };
 const validate = async () => {
     domainError.value = certificateError.value = '';
@@ -339,7 +389,8 @@ const validate = async () => {
         return false;
     }
     if (props.draft.enableSSL) {
-        await loadCertificates();
+        const version = generation;
+        if (!(await loadCertificates()) || !current(version)) return false;
         if (!matchingCertificates.value.some((item) => item.id === props.draft.sslID)) {
             certificateError.value = i18n.global.t('panelMCP.websiteCertificateRequired');
             return false;
@@ -352,13 +403,16 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
     const version = generation;
     writing.value = true;
     emit('busy', true);
-    errorKey.value = '';
     localPending.value = { ...operation };
     const deletesWebsite = operation.operation === 'unbind' && operation.deleteWebsite === true;
     try {
         const latest = binding.value || (await read(version));
         if (!current(version) || !latest) return false;
-        const request = { requestId: operation.requestId, revision: latest.revision };
+        // A retry must keep the revision that authorized the original intent.
+        const revision = operation.revision ?? latest.revision;
+        operation = { ...operation, revision };
+        localPending.value = operation;
+        const request = { requestId: operation.requestId, revision };
         const response =
             operation.operation === 'bind'
                 ? await bindPanelMCPWebsite({
@@ -375,53 +429,29 @@ const perform = async (operation: PendingOperation): Promise<boolean> => {
                     })
                   : await unbindPanelMCPWebsite({
                         ...request,
-                        ...(deletesWebsite ? { deleteWebsite: true } : {}),
+                        ...(operation.deleteWebsite !== undefined ? { deleteWebsite: operation.deleteWebsite } : {}),
                     });
         if (!current(version)) return false;
-        if (!validBinding(response.data)) throw { code: 503 };
+        if (!validBinding(response?.data) || response.data.requestId !== operation.requestId) throw { code: 503 };
         if (deletesWebsite && response.data.websiteDeleted !== true) throw { code: 503 };
         acceptBinding(response.data);
-        if (response.data.state !== (operation.operation === 'unbind' ? 'unbound' : 'bound')) throw { code: 503 };
-        localPending.value = undefined;
-        uncertain.value = false;
-        editing.value = false;
-        props.draft.requested = false;
-        emit('changed', response.data);
+        if (!completed(response.data, operation)) throw { code: 503 };
+        finish(response.data);
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
         return true;
     } catch (error) {
         if (current(version)) {
-            uncertain.value = isMCPMutationUncertain(error);
-            errorKey.value = isMCPRevisionConflict(error)
-                ? 'panelMCP.websiteConflict'
-                : uncertain.value
-                  ? 'panelMCP.websiteUncertain'
-                  : 'panelMCP.websiteOperationFailed';
-            const conflict = getMCPConflict(error);
-            if (conflict?.reason === 'website_domain_conflict' && typeof conflict.message === 'string') {
-                domainError.value = conflict.message;
-                errorKey.value = '';
-            }
+            const unconfirmed = isMCPMutationUncertain(error);
+            uncertain.value = unconfirmed;
             if (!uncertain.value) localPending.value = undefined;
             try {
                 const verified = await read(version);
-                if (
-                    uncertain.value &&
-                    verified &&
-                    verified.requestId === operation.requestId &&
-                    !verified.pendingRequest &&
-                    (!deletesWebsite || verified.websiteDeleted === true) &&
-                    verified.state === (operation.operation === 'unbind' ? 'unbound' : 'bound')
-                ) {
-                    localPending.value = undefined;
-                    uncertain.value = editing.value = false;
-                    errorKey.value = '';
-                    props.draft.requested = false;
-                    emit('changed', verified);
-                    return true;
-                }
+                if (unconfirmed && verified && completed(verified, operation)) return true;
             } catch {
                 /* Keep the submitted operation until the user can check its result. */
+            }
+            if (current(version)) {
+                notifyFailure(error, unconfirmed ? 'panelMCP.websiteUncertain' : 'panelMCP.websiteOperationFailed');
             }
         }
         return false;
@@ -470,7 +500,7 @@ const requestUnbind = async (cancelPending: boolean) => {
         await ElMessageBox.confirm(
             i18n.global.t('panelMCP.websiteUnbindConfirm'),
             i18n.global.t('panelMCP.websiteUnbind'),
-            { type: 'warning', confirmButtonType: 'danger' },
+            { type: 'warning' },
         );
     } catch {
         return;
@@ -502,7 +532,6 @@ const activate = () => {
     if (active) return;
     active = true;
     if (props.canManage) void load();
-    if (props.draft.enableSSL && showEditor.value) void loadCertificates();
 };
 const invalidate = () => {
     generation++;
@@ -516,7 +545,7 @@ const invalidate = () => {
     reading.value = false;
     editing.value = uncertain.value = false;
     localPending.value = undefined;
-    domainError.value = certificateError.value = errorKey.value = '';
+    domainError.value = certificateError.value = '';
     emit('binding', undefined);
 };
 const deactivate = () => {

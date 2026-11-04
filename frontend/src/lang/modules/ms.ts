@@ -1841,6 +1841,7 @@ const message = {
         websiteUnavailable: 'Pautan tidak tersedia',
         websiteDomainInvalid: 'Masukkan domain yang sah, dengan port pilihan.',
         websiteCertificateRequired: 'Pilih sijil sah yang meliputi domain ini.',
+        websiteCertificatesLoadFailed: 'Tidak dapat memuatkan senarai sijil. Muat semula untuk mencuba lagi.',
         websiteCertificateEmpty: 'Tiada sijil sepadan. Mohon atau import sijil.',
         websiteUnbind: 'Nyahpaut dan padam laman web',
         websiteUnbindConfirm:

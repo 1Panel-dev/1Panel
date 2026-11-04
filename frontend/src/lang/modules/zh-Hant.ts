@@ -1731,6 +1731,7 @@ const message = {
         websiteUnavailable: '綁定不可用',
         websiteDomainInvalid: '請輸入有效網域，可包含連接埠。',
         websiteCertificateRequired: '請選擇涵蓋此網域且有效的憑證。',
+        websiteCertificatesLoadFailed: '憑證清單讀取失敗，請重新整理後重試。',
         websiteCertificateEmpty: '無符合憑證，請先申請或匯入。',
         websiteUnbind: '解除綁定並刪除網站',
         websiteUnbindConfirm: '解除綁定並刪除網站及目錄？憑證保留，重新綁定將建立新網站。',

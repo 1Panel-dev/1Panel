@@ -1836,6 +1836,7 @@ const message = {
         websiteUnavailable: 'Bağlantı kullanılamıyor',
         websiteDomainInvalid: 'Geçerli bir alan adı girin; isteğe bağlı olarak bağlantı noktası ekleyebilirsiniz.',
         websiteCertificateRequired: 'Bu alan adını kapsayan geçerli bir sertifika seçin.',
+        websiteCertificatesLoadFailed: 'Sertifika listesi yüklenemedi. Yenileyip tekrar deneyin.',
         websiteCertificateEmpty: 'Uygun sertifika yok. Başvurun veya içe aktarın.',
         websiteUnbind: 'Bağlantıyı kaldır ve siteyi sil',
         websiteUnbindConfirm:
