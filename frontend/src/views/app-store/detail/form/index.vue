@@ -157,7 +157,7 @@
 </template>
 
 <script lang="ts" setup>
-import { expandInvalidFormSection } from '@/views/ai/model/components/form-section';
+import { expandInvalidFormSection } from '@/components/form-section';
 import { App } from '@/api/interface/app';
 import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/app';
 import { getAppStoreConfig } from '@/api/modules/setting';
@@ -476,5 +476,5 @@ defineExpose({
 </script>
 
 <style lang="scss" scoped>
-@use '@/views/ai/model/components/form-section.scss';
+@use '@/components/form-section/index.scss';
 </style>

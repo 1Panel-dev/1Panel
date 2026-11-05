@@ -4084,9 +4084,9 @@ const message = {
         fileExchange: 'Ticari sürüme yükselterek birden fazla sunucu arasında dosyaları hızlıca aktarabilirsiniz.',
         app: 'Ticari sürüme yükselterek mobil uygulamada hizmet bilgilerini ve anormallik izlemeyi görüntüleyebilirsiniz.',
         cluster: 'Ticari sürüme yükselterek MySQL/Postgres/Redis birincil-kopya kümelerini yönetebilirsiniz.',
-        vllm: 'Ticari sürüme yükselterek vLLM hizmetlerini 1Panel içinde merkezi olarak dağıtabilir, yapılandırabilir, yaşam döngüsünü yönetebilir ve görevleri izleyebilirsiniz.',
+        vllm: 'vLLM dağıtımı, hizmet izleme, günlük görüntüleme ve günlük işlemleri tek yerden yönetmek için ticari sürüme yükseltin.',
         'model-downloader':
-            'Ticari sürüme yükselterek HuggingFace, ModelScope veya uyumlu aynalardan yerel model dosyalarını arayabilir, indirebilir ve yönetebilir; model dizinlerini ve indirme görevlerini merkezi olarak takip edebilirsiniz.',
+            'Öne çıkan modelleri incelemek, indirmeleri yönetmek, vLLM Recipes içeriklerini yeniden kullanmak ve indirme kaynakları ile erişim bilgilerini yapılandırmak için ticari sürüme yükseltin.',
     },
     clean: {
         scan: 'Taramayı başlat',
@@ -7218,30 +7218,27 @@ const message = {
             clusterTitle3: 'Çoğaltma Durumu',
             clusterContent3:
                 'Ana-çalışan çoğaltma durumunu ve gecikme bilgilerini görüntüleyerek senkronizasyon sorunlarını gidermeye yardımcı olur',
-            modelDownloaderTitle1: 'Model Keşfi',
+            modelDownloaderTitle1: 'Öne Çıkan Modeller',
             modelDownloaderContent1:
-                'HuggingFace model depolarını doğrudan arayın; indirme sayısı, beğeni, model ayrıntıları ve dosya listesini görüntüleyin.',
-            modelDownloaderTitle2: 'Hızlandırılmış İndirme',
+                'Öne çıkan modelleri inceleyin, aile ve ağırlık sağlayıcısına göre filtreleyin, model ayrıntılarını görüntüleyin ve indirmeyi başlatın.',
+            modelDownloaderTitle2: 'Model İndirme',
             modelDownloaderContent2:
-                'Resmi site, aynalar ve özel modeller için HuggingFace hızlandırma endpointi ve HuggingFace Token yapılandırın.',
-            modelDownloaderTitle3: 'Görev Takibi',
+                'Hugging Face ve ModelScope üzerinden model indirin, ilerlemeyi izleyin, görevleri iptal edin veya yeniden deneyin ve yerel dosyaları yönetin.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                'İndirme kuyruğunu, görev durumunu, ilerlemeyi ve hataları görüntüleyin; iptal, yeniden deneme ve kayıt temizlemeyi destekler.',
-            modelDownloaderTitle4: 'Yerel Yönetim',
+                'Resmî Recipes içeriklerini inceleyip eşitleyin, özel tarifleri yönetin ve modellere uygun dağıtım parametrelerini yeniden kullanın.',
+            modelDownloaderTitle4: 'Yapılandırma',
             modelDownloaderContent4:
-                'Yerel model dizinlerini tek yerden yönetin; yolları, boyutları, zamanları görüntüleyin ve kullanılmayan model dosyalarını silin.',
-            vllmTitle1: 'Merkezi Yönetim',
+                'Model indirme dizinini, kaynak adreslerini, erişim belirteçlerini ve öne çıkan modellerin otomatik eşitlenmesini yapılandırın.',
+            vllmTitle1: 'Model Dağıtımı',
             vllmContent1:
-                "Dağıtık vLLM örneklerini 1Panel'e entegre edin ve sürümleri, çalışma durumlarını ve çalışma dizinlerini merkezi olarak yönetin.",
-            vllmTitle2: 'Hızlı Dağıtım',
+                'Model dizinini ve konteyner imajını seçin, GPU, port ve başlatma parametrelerini yapılandırın ve vLLM örnekleri oluşturun.',
+            vllmTitle2: 'Hizmet İzleme',
             vllmContent2:
-                'Görsel formlar aracılığıyla sürüm seçimi, model dizini bağlama ve başlatma parametrelerinin yapılandırılmasını tamamlayarak manuel yapılandırma karmaşıklığını azaltın.',
-            vllmTitle3: 'Operasyonel Verimlilik',
+                'Model hizmetinin performansını izlemek için örnek durumunu, istek sayısını, işlem hacmini ve gecikmeyi görüntüleyin.',
+            vllmTitle3: 'Günlük İşlemler',
             vllmContent3:
-                'Örnek oluşturma, düzenleme, başlatma, durdurma, yeniden başlatma, silme ve görev takibini tek bir arayüzden gerçekleştirerek yerel model hizmetlerinin yönetim verimliliğini artırın.',
-            vllmTitle4: 'Esnek Yapılandırma',
-            vllmContent4:
-                'Gelişmiş ayarlar aracılığıyla portları, konteynerleri, başlatma komutlarını ve Compose yapılandırmalarını merkezi olarak yönetin; standartlaştırılmış dağıtım ve sonraki ayarlamaları kolaylaştırın.',
+                'Örnekleri başlatın, durdurun, yeniden başlatın ve silin; günlükleri görüntüleyin, terminalleri açın ve işlem görevlerini takip edin.',
         },
         node: {
             master: 'Ana Düğüm',

@@ -4094,9 +4094,9 @@ const message = {
         fileExchange: 'Atualize para a edição comercial para transferir arquivos rapidamente entre vários servidores.',
         app: 'Faça upgrade para a edição comercial para visualizar informações do serviço e monitoramento de anomalias no aplicativo móvel.',
         cluster: 'Atualize para a edição comercial para gerenciar clusters primário-réplica de MySQL/Postgres/Redis.',
-        vllm: 'Atualize para a edição comercial para gerenciar serviços vLLM de forma centralizada no 1Panel, incluindo implantação, configuração, operações de ciclo de vida e acompanhamento de tarefas.',
+        vllm: 'Atualize para a edição comercial para implantar vLLM, monitorar serviços, consultar logs e gerenciar as operações diárias em um só lugar.',
         'model-downloader':
-            'Atualize para a edição comercial para pesquisar, baixar e gerenciar arquivos de modelos locais do HuggingFace, ModelScope ou mirrors compatíveis, com diretórios de modelos e tarefas de download centralizados.',
+            'Atualize para a edição comercial para explorar modelos em destaque, gerenciar downloads, reutilizar vLLM Recipes e configurar fontes de download e credenciais de acesso.',
         exceptionalHelper:
             'A verificação da sincronização da licença está anormal. Clique em sincronizar manualmente para garantir o funcionamento da edição comercial. detalhe: ',
         tamperHelper:
@@ -7243,30 +7243,27 @@ const message = {
             clusterTitle3: 'Estado de Replicação',
             clusterContent3:
                 'Exibe o estado de replicação mestre-escravo e informações de atraso, auxiliando na resolução de problemas de sincronização',
-            modelDownloaderTitle1: 'Descoberta de modelos',
+            modelDownloaderTitle1: 'Modelos em destaque',
             modelDownloaderContent1:
-                'Pesquise repositórios de modelos do HuggingFace diretamente e veja downloads, curtidas, detalhes do modelo e lista de arquivos.',
-            modelDownloaderTitle2: 'Downloads acelerados',
+                'Explore modelos em destaque, filtre por família e provedor de pesos, consulte os detalhes e inicie downloads.',
+            modelDownloaderTitle2: 'Download de modelos',
             modelDownloaderContent2:
-                'Configure um endpoint de aceleração do HuggingFace e HuggingFace Token para o site oficial, espelhos e modelos privados.',
-            modelDownloaderTitle3: 'Acompanhamento de tarefas',
+                'Baixe modelos do Hugging Face e ModelScope, acompanhe o progresso, cancele ou repita tarefas e gerencie arquivos locais.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                'Veja filas de download, status, progresso e erros, com suporte para cancelar, tentar novamente e limpar registros.',
-            modelDownloaderTitle4: 'Gerenciamento local',
+                'Explore e sincronize Recipes oficiais, gerencie receitas personalizadas e reutilize parâmetros de implantação compatíveis com cada modelo.',
+            modelDownloaderTitle4: 'Configuração',
             modelDownloaderContent4:
-                'Gerencie diretórios de modelos locais em um só lugar, incluindo caminhos, tamanhos, horários e exclusão de modelos não usados.',
-            vllmTitle1: 'Gestão centralizada',
+                'Configure o diretório de download, os endereços das fontes, os tokens de acesso e a sincronização automática dos modelos em destaque.',
+            vllmTitle1: 'Implantação de modelos',
             vllmContent1:
-                'Integre instâncias vLLM distribuídas ao 1Panel e monitore versões, status operacional e diretórios de execução de forma centralizada.',
-            vllmTitle2: 'Implantação rápida',
+                'Selecione o diretório do modelo e a imagem do contêiner, configure GPUs, portas e parâmetros de inicialização e crie instâncias do vLLM.',
+            vllmTitle2: 'Monitoramento do serviço',
             vllmContent2:
-                'Utilize formulários visuais para selecionar versões, montar diretórios de modelos e configurar parâmetros de inicialização, reduzindo a complexidade da configuração manual.',
-            vllmTitle3: 'Eficiência operacional',
+                'Consulte o estado das instâncias, a quantidade de requisições, a vazão e a latência do serviço de modelos.',
+            vllmTitle3: 'Operações diárias',
             vllmContent3:
-                'Gerencie a criação, edição, inicialização, parada, reinicialização, exclusão de instâncias e o acompanhamento de tarefas em uma única interface, aumentando a eficiência operacional dos serviços de modelos locais.',
-            vllmTitle4: 'Configuração flexível',
-            vllmContent4:
-                'Gerencie portas, contêineres, comandos de inicialização e configurações do Compose de forma unificada por meio de opções avançadas, facilitando implantações padronizadas e ajustes posteriores.',
+                'Inicie, pare, reinicie e exclua instâncias, consulte logs, abra terminais e acompanhe tarefas operacionais.',
         },
         node: {
             master: 'Nó Principal',

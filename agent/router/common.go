@@ -24,7 +24,6 @@ func commonGroups() []CommonRouter {
 		&ProcessRouter{},
 		&WebsiteCARouter{},
 		&AIToolsRouter{},
-		&ModelDownloaderRouter{},
 		&GroupRouter{},
 		&AlertRouter{},
 		&RuntimeDiagnosticsRouter{},

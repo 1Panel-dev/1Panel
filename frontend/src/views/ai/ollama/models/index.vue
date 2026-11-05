@@ -151,13 +151,13 @@
 
 <script lang="ts" setup>
 import { useSearchState } from '@/utils/search-reset';
-import AddDialog from '@/views/ai/model/ollama/add/index.vue';
+import AddDialog from '@/views/ai/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import Terminal from '@/views/ai/model/ollama/terminal/index.vue';
+import Terminal from '@/views/ai/ollama/terminal/index.vue';
 import { toRef, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import AppStatus from '@/components/app-status/index.vue';
-import Connection from '@/views/ai/model/components/connection/index.vue';
+import Connection from '@/views/ai/components/connection/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { App } from '@/api/interface/app';
 import i18n from '@/lang';
@@ -167,7 +167,7 @@ import { getAppPort } from '@/api/modules/app';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { MsgInfo, MsgSuccess } from '@/utils/message';
-import BindDomain from '@/views/ai/model/ollama/domain/index.vue';
+import BindDomain from '@/views/ai/ollama/domain/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { routerToNameWithQuery } from '@/utils/router';
 

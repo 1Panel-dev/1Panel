@@ -26,12 +26,6 @@ func Run() {
 		interval model.Setting
 		status   model.Setting
 	)
-	if !global.CONF.Base.IsOffline {
-		if _, err := global.Cron.AddFunc("@every 24h", service.SyncFeaturedModels); err != nil {
-			global.LOG.Errorf("add featured model sync job failed: %v", err)
-		}
-		go service.SyncFeaturedModels()
-	}
 	go syncBeforeStart()
 	if err := global.DB.Where("key = ?", "MonitorStatus").Find(&status).Error; err != nil {
 		global.LOG.Errorf("load monitor status from db failed, err: %v", err)

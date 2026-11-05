@@ -328,7 +328,22 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 import ProviderLogo from '@/components/agent-provider-logo/index.vue';
 
 import DrawerPro from '@/components/drawer-pro/index.vue';
-import { loadVllmAPI, readPages, vllmAvailable } from '../../deployment';
+import { readPages } from '@/utils/pagination';
+import type { ReqPage, ResPage, ResultData } from '@/api/interface';
+
+const vllmModules = import.meta.glob<{
+    pageVllm: (req: ReqPage & { info: string }) => Promise<
+        ResultData<
+            ResPage<{
+                id: number;
+                name: string;
+                modelAccountBaseURL: string;
+                servedModelName: string;
+            }>
+        >
+    >;
+}>('@/xpack/api/modules/vllm.ts');
+const vllmLoader = Object.values(vllmModules)[0];
 
 const props = defineProps({ inline: Boolean });
 const emit = defineEmits(['search', 'close']);
@@ -858,8 +873,8 @@ watch([open, () => form.provider, connectionMode], async ([visible, provider, mo
     loadingEngines.value = true;
     try {
         let engines: typeof localEngines.value = [];
-        if (provider === 'vllm' && isProductPro.value && vllmAvailable) {
-            const api = await loadVllmAPI();
+        if (provider === 'vllm' && isProductPro.value && vllmLoader) {
+            const api = await vllmLoader();
             if (cancelled) return;
             const items = await readPages((page) => api.pageVllm({ ...page, info: '' }));
             engines = items.map((item) => ({

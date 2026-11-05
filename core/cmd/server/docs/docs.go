@@ -3337,7 +3337,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/featured/search": {
+		"/xpack/model/downloader/featured/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3393,7 +3393,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/featured/sync": {
+		"/xpack/model/downloader/featured/sync": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3421,7 +3421,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/featured/sync/status": {
+		"/xpack/model/downloader/featured/sync/status": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3469,12 +3469,12 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/hf/download": {
+		"/xpack/model/downloader/hf/download": {
 			"post": {
 				"consumes": [
 					"application/json"
 				],
-				"description": "Creates an asynchronous download task. Query /ai/model/downloader/tasks/search for progress.",
+				"description": "Creates an asynchronous download task. Query /xpack/model/downloader/tasks/search for progress.",
 				"parameters": [
 					{
 						"description": "request",
@@ -3521,7 +3521,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/hf/info": {
+		"/xpack/model/downloader/hf/info": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3562,7 +3562,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/hf/search": {
+		"/xpack/model/downloader/hf/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3618,7 +3618,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/local/delete": {
+		"/xpack/model/downloader/local/delete": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3665,7 +3665,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/local/search": {
+		"/xpack/model/downloader/local/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3721,12 +3721,12 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/modelscope/download": {
+		"/xpack/model/downloader/modelscope/download": {
 			"post": {
 				"consumes": [
 					"application/json"
 				],
-				"description": "Creates an asynchronous download task. Query /ai/model/downloader/tasks/search for progress.",
+				"description": "Creates an asynchronous download task. Query /xpack/model/downloader/tasks/search for progress.",
 				"parameters": [
 					{
 						"description": "request",
@@ -3773,7 +3773,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/modelscope/info": {
+		"/xpack/model/downloader/modelscope/info": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3814,7 +3814,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/modelscope/search": {
+		"/xpack/model/downloader/modelscope/search": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -3870,7 +3870,7 @@ const docTemplate = `{
 				]
 			}
 		},
-		"/ai/model/downloader/settings": {
+		"/xpack/model/downloader/settings": {
 			"get": {
 				"produces": [
 					"application/json"
@@ -3900,7 +3900,7 @@ const docTemplate = `{
 				"consumes": [
 					"application/json"
 				],
-				"description": "Updates the download directory, source endpoints and tokens. The featuredModelsSync field is ignored; use /ai/model/downloader/featured/sync/status to update automatic synchronization.",
+				"description": "Updates the download directory, source endpoints and tokens. The featuredModelsSync field is ignored; use /xpack/model/downloader/featured/sync/status to update automatic synchronization.",
 				"parameters": [
 					{
 						"description": "request",
@@ -3943,7 +3943,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/tasks/cancel": {
+		"/xpack/model/downloader/tasks/cancel": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -4000,7 +4000,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/tasks/remove": {
+		"/xpack/model/downloader/tasks/remove": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -4057,7 +4057,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/tasks/retry": {
+		"/xpack/model/downloader/tasks/retry": {
 			"post": {
 				"consumes": [
 					"application/json"
@@ -4117,7 +4117,7 @@ const docTemplate = `{
 				}
 			}
 		},
-		"/ai/model/downloader/tasks/search": {
+		"/xpack/model/downloader/tasks/search": {
 			"post": {
 				"consumes": [
 					"application/json"

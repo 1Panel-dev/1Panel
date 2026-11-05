@@ -4021,9 +4021,9 @@ const message = {
         fileExchange: 'Upgrade to Commercial Edition to transfer files quickly between servers.',
         app: 'Upgrade to Commercial Edition to view service details, anomaly monitoring, and more in the mobile app.',
         cluster: 'Upgrade to Commercial Edition to manage MySQL/Postgres/Redis primary-replica clusters.',
-        vllm: 'Upgrade to Commercial Edition to manage vLLM services in 1Panel with centralized deployment, configuration, lifecycle operations, and task tracking.',
+        vllm: 'Upgrade to the commercial edition to deploy vLLM instances, monitor services, view logs, and manage daily operations in one place.',
         'model-downloader':
-            'Upgrade to Commercial Edition to search, download, and manage local model files from HuggingFace, ModelScope, or compatible mirrors with centralized model directories and download tasks.',
+            'Upgrade to the commercial edition to browse featured models, manage downloads, reuse vLLM Recipes, and configure download sources and access credentials.',
     },
     clean: {
         scan: 'Start scanning',
@@ -7101,30 +7101,27 @@ const message = {
             clusterTitle3: 'Replication Status',
             clusterContent3:
                 'Displays master-slave replication status and delay information, assisting in troubleshooting synchronization issues',
-            vllmTitle1: 'Centralized Management',
+            vllmTitle1: 'Model Deployment',
             vllmContent1:
-                'Bring scattered vLLM services into 1Panel for unified visibility of instances, versions, status, and runtime paths.',
-            vllmTitle2: 'Fast Deployment',
+                'Select a model directory and container image, configure GPUs, ports, and startup parameters, and create vLLM instances.',
+            vllmTitle2: 'Service Monitoring',
             vllmContent2:
-                'Use a visual form to configure version selection, model mounts, and startup parameters with less manual orchestration.',
-            vllmTitle3: 'Operational Efficiency',
+                'View instance status, request counts, throughput, and latency to monitor model service performance.',
+            vllmTitle3: 'Daily Operations',
             vllmContent3:
-                'Handle create, edit, start, stop, restart, delete, and task tracking from one page to simplify local model operations.',
-            vllmTitle4: 'Controlled Configuration',
-            vllmContent4:
-                'Standardize ports, containers, startup commands, and Compose settings through advanced options for easier delivery and later adjustments.',
-            modelDownloaderTitle1: 'Model Discovery',
+                'Start, stop, restart, and delete instances, view logs, open terminals, and track operation tasks.',
+            modelDownloaderTitle1: 'Featured Models',
             modelDownloaderContent1:
-                'Search HuggingFace model repositories directly and view downloads, likes, model details, and file lists.',
-            modelDownloaderTitle2: 'Accelerated Downloads',
+                'Browse featured models, filter by family and weight provider, view model details, and start downloads.',
+            modelDownloaderTitle2: 'Model Downloads',
             modelDownloaderContent2:
-                'Configure a HuggingFace acceleration endpoint and HuggingFace Token for the official site, mirrors, and private models.',
-            modelDownloaderTitle3: 'Task Tracking',
+                'Download models from Hugging Face and ModelScope, track progress, cancel or retry tasks, and manage local files.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                'Review download queues, task status, progress, and errors, with support for canceling, retrying, and clearing records.',
-            modelDownloaderTitle4: 'Local Management',
+                'Browse and sync official Recipes, manage custom recipes, match models, and reuse deployment parameters.',
+            modelDownloaderTitle4: 'Configuration',
             modelDownloaderContent4:
-                'Manage local model directories in one place, including paths, sizes, timestamps, and deleting unused model files.',
+                'Configure the model download directory, source endpoints, access tokens, and automatic featured model synchronization.',
         },
         node: {
             master: 'Main Node',

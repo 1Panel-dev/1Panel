@@ -4088,9 +4088,9 @@ const message = {
         fileExchange: 'Naik taraf ke Edisi Komersial untuk memindahkan fail dengan pantas antara pelayan.',
         app: 'Naik taraf ke Edisi Komersial untuk melihat maklumat perkhidmatan dan pemantauan anomali dalam aplikasi mudah alih.',
         cluster: 'Naik taraf ke Edisi Komersial untuk mengurus kelompok utama-replika MySQL/Postgres/Redis.',
-        vllm: 'Naik taraf ke Edisi Komersial untuk mengurus perkhidmatan vLLM secara berpusat dalam 1Panel, termasuk penggunaan, konfigurasi, operasi kitar hayat dan penjejakan tugas.',
+        vllm: 'Naik taraf kepada edisi komersial untuk menggunakan instans vLLM, memantau perkhidmatan, melihat log dan mengurus operasi harian di satu tempat.',
         'model-downloader':
-            'Naik taraf kepada edisi komersial untuk mencari, memuat turun dan mengurus fail model tempatan daripada HuggingFace, ModelScope atau cermin serasi, dengan direktori model dan tugasan muat turun berpusat.',
+            'Naik taraf kepada edisi komersial untuk menyemak model pilihan, mengurus muat turun, menggunakan semula vLLM Recipes serta menetapkan sumber muat turun dan kelayakan akses.',
         exceptionalHelper:
             'Pengesahan penyegerakan lesen tidak normal. Klik butang sync secara manual untuk pastikan fungsi Edisi Komersial berjalan baik. butiran: ',
         tamperHelper: 'Operasi gagal, fail atau folder mempunyai perlindungan gangguan. Sila semak dan cuba lagi!',
@@ -7205,30 +7205,27 @@ const message = {
             clusterTitle3: 'Status Replikasi',
             clusterContent3:
                 'Memaparkan status replikasi utama-hamba dan maklumat kelewatan, membantu menyelesaikan masalah sinkronisasi',
-            modelDownloaderTitle1: 'Penemuan Model',
+            modelDownloaderTitle1: 'Model Pilihan',
             modelDownloaderContent1:
-                'Cari repositori model HuggingFace secara langsung dan lihat muat turun, suka, butiran model dan senarai fail.',
-            modelDownloaderTitle2: 'Muat Turun Dipercepat',
+                'Semak model pilihan, tapis mengikut keluarga dan penyedia pemberat, lihat butiran model dan mulakan muat turun.',
+            modelDownloaderTitle2: 'Muat Turun Model',
             modelDownloaderContent2:
-                'Konfigurasikan titik akhir pecutan HuggingFace dan HuggingFace Token untuk laman rasmi, cermin dan model persendirian.',
-            modelDownloaderTitle3: 'Penjejakan Tugas',
+                'Muat turun model daripada Hugging Face dan ModelScope, pantau kemajuan, batalkan atau cuba semula tugas dan urus fail setempat.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                'Semak baris gilir muat turun, status tugas, kemajuan dan ralat, dengan sokongan batal, cuba semula dan bersihkan rekod.',
-            modelDownloaderTitle4: 'Pengurusan Tempatan',
+                'Semak dan segerakkan Recipes rasmi, urus resipi tersuai, padankan model dan guna semula parameter penggunaan.',
+            modelDownloaderTitle4: 'Konfigurasi',
             modelDownloaderContent4:
-                'Urus direktori model tempatan di satu tempat, termasuk laluan, saiz, masa dan pemadaman fail model yang tidak digunakan.',
-            vllmTitle1: 'Pengurusan Berpusat',
+                'Tetapkan direktori muat turun model, alamat sumber, token akses dan penyegerakan automatik model pilihan.',
+            vllmTitle1: 'Penggunaan Model',
             vllmContent1:
-                'Integrasikan instans vLLM yang diedarkan ke dalam 1Panel dan pantau versi, status operasi serta direktori kerja secara berpusat.',
-            vllmTitle2: 'Penerapan Pantas',
+                'Pilih direktori model dan imej kontena, tetapkan GPU, port dan parameter permulaan, kemudian cipta instans vLLM.',
+            vllmTitle2: 'Pemantauan Perkhidmatan',
             vllmContent2:
-                'Gunakan borang visual untuk memilih versi, memasang direktori model dan mengkonfigurasi parameter permulaan, sekali gus mengurangkan kerumitan konfigurasi manual.',
-            vllmTitle3: 'Operasi yang Cekap',
+                'Lihat status instans, jumlah permintaan, daya pemprosesan dan kependaman untuk memantau prestasi perkhidmatan model.',
+            vllmTitle3: 'Operasi Harian',
             vllmContent3:
-                'Urus penciptaan, penyuntingan, permulaan, pemberhentian, mulakan semula, penghapusan instans serta pemantauan tugas dalam satu antara muka bagi meningkatkan kecekapan operasi perkhidmatan model tempatan.',
-            vllmTitle4: 'Konfigurasi Fleksibel',
-            vllmContent4:
-                'Urus port, kontena, arahan permulaan dan konfigurasi Compose secara berpusat melalui tetapan lanjutan untuk memudahkan penerapan piawai serta pelarasan selepas pelaksanaan.',
+                'Mulakan, hentikan, mulakan semula dan padam instans, lihat log, buka terminal dan jejak tugas operasi.',
         },
         node: {
             master: 'Nod Utama',

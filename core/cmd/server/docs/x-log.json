@@ -8,7 +8,7 @@
 		"formatZH": "更新 Ollama 绑定域名 [domain]",
 		"formatEN": "update Ollama bind domain [domain]"
 	},
-	"/ai/model/downloader/featured/sync/status": {
+	"/xpack/model/downloader/featured/sync/status": {
 		"bodyKeys": [
 			"value"
 		],
@@ -17,7 +17,7 @@
 		"formatZH": "更新推荐模型自动同步 [value]",
 		"formatEN": "update featured model automatic synchronization [value]"
 	},
-	"/ai/model/downloader/hf/download": {
+	"/xpack/model/downloader/hf/download": {
 		"bodyKeys": [
 			"repoID",
 			"revision"
@@ -27,7 +27,7 @@
 		"formatZH": "下载 Hugging Face 模型 [repoID]",
 		"formatEN": "download Hugging Face model [repoID]"
 	},
-	"/ai/model/downloader/local/delete": {
+	"/xpack/model/downloader/local/delete": {
 		"bodyKeys": [
 			"name"
 		],
@@ -36,7 +36,7 @@
 		"formatZH": "删除本地模型 [name]",
 		"formatEN": "delete local model [name]"
 	},
-	"/ai/model/downloader/modelscope/download": {
+	"/xpack/model/downloader/modelscope/download": {
 		"bodyKeys": [
 			"repoID",
 			"revision"
@@ -46,7 +46,7 @@
 		"formatZH": "下载 ModelScope 模型 [repoID]",
 		"formatEN": "download ModelScope model [repoID]"
 	},
-	"/ai/model/downloader/settings": {
+	"/xpack/model/downloader/settings": {
 		"bodyKeys": [
 			"modelDir"
 		],
@@ -55,7 +55,7 @@
 		"formatZH": "更新模型下载设置 [modelDir]",
 		"formatEN": "update model downloader settings [modelDir]"
 	},
-	"/ai/model/downloader/tasks/cancel": {
+	"/xpack/model/downloader/tasks/cancel": {
 		"bodyKeys": [
 			"id"
 		],
@@ -73,7 +73,7 @@
 		"formatZH": "取消模型下载任务 [repoID]",
 		"formatEN": "cancel model download task [repoID]"
 	},
-	"/ai/model/downloader/tasks/remove": {
+	"/xpack/model/downloader/tasks/remove": {
 		"bodyKeys": [
 			"id"
 		],
@@ -91,7 +91,7 @@
 		"formatZH": "移除模型下载任务 [repoID]",
 		"formatEN": "remove model download task [repoID]"
 	},
-	"/ai/model/downloader/tasks/retry": {
+	"/xpack/model/downloader/tasks/retry": {
 		"bodyKeys": [
 			"id"
 		],

@@ -61,7 +61,7 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
-import OllamaAdd from '@/views/ai/model/ollama/add/index.vue';
+import OllamaAdd from '@/views/ai/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import OpDialog from '@/components/del-dialog/index.vue';
 import {
