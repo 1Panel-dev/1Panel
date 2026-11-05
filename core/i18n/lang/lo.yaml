@@ -588,9 +588,9 @@ MCPInstallLocalImage: "ມີອິມເມດຢູ່ໃນເຄື່ອງ
 MCPInstallVerifyImage: "ກວດສອບເວີຊັນອິມເມດ ແລະ ສັນຍາບໍລິການທີ່ຈັດການ"
 MCPInstallVerifiedImage: "ກວດສອບອິມເມດຜ່ານແລ້ວ"
 
-PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
-PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
-PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
+PHPExtensionsNoTargets: "ບໍ່ມີໂນດປາຍທາງເຫຼືອຫຼັງຈາກຍົກເວັ້ນໂນດຕົ້ນທາງ"
+PHPExtensionsSyncTask: "ຊິງແມ່ແບບສ່ວນຂະຫຍາຍ PHP [{{ .name }}]"
+PHPExtensionsSyncSkipped: "ໂນດ [{{ .node }}] ມີແມ່ແບບທີ່ຄືກັນແລ້ວ; ຂ້າມ"
 MCPInstallCleanup: "ກຳລັງລ້າງຄອນເທນເນີເກົ່າ"
 MCPInstallOldContainerRemoved: "ລຶບຄອນເທນເນີເກົ່າແລ້ວ"
 MCPInstallOldImageRemoved: "ລຶບອິມເມຈເກົ່າແລ້ວ"

@@ -816,4 +816,4 @@ ContainerImageCheckFailures: "Не удалось проверить конте�
 
 ErrImageCheckProxyRequired: "Для проверки обновлений образов в текущей среде сначала настройте прокси-сервер."
 
-ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+ErrPHPExtensionsConflict: "Шаблон расширений PHP с таким именем уже существует и имеет другое содержимое; перезапись не выполнена"

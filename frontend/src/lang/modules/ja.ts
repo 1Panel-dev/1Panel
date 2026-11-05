@@ -3990,6 +3990,12 @@ const message = {
             '商用版にアップグレードすると、ノードを手動で切り替えずにマルチノードアプリのバージョンを一括アップグレードできます。',
         nodeDashboard:
             '商用版にアップグレードすると、マルチノードのアプリ、Web サイト、データベース、スケジュールタスクを一元管理できます。',
+        imageExchange: '商用版にアップグレードすると、ノード間でコンテナイメージを一括転送できます。',
+        appExchange:
+            '商用版にアップグレードすると、インストール済みアプリケーションを移行先ノードに移行し、必要なリソースの依存関係を確認できます。',
+        sslSync: '商用版にアップグレードすると、ソースノードの証明書を1つ以上のターゲットノードに同期できます。',
+        phpExtensionsSync:
+            '商用版にアップグレードすると、PHP 拡張機能テンプレートを1つ以上のターゲットノードに同期できます。',
         fileExchange: '商用版にアップグレードすると、複数サーバー間でファイルをすばやく転送できます。',
         cluster: '商用版にアップグレードすると、MySQL/Postgres/Redis のプライマリ/レプリカ構成を管理できます。',
         vllm: '商用版にアップグレードすると、1Panel で vLLM サービスのデプロイ、設定、ライフサイクル操作、タスク追跡を一元管理できます。',
@@ -7024,6 +7030,34 @@ const message = {
             nodeContent3: '各ノードの運用状況をリアルタイムで把握',
             nodeTitle4: '迅速なリモート接続',
             nodeContent4: 'ワンクリックでノードリモート端末に直接接続',
+            imageExchangeTitle1: '転送元のイメージを選択',
+            imageExchangeContent1: 'ソースノードのコンテナイメージを確認し、転送するイメージを選択します。',
+            imageExchangeTitle2: 'イメージを配布',
+            imageExchangeContent2: '選択したイメージを1つ以上のターゲットノードに転送します。',
+            imageExchangeTitle3: '転送ログを表示',
+            imageExchangeContent3: 'タスクログでイメージの転送状況と実行結果を確認します。',
+            appExchangeTitle1: 'アプリケーションを選択',
+            appExchangeContent1: 'ソースノードにインストールされたアプリケーションを確認し、移行するものを選択します。',
+            appExchangeTitle2: '依存関係を確認',
+            appExchangeContent2: '移行前に、移行先ノードとデータベースなどの必要なリソースを確認します。',
+            appExchangeTitle3: 'アプリケーションを移行',
+            appExchangeContent3:
+                'アプリケーションのバックアップを移行先ノードに転送して復元し、タスクログで結果を確認します。',
+            sslSyncTitle1: '証明書を選択',
+            sslSyncContent1: 'ソースノードの証明書情報を確認し、同期する証明書を選択します。',
+            sslSyncTitle2: 'ノード間で同期',
+            sslSyncContent2: 'ソースノードを自動的に除外し、選択した証明書をターゲットノードに同期します。',
+            sslSyncTitle3: '同期タスクを確認',
+            sslSyncContent3: '実行前にターゲットノードと証明書を確認し、実行後にタスクログで結果を確認します。',
+            phpExtensionsSyncTitle1: 'テンプレートを選択',
+            phpExtensionsSyncContent1:
+                'ソースノードのテンプレート名と拡張機能一覧を確認し、同期するテンプレートを選択します。',
+            phpExtensionsSyncTitle2: 'テンプレートを同期',
+            phpExtensionsSyncContent2:
+                'ソースノードを自動的に除外し、選択したテンプレートをターゲットノードに同期します。',
+            phpExtensionsSyncTitle3: '既存のテンプレートを確認',
+            phpExtensionsSyncContent3:
+                '名前と内容が一致するテンプレートはスキップします。内容が異なる場合は上書きせず、競合を報告します。',
             fileExchangeTitle1: 'キー認証伝送',
             fileExchangeContent1: 'SSHキーを介して認証し、伝送のセキュリティを確保します。',
             fileExchangeTitle2: '効率的なファイル同期',
@@ -7538,13 +7572,13 @@ const message = {
                 '{0} 個のイメージを {1} 個のノードへ転送します。合計 {2} 件のタスクが作成されます。',
 
             ssl: '証明書同期',
-            phpExtensions: 'PHP Extension Template Sync',
-            phpExtensionsTitle: 'Extension Template Sync',
-            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
-            phpExtensionsList: 'PHP extensions',
-            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensions: 'PHP 拡張機能テンプレートの同期',
+            phpExtensionsTitle: '拡張機能テンプレートの同期',
+            phpExtensionsDesc: 'ソースノードを選択し、その PHP 拡張機能テンプレートをターゲットノードに同期します。',
+            phpExtensionsList: 'PHP 拡張機能',
+            phpExtensionsConfirm: '{0} 件の PHP 拡張機能テンプレートを {1} 個のノードに同期します。',
             phpExtensionsConflictHint:
-                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
+                '同一のテンプレートはスキップします。同じ名前で内容が異なるテンプレートは競合として報告し、上書きしません。',
             sslBatchDesc: 'ソースノードを選択すると、指定した証明書を現在のパネル環境へ同期できます。',
             sslBatchConfirmPrefix: '{0} 件の証明書を {1} 個のノードへ同期します。合計 {2} 件のタスクが作成されます。',
 

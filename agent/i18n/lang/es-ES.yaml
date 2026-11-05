@@ -816,4 +816,4 @@ ContainerImageCheckFailures: "Falló la comprobación de {{ .count }} contenedor
 
 ErrImageCheckProxyRequired: "Para comprobar actualizaciones de imágenes en el entorno actual, configura primero un servidor proxy."
 
-ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+ErrPHPExtensionsConflict: "Ya existe una plantilla de extensiones PHP con este nombre y contenido diferente; no se ha sobrescrito"

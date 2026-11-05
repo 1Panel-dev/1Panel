@@ -4082,6 +4082,13 @@ const message = {
             'Atualize para a edição comercial para atualizar versões de aplicativos multi-nó sem alternar manualmente entre os nós.',
         nodeDashboard:
             'Atualize para a edição comercial para gerenciar aplicativos, sites, bancos de dados e tarefas agendadas multi-nó de forma centralizada.',
+        imageExchange: 'Atualize para a edição comercial para transferir imagens de contêineres em lote entre nós.',
+        appExchange:
+            'Atualize para a edição comercial para migrar aplicativos instalados para nós de destino e confirmar suas dependências de recursos.',
+        sslSync:
+            'Atualize para a edição comercial para sincronizar certificados de um nó de origem com um ou mais nós de destino.',
+        phpExtensionsSync:
+            'Atualize para a edição comercial para sincronizar modelos de extensões PHP com um ou mais nós de destino.',
         fileExchange: 'Atualize para a edição comercial para transferir arquivos rapidamente entre vários servidores.',
         app: 'Faça upgrade para a edição comercial para visualizar informações do serviço e monitoramento de anomalias no aplicativo móvel.',
         cluster: 'Atualize para a edição comercial para gerenciar clusters primário-réplica de MySQL/Postgres/Redis.',
@@ -7172,6 +7179,40 @@ const message = {
             nodeContent3: 'Acompanhe em tempo real o status operacional de cada nó',
             nodeTitle4: 'Conexão Remota Rápida',
             nodeContent4: 'Conecte-se diretamente a terminais remotos de nós com um clique',
+            imageExchangeTitle1: 'Selecionar imagens de origem',
+            imageExchangeContent1:
+                'Consulte as imagens de contêineres do nó de origem e selecione as que deseja transferir.',
+            imageExchangeTitle2: 'Distribuir imagens',
+            imageExchangeContent2: 'Transfira as imagens selecionadas para um ou mais nós de destino.',
+            imageExchangeTitle3: 'Ver logs de transferência',
+            imageExchangeContent3:
+                'Acompanhe o progresso e os resultados da transferência de imagens nos logs de tarefas.',
+            appExchangeTitle1: 'Selecionar um aplicativo',
+            appExchangeContent1: 'Consulte os aplicativos instalados no nó de origem e selecione um para migrar.',
+            appExchangeTitle2: 'Confirmar dependências',
+            appExchangeContent2:
+                'Antes da migração, confirme os nós de destino e os recursos necessários, como bancos de dados.',
+            appExchangeTitle3: 'Migrar aplicativos',
+            appExchangeContent3:
+                'Transfira os backups dos aplicativos para os nós de destino para restauração e consulte os resultados nos logs de tarefas.',
+            sslSyncTitle1: 'Selecionar certificados',
+            sslSyncContent1:
+                'Consulte os detalhes dos certificados do nó de origem e selecione os que deseja sincronizar.',
+            sslSyncTitle2: 'Sincronizar entre nós',
+            sslSyncContent2:
+                'Sincronize os certificados selecionados com os nós de destino, excluindo automaticamente o nó de origem.',
+            sslSyncTitle3: 'Confirmar tarefas de sincronização',
+            sslSyncContent3:
+                'Revise os nós de destino e os certificados antes da execução e consulte os resultados nos logs de tarefas.',
+            phpExtensionsSyncTitle1: 'Selecionar um modelo',
+            phpExtensionsSyncContent1:
+                'Consulte os nomes dos modelos e as listas de extensões do nó de origem e selecione um modelo para sincronizar.',
+            phpExtensionsSyncTitle2: 'Sincronizar modelos',
+            phpExtensionsSyncContent2:
+                'Sincronize o modelo selecionado com os nós de destino, excluindo automaticamente o nó de origem.',
+            phpExtensionsSyncTitle3: 'Verificar modelos existentes',
+            phpExtensionsSyncContent3:
+                'Modelos com nome e conteúdo idênticos são ignorados. Conteúdos diferentes são sinalizados como conflitos e não são sobrescritos.',
             fileExchangeTitle1: 'Transmissão de Autenticação por Chave',
             fileExchangeContent1: 'Autentique via chaves SSH para garantir a segurança da transmissão.',
             fileExchangeTitle2: 'Sincronização de Arquivos Eficiente',
@@ -7697,13 +7738,14 @@ const message = {
             imageBatchConfirmPrefix: 'Serão encaminhadas {0} imagens para {1} nós, totalizando {2} tarefas.',
 
             ssl: 'Sincronização de Certificados',
-            phpExtensions: 'PHP Extension Template Sync',
-            phpExtensionsTitle: 'Extension Template Sync',
-            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
-            phpExtensionsList: 'PHP extensions',
-            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensions: 'Sincronização de modelos de extensões PHP',
+            phpExtensionsTitle: 'Sincronização de modelos de extensões',
+            phpExtensionsDesc:
+                'Selecione um nó de origem para sincronizar seu modelo de extensões PHP com os nós de destino.',
+            phpExtensionsList: 'Extensões PHP',
+            phpExtensionsConfirm: 'Serão sincronizados {0} modelos de extensões PHP com {1} nós.',
             phpExtensionsConflictHint:
-                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
+                'Modelos idênticos são ignorados. Modelos com o mesmo nome e conteúdo diferente são sinalizados como conflitos e não são sobrescritos.',
             sslBatchDesc:
                 'Após selecionar o nó de origem, os certificados especificados podem ser sincronizados com o ambiente atual do painel.',
             sslBatchConfirmPrefix: 'Serão sincronizados {0} certificados para {1} nós, totalizando {2} tarefas.',

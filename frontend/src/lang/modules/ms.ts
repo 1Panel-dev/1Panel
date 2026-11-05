@@ -4076,6 +4076,13 @@ const message = {
             'Naik taraf ke Edisi Komersial untuk menaik taraf versi aplikasi berbilang nod tanpa menukar nod secara manual.',
         nodeDashboard:
             'Naik taraf ke Edisi Komersial untuk mengurus aplikasi, laman web, pangkalan data dan tugas berjadual berbilang nod secara berpusat.',
+        imageExchange: 'Naik taraf ke Edisi Komersial untuk memindahkan imej kontena secara kelompok antara nod.',
+        appExchange:
+            'Naik taraf ke Edisi Komersial untuk memindahkan aplikasi yang dipasang ke nod sasaran dan mengesahkan kebergantungan sumbernya.',
+        sslSync:
+            'Naik taraf ke Edisi Komersial untuk menyegerakkan sijil daripada nod sumber ke satu atau lebih nod sasaran.',
+        phpExtensionsSync:
+            'Naik taraf ke Edisi Komersial untuk menyegerakkan templat sambungan PHP ke satu atau lebih nod sasaran.',
         fileExchange: 'Naik taraf ke Edisi Komersial untuk memindahkan fail dengan pantas antara pelayan.',
         app: 'Naik taraf ke Edisi Komersial untuk melihat maklumat perkhidmatan dan pemantauan anomali dalam aplikasi mudah alih.',
         cluster: 'Naik taraf ke Edisi Komersial untuk mengurus kelompok utama-replika MySQL/Postgres/Redis.',
@@ -7137,6 +7144,38 @@ const message = {
             nodeContent3: 'Memantau status operasi setiap nod secara real-time',
             nodeTitle4: 'Sambungan Jauh Pantas',
             nodeContent4: 'Sambung terus ke terminal jauh nod dengan satu klik',
+            imageExchangeTitle1: 'Pilih imej sumber',
+            imageExchangeContent1: 'Lihat imej kontena pada nod sumber dan pilih imej yang hendak dipindahkan.',
+            imageExchangeTitle2: 'Edarkan imej',
+            imageExchangeContent2: 'Pindahkan imej yang dipilih ke satu atau lebih nod sasaran.',
+            imageExchangeTitle3: 'Lihat log pemindahan',
+            imageExchangeContent3: 'Pantau kemajuan dan hasil pemindahan imej dalam log tugas.',
+            appExchangeTitle1: 'Pilih aplikasi',
+            appExchangeContent1:
+                'Lihat aplikasi yang dipasang pada nod sumber dan pilih aplikasi yang hendak dipindahkan.',
+            appExchangeTitle2: 'Sahkan kebergantungan',
+            appExchangeContent2:
+                'Sebelum pemindahan, sahkan nod sasaran dan sumber yang diperlukan, seperti pangkalan data.',
+            appExchangeTitle3: 'Pindahkan aplikasi',
+            appExchangeContent3:
+                'Pindahkan sandaran aplikasi ke nod sasaran untuk pemulihan dan lihat hasilnya dalam log tugas.',
+            sslSyncTitle1: 'Pilih sijil',
+            sslSyncContent1: 'Lihat butiran sijil pada nod sumber dan pilih sijil yang hendak disegerakkan.',
+            sslSyncTitle2: 'Segerakkan antara nod',
+            sslSyncContent2:
+                'Segerakkan sijil yang dipilih ke nod sasaran dengan mengecualikan nod sumber secara automatik.',
+            sslSyncTitle3: 'Sahkan tugas penyegerakan',
+            sslSyncContent3:
+                'Semak nod sasaran dan sijil sebelum pelaksanaan, kemudian lihat hasilnya dalam log tugas.',
+            phpExtensionsSyncTitle1: 'Pilih templat',
+            phpExtensionsSyncContent1:
+                'Lihat nama templat dan senarai sambungan pada nod sumber, kemudian pilih templat yang hendak disegerakkan.',
+            phpExtensionsSyncTitle2: 'Segerakkan templat',
+            phpExtensionsSyncContent2:
+                'Segerakkan templat yang dipilih ke nod sasaran dengan mengecualikan nod sumber secara automatik.',
+            phpExtensionsSyncTitle3: 'Semak templat sedia ada',
+            phpExtensionsSyncContent3:
+                'Templat dengan nama dan kandungan yang sama akan dilangkau. Kandungan yang berbeza dilaporkan sebagai konflik tanpa ditulis ganti.',
             fileExchangeTitle1: 'Pengangkutan Pengesahan Kunci',
             fileExchangeContent1: 'Mengesahkan melalui kunci SSH untuk memastikan keselamatan pengangkutan.',
             fileExchangeTitle2: 'Segerakan Fail Cekap',
@@ -7660,13 +7699,13 @@ const message = {
             imageBatchConfirmPrefix: 'Akan memindahkan {0} imej ke {1} nod, dengan jumlah {2} tugasan.',
 
             ssl: 'Penyegerakan Sijil',
-            phpExtensions: 'PHP Extension Template Sync',
-            phpExtensionsTitle: 'Extension Template Sync',
-            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
-            phpExtensionsList: 'PHP extensions',
-            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensions: 'Penyegerakan Templat Sambungan PHP',
+            phpExtensionsTitle: 'Penyegerakan Templat Sambungan',
+            phpExtensionsDesc: 'Pilih nod sumber untuk menyegerakkan templat sambungan PHP ke nod sasaran.',
+            phpExtensionsList: 'Sambungan PHP',
+            phpExtensionsConfirm: 'Segerakkan {0} templat sambungan PHP ke {1} nod.',
             phpExtensionsConflictHint:
-                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
+                'Templat yang sama akan dilangkau. Templat dengan nama yang sama tetapi kandungan berbeza dilaporkan sebagai konflik dan tidak akan ditulis ganti.',
             sslBatchDesc:
                 'Selepas memilih nod sumber, sijil yang ditentukan boleh disegerakkan ke persekitaran panel semasa.',
             sslBatchConfirmPrefix: 'Akan menyegerakkan {0} sijil ke {1} nod, dengan jumlah {2} tugasan.',

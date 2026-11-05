@@ -816,4 +816,4 @@ ContainerImageCheckFailures: "컨테이너 {{ .count }}개 확인에 실패했�
 
 ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트를 확인하려면 먼저 프록시 서버를 설정하세요."
 
-ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+ErrPHPExtensionsConflict: "같은 이름에 내용이 다른 PHP 확장 템플릿이 이미 있어 덮어쓰지 않았습니다"

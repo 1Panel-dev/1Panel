@@ -588,9 +588,9 @@ MCPInstallLocalImage: "Образ уже есть локально; пропус
 MCPInstallVerifyImage: "Проверить версию образа и контракт управляемой службы"
 MCPInstallVerifiedImage: "Образ успешно проверен"
 
-PHPExtensionsNoTargets: "No target nodes remain after excluding the source node"
-PHPExtensionsSyncTask: "Sync PHP extension template [{{ .name }}]"
-PHPExtensionsSyncSkipped: "Node [{{ .node }}] already has an identical template; skipped"
+PHPExtensionsNoTargets: "После исключения исходного узла не осталось целевых узлов"
+PHPExtensionsSyncTask: "Синхронизация шаблона расширений PHP [{{ .name }}]"
+PHPExtensionsSyncSkipped: "На узле [{{ .node }}] уже есть идентичный шаблон; пропущено"
 MCPInstallCleanup: "Очистка предыдущего контейнера"
 MCPInstallOldContainerRemoved: "Предыдущий контейнер удалён"
 MCPInstallOldImageRemoved: "Предыдущий образ удалён"

@@ -817,4 +817,4 @@ ContainerImageCheckFailures: "بررسی {{ .count }} کانتینر ناموف�
 
 ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصاویر در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید."
 
-ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"

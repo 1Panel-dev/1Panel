@@ -816,4 +816,4 @@ ContainerImageCheckFailures: "Semakan {{ .count }} kontena gagal; lihat log tuga
 
 ErrImageCheckProxyRequired: "Untuk menyemak kemas kini imej dalam persekitaran semasa, sila konfigurasikan pelayan proksi terlebih dahulu."
 
-ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+ErrPHPExtensionsConflict: "Templat sambungan PHP dengan nama ini sudah wujud tetapi kandungannya berbeza; tidak ditulis ganti"
