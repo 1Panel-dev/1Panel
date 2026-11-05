@@ -5,7 +5,7 @@
                 <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-dropdown @command="handleSyncOp" class="mr-2.5">
+                <el-dropdown @command="handleSyncOp">
                     <el-button type="primary" plain>
                         {{ $t('commons.button.sync') }}
                         <el-icon><arrow-down /></el-icon>
@@ -34,6 +34,20 @@
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
+                <span v-if="!isOffline && scriptSync" class="sync-status">
+                    {{
+                        $t(
+                            scriptSync === 'Enable'
+                                ? 'commons.status.autoSyncEnabled'
+                                : 'commons.status.autoSyncDisabled',
+                        )
+                    }}
+                    <el-tooltip :content="$t('cronjob.library.autoSyncHelper')" placement="top">
+                        <el-icon tabindex="0" :aria-label="$t('cronjob.library.autoSyncHelper')">
+                            <InfoFilled />
+                        </el-icon>
+                    </el-tooltip>
+                </span>
 
                 <el-button v-permission v-node-admin type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
@@ -124,6 +138,7 @@
 </template>
 
 <script setup lang="ts">
+import { InfoFilled } from '@element-plus/icons-vue';
 import { useSearchState } from '@/utils/search-reset';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { deepCopy } from '@/utils/misc';
@@ -142,7 +157,7 @@ import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getSettingBaseInfo, updateSetting } from '@/api/modules/setting';
 
-const { globalStore, currentNode, isAdminOrNodeAdmin, isMobile } = useGlobalStore();
+const { globalStore, currentNode, isAdminOrNodeAdmin, isMobile, isOffline } = useGlobalStore();
 
 const myDetail = ref();
 
@@ -378,3 +393,13 @@ onMounted(() => {
     loadGroupOptions();
 });
 </script>
+
+<style scoped>
+.sync-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--el-text-color-secondary);
+    font-size: 13px;
+}
+</style>

@@ -345,6 +345,8 @@ const message = {
             serviceNotStarted: '尚未啟動 {0} 服務',
         },
         status: {
+            autoSyncEnabled: '自動同步已開啟',
+            autoSyncDisabled: '自動同步未開啟',
             running: '已啟動',
             done: '已完成',
             scanFailed: '未完成',
@@ -1035,7 +1037,16 @@ const message = {
             modelTokenHelper: '選填，存取私人或受限模型時需填寫具備權限的 Token。',
             modelDirHelper: '模型下載儲存目錄，也用於讀取本機模型清單。',
             featuredModelsHelper:
-                '1Panel 官方精選模型目錄，可手動重新整理或開啟每 24 小時自動同步，僅更新目錄，不下載模型檔案。',
+                '瀏覽 1Panel 官方精選模型，查看模型規格、適用情境及下載來源，選擇合適的模型進行下載。',
+            featuredModelsSyncHelper: '開啟自動同步後，每天凌晨更新精選模型目錄，不下載模型檔案；也可手動立即同步。',
+            recipeSyncHelper:
+                '開啟自動同步後，每天凌晨更新同步來源的 Recipes，自訂 Recipes不受影響；也可手動立即同步。',
+            readinessPreparing: '準備中',
+            readinessReady: '已就緒',
+            readinessNotReady: '未就緒',
+            readinessPreparingHelper: '容器已啟動，模型可能仍在載入，請稍候。',
+            readinessReadyHelper: '容器健康檢查已通過，服務已就緒。',
+            readinessNotReadyHelper: '容器仍在執行，但健康檢查連續失敗，服務尚未就緒，請查看容器日誌。',
             addInstanceHelper: '建立 vLLM 執行個體，將已下載的模型部署為模型服務。',
             addService: '新增',
             onlineModel: '線上模型',
@@ -1052,8 +1063,9 @@ const message = {
             recipeConfig: 'Recipe 配置',
             selectRecipe: '選擇 Recipe',
             createRecipe: '建立 Recipe',
-            recipeHelper:
-                'Recipe 用於描述模型在指定硬體上的啟動方式，包含模型、硬體和啟動參數；支援從 {link} 匯入命令。',
+            recipeSynced: '系統同步',
+            recipeCustom: '自訂',
+            recipeHelper: '儲存和管理模型的啟動命令，部署時可直接選用，也可從 {link} 匯入。',
             recipeFormHelper:
                 '前往 {link}，依序選擇模型提供商和目標模型，再根據硬體、量化版本及部署策略等選項產生啟動命令。',
             recipeArguments: '啟動參數',
@@ -2491,6 +2503,7 @@ const message = {
         library: {
             script: '腳本',
             syncNow: '立即同步',
+            autoSyncHelper: '開啟自動同步後，每天凌晨更新系統腳本，自訂腳本不受影響；也可手動立即同步。',
             turnOnSync: '開啟自動同步',
             turnOnSyncHelper: '開啟自動同步將在每天凌晨時段進行自動同步',
             turnOffSync: '關閉自動同步',
@@ -6599,7 +6612,7 @@ const message = {
             modelDownloaderContent2:
                 '從 Hugging Face 和 ModelScope 下載模型，查看任務進度，支援取消、重試和本機檔案管理。',
             modelDownloaderTitle3: 'vLLM Recipes',
-            modelDownloaderContent3: '瀏覽及同步官方 Recipes，管理自訂配方，匹配模型並重用部署參數。',
+            modelDownloaderContent3: '瀏覽及同步官方 Recipes，管理自訂 Recipes，匹配模型並重用部署參數。',
             modelDownloaderTitle4: '設定',
             modelDownloaderContent4: '統一設定模型下載目錄、下載來源網址、存取 Token 和精選模型自動同步。',
         },

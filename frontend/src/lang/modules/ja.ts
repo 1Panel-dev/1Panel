@@ -364,6 +364,8 @@ const message = {
             serviceNotStarted: '{0}サービスは開始されません。',
         },
         status: {
+            autoSyncEnabled: '自動同期は有効です',
+            autoSyncDisabled: '自動同期は無効です',
             running: 'ランニング',
             done: '終わり',
             scanFailed: '不完全',
@@ -1087,7 +1089,19 @@ const message = {
             modelTokenHelper: '任意。非公開・制限付きモデルにはアクセス権のあるトークンが必要です。',
             modelDirHelper: 'モデルの保存先とローカルモデル一覧の読み込み先です。',
             featuredModelsHelper:
-                '1Panel 公式のおすすめモデル一覧です。手動更新または 24 時間ごとの自動同期が可能です。同期は一覧のみを更新し、モデルファイルはダウンロードしません。',
+                '1Panel が厳選したモデルの仕様、用途、ダウンロード元を確認し、適切なモデルを選んでダウンロードできます。',
+            featuredModelsSyncHelper:
+                '自動同期を有効にすると、毎日未明に厳選モデルのカタログを更新します。モデルファイルはダウンロードしません。いつでも手動で同期できます。',
+            recipeSyncHelper:
+                '自動同期を有効にすると、毎日未明に同期元のレシピを更新します。カスタムレシピには影響しません。いつでも手動で同期できます。',
+            readinessPreparing: '準備中',
+            readinessReady: '準備完了',
+            readinessNotReady: '準備未完了',
+            readinessPreparingHelper:
+                'コンテナーは起動していますが、ヘルスチェックはまだ成功していません。モデルの読み込み中の可能性があります。しばらくお待ちください。',
+            readinessReadyHelper: '直近のコンテナーヘルスチェックに成功しました。サービスの準備が完了しています。',
+            readinessNotReadyHelper:
+                'コンテナーは稼働していますが、ヘルスチェックが連続して失敗しています。サービスの準備が完了していません。コンテナーログを確認してください。',
             addInstanceHelper: 'vLLM インスタンスを作成し、ダウンロード済みモデルをモデルサービスとして公開します。',
             addService: '追加',
             onlineModel: 'オンラインモデル',
@@ -1104,8 +1118,10 @@ const message = {
             recipeConfig: 'Recipe 設定',
             selectRecipe: 'Recipe を選択',
             createRecipe: 'Recipe を作成',
+            recipeSynced: '同期済み',
+            recipeCustom: 'カスタム',
             recipeHelper:
-                'Recipe は、指定したハードウェアでモデルを起動する方法を記述し、モデル、ハードウェア、起動引数を含みます。{link} からコマンドをインポートできます。',
+                'ハードウェアごとのモデルデプロイ用レシピを管理し、起動引数を再利用してすばやくデプロイできます。{link} からのコマンドのインポートにも対応しています。',
             recipeFormHelper:
                 '{link} にアクセスし、モデルの提供元を選択してから、対象のモデルを選択します。 ハードウェア、量子化バージョン、デプロイ戦略などを設定すると、最終的な起動コマンドが生成されます。',
             recipeArguments: '起動引数',
@@ -2618,6 +2634,8 @@ const message = {
         library: {
             script: 'スクリプト',
             syncNow: '今すぐ同期',
+            autoSyncHelper:
+                '自動同期を有効にすると、毎日未明にシステムスクリプトを更新します。カスタムスクリプトには影響しません。いつでも手動で同期できます。',
             turnOnSync: '自動同期を有効化',
             turnOnSyncHelper: '自動同期を有効にすると、毎日未明の時間帯に自動同期が実行されます',
             turnOffSync: '自動同期を無効化',

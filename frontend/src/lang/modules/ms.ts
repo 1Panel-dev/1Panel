@@ -371,6 +371,8 @@ const message = {
             serviceNotStarted: 'Perkhidmatan {0} belum dimulakan.',
         },
         status: {
+            autoSyncEnabled: 'Penyegerakan automatik diaktifkan',
+            autoSyncDisabled: 'Penyegerakan automatik dinyahaktifkan',
             running: 'Sedang Berjalan',
             done: 'Selesai',
             scanFailed: 'Tidak Lengkap',
@@ -1110,7 +1112,19 @@ const message = {
             modelTokenHelper: 'Pilihan. Gunakan token dengan kebenaran akses untuk model peribadi atau terhad.',
             modelDirHelper: 'Direktori muat turun model dan sumber senarai model setempat.',
             featuredModelsHelper:
-                'Katalog model pilihan rasmi 1Panel. Muat semula secara manual atau aktifkan penyegerakan automatik setiap 24 jam. Hanya katalog dikemas kini, tanpa memuat turun fail model.',
+                'Semak model pilihan 1Panel, lihat spesifikasi, kegunaan dan sumber muat turun, kemudian pilih model yang sesuai untuk dimuat turun.',
+            featuredModelsSyncHelper:
+                'Penyegerakan automatik mengemas kini katalog model pilihan setiap hari pada awal pagi tanpa memuat turun fail model. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
+            recipeSyncHelper:
+                'Penyegerakan automatik mengemas kini resipi yang disegerakkan setiap hari pada awal pagi tanpa menjejaskan resipi tersuai. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
+            readinessPreparing: 'Sedang disediakan',
+            readinessReady: 'Sedia',
+            readinessNotReady: 'Belum sedia',
+            readinessPreparingHelper:
+                'Bekas telah dimulakan tetapi belum lulus pemeriksaan kesihatan. Model mungkin masih dimuatkan. Sila tunggu.',
+            readinessReadyHelper: 'Pemeriksaan kesihatan bekas yang terkini telah lulus. Perkhidmatan sudah sedia.',
+            readinessNotReadyHelper:
+                'Bekas masih berjalan, tetapi pemeriksaan kesihatan berturut-turut telah gagal. Perkhidmatan belum sedia. Semak log bekas.',
             addInstanceHelper:
                 'Cipta instans vLLM untuk menyediakan model yang dimuat turun sebagai perkhidmatan model.',
             addService: 'Tambah',
@@ -1128,8 +1142,10 @@ const message = {
             recipeConfig: 'Konfigurasi Recipe',
             selectRecipe: 'Pilih Recipe',
             createRecipe: 'Cipta Recipe',
+            recipeSynced: 'Disegerakkan',
+            recipeCustom: 'Tersuai',
             recipeHelper:
-                'Recipe menerangkan cara melancarkan model pada perkakasan tertentu, termasuk model, perkakasan dan argumen pelancaran. Arahan boleh diimport daripada {link}.',
+                'Urus resipi penggunaan model untuk perkakasan berbeza, guna semula argumen pelancaran untuk penggunaan pantas atau import arahan daripada {link}.',
             recipeFormHelper:
                 'Pergi ke {link}, pilih penyedia model, kemudian pilih model sasaran. Konfigurasikan perkakasan, varian pengkuantuman, strategi penggunaan dan pilihan lain untuk menjana arahan pelancaran akhir.',
             recipeArguments: 'Argumen pelancaran',
@@ -2671,6 +2687,8 @@ const message = {
         library: {
             script: 'Skrip',
             syncNow: 'Segerakan Sekarang',
+            autoSyncHelper:
+                'Penyegerakan automatik mengemas kini skrip sistem setiap hari pada awal pagi tanpa menjejaskan skrip tersuai. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
             turnOnSync: 'Hidupkan Segerakan Auto',
             turnOnSyncHelper:
                 'Menghidupkan segerakan auto akan melakukan penyegerakan automatik pada waktu awal pagi setiap hari',
