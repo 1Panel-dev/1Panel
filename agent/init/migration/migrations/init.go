@@ -1938,3 +1938,12 @@ var AddModelQuickJump = &gormigrate.Migration{
 		}).Error
 	},
 }
+
+var UpdateModelServicesQuickJumpRouter = &gormigrate.Migration{
+	ID: "20261105-update-model-services-quick-jump-router",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Model(&model.QuickJump{}).
+			Where("name = ? AND router IN ?", "ModelServices", []string{"/ai/model", "/ai/model/account"}).
+			Update("router", "/ai/model-services").Error
+	},
+}
