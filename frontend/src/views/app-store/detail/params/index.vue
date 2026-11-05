@@ -270,7 +270,8 @@ const getServices = async (childKey: string, key: string | undefined, pObj: Para
     if (appKey.value == 'mysql' || appKey.value == 'mariadb') {
         form.format = 'utf8mb4';
     }
-    await getAppService(key).then((res) => {
+    const minVersion = pObj.minVersion || pObj.child?.minVersion;
+    await getAppService(key, undefined, minVersion).then((res) => {
         pObj.services = res.data || [];
         form[childKey] = '';
         if (res.data && res.data.length > 0) {

@@ -145,6 +145,8 @@ type AppForm struct {
 }
 
 type AppFormFields struct {
+	Key         string         `json:"key,omitempty" yaml:"key,omitempty"`
+	MinVersion  string         `json:"minVersion,omitempty" yaml:"minVersion,omitempty"`
 	Type        string         `json:"type"`
 	LabelZh     string         `json:"labelZh"`
 	LabelEn     string         `json:"labelEn"`

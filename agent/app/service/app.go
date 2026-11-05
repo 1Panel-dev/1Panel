@@ -393,6 +393,9 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	if err != nil {
 		return
 	}
+	if err = validateAppServiceVersions(appDetail.Params, req.Params); err != nil {
+		return
+	}
 	if err = checkVllmVersionAccess(app.Key, appDetail.Version); err != nil {
 		return
 	}

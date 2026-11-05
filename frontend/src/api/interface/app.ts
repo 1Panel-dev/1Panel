@@ -111,6 +111,7 @@ export namespace App {
         default: any;
         envKey: string;
         key?: string;
+        minVersion?: string;
         values?: ServiceParam[];
         child?: FromFieldChild;
         params?: FromParam[];

@@ -186,13 +186,14 @@ func (b *BaseApi) OperateInstalled(c *gin.Context) {
 // @Summary Search app service by key
 // @Accept json
 // @Param key path string true "request"
+// @Param minVersion query string false "Minimum service version"
 // @Success 200 {array} response.AppService
 // @Security ApiKeyAuth
 // @Security Timestamp
 // @Router /apps/services/:key [get]
 func (b *BaseApi) GetServices(c *gin.Context) {
 	key := c.Param("key")
-	services, err := appInstallService.GetServices(key)
+	services, err := appInstallService.GetServices(key, c.Query("minVersion"))
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

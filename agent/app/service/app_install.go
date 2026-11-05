@@ -46,7 +46,7 @@ type IAppInstallService interface {
 	Operate(req request.AppInstalledOperate) error
 	Update(req request.AppInstalledUpdate) error
 	SyncAll(systemInit bool) error
-	GetServices(key string) ([]response.AppService, error)
+	GetServices(key string, minVersion string) ([]response.AppService, error)
 	GetUpdateVersions(req request.AppUpdateVersion) ([]dto.AppVersion, error)
 	GetParams(id uint) (*response.AppConfig, error)
 	ChangeAppPort(req request.PortUpdate) error
@@ -711,7 +711,7 @@ func (a *AppInstallService) SyncAll(systemInit bool) error {
 	return nil
 }
 
-func (a *AppInstallService) GetServices(key string) ([]response.AppService, error) {
+func (a *AppInstallService) GetServices(key string, minVersion string) ([]response.AppService, error) {
 	var res []response.AppService
 	if DatabaseKeys[key] > 0 {
 		types := []string{key}
@@ -741,6 +741,9 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 				if err != nil {
 					return nil, err
 				}
+				if !appServiceVersionAllowed(install.Version, minVersion) {
+					continue
+				}
 				paramMap := make(map[string]string)
 				if install.Param != "" {
 					_ = json.Unmarshal([]byte(install.Param), &paramMap)
@@ -749,6 +752,9 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 				service.From = constant.AppResourceLocal
 				service.Status = install.Status
 			} else {
+				if !appServiceVersionAllowed(db.Version, minVersion) {
+					continue
+				}
 				service.From = constant.AppResourceRemote
 				service.Status = constant.StatusRunning
 				service.Config = map[string]string{"PANEL_DB_ROOT_PASSWORD": db.Password, "PANEL_DB_ROOT_USER": db.Username}
@@ -765,6 +771,9 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			return nil, err
 		}
 		for _, install := range installs {
+			if !appServiceVersionAllowed(install.Version, minVersion) {
+				continue
+			}
 			paramMap := make(map[string]string)
 			if install.Param != "" {
 				_ = json.Unmarshal([]byte(install.Param), &paramMap)

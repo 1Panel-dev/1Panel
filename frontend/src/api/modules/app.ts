@@ -86,9 +86,16 @@ export const syncInstalledApp = () => {
     return http.post<any>('apps/installed/sync', {});
 };
 
-export const getAppService = (key: string | undefined, node?: string) => {
-    const params = node ? `?operateNode=${node}` : '';
-    return http.get<App.AppService[]>(`apps/services/${key}${params}`);
+export const getAppService = (key: string | undefined, node?: string, minVersion?: string) => {
+    const params = new URLSearchParams();
+    if (node) {
+        params.set('operateNode', node);
+    }
+    if (minVersion) {
+        params.set('minVersion', minVersion);
+    }
+    const query = params.toString();
+    return http.get<App.AppService[]>(`apps/services/${key}${query ? '?' + query : ''}`);
 };
 
 export const getAppUpdateVersions = (req: App.AppUpdateVersionReq, node?: string) => {
