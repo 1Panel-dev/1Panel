@@ -6,14 +6,25 @@ const aiRouter = {
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,
-    redirect: '/ai/model/account',
+    redirect: '/ai/model-services',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.aiTools',
     },
     children: [
         {
-            path: '/ai/model/local/ollama',
+            path: '/ai/gpu/current',
+            name: 'GPU',
+            component: () => import('@/views/ai/gpu/current/index.vue'),
+            meta: {
+                icon: 'p-gpu-menu',
+                title: 'aiTools.gpu.gpu',
+                activeMenu: '/ai/gpu/current',
+                permission: 'ai_gpu_view',
+            },
+        },
+        {
+            path: '/ai/ollama',
             name: 'OllamaModels',
             component: () => import('@/views/ai/ollama/index.vue'),
             meta: {
@@ -23,13 +34,13 @@ const aiRouter = {
             },
         },
         {
-            path: '/ai/model/account',
+            path: '/ai/model-services',
             name: 'ModelServices',
             component: () => import('@/views/ai/model/index.vue'),
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.services',
-                activeMenu: '/ai/model/account',
+                activeMenu: '/ai/model-services',
                 permission: 'ai_model_view',
             },
         },
@@ -73,17 +84,6 @@ const aiRouter = {
                 title: 'panelMCP.accessTitle',
                 activeMenu: '/ai/mcp',
                 permission: 'mcp_access_view',
-            },
-        },
-        {
-            path: '/ai/gpu/current',
-            name: 'GPU',
-            component: () => import('@/views/ai/gpu/current/index.vue'),
-            meta: {
-                icon: 'p-gpu-menu',
-                title: 'aiTools.gpu.gpu',
-                activeMenu: '/ai/gpu/current',
-                permission: 'ai_gpu_view',
             },
         },
         {

@@ -41,7 +41,7 @@ export const jumpToInstall = (type: string, key: string) => {
         case 'vllm':
             if (globalStore.isProductPro && router.hasRoute('LocalModel')) {
                 router.push({
-                    path: '/ai/model/local',
+                    path: '/ai/vllm/deployments',
                     query: {
                         engine: 'vllm',
                         uncached: 'true',

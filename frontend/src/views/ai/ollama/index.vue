@@ -1,6 +1,6 @@
 <template>
     <div>
-        <RouterButton :buttons="[{ label: $t('aiTools.model.ollamaManagement'), path: '/ai/model/local/ollama' }]" />
+        <RouterButton :buttons="[{ label: $t('aiTools.model.ollamaManagement'), path: '/ai/ollama' }]" />
         <OllamaModels :key="currentNode" />
     </div>
 </template>

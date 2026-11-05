@@ -1,6 +1,6 @@
 <template>
     <div class="model-page">
-        <RouterButton :buttons="[{ label: $t('aiTools.model.services'), path: '/ai/model/account' }]" />
+        <RouterButton :buttons="[{ label: $t('aiTools.model.services'), path: '/ai/model-services' }]" />
         <LayoutContent v-loading="loading">
             <template #leftToolBar>
                 <el-button v-permission type="primary" @click="createRef.open()">

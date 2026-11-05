@@ -1490,3 +1490,47 @@ var UpdateFirewallMenuPath = &gormigrate.Migration{
 		})
 	},
 }
+
+var UpdateAiMenus = &gormigrate.Migration{
+	ID: "20261105-update-ai-menus",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.UpdateHideMenu(tx, func(menus []dto.ShowMenu) []dto.ShowMenu {
+			sorts := map[string]int{
+				"GPU":               10,
+				"OllamaModels":      25,
+				"AIModel":           50,
+				"ModelServices":     75,
+				"AIBenchmark":       100,
+				"AIProxyManagement": 125,
+				"Agents":            150,
+				"SkillsHub":         175,
+				"MCPServer":         200,
+			}
+			paths := map[string]string{
+				"/ai/model":              "/ai/vllm",
+				"/ai/model/files":        "/ai/vllm/models",
+				"/ai/model/local":        "/ai/vllm/deployments",
+				"/ai/model/local/ollama": "/ai/ollama",
+				"/ai/model/account":      "/ai/model-services",
+			}
+			for i := range menus {
+				if menus[i].Label != "AI-Menu" {
+					continue
+				}
+				if path, ok := paths[menus[i].Path]; ok {
+					menus[i].Path = path
+				}
+				for j := range menus[i].Children {
+					if sort, ok := sorts[menus[i].Children[j].Label]; ok {
+						menus[i].Children[j].Sort = sort
+					}
+					if path, ok := paths[menus[i].Children[j].Path]; ok {
+						menus[i].Children[j].Path = path
+					}
+				}
+				break
+			}
+			return menus
+		})
+	},
+}
