@@ -32,15 +32,6 @@ const (
 	defaultVerifyMaxTokens = 16
 )
 
-func SkipVerification(provider string) bool {
-	switch provider {
-	case "vllm", "ollama", "llmman", "kimi-coding":
-		return true
-	default:
-		return false
-	}
-}
-
 func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) error {
 	req := BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model)
 	httpReq, err := http.NewRequest(req.Method, req.URL, bytes.NewReader(req.Body))

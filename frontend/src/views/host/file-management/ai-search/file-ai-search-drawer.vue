@@ -494,7 +494,6 @@ import { File } from '@/api/interface/file';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import i18n from '@/lang';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
-import { isAgentAccountVerificationSkipped } from '@/utils/agent';
 import MkdownEditor from '@/components/mkdown-editor/index.vue';
 
 const AI_SEARCH_DEFAULT_MAX_ITEMS = 500;
@@ -647,7 +646,14 @@ const fileAiSettingsSaving = ref(false);
 const fileAiStatus = ref<'Enable' | 'Disable'>('Disable');
 const fileAiAccountId = ref('');
 const fileAiAgentAccountOptions = ref<
-    Array<{ id: number | string; name: string; provider?: string; providerName?: string; verified?: boolean }>
+    Array<{
+        id: number | string;
+        name: string;
+        provider?: string;
+        providerName?: string;
+        verified?: boolean;
+        validateAvailability?: boolean;
+    }>
 >([]);
 
 const loadFileAiManageSettings = async () => {
@@ -661,17 +667,13 @@ const loadFileAiAgentAccounts = async () => {
     fileAiAgentAccountOptions.value = res.data?.items || [];
 };
 
-const fileAiVerificationLabel = (item: { provider?: string; verified?: boolean }) => {
-    if (isAgentAccountVerificationSkipped(item.provider)) {
-        return i18n.global.t('aiTools.agents.verifySkipped');
-    }
+const fileAiVerificationLabel = (item: { provider?: string; verified?: boolean; validateAvailability?: boolean }) => {
+    if (item.validateAvailability === false) return i18n.global.t('aiTools.agents.verifySkipped');
     return item.verified ? 'OK' : 'N/A';
 };
 
-const fileAiVerificationTagType = (item: { provider?: string; verified?: boolean }) => {
-    if (isAgentAccountVerificationSkipped(item.provider)) {
-        return 'success';
-    }
+const fileAiVerificationTagType = (item: { provider?: string; verified?: boolean; validateAvailability?: boolean }) => {
+    if (item.validateAvailability === false) return 'info';
     return item.verified ? 'success' : 'warning';
 };
 

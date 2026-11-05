@@ -1022,7 +1022,7 @@ const message = {
             apiTypeBaseURLMismatch: 'Base URL فعلی شبیه مسیر {0} است، اما {1} انتخاب شده است. URL پیشنهادی: {2}',
             customImageURLHelper:
                 'برای حساب Custom، URL کامل رابط تولید تصویر را وارد کنید. مسیر به‌صورت خودکار افزوده نمی‌شود. نمونه: {0}',
-            validateAvailability: 'اعتبارسنجی دسترس‌پذیری حساب',
+            validateAvailability: 'بررسی دسترس‌پذیری هنگام ذخیره',
             validateAvailabilityHelper: 'پیش از ذخیره یک پیام حداقلی برای بررسی API ارسال می‌شود',
             validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
@@ -1130,6 +1130,13 @@ const message = {
             endpoint: 'نقطه پایانی',
             cloudAccount: 'حساب ابری',
             connectionStatus: 'وضعیت اتصال',
+            verify: 'بررسی',
+            verifying: 'در حال بررسی',
+            verifyFailed: 'بررسی ناموفق',
+            verifiedAt: 'زمان بررسی',
+            verifyModelChangeHelper: 'با تغییر مدل تأیید، سرویس بدون فراخوانی مدل به حالت تأییدنشده تغییر می‌کند.',
+            verifyOnChangeHelper:
+                'در حالت غیرفعال، بررسی لازم نیست. با فعال‌سازی یک بار بررسی انجام می‌شود؛ پس از آن فقط با تغییر تنظیمات اتصال یا مدل بررسی تکرار می‌شود.',
             unverified: 'تأیید نشده',
             manage: 'مدیریت',
             loadFailed: 'بارگذاری ناموفق بود. صفحه را تازه‌سازی کرده و دوباره تلاش کنید.',

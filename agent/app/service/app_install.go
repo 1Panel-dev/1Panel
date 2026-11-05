@@ -292,7 +292,7 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	}
 	switch req.Operate {
 	case constant.Rebuild:
-		return rebuildApp(install)
+		return rebuildApp(install, req.TaskID, nil)
 	case constant.Start:
 		out, err := compose.Up(dockerComposePath)
 		if err != nil {
@@ -382,6 +382,11 @@ func operateAppTask(install model.AppInstall, req request.AppInstalledOperate, o
 	operationTask.AddSubTaskWithOps(
 		task.GetTaskName(install.Name, taskType, task.TaskScopeApp),
 		func(t *task.Task) error {
+			if req.Operate == constant.Start || req.Operate == constant.Restart {
+				if err := resetLocalModelAccountVerification(install); err != nil {
+					return err
+				}
+			}
 			if req.UseLifecycleScripts {
 				if err := runScript(t, &install, operation); err != nil {
 					return err
@@ -463,6 +468,10 @@ func (a *AppInstallService) UpdateSort(req request.AppInstallSort) error {
 }
 
 func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
+	return a.UpdateWithBeforeRestart(req, nil)
+}
+
+func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpdate, beforeRestart func(*model.AppInstall) error) error {
 	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
@@ -618,6 +627,18 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 		failed.Message = operationErr.Error()
 		_ = appInstallRepo.Save(context.Background(), &failed)
 	}
+	if installed.App.Key == "ollama" && installed.SyncModelAccount {
+		if err := syncOllamaModelAccount(installed, modelAccountBaseURL, true, true); err != nil {
+			restoreConfig(err)
+			return err
+		}
+	}
+	if beforeRestart != nil {
+		if err := beforeRestart(&installed); err != nil {
+			restoreConfig(err)
+			return err
+		}
+	}
 	if req.UseLifecycleScripts {
 		err = operateAppTask(installed, request.AppInstalledOperate{
 			InstallId:           installed.ID,
@@ -626,7 +647,7 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 			UseLifecycleScripts: true,
 		}, restoreConfig)
 	} else {
-		err = rebuildApp(installed)
+		err = rebuildApp(installed, req.TaskID, restoreConfig)
 	}
 	if err != nil {
 		restoreConfig(err)
@@ -670,9 +691,6 @@ func (a *AppInstallService) Update(req request.AppInstalledUpdate) error {
 	}
 	if proxyChanged && website.ID != 0 && currentProxyErr != nil {
 		global.LOG.Error(buserr.WithErr("ErrUpdateBuWebsite", currentProxyErr).Error())
-	}
-	if installed.App.Key == "ollama" && installed.SyncModelAccount {
-		return syncOllamaModelAccount(installed, modelAccountBaseURL, true, true)
 	}
 	return nil
 }

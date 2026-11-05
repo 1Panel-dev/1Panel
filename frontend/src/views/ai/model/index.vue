@@ -132,9 +132,24 @@
                     </el-table-column>
                     <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
                         <template #default="{ row }">
-                            <el-tag :type="connectionStatus(row).type">
-                                {{ connectionStatus(row).label }}
-                            </el-tag>
+                            <el-tooltip
+                                :disabled="!row.validateAvailability || (!row.verifiedAt && !row.verifyError)"
+                                placement="top"
+                            >
+                                <template #content>
+                                    <div v-if="row.verifiedAt">
+                                        {{ $t('aiTools.model.verifiedAt') }}:
+                                        {{ dateFormatSimpleWithSecond(row.verifiedAt) }}
+                                    </div>
+                                    <div v-if="row.verifyModel">
+                                        {{ $t('aiTools.agents.verifyModel') }}: {{ row.verifyModel }}
+                                    </div>
+                                    <div v-if="row.verifyError" class="max-w-md break-words">{{ row.verifyError }}</div>
+                                </template>
+                                <el-tag :type="connectionStatus(row).type">
+                                    {{ connectionStatus(row).label }}
+                                </el-tag>
+                            </el-tooltip>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -159,7 +174,7 @@
                         :label="$t('commons.table.operate')"
                         align="left"
                         fixed="right"
-                        :ellipsis="3"
+                        :ellipsis="2"
                         width="220"
                     />
                 </ComplexTable>
@@ -177,11 +192,12 @@ import { ElMessageBox } from 'element-plus';
 import { Cloudy, Monitor } from '@element-plus/icons-vue';
 import type { AI } from '@/api/interface/ai';
 import type { FuTableColumnConfig } from '@/components/table/shared';
-import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
+import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, verifyAgentAccount } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 import i18n from '@/lang';
-import { dateFormat } from '@/utils/date';
+import { dateFormat, dateFormatSimpleWithSecond } from '@/utils/date';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { useSearchState } from '@/utils/search-reset';
 import CreateService from './create/index.vue';
 import ModelPool from './model-pool/index.vue';
@@ -194,6 +210,7 @@ const { isIntl, currentNode } = useGlobalStore();
 const createRef = ref();
 const poolRef = ref();
 const loading = ref(false);
+const verifyingAccounts = reactive(new Set<string>());
 const connections = ref<AI.AgentAccountItem[]>([]);
 const accountColumns = ref<FuTableColumnConfig[]>([]);
 const providers = ref<AI.ProviderInfo[]>([]);
@@ -288,13 +305,35 @@ const search = async () => {
 };
 
 const connectionStatus = (row: AI.AgentAccountItem) => {
-    if (isAgentAccountVerificationSkipped(row.provider)) {
-        return { type: 'success' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
+    if (!row.validateAvailability) {
+        return { type: 'info' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
+    }
+    if (verifyingAccounts.has(`${currentNode.value}:${row.id}`)) {
+        return { type: 'info' as const, label: i18n.global.t('aiTools.model.verifying') };
+    }
+    if (row.verifyError) {
+        return { type: 'danger' as const, label: i18n.global.t('aiTools.model.verifyFailed') };
     }
     return {
         type: row.verified ? ('success' as const) : ('warning' as const),
         label: i18n.global.t(row.verified ? 'aiTools.agents.verified' : 'aiTools.model.unverified'),
     };
+};
+
+const verifyAccount = async (row: AI.AgentAccountItem) => {
+    const node = currentNode.value;
+    const key = `${node}:${row.id}`;
+    if (verifyingAccounts.has(key)) return;
+    verifyingAccounts.add(key);
+    try {
+        await verifyAgentAccount({ id: row.id }, node);
+        MsgSuccess(i18n.global.t('aiTools.agents.verified'));
+    } catch (error: any) {
+        MsgError(String(error?.response?.data?.message || error?.message || i18n.global.t('commons.res.commonError')));
+    } finally {
+        verifyingAccounts.delete(key);
+        if (currentNode.value === node) await search();
+    }
 };
 const accountButtons = [
     {
@@ -306,6 +345,13 @@ const accountButtons = [
         label: i18n.global.t('aiTools.agents.modelPool'),
         disabled: (row: AI.AgentAccountItem) => row.provider === 'vllm',
         click: (row: AI.AgentAccountItem) => poolRef.value.open(row),
+    },
+    {
+        label: i18n.global.t('aiTools.model.verify'),
+        permission: true,
+        disabled: (row: AI.AgentAccountItem) =>
+            !row.validateAvailability || verifyingAccounts.has(`${currentNode.value}:${row.id}`),
+        click: verifyAccount,
     },
     {
         label: i18n.global.t('commons.button.delete'),

@@ -407,6 +407,9 @@ func (u *appUpgradeContext) prepareOpenresty(t *task.Task, stagedInstall model.A
 }
 
 func (u *appUpgradeContext) cutover(t *task.Task) error {
+	if err := resetLocalModelAccountVerification(u.original); err != nil {
+		return err
+	}
 	u.stopAttempted = true
 	t.LogStart(i18n.GetMsgByKey("UpgradeStop"))
 	if out, err := compose.Stop(u.original.GetComposePath()); err != nil {

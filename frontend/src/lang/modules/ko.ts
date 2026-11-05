@@ -1016,7 +1016,7 @@ const message = {
             customImageURLHelper:
                 'Custom 계정에는 전체 이미지 생성 엔드포인트 URL을 입력하세요. 경로는 자동으로 추가되지 않습니다. 예: {0}',
             apiTypeBaseURLMismatch: '현재 Base URL은 {0} 경로처럼 보이지만 {1}이 선택되었습니다. 권장 URL: {2}',
-            validateAvailability: '계정 가용성 확인',
+            validateAvailability: '저장 시 가용성 검증',
             validateAvailabilityHelper: '저장 전에 최소 메시지를 보내 API를 확인합니다',
             validateImageAvailabilityHelper: '저장 전에 최소 이미지 한 장을 생성하며 비용이 발생할 수 있습니다',
         },
@@ -1125,6 +1125,13 @@ const message = {
             endpoint: '엔드포인트',
             cloudAccount: '클라우드 계정',
             connectionStatus: '연결 상태',
+            verify: '검증',
+            verifying: '검증 중',
+            verifyFailed: '검증 실패',
+            verifiedAt: '검증 시간',
+            verifyModelChangeHelper: '검증 모델을 변경하면 모델을 호출하지 않고 서비스가 미검증 상태로 표시됩니다.',
+            verifyOnChangeHelper:
+                '비활성화하면 검증이 필요하지 않습니다. 활성화 시 한 번 검증하고, 이후에는 연결 설정 또는 검증 모델이 변경될 때만 검증합니다.',
             unverified: '미검증',
             manage: '관리',
             loadFailed: '불러오지 못했습니다. 새로 고침 후 다시 시도하세요.',
