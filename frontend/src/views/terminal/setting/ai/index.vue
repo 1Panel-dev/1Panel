@@ -78,7 +78,6 @@ import i18n from '@/lang';
 import { pageAgentAccounts } from '@/api/modules/ai';
 import { getAgentTerminalAIInfo, updateAgentTerminalAIInfo } from '@/api/modules/setting';
 import { MsgSuccess } from '@/utils/message';
-import { isAgentAccountVerificationSkipped } from '@/utils/agent';
 import {
     AI_PREFIX_OPTIONS,
     DEFAULT_AI_PREFIX,
@@ -93,6 +92,7 @@ interface AgentAccountOption {
     provider?: string;
     providerName?: string;
     verified?: boolean;
+    validateAvailability?: boolean;
 }
 
 type FormInstance = InstanceType<typeof ElForm>;
@@ -127,16 +127,12 @@ const openDrawer = () => {
 };
 
 const verificationLabel = (item: AgentAccountOption) => {
-    if (isAgentAccountVerificationSkipped(item.provider)) {
-        return i18n.global.t('aiTools.agents.verifySkipped');
-    }
+    if (item.validateAvailability === false) return i18n.global.t('aiTools.agents.verifySkipped');
     return item.verified ? 'OK' : 'N/A';
 };
 
 const verificationTagType = (item: AgentAccountOption) => {
-    if (isAgentAccountVerificationSkipped(item.provider)) {
-        return 'success';
-    }
+    if (item.validateAvailability === false) return 'info';
     return item.verified ? 'success' : 'warning';
 };
 

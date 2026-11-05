@@ -1049,7 +1049,7 @@ const message = {
                 'Masukkan URL titik akhir penjanaan imej yang lengkap untuk akaun Custom. Laluan tidak ditambah secara automatik. Contoh: {0}',
             apiTypeBaseURLMismatch:
                 'Base URL semasa kelihatan seperti laluan {0}, tetapi {1} dipilih. URL yang disyorkan: {2}',
-            validateAvailability: 'Sahkan ketersediaan akaun',
+            validateAvailability: 'Sahkan ketersediaan semasa menyimpan',
             validateAvailabilityHelper: 'Hantar mesej minimum sebelum menyimpan untuk mengesahkan API',
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
@@ -1160,6 +1160,14 @@ const message = {
             endpoint: 'Titik akhir',
             cloudAccount: 'Akaun awan',
             connectionStatus: 'Status sambungan',
+            verify: 'Sahkan',
+            verifying: 'Sedang mengesahkan',
+            verifyFailed: 'Pengesahan gagal',
+            verifiedAt: 'Masa pengesahan',
+            verifyModelChangeHelper:
+                'Menukar model pengesahan menandakan perkhidmatan sebagai belum disahkan tanpa memanggil model.',
+            verifyOnChangeHelper:
+                'Apabila dimatikan, pengesahan tidak diperlukan. Mengaktifkannya menjalankan pengesahan sekali; selepas itu hanya perubahan tetapan sambungan atau model pengesahan akan disahkan.',
             unverified: 'Belum disahkan',
             manage: 'Urus',
             loadFailed: 'Gagal memuatkan. Muat semula dan cuba lagi.',
@@ -3140,7 +3148,8 @@ const message = {
         aiSearchHint:
             'Cari kandungan fail baris demi baris. Gunakan butang di sebelah kanan baris carian dan "Syarat lanjutan" di bawah. Apabila akaun AI diaktifkan dan disimpan, ringkasan Markdown juga boleh dijana.',
         aiSearchAccountTitle: 'Akaun AI',
-        aiSearchAccountIntro: 'Pilih perkhidmatan model besar untuk menjana ringkasan, kemudian simpan selepas perubahan.',
+        aiSearchAccountIntro:
+            'Pilih perkhidmatan model besar untuk menjana ringkasan, kemudian simpan selepas perubahan.',
         aiSearchAccountEnable: 'Dayakan carian AI fail',
         aiSearchSaveAccount: 'Simpan konfigurasi akaun',
         aiSearchSectionQuery: 'Carian',

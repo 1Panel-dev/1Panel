@@ -58,7 +58,8 @@ type IAppService interface {
 	GetAppDetailByKey(appKey, version string) (response.AppDetailSimpleDTO, error)
 }
 
-type appInstallHooks struct {
+type AppInstallHooks struct {
+	AfterCreate    func(appInstall *model.AppInstall) error
 	AfterCopyData  func(appInstall *model.AppInstall) error
 	PrepareSiteDir func(model.App, model.AppDetail, request.AppInstallCreate, *task.Task) error
 }
@@ -367,10 +368,10 @@ func (a AppService) GetAppDetailByID(id uint) (*response.AppDetailDTO, error) {
 }
 
 func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (appInstall *model.AppInstall, err error) {
-	return a.installWithHooks(req, executeScript, nil)
+	return a.InstallWithHooks(req, executeScript, nil)
 }
 
-func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript bool, hooks *appInstallHooks) (appInstall *model.AppInstall, err error) {
+func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks) (appInstall *model.AppInstall, err error) {
 	if err = docker.CreateDefaultDockerNetwork(); err != nil {
 		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
 		return
@@ -589,6 +590,20 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		return
 	}
 
+	if hooks != nil && hooks.AfterCreate != nil {
+		if err = hooks.AfterCreate(appInstall); err != nil {
+			return
+		}
+	}
+	if app.Key == "ollama" && appInstall.SyncModelAccount {
+		if _, err = SyncLocalModelAccount(*appInstall, 0, modelAccountBaseURL, nil, false, true, nil); err != nil {
+			appInstall.Status = constant.StatusInstallErr
+			appInstall.Message = err.Error()
+			_ = appInstallRepo.Save(context.Background(), appInstall)
+			return
+		}
+	}
+
 	installTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskInstall, task.TaskScopeApp, req.TaskID, appInstall.ID)
 	if err != nil {
 		appInstall.Status = constant.StatusInstallErr
@@ -629,10 +644,6 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 			return err
 		}
 		updateToolApp(appInstall)
-		if app.Key == "ollama" && appInstall.SyncModelAccount {
-			_, err := SyncLocalModelAccount(*appInstall, 0, modelAccountBaseURL, nil, false, true)
-			return err
-		}
 		return nil
 	}
 

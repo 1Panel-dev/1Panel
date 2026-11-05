@@ -1228,16 +1228,19 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages, useLifecyc
 	}
 }
 
-func rebuildApp(appInstall model.AppInstall) error {
+func rebuildApp(appInstall model.AppInstall, taskID string, onFailure func(error)) error {
 	appInstall.Status = constant.StatusRebuilding
 	if err := appInstallRepo.Save(context.Background(), &appInstall); err != nil {
 		return err
 	}
-	buildTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskBuild, task.TaskScopeApp, "", appInstall.ID)
+	buildTask, err := task.NewTaskWithOps(appInstall.Name, task.TaskBuild, task.TaskScopeApp, taskID, appInstall.ID)
 	if err != nil {
 		return handleErr(appInstall, err, "")
 	}
 	buildTask.AddSubTaskWithOps(buildTask.Name, func(t *task.Task) error {
+		if err := resetLocalModelAccountVerification(appInstall); err != nil {
+			return err
+		}
 		t.Log(task.GetTaskName(appInstall.Name, "Stop", task.TaskScopeApp))
 		out, err := compose.Down(appInstall.GetComposePath())
 		if strings.TrimSpace(out) != "" {
@@ -1264,6 +1267,10 @@ func rebuildApp(appInstall model.AppInstall) error {
 	}, nil, 0, 0)
 	go func() {
 		if err := buildTask.Execute(); err != nil {
+			if onFailure != nil {
+				onFailure(err)
+				return
+			}
 			_ = handleErr(appInstall, err, "")
 		}
 	}()
@@ -2089,7 +2096,7 @@ func getAppTags(appID uint, lang string) ([]response.TagDTO, error) {
 	return res, nil
 }
 
-func prepareAppInstallSiteDirectory(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task, hooks *appInstallHooks) error {
+func prepareAppInstallSiteDirectory(app model.App, appDetail model.AppDetail, req request.AppInstallCreate, t *task.Task, hooks *AppInstallHooks) error {
 	if hooks != nil && hooks.PrepareSiteDir != nil {
 		return hooks.PrepareSiteDir(app, appDetail, req, t)
 	}

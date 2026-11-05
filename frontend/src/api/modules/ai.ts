@@ -208,11 +208,17 @@ export const getAgentProviders = () => {
 };
 
 export const createAgentAccount = (req: AI.AgentAccountCreateReq) => {
-    return http.post(`/ai/accounts`, req);
+    return http.postWithConfig(`/ai/accounts`, req, {
+        timeout: TimeoutEnum.T_60S,
+        errorMessageMode: 'manual',
+    });
 };
 
 export const updateAgentAccount = (req: AI.AgentAccountUpdateReq) => {
-    return http.post(`/ai/accounts/update`, req);
+    return http.postWithConfig(`/ai/accounts/update`, req, {
+        timeout: TimeoutEnum.T_60S,
+        errorMessageMode: 'manual',
+    });
 };
 
 export const pageAgentAccounts = (req: AI.AgentAccountSearch, currentNode?: string) => {
@@ -232,6 +238,10 @@ export const getAgentAccountModels = (req: AI.AgentAccountModelReq) => {
     return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models`, req);
 };
 
+export const updateAgentAccountVerifyModel = (req: AI.AgentAccountVerifyModelUpdateReq) => {
+    return http.post(`/ai/accounts/models/verify-model`, req);
+};
+
 export const discoverAgentAccountModels = (req: AI.AgentAccountModelDiscoverReq) => {
     return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req);
 };
@@ -242,6 +252,14 @@ export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
 
 export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
     return http.post(`/ai/accounts/models/update`, req);
+};
+
+export const verifyAgentAccount = (req: { id: number }, currentNode: string) => {
+    return http.postWithConfig(`/ai/accounts/verify`, req, {
+        timeout: TimeoutEnum.T_60S,
+        errorMessageMode: 'manual',
+        headers: { CurrentNode: currentNode },
+    });
 };
 
 export const deleteAgentAccountModel = (req: AI.AgentAccountModelDeleteReq) => {

@@ -1038,8 +1038,8 @@ const message = {
                 'Enter the complete image generation endpoint for Custom accounts. The path is not appended automatically. Example: {0}',
             apiTypeBaseURLMismatch:
                 'The current Base URL looks like a {0} path, but {1} is selected. Recommended URL: {2}',
-            validateAvailability: 'Validate account availability',
-            validateAvailabilityHelper: 'Send a minimal message before saving to validate the API',
+            validateAvailability: 'Verify availability on save',
+            validateAvailabilityHelper: 'Send a minimal message to verify API availability',
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
@@ -1147,7 +1147,15 @@ const message = {
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
             cloudAccount: 'Cloud account',
-            connectionStatus: 'Connection status',
+            connectionStatus: 'Verification status',
+            verify: 'Verify',
+            verifying: 'Verifying',
+            verifyFailed: 'Verification failed',
+            verifiedAt: 'Verification time',
+            verifyModelChangeHelper:
+                'Changing the verification model marks the service as unverified without calling the model.',
+            verifyOnChangeHelper:
+                'When disabled, verification is not required. Enabling runs verification once; later edits verify only when connection settings or the verification model change.',
             unverified: 'Unverified',
             manage: 'Manage',
             loadFailed: 'Failed to load. Refresh to retry.',

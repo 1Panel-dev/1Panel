@@ -127,11 +127,10 @@
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
             </el-form-item>
-            <el-form-item
-                v-if="isImageAPIType || isEmbeddingAPIType || !isAgentAccountVerificationSkipped(form.provider)"
-            >
+            <el-form-item>
                 <el-switch v-model="form.validateAvailability" />
                 <el-text class="validate-availability-label">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
+                <span v-if="form.id" class="input-help">{{ $t('aiTools.model.verifyOnChangeHelper') }}</span>
                 <span class="input-help">
                     {{
                         isImageAPIType
@@ -175,7 +174,7 @@
                         {{ $t('aiTools.agents.discoverModelsHelper') }}
                     </div>
                     <div
-                        v-if="requiresVerifyModel && modelConfigMode === 'discover' && discoveredModels.length"
+                        v-if="form.validateAvailability && (modelConfigMode === 'manual' || discoveredModels.length)"
                         class="input-help model-discovery__help"
                     >
                         {{ $t('aiTools.agents.verifyModelHelper') }}
@@ -196,32 +195,46 @@
                     <el-table
                         v-if="modelConfigMode === 'discover' && discoveredModels.length"
                         :data="discoveredModels"
-                        border
                         max-height="320"
                     >
                         <el-table-column
-                            v-if="requiresVerifyModel"
-                            :label="$t('aiTools.agents.verifyModel')"
-                            width="110"
+                            v-if="form.validateAvailability"
+                            :label="$t('aiTools.model.verify')"
+                            width="90"
                             align="center"
                         >
                             <template #default="{ row }">
-                                <el-radio v-model="form.verifyModel" :value="row.id" />
+                                <el-radio
+                                    v-model="form.verifyModel"
+                                    class="verification-radio"
+                                    :value="row.id"
+                                    :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
+                                >
+                                    <span />
+                                </el-radio>
                             </template>
                         </el-table-column>
                         <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
                         <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
                     </el-table>
                     <template v-if="modelConfigMode === 'manual'">
-                        <el-table :data="manualModels" border max-height="320">
+                        <el-table :data="manualModels" max-height="320">
                             <el-table-column
-                                v-if="requiresVerifyModel"
-                                :label="$t('aiTools.agents.verifyModel')"
-                                width="110"
+                                v-if="form.validateAvailability"
+                                :label="$t('aiTools.model.verify')"
+                                width="90"
                                 align="center"
                             >
                                 <template #default="{ row, $index }">
-                                    <el-radio v-model="manualVerifyIndex" :value="$index" :disabled="!row.id.trim()" />
+                                    <el-radio
+                                        v-model="manualVerifyIndex"
+                                        class="verification-radio"
+                                        :value="$index"
+                                        :disabled="!row.id.trim()"
+                                        :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
+                                    >
+                                        <span />
+                                    </el-radio>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('aiTools.model.model')" min-width="220">
@@ -255,7 +268,16 @@
                                 align="center"
                             >
                                 <template #default="{ $index }">
-                                    <el-button type="primary" link @click="removeManualModel($index)">
+                                    <el-button
+                                        type="primary"
+                                        link
+                                        :disabled="
+                                            form.validateAvailability &&
+                                            Boolean(form.id) &&
+                                            manualVerifyIndex === $index
+                                        "
+                                        @click="removeManualModel($index)"
+                                    >
                                         {{ $t('commons.button.delete') }}
                                     </el-button>
                                 </template>
@@ -322,7 +344,7 @@ import {
 } from '@/api/modules/ai';
 import { checkAppInstalled } from '@/api/modules/app';
 import i18n from '@/lang';
-import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
+import { getAgentProviderDisplayName } from '@/utils/agent';
 import { MsgError } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import ProviderLogo from '@/components/agent-provider-logo/index.vue';
@@ -404,7 +426,6 @@ const selectedAPIConfig = computed(() =>
     selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
 );
 const isImageAPIType = computed(() => form.apiType.endsWith('-images'));
-const isEmbeddingAPIType = computed(() => form.apiType === 'openai-embeddings');
 const supportsModelDiscovery = computed(() => Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
 const defaultModels = computed(() => {
     if (selectedAPIConfig.value?.models.length) {
@@ -413,12 +434,9 @@ const defaultModels = computed(() => {
     return isImageAPIType.value ? [] : selectedProvider.value?.models || [];
 });
 const showModelPool = computed(() => !form.appInstallId);
-const requiresVerifyModel = computed(
-    () => form.validateAvailability && (isEmbeddingAPIType.value || !isAgentAccountVerificationSkipped(form.provider)),
-);
 const verifyModelOptions = computed(() => (form.id ? editModels.value : defaultModels.value));
 const showVerifyModelSelect = computed(
-    () => requiresVerifyModel.value && verifyModelOptions.value.length > 0 && !showModelPool.value,
+    () => form.validateAvailability && verifyModelOptions.value.length > 0 && !showModelPool.value,
 );
 const apiTypeOptions = computed(() => selectedProvider.value?.apiTypes.map((item) => item.apiType) || []);
 const authModeOptions = computed(() => selectedAPIConfig.value?.authModes || []);
@@ -666,14 +684,11 @@ const submit = async () => {
         MsgError(i18n.global.t('aiTools.agents.accountModelsSingle'));
         return;
     }
-    let verifyModel = '';
-    if (requiresVerifyModel.value) {
-        verifyModel = form.verifyModel;
-        if (modelConfigMode.value === 'manual' && showModelPool.value) {
-            verifyModel = accountModels[manualVerifyIndex.value]?.id || '';
-        }
+    let verifyModel = form.verifyModel;
+    if (modelConfigMode.value === 'manual' && showModelPool.value) {
+        verifyModel = accountModels[manualVerifyIndex.value]?.id || '';
     }
-    if (requiresVerifyModel.value && !verifyModel) {
+    if (form.validateAvailability && !verifyModel && (!form.id || editModels.value.length > 0)) {
         MsgError(i18n.global.t('aiTools.agents.verifyModelRequired'));
         return;
     }
@@ -712,7 +727,13 @@ const submit = async () => {
         emit('search');
         open.value = false;
     } catch (error: any) {
-        MsgError(String(error?.message || i18n.global.t('commons.res.commonError')));
+        MsgError(
+            String(
+                error?.response?.data?.message ||
+                    (error?.code === 'ECONNABORTED' ? i18n.global.t('commons.msg.requestTimeout') : error?.message) ||
+                    i18n.global.t('commons.res.commonError'),
+            ),
+        );
     } finally {
         loading.value = false;
     }
@@ -750,6 +771,7 @@ interface OpenParams {
     apiType?: string;
     authMode?: string;
     verifyModel?: string;
+    validateAvailability?: boolean;
     models?: AI.AgentAccountModel[];
     remark?: string;
 }
@@ -770,7 +792,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
         form.rememberApiKey = params.rememberApiKey || false;
-        form.validateAvailability = false;
+        form.validateAvailability = params.validateAvailability ?? true;
         editModels.value = params.models || [];
         const provider = providers.value[form.provider];
         form.apiType = provider?.apiTypes.some((item) => item.apiType === params.apiType)
@@ -827,10 +849,10 @@ const loadProviders = async () => {
 };
 
 const handleProviderChange = () => {
+    form.validateAvailability = true;
     if (connectionMode.value === 'local') {
         form.apiKey = '';
         form.rememberApiKey = false;
-        form.validateAvailability = true;
     }
     connectionMode.value = 'manual';
     form.localEngineId = undefined;
@@ -843,7 +865,7 @@ const handleProviderChange = () => {
 };
 
 const handleConnectionModeChange = () => {
-    form.validateAvailability = connectionMode.value !== 'local';
+    form.validateAvailability = true;
     form.localEngineId = undefined;
     form.baseURL = selectedAPIConfig.value?.baseUrl || '';
     form.apiKey = '';
@@ -1032,5 +1054,14 @@ defineExpose({
 .model-discovery__add {
     display: inline-block;
     margin-top: 12px;
+}
+
+.verification-radio {
+    margin-right: 0;
+    height: 32px;
+
+    :deep(.el-radio__label) {
+        display: none;
+    }
 }
 </style>

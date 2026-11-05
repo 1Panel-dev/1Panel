@@ -301,13 +301,19 @@ type AgentOverviewSnapshot struct {
 }
 
 type AgentAccountModel struct {
-	RecordID uint   `json:"recordId"`
-	ID       string `json:"id"`
-	Name     string `json:"name"`
+	RecordID      uint   `json:"recordId"`
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	IsVerifyModel bool   `json:"isVerifyModel,omitempty"`
 }
 
 type AgentAccountModelReq struct {
 	AccountID uint `json:"accountId" validate:"required"`
+}
+
+type AgentAccountVerifyModelUpdateReq struct {
+	AccountID uint `json:"accountId" validate:"required"`
+	RecordID  uint `json:"recordId" validate:"required"`
 }
 
 type AgentAccountModelDiscoverReq struct {
@@ -364,10 +370,11 @@ type AgentAccountUpdateReq struct {
 }
 
 type AgentAccountVerifyReq struct {
-	Provider string `json:"provider" validate:"required"`
-	APIKey   string `json:"apiKey" validate:"required"`
+	ID       uint   `json:"id"`
+	Provider string `json:"provider" validate:"required_without=ID"`
+	APIKey   string `json:"apiKey" validate:"required_without=ID"`
 	BaseURL  string `json:"baseURL"`
-	APIType  string `json:"apiType" validate:"required"`
+	APIType  string `json:"apiType" validate:"required_without=ID"`
 	AuthMode string `json:"authMode"`
 	Model    string `json:"model"`
 }
@@ -389,22 +396,25 @@ type AgentAccountProviderCountReq struct {
 }
 
 type AgentAccountInfo struct {
-	AppInstallID    uint                `json:"appInstallId"`
-	ID              uint                `json:"id"`
-	MasterAccountID uint                `json:"masterAccountId"`
-	Provider        string              `json:"provider"`
-	ProviderName    string              `json:"providerName"`
-	Name            string              `json:"name"`
-	APIKey          string              `json:"apiKey"`
-	RememberAPIKey  bool                `json:"rememberApiKey"`
-	BaseURL         string              `json:"baseUrl"`
-	Models          []AgentAccountModel `json:"models"`
-	APIType         string              `json:"apiType"`
-	AuthMode        string              `json:"authMode"`
-	VerifyModel     string              `json:"verifyModel"`
-	Verified        bool                `json:"verified"`
-	Remark          string              `json:"remark"`
-	CreatedAt       time.Time           `json:"createdAt"`
+	AppInstallID         uint                `json:"appInstallId"`
+	ID                   uint                `json:"id"`
+	MasterAccountID      uint                `json:"masterAccountId"`
+	Provider             string              `json:"provider"`
+	ProviderName         string              `json:"providerName"`
+	Name                 string              `json:"name"`
+	APIKey               string              `json:"apiKey"`
+	RememberAPIKey       bool                `json:"rememberApiKey"`
+	BaseURL              string              `json:"baseUrl"`
+	Models               []AgentAccountModel `json:"models"`
+	APIType              string              `json:"apiType"`
+	AuthMode             string              `json:"authMode"`
+	VerifyModel          string              `json:"verifyModel"`
+	VerifiedAt           *time.Time          `json:"verifiedAt"`
+	VerifyError          string              `json:"verifyError"`
+	Verified             bool                `json:"verified"`
+	ValidateAvailability bool                `json:"validateAvailability"`
+	Remark               string              `json:"remark"`
+	CreatedAt            time.Time           `json:"createdAt"`
 }
 
 type ProviderModelInfo struct {

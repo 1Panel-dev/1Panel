@@ -501,6 +501,26 @@ func (b *BaseApi) GetAgentAccountModels(c *gin.Context) {
 }
 
 // @Tags AI
+// @Summary Update verification model
+// @Accept json
+// @Param request body dto.AgentAccountVerifyModelUpdateReq true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /ai/accounts/models/verify-model [post]
+func (b *BaseApi) UpdateAgentAccountVerifyModel(c *gin.Context) {
+	var req dto.AgentAccountVerifyModelUpdateReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := agentService.UpdateAccountVerifyModel(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags AI
 // @Summary Discover custom provider models
 // @Accept json
 // @Param request body dto.AgentAccountModelDiscoverReq true "request"

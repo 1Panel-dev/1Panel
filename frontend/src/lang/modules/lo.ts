@@ -1013,7 +1013,7 @@ const message = {
             customImageURLHelper:
                 'ສຳລັບບັນຊີ Custom ໃຫ້ປ້ອນ URL ຂອງ endpoint ສ້າງຮູບທີ່ຄົບຖ້ວນ. ລະບົບຈະບໍ່ເພີ່ມ path ອັດຕະໂນມັດ. ຕົວຢ່າງ: {0}',
             apiTypeBaseURLMismatch: 'Base URL ປັດຈຸບັນເບິ່ງຄືວ່າເປັນເສັ້ນທາງ {0}, ແຕ່ໄດ້ເລືອກ {1}. URL ທີ່ແນະນຳ: {2}',
-            validateAvailability: 'ກວດສອບການພ້ອມໃຊ້ງານຂອງບັນຊີ',
+            validateAvailability: 'ກວດສອບຄວາມພ້ອມໃຊ້ເມື່ອບັນທຶກ',
             validateAvailabilityHelper: 'ສົ່ງຂໍ້ຄວາມຂະໜາດນ້ອຍກ່ອນບັນທຶກເພື່ອກວດສອບ API',
             validateImageAvailabilityHelper: 'ສ້າງຮູບຂະໜາດນ້ອຍໜຶ່ງຮູບກ່ອນບັນທຶກ ແລະ ອາດມີຄ່າໃຊ້ຈ່າຍ',
         },
@@ -1119,6 +1119,13 @@ const message = {
             endpoint: 'ຈຸດເຊື່ອມຕໍ່',
             cloudAccount: 'ບັນຊີຄລາວ',
             connectionStatus: 'ສະຖານະການເຊື່ອມຕໍ່',
+            verify: 'ກວດສອບ',
+            verifying: 'ກຳລັງກວດສອບ',
+            verifyFailed: 'ການກວດສອບລົ້ມເຫຼວ',
+            verifiedAt: 'ເວລາກວດສອບ',
+            verifyModelChangeHelper: 'ການປ່ຽນໂມເດວສຳລັບການຢືນຢັນຈະໝາຍບໍລິການວ່າຍັງບໍ່ໄດ້ຢືນຢັນ ໂດຍບໍ່ເອີ້ນໃຊ້ໂມເດວ.',
+            verifyOnChangeHelper:
+                'ເມື່ອປິດ ບໍ່ຈຳເປັນຕ້ອງກວດສອບ. ເມື່ອເປີດ ຈະກວດສອບໜຶ່ງຄັ້ງ; ຫຼັງຈາກນັ້ນ ຈະກວດສອບສະເພາະເມື່ອການຕັ້ງຄ່າການເຊື່ອມຕໍ່ ຫຼືໂມເດວກວດສອບປ່ຽນແປງ.',
             unverified: 'ຍັງບໍ່ໄດ້ຢືນຢັນ',
             manage: 'ຈັດການ',
             loadFailed: 'ໂຫຼດບໍ່ສຳເລັດ. ກະລຸນາໂຫຼດໜ້າຄືນແລ້ວລອງອີກຄັ້ງ.',

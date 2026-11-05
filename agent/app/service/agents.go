@@ -79,6 +79,7 @@ type IAgentService interface {
 	PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error)
 	CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error)
 	GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error)
+	UpdateAccountVerifyModel(req dto.AgentAccountVerifyModelUpdateReq) error
 	DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error)
 	CreateAccountModel(req dto.AgentAccountModelCreateReq) error
 	UpdateAccountModel(req dto.AgentAccountModelUpdateReq) error
@@ -184,7 +185,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 	storedModel := ""
 	var allowedOrigins []string
 	var account *model.AgentAccount
-	var installHooks *appInstallHooks
+	var installHooks *AppInstallHooks
 	var dashboardAuth agentDashboardAuth
 
 	if agentType == constant.AppOpenclaw || agentType == constant.AppHermesAgent {
@@ -195,7 +196,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		if !account.Verified {
+		if account.ValidateAvailability && !account.Verified {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
 		provider = account.Provider
@@ -224,14 +225,14 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if token == "" {
 			token = generateToken()
 		}
-		installHooks = &appInstallHooks{
+		installHooks = &AppInstallHooks{
 			AfterCopyData: func(appInstall *model.AppInstall) error {
 				return prepareOpenclawInstallFiles(appInstall, account, storedModel, token, allowedOrigins)
 			},
 		}
 	} else if agentType == constant.AppHermesAgent {
 		dashboardAuth = normalizeAgentDashboardAuth(req.DashboardUsername, req.DashboardPassword)
-		installHooks = &appInstallHooks{
+		installHooks = &AppInstallHooks{
 			AfterCopyData: func(appInstall *model.AppInstall) error {
 				if err := prepareHermesInstallFiles(appInstall, account, storedModel); err != nil {
 					return err
@@ -298,7 +299,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 			DockerCompose: req.DockerCompose,
 		},
 	}
-	appInstall, err := AppService{}.installWithHooks(installReq, false, installHooks)
+	appInstall, err := AppService{}.InstallWithHooks(installReq, false, installHooks)
 	if err != nil {
 		return nil, err
 	}
@@ -1041,8 +1042,6 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 }
 
 func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
-	agentAccountMutationMu.Lock()
-	defer agentAccountMutationMu.Unlock()
 	provider := req.Provider
 	if err := ensureAgentAccountNameAvailable(provider, req.Name, 0); err != nil {
 		return err
@@ -1060,17 +1059,27 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	if err != nil {
 		return err
 	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := ensureAgentAccountNameAvailable(provider, req.Name, 0); err != nil {
+		return err
+	}
 	account := &model.AgentAccount{
-		Provider:       resolvedInput.Provider,
-		Name:           req.Name,
-		APIKey:         resolvedInput.APIKey,
-		RememberAPIKey: req.RememberAPIKey,
-		BaseURL:        resolvedInput.BaseURL,
-		APIType:        resolvedInput.APIType,
-		AuthMode:       resolvedInput.AuthMode,
-		VerifyModel:    verifyModel,
-		Verified:       true,
-		Remark:         req.Remark,
+		Provider:             resolvedInput.Provider,
+		Name:                 req.Name,
+		APIKey:               resolvedInput.APIKey,
+		RememberAPIKey:       req.RememberAPIKey,
+		BaseURL:              resolvedInput.BaseURL,
+		APIType:              resolvedInput.APIType,
+		AuthMode:             resolvedInput.AuthMode,
+		VerifyModel:          verifyModel,
+		Verified:             validateAvailability,
+		ValidateAvailability: validateAvailability,
+		Remark:               req.Remark,
+	}
+	if validateAvailability {
+		now := time.Now()
+		account.VerifiedAt = &now
 	}
 	if err := global.DB.Transaction(func(tx *gorm.DB) error {
 		if err := tx.Create(account).Error; err != nil {
@@ -1088,8 +1097,6 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 }
 
 func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
-	agentAccountMutationMu.Lock()
-	defer agentAccountMutationMu.Unlock()
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
@@ -1105,6 +1112,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if err != nil {
 		return err
 	}
+	previousModels := append([]dto.AgentAccountModel(nil), models...)
 	if req.Models != nil {
 		if account.AppInstallID != 0 {
 			return buserr.WithDetail("ErrInvalidParams", "local model pool is managed by the deployment", nil)
@@ -1130,11 +1138,51 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 			return err
 		}
 	}
-	validateAvailability := req.ValidateAvailability == nil || *req.ValidateAvailability
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, validateAvailability, account.AppInstallID != 0 && len(models) == 0)
+	validateAvailability := account.ValidateAvailability
+	if req.ValidateAvailability != nil {
+		validateAvailability = *req.ValidateAvailability
+	}
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, false, account.AppInstallID != 0 && len(models) == 0)
 	if err != nil {
 		return err
 	}
+	previousVerifyModel := account.VerifyModel
+	if previousVerifyModel == "" && len(previousModels) > 0 {
+		previousVerifyModel = previousModels[0].ID
+	}
+	connectionChanged := account.APIKey != resolvedInput.APIKey || account.BaseURL != resolvedInput.BaseURL ||
+		account.APIType != resolvedInput.APIType || account.AuthMode != resolvedInput.AuthMode || !sameProviderModelID(provider, previousVerifyModel, verifyModel)
+	shouldVerify := validateAvailability && (connectionChanged || !account.ValidateAvailability)
+	if shouldVerify {
+		if _, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, true, false); err != nil {
+			return err
+		}
+	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := ensureAgentAccountUnchanged(account, previousModels); err != nil {
+		return err
+	}
+	if err := ensureAgentAccountNameAvailable(provider, req.Name, account.ID); err != nil {
+		return err
+	}
+	if req.Models != nil {
+		if err := ensureAccountModelsNotBound(account, models); err != nil {
+			return err
+		}
+	}
+	if account.ValidateAvailability && (!validateAvailability || connectionChanged) {
+		account.Verified = false
+		account.VerifiedAt = nil
+		account.VerifyError = ""
+	}
+	if shouldVerify {
+		now := time.Now()
+		account.Verified = true
+		account.VerifiedAt = &now
+		account.VerifyError = ""
+	}
+	account.ValidateAvailability = validateAvailability
 	account.Name = req.Name
 	account.APIKey = resolvedInput.APIKey
 	account.RememberAPIKey = req.RememberAPIKey
@@ -1143,7 +1191,6 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	account.AuthMode = resolvedInput.AuthMode
 	account.VerifyModel = verifyModel
 	account.Remark = req.Remark
-	account.Verified = true
 
 	if req.Models != nil {
 		rows := make([]model.AgentAccountModel, 0, len(models))
@@ -1212,22 +1259,25 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 			appInstallID = item.AppInstallID
 		}
 		items = append(items, dto.AgentAccountInfo{
-			AppInstallID:    appInstallID,
-			ID:              item.ID,
-			MasterAccountID: item.MasterAccountID,
-			Provider:        item.Provider,
-			ProviderName:    localizedAgentProviderName(item.Provider),
-			Name:            item.Name,
-			APIKey:          apiKey,
-			RememberAPIKey:  item.RememberAPIKey,
-			BaseURL:         item.BaseURL,
-			Models:          nil,
-			APIType:         item.APIType,
-			AuthMode:        item.AuthMode,
-			VerifyModel:     item.VerifyModel,
-			Verified:        item.Verified,
-			Remark:          item.Remark,
-			CreatedAt:       item.CreatedAt,
+			AppInstallID:         appInstallID,
+			ID:                   item.ID,
+			MasterAccountID:      item.MasterAccountID,
+			Provider:             item.Provider,
+			ProviderName:         localizedAgentProviderName(item.Provider),
+			Name:                 item.Name,
+			APIKey:               apiKey,
+			RememberAPIKey:       item.RememberAPIKey,
+			BaseURL:              item.BaseURL,
+			Models:               nil,
+			APIType:              item.APIType,
+			AuthMode:             item.AuthMode,
+			VerifyModel:          item.VerifyModel,
+			Verified:             item.Verified,
+			ValidateAvailability: item.ValidateAvailability,
+			VerifiedAt:           item.VerifiedAt,
+			VerifyError:          item.VerifyError,
+			Remark:               item.Remark,
+			CreatedAt:            item.CreatedAt,
 		})
 	}
 	if len(list) > 0 {
@@ -1263,7 +1313,51 @@ func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.Agen
 	if err != nil {
 		return nil, err
 	}
-	return loadAgentAccountModels(account)
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return nil, err
+	}
+	verifyModel := account.VerifyModel
+	if verifyModel == "" && len(models) > 0 {
+		verifyModel = models[0].ID
+	}
+	for i := range models {
+		models[i].IsVerifyModel = sameProviderModelID(account.Provider, verifyModel, models[i].ID)
+	}
+	return models, nil
+}
+
+func (a AgentService) UpdateAccountVerifyModel(req dto.AgentAccountVerifyModelUpdateReq) error {
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+	if err != nil {
+		return err
+	}
+	record, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.RecordID), repo.WithByAccountID(req.AccountID))
+	if err != nil {
+		return err
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	previousVerifyModel := account.VerifyModel
+	if previousVerifyModel == "" && len(models) > 0 {
+		previousVerifyModel = models[0].ID
+	}
+	if account.ValidateAvailability && !sameProviderModelID(account.Provider, previousVerifyModel, record.Model) {
+		account.Verified = false
+		account.VerifiedAt = nil
+		account.VerifyError = ""
+	}
+	account.VerifyModel = record.Model
+	if err := agentAccountRepo.UpdateVerification(account); err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return nil
 }
 
 func (a AgentService) DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error) {
@@ -1323,6 +1417,11 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 			return err
 		}
 	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := ensureAgentAccountUnchanged(account, models); err != nil {
+		return err
+	}
 	sortOrder := len(models) + 1
 	record := &model.AgentAccountModel{
 		AccountID: account.ID,
@@ -1330,7 +1429,8 @@ func (a AgentService) CreateAccountModel(req dto.AgentAccountModelCreateReq) err
 		Name:      nextModel.Name,
 		SortOrder: sortOrder,
 	}
-	if err := agentAccountModelRepo.Create(record); err != nil {
+	err = agentAccountModelRepo.Create(record)
+	if err != nil {
 		return err
 	}
 	return a.syncAgentsByAccount(account)
@@ -1382,17 +1482,34 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
 		return err
 	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := ensureAgentAccountUnchanged(account, models); err != nil {
+		return err
+	}
+	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
+		return err
+	}
 	previousModelID := record.Model
 	record.Model = nextModel.ID
 	record.Name = nextModel.Name
-	if err := agentAccountModelRepo.Save(record); err != nil {
-		return err
+	verifyModel := account.VerifyModel
+	if verifyModel == "" && len(models) > 0 {
+		verifyModel = models[0].ID
 	}
-	if sameProviderModelID(account.Provider, account.VerifyModel, previousModelID) {
-		account.VerifyModel = nextModel.ID
-		if err := agentAccountRepo.Save(account); err != nil {
-			return err
+	if sameProviderModelID(account.Provider, verifyModel, previousModelID) && !sameProviderModelID(account.Provider, previousModelID, nextModel.ID) {
+		if account.ValidateAvailability {
+			account.Verified = false
+			account.VerifiedAt = nil
+			account.VerifyError = ""
 		}
+		account.VerifyModel = nextModel.ID
+		err = agentAccountModelRepo.SaveWithAccount(record, account)
+	} else {
+		err = agentAccountModelRepo.Save(record)
+	}
+	if err != nil {
+		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
 	terminalai.InvalidateFileAIRuntimeCache()
@@ -1412,12 +1529,16 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 	if err != nil {
 		return err
 	}
-	if sameProviderModelID(account.Provider, account.VerifyModel, record.Model) {
-		return buserr.New("ErrAgentVerifyModelInUse")
-	}
 	models, err := loadAgentAccountModels(account)
 	if err != nil {
 		return err
+	}
+	verifyModel := account.VerifyModel
+	if verifyModel == "" && len(models) > 0 {
+		verifyModel = models[0].ID
+	}
+	if account.ValidateAvailability && sameProviderModelID(account.Provider, verifyModel, record.Model) {
+		return buserr.New("ErrAgentVerifyModelInUse")
 	}
 	nextModels := make([]dto.AgentAccountModel, 0, len(models))
 	for _, item := range models {
@@ -1467,7 +1588,13 @@ func (a AgentService) DeleteAccountModel(req dto.AgentAccountModelDeleteReq) err
 			return err
 		}
 	}
-	if err := agentAccountModelRepo.DeleteByID(req.RecordID); err != nil {
+	if sameProviderModelID(account.Provider, account.VerifyModel, record.Model) {
+		account.VerifyModel = ""
+		err = agentAccountModelRepo.DeleteWithAccount(req.RecordID, account)
+	} else {
+		err = agentAccountModelRepo.DeleteByID(req.RecordID)
+	}
+	if err != nil {
 		return err
 	}
 	if err := compactPersistedAgentAccountModelSortOrder(req.AccountID); err != nil {
@@ -1486,8 +1613,45 @@ func (a AgentService) SyncAgentsByAccount(account *model.AgentAccount) error {
 }
 
 func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
-	_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model, true, false)
-	return err
+	if req.ID == 0 {
+		_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model, true, false)
+		return err
+	}
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	if !account.ValidateAvailability {
+		return nil
+	}
+	models, err := loadAgentAccountModels(account)
+	if err != nil {
+		return err
+	}
+	verifyModel, verifyErr := resolveAgentAccountVerifyModel(account.Provider, account.VerifyModel, models)
+	if verifyErr == nil {
+		_, verifyErr = resolveAgentAccountInput(account.Provider, account.APIType, account.AuthMode, account.APIKey, account.BaseURL, verifyModel, true, false)
+	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := ensureAgentAccountUnchanged(account, models); err != nil {
+		return err
+	}
+	now := time.Now()
+	account.VerifyModel = verifyModel
+	account.VerifiedAt = &now
+	account.Verified = verifyErr == nil
+	account.VerifyError = ""
+	if verifyErr != nil {
+		account.VerifyError = verifyErr.Error()
+	}
+	err = agentAccountRepo.UpdateVerification(account)
+	if err != nil {
+		return err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return verifyErr
 }
 
 func (a AgentService) DeleteAccount(req dto.AgentAccountDeleteReq) error {

@@ -1044,7 +1044,7 @@ const message = {
                 'Informe a URL completa do endpoint de geração de imagens para contas Custom. O caminho não é adicionado automaticamente. Exemplo: {0}',
             apiTypeBaseURLMismatch:
                 'A Base URL atual parece um caminho {0}, mas {1} está selecionado. URL recomendada: {2}',
-            validateAvailability: 'Validar disponibilidade da conta',
+            validateAvailability: 'Verificar disponibilidade ao salvar',
             validateAvailabilityHelper: 'Envia uma mensagem mínima antes de salvar para validar a API',
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
@@ -1155,6 +1155,14 @@ const message = {
             endpoint: 'Endpoint',
             cloudAccount: 'Conta na nuvem',
             connectionStatus: 'Status da conexão',
+            verify: 'Verificar',
+            verifying: 'Verificando',
+            verifyFailed: 'Falha na verificação',
+            verifiedAt: 'Horário da verificação',
+            verifyModelChangeHelper:
+                'Alterar o modelo de verificação marca o serviço como não verificado sem chamar o modelo.',
+            verifyOnChangeHelper:
+                'Quando desativada, a verificação não é necessária. Ao ativar, verifica uma vez; depois, apenas alterações na conexão ou no modelo de verificação acionam a verificação.',
             unverified: 'Não verificado',
             manage: 'Gerenciar',
             loadFailed: 'Falha ao carregar. Atualize a página e tente novamente.',

@@ -1026,7 +1026,7 @@ const message = {
             customImageURLHelper:
                 'Custom アカウントには画像生成 API の完全な URL を入力してください。パスは自動追加されません。例: {0}',
             apiTypeBaseURLMismatch: '現在の Base URL は {0} のパスに見えますが、{1} が選択されています。推奨 URL: {2}',
-            validateAvailability: 'アカウントの可用性を検証',
+            validateAvailability: '保存時に可用性を検証',
             validateAvailabilityHelper: '保存前に最小メッセージを送信して API を検証します',
             validateImageAvailabilityHelper: '保存前に最小画像を1枚生成するため、料金が発生する場合があります',
         },
@@ -1136,6 +1136,13 @@ const message = {
             endpoint: 'エンドポイント',
             cloudAccount: 'クラウドアカウント',
             connectionStatus: '接続状態',
+            verify: '検証',
+            verifying: '検証中',
+            verifyFailed: '検証失敗',
+            verifiedAt: '検証日時',
+            verifyModelChangeHelper: '検証モデルを変更すると、モデルを呼び出さずにサービスが未検証になります。',
+            verifyOnChangeHelper:
+                '無効時は検証不要です。有効にすると一度検証し、その後は接続設定または検証モデルの変更時のみ検証します。',
             unverified: '未検証',
             manage: '管理',
             loadFailed: '読み込みに失敗しました。更新して再試行してください。',

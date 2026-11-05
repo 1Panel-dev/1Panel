@@ -1047,7 +1047,7 @@ const message = {
                 'Custom hesaplar için tam görsel oluşturma uç noktası URL’sini girin. Yol otomatik eklenmez. Örnek: {0}',
             apiTypeBaseURLMismatch:
                 'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
-            validateAvailability: 'Hesap kullanılabilirliğini doğrula',
+            validateAvailability: 'Kaydederken kullanılabilirliği doğrula',
             validateAvailabilityHelper: 'Kaydetmeden önce API’yi doğrulamak için en küçük iletiyi gönderir',
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
@@ -1157,6 +1157,14 @@ const message = {
             endpoint: 'Uç nokta',
             cloudAccount: 'Bulut hesabı',
             connectionStatus: 'Bağlantı durumu',
+            verify: 'Doğrula',
+            verifying: 'Doğrulanıyor',
+            verifyFailed: 'Doğrulama başarısız',
+            verifiedAt: 'Doğrulama zamanı',
+            verifyModelChangeHelper:
+                'Doğrulama modeli değiştirildiğinde hizmet, model çağrılmadan doğrulanmamış olarak işaretlenir.',
+            verifyOnChangeHelper:
+                'Devre dışıyken doğrulama gerekmez. Etkinleştirildiğinde bir kez doğrulanır; sonrasında yalnızca bağlantı ayarları veya doğrulama modeli değiştiğinde doğrulanır.',
             unverified: 'Doğrulanmadı',
             manage: 'Yönet',
             loadFailed: 'Yüklenemedi. Yenileyip tekrar deneyin.',

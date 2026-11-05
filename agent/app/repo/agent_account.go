@@ -16,6 +16,8 @@ type IAgentAccountRepo interface {
 	WithByMasterAccountID(masterID uint) DBOption
 	Create(account *model.AgentAccount) error
 	Save(account *model.AgentAccount) error
+	UpdateVerification(account *model.AgentAccount) error
+	ResetVerificationByAppInstallID(appInstallID uint) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	Count() (int64, error)
@@ -56,6 +58,30 @@ func (a AgentAccountRepo) Create(account *model.AgentAccount) error {
 
 func (a AgentAccountRepo) Save(account *model.AgentAccount) error {
 	return getDb().Save(account).Error
+}
+
+func (a AgentAccountRepo) UpdateVerification(account *model.AgentAccount) error {
+	result := getDb().Model(&model.AgentAccount{}).Where("id = ?", account.ID).Updates(map[string]interface{}{
+		"verified":     account.Verified,
+		"verified_at":  account.VerifiedAt,
+		"verify_error": account.VerifyError,
+		"verify_model": account.VerifyModel,
+	})
+	if result.Error != nil {
+		return result.Error
+	}
+	if result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return nil
+}
+
+func (a AgentAccountRepo) ResetVerificationByAppInstallID(appInstallID uint) error {
+	return getDb().Model(&model.AgentAccount{}).Where("app_install_id = ? AND validate_availability = ?", appInstallID, true).Updates(map[string]interface{}{
+		"verified":     false,
+		"verified_at":  nil,
+		"verify_error": "",
+	}).Error
 }
 
 func (a AgentAccountRepo) DeleteByID(id uint) error {
