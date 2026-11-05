@@ -299,8 +299,19 @@ func checkContainerImageUpdate(ctx context.Context, cli imageCheckUpdateDockerCl
 		record.LatestVersion = remote.target.Tag
 		record.TargetImage = "docker.io/" + repository + ":" + remote.target.Tag
 		record.TargetImageID = remote.target.ConfigDigest
+		sameImage := inspected.ID == remote.target.ConfigDigest
+		if inspected.Descriptor != nil {
+			// The containerd store uses the pulled index/manifest as its image ID,
+			// not the config digest. Persist the ID that pulling this tag will produce
+			// so post-upgrade reconciliation uses the same identity as Docker.
+			if remote.target.ReferenceDigest == "" {
+				return record, fmt.Errorf("Docker Hub manifest response is missing its digest")
+			}
+			record.TargetImageID = remote.target.ReferenceDigest
+			sameImage = inspected.ID == remote.target.ReferenceDigest || inspected.ID == remote.target.Digest
+		}
 		// Both versioned and floating tags can be republished with new image content.
-		record.HasUpdate = remote.target.Tag != tag || remote.target.ConfigDigest != inspected.ID
+		record.HasUpdate = remote.target.Tag != tag || !sameImage
 		return record, nil
 	}
 	return record, fmt.Errorf("no compatible image for %s/%s", platform.OS, platform.Architecture)
