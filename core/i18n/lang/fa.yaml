@@ -156,7 +156,7 @@ ErrAlertSync: "خطا در همگام‌سازی اطلاعات هشدار، ب�
 ErrAIProxyUserGroupIsDefault: "گروه کاربری پیش‌فرض قابل حذف نیست."
 ErrAIProxyUserGroupInUse: "گروه کاربری در حال استفاده است و قابل حذف نیست."
 ErrAIProxyUserGroupExists: "نام گروه کاربری از قبل وجود دارد."
-ErrAIProxyBackendAccountExists: "این حساب مدل قبلاً به مجموعه حساب‌های دروازه AI وارد شده است."
+ErrAIProxyBackendAccountExists: "این سرویس مدل قبلاً به مجموعه حساب‌های دروازه AI وارد شده است."
 ErrAIProxyModelGroupInUse: "گروه مدل در حال استفاده است و قابل حذف نیست."
 ErrAIProxyModelGroupExists: "نام گروه مدل از قبل وجود دارد."
 ErrAIProxySensitiveGroupInUse: "گروه کلمات حساس در حال استفاده است و قابل حذف نیست."

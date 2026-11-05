@@ -70,8 +70,8 @@ Decrypt: 'Descriptografar'
 
 # agente
 ErrAgentAccountBound: 'Conta vinculada a agente'
-ErrTerminalAIAccountInUse: 'Esta conta de modelo esta sendo usada pelo Terminal AI. Troque a conta nas configuracoes do Terminal AI ou desative o Terminal AI e tente novamente.'
-ErrFileAIAccountInUse: 'Esta conta de modelo está sendo usada pela IA do gerenciador de arquivos. Troque a conta nas configurações ou desative a IA e tente novamente.'
+ErrTerminalAIAccountInUse: 'Este serviço de modelo esta sendo usado pelo Terminal AI. Troque a conta nas configuracoes do Terminal AI ou desative o Terminal AI e tente novamente.'
+ErrFileAIAccountInUse: 'Este serviço de modelo está sendo usado pela IA do gerenciador de arquivos. Troque a conta nas configurações ou desative a IA e tente novamente.'
 ErrAgentAccountUnavailable: 'Conexão da conta indisponível: {{ .err }}'
 ErrAgentProviderNotSupported: 'Provedor de agente não suportado'
 ErrAgentAccountRequired: 'Selecione uma conta de agente primeiro'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'Falha na solicitação de AI: {{ .err }}'
 
 # gateway de IA
 ErrAIProxyServiceNotInstalled: 'O serviço {{ .name }} não está instalado'
-ErrAIProxyModelAccountNotFound: 'Conta de modelo {{ .id }} não encontrada'
+ErrAIProxyModelAccountNotFound: 'Serviço de modelo {{ .id }} não encontrado'
 ErrAIProxyModelMapRequired: 'Este campo é obrigatório.'
 ErrAIProxyModelMapInvalid: 'O mapeamento de modelos deve ser um objeto JSON válido: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'O mapeamento de modelos não pode estar vazio'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: 'Gateway de IA do 1Panel'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'A cadeia DOCKER-USER do Docker não foi encontrada. Reinicie o Docker e tente novamente'

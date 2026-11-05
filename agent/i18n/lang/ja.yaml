@@ -70,8 +70,8 @@ Decrypt: '復号化'
 
 # エージェント
 ErrAgentAccountBound: 'アカウントはエージェントに紐づいています'
-ErrTerminalAIAccountInUse: 'このモデルアカウントは Terminal AI で使用中です。Terminal AI の設定で別のアカウントへ切り替えるか、Terminal AI を無効にしてから再試行してください。'
-ErrFileAIAccountInUse: 'このモデルアカウントはファイル管理 AI で使用中です。ファイル管理 AI の設定で別のアカウントへ切り替えるか、ファイル管理 AI を無効にしてから再試行してください。'
+ErrTerminalAIAccountInUse: 'このモデルサービスは Terminal AI で使用中です。Terminal AI の設定で別のアカウントへ切り替えるか、Terminal AI を無効にしてから再試行してください。'
+ErrFileAIAccountInUse: 'このモデルサービスはファイル管理 AI で使用中です。ファイル管理 AI の設定で別のアカウントへ切り替えるか、ファイル管理 AI を無効にしてから再試行してください。'
 ErrAgentAccountUnavailable: 'アカウント接続不可: {{ .err }}'
 ErrAgentProviderNotSupported: 'エージェントプロバイダ非対応'
 ErrAgentAccountRequired: 'まずエージェントアカウントを選択'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'AI リクエストに失敗しました: {{ .err }}'
 
 # AIゲートウェイ
 ErrAIProxyServiceNotInstalled: '{{ .name }} サービスはインストールされていません'
-ErrAIProxyModelAccountNotFound: 'モデルアカウント {{ .id }} が見つかりません'
+ErrAIProxyModelAccountNotFound: 'モデルサービス {{ .id }} が見つかりません'
 ErrAIProxyModelMapRequired: 'この項目は必須です。'
 ErrAIProxyModelMapInvalid: 'モデルマッピングは有効な JSON オブジェクトである必要があります: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'モデルマッピングは空にできません'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: '1Panel AI ゲートウェイ'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Docker の DOCKER-USER チェーンが見つかりません。Docker を再起動してから再試行してください'

@@ -670,7 +670,7 @@ const fileAiVerificationLabel = (item: { provider?: string; verified?: boolean }
 
 const fileAiVerificationTagType = (item: { provider?: string; verified?: boolean }) => {
     if (isAgentAccountVerificationSkipped(item.provider)) {
-        return 'info';
+        return 'success';
     }
     return item.verified ? 'success' : 'warning';
 };

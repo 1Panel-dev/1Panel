@@ -70,8 +70,8 @@ Decrypt: 'Расшифровать'
 
 # агент
 ErrAgentAccountBound: 'Акаунт привязан к агенту'
-ErrTerminalAIAccountInUse: 'Эта учетная запись модели сейчас используется Terminal AI. Смените учетную запись в настройках Terminal AI или отключите Terminal AI и повторите попытку.'
-ErrFileAIAccountInUse: 'Эта учетная запись модели используется ИИ файлового менеджера. Смените учетную запись в его настройках или отключите ИИ и повторите попытку.'
+ErrTerminalAIAccountInUse: 'Этот сервис модели сейчас используется Terminal AI. Смените учетную запись в настройках Terminal AI или отключите Terminal AI и повторите попытку.'
+ErrFileAIAccountInUse: 'Этот сервис модели используется ИИ файлового менеджера. Смените учетную запись в его настройках или отключите ИИ и повторите попытку.'
 ErrAgentAccountUnavailable: 'Связь с аккаунтом недоступна: {{ .err }}'
 ErrAgentProviderNotSupported: 'Провайдер агента не поддерживается'
 ErrAgentAccountRequired: 'Выберите аккаунт агента'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'Ошибка запроса AI: {{ .err }}'
 
 # AI-шлюз
 ErrAIProxyServiceNotInstalled: 'Сервис {{ .name }} не установлен'
-ErrAIProxyModelAccountNotFound: 'Аккаунт модели {{ .id }} не найден'
+ErrAIProxyModelAccountNotFound: 'Сервис модели {{ .id }} не найден'
 ErrAIProxyModelMapRequired: 'Это поле обязательно.'
 ErrAIProxyModelMapInvalid: 'Сопоставление моделей должно быть допустимым JSON-объектом: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'Сопоставление моделей не может быть пустым'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: 'ИИ-шлюз 1Panel'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Цепочка Docker DOCKER-USER не найдена. Перезапустите Docker и повторите попытку'

@@ -70,8 +70,8 @@ Decrypt: 'Şifre Çöz'
 
 # ajan
 ErrAgentAccountBound: 'Hesap bir ajana bağlı'
-ErrTerminalAIAccountInUse: 'Bu model hesabi su anda Terminal AI tarafindan kullaniliyor. Terminal AI ayarlarinda baska bir hesaba gecin veya Terminal AI yi devre disi birakip tekrar deneyin.'
-ErrFileAIAccountInUse: 'Bu model hesabı dosya yönetimi yapay zekası tarafından kullanılıyor. Ayarlardan hesabı değiştirin veya yapay zekayı devre dışı bırakıp yeniden deneyin.'
+ErrTerminalAIAccountInUse: 'Bu model hizmeti su anda Terminal AI tarafindan kullaniliyor. Terminal AI ayarlarinda baska bir hesaba gecin veya Terminal AI yi devre disi birakip tekrar deneyin.'
+ErrFileAIAccountInUse: 'Bu model hizmeti dosya yönetimi yapay zekası tarafından kullanılıyor. Ayarlardan hesabı değiştirin veya yapay zekayı devre dışı bırakıp yeniden deneyin.'
 ErrAgentAccountUnavailable: 'Hesap bağlantısı yok: {{ .err }}'
 ErrAgentProviderNotSupported: 'Ajans sağlayıcısı desteklenmiyor'
 ErrAgentAccountRequired: 'Önce bir ajans hesabı seçin'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'AI istegi basarisiz oldu: {{ .err }}'
 
 # AI ağ geçidi
 ErrAIProxyServiceNotInstalled: '{{ .name }} servisi kurulu değil'
-ErrAIProxyModelAccountNotFound: 'Model hesabı {{ .id }} bulunamadı'
+ErrAIProxyModelAccountNotFound: 'Model hizmeti {{ .id }} bulunamadı'
 ErrAIProxyModelMapRequired: 'Bu alan zorunludur.'
 ErrAIProxyModelMapInvalid: 'Model eşlemesi geçerli bir JSON nesnesi olmalıdır: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'Model eşlemesi boş olamaz'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: '1Panel AI Ağ Geçidi'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Docker DOCKER-USER zinciri bulunamadı. Docker’ı yeniden başlatıp tekrar deneyin'

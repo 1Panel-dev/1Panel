@@ -156,7 +156,7 @@ ErrAlertSync: "ການຊິງຂໍ້ມູນແຈ້ງເຕືອນ�
 ErrAIProxyUserGroupIsDefault: "ບໍ່ສາມາດລຶບກຸ່ມຜູ້ໃຊ້ເລີ່ມຕົ້ນໄດ້."
 ErrAIProxyUserGroupInUse: "ກຸ່ມຜູ້ໃຊ້ກຳລັງຖືກໃຊ້ງານ ແລະ ບໍ່ສາມາດລຶບໄດ້."
 ErrAIProxyUserGroupExists: "ມີຊື່ກຸ່ມຜູ້ໃຊ້ນີ້ຢູ່ແລ້ວ."
-ErrAIProxyBackendAccountExists: "ບັນຊີໂມເດວນີ້ຖືກນຳເຂົ້າໃນພູນບັນຊີ AI Gateway ແລ້ວ."
+ErrAIProxyBackendAccountExists: "ບໍລິການໂມເດວນີ້ຖືກນຳເຂົ້າໃນພູນບັນຊີ AI Gateway ແລ້ວ."
 ErrAIProxyModelGroupInUse: "ກຸ່ມໂມເດວກຳລັງຖືກໃຊ້ງານ ແລະ ບໍ່ສາມາດລຶບໄດ້."
 ErrAIProxyModelGroupExists: "ມີຊື່ກຸ່ມໂມເດວນີ້ຢູ່ແລ້ວ."
 ErrAIProxySensitiveGroupInUse: "ກຸ່ມຄຳທີ່ລະອຽດອ່ອນກຳລັງຖືກໃຊ້ງານ ແລະ ບໍ່ສາມາດລຶບໄດ້."

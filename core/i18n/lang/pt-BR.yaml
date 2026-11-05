@@ -156,7 +156,7 @@ ErrAlertSync: "Erro na sincronização das informações de alerta, verifique e 
 ErrAIProxyUserGroupIsDefault: "O grupo de usuários padrão não pode ser excluído."
 ErrAIProxyUserGroupInUse: "O grupo de usuários está em uso e não pode ser excluído."
 ErrAIProxyUserGroupExists: "O nome do grupo de usuários já existe."
-ErrAIProxyBackendAccountExists: "Esta conta de modelo já foi importada para o pool de contas do AI Gateway."
+ErrAIProxyBackendAccountExists: "Este serviço de modelo já foi importado para o pool de contas do AI Gateway."
 ErrAIProxyModelGroupInUse: "O grupo de modelos está em uso e não pode ser excluído."
 ErrAIProxyModelGroupExists: "O nome do grupo de modelos já existe."
 ErrAIProxySensitiveGroupInUse: "O grupo de palavras sensíveis está em uso e não pode ser excluído."

@@ -70,8 +70,8 @@ Decrypt: 'Dekripsi'
 
 # ejen
 ErrAgentAccountBound: 'Akaun terikat kepada ejen'
-ErrTerminalAIAccountInUse: 'Akaun model ini sedang digunakan oleh Terminal AI. Tukar akaun dalam tetapan Terminal AI atau nyahaktifkan Terminal AI, kemudian cuba lagi.'
-ErrFileAIAccountInUse: 'Akaun model ini sedang digunakan oleh AI pengurusan fail. Tukar akaun dalam tetapannya atau nyahaktifkan AI tersebut, kemudian cuba lagi.'
+ErrTerminalAIAccountInUse: 'Perkhidmatan model ini sedang digunakan oleh Terminal AI. Tukar akaun dalam tetapan Terminal AI atau nyahaktifkan Terminal AI, kemudian cuba lagi.'
+ErrFileAIAccountInUse: 'Perkhidmatan model ini sedang digunakan oleh AI pengurusan fail. Tukar akaun dalam tetapannya atau nyahaktifkan AI tersebut, kemudian cuba lagi.'
 ErrAgentAccountUnavailable: 'Sambungan akaun tidak tersedia: {{ .err }}'
 ErrAgentProviderNotSupported: 'Penyedia ejen tidak disokong'
 ErrAgentAccountRequired: 'Pilih akaun ejen terlebih dahulu'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'Permintaan AI gagal: {{ .err }}'
 
 # gerbang AI
 ErrAIProxyServiceNotInstalled: 'Perkhidmatan {{ .name }} belum dipasang'
-ErrAIProxyModelAccountNotFound: 'Akaun model {{ .id }} tidak ditemui'
+ErrAIProxyModelAccountNotFound: 'Perkhidmatan model {{ .id }} tidak ditemui'
 ErrAIProxyModelMapRequired: 'Medan ini wajib diisi.'
 ErrAIProxyModelMapInvalid: 'Pemetaan model mestilah objek JSON yang sah: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'Pemetaan model tidak boleh kosong'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: 'Gerbang AI 1Panel'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'Rantaian DOCKER-USER Docker tidak ditemui. Mulakan semula Docker dan cuba lagi'

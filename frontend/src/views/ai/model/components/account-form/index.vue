@@ -127,7 +127,9 @@
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
             </el-form-item>
-            <el-form-item>
+            <el-form-item
+                v-if="isImageAPIType || isEmbeddingAPIType || !isAgentAccountVerificationSkipped(form.provider)"
+            >
                 <el-switch v-model="form.validateAvailability" />
                 <el-text class="validate-availability-label">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
                 <span class="input-help">

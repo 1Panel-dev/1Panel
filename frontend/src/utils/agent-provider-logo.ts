@@ -1,3 +1,5 @@
+import menuLogo from '../assets/images/1panel-menu-logo.svg?raw';
+
 export interface AgentProviderLogo {
     src?: string;
     mark: string;
@@ -51,6 +53,12 @@ const providerLogos: Record<string, AgentProviderLogo> = {
         color: '#4338ca',
         borderColor: '#dcdfe6',
         source: 'https://vllm.ai/vLLM-Logo.svg',
+    },
+    '1panel-ai-gateway': {
+        src: `data:image/svg+xml,${encodeURIComponent(menuLogo.replace('currentColor', '#005eeb'))}`,
+        mark: '1P',
+        background: '#ffffff',
+        color: '#005eeb',
     },
     deepseek: {
         src: asset('deepseek.png'),

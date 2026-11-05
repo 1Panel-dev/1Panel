@@ -59,6 +59,10 @@ var catalog = map[string]Meta{
 		Key: "vllm", DisplayName: "vLLM", Sort: 20, DefaultAPIType: "openai-completions", EnvKey: "VLLM_API_KEY",
 		APIConfigs: editableAPIConfigs(false, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
 	},
+	"1panel-ai-gateway": {
+		Key: "1panel-ai-gateway", DisplayName: "1Panel AI Gateway", DisplayNameKey: "AIProvider1PanelGateway", Sort: 21, DefaultAPIType: "openai-completions", EnvKey: "ONEPANEL_AI_GATEWAY_API_KEY",
+		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
+	},
 	"deepseek": {
 		Key: "deepseek", DisplayName: "DeepSeek", Sort: 25, DefaultAPIType: "openai-completions", EnvKey: "DEEPSEEK_API_KEY",
 		APIConfigs: []APIConfig{
