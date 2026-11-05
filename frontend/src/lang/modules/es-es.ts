@@ -4100,9 +4100,9 @@ const message = {
         app: 'La edición comercial permite ver información de servicio, monitoreo, etc. vía app móvil.',
         cluster:
             'Actualizar a la edición comercial permite gestionar clústeres primario-réplica de MySQL/Postgres/Redis.',
-        vllm: 'Actualiza a la edición comercial para gestionar servicios vLLM en 1Panel con despliegue, configuración, operaciones del ciclo de vida y seguimiento de tareas centralizados.',
+        vllm: 'Actualiza a la edición comercial para desplegar vLLM, monitorizar servicios, consultar registros y gestionar las operaciones diarias desde un solo lugar.',
         'model-downloader':
-            'Actualiza a la edición comercial para buscar, descargar y gestionar archivos de modelos locales desde HuggingFace, ModelScope o espejos compatibles, con directorios de modelos y tareas de descarga centralizados.',
+            'Actualiza a la edición comercial para explorar modelos destacados, gestionar descargas, reutilizar vLLM Recipes y configurar los orígenes de descarga y las credenciales de acceso.',
         offLine: 'Sin conexión',
     },
     clean: {
@@ -7222,30 +7222,27 @@ const message = {
             clusterTitle3: 'Estado de Replicación',
             clusterContent3:
                 'Muestra estado de replicación maestro-esclavo y retrasos, ayudando a diagnosticar problemas de sincronización',
-            modelDownloaderTitle1: 'Descubrimiento de modelos',
+            modelDownloaderTitle1: 'Modelos destacados',
             modelDownloaderContent1:
-                'Busca repositorios de modelos de HuggingFace directamente y consulta descargas, me gusta, detalles y archivos.',
-            modelDownloaderTitle2: 'Descargas aceleradas',
+                'Explora modelos destacados, filtra por familia y proveedor de pesos, consulta los detalles e inicia descargas.',
+            modelDownloaderTitle2: 'Descarga de modelos',
             modelDownloaderContent2:
-                'Configura un endpoint de aceleración de HuggingFace y HuggingFace Token para el sitio oficial, espejos y modelos privados.',
-            modelDownloaderTitle3: 'Seguimiento de tareas',
+                'Descarga modelos de Hugging Face y ModelScope, consulta el progreso, cancela o reintenta tareas y gestiona los archivos locales.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                'Consulta la cola, el estado, el progreso y los errores de descarga, con soporte para cancelar, reintentar y limpiar registros.',
-            modelDownloaderTitle4: 'Gestión local',
+                'Explora y sincroniza Recipes oficiales, gestiona recetas personalizadas y reutiliza parámetros de despliegue compatibles con cada modelo.',
+            modelDownloaderTitle4: 'Configuración',
             modelDownloaderContent4:
-                'Gestiona directorios de modelos locales en un solo lugar, incluyendo rutas, tamaños, fechas y eliminación de modelos no usados.',
-            vllmTitle1: 'Gestión centralizada',
+                'Configura el directorio de descarga, las direcciones de origen, los tokens de acceso y la sincronización automática de modelos destacados.',
+            vllmTitle1: 'Despliegue de modelos',
             vllmContent1:
-                'Centralice la gestión de instancias vLLM distribuidas y supervise versiones, estado de ejecución y directorios de trabajo desde una única plataforma.',
-            vllmTitle2: 'Despliegue rápido',
+                'Selecciona el directorio del modelo y la imagen del contenedor, configura GPU, puertos y parámetros de inicio, y crea instancias de vLLM.',
+            vllmTitle2: 'Monitorización del servicio',
             vllmContent2:
-                'Configure y despliegue servicios vLLM en minutos mediante formularios visuales, sin necesidad de complejas operaciones manuales.',
-            vllmTitle3: 'Operación eficiente',
+                'Consulta el estado de las instancias, el número de solicitudes, el rendimiento y la latencia del servicio de modelos.',
+            vllmTitle3: 'Operaciones diarias',
             vllmContent3:
-                'Realice la creación, edición, inicio, detención, reinicio y eliminación de instancias desde una sola interfaz para simplificar la operación diaria.',
-            vllmTitle4: 'Control avanzado',
-            vllmContent4:
-                'Personalice puertos, contenedores, comandos de arranque y archivos Compose con opciones avanzadas para lograr implementaciones más flexibles y estandarizadas.',
+                'Inicia, detén, reinicia y elimina instancias, consulta registros, abre terminales y realiza el seguimiento de las tareas.',
         },
         node: {
             master: 'Nodo Principal',

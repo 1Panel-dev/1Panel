@@ -39,7 +39,7 @@ export const jumpToInstall = (type: string, key: string) => {
             });
             return true;
         case 'vllm':
-            if (globalStore.isProductPro) {
+            if (globalStore.isProductPro && router.hasRoute('LocalModel')) {
                 router.push({
                     path: '/ai/model/local',
                     query: {

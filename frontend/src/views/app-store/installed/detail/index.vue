@@ -235,9 +235,9 @@
     </DrawerPro>
 </template>
 <script lang="ts" setup>
-import { expandInvalidFormSection } from '@/views/ai/model/components/form-section';
-import AccountAddress from '@/views/ai/model/components/account-address/index.vue';
-import GPUConfig from '@/views/ai/model/components/gpu-config/index.vue';
+import { expandInvalidFormSection } from '@/components/form-section';
+import AccountAddress from '@/views/ai/components/account-address/index.vue';
+import GPUConfig from '@/views/ai/components/gpu-config/index.vue';
 import Diff from '@/views/app-store/installed/upgrade/diff/index.vue';
 
 import { App } from '@/api/interface/app';
@@ -583,7 +583,7 @@ onBeforeUnmount(() => {
 </script>
 
 <style lang="scss" scoped>
-@use '@/views/ai/model/components/form-section.scss';
+@use '@/components/form-section/index.scss';
 .change-button {
     margin-top: 5px;
 }

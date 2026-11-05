@@ -10,12 +10,6 @@ import (
 )
 
 func Init() {
-	global.LOG.Info("recover interrupted model download tasks start")
-	if err := service.NewIModelDownloaderService().RecoverInterruptedTasks(); err != nil {
-		global.LOG.Warnf("recover interrupted model download tasks failed, err: %v", err)
-	}
-	global.LOG.Info("recover interrupted model download tasks done")
-
 	go syncApp()
 	go syncInstalledApp()
 	go syncRuntime()

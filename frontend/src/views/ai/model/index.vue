@@ -1,363 +1,190 @@
 <template>
     <div class="model-page">
-        <RouterButton :buttons="tabs" />
-        <component :is="downloaderView" v-if="isFiles" @deploy="(modelDir) => createRef.open('vllm', modelDir)" />
-        <template v-else>
-            <LayoutContent v-loading="loading">
-                <template #leftToolBar>
-                    <el-button v-permission type="primary" @click="createRef.open()">
-                        {{ $t(isLocal ? 'aiTools.model.addInstance' : 'aiTools.model.addService') }}
-                    </el-button>
-                </template>
-                <template #rightToolBar>
-                    <el-select
-                        v-if="!isLocal"
-                        v-model="apiType"
-                        clearable
-                        filterable
-                        placeholder=""
-                        class="model-filter"
-                        @change="resetPageAndSearch"
+        <RouterButton :buttons="[{ label: $t('aiTools.model.services'), path: '/ai/model/account' }]" />
+        <LayoutContent v-loading="loading">
+            <template #leftToolBar>
+                <el-button v-permission type="primary" @click="createRef.open()">
+                    {{ $t('aiTools.model.addService') }}
+                </el-button>
+            </template>
+            <template #rightToolBar>
+                <el-select
+                    v-model="apiType"
+                    clearable
+                    filterable
+                    placeholder=""
+                    class="model-filter"
+                    @change="resetPageAndSearch"
+                >
+                    <template #prefix>{{ 'API ' + $t('commons.table.type') }}</template>
+                    <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item" />
+                </el-select>
+                <el-select
+                    v-model="provider"
+                    clearable
+                    filterable
+                    class="model-filter"
+                    placeholder=""
+                    @change="resetPageAndSearch"
+                >
+                    <template #prefix>{{ $t('aiTools.agents.provider') }}</template>
+                    <el-option
+                        v-for="item in providerOptions"
+                        :key="item.value"
+                        :label="item.label"
+                        :value="item.value"
                     >
-                        <template #prefix>{{ 'API ' + $t('commons.table.type') }}</template>
-                        <el-option v-for="item in apiTypeOptions" :key="item" :label="item" :value="item" />
-                    </el-select>
-                    <el-select
-                        v-if="!isLocal"
-                        v-model="provider"
-                        clearable
-                        filterable
-                        class="model-filter"
-                        placeholder=""
-                        @change="resetPageAndSearch"
-                    >
-                        <template #prefix>{{ $t('aiTools.agents.provider') }}</template>
-                        <el-option
-                            v-for="item in providerOptions"
-                            :key="item.value"
-                            :label="item.label"
-                            :value="item.value"
-                        >
-                            <ProviderLabel :provider="item.value" :display-name="item.label" />
-                        </el-option>
-                    </el-select>
-                    <TableSearch v-model:searchName="searchName" class="model-search" @search="resetPageAndSearch" />
-                    <TableRefresh @search="search" />
-                    <TableSetting v-if="isLocal" title="model-deployment-refresh" @search="!loading && search()" />
-                    <fu-table-column-select
-                        v-else
-                        :columns="accountColumns"
-                        trigger="hover"
-                        :title="$t('commons.table.selectColumn')"
-                        :only-icon="true"
-                    />
-                </template>
-                <template #prompt>
-                    <el-alert
-                        type="info"
-                        :closable="false"
-                        :title="$t(isLocal ? 'aiTools.model.addInstanceHelper' : 'aiTools.model.serviceHelper')"
-                    />
-                </template>
-                <template #main>
-                    <ComplexTable
-                        v-if="!isLocal"
-                        :data="connections"
-                        row-key="id"
-                        :pagination-config="pagination"
-                        :columns="accountColumns"
-                        local-key="modelServiceColumn"
-                        @search="search"
-                    >
-                        <el-table-column prop="name" :label="$t('commons.table.name')" min-width="220" fixed="left">
-                            <template #default="{ row }">
-                                <div class="service-name">
-                                    <div class="service-title cell-ellipsis" :title="row.name">{{ row.name }}</div>
-                                    <el-tag class="service-source-tag" type="info" size="small">
-                                        {{
-                                            $t(
-                                                !row.appInstallId
-                                                    ? 'aiTools.model.cloudAccount'
-                                                    : 'aiTools.model.localModel',
-                                            )
-                                        }}
-                                    </el-tag>
-                                </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="provider" :label="$t('aiTools.model.engineProvider')" min-width="180">
-                            <template #default="{ row }">
-                                <div class="cell-ellipsis">
-                                    <ProviderLabel :provider="row.provider" :display-name="row.providerName" />
-                                </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            prop="apiType"
-                            :label="'API ' + $t('commons.table.type')"
-                            min-width="200"
-                            show-overflow-tooltip
-                        >
-                            <template #default="{ row }">
-                                {{ row.apiType || '—' }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="models" :label="$t('aiTools.model.model')" min-width="200">
-                            <template #default="{ row }">
-                                <div
-                                    v-for="(model, index) in (row.models || []).slice(0, 2)"
-                                    :key="model.id"
-                                    class="model-line"
-                                >
-                                    <span class="cell-ellipsis" :title="model.id">{{ model.id }}</span>
-                                    <el-button
-                                        v-if="!row.appInstallId && index === 1 && row.models.length > 2"
-                                        size="small"
-                                        class="model-more"
-                                        @click="poolRef.open(row)"
-                                    >
-                                        +{{ row.models.length - 2 }}
-                                    </el-button>
-                                    <el-tooltip
-                                        v-if="row.appInstallId && index === 1 && row.models.length > 2"
-                                        :content="
-                                            row.models
-                                                .slice(2)
-                                                .map((item) => item.id)
-                                                .join(', ')
-                                        "
-                                        placement="top"
-                                    >
-                                        <el-button size="small" class="model-more">
-                                            +{{ row.models.length - 2 }}
-                                        </el-button>
-                                    </el-tooltip>
-                                </div>
-                                <span v-if="!row.models?.length">—</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
-                            <template #default="{ row }">
-                                <el-tag :type="connectionStatus(row).type">
-                                    {{ connectionStatus(row).label }}
+                        <ProviderLabel :provider="item.value" :display-name="item.label" />
+                    </el-option>
+                </el-select>
+                <TableSearch v-model:searchName="searchName" class="model-search" @search="resetPageAndSearch" />
+                <TableRefresh @search="search" />
+                <fu-table-column-select
+                    :columns="accountColumns"
+                    trigger="hover"
+                    :title="$t('commons.table.selectColumn')"
+                    :only-icon="true"
+                />
+            </template>
+            <template #prompt>
+                <el-alert type="info" :closable="false" :title="$t('aiTools.model.serviceHelper')" />
+            </template>
+            <template #main>
+                <ComplexTable
+                    :data="connections"
+                    row-key="id"
+                    :pagination-config="pagination"
+                    :columns="accountColumns"
+                    local-key="modelServiceColumn"
+                    @search="search"
+                >
+                    <el-table-column prop="name" :label="$t('commons.table.name')" min-width="220" fixed="left">
+                        <template #default="{ row }">
+                            <div class="service-name">
+                                <div class="service-title cell-ellipsis" :title="row.name">{{ row.name }}</div>
+                                <el-tag class="service-source-tag" type="info" size="small">
+                                    {{
+                                        $t(
+                                            !row.appInstallId
+                                                ? 'aiTools.model.cloudAccount'
+                                                : 'aiTools.model.localModel',
+                                        )
+                                    }}
                                 </el-tag>
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            prop="baseUrl"
-                            :label="$t('aiTools.model.endpoint')"
-                            min-width="280"
-                            show-overflow-tooltip
-                        >
-                            <template #default="{ row }">
-                                {{ row.baseUrl || '—' }}
-                            </template>
-                        </el-table-column>
-                        <el-table-column
-                            prop="createdAt"
-                            :label="$t('commons.table.createdAt')"
-                            :formatter="dateFormat"
-                            min-width="180"
-                            show-overflow-tooltip
-                        />
-                        <fu-table-operations
-                            :buttons="accountButtons"
-                            :label="$t('commons.table.operate')"
-                            align="left"
-                            fixed="right"
-                            :ellipsis="3"
-                            width="220"
-                        />
-                    </ComplexTable>
-                    <ComplexTable
-                        v-else
-                        :data="deployments"
-                        :pagination-config="pagination"
-                        :row-style="{ height: '63px' }"
-                        @search="search"
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="provider" :label="$t('aiTools.model.engineProvider')" min-width="180">
+                        <template #default="{ row }">
+                            <div class="cell-ellipsis">
+                                <ProviderLabel :provider="row.provider" :display-name="row.providerName" />
+                            </div>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="apiType"
+                        :label="'API ' + $t('commons.table.type')"
+                        min-width="200"
+                        show-overflow-tooltip
                     >
-                        <el-table-column :label="$t('commons.table.name')" min-width="190">
-                            <template #default="{ row }">
-                                <el-button link type="primary" @click="manageRef.open(row, 'connection', true)">
-                                    {{ row.name }}
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('app.version')" min-width="150">
-                            <template #default="{ row }">
-                                <div class="flex items-center gap-2">
-                                    <span>{{ formatVllmVersion(row.appVersion) || '—' }}</span>
-                                    <el-button
-                                        v-if="row.upgradable && hasPermission('app_manage')"
-                                        v-permission
-                                        link
-                                        type="primary"
-                                        class="shrink-0"
-                                        :disabled="operationDisabled(row)"
-                                        @click="manageRef.open(row, 'upgrade', true)"
-                                    >
-                                        {{ $t('commons.button.upgrade') }}
-                                    </el-button>
-                                </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.table.port')" min-width="120">
-                            <template #default="{ row }">
+                        <template #default="{ row }">
+                            {{ row.apiType || '—' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="models" :label="$t('aiTools.model.model')" min-width="200">
+                        <template #default="{ row }">
+                            <div
+                                v-for="(model, index) in (row.models || []).slice(0, 2)"
+                                :key="model.id"
+                                class="model-line"
+                            >
+                                <span class="cell-ellipsis" :title="model.id">{{ model.id }}</span>
                                 <el-button
-                                    v-if="row.port > 0"
-                                    icon="Position"
-                                    plain
+                                    v-if="!row.appInstallId && index === 1 && row.models.length > 2"
                                     size="small"
-                                    @click="portJumpRef.acceptParams({ port: row.port, ip: '', protocol: 'http' })"
+                                    class="model-more"
+                                    @click="poolRef.open(row)"
                                 >
-                                    {{ row.port }}
+                                    +{{ row.models.length - 2 }}
                                 </el-button>
-                                <span v-else>—</span>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('aiTools.model.model')" min-width="200">
-                            <template #default="{ row }">
-                                <div class="cell-ellipsis" :title="row.servedModelName">
-                                    {{ row.servedModelName || '—' }}
-                                </div>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.table.status')" min-width="150">
-                            <template #default="{ row }">
-                                <el-dropdown placement="bottom" :disabled="statusDisabled(row)">
-                                    <Status v-permission :status="row.status" operate :disabled="statusDisabled(row)" />
-                                    <template #dropdown>
-                                        <el-dropdown-menu>
-                                            <el-dropdown-item
-                                                :disabled="statusDisabled(row) || row.status === 'Running'"
-                                                @click="operate(row, 'start')"
-                                            >
-                                                {{ $t('commons.operate.start') }}
-                                            </el-dropdown-item>
-                                            <el-dropdown-item
-                                                :disabled="
-                                                    statusDisabled(row) || ['Stopped', 'Exited'].includes(row.status)
-                                                "
-                                                @click="operate(row, 'stop')"
-                                            >
-                                                {{ $t('commons.operate.stop') }}
-                                            </el-dropdown-item>
-                                            <el-dropdown-item
-                                                :disabled="statusDisabled(row)"
-                                                @click="operate(row, 'restart')"
-                                            >
-                                                {{ $t('commons.button.restart') }}
-                                            </el-dropdown-item>
-                                        </el-dropdown-menu>
-                                    </template>
-                                </el-dropdown>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('commons.button.log')" min-width="90">
-                            <template #default="{ row }">
-                                <el-button @click="manageRef.open(row, 'log', true)" link type="primary">
-                                    {{ $t('website.check') }}
-                                </el-button>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('container.source')" min-width="170">
-                            <template #default="{ row }">
-                                <template v-if="row.status === 'Running' && row.containerName">
-                                    <ContainerResource
-                                        v-if="resourceStats[row.containerName]"
-                                        :stats="resourceStats[row.containerName]"
-                                    />
-                                    <el-icon
-                                        v-else-if="resourceStats[row.containerName] === undefined"
-                                        class="is-loading"
-                                    >
-                                        <Loading />
-                                    </el-icon>
-                                    <el-tooltip v-else :content="$t('aiTools.model.loadFailed')">
-                                        <span>—</span>
-                                    </el-tooltip>
-                                </template>
-                                <span v-else>—</span>
-                            </template>
-                        </el-table-column>
-                        <fu-table-operations
-                            :buttons="deploymentButtons"
-                            :label="$t('commons.table.operate')"
-                            fixed="right"
-                            :ellipsis="2"
-                            width="240"
-                        />
-                    </ComplexTable>
-                </template>
-            </LayoutContent>
-        </template>
-        <CreateService ref="createRef" :engines-only="isLocal || isFiles" @search="search" @manage="manageDeployment" />
-        <ManageDeployment
-            ref="manageRef"
-            @search="search"
-            @upgrade="(app) => upgradeRef.acceptParams(app, 'upgrade')"
-        />
-        <AppUpgrade ref="upgradeRef" @close="search" />
-        <TaskLog ref="taskRef" width="70%" @close="search" />
+                                <el-tooltip
+                                    v-if="row.appInstallId && index === 1 && row.models.length > 2"
+                                    :content="
+                                        row.models
+                                            .slice(2)
+                                            .map((item) => item.id)
+                                            .join(', ')
+                                    "
+                                    placement="top"
+                                >
+                                    <el-button size="small" class="model-more">+{{ row.models.length - 2 }}</el-button>
+                                </el-tooltip>
+                            </div>
+                            <span v-if="!row.models?.length">—</span>
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
+                        <template #default="{ row }">
+                            <el-tag :type="connectionStatus(row).type">
+                                {{ connectionStatus(row).label }}
+                            </el-tag>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="baseUrl"
+                        :label="$t('aiTools.model.endpoint')"
+                        min-width="280"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            {{ row.baseUrl || '—' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
+                        prop="createdAt"
+                        :label="$t('commons.table.createdAt')"
+                        :formatter="dateFormat"
+                        min-width="180"
+                        show-overflow-tooltip
+                    />
+                    <fu-table-operations
+                        :buttons="accountButtons"
+                        :label="$t('commons.table.operate')"
+                        align="left"
+                        fixed="right"
+                        :ellipsis="3"
+                        width="220"
+                    />
+                </ComplexTable>
+            </template>
+        </LayoutContent>
+        <CreateService ref="createRef" @search="search" />
         <ModelPool ref="poolRef" @updated="search" />
-        <TerminalDialog :key="`terminal:${currentNode}:${route.fullPath}`" ref="terminalRef" />
-        <SyncService ref="syncRef" @search="search" />
-        <PortJump ref="portJumpRef" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, defineAsyncComponent, nextTick, reactive, ref, toRef, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { computed, reactive, ref, toRef, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
 import type { AI } from '@/api/interface/ai';
-import type { Container } from '@/api/interface/container';
-import { containerListStats } from '@/api/modules/container';
-import ContainerResource from '@/components/container-resource/index.vue';
-import PortJump from '@/components/port-jump/index.vue';
 import type { FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAgentProviderDisplayName, isAgentAccountVerificationSkipped } from '@/utils/agent';
 import i18n from '@/lang';
-import { hasPermission } from '@/utils/rbac';
-import { hasManagePermissionAccess } from '@/utils/permission';
-import { newUUID } from '@/utils/id';
 import { dateFormat } from '@/utils/date';
 import { useSearchState } from '@/utils/search-reset';
-import TaskLog from '@/components/log/task/index.vue';
-import CreateService from './components/create/index.vue';
-import ManageDeployment from './components/deployment-manage/index.vue';
-import AppUpgrade from '@/views/app-store/installed/upgrade/index.vue';
-import ModelPool from './components/model-pool/index.vue';
-import TerminalDialog from '@/views/container/container/terminal/index.vue';
-import SyncService from './components/sync/index.vue';
+import CreateService from './create/index.vue';
+import ModelPool from './model-pool/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
-import { formatVllmVersion, loadVllmAPI, vllmAvailable, type Deployment } from './deployment';
 
 const route = useRoute();
-const router = useRouter();
 const pagePath = route.path;
 const isCurrentPage = computed(() => route.path === pagePath);
-const { isProductPro, isIntl, currentNode, isAdminOrNodeAdmin } = useGlobalStore();
-const isFiles = pagePath === '/ai/model/files';
-const isLocal = pagePath === '/ai/model/local';
-const tabs = computed(() =>
-    isFiles || isLocal
-        ? [
-              { label: i18n.global.t('aiTools.model.files'), path: '/ai/model/files' },
-              { label: i18n.global.t('aiTools.model.deployments'), path: '/ai/model/local' },
-          ]
-        : [{ label: i18n.global.t('aiTools.model.services'), path: '/ai/model/account' }],
-);
-const downloaderView = defineAsyncComponent(() => import('@/views/model-downloader/index.vue'));
+const { isIntl, currentNode } = useGlobalStore();
 const createRef = ref();
-const manageRef = ref();
-const upgradeRef = ref();
 const poolRef = ref();
-const terminalRef = ref<InstanceType<typeof TerminalDialog>>();
-const syncRef = ref<InstanceType<typeof SyncService>>();
-const portJumpRef = ref<InstanceType<typeof PortJump>>();
 const loading = ref(false);
 const connections = ref<AI.AgentAccountItem[]>([]);
 const accountColumns = ref<FuTableColumnConfig[]>([]);
@@ -365,7 +192,6 @@ const providers = ref<AI.ProviderInfo[]>([]);
 watch(
     currentNode,
     async (_, __, onCleanup) => {
-        if (isLocal || isFiles) return;
         let cancelled = false;
         onCleanup(() => (cancelled = true));
         providers.value = [];
@@ -378,32 +204,29 @@ watch(
     },
     { immediate: true },
 );
-const deployments = ref<Deployment[]>([]);
 const apiType = ref('');
 const provider = ref('');
 const searchName = ref('');
 const pagination = reactive({ currentPage: 1, pageSize: 10, total: 0 });
-if (!isLocal && !isFiles) {
-    useSearchState(
-        'ai/agents/model/index',
-        {
-            search: searchName,
-            apiType,
-            provider,
-            page: toRef(pagination, 'currentPage'),
-            pageSize: toRef(pagination, 'pageSize'),
+useSearchState(
+    'ai/agents/model/index',
+    {
+        search: searchName,
+        apiType,
+        provider,
+        page: toRef(pagination, 'currentPage'),
+        pageSize: toRef(pagination, 'pageSize'),
+    },
+    {
+        onRevisit: () => {
+            if (typeof route.query.name === 'string' && route.query.name !== searchName.value) {
+                searchName.value = route.query.name;
+                resetPage();
+            }
+            return search();
         },
-        {
-            onRevisit: () => {
-                if (typeof route.query.name === 'string' && route.query.name !== searchName.value) {
-                    searchName.value = route.query.name;
-                    resetPage();
-                }
-                return search();
-            },
-        },
-    );
-}
+    },
+);
 const apiTypeOptions = computed(() =>
     Array.from(new Set(providers.value.flatMap((item) => item.apiTypes.map((api) => api.apiType)))).sort(),
 );
@@ -414,36 +237,6 @@ const providerOptions = computed(() =>
             value: item.provider,
             label: getAgentProviderDisplayName(item.provider, item.displayName),
         })),
-);
-const resourceStats = ref<Record<string, Container.ContainerListStats | null>>({});
-watch(
-    [deployments, isCurrentPage, currentNode],
-    async ([rows, active, node], _, onCleanup) => {
-        resourceStats.value = {};
-        const controller = new AbortController();
-        onCleanup(() => {
-            controller.abort();
-        });
-        if (!active || !isLocal) return;
-        const names = [
-            ...new Set(
-                rows.filter((row) => row.status === 'Running' && row.containerName).map((row) => row.containerName),
-            ),
-        ];
-        if (!names.length) return;
-        try {
-            const { data } = await containerListStats(node, undefined, {
-                signal: controller.signal,
-                skipErrorMessage: true,
-            });
-            if (controller.signal.aborted) return;
-            const statsByName = new Map((data || []).map((item) => [item.containerName, item]));
-            resourceStats.value = Object.fromEntries(names.map((name) => [name, statsByName.get(name) || null]));
-        } catch {
-            if (!controller.signal.aborted) resourceStats.value = Object.fromEntries(names.map((name) => [name, null]));
-        }
-    },
-    { immediate: true },
 );
 const resetPage = () => {
     pagination.currentPage = 1;
@@ -461,37 +254,19 @@ const resetPageIfNeeded = () => {
 let searchVersion = 0;
 const search = async () => {
     const version = ++searchVersion;
-    if (!isCurrentPage.value || isFiles) return;
+    if (!isCurrentPage.value) return;
     loading.value = true;
     try {
-        if (isLocal) {
-            if (!isProductPro.value || !vllmAvailable) {
-                deployments.value = [];
-                pagination.total = 0;
-                return;
-            }
-            const api = await loadVllmAPI();
-            if (version !== searchVersion) return;
-            const { data } = await api.pageVllm({
-                page: pagination.currentPage,
-                pageSize: pagination.pageSize,
-                info: searchName.value,
-            });
-            if (version !== searchVersion) return;
-            deployments.value = data.items || [];
-            pagination.total = data.total;
-        } else {
-            const result = await pageAgentAccounts({
-                page: pagination.currentPage,
-                pageSize: pagination.pageSize,
-                apiType: apiType.value,
-                provider: provider.value,
-                name: searchName.value,
-            });
-            if (version !== searchVersion) return;
-            connections.value = result.data.items || [];
-            pagination.total = result.data.total;
-        }
+        const result = await pageAgentAccounts({
+            page: pagination.currentPage,
+            pageSize: pagination.pageSize,
+            apiType: apiType.value,
+            provider: provider.value,
+            name: searchName.value,
+        });
+        if (version !== searchVersion) return;
+        connections.value = result.data.items || [];
+        pagination.total = result.data.total;
         const previousPage = pagination.currentPage;
         resetPageIfNeeded();
         if (previousPage !== pagination.currentPage) await search();
@@ -499,7 +274,6 @@ const search = async () => {
         if (version !== searchVersion) return;
         connections.value = [];
         pagination.total = 0;
-        deployments.value = [];
     } finally {
         if (version === searchVersion) loading.value = false;
     }
@@ -514,7 +288,6 @@ const connectionStatus = (row: AI.AgentAccountItem) => {
         label: i18n.global.t(row.verified ? 'aiTools.agents.verified' : 'aiTools.model.unverified'),
     };
 };
-const manageDeployment = (row: Deployment) => manageRef.value.open(row);
 const accountButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
@@ -540,120 +313,20 @@ const accountButtons = [
         },
     },
 ];
-const taskRef = ref();
-const pending = ref(false);
-const operationDisabled = (row: Deployment) => Boolean(pending.value || row.taskID);
-const statusDisabled = (row: Deployment) => operationDisabled(row) || !hasManagePermissionAccess();
-const operate = async (row: Deployment, operation: 'start' | 'stop' | 'restart') => {
-    if (statusDisabled(row)) return;
-    const node = currentNode.value;
-    await ElMessageBox.confirm(
-        i18n.global.t('app.operatorHelper', [i18n.global.t('commons.operate.' + operation)]),
-        i18n.global.t('commons.operate.' + operation),
-        { type: 'warning' },
-    );
-    if (node !== currentNode.value || statusDisabled(row)) return;
-    pending.value = true;
-    try {
-        const taskID = newUUID();
-        await (await loadVllmAPI()).operateVllm({ id: row.id, operate: operation, taskID });
-        if (node !== currentNode.value) return;
-        taskRef.value.openWithTaskID(taskID);
-        await search();
-    } finally {
-        pending.value = false;
-    }
-};
-const deploymentButtons = [
-    {
-        label: i18n.global.t('commons.button.edit'),
-        permission: true,
-        disabled: operationDisabled,
-        click: (row: Deployment) => manageRef.value.open(row, 'config', true),
-    },
-    {
-        label: i18n.global.t('menu.monitor'),
-        click: (row: Deployment) => manageRef.value.open(row, 'monitor', true),
-    },
-    {
-        label: i18n.global.t('menu.terminal'),
-        disabled: (row: Deployment) =>
-            operationDisabled(row) || row.status !== 'Running' || !row.containerName || !isAdminOrNodeAdmin.value,
-        click: (row: Deployment) =>
-            terminalRef.value?.acceptParams({
-                containerID: row.containerName,
-                title: row.name,
-                node: currentNode.value,
-            }),
-    },
-    {
-        label: i18n.global.t('commons.button.sync'),
-        permission: true,
-        disabled: operationDisabled,
-        click: (row: Deployment) => syncRef.value.open(row),
-    },
-    {
-        label: i18n.global.t('commons.button.delete'),
-        permission: true,
-        disabled: (row: Deployment) => operationDisabled(row),
-        click: (row: Deployment) => manageRef.value.open(row, 'delete', true),
-    },
-];
 watch(
-    [
-        () => route.path,
-        () => route.query.tab,
-        () => route.query.name,
-        () => route.query.open,
-        () => route.query.engine,
-        currentNode,
-        isProductPro,
-    ],
-    async (_, previous, onCleanup) => {
-        let cancelled = false;
-        onCleanup(() => (cancelled = true));
+    [() => route.path, () => route.query.name, currentNode],
+    async (_, previous) => {
         if (!isCurrentPage.value) {
             searchVersion++;
             loading.value = false;
             return;
         }
-        if (isLocal && route.query.tab === 'downloader') {
-            await router.replace('/ai/model/files');
-            return;
-        }
-        if (
-            isLocal &&
-            route.query.open === 'create' &&
-            route.query.engine !== 'vllm' &&
-            (route.query.engine === 'ollama' || route.query.tab === 'ollama')
-        ) {
-            await router.replace({ name: 'AppAll', query: { install: 'ollama' } });
-            return;
-        }
-        if (isLocal || isFiles) {
-            apiType.value = '';
-            provider.value = '';
-            searchName.value = '';
+        if (previous.length && previous[0] !== pagePath) return;
+        if (typeof route.query.name === 'string' && route.query.name !== searchName.value) {
+            searchName.value = route.query.name;
             resetPage();
-        } else {
-            if (previous.length && previous[0] !== pagePath) return;
-            if (typeof route.query.name === 'string' && route.query.name !== searchName.value) {
-                searchName.value = route.query.name;
-                resetPage();
-            }
         }
         await search();
-        if (cancelled) return;
-        if (isCurrentPage.value && isLocal && route.query.open === 'create' && route.query.engine === 'vllm') {
-            await nextTick();
-            if (cancelled) return;
-            await createRef.value.open('vllm');
-            if (cancelled) return;
-            const query = { ...route.query };
-            delete query.open;
-            delete query.tab;
-            await router.replace({ path: route.path, query });
-        }
     },
     { immediate: true },
 );

@@ -6,7 +6,7 @@ const aiRouter = {
     path: '/ai',
     name: 'AI-Menu',
     component: Layout,
-    redirect: '/ai/model',
+    redirect: '/ai/model/account',
     meta: {
         icon: 'p-jiqiren2',
         title: 'menu.aiTools',
@@ -15,32 +15,10 @@ const aiRouter = {
         {
             path: '/ai/model/local/ollama',
             name: 'OllamaModels',
-            component: () => import('@/views/ai/model/ollama/index.vue'),
+            component: () => import('@/views/ai/ollama/index.vue'),
             meta: {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.ollamaManagement',
-                permission: 'ai_model_view',
-            },
-        },
-        {
-            path: '/ai/model',
-            name: 'AIModel',
-            redirect: '/ai/model/files',
-            meta: {
-                icon: 'p-moxing-menu',
-                title: 'aiTools.model.vllmManagement',
-                activeMenu: '/ai/model',
-                permission: 'ai_model_view',
-            },
-        },
-        {
-            path: '/ai/model/files',
-            hidden: true,
-            name: 'ModelFiles',
-            component: () => import('@/views/ai/model/index.vue'),
-            meta: {
-                title: 'aiTools.model.files',
-                activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },
         },
@@ -52,17 +30,6 @@ const aiRouter = {
                 icon: 'p-moxing-menu',
                 title: 'aiTools.model.services',
                 activeMenu: '/ai/model/account',
-                permission: 'ai_model_view',
-            },
-        },
-        {
-            path: '/ai/model/local',
-            hidden: true,
-            name: 'LocalModel',
-            component: () => import('@/views/ai/model/index.vue'),
-            meta: {
-                title: 'aiTools.model.deployments',
-                activeMenu: '/ai/model',
                 permission: 'ai_model_view',
             },
         },

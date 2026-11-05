@@ -60,9 +60,6 @@ func OperationResolveMeta() gin.HandlerFunc {
 			return
 		}
 		reqPath := strings.TrimPrefix(c.Request.URL.Path, "/api/v2")
-		if strings.HasPrefix(reqPath, "/xpack/model/downloader/") {
-			reqPath = strings.Replace(reqPath, "/xpack/model/downloader/", "/ai/model/downloader/", 1)
-		}
 		meta, ok := metaMap[reqPath]
 		if !ok || len(meta.BeforeFunctions) == 0 {
 			c.Next()

@@ -97,36 +97,23 @@ func Start() {
 	viper.Init()
 	dir.Init()
 	log.Init()
-	global.LOG.Info("agent startup: logger initialized")
 	if err := files.CleanupInterruptedDownloads(); err != nil {
 		global.LOG.Warnf("clean interrupted remote downloads: %s", err)
 	}
 	db.Init()
-	global.LOG.Info("agent startup: database initialized")
 	migration.Init()
-	global.LOG.Info("agent startup: migration initialized")
 	i18n.Init()
-	global.LOG.Info("agent startup: i18n initialized")
 	cache.Init()
-	global.LOG.Info("agent startup: cache initialized")
 	app.Init()
-	global.LOG.Info("agent startup: app initialized")
 	lang.Init()
-	global.LOG.Info("agent startup: language initialized")
 	validator.Init()
-	global.LOG.Info("agent startup: validator initialized")
 	cron.Run()
-	global.LOG.Info("agent startup: cron initialized")
 	hook.Init()
-	global.LOG.Info("agent startup: hook initialized")
 	go firewall.Init()
-	global.LOG.Info("agent startup: firewall init scheduled")
 	InitOthers()
-	global.LOG.Info("agent startup: edition initialized")
 	kvm.Init()
 
 	rootRouter := router.Routers()
-	global.LOG.Info("agent startup: router initialized")
 
 	server := &http.Server{
 		Handler: rootRouter,
@@ -139,7 +126,6 @@ func Start() {
 	}
 
 	if global.IsMaster {
-		global.LOG.Infof("agent startup: master mode, preparing unix socket %s", masterSocketPath)
 		if err := prepareMasterSocketDir(masterSocketDir); err != nil {
 			panic(err)
 		}
@@ -152,14 +138,12 @@ func Start() {
 			_ = listener.Close()
 			panic(err)
 		}
-		global.LOG.Infof("agent startup: listening on unix socket %s", masterSocketPath)
 		business.Init()
-		global.LOG.Info("agent startup: business initialized")
+		global.LOG.Infof("agent startup: listening on unix socket %s", masterSocketPath)
 		_ = server.Serve(listener)
 		return
 	} else {
 		server.Addr = fmt.Sprintf("0.0.0.0:%s", global.CONF.Base.Port)
-		global.LOG.Infof("agent startup: node mode, preparing https listener %s", server.Addr)
 		settingRepo := repo.NewISettingRepo()
 		certItem, err := settingRepo.Get(settingRepo.WithByKey("ServerCrt"))
 		if err != nil {
@@ -189,7 +173,6 @@ func Start() {
 			server.TLSConfig.ClientCAs = caCertPool
 		}
 		business.Init()
-		global.LOG.Info("agent startup: business initialized")
 		global.LOG.Infof("listen at https://0.0.0.0:%s", global.CONF.Base.Port)
 		if err := server.ListenAndServeTLS("", ""); err != nil {
 			panic(err)

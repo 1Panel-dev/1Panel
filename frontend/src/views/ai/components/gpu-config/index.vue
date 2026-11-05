@@ -258,7 +258,7 @@ defineExpose({ init, loading });
 </script>
 
 <style lang="scss" scoped>
-@use '@/views/ai/model/components/form-section.scss';
+@use '@/components/form-section/index.scss';
 .gpu-capabilities-label {
     display: inline-flex;
     align-items: flex-start;

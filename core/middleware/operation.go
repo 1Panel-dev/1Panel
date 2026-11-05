@@ -325,9 +325,6 @@ func loadLogInfo(path string) string {
 func normalizeOperationPath(reqPath string) string {
 	pathItem := strings.TrimPrefix(reqPath, "/api/v2")
 	pathItem = strings.TrimPrefix(pathItem, "/api/v2/core")
-	if strings.HasPrefix(pathItem, "/xpack/model/downloader/") {
-		pathItem = strings.Replace(pathItem, "/xpack/model/downloader/", "/ai/model/downloader/", 1)
-	}
 	return pathItem
 }
 

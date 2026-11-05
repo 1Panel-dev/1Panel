@@ -3931,9 +3931,9 @@ const message = {
         fileExchange: '상용 버전으로 업그레이드하면 여러 서버 간에 파일을 빠르게 전송할 수 있습니다.',
         app: '상용 버전으로 업그레이드하면 모바일 앱에서 서비스 정보와 이상 모니터링을 확인할 수 있습니다.',
         cluster: '상용 버전으로 업그레이드하면 MySQL/Postgres/Redis 기본-복제 클러스터를 관리할 수 있습니다.',
-        vllm: '상용 버전으로 업그레이드하면 1Panel에서 vLLM 서비스의 배포, 구성, 수명 주기 작업 및 작업 추적을 중앙에서 관리할 수 있습니다.',
+        vllm: '상용 버전으로 업그레이드하면 vLLM 배포, 서비스 모니터링, 로그 조회 및 일상 운영을 한곳에서 관리할 수 있습니다.',
         'model-downloader':
-            '상용 버전으로 업그레이드하면 HuggingFace, ModelScope 또는 호환 미러에서 로컬 모델 파일을 검색, 다운로드 및 관리하고 모델 디렉터리와 다운로드 작업을 통합 관리할 수 있습니다.',
+            '상용 버전으로 업그레이드하면 추천 모델 조회, 다운로드 관리, vLLM Recipes 재사용 및 다운로드 소스와 인증 정보 설정을 이용할 수 있습니다.',
         exceptionalHelper:
             '라이선스 동기화 검증이 비정상입니다. 수동으로 동기화해 상용 버전 기능이 정상적으로 동작하는지 확인하세요. 상세: ',
         tamperHelper: '작업 실패, 파일/폴더에 변조 방지가 활성화되어 있습니다. 확인 후 다시 시도하세요!',
@@ -6941,30 +6941,27 @@ const message = {
             clusterTitle3: '복제 상태',
             clusterContent3:
                 '마스터-슬레이브 복제 상태 및 지연 정보를 표시하여 동기화 문제를 해결하는 데 도움을 줍니다',
-            modelDownloaderTitle1: '모델 탐색',
+            modelDownloaderTitle1: '추천 모델',
             modelDownloaderContent1:
-                'HuggingFace 모델 저장소를 직접 검색하고 다운로드 수, 좋아요, 모델 상세 정보, 파일 목록을 확인합니다.',
-            modelDownloaderTitle2: '가속 다운로드',
+                '추천 모델을 모델 계열과 가중치 제공자로 필터링하고, 모델 정보를 확인하여 다운로드할 수 있습니다.',
+            modelDownloaderTitle2: '모델 다운로드',
             modelDownloaderContent2:
-                'HuggingFace 가속 엔드포인트와 HuggingFace Token을 설정하여 공식 사이트, 미러, 비공개 모델에 대응합니다.',
-            modelDownloaderTitle3: '작업 추적',
+                'Hugging Face와 ModelScope에서 모델을 다운로드하고 진행 상황 확인, 취소, 재시도 및 로컬 파일 관리를 수행합니다.',
+            modelDownloaderTitle3: 'vLLM Recipes',
             modelDownloaderContent3:
-                '다운로드 대기열, 작업 상태, 진행률, 오류를 한곳에서 확인하고 취소, 재시도, 기록 정리를 지원합니다.',
-            modelDownloaderTitle4: '로컬 관리',
+                '공식 Recipes를 조회하고 동기화하며, 사용자 정의 레시피를 관리하고 모델에 맞는 배포 매개변수를 재사용합니다.',
+            modelDownloaderTitle4: '설정',
             modelDownloaderContent4:
-                '로컬 모델 디렉토리를 중앙에서 관리하고 경로, 크기, 시간을 확인하며 불필요한 모델 파일을 삭제합니다.',
-            vllmTitle1: '통합 관리',
+                '모델 다운로드 디렉터리, 소스 주소, 액세스 토큰 및 추천 모델 자동 동기화를 설정합니다.',
+            vllmTitle1: '모델 배포',
             vllmContent1:
-                '분산된 vLLM 서비스를 1Panel에 통합하여 인스턴스、버전、상태、실행 디렉토리를 집중 조회할 수 있습니다.',
-            vllmTitle2: '빠른 배포',
+                '모델 디렉터리와 컨테이너 이미지를 선택하고 GPU, 포트 및 시작 매개변수를 설정하여 vLLM 인스턴스를 생성합니다.',
+            vllmTitle2: '서비스 모니터링',
             vllmContent2:
-                '시각적 양식으로 버전 선택、모델 디렉토리 마운트、시작 매개변수 설정을 완료하여 수동 구성 비용을 줄입니다.',
-            vllmTitle3: '운영 효율성',
+                '인스턴스 상태, 요청 수, 처리량 및 지연 시간을 확인하여 모델 서비스의 운영 상태를 파악합니다.',
+            vllmTitle3: '일상 운영',
             vllmContent3:
-                '같은 페이지에서 생성、편집、시작、중지、재시작、삭제、작업 추적을 완료하여 로컬 모델 서비스 유지보수 효율을 향상시킵니다.',
-            vllmTitle4: '구성 제어',
-            vllmContent4:
-                '고급 설정으로 포트、컨테이너、시작 명령、Compose 구성을 통합 관리하여 표준화된 배포와 후속 조정을 용이하게 합니다.',
+                '인스턴스 시작, 중지, 재시작 및 삭제를 수행하고 로그 조회, 터미널 접속 및 작업 추적을 지원합니다.',
         },
         node: {
             master: '주 노드',
