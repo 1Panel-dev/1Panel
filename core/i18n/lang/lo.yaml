@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "ຕິດຕັ້ງບໍ່ສຳເລັດແ�
 MCPInstallLocalImage: "ມີອິມເມດຢູ່ໃນເຄື່ອງແລ້ວ; ຂ້າມການດາວໂຫຼດ"
 MCPInstallVerifyImage: "ກວດສອບເວີຊັນອິມເມດ ແລະ ສັນຍາບໍລິການທີ່ຈັດການ"
 MCPInstallVerifiedImage: "ກວດສອບອິມເມດຜ່ານແລ້ວ"
+
+PHPExtensionsNoTargets: "ບໍ່ມີໂນດປາຍທາງເຫຼືອຫຼັງຈາກຍົກເວັ້ນໂນດຕົ້ນທາງ"
+PHPExtensionsSyncTask: "ຊິງແມ່ແບບສ່ວນຂະຫຍາຍ PHP [{{ .name }}]"
+PHPExtensionsSyncSkipped: "ໂນດ [{{ .node }}] ມີແມ່ແບບທີ່ຄືກັນແລ້ວ; ຂ້າມ"
 MCPInstallCleanup: "ກຳລັງລ້າງຄອນເທນເນີເກົ່າ"
 MCPInstallOldContainerRemoved: "ລຶບຄອນເທນເນີເກົ່າແລ້ວ"
 MCPInstallOldImageRemoved: "ລຶບອິມເມຈເກົ່າແລ້ວ"

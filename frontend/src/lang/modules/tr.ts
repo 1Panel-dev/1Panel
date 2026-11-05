@@ -4073,6 +4073,14 @@ const message = {
             'Ticari sürüme yükselterek düğümleri manuel değiştirmeden çok düğümlü uygulama sürümlerini toplu olarak yükseltebilirsiniz.',
         nodeDashboard:
             'Ticari sürüme yükselterek çok düğümlü uygulamaları, web sitelerini, veritabanlarını ve zamanlanmış görevleri merkezi olarak yönetebilirsiniz.',
+        imageExchange:
+            'Ticari sürüme yükselterek konteyner imajlarını düğümler arasında toplu olarak aktarabilirsiniz.',
+        appExchange:
+            'Ticari sürüme yükselterek yüklü uygulamaları hedef düğümlere taşıyabilir ve gerekli kaynak bağımlılıklarını doğrulayabilirsiniz.',
+        sslSync:
+            'Ticari sürüme yükselterek kaynak düğümdeki sertifikaları bir veya daha fazla hedef düğümle eşitleyebilirsiniz.',
+        phpExtensionsSync:
+            'Ticari sürüme yükselterek PHP uzantı şablonlarını bir veya daha fazla hedef düğümle eşitleyebilirsiniz.',
         fileExchange: 'Ticari sürüme yükselterek birden fazla sunucu arasında dosyaları hızlıca aktarabilirsiniz.',
         app: 'Ticari sürüme yükselterek mobil uygulamada hizmet bilgilerini ve anormallik izlemeyi görüntüleyebilirsiniz.',
         cluster: 'Ticari sürüme yükselterek MySQL/Postgres/Redis birincil-kopya kümelerini yönetebilirsiniz.',
@@ -7151,6 +7159,37 @@ const message = {
             nodeContent3: 'Her düğümün çalışma durumunu gerçek zamanlı olarak izler',
             nodeTitle4: 'Hızlı Uzak Bağlantı',
             nodeContent4: 'Düğümlere tek tıkla doğrudan uzak terminal bağlantısı',
+            imageExchangeTitle1: 'Kaynak imajları seçin',
+            imageExchangeContent1: 'Kaynak düğümdeki konteyner imajlarını inceleyin ve aktarılacak imajları seçin.',
+            imageExchangeTitle2: 'İmajları dağıtın',
+            imageExchangeContent2: 'Seçilen imajları bir veya daha fazla hedef düğüme aktarın.',
+            imageExchangeTitle3: 'Aktarım günlüklerini görüntüleyin',
+            imageExchangeContent3: 'İmaj aktarımının ilerlemesini ve sonuçlarını görev günlüklerinden takip edin.',
+            appExchangeTitle1: 'Bir uygulama seçin',
+            appExchangeContent1: 'Kaynak düğümde yüklü uygulamaları inceleyin ve taşınacak uygulamayı seçin.',
+            appExchangeTitle2: 'Bağımlılıkları doğrulayın',
+            appExchangeContent2:
+                'Taşıma işleminden önce hedef düğümleri ve veritabanları gibi gerekli kaynakları doğrulayın.',
+            appExchangeTitle3: 'Uygulamaları taşıyın',
+            appExchangeContent3:
+                'Uygulama yedeklerini geri yüklemek için hedef düğümlere aktarın ve sonuçları görev günlüklerinde görüntüleyin.',
+            sslSyncTitle1: 'Sertifikaları seçin',
+            sslSyncContent1: 'Kaynak düğümdeki sertifika bilgilerini inceleyin ve eşitlenecek sertifikaları seçin.',
+            sslSyncTitle2: 'Düğümler arasında eşitleyin',
+            sslSyncContent2:
+                'Kaynak düğüm otomatik olarak hariç tutularak seçilen sertifikaları hedef düğümlerle eşitleyin.',
+            sslSyncTitle3: 'Eşitleme görevlerini onaylayın',
+            sslSyncContent3:
+                'İşlemden önce hedef düğümleri ve sertifikaları gözden geçirin, ardından sonuçları görev günlüklerinde görüntüleyin.',
+            phpExtensionsSyncTitle1: 'Bir şablon seçin',
+            phpExtensionsSyncContent1:
+                'Kaynak düğümdeki şablon adlarını ve uzantı listelerini inceleyin ve eşitlenecek şablonu seçin.',
+            phpExtensionsSyncTitle2: 'Şablonları eşitleyin',
+            phpExtensionsSyncContent2:
+                'Kaynak düğüm otomatik olarak hariç tutularak seçilen şablonu hedef düğümlerle eşitleyin.',
+            phpExtensionsSyncTitle3: 'Mevcut şablonları kontrol edin',
+            phpExtensionsSyncContent3:
+                'Adı ve içeriği aynı olan şablonlar atlanır. İçerik farklıysa üzerine yazılmadan çakışma bildirilir.',
             fileExchangeTitle1: 'Anahtar Kimlik Doğrulama İletimi',
             fileExchangeContent1: 'İletim güvenliğini sağlamak için SSH anahtarları ile kimlik doğrulaması yapar.',
             fileExchangeTitle2: 'Verimli Dosya Senkronizasyonu',
@@ -7675,6 +7714,13 @@ const message = {
             imageBatchConfirmPrefix: '{0} imaj {1} düğüme aktarılacak, toplam {2} görev oluşturulacak.',
 
             ssl: 'Sertifika Senkronizasyonu',
+            phpExtensions: 'PHP Uzantı Şablonu Eşitleme',
+            phpExtensionsTitle: 'Uzantı Şablonu Eşitleme',
+            phpExtensionsDesc: 'PHP uzantı şablonunu hedef düğümlerle eşitlemek için bir kaynak düğüm seçin.',
+            phpExtensionsList: 'PHP uzantıları',
+            phpExtensionsConfirm: '{0} PHP uzantı şablonu {1} düğümle eşitlenecek.',
+            phpExtensionsConflictHint:
+                'Aynı şablonlar atlanır. Adı aynı ancak içeriği farklı olan şablonlar çakışma olarak bildirilir ve üzerlerine yazılmaz.',
             sslBatchDesc:
                 'Kaynak düğüm seçildikten sonra belirtilen sertifikalar mevcut panel ortamına senkronize edilebilir.',
             sslBatchConfirmPrefix: '{0} sertifika {1} düğüme senkronize edilecek, toplam {2} görev oluşturulacak.',

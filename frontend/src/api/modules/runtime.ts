@@ -46,8 +46,13 @@ export const OperateNodeModule = (req: Runtime.NodeModuleReq) => {
     return http.post<any>(`/runtimes/node/modules/operate`, req, TimeoutEnum.T_10M);
 };
 
-export const SearchPHPExtensions = (req: ReqPage) => {
-    return http.post<ResPage<Runtime.PHPExtensions>>(`/runtimes/php/extensions/search`, req);
+export const SearchPHPExtensions = (req: ReqPage & { name?: string }, currentNode?: string) => {
+    return http.post<ResPage<Runtime.PHPExtensions>>(
+        `/runtimes/php/extensions/search`,
+        req,
+        undefined,
+        currentNode ? { CurrentNode: currentNode } : undefined,
+    );
 };
 
 export const ListPHPExtensions = (req: Runtime.PHPExtensionsList) => {
@@ -136,4 +141,8 @@ export const updateRemark = (req: Runtime.RemarkUpdate) => {
 
 export const getFPMStatus = (id: number) => {
     return http.get<Runtime.FpmStatus[]>(`/runtimes/php/fpm/status/${id}`);
+};
+
+export const PushPHPExtensions = (req: Runtime.PHPExtensionsPush) => {
+    return http.post(`/runtimes/php/extensions/push`, req, undefined, { CurrentNode: 'local' });
 };

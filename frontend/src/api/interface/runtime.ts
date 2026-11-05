@@ -1,6 +1,13 @@
 import { CommonModel, ReqPage } from '.';
 import { App } from './app';
 export namespace Runtime {
+    export interface PHPExtensionsPush {
+        sourceNode: string;
+        targetNodes: string[];
+        id: number;
+        taskID: string;
+    }
+
     export interface Runtime extends CommonModel {
         name: string;
         appDetailID: number;

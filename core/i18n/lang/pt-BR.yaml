@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "Instalação falhou e a recuperação está incomplet
 MCPInstallLocalImage: "A imagem já existe localmente; ignorar o download"
 MCPInstallVerifyImage: "Validar a versão da imagem e o contrato do serviço gerenciado"
 MCPInstallVerifiedImage: "A imagem passou na validação"
+
+PHPExtensionsNoTargets: "Não restam nós de destino após excluir o nó de origem"
+PHPExtensionsSyncTask: "Sincronizar modelo de extensões PHP [{{ .name }}]"
+PHPExtensionsSyncSkipped: "O nó [{{ .node }}] já possui um modelo idêntico; ignorado"
 MCPInstallCleanup: "Limpar o contêiner anterior"
 MCPInstallOldContainerRemoved: "Contêiner anterior removido"
 MCPInstallOldImageRemoved: "Imagem anterior removida"

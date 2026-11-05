@@ -4011,6 +4011,13 @@ const message = {
         nodeApp: 'Upgrade to Commercial Edition to upgrade multi-node app versions without switching nodes manually.',
         nodeDashboard:
             'Upgrade to Commercial Edition for centralized management of multi-node apps, websites, databases, and scheduled tasks.',
+        imageExchange: 'Upgrade to Commercial Edition to transfer container images between nodes in batches.',
+        appExchange:
+            'Upgrade to Commercial Edition to migrate installed applications to target nodes and confirm their resource dependencies.',
+        sslSync:
+            'Upgrade to Commercial Edition to synchronize certificates from a source node to one or more target nodes.',
+        phpExtensionsSync:
+            'Upgrade to Commercial Edition to synchronize PHP extension templates to one or more target nodes.',
         fileExchange: 'Upgrade to Commercial Edition to transfer files quickly between servers.',
         app: 'Upgrade to Commercial Edition to view service details, anomaly monitoring, and more in the mobile app.',
         cluster: 'Upgrade to Commercial Edition to manage MySQL/Postgres/Redis primary-replica clusters.',
@@ -7038,6 +7045,35 @@ const message = {
             nodeContent3: "Real-time monitoring of each node's operational status",
             nodeTitle4: 'Quick Remote Connection',
             nodeContent4: 'One-click direct connection to node remote terminals',
+            imageExchangeTitle1: 'Select source images',
+            imageExchangeContent1: 'Browse container images on the source node and select the images to transfer.',
+            imageExchangeTitle2: 'Distribute images',
+            imageExchangeContent2: 'Transfer selected images to one or more target nodes.',
+            imageExchangeTitle3: 'View transfer logs',
+            imageExchangeContent3: 'Track image transfer progress and results in task logs.',
+            appExchangeTitle1: 'Select an application',
+            appExchangeContent1: 'Browse installed applications on the source node and select one to migrate.',
+            appExchangeTitle2: 'Confirm dependencies',
+            appExchangeContent2: 'Confirm target nodes and required resources, such as databases, before migration.',
+            appExchangeTitle3: 'Migrate applications',
+            appExchangeContent3:
+                'Transfer application backups to target nodes for restoration and view results in task logs.',
+            sslSyncTitle1: 'Select certificates',
+            sslSyncContent1: 'Browse certificate details on the source node and select certificates to synchronize.',
+            sslSyncTitle2: 'Synchronize across nodes',
+            sslSyncContent2:
+                'Synchronize selected certificates to target nodes, automatically excluding the source node.',
+            sslSyncTitle3: 'Confirm sync tasks',
+            sslSyncContent3: 'Review target nodes and certificates before execution, then view results in task logs.',
+            phpExtensionsSyncTitle1: 'Select a template',
+            phpExtensionsSyncContent1:
+                'Browse template names and extension lists on the source node and select a template to synchronize.',
+            phpExtensionsSyncTitle2: 'Synchronize templates',
+            phpExtensionsSyncContent2:
+                'Synchronize the selected template to target nodes, automatically excluding the source node.',
+            phpExtensionsSyncTitle3: 'Check existing templates',
+            phpExtensionsSyncContent3:
+                'Skip templates with identical names and content. Report conflicts without overwriting different content.',
             fileExchangeTitle1: 'Key Authentication Transmission',
             fileExchangeContent1: 'Authenticate via SSH keys to ensure transmission security.',
             fileExchangeTitle2: 'Efficient File Synchronization',
@@ -7552,6 +7588,13 @@ const message = {
             imageBatchConfirmPrefix: 'About to transfer {0} images to {1} nodes, for a total of {2} tasks.',
 
             ssl: 'Certificate Sync',
+            phpExtensions: 'PHP Extension Template Sync',
+            phpExtensionsTitle: 'Extension Template Sync',
+            phpExtensionsDesc: 'Select a source node to sync its PHP extension template to target nodes.',
+            phpExtensionsList: 'PHP extensions',
+            phpExtensionsConfirm: 'Sync {0} PHP extension template(s) to {1} node(s).',
+            phpExtensionsConflictHint:
+                'Identical templates are skipped. Same-name templates with different content are reported as conflicts and will not be overwritten.',
             sslBatchDesc:
                 'After selecting a source node, sync the specified certificate into the current panel environment.',
             sslBatchConfirmPrefix: 'About to sync {0} certificates to {1} nodes, for a total of {2} tasks.',

@@ -816,3 +816,5 @@ ContainerImageCheckSummary: "检查结束：成功 {{ .checked }}，可升级 {{
 ContainerImageCheckFailures: "{{ .count }} 个容器检查失败，请查看任务日志"
 
 ErrImageCheckProxyRequired: "当前运行环境下，如需检查镜像是否更新，请优先配置代理服务器"
+
+ErrPHPExtensionsConflict: "同名 PHP 扩展模版已存在且内容不同，未覆盖"

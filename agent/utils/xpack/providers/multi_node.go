@@ -19,5 +19,6 @@ type MultiNodeProvider interface {
 	LoadRequestTransport() *http.Transport
 	ValidateCertificate(c *gin.Context) bool
 	PushSSLToNode(websiteSSL *model.WebsiteSSL) error
+	PushPHPExtensionsToNode(req dto.PHPExtensionsPush) error
 	GetAgentInfo() (*dto.AgentInfo, error)
 }

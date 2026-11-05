@@ -4088,6 +4088,14 @@ const message = {
             'Actualizar a la edición comercial permite actualizar versiones de aplicaciones multinodo sin cambiar de nodo manualmente.',
         nodeDashboard:
             'Actualizar a la edición comercial permite la gestión centralizada de aplicaciones, sitios web, bases de datos y tareas programadas multinodo.',
+        imageExchange:
+            'Actualiza a la Edición Comercial para transferir imágenes de contenedores por lotes entre nodos.',
+        appExchange:
+            'Actualiza a la Edición Comercial para migrar aplicaciones instaladas a nodos de destino y confirmar sus dependencias de recursos.',
+        sslSync:
+            'Actualiza a la Edición Comercial para sincronizar certificados de un nodo de origen con uno o varios nodos de destino.',
+        phpExtensionsSync:
+            'Actualiza a la Edición Comercial para sincronizar plantillas de extensiones PHP con uno o varios nodos de destino.',
         fileExchange: 'La edición comercial permite transferir archivos entre varios servidores.',
         app: 'La edición comercial permite ver información de servicio, monitoreo, etc. vía app móvil.',
         cluster:
@@ -7151,6 +7159,41 @@ const message = {
             nodeContent3: 'Supervisa en tiempo real el estado operativo de cada nodo',
             nodeTitle4: 'Conexión Remota Rápida',
             nodeContent4: 'Conecta directamente a la terminal remota de un nodo con un clic',
+            imageExchangeTitle1: 'Seleccionar imágenes de origen',
+            imageExchangeContent1:
+                'Consulta las imágenes de contenedores del nodo de origen y selecciona las que quieras transferir.',
+            imageExchangeTitle2: 'Distribuir imágenes',
+            imageExchangeContent2: 'Transfiere las imágenes seleccionadas a uno o varios nodos de destino.',
+            imageExchangeTitle3: 'Ver registros de transferencia',
+            imageExchangeContent3:
+                'Consulta el progreso y los resultados de la transferencia de imágenes en los registros de tareas.',
+            appExchangeTitle1: 'Seleccionar una aplicación',
+            appExchangeContent1:
+                'Consulta las aplicaciones instaladas en el nodo de origen y selecciona una para migrarla.',
+            appExchangeTitle2: 'Confirmar dependencias',
+            appExchangeContent2:
+                'Antes de migrar, confirma los nodos de destino y los recursos necesarios, como las bases de datos.',
+            appExchangeTitle3: 'Migrar aplicaciones',
+            appExchangeContent3:
+                'Transfiere las copias de seguridad de las aplicaciones a los nodos de destino para restaurarlas y consulta los resultados en los registros de tareas.',
+            sslSyncTitle1: 'Seleccionar certificados',
+            sslSyncContent1:
+                'Consulta los detalles de los certificados del nodo de origen y selecciona los que quieras sincronizar.',
+            sslSyncTitle2: 'Sincronizar entre nodos',
+            sslSyncContent2:
+                'Sincroniza los certificados seleccionados con los nodos de destino, excluyendo automáticamente el nodo de origen.',
+            sslSyncTitle3: 'Confirmar tareas de sincronización',
+            sslSyncContent3:
+                'Revisa los nodos de destino y los certificados antes de ejecutar la tarea y consulta los resultados en los registros de tareas.',
+            phpExtensionsSyncTitle1: 'Seleccionar una plantilla',
+            phpExtensionsSyncContent1:
+                'Consulta los nombres de las plantillas y sus listas de extensiones en el nodo de origen y selecciona una plantilla para sincronizarla.',
+            phpExtensionsSyncTitle2: 'Sincronizar plantillas',
+            phpExtensionsSyncContent2:
+                'Sincroniza la plantilla seleccionada con los nodos de destino, excluyendo automáticamente el nodo de origen.',
+            phpExtensionsSyncTitle3: 'Comprobar plantillas existentes',
+            phpExtensionsSyncContent3:
+                'Se omiten las plantillas con el mismo nombre y contenido. Si el contenido es diferente, se informa del conflicto sin sobrescribirlo.',
             fileExchangeTitle1: 'Transmisión con Autenticación por Claves',
             fileExchangeContent1: 'Autenticación vía claves SSH para garantizar seguridad en la transmisión.',
             fileExchangeTitle2: 'Sincronización de Archivos Eficiente',
@@ -7669,6 +7712,14 @@ const message = {
             imageBatchConfirmPrefix: 'Se enviarán {0} imágenes a {1} nodos, creando {2} tareas.',
 
             ssl: 'Sincronización de certificados',
+            phpExtensions: 'Sincronización de plantillas de extensiones PHP',
+            phpExtensionsTitle: 'Sincronización de plantillas de extensiones',
+            phpExtensionsDesc:
+                'Selecciona un nodo de origen para sincronizar su plantilla de extensiones PHP con los nodos de destino.',
+            phpExtensionsList: 'Extensiones PHP',
+            phpExtensionsConfirm: 'Se sincronizarán {0} plantillas de extensiones PHP con {1} nodos.',
+            phpExtensionsConflictHint:
+                'Se omiten las plantillas idénticas. Las plantillas con el mismo nombre y contenido diferente se notifican como conflictos y no se sobrescriben.',
             sslBatchDesc:
                 'Después de seleccionar el nodo de origen, los certificados especificados pueden sincronizarse con el entorno actual del panel.',
             sslBatchConfirmPrefix: 'Se sincronizarán {0} certificados a {1} nodos, creando {2} tareas.',

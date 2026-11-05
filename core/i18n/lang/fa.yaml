@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "نصب ناموفق و بازیابی سرویس نا
 MCPInstallLocalImage: "تصویر به‌صورت محلی موجود است؛ دریافت انجام نمی‌شود"
 MCPInstallVerifyImage: "اعتبارسنجی نسخه تصویر و قرارداد سرویس مدیریت‌شده"
 MCPInstallVerifiedImage: "اعتبارسنجی تصویر موفق بود"
+
+PHPExtensionsNoTargets: "پس از کنار گذاشتن گره مبدأ، هیچ گره مقصدی باقی نمانده است"
+PHPExtensionsSyncTask: "همگام‌سازی قالب افزونه PHP [{{ .name }}]"
+PHPExtensionsSyncSkipped: "گره [{{ .node }}] از قبل قالب یکسانی دارد؛ نادیده گرفته شد"
 MCPInstallCleanup: "پاک‌سازی کانتینر قبلی"
 MCPInstallOldContainerRemoved: "کانتینر قبلی حذف شد"
 MCPInstallOldImageRemoved: "ایمیج قبلی حذف شد"

@@ -103,3 +103,46 @@ func (b *BaseApi) DeletePHPExtensions(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+// @Router /runtimes/php/extensions/detail [post]
+func (b *BaseApi) GetPHPExtensions(c *gin.Context) {
+	var req request.PHPExtensionsDelete
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	item, err := phpExtensionsService.Get(req.ID)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, item)
+}
+
+// @Router /runtimes/php/extensions/import [post]
+// @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"同步 PHP 扩展模版 [name]","formatEN":"Sync PHP extension template [name]"}
+func (b *BaseApi) ImportPHPExtensions(c *gin.Context) {
+	var req request.PHPExtensionsCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	status, err := phpExtensionsService.Import(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, status)
+}
+
+// @Router /runtimes/php/extensions/push [post]
+// @x-panel-log {"bodyKeys":["sourceNode","targetNodes"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"推送 PHP 扩展模版 [sourceNode] 至 [targetNodes]","formatEN":"Push PHP extension template from [sourceNode] to [targetNodes]"}
+func (b *BaseApi) PushPHPExtensions(c *gin.Context) {
+	var req dto.PHPExtensionsPush
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := phpExtensionsService.Push(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

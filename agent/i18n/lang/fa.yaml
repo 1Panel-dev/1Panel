@@ -817,3 +817,5 @@ ContainerImageCheckSummary: "بررسی پایان یافت: بررسی‌شده
 ContainerImageCheckFailures: "بررسی {{ .count }} کانتینر ناموفق بود؛ گزارش وظیفه را مشاهده کنید"
 
 ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصاویر در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید."
+
+ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"

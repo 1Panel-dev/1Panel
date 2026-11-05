@@ -816,3 +816,5 @@ ContainerImageCheckSummary: "Check finished: {{ .checked }} checked, {{ .updates
 ContainerImageCheckFailures: "{{ .count }} container checks failed; see the task log"
 
 ErrImageCheckProxyRequired: "To check for image updates in the current runtime environment, please configure a proxy server first."
+
+ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"

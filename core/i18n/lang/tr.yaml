@@ -587,6 +587,10 @@ MCPInstallRecoveryFailed: "Kurulum başarısız ve hizmet tam geri yüklenemedi.
 MCPInstallLocalImage: "İmaj yerel olarak mevcut; indirmeyi atla"
 MCPInstallVerifyImage: "İmaj sürümünü ve yönetilen hizmet sözleşmesini doğrula"
 MCPInstallVerifiedImage: "İmaj doğrulaması başarılı"
+
+PHPExtensionsNoTargets: "Kaynak düğüm hariç tutulduktan sonra hedef düğüm kalmadı"
+PHPExtensionsSyncTask: "PHP uzantı şablonunu eşitle [{{ .name }}]"
+PHPExtensionsSyncSkipped: "[{{ .node }}] düğümünde aynı şablon zaten mevcut; atlandı"
 MCPInstallCleanup: "Önceki konteyneri temizle"
 MCPInstallOldContainerRemoved: "Önceki konteyner silindi"
 MCPInstallOldImageRemoved: "Önceki imaj silindi"

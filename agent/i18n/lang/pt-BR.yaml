@@ -816,3 +816,5 @@ ContainerImageCheckSummary: "Verificação concluída: verificados {{ .checked }
 ContainerImageCheckFailures: "Falha na verificação de {{ .count }} contêineres; consulte o log da tarefa"
 
 ErrImageCheckProxyRequired: "Para verificar atualizações de imagens no ambiente atual, configure primeiro um servidor proxy."
+
+ErrPHPExtensionsConflict: "Já existe um modelo de extensões PHP com este nome e conteúdo diferente; ele não foi sobrescrito"

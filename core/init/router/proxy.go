@@ -199,5 +199,7 @@ func checkSession(c *gin.Context, refresh bool) bool {
 }
 
 func isLocalAPI(urlPath string) bool {
-	return urlPath == "/api/v2/core/xpack/sync/ssl" || urlPath == "/api/v2/core/xpack/settings/search"
+	return urlPath == "/api/v2/core/xpack/sync/ssl" ||
+		urlPath == "/api/v2/core/xpack/sync/php/extensions" ||
+		urlPath == "/api/v2/core/xpack/settings/search"
 }

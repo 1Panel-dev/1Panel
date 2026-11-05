@@ -27,6 +27,9 @@ func (r *RuntimeRouter) InitRouter(Router *gin.RouterGroup) {
 		groupRouter.POST("/node/modules/operate", baseApi.OperateNodeModules)
 
 		groupRouter.POST("/php/extensions/search", baseApi.PagePHPExtensions)
+		groupRouter.POST("/php/extensions/detail", baseApi.GetPHPExtensions)
+		groupRouter.POST("/php/extensions/import", baseApi.ImportPHPExtensions)
+		groupRouter.POST("/php/extensions/push", baseApi.PushPHPExtensions)
 		groupRouter.POST("/php/extensions", baseApi.CreatePHPExtensions)
 		groupRouter.POST("/php/extensions/update", baseApi.UpdatePHPExtensions)
 		groupRouter.POST("/php/extensions/del", baseApi.DeletePHPExtensions)
