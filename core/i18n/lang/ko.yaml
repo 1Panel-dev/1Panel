@@ -156,7 +156,7 @@ ErrAlertSync: "경고 정보 동기화 오류, 다시 확인하고 시도해 주
 ErrAIProxyUserGroupIsDefault: "기본 사용자 그룹은 삭제할 수 없습니다"
 ErrAIProxyUserGroupInUse: "사용자 그룹이 사용 중이므로 삭제할 수 없습니다."
 ErrAIProxyUserGroupExists: "사용자 그룹 이름이 이미 존재합니다."
-ErrAIProxyBackendAccountExists: "이 모델 계정은 이미 AI 게이트웨이 계정 풀에 가져왔습니다."
+ErrAIProxyBackendAccountExists: "이 모델 서비스는 이미 AI 게이트웨이 계정 풀에 가져왔습니다."
 ErrAIProxyModelGroupInUse: "모델 그룹이 사용 중이므로 삭제할 수 없습니다."
 ErrAIProxyModelGroupExists: "모델 그룹 이름이 이미 존재합니다."
 ErrAIProxySensitiveGroupInUse: "민감 단어 그룹이 사용 중이므로 삭제할 수 없습니다."

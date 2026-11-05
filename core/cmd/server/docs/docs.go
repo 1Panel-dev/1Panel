@@ -51,7 +51,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create model account",
+				"summary": "Create model service",
 				"tags": [
 					"AI"
 				]
@@ -92,7 +92,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Count model accounts by provider",
+				"summary": "Count model services by provider",
 				"tags": [
 					"AI"
 				]
@@ -127,7 +127,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete model account",
+				"summary": "Delete model service",
 				"tags": [
 					"AI"
 				]
@@ -168,7 +168,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "List model account models",
+				"summary": "List model service models",
 				"tags": [
 					"AI"
 				]
@@ -203,7 +203,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Create model account model",
+				"summary": "Create model service model",
 				"tags": [
 					"AI"
 				]
@@ -238,7 +238,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Delete model account model",
+				"summary": "Delete model service model",
 				"tags": [
 					"AI"
 				]
@@ -314,7 +314,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update model account model",
+				"summary": "Update model service model",
 				"tags": [
 					"AI"
 				]
@@ -341,7 +341,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Get model account providers",
+				"summary": "Get model service providers",
 				"tags": [
 					"AI"
 				]
@@ -379,7 +379,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Page model accounts",
+				"summary": "Page model services",
 				"tags": [
 					"AI"
 				]
@@ -414,7 +414,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update model account",
+				"summary": "Update model service",
 				"tags": [
 					"AI"
 				]
@@ -449,7 +449,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Verify model account",
+				"summary": "Verify model service",
 				"tags": [
 					"AI"
 				]

@@ -70,8 +70,8 @@ Decrypt: "Decrypt"
 
 # agent
 ErrAgentAccountBound: 'Account is bound to an agent and cannot be deleted'
-ErrTerminalAIAccountInUse: 'This model account is currently used by Terminal AI. Switch the account in Terminal AI settings or disable Terminal AI and try again.'
-ErrFileAIAccountInUse: 'This model account is currently used by File Management AI. Switch the account in File Management AI settings or disable File Management AI and try again.'
+ErrTerminalAIAccountInUse: 'This model service is currently used by Terminal AI. Switch the account in Terminal AI settings or disable Terminal AI and try again.'
+ErrFileAIAccountInUse: 'This model service is currently used by File Management AI. Switch the account in File Management AI settings or disable File Management AI and try again.'
 ErrAgentAccountUnavailable: 'Account connection unavailable: {{ .err }}'
 ErrAgentProviderNotSupported: 'Unsupported agent provider'
 ErrAgentAccountRequired: 'Select an agent account first'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'AI request failed: {{ .err }}'
 
 # AI gateway
 ErrAIProxyServiceNotInstalled: '{{ .name }} service is not installed'
-ErrAIProxyModelAccountNotFound: 'Model account {{ .id }} not found'
+ErrAIProxyModelAccountNotFound: 'Model service {{ .id }} not found'
 ErrAIProxyModelMapRequired: 'This field is required.'
 ErrAIProxyModelMapInvalid: 'Model mapping must be a valid JSON object: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'Model mapping cannot be empty'
@@ -687,6 +687,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: '1Panel AI Gateway'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'The Docker DOCKER-USER chain was not found. Restart Docker and try again'

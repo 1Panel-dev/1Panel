@@ -156,7 +156,7 @@ ErrAlertSync: "Ошибка синхронизации информации об
 ErrAIProxyUserGroupIsDefault: "Группу пользователей по умолчанию нельзя удалить."
 ErrAIProxyUserGroupInUse: "Группа пользователей используется и не может быть удалена."
 ErrAIProxyUserGroupExists: "Имя группы пользователей уже существует."
-ErrAIProxyBackendAccountExists: "Эта учетная запись модели уже импортирована в пул аккаунтов AI Gateway."
+ErrAIProxyBackendAccountExists: "Этот сервис модели уже импортирован в пул аккаунтов AI Gateway."
 ErrAIProxyModelGroupInUse: "Группа моделей используется и не может быть удалена."
 ErrAIProxyModelGroupExists: "Имя группы моделей уже существует."
 ErrAIProxySensitiveGroupInUse: "Группа чувствительных слов используется и не может быть удалена."

@@ -156,7 +156,7 @@ ErrAlertSync: "アラート情報の同期エラーです。後で再試行し�
 ErrAIProxyUserGroupIsDefault: "デフォルトユーザーグループは削除できません"
 ErrAIProxyUserGroupInUse: "ユーザーグループは使用中のため、削除できません。"
 ErrAIProxyUserGroupExists: "ユーザーグループ名は既に存在します。"
-ErrAIProxyBackendAccountExists: "このモデルアカウントは既に AI ゲートウェイのアカウントプールにインポートされています。"
+ErrAIProxyBackendAccountExists: "このモデルサービスは既に AI ゲートウェイのアカウントプールにインポートされています。"
 ErrAIProxyModelGroupInUse: "モデルグループは使用中のため、削除できません。"
 ErrAIProxyModelGroupExists: "モデルグループ名は既に存在します。"
 ErrAIProxySensitiveGroupInUse: "センシティブワードグループは使用中のため削除できません。"

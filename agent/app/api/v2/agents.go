@@ -380,7 +380,7 @@ func (b *BaseApi) DeleteHermesChatSession(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Get model account providers
+// @Summary Get model service providers
 // @Success 200 {array} dto.ProviderInfo
 // @Security ApiKeyAuth
 // @Security Timestamp
@@ -395,7 +395,7 @@ func (b *BaseApi) GetAgentProviders(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Create model account
+// @Summary Create model service
 // @Accept json
 // @Param request body dto.AgentAccountCreateReq true "request"
 // @Success 200
@@ -415,7 +415,7 @@ func (b *BaseApi) CreateAgentAccount(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Update model account
+// @Summary Update model service
 // @Accept json
 // @Param request body dto.AgentAccountUpdateReq true "request"
 // @Success 200
@@ -435,7 +435,7 @@ func (b *BaseApi) UpdateAgentAccount(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Page model accounts
+// @Summary Page model services
 // @Accept json
 // @Param request body dto.AgentAccountSearch true "request"
 // @Success 200 {object} dto.PageResult
@@ -459,7 +459,7 @@ func (b *BaseApi) PageAgentAccounts(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Count model accounts by provider
+// @Summary Count model services by provider
 // @Accept json
 // @Param request body dto.AgentAccountProviderCountReq true "request"
 // @Success 200 {object} map[string]int64
@@ -480,7 +480,7 @@ func (b *BaseApi) CountAgentAccountsByProviders(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary List model account models
+// @Summary List model service models
 // @Accept json
 // @Param request body dto.AgentAccountModelReq true "request"
 // @Success 200 {array} dto.AgentAccountModel
@@ -522,7 +522,7 @@ func (b *BaseApi) DiscoverAgentAccountModels(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Create model account model
+// @Summary Create model service model
 // @Accept json
 // @Param request body dto.AgentAccountModelCreateReq true "request"
 // @Success 200
@@ -542,7 +542,7 @@ func (b *BaseApi) CreateAgentAccountModel(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Update model account model
+// @Summary Update model service model
 // @Accept json
 // @Param request body dto.AgentAccountModelUpdateReq true "request"
 // @Success 200
@@ -562,7 +562,7 @@ func (b *BaseApi) UpdateAgentAccountModel(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Delete model account model
+// @Summary Delete model service model
 // @Accept json
 // @Param request body dto.AgentAccountModelDeleteReq true "request"
 // @Success 200
@@ -582,7 +582,7 @@ func (b *BaseApi) DeleteAgentAccountModel(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Verify model account
+// @Summary Verify model service
 // @Accept json
 // @Param request body dto.AgentAccountVerifyReq true "request"
 // @Success 200
@@ -602,7 +602,7 @@ func (b *BaseApi) VerifyAgentAccount(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Delete model account
+// @Summary Delete model service
 // @Accept json
 // @Param request body dto.AgentAccountDeleteReq true "request"
 // @Success 200

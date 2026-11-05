@@ -156,7 +156,7 @@ ErrAlertSync: "Uyarı bilgisi senkronizasyon hatası, lütfen kontrol edip tekra
 ErrAIProxyUserGroupIsDefault: "Varsayılan kullanıcı grubu silinemez."
 ErrAIProxyUserGroupInUse: "Kullanıcı grubu kullanımda ve silinemez."
 ErrAIProxyUserGroupExists: "Kullanıcı grubu adı zaten mevcut."
-ErrAIProxyBackendAccountExists: "Bu model hesabı AI Gateway hesap havuzuna zaten aktarılmış."
+ErrAIProxyBackendAccountExists: "Bu model hizmeti AI Gateway hesap havuzuna zaten aktarılmış."
 ErrAIProxyModelGroupInUse: "Model grubu kullanımda ve silinemez."
 ErrAIProxyModelGroupExists: "Model grubu adı zaten mevcut."
 ErrAIProxySensitiveGroupInUse: "Hassas kelime grubu kullanımda ve silinemez."

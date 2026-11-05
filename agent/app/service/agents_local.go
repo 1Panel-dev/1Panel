@@ -36,7 +36,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 			return nil, err
 		}
 		if err == nil && account.AppInstallID != 0 && account.AppInstallID != install.ID {
-			return nil, fmt.Errorf("model account belongs to another installation")
+			return nil, fmt.Errorf("model service belongs to another installation")
 		}
 	}
 	if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -228,12 +228,12 @@ func CleanupLocalModelAccount(installID uint) {
 	}
 	accounts, err := agentAccountRepo.List(repo.WithByAppInstallID(installID))
 	if err != nil {
-		global.LOG.Errorf("load local model accounts: %v", err)
+		global.LOG.Errorf("load local model services: %v", err)
 		return
 	}
 	for _, account := range accounts {
 		if err := (AgentService{}).DeleteAccount(dto.AgentAccountDeleteReq{ID: account.ID}); err != nil {
-			global.LOG.Warnf("keep local model account %d after uninstall: %v", account.ID, err)
+			global.LOG.Warnf("keep local model service %d after uninstall: %v", account.ID, err)
 		}
 	}
 }
@@ -243,7 +243,7 @@ func ResolveLocalModelAccountBaseURL(addressType, customURL, containerName, cont
 	case "custom":
 		baseURL := strings.TrimRight(strings.TrimSpace(customURL), "/")
 		if !strings.HasPrefix(baseURL, "http://") && !strings.HasPrefix(baseURL, "https://") {
-			return "", fmt.Errorf("model account base URL must start with http:// or https://")
+			return "", fmt.Errorf("model service base URL must start with http:// or https://")
 		}
 		return baseURL, nil
 	case "localhost":

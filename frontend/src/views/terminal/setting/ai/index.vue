@@ -135,7 +135,7 @@ const verificationLabel = (item: AgentAccountOption) => {
 
 const verificationTagType = (item: AgentAccountOption) => {
     if (isAgentAccountVerificationSkipped(item.provider)) {
-        return 'info';
+        return 'success';
     }
     return item.verified ? 'success' : 'warning';
 };

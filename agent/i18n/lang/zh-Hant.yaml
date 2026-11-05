@@ -70,8 +70,8 @@ Decrypt: '解密'
 
 # 智慧體
 ErrAgentAccountBound: '該帳號已綁定到智能體，無法刪除，請重試。'
-ErrTerminalAIAccountInUse: '該模型帳號正被終端 AI 使用，請在終端 AI 設定中更換帳號或關閉終端 AI 後再試。'
-ErrFileAIAccountInUse: '該模型帳號正被檔案管理 AI 使用，請在檔案管理 AI 設定中更換帳號或關閉檔案管理 AI 後再試。'
+ErrTerminalAIAccountInUse: '該模型服務正被終端 AI 使用，請在終端 AI 設定中更換帳號或關閉終端 AI 後再試。'
+ErrFileAIAccountInUse: '該模型服務正被檔案管理 AI 使用，請在檔案管理 AI 設定中更換帳號或關閉檔案管理 AI 後再試。'
 ErrAgentAccountUnavailable: '帳號連線資訊不可用，錯誤：{{ .err }}，請重試'
 ErrAgentProviderNotSupported: '暫不支援該智能體提供商，請重試'
 ErrAgentAccountRequired: '請選擇智能體帳號後重試'
@@ -676,7 +676,7 @@ TerminalAIRequestFailed: 'AI 請求失敗：{{ .err }}'
 
 # AI 閘道
 ErrAIProxyServiceNotInstalled: '{{ .name }} 服務未安裝'
-ErrAIProxyModelAccountNotFound: '模型帳號 {{ .id }} 不存在'
+ErrAIProxyModelAccountNotFound: '模型服務 {{ .id }} 不存在'
 ErrAIProxyModelMapRequired: '請填寫必填項'
 ErrAIProxyModelMapInvalid: '模型映射必須是合法的 JSON 物件：{{ .err }}'
 ErrAIProxyModelMapEmpty: '模型映射不能為空'
@@ -687,6 +687,7 @@ AIProviderBailian: '阿里雲百煉'
 AIProviderBailianCodingPlan: '阿里雲百煉 Coding Plan'
 AIProviderArk: '火山方舟'
 AIProviderArkCodingPlan: '火山方舟 Coding Plan'
+AIProvider1PanelGateway: '1Panel AI 閘道'
 
 # 防火牆
 ErrDockerIptablesChainUnavailable: '未偵測到 Docker 的 DOCKER-USER 鏈，請重新啟動 Docker 後再試'

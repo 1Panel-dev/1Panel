@@ -507,7 +507,7 @@ const search = async () => {
 
 const connectionStatus = (row: AI.AgentAccountItem) => {
     if (isAgentAccountVerificationSkipped(row.provider)) {
-        return { type: 'info' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
+        return { type: 'success' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
     }
     return {
         type: row.verified ? ('success' as const) : ('warning' as const),

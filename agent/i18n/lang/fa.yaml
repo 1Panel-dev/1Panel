@@ -70,8 +70,8 @@ Decrypt: "رمزگشایی"
 
 # عامل
 ErrAgentAccountBound: 'حساب به یک عامل متصل است و قابل حذف نیست'
-ErrTerminalAIAccountInUse: 'این حساب مدل در حال حاضر توسط ترمینال هوش مصنوعی استفاده می‌شود. حساب را در تنظیمات ترمینال هوش مصنوعی تغییر دهید یا ترمینال هوش مصنوعی را غیرفعال کرده و دوباره تلاش کنید.'
-ErrFileAIAccountInUse: 'این حساب مدل توسط هوش مصنوعی مدیریت فایل استفاده می‌شود. حساب را در تنظیمات آن تغییر دهید یا هوش مصنوعی مدیریت فایل را غیرفعال کرده و دوباره تلاش کنید.'
+ErrTerminalAIAccountInUse: 'این سرویس مدل در حال حاضر توسط ترمینال هوش مصنوعی استفاده می‌شود. حساب را در تنظیمات ترمینال هوش مصنوعی تغییر دهید یا ترمینال هوش مصنوعی را غیرفعال کرده و دوباره تلاش کنید.'
+ErrFileAIAccountInUse: 'این سرویس مدل توسط هوش مصنوعی مدیریت فایل استفاده می‌شود. حساب را در تنظیمات آن تغییر دهید یا هوش مصنوعی مدیریت فایل را غیرفعال کرده و دوباره تلاش کنید.'
 ErrAgentAccountUnavailable: 'اتصال حساب در دسترس نیست: {{ .err }}'
 ErrAgentProviderNotSupported: 'ارائه‌دهنده عامل پشتیبانی نمی‌شود'
 ErrAgentAccountRequired: 'ابتدا یک حساب عامل انتخاب کنید'
@@ -677,7 +677,7 @@ TerminalAIRequestFailed: 'درخواست هوش مصنوعی ناموفق بود
 
 # دروازه هوش مصنوعی
 ErrAIProxyServiceNotInstalled: 'سرویس {{ .name }} نصب نشده است'
-ErrAIProxyModelAccountNotFound: 'حساب مدل {{ .id }} یافت نشد'
+ErrAIProxyModelAccountNotFound: 'سرویس مدل {{ .id }} یافت نشد'
 ErrAIProxyModelMapRequired: 'این فیلد الزامی است.'
 ErrAIProxyModelMapInvalid: 'نگاشت مدل باید یک شی JSON معتبر باشد: {{ .err }}'
 ErrAIProxyModelMapEmpty: 'نگاشت مدل نمی‌تواند خالی باشد'
@@ -688,6 +688,7 @@ AIProviderBailian: 'Alibaba Cloud Model Studio'
 AIProviderBailianCodingPlan: 'Alibaba Cloud Model Studio Coding Plan'
 AIProviderArk: 'Volcengine Ark'
 AIProviderArkCodingPlan: 'Volcengine Ark Coding Plan'
+AIProvider1PanelGateway: 'درگاه هوش مصنوعی 1Panel'
 
 # Firewall
 ErrDockerIptablesChainUnavailable: 'زنجیره DOCKER-USER داکر یافت نشد. داکر را راه‌اندازی مجدد کنید و دوباره تلاش کنید'
