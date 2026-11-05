@@ -366,6 +366,8 @@ const message = {
             serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
+            autoSyncEnabled: 'Auto-sync enabled',
+            autoSyncDisabled: 'Auto-sync disabled',
             running: 'Running',
             done: 'Done',
             scanFailed: 'Incomplete',
@@ -1099,7 +1101,19 @@ const message = {
             modelTokenHelper: 'Optional. Use a token with access permissions for private or restricted models.',
             modelDirHelper: 'Directory for model downloads and the local model list.',
             featuredModelsHelper:
-                'Official 1Panel featured model catalog. Refresh manually or enable auto-sync every 24 hours. Sync updates only the catalog, without downloading model files.',
+                'Browse models curated by 1Panel, review specifications, use cases, and download sources, and choose a model to download.',
+            featuredModelsSyncHelper:
+                'When enabled, auto-sync updates the featured model catalog daily in the early morning without downloading model files. You can also sync manually at any time.',
+            recipeSyncHelper:
+                'When enabled, auto-sync updates synced recipes daily in the early morning without affecting custom recipes. You can also sync manually at any time.',
+            readinessPreparing: 'Preparing',
+            readinessReady: 'Ready',
+            readinessNotReady: 'Not ready',
+            readinessPreparingHelper:
+                'The container has started but has not passed its health check yet. The model may still be loading. Please wait.',
+            readinessReadyHelper: 'The latest container health check passed. The service is ready.',
+            readinessNotReadyHelper:
+                'The container is still running, but consecutive health checks have failed. The service is not ready. Check the container logs.',
             addInstanceHelper: 'Create a vLLM instance to serve downloaded models.',
             addService: 'Add',
             onlineModel: 'Online models',
@@ -1116,8 +1130,10 @@ const message = {
             recipeConfig: 'Recipe configuration',
             selectRecipe: 'Select Recipe',
             createRecipe: 'Create Recipe',
+            recipeSynced: 'Synced',
+            recipeCustom: 'Custom',
             recipeHelper:
-                'A Recipe describes how to launch a model on specific hardware, including the model, hardware, and launch arguments. Commands can be imported from {link}.',
+                'Manage model deployment recipes for different hardware, reuse launch arguments for quick deployment, or import commands from {link}.',
             recipeFormHelper:
                 'Go to {link}, select the model provider, then select the target model. Configure the hardware, quantization variant, deployment strategy, and other options to generate the final launch command.',
             recipeArguments: 'Launch arguments',
@@ -2644,6 +2660,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Sync Now',
+            autoSyncHelper:
+                'When enabled, auto-sync updates system scripts daily in the early morning without affecting custom scripts. You can also sync manually at any time.',
             turnOnSync: 'Enable Auto Sync',
             turnOnSyncHelper:
                 'Enabling auto sync will perform automatic synchronization during early morning hours daily',

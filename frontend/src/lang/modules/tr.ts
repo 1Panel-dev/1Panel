@@ -367,6 +367,8 @@ const message = {
             serviceNotStarted: '{0} servisi başlatılmadı.',
         },
         status: {
+            autoSyncEnabled: 'Otomatik eşitleme açık',
+            autoSyncDisabled: 'Otomatik eşitleme kapalı',
             running: 'Çalışıyor',
             done: 'Tamamlandı',
             scanFailed: 'Eksik',
@@ -1108,7 +1110,19 @@ const message = {
             modelTokenHelper: 'İsteğe bağlı. Özel veya kısıtlı modeller için erişim yetkili bir token kullanın.',
             modelDirHelper: 'Modellerin indirildiği ve yerel model listesinin okunduğu dizin.',
             featuredModelsHelper:
-                '1Panel resmî öne çıkan model kataloğu. Elle yenileyin veya 24 saatte bir otomatik eşitlemeyi etkinleştirin. Yalnızca katalog güncellenir; model dosyaları indirilmez.',
+                '1Panel tarafından seçilen modelleri inceleyin, özellikleri, kullanım alanlarını ve indirme kaynaklarını görüntüleyerek uygun modeli indirin.',
+            featuredModelsSyncHelper:
+                'Otomatik eşitleme, model dosyalarını indirmeden öne çıkan model kataloğunu her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
+            recipeSyncHelper:
+                'Otomatik eşitleme, özel tarifleri etkilemeden eşitlenen tarifleri her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
+            readinessPreparing: 'Hazırlanıyor',
+            readinessReady: 'Hazır',
+            readinessNotReady: 'Hazır değil',
+            readinessPreparingHelper:
+                'Konteyner başlatıldı ancak henüz sağlık kontrolünü geçmedi. Model hâlâ yükleniyor olabilir. Lütfen bekleyin.',
+            readinessReadyHelper: 'Konteynerin son sağlık kontrolü başarılı oldu. Hizmet hazır.',
+            readinessNotReadyHelper:
+                'Konteyner çalışıyor ancak art arda yapılan sağlık kontrolleri başarısız oldu. Hizmet henüz hazır değil. Konteyner günlüklerini kontrol edin.',
             addInstanceHelper: 'İndirilen modelleri sunmak için bir vLLM örneği oluşturun.',
             addService: 'Ekle',
             onlineModel: 'Çevrimiçi modeller',
@@ -1125,8 +1139,10 @@ const message = {
             recipeConfig: 'Recipe yapılandırması',
             selectRecipe: 'Recipe seç',
             createRecipe: 'Recipe oluştur',
+            recipeSynced: 'Eşitlenmiş',
+            recipeCustom: 'Özel',
             recipeHelper:
-                'Recipe, bir modelin belirli bir donanımda nasıl başlatılacağını açıklar; model, donanım ve başlatma parametrelerini içerir. {link} üzerinden komut içe aktarılabilir.',
+                'Farklı donanımlar için model dağıtım tariflerini yönetin, hızlı dağıtım için başlatma argümanlarını yeniden kullanın veya {link} üzerinden komutları içe aktarın.',
             recipeFormHelper:
                 '{link} adresine gidin, önce model sağlayıcısını, ardından hedef modeli seçin. Son başlatma komutunu oluşturmak için donanımı, kuantizasyon sürümünü, dağıtım stratejisini ve diğer seçenekleri yapılandırın.',
             recipeArguments: 'Başlatma parametreleri',
@@ -2670,6 +2686,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Hemen Senkronize Et',
+            autoSyncHelper:
+                'Otomatik eşitleme, özel betikleri etkilemeden sistem betiklerini her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
             turnOnSync: 'Otomatik Senkronizasyonu Aç',
             turnOnSyncHelper:
                 'Otomatik senkronizasyonu açmak, her gün sabahın erken saatlerinde otomatik senkronizasyon gerçekleştirecektir',

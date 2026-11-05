@@ -366,6 +366,8 @@ const message = {
             serviceNotStarted: 'El servicio {0} no está iniciado.',
         },
         status: {
+            autoSyncEnabled: 'Sincronización automática activada',
+            autoSyncDisabled: 'Sincronización automática desactivada',
             running: 'En ejecución',
             done: 'Completado',
             scanFailed: 'Incompleto',
@@ -1101,7 +1103,20 @@ const message = {
             modelTokenHelper: 'Opcional. Use un token con permisos para acceder a modelos privados o restringidos.',
             modelDirHelper: 'Directorio de descarga y listado de modelos locales.',
             featuredModelsHelper:
-                'Catálogo oficial de modelos destacados de 1Panel. Actualícelo manualmente o active la sincronización automática cada 24 horas. Solo se actualiza el catálogo, sin descargar modelos.',
+                'Explora los modelos seleccionados por 1Panel, consulta sus especificaciones, casos de uso y fuentes de descarga, y elige un modelo para descargar.',
+            featuredModelsSyncHelper:
+                'La sincronización automática actualiza el catálogo de modelos destacados cada madrugada sin descargar archivos de modelos. También puedes sincronizar manualmente en cualquier momento.',
+            recipeSyncHelper:
+                'La sincronización automática actualiza las recetas sincronizadas cada madrugada sin afectar a las personalizadas. También puedes sincronizar manualmente en cualquier momento.',
+            readinessPreparing: 'Preparando',
+            readinessReady: 'Listo',
+            readinessNotReady: 'No está listo',
+            readinessPreparingHelper:
+                'El contenedor se ha iniciado, pero aún no ha superado la comprobación de estado. El modelo podría seguir cargándose. Espera un momento.',
+            readinessReadyHelper:
+                'La última comprobación de estado del contenedor se ha superado. El servicio está listo.',
+            readinessNotReadyHelper:
+                'El contenedor sigue ejecutándose, pero varias comprobaciones de estado consecutivas han fallado. El servicio no está listo. Consulta los registros del contenedor.',
             addInstanceHelper: 'Cree una instancia de vLLM para servir los modelos descargados.',
             addService: 'Añadir',
             onlineModel: 'Modelos en línea',
@@ -1118,8 +1133,10 @@ const message = {
             recipeConfig: 'Configuración de Recipe',
             selectRecipe: 'Seleccionar Recipe',
             createRecipe: 'Crear Recipe',
+            recipeSynced: 'Sincronizado',
+            recipeCustom: 'Personalizado',
             recipeHelper:
-                'Una Recipe describe cómo iniciar un modelo en un hardware específico e incluye el modelo, el hardware y los argumentos de inicio. Permite importar comandos desde {link}.',
+                'Gestiona recetas de despliegue para distintos equipos, reutiliza argumentos de inicio para desplegar rápidamente o importa comandos desde {link}.',
             recipeFormHelper:
                 'Vaya a {link}, seleccione el proveedor del modelo y luego el modelo de destino. Configure el hardware, la variante de cuantización, la estrategia de despliegue y otras opciones para generar el comando de inicio final.',
             recipeArguments: 'Argumentos de inicio',
@@ -2686,6 +2703,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Sincronizar Ahora',
+            autoSyncHelper:
+                'La sincronización automática actualiza los scripts del sistema cada madrugada sin afectar a los personalizados. También puedes sincronizar manualmente en cualquier momento.',
             turnOnSync: 'Activar Sincronización Automática',
             turnOnSyncHelper:
                 'Activar la sincronización automática realizará sincronizaciones automáticas durante las primeras horas de la madrugada diariamente',

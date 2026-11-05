@@ -364,6 +364,8 @@ const message = {
             serviceNotStarted: 'O serviço {0} não está iniciado.',
         },
         status: {
+            autoSyncEnabled: 'Sincronização automática ativada',
+            autoSyncDisabled: 'Sincronização automática desativada',
             running: 'Em execução',
             done: 'Concluído',
             scanFailed: 'Incompleto',
@@ -1105,7 +1107,20 @@ const message = {
             modelTokenHelper: 'Opcional. Use um token com permissão para acessar modelos privados ou restritos.',
             modelDirHelper: 'Diretório de download e listagem dos modelos locais.',
             featuredModelsHelper:
-                'Catálogo oficial de modelos em destaque do 1Panel. Atualize manualmente ou ative a sincronização automática a cada 24 horas. Apenas o catálogo é atualizado, sem baixar modelos.',
+                'Explore os modelos selecionados pelo 1Panel, consulte especificações, casos de uso e fontes de download e escolha um modelo para baixar.',
+            featuredModelsSyncHelper:
+                'A sincronização automática atualiza o catálogo de modelos em destaque diariamente de madrugada sem baixar arquivos de modelos. Você também pode sincronizar manualmente a qualquer momento.',
+            recipeSyncHelper:
+                'A sincronização automática atualiza as receitas sincronizadas diariamente de madrugada sem afetar as personalizadas. Você também pode sincronizar manualmente a qualquer momento.',
+            readinessPreparing: 'Preparando',
+            readinessReady: 'Pronto',
+            readinessNotReady: 'Não está pronto',
+            readinessPreparingHelper:
+                'O contêiner foi iniciado, mas ainda não passou na verificação de integridade. O modelo pode estar carregando. Aguarde.',
+            readinessReadyHelper:
+                'A última verificação de integridade do contêiner foi aprovada. O serviço está pronto.',
+            readinessNotReadyHelper:
+                'O contêiner continua em execução, mas verificações de integridade consecutivas falharam. O serviço não está pronto. Consulte os logs do contêiner.',
             addInstanceHelper: 'Crie uma instância do vLLM para servir os modelos baixados.',
             addService: 'Adicionar',
             onlineModel: 'Modelos online',
@@ -1122,8 +1137,10 @@ const message = {
             recipeConfig: 'Configuração de Recipe',
             selectRecipe: 'Selecionar Recipe',
             createRecipe: 'Criar Recipe',
+            recipeSynced: 'Sincronizado',
+            recipeCustom: 'Personalizado',
             recipeHelper:
-                'Uma Recipe descreve como iniciar um modelo em um hardware específico, incluindo o modelo, o hardware e os argumentos de inicialização. É possível importar comandos de {link}.',
+                'Gerencie receitas de implantação para diferentes hardwares, reutilize argumentos de inicialização para implantar rapidamente ou importe comandos de {link}.',
             recipeFormHelper:
                 'Acesse {link}, selecione o provedor do modelo e depois o modelo desejado. Configure o hardware, a variante de quantização, a estratégia de implantação e outras opções para gerar o comando final de inicialização.',
             recipeArguments: 'Argumentos de inicialização',
@@ -2663,6 +2680,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Sincronizar Agora',
+            autoSyncHelper:
+                'A sincronização automática atualiza os scripts do sistema diariamente de madrugada sem afetar os personalizados. Você também pode sincronizar manualmente a qualquer momento.',
             turnOnSync: 'Ativar Sincronização Automática',
             turnOnSyncHelper:
                 'Ativar a sincronização automática realizará sincronizações automáticas durante as primeiras horas da manhã diariamente',

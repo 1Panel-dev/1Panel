@@ -61,16 +61,27 @@
                     <el-table-column prop="name" :label="$t('commons.table.name')" min-width="220" fixed="left">
                         <template #default="{ row }">
                             <div class="service-name">
+                                <el-tooltip
+                                    :content="
+                                        $t(row.appInstallId ? 'aiTools.model.localModel' : 'aiTools.model.cloudAccount')
+                                    "
+                                    placement="top"
+                                >
+                                    <el-icon
+                                        class="service-source-icon"
+                                        :aria-label="
+                                            $t(
+                                                row.appInstallId
+                                                    ? 'aiTools.model.localModel'
+                                                    : 'aiTools.model.cloudAccount',
+                                            )
+                                        "
+                                    >
+                                        <Monitor v-if="row.appInstallId" />
+                                        <Cloudy v-else />
+                                    </el-icon>
+                                </el-tooltip>
                                 <div class="service-title cell-ellipsis" :title="row.name">{{ row.name }}</div>
-                                <el-tag class="service-source-tag" type="info" size="small">
-                                    {{
-                                        $t(
-                                            !row.appInstallId
-                                                ? 'aiTools.model.cloudAccount'
-                                                : 'aiTools.model.localModel',
-                                        )
-                                    }}
-                                </el-tag>
                             </div>
                         </template>
                     </el-table-column>
@@ -93,31 +104,27 @@
                     </el-table-column>
                     <el-table-column prop="models" :label="$t('aiTools.model.model')" min-width="200">
                         <template #default="{ row }">
-                            <div
-                                v-for="(model, index) in (row.models || []).slice(0, 2)"
-                                :key="model.id"
-                                class="model-line"
-                            >
-                                <span class="cell-ellipsis" :title="model.id">{{ model.id }}</span>
+                            <div v-if="row.models?.length" class="model-line">
+                                <span class="cell-ellipsis" :title="row.models[0].id">{{ row.models[0].id }}</span>
                                 <el-button
-                                    v-if="!row.appInstallId && index === 1 && row.models.length > 2"
+                                    v-if="!row.appInstallId && row.models.length > 1"
                                     size="small"
                                     class="model-more"
                                     @click="poolRef.open(row)"
                                 >
-                                    +{{ row.models.length - 2 }}
+                                    +{{ row.models.length - 1 }}
                                 </el-button>
                                 <el-tooltip
-                                    v-if="row.appInstallId && index === 1 && row.models.length > 2"
+                                    v-if="row.appInstallId && row.models.length > 1"
                                     :content="
                                         row.models
-                                            .slice(2)
+                                            .slice(1)
                                             .map((item) => item.id)
                                             .join(', ')
                                     "
                                     placement="top"
                                 >
-                                    <el-button size="small" class="model-more">+{{ row.models.length - 2 }}</el-button>
+                                    <el-button size="small" class="model-more">+{{ row.models.length - 1 }}</el-button>
                                 </el-tooltip>
                             </div>
                             <span v-if="!row.models?.length">—</span>
@@ -167,6 +174,7 @@
 import { computed, reactive, ref, toRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
+import { Cloudy, Monitor } from '@element-plus/icons-vue';
 import type { AI } from '@/api/interface/ai';
 import type { FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts } from '@/api/modules/ai';
@@ -334,13 +342,18 @@ watch(
 
 <style scoped lang="scss">
 .service-name {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     min-width: 0;
 }
 .service-title {
     font-weight: 600;
 }
-.service-source-tag {
-    margin-top: 4px;
+.service-source-icon {
+    flex-shrink: 0;
+    font-size: 16px;
+    color: var(--el-color-primary);
 }
 .cell-ellipsis {
     overflow: hidden;
@@ -350,9 +363,6 @@ watch(
 .model-line {
     display: flex;
     align-items: center;
-    & + & {
-        margin-top: 6px;
-    }
 }
 .model-more {
     flex-shrink: 0;

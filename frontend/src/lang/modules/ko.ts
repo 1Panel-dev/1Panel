@@ -359,6 +359,8 @@ const message = {
             serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
+            autoSyncEnabled: '자동 동기화 켜짐',
+            autoSyncDisabled: '자동 동기화 꺼짐',
             running: '실행 중',
             done: '완료',
             scanFailed: '불완전',
@@ -1076,7 +1078,19 @@ const message = {
             modelTokenHelper: '선택 사항. 비공개 또는 제한된 모델에는 접근 권한이 있는 토큰이 필요합니다.',
             modelDirHelper: '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다.',
             featuredModelsHelper:
-                '1Panel 공식 추천 모델 목록입니다. 수동으로 새로 고치거나 24시간마다 자동 동기화를 설정할 수 있습니다. 목록만 갱신하며 모델 파일은 다운로드하지 않습니다.',
+                '1Panel이 선정한 모델의 사양, 활용 사례 및 다운로드 소스를 확인하고 적합한 모델을 선택하여 다운로드하세요.',
+            featuredModelsSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 추천 모델 목록을 업데이트하며 모델 파일은 다운로드하지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
+            recipeSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 동기화된 레시피를 업데이트하며 사용자 정의 레시피에는 영향을 주지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
+            readinessPreparing: '준비 중',
+            readinessReady: '준비 완료',
+            readinessNotReady: '준비되지 않음',
+            readinessPreparingHelper:
+                '컨테이너가 시작되었지만 아직 상태 확인을 통과하지 못했습니다. 모델을 불러오는 중일 수 있으니 잠시 기다려 주세요.',
+            readinessReadyHelper: '최근 컨테이너 상태 확인을 통과했습니다. 서비스가 준비되었습니다.',
+            readinessNotReadyHelper:
+                '컨테이너는 실행 중이지만 상태 확인이 연속으로 실패했습니다. 서비스가 아직 준비되지 않았습니다. 컨테이너 로그를 확인하세요.',
             addInstanceHelper: 'vLLM 인스턴스를 생성하여 다운로드한 모델을 모델 서비스로 배포합니다.',
             addService: '추가',
             onlineModel: '온라인 모델',
@@ -1093,8 +1107,10 @@ const message = {
             recipeConfig: 'Recipe 설정',
             selectRecipe: 'Recipe 선택',
             createRecipe: 'Recipe 만들기',
+            recipeSynced: '동기화됨',
+            recipeCustom: '사용자 정의',
             recipeHelper:
-                'Recipe는 특정 하드웨어에서 모델을 실행하는 방법을 설명하며 모델, 하드웨어 및 실행 인수를 포함합니다. {link}에서 명령을 가져올 수 있습니다.',
+                '다양한 하드웨어용 모델 배포 레시피를 관리하고, 실행 인수를 재사용하여 빠르게 배포하거나 {link}에서 명령을 가져올 수 있습니다.',
             recipeFormHelper:
                 '{link}에서 모델 제공업체를 먼저 선택한 다음 대상 모델을 선택하세요. 하드웨어, 양자화 버전, 배포 전략 등을 설정하면 최종 실행 명령이 생성됩니다.',
             recipeArguments: '시작 인수',
@@ -2593,6 +2609,8 @@ const message = {
         library: {
             script: '스크립트',
             syncNow: '지금 동기화',
+            autoSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 시스템 스크립트를 업데이트하며 사용자 정의 스크립트에는 영향을 주지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
             turnOnSync: '자동 동기화 켜기',
             turnOnSyncHelper: '자동 동기화를 켜면 매일 새벽 시간에 자동 동기화가 수행됩니다',
             turnOffSync: '자동 동기화 끄기',
