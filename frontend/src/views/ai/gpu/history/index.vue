@@ -1,7 +1,7 @@
 <template>
     <div v-loading="loading">
         <RouterMenu />
-        <template v-if="supported">
+        <template v-if="supported && options.length">
             <el-card class="history-toolbar">
                 <div class="flex flex-wrap gap-3 items-center">
                     <el-select style="max-width: 100%" class="p-w-400" v-model="selectedDevice" @change="search">
@@ -26,7 +26,10 @@
                             :clearable="false"
                             @change="changeTimeRange"
                         />
-                        <TableRefresh @search="refresh" />
+                        <TableSetting title="gpu-refresh" @search="refresh" />
+                        <el-tooltip :content="$t('aiTools.gpu.environment.recheck')">
+                            <TableRefresh :disabled="loading" @search="refresh" />
+                        </el-tooltip>
                     </div>
                 </div>
                 <div v-if="history?.sampleCount && history.bucketSeconds > 0" class="history-summary">
@@ -67,26 +70,23 @@
                 </el-col>
             </el-row>
         </template>
-        <LayoutContent v-else-if="!loading" :title="$t('aiTools.gpu.monitoringTitle')" :divider="true">
+        <LayoutContent v-else :title="$t('aiTools.gpu.monitoringTitle')">
             <template #rightToolBar>
-                <TableRefresh @search="refresh" />
+                <TableSetting title="gpu-refresh" @search="refresh" />
+                <el-tooltip :content="$t('aiTools.gpu.environment.recheck')">
+                    <TableRefresh :disabled="loading" @search="refresh" />
+                </el-tooltip>
             </template>
             <template #main>
                 <el-alert
                     v-if="failed"
+                    class="common-prompt"
                     :title="$t('aiTools.gpu.historyLoadFailed')"
                     type="error"
                     :closable="false"
                     show-icon
                 />
-                <div v-else class="app-warn">
-                    <div class="flx-center">
-                        <span>{{ $t('aiTools.gpu.gpuHelper') }}</span>
-                    </div>
-                    <div>
-                        <img src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
+                <el-empty v-else-if="!loading" :description="$t('aiTools.gpu.environment.notDetected')" />
             </template>
         </LayoutContent>
     </div>
@@ -371,6 +371,7 @@ const loadOptions = async () => {
     }
 };
 const refresh = () => {
+    if (loading.value) return;
     if (followNow) timeRangeGlobal.value = [timeRangeGlobal.value[0], new Date()];
     void loadOptions();
 };

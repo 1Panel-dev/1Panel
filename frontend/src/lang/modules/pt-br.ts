@@ -1776,6 +1776,75 @@ const message = {
             timePerOutputTokenChart: 'Latência entre tokens',
         },
         gpu: {
+            environment: {
+                hostGPU: 'GPU do host',
+                containerGPU: 'Suporte a GPU em contêineres',
+                monitorAvailable: 'Monitoramento disponível',
+                monitorPartial: 'Monitoramento parcial',
+                notReady: 'Não está pronto',
+                ready: 'Pronto',
+                checkedAt: 'Verificado em',
+                checkDetailsHelp: 'Confira os detalhes, verifique o ambiente e execute a verificação novamente.',
+                driverActionTitle: 'Verifique primeiro o driver da GPU do host',
+                driverActionHelp:
+                    'Instale ou repare o driver do dispositivo afetado antes de continuar a verificação do ambiente de contêineres.',
+                driverGuide: 'Ver guia de instalação do driver',
+                toolkitActionTitle: 'O suporte a GPU em contêineres não está pronto',
+                toolkitActionHelp:
+                    'Instale ou repare o NVIDIA Container Toolkit e depois verifique a configuração do Docker.',
+                toolkitGuide: 'Ver guia de instalação do Toolkit',
+                dockerActionTitle: 'O suporte a NVIDIA GPU no Docker não está pronto',
+                dockerActionHelp:
+                    'Verifique a configuração do runtime NVIDIA no Docker e execute a verificação novamente.',
+                monitorUnaffected: 'Este problema não afeta o monitoramento da GPU do host.',
+                title: 'Verificações do ambiente',
+                passed: 'Verificações do ambiente concluídas com sucesso',
+                issues: 'Problemas de ambiente detectados: {count}. Siga as orientações para verificá-los.',
+                recheck: 'Verificar novamente',
+                installGuide: 'Ver guia de instalação',
+                goContainerSettings: 'Abrir configurações de contêineres',
+                details: 'Detalhes da verificação',
+                vendor: 'Fabricante',
+                gpuCount: 'Quantidade de GPUs',
+                cardCount: 'Quantidade de placas',
+                notDetected: 'Nenhum dispositivo GPU/NPU/XPU compatível foi detectado no nó atual.',
+                unknown:
+                    'Não foi possível confirmar o estado do dispositivo. Consulte os detalhes e verifique novamente.',
+                loadFailed: 'Não foi possível ler as informações do dispositivo. Tente novamente.',
+                notApplicable: 'Não se aplica',
+                cudaHelper:
+                    'Esta é a versão do CUDA compatível com o driver, não a versão do CUDA Toolkit instalada no host.',
+                partialMemory: 'Alguns dados de memória estão indisponíveis',
+                sharedMemory: 'Memória compartilhada do sistema: {memory}',
+                driver: 'Driver e ferramentas de gerenciamento de dispositivos',
+                nvidiaDriver: 'Driver NVIDIA',
+                toolkit: 'NVIDIA Container Toolkit',
+                docker: 'Configuração de GPU NVIDIA no Docker',
+                statusPassed: 'Normal',
+                statusMissing: 'Não detectado',
+                statusUnconfigured: 'Configuração pendente',
+                statusFailed: 'Falha na verificação',
+                statusUnknown: 'Desconhecido',
+                driverMissing:
+                    'O driver {vendor} não foi detectado. Instale ou verifique o driver (ferramenta de detecção: {tool}).',
+                driverFailed:
+                    'Não foi possível ler as informações do dispositivo usando {tool}. Verifique o estado do driver.',
+                driverUnknown: 'Não foi possível confirmar o estado do driver do dispositivo. Verifique {tool}.',
+                toolkitMissing:
+                    'NVIDIA Container Toolkit não foi detectado. Instale e configure a ferramenta antes de usar GPUs NVIDIA em contêineres.',
+                toolkitFailed: 'Não foi possível verificar o NVIDIA Container Toolkit. Consulte os detalhes da falha.',
+                dockerConfigMissing:
+                    'Nenhuma entrada runtimes.nvidia foi detectada no arquivo de configuração padrão do Docker. Conclua a configuração seguindo a documentação.',
+                dockerConfigInvalid:
+                    'A configuração do ambiente de execução NVIDIA no Docker é inválida. Verifique runtimes.nvidia.path no daemon.json.',
+                dockerConfigPending:
+                    'O arquivo de configuração padrão contém a configuração do ambiente de execução NVIDIA, mas o serviço Docker atual ainda não a carregou. Confirme o arquivo de configuração, reinicie o Docker e verifique novamente.',
+                dockerConfigUnreadable:
+                    'Não foi possível ler o arquivo de configuração do Docker. Consulte os detalhes da verificação.',
+                dockerUnconfigured: 'A configuração de GPU NVIDIA no Docker está incompleta.',
+                dockerFailed:
+                    'Não foi possível verificar a configuração de GPU NVIDIA no Docker. Consulte os detalhes da falha.',
+            },
             systemMemory: 'Memória compartilhada do sistema',
             systemMemoryUsed: 'Memória do sistema em uso',
             systemMemoryTotal: 'Memória total do sistema',
@@ -1836,6 +1905,8 @@ const message = {
             pcieWidth: 'Largura PCIe (atual / máxima)',
             gpu: 'Gerenciamento de GPU',
             monitoringTitle: 'Monitoramento de GPU',
+            currentHelper:
+                'Veja o estado em tempo real e o uso de recursos dos dispositivos GPU/NPU/XPU no nó atual. O resumo superior inclui todos os dispositivos; as métricas detalhadas são exibidas por dispositivo.',
             gpuHelper:
                 'Nenhum comando de gerenciamento de GPU/XPU/NPU compatível foi detectado. Verifique e tente novamente!',
             process: 'Informações do Processo',

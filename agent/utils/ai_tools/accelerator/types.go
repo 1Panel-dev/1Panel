@@ -102,6 +102,7 @@ type Device struct {
 	NPUIndex      int
 	ChipIndex     int
 	Name          string
+	DriverVersion string
 	Label         string
 	BusID         string
 	Metrics       Metrics

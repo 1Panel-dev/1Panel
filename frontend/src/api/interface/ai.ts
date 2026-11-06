@@ -37,6 +37,28 @@ export namespace AI {
         info?: string;
     }
 
+    export interface GPUEnvironmentCheck {
+        vendor: string;
+        item: 'driver' | 'toolkit' | 'docker';
+        status: 'passed' | 'missing' | 'unconfigured' | 'failed' | 'unknown';
+        code?: string;
+        version?: string;
+        reason?: string;
+    }
+    export interface GPUEnvironment {
+        checkedAt: string;
+        hardwareStatus: 'detected' | 'not_detected' | 'unknown';
+        checks: GPUEnvironmentCheck[];
+    }
+    export interface GPUSummary {
+        vendor: string;
+        driverVersion: string;
+        cudaVersion: string;
+        cardCount: number | null;
+        memoryTotal: number | null;
+        sharedMemoryTotal: number | null;
+        memoryPartial: boolean;
+    }
     export interface Info {
         collectedAt?: string;
         warnings?: string[];
@@ -47,6 +69,8 @@ export namespace AI {
         npu: NPU[];
         xpuDriverVersion: string;
         xpu: XpuInfo['xpu'];
+        environment?: GPUEnvironment;
+        summaries?: GPUSummary[];
     }
     export interface GPU {
         sharedMemory?: boolean;

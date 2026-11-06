@@ -4,8 +4,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/service"
-	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/accelerator"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,20 +19,12 @@ func (b *BaseApi) LoadModelGPUDevices(c *gin.Context) {
 // @Security Timestamp
 // @Router /ai/gpu/load [get]
 func (b *BaseApi) LoadGpuInfo(c *gin.Context) {
-	ok, client := accelerator.New()
-	if ok {
-		snapshot, err := client.Collect(c.Request.Context())
-		if err != nil {
-			helper.BadRequest(c, err)
-			return
-		}
-		if warning := snapshot.Warning(); warning != nil {
-			global.LOG.Warnf("load realtime accelerator data partially failed, err: %v", warning)
-		}
-		helper.SuccessWithData(c, &snapshot.Info)
+	info, err := service.LoadGPUInfo(c.Request.Context(), c.Query("refresh") == "true")
+	if err != nil {
+		helper.BadRequest(c, err)
 		return
 	}
-	helper.SuccessWithData(c, &accelerator.Info{})
+	helper.SuccessWithData(c, info)
 }
 
 // @Tags AI

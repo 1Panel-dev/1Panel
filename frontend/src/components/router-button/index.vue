@@ -5,8 +5,10 @@
                 <el-radio-group v-model="activeName" @change="handleChange">
                     <el-radio-button
                         class="router_card_button"
+                        :class="{ 'opacity-50': button.disabled }"
                         :label="button.label"
                         :value="button.label"
+                        :disabled="button.disabled"
                         v-for="(button, index) in buttonArray"
                         size="large"
                         :key="index"
@@ -94,7 +96,10 @@ const expiresAlertKey = computed(() => (isEnterprise.value ? 'xpack.expiresEnter
 
 const handleChange = async (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);
-    if (!btn) return;
+    if (!btn || btn.disabled) {
+        syncActiveName();
+        return;
+    }
     try {
         if (btn.path) await routerToPathWithQuery(btn.path, { uncached: 'true' });
         else if (btn.name) await routerToNameWithQuery(btn.name, { uncached: 'true' });

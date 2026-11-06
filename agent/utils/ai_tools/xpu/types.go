@@ -63,6 +63,7 @@ type Info struct {
 }
 
 type Device struct {
+	ReadError     string      `json:"-"`
 	Tiles         []TileStats `json:"tiles"`
 	ProcessStatus string      `json:"processStatus"`
 
