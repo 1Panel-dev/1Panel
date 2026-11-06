@@ -1644,6 +1644,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Model hizmetlerini farklı istek uzunlukları ve eşzamanlılık ayarlarıyla test ederek aktarım hızı, ilk token süresi ve istek gecikmesi gibi metrikleri ölçün.',
             launchCommand: 'Başlatma Komutu',
             retest: 'Yeniden test et',
             statusRunning: 'Çalışıyor',
@@ -2124,6 +2126,9 @@ const message = {
             'Uzun girdiler ve ortak önekler dahil, farklı senaryolar ve eşzamanlılık düzeylerinde tekrarlı ölçümler.',
         customDescription: 'Bir senaryoyla başlayın, parametrelerini ayarlayın ve gerektiğinde yenilerini ekleyin.',
         scenarios: 'Senaryolar',
+        scenarioCount: 'Senaryolar (toplam {count})',
+        scenarioHelp:
+            'Her senaryo giriş/çıkış token sayılarını, eşzamanlılık düzeylerini ve istek parametrelerini tanımlar. Eşzamanlılık düzeyleri sırayla test edilir; her düzey ayarlanan tekrar sayısı kadar çalıştırılır ve her çalıştırma bir ölçüm noktası oluşturur.',
         builtIn: 'Yerleşik',
         builtInHelp: 'Yerleşik planlar düzenlenemez veya silinemez. Test oluştururken bir kopyayı ayarlayın.',
         modified: 'Değiştirildi',
@@ -2162,6 +2167,52 @@ const message = {
         secretHelp: 'Kopyalar API anahtarlarını ve başlıkları içermez. Gerekiyorsa yeniden girin.',
         resultHelp:
             'Medyan ve en düşük/en yüksek değerler yalnızca istek anomalisi olmayan başarılı çalışmaları içerir. P99, çalışma başına P99 değerlerinin medyanıdır. Önbellek ve dış trafik kontrol edilmez.',
+    },
+    benchmarkSettings: {
+        settingsHelp:
+            'Önce Benchmark imajını ve bir test planını hazırlayın. Her ikisi de hazır olduğunda bir kıyaslama testi oluşturabilirsiniz.',
+        imageAvailable: 'Benchmark imajı hazır ({image})',
+        imageUnavailable: 'Benchmark imajı bulunamadı ({image})',
+        retestServiceHelp:
+            'Yeniden testler görev parametrelerini korur. Geçerli model hizmetini doğrulayın; kimlik bilgileri seçilen hizmetten alınır.',
+        prepareHelp:
+            'Bir kıyaslama oluşturmadan önce {settings} bölümünde Benchmark imajını ve test planlarını hazırlayın.',
+        image: 'Benchmark imajı',
+        ready: 'Hazır',
+        unconfigured: 'Yapılandırılmadı',
+        checkFailed: 'Kontrol başarısız',
+        imageMissing: 'Gerekli imaj bulunamadı. İmaj yönetiminde {image} imajını indirin.',
+        imageReady: 'Benchmark imajı test oluşturmaya hazır.',
+        imageHelp: 'Benchmark imajı yük testi istemcisini çalıştırır ve seçilen model hizmetine istek gönderir.',
+        mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
+        goImages: 'İmaj yönetimine git',
+        goModels: 'Model indirmelerine git',
+        tokenizerHelp:
+            'Tokenizer test metnini kodlar ve token sayısını hesaplar. Varsayılan model dizininden geçerli tokenizer dosyaları içeren bir model seçin.',
+        tokenizerEmpty: 'Kullanılabilir model yok. Model indirmelerinden tokenizer dosyaları içeren bir model indirin.',
+        tokenizerEmptyWithDownload:
+            'Kullanılabilir model yok. Tokenizer dosyaları içeren bir model indirmek için {download} sayfasını açın.',
+        tokenizerInvalid:
+            'Bu modelde kullanılabilir tokenizer yok. Başka bir model seçin veya model indirmelerinde dosyalarını hazırlayın.',
+        schemeHelp:
+            'Test planları istek parametrelerini, eşzamanlılığı ve yürütme kurallarını tanımlar. En az bir kullanılabilir plan hazırlayın.',
+        schemeEmpty: 'Kullanılabilir test planı yok. Önce bir plan oluşturun.',
+        manageSchemes: 'Test planlarını yönet',
+        selectService: 'Bir model hizmeti seçin',
+        serviceHelp:
+            'Test edilecek model hizmetini seçin. Bu hizmete istek gönderilecektir; erişilebilir olduğundan emin olun.',
+        noServices: 'Kullanılabilir model hizmeti yok. Önce bir model hizmeti ekleyin.',
+        goModelServices: 'Model hizmetlerine git',
+        unsupportedServices: 'Desteklenmeyen hizmetler devre dışı. Nedenini görmek için seçeneğin üzerine gelin.',
+        unsupportedProtocol:
+            'Bu API protokolü desteklenmiyor: {0}. OpenAI Chat Completions kullanan bir model hizmeti seçin.',
+        unsupportedAuth:
+            'Bu kimlik doğrulama yöntemi desteklenmiyor: {0}. Bearer kimlik doğrulaması kullanan bir hizmet seçin.',
+        serviceModelsMissing: 'Bu hizmette yapılandırılmış model yok. Model hizmeti yönetiminden model ekleyin.',
+        prerequisitesTitle: 'Önce test ayarlarını tamamlayın',
+        prerequisitesMissing: 'Şu ön koşullar hazır değil: {0}. Ayarlardan tamamlayın.',
+        precheckFailed: 'Test ön koşulları kontrol edilemedi. Ayarları açıp tekrar kontrol edin.',
+        goSettings: 'Ayarlara git',
     },
     benchmarkOverview: {
         comparison: 'Senaryo ve eşzamanlılık karşılaştırması',

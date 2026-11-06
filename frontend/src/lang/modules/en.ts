@@ -1636,6 +1636,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Benchmark model services across different request lengths and concurrency settings to evaluate metrics such as throughput, time to first token, and request latency.',
             launchCommand: 'Launch Command',
             retest: 'Retest',
             statusRunning: 'Running',
@@ -2108,6 +2110,9 @@ const message = {
             'Multiple scenarios, concurrency levels and repeated runs, including long inputs and shared prefixes.',
         customDescription: 'Start with one scenario, set its parameters and add more as needed.',
         scenarios: 'Scenarios',
+        scenarioCount: 'Scenarios ({count} total)',
+        scenarioHelp:
+            'Each scenario defines input/output tokens, concurrency levels and request parameters. Concurrency levels are tested in sequence; each level runs for the configured number of trials, and each run creates one test point.',
         builtIn: 'Built-in',
         builtInHelp: 'Built-in schemes cannot be edited or deleted. Adjust a copy when creating a test.',
         modified: 'Modified',
@@ -2146,6 +2151,50 @@ const message = {
         secretHelp: 'API keys and headers are excluded from copies. Enter them again if needed.',
         resultHelp:
             'Only successful runs without request anomalies enter the median and min/max summaries. P99 is the median of per-run P99 values. Cache and external traffic are uncontrolled.',
+    },
+    benchmarkSettings: {
+        settingsHelp: 'Prepare the Benchmark image and a test scheme. You can create a benchmark once both are ready.',
+        imageAvailable: 'Benchmark image is ready ({image})',
+        imageUnavailable: 'Benchmark image was not found ({image})',
+        retestServiceHelp:
+            'Retests keep the task parameters. Confirm the current model service; credentials are loaded from the selected service.',
+        prepareHelp: 'Before creating a benchmark, prepare the Benchmark image and test schemes in {settings}.',
+        image: 'Benchmark image',
+        ready: 'Ready',
+        unconfigured: 'Not configured',
+        checkFailed: 'Check failed',
+        imageMissing: 'The required image was not found. Pull {image} in image management.',
+        imageReady: 'The Benchmark image is ready for creating tests.',
+        imageHelp: 'The Benchmark image runs the load test client and sends requests to the selected model service.',
+        mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
+        goImages: 'Go to image management',
+        goModels: 'Go to model downloads',
+        tokenizerHelp:
+            'Tokenizers encode test text and count tokens. Select a model with valid tokenizer files from the default model directory.',
+        tokenizerEmpty: 'No models are available. Download a model containing tokenizer files in model downloads.',
+        tokenizerEmptyWithDownload:
+            'No models are available. Open {download} to download a model containing tokenizer files.',
+        tokenizerInvalid:
+            'This model has no usable tokenizer. Select another model or prepare its files in model downloads.',
+        schemeHelp:
+            'Test schemes define request parameters, concurrency, and execution rules. Prepare at least one available scheme.',
+        schemeEmpty: 'No test schemes are available. Create a scheme first.',
+        manageSchemes: 'Manage test schemes',
+        selectService: 'Select a model service',
+        serviceHelp:
+            'Select a model service to benchmark. Requests will be sent to this service; make sure it is reachable.',
+        noServices: 'No model services are available. Add a model service first.',
+        goModelServices: 'Go to model services',
+        unsupportedServices: 'Unsupported services are disabled. Hover over an option for the reason.',
+        unsupportedProtocol:
+            'This API protocol is not supported: {0}. Select a model service using OpenAI Chat Completions.',
+        unsupportedAuth:
+            'This authentication method is not supported: {0}. Select a service using Bearer authentication.',
+        serviceModelsMissing: 'This service has no configured models. Add models in model service management.',
+        prerequisitesTitle: 'Complete benchmark settings first',
+        prerequisitesMissing: 'The following prerequisites are not ready: {0}. Complete them in settings.',
+        precheckFailed: 'Could not check benchmark prerequisites. Open settings and check again.',
+        goSettings: 'Go to settings',
     },
     benchmarkOverview: {
         comparison: 'Scenario and concurrency comparison',
