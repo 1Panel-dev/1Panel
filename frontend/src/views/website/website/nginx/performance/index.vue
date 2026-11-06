@@ -24,7 +24,9 @@
                         <span class="input-help">{{ $t('nginx.clientMaxBodySizeHelper') }}</span>
                     </el-form-item>
                     <el-form-item label="keepalive_timeout" prop="keepalive_timeout">
-                        <el-input clearable type="number" v-model.number="form.keepalive_timeout"></el-input>
+                        <el-input clearable type="number" v-model.number="form.keepalive_timeout">
+                            <template #append>{{ timeUnitLabel('keepalive_timeout') }}</template>
+                        </el-input>
                         <span class="input-help">{{ $t('nginx.keepaliveTimeoutHelper') }}</span>
                     </el-form-item>
                 </el-col>
@@ -45,6 +47,30 @@
                     <el-form-item label="gzip_comp_level" prop="gzip_comp_level">
                         <el-input clearable v-model.number="form.gzip_comp_level"></el-input>
                         <span class="input-help">{{ $t('nginx.gzipCompLevelHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+            </el-row>
+            <el-row :gutter="20">
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
+                    <el-form-item label="proxy_connect_timeout" prop="proxy_connect_timeout">
+                        <el-input clearable type="number" v-model.number="form.proxy_connect_timeout">
+                            <template #append>{{ timeUnitLabel('proxy_connect_timeout') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.proxyConnectTimeoutHelper') }}</span>
+                    </el-form-item>
+                    <el-form-item label="proxy_send_timeout" prop="proxy_send_timeout">
+                        <el-input clearable type="number" v-model.number="form.proxy_send_timeout">
+                            <template #append>{{ timeUnitLabel('proxy_send_timeout') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.proxySendTimeoutHelper') }}</span>
+                    </el-form-item>
+                </el-col>
+                <el-col :xs="24" :sm="24" :md="9" :lg="9" :xl="9">
+                    <el-form-item label="proxy_read_timeout" prop="proxy_read_timeout">
+                        <el-input clearable type="number" v-model.number="form.proxy_read_timeout">
+                            <template #append>{{ timeUnitLabel('proxy_read_timeout') }}</template>
+                        </el-input>
+                        <span class="input-help">{{ $t('nginx.proxyReadTimeoutHelper') }}</span>
                     </el-form-item>
                 </el-col>
             </el-row>
@@ -123,6 +149,9 @@ let form = ref({
     brotli: 'on',
     brotli_comp_level: 5,
     brotli_min_length: 1,
+    proxy_connect_timeout: 60,
+    proxy_send_timeout: 60,
+    proxy_read_timeout: 60,
 });
 let nginxFormRef = ref();
 let loading = ref(false);
@@ -147,6 +176,9 @@ const variablesRules = reactive({
     brotli: [Rules.requiredSelect],
     brotli_min_length: [Rules.requiredSelect],
     brotli_comp_level: [checkNumberRange(0, 11)],
+    proxy_connect_timeout: [Rules.requiredInput, checkNumberRange(1, 999999999)],
+    proxy_send_timeout: [Rules.requiredInput, checkNumberRange(1, 999999999)],
+    proxy_read_timeout: [Rules.requiredInput, checkNumberRange(1, 999999999)],
 });
 
 // nginx size directives may be written with or without a unit suffix, and
@@ -176,20 +208,53 @@ const unitLabel = (name: string, defaultUnit: string) => {
     return unit === '' ? 'B' : unit.toUpperCase();
 };
 
+// Time directives take a unit suffix as well, and a bare number means
+// seconds. The suffix is case-sensitive: m is minutes, M is months.
+const timeKeys = ['keepalive_timeout', 'proxy_connect_timeout', 'proxy_send_timeout', 'proxy_read_timeout'];
+
+const parseTimeParam = (name: string, value: string) => {
+    const matched = /^(\d+)\s*(ms|s|m|h|d|w|M|y)?$/.exec(value.trim());
+    if (!matched) {
+        return Number(value.match(/\d+/g)?.[0] ?? 0);
+    }
+    units.value[name] = matched[2] ?? '';
+    return Number(matched[1]);
+};
+
+const timeUnitLabel = (name: string) => units.value[name] || 's';
+
+// The stock nginx.conf does not set these, so nginx applies its built-in
+// defaults. An absent directive is shown with that default and left out of
+// the save unless changed: an included file may already set it at http
+// level, and writing it again would fail the config test as a duplicate.
+const builtinDefaults: Record<string, number> = {
+    proxy_connect_timeout: 60,
+    proxy_send_timeout: 60,
+    proxy_read_timeout: 60,
+};
+const absentKeys = new Set<string>();
+
 const getParams = async () => {
     // Reset the unit cache: a directive removed since the last load must not
     // hand its remembered unit to a value that no longer carries one.
     units.value = {};
+    absentKeys.clear();
     const res = await getNginxConfigByScope(req.value);
     data.value = res.data;
     for (const param of res.data) {
         if (param.params.length === 0) {
+            if (param.name in builtinDefaults) {
+                form.value[param.name] = builtinDefaults[param.name];
+                absentKeys.add(param.name);
+            }
             continue;
         }
         if (param.name == 'gzip') {
             form.value.gzip = param.params[0];
         } else if (sizeKeys.includes(param.name)) {
             form.value[param.name] = parseSizeParam(param.name, param.params[0]);
+        } else if (timeKeys.includes(param.name)) {
+            form.value[param.name] = parseTimeParam(param.name, param.params[0]);
         } else if (param.name in form.value) {
             form.value[param.name] = Number(param.params[0].match(/\d+/g)?.[0] ?? 0);
         }
@@ -231,15 +296,21 @@ const submit = async (formEl: FormInstance | undefined) => {
             return;
         }
         loading.value = true;
-        let params = {
+        let params: Record<string, string> = {
             gzip: form.value.gzip,
             server_names_hash_bucket_size: String(form.value.server_names_hash_bucket_size),
             client_header_buffer_size: withUnit('client_header_buffer_size', form.value.client_header_buffer_size, 'k'),
             client_max_body_size: withUnit('client_max_body_size', form.value.client_max_body_size, 'm'),
-            keepalive_timeout: String(form.value.keepalive_timeout),
+            keepalive_timeout: withUnit('keepalive_timeout', form.value.keepalive_timeout, ''),
             gzip_min_length: withUnit('gzip_min_length', form.value.gzip_min_length, 'k'),
             gzip_comp_level: String(form.value.gzip_comp_level),
         };
+        for (const name of Object.keys(builtinDefaults)) {
+            if (absentKeys.has(name) && form.value[name] === builtinDefaults[name]) {
+                continue;
+            }
+            params[name] = withUnit(name, form.value[name], '');
+        }
         updateReq.value.params = params;
         updateNginxConfigByScope(updateReq.value)
             .then(() => {

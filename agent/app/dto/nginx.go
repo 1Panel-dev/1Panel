@@ -63,7 +63,7 @@ var ScopeKeyMap = map[NginxKey][]string{
 	Index:     {"index"},
 	LimitConn: {"limit_conn", "limit_rate", "limit_conn_zone"},
 	SSL:       {"ssl_certificate", "ssl_certificate_key"},
-	HttpPer:   {"server_names_hash_bucket_size", "client_header_buffer_size", "client_max_body_size", "keepalive_timeout", "gzip", "gzip_min_length", "gzip_comp_level", "gzip_types", "gzip_vary", "gzip_proxied"},
+	HttpPer:   {"server_names_hash_bucket_size", "client_header_buffer_size", "client_max_body_size", "keepalive_timeout", "gzip", "gzip_min_length", "gzip_comp_level", "gzip_types", "gzip_vary", "gzip_proxied", "proxy_connect_timeout", "proxy_send_timeout", "proxy_read_timeout"},
 }
 
 var StaticFileKeyMap = map[NginxKey]struct {
