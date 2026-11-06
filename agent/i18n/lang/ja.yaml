@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "{{ .count }} コンテナの確認に失敗しま�
 ErrImageCheckProxyRequired: "現在の実行環境でイメージの更新を確認するには、先にプロキシサーバーを設定してください。"
 
 ErrPHPExtensionsConflict: "同じ名前で内容が異なる PHP 拡張機能テンプレートが既に存在するため、上書きしませんでした"
+
+ErrModelTokenizerDirOverlap: "モデルとトークナイザーのディレクトリは別々にし、一方が他方を含まないようにしてください"

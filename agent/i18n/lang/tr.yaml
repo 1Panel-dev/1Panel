@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "{{ .count }} konteyner denetlenemedi; görev günl
 ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemelerini kontrol etmek için önce bir proxy sunucusu yapılandırın."
 
 ErrPHPExtensionsConflict: "Bu ada sahip ancak içeriği farklı bir PHP uzantı şablonu zaten mevcut; üzerine yazılmadı"
+
+ErrModelTokenizerDirOverlap: "Model ve tokenizer dizinleri farklı olmalı ve biri diğerini içermemelidir"

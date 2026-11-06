@@ -364,6 +364,8 @@ const message = {
             serviceNotStarted: 'O serviço {0} não está iniciado.',
         },
         status: {
+            autoSyncEnabled: 'Sincronização automática ativada',
+            autoSyncDisabled: 'Sincronização automática desativada',
             running: 'Em execução',
             done: 'Concluído',
             scanFailed: 'Incompleto',
@@ -1042,7 +1044,7 @@ const message = {
                 'Informe a URL completa do endpoint de geração de imagens para contas Custom. O caminho não é adicionado automaticamente. Exemplo: {0}',
             apiTypeBaseURLMismatch:
                 'A Base URL atual parece um caminho {0}, mas {1} está selecionado. URL recomendada: {2}',
-            validateAvailability: 'Validar disponibilidade da conta',
+            validateAvailability: 'Verificar disponibilidade ao salvar',
             validateAvailabilityHelper: 'Envia uma mensagem mínima antes de salvar para validar a API',
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
@@ -1051,6 +1053,8 @@ const message = {
             searchHelper:
                 'Encontre modelos no ModelScope ou Hugging Face e depois implante-os ou crie uma Recipe em Preparação de modelos.',
             modelScopeSearchHelper: 'Acesso estável na China continental',
+            huggingFaceNetworkHelper:
+                'Buscas e downloads do Hugging Face exigem acesso do servidor ao site. Se indisponível, configure uma URL de espelho acessível em Configurações ou selecione ModelScope. Em ambientes offline, envie os modelos manualmente.',
             huggingFaceSearchHelper: 'Ampla coleção de modelos',
             searchPlaceholder: 'Digite o nome ou ID do repositório, ex.: Qwen/Qwen3-8B',
             popularSearches: 'Buscas populares',
@@ -1063,7 +1067,13 @@ const message = {
             localFilesMissing: 'Arquivos locais não encontrados',
             ollamaNameHelper:
                 'Insira o nome completo do modelo da biblioteca do Ollama. Se nenhuma tag for especificada, será usada latest.',
-            downloadHelper: 'Clique em “Pesquisar” para encontrar e baixar modelos do ModelScope e do Hugging Face.',
+            downloadHelper:
+                'Baixe modelos ou tokenizadores do ModelScope ou Hugging Face, ou adicione arquivos locais seguindo os {requirements}.',
+            localModelSizeHelper:
+                'Indica o tamanho atual do diretório, não que todos os arquivos tenham terminado de ser enviados.',
+            localModelLayoutTitle: 'Exemplos',
+            localLayoutDirect: 'Colocar diretamente',
+            localLayoutGrouped: 'Por organização (opcional)',
             serviceHelper:
                 'Conecte serviços de modelos de nuvens públicas, mecanismos de inferência locais e gateways de IA para uso pelos agentes integrados do 1Panel e agentes externos, como o WorkBuddy.',
             gpuType: 'Tipo de GPU',
@@ -1103,9 +1113,29 @@ const message = {
             addInstance: 'Adicionar instância',
             modelScopeEndpointHelper: 'Para buscar e baixar modelos do ModelScope. Usa a URL oficial por padrão.',
             modelTokenHelper: 'Opcional. Use um token com permissão para acessar modelos privados ou restritos.',
-            modelDirHelper: 'Diretório de download e listagem dos modelos locais.',
+            tokenizerDir: 'Diretório de tokenizadores',
+            tokenizerDirHelper:
+                'Diretório para downloads e a lista de tokenizadores locais. Alterá-lo não move os arquivos existentes.',
+            modelDirHelper:
+                'Diretório de download e listagem dos modelos locais. Alterá-lo não move os arquivos existentes.',
             featuredModelsHelper:
-                'Catálogo oficial de modelos em destaque do 1Panel. Atualize manualmente ou ative a sincronização automática a cada 24 horas. Apenas o catálogo é atualizado, sem baixar modelos.',
+                'Explore os modelos selecionados pelo 1Panel, consulte especificações, casos de uso e fontes de download e escolha um modelo para baixar.',
+            featuredModelsSyncHelper:
+                'A sincronização automática atualiza o catálogo de modelos em destaque diariamente de madrugada sem baixar arquivos de modelos. Você também pode sincronizar manualmente a qualquer momento.',
+            recipeSyncHelper:
+                'A sincronização automática atualiza as receitas sincronizadas diariamente de madrugada sem afetar as personalizadas. Você também pode sincronizar manualmente a qualquer momento.',
+            serviceStatus: 'Status do serviço',
+            readinessNotRunning: 'Não está em execução',
+            readinessWaiting: 'Aguardando disponibilidade',
+            readinessPreparing: 'Preparando',
+            readinessReady: 'Pronto',
+            readinessNotReady: 'Não está pronto',
+            readinessPreparingHelper:
+                'O contêiner foi iniciado, mas ainda não passou na verificação de integridade. O modelo pode estar carregando. Aguarde.',
+            readinessReadyHelper:
+                'A última verificação de integridade do contêiner foi aprovada. O serviço está pronto.',
+            readinessNotReadyHelper:
+                'O contêiner continua em execução, mas verificações de integridade consecutivas falharam. O serviço não está pronto. Consulte os logs do contêiner.',
             addInstanceHelper: 'Crie uma instância do vLLM para servir os modelos baixados.',
             addService: 'Adicionar',
             onlineModel: 'Modelos online',
@@ -1115,6 +1145,16 @@ const message = {
             ollamaManagement: 'Gerenciamento do Ollama',
             vllmManagement: 'Gerenciamento do vLLM',
             serviceDetails: 'Detalhes do serviço',
+            deleteDeploymentHelper: 'Esta instância será interrompida e excluída',
+            deleteDeploymentServiceHelper:
+                'Esta instância será interrompida e excluída junto com os serviços de modelos associados',
+            connectionInfo: 'Informações de conexão',
+            deploymentInfo: 'Informações da implantação',
+            serviceAPIHelper: 'Este serviço fornece uma API compatível com OpenAI.',
+            serviceAddressHelper:
+                'Use o endereço do contêiner para aplicativos em contêineres e o endereço externo para aplicativos do host ou externos.',
+            externalAddress: 'Endereço externo',
+            imageVersion: 'Versão da imagem',
             deployments: 'Implantação de modelos',
             files: 'Preparação de modelos',
             connectExternal: 'Conectar serviço externo',
@@ -1122,8 +1162,10 @@ const message = {
             recipeConfig: 'Configuração de Recipe',
             selectRecipe: 'Selecionar Recipe',
             createRecipe: 'Criar Recipe',
+            recipeSynced: 'Sincronizado',
+            recipeCustom: 'Personalizado',
             recipeHelper:
-                'Uma Recipe descreve como iniciar um modelo em um hardware específico, incluindo o modelo, o hardware e os argumentos de inicialização. É possível importar comandos de {link}.',
+                'Gerencie receitas de implantação para diferentes hardwares, reutilize argumentos de inicialização para implantar rapidamente ou importe comandos de {link}.',
             recipeFormHelper:
                 'Acesse {link}, selecione o provedor do modelo e depois o modelo desejado. Configure o hardware, a variante de quantização, a estratégia de implantação e outras opções para gerar o comando final de inicialização.',
             recipeArguments: 'Argumentos de inicialização',
@@ -1136,8 +1178,25 @@ const message = {
                 'Nenhum comando de inicialização válido foi detectado. Cole um comando pip/uv ou docker que inclua um modelo.',
             engineProvider: 'Mecanismo / Provedor',
             endpoint: 'Endpoint',
+            localService: 'Local',
+            cloudService: 'Nuvem',
             cloudAccount: 'Conta na nuvem',
             connectionStatus: 'Status da conexão',
+            verify: 'Verificar',
+            verifying: 'Verificando',
+            verifyFailed: 'Falha na verificação',
+            verificationInfo: 'Detalhes da verificação',
+            verifiedAt: 'Horário da verificação',
+            verifyModelChangeHelper:
+                'Alterar o modelo de verificação marca o serviço como não verificado sem chamar o modelo.',
+            reverify: 'Verificar novamente',
+            verifyConfirm: 'O modelo será verificado com as configurações abaixo. Continuar?',
+            apiKeyHelper:
+                'Se o serviço não exigir uma API Key, insira qualquer valor de preenchimento não vazio, como unused.',
+            verifyOnChangeHelper:
+                'Ao ativar ou alterar a conexão ou o modelo de verificação, a API é verificada com uma mensagem mínima.',
+            verifyImageOnChangeHelper:
+                'Ao ativar ou alterar a conexão ou o modelo de verificação, uma imagem mínima é gerada para verificar a API; pode haver cobrança.',
             unverified: 'Não verificado',
             manage: 'Gerenciar',
             loadFailed: 'Falha ao carregar. Atualize a página e tente novamente.',
@@ -1620,6 +1679,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Execute testes de desempenho dos serviços de modelos com diferentes comprimentos de solicitação e configurações de simultaneidade para medir métricas como a taxa de processamento, o tempo até o primeiro token e a latência das solicitações.',
             launchCommand: 'Comando de inicialização',
             retest: 'Testar novamente',
             statusRunning: 'Executando',
@@ -1773,7 +1834,8 @@ const message = {
                 'Estes registros não têm um ID de dispositivo estável. Não é possível verificar a identidade nem os valores ausentes.',
             pcieGeneration: 'Geração PCIe (atual / máxima)',
             pcieWidth: 'Largura PCIe (atual / máxima)',
-            gpu: 'Monitoramento de GPU',
+            gpu: 'Gerenciamento de GPU',
+            monitoringTitle: 'Monitoramento de GPU',
             gpuHelper:
                 'Nenhum comando de gerenciamento de GPU/XPU/NPU compatível foi detectado. Verifique e tente novamente!',
             process: 'Informações do Processo',
@@ -2101,6 +2163,9 @@ const message = {
             'Vários cenários, níveis de concorrência e repetições, incluindo entradas longas e prefixos compartilhados.',
         customDescription: 'Comece com um cenário, configure os parâmetros e adicione outros conforme necessário.',
         scenarios: 'Cenários',
+        scenarioCount: 'Cenários ({count} no total)',
+        scenarioHelp:
+            'Cada cenário define os tokens de entrada/saída, os níveis de concorrência e os parâmetros das requisições. Os níveis são testados em sequência; cada nível é executado pelo número de repetições configurado e cada execução gera um ponto de medição.',
         builtIn: 'Integrado',
         builtInHelp: 'Planos integrados não podem ser editados ou excluídos. Ajuste uma cópia ao criar um teste.',
         modified: 'Modificado',
@@ -2139,6 +2204,54 @@ const message = {
         secretHelp: 'As cópias não incluem chaves de API nem cabeçalhos. Informe-os novamente se necessário.',
         resultHelp:
             'A mediana e os valores mínimo/máximo incluem apenas execuções bem-sucedidas sem anomalias. P99 é a mediana dos P99 de cada execução. Cache e tráfego externo não são controlados.',
+    },
+    benchmarkSettings: {
+        imagePullHelp:
+            'A imagem {image} é grande e o download pode demorar, dependendo da velocidade da rede. Você pode configurar um espelho do registro para acelerar o download. Você pode fechar a janela da tarefa; o download continuará em segundo plano. Acompanhe o progresso na central de tarefas.',
+        settingsHelp:
+            'Prepare a imagem do Benchmark e um plano de teste. Você poderá criar um benchmark quando ambos estiverem prontos.',
+        imageAvailable: 'A imagem do Benchmark está pronta ({image})',
+        imageUnavailable: 'A imagem do Benchmark não foi encontrada ({image})',
+        retestServiceHelp:
+            'Os novos testes mantêm os parâmetros da tarefa. Confirme o serviço de modelos atual; as credenciais são obtidas do serviço selecionado.',
+        prepareHelp: 'Antes de criar um benchmark, prepare a imagem Benchmark e os planos de teste em {settings}.',
+        image: 'Imagem do Benchmark',
+        ready: 'Pronto',
+        unconfigured: 'Não configurado',
+        checkFailed: 'Falha na verificação',
+        imageMissing: 'A imagem necessária não foi encontrada. Baixe {image} no gerenciamento de imagens.',
+        imageReady: 'A imagem do Benchmark está pronta para criar testes.',
+        imageHelp:
+            'A imagem do Benchmark executa o cliente de carga e envia solicitações ao serviço de modelos selecionado.',
+        mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
+        goImages: 'Ir ao gerenciamento de imagens',
+        goModels: 'Ir aos downloads de modelos',
+        tokenizerHelp:
+            'Selecione um tokenizador do diretório de tokenizadores para codificar o texto de teste e contar tokens.',
+        tokenizerEmpty:
+            'Não há modelos disponíveis. Baixe um modelo com arquivos de tokenizador nos downloads de modelos.',
+        tokenizerEmptyWithDownload: 'Não há tokenizadores disponíveis. Abra {download} para baixar um.',
+        tokenizerInvalid: 'Este tokenizador está indisponível. Selecione outro ou baixe novamente.',
+        schemeHelp:
+            'Os planos de teste definem os parâmetros de solicitação, a concorrência e as regras de execução. Prepare pelo menos um plano disponível.',
+        schemeEmpty: 'Não há planos de teste disponíveis. Crie um primeiro.',
+        manageSchemes: 'Gerenciar planos de teste',
+        selectService: 'Selecione um serviço de modelos',
+        serviceHelp: 'Selecione um serviço e ajuste a URL se necessário.',
+        noServices: 'Não há serviços de modelos disponíveis. Adicione um primeiro.',
+        goModelServices: 'Ir aos serviços de modelos',
+        serviceUnsupported: 'Ainda não suportado',
+        unsupportedProtocol:
+            'Este protocolo de API não é compatível: {0}. Selecione um serviço de modelos que use OpenAI Chat Completions.',
+        unsupportedAuth:
+            'Este método de autenticação não é compatível: {0}. Selecione um serviço com autenticação Bearer.',
+        serviceModelsMissing:
+            'Este serviço não tem modelos configurados. Adicione modelos no gerenciamento de serviços de modelos.',
+        prerequisitesTitle: 'Conclua primeiro as configurações do teste',
+        prerequisitesMissing: 'Os seguintes pré-requisitos não estão prontos: {0}. Conclua-os nas configurações.',
+        precheckFailed:
+            'Não foi possível verificar os pré-requisitos do teste. Abra as configurações e verifique novamente.',
+        goSettings: 'Ir às configurações',
     },
     benchmarkOverview: {
         comparison: 'Comparação de cenários e concorrência',
@@ -2663,6 +2776,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Sincronizar Agora',
+            autoSyncHelper:
+                'A sincronização automática atualiza os scripts do sistema diariamente de madrugada sem afetar os personalizados. Você também pode sincronizar manualmente a qualquer momento.',
             turnOnSync: 'Ativar Sincronização Automática',
             turnOnSyncHelper:
                 'Ativar a sincronização automática realizará sincronizações automáticas durante as primeiras horas da manhã diariamente',

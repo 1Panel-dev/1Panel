@@ -380,8 +380,8 @@ const usedMemory = computed(() =>
     .gpu-card {
         display: grid;
         grid-template-columns: minmax(0, 2.4fr) minmax(0, 1.35fr);
-        gap: 16px;
-        padding: 12px 16px;
+        gap: 10px 16px;
+        padding: 10px 16px;
     }
 
     .device-header {

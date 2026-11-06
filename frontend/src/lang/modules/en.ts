@@ -366,6 +366,8 @@ const message = {
             serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
+            autoSyncEnabled: 'Auto-sync enabled',
+            autoSyncDisabled: 'Auto-sync disabled',
             running: 'Running',
             done: 'Done',
             scanFailed: 'Incomplete',
@@ -1036,8 +1038,8 @@ const message = {
                 'Enter the complete image generation endpoint for Custom accounts. The path is not appended automatically. Example: {0}',
             apiTypeBaseURLMismatch:
                 'The current Base URL looks like a {0} path, but {1} is selected. Recommended URL: {2}',
-            validateAvailability: 'Validate account availability',
-            validateAvailabilityHelper: 'Send a minimal message before saving to validate the API',
+            validateAvailability: 'Verify availability on save',
+            validateAvailabilityHelper: 'Send a minimal message to verify API availability',
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
@@ -1045,6 +1047,8 @@ const message = {
             searchHelper:
                 'Find models on ModelScope or Hugging Face, then deploy them or create a Recipe in Model Preparation.',
             modelScopeSearchHelper: 'Reliable access in mainland China',
+            huggingFaceNetworkHelper:
+                'Hugging Face search and downloads require server access to the site. If unavailable, configure an accessible Hugging Face mirror URL in Settings or select ModelScope. Upload models manually in offline environments.',
             huggingFaceSearchHelper: 'Extensive model collection',
             searchPlaceholder: 'Enter a model name or repository ID, e.g. Qwen/Qwen3-8B',
             popularSearches: 'Popular searches',
@@ -1057,7 +1061,13 @@ const message = {
             localFilesMissing: 'Local files not found',
             ollamaNameHelper:
                 'Enter the full model name from the Ollama library. If no tag is specified, latest is used.',
-            downloadHelper: 'Click “Search” to find and download models from ModelScope and Hugging Face.',
+            downloadHelper:
+                'Download models or tokenizers from ModelScope or Hugging Face, or add local files using the {requirements}.',
+            localModelSizeHelper:
+                'This is the current directory size and does not confirm that all files have finished uploading.',
+            localModelLayoutTitle: 'Examples',
+            localLayoutDirect: 'Direct placement',
+            localLayoutGrouped: 'Group by organization (optional)',
             serviceHelper:
                 'Connect model services from public clouds, local inference engines, and AI gateways for use by built-in 1Panel agents and external agents such as WorkBuddy.',
             gpuType: 'GPU Type',
@@ -1097,9 +1107,28 @@ const message = {
             addInstance: 'Add instance',
             modelScopeEndpointHelper: 'Used to search and download ModelScope models. Defaults to the official URL.',
             modelTokenHelper: 'Optional. Use a token with access permissions for private or restricted models.',
-            modelDirHelper: 'Directory for model downloads and the local model list.',
+            tokenizerDir: 'Tokenizer directory',
+            tokenizerDirHelper:
+                'Directory for tokenizer downloads and the local tokenizer list. Changing it does not move existing files.',
+            modelDirHelper:
+                'Directory for model downloads and the local model list. Changing it does not move existing files.',
             featuredModelsHelper:
-                'Official 1Panel featured model catalog. Refresh manually or enable auto-sync every 24 hours. Sync updates only the catalog, without downloading model files.',
+                'Browse models curated by 1Panel, review specifications, use cases, and download sources, and choose a model to download.',
+            featuredModelsSyncHelper:
+                'When enabled, auto-sync updates the featured model catalog daily in the early morning without downloading model files. You can also sync manually at any time.',
+            recipeSyncHelper:
+                'When enabled, auto-sync updates synced recipes daily in the early morning without affecting custom recipes. You can also sync manually at any time.',
+            serviceStatus: 'Service status',
+            readinessNotRunning: 'Not running',
+            readinessWaiting: 'Waiting for readiness',
+            readinessPreparing: 'Preparing',
+            readinessReady: 'Ready',
+            readinessNotReady: 'Not ready',
+            readinessPreparingHelper:
+                'The container has started but has not passed its health check yet. The model may still be loading. Please wait.',
+            readinessReadyHelper: 'The latest container health check passed. The service is ready.',
+            readinessNotReadyHelper:
+                'The container is still running, but consecutive health checks have failed. The service is not ready. Check the container logs.',
             addInstanceHelper: 'Create a vLLM instance to serve downloaded models.',
             addService: 'Add',
             onlineModel: 'Online models',
@@ -1109,6 +1138,16 @@ const message = {
             ollamaManagement: 'Ollama management',
             vllmManagement: 'vLLM management',
             serviceDetails: 'Service details',
+            deleteDeploymentHelper: 'This instance will be stopped and deleted',
+            deleteDeploymentServiceHelper:
+                'This instance will be stopped and deleted along with its linked model services',
+            connectionInfo: 'Connection information',
+            deploymentInfo: 'Deployment information',
+            serviceAPIHelper: 'This service provides an OpenAI-compatible API.',
+            serviceAddressHelper:
+                'Use the container address for container apps and the external address for host or external apps.',
+            externalAddress: 'External address',
+            imageVersion: 'Image version',
             deployments: 'Model deployment',
             files: 'Model preparation',
             connectExternal: 'Connect external service',
@@ -1116,8 +1155,10 @@ const message = {
             recipeConfig: 'Recipe configuration',
             selectRecipe: 'Select Recipe',
             createRecipe: 'Create Recipe',
+            recipeSynced: 'Synced',
+            recipeCustom: 'Custom',
             recipeHelper:
-                'A Recipe describes how to launch a model on specific hardware, including the model, hardware, and launch arguments. Commands can be imported from {link}.',
+                'Manage model deployment recipes for different hardware, reuse launch arguments for quick deployment, or import commands from {link}.',
             recipeFormHelper:
                 'Go to {link}, select the model provider, then select the target model. Configure the hardware, quantization variant, deployment strategy, and other options to generate the final launch command.',
             recipeArguments: 'Launch arguments',
@@ -1130,8 +1171,25 @@ const message = {
                 'No valid launch command detected. Paste a pip/uv or docker command that includes a model.',
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
+            localService: 'Local',
+            cloudService: 'Cloud',
             cloudAccount: 'Cloud account',
-            connectionStatus: 'Connection status',
+            connectionStatus: 'Verification status',
+            verify: 'Verify',
+            verifying: 'Verifying',
+            verifyFailed: 'Verification failed',
+            verificationInfo: 'Verification details',
+            verifiedAt: 'Verification time',
+            verifyModelChangeHelper:
+                'Changing the verification model marks the service as unverified without calling the model.',
+            reverify: 'Verify again',
+            verifyConfirm: 'The model will be verified using the settings below. Continue?',
+            apiKeyHelper:
+                'If the service does not require an API Key, enter any non-empty placeholder, such as unused.',
+            verifyOnChangeHelper:
+                'When enabled or connection settings or the verification model change, verify the API with a minimal message.',
+            verifyImageOnChangeHelper:
+                'When enabled or connection settings or the verification model change, verify the API by generating a minimal image; charges may apply.',
             unverified: 'Unverified',
             manage: 'Manage',
             loadFailed: 'Failed to load. Refresh to retry.',
@@ -1612,6 +1670,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Benchmark model services across different request lengths and concurrency settings to evaluate metrics such as throughput, time to first token, and request latency.',
             launchCommand: 'Launch Command',
             retest: 'Retest',
             statusRunning: 'Running',
@@ -1761,7 +1821,8 @@ const message = {
                 'These records have no stable device ID. Their identity and missing values cannot be verified.',
             pcieGeneration: 'PCIe generation (current / maximum)',
             pcieWidth: 'PCIe width (current / maximum)',
-            gpu: 'GPU Monitoring',
+            gpu: 'GPU Management',
+            monitoringTitle: 'GPU Monitoring',
             gpuHelper: 'No supported GPU/XPU/NPU management command was detected. Please check and try again!',
             process: 'Process Information',
             processCount: 'Process Count',
@@ -2084,6 +2145,9 @@ const message = {
             'Multiple scenarios, concurrency levels and repeated runs, including long inputs and shared prefixes.',
         customDescription: 'Start with one scenario, set its parameters and add more as needed.',
         scenarios: 'Scenarios',
+        scenarioCount: 'Scenarios ({count} total)',
+        scenarioHelp:
+            'Each scenario defines input/output tokens, concurrency levels and request parameters. Concurrency levels are tested in sequence; each level runs for the configured number of trials, and each run creates one test point.',
         builtIn: 'Built-in',
         builtInHelp: 'Built-in schemes cannot be edited or deleted. Adjust a copy when creating a test.',
         modified: 'Modified',
@@ -2122,6 +2186,48 @@ const message = {
         secretHelp: 'API keys and headers are excluded from copies. Enter them again if needed.',
         resultHelp:
             'Only successful runs without request anomalies enter the median and min/max summaries. P99 is the median of per-run P99 values. Cache and external traffic are uncontrolled.',
+    },
+    benchmarkSettings: {
+        imagePullHelp:
+            'The {image} image is large and may take a while to pull, depending on your network speed. You can configure a registry mirror to speed up the pull. You can close the task dialog; the pull will continue in the background. View progress in the task center.',
+        settingsHelp: 'Prepare the Benchmark image and a test scheme. You can create a benchmark once both are ready.',
+        imageAvailable: 'Benchmark image is ready ({image})',
+        imageUnavailable: 'Benchmark image was not found ({image})',
+        retestServiceHelp:
+            'Retests keep the task parameters. Confirm the current model service; credentials are loaded from the selected service.',
+        prepareHelp: 'Before creating a benchmark, prepare the Benchmark image and test schemes in {settings}.',
+        image: 'Benchmark image',
+        ready: 'Ready',
+        unconfigured: 'Not configured',
+        checkFailed: 'Check failed',
+        imageMissing: 'The required image was not found. Pull {image} in image management.',
+        imageReady: 'The Benchmark image is ready for creating tests.',
+        imageHelp: 'The Benchmark image runs the load test client and sends requests to the selected model service.',
+        mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
+        goImages: 'Go to image management',
+        goModels: 'Go to model downloads',
+        tokenizerHelp: 'Select a tokenizer from the tokenizer directory to encode test text and count tokens.',
+        tokenizerEmpty: 'No models are available. Download a model containing tokenizer files in model downloads.',
+        tokenizerEmptyWithDownload: 'No tokenizers are available. Open {download} to download one.',
+        tokenizerInvalid: 'This tokenizer is unavailable. Select another or download it again in model downloads.',
+        schemeHelp:
+            'Test schemes define request parameters, concurrency, and execution rules. Prepare at least one available scheme.',
+        schemeEmpty: 'No test schemes are available. Create a scheme first.',
+        manageSchemes: 'Manage test schemes',
+        selectService: 'Select a model service',
+        serviceHelp: 'Select a model service; edit the request URL as needed.',
+        noServices: 'No model services are available. Add a model service first.',
+        goModelServices: 'Go to model services',
+        serviceUnsupported: 'Not supported yet',
+        unsupportedProtocol:
+            'This API protocol is not supported: {0}. Select a model service using OpenAI Chat Completions.',
+        unsupportedAuth:
+            'This authentication method is not supported: {0}. Select a service using Bearer authentication.',
+        serviceModelsMissing: 'This service has no configured models. Add models in model service management.',
+        prerequisitesTitle: 'Complete benchmark settings first',
+        prerequisitesMissing: 'The following prerequisites are not ready: {0}. Complete them in settings.',
+        precheckFailed: 'Could not check benchmark prerequisites. Open settings and check again.',
+        goSettings: 'Go to settings',
     },
     benchmarkOverview: {
         comparison: 'Scenario and concurrency comparison',
@@ -2644,6 +2750,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Sync Now',
+            autoSyncHelper:
+                'When enabled, auto-sync updates system scripts daily in the early morning without affecting custom scripts. You can also sync manually at any time.',
             turnOnSync: 'Enable Auto Sync',
             turnOnSyncHelper:
                 'Enabling auto sync will perform automatic synchronization during early morning hours daily',

@@ -819,3 +819,5 @@ ContainerImageCheckFailures: "بررسی {{ .count }} کانتینر ناموف�
 ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصاویر در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید."
 
 ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"
+
+ErrModelTokenizerDirOverlap: "پوشه‌های مدل و توکن‌ساز باید متفاوت باشند و هیچ‌کدام نباید درون دیگری قرار گیرد"

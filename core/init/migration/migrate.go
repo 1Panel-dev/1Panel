@@ -76,5 +76,6 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.MoveVirtualMachineMenuToTopLevel,
 		migrations.UpdateAiModelManagementMenus,
 		migrations.AddModelServicesMenu,
+		migrations.UpdateAiMenus,
 	}
 }

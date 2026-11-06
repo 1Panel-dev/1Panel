@@ -7,13 +7,38 @@
                         {{ $t('commons.button.add') }}
                     </el-button>
                 </div>
+                <p v-if="account.validateAvailability && items.length" class="input-help verification-help">
+                    {{ $t('aiTools.agents.verifyModelHelper') }}
+                    {{ $t('aiTools.model.verifyModelChangeHelper') }}
+                </p>
                 <ComplexTable :data="items">
+                    <el-table-column
+                        v-if="account.validateAvailability"
+                        :label="$t('aiTools.model.verify')"
+                        width="90"
+                        align="center"
+                    >
+                        <template #default="{ row }">
+                            <el-radio
+                                v-permission
+                                class="verification-radio"
+                                :model-value="verifyModelRecordID"
+                                :value="row.recordId"
+                                :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
+                                :disabled="readOnly || selectingVerifyModel || saving"
+                                @change="selectVerifyModel(row)"
+                            >
+                                <span />
+                            </el-radio>
+                        </template>
+                    </el-table-column>
                     <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
                     <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
                     <fu-table-operations
                         v-if="!readOnly"
                         :buttons="buttons"
                         :label="$t('commons.table.operate')"
+                        :width="localOllama ? 80 : 140"
                         fixed="right"
                     />
                 </ComplexTable>
@@ -69,10 +94,11 @@ import {
     deleteAgentAccountModel,
     getAgentAccountModels,
     updateAgentAccountModel,
+    updateAgentAccountVerifyModel,
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
-import { MsgError } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
 import { getAgentProviderDisplayName } from '@/utils/agent';
 import { Rules } from '@/global/form-rules';
 
@@ -83,8 +109,10 @@ const readOnly = ref(false);
 const editorOpen = ref(false);
 const loading = ref(false);
 const saving = ref(false);
+const selectingVerifyModel = ref(false);
 const formRef = ref<FormInstance>();
 const items = ref<AI.AgentAccountModel[]>([]);
+const verifyModelRecordID = computed(() => items.value.find((item) => item.isVerifyModel)?.recordId);
 const ollamaAddRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
@@ -96,6 +124,7 @@ const account = reactive({
     name: '',
     provider: '',
     appInstallId: 0,
+    validateAvailability: true,
 });
 
 const form = reactive<AI.AgentAccountModel>({
@@ -121,12 +150,15 @@ const buttons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        disabled: () => selectingVerifyModel.value,
         click: (row: AI.AgentAccountModel) => openEdit(row),
         show: () => !localOllama.value,
     },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        disabled: (row: AI.AgentAccountModel) =>
+            selectingVerifyModel.value || (account.validateAvailability && Boolean(row.isVerifyModel)),
         click: (row: AI.AgentAccountModel) => onDelete(row),
     },
 ];
@@ -135,7 +167,21 @@ const buildModelItem = (model?: Partial<AI.AgentAccountModel>): AI.AgentAccountM
     recordId: Number(model?.recordId || 0),
     id: String(model?.id || '').trim(),
     name: String(model?.name || '').trim(),
+    isVerifyModel: Boolean(model?.isVerifyModel),
 });
+
+const selectVerifyModel = async (row: AI.AgentAccountModel) => {
+    if (row.isVerifyModel || selectingVerifyModel.value || readOnly.value) return;
+    selectingVerifyModel.value = true;
+    try {
+        await updateAgentAccountVerifyModel({ accountId: account.id, recordId: row.recordId });
+        await search();
+        emit('updated');
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } finally {
+        selectingVerifyModel.value = false;
+    }
+};
 
 const search = async () => {
     if (!account.id) {
@@ -198,7 +244,13 @@ const submit = async () => {
         await search();
         emit('updated');
     } catch (error: any) {
-        MsgError(String(error?.message || i18n.global.t('commons.res.commonError')));
+        MsgError(
+            String(
+                error?.response?.data?.message ||
+                    (error?.code === 'ECONNABORTED' ? i18n.global.t('commons.msg.requestTimeout') : error?.message) ||
+                    i18n.global.t('commons.res.commonError'),
+            ),
+        );
     } finally {
         saving.value = false;
     }
@@ -252,6 +304,7 @@ const openDrawer = async (row: AI.AgentAccountItem) => {
     account.id = row.id;
     account.name = row.name;
     account.provider = row.provider;
+    account.validateAvailability = row.validateAvailability;
     open.value = true;
     await search();
 };
@@ -267,5 +320,18 @@ defineExpose({
     justify-content: flex-start;
     margin-bottom: 16px;
     margin-top: 5px;
+}
+
+.verification-help {
+    margin: 0 0 12px;
+}
+
+.verification-radio {
+    margin-right: 0;
+    height: 32px;
+
+    :deep(.el-radio__label) {
+        display: none;
+    }
 }
 </style>

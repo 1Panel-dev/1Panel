@@ -371,6 +371,8 @@ const message = {
             serviceNotStarted: 'Perkhidmatan {0} belum dimulakan.',
         },
         status: {
+            autoSyncEnabled: 'Penyegerakan automatik diaktifkan',
+            autoSyncDisabled: 'Penyegerakan automatik dinyahaktifkan',
             running: 'Sedang Berjalan',
             done: 'Selesai',
             scanFailed: 'Tidak Lengkap',
@@ -1047,7 +1049,7 @@ const message = {
                 'Masukkan URL titik akhir penjanaan imej yang lengkap untuk akaun Custom. Laluan tidak ditambah secara automatik. Contoh: {0}',
             apiTypeBaseURLMismatch:
                 'Base URL semasa kelihatan seperti laluan {0}, tetapi {1} dipilih. URL yang disyorkan: {2}',
-            validateAvailability: 'Sahkan ketersediaan akaun',
+            validateAvailability: 'Sahkan ketersediaan semasa menyimpan',
             validateAvailabilityHelper: 'Hantar mesej minimum sebelum menyimpan untuk mengesahkan API',
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
@@ -1056,6 +1058,8 @@ const message = {
             searchHelper:
                 'Cari model di ModelScope atau Hugging Face, kemudian gunakan model atau cipta Recipe dalam Persediaan Model.',
             modelScopeSearchHelper: 'Akses stabil di tanah besar China',
+            huggingFaceNetworkHelper:
+                'Carian dan muat turun Hugging Face memerlukan akses pelayan ke laman tersebut. Jika tidak tersedia, tetapkan URL cermin Hugging Face yang boleh dicapai dalam Tetapan atau pilih ModelScope. Dalam persekitaran luar talian, muat naik model secara manual.',
             huggingFaceSearchHelper: 'Koleksi model yang luas',
             searchPlaceholder: 'Masukkan nama model atau ID repositori, cth. Qwen/Qwen3-8B',
             popularSearches: 'Carian popular',
@@ -1068,7 +1072,13 @@ const message = {
             localFilesMissing: 'Fail setempat tidak ditemui',
             ollamaNameHelper:
                 'Masukkan nama model penuh daripada pustaka Ollama. Jika tag tidak dinyatakan, latest akan digunakan.',
-            downloadHelper: 'Klik “Cari” untuk mencari dan memuat turun model daripada ModelScope dan Hugging Face.',
+            downloadHelper:
+                'Muat turun model atau tokenizer daripada ModelScope atau Hugging Face, atau tambah fail setempat mengikut {requirements}.',
+            localModelSizeHelper:
+                'Ini ialah saiz direktori semasa dan tidak mengesahkan bahawa semua fail telah selesai dimuat naik.',
+            localModelLayoutTitle: 'Contoh',
+            localLayoutDirect: 'Letak terus',
+            localLayoutGrouped: 'Kumpul ikut organisasi (pilihan)',
             serviceHelper:
                 'Sambungkan perkhidmatan model daripada awan awam, enjin inferens setempat dan gerbang AI untuk digunakan oleh ejen terbina dalam 1Panel serta ejen luaran seperti WorkBuddy.',
             gpuType: 'Jenis GPU',
@@ -1108,9 +1118,28 @@ const message = {
             modelScopeEndpointHelper:
                 'Untuk mencari dan memuat turun model ModelScope. Menggunakan URL rasmi secara lalai.',
             modelTokenHelper: 'Pilihan. Gunakan token dengan kebenaran akses untuk model peribadi atau terhad.',
-            modelDirHelper: 'Direktori muat turun model dan sumber senarai model setempat.',
+            tokenizerDir: 'Direktori tokenizer',
+            tokenizerDirHelper:
+                'Direktori muat turun dan senarai tokenizer setempat. Perubahan tidak memindahkan fail sedia ada.',
+            modelDirHelper:
+                'Direktori muat turun model dan sumber senarai model setempat. Perubahan tidak memindahkan fail sedia ada.',
             featuredModelsHelper:
-                'Katalog model pilihan rasmi 1Panel. Muat semula secara manual atau aktifkan penyegerakan automatik setiap 24 jam. Hanya katalog dikemas kini, tanpa memuat turun fail model.',
+                'Semak model pilihan 1Panel, lihat spesifikasi, kegunaan dan sumber muat turun, kemudian pilih model yang sesuai untuk dimuat turun.',
+            featuredModelsSyncHelper:
+                'Penyegerakan automatik mengemas kini katalog model pilihan setiap hari pada awal pagi tanpa memuat turun fail model. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
+            recipeSyncHelper:
+                'Penyegerakan automatik mengemas kini resipi yang disegerakkan setiap hari pada awal pagi tanpa menjejaskan resipi tersuai. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
+            serviceStatus: 'Status perkhidmatan',
+            readinessNotRunning: 'Tidak berjalan',
+            readinessWaiting: 'Menunggu kesediaan',
+            readinessPreparing: 'Sedang disediakan',
+            readinessReady: 'Sedia',
+            readinessNotReady: 'Belum sedia',
+            readinessPreparingHelper:
+                'Bekas telah dimulakan tetapi belum lulus pemeriksaan kesihatan. Model mungkin masih dimuatkan. Sila tunggu.',
+            readinessReadyHelper: 'Pemeriksaan kesihatan bekas yang terkini telah lulus. Perkhidmatan sudah sedia.',
+            readinessNotReadyHelper:
+                'Bekas masih berjalan, tetapi pemeriksaan kesihatan berturut-turut telah gagal. Perkhidmatan belum sedia. Semak log bekas.',
             addInstanceHelper:
                 'Cipta instans vLLM untuk menyediakan model yang dimuat turun sebagai perkhidmatan model.',
             addService: 'Tambah',
@@ -1121,6 +1150,16 @@ const message = {
             ollamaManagement: 'Pengurusan Ollama',
             vllmManagement: 'Pengurusan vLLM',
             serviceDetails: 'Butiran perkhidmatan',
+            deleteDeploymentHelper: 'Instans ini akan dihentikan dan dipadamkan',
+            deleteDeploymentServiceHelper:
+                'Instans ini akan dihentikan dan dipadamkan bersama perkhidmatan model yang berkaitan',
+            connectionInfo: 'Maklumat sambungan',
+            deploymentInfo: 'Maklumat penggunaan',
+            serviceAPIHelper: 'Perkhidmatan ini menyediakan API yang serasi dengan OpenAI.',
+            serviceAddressHelper:
+                'Gunakan alamat bekas untuk aplikasi dalam bekas dan alamat luaran untuk aplikasi hos atau luaran.',
+            externalAddress: 'Alamat luaran',
+            imageVersion: 'Versi imej',
             deployments: 'Pengerahan model',
             files: 'Penyediaan model',
             connectExternal: 'Sambungkan perkhidmatan luaran',
@@ -1128,8 +1167,10 @@ const message = {
             recipeConfig: 'Konfigurasi Recipe',
             selectRecipe: 'Pilih Recipe',
             createRecipe: 'Cipta Recipe',
+            recipeSynced: 'Disegerakkan',
+            recipeCustom: 'Tersuai',
             recipeHelper:
-                'Recipe menerangkan cara melancarkan model pada perkakasan tertentu, termasuk model, perkakasan dan argumen pelancaran. Arahan boleh diimport daripada {link}.',
+                'Urus resipi penggunaan model untuk perkakasan berbeza, guna semula argumen pelancaran untuk penggunaan pantas atau import arahan daripada {link}.',
             recipeFormHelper:
                 'Pergi ke {link}, pilih penyedia model, kemudian pilih model sasaran. Konfigurasikan perkakasan, varian pengkuantuman, strategi penggunaan dan pilihan lain untuk menjana arahan pelancaran akhir.',
             recipeArguments: 'Argumen pelancaran',
@@ -1142,8 +1183,25 @@ const message = {
                 'Tiada arahan pelancaran yang sah dikesan. Tampal arahan pip/uv atau docker yang mengandungi model.',
             engineProvider: 'Enjin / Pembekal',
             endpoint: 'Titik akhir',
+            localService: 'Setempat',
+            cloudService: 'Awan',
             cloudAccount: 'Akaun awan',
             connectionStatus: 'Status sambungan',
+            verify: 'Sahkan',
+            verifying: 'Sedang mengesahkan',
+            verifyFailed: 'Pengesahan gagal',
+            verificationInfo: 'Butiran pengesahan',
+            verifiedAt: 'Masa pengesahan',
+            verifyModelChangeHelper:
+                'Menukar model pengesahan menandakan perkhidmatan sebagai belum disahkan tanpa memanggil model.',
+            reverify: 'Sahkan semula',
+            verifyConfirm: 'Model akan disahkan menggunakan tetapan di bawah. Teruskan?',
+            apiKeyHelper:
+                'Jika perkhidmatan tidak memerlukan API Key, masukkan sebarang nilai pemegang tempat yang tidak kosong, seperti unused.',
+            verifyOnChangeHelper:
+                'Apabila diaktifkan atau tetapan sambungan atau model pengesahan berubah, API disahkan dengan mesej minimum.',
+            verifyImageOnChangeHelper:
+                'Apabila diaktifkan atau tetapan sambungan atau model pengesahan berubah, imej minimum dijana untuk mengesahkan API; caj mungkin dikenakan.',
             unverified: 'Belum disahkan',
             manage: 'Urus',
             loadFailed: 'Gagal memuatkan. Muat semula dan cuba lagi.',
@@ -1625,6 +1683,8 @@ const message = {
         },
         benchmark: {
             title: 'Penanda Aras',
+            description:
+                'Jalankan penanda aras perkhidmatan model dengan panjang permintaan dan tetapan keserentakan yang berbeza untuk mengukur metrik seperti daya pemprosesan, masa hingga token pertama dan kependaman permintaan.',
             launchCommand: 'Arahan Pelancaran',
             retest: 'Uji Semula',
             statusRunning: 'Sedang berjalan',
@@ -1776,7 +1836,8 @@ const message = {
                 'Rekod ini tiada ID peranti yang tetap. Identiti peranti dan nilai yang hilang tidak dapat disahkan.',
             pcieGeneration: 'Generasi PCIe (semasa / maksimum)',
             pcieWidth: 'Lebar PCIe (semasa / maksimum)',
-            gpu: 'Pemantauan GPU',
+            gpu: 'Pengurusan GPU',
+            monitoringTitle: 'Pemantauan GPU',
             gpuHelper: 'Tiada arahan pengurusan GPU/XPU/NPU yang disokong dikesan. Sila periksa dan cuba lagi!',
             process: 'Maklumat Proses',
             type: 'Jenis',
@@ -2106,6 +2167,9 @@ const message = {
             'Pelbagai senario, tahap keserentakan dan ulangan, termasuk input panjang dan awalan dikongsi.',
         customDescription: 'Mulakan dengan satu senario, tetapkan parameternya dan tambah lagi mengikut keperluan.',
         scenarios: 'Senario',
+        scenarioCount: 'Senario ({count} keseluruhan)',
+        scenarioHelp:
+            'Setiap senario menentukan token input/output, tahap keserentakan dan parameter permintaan. Tahap keserentakan diuji mengikut urutan; setiap tahap dijalankan mengikut bilangan ulangan yang ditetapkan, dan setiap larian menghasilkan satu titik pengukuran.',
         builtIn: 'Terbina dalam',
         builtInHelp: 'Pelan terbina dalam tidak boleh disunting atau dipadam. Laraskan salinan semasa mencipta ujian.',
         modified: 'Diubah suai',
@@ -2144,6 +2208,52 @@ const message = {
         secretHelp: 'Salinan tidak mengandungi kunci API atau pengepala. Masukkan semula jika perlu.',
         resultHelp:
             'Median dan minimum/maksimum hanya melibatkan ujian berjaya tanpa anomali permintaan. P99 ialah median P99 setiap ujian. Cache dan trafik luaran tidak dikawal.',
+    },
+    benchmarkSettings: {
+        imagePullHelp:
+            'Imej {image} besar dan mungkin mengambil masa yang lama untuk dimuat turun, bergantung pada kelajuan rangkaian. Anda boleh mengkonfigurasi cermin registri untuk mempercepat muat turun. Anda boleh menutup dialog tugas; muat turun akan diteruskan di latar belakang. Lihat kemajuan di pusat tugas.',
+        settingsHelp:
+            'Sediakan imej Benchmark dan skema ujian dahulu. Anda boleh mencipta penanda aras apabila kedua-duanya sedia.',
+        imageAvailable: 'Imej Benchmark sedia ({image})',
+        imageUnavailable: 'Imej Benchmark tidak ditemui ({image})',
+        prepareHelp: 'Sebelum mencipta penanda aras, sediakan imej Benchmark dan skema ujian dalam {settings}.',
+        image: 'Imej Benchmark',
+        ready: 'Sedia',
+        unconfigured: 'Belum dikonfigurasi',
+        checkFailed: 'Semakan gagal',
+        imageMissing: 'Imej yang diperlukan tidak ditemui. Tarik {image} dalam pengurusan imej.',
+        imageReady: 'Imej Benchmark sedia untuk mencipta ujian.',
+        imageHelp:
+            'Imej Benchmark menjalankan klien ujian beban dan menghantar permintaan ke perkhidmatan model yang dipilih.',
+        mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
+        goImages: 'Ke pengurusan imej',
+        goModels: 'Ke muat turun model',
+        tokenizerHelp: 'Pilih tokenizer daripada direktori tokenizer untuk mengekod teks ujian dan mengira token.',
+        tokenizerEmpty:
+            'Tiada model tersedia. Muat turun model yang mengandungi fail tokenizer di halaman muat turun model.',
+        tokenizerEmptyWithDownload: 'Tiada tokenizer tersedia. Buka {download} untuk memuat turun.',
+        tokenizerInvalid: 'Tokenizer ini tidak tersedia. Pilih yang lain atau muat turun semula.',
+        schemeHelp:
+            'Skema ujian menentukan parameter permintaan, keserentakan dan peraturan pelaksanaan. Sediakan sekurang-kurangnya satu skema yang tersedia.',
+        schemeEmpty: 'Tiada skema ujian tersedia. Cipta skema dahulu.',
+        manageSchemes: 'Urus skema ujian',
+        selectService: 'Pilih perkhidmatan model',
+        serviceHelp: 'Pilih perkhidmatan model; ubah URL jika perlu.',
+        noServices: 'Tiada perkhidmatan model tersedia. Tambah perkhidmatan model dahulu.',
+        goModelServices: 'Ke perkhidmatan model',
+        serviceUnsupported: 'Belum disokong',
+        unsupportedProtocol:
+            'Protokol API ini tidak disokong: {0}. Pilih perkhidmatan model yang menggunakan OpenAI Chat Completions.',
+        unsupportedAuth:
+            'Kaedah pengesahan ini tidak disokong: {0}. Pilih perkhidmatan yang menggunakan pengesahan Bearer.',
+        serviceModelsMissing:
+            'Perkhidmatan ini belum mempunyai model. Tambah model dalam pengurusan perkhidmatan model.',
+        prerequisitesTitle: 'Lengkapkan tetapan penanda aras dahulu',
+        prerequisitesMissing: 'Prasyarat berikut belum sedia: {0}. Lengkapkannya dalam tetapan.',
+        precheckFailed: 'Tidak dapat menyemak prasyarat penanda aras. Buka tetapan dan semak semula.',
+        goSettings: 'Ke tetapan',
+        retestServiceHelp:
+            'Ujian semula mengekalkan parameter tugas. Sahkan perkhidmatan model semasa; kelayakan dimuatkan daripada perkhidmatan yang dipilih.',
     },
     benchmarkOverview: {
         comparison: 'Perbandingan senario dan keserentakan',
@@ -2671,6 +2781,8 @@ const message = {
         library: {
             script: 'Skrip',
             syncNow: 'Segerakan Sekarang',
+            autoSyncHelper:
+                'Penyegerakan automatik mengemas kini skrip sistem setiap hari pada awal pagi tanpa menjejaskan skrip tersuai. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
             turnOnSync: 'Hidupkan Segerakan Auto',
             turnOnSyncHelper:
                 'Menghidupkan segerakan auto akan melakukan penyegerakan automatik pada waktu awal pagi setiap hari',
@@ -3122,7 +3234,8 @@ const message = {
         aiSearchHint:
             'Cari kandungan fail baris demi baris. Gunakan butang di sebelah kanan baris carian dan "Syarat lanjutan" di bawah. Apabila akaun AI diaktifkan dan disimpan, ringkasan Markdown juga boleh dijana.',
         aiSearchAccountTitle: 'Akaun AI',
-        aiSearchAccountIntro: 'Pilih perkhidmatan model besar untuk menjana ringkasan, kemudian simpan selepas perubahan.',
+        aiSearchAccountIntro:
+            'Pilih perkhidmatan model besar untuk menjana ringkasan, kemudian simpan selepas perubahan.',
         aiSearchAccountEnable: 'Dayakan carian AI fail',
         aiSearchSaveAccount: 'Simpan konfigurasi akaun',
         aiSearchSectionQuery: 'Carian',

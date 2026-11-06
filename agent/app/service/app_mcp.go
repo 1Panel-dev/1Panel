@@ -7,7 +7,7 @@ import (
 )
 
 func (a AppService) InstallForMCP(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error) {
-	return a.installWithHooks(req, executeScript, &appInstallHooks{PrepareSiteDir: prepareMCPInstallSiteDirectory})
+	return a.InstallWithHooks(req, executeScript, &AppInstallHooks{PrepareSiteDir: prepareMCPInstallSiteDirectory})
 }
 
 func prepareMCPInstallSiteDirectory(app model.App, detail model.AppDetail, req request.AppInstallCreate, _ *task.Task) error {

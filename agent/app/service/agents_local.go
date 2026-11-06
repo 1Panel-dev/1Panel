@@ -20,7 +20,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL string, models []dto.AgentAccountModel, updateBaseURL, createIfMissing bool) (*model.AgentAccount, error) {
+func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL string, models []dto.AgentAccountModel, updateBaseURL, createIfMissing bool, apiKey *string) (*model.AgentAccount, error) {
 	if install.ID == 0 || (install.App.Key != "ollama" && install.App.Key != "vllm") {
 		return nil, fmt.Errorf("invalid local model installation")
 	}
@@ -58,9 +58,13 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		if install.App.Key == "ollama" {
 			apiType, apiKey = "openai-responses", "ollama-local"
 		}
-		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, Verified: true}
+		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, ValidateAvailability: true}
 	}
 	accountChanged := account.ID == 0 || account.AppInstallID != install.ID || (updateBaseURL && account.BaseURL != baseURL)
+	if apiKey != nil && account.APIKey != strings.TrimSpace(*apiKey) {
+		account.APIKey = strings.TrimSpace(*apiKey)
+		accountChanged = true
+	}
 	account.AppInstallID = install.ID
 	if updateBaseURL {
 		account.BaseURL = baseURL
@@ -76,6 +80,11 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 	if !verifyModelExists {
 		account.VerifyModel = ""
 		accountChanged = true
+	}
+	if accountChanged && account.ValidateAvailability {
+		account.Verified = false
+		account.VerifiedAt = nil
+		account.VerifyError = ""
 	}
 	var previous []model.AgentAccountModel
 	if account.ID != 0 {
@@ -138,7 +147,7 @@ func syncOllamaModelAccount(install model.AppInstall, baseURL string, updateBase
 	for _, item := range models {
 		items = append(items, dto.AgentAccountModel{ID: item.Name, Name: item.Name})
 	}
-	_, err = SyncLocalModelAccount(install, 0, baseURL, items, updateBaseURL, createIfMissing)
+	_, err = SyncLocalModelAccount(install, 0, baseURL, items, updateBaseURL, createIfMissing, nil)
 	return err
 }
 
@@ -177,6 +186,11 @@ func updateOllamaModelPool(modelName string, remove bool) error {
 		}
 		if sameProviderModelID("ollama", account.VerifyModel, modelName) {
 			account.VerifyModel = ""
+			if account.ValidateAvailability {
+				account.Verified = false
+				account.VerifiedAt = nil
+				account.VerifyError = ""
+			}
 			if err := agentAccountRepo.Save(account); err != nil {
 				return err
 			}
@@ -192,6 +206,20 @@ func updateOllamaModelPool(modelName string, remove bool) error {
 		if err := agentAccountModelRepo.Create(record); err != nil {
 			return err
 		}
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return nil
+}
+
+func resetLocalModelAccountVerification(install model.AppInstall) error {
+	if install.App.Key != "ollama" && install.App.Key != "vllm" {
+		return nil
+	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	if err := agentAccountRepo.ResetVerificationByAppInstallID(install.ID); err != nil {
+		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
 	terminalai.InvalidateFileAIRuntimeCache()

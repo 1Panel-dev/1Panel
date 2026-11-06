@@ -367,6 +367,8 @@ const message = {
             serviceNotStarted: '{0} servisi başlatılmadı.',
         },
         status: {
+            autoSyncEnabled: 'Otomatik eşitleme açık',
+            autoSyncDisabled: 'Otomatik eşitleme kapalı',
             running: 'Çalışıyor',
             done: 'Tamamlandı',
             scanFailed: 'Eksik',
@@ -1045,7 +1047,7 @@ const message = {
                 'Custom hesaplar için tam görsel oluşturma uç noktası URL’sini girin. Yol otomatik eklenmez. Örnek: {0}',
             apiTypeBaseURLMismatch:
                 'Geçerli Base URL bir {0} yolu gibi görünüyor, ancak {1} seçildi. Önerilen URL: {2}',
-            validateAvailability: 'Hesap kullanılabilirliğini doğrula',
+            validateAvailability: 'Kaydederken kullanılabilirliği doğrula',
             validateAvailabilityHelper: 'Kaydetmeden önce API’yi doğrulamak için en küçük iletiyi gönderir',
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
@@ -1054,6 +1056,8 @@ const message = {
             searchHelper:
                 'ModelScope veya Hugging Face üzerinde model bulun, ardından Model Hazırlığı bölümünde dağıtın veya bir Recipe oluşturun.',
             modelScopeSearchHelper: 'Çin ana karasında kararlı erişim',
+            huggingFaceNetworkHelper:
+                'Hugging Face araması ve indirmeleri için sunucunun siteye erişebilmesi gerekir. Erişim yoksa Ayarlar bölümünde erişilebilir bir Hugging Face ayna URL adresi yapılandırın veya ModelScope seçin. Çevrimdışı ortamlarda modelleri elle yükleyin.',
             huggingFaceSearchHelper: 'Geniş model koleksiyonu',
             searchPlaceholder: 'Model adı veya depo kimliği girin, ör. Qwen/Qwen3-8B',
             popularSearches: 'Popüler aramalar',
@@ -1066,7 +1070,12 @@ const message = {
             localFilesMissing: 'Yerel dosyalar bulunamadı',
             ollamaNameHelper: 'Ollama kütüphanesindeki tam model adını girin. Etiket belirtilmezse latest kullanılır.',
             downloadHelper:
-                'ModelScope ve Hugging Face üzerindeki modelleri bulup indirmek için “Ara” düğmesine tıklayın.',
+                'ModelScope veya Hugging Face üzerinden model ya da tokenizer indirin veya {requirements} ile yerel dosyalar ekleyin.',
+            localModelSizeHelper:
+                'Bu, dizinin mevcut boyutudur; tüm dosyaların yüklenmesinin tamamlandığını doğrulamaz.',
+            localModelLayoutTitle: 'Örnekler',
+            localLayoutDirect: 'Doğrudan yerleştirme',
+            localLayoutGrouped: 'Kuruluşa göre (isteğe bağlı)',
             serviceHelper:
                 'Genel bulutlardan, yerel çıkarım motorlarından ve AI ağ geçitlerinden model hizmetlerini bağlayarak yerleşik 1Panel ajanları ve WorkBuddy gibi harici ajanlar için kullanıma sunun.',
             gpuType: 'GPU türü',
@@ -1106,9 +1115,28 @@ const message = {
             modelScopeEndpointHelper:
                 'ModelScope modellerini aramak ve indirmek için kullanılır. Varsayılan, resmî URL adresidir.',
             modelTokenHelper: 'İsteğe bağlı. Özel veya kısıtlı modeller için erişim yetkili bir token kullanın.',
-            modelDirHelper: 'Modellerin indirildiği ve yerel model listesinin okunduğu dizin.',
+            tokenizerDir: 'Tokenizer dizini',
+            tokenizerDirHelper:
+                'Tokenizer indirmeleri ve yerel liste için kullanılan dizin. Değiştirmek mevcut dosyaları taşımaz.',
+            modelDirHelper:
+                'Modellerin indirildiği ve yerel model listesinin okunduğu dizin. Değiştirmek mevcut dosyaları taşımaz.',
             featuredModelsHelper:
-                '1Panel resmî öne çıkan model kataloğu. Elle yenileyin veya 24 saatte bir otomatik eşitlemeyi etkinleştirin. Yalnızca katalog güncellenir; model dosyaları indirilmez.',
+                '1Panel tarafından seçilen modelleri inceleyin, özellikleri, kullanım alanlarını ve indirme kaynaklarını görüntüleyerek uygun modeli indirin.',
+            featuredModelsSyncHelper:
+                'Otomatik eşitleme, model dosyalarını indirmeden öne çıkan model kataloğunu her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
+            recipeSyncHelper:
+                'Otomatik eşitleme, özel tarifleri etkilemeden eşitlenen tarifleri her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
+            serviceStatus: 'Hizmet durumu',
+            readinessNotRunning: 'Çalışmıyor',
+            readinessWaiting: 'Hazır olması bekleniyor',
+            readinessPreparing: 'Hazırlanıyor',
+            readinessReady: 'Hazır',
+            readinessNotReady: 'Hazır değil',
+            readinessPreparingHelper:
+                'Konteyner başlatıldı ancak henüz sağlık kontrolünü geçmedi. Model hâlâ yükleniyor olabilir. Lütfen bekleyin.',
+            readinessReadyHelper: 'Konteynerin son sağlık kontrolü başarılı oldu. Hizmet hazır.',
+            readinessNotReadyHelper:
+                'Konteyner çalışıyor ancak art arda yapılan sağlık kontrolleri başarısız oldu. Hizmet henüz hazır değil. Konteyner günlüklerini kontrol edin.',
             addInstanceHelper: 'İndirilen modelleri sunmak için bir vLLM örneği oluşturun.',
             addService: 'Ekle',
             onlineModel: 'Çevrimiçi modeller',
@@ -1118,6 +1146,16 @@ const message = {
             ollamaManagement: 'Ollama yönetimi',
             vllmManagement: 'vLLM yönetimi',
             serviceDetails: 'Hizmet ayrıntıları',
+            deleteDeploymentHelper: 'Bu örnek durdurulacak ve silinecektir',
+            deleteDeploymentServiceHelper:
+                'Bu örnek durdurulacak ve ilişkili model hizmetleriyle birlikte silinecektir',
+            connectionInfo: 'Bağlantı bilgileri',
+            deploymentInfo: 'Dağıtım bilgileri',
+            serviceAPIHelper: 'Bu hizmet OpenAI uyumlu bir API sağlar.',
+            serviceAddressHelper:
+                'Konteyner uygulamaları için konteyner adresini, ana makine veya harici uygulamalar için harici adresi kullanın.',
+            externalAddress: 'Harici adres',
+            imageVersion: 'İmaj sürümü',
             deployments: 'Model dağıtımı',
             files: 'Model hazırlığı',
             connectExternal: 'Harici hizmete bağlan',
@@ -1125,8 +1163,10 @@ const message = {
             recipeConfig: 'Recipe yapılandırması',
             selectRecipe: 'Recipe seç',
             createRecipe: 'Recipe oluştur',
+            recipeSynced: 'Eşitlenmiş',
+            recipeCustom: 'Özel',
             recipeHelper:
-                'Recipe, bir modelin belirli bir donanımda nasıl başlatılacağını açıklar; model, donanım ve başlatma parametrelerini içerir. {link} üzerinden komut içe aktarılabilir.',
+                'Farklı donanımlar için model dağıtım tariflerini yönetin, hızlı dağıtım için başlatma argümanlarını yeniden kullanın veya {link} üzerinden komutları içe aktarın.',
             recipeFormHelper:
                 '{link} adresine gidin, önce model sağlayıcısını, ardından hedef modeli seçin. Son başlatma komutunu oluşturmak için donanımı, kuantizasyon sürümünü, dağıtım stratejisini ve diğer seçenekleri yapılandırın.',
             recipeArguments: 'Başlatma parametreleri',
@@ -1139,8 +1179,24 @@ const message = {
                 'Geçerli bir başlatma komutu algılanmadı. Model içeren bir pip/uv veya docker komutu yapıştırın.',
             engineProvider: 'Motor / Sağlayıcı',
             endpoint: 'Uç nokta',
+            localService: 'Yerel',
+            cloudService: 'Bulut',
             cloudAccount: 'Bulut hesabı',
             connectionStatus: 'Bağlantı durumu',
+            verify: 'Doğrula',
+            verifying: 'Doğrulanıyor',
+            verifyFailed: 'Doğrulama başarısız',
+            verificationInfo: 'Doğrulama bilgileri',
+            verifiedAt: 'Doğrulama zamanı',
+            verifyModelChangeHelper:
+                'Doğrulama modeli değiştirildiğinde hizmet, model çağrılmadan doğrulanmamış olarak işaretlenir.',
+            reverify: 'Yeniden doğrula',
+            verifyConfirm: 'Model aşağıdaki ayarlarla doğrulanacak. Devam edilsin mi?',
+            apiKeyHelper: 'Hizmet API Key gerektirmiyorsa unused gibi boş olmayan herhangi bir yer tutucu değer girin.',
+            verifyOnChangeHelper:
+                'Etkinleştirildiğinde veya bağlantı ayarları ya da doğrulama modeli değiştiğinde API kısa bir mesajla doğrulanır.',
+            verifyImageOnChangeHelper:
+                'Etkinleştirildiğinde veya bağlantı ayarları ya da doğrulama modeli değiştiğinde API küçük bir görsel üretilerek doğrulanır; ücret oluşabilir.',
             unverified: 'Doğrulanmadı',
             manage: 'Yönet',
             loadFailed: 'Yüklenemedi. Yenileyip tekrar deneyin.',
@@ -1620,6 +1676,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Model hizmetlerini farklı istek uzunlukları ve eşzamanlılık ayarlarıyla test ederek aktarım hızı, ilk token süresi ve istek gecikmesi gibi metrikleri ölçün.',
             launchCommand: 'Başlatma Komutu',
             retest: 'Yeniden test et',
             statusRunning: 'Çalışıyor',
@@ -1771,7 +1829,8 @@ const message = {
             legacyHistory: 'Bu kayıtların sabit cihaz kimliği yoktur. Cihaz kimliği ve eksik değerler doğrulanamaz.',
             pcieGeneration: 'PCIe nesli (geçerli / en yüksek)',
             pcieWidth: 'PCIe genişliği (geçerli / en yüksek)',
-            gpu: 'GPU İzleme',
+            gpu: 'GPU Yönetimi',
+            monitoringTitle: 'GPU İzleme',
             gpuHelper: 'Desteklenen bir GPU/XPU/NPU yönetim komutu algılanmadı. Lütfen kontrol edip tekrar deneyin!',
             process: 'İşlem Bilgisi',
             type: 'Tür',
@@ -2100,6 +2159,9 @@ const message = {
             'Uzun girdiler ve ortak önekler dahil, farklı senaryolar ve eşzamanlılık düzeylerinde tekrarlı ölçümler.',
         customDescription: 'Bir senaryoyla başlayın, parametrelerini ayarlayın ve gerektiğinde yenilerini ekleyin.',
         scenarios: 'Senaryolar',
+        scenarioCount: 'Senaryolar (toplam {count})',
+        scenarioHelp:
+            'Her senaryo giriş/çıkış token sayılarını, eşzamanlılık düzeylerini ve istek parametrelerini tanımlar. Eşzamanlılık düzeyleri sırayla test edilir; her düzey ayarlanan tekrar sayısı kadar çalıştırılır ve her çalıştırma bir ölçüm noktası oluşturur.',
         builtIn: 'Yerleşik',
         builtInHelp: 'Yerleşik planlar düzenlenemez veya silinemez. Test oluştururken bir kopyayı ayarlayın.',
         modified: 'Değiştirildi',
@@ -2138,6 +2200,50 @@ const message = {
         secretHelp: 'Kopyalar API anahtarlarını ve başlıkları içermez. Gerekiyorsa yeniden girin.',
         resultHelp:
             'Medyan ve en düşük/en yüksek değerler yalnızca istek anomalisi olmayan başarılı çalışmaları içerir. P99, çalışma başına P99 değerlerinin medyanıdır. Önbellek ve dış trafik kontrol edilmez.',
+    },
+    benchmarkSettings: {
+        imagePullHelp:
+            '{image} imajı büyük olduğundan indirme işlemi ağ hızınıza bağlı olarak uzun sürebilir. İndirmeyi hızlandırmak için bir kayıt defteri aynası yapılandırabilirsiniz. Görev penceresini kapatabilirsiniz; indirme arka planda devam eder. İlerlemeyi görev merkezinden takip edebilirsiniz.',
+        settingsHelp:
+            'Önce Benchmark imajını ve bir test planını hazırlayın. Her ikisi de hazır olduğunda bir kıyaslama testi oluşturabilirsiniz.',
+        imageAvailable: 'Benchmark imajı hazır ({image})',
+        imageUnavailable: 'Benchmark imajı bulunamadı ({image})',
+        retestServiceHelp:
+            'Yeniden testler görev parametrelerini korur. Geçerli model hizmetini doğrulayın; kimlik bilgileri seçilen hizmetten alınır.',
+        prepareHelp:
+            'Bir kıyaslama oluşturmadan önce {settings} bölümünde Benchmark imajını ve test planlarını hazırlayın.',
+        image: 'Benchmark imajı',
+        ready: 'Hazır',
+        unconfigured: 'Yapılandırılmadı',
+        checkFailed: 'Kontrol başarısız',
+        imageMissing: 'Gerekli imaj bulunamadı. İmaj yönetiminde {image} imajını indirin.',
+        imageReady: 'Benchmark imajı test oluşturmaya hazır.',
+        imageHelp: 'Benchmark imajı yük testi istemcisini çalıştırır ve seçilen model hizmetine istek gönderir.',
+        mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
+        goImages: 'İmaj yönetimine git',
+        goModels: 'Model indirmelerine git',
+        tokenizerHelp: 'Test metnini kodlamak ve token saymak için tokenizer dizininden bir tokenizer seçin.',
+        tokenizerEmpty: 'Kullanılabilir model yok. Model indirmelerinden tokenizer dosyaları içeren bir model indirin.',
+        tokenizerEmptyWithDownload: 'Kullanılabilir tokenizer yok. İndirmek için {download} sayfasını açın.',
+        tokenizerInvalid: 'Bu tokenizer kullanılamıyor. Başka birini seçin veya yeniden indirin.',
+        schemeHelp:
+            'Test planları istek parametrelerini, eşzamanlılığı ve yürütme kurallarını tanımlar. En az bir kullanılabilir plan hazırlayın.',
+        schemeEmpty: 'Kullanılabilir test planı yok. Önce bir plan oluşturun.',
+        manageSchemes: 'Test planlarını yönet',
+        selectService: 'Bir model hizmeti seçin',
+        serviceHelp: 'Model hizmetini seçin; gerekirse istek URL’sini düzenleyin.',
+        noServices: 'Kullanılabilir model hizmeti yok. Önce bir model hizmeti ekleyin.',
+        goModelServices: 'Model hizmetlerine git',
+        serviceUnsupported: 'Henüz desteklenmiyor',
+        unsupportedProtocol:
+            'Bu API protokolü desteklenmiyor: {0}. OpenAI Chat Completions kullanan bir model hizmeti seçin.',
+        unsupportedAuth:
+            'Bu kimlik doğrulama yöntemi desteklenmiyor: {0}. Bearer kimlik doğrulaması kullanan bir hizmet seçin.',
+        serviceModelsMissing: 'Bu hizmette yapılandırılmış model yok. Model hizmeti yönetiminden model ekleyin.',
+        prerequisitesTitle: 'Önce test ayarlarını tamamlayın',
+        prerequisitesMissing: 'Şu ön koşullar hazır değil: {0}. Ayarlardan tamamlayın.',
+        precheckFailed: 'Test ön koşulları kontrol edilemedi. Ayarları açıp tekrar kontrol edin.',
+        goSettings: 'Ayarlara git',
     },
     benchmarkOverview: {
         comparison: 'Senaryo ve eşzamanlılık karşılaştırması',
@@ -2670,6 +2776,8 @@ const message = {
         library: {
             script: 'Script',
             syncNow: 'Hemen Senkronize Et',
+            autoSyncHelper:
+                'Otomatik eşitleme, özel betikleri etkilemeden sistem betiklerini her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
             turnOnSync: 'Otomatik Senkronizasyonu Aç',
             turnOnSyncHelper:
                 'Otomatik senkronizasyonu açmak, her gün sabahın erken saatlerinde otomatik senkronizasyon gerçekleştirecektir',

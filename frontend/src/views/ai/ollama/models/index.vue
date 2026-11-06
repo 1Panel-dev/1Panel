@@ -205,7 +205,7 @@ const opRef = ref();
 const operateIDs = ref();
 const forceDelete = ref();
 
-const modelInfo = reactive({ status: '', name: '', containerName: '', httpPort: 0 });
+const modelInfo = reactive({ status: '', name: '', version: '', containerName: '', httpPort: 0 });
 
 function selectable(row) {
     return row.status !== 'Waiting';
@@ -358,6 +358,8 @@ const buttons = [
 const onLoadConn = () => {
     connectionRef.value.acceptParams({
         name: modelInfo.name,
+        status: modelInfo.status,
+        version: modelInfo.version,
         engine: 'ollama',
         port: modelInfo.httpPort,
         containerName: modelInfo.containerName,
@@ -393,6 +395,7 @@ const checkExist = async (installed: App.CheckInstalled | false) => {
     modelInstalled.value = installed.isExist;
     modelInfo.status = installed.status;
     modelInfo.name = installed.name;
+    modelInfo.version = installed.version;
     modelInfo.containerName = installed.containerName;
     modelInfo.httpPort = installed.httpPort;
     if (installed.isExist) {

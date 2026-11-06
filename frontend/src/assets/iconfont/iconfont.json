@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "42686258",
+      "name": "intervl_modelscope",
+      "font_class": "modelscope1",
+      "unicode": "e685",
+      "unicode_decimal": 59013
+    },
+    {
       "icon_id": "35139945",
       "name": "虚拟机",
       "font_class": "xuniji",
@@ -13,18 +20,11 @@
       "unicode_decimal": 58927
     },
     {
-      "icon_id": "38704691",
+      "icon_id": "38465464",
       "name": "huggingface",
-      "font_class": "huggingface1",
-      "unicode": "e656",
-      "unicode_decimal": 58966
-    },
-    {
-      "icon_id": "45461892",
-      "name": "modelscope",
-      "font_class": "modelscope",
-      "unicode": "e6be",
-      "unicode_decimal": 59070
+      "font_class": "huggingface",
+      "unicode": "e7d1",
+      "unicode_decimal": 59345
     },
     {
       "icon_id": "12903469",

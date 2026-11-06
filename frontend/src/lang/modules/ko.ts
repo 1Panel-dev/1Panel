@@ -359,6 +359,8 @@ const message = {
             serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
+            autoSyncEnabled: '자동 동기화 켜짐',
+            autoSyncDisabled: '자동 동기화 꺼짐',
             running: '실행 중',
             done: '완료',
             scanFailed: '불완전',
@@ -1014,7 +1016,7 @@ const message = {
             customImageURLHelper:
                 'Custom 계정에는 전체 이미지 생성 엔드포인트 URL을 입력하세요. 경로는 자동으로 추가되지 않습니다. 예: {0}',
             apiTypeBaseURLMismatch: '현재 Base URL은 {0} 경로처럼 보이지만 {1}이 선택되었습니다. 권장 URL: {2}',
-            validateAvailability: '계정 가용성 확인',
+            validateAvailability: '저장 시 가용성 검증',
             validateAvailabilityHelper: '저장 전에 최소 메시지를 보내 API를 확인합니다',
             validateImageAvailabilityHelper: '저장 전에 최소 이미지 한 장을 생성하며 비용이 발생할 수 있습니다',
         },
@@ -1023,6 +1025,8 @@ const message = {
             searchHelper:
                 'ModelScope 또는 Hugging Face에서 모델을 찾아 다운로드한 후 모델 준비에서 배포하거나 Recipe를 만들 수 있습니다.',
             modelScopeSearchHelper: '중국 본토에서 안정적인 접속',
+            huggingFaceNetworkHelper:
+                'Hugging Face 검색 및 다운로드에는 서버에서 해당 사이트에 접근할 수 있어야 합니다. 접근할 수 없다면 설정에서 접근 가능한 Hugging Face 미러 URL을 지정하거나 ModelScope를 선택하세요. 오프라인 환경에서는 모델을 수동으로 업로드하세요.',
             huggingFaceSearchHelper: '풍부한 모델 컬렉션',
             searchPlaceholder: '모델 이름 또는 저장소 ID 입력, 예: Qwen/Qwen3-8B',
             popularSearches: '인기 검색어',
@@ -1035,7 +1039,11 @@ const message = {
             localFilesMissing: '로컬 파일을 찾을 수 없습니다',
             ollamaNameHelper: 'Ollama 라이브러리의 전체 모델 이름을 입력하세요. 태그를 생략하면 latest가 사용됩니다.',
             downloadHelper:
-                '“검색” 버튼을 클릭하여 ModelScope 및 Hugging Face의 모델을 검색하고 다운로드할 수 있습니다.',
+                'ModelScope 또는 Hugging Face에서 모델이나 토크나이저를 다운로드하거나 {requirements}에 따라 로컬 파일을 추가하세요.',
+            localModelSizeHelper: '현재 디렉터리 크기이며 모든 파일의 업로드가 완료되었음을 의미하지 않습니다.',
+            localModelLayoutTitle: '예시',
+            localLayoutDirect: '바로 배치',
+            localLayoutGrouped: '조직별 분류 (선택)',
             serviceHelper:
                 '퍼블릭 클라우드, 로컬 추론 엔진, AI 게이트웨이 등의 모델 서비스를 통합하여 1Panel 내장 에이전트와 WorkBuddy 같은 외부 에이전트에서 사용할 수 있습니다.',
             gpuType: 'GPU 유형',
@@ -1074,9 +1082,28 @@ const message = {
             addInstance: '인스턴스 추가',
             modelScopeEndpointHelper: 'ModelScope 모델 검색 및 다운로드에 사용하며, 기본값은 공식 URL입니다.',
             modelTokenHelper: '선택 사항. 비공개 또는 제한된 모델에는 접근 권한이 있는 토큰이 필요합니다.',
-            modelDirHelper: '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다.',
+            tokenizerDir: '토크나이저 디렉터리',
+            tokenizerDirHelper:
+                '토크나이저 다운로드 저장 및 로컬 목록 조회에 사용합니다. 변경해도 기존 파일은 이동하지 않습니다.',
+            modelDirHelper:
+                '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다. 변경해도 기존 파일은 이동하지 않습니다.',
             featuredModelsHelper:
-                '1Panel 공식 추천 모델 목록입니다. 수동으로 새로 고치거나 24시간마다 자동 동기화를 설정할 수 있습니다. 목록만 갱신하며 모델 파일은 다운로드하지 않습니다.',
+                '1Panel이 선정한 모델의 사양, 활용 사례 및 다운로드 소스를 확인하고 적합한 모델을 선택하여 다운로드하세요.',
+            featuredModelsSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 추천 모델 목록을 업데이트하며 모델 파일은 다운로드하지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
+            recipeSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 동기화된 레시피를 업데이트하며 사용자 정의 레시피에는 영향을 주지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
+            serviceStatus: '서비스 상태',
+            readinessNotRunning: '실행 중 아님',
+            readinessWaiting: '준비 완료 대기 중',
+            readinessPreparing: '준비 중',
+            readinessReady: '준비 완료',
+            readinessNotReady: '준비되지 않음',
+            readinessPreparingHelper:
+                '컨테이너가 시작되었지만 아직 상태 확인을 통과하지 못했습니다. 모델을 불러오는 중일 수 있으니 잠시 기다려 주세요.',
+            readinessReadyHelper: '최근 컨테이너 상태 확인을 통과했습니다. 서비스가 준비되었습니다.',
+            readinessNotReadyHelper:
+                '컨테이너는 실행 중이지만 상태 확인이 연속으로 실패했습니다. 서비스가 아직 준비되지 않았습니다. 컨테이너 로그를 확인하세요.',
             addInstanceHelper: 'vLLM 인스턴스를 생성하여 다운로드한 모델을 모델 서비스로 배포합니다.',
             addService: '추가',
             onlineModel: '온라인 모델',
@@ -1086,6 +1113,14 @@ const message = {
             ollamaManagement: 'Ollama 관리',
             vllmManagement: 'vLLM 관리',
             serviceDetails: '서비스 상세 정보',
+            deleteDeploymentHelper: '이 인스턴스를 중지하고 삭제합니다',
+            deleteDeploymentServiceHelper: '이 인스턴스를 중지하고 연결된 모델 서비스와 함께 삭제합니다',
+            connectionInfo: '연결 정보',
+            deploymentInfo: '배포 정보',
+            serviceAPIHelper: '이 서비스는 OpenAI 호환 API를 제공합니다.',
+            serviceAddressHelper: '컨테이너 앱에는 컨테이너 주소를, 호스트 또는 외부 앱에는 외부 주소를 사용하세요.',
+            externalAddress: '외부 접속 주소',
+            imageVersion: '이미지 버전',
             deployments: '모델 배포',
             files: '모델 준비',
             connectExternal: '외부 서비스 연결',
@@ -1093,8 +1128,10 @@ const message = {
             recipeConfig: 'Recipe 설정',
             selectRecipe: 'Recipe 선택',
             createRecipe: 'Recipe 만들기',
+            recipeSynced: '동기화됨',
+            recipeCustom: '사용자 정의',
             recipeHelper:
-                'Recipe는 특정 하드웨어에서 모델을 실행하는 방법을 설명하며 모델, 하드웨어 및 실행 인수를 포함합니다. {link}에서 명령을 가져올 수 있습니다.',
+                '다양한 하드웨어용 모델 배포 레시피를 관리하고, 실행 인수를 재사용하여 빠르게 배포하거나 {link}에서 명령을 가져올 수 있습니다.',
             recipeFormHelper:
                 '{link}에서 모델 제공업체를 먼저 선택한 다음 대상 모델을 선택하세요. 하드웨어, 양자화 버전, 배포 전략 등을 설정하면 최종 실행 명령이 생성됩니다.',
             recipeArguments: '시작 인수',
@@ -1107,8 +1144,22 @@ const message = {
                 '유효한 실행 명령을 찾지 못했습니다. 모델이 포함된 pip/uv 또는 docker 명령을 붙여넣으세요.',
             engineProvider: '엔진 / 공급자',
             endpoint: '엔드포인트',
+            localService: '로컬',
+            cloudService: '클라우드',
             cloudAccount: '클라우드 계정',
             connectionStatus: '연결 상태',
+            verify: '검증',
+            verifying: '검증 중',
+            verifyFailed: '검증 실패',
+            verificationInfo: '검증 정보',
+            verifiedAt: '검증 시간',
+            verifyModelChangeHelper: '검증 모델을 변경하면 모델을 호출하지 않고 서비스가 미검증 상태로 표시됩니다.',
+            reverify: '다시 검증',
+            verifyConfirm: '아래 설정으로 모델을 검증합니다. 계속하시겠습니까?',
+            apiKeyHelper: '서비스에 API Key가 필요하지 않으면 unused와 같은 비어 있지 않은 임의의 값을 입력하세요.',
+            verifyOnChangeHelper: '활성화하거나 연결 설정 또는 검증 모델을 변경하면 최소 메시지로 API를 검증합니다.',
+            verifyImageOnChangeHelper:
+                '활성화하거나 연결 설정 또는 검증 모델을 변경하면 최소 이미지를 생성하여 API를 검증하며, 비용이 발생할 수 있습니다.',
             unverified: '미검증',
             manage: '관리',
             loadFailed: '불러오지 못했습니다. 새로 고침 후 다시 시도하세요.',
@@ -1585,6 +1636,8 @@ const message = {
         },
         benchmark: {
             title: '벤치마크',
+            description:
+                '모델 서비스의 벤치마크를 실행하여 다양한 요청 길이와 동시 실행 설정에서 처리량, 첫 토큰까지 걸리는 시간, 요청 지연 시간 등의 지표를 평가합니다.',
             launchCommand: '시작 명령',
             retest: '다시 테스트',
             statusRunning: '실행 중',
@@ -1730,7 +1783,8 @@ const message = {
             legacyHistory: '이 기록에는 고정 장치 ID가 없어 장치 식별 및 누락 값을 확인할 수 없습니다.',
             pcieGeneration: 'PCIe 세대 (현재 / 최대)',
             pcieWidth: 'PCIe 너비 (현재 / 최대)',
-            gpu: 'GPU 모니터링',
+            gpu: 'GPU 관리',
+            monitoringTitle: 'GPU 모니터링',
             gpuHelper: '지원되는 GPU/XPU/NPU 관리 명령을 감지하지 못했습니다. 확인하고 다시 시도하세요!',
             process: '프로세스 정보',
             type: '유형',
@@ -2047,6 +2101,9 @@ const message = {
         fullDescription: '긴 입력과 공유 접두사를 포함하여 여러 시나리오와 동시 요청 수로 반복 측정합니다.',
         customDescription: '시나리오 하나로 시작하여 매개변수를 설정하고 필요에 따라 추가합니다.',
         scenarios: '시나리오',
+        scenarioCount: '시나리오(총 {count}개)',
+        scenarioHelp:
+            '각 시나리오는 입력/출력 토큰 수, 동시 실행 수준 및 요청 매개변수를 정의합니다. 동시 실행 수준을 순서대로 테스트하고, 각 수준을 설정된 반복 횟수만큼 실행하며, 실행할 때마다 측정점 하나를 생성합니다.',
         builtIn: '기본 제공',
         builtInHelp: '기본 제공 계획은 수정하거나 삭제할 수 없습니다. 테스트 생성 시 복사본을 조정하세요.',
         modified: '수정됨',
@@ -2085,6 +2142,49 @@ const message = {
         secretHelp: '복사본에는 API 키와 헤더가 없습니다. 필요한 경우 다시 입력하세요.',
         resultHelp:
             '요청 이상이 없는 성공한 실행만 중앙값과 최솟값/최댓값에 포함합니다. P99는 각 실행 P99의 중앙값입니다. 캐시와 외부 트래픽은 통제되지 않습니다.',
+    },
+    benchmarkSettings: {
+        imagePullHelp:
+            '{image} 이미지 크기가 커서 네트워크 속도에 따라 가져오는 데 시간이 오래 걸릴 수 있습니다. 레지스트리 미러를 설정하여 다운로드 속도를 높일 수 있습니다. 작업 창을 닫아도 백그라운드에서 계속 진행됩니다. 작업 센터에서 진행 상황을 확인할 수 있습니다.',
+        settingsHelp:
+            'Benchmark 이미지와 테스트 계획을 먼저 준비하세요. 두 항목이 모두 준비되면 벤치마크를 생성할 수 있습니다.',
+        imageAvailable: 'Benchmark 이미지가 준비되었습니다 ({image})',
+        imageUnavailable: 'Benchmark 이미지를 찾을 수 없습니다 ({image})',
+        retestServiceHelp:
+            '재테스트는 작업 매개변수를 유지합니다. 현재 모델 서비스를 확인하세요. 인증 정보는 선택한 서비스에서 불러옵니다.',
+        prepareHelp: '벤치마크를 생성하기 전에 {settings}에서 Benchmark 이미지와 테스트 계획을 준비하세요.',
+        image: 'Benchmark 이미지',
+        ready: '준비됨',
+        unconfigured: '미설정',
+        checkFailed: '확인 실패',
+        imageMissing: '필요한 이미지를 찾을 수 없습니다. 이미지 관리에서 {image} 이미지를 가져오세요.',
+        imageReady: 'Benchmark 이미지가 준비되었습니다. 벤치마크를 생성할 수 있습니다.',
+        imageHelp: 'Benchmark 이미지는 부하 테스트 클라이언트를 실행하고 선택한 모델 서비스에 요청을 보냅니다.',
+        mainNodeHelp: '벤치마크는 메인 노드에서 실행됩니다. 이미지와 토크나이저를 메인 노드에 준비하세요.',
+        goImages: '이미지 관리로 이동',
+        goModels: '모델 다운로드로 이동',
+        tokenizerHelp: '토크나이저 디렉터리에서 항목을 선택하여 테스트 텍스트를 인코딩하고 토큰 수를 계산하세요.',
+        tokenizerEmpty:
+            '사용 가능한 모델이 없습니다. 모델 다운로드에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
+        tokenizerEmptyWithDownload: '사용 가능한 토크나이저가 없습니다. {download}에서 다운로드하세요.',
+        tokenizerInvalid: '이 토크나이저는 사용할 수 없습니다. 다른 항목을 선택하거나 다시 다운로드하세요.',
+        schemeHelp:
+            '테스트 계획은 요청 매개변수, 동시 실행 수 및 실행 규칙을 정의합니다. 사용 가능한 계획을 하나 이상 준비하세요.',
+        schemeEmpty: '사용 가능한 테스트 계획이 없습니다. 먼저 계획을 생성하세요.',
+        manageSchemes: '테스트 계획 관리',
+        selectService: '모델 서비스 선택',
+        serviceHelp: '모델 서비스를 선택하고 필요하면 요청 URL을 수정하세요.',
+        noServices: '사용 가능한 모델 서비스가 없습니다. 먼저 모델 서비스를 추가하세요.',
+        goModelServices: '모델 서비스로 이동',
+        serviceUnsupported: '아직 지원하지 않음',
+        unsupportedProtocol:
+            '지원하지 않는 API 프로토콜입니다: {0}. OpenAI Chat Completions를 사용하는 모델 서비스를 선택하세요.',
+        unsupportedAuth: '지원하지 않는 인증 방식입니다: {0}. Bearer 인증을 사용하는 서비스를 선택하세요.',
+        serviceModelsMissing: '이 서비스에 설정된 모델이 없습니다. 모델 서비스 관리에서 모델을 추가하세요.',
+        prerequisitesTitle: '먼저 벤치마크 설정을 완료하세요',
+        prerequisitesMissing: '다음 항목이 준비되지 않았습니다: {0}. 설정에서 준비를 완료하세요.',
+        precheckFailed: '벤치마크 사전 조건을 확인하지 못했습니다. 설정을 열고 다시 확인하세요.',
+        goSettings: '설정으로 이동',
     },
     benchmarkOverview: {
         comparison: '시나리오 및 동시 요청 수 비교',
@@ -2593,6 +2693,8 @@ const message = {
         library: {
             script: '스크립트',
             syncNow: '지금 동기화',
+            autoSyncHelper:
+                '자동 동기화를 켜면 매일 새벽 시스템 스크립트를 업데이트하며 사용자 정의 스크립트에는 영향을 주지 않습니다. 언제든지 수동으로 동기화할 수도 있습니다.',
             turnOnSync: '자동 동기화 켜기',
             turnOnSyncHelper: '자동 동기화를 켜면 매일 새벽 시간에 자동 동기화가 수행됩니다',
             turnOffSync: '자동 동기화 끄기',

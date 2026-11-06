@@ -1938,3 +1938,22 @@ var AddModelQuickJump = &gormigrate.Migration{
 		}).Error
 	},
 }
+
+var UpdateModelServicesQuickJumpRouter = &gormigrate.Migration{
+	ID: "20261105-update-model-services-quick-jump-router",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.Model(&model.QuickJump{}).
+			Where("name = ? AND router IN ?", "ModelServices", []string{"/ai/model", "/ai/model/account"}).
+			Update("router", "/ai/model-services").Error
+	},
+}
+
+var AddAgentAccountVerificationResult = &gormigrate.Migration{
+	ID: "20261106-add-agent-account-verification-settings",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		return tx.Model(&model.AgentAccount{}).Where("validate_availability IS NULL").Update("validate_availability", true).Error
+	},
+}

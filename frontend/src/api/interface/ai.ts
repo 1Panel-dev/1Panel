@@ -609,6 +609,12 @@ export namespace AI {
         recordId: number;
         id: string;
         name: string;
+        isVerifyModel?: boolean;
+    }
+
+    export interface AgentAccountVerifyModelUpdateReq {
+        accountId: number;
+        recordId: number;
     }
 
     export interface AgentAccountModelReq {
@@ -719,6 +725,9 @@ export namespace AI {
         authMode: string;
         verifyModel: string;
         verified: boolean;
+        validateAvailability: boolean;
+        verifiedAt?: string | null;
+        verifyError?: string;
         remark: string;
         createdAt: string;
     }

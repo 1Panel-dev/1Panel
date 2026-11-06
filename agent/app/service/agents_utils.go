@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/url"
 	"path"
+	"reflect"
 	"regexp"
 	"slices"
 	"strconv"
@@ -63,6 +64,21 @@ func ensureAgentAccountNameAvailable(provider, name string, excludeID uint) erro
 	return nil
 }
 
+func ensureAgentAccountUnchanged(account *model.AgentAccount, models []dto.AgentAccountModel) error {
+	current, err := agentAccountRepo.GetFirst(repo.WithByID(account.ID))
+	if err != nil {
+		return err
+	}
+	currentModels, err := loadAgentAccountModels(current)
+	if err != nil {
+		return err
+	}
+	if !reflect.DeepEqual(account, current) || !slices.Equal(models, currentModels) {
+		return buserr.WithDetail("ErrInvalidParams", "model service changed during validation; reload and retry", nil)
+	}
+	return nil
+}
+
 func agentAccountUsedBySetting(tx *gorm.DB, accountID uint, statusKey, accountIDKey string) (bool, error) {
 	var settings []model.Setting
 	if err := tx.Where("key IN ?", []string{statusKey, accountIDKey}).Find(&settings).Error; err != nil {
@@ -113,11 +129,10 @@ func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, mode
 		return resolvedAgentAccountInput{}, err
 	}
 	modelID = strings.TrimSpace(modelID)
-	if modelID == "" && !allowEmptyModel {
+	if modelID == "" && (validateAvailability || !allowEmptyModel) {
 		return resolvedAgentAccountInput{}, buserr.New("ErrAgentAccountModelsRequired")
 	}
-	imageAPI := providercatalog.IsImageAPIType(resolvedAPIType)
-	if validateAvailability && (imageAPI || providercatalog.IsEmbeddingAPIType(resolvedAPIType) || !providercatalog.SkipVerification(provider)) {
+	if validateAvailability {
 		if err := providercatalog.VerifyAccount(provider, resolvedAPIType, resolvedAuthMode, resolvedBaseURL, resolvedAPIKey, modelID); err != nil {
 			return resolvedAgentAccountInput{}, err
 		}

@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "{{ .count }} 個容器檢查失敗，請查看任�
 ErrImageCheckProxyRequired: "目前運行環境下，如需檢查映像是否更新，請先設定代理伺服器"
 
 ErrPHPExtensionsConflict: "同名 PHP 擴充模版已存在且內容不同，未覆蓋"
+
+ErrModelTokenizerDirOverlap: "模型目錄和分詞器目錄不能相同或互相包含"
