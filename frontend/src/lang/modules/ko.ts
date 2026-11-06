@@ -1608,6 +1608,8 @@ const message = {
         },
         benchmark: {
             title: '벤치마크',
+            description:
+                '모델 서비스의 벤치마크를 실행하여 다양한 요청 길이와 동시 실행 설정에서 처리량, 첫 토큰까지 걸리는 시간, 요청 지연 시간 등의 지표를 평가합니다.',
             launchCommand: '시작 명령',
             retest: '다시 테스트',
             statusRunning: '실행 중',
@@ -2070,6 +2072,9 @@ const message = {
         fullDescription: '긴 입력과 공유 접두사를 포함하여 여러 시나리오와 동시 요청 수로 반복 측정합니다.',
         customDescription: '시나리오 하나로 시작하여 매개변수를 설정하고 필요에 따라 추가합니다.',
         scenarios: '시나리오',
+        scenarioCount: '시나리오(총 {count}개)',
+        scenarioHelp:
+            '각 시나리오는 입력/출력 토큰 수, 동시 실행 수준 및 요청 매개변수를 정의합니다. 동시 실행 수준을 순서대로 테스트하고, 각 수준을 설정된 반복 횟수만큼 실행하며, 실행할 때마다 측정점 하나를 생성합니다.',
         builtIn: '기본 제공',
         builtInHelp: '기본 제공 계획은 수정하거나 삭제할 수 없습니다. 테스트 생성 시 복사본을 조정하세요.',
         modified: '수정됨',
@@ -2108,6 +2113,52 @@ const message = {
         secretHelp: '복사본에는 API 키와 헤더가 없습니다. 필요한 경우 다시 입력하세요.',
         resultHelp:
             '요청 이상이 없는 성공한 실행만 중앙값과 최솟값/최댓값에 포함합니다. P99는 각 실행 P99의 중앙값입니다. 캐시와 외부 트래픽은 통제되지 않습니다.',
+    },
+    benchmarkSettings: {
+        settingsHelp:
+            'Benchmark 이미지와 테스트 계획을 먼저 준비하세요. 두 항목이 모두 준비되면 벤치마크를 생성할 수 있습니다.',
+        imageAvailable: 'Benchmark 이미지가 준비되었습니다 ({image})',
+        imageUnavailable: 'Benchmark 이미지를 찾을 수 없습니다 ({image})',
+        retestServiceHelp:
+            '재테스트는 작업 매개변수를 유지합니다. 현재 모델 서비스를 확인하세요. 인증 정보는 선택한 서비스에서 불러옵니다.',
+        prepareHelp: '벤치마크를 생성하기 전에 {settings}에서 Benchmark 이미지와 테스트 계획을 준비하세요.',
+        image: 'Benchmark 이미지',
+        ready: '준비됨',
+        unconfigured: '미설정',
+        checkFailed: '확인 실패',
+        imageMissing: '필요한 이미지를 찾을 수 없습니다. 이미지 관리에서 {image} 이미지를 가져오세요.',
+        imageReady: 'Benchmark 이미지가 준비되었습니다. 벤치마크를 생성할 수 있습니다.',
+        imageHelp: 'Benchmark 이미지는 부하 테스트 클라이언트를 실행하고 선택한 모델 서비스에 요청을 보냅니다.',
+        mainNodeHelp: '벤치마크는 메인 노드에서 실행됩니다. 이미지와 토크나이저를 메인 노드에 준비하세요.',
+        goImages: '이미지 관리로 이동',
+        goModels: '모델 다운로드로 이동',
+        tokenizerHelp:
+            '토크나이저는 테스트 텍스트를 인코딩하고 토큰 수를 계산합니다. 기본 모델 디렉터리에서 유효한 토크나이저 파일이 포함된 모델을 선택하세요.',
+        tokenizerEmpty:
+            '사용 가능한 모델이 없습니다. 모델 다운로드에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
+        tokenizerEmptyWithDownload:
+            '사용 가능한 모델이 없습니다. {download} 페이지에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
+        tokenizerInvalid:
+            '이 모델의 토크나이저를 사용할 수 없습니다. 다른 모델을 선택하거나 모델 다운로드에서 파일을 다시 준비하세요.',
+        schemeHelp:
+            '테스트 계획은 요청 매개변수, 동시 실행 수 및 실행 규칙을 정의합니다. 사용 가능한 계획을 하나 이상 준비하세요.',
+        schemeEmpty: '사용 가능한 테스트 계획이 없습니다. 먼저 계획을 생성하세요.',
+        manageSchemes: '테스트 계획 관리',
+        selectService: '모델 서비스 선택',
+        serviceHelp:
+            '벤치마크할 모델 서비스를 선택하세요. 해당 서비스에 요청을 보내므로 정상적으로 접근할 수 있는지 확인하세요.',
+        noServices: '사용 가능한 모델 서비스가 없습니다. 먼저 모델 서비스를 추가하세요.',
+        goModelServices: '모델 서비스로 이동',
+        unsupportedServices:
+            '지원하지 않는 서비스는 선택할 수 없습니다. 항목 위에 마우스를 올리면 이유를 확인할 수 있습니다.',
+        unsupportedProtocol:
+            '지원하지 않는 API 프로토콜입니다: {0}. OpenAI Chat Completions를 사용하는 모델 서비스를 선택하세요.',
+        unsupportedAuth: '지원하지 않는 인증 방식입니다: {0}. Bearer 인증을 사용하는 서비스를 선택하세요.',
+        serviceModelsMissing: '이 서비스에 설정된 모델이 없습니다. 모델 서비스 관리에서 모델을 추가하세요.',
+        prerequisitesTitle: '먼저 벤치마크 설정을 완료하세요',
+        prerequisitesMissing: '다음 항목이 준비되지 않았습니다: {0}. 설정에서 준비를 완료하세요.',
+        precheckFailed: '벤치마크 사전 조건을 확인하지 못했습니다. 설정을 열고 다시 확인하세요.',
+        goSettings: '설정으로 이동',
     },
     benchmarkOverview: {
         comparison: '시나리오 및 동시 요청 수 비교',

@@ -162,7 +162,8 @@
 
 <script lang="ts" setup>
 import { useSearchState } from '@/utils/search-reset';
-import { toRef, reactive, ref, computed, watch, onBeforeUnmount } from 'vue';
+import { toRef, reactive, ref, computed, watch, onActivated, onDeactivated, onBeforeUnmount } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { dateFormat } from '@/utils/date';
 import { newUUID } from '@/utils/id';
 import { computeSize2 } from '@/utils/size';
@@ -179,14 +180,25 @@ import Prune from '@/views/container/image/prune/index.vue';
 import DockerStatus from '@/views/container/docker-status/index.vue';
 import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import TaskLog from '@/components/log/task/index.vue';
-import { searchImage, listImageRepo, imageRemove, inspect, containerPrune, imagePull } from '@/api/modules/container';
+import {
+    searchImage,
+    listImageRepo,
+    imageRemove,
+    inspect,
+    containerPrune,
+    imagePull,
+    loadDockerStatus,
+} from '@/api/modules/container';
 import i18n from '@/lang';
 import { ElMessageBox } from 'element-plus';
 import { updateCommonDescription } from '@/api/modules/setting';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
-const { isMobile, currentNode } = useGlobalStore();
+const { isMobile, currentNode, globalStore } = useGlobalStore();
+const route = useRoute();
+const router = useRouter();
+let pageActive = true;
 const taskLogRef = ref();
 
 const loading = ref(false);
@@ -271,7 +283,10 @@ const resetRepos = () => {
     repos.value = undefined;
 };
 watch(currentNode, resetRepos, { flush: 'sync' });
-onBeforeUnmount(resetRepos);
+onBeforeUnmount(() => {
+    pageActive = false;
+    resetRepos();
+});
 const loadRepos = () => {
     if (repoRequest) return repoRequest;
     const version = repoGeneration;
@@ -344,14 +359,81 @@ const onInspect = async (id: string) => {
 const remoteSearchRef = ref();
 const onRemotePull = async (imageName: string) => {
     const version = ++pullGeneration;
+    const node = currentNode.value;
     try {
         if (!repos.value) await loadRepos();
-        if (version !== pullGeneration) return;
+        if (
+            version !== pullGeneration ||
+            !pageActive ||
+            route.name !== 'Image' ||
+            node !== currentNode.value ||
+            !isActive.value ||
+            !isExist.value ||
+            !globalStore.hasPermission('container_manage')
+        )
+            return;
         dialogPullRef.value!.acceptParams({ repos: repos.value, imageName });
     } catch {
         // The request interceptor displays errors.
     }
 };
+
+let openingPullQuery = false;
+const openRequestedPull = async () => {
+    if (openingPullQuery || !pageActive || route.name !== 'Image' || route.query.pull === undefined) return;
+    openingPullQuery = true;
+    const imageName = route.query.pull;
+    const requestPath = route.fullPath;
+    const node = currentNode.value;
+    const version = pullGeneration;
+    const isCurrent = () =>
+        pageActive && route.name === 'Image' && node === currentNode.value && version === pullGeneration;
+    const query = { ...route.query };
+    delete query.pull;
+    try {
+        const failure = await router.replace({ path: route.path, query, hash: route.hash });
+        if (
+            failure ||
+            !isCurrent() ||
+            !globalStore.hasPermission('container_manage') ||
+            typeof imageName !== 'string' ||
+            !/^[a-zA-Z0-9][a-z:@A-Z0-9_/.-]{0,255}$/.test(imageName)
+        )
+            return;
+        const { data: status } = await loadDockerStatus();
+        if (!isCurrent()) return;
+        const needsSearch = !isActive.value || !isExist.value;
+        isActive.value = status.isActive;
+        isExist.value = status.isExist;
+        if (!isActive.value || !isExist.value) return;
+        if (needsSearch) void search();
+        await onRemotePull(imageName);
+    } catch {
+        // Navigation and request errors use their existing handlers.
+    } finally {
+        openingPullQuery = false;
+        if (
+            pageActive &&
+            route.name === 'Image' &&
+            route.query.pull !== undefined &&
+            (route.fullPath !== requestPath || node !== currentNode.value || version !== pullGeneration)
+        )
+            void openRequestedPull();
+    }
+};
+watch(
+    () => route.fullPath,
+    () => void openRequestedPull(),
+    { immediate: true, flush: 'post' },
+);
+onActivated(() => {
+    pageActive = true;
+    void openRequestedPull();
+});
+onDeactivated(() => {
+    pageActive = false;
+    pullGeneration++;
+});
 
 const onOpenPull = () => {
     let params = {

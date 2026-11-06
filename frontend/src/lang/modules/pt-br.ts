@@ -1645,6 +1645,8 @@ const message = {
         },
         benchmark: {
             title: 'Benchmark',
+            description:
+                'Execute testes de desempenho dos serviços de modelos com diferentes comprimentos de solicitação e configurações de simultaneidade para medir métricas como a taxa de processamento, o tempo até o primeiro token e a latência das solicitações.',
             launchCommand: 'Comando de inicialização',
             retest: 'Testar novamente',
             statusRunning: 'Executando',
@@ -2126,6 +2128,9 @@ const message = {
             'Vários cenários, níveis de concorrência e repetições, incluindo entradas longas e prefixos compartilhados.',
         customDescription: 'Comece com um cenário, configure os parâmetros e adicione outros conforme necessário.',
         scenarios: 'Cenários',
+        scenarioCount: 'Cenários ({count} no total)',
+        scenarioHelp:
+            'Cada cenário define os tokens de entrada/saída, os níveis de concorrência e os parâmetros das requisições. Os níveis são testados em sequência; cada nível é executado pelo número de repetições configurado e cada execução gera um ponto de medição.',
         builtIn: 'Integrado',
         builtInHelp: 'Planos integrados não podem ser editados ou excluídos. Ajuste uma cópia ao criar um teste.',
         modified: 'Modificado',
@@ -2164,6 +2169,56 @@ const message = {
         secretHelp: 'As cópias não incluem chaves de API nem cabeçalhos. Informe-os novamente se necessário.',
         resultHelp:
             'A mediana e os valores mínimo/máximo incluem apenas execuções bem-sucedidas sem anomalias. P99 é a mediana dos P99 de cada execução. Cache e tráfego externo não são controlados.',
+    },
+    benchmarkSettings: {
+        settingsHelp:
+            'Prepare a imagem do Benchmark e um plano de teste. Você poderá criar um benchmark quando ambos estiverem prontos.',
+        imageAvailable: 'A imagem do Benchmark está pronta ({image})',
+        imageUnavailable: 'A imagem do Benchmark não foi encontrada ({image})',
+        retestServiceHelp:
+            'Os novos testes mantêm os parâmetros da tarefa. Confirme o serviço de modelos atual; as credenciais são obtidas do serviço selecionado.',
+        prepareHelp: 'Antes de criar um benchmark, prepare a imagem Benchmark e os planos de teste em {settings}.',
+        image: 'Imagem do Benchmark',
+        ready: 'Pronto',
+        unconfigured: 'Não configurado',
+        checkFailed: 'Falha na verificação',
+        imageMissing: 'A imagem necessária não foi encontrada. Baixe {image} no gerenciamento de imagens.',
+        imageReady: 'A imagem do Benchmark está pronta para criar testes.',
+        imageHelp:
+            'A imagem do Benchmark executa o cliente de carga e envia solicitações ao serviço de modelos selecionado.',
+        mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
+        goImages: 'Ir ao gerenciamento de imagens',
+        goModels: 'Ir aos downloads de modelos',
+        tokenizerHelp:
+            'Os tokenizadores codificam o texto de teste e contam os tokens. Selecione um modelo com arquivos de tokenizador válidos no diretório padrão de modelos.',
+        tokenizerEmpty:
+            'Não há modelos disponíveis. Baixe um modelo com arquivos de tokenizador nos downloads de modelos.',
+        tokenizerEmptyWithDownload:
+            'Não há modelos disponíveis. Abra {download} para baixar um modelo com arquivos de tokenizador.',
+        tokenizerInvalid:
+            'Este modelo não tem um tokenizador utilizável. Selecione outro modelo ou prepare seus arquivos nos downloads de modelos.',
+        schemeHelp:
+            'Os planos de teste definem os parâmetros de solicitação, a concorrência e as regras de execução. Prepare pelo menos um plano disponível.',
+        schemeEmpty: 'Não há planos de teste disponíveis. Crie um primeiro.',
+        manageSchemes: 'Gerenciar planos de teste',
+        selectService: 'Selecione um serviço de modelos',
+        serviceHelp:
+            'Selecione o serviço de modelos que deseja testar. As solicitações serão enviadas a esse serviço; confirme que ele está acessível.',
+        noServices: 'Não há serviços de modelos disponíveis. Adicione um primeiro.',
+        goModelServices: 'Ir aos serviços de modelos',
+        unsupportedServices:
+            'Os serviços incompatíveis estão desativados. Passe o cursor sobre uma opção para ver o motivo.',
+        unsupportedProtocol:
+            'Este protocolo de API não é compatível: {0}. Selecione um serviço de modelos que use OpenAI Chat Completions.',
+        unsupportedAuth:
+            'Este método de autenticação não é compatível: {0}. Selecione um serviço com autenticação Bearer.',
+        serviceModelsMissing:
+            'Este serviço não tem modelos configurados. Adicione modelos no gerenciamento de serviços de modelos.',
+        prerequisitesTitle: 'Conclua primeiro as configurações do teste',
+        prerequisitesMissing: 'Os seguintes pré-requisitos não estão prontos: {0}. Conclua-os nas configurações.',
+        precheckFailed:
+            'Não foi possível verificar os pré-requisitos do teste. Abra as configurações e verifique novamente.',
+        goSettings: 'Ir às configurações',
     },
     benchmarkOverview: {
         comparison: 'Comparação de cenários e concorrência',

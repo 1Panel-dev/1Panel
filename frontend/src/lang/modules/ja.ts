@@ -1624,6 +1624,8 @@ const message = {
         },
         benchmark: {
             title: 'ベンチマーク',
+            description:
+                'モデルサービスのベンチマークを実行し、リクエストの長さや同時実行数の設定ごとに、スループット、最初のトークンまでの時間、リクエストの所要時間などの指標を評価します。',
             launchCommand: '起動コマンド',
             retest: '再テスト',
             statusRunning: '実行中',
@@ -2091,6 +2093,9 @@ const message = {
         fullDescription: '長い入力と共有プレフィックスを含む、複数シナリオ・同時実行数での反復測定です。',
         customDescription: '1つのシナリオから始め、パラメーターを設定し、必要に応じて追加します。',
         scenarios: 'シナリオ',
+        scenarioCount: 'シナリオ（合計 {count} 件）',
+        scenarioHelp:
+            '各シナリオでは、入力/出力トークン数、同時実行数の段階、リクエストパラメーターを定義します。各同時実行数を順番にテストし、設定した反復回数だけ実行します。実行ごとに 1 つの測定点が生成されます。',
         builtIn: '組み込み',
         builtInHelp: '組み込みプランは編集・削除できません。テスト作成時にコピーを調整できます。',
         modified: '変更済み',
@@ -2129,6 +2134,54 @@ const message = {
         secretHelp: 'コピーに API キーとヘッダーは含まれません。必要に応じて再入力してください。',
         resultHelp:
             '要求異常のない成功した試行のみを集計し、中央値と最小・最大値を表示します。P99 は試行ごとの P99 の中央値です。キャッシュと外部トラフィックは制御されません。',
+    },
+    benchmarkSettings: {
+        settingsHelp:
+            'Benchmark イメージとテストプランを準備してください。両方の準備が完了すると、ベンチマークを作成できます。',
+        imageAvailable: 'Benchmark イメージは準備済みです（{image}）',
+        imageUnavailable: 'Benchmark イメージが見つかりません（{image}）',
+        retestServiceHelp:
+            '再テストではタスクのパラメーターを引き継ぎます。現在のモデルサービスを確認してください。認証情報は選択したサービスから読み込まれます。',
+        prepareHelp: 'ベンチマークを作成する前に、{settings} で Benchmark イメージとテストプランを準備してください。',
+        image: 'Benchmark イメージ',
+        ready: '準備完了',
+        unconfigured: '未設定',
+        checkFailed: '確認失敗',
+        imageMissing: '必要なイメージが見つかりません。イメージ管理で {image} を取得してください。',
+        imageReady: 'Benchmark イメージの準備ができました。ベンチマークを作成できます。',
+        imageHelp:
+            'Benchmark イメージは負荷テストクライアントを実行し、選択したモデルサービスにリクエストを送信します。',
+        mainNodeHelp:
+            'ベンチマークはメインノードで実行されます。イメージとトークナイザーをメインノードで準備してください。',
+        goImages: 'イメージ管理へ',
+        goModels: 'モデルダウンロードへ',
+        tokenizerHelp:
+            'トークナイザーはテストテキストのエンコードとトークン数の計算に使用します。既定のモデルディレクトリから有効なトークナイザーファイルを含むモデルを選択してください。',
+        tokenizerEmpty:
+            '利用できるモデルがありません。モデルダウンロードでトークナイザーファイルを含むモデルをダウンロードしてください。',
+        tokenizerEmptyWithDownload:
+            '利用できるモデルがありません。{download}ページでトークナイザーファイルを含むモデルをダウンロードしてください。',
+        tokenizerInvalid:
+            'このモデルのトークナイザーは使用できません。別のモデルを選択するか、モデルダウンロードでファイルを準備し直してください。',
+        schemeHelp:
+            'テストプランはリクエストパラメーター、同時実行数、実行ルールを定義します。利用できるプランを少なくとも 1 つ準備してください。',
+        schemeEmpty: '利用できるテストプランがありません。先にプランを作成してください。',
+        manageSchemes: 'テストプランの管理',
+        selectService: 'モデルサービスを選択',
+        serviceHelp:
+            'ベンチマークするモデルサービスを選択してください。このサービスにリクエストが送信されるため、接続可能であることを確認してください。',
+        noServices: '利用できるモデルサービスがありません。先にモデルサービスを追加してください。',
+        goModelServices: 'モデルサービスへ',
+        unsupportedServices: '未対応のサービスは選択できません。選択肢にカーソルを合わせると理由を確認できます。',
+        unsupportedProtocol:
+            'この API プロトコルには対応していません: {0}。OpenAI Chat Completions を使用するモデルサービスを選択してください。',
+        unsupportedAuth: 'この認証方式には対応していません: {0}。Bearer 認証を使用するサービスを選択してください。',
+        serviceModelsMissing:
+            'このサービスにはモデルが設定されていません。モデルサービス管理でモデルを追加してください。',
+        prerequisitesTitle: '先にベンチマーク設定を完了してください',
+        prerequisitesMissing: '次の準備が完了していません: {0}。設定で準備を完了してください。',
+        precheckFailed: 'ベンチマークの前提条件を確認できませんでした。設定を開いてもう一度確認してください。',
+        goSettings: '設定へ',
     },
     benchmarkOverview: {
         comparison: 'シナリオと同時実行数の比較',

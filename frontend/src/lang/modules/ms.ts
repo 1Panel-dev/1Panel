@@ -1649,6 +1649,8 @@ const message = {
         },
         benchmark: {
             title: 'Penanda Aras',
+            description:
+                'Jalankan penanda aras perkhidmatan model dengan panjang permintaan dan tetapan keserentakan yang berbeza untuk mengukur metrik seperti daya pemprosesan, masa hingga token pertama dan kependaman permintaan.',
             launchCommand: 'Arahan Pelancaran',
             retest: 'Uji Semula',
             statusRunning: 'Sedang berjalan',
@@ -2130,6 +2132,9 @@ const message = {
             'Pelbagai senario, tahap keserentakan dan ulangan, termasuk input panjang dan awalan dikongsi.',
         customDescription: 'Mulakan dengan satu senario, tetapkan parameternya dan tambah lagi mengikut keperluan.',
         scenarios: 'Senario',
+        scenarioCount: 'Senario ({count} keseluruhan)',
+        scenarioHelp:
+            'Setiap senario menentukan token input/output, tahap keserentakan dan parameter permintaan. Tahap keserentakan diuji mengikut urutan; setiap tahap dijalankan mengikut bilangan ulangan yang ditetapkan, dan setiap larian menghasilkan satu titik pengukuran.',
         builtIn: 'Terbina dalam',
         builtInHelp: 'Pelan terbina dalam tidak boleh disunting atau dipadam. Laraskan salinan semasa mencipta ujian.',
         modified: 'Diubah suai',
@@ -2168,6 +2173,55 @@ const message = {
         secretHelp: 'Salinan tidak mengandungi kunci API atau pengepala. Masukkan semula jika perlu.',
         resultHelp:
             'Median dan minimum/maksimum hanya melibatkan ujian berjaya tanpa anomali permintaan. P99 ialah median P99 setiap ujian. Cache dan trafik luaran tidak dikawal.',
+    },
+    benchmarkSettings: {
+        settingsHelp:
+            'Sediakan imej Benchmark dan skema ujian dahulu. Anda boleh mencipta penanda aras apabila kedua-duanya sedia.',
+        imageAvailable: 'Imej Benchmark sedia ({image})',
+        imageUnavailable: 'Imej Benchmark tidak ditemui ({image})',
+        prepareHelp: 'Sebelum mencipta penanda aras, sediakan imej Benchmark dan skema ujian dalam {settings}.',
+        image: 'Imej Benchmark',
+        ready: 'Sedia',
+        unconfigured: 'Belum dikonfigurasi',
+        checkFailed: 'Semakan gagal',
+        imageMissing: 'Imej yang diperlukan tidak ditemui. Tarik {image} dalam pengurusan imej.',
+        imageReady: 'Imej Benchmark sedia untuk mencipta ujian.',
+        imageHelp:
+            'Imej Benchmark menjalankan klien ujian beban dan menghantar permintaan ke perkhidmatan model yang dipilih.',
+        mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
+        goImages: 'Ke pengurusan imej',
+        goModels: 'Ke muat turun model',
+        tokenizerHelp:
+            'Tokenizer mengekod teks ujian dan mengira token. Pilih model dengan fail tokenizer yang sah daripada direktori model lalai.',
+        tokenizerEmpty:
+            'Tiada model tersedia. Muat turun model yang mengandungi fail tokenizer di halaman muat turun model.',
+        tokenizerEmptyWithDownload:
+            'Tiada model tersedia. Buka {download} untuk memuat turun model yang mengandungi fail tokenizer.',
+        tokenizerInvalid:
+            'Tokenizer model ini tidak boleh digunakan. Pilih model lain atau sediakan failnya di halaman muat turun model.',
+        schemeHelp:
+            'Skema ujian menentukan parameter permintaan, keserentakan dan peraturan pelaksanaan. Sediakan sekurang-kurangnya satu skema yang tersedia.',
+        schemeEmpty: 'Tiada skema ujian tersedia. Cipta skema dahulu.',
+        manageSchemes: 'Urus skema ujian',
+        selectService: 'Pilih perkhidmatan model',
+        serviceHelp:
+            'Pilih perkhidmatan model untuk diuji. Permintaan akan dihantar ke perkhidmatan ini; pastikan ia boleh dicapai.',
+        noServices: 'Tiada perkhidmatan model tersedia. Tambah perkhidmatan model dahulu.',
+        goModelServices: 'Ke perkhidmatan model',
+        unsupportedServices:
+            'Perkhidmatan yang tidak disokong dinyahdayakan. Letakkan penuding pada pilihan untuk melihat sebabnya.',
+        unsupportedProtocol:
+            'Protokol API ini tidak disokong: {0}. Pilih perkhidmatan model yang menggunakan OpenAI Chat Completions.',
+        unsupportedAuth:
+            'Kaedah pengesahan ini tidak disokong: {0}. Pilih perkhidmatan yang menggunakan pengesahan Bearer.',
+        serviceModelsMissing:
+            'Perkhidmatan ini belum mempunyai model. Tambah model dalam pengurusan perkhidmatan model.',
+        prerequisitesTitle: 'Lengkapkan tetapan penanda aras dahulu',
+        prerequisitesMissing: 'Prasyarat berikut belum sedia: {0}. Lengkapkannya dalam tetapan.',
+        precheckFailed: 'Tidak dapat menyemak prasyarat penanda aras. Buka tetapan dan semak semula.',
+        goSettings: 'Ke tetapan',
+        retestServiceHelp:
+            'Ujian semula mengekalkan parameter tugas. Sahkan perkhidmatan model semasa; kelayakan dimuatkan daripada perkhidmatan yang dipilih.',
     },
     benchmarkOverview: {
         comparison: 'Perbandingan senario dan keserentakan',
