@@ -1776,6 +1776,53 @@ const message = {
             timePerOutputTokenChart: 'Latencia entre tokens',
         },
         gpu: {
+            environment: {
+                title: 'Comprobaciones del entorno',
+                passed: 'Comprobaciones del entorno superadas',
+                issues: 'Problemas del entorno detectados: {count}. Siga las indicaciones para revisarlos.',
+                recheck: 'Comprobar de nuevo',
+                installGuide: 'Ver guía de instalación',
+                goContainerSettings: 'Abrir configuración de contenedores',
+                details: 'Detalles de la comprobación',
+                vendor: 'Fabricante',
+                cardCount: 'Número de tarjetas',
+                notDetected: 'No se detectaron dispositivos GPU/NPU/XPU compatibles en el nodo actual.',
+                unknown: 'No se pudo confirmar el estado del dispositivo. Revise los detalles y vuelva a comprobarlo.',
+                loadFailed: 'No se pudo leer la información del dispositivo. Inténtelo de nuevo.',
+                notApplicable: 'No aplicable',
+                cudaHelper:
+                    'Esta es la versión de CUDA compatible con el controlador, no la versión de CUDA Toolkit instalada en el host.',
+                partialMemory: 'Algunos datos de memoria no están disponibles',
+                sharedMemory: 'Memoria del sistema compartida: {memory}',
+                driver: 'Controlador y herramientas de gestión de dispositivos',
+                nvidiaDriver: 'Controlador NVIDIA',
+                toolkit: 'NVIDIA Container Toolkit',
+                docker: 'Configuración de GPU NVIDIA en Docker',
+                statusPassed: 'Normal',
+                statusMissing: 'No detectado',
+                statusUnconfigured: 'Configuración pendiente',
+                statusFailed: 'Error de comprobación',
+                statusUnknown: 'Desconocido',
+                driverMissing:
+                    'No se detectó el controlador de {vendor}. Instale o compruebe el controlador (herramienta de detección: {tool}).',
+                driverFailed:
+                    'No se pudo leer la información del dispositivo mediante {tool}. Compruebe el estado del controlador.',
+                driverUnknown: 'No se pudo confirmar el estado del controlador del dispositivo. Compruebe {tool}.',
+                toolkitMissing:
+                    'No se detectó NVIDIA Container Toolkit. Instálelo y configúrelo antes de usar GPU NVIDIA en contenedores.',
+                toolkitFailed: 'No se pudo comprobar NVIDIA Container Toolkit. Revise los detalles del error.',
+                dockerConfigMissing:
+                    'No se detectó la entrada runtimes.nvidia en el archivo de configuración predeterminado de Docker. Complete la configuración siguiendo la documentación.',
+                dockerConfigInvalid:
+                    'La configuración del entorno de ejecución de NVIDIA en Docker no es válida. Compruebe runtimes.nvidia.path en daemon.json.',
+                dockerConfigPending:
+                    'El archivo de configuración predeterminado contiene la configuración del entorno de ejecución de NVIDIA, pero el servicio Docker actual aún no la ha cargado. Confirme el archivo de configuración, reinicie Docker y vuelva a comprobarlo.',
+                dockerConfigUnreadable:
+                    'No se pudo leer el archivo de configuración de Docker. Revise los detalles de la comprobación.',
+                dockerUnconfigured: 'La configuración de GPU NVIDIA en Docker está incompleta.',
+                dockerFailed:
+                    'No se pudo comprobar la configuración de GPU NVIDIA en Docker. Revise los detalles del error.',
+            },
             systemMemory: 'Memoria compartida del sistema',
             systemMemoryUsed: 'Memoria del sistema utilizada',
             systemMemoryTotal: 'Memoria total del sistema',
@@ -1836,6 +1883,8 @@ const message = {
             pcieWidth: 'Ancho PCIe (actual / máximo)',
             gpu: 'Gestión de GPU',
             monitoringTitle: 'Monitoreo de GPU',
+            currentHelper:
+                'Consulte el estado en tiempo real y el uso de recursos de los dispositivos GPU/NPU/XPU del nodo actual. El resumen superior incluye todos los dispositivos; las métricas detalladas se muestran por dispositivo.',
             gpuHelper:
                 'No se detectó ningún comando de administración de GPU/XPU/NPU compatible. ¡Compruebe e inténtelo de nuevo!',
             process: 'Información del Proceso',

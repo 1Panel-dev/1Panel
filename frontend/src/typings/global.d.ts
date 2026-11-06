@@ -28,5 +28,6 @@ declare interface RouterButton {
     path?: string;
     name?: string;
     count?: number;
+    disabled?: boolean;
     permission?: string | string[];
 }

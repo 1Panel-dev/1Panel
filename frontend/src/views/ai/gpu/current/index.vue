@@ -1,32 +1,150 @@
 <template>
     <div>
-        <RouterMenu />
+        <RouterMenu :history-disabled="historyDisabled" />
         <div>
-            <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.monitoringTitle')" v-if="hasAccelerators">
+            <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.monitoringTitle')">
+                <template v-if="hasAccelerators" #leftToolBar>
+                    <el-alert type="info" :closable="false" :title="$t('aiTools.gpu.currentHelper')" />
+                </template>
                 <template #rightToolBar>
-                    <TableSetting title="gpu-refresh" @search="refresh()" />
-                    <TableRefresh @search="refresh()" />
+                    <TableSetting title="gpu-refresh" @search="search()" />
+                    <el-tooltip :content="$t('aiTools.gpu.environment.recheck')">
+                        <TableRefresh :disabled="loading" @search="refresh()" />
+                    </el-tooltip>
                 </template>
                 <template #main>
-                    <div class="device-overview">
+                    <el-alert
+                        v-if="loadFailed"
+                        class="common-prompt"
+                        :title="$t('aiTools.gpu.environment.loadFailed')"
+                        type="error"
+                        :closable="false"
+                        show-icon
+                    >
+                        <el-button type="primary" link :disabled="loading" @click="refresh()">
+                            {{ $t('aiTools.gpu.environment.recheck') }}
+                        </el-button>
+                    </el-alert>
+                    <el-alert
+                        v-else-if="showEnvironmentAlert"
+                        class="common-prompt"
+                        :title="environmentTitle"
+                        :type="environmentAlertType"
+                        :closable="false"
+                        show-icon
+                    >
+                        <div class="flex flex-wrap items-center gap-3">
+                            <el-link
+                                v-if="needsInstallGuide"
+                                type="primary"
+                                href="https://docs.fit2cloud.com/1panel/faq/gpu-driver"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ $t('aiTools.gpu.environment.installGuide') }}
+                            </el-link>
+                            <el-button
+                                v-if="hasDockerConfigIssue"
+                                type="primary"
+                                link
+                                @click="routerToName('ContainerSetting')"
+                            >
+                                {{ $t('aiTools.gpu.environment.goContainerSettings') }}
+                            </el-button>
+                            <el-button type="primary" link :disabled="loading" @click="refresh()">
+                                {{ $t('aiTools.gpu.environment.recheck') }}
+                            </el-button>
+                        </div>
+                    </el-alert>
+                    <el-collapse v-if="environmentChecks.length || gpuInfo.warnings?.length" class="mb-4">
+                        <el-collapse-item :title="$t('aiTools.gpu.environment.details')" name="environment">
+                            <div v-for="check in environmentChecks" :key="`${check.vendor}-${check.item}`" class="mb-2">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    <span>{{ checkTitle(check) }}</span>
+                                    <el-tag :type="checkTagType(check)" size="small">
+                                        {{ checkStatus(check) }}
+                                    </el-tag>
+                                    <span v-if="check.version">{{ check.version }}</span>
+                                </div>
+                                <pre v-if="check.reason" class="whitespace-pre-wrap break-words mt-1">{{
+                                    check.reason
+                                }}</pre>
+                            </div>
+                            <div v-for="warning in gpuInfo.warnings || []" :key="warning" class="break-words">
+                                {{ warning }}
+                            </div>
+                        </el-collapse-item>
+                    </el-collapse>
+                    <div v-for="summary in overviewRows" :key="summary.vendor" class="device-overview mb-2">
+                        <div class="overview-item">
+                            <span>{{ $t('aiTools.gpu.environment.vendor') }}</span>
+                            <strong>{{ vendorTitle(summary.vendor) }}</strong>
+                        </div>
                         <div class="overview-item">
                             <span>{{ $t('aiTools.gpu.driverVersion') }}</span>
-                            <strong>{{ gpuInfo.driverVersion }}</strong>
+                            <strong>{{ displayValue(summary.driverVersion) }}</strong>
                         </div>
-                        <div v-if="gpuInfo.cudaVersion" class="overview-item">
+                        <div class="overview-item">
                             <span>{{ $t('aiTools.gpu.cudaVersion') }}</span>
-                            <strong>{{ gpuInfo.cudaVersion }}</strong>
+                            <el-tooltip
+                                v-if="summary.vendor === 'nvidia' || summary.cudaVersion"
+                                :content="$t('aiTools.gpu.environment.cudaHelper')"
+                            >
+                                <strong>{{ displayValue(summary.cudaVersion) }}</strong>
+                            </el-tooltip>
+                            <strong v-else>{{ $t('aiTools.gpu.environment.notApplicable') }}</strong>
                         </div>
-                        <div v-if="gpuInfo.collectedAt" class="overview-item">
-                            <span>{{ $t('aiTools.gpu.collectedAt') }}</span>
-                            <strong>{{ new Date(gpuInfo.collectedAt).toLocaleString() }}</strong>
+                        <div class="overview-item">
+                            <span>{{ $t('aiTools.gpu.environment.cardCount') }}</span>
+                            <strong>{{ summary.cardCountText }}</strong>
                         </div>
-                        <div class="overview-count">{{ deviceCountText }}</div>
+                        <div class="overview-item">
+                            <span>
+                                {{
+                                    $t(
+                                        summary.sharedMemoryOnly
+                                            ? 'aiTools.gpu.systemMemory'
+                                            : 'aiTools.gpu.memoryTotal',
+                                    )
+                                }}
+                            </span>
+                            <el-tooltip
+                                :disabled="!summary.sharedMemoryOnly && !summary.memoryPartial"
+                                :content="summaryMemoryTooltip(summary)"
+                            >
+                                <strong>
+                                    {{
+                                        formatSummaryMemory(
+                                            summary.sharedMemoryOnly ? summary.sharedMemoryTotal : summary.memoryTotal,
+                                        )
+                                    }}
+                                </strong>
+                            </el-tooltip>
+                            <el-tooltip
+                                v-if="!summary.sharedMemoryOnly && summary.sharedMemoryTotal !== null"
+                                :content="$t('aiTools.gpu.systemMemoryHelper')"
+                            >
+                                <span class="whitespace-normal">
+                                    {{
+                                        $t('aiTools.gpu.environment.sharedMemory', {
+                                            memory: formatSummaryMemory(summary.sharedMemoryTotal),
+                                        })
+                                    }}
+                                </span>
+                            </el-tooltip>
+                        </div>
                     </div>
-
-                    <div class="gpu-group-list">
+                    <div v-if="hasAccelerators && gpuInfo.collectedAt" class="input-help">
+                        {{ $t('aiTools.gpu.collectedAt') }}:
+                        {{ new Date(gpuInfo.collectedAt).toLocaleString() }}
+                    </div>
+                    <el-empty
+                        v-if="!hasAccelerators && !loading && !loadFailed && !showEnvironmentAlert"
+                        :description="emptyDescription"
+                    />
+                    <div v-if="hasAccelerators" class="gpu-group-list">
                         <section v-for="group in gpuGroups" :key="group.key" class="gpu-group">
-                            <div class="group-header">
+                            <div v-if="group.title" class="group-header">
                                 <div class="group-identity">
                                     <strong>{{ group.title }}</strong>
                                 </div>
@@ -79,7 +197,12 @@
                                                 >
                                                     {{ $t('commons.button.view') }}
                                                 </el-button>
-                                                <el-button type="primary" link @click="openHistory(item)">
+                                                <el-button
+                                                    type="primary"
+                                                    link
+                                                    :disabled="historyDisabled"
+                                                    @click="openHistory(item)"
+                                                >
                                                     {{ $t('aiTools.gpu.history') }}
                                                 </el-button>
                                             </div>
@@ -168,10 +291,6 @@
                             </div>
                         </section>
                         <section v-if="xpuInfo.xpu.length" class="gpu-group">
-                            <div class="group-header">
-                                <div class="group-identity"><strong>XPU</strong></div>
-                            </div>
-
                             <div class="device-card-grid">
                                 <el-card
                                     v-for="item in xpuInfo.xpu"
@@ -208,7 +327,12 @@
                                                 >
                                                     {{ $t('commons.button.view') }}
                                                 </el-button>
-                                                <el-button type="primary" link @click="openHistory(item)">
+                                                <el-button
+                                                    type="primary"
+                                                    link
+                                                    :disabled="historyDisabled"
+                                                    @click="openHistory(item)"
+                                                >
                                                     {{ $t('aiTools.gpu.history') }}
                                                 </el-button>
                                             </div>
@@ -321,42 +445,33 @@
                 />
             </template>
         </DialogPro>
-        <LayoutContent :title="$t('aiTools.gpu.monitoringTitle')" :divider="true" v-if="!hasAccelerators && !loading">
-            <template #rightToolBar>
-                <TableRefresh @search="refresh()" />
-            </template>
-            <template #main>
-                <div class="app-warn">
-                    <div class="flx-center">
-                        <span>{{ $t('aiTools.gpu.gpuHelper') }}</span>
-                    </div>
-                    <div>
-                        <img src="@/assets/images/no_app.svg" />
-                    </div>
-                </div>
-            </template>
-        </LayoutContent>
     </div>
 </template>
 
 <script lang="ts" setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { InfoFilled } from '@element-plus/icons-vue';
 import { loadGPUInfo } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/gpu/index.vue';
 import { AI } from '@/api/interface/ai';
+import { useGlobalStore } from '@/composables/useGlobalStore';
+import { routerToName } from '@/utils/router';
 import i18n from '@/lang';
-import { MsgWarning } from '@/utils/message';
+import { computeSizeForDocker } from '@/utils/size';
 import DeviceDetails, { type DetailSection } from './components/DeviceDetails.vue';
 
 const router = useRouter();
-const loading = ref();
+const route = useRoute();
+const pagePath = route.path;
+const { currentNode } = useGlobalStore();
+const loading = ref(false);
+const loadFailed = ref(false);
 const processDrawerVisible = ref(false);
 const processDeviceKey = ref('');
 const detailDeviceKey = ref('');
 const processXPUId = ref<number | null>(null);
-const gpuInfo = ref<AI.Info>({
+const emptyGPUInfo = (): AI.Info => ({
     cudaVersion: '',
     driverVersion: '',
     type: 'nvidia',
@@ -365,6 +480,7 @@ const gpuInfo = ref<AI.Info>({
     xpuDriverVersion: '',
     xpu: [],
 });
+const gpuInfo = ref<AI.Info>(emptyGPUInfo());
 const xpuInfo = ref<AI.XpuInfo>({
     driverVersion: '',
     type: 'xpu',
@@ -396,7 +512,7 @@ const gpuGroups = computed<GPUGroup[]>(() => {
         if (!groups.has(key)) {
             groups.set(key, {
                 key,
-                title: item.type === 'ascend' ? `NPU ${item.npuIndex}` : item.type.toUpperCase(),
+                title: item.type === 'ascend' ? `NPU ${item.npuIndex}` : '',
                 devices: [],
             });
         }
@@ -464,6 +580,203 @@ const hasAccelerators = computed(() => {
     return gpuGroups.value.length > 0 || xpuInfo.value.xpu.length > 0;
 });
 
+const vendorTitle = (vendor: string): string => {
+    const titles: Record<string, string> = {
+        nvidia: 'NVIDIA',
+        intel: 'Intel',
+        xpu: 'Intel',
+        ascend: 'Huawei Ascend',
+        amd: 'AMD',
+    };
+    if (vendor === 'mixed') {
+        const vendors = new Set(gpuInfo.value.gpu.map((device) => device.type as string));
+        if (gpuInfo.value.npu.length) vendors.add('ascend');
+        if (xpuInfo.value.xpu.length) vendors.add('intel');
+        return Array.from(vendors, vendorTitle).join(' / ') || '—';
+    }
+    return titles[vendor] || vendor || '—';
+};
+
+const displayValue = (value: string | undefined) => {
+    return isAvailable(value) ? value : '—';
+};
+
+const formatSummaryMemory = (value: number | null) => {
+    return value === null || !Number.isFinite(value) ? '—' : computeSizeForDocker(value);
+};
+
+const overviewRows = computed(() => {
+    if (gpuInfo.value.summaries?.length) {
+        return gpuInfo.value.summaries.map((summary) => {
+            const devices = gpuInfo.value.gpu.filter((device) => device.type === summary.vendor);
+            const sharedMemoryTotal =
+                devices.length && !devices.some((device) => device.sharedMemory) ? null : summary.sharedMemoryTotal;
+            return {
+                ...summary,
+                sharedMemoryTotal,
+                cardCountText: summary.cardCount === null ? '—' : String(summary.cardCount),
+                sharedMemoryOnly:
+                    summary.memoryTotal === null &&
+                    sharedMemoryTotal !== null &&
+                    devices.every((device) => device.sharedMemory),
+            };
+        });
+    }
+    if (!hasAccelerators.value) return [];
+    // Older nodes lack summaries. Reuse all collected cards and the existing
+    // memory parser, without counting tiles or the shared host pool twice.
+    const memoryDevices = [
+        ...[...gpuInfo.value.gpu, ...gpuInfo.value.npu].map((device) => ({
+            id: deviceKey(device),
+            total: device.memTotal,
+            shared: device.type !== 'ascend' && Boolean(device.sharedMemory),
+        })),
+        ...xpuInfo.value.xpu.map((device) => ({
+            id: `xpu-${device.basic.deviceID}`,
+            total: device.basic.memory,
+            shared: false,
+        })),
+    ];
+    let memoryTotal: number | null = null;
+    let sharedMemoryTotal: number | null = null;
+    let memoryPartial = false;
+    const seen = new Set<string>();
+    for (const device of memoryDevices) {
+        if (seen.has(device.id)) continue;
+        seen.add(device.id);
+        const total = memoryMiB(device.total || '');
+        if (total === null || !Number.isFinite(total) || total < 0) {
+            memoryPartial = true;
+            continue;
+        }
+        const bytes = total * 1024 * 1024;
+        if (device.shared) {
+            sharedMemoryTotal = Math.max(sharedMemoryTotal ?? 0, bytes);
+        } else {
+            memoryTotal = (memoryTotal ?? 0) + bytes;
+        }
+    }
+    return [
+        {
+            vendor: gpuInfo.value.type,
+            driverVersion: gpuInfo.value.driverVersion,
+            cudaVersion: gpuInfo.value.cudaVersion,
+            cardCountText: deviceCountText.value,
+            memoryTotal,
+            sharedMemoryTotal,
+            sharedMemoryOnly: sharedMemoryTotal !== null && memoryDevices.every((device) => device.shared),
+            memoryPartial,
+        },
+    ];
+});
+
+const environmentChecks = computed(() => gpuInfo.value.environment?.checks || []);
+const historyDisabled = computed(
+    () =>
+        (loading.value && !gpuInfo.value.environment && !hasAccelerators.value) ||
+        environmentChecks.value.some(
+            (check) => check.item === 'driver' && check.status !== 'passed' && (check.vendor || !hasAccelerators.value),
+        ),
+);
+const environmentIssues = computed(() => environmentChecks.value.filter((check) => check.status !== 'passed'));
+const hasDockerConfigIssue = computed(() => environmentIssues.value.some((check) => check.item === 'docker'));
+const showEnvironmentAlert = computed(
+    () =>
+        gpuInfo.value.environment &&
+        (gpuInfo.value.environment.hardwareStatus !== 'not_detected' || environmentIssues.value.length > 0),
+);
+const needsInstallGuide = computed(() =>
+    environmentIssues.value.some(
+        (check) =>
+            check.status === 'missing' || check.status === 'unconfigured' || check.code === 'dockerConfigInvalid',
+    ),
+);
+const environmentTitle = computed(() => {
+    if (environmentIssues.value.length) {
+        return environmentIssues.value.map(checkDescription).join(' ');
+    }
+    switch (gpuInfo.value.environment?.hardwareStatus) {
+        case 'not_detected':
+            return i18n.global.t('aiTools.gpu.environment.notDetected');
+        case 'unknown':
+            return i18n.global.t('aiTools.gpu.environment.unknown');
+        default:
+            return i18n.global.t('aiTools.gpu.environment.passed');
+    }
+});
+const environmentAlertType = computed(() => {
+    if (environmentIssues.value.length) return 'warning';
+    return gpuInfo.value.environment?.hardwareStatus === 'detected' ? 'success' : 'info';
+});
+const emptyDescription = computed(() => {
+    if (!gpuInfo.value.environment) return i18n.global.t('aiTools.gpu.gpuHelper');
+    return gpuInfo.value.environment.hardwareStatus === 'not_detected'
+        ? i18n.global.t('aiTools.gpu.environment.notDetected')
+        : i18n.global.t('aiTools.gpu.environment.unknown');
+});
+const checkStatus = (check: AI.GPUEnvironmentCheck) => {
+    const status = check.status[0].toUpperCase() + check.status.slice(1);
+    return i18n.global.t(`aiTools.gpu.environment.status${status}`);
+};
+const checkTagType = (check: AI.GPUEnvironmentCheck) => {
+    if (check.status === 'passed') return 'success';
+    return check.status === 'failed' ? 'danger' : 'warning';
+};
+const checkTitle = (check: AI.GPUEnvironmentCheck) => {
+    if (check.vendor === 'nvidia' && check.item === 'driver') {
+        return i18n.global.t('aiTools.gpu.environment.nvidiaDriver');
+    }
+    const title = i18n.global.t(`aiTools.gpu.environment.${check.item}`);
+    return check.vendor && check.item === 'driver' ? `${vendorTitle(check.vendor)} · ${title}` : title;
+};
+const checkDescription = (check: AI.GPUEnvironmentCheck) => {
+    const managementTools: Record<string, string> = {
+        nvidia: 'nvidia-smi',
+        intel: 'xpu-smi',
+        ascend: 'npu-smi',
+        amd: 'amd-smi',
+    };
+    const tool = managementTools[check.vendor];
+    let key: string;
+    if (check.item === 'driver') {
+        if (!tool) return i18n.global.t('aiTools.gpu.environment.unknown');
+        key =
+            check.status === 'missing' || check.status === 'unconfigured'
+                ? 'driverMissing'
+                : check.status === 'failed'
+                  ? 'driverFailed'
+                  : 'driverUnknown';
+    } else if (check.item === 'toolkit') {
+        key = check.status === 'missing' || check.status === 'unconfigured' ? 'toolkitMissing' : 'toolkitFailed';
+    } else {
+        const configKeys = [
+            'dockerConfigMissing',
+            'dockerConfigInvalid',
+            'dockerConfigPending',
+            'dockerConfigUnreadable',
+        ];
+        const code = check.code || '';
+        key = configKeys.includes(code)
+            ? code
+            : check.status === 'missing' || check.status === 'unconfigured'
+              ? 'dockerUnconfigured'
+              : 'dockerFailed';
+    }
+    const description = i18n.global.t(`aiTools.gpu.environment.${key}`, {
+        tool: tool || '',
+        vendor: vendorTitle(check.vendor),
+    });
+    return check.item === 'driver' && key !== 'driverMissing' ? `${checkTitle(check)}: ${description}` : description;
+};
+
+const summaryMemoryTooltip = (summary: { sharedMemoryOnly: boolean; memoryPartial: boolean }) =>
+    [
+        summary.sharedMemoryOnly && i18n.global.t('aiTools.gpu.systemMemoryHelper'),
+        summary.memoryPartial && i18n.global.t('aiTools.gpu.environment.partialMemory'),
+    ]
+        .filter(Boolean)
+        .join(' ');
+
 const normalizeAcceleratorInfo = (data: AI.Info): AI.Info => {
     const devices = (data.gpu || []) as AcceleratorDevice[];
     const legacyNPUs = devices
@@ -495,22 +808,36 @@ const applyAcceleratorInfo = (data: AI.Info) => {
     };
 };
 
-const search = async () => {
+let requestID = 0;
+const search = async (refreshEnvironment = false) => {
+    if (route.path !== pagePath) return;
     if (loading.value) return;
+    const id = ++requestID;
+    const node = currentNode.value;
     loading.value = true;
+    loadFailed.value = false;
     try {
-        const res = await loadGPUInfo();
+        const res = await loadGPUInfo(refreshEnvironment, node);
+        if (id !== requestID || node !== currentNode.value) return;
         applyAcceleratorInfo(res.data);
-        if (res.data.warnings?.length) {
-            MsgWarning(res.data.warnings.join('; '));
-        }
     } catch {
+        if (id === requestID && node === currentNode.value) loadFailed.value = true;
     } finally {
-        loading.value = false;
+        if (id === requestID) loading.value = false;
     }
 };
 
-const refresh = search;
+const refresh = () => search(true);
+
+watch(currentNode, () => {
+    requestID++;
+    loading.value = false;
+    loadFailed.value = false;
+    applyAcceleratorInfo(emptyGPUInfo());
+    detailDeviceKey.value = '';
+    processDrawerVisible.value = false;
+    search(true);
+});
 
 const visibleSections = (sections: DetailSection[]) => {
     return sections
@@ -765,6 +1092,7 @@ const stableDeviceID = (vendor: string, identifier: string | undefined, fallback
 };
 
 const openHistory = (item: AcceleratorDevice | AI.XpuInfo['xpu'][number]) => {
+    if (historyDisabled.value) return;
     let deviceID: string;
     if ('basic' in item) {
         deviceID = stableDeviceID(
@@ -919,6 +1247,15 @@ const loadEcc = (val: string) => {
 onMounted(() => {
     search();
 });
+onActivated(() => {
+    search();
+});
+const invalidateRequest = () => {
+    requestID++;
+    loading.value = false;
+};
+onDeactivated(invalidateRequest);
+onBeforeUnmount(invalidateRequest);
 </script>
 
 <style lang="scss" scoped>
@@ -953,16 +1290,6 @@ onMounted(() => {
         font-weight: 600;
         line-height: 18px;
     }
-}
-.overview-count {
-    margin-left: 16px;
-    padding-left: 16px;
-    border-left: 1px solid var(--el-border-color-lighter);
-    color: var(--el-color-primary);
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 18px;
-    white-space: nowrap;
 }
 .gpu-group-list {
     display: flex;
@@ -1167,9 +1494,6 @@ onMounted(() => {
         flex-wrap: wrap;
         gap: 8px 0;
         padding: 10px 12px;
-    }
-    .overview-count {
-        width: auto;
     }
     .device-metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));

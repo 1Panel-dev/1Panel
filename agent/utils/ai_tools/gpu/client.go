@@ -23,12 +23,26 @@ type providerResult struct {
 	err  error
 }
 
-func New() (bool, Client) {
-	client := Client{}
+// ManagementCommands discovers the same vendor tools used by collection and
+// environment checks, including installations outside the default PATH.
+func ManagementCommands() map[string]string {
+	commands := make(map[string]string)
 	if cmd.Which(nvidiaSMICommand) {
-		client.providers = append(client.providers, nvidiaSMI{})
+		commands["nvidia"] = nvidiaSMICommand
 	}
 	if command, ok := findAMDSMI(); ok {
+		commands["amd"] = command
+	}
+	return commands
+}
+
+func New() (bool, Client) {
+	client := Client{}
+	commands := ManagementCommands()
+	if commands["nvidia"] != "" {
+		client.providers = append(client.providers, nvidiaSMI{})
+	}
+	if command := commands["amd"]; command != "" {
 		client.providers = append(client.providers, amdSMI{command: command})
 	}
 	return len(client.providers) > 0, client

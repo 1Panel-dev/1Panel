@@ -56,7 +56,9 @@ func (p npuProvider) Collect(ctx context.Context) (*ProviderSnapshot, error) {
 		NPUs:          info.Devices,
 	}
 	for index := range result.NPUs {
-		result.Devices = append(result.Devices, normalizeNPU(&result.NPUs[index]))
+		device := normalizeNPU(&result.NPUs[index])
+		device.DriverVersion = info.DriverVersion
+		result.Devices = append(result.Devices, device)
 	}
 	return result, nil
 }

@@ -192,6 +192,18 @@ func (u *DockerService) LoadDockerStatus() *dto.DockerStatus {
 	return &data
 }
 
+func readDockerDaemonConfig() (map[string]interface{}, error) {
+	file, err := os.ReadFile(constant.DaemonJsonPath)
+	if err != nil {
+		return nil, err
+	}
+	daemonMap := make(map[string]interface{})
+	if err := json.Unmarshal(file, &daemonMap); err != nil {
+		return nil, err
+	}
+	return daemonMap, nil
+}
+
 func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 	ctx := context.Background()
 	var data dto.DaemonJsonConf
@@ -210,18 +222,11 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 	if strings.Contains(stdout2, "Swarm: active") {
 		data.IsSwarm = true
 	}
-	if _, err := os.Stat(constant.DaemonJsonPath); err != nil {
-		return &data, nil
-	}
-	file, err := os.ReadFile(constant.DaemonJsonPath)
+	daemonMap, err := readDockerDaemonConfig()
 	if err != nil {
 		return &data, nil
 	}
 	var conf daemonJsonItem
-	daemonMap := make(map[string]interface{})
-	if err := json.Unmarshal(file, &daemonMap); err != nil {
-		return &data, nil
-	}
 	arr, err := json.Marshal(daemonMap)
 	if err != nil {
 		return &data, err

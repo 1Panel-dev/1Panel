@@ -47,8 +47,11 @@ export const loadModelGPUDevices = () => {
     return http.get<{ devices: AI.ModelGPUDevice[]; warnings: string[] }>('/ai/model/gpu/devices');
 };
 
-export const loadGPUInfo = () => {
-    return http.get<AI.Info>(`/ai/gpu/load`);
+export const loadGPUInfo = (refresh = false, currentNode?: string) => {
+    return http.get<AI.Info>(`/ai/gpu/load`, refresh ? { refresh: true } : {}, {
+        timeout: TimeoutEnum.T_40S,
+        headers: currentNode ? { CurrentNode: currentNode } : undefined,
+    });
 };
 export const getGPUOptions = (currentNode?: string) => {
     return http.get<AI.MonitorGPUOptions>(
