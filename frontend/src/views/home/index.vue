@@ -622,6 +622,14 @@ const vllmChartOption = computed(() => ({
     grid: monitorChartGrid,
     legend: monitorChartLegend,
     formatStr: 'tokens/s',
+    yAxis: [
+        {
+            type: 'value',
+            name: '( tokens/s )',
+            min: 0,
+            max: ({ max }: { max: number }) => (max > 0 ? undefined : 1),
+        },
+    ],
     tooltip: {
         trigger: 'axis',
         valueFormatter: (value: number | null) => `${formatVllmMetric(value)} tokens/s`,
@@ -648,12 +656,14 @@ const loadVllmOptions = async () => {
     }
 };
 
-const stopVllmMonitor = () => {
+const stopVllmMonitor = (resetData = true) => {
     clearTimeout(vllmTimer);
     vllmController?.abort();
-    vllmCurrent.value = undefined;
-    vllmPoints.value = [];
-    vllmLoadFailed.value = false;
+    if (resetData) {
+        vllmCurrent.value = undefined;
+        vllmPoints.value = [];
+        vllmLoadFailed.value = false;
+    }
 };
 
 const refreshVllmMonitor = async () => {
@@ -1364,8 +1374,8 @@ watch(
     { immediate: true, flush: 'sync' },
 );
 
-watch([chartOption, vllmInstallID, isActive], () => {
-    stopVllmMonitor();
+watch([chartOption, vllmInstallID, isActive], ([, installID], [, previousInstallID]) => {
+    stopVllmMonitor(installID !== previousInstallID);
     if (chartOption.value === 'vllm' && hasVllm.value && vllmInstallID.value && isActive.value) {
         void refreshVllmMonitor();
     }
