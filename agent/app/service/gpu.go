@@ -74,7 +74,7 @@ func LoadGPUInfo(ctx context.Context, refresh bool) (*dto.GPURealtimeInfo, error
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	environment := assembleGPUEnvironment(probe, summaries, collectErr, snapshot.Info.Warnings)
+	environment := assembleGPUEnvironment(probe, summaries, collectErr, snapshot.Info)
 	for _, check := range environment.Checks {
 		if check.Item == "driver" && check.Vendor != "" && !slices.ContainsFunc(summaries, func(item dto.GPUSummary) bool { return item.Vendor == check.Vendor }) {
 			summaries = append(summaries, dto.GPUSummary{Vendor: check.Vendor, MemoryPartial: true})
@@ -96,8 +96,6 @@ func loadGPUEnvironmentProbe(ctx context.Context, refresh, nvidiaPresent bool) g
 			return cached
 		}
 	}
-	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-	defer cancel()
 	probe := gpuEnvironmentProbe{CheckedAt: time.Now(), Commands: map[string]bool{}}
 	var err error
 	probe.Hardware, err = detectGPUHardware("/sys/bus/pci/devices")
@@ -160,7 +158,7 @@ func detectGPUHardware(directory string) (map[string]int, error) {
 	return devices, nil
 }
 
-func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummary, collectErr error, warnings []string) dto.GPUEnvironment {
+func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummary, collectErr error, info accelerator.Info) dto.GPUEnvironment {
 	result := dto.GPUEnvironment{CheckedAt: probe.CheckedAt, HardwareStatus: "not_detected", Checks: []dto.GPUEnvironmentCheck{}}
 	if len(probe.Hardware) > 0 || len(summaries) > 0 {
 		result.HardwareStatus = "detected"
@@ -177,6 +175,21 @@ func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummar
 		case index >= 0:
 			check.Status = "passed"
 			check.Version = summaries[index].DriverVersion
+			if vendor == "intel" {
+				var readErrors []string
+				for _, device := range info.XPUs {
+					if device.ReadError != "" {
+						readErrors = append(readErrors, device.ReadError)
+					}
+				}
+				if len(readErrors) > 0 {
+					check.Status = "unknown"
+					if len(readErrors) == len(info.XPUs) {
+						check.Status = "failed"
+					}
+					check.Reason = strings.Join(readErrors, "; ")
+				}
+			}
 		case !probe.Commands[vendor]:
 			check.Status = "missing"
 			check.Reason = "The device management utility was not found; check the driver and management tool installation."
@@ -185,9 +198,9 @@ func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummar
 			check.Reason = collectErr.Error()
 		default:
 			check.Reason = "The management utility returned no readable devices."
-			if len(warnings) > 0 {
+			if len(info.Warnings) > 0 {
 				check.Status = "failed"
-				check.Reason = strings.Join(warnings, "; ")
+				check.Reason = strings.Join(info.Warnings, "; ")
 			}
 		}
 		result.Checks = append(result.Checks, check)
@@ -214,22 +227,26 @@ func findGPUContainerCommand(name string) string {
 }
 
 func checkNVIDIAContainerEnvironment(ctx context.Context) []dto.GPUEnvironmentCheck {
-	toolkit := checkNVIDIAToolkit(ctx, findGPUContainerCommand, func(ctx context.Context, path string) (string, error) {
+	toolkitCtx, cancelToolkit := context.WithTimeout(ctx, 5*time.Second)
+	toolkit := checkNVIDIAToolkit(toolkitCtx, findGPUContainerCommand, func(ctx context.Context, path string) (string, error) {
 		return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(3*time.Second)).RunWithStdout(path, "--version")
 	})
+	cancelToolkit()
+	dockerCtx, cancelDocker := context.WithTimeout(ctx, 5*time.Second)
+	defer cancelDocker()
 	dockerCheck := dto.GPUEnvironmentCheck{Vendor: "nvidia", Item: "docker", Status: "failed"}
 	cli, err := docker.NewDockerClient()
 	if err == nil {
 		defer cli.Close()
 		var info system.Info
-		info, err = cli.Info(ctx)
+		info, err = cli.Info(dockerCtx)
 		if err == nil {
 			dockerCheck = checkNVIDIADockerInfo(info, false)
 			if cli.DaemonHost() == "unix:///var/run/docker.sock" {
 				dockerCheck = checkNVIDIADockerConfig(info, readDockerDaemonConfig, findGPUContainerCommand)
-			} else if dockerCheck.Status != "passed" {
+			} else {
 				dockerCheck.Status = "unknown"
-				dockerCheck.Reason = "The selected Docker daemon has no registered NVIDIA runtime; its configuration cannot be verified using the local default daemon.json."
+				dockerCheck.Reason = "The selected Docker daemon's NVIDIA runtime cannot be verified using local executables or the default daemon.json."
 			}
 		}
 	}
@@ -273,11 +290,6 @@ func checkNVIDIAToolkit(ctx context.Context, findCommand func(string) string, ru
 		}
 		return toolkit
 	}
-	if ctk := findCommand("nvidia-ctk"); ctk != "" {
-		if data, err := runVersion(ctx, ctk); err == nil && strings.TrimSpace(data) != "" {
-			toolkit.Version = strings.SplitN(strings.TrimSpace(data), "\n", 2)[0]
-		}
-	}
 	return toolkit
 }
 
@@ -297,7 +309,25 @@ func checkNVIDIADockerInfo(info system.Info, hookInstalled bool) dto.GPUEnvironm
 func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]interface{}, error), findCommand func(string) string) dto.GPUEnvironmentCheck {
 	result := checkNVIDIADockerInfo(info, false)
 	if result.Status == "passed" {
+		runtimePath := info.Runtimes["nvidia"].Path
+		if runtimePath == "" {
+			result.Status = "unknown"
+			result.Reason = "Docker registered an NVIDIA runtime without an executable path; its availability cannot be verified."
+			return result
+		}
+		resolved := runtimePath
+		if !filepath.IsAbs(runtimePath) {
+			resolved = findCommand(runtimePath)
+		}
+		if resolved == "" || !cmd.Which(resolved) {
+			result.Status = "failed"
+			result.Code = "dockerConfigInvalid"
+			result.Reason = fmt.Sprintf("The registered NVIDIA runtime %q cannot be found or executed.", runtimePath)
+		}
 		return result
+	}
+	if hook := findCommand("nvidia-container-runtime-hook"); hook != "" && cmd.Which(hook) {
+		result = checkNVIDIADockerInfo(info, true)
 	}
 	config, err := readConfig()
 	if err != nil {
@@ -305,6 +335,9 @@ func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]int
 		var typeError *json.UnmarshalTypeError
 		switch {
 		case os.IsNotExist(err):
+			if result.Status == "unknown" {
+				return result
+			}
 			result.Code = "dockerConfigMissing"
 			result.Reason = fmt.Sprintf("Docker configuration %s is missing; configure runtimes.nvidia.path and restart Docker.", constant.DaemonJsonPath)
 		case errors.As(err, &syntaxError), errors.As(err, &typeError):
@@ -326,6 +359,9 @@ func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]int
 	}
 	runtimes, ok := config["runtimes"].(map[string]interface{})
 	if config["runtimes"] == nil || (ok && runtimes["nvidia"] == nil) {
+		if result.Status == "unknown" {
+			return result
+		}
 		result.Code = "dockerConfigMissing"
 		result.Reason = fmt.Sprintf("Docker configuration %s has no runtimes.nvidia entry.", constant.DaemonJsonPath)
 		return result
@@ -345,6 +381,7 @@ func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]int
 		result.Reason = fmt.Sprintf("The configured NVIDIA runtime %q cannot be found or executed.", runtimePath)
 		return result
 	}
+	result.Status = "unconfigured"
 	result.Code = "dockerConfigPending"
 	result.Reason = "The default daemon.json contains runtimes.nvidia.path, but the running Docker daemon has not registered the NVIDIA runtime; confirm the daemon uses this configuration file, then restart Docker and check again."
 	return result

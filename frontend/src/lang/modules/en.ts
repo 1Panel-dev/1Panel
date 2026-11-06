@@ -1791,6 +1791,7 @@ const message = {
                 goContainerSettings: 'Open Container Settings',
                 details: 'Check details',
                 vendor: 'Vendor',
+                gpuCount: 'GPU count',
                 cardCount: 'Card count',
                 notDetected: 'No supported GPU/NPU/XPU devices were detected on the current node.',
                 unknown: 'Could not confirm device status. Review the check details and try again.',

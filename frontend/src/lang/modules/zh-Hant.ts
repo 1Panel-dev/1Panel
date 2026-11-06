@@ -1682,6 +1682,7 @@ const message = {
                 goContainerSettings: '前往容器設定',
                 details: '偵測詳情',
                 vendor: '廠商',
+                gpuCount: 'GPU 數量',
                 cardCount: '卡數量',
                 notDetected: '目前節點未偵測到支援的 GPU/NPU/XPU 裝置。',
                 unknown: '無法確認裝置狀態，請查看偵測詳情後重新偵測。',

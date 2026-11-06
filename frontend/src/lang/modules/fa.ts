@@ -1767,6 +1767,7 @@ const message = {
                 goContainerSettings: 'باز کردن تنظیمات کانتینر',
                 details: 'جزئیات بررسی',
                 vendor: 'سازنده',
+                gpuCount: 'تعداد GPU',
                 cardCount: 'تعداد کارت‌ها',
                 notDetected: 'هیچ دستگاه GPU/NPU/XPU پشتیبانی‌شده‌ای در گره فعلی شناسایی نشد.',
                 unknown: 'وضعیت دستگاه قابل تأیید نیست. جزئیات بررسی را ببینید و دوباره تلاش کنید.',

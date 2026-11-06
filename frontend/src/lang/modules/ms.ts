@@ -1805,6 +1805,7 @@ const message = {
                 goContainerSettings: 'Buka tetapan bekas',
                 details: 'Butiran semakan',
                 vendor: 'Pengeluar',
+                gpuCount: 'Bilangan GPU',
                 cardCount: 'Bilangan kad',
                 notDetected: 'Tiada peranti GPU/NPU/XPU yang disokong dikesan pada nod semasa.',
                 unknown: 'Status peranti tidak dapat dipastikan. Lihat butiran semakan dan cuba lagi.',

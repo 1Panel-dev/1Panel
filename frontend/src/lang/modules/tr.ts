@@ -1801,6 +1801,7 @@ const message = {
                 goContainerSettings: 'Kapsayıcı ayarlarını aç',
                 details: 'Denetim ayrıntıları',
                 vendor: 'Üretici',
+                gpuCount: 'GPU sayısı',
                 cardCount: 'Kart sayısı',
                 notDetected: 'Geçerli düğümde desteklenen GPU/NPU/XPU aygıtı algılanmadı.',
                 unknown: 'Aygıt durumu doğrulanamadı. Denetim ayrıntılarını inceleyip yeniden deneyin.',

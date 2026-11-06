@@ -1754,6 +1754,7 @@ const message = {
                 goContainerSettings: '컨테이너 설정 열기',
                 details: '점검 세부 정보',
                 vendor: '제조사',
+                gpuCount: 'GPU 수',
                 cardCount: '카드 수',
                 notDetected: '현재 노드에서 지원되는 GPU/NPU/XPU 장치가 감지되지 않았습니다.',
                 unknown: '장치 상태를 확인할 수 없습니다. 점검 세부 정보를 확인한 후 다시 시도하세요.',

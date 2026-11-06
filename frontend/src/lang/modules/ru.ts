@@ -1796,6 +1796,7 @@ const message = {
                 goContainerSettings: 'Открыть настройки контейнеров',
                 details: 'Подробности проверки',
                 vendor: 'Производитель',
+                gpuCount: 'Количество GPU',
                 cardCount: 'Количество карт',
                 notDetected: 'На текущем узле не обнаружены поддерживаемые устройства GPU/NPU/XPU.',
                 unknown:

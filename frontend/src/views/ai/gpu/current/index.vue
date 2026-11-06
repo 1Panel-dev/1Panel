@@ -153,7 +153,15 @@
                             <strong v-else>{{ $t('aiTools.gpu.environment.notApplicable') }}</strong>
                         </div>
                         <div class="overview-item">
-                            <span>{{ $t('aiTools.gpu.environment.cardCount') }}</span>
+                            <span>
+                                {{
+                                    $t(
+                                        summary.vendor === 'intel' || summary.vendor === 'xpu'
+                                            ? 'aiTools.gpu.environment.gpuCount'
+                                            : 'aiTools.gpu.environment.cardCount',
+                                    )
+                                }}
+                            </span>
                             <strong>{{ summary.cardCountText }}</strong>
                         </div>
                         <div class="overview-item">
@@ -752,7 +760,7 @@ const showEnvironment = computed(
 );
 const hostEnvironmentStatus = computed<{ type: 'success' | 'warning' | 'info'; label: string }>(() => {
     const hasDriverIssue = driverChecks.value.some((check) => check.status !== 'passed');
-    if (hasAccelerators.value) {
+    if (hasAccelerators.value && (!hasDriverIssue || driverChecks.value.some((check) => check.status === 'passed'))) {
         return hasDriverIssue
             ? { type: 'warning', label: 'monitorPartial' }
             : { type: 'success', label: 'monitorAvailable' };

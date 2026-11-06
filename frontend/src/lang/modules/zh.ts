@@ -1695,6 +1695,7 @@ const message = {
                 goContainerSettings: '前往容器配置',
                 details: '检测详情',
                 vendor: '厂商',
+                gpuCount: 'GPU 数量',
                 cardCount: '卡数量',
                 notDetected: '当前节点未检测到支持的 GPU/NPU/XPU 设备。',
                 unknown: '无法确认设备状态，请查看检测详情后重新检测。',

@@ -1805,6 +1805,7 @@ const message = {
                 goContainerSettings: 'Abrir configuración de contenedores',
                 details: 'Detalles de la comprobación',
                 vendor: 'Fabricante',
+                gpuCount: 'Cantidad de GPU',
                 cardCount: 'Número de tarjetas',
                 notDetected: 'No se detectaron dispositivos GPU/NPU/XPU compatibles en el nodo actual.',
                 unknown: 'No se pudo confirmar el estado del dispositivo. Revise los detalles y vuelva a comprobarlo.',
