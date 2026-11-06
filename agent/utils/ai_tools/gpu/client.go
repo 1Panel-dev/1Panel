@@ -23,8 +23,6 @@ type providerResult struct {
 	err  error
 }
 
-// ManagementCommands discovers the same vendor tools used by collection and
-// environment checks, including installations outside the default PATH.
 func ManagementCommands() map[string]string {
 	commands := make(map[string]string)
 	if cmd.Which(nvidiaSMICommand) {

@@ -623,8 +623,6 @@ const overviewRows = computed(() => {
         });
     }
     if (!hasAccelerators.value) return [];
-    // Older nodes lack summaries. Reuse all collected cards and the existing
-    // memory parser, without counting tiles or the shared host pool twice.
     const memoryDevices = [
         ...[...gpuInfo.value.gpu, ...gpuInfo.value.npu].map((device) => ({
             id: deviceKey(device),

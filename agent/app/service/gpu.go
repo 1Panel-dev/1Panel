@@ -39,8 +39,6 @@ type gpuEnvironmentProbe struct {
 	Checks        []dto.GPUEnvironmentCheck `json:"checks"`
 }
 
-// LoadGPUInfo enriches the realtime response without changing the collection
-// contract used by background monitoring and model device selection.
 func LoadGPUInfo(ctx context.Context, refresh bool) (*dto.GPURealtimeInfo, error) {
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
@@ -77,7 +75,6 @@ func LoadGPUInfo(ctx context.Context, refresh bool) (*dto.GPURealtimeInfo, error
 		return nil, err
 	}
 	environment := assembleGPUEnvironment(probe, summaries, collectErr, snapshot.Info.Warnings)
-	// Keep identified hardware visible even when its management tool is missing.
 	for _, check := range environment.Checks {
 		if check.Item == "driver" && check.Vendor != "" && !slices.ContainsFunc(summaries, func(item dto.GPUSummary) bool { return item.Vendor == check.Vendor }) {
 			summaries = append(summaries, dto.GPUSummary{Vendor: check.Vendor, MemoryPartial: true})
@@ -124,9 +121,6 @@ func loadGPUEnvironmentProbe(ctx context.Context, refresh, nvidiaPresent bool) g
 	return probe
 }
 
-// PCI inventory does not depend on the vendor's driver or management utility.
-// Restrict class codes so Intel NICs and Huawei management controllers cannot
-// be mistaken for compute devices merely because their vendor IDs match.
 func detectGPUHardware(directory string) (map[string]int, error) {
 	devices := map[string]int{}
 	entries, err := os.ReadDir(directory)
@@ -210,8 +204,6 @@ func findGPUContainerCommand(name string) string {
 		if cmd.Which(path) {
 			return path
 		}
-		// Preserve an installed but non-executable component so the version
-		// check reports its permission error instead of claiming it is absent.
 		if filepath.IsAbs(path) {
 			if info, err := os.Stat(path); err == nil && !info.IsDir() {
 				return path
@@ -281,8 +273,6 @@ func checkNVIDIAToolkit(ctx context.Context, findCommand func(string) string, ru
 		}
 		return toolkit
 	}
-	// nvidia-ctk is not required by legacy nvidia-docker2 installations. Prefer
-	// its package version when available without treating its absence as failure.
 	if ctk := findCommand("nvidia-ctk"); ctk != "" {
 		if data, err := runVersion(ctx, ctk); err == nil && strings.TrimSpace(data) != "" {
 			toolkit.Version = strings.SplitN(strings.TrimSpace(data), "\n", 2)[0]
@@ -297,8 +287,6 @@ func checkNVIDIADockerInfo(info system.Info, hookInstalled bool) dto.GPUEnvironm
 		result.Status = "passed"
 		return result
 	}
-	// DeviceRequests can also be served by a daemon that discovered NVIDIA's
-	// runtime hook at startup. The Info API cannot confirm that registration.
 	if hookInstalled {
 		result.Status = "unknown"
 		result.Reason = "NVIDIA runtime hook is installed, but Docker does not expose its GPU device-driver registration."
@@ -308,8 +296,6 @@ func checkNVIDIADockerInfo(info system.Info, hookInstalled bool) dto.GPUEnvironm
 
 func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]interface{}, error), findCommand func(string) string) dto.GPUEnvironmentCheck {
 	result := checkNVIDIADockerInfo(info, false)
-	// Runtime registration may come from --add-runtime or a custom config file.
-	// A working daemon must not fail because the default file is not its source.
 	if result.Status == "passed" {
 		return result
 	}
@@ -352,7 +338,6 @@ func checkNVIDIADockerConfig(info system.Info, readConfig func() (map[string]int
 		result.Reason = "runtimes.nvidia.path must contain a runtime executable name or absolute path."
 		return result
 	}
-	// Only inspect executability; never execute an arbitrary configured path.
 	resolved := findCommand(runtimePath)
 	if resolved == "" || !cmd.Which(resolved) {
 		result.Status = "failed"
@@ -394,7 +379,6 @@ func summarizeGPUs(snapshot *accelerator.Snapshot) []dto.GPUSummary {
 			}
 			bytes := device.Metrics.MemoryTotal.ValueOrZero() * 1024 * 1024
 			if device.GPU != nil && device.GPU.SharedMemory {
-				// All unified-memory GPUs share this same host memory pool.
 				if summary.SharedMemoryTotal == nil || bytes > *summary.SharedMemoryTotal {
 					summary.SharedMemoryTotal = &bytes
 				}
