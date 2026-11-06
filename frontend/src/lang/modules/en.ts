@@ -1062,13 +1062,12 @@ const message = {
             ollamaNameHelper:
                 'Enter the full model name from the Ollama library. If no tag is specified, latest is used.',
             downloadHelper:
-                'Search and download models from ModelScope or Hugging Face, or upload local models following the {requirements}.',
+                'Download models or tokenizers from ModelScope or Hugging Face, or add local files using the {requirements}.',
             localModelSizeHelper:
                 'This is the current directory size and does not confirm that all files have finished uploading.',
-            localModelLayoutTitle: 'Directory requirements',
-            localModelLayoutPath: 'Place the complete model in {modelDir} using the organization/model-name structure.',
-            localModelLayoutConfig:
-                'The model root must contain config.json or params.json; otherwise, it will not appear in the list.',
+            localModelLayoutTitle: 'Examples',
+            localLayoutDirect: 'Direct placement',
+            localLayoutGrouped: 'Group by organization (optional)',
             serviceHelper:
                 'Connect model services from public clouds, local inference engines, and AI gateways for use by built-in 1Panel agents and external agents such as WorkBuddy.',
             gpuType: 'GPU Type',
@@ -1108,6 +1107,9 @@ const message = {
             addInstance: 'Add instance',
             modelScopeEndpointHelper: 'Used to search and download ModelScope models. Defaults to the official URL.',
             modelTokenHelper: 'Optional. Use a token with access permissions for private or restricted models.',
+            tokenizerDir: 'Tokenizer directory',
+            tokenizerDirHelper:
+                'Directory for tokenizer downloads and the local tokenizer list. Changing it does not move existing files.',
             modelDirHelper:
                 'Directory for model downloads and the local model list. Changing it does not move existing files.',
             featuredModelsHelper:
@@ -2204,23 +2206,19 @@ const message = {
         mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
         goImages: 'Go to image management',
         goModels: 'Go to model downloads',
-        tokenizerHelp:
-            'Tokenizers encode test text and count tokens. Select a model with valid tokenizer files from the default model directory.',
+        tokenizerHelp: 'Select a tokenizer from the tokenizer directory to encode test text and count tokens.',
         tokenizerEmpty: 'No models are available. Download a model containing tokenizer files in model downloads.',
-        tokenizerEmptyWithDownload:
-            'No models are available. Open {download} to download a model containing tokenizer files.',
-        tokenizerInvalid:
-            'This model has no usable tokenizer. Select another model or prepare its files in model downloads.',
+        tokenizerEmptyWithDownload: 'No tokenizers are available. Open {download} to download one.',
+        tokenizerInvalid: 'This tokenizer is unavailable. Select another or download it again in model downloads.',
         schemeHelp:
             'Test schemes define request parameters, concurrency, and execution rules. Prepare at least one available scheme.',
         schemeEmpty: 'No test schemes are available. Create a scheme first.',
         manageSchemes: 'Manage test schemes',
         selectService: 'Select a model service',
-        serviceHelp:
-            'Select a model service to benchmark. Requests will be sent to this service; make sure it is reachable.',
+        serviceHelp: 'Select a model service; edit the request URL as needed.',
         noServices: 'No model services are available. Add a model service first.',
         goModelServices: 'Go to model services',
-        unsupportedServices: 'Unsupported services are disabled. Hover over an option for the reason.',
+        serviceUnsupported: 'Not supported yet',
         unsupportedProtocol:
             'This API protocol is not supported: {0}. Select a model service using OpenAI Chat Completions.',
         unsupportedAuth:

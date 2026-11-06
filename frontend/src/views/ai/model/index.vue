@@ -96,7 +96,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="provider" :label="$t('aiTools.model.engineProvider')" min-width="180">
+                    <el-table-column prop="provider" :label="$t('aiTools.agents.provider')" min-width="180">
                         <template #default="{ row }">
                             <div class="cell-ellipsis">
                                 <ProviderLabel :provider="row.provider" :display-name="row.providerName" />

@@ -1039,12 +1039,11 @@ const message = {
             localFilesMissing: '로컬 파일을 찾을 수 없습니다',
             ollamaNameHelper: 'Ollama 라이브러리의 전체 모델 이름을 입력하세요. 태그를 생략하면 latest가 사용됩니다.',
             downloadHelper:
-                'ModelScope 또는 Hugging Face에서 모델을 검색하여 다운로드하거나 {requirements}에 맞춰 로컬 모델을 업로드할 수 있습니다.',
+                'ModelScope 또는 Hugging Face에서 모델이나 토크나이저를 다운로드하거나 {requirements}에 따라 로컬 파일을 추가하세요.',
             localModelSizeHelper: '현재 디렉터리 크기이며 모든 파일의 업로드가 완료되었음을 의미하지 않습니다.',
-            localModelLayoutTitle: '디렉터리 요구 사항',
-            localModelLayoutPath: '전체 모델을 조직/모델 이름 구조로 모델 디렉터리 {modelDir}에 배치하세요.',
-            localModelLayoutConfig:
-                '모델 루트에 config.json 또는 params.json이 있어야 합니다. 없으면 목록에 표시되지 않습니다.',
+            localModelLayoutTitle: '예시',
+            localLayoutDirect: '바로 배치',
+            localLayoutGrouped: '조직별 분류 (선택)',
             serviceHelper:
                 '퍼블릭 클라우드, 로컬 추론 엔진, AI 게이트웨이 등의 모델 서비스를 통합하여 1Panel 내장 에이전트와 WorkBuddy 같은 외부 에이전트에서 사용할 수 있습니다.',
             gpuType: 'GPU 유형',
@@ -1083,6 +1082,9 @@ const message = {
             addInstance: '인스턴스 추가',
             modelScopeEndpointHelper: 'ModelScope 모델 검색 및 다운로드에 사용하며, 기본값은 공식 URL입니다.',
             modelTokenHelper: '선택 사항. 비공개 또는 제한된 모델에는 접근 권한이 있는 토큰이 필요합니다.',
+            tokenizerDir: '토크나이저 디렉터리',
+            tokenizerDirHelper:
+                '토크나이저 다운로드 저장 및 로컬 목록 조회에 사용합니다. 변경해도 기존 파일은 이동하지 않습니다.',
             modelDirHelper:
                 '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다. 변경해도 기존 파일은 이동하지 않습니다.',
             featuredModelsHelper:
@@ -2161,25 +2163,20 @@ const message = {
         mainNodeHelp: '벤치마크는 메인 노드에서 실행됩니다. 이미지와 토크나이저를 메인 노드에 준비하세요.',
         goImages: '이미지 관리로 이동',
         goModels: '모델 다운로드로 이동',
-        tokenizerHelp:
-            '토크나이저는 테스트 텍스트를 인코딩하고 토큰 수를 계산합니다. 기본 모델 디렉터리에서 유효한 토크나이저 파일이 포함된 모델을 선택하세요.',
+        tokenizerHelp: '토크나이저 디렉터리에서 항목을 선택하여 테스트 텍스트를 인코딩하고 토큰 수를 계산하세요.',
         tokenizerEmpty:
             '사용 가능한 모델이 없습니다. 모델 다운로드에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
-        tokenizerEmptyWithDownload:
-            '사용 가능한 모델이 없습니다. {download} 페이지에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
-        tokenizerInvalid:
-            '이 모델의 토크나이저를 사용할 수 없습니다. 다른 모델을 선택하거나 모델 다운로드에서 파일을 다시 준비하세요.',
+        tokenizerEmptyWithDownload: '사용 가능한 토크나이저가 없습니다. {download}에서 다운로드하세요.',
+        tokenizerInvalid: '이 토크나이저는 사용할 수 없습니다. 다른 항목을 선택하거나 다시 다운로드하세요.',
         schemeHelp:
             '테스트 계획은 요청 매개변수, 동시 실행 수 및 실행 규칙을 정의합니다. 사용 가능한 계획을 하나 이상 준비하세요.',
         schemeEmpty: '사용 가능한 테스트 계획이 없습니다. 먼저 계획을 생성하세요.',
         manageSchemes: '테스트 계획 관리',
         selectService: '모델 서비스 선택',
-        serviceHelp:
-            '벤치마크할 모델 서비스를 선택하세요. 해당 서비스에 요청을 보내므로 정상적으로 접근할 수 있는지 확인하세요.',
+        serviceHelp: '모델 서비스를 선택하고 필요하면 요청 URL을 수정하세요.',
         noServices: '사용 가능한 모델 서비스가 없습니다. 먼저 모델 서비스를 추가하세요.',
         goModelServices: '모델 서비스로 이동',
-        unsupportedServices:
-            '지원하지 않는 서비스는 선택할 수 없습니다. 항목 위에 마우스를 올리면 이유를 확인할 수 있습니다.',
+        serviceUnsupported: '아직 지원하지 않음',
         unsupportedProtocol:
             '지원하지 않는 API 프로토콜입니다: {0}. OpenAI Chat Completions를 사용하는 모델 서비스를 선택하세요.',
         unsupportedAuth: '지원하지 않는 인증 방식입니다: {0}. Bearer 인증을 사용하는 서비스를 선택하세요.',

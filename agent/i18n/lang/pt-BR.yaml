@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "Falha na verificação de {{ .count }} contêinere
 ErrImageCheckProxyRequired: "Para verificar atualizações de imagens no ambiente atual, configure primeiro um servidor proxy."
 
 ErrPHPExtensionsConflict: "Já existe um modelo de extensões PHP com este nome e conteúdo diferente; ele não foi sobrescrito"
+
+ErrModelTokenizerDirOverlap: "Os diretórios de modelos e tokenizadores devem ser diferentes e nenhum pode conter o outro"

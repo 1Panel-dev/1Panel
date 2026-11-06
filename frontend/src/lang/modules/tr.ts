@@ -1070,13 +1070,12 @@ const message = {
             localFilesMissing: 'Yerel dosyalar bulunamadı',
             ollamaNameHelper: 'Ollama kütüphanesindeki tam model adını girin. Etiket belirtilmezse latest kullanılır.',
             downloadHelper:
-                'ModelScope veya Hugging Face üzerinden model arayıp indirin ya da {requirements} doğrultusunda yerel modeller yükleyin.',
+                'ModelScope veya Hugging Face üzerinden model ya da tokenizer indirin veya {requirements} ile yerel dosyalar ekleyin.',
             localModelSizeHelper:
                 'Bu, dizinin mevcut boyutudur; tüm dosyaların yüklenmesinin tamamlandığını doğrulamaz.',
-            localModelLayoutTitle: 'Dizin gereksinimleri',
-            localModelLayoutPath: 'Eksiksiz modeli kuruluş/model adı yapısıyla {modelDir} model dizinine yerleştirin.',
-            localModelLayoutConfig:
-                'Model kökünde config.json veya params.json bulunmalıdır; aksi takdirde model listede görünmez.',
+            localModelLayoutTitle: 'Örnekler',
+            localLayoutDirect: 'Doğrudan yerleştirme',
+            localLayoutGrouped: 'Kuruluşa göre (isteğe bağlı)',
             serviceHelper:
                 'Genel bulutlardan, yerel çıkarım motorlarından ve AI ağ geçitlerinden model hizmetlerini bağlayarak yerleşik 1Panel ajanları ve WorkBuddy gibi harici ajanlar için kullanıma sunun.',
             gpuType: 'GPU türü',
@@ -1116,6 +1115,9 @@ const message = {
             modelScopeEndpointHelper:
                 'ModelScope modellerini aramak ve indirmek için kullanılır. Varsayılan, resmî URL adresidir.',
             modelTokenHelper: 'İsteğe bağlı. Özel veya kısıtlı modeller için erişim yetkili bir token kullanın.',
+            tokenizerDir: 'Tokenizer dizini',
+            tokenizerDirHelper:
+                'Tokenizer indirmeleri ve yerel liste için kullanılan dizin. Değiştirmek mevcut dosyaları taşımaz.',
             modelDirHelper:
                 'Modellerin indirildiği ve yerel model listesinin okunduğu dizin. Değiştirmek mevcut dosyaları taşımaz.',
             featuredModelsHelper:
@@ -2220,23 +2222,19 @@ const message = {
         mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
         goImages: 'İmaj yönetimine git',
         goModels: 'Model indirmelerine git',
-        tokenizerHelp:
-            'Tokenizer test metnini kodlar ve token sayısını hesaplar. Varsayılan model dizininden geçerli tokenizer dosyaları içeren bir model seçin.',
+        tokenizerHelp: 'Test metnini kodlamak ve token saymak için tokenizer dizininden bir tokenizer seçin.',
         tokenizerEmpty: 'Kullanılabilir model yok. Model indirmelerinden tokenizer dosyaları içeren bir model indirin.',
-        tokenizerEmptyWithDownload:
-            'Kullanılabilir model yok. Tokenizer dosyaları içeren bir model indirmek için {download} sayfasını açın.',
-        tokenizerInvalid:
-            'Bu modelde kullanılabilir tokenizer yok. Başka bir model seçin veya model indirmelerinde dosyalarını hazırlayın.',
+        tokenizerEmptyWithDownload: 'Kullanılabilir tokenizer yok. İndirmek için {download} sayfasını açın.',
+        tokenizerInvalid: 'Bu tokenizer kullanılamıyor. Başka birini seçin veya yeniden indirin.',
         schemeHelp:
             'Test planları istek parametrelerini, eşzamanlılığı ve yürütme kurallarını tanımlar. En az bir kullanılabilir plan hazırlayın.',
         schemeEmpty: 'Kullanılabilir test planı yok. Önce bir plan oluşturun.',
         manageSchemes: 'Test planlarını yönet',
         selectService: 'Bir model hizmeti seçin',
-        serviceHelp:
-            'Test edilecek model hizmetini seçin. Bu hizmete istek gönderilecektir; erişilebilir olduğundan emin olun.',
+        serviceHelp: 'Model hizmetini seçin; gerekirse istek URL’sini düzenleyin.',
         noServices: 'Kullanılabilir model hizmeti yok. Önce bir model hizmeti ekleyin.',
         goModelServices: 'Model hizmetlerine git',
-        unsupportedServices: 'Desteklenmeyen hizmetler devre dışı. Nedenini görmek için seçeneğin üzerine gelin.',
+        serviceUnsupported: 'Henüz desteklenmiyor',
         unsupportedProtocol:
             'Bu API protokolü desteklenmiyor: {0}. OpenAI Chat Completions kullanan bir model hizmeti seçin.',
         unsupportedAuth:

@@ -809,3 +809,5 @@ ContainerImageCheckFailures: "ກວດສອບ {{ .count }} ຄອນເທນ
 ErrImageCheckProxyRequired: "ເພື່ອກວດສອບການອັບເດດອິມເມຈໃນສະພາບແວດລ້ອມປັດຈຸບັນ ກະລຸນາຕັ້ງຄ່າພຣັອກຊີເຊີບເວີກ່ອນ."
 
 ErrPHPExtensionsConflict: "ມີແມ່ແບບສ່ວນຂະຫຍາຍ PHP ຊື່ນີ້ຢູ່ແລ້ວແຕ່ເນື້ອຫາຕ່າງກັນ; ບໍ່ໄດ້ຂຽນທັບ"
+
+ErrModelTokenizerDirOverlap: "ໂຟນເດີໂມເດວ ແລະ tokenizer ຕ້ອງແຕກຕ່າງກັນ ແລະ ບໍ່ສາມາດຢູ່ພາຍໃນກັນໄດ້"

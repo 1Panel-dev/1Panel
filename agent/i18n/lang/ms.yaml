@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "Semakan {{ .count }} kontena gagal; lihat log tuga
 ErrImageCheckProxyRequired: "Untuk menyemak kemas kini imej dalam persekitaran semasa, sila konfigurasikan pelayan proksi terlebih dahulu."
 
 ErrPHPExtensionsConflict: "Templat sambungan PHP dengan nama ini sudah wujud tetapi kandungannya berbeza; tidak ditulis ganti"
+
+ErrModelTokenizerDirOverlap: "Direktori model dan tokenizer mestilah berbeza dan tidak boleh mengandungi satu sama lain"
