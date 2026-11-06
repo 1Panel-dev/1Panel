@@ -874,7 +874,7 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 		return false
 	case message, ok := <-messages:
 		if ok {
-			_, err := fmt.Fprintf(w, "data: %s\n\n", message)
+			_, err := fmt.Fprintf(w, "data: %s\n\n", base64.StdEncoding.EncodeToString([]byte(message)))
 			return err == nil
 		}
 		// The collector closes both channels when it finishes. Drain all buffered
@@ -952,8 +952,6 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		}
 	}()
 
-	reader := bufio.NewReader(stdout)
-
 	processKilled := false
 	go func() {
 		<-done
@@ -966,27 +964,21 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 		}
 	}()
 
+	buffer := make([]byte, 32*1024)
 	for {
-		line, err := reader.ReadString('\n')
+		n, err := stdout.Read(buffer)
+		if n > 0 {
+			select {
+			case messageChan <- string(buffer[:n]):
+			case <-done:
+				return
+			}
+		}
 		if err != nil {
 			if err == io.EOF {
-				if len(line) > 0 {
-					line = strings.TrimSuffix(line, "\n")
-					select {
-					case messageChan <- line:
-					case <-done:
-						return
-					}
-				}
 				break
 			}
 			errorChan <- fmt.Errorf("reader error: %v", err)
-			return
-		}
-		line = strings.TrimSuffix(line, "\n")
-		select {
-		case messageChan <- line:
-		case <-done:
 			return
 		}
 	}

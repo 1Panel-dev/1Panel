@@ -434,7 +434,7 @@
                     </el-carousel-item>
                 </el-carousel>
 
-                <AppLauncher ref="appRef" class="card-interval dashboard-app" />
+                <AppLauncher ref="appRef" class="dashboard-app" />
             </el-col>
         </el-row>
 

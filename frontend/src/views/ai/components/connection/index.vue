@@ -2,94 +2,122 @@
     <DrawerPro
         v-model="drawerVisible"
         :header="$t(engine === 'vllm' ? 'aiTools.model.serviceDetails' : 'database.databaseConnInfo')"
-        :size="isMobile ? 'full' : 'normal'"
+        :size="isMobile ? 'full' : 'large'"
         @close="handleClose"
     >
         <div class="connection-details">
-            <div v-if="form.name" class="service-heading">
-                <el-tag effect="plain">
-                    {{ engine === 'ollama' ? 'Ollama' : 'vLLM' }}
-                </el-tag>
-                <strong>{{ form.name }}</strong>
+            <header class="service-identity">
+                <div class="engine-icon">
+                    <img :src="engine === 'ollama' ? ollamaIcon : vllmIcon" :alt="engineName" />
+                </div>
+                <div class="service-heading">
+                    <div class="service-title">
+                        <h2>{{ form.name || engineName }}</h2>
+                        <Status v-if="form.status" :status="form.status" />
+                    </div>
+                    <div class="service-version">
+                        <span>{{ engineName }}</span>
+                        <span v-if="form.version">{{ $t('app.version') }} {{ form.version }}</span>
+                    </div>
+                </div>
+            </header>
+            <div class="service-intro">
+                <el-icon><InfoFilled /></el-icon>
+                <p>{{ $t('aiTools.model.serviceAddressHelper') }}</p>
             </div>
-            <section v-if="engine === 'vllm'" class="detail-card">
-                <h3 class="detail-title">
-                    <el-icon><FolderOpened /></el-icon>
-                    {{ $t('aiTools.model.modelDir') }}
-                </h3>
-                <div class="detail-value model-directory">
-                    <code>{{ form.modelDir || '—' }}</code>
-                    <CopyButton v-if="form.modelDir" :content="form.modelDir" />
-                </div>
-            </section>
             <section class="detail-card">
-                <h3 class="detail-title">
+                <h3>
                     <el-icon><Connection /></el-icon>
-                    {{ $t('database.containerConn') }}
+                    {{ $t('aiTools.model.connectionInfo') }}
                 </h3>
-                <div class="detail-row">
-                    <span class="detail-label">{{ $t('app.containerName') }}</span>
-                    <div class="detail-value">
-                        <code>{{ form.containerName }}</code>
-                        <CopyButton :content="form.containerName" />
+                <div class="connection-fields">
+                    <div class="connection-field primary-field">
+                        <span class="field-label">
+                            {{ $t(bindDomain.connUrl ? 'setting.proxyUrl' : 'aiTools.model.externalAddress') }}
+                        </span>
+                        <div v-loading="addressLoading" class="copy-value">
+                            <code>{{ externalAddress || '—' }}</code>
+                            <CopyButton v-if="externalAddress" :content="externalAddress" :is-icon="false" />
+                        </div>
+                        <span v-if="addressFailed" class="address-error">{{ $t('aiTools.model.loadFailed') }}</span>
+                    </div>
+                    <div class="connection-field">
+                        <span class="field-label">{{ $t('aiTools.aiProxy.apiType') }}</span>
+                        <span class="api-type">{{ engine === 'ollama' ? 'Ollama' : 'openai-completions' }}</span>
+                    </div>
+                    <div class="connection-field">
+                        <span class="field-label">{{ $t('aiTools.model.containerAddress') }}</span>
+                        <div class="copy-value">
+                            <code>{{ containerAddress || '—' }}</code>
+                            <CopyButton v-if="containerAddress" :content="containerAddress" :is-icon="false" />
+                        </div>
+                        <p class="field-help">{{ $t('aiTools.model.container_conn_helper') }}</p>
                     </div>
                 </div>
-                <div v-if="form.containerPort" class="detail-row">
-                    <span class="detail-label">{{ $t('commons.table.port') }}</span>
-                    <div class="detail-value">
-                        <code>{{ form.containerPort }}</code>
-                        <CopyButton :content="form.containerPort" />
-                    </div>
-                </div>
-                <p class="detail-help">{{ $t('aiTools.model.container_conn_helper') }}</p>
             </section>
             <section class="detail-card">
-                <h3 class="detail-title">
-                    <el-icon><Link /></el-icon>
-                    {{ $t(bindDomain.connUrl ? 'setting.proxyUrl' : 'database.remoteConn') }}
+                <h3>
+                    <el-icon><Box /></el-icon>
+                    {{ $t('aiTools.model.deploymentInfo') }}
                 </h3>
-                <div class="detail-row">
-                    <span class="detail-label">{{ $t('database.connAddress') }}</span>
-                    <div class="detail-value">
-                        <code>{{ externalAddress }}</code>
-                        <CopyButton :content="externalAddress" />
+                <dl class="deployment-fields">
+                    <div>
+                        <dt>{{ $t('app.containerName') }}</dt>
+                        <dd class="copy-detail">
+                            <code>{{ form.containerName || '—' }}</code>
+                            <CopyButton
+                                v-if="form.containerName"
+                                :content="form.containerName"
+                                :aria-label="$t('commons.button.copy')"
+                            />
+                        </dd>
                     </div>
-                </div>
-                <div
-                    v-if="engine !== 'ollama' && !bindDomain.connUrl && form.port && !form.endpoint"
-                    class="detail-row"
-                >
-                    <span class="detail-label">{{ $t('commons.table.port') }}</span>
-                    <div class="detail-value">
-                        <code>{{ form.port }}</code>
-                        <CopyButton :content="form.port + ''" />
+                    <div v-if="form.version">
+                        <dt>{{ $t('aiTools.model.imageVersion') }}</dt>
+                        <dd>{{ form.version }}</dd>
                     </div>
-                </div>
-                <p class="detail-help">{{ $t('database.remoteConnHelper2') }}</p>
+                    <div>
+                        <dt>{{ $t('commons.table.port') }}</dt>
+                        <dd>
+                            <code>{{ form.port || '—' }}</code>
+                        </dd>
+                    </div>
+                    <div v-if="form.modelDir">
+                        <dt>{{ $t('aiTools.model.modelDir') }}</dt>
+                        <dd class="copy-detail">
+                            <code>{{ form.modelDir }}</code>
+                            <CopyButton :content="form.modelDir" :aria-label="$t('commons.button.copy')" />
+                        </dd>
+                    </div>
+                </dl>
             </section>
         </div>
         <template #footer>
-            <el-button @click="handleClose">
-                {{ $t('commons.button.close') }}
-            </el-button>
+            <el-button @click="drawerVisible = false">{{ $t('commons.button.close') }}</el-button>
         </template>
     </DrawerPro>
 </template>
 
 <script lang="ts" setup>
-import { computed, reactive, ref } from 'vue';
-import { Connection, FolderOpened, Link } from '@element-plus/icons-vue';
-import i18n from '@/lang';
+import { computed, reactive, ref, watch } from 'vue';
+import { Box, Connection, InfoFilled } from '@element-plus/icons-vue';
 import { getAgentSettingInfo } from '@/api/modules/setting';
 import { getBindDomain } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import ollamaIcon from '@/assets/images/ai-providers/ollama.webp';
+import vllmIcon from '@/assets/images/ai-providers/vllm.svg';
+
 const { currentNode, isMobile } = useGlobalStore();
 const emit = defineEmits(['close']);
 const engine = ref<'ollama' | 'vllm'>('ollama');
-
+const engineName = computed(() => (engine.value === 'ollama' ? 'Ollama' : 'vLLM'));
 const drawerVisible = ref(false);
+const addressLoading = ref(false);
+const addressFailed = ref(false);
 const form = reactive({
     name: '',
+    status: '',
+    version: '',
     modelDir: '',
     systemIP: '',
     containerName: '',
@@ -97,19 +125,23 @@ const form = reactive({
     containerPort: '11434',
     endpoint: '',
 });
-const bindDomain = ref({
-    connUrl: '',
-});
+const bindDomain = ref({ connUrl: '' });
 const externalAddress = computed(() => {
     if (bindDomain.value.connUrl) return bindDomain.value.connUrl;
     if (form.endpoint) return form.endpoint;
-    if (engine.value !== 'ollama' || !form.port || !form.systemIP) return form.systemIP;
+    if (!form.port || !form.systemIP) return '';
     const host = form.systemIP.includes(':') && !form.systemIP.startsWith('[') ? `[${form.systemIP}]` : form.systemIP;
     return `http://${host}:${form.port}`;
+});
+const containerAddress = computed(() => {
+    if (!form.containerName) return '';
+    return form.containerPort ? `${form.containerName}:${form.containerPort}` : form.containerName;
 });
 
 interface DialogProps {
     name?: string;
+    status?: string;
+    version?: string;
     modelDir?: string;
     port: number;
     containerPort?: string;
@@ -119,131 +151,228 @@ interface DialogProps {
     appinstallID?: number;
 }
 
-const acceptParams = (param: DialogProps): void => {
+let request = 0;
+const acceptParams = async (param: DialogProps) => {
+    const version = ++request;
     engine.value = param.engine || 'ollama';
-    form.name = param.name || '';
-    form.modelDir = param.modelDir || '';
-    form.containerPort = param.containerPort ?? '11434';
-    form.endpoint = param.endpoint || '';
+    Object.assign(form, {
+        name: param.name || '',
+        status: param.status || '',
+        version: param.version || '',
+        modelDir: param.modelDir || '',
+        systemIP: '',
+        containerPort: param.containerPort ?? '11434',
+        endpoint: param.endpoint || '',
+        containerName: param.containerName,
+        port: param.port,
+    });
     bindDomain.value.connUrl = '';
-    form.containerName = param.containerName;
-    form.port = param.port;
-    loadSystemIP();
-    loadBindDomain(param.appinstallID);
+    addressFailed.value = false;
+    addressLoading.value = true;
     drawerVisible.value = true;
+    const [settings, domain] = await Promise.allSettled([
+        getAgentSettingInfo(),
+        param.appinstallID > 0 ? getBindDomain({ appInstallID: param.appinstallID }) : Promise.resolve(null),
+    ]);
+    if (version !== request) return;
+    if (settings.status === 'fulfilled') form.systemIP = settings.value.data.systemIP || '127.0.0.1';
+    if (domain.status === 'fulfilled' && domain.value?.data.websiteID > 0) {
+        bindDomain.value.connUrl = domain.value.data.connUrl;
+    }
+    addressLoading.value = false;
+    addressFailed.value = settings.status === 'rejected' && !externalAddress.value;
 };
-
 const handleClose = () => {
+    request++;
     drawerVisible.value = false;
     emit('close');
 };
-
-const loadSystemIP = async () => {
-    if (currentNode.value !== 'local') {
-        form.systemIP = currentNode.value || i18n.global.t('database.localIP');
-        return;
-    }
-    const res = await getAgentSettingInfo();
-    form.systemIP = res.data.systemIP || i18n.global.t('database.localIP');
-};
-
-const loadBindDomain = async (appInstallID: number) => {
-    if (appInstallID == undefined || appInstallID <= 0) {
-        return;
-    }
-    try {
-        const res = await getBindDomain({
-            appInstallID: appInstallID,
-        });
-        if (res.data.websiteID > 0) {
-            bindDomain.value.connUrl = res.data.connUrl;
-        }
-    } catch (e) {}
-};
-
-defineExpose({
-    acceptParams,
+watch(currentNode, () => {
+    if (drawerVisible.value) handleClose();
 });
+defineExpose({ acceptParams });
 </script>
 
 <style lang="scss" scoped>
 .connection-details {
     display: grid;
-    gap: 16px;
+    gap: 20px;
+    color: var(--el-text-color-primary);
 }
-.service-heading {
+.service-identity,
+.service-title,
+.service-version {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: var(--el-text-color-primary);
-    strong {
-        min-width: 0;
+}
+.service-identity {
+    padding-top: 4px;
+}
+.engine-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 12px;
+    background: var(--el-fill-color-extra-light);
+    img {
+        width: 36px;
+        height: 36px;
+        object-fit: contain;
+    }
+}
+.service-heading {
+    min-width: 0;
+}
+.service-title {
+    flex-wrap: wrap;
+    gap: 8px;
+    h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
         overflow-wrap: anywhere;
-        font-size: 16px;
+    }
+}
+.service-version {
+    flex-wrap: wrap;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--el-text-color-secondary);
+}
+.service-intro {
+    display: flex;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 8px;
+    background: var(--el-color-primary-light-9);
+    .el-icon {
+        flex-shrink: 0;
+        margin-top: 3px;
+        color: var(--el-color-primary);
+    }
+    p {
+        margin: 0;
+        font-size: 12px;
+        line-height: 1.8;
     }
 }
 .detail-card {
-    padding: 18px;
+    overflow: hidden;
     border: 1px solid var(--el-border-color-lighter);
-    border-radius: 8px;
-    background: var(--el-fill-color-extra-light);
-}
-.detail-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 0 0 16px;
-    font-size: 14px;
-    font-weight: 600;
-    color: var(--el-text-color-primary);
-    .el-icon {
-        color: var(--el-color-primary);
-        font-size: 18px;
+    border-radius: 10px;
+    h3 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0;
+        padding: 15px 20px;
+        border-bottom: 1px solid var(--el-border-color-lighter);
+        font-size: 14px;
+        font-weight: 600;
+        .el-icon {
+            color: var(--el-color-primary);
+            font-size: 17px;
+        }
     }
 }
-.detail-row {
+.connection-fields {
     display: grid;
-    grid-template-columns: 80px minmax(0, 1fr);
-    gap: 12px;
-    align-items: baseline;
-    & + & {
-        margin-top: 12px;
-    }
+    gap: 18px;
+    padding: 20px;
 }
-.detail-label,
-.detail-help {
+.connection-field {
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+}
+.field-label,
+.field-help,
+.deployment-fields dt {
     color: var(--el-text-color-secondary);
     font-size: 12px;
 }
-.detail-value {
+.field-help {
+    margin: 0;
+    line-height: 1.6;
+}
+.copy-value {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    box-sizing: border-box;
+    min-height: 44px;
+    padding: 8px 12px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 6px;
+    background: var(--el-fill-color-extra-light);
+    :deep(.el-button) {
+        flex-shrink: 0;
+        height: 26px;
+        padding: 0 9px;
+        font-size: 12px;
+    }
+}
+.primary-field .copy-value {
+    border-color: var(--el-color-primary-light-7);
+    background: var(--el-color-primary-light-9);
+    code {
+        color: var(--el-color-primary);
+    }
+}
+code {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    font-family: var(--el-font-family-monospace, monospace);
+    font-size: 13px;
+    line-height: 1.6;
+}
+.api-type {
+    font-size: 13px;
+}
+.address-error {
+    color: var(--el-color-danger);
+    font-size: 12px;
+}
+.deployment-fields {
+    display: grid;
+    gap: 16px;
+    margin: 0;
+    padding: 20px;
+    > div {
+        display: grid;
+        grid-template-columns: 100px minmax(0, 1fr);
+        gap: 16px;
+        align-items: baseline;
+    }
+    dd {
+        margin: 0;
+        overflow-wrap: anywhere;
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+.copy-detail {
     display: flex;
     align-items: flex-start;
     gap: 8px;
-    min-width: 0;
-    code {
-        min-width: 0;
-        overflow-wrap: anywhere;
-        line-height: 1.6;
-        font-size: 13px;
-        color: var(--el-text-color-primary);
-    }
     :deep(.el-button) {
         flex-shrink: 0;
     }
 }
-.model-directory {
-    padding: 12px;
-    border-radius: 6px;
-    background: var(--el-bg-color);
-}
-.detail-help {
-    margin: 14px 0 0;
-    line-height: 1.6;
-}
-@media (max-width: 768px) {
-    .detail-row {
+@media (max-width: 480px) {
+    .detail-card h3,
+    .connection-fields,
+    .deployment-fields {
+        padding: 16px;
+    }
+    .deployment-fields > div {
         grid-template-columns: minmax(0, 1fr);
-        gap: 4px;
+        gap: 6px;
     }
 }
 </style>

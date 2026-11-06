@@ -2,7 +2,7 @@
     <div>
         <RouterMenu />
         <div>
-            <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.gpu')" v-if="hasAccelerators">
+            <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.monitoringTitle')" v-if="hasAccelerators">
                 <template #rightToolBar>
                     <TableSetting title="gpu-refresh" @search="refresh()" />
                     <TableRefresh @search="refresh()" />
@@ -321,7 +321,7 @@
                 />
             </template>
         </DialogPro>
-        <LayoutContent :title="$t('aiTools.gpu.gpu')" :divider="true" v-if="!hasAccelerators && !loading">
+        <LayoutContent :title="$t('aiTools.gpu.monitoringTitle')" :divider="true" v-if="!hasAccelerators && !loading">
             <template #rightToolBar>
                 <TableRefresh @search="refresh()" />
             </template>

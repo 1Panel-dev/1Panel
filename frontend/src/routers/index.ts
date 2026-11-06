@@ -114,7 +114,6 @@ router.beforeEach(async (to, from) => {
     const cachedRoute = readPanelCache<string>('tabs', activeMenuKey);
     if (
         to.meta.activeMenu &&
-        to.name !== 'ModelFiles' &&
         to.meta.activeMenu != from.meta.activeMenu &&
         typeof cachedRoute === 'string' &&
         cachedRoute &&

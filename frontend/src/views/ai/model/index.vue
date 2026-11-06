@@ -63,7 +63,11 @@
                             <div class="service-name">
                                 <el-tooltip
                                     :content="
-                                        $t(row.appInstallId ? 'aiTools.model.localModel' : 'aiTools.model.cloudAccount')
+                                        $t(
+                                            row.appInstallId
+                                                ? 'aiTools.model.localService'
+                                                : 'aiTools.model.cloudService',
+                                        )
                                     "
                                     placement="top"
                                 >
@@ -72,8 +76,8 @@
                                         :aria-label="
                                             $t(
                                                 row.appInstallId
-                                                    ? 'aiTools.model.localModel'
-                                                    : 'aiTools.model.cloudAccount',
+                                                    ? 'aiTools.model.localService'
+                                                    : 'aiTools.model.cloudService',
                                             )
                                         "
                                     >
@@ -81,7 +85,14 @@
                                         <Cloudy v-else />
                                     </el-icon>
                                 </el-tooltip>
-                                <div class="service-title cell-ellipsis" :title="row.name">{{ row.name }}</div>
+                                <el-button
+                                    class="service-name-link"
+                                    link
+                                    type="primary"
+                                    @click="detailAccountID = row.id"
+                                >
+                                    <span class="cell-ellipsis" :title="row.name">{{ row.name }}</span>
+                                </el-button>
                             </div>
                         </template>
                     </el-table-column>
@@ -132,24 +143,40 @@
                     </el-table-column>
                     <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
                         <template #default="{ row }">
-                            <el-tooltip
-                                :disabled="!row.validateAvailability || (!row.verifiedAt && !row.verifyError)"
-                                placement="top"
-                            >
-                                <template #content>
-                                    <div v-if="row.verifiedAt">
-                                        {{ $t('aiTools.model.verifiedAt') }}:
-                                        {{ dateFormatSimpleWithSecond(row.verifiedAt) }}
-                                    </div>
-                                    <div v-if="row.verifyModel">
-                                        {{ $t('aiTools.agents.verifyModel') }}: {{ row.verifyModel }}
-                                    </div>
-                                    <div v-if="row.verifyError" class="max-w-md break-words">{{ row.verifyError }}</div>
-                                </template>
-                                <el-tag :type="connectionStatus(row).type">
-                                    {{ connectionStatus(row).label }}
-                                </el-tag>
-                            </el-tooltip>
+                            <div class="verification-status">
+                                <el-tooltip :disabled="!row.verifiedAt && !row.verifyError" placement="top">
+                                    <template #content>
+                                        <div v-if="row.verifiedAt">
+                                            {{ $t('aiTools.model.verifiedAt') }}:
+                                            {{ dateFormatSimpleWithSecond(row.verifiedAt) }}
+                                        </div>
+                                        <div v-if="row.verifyModel">
+                                            {{ $t('aiTools.agents.verifyModel') }}: {{ row.verifyModel }}
+                                        </div>
+                                        <div v-if="row.verifyError" class="max-w-md break-words">
+                                            {{ row.verifyError }}
+                                        </div>
+                                    </template>
+                                    <el-tag :type="connectionStatus(row).type">
+                                        {{ connectionStatus(row).label }}
+                                    </el-tag>
+                                </el-tooltip>
+                                <el-tooltip
+                                    v-if="row.validateAvailability"
+                                    :content="$t('aiTools.model.reverify')"
+                                    placement="top"
+                                >
+                                    <el-button
+                                        v-permission
+                                        link
+                                        type="primary"
+                                        :icon="RefreshRight"
+                                        :aria-label="$t('aiTools.model.reverify')"
+                                        :disabled="verifyingAccounts.has(`${currentNode}:${row.id}`)"
+                                        @click="verifyTarget = { account: row, node: currentNode }"
+                                    />
+                                </el-tooltip>
+                            </div>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -180,6 +207,61 @@
                 </ComplexTable>
             </template>
         </LayoutContent>
+        <DialogPro
+            v-model="verifyDialogVisible"
+            :title="$t('aiTools.model.verify')"
+            :size="isMobile ? 'w-90' : 'normal'"
+            class="verify-dialog"
+        >
+            <template #content>
+                <div v-if="verifyTarget" class="verify-content">
+                    <div class="verify-summary">
+                        <div class="verify-icon">
+                            <el-icon><Connection /></el-icon>
+                        </div>
+                        <div class="verify-heading">
+                            <h3>{{ verifyTarget.account.name }}</h3>
+                            <p>{{ $t('aiTools.model.verifyConfirm') }}</p>
+                        </div>
+                    </div>
+                    <dl class="verify-fields">
+                        <div class="verify-address">
+                            <dt>{{ $t('aiTools.model.endpoint') }}</dt>
+                            <dd>
+                                <code>{{ verifyTarget.account.baseUrl || '—' }}</code>
+                            </dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('aiTools.aiProxy.apiType') }}</dt>
+                            <dd>{{ verifyTarget.account.apiType || '—' }}</dd>
+                        </div>
+                        <div>
+                            <dt>{{ $t('aiTools.agents.verifyModel') }}</dt>
+                            <dd>
+                                {{ verifyTarget.account.verifyModel || verifyTarget.account.models?.[0]?.id || '—' }}
+                            </dd>
+                        </div>
+                    </dl>
+                </div>
+            </template>
+            <template #footer>
+                <el-button @click="verifyDialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button v-permission type="primary" @click="verifyAccount">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </template>
+        </DialogPro>
+        <ServiceDetails
+            v-if="detailAccount"
+            :model-value="true"
+            :account="detailAccount"
+            :status="connectionStatus(detailAccount)"
+            :verifying="verifyingAccounts.has(`${currentNode}:${detailAccount.id}`)"
+            @update:model-value="!$event && (detailAccountID = undefined)"
+            @edit="createRef.openAccount(detailAccount)"
+            @models="poolRef.open(detailAccount)"
+            @verify="verifyTarget = { account: detailAccount, node: currentNode }"
+        />
         <CreateService ref="createRef" @search="search" />
         <ModelPool ref="poolRef" @updated="search" />
     </div>
@@ -189,7 +271,7 @@
 import { computed, reactive, ref, toRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
-import { Cloudy, Monitor } from '@element-plus/icons-vue';
+import { Cloudy, Connection, Monitor, RefreshRight } from '@element-plus/icons-vue';
 import type { AI } from '@/api/interface/ai';
 import type { FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, verifyAgentAccount } from '@/api/modules/ai';
@@ -201,17 +283,33 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useSearchState } from '@/utils/search-reset';
 import CreateService from './create/index.vue';
 import ModelPool from './model-pool/index.vue';
+import ServiceDetails from './details/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
 
 const route = useRoute();
 const pagePath = route.path;
 const isCurrentPage = computed(() => route.path === pagePath);
-const { isIntl, currentNode } = useGlobalStore();
+const { isIntl, isMobile, currentNode } = useGlobalStore();
 const createRef = ref();
 const poolRef = ref();
 const loading = ref(false);
 const verifyingAccounts = reactive(new Set<string>());
+const verifyTarget = ref<{ account: AI.AgentAccountItem; node: string }>();
+const verifyDialogVisible = computed({
+    get: () => Boolean(verifyTarget.value),
+    set: (visible: boolean) => {
+        if (!visible) verifyTarget.value = undefined;
+    },
+});
 const connections = ref<AI.AgentAccountItem[]>([]);
+const detailAccountID = ref<number>();
+const detailAccount = computed(() => connections.value.find((item) => item.id === detailAccountID.value));
+watch(detailAccount, (account) => {
+    if (!account) detailAccountID.value = undefined;
+});
+watch([currentNode, () => route.path], () => {
+    detailAccountID.value = undefined;
+});
 const accountColumns = ref<FuTableColumnConfig[]>([]);
 const providers = ref<AI.ProviderInfo[]>([]);
 watch(
@@ -305,11 +403,11 @@ const search = async () => {
 };
 
 const connectionStatus = (row: AI.AgentAccountItem) => {
-    if (!row.validateAvailability) {
-        return { type: 'info' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
-    }
     if (verifyingAccounts.has(`${currentNode.value}:${row.id}`)) {
         return { type: 'info' as const, label: i18n.global.t('aiTools.model.verifying') };
+    }
+    if (!row.validateAvailability) {
+        return { type: 'success' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
     }
     if (row.verifyError) {
         return { type: 'danger' as const, label: i18n.global.t('aiTools.model.verifyFailed') };
@@ -320,10 +418,13 @@ const connectionStatus = (row: AI.AgentAccountItem) => {
     };
 };
 
-const verifyAccount = async (row: AI.AgentAccountItem) => {
-    const node = currentNode.value;
+const verifyAccount = async () => {
+    if (!verifyTarget.value) return;
+    const { account: row, node } = verifyTarget.value;
+    verifyTarget.value = undefined;
     const key = `${node}:${row.id}`;
-    if (verifyingAccounts.has(key)) return;
+    if (!row.validateAvailability || currentNode.value !== node || !isCurrentPage.value || verifyingAccounts.has(key))
+        return;
     verifyingAccounts.add(key);
     try {
         await verifyAgentAccount({ id: row.id }, node);
@@ -347,13 +448,6 @@ const accountButtons = [
         click: (row: AI.AgentAccountItem) => poolRef.value.open(row),
     },
     {
-        label: i18n.global.t('aiTools.model.verify'),
-        permission: true,
-        disabled: (row: AI.AgentAccountItem) =>
-            !row.validateAvailability || verifyingAccounts.has(`${currentNode.value}:${row.id}`),
-        click: verifyAccount,
-    },
-    {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
         click: async (row: AI.AgentAccountItem) => {
@@ -370,6 +464,9 @@ const accountButtons = [
 watch(
     [() => route.path, () => route.query.name, currentNode],
     async (_, previous) => {
+        if (verifyTarget.value?.node !== currentNode.value || !isCurrentPage.value) {
+            verifyTarget.value = undefined;
+        }
         if (!isCurrentPage.value) {
             searchVersion++;
             loading.value = false;
@@ -387,19 +484,103 @@ watch(
 </script>
 
 <style scoped lang="scss">
+.verification-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.verify-dialog {
+    max-width: 560px;
+}
+.verify-content {
+    padding: 4px 0 8px;
+}
+.verify-summary {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.verify-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--el-color-primary-light-9);
+    color: var(--el-color-primary);
+    font-size: 20px;
+}
+.verify-heading {
+    min-width: 0;
+    h3 {
+        margin: 0 0 6px;
+        font-size: 15px;
+        color: var(--el-text-color-primary);
+        overflow-wrap: anywhere;
+    }
+    p {
+        margin: 0;
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
+        line-height: 1.6;
+    }
+}
+.verify-fields {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--el-border-color-lighter);
+    border-radius: 8px;
+    background: var(--el-fill-color-extra-light);
+    dt {
+        margin-bottom: 8px;
+        color: var(--el-text-color-secondary);
+        font-size: 12px;
+    }
+    dd {
+        margin: 0;
+        color: var(--el-text-color-primary);
+        font-size: 13px;
+        line-height: 1.6;
+        overflow-wrap: anywhere;
+    }
+    code {
+        font-family: var(--el-font-family-monospace, monospace);
+    }
+}
+.verify-address {
+    grid-column: 1 / -1;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--el-border-color-lighter);
+}
+@media (max-width: 480px) {
+    .verify-fields {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
 .service-name {
     display: flex;
     align-items: center;
     gap: 8px;
     min-width: 0;
 }
-.service-title {
-    font-weight: 600;
+.service-name-link {
+    min-width: 0;
+    font-weight: 400;
+    :deep(> span) {
+        min-width: 0;
+    }
 }
 .service-source-icon {
     flex-shrink: 0;
     font-size: 16px;
-    color: var(--el-color-primary);
+    color: var(--el-text-color-secondary);
 }
 .cell-ellipsis {
     overflow: hidden;

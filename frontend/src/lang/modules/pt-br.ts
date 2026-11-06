@@ -1053,6 +1053,8 @@ const message = {
             searchHelper:
                 'Encontre modelos no ModelScope ou Hugging Face e depois implante-os ou crie uma Recipe em Preparação de modelos.',
             modelScopeSearchHelper: 'Acesso estável na China continental',
+            huggingFaceNetworkHelper:
+                'Buscas e downloads do Hugging Face exigem acesso do servidor ao site. Se indisponível, configure uma URL de espelho acessível em Configurações ou selecione ModelScope. Em ambientes offline, envie os modelos manualmente.',
             huggingFaceSearchHelper: 'Ampla coleção de modelos',
             searchPlaceholder: 'Digite o nome ou ID do repositório, ex.: Qwen/Qwen3-8B',
             popularSearches: 'Buscas populares',
@@ -1065,7 +1067,15 @@ const message = {
             localFilesMissing: 'Arquivos locais não encontrados',
             ollamaNameHelper:
                 'Insira o nome completo do modelo da biblioteca do Ollama. Se nenhuma tag for especificada, será usada latest.',
-            downloadHelper: 'Clique em “Pesquisar” para encontrar e baixar modelos do ModelScope e do Hugging Face.',
+            downloadHelper:
+                'Pesquise e baixe modelos do ModelScope ou Hugging Face, ou envie modelos locais seguindo os {requirements}.',
+            localModelSizeHelper:
+                'Indica o tamanho atual do diretório, não que todos os arquivos tenham terminado de ser enviados.',
+            localModelLayoutTitle: 'Requisitos de diretórios',
+            localModelLayoutPath:
+                'Coloque o modelo completo no diretório {modelDir} com a estrutura organização/nome do modelo.',
+            localModelLayoutConfig:
+                'A raiz do modelo deve conter config.json ou params.json; caso contrário, ele não aparecerá na lista.',
             serviceHelper:
                 'Conecte serviços de modelos de nuvens públicas, mecanismos de inferência locais e gateways de IA para uso pelos agentes integrados do 1Panel e agentes externos, como o WorkBuddy.',
             gpuType: 'Tipo de GPU',
@@ -1112,6 +1122,9 @@ const message = {
                 'A sincronização automática atualiza o catálogo de modelos em destaque diariamente de madrugada sem baixar arquivos de modelos. Você também pode sincronizar manualmente a qualquer momento.',
             recipeSyncHelper:
                 'A sincronização automática atualiza as receitas sincronizadas diariamente de madrugada sem afetar as personalizadas. Você também pode sincronizar manualmente a qualquer momento.',
+            serviceStatus: 'Status do serviço',
+            readinessNotRunning: 'Não está em execução',
+            readinessWaiting: 'Aguardando disponibilidade',
             readinessPreparing: 'Preparando',
             readinessReady: 'Pronto',
             readinessNotReady: 'Não está pronto',
@@ -1130,6 +1143,16 @@ const message = {
             ollamaManagement: 'Gerenciamento do Ollama',
             vllmManagement: 'Gerenciamento do vLLM',
             serviceDetails: 'Detalhes do serviço',
+            deleteDeploymentHelper: 'Esta instância será interrompida e excluída',
+            deleteDeploymentServiceHelper:
+                'Esta instância será interrompida e excluída junto com os serviços de modelos associados',
+            connectionInfo: 'Informações de conexão',
+            deploymentInfo: 'Informações da implantação',
+            serviceAPIHelper: 'Este serviço fornece uma API compatível com OpenAI.',
+            serviceAddressHelper:
+                'Use o endereço do contêiner para aplicativos em contêineres e o endereço externo para aplicativos do host ou externos.',
+            externalAddress: 'Endereço externo',
+            imageVersion: 'Versão da imagem',
             deployments: 'Implantação de modelos',
             files: 'Preparação de modelos',
             connectExternal: 'Conectar serviço externo',
@@ -1153,16 +1176,25 @@ const message = {
                 'Nenhum comando de inicialização válido foi detectado. Cole um comando pip/uv ou docker que inclua um modelo.',
             engineProvider: 'Mecanismo / Provedor',
             endpoint: 'Endpoint',
+            localService: 'Local',
+            cloudService: 'Nuvem',
             cloudAccount: 'Conta na nuvem',
             connectionStatus: 'Status da conexão',
             verify: 'Verificar',
             verifying: 'Verificando',
             verifyFailed: 'Falha na verificação',
+            verificationInfo: 'Detalhes da verificação',
             verifiedAt: 'Horário da verificação',
             verifyModelChangeHelper:
                 'Alterar o modelo de verificação marca o serviço como não verificado sem chamar o modelo.',
+            reverify: 'Verificar novamente',
+            verifyConfirm: 'O modelo será verificado com as configurações abaixo. Continuar?',
+            apiKeyHelper:
+                'Se o serviço não exigir uma API Key, insira qualquer valor de preenchimento não vazio, como unused.',
             verifyOnChangeHelper:
-                'Quando desativada, a verificação não é necessária. Ao ativar, verifica uma vez; depois, apenas alterações na conexão ou no modelo de verificação acionam a verificação.',
+                'Ao ativar ou alterar a conexão ou o modelo de verificação, a API é verificada com uma mensagem mínima.',
+            verifyImageOnChangeHelper:
+                'Ao ativar ou alterar a conexão ou o modelo de verificação, uma imagem mínima é gerada para verificar a API; pode haver cobrança.',
             unverified: 'Não verificado',
             manage: 'Gerenciar',
             loadFailed: 'Falha ao carregar. Atualize a página e tente novamente.',
@@ -1798,7 +1830,8 @@ const message = {
                 'Estes registros não têm um ID de dispositivo estável. Não é possível verificar a identidade nem os valores ausentes.',
             pcieGeneration: 'Geração PCIe (atual / máxima)',
             pcieWidth: 'Largura PCIe (atual / máxima)',
-            gpu: 'Monitoramento de GPU',
+            gpu: 'Gerenciamento de GPU',
+            monitoringTitle: 'Monitoramento de GPU',
             gpuHelper:
                 'Nenhum comando de gerenciamento de GPU/XPU/NPU compatível foi detectado. Verifique e tente novamente!',
             process: 'Informações do Processo',

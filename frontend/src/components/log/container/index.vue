@@ -73,6 +73,7 @@
 import { cleanComposeLog, cleanContainerLog, DownloadFile } from '@/api/modules/container';
 import { FitAddon } from '@xterm/addon-fit';
 import { Terminal } from '@xterm/xterm';
+import { Base64 } from 'js-base64';
 import '@xterm/xterm/css/xterm.css';
 import i18n from '@/lang';
 import { dateFormatForName } from '@/utils/date';
@@ -181,13 +182,9 @@ const clearTerminal = () => {
     followBottom = true;
 };
 
-const writeLogLine = (data: string) => {
-    term?.writeln(data);
-};
-
 const showEventSourceAuthError = (message: string) => {
     MsgError(message);
-    writeLogLine(message);
+    term?.writeln(message);
 };
 
 const initTerminal = () => {
@@ -263,7 +260,7 @@ const searchLogs = async () => {
     eventSource = source;
     source.onmessage = (event: MessageEvent) => {
         if (version !== searchVersion) return;
-        writeLogLine(event.data);
+        term?.write(Base64.toUint8Array(event.data));
     };
     source.onerror = (event: MessageEvent) => {
         if (version !== searchVersion) return;

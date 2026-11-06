@@ -1049,6 +1049,8 @@ const message = {
             searchHelper:
                 'Busca modelos en ModelScope o Hugging Face y luego despliégalos o crea una Recipe en Preparación de modelos.',
             modelScopeSearchHelper: 'Acceso estable en China continental',
+            huggingFaceNetworkHelper:
+                'Las búsquedas y descargas de Hugging Face requieren acceso del servidor al sitio. Si no está disponible, configure una URL de espejo accesible en Configuración o seleccione ModelScope. En entornos sin conexión, cargue los modelos manualmente.',
             huggingFaceSearchHelper: 'Amplia colección de modelos',
             searchPlaceholder: 'Introduce el nombre o ID del repositorio, p. ej. Qwen/Qwen3-8B',
             popularSearches: 'Búsquedas populares',
@@ -1061,7 +1063,15 @@ const message = {
             localFilesMissing: 'No se encontraron los archivos locales',
             ollamaNameHelper:
                 'Introduzca el nombre completo del modelo de la biblioteca de Ollama. Si no especifica una etiqueta, se usará latest.',
-            downloadHelper: 'Haga clic en «Buscar» para encontrar y descargar modelos de ModelScope y Hugging Face.',
+            downloadHelper:
+                'Busque y descargue modelos de ModelScope o Hugging Face, o suba modelos locales siguiendo los {requirements}.',
+            localModelSizeHelper:
+                'Indica el tamaño actual del directorio, no que todos los archivos hayan terminado de subirse.',
+            localModelLayoutTitle: 'Requisitos de directorios',
+            localModelLayoutPath:
+                'Coloque el modelo completo en el directorio {modelDir} con la estructura organización/nombre del modelo.',
+            localModelLayoutConfig:
+                'La raíz del modelo debe contener config.json o params.json; de lo contrario, no aparecerá en la lista.',
             serviceHelper:
                 'Conecte servicios de modelos de nubes públicas, motores de inferencia locales y puertas de enlace de IA para que los utilicen los agentes integrados de 1Panel y agentes externos como WorkBuddy.',
             gpuType: 'Tipo de GPU',
@@ -1108,6 +1118,9 @@ const message = {
                 'La sincronización automática actualiza el catálogo de modelos destacados cada madrugada sin descargar archivos de modelos. También puedes sincronizar manualmente en cualquier momento.',
             recipeSyncHelper:
                 'La sincronización automática actualiza las recetas sincronizadas cada madrugada sin afectar a las personalizadas. También puedes sincronizar manualmente en cualquier momento.',
+            serviceStatus: 'Estado del servicio',
+            readinessNotRunning: 'Sin ejecutar',
+            readinessWaiting: 'Esperando disponibilidad',
             readinessPreparing: 'Preparando',
             readinessReady: 'Listo',
             readinessNotReady: 'No está listo',
@@ -1126,6 +1139,16 @@ const message = {
             ollamaManagement: 'Gestión de Ollama',
             vllmManagement: 'Gestión de vLLM',
             serviceDetails: 'Detalles del servicio',
+            deleteDeploymentHelper: 'Se detendrá y eliminará esta instancia',
+            deleteDeploymentServiceHelper:
+                'Se detendrá y eliminará esta instancia junto con sus servicios de modelos asociados',
+            connectionInfo: 'Información de conexión',
+            deploymentInfo: 'Información del despliegue',
+            serviceAPIHelper: 'Este servicio ofrece una API compatible con OpenAI.',
+            serviceAddressHelper:
+                'Use la dirección del contenedor para sus aplicaciones y la dirección externa para aplicaciones del host o externas.',
+            externalAddress: 'Dirección externa',
+            imageVersion: 'Versión de la imagen',
             deployments: 'Despliegue de modelos',
             files: 'Preparación de modelos',
             connectExternal: 'Conectar servicio externo',
@@ -1149,16 +1172,25 @@ const message = {
                 'No se detectó un comando de inicio válido. Pegue un comando pip/uv o docker que incluya un modelo.',
             engineProvider: 'Motor / Proveedor',
             endpoint: 'Punto de conexión',
+            localService: 'Local',
+            cloudService: 'Nube',
             cloudAccount: 'Cuenta en la nube',
             connectionStatus: 'Estado de conexión',
             verify: 'Verificar',
             verifying: 'Verificando',
             verifyFailed: 'Verificación fallida',
+            verificationInfo: 'Detalles de verificación',
             verifiedAt: 'Hora de verificación',
             verifyModelChangeHelper:
                 'Cambiar el modelo de verificación marca el servicio como no verificado sin llamar al modelo.',
+            reverify: 'Verificar de nuevo',
+            verifyConfirm: 'Se verificará el modelo con la siguiente configuración. ¿Continuar?',
+            apiKeyHelper:
+                'Si el servicio no requiere una API Key, introduzca cualquier valor de relleno no vacío, como unused.',
             verifyOnChangeHelper:
-                'Si se desactiva, no se requiere verificación. Al activarla se verifica una vez; después solo se verifica si cambia la conexión o el modelo de verificación.',
+                'Al activar o cambiar la conexión o el modelo de verificación, se verifica la API con un mensaje mínimo.',
+            verifyImageOnChangeHelper:
+                'Al activar o cambiar la conexión o el modelo de verificación, se genera una imagen mínima para verificar la API; pueden aplicarse cargos.',
             unverified: 'Sin verificar',
             manage: 'Gestionar',
             loadFailed: 'No se pudo cargar. Actualice la página e inténtelo de nuevo.',
@@ -1798,7 +1830,8 @@ const message = {
                 'Estos registros no tienen un ID de dispositivo estable. No se pueden verificar su identidad ni los valores ausentes.',
             pcieGeneration: 'Generación PCIe (actual / máxima)',
             pcieWidth: 'Ancho PCIe (actual / máximo)',
-            gpu: 'Monitoreo de GPU',
+            gpu: 'Gestión de GPU',
+            monitoringTitle: 'Monitoreo de GPU',
             gpuHelper:
                 'No se detectó ningún comando de administración de GPU/XPU/NPU compatible. ¡Compruebe e inténtelo de nuevo!',
             process: 'Información del Proceso',
