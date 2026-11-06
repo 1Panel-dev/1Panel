@@ -1116,7 +1116,8 @@ const message = {
             modelScopeEndpointHelper:
                 'ModelScope modellerini aramak ve indirmek için kullanılır. Varsayılan, resmî URL adresidir.',
             modelTokenHelper: 'İsteğe bağlı. Özel veya kısıtlı modeller için erişim yetkili bir token kullanın.',
-            modelDirHelper: 'Modellerin indirildiği ve yerel model listesinin okunduğu dizin.',
+            modelDirHelper:
+                'Modellerin indirildiği ve yerel model listesinin okunduğu dizin. Değiştirmek mevcut dosyaları taşımaz.',
             featuredModelsHelper:
                 '1Panel tarafından seçilen modelleri inceleyin, özellikleri, kullanım alanlarını ve indirme kaynaklarını görüntüleyerek uygun modeli indirin.',
             featuredModelsSyncHelper:
@@ -2199,6 +2200,8 @@ const message = {
             'Medyan ve en düşük/en yüksek değerler yalnızca istek anomalisi olmayan başarılı çalışmaları içerir. P99, çalışma başına P99 değerlerinin medyanıdır. Önbellek ve dış trafik kontrol edilmez.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            '{image} imajı büyük olduğundan indirme işlemi ağ hızınıza bağlı olarak uzun sürebilir. İndirmeyi hızlandırmak için bir kayıt defteri aynası yapılandırabilirsiniz. Görev penceresini kapatabilirsiniz; indirme arka planda devam eder. İlerlemeyi görev merkezinden takip edebilirsiniz.',
         settingsHelp:
             'Önce Benchmark imajını ve bir test planını hazırlayın. Her ikisi de hazır olduğunda bir kıyaslama testi oluşturabilirsiniz.',
         imageAvailable: 'Benchmark imajı hazır ({image})',

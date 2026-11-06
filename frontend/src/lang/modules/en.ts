@@ -1108,7 +1108,8 @@ const message = {
             addInstance: 'Add instance',
             modelScopeEndpointHelper: 'Used to search and download ModelScope models. Defaults to the official URL.',
             modelTokenHelper: 'Optional. Use a token with access permissions for private or restricted models.',
-            modelDirHelper: 'Directory for model downloads and the local model list.',
+            modelDirHelper:
+                'Directory for model downloads and the local model list. Changing it does not move existing files.',
             featuredModelsHelper:
                 'Browse models curated by 1Panel, review specifications, use cases, and download sources, and choose a model to download.',
             featuredModelsSyncHelper:
@@ -2185,6 +2186,8 @@ const message = {
             'Only successful runs without request anomalies enter the median and min/max summaries. P99 is the median of per-run P99 values. Cache and external traffic are uncontrolled.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'The {image} image is large and may take a while to pull, depending on your network speed. You can configure a registry mirror to speed up the pull. You can close the task dialog; the pull will continue in the background. View progress in the task center.',
         settingsHelp: 'Prepare the Benchmark image and a test scheme. You can create a benchmark once both are ready.',
         imageAvailable: 'Benchmark image is ready ({image})',
         imageUnavailable: 'Benchmark image was not found ({image})',

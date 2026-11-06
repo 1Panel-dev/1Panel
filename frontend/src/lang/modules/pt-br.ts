@@ -1115,7 +1115,8 @@ const message = {
             addInstance: 'Adicionar instância',
             modelScopeEndpointHelper: 'Para buscar e baixar modelos do ModelScope. Usa a URL oficial por padrão.',
             modelTokenHelper: 'Opcional. Use um token com permissão para acessar modelos privados ou restritos.',
-            modelDirHelper: 'Diretório de download e listagem dos modelos locais.',
+            modelDirHelper:
+                'Diretório de download e listagem dos modelos locais. Alterá-lo não move os arquivos existentes.',
             featuredModelsHelper:
                 'Explore os modelos selecionados pelo 1Panel, consulte especificações, casos de uso e fontes de download e escolha um modelo para baixar.',
             featuredModelsSyncHelper:
@@ -2204,6 +2205,8 @@ const message = {
             'A mediana e os valores mínimo/máximo incluem apenas execuções bem-sucedidas sem anomalias. P99 é a mediana dos P99 de cada execução. Cache e tráfego externo não são controlados.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'A imagem {image} é grande e o download pode demorar, dependendo da velocidade da rede. Você pode configurar um espelho do registro para acelerar o download. Você pode fechar a janela da tarefa; o download continuará em segundo plano. Acompanhe o progresso na central de tarefas.',
         settingsHelp:
             'Prepare a imagem do Benchmark e um plano de teste. Você poderá criar um benchmark quando ambos estiverem prontos.',
         imageAvailable: 'A imagem do Benchmark está pronta ({image})',

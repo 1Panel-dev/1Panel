@@ -1054,7 +1054,7 @@ const message = {
             addInstance: '新增实例',
             modelScopeEndpointHelper: '用于搜索和下载 ModelScope 模型，默认使用官方地址。',
             modelTokenHelper: '选填，访问私有或受限模型时需填写有权限的 Token。',
-            modelDirHelper: '模型下载保存目录，也用于读取本地模型列表。',
+            modelDirHelper: '模型下载保存目录，也用于读取本地模型列表。修改后不会自动迁移已有文件。',
             featuredModelsHelper:
                 '浏览 1Panel 官方精选模型，查看模型规格、适用场景及下载来源，选择合适的模型进行下载。',
             featuredModelsSyncHelper: '开启自动同步后，每天凌晨更新精选模型目录，不下载模型文件；也可手动立即同步。',
@@ -2064,6 +2064,8 @@ const message = {
             '汇总仅使用成功且无请求异常的重复测试，显示中位数和最小/最大值。P99 是每次测试 P99 的中位数；缓存和外部流量未受控。',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            '{image} 镜像较大，拉取可能需要较长时间，具体取决于网络速度。可配置镜像加速以提升拉取速度。可关闭任务弹框，拉取将在后台继续，进度可在任务中心查看。',
         settingsHelp: '请先准备 Benchmark 镜像和测试方案，两项均就绪后即可创建基准测试。',
         imageAvailable: 'Benchmark 镜像已就绪（{image}）',
         imageUnavailable: '未检测到 Benchmark 镜像（{image}）',

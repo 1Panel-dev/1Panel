@@ -1120,7 +1120,8 @@ const message = {
             modelScopeEndpointHelper:
                 'Untuk mencari dan memuat turun model ModelScope. Menggunakan URL rasmi secara lalai.',
             modelTokenHelper: 'Pilihan. Gunakan token dengan kebenaran akses untuk model peribadi atau terhad.',
-            modelDirHelper: 'Direktori muat turun model dan sumber senarai model setempat.',
+            modelDirHelper:
+                'Direktori muat turun model dan sumber senarai model setempat. Perubahan tidak memindahkan fail sedia ada.',
             featuredModelsHelper:
                 'Semak model pilihan 1Panel, lihat spesifikasi, kegunaan dan sumber muat turun, kemudian pilih model yang sesuai untuk dimuat turun.',
             featuredModelsSyncHelper:
@@ -2208,6 +2209,8 @@ const message = {
             'Median dan minimum/maksimum hanya melibatkan ujian berjaya tanpa anomali permintaan. P99 ialah median P99 setiap ujian. Cache dan trafik luaran tidak dikawal.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'Imej {image} besar dan mungkin mengambil masa yang lama untuk dimuat turun, bergantung pada kelajuan rangkaian. Anda boleh mengkonfigurasi cermin registri untuk mempercepat muat turun. Anda boleh menutup dialog tugas; muat turun akan diteruskan di latar belakang. Lihat kemajuan di pusat tugas.',
         settingsHelp:
             'Sediakan imej Benchmark dan skema ujian dahulu. Anda boleh mencipta penanda aras apabila kedua-duanya sedia.',
         imageAvailable: 'Imej Benchmark sedia ({image})',

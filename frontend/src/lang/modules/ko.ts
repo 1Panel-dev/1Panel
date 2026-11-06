@@ -1083,7 +1083,8 @@ const message = {
             addInstance: '인스턴스 추가',
             modelScopeEndpointHelper: 'ModelScope 모델 검색 및 다운로드에 사용하며, 기본값은 공식 URL입니다.',
             modelTokenHelper: '선택 사항. 비공개 또는 제한된 모델에는 접근 권한이 있는 토큰이 필요합니다.',
-            modelDirHelper: '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다.',
+            modelDirHelper:
+                '모델 다운로드 저장 경로이자 로컬 모델 목록을 읽는 경로입니다. 변경해도 기존 파일은 이동하지 않습니다.',
             featuredModelsHelper:
                 '1Panel이 선정한 모델의 사양, 활용 사례 및 다운로드 소스를 확인하고 적합한 모델을 선택하여 다운로드하세요.',
             featuredModelsSyncHelper:
@@ -2141,6 +2142,8 @@ const message = {
             '요청 이상이 없는 성공한 실행만 중앙값과 최솟값/최댓값에 포함합니다. P99는 각 실행 P99의 중앙값입니다. 캐시와 외부 트래픽은 통제되지 않습니다.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            '{image} 이미지 크기가 커서 네트워크 속도에 따라 가져오는 데 시간이 오래 걸릴 수 있습니다. 레지스트리 미러를 설정하여 다운로드 속도를 높일 수 있습니다. 작업 창을 닫아도 백그라운드에서 계속 진행됩니다. 작업 센터에서 진행 상황을 확인할 수 있습니다.',
         settingsHelp:
             'Benchmark 이미지와 테스트 계획을 먼저 준비하세요. 두 항목이 모두 준비되면 벤치마크를 생성할 수 있습니다.',
         imageAvailable: 'Benchmark 이미지가 준비되었습니다 ({image})',

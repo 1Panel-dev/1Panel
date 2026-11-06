@@ -1096,7 +1096,8 @@ const message = {
             addInstance: 'インスタンスを追加',
             modelScopeEndpointHelper: 'ModelScope モデルの検索とダウンロードに使用します。既定は公式 URL です。',
             modelTokenHelper: '任意。非公開・制限付きモデルにはアクセス権のあるトークンが必要です。',
-            modelDirHelper: 'モデルの保存先とローカルモデル一覧の読み込み先です。',
+            modelDirHelper:
+                'モデルの保存先とローカルモデル一覧の読み込み先です。変更しても既存ファイルは移動されません。',
             featuredModelsHelper:
                 '1Panel が厳選したモデルの仕様、用途、ダウンロード元を確認し、適切なモデルを選んでダウンロードできます。',
             featuredModelsSyncHelper:
@@ -2166,6 +2167,8 @@ const message = {
             '要求異常のない成功した試行のみを集計し、中央値と最小・最大値を表示します。P99 は試行ごとの P99 の中央値です。キャッシュと外部トラフィックは制御されません。',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            '{image} はサイズが大きいため、ネットワーク速度によっては取得に時間がかかります。レジストリミラーを設定すると、取得を高速化できます。タスクダイアログを閉じても取得はバックグラウンドで続行されます。進捗はタスクセンターで確認できます。',
         settingsHelp:
             'Benchmark イメージとテストプランを準備してください。両方の準備が完了すると、ベンチマークを作成できます。',
         imageAvailable: 'Benchmark イメージは準備済みです（{image}）',
