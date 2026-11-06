@@ -1035,11 +1035,11 @@ const message = {
             localFilesMissing: 'ບໍ່ພົບໄຟລ໌ພາຍໃນ',
             ollamaNameHelper: 'ກະລຸນາໃສ່ຊື່ໂມເດວເຕັມຈາກຄັງ Ollama. ຖ້າບໍ່ລະບຸແທັກ ຈະໃຊ້ latest.',
             downloadHelper:
-                'ຄົ້ນຫາ ແລະ ດາວໂຫຼດໂມເດວຈາກ ModelScope ຫຼື Hugging Face ຫຼື ອັບໂຫຼດໂມເດວພາຍໃນເຄື່ອງຕາມ{requirements}.',
+                'ດາວໂຫຼດໂມເດວ ຫຼື tokenizer ຈາກ ModelScope ຫຼື Hugging Face, ຫຼື ເພີ່ມໄຟລ໌ໃນເຄື່ອງຕາມ {requirements}.',
             localModelSizeHelper: 'ສະແດງພຽງຂະໜາດໂຟນເດີໃນປັດຈຸບັນ ບໍ່ໄດ້ໝາຍຄວາມວ່າອັບໂຫຼດໄຟລ໌ຄົບແລ້ວ.',
-            localModelLayoutTitle: 'ຂໍ້ກຳນົດໂຟນເດີ',
-            localModelLayoutPath: 'ວາງໂມເດວທີ່ຄົບຖ້ວນໃນໂຟນເດີໂມເດວ {modelDir} ໂດຍໃຊ້ໂຄງສ້າງ ອົງກອນ/ຊື່ໂມເດວ.',
-            localModelLayoutConfig: 'ໂຟນເດີຫຼັກຂອງໂມເດວຕ້ອງມີ config.json ຫຼື params.json, ຖ້າບໍ່ມີຈະບໍ່ສະແດງໃນລາຍການ.',
+            localModelLayoutTitle: 'ຕົວຢ່າງ',
+            localLayoutDirect: 'ວາງໂດຍກົງ',
+            localLayoutGrouped: 'ແຍກຕາມອົງກອນ (ທາງເລືອກ)',
             serviceHelper:
                 'ເຊື່ອມຕໍ່ບໍລິການໂມເດວຈາກຄລາວສາທາລະນະ, ເຄື່ອງຈັກອະນຸມານພາຍໃນ ແລະ ເກດເວ AI ເພື່ອໃຫ້ຕົວແທນໃນ 1Panel ແລະ ຕົວແທນພາຍນອກເຊັ່ນ WorkBuddy ໃຊ້ງານ.',
             gpuType: 'ປະເພດ GPU',
@@ -1078,7 +1078,9 @@ const message = {
             addInstance: 'ເພີ່ມອິນສະແຕນ',
             modelScopeEndpointHelper: 'ໃຊ້ຄົ້ນຫາ ແລະ ດາວໂຫຼດໂມເດວ ModelScope. ຄ່າເລີ່ມຕົ້ນແມ່ນ URL ທາງການ.',
             modelTokenHelper: 'ບໍ່ບັງຄັບ. ໂມເດວສ່ວນຕົວ ຫຼື ທີ່ຈຳກັດຕ້ອງໃຊ້ Token ທີ່ມີສິດເຂົ້າເຖິງ.',
-            modelDirHelper: 'ໂຟນເດີດາວໂຫຼດໂມເດວ ແລະ ແຫຼ່ງລາຍການໂມເດວພາຍໃນເຄື່ອງ.',
+            tokenizerDir: 'ໂຟນເດີ tokenizer',
+            tokenizerDirHelper: 'ໂຟນເດີສຳລັບດາວໂຫຼດ ແລະ ອ່ານລາຍການ tokenizer ໃນເຄື່ອງ. ການປ່ຽນຈະບໍ່ຍ້າຍໄຟລ໌ເກົ່າ.',
+            modelDirHelper: 'ໂຟນເດີດາວໂຫຼດໂມເດວ ແລະ ແຫຼ່ງລາຍການໂມເດວພາຍໃນເຄື່ອງ. ການປ່ຽນຈະບໍ່ຍ້າຍໄຟລ໌ເກົ່າ.',
             featuredModelsHelper:
                 'ເບິ່ງໂມເດລທີ່ 1Panel ຄັດເລືອກ, ກວດເບິ່ງຂໍ້ກຳນົດ, ການນຳໃຊ້ ແລະແຫຼ່ງດາວໂຫຼດ ແລ້ວເລືອກໂມເດລທີ່ເໝາະສົມເພື່ອດາວໂຫຼດ.',
             featuredModelsSyncHelper:
@@ -2129,6 +2131,8 @@ const message = {
             'ຄ່າກາງ ແລະ ຄ່າຕ່ຳສຸດ/ສູງສຸດໃຊ້ສະເພາະການທົດສອບສຳເລັດທີ່ບໍ່ມີຄຳຮ້ອງຂໍຜິດປົກກະຕິ. P99 ແມ່ນຄ່າກາງຂອງ P99 ແຕ່ລະຄັ້ງ. ແຄຊ ແລະ ການຈະລາຈອນພາຍນອກບໍ່ໄດ້ຄວບຄຸມ.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'ອິມເມຈ {image} ມີຂະໜາດໃຫຍ່ ແລະອາດໃຊ້ເວລາດົນໃນການດຶງ ຂຶ້ນກັບຄວາມໄວເຄືອຂ່າຍ. ທ່ານສາມາດຕັ້ງຄ່າມິເຣີຂອງຣີຈິສທຣີເພື່ອເລັ່ງການດຶງ. ທ່ານສາມາດປິດໜ້າຕ່າງວຽກໄດ້; ການດຶງຈະສືບຕໍ່ໃນພື້ນຫຼັງ. ເບິ່ງຄວາມຄືບໜ້າໄດ້ໃນສູນວຽກ.',
         settingsHelp: 'ກະລຸນາກະກຽມອິມເມຈ Benchmark ແລະແຜນທົດສອບກ່ອນ. ເມື່ອທັງສອງພ້ອມແລ້ວ ຈຶ່ງສາມາດສ້າງການທົດສອບໄດ້.',
         imageAvailable: 'ອິມເມຈ Benchmark ພ້ອມໃຊ້ງານແລ້ວ ({image})',
         imageUnavailable: 'ບໍ່ພົບອິມເມຈ Benchmark ({image})',
@@ -2143,20 +2147,19 @@ const message = {
         mainNodeHelp: 'ການທົດສອບແລ່ນຢູ່ໂນດຫຼັກ. ກະກຽມອິມເມຈ ແລະ tokenizer ຢູ່ໂນດນັ້ນ.',
         goImages: 'ໄປຈັດການອິມເມຈ',
         goModels: 'ໄປດາວໂຫຼດໂມເດວ',
-        tokenizerHelp:
-            'Tokenizer ໃຊ້ເຂົ້າລະຫັດຂໍ້ຄວາມທົດສອບ ແລະນັບ token. ເລືອກໂມເດວທີ່ມີໄຟລ໌ tokenizer ຖືກຕ້ອງຈາກໂຟນເດີໂມເດວເລີ່ມຕົ້ນ.',
+        tokenizerHelp: 'ເລືອກ tokenizer ຈາກໂຟນເດີ tokenizer ເພື່ອເຂົ້າລະຫັດຂໍ້ຄວາມທົດສອບ ແລະ ນັບ token.',
         tokenizerEmpty: 'ບໍ່ມີໂມເດວທີ່ໃຊ້ໄດ້. ດາວໂຫຼດໂມເດວທີ່ມີໄຟລ໌ tokenizer ໃນໜ້າດາວໂຫຼດໂມເດວ.',
-        tokenizerEmptyWithDownload: 'ບໍ່ມີໂມເດວທີ່ໃຊ້ໄດ້. ເປີດໜ້າ {download} ເພື່ອດາວໂຫຼດໂມເດວທີ່ມີໄຟລ໌ tokenizer.',
-        tokenizerInvalid: 'Tokenizer ຂອງໂມເດວນີ້ໃຊ້ບໍ່ໄດ້. ເລືອກໂມເດວອື່ນ ຫຼືກະກຽມໄຟລ໌ຄືນໃນໜ້າດາວໂຫຼດໂມເດວ.',
+        tokenizerEmptyWithDownload: 'ບໍ່ມີ tokenizer ທີ່ໃຊ້ໄດ້. ເປີດ {download} ເພື່ອດາວໂຫຼດ.',
+        tokenizerInvalid: 'Tokenizer ນີ້ໃຊ້ບໍ່ໄດ້. ເລືອກອັນອື່ນ ຫຼື ດາວໂຫຼດຄືນ.',
         schemeHelp:
             'ແຜນທົດສອບກຳນົດພາລາມິເຕີຄຳຮ້ອງຂໍ, ຈຳນວນການເຮັດວຽກພ້ອມກັນ ແລະກົດການແລ່ນ. ກະກຽມຢ່າງໜ້ອຍໜຶ່ງແຜນທີ່ໃຊ້ໄດ້.',
         schemeEmpty: 'ບໍ່ມີແຜນທົດສອບທີ່ໃຊ້ໄດ້. ສ້າງແຜນກ່ອນ.',
         manageSchemes: 'ຈັດການແຜນທົດສອບ',
         selectService: 'ເລືອກບໍລິການໂມເດວ',
-        serviceHelp: 'ເລືອກບໍລິການໂມເດວທີ່ຈະທົດສອບ. ຄຳຮ້ອງຂໍຈະຖືກສົ່ງໄປບໍລິການນີ້; ກະລຸນາກວດວ່າເຂົ້າເຖິງໄດ້.',
+        serviceHelp: 'ເລືອກບໍລິການໂມເດວ ແລະ ແກ້ໄຂ URL ຕາມຕ້ອງການ.',
         noServices: 'ບໍ່ມີບໍລິການໂມເດວ. ເພີ່ມບໍລິການໂມເດວກ່ອນ.',
         goModelServices: 'ໄປບໍລິການໂມເດວ',
-        unsupportedServices: 'ບໍລິການທີ່ບໍ່ຮອງຮັບຖືກປິດໃຊ້. ວາງເມົາສ໌ເທິງຕົວເລືອກເພື່ອເບິ່ງເຫດຜົນ.',
+        serviceUnsupported: 'ຍັງບໍ່ຮອງຮັບ',
         unsupportedProtocol: 'ຍັງບໍ່ຮອງຮັບໂປຣໂຕຄອນ API ນີ້: {0}. ເລືອກບໍລິການທີ່ໃຊ້ OpenAI Chat Completions.',
         unsupportedAuth: 'ຍັງບໍ່ຮອງຮັບວິທີຢືນຢັນຕົວຕົນນີ້: {0}. ເລືອກບໍລິການທີ່ໃຊ້ Bearer.',
         serviceModelsMissing: 'ບໍລິການນີ້ຍັງບໍ່ມີໂມເດວ. ເພີ່ມໂມເດວໃນການຈັດການບໍລິການໂມເດວ.',

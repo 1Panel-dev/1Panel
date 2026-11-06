@@ -1064,14 +1064,12 @@ const message = {
             ollamaNameHelper:
                 'Introduzca el nombre completo del modelo de la biblioteca de Ollama. Si no especifica una etiqueta, se usará latest.',
             downloadHelper:
-                'Busque y descargue modelos de ModelScope o Hugging Face, o suba modelos locales siguiendo los {requirements}.',
+                'Descargue modelos o tokenizadores de ModelScope o Hugging Face, o añada archivos locales siguiendo los {requirements}.',
             localModelSizeHelper:
                 'Indica el tamaño actual del directorio, no que todos los archivos hayan terminado de subirse.',
-            localModelLayoutTitle: 'Requisitos de directorios',
-            localModelLayoutPath:
-                'Coloque el modelo completo en el directorio {modelDir} con la estructura organización/nombre del modelo.',
-            localModelLayoutConfig:
-                'La raíz del modelo debe contener config.json o params.json; de lo contrario, no aparecerá en la lista.',
+            localModelLayoutTitle: 'Ejemplos',
+            localLayoutDirect: 'Ubicación directa',
+            localLayoutGrouped: 'Por organización (opcional)',
             serviceHelper:
                 'Conecte servicios de modelos de nubes públicas, motores de inferencia locales y puertas de enlace de IA para que los utilicen los agentes integrados de 1Panel y agentes externos como WorkBuddy.',
             gpuType: 'Tipo de GPU',
@@ -1111,7 +1109,11 @@ const message = {
             addInstance: 'Añadir instancia',
             modelScopeEndpointHelper: 'Para buscar y descargar modelos de ModelScope. Usa la URL oficial por defecto.',
             modelTokenHelper: 'Opcional. Use un token con permisos para acceder a modelos privados o restringidos.',
-            modelDirHelper: 'Directorio de descarga y listado de modelos locales.',
+            tokenizerDir: 'Directorio de tokenizadores',
+            tokenizerDirHelper:
+                'Directorio para descargas y la lista de tokenizadores locales. Cambiarlo no mueve los archivos existentes.',
+            modelDirHelper:
+                'Directorio de descarga y listado de modelos locales. Cambiarlo no mueve los archivos existentes.',
             featuredModelsHelper:
                 'Explora los modelos seleccionados por 1Panel, consulta sus especificaciones, casos de uso y fuentes de descarga, y elige un modelo para descargar.',
             featuredModelsSyncHelper:
@@ -2207,6 +2209,8 @@ const message = {
             'La mediana y los mínimos/máximos solo incluyen ejecuciones correctas sin anomalías. P99 es la mediana de los P99 de cada ejecución. La caché y el tráfico externo no están controlados.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'La imagen {image} es grande y la descarga puede tardar, según la velocidad de la red. Puede configurar un espejo del registro para acelerar la descarga. Puede cerrar el diálogo de tareas; la descarga continuará en segundo plano. Consulte el progreso en el centro de tareas.',
         settingsHelp:
             'Prepare la imagen de Benchmark y un plan de prueba. Podrá crear una prueba de rendimiento cuando ambos estén listos.',
         imageAvailable: 'La imagen de Benchmark está lista ({image})',
@@ -2226,24 +2230,20 @@ const message = {
         goImages: 'Ir a la gestión de imágenes',
         goModels: 'Ir a las descargas de modelos',
         tokenizerHelp:
-            'Los tokenizadores codifican el texto de prueba y cuentan los tokens. Seleccione un modelo con archivos de tokenizador válidos en el directorio de modelos predeterminado.',
+            'Seleccione un tokenizador del directorio de tokenizadores para codificar el texto de prueba y contar tokens.',
         tokenizerEmpty:
             'No hay modelos disponibles. Descargue un modelo que incluya archivos de tokenizador en las descargas de modelos.',
-        tokenizerEmptyWithDownload:
-            'No hay modelos disponibles. Abra {download} para descargar un modelo que incluya archivos de tokenizador.',
-        tokenizerInvalid:
-            'Este modelo no tiene un tokenizador utilizable. Seleccione otro modelo o prepare sus archivos en las descargas de modelos.',
+        tokenizerEmptyWithDownload: 'No hay tokenizadores disponibles. Abra {download} para descargar uno.',
+        tokenizerInvalid: 'Este tokenizador no está disponible. Seleccione otro o descárguelo de nuevo.',
         schemeHelp:
             'Los planes de prueba definen los parámetros de solicitud, la concurrencia y las reglas de ejecución. Prepare al menos un plan disponible.',
         schemeEmpty: 'No hay planes de prueba disponibles. Cree uno primero.',
         manageSchemes: 'Gestionar planes de prueba',
         selectService: 'Seleccione un servicio de modelos',
-        serviceHelp:
-            'Seleccione el servicio de modelos que desea probar. Se enviarán solicitudes a este servicio; asegúrese de que sea accesible.',
+        serviceHelp: 'Seleccione un servicio y ajuste la URL si es necesario.',
         noServices: 'No hay servicios de modelos disponibles. Añada uno primero.',
         goModelServices: 'Ir a los servicios de modelos',
-        unsupportedServices:
-            'Los servicios no compatibles están deshabilitados. Pase el cursor sobre una opción para ver el motivo.',
+        serviceUnsupported: 'Aún no compatible',
         unsupportedProtocol:
             'Este protocolo de API no es compatible: {0}. Seleccione un servicio de modelos que use OpenAI Chat Completions.',
         unsupportedAuth:

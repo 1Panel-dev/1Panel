@@ -1073,14 +1073,12 @@ const message = {
             ollamaNameHelper:
                 'Masukkan nama model penuh daripada pustaka Ollama. Jika tag tidak dinyatakan, latest akan digunakan.',
             downloadHelper:
-                'Cari dan muat turun model daripada ModelScope atau Hugging Face, atau muat naik model setempat mengikut {requirements}.',
+                'Muat turun model atau tokenizer daripada ModelScope atau Hugging Face, atau tambah fail setempat mengikut {requirements}.',
             localModelSizeHelper:
                 'Ini ialah saiz direktori semasa dan tidak mengesahkan bahawa semua fail telah selesai dimuat naik.',
-            localModelLayoutTitle: 'Keperluan direktori',
-            localModelLayoutPath:
-                'Letakkan model lengkap dalam direktori model {modelDir} menggunakan struktur organisasi/nama model.',
-            localModelLayoutConfig:
-                'Akar model mesti mengandungi config.json atau params.json; jika tidak, model tidak akan dipaparkan dalam senarai.',
+            localModelLayoutTitle: 'Contoh',
+            localLayoutDirect: 'Letak terus',
+            localLayoutGrouped: 'Kumpul ikut organisasi (pilihan)',
             serviceHelper:
                 'Sambungkan perkhidmatan model daripada awan awam, enjin inferens setempat dan gerbang AI untuk digunakan oleh ejen terbina dalam 1Panel serta ejen luaran seperti WorkBuddy.',
             gpuType: 'Jenis GPU',
@@ -1120,7 +1118,11 @@ const message = {
             modelScopeEndpointHelper:
                 'Untuk mencari dan memuat turun model ModelScope. Menggunakan URL rasmi secara lalai.',
             modelTokenHelper: 'Pilihan. Gunakan token dengan kebenaran akses untuk model peribadi atau terhad.',
-            modelDirHelper: 'Direktori muat turun model dan sumber senarai model setempat.',
+            tokenizerDir: 'Direktori tokenizer',
+            tokenizerDirHelper:
+                'Direktori muat turun dan senarai tokenizer setempat. Perubahan tidak memindahkan fail sedia ada.',
+            modelDirHelper:
+                'Direktori muat turun model dan sumber senarai model setempat. Perubahan tidak memindahkan fail sedia ada.',
             featuredModelsHelper:
                 'Semak model pilihan 1Panel, lihat spesifikasi, kegunaan dan sumber muat turun, kemudian pilih model yang sesuai untuk dimuat turun.',
             featuredModelsSyncHelper:
@@ -2208,6 +2210,8 @@ const message = {
             'Median dan minimum/maksimum hanya melibatkan ujian berjaya tanpa anomali permintaan. P99 ialah median P99 setiap ujian. Cache dan trafik luaran tidak dikawal.',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            'Imej {image} besar dan mungkin mengambil masa yang lama untuk dimuat turun, bergantung pada kelajuan rangkaian. Anda boleh mengkonfigurasi cermin registri untuk mempercepat muat turun. Anda boleh menutup dialog tugas; muat turun akan diteruskan di latar belakang. Lihat kemajuan di pusat tugas.',
         settingsHelp:
             'Sediakan imej Benchmark dan skema ujian dahulu. Anda boleh mencipta penanda aras apabila kedua-duanya sedia.',
         imageAvailable: 'Imej Benchmark sedia ({image})',
@@ -2224,25 +2228,20 @@ const message = {
         mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
         goImages: 'Ke pengurusan imej',
         goModels: 'Ke muat turun model',
-        tokenizerHelp:
-            'Tokenizer mengekod teks ujian dan mengira token. Pilih model dengan fail tokenizer yang sah daripada direktori model lalai.',
+        tokenizerHelp: 'Pilih tokenizer daripada direktori tokenizer untuk mengekod teks ujian dan mengira token.',
         tokenizerEmpty:
             'Tiada model tersedia. Muat turun model yang mengandungi fail tokenizer di halaman muat turun model.',
-        tokenizerEmptyWithDownload:
-            'Tiada model tersedia. Buka {download} untuk memuat turun model yang mengandungi fail tokenizer.',
-        tokenizerInvalid:
-            'Tokenizer model ini tidak boleh digunakan. Pilih model lain atau sediakan failnya di halaman muat turun model.',
+        tokenizerEmptyWithDownload: 'Tiada tokenizer tersedia. Buka {download} untuk memuat turun.',
+        tokenizerInvalid: 'Tokenizer ini tidak tersedia. Pilih yang lain atau muat turun semula.',
         schemeHelp:
             'Skema ujian menentukan parameter permintaan, keserentakan dan peraturan pelaksanaan. Sediakan sekurang-kurangnya satu skema yang tersedia.',
         schemeEmpty: 'Tiada skema ujian tersedia. Cipta skema dahulu.',
         manageSchemes: 'Urus skema ujian',
         selectService: 'Pilih perkhidmatan model',
-        serviceHelp:
-            'Pilih perkhidmatan model untuk diuji. Permintaan akan dihantar ke perkhidmatan ini; pastikan ia boleh dicapai.',
+        serviceHelp: 'Pilih perkhidmatan model; ubah URL jika perlu.',
         noServices: 'Tiada perkhidmatan model tersedia. Tambah perkhidmatan model dahulu.',
         goModelServices: 'Ke perkhidmatan model',
-        unsupportedServices:
-            'Perkhidmatan yang tidak disokong dinyahdayakan. Letakkan penuding pada pilihan untuk melihat sebabnya.',
+        serviceUnsupported: 'Belum disokong',
         unsupportedProtocol:
             'Protokol API ini tidak disokong: {0}. Pilih perkhidmatan model yang menggunakan OpenAI Chat Completions.',
         unsupportedAuth:

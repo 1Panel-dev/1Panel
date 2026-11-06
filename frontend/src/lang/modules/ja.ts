@@ -1050,14 +1050,12 @@ const message = {
             ollamaNameHelper:
                 'Ollama ライブラリの完全なモデル名を入力してください。タグを省略すると latest が使用されます。',
             downloadHelper:
-                'ModelScope、Hugging Face のモデルを検索・ダウンロードするか、{requirements}に従ってローカルモデルをアップロードできます。',
+                'ModelScopeやHugging Faceからモデルやトークナイザーをダウンロードするか、{requirements}に従ってローカルファイルを追加できます。',
             localModelSizeHelper:
                 '現在のディレクトリサイズを示します。すべてのファイルのアップロード完了を意味するものではありません。',
-            localModelLayoutTitle: 'ディレクトリ要件',
-            localModelLayoutPath:
-                '完全なモデルを「組織名/モデル名」の構成でモデルディレクトリ {modelDir} に配置してください。',
-            localModelLayoutConfig:
-                'モデルのルートに config.json または params.json が必要です。ない場合は一覧に表示されません。',
+            localModelLayoutTitle: '例',
+            localLayoutDirect: '直接配置',
+            localLayoutGrouped: '組織別に分類（任意）',
             serviceHelper:
                 'パブリッククラウド、ローカル推論エンジン、AI ゲートウェイなどのモデルサービスを統合し、1Panel 内蔵エージェントや WorkBuddy などの外部エージェントから利用できます。',
             gpuType: 'GPU タイプ',
@@ -1096,7 +1094,11 @@ const message = {
             addInstance: 'インスタンスを追加',
             modelScopeEndpointHelper: 'ModelScope モデルの検索とダウンロードに使用します。既定は公式 URL です。',
             modelTokenHelper: '任意。非公開・制限付きモデルにはアクセス権のあるトークンが必要です。',
-            modelDirHelper: 'モデルの保存先とローカルモデル一覧の読み込み先です。',
+            tokenizerDir: 'トークナイザーディレクトリ',
+            tokenizerDirHelper:
+                'トークナイザーの保存先とローカル一覧の読み取り先です。変更しても既存ファイルは移動されません。',
+            modelDirHelper:
+                'モデルの保存先とローカルモデル一覧の読み込み先です。変更しても既存ファイルは移動されません。',
             featuredModelsHelper:
                 '1Panel が厳選したモデルの仕様、用途、ダウンロード元を確認し、適切なモデルを選んでダウンロードできます。',
             featuredModelsSyncHelper:
@@ -2166,6 +2168,8 @@ const message = {
             '要求異常のない成功した試行のみを集計し、中央値と最小・最大値を表示します。P99 は試行ごとの P99 の中央値です。キャッシュと外部トラフィックは制御されません。',
     },
     benchmarkSettings: {
+        imagePullHelp:
+            '{image} はサイズが大きいため、ネットワーク速度によっては取得に時間がかかります。レジストリミラーを設定すると、取得を高速化できます。タスクダイアログを閉じても取得はバックグラウンドで続行されます。進捗はタスクセンターで確認できます。',
         settingsHelp:
             'Benchmark イメージとテストプランを準備してください。両方の準備が完了すると、ベンチマークを作成できます。',
         imageAvailable: 'Benchmark イメージは準備済みです（{image}）',
@@ -2185,24 +2189,20 @@ const message = {
             'ベンチマークはメインノードで実行されます。イメージとトークナイザーをメインノードで準備してください。',
         goImages: 'イメージ管理へ',
         goModels: 'モデルダウンロードへ',
-        tokenizerHelp:
-            'トークナイザーはテストテキストのエンコードとトークン数の計算に使用します。既定のモデルディレクトリから有効なトークナイザーファイルを含むモデルを選択してください。',
+        tokenizerHelp: 'トークナイザーディレクトリから選択し、テスト文のエンコードとトークン数の計測に使用します。',
         tokenizerEmpty:
             '利用できるモデルがありません。モデルダウンロードでトークナイザーファイルを含むモデルをダウンロードしてください。',
-        tokenizerEmptyWithDownload:
-            '利用できるモデルがありません。{download}ページでトークナイザーファイルを含むモデルをダウンロードしてください。',
-        tokenizerInvalid:
-            'このモデルのトークナイザーは使用できません。別のモデルを選択するか、モデルダウンロードでファイルを準備し直してください。',
+        tokenizerEmptyWithDownload: '利用可能なトークナイザーがありません。{download}からダウンロードしてください。',
+        tokenizerInvalid: 'このトークナイザーは利用できません。別のものを選択するか、再ダウンロードしてください。',
         schemeHelp:
             'テストプランはリクエストパラメーター、同時実行数、実行ルールを定義します。利用できるプランを少なくとも 1 つ準備してください。',
         schemeEmpty: '利用できるテストプランがありません。先にプランを作成してください。',
         manageSchemes: 'テストプランの管理',
         selectService: 'モデルサービスを選択',
-        serviceHelp:
-            'ベンチマークするモデルサービスを選択してください。このサービスにリクエストが送信されるため、接続可能であることを確認してください。',
+        serviceHelp: 'モデルサービスを選択し、必要に応じてリクエストURLを変更してください。',
         noServices: '利用できるモデルサービスがありません。先にモデルサービスを追加してください。',
         goModelServices: 'モデルサービスへ',
-        unsupportedServices: '未対応のサービスは選択できません。選択肢にカーソルを合わせると理由を確認できます。',
+        serviceUnsupported: '未対応',
         unsupportedProtocol:
             'この API プロトコルには対応していません: {0}。OpenAI Chat Completions を使用するモデルサービスを選択してください。',
         unsupportedAuth: 'この認証方式には対応していません: {0}。Bearer 認証を使用するサービスを選択してください。',

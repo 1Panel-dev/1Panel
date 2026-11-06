@@ -818,3 +818,5 @@ ContainerImageCheckFailures: "{{ .count }} container checks failed; see the task
 ErrImageCheckProxyRequired: "To check for image updates in the current runtime environment, please configure a proxy server first."
 
 ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
+
+ErrModelTokenizerDirOverlap: "The model and tokenizer directories must be different, and neither can contain the other"
