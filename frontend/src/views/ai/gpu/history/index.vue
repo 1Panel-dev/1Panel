@@ -67,7 +67,7 @@
                 </el-col>
             </el-row>
         </template>
-        <LayoutContent v-else-if="!loading" :title="$t('aiTools.gpu.gpu')" :divider="true">
+        <LayoutContent v-else-if="!loading" :title="$t('aiTools.gpu.monitoringTitle')" :divider="true">
             <template #rightToolBar>
                 <TableRefresh @search="refresh" />
             </template>

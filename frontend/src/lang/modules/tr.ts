@@ -1056,6 +1056,8 @@ const message = {
             searchHelper:
                 'ModelScope veya Hugging Face üzerinde model bulun, ardından Model Hazırlığı bölümünde dağıtın veya bir Recipe oluşturun.',
             modelScopeSearchHelper: 'Çin ana karasında kararlı erişim',
+            huggingFaceNetworkHelper:
+                'Hugging Face araması ve indirmeleri için sunucunun siteye erişebilmesi gerekir. Erişim yoksa Ayarlar bölümünde erişilebilir bir Hugging Face ayna URL adresi yapılandırın veya ModelScope seçin. Çevrimdışı ortamlarda modelleri elle yükleyin.',
             huggingFaceSearchHelper: 'Geniş model koleksiyonu',
             searchPlaceholder: 'Model adı veya depo kimliği girin, ör. Qwen/Qwen3-8B',
             popularSearches: 'Popüler aramalar',
@@ -1068,7 +1070,13 @@ const message = {
             localFilesMissing: 'Yerel dosyalar bulunamadı',
             ollamaNameHelper: 'Ollama kütüphanesindeki tam model adını girin. Etiket belirtilmezse latest kullanılır.',
             downloadHelper:
-                'ModelScope ve Hugging Face üzerindeki modelleri bulup indirmek için “Ara” düğmesine tıklayın.',
+                'ModelScope veya Hugging Face üzerinden model arayıp indirin ya da {requirements} doğrultusunda yerel modeller yükleyin.',
+            localModelSizeHelper:
+                'Bu, dizinin mevcut boyutudur; tüm dosyaların yüklenmesinin tamamlandığını doğrulamaz.',
+            localModelLayoutTitle: 'Dizin gereksinimleri',
+            localModelLayoutPath: 'Eksiksiz modeli kuruluş/model adı yapısıyla {modelDir} model dizinine yerleştirin.',
+            localModelLayoutConfig:
+                'Model kökünde config.json veya params.json bulunmalıdır; aksi takdirde model listede görünmez.',
             serviceHelper:
                 'Genel bulutlardan, yerel çıkarım motorlarından ve AI ağ geçitlerinden model hizmetlerini bağlayarak yerleşik 1Panel ajanları ve WorkBuddy gibi harici ajanlar için kullanıma sunun.',
             gpuType: 'GPU türü',
@@ -1115,6 +1123,9 @@ const message = {
                 'Otomatik eşitleme, model dosyalarını indirmeden öne çıkan model kataloğunu her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
             recipeSyncHelper:
                 'Otomatik eşitleme, özel tarifleri etkilemeden eşitlenen tarifleri her gün sabahın erken saatlerinde günceller. İstediğiniz zaman elle de eşitleyebilirsiniz.',
+            serviceStatus: 'Hizmet durumu',
+            readinessNotRunning: 'Çalışmıyor',
+            readinessWaiting: 'Hazır olması bekleniyor',
             readinessPreparing: 'Hazırlanıyor',
             readinessReady: 'Hazır',
             readinessNotReady: 'Hazır değil',
@@ -1132,6 +1143,16 @@ const message = {
             ollamaManagement: 'Ollama yönetimi',
             vllmManagement: 'vLLM yönetimi',
             serviceDetails: 'Hizmet ayrıntıları',
+            deleteDeploymentHelper: 'Bu örnek durdurulacak ve silinecektir',
+            deleteDeploymentServiceHelper:
+                'Bu örnek durdurulacak ve ilişkili model hizmetleriyle birlikte silinecektir',
+            connectionInfo: 'Bağlantı bilgileri',
+            deploymentInfo: 'Dağıtım bilgileri',
+            serviceAPIHelper: 'Bu hizmet OpenAI uyumlu bir API sağlar.',
+            serviceAddressHelper:
+                'Konteyner uygulamaları için konteyner adresini, ana makine veya harici uygulamalar için harici adresi kullanın.',
+            externalAddress: 'Harici adres',
+            imageVersion: 'İmaj sürümü',
             deployments: 'Model dağıtımı',
             files: 'Model hazırlığı',
             connectExternal: 'Harici hizmete bağlan',
@@ -1155,16 +1176,24 @@ const message = {
                 'Geçerli bir başlatma komutu algılanmadı. Model içeren bir pip/uv veya docker komutu yapıştırın.',
             engineProvider: 'Motor / Sağlayıcı',
             endpoint: 'Uç nokta',
+            localService: 'Yerel',
+            cloudService: 'Bulut',
             cloudAccount: 'Bulut hesabı',
             connectionStatus: 'Bağlantı durumu',
             verify: 'Doğrula',
             verifying: 'Doğrulanıyor',
             verifyFailed: 'Doğrulama başarısız',
+            verificationInfo: 'Doğrulama bilgileri',
             verifiedAt: 'Doğrulama zamanı',
             verifyModelChangeHelper:
                 'Doğrulama modeli değiştirildiğinde hizmet, model çağrılmadan doğrulanmamış olarak işaretlenir.',
+            reverify: 'Yeniden doğrula',
+            verifyConfirm: 'Model aşağıdaki ayarlarla doğrulanacak. Devam edilsin mi?',
+            apiKeyHelper: 'Hizmet API Key gerektirmiyorsa unused gibi boş olmayan herhangi bir yer tutucu değer girin.',
             verifyOnChangeHelper:
-                'Devre dışıyken doğrulama gerekmez. Etkinleştirildiğinde bir kez doğrulanır; sonrasında yalnızca bağlantı ayarları veya doğrulama modeli değiştiğinde doğrulanır.',
+                'Etkinleştirildiğinde veya bağlantı ayarları ya da doğrulama modeli değiştiğinde API kısa bir mesajla doğrulanır.',
+            verifyImageOnChangeHelper:
+                'Etkinleştirildiğinde veya bağlantı ayarları ya da doğrulama modeli değiştiğinde API küçük bir görsel üretilerek doğrulanır; ücret oluşabilir.',
             unverified: 'Doğrulanmadı',
             manage: 'Yönet',
             loadFailed: 'Yüklenemedi. Yenileyip tekrar deneyin.',
@@ -1797,7 +1826,8 @@ const message = {
             legacyHistory: 'Bu kayıtların sabit cihaz kimliği yoktur. Cihaz kimliği ve eksik değerler doğrulanamaz.',
             pcieGeneration: 'PCIe nesli (geçerli / en yüksek)',
             pcieWidth: 'PCIe genişliği (geçerli / en yüksek)',
-            gpu: 'GPU İzleme',
+            gpu: 'GPU Yönetimi',
+            monitoringTitle: 'GPU İzleme',
             gpuHelper: 'Desteklenen bir GPU/XPU/NPU yönetim komutu algılanmadı. Lütfen kontrol edip tekrar deneyin!',
             process: 'İşlem Bilgisi',
             type: 'Tür',

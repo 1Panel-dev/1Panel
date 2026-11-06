@@ -1,5 +1,5 @@
 <template>
-    <details ref="sectionRef" open class="form-section">
+    <details ref="sectionRef" :open="!collapsed" class="form-section">
         <summary class="form-section-header">
             <span>{{ $t('aiTools.model.gpuAcceleration') }}</span>
             <el-switch
@@ -139,7 +139,10 @@ import { loadModelGPUDevices } from '@/api/modules/ai';
 import i18n from '@/lang';
 
 const gpuTypeLabels: Record<string, string> = { nvidia: 'NVIDIA', intel: 'Intel', ascend: 'Ascend', amd: 'AMD' };
-const props = withDefaults(defineProps<{ imageType?: string }>(), { imageType: 'nvidia' });
+const props = withDefaults(defineProps<{ imageType?: string; collapsed?: boolean }>(), {
+    imageType: 'nvidia',
+    collapsed: false,
+});
 const model = defineModel<AI.ModelGPUConfig>({ required: true });
 const sectionRef = ref<HTMLDetailsElement>();
 const loading = ref(false);

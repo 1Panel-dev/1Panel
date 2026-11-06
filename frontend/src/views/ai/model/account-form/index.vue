@@ -123,6 +123,7 @@
                     autocomplete="new-password"
                     show-password
                 />
+                <span class="input-help">{{ $t('aiTools.model.apiKeyHelper') }}</span>
             </el-form-item>
             <el-form-item>
                 <el-checkbox v-model="form.rememberApiKey">{{ $t('terminal.rememberPassword') }}</el-checkbox>
@@ -130,12 +131,11 @@
             <el-form-item>
                 <el-switch v-model="form.validateAvailability" />
                 <el-text class="validate-availability-label">{{ $t('aiTools.agents.validateAvailability') }}</el-text>
-                <span v-if="form.id" class="input-help">{{ $t('aiTools.model.verifyOnChangeHelper') }}</span>
                 <span class="input-help">
                     {{
                         isImageAPIType
-                            ? $t('aiTools.agents.validateImageAvailabilityHelper')
-                            : $t('aiTools.agents.validateAvailabilityHelper')
+                            ? $t('aiTools.model.verifyImageOnChangeHelper')
+                            : $t('aiTools.model.verifyOnChangeHelper')
                     }}
                 </span>
             </el-form-item>

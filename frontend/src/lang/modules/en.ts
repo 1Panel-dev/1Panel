@@ -1047,6 +1047,8 @@ const message = {
             searchHelper:
                 'Find models on ModelScope or Hugging Face, then deploy them or create a Recipe in Model Preparation.',
             modelScopeSearchHelper: 'Reliable access in mainland China',
+            huggingFaceNetworkHelper:
+                'Hugging Face search and downloads require server access to the site. If unavailable, configure an accessible Hugging Face mirror URL in Settings or select ModelScope. Upload models manually in offline environments.',
             huggingFaceSearchHelper: 'Extensive model collection',
             searchPlaceholder: 'Enter a model name or repository ID, e.g. Qwen/Qwen3-8B',
             popularSearches: 'Popular searches',
@@ -1059,7 +1061,14 @@ const message = {
             localFilesMissing: 'Local files not found',
             ollamaNameHelper:
                 'Enter the full model name from the Ollama library. If no tag is specified, latest is used.',
-            downloadHelper: 'Click “Search” to find and download models from ModelScope and Hugging Face.',
+            downloadHelper:
+                'Search and download models from ModelScope or Hugging Face, or upload local models following the {requirements}.',
+            localModelSizeHelper:
+                'This is the current directory size and does not confirm that all files have finished uploading.',
+            localModelLayoutTitle: 'Directory requirements',
+            localModelLayoutPath: 'Place the complete model in {modelDir} using the organization/model-name structure.',
+            localModelLayoutConfig:
+                'The model root must contain config.json or params.json; otherwise, it will not appear in the list.',
             serviceHelper:
                 'Connect model services from public clouds, local inference engines, and AI gateways for use by built-in 1Panel agents and external agents such as WorkBuddy.',
             gpuType: 'GPU Type',
@@ -1106,6 +1115,9 @@ const message = {
                 'When enabled, auto-sync updates the featured model catalog daily in the early morning without downloading model files. You can also sync manually at any time.',
             recipeSyncHelper:
                 'When enabled, auto-sync updates synced recipes daily in the early morning without affecting custom recipes. You can also sync manually at any time.',
+            serviceStatus: 'Service status',
+            readinessNotRunning: 'Not running',
+            readinessWaiting: 'Waiting for readiness',
             readinessPreparing: 'Preparing',
             readinessReady: 'Ready',
             readinessNotReady: 'Not ready',
@@ -1123,6 +1135,16 @@ const message = {
             ollamaManagement: 'Ollama management',
             vllmManagement: 'vLLM management',
             serviceDetails: 'Service details',
+            deleteDeploymentHelper: 'This instance will be stopped and deleted',
+            deleteDeploymentServiceHelper:
+                'This instance will be stopped and deleted along with its linked model services',
+            connectionInfo: 'Connection information',
+            deploymentInfo: 'Deployment information',
+            serviceAPIHelper: 'This service provides an OpenAI-compatible API.',
+            serviceAddressHelper:
+                'Use the container address for container apps and the external address for host or external apps.',
+            externalAddress: 'External address',
+            imageVersion: 'Image version',
             deployments: 'Model deployment',
             files: 'Model preparation',
             connectExternal: 'Connect external service',
@@ -1146,16 +1168,25 @@ const message = {
                 'No valid launch command detected. Paste a pip/uv or docker command that includes a model.',
             engineProvider: 'Engine / Provider',
             endpoint: 'Endpoint',
+            localService: 'Local',
+            cloudService: 'Cloud',
             cloudAccount: 'Cloud account',
             connectionStatus: 'Verification status',
             verify: 'Verify',
             verifying: 'Verifying',
             verifyFailed: 'Verification failed',
+            verificationInfo: 'Verification details',
             verifiedAt: 'Verification time',
             verifyModelChangeHelper:
                 'Changing the verification model marks the service as unverified without calling the model.',
+            reverify: 'Verify again',
+            verifyConfirm: 'The model will be verified using the settings below. Continue?',
+            apiKeyHelper:
+                'If the service does not require an API Key, enter any non-empty placeholder, such as unused.',
             verifyOnChangeHelper:
-                'When disabled, verification is not required. Enabling runs verification once; later edits verify only when connection settings or the verification model change.',
+                'When enabled or connection settings or the verification model change, verify the API with a minimal message.',
+            verifyImageOnChangeHelper:
+                'When enabled or connection settings or the verification model change, verify the API by generating a minimal image; charges may apply.',
             unverified: 'Unverified',
             manage: 'Manage',
             loadFailed: 'Failed to load. Refresh to retry.',
@@ -1787,7 +1818,8 @@ const message = {
                 'These records have no stable device ID. Their identity and missing values cannot be verified.',
             pcieGeneration: 'PCIe generation (current / maximum)',
             pcieWidth: 'PCIe width (current / maximum)',
-            gpu: 'GPU Monitoring',
+            gpu: 'GPU Management',
+            monitoringTitle: 'GPU Monitoring',
             gpuHelper: 'No supported GPU/XPU/NPU management command was detected. Please check and try again!',
             process: 'Process Information',
             processCount: 'Process Count',

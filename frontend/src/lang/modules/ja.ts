@@ -1035,6 +1035,8 @@ const message = {
             searchHelper:
                 'ModelScope または Hugging Face でモデルを検索し、ダウンロード後にモデル準備でデプロイまたは Recipe を作成できます。',
             modelScopeSearchHelper: '中国本土から安定したアクセス',
+            huggingFaceNetworkHelper:
+                'Hugging Face の検索とダウンロードにはサーバーからサイトへの接続が必要です。接続できない場合は、設定で利用可能な Hugging Face ミラー URL を指定するか、ModelScope を選択してください。オフライン環境ではモデルを手動でアップロードしてください。',
             huggingFaceSearchHelper: '豊富なモデル',
             searchPlaceholder: 'モデル名またはリポジトリ ID を入力（例：Qwen/Qwen3-8B）',
             popularSearches: '人気の検索',
@@ -1048,7 +1050,14 @@ const message = {
             ollamaNameHelper:
                 'Ollama ライブラリの完全なモデル名を入力してください。タグを省略すると latest が使用されます。',
             downloadHelper:
-                '「検索」をクリックすると、ModelScope や Hugging Face のモデルを検索してダウンロードできます。',
+                'ModelScope、Hugging Face のモデルを検索・ダウンロードするか、{requirements}に従ってローカルモデルをアップロードできます。',
+            localModelSizeHelper:
+                '現在のディレクトリサイズを示します。すべてのファイルのアップロード完了を意味するものではありません。',
+            localModelLayoutTitle: 'ディレクトリ要件',
+            localModelLayoutPath:
+                '完全なモデルを「組織名/モデル名」の構成でモデルディレクトリ {modelDir} に配置してください。',
+            localModelLayoutConfig:
+                'モデルのルートに config.json または params.json が必要です。ない場合は一覧に表示されません。',
             serviceHelper:
                 'パブリッククラウド、ローカル推論エンジン、AI ゲートウェイなどのモデルサービスを統合し、1Panel 内蔵エージェントや WorkBuddy などの外部エージェントから利用できます。',
             gpuType: 'GPU タイプ',
@@ -1094,6 +1103,9 @@ const message = {
                 '自動同期を有効にすると、毎日未明に厳選モデルのカタログを更新します。モデルファイルはダウンロードしません。いつでも手動で同期できます。',
             recipeSyncHelper:
                 '自動同期を有効にすると、毎日未明に同期元のレシピを更新します。カスタムレシピには影響しません。いつでも手動で同期できます。',
+            serviceStatus: 'サービス状態',
+            readinessNotRunning: '未稼働',
+            readinessWaiting: '準備完了待ち',
             readinessPreparing: '準備中',
             readinessReady: '準備完了',
             readinessNotReady: '準備未完了',
@@ -1111,6 +1123,15 @@ const message = {
             ollamaManagement: 'Ollama 管理',
             vllmManagement: 'vLLM 管理',
             serviceDetails: 'サービス詳細',
+            deleteDeploymentHelper: 'このインスタンスを停止して削除します',
+            deleteDeploymentServiceHelper: 'このインスタンスを停止し、関連するモデルサービスとともに削除します',
+            connectionInfo: '接続情報',
+            deploymentInfo: 'デプロイ情報',
+            serviceAPIHelper: 'このサービスは OpenAI 互換 API を提供します。',
+            serviceAddressHelper:
+                'コンテナ内のアプリにはコンテナアドレスを、ホスト上または外部のアプリには外部アドレスを使用してください。',
+            externalAddress: '外部アクセスアドレス',
+            imageVersion: 'イメージバージョン',
             deployments: 'モデルデプロイ',
             files: 'モデル準備',
             connectExternal: '外部サービスに接続',
@@ -1134,15 +1155,23 @@ const message = {
                 '有効な起動コマンドが見つかりません。モデルを含む pip/uv または docker コマンドを貼り付けてください。',
             engineProvider: 'エンジン / プロバイダー',
             endpoint: 'エンドポイント',
+            localService: 'ローカル',
+            cloudService: 'クラウド',
             cloudAccount: 'クラウドアカウント',
             connectionStatus: '接続状態',
             verify: '検証',
             verifying: '検証中',
             verifyFailed: '検証失敗',
+            verificationInfo: '検証情報',
             verifiedAt: '検証日時',
             verifyModelChangeHelper: '検証モデルを変更すると、モデルを呼び出さずにサービスが未検証になります。',
+            reverify: '再検証',
+            verifyConfirm: '以下の設定でモデルを検証します。続行しますか？',
+            apiKeyHelper: 'サービスに API Key が不要な場合は、unused などの空でない任意の値を入力してください。',
             verifyOnChangeHelper:
-                '無効時は検証不要です。有効にすると一度検証し、その後は接続設定または検証モデルの変更時のみ検証します。',
+                '有効化時、または接続設定・検証モデルの変更時に、最小限のメッセージで API を検証します。',
+            verifyImageOnChangeHelper:
+                '有効化時、または接続設定・検証モデルの変更時に、最小の画像を生成して API を検証します。料金が発生する場合があります。',
             unverified: '未検証',
             manage: '管理',
             loadFailed: '読み込みに失敗しました。更新して再試行してください。',
@@ -1771,7 +1800,8 @@ const message = {
             legacyHistory: 'これらの記録には固定のデバイス ID がなく、デバイスの識別や欠損値を確認できません。',
             pcieGeneration: 'PCIe 世代（現在 / 最大）',
             pcieWidth: 'PCIe 幅（現在 / 最大）',
-            gpu: 'GPU 監視',
+            gpu: 'GPU 管理',
+            monitoringTitle: 'GPU 監視',
             gpuHelper: '対応する GPU/XPU/NPU 管理コマンドが検出されませんでした。確認して再試行してください！',
             process: 'プロセス情報',
             type: 'タイプ',

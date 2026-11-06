@@ -1031,6 +1031,8 @@ const message = {
             searchHelper:
                 'مدل‌ها را در ModelScope یا Hugging Face پیدا کنید، سپس در آماده‌سازی مدل آن‌ها را مستقر کنید یا یک Recipe بسازید.',
             modelScopeSearchHelper: 'دسترسی پایدار در سرزمین اصلی چین',
+            huggingFaceNetworkHelper:
+                'جستجو و دانلود از Hugging Face به دسترسی سرور به سایت نیاز دارد. اگر دسترسی ممکن نیست، نشانی آینه قابل دسترس Hugging Face را در تنظیمات وارد کنید یا ModelScope را انتخاب کنید. در محیط آفلاین مدل‌ها را دستی بارگذاری کنید.',
             huggingFaceSearchHelper: 'مجموعه گسترده مدل‌ها',
             searchPlaceholder: 'نام مدل یا شناسه مخزن را وارد کنید، مانند Qwen/Qwen3-8B',
             popularSearches: 'جستجوهای محبوب',
@@ -1043,7 +1045,14 @@ const message = {
             localFilesMissing: 'فایل‌های محلی یافت نشد',
             ollamaNameHelper:
                 'نام کامل مدل را از کتابخانه Ollama وارد کنید. اگر برچسب مشخص نشود، latest استفاده می‌شود.',
-            downloadHelper: 'برای یافتن و دانلود مدل‌ها از ModelScope و Hugging Face روی «جستجو» کلیک کنید.',
+            downloadHelper:
+                'مدل‌ها را از ModelScope یا Hugging Face جستجو و دانلود کنید، یا مدل‌های محلی را مطابق {requirements} بارگذاری کنید.',
+            localModelSizeHelper:
+                'این مقدار فقط اندازه فعلی پوشه را نشان می‌دهد و به معنی پایان بارگذاری همه فایل‌ها نیست.',
+            localModelLayoutTitle: 'الزامات پوشه',
+            localModelLayoutPath: 'مدل کامل را با ساختار سازمان/نام مدل در پوشه مدل {modelDir} قرار دهید.',
+            localModelLayoutConfig:
+                'ریشه مدل باید شامل config.json یا params.json باشد؛ در غیر این صورت مدل در فهرست نمایش داده نمی‌شود.',
             serviceHelper:
                 'سرویس‌های مدل از ابرهای عمومی، موتورهای استنتاج محلی و درگاه‌های هوش مصنوعی را برای استفاده عامل‌های داخلی 1Panel و عامل‌های خارجی مانند WorkBuddy متصل کنید.',
             gpuType: 'نوع GPU',
@@ -1089,6 +1098,9 @@ const message = {
                 'همگام‌سازی خودکار هر روز در ساعات اولیه صبح فهرست مدل‌های منتخب را بدون دانلود فایل‌های مدل به‌روز می‌کند. همگام‌سازی دستی نیز در هر زمان امکان‌پذیر است.',
             recipeSyncHelper:
                 'همگام‌سازی خودکار هر روز در ساعات اولیه صبح دستورهای همگام‌شده را بدون تأثیر بر دستورهای سفارشی به‌روز می‌کند. همگام‌سازی دستی نیز در هر زمان امکان‌پذیر است.',
+            serviceStatus: 'وضعیت سرویس',
+            readinessNotRunning: 'در حال اجرا نیست',
+            readinessWaiting: 'در انتظار آماده شدن',
             readinessPreparing: 'در حال آماده‌سازی',
             readinessReady: 'آماده',
             readinessNotReady: 'آماده نیست',
@@ -1106,6 +1118,15 @@ const message = {
             ollamaManagement: 'مدیریت Ollama',
             vllmManagement: 'مدیریت vLLM',
             serviceDetails: 'جزئیات سرویس',
+            deleteDeploymentHelper: 'این نمونه متوقف و حذف می‌شود',
+            deleteDeploymentServiceHelper: 'این نمونه متوقف و همراه با سرویس‌های مدل مرتبط حذف می‌شود',
+            connectionInfo: 'اطلاعات اتصال',
+            deploymentInfo: 'اطلاعات استقرار',
+            serviceAPIHelper: 'این سرویس یک API سازگار با OpenAI ارائه می‌دهد.',
+            serviceAddressHelper:
+                'برای برنامه‌های کانتینری از آدرس کانتینر و برای برنامه‌های میزبان یا خارجی از آدرس خارجی استفاده کنید.',
+            externalAddress: 'آدرس خارجی',
+            imageVersion: 'نسخه ایمیج',
             deployments: 'استقرار مدل',
             files: 'آماده‌سازی مدل',
             connectExternal: 'اتصال به سرویس خارجی',
@@ -1128,15 +1149,23 @@ const message = {
             recipeImportError: 'فرمان اجرای معتبری شناسایی نشد. یک فرمان pip/uv یا docker شامل مدل را جای‌گذاری کنید.',
             engineProvider: 'موتور / ارائه‌دهنده',
             endpoint: 'نقطه پایانی',
+            localService: 'محلی',
+            cloudService: 'ابری',
             cloudAccount: 'حساب ابری',
             connectionStatus: 'وضعیت اتصال',
             verify: 'بررسی',
             verifying: 'در حال بررسی',
             verifyFailed: 'بررسی ناموفق',
+            verificationInfo: 'اطلاعات بررسی',
             verifiedAt: 'زمان بررسی',
             verifyModelChangeHelper: 'با تغییر مدل تأیید، سرویس بدون فراخوانی مدل به حالت تأییدنشده تغییر می‌کند.',
+            reverify: 'بررسی مجدد',
+            verifyConfirm: 'مدل با تنظیمات زیر بررسی می‌شود. ادامه می‌دهید؟',
+            apiKeyHelper: 'اگر سرویس به API Key نیاز ندارد، یک مقدار جایگزین غیرخالی مانند unused وارد کنید.',
             verifyOnChangeHelper:
-                'در حالت غیرفعال، بررسی لازم نیست. با فعال‌سازی یک بار بررسی انجام می‌شود؛ پس از آن فقط با تغییر تنظیمات اتصال یا مدل بررسی تکرار می‌شود.',
+                'هنگام فعال‌سازی یا تغییر تنظیمات اتصال یا مدل بررسی، API با یک پیام حداقلی بررسی می‌شود.',
+            verifyImageOnChangeHelper:
+                'هنگام فعال‌سازی یا تغییر تنظیمات اتصال یا مدل بررسی، API با تولید یک تصویر حداقلی بررسی می‌شود؛ ممکن است هزینه داشته باشد.',
             unverified: 'تأیید نشده',
             manage: 'مدیریت',
             loadFailed: 'بارگذاری ناموفق بود. صفحه را تازه‌سازی کرده و دوباره تلاش کنید.',
@@ -1765,7 +1794,8 @@ const message = {
             legacyHistory: 'این رکوردها شناسه ثابت دستگاه ندارند. هویت دستگاه و مقادیر مفقود قابل تأیید نیستند.',
             pcieGeneration: 'نسل PCIe (فعلی / حداکثر)',
             pcieWidth: 'عرض PCIe (فعلی / حداکثر)',
-            gpu: 'نظارت بر GPU',
+            gpu: 'مدیریت GPU',
+            monitoringTitle: 'نظارت بر GPU',
             gpuHelper: 'هیچ دستور مدیریت GPU/XPU/NPU پشتیبانی‌شده‌ای شناسایی نشد. لطفاً بررسی و دوباره تلاش کنید!',
             process: 'اطلاعات فرآیند',
             processCount: 'تعداد فرآیندها',

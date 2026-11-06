@@ -1058,6 +1058,8 @@ const message = {
             searchHelper:
                 'Cari model di ModelScope atau Hugging Face, kemudian gunakan model atau cipta Recipe dalam Persediaan Model.',
             modelScopeSearchHelper: 'Akses stabil di tanah besar China',
+            huggingFaceNetworkHelper:
+                'Carian dan muat turun Hugging Face memerlukan akses pelayan ke laman tersebut. Jika tidak tersedia, tetapkan URL cermin Hugging Face yang boleh dicapai dalam Tetapan atau pilih ModelScope. Dalam persekitaran luar talian, muat naik model secara manual.',
             huggingFaceSearchHelper: 'Koleksi model yang luas',
             searchPlaceholder: 'Masukkan nama model atau ID repositori, cth. Qwen/Qwen3-8B',
             popularSearches: 'Carian popular',
@@ -1070,7 +1072,15 @@ const message = {
             localFilesMissing: 'Fail setempat tidak ditemui',
             ollamaNameHelper:
                 'Masukkan nama model penuh daripada pustaka Ollama. Jika tag tidak dinyatakan, latest akan digunakan.',
-            downloadHelper: 'Klik “Cari” untuk mencari dan memuat turun model daripada ModelScope dan Hugging Face.',
+            downloadHelper:
+                'Cari dan muat turun model daripada ModelScope atau Hugging Face, atau muat naik model setempat mengikut {requirements}.',
+            localModelSizeHelper:
+                'Ini ialah saiz direktori semasa dan tidak mengesahkan bahawa semua fail telah selesai dimuat naik.',
+            localModelLayoutTitle: 'Keperluan direktori',
+            localModelLayoutPath:
+                'Letakkan model lengkap dalam direktori model {modelDir} menggunakan struktur organisasi/nama model.',
+            localModelLayoutConfig:
+                'Akar model mesti mengandungi config.json atau params.json; jika tidak, model tidak akan dipaparkan dalam senarai.',
             serviceHelper:
                 'Sambungkan perkhidmatan model daripada awan awam, enjin inferens setempat dan gerbang AI untuk digunakan oleh ejen terbina dalam 1Panel serta ejen luaran seperti WorkBuddy.',
             gpuType: 'Jenis GPU',
@@ -1117,6 +1127,9 @@ const message = {
                 'Penyegerakan automatik mengemas kini katalog model pilihan setiap hari pada awal pagi tanpa memuat turun fail model. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
             recipeSyncHelper:
                 'Penyegerakan automatik mengemas kini resipi yang disegerakkan setiap hari pada awal pagi tanpa menjejaskan resipi tersuai. Anda juga boleh menyegerakkan secara manual pada bila-bila masa.',
+            serviceStatus: 'Status perkhidmatan',
+            readinessNotRunning: 'Tidak berjalan',
+            readinessWaiting: 'Menunggu kesediaan',
             readinessPreparing: 'Sedang disediakan',
             readinessReady: 'Sedia',
             readinessNotReady: 'Belum sedia',
@@ -1135,6 +1148,16 @@ const message = {
             ollamaManagement: 'Pengurusan Ollama',
             vllmManagement: 'Pengurusan vLLM',
             serviceDetails: 'Butiran perkhidmatan',
+            deleteDeploymentHelper: 'Instans ini akan dihentikan dan dipadamkan',
+            deleteDeploymentServiceHelper:
+                'Instans ini akan dihentikan dan dipadamkan bersama perkhidmatan model yang berkaitan',
+            connectionInfo: 'Maklumat sambungan',
+            deploymentInfo: 'Maklumat penggunaan',
+            serviceAPIHelper: 'Perkhidmatan ini menyediakan API yang serasi dengan OpenAI.',
+            serviceAddressHelper:
+                'Gunakan alamat bekas untuk aplikasi dalam bekas dan alamat luaran untuk aplikasi hos atau luaran.',
+            externalAddress: 'Alamat luaran',
+            imageVersion: 'Versi imej',
             deployments: 'Pengerahan model',
             files: 'Penyediaan model',
             connectExternal: 'Sambungkan perkhidmatan luaran',
@@ -1158,16 +1181,25 @@ const message = {
                 'Tiada arahan pelancaran yang sah dikesan. Tampal arahan pip/uv atau docker yang mengandungi model.',
             engineProvider: 'Enjin / Pembekal',
             endpoint: 'Titik akhir',
+            localService: 'Setempat',
+            cloudService: 'Awan',
             cloudAccount: 'Akaun awan',
             connectionStatus: 'Status sambungan',
             verify: 'Sahkan',
             verifying: 'Sedang mengesahkan',
             verifyFailed: 'Pengesahan gagal',
+            verificationInfo: 'Butiran pengesahan',
             verifiedAt: 'Masa pengesahan',
             verifyModelChangeHelper:
                 'Menukar model pengesahan menandakan perkhidmatan sebagai belum disahkan tanpa memanggil model.',
+            reverify: 'Sahkan semula',
+            verifyConfirm: 'Model akan disahkan menggunakan tetapan di bawah. Teruskan?',
+            apiKeyHelper:
+                'Jika perkhidmatan tidak memerlukan API Key, masukkan sebarang nilai pemegang tempat yang tidak kosong, seperti unused.',
             verifyOnChangeHelper:
-                'Apabila dimatikan, pengesahan tidak diperlukan. Mengaktifkannya menjalankan pengesahan sekali; selepas itu hanya perubahan tetapan sambungan atau model pengesahan akan disahkan.',
+                'Apabila diaktifkan atau tetapan sambungan atau model pengesahan berubah, API disahkan dengan mesej minimum.',
+            verifyImageOnChangeHelper:
+                'Apabila diaktifkan atau tetapan sambungan atau model pengesahan berubah, imej minimum dijana untuk mengesahkan API; caj mungkin dikenakan.',
             unverified: 'Belum disahkan',
             manage: 'Urus',
             loadFailed: 'Gagal memuatkan. Muat semula dan cuba lagi.',
@@ -1802,7 +1834,8 @@ const message = {
                 'Rekod ini tiada ID peranti yang tetap. Identiti peranti dan nilai yang hilang tidak dapat disahkan.',
             pcieGeneration: 'Generasi PCIe (semasa / maksimum)',
             pcieWidth: 'Lebar PCIe (semasa / maksimum)',
-            gpu: 'Pemantauan GPU',
+            gpu: 'Pengurusan GPU',
+            monitoringTitle: 'Pemantauan GPU',
             gpuHelper: 'Tiada arahan pengurusan GPU/XPU/NPU yang disokong dikesan. Sila periksa dan cuba lagi!',
             process: 'Maklumat Proses',
             type: 'Jenis',
