@@ -28,6 +28,7 @@
                 <ComplexTable
                     :selection-context="() => [searchName]"
                     row-key="name"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"

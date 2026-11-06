@@ -11,7 +11,13 @@
                 </el-button>
             </template>
             <template #main>
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <ComplexTable
+                    :data="data"
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @search="search()"
+                    v-loading="loading"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
                         show-overflow-tooltip

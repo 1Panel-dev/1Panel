@@ -11,7 +11,13 @@
                 <el-alert :title="$t('ssl.acmeHelper')" type="info" :closable="false" />
             </template>
             <template #main>
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <ComplexTable
+                    :data="data"
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @search="search()"
+                    v-loading="loading"
+                >
                     <el-table-column
                         :label="$t('website.email')"
                         fix

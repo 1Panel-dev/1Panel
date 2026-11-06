@@ -53,6 +53,7 @@
                     row-key="id"
                     :class="{ mask: !clamStatus.isRunning }"
                     v-if="!isSettingShow"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :scrollbar-always-on="isMobile"
                     v-model:selects="selects"

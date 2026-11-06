@@ -68,6 +68,7 @@
                 </template>
                 <template #main>
                     <ComplexTable
+                        :cache-pagination="false"
                         :pagination-config="paginationConfig"
                         v-model:selects="selects"
                         @sort-change="search"

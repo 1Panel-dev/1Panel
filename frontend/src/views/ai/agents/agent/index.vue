@@ -20,6 +20,7 @@
                     v-if="!noApp"
                     v-model:view-mode="viewMode"
                     :data="items"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     @search="search"
                 >

@@ -8,7 +8,12 @@
                 </el-button>
             </template>
             <template #main>
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()">
+                <ComplexTable
+                    :data="data"
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @search="search()"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

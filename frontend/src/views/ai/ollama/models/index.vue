@@ -50,6 +50,7 @@
                     v-else-if="modelInstalled"
                     :selection-context="() => [searchName]"
                     row-key="id"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     @sort-change="search"

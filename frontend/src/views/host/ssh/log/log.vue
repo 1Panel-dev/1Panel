@@ -26,7 +26,13 @@
             </template>
 
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="400">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    :data="data"
+                    @search="search"
+                    :heightDiff="400"
+                >
                     <el-table-column min-width="80" :label="$t('logs.loginIP')" prop="address" />
                     <el-table-column min-width="60" :label="$t('ssh.belong')" prop="area" />
                     <el-table-column min-width="60" :label="$t('commons.table.port')" prop="port" />

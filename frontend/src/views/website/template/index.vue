@@ -15,7 +15,13 @@
                 <TableRefresh @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :data="data" :pagination-config="paginationConfig" @search="search()" v-loading="loading">
+                <ComplexTable
+                    :data="data"
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @search="search()"
+                    v-loading="loading"
+                >
                     <el-table-column :label="$t('template.name')" prop="name" min-width="120px" show-overflow-tooltip />
                     <el-table-column :label="$t('template.type')" prop="type" width="150px">
                         <template #default="{ row }">

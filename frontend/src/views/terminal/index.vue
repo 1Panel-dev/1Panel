@@ -1,35 +1,20 @@
 <template>
-    <div>
-        <el-card class="router_card">
-            <el-radio-group v-model="activeNames" @change="handleChange">
-                <el-radio-button class="router_card_button" size="large" value="terminal">
-                    {{ $t('menu.terminal', 2) }}
-                </el-radio-button>
-                <el-radio-button v-if="isAdmin" class="router_card_button" size="large" value="host">
-                    {{ $t('terminal.host', 2) }}
-                </el-radio-button>
-                <el-radio-button class="router_card_button" size="large" value="command">
-                    {{ $t('terminal.quickCommand', 2) }}
-                </el-radio-button>
-                <el-radio-button v-if="isAdmin" class="router_card_button" size="large" value="setting">
-                    {{ $t('container.setting') }}
-                </el-radio-button>
-            </el-radio-group>
-        </el-card>
-
-        <div v-show="activeNames === 'terminal'">
-            <TerminalTab ref="terminalTabRef" />
-        </div>
-        <div v-if="isAdmin && activeNames === 'host'">
-            <HostTab ref="hostTabRef" />
-        </div>
-        <div v-if="activeNames === 'command'">
-            <CommandTab ref="commandTabRef" />
-        </div>
-        <div v-if="isAdmin && activeNames === 'setting'">
-            <SettingTab ref="settingTabRef" />
-        </div>
-    </div>
+    <CachedTabs
+        :items="tabs"
+        default-value="terminal"
+        cache-key="terminal/main"
+        :requested-value="route.path === '/terminal' && route.query.path ? 'terminal' : undefined"
+        @activate="handleChange"
+    >
+        <template #default="{ active }">
+            <div v-show="active === 'terminal'">
+                <TerminalTab ref="terminalTabRef" />
+            </div>
+            <HostTab v-if="isAdmin && active === 'host'" ref="hostTabRef" />
+            <CommandTab v-if="active === 'command'" ref="commandTabRef" />
+            <SettingTab v-if="isAdmin && active === 'setting'" ref="settingTabRef" />
+        </template>
+    </CachedTabs>
 </template>
 
 <script setup lang="ts">
@@ -37,20 +22,29 @@ import HostTab from '@/views/terminal/host/index.vue';
 import CommandTab from '@/views/terminal/command/index.vue';
 import TerminalTab from '@/views/terminal/terminal/index.vue';
 import SettingTab from '@/views/terminal/setting/index.vue';
-import { onMounted, ref } from 'vue';
+import { computed, onMounted, ref } from 'vue';
+import { useRoute } from 'vue-router';
+import CachedTabs from '@/components/cached-tabs/index.vue';
+import i18n from '@/lang';
 import { getTerminalInfo } from '@/api/modules/setting';
 import { TerminalStore } from '@/store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const terminalStore = TerminalStore();
 const { isAdmin } = useGlobalStore();
-const activeNames = ref<string>('terminal');
+const route = useRoute();
+const tabs = computed(() => [
+    { value: 'terminal', label: i18n.global.t('menu.terminal', 2) },
+    ...(isAdmin.value ? [{ value: 'host', label: i18n.global.t('terminal.host', 2) }] : []),
+    { value: 'command', label: i18n.global.t('terminal.quickCommand', 2) },
+    ...(isAdmin.value ? [{ value: 'setting', label: i18n.global.t('container.setting') }] : []),
+]);
 const hostTabRef = ref();
 const commandTabRef = ref();
 const terminalTabRef = ref();
 const settingTabRef = ref();
 
-const handleChange = (tab: any) => {
+const handleChange = (tab: string) => {
     if (tab === 'host' && isAdmin.value) {
         hostTabRef.value?.acceptParams();
     }
@@ -85,29 +79,5 @@ const loadTerminalSetting = async () => {
 
 onMounted(() => {
     loadTerminalSetting();
-    handleChange('terminal');
 });
 </script>
-
-<style lang="scss" scoped>
-.router_card {
-    --el-card-padding: 0;
-}
-
-.router_card_button {
-    :deep(.el-radio-button__inner) {
-        min-width: 100px;
-        height: 100%;
-        background-color: var(--panel-button-active) !important;
-        box-shadow: none !important;
-        outline: none !important;
-        border: 2px solid transparent !important;
-    }
-
-    :deep(.el-radio-button__original-radio:checked + .el-radio-button__inner) {
-        color: $primary-color;
-        border-color: $primary-color !important;
-        border-radius: 4px;
-    }
-}
-</style>

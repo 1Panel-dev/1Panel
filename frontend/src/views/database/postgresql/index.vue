@@ -93,6 +93,7 @@
                 <ComplexTable
                     v-if="currentDB"
                     :class="{ mask: maskShow }"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     @sort-change="search"
                     @search="search"

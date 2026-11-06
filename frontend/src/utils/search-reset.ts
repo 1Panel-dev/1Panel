@@ -139,11 +139,11 @@ export const bindSearchState = (key: () => string | undefined, fields: SearchFie
 
 interface SearchStateOptions {
     scope?: () => string | number | undefined;
-    onRevisit: () => unknown;
+    onRevisit?: () => unknown;
 }
 
 /** Keep queries across page visits and reload data when a cached page becomes active. */
-export const useSearchState = (page: string, fields: SearchFields, options: SearchStateOptions) => {
+export const useSearchState = (page: string, fields: SearchFields, options: SearchStateOptions = {}) => {
     const { cacheUserID } = storeToRefs(GlobalStore());
     const binding = bindSearchState(() => {
         const scope = options.scope?.();
@@ -160,6 +160,6 @@ export const useSearchState = (page: string, fields: SearchFields, options: Sear
     onActivated(async () => {
         if (!deactivated) return;
         deactivated = false;
-        if (await binding.resume()) return options.onRevisit();
+        if (await binding.resume()) return options.onRevisit?.();
     });
 };

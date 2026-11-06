@@ -28,6 +28,7 @@
                     </template>
                 </el-alert>
                 <ComplexTable
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     @sort-change="search"
                     @search="search"

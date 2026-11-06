@@ -62,7 +62,7 @@ import TerminalDock from '@/components/terminal/dock/index.vue';
 import useResize from './hooks/useResize';
 import { MenuStore, TabsStore } from '@/store';
 import { getSystemAvailable } from '@/api/modules/setting';
-import { useRoute, useRouter } from 'vue-router';
+import { openMenu } from '@/utils/router';
 import { loadMasterProductProFromDB, loadProductProFromDB } from '@/utils/xpack';
 import { useTheme } from '@/global/use-theme';
 import TaskList from '@/components/task-list/index.vue';
@@ -95,8 +95,6 @@ const openTask = () => {
         menuStore.setCollapse();
     }
 };
-const router = useRouter();
-const route = useRoute();
 const menuStore = MenuStore();
 
 const tabsStore = TabsStore();
@@ -151,9 +149,7 @@ watch(
     },
 );
 const handleMenuClick = async (path) => {
-    await router.push({ path: path });
-    tabsStore.addTab(route);
-    tabsStore.activeTabPath = route.path;
+    await openMenu(path);
 };
 
 const toLogin = () => {
