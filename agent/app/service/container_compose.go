@@ -9,6 +9,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -608,7 +609,10 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 	if err != nil {
 		return err
 	}
-	projectName := loadComposeProjectNameForLog(list, req.Name, req.Path)
+	projectName, err := loadComposeProjectNameForLog(list, req.Name, req.Path)
+	if err != nil {
+		return err
+	}
 	ctx := context.Background()
 	for _, item := range list {
 		if name, ok := item.Labels[composeProjectLabel]; ok {
@@ -648,24 +652,37 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 // loadComposeProjectNameForLog returns the project name that Compose uses for
 // the containers of composePath. Apps and runtimes pass their display name,
 // which can differ from the project name, for example in letter case.
-func loadComposeProjectNameForLog(list []container.Summary, name, composePath string) string {
+// If several projects use composePath and none of them matches name, it
+// returns an error rather than picking one of them.
+func loadComposeProjectNameForLog(list []container.Summary, name, composePath string) (string, error) {
 	for _, item := range list {
 		if item.Labels[composeProjectLabel] == name {
-			return name
+			return name, nil
 		}
 	}
 	target := filepath.Clean(strings.TrimSpace(primaryComposePath(composePath)))
+	var candidates []string
 	for _, item := range list {
 		projectName := item.Labels[composeProjectLabel]
-		if projectName == "" {
+		if projectName == "" || slices.Contains(candidates, projectName) {
 			continue
 		}
 		configFile := strings.TrimSpace(primaryComposePath(item.Labels[composeConfigLabel]))
 		if configFile != "" && filepath.Clean(configFile) == target {
-			return projectName
+			candidates = append(candidates, projectName)
 		}
 	}
-	return name
+	switch len(candidates) {
+	case 0:
+		return name, nil
+	case 1:
+		return candidates[0], nil
+	}
+	if normalized := normalizeComposeProjectName(name); slices.Contains(candidates, normalized) {
+		return normalized, nil
+	}
+	slices.Sort(candidates)
+	return "", fmt.Errorf("compose file %s is used by multiple projects (%s), cannot determine the project of %s", target, strings.Join(candidates, ", "), name)
 }
 
 func (u *ContainerService) LoadComposeEnv(name string) (string, error) {

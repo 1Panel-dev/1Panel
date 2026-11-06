@@ -3,11 +3,16 @@ package service
 import (
 	"testing"
 
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/docker/docker/api/types/container"
 )
 
 func TestLoadComposeProjectNameForLog(t *testing.T) {
 	list := []container.Summary{
+		{Labels: map[string]string{
+			composeProjectLabel: "openclaw",
+			composeConfigLabel:  "/opt/1panel/apps/openclaw/OpenClaw/docker-compose.yml",
+		}},
 		{Labels: map[string]string{
 			composeProjectLabel: "openclaw",
 			composeConfigLabel:  "/opt/1panel/apps/openclaw/OpenClaw/docker-compose.yml",
@@ -30,8 +35,48 @@ func TestLoadComposeProjectNameForLog(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := loadComposeProjectNameForLog(list, tt.inputName, tt.composePath); got != tt.want {
+			got, err := loadComposeProjectNameForLog(list, tt.inputName, tt.composePath)
+			if err != nil {
+				t.Fatalf("loadComposeProjectNameForLog(%q, %q) returned error: %v", tt.inputName, tt.composePath, err)
+			}
+			if got != tt.want {
 				t.Fatalf("loadComposeProjectNameForLog(%q, %q) = %q, want %q", tt.inputName, tt.composePath, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestLoadComposeProjectNameForLogSharedComposeFile(t *testing.T) {
+	re.Init()
+	const composePath = "/opt/1panel/apps/openclaw/OpenClaw/docker-compose.yml"
+	openclaw := container.Summary{Labels: map[string]string{
+		composeProjectLabel: "openclaw",
+		composeConfigLabel:  composePath,
+	}}
+	sandbox := container.Summary{Labels: map[string]string{
+		composeProjectLabel: "sandbox",
+		composeConfigLabel:  composePath,
+	}}
+	orders := map[string][]container.Summary{
+		"openclaw first": {openclaw, sandbox},
+		"sandbox first":  {sandbox, openclaw},
+	}
+	for order, list := range orders {
+		t.Run(order, func(t *testing.T) {
+			// The display name normalizes to one of the projects.
+			got, err := loadComposeProjectNameForLog(list, "OpenClaw", composePath)
+			if err != nil || got != "openclaw" {
+				t.Fatalf("display name: got %q, %v, want %q", got, err, "openclaw")
+			}
+			// An exact project name selects that project.
+			got, err = loadComposeProjectNameForLog(list, "sandbox", composePath)
+			if err != nil || got != "sandbox" {
+				t.Fatalf("project name: got %q, %v, want %q", got, err, "sandbox")
+			}
+			// A name that matches neither project is ambiguous.
+			got, err = loadComposeProjectNameForLog(list, "My App", composePath)
+			if err == nil {
+				t.Fatalf("ambiguous name: got %q, want an error", got)
 			}
 		})
 	}
