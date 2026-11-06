@@ -24,7 +24,7 @@
                     @keyup.enter="search"
                     @clear="search"
                 />
-                <el-button :disabled="loading" @click="search">{{ $t('commons.button.confirm') }}</el-button>
+                <el-button :disabled="loading" @click="search">{{ $t('commons.button.search') }}</el-button>
             </div>
             <div class="directory-row directory-header">
                 <span>{{ $t('file.path') }}</span>
