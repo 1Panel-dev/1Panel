@@ -1748,6 +1748,25 @@ const message = {
         },
         gpu: {
             environment: {
+                hostGPU: 'ホスト GPU',
+                containerGPU: 'コンテナーの GPU 対応',
+                monitorAvailable: '監視可能',
+                monitorPartial: '一部監視可能',
+                notReady: '未準備',
+                ready: '準備完了',
+                checkedAt: '確認日時',
+                checkDetailsHelp: '確認の詳細を参照し、環境の状態を確認してから再チェックしてください。',
+                driverActionTitle: 'まずホスト GPU ドライバーを確認してください',
+                driverActionHelp:
+                    '問題のあるデバイスのドライバーをインストールまたは修復してから、コンテナー環境の確認を続けてください。',
+                driverGuide: 'ドライバーのインストール手順',
+                toolkitActionTitle: 'コンテナーの GPU 環境が未準備です',
+                toolkitActionHelp:
+                    'NVIDIA Container Toolkit をインストールまたは修復してから、Docker の設定を確認してください。',
+                toolkitGuide: 'Toolkit のインストール手順',
+                dockerActionTitle: 'Docker の NVIDIA GPU 環境が未準備です',
+                dockerActionHelp: 'Docker の NVIDIA ランタイム設定を確認してから、再チェックしてください。',
+                monitorUnaffected: 'この問題はホスト GPU の監視に影響しません。',
                 title: '環境チェック',
                 passed: '環境チェックに合格しました',
                 issues: '環境の問題が {count} 件見つかりました。案内に従って確認してください。',

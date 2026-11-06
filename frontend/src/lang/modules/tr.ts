@@ -1773,6 +1773,26 @@ const message = {
         },
         gpu: {
             environment: {
+                hostGPU: 'Ana makine GPU’su',
+                containerGPU: 'Konteyner GPU desteği',
+                monitorAvailable: 'İzleme kullanılabilir',
+                monitorPartial: 'Kısmi izleme',
+                notReady: 'Hazır değil',
+                ready: 'Hazır',
+                checkedAt: 'Kontrol zamanı',
+                checkDetailsHelp: 'Kontrol ayrıntılarını inceleyin, ortam durumunu doğrulayın ve yeniden kontrol edin.',
+                driverActionTitle: 'Önce ana makine GPU sürücüsünü kontrol edin',
+                driverActionHelp:
+                    'Konteyner ortamını kontrol etmeye devam etmeden önce sorunlu aygıtın sürücüsünü kurun veya onarın.',
+                driverGuide: 'Sürücü kurulum kılavuzunu görüntüle',
+                toolkitActionTitle: 'Konteyner GPU desteği hazır değil',
+                toolkitActionHelp:
+                    'Önce NVIDIA Container Toolkit’i kurun veya onarın, ardından Docker yapılandırmasını kontrol edin.',
+                toolkitGuide: 'Toolkit kurulum kılavuzunu görüntüle',
+                dockerActionTitle: 'Docker NVIDIA GPU desteği hazır değil',
+                dockerActionHelp:
+                    'Docker içindeki NVIDIA çalışma zamanı yapılandırmasını kontrol edip yeniden deneyin.',
+                monitorUnaffected: 'Bu sorun ana makine GPU izlemesini etkilemez.',
                 title: 'Ortam denetimleri',
                 passed: 'Ortam denetimleri başarılı',
                 issues: '{count} ortam sorunu algılandı. Denetlemek için yönergeleri izleyin.',

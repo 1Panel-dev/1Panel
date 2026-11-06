@@ -1769,6 +1769,25 @@ const message = {
         },
         gpu: {
             environment: {
+                hostGPU: 'GPU хоста',
+                containerGPU: 'Поддержка GPU в контейнерах',
+                monitorAvailable: 'Мониторинг доступен',
+                monitorPartial: 'Частичный мониторинг',
+                notReady: 'Не готово',
+                ready: 'Готово',
+                checkedAt: 'Время проверки',
+                checkDetailsHelp: 'Изучите результаты проверки, проверьте состояние среды и повторите проверку.',
+                driverActionTitle: 'Сначала проверьте драйвер GPU хоста',
+                driverActionHelp:
+                    'Установите или восстановите драйвер проблемного устройства, затем продолжите проверку среды контейнеров.',
+                driverGuide: 'Инструкция по установке драйвера',
+                toolkitActionTitle: 'Поддержка GPU в контейнерах не готова',
+                toolkitActionHelp:
+                    'Установите или восстановите NVIDIA Container Toolkit, затем проверьте настройки Docker.',
+                toolkitGuide: 'Инструкция по установке Toolkit',
+                dockerActionTitle: 'Поддержка NVIDIA GPU в Docker не готова',
+                dockerActionHelp: 'Проверьте настройки среды выполнения NVIDIA в Docker и повторите проверку.',
+                monitorUnaffected: 'Эта проблема не влияет на мониторинг GPU хоста.',
                 title: 'Проверка окружения',
                 passed: 'Проверки окружения пройдены',
                 issues: 'Обнаружено проблем окружения: {count}. Проверьте их согласно подсказкам.',

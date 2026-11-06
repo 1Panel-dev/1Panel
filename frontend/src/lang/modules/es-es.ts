@@ -1777,6 +1777,26 @@ const message = {
         },
         gpu: {
             environment: {
+                hostGPU: 'GPU del host',
+                containerGPU: 'Compatibilidad GPU en contenedores',
+                monitorAvailable: 'Supervisión disponible',
+                monitorPartial: 'Supervisión parcial',
+                notReady: 'No está listo',
+                ready: 'Listo',
+                checkedAt: 'Última comprobación',
+                checkDetailsHelp: 'Revisa los detalles, verifica el entorno y vuelve a comprobarlo.',
+                driverActionTitle: 'Comprueba primero el controlador GPU del host',
+                driverActionHelp:
+                    'Instala o repara el controlador del dispositivo afectado antes de continuar con las comprobaciones del entorno de contenedores.',
+                driverGuide: 'Ver guía de instalación del controlador',
+                toolkitActionTitle: 'La compatibilidad GPU en contenedores no está lista',
+                toolkitActionHelp:
+                    'Instala o repara NVIDIA Container Toolkit y después comprueba la configuración de Docker.',
+                toolkitGuide: 'Ver guía de instalación de Toolkit',
+                dockerActionTitle: 'La compatibilidad NVIDIA GPU de Docker no está lista',
+                dockerActionHelp:
+                    'Comprueba la configuración del runtime NVIDIA en Docker y vuelve a realizar la comprobación.',
+                monitorUnaffected: 'Este problema no afecta a la supervisión de la GPU del host.',
                 title: 'Comprobaciones del entorno',
                 passed: 'Comprobaciones del entorno superadas',
                 issues: 'Problemas del entorno detectados: {count}. Siga las indicaciones para revisarlos.',
