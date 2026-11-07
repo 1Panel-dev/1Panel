@@ -553,7 +553,7 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 			}
 		}
 		if req.Advanced && !req.SkipComposeCommonConfig {
-			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params, installed.App.Key); err != nil {
 				return err
 			}
 		}
@@ -1207,7 +1207,11 @@ func syncAppInstallStatus(appInstall *model.AppInstall, force bool) error {
 		containersMap  map[string]container.Summary
 		containerNames = strings.Split(appInstall.ContainerName, ",")
 	)
-	containers, err = cli.ListContainersByName(containerNames)
+	if appInstall.App.Key == "vllm" {
+		containers, err = cli.ListAllContainers()
+	} else {
+		containers, err = cli.ListContainersByName(containerNames)
+	}
 	if err != nil {
 		return err
 	}

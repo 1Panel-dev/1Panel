@@ -3,136 +3,40 @@
         <RouterMenu :history-disabled="historyDisabled" />
         <div>
             <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.monitoringTitle')">
+                <template v-if="loadFailed || gpuInfo.environment || gpuInfo.warnings?.length" #app>
+                    <div class="app-status">
+                        <el-card>
+                            <div class="flex w-full flex-col gap-4 md:flex-row md:items-center">
+                                <div class="flex flex-wrap items-center gap-4 ml-3">
+                                    <el-tag effect="dark" type="primary">
+                                        {{ $t('aiTools.gpu.environment.title') }}
+                                    </el-tag>
+                                    <el-text :type="environmentPassed ? 'success' : loadFailed ? 'danger' : 'warning'">
+                                        {{ environmentSummary }}
+                                    </el-text>
+                                </div>
+                                <div class="flex shrink-0 items-center">
+                                    <el-button type="primary" link @click="environmentDialogVisible = true">
+                                        {{ $t('aiTools.gpu.environment.details') }}
+                                    </el-button>
+                                    <el-divider direction="vertical" />
+                                    <el-button type="primary" link :disabled="loading" @click="refresh()">
+                                        {{ $t('aiTools.gpu.environment.recheck') }}
+                                    </el-button>
+                                </div>
+                            </div>
+                        </el-card>
+                    </div>
+                </template>
                 <template #leftToolBar>
                     <h3 class="environment-heading">
-                        {{ $t(showEnvironment ? 'aiTools.gpu.environment.title' : 'aiTools.gpu.monitoringTitle') }}
+                        {{ $t('aiTools.gpu.monitoringTitle') }}
                     </h3>
                 </template>
                 <template #rightToolBar>
                     <TableSetting title="gpu-refresh" @search="search()" />
-                    <el-tooltip :content="$t('aiTools.gpu.environment.recheck')">
-                        <TableRefresh :disabled="loading" @search="refresh()" />
-                    </el-tooltip>
                 </template>
                 <template #main>
-                    <el-alert
-                        v-if="loadFailed"
-                        class="common-prompt"
-                        :title="$t('aiTools.gpu.environment.loadFailed')"
-                        type="error"
-                        :closable="false"
-                        show-icon
-                    >
-                        <el-button type="primary" link :disabled="loading" @click="refresh()">
-                            {{ $t('aiTools.gpu.environment.recheck') }}
-                        </el-button>
-                    </el-alert>
-                    <section v-else-if="showEnvironment" class="environment-status">
-                        <div class="environment-row">
-                            <div class="environment-identity">
-                                <el-icon :size="22"><Monitor /></el-icon>
-                                <div>
-                                    <strong>{{ $t('aiTools.gpu.environment.hostGPU') }}</strong>
-                                    <div class="environment-description">
-                                        <template v-if="driverChecks.length">
-                                            <span v-for="check in driverChecks" :key="check.vendor">
-                                                {{ checkTitle(check) }} · {{ checkStatus(check) }}
-                                                {{ check.version }}
-                                            </span>
-                                        </template>
-                                        <span v-else>{{ hasAccelerators ? deviceCountText : emptyDescription }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <el-tag :type="hostEnvironmentStatus.type">
-                                {{ $t('aiTools.gpu.environment.' + hostEnvironmentStatus.label) }}
-                            </el-tag>
-                        </div>
-                        <div v-if="containerChecks.length" class="environment-row">
-                            <div class="environment-identity">
-                                <el-icon :size="22"><Box /></el-icon>
-                                <div>
-                                    <strong>{{ $t('aiTools.gpu.environment.containerGPU') }}</strong>
-                                    <div class="environment-description">
-                                        <span v-for="check in containerChecks" :key="check.item">
-                                            {{ checkTitle(check) }} · {{ checkStatus(check) }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            <el-tag :type="containerEnvironmentStatus.type">
-                                {{ $t('aiTools.gpu.environment.' + containerEnvironmentStatus.label) }}
-                            </el-tag>
-                        </div>
-                        <div v-if="environmentGuidance" class="environment-guidance">
-                            <div>
-                                <strong>{{ $t('aiTools.gpu.environment.' + environmentGuidance.title) }}</strong>
-                                <p>
-                                    <template v-if="environmentGuidance.item !== 'driver' && hasAccelerators">
-                                        {{ $t('aiTools.gpu.environment.monitorUnaffected') }}
-                                    </template>
-                                    {{ $t('aiTools.gpu.environment.' + environmentGuidance.description) }}
-                                </p>
-                            </div>
-                            <el-button
-                                v-if="environmentGuidance.action === 'docker'"
-                                type="primary"
-                                @click="routerToName('ContainerSetting')"
-                            >
-                                {{ $t('aiTools.gpu.environment.goContainerSettings') }}
-                            </el-button>
-                            <el-button
-                                v-else-if="environmentGuidance.action === 'details'"
-                                type="primary"
-                                @click="environmentDetails = ['environment']"
-                            >
-                                {{ $t('aiTools.gpu.environment.details') }}
-                            </el-button>
-                            <el-button
-                                v-else
-                                tag="a"
-                                type="primary"
-                                href="https://docs.fit2cloud.com/1panel/faq/gpu-driver"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                            >
-                                {{ $t('aiTools.gpu.environment.' + environmentGuidance.action) }}
-                            </el-button>
-                        </div>
-                    </section>
-                    <el-collapse
-                        v-if="!loadFailed && (environmentChecks.length || gpuInfo.warnings?.length)"
-                        v-model="environmentDetails"
-                        class="environment-details"
-                    >
-                        <el-collapse-item :title="$t('aiTools.gpu.environment.details')" name="environment">
-                            <div v-for="check in environmentChecks" :key="`${check.vendor}-${check.item}`" class="mb-2">
-                                <div class="flex flex-wrap items-center gap-2">
-                                    <span>{{ checkTitle(check) }}</span>
-                                    <el-tag :type="checkTagType(check)" size="small">
-                                        {{ checkStatus(check) }}
-                                    </el-tag>
-                                    <span v-if="check.version">{{ check.version }}</span>
-                                </div>
-                                <p v-if="check.status !== 'passed'" class="environment-check-description">
-                                    {{ checkDescription(check) }}
-                                </p>
-                                <pre v-if="check.reason" class="whitespace-pre-wrap break-words mt-1">{{
-                                    check.reason
-                                }}</pre>
-                            </div>
-                            <div v-for="warning in gpuInfo.warnings || []" :key="warning" class="break-words">
-                                {{ warning }}
-                            </div>
-                        </el-collapse-item>
-                    </el-collapse>
-                    <div
-                        v-if="showEnvironment && !loadFailed && gpuInfo.environment?.checkedAt"
-                        class="input-help mb-4"
-                    >
-                        {{ $t('aiTools.gpu.environment.checkedAt') }}:
-                        {{ new Date(gpuInfo.environment.checkedAt).toLocaleString() }}
-                    </div>
                     <div v-for="summary in overviewRows" :key="summary.vendor" class="device-overview mb-2">
                         <div class="overview-item">
                             <span>{{ $t('aiTools.gpu.environment.vendor') }}</span>
@@ -474,6 +378,142 @@
             />
             <el-empty v-else :description="$t('commons.msg.noneData')" />
         </DrawerPro>
+        <DialogPro v-model="environmentDialogVisible" :title="$t('aiTools.gpu.environment.title')" size="large">
+            <div v-loading="loading">
+                <el-alert
+                    v-if="loadFailed"
+                    class="common-prompt"
+                    :title="$t('aiTools.gpu.environment.loadFailed')"
+                    type="error"
+                    :closable="false"
+                    show-icon
+                >
+                    <el-button type="primary" link :disabled="loading" @click="refresh()">
+                        {{ $t('aiTools.gpu.environment.recheck') }}
+                    </el-button>
+                </el-alert>
+                <section v-else-if="showEnvironment" class="environment-status">
+                    <div class="environment-row">
+                        <div class="environment-identity">
+                            <el-icon :size="22"><Monitor /></el-icon>
+                            <div>
+                                <strong>{{ $t('aiTools.gpu.environment.hostGPU') }}</strong>
+                                <div class="environment-description">
+                                    <template v-if="driverChecks.length">
+                                        <span v-for="check in driverChecks" :key="check.vendor">
+                                            {{ checkTitle(check) }} · {{ checkStatus(check) }}
+                                            {{ check.version }}
+                                        </span>
+                                    </template>
+                                    <span v-else>
+                                        {{ hasAccelerators ? deviceCountText : emptyDescription }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <el-tag :type="hostEnvironmentStatus.type">
+                            {{ $t('aiTools.gpu.environment.' + hostEnvironmentStatus.label) }}
+                        </el-tag>
+                    </div>
+                    <div v-if="containerChecks.length" class="environment-row">
+                        <div class="environment-identity">
+                            <el-icon :size="22"><Box /></el-icon>
+                            <div>
+                                <strong>{{ $t('aiTools.gpu.environment.containerGPU') }}</strong>
+                                <div class="environment-description">
+                                    <span v-for="check in containerChecks" :key="check.item">
+                                        {{ checkTitle(check) }} · {{ checkStatus(check) }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <el-tag :type="containerEnvironmentStatus.type">
+                            {{ $t('aiTools.gpu.environment.' + containerEnvironmentStatus.label) }}
+                        </el-tag>
+                    </div>
+                    <div v-if="environmentGuidance" class="environment-guidance">
+                        <div>
+                            <strong>
+                                {{ $t('aiTools.gpu.environment.' + environmentGuidance.title) }}
+                            </strong>
+                            <p>
+                                <template v-if="environmentGuidance.item !== 'driver' && hasAccelerators">
+                                    {{ $t('aiTools.gpu.environment.monitorUnaffected') }}
+                                </template>
+                                {{ $t('aiTools.gpu.environment.' + environmentGuidance.description) }}
+                            </p>
+                        </div>
+                        <el-button
+                            v-if="environmentGuidance.action === 'docker'"
+                            type="primary"
+                            @click="
+                                environmentDialogVisible = false;
+                                routerToName('ContainerSetting');
+                            "
+                        >
+                            {{ $t('aiTools.gpu.environment.goContainerSettings') }}
+                        </el-button>
+                        <el-button
+                            v-else-if="environmentGuidance.action === 'details'"
+                            type="primary"
+                            @click="environmentDetails = ['environment']"
+                        >
+                            {{ $t('aiTools.gpu.environment.details') }}
+                        </el-button>
+                        <el-button
+                            v-else
+                            tag="a"
+                            type="primary"
+                            href="https://docs.fit2cloud.com/1panel/faq/gpu-driver"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                        >
+                            {{ $t('aiTools.gpu.environment.' + environmentGuidance.action) }}
+                        </el-button>
+                    </div>
+                </section>
+                <el-empty
+                    v-if="!loadFailed && !showEnvironment && !environmentChecks.length && !gpuInfo.warnings?.length"
+                    :description="environmentSummary"
+                />
+                <el-collapse
+                    v-if="!loadFailed && (environmentChecks.length || gpuInfo.warnings?.length)"
+                    v-model="environmentDetails"
+                    class="environment-details"
+                >
+                    <el-collapse-item :title="$t('aiTools.gpu.environment.details')" name="environment">
+                        <div v-for="check in environmentChecks" :key="`${check.vendor}-${check.item}`" class="mb-2">
+                            <div class="flex flex-wrap items-center gap-2">
+                                <span>{{ checkTitle(check) }}</span>
+                                <el-tag :type="checkTagType(check)" size="small">
+                                    {{ checkStatus(check) }}
+                                </el-tag>
+                                <span v-if="check.version">{{ check.version }}</span>
+                            </div>
+                            <p v-if="check.status !== 'passed'" class="environment-check-description">
+                                {{ checkDescription(check) }}
+                            </p>
+                            <pre v-if="check.reason" class="whitespace-pre-wrap break-words mt-1">{{
+                                check.reason
+                            }}</pre>
+                        </div>
+                        <div v-for="warning in gpuInfo.warnings || []" :key="warning" class="break-words">
+                            {{ warning }}
+                        </div>
+                    </el-collapse-item>
+                </el-collapse>
+                <div v-if="showEnvironment && !loadFailed && gpuInfo.environment?.checkedAt" class="input-help mb-4">
+                    {{ $t('aiTools.gpu.environment.checkedAt') }}:
+                    {{ new Date(gpuInfo.environment.checkedAt).toLocaleString() }}
+                </div>
+            </div>
+            <template #footer>
+                <el-button @click="environmentDialogVisible = false">{{ $t('commons.button.close') }}</el-button>
+                <el-button type="primary" :loading="loading" @click="refresh()">
+                    {{ $t('aiTools.gpu.environment.recheck') }}
+                </el-button>
+            </template>
+        </DialogPro>
         <DialogPro v-model="processDrawerVisible" :title="processDrawerTitle" size="large">
             <template v-if="processGPU">
                 <el-alert
@@ -533,7 +573,8 @@ const pagePath = route.path;
 const { currentNode } = useGlobalStore();
 const loading = ref(false);
 const loadFailed = ref(false);
-const environmentDetails = ref<string[]>([]);
+const environmentDetails = ref<string[]>(['environment']);
+const environmentDialogVisible = ref(false);
 const processDrawerVisible = ref(false);
 const processDeviceKey = ref('');
 const detailDeviceKey = ref('');
@@ -744,6 +785,26 @@ const overviewRows = computed(() => {
 });
 
 const environmentChecks = computed(() => gpuInfo.value.environment?.checks || []);
+const environmentIssueCount = computed(
+    () =>
+        environmentChecks.value.filter((check) => check.status !== 'passed').length +
+        (gpuInfo.value.warnings?.length || 0),
+);
+const environmentPassed = computed(
+    () => !loadFailed.value && environmentChecks.value.length > 0 && environmentIssueCount.value === 0,
+);
+const environmentSummary = computed(() => {
+    if (loadFailed.value) return i18n.global.t('aiTools.gpu.environment.loadFailed');
+    if (environmentPassed.value) return i18n.global.t('aiTools.gpu.environment.passed');
+    if (environmentIssueCount.value) {
+        return i18n.global.t('aiTools.gpu.environment.issues', { count: environmentIssueCount.value });
+    }
+    return i18n.global.t(
+        gpuInfo.value.environment?.hardwareStatus === 'not_detected'
+            ? 'aiTools.gpu.environment.notDetected'
+            : 'aiTools.gpu.environment.unknown',
+    );
+});
 const historyDisabled = computed(
     () =>
         (loading.value && !gpuInfo.value.environment && !hasAccelerators.value) ||
@@ -920,7 +981,9 @@ const search = async (refreshEnvironment = false) => {
         if (id !== requestID || node !== currentNode.value) return;
         applyAcceleratorInfo(res.data);
     } catch {
-        if (id === requestID && node === currentNode.value) loadFailed.value = true;
+        if (id === requestID && node === currentNode.value) {
+            loadFailed.value = true;
+        }
     } finally {
         if (id === requestID) loading.value = false;
     }
@@ -929,7 +992,8 @@ const search = async (refreshEnvironment = false) => {
 const refresh = () => search(true);
 
 watch(currentNode, () => {
-    environmentDetails.value = [];
+    environmentDialogVisible.value = false;
+    environmentDetails.value = ['environment'];
     requestID++;
     loading.value = false;
     loadFailed.value = false;
