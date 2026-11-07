@@ -25,6 +25,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
+	"github.com/1Panel-dev/1Panel/agent/utils/env"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/filters"
@@ -905,7 +906,7 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 		}
 		install.Env = string(content)
 	}
-	content, err := godotenv.Marshal(params)
+	content, err := env.MarshalWithOrder(params, nil)
 	if err != nil {
 		return nil, err
 	}
