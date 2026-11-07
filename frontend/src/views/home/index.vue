@@ -99,7 +99,9 @@
                         >
                             <el-radio-button value="network">{{ $t('home.network') }}</el-radio-button>
                             <el-radio-button value="io">{{ $t('home.io') }}</el-radio-button>
-                            <el-radio-button v-if="hasVllm" value="vllm">vLLM</el-radio-button>
+                            <el-radio-button v-if="hasVllm" value="vllm">
+                                {{ $t('aiTools.vllmMonitor.tokenThroughput') }}
+                            </el-radio-button>
                         </el-radio-group>
                         <el-select
                             v-if="chartOption === 'network'"
