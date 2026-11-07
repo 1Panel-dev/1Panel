@@ -1798,6 +1798,11 @@ const message = {
                     'Comprueba la configuración del runtime NVIDIA en Docker y vuelve a realizar la comprobación.',
                 monitorUnaffected: 'Este problema no afecta a la supervisión de la GPU del host.',
                 title: 'Comprobaciones del entorno',
+                passedLabel: 'Comprobación correcta',
+                issuesLabel: 'Problemas del entorno · {count}',
+                loadFailedLabel: 'Comprobación fallida',
+                notDetectedLabel: 'Sin dispositivos detectados',
+                unknownLabel: 'Estado desconocido',
                 passed: 'Comprobaciones del entorno superadas',
                 issues: 'Problemas del entorno detectados: {count}. Siga las indicaciones para revisarlos.',
                 recheck: 'Comprobar de nuevo',
@@ -2162,6 +2167,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        logAutoRefresh: 'Actualización automática',
+        logWindowHelp:
+            'Solo se muestran los registros recientes. Descargue el archivo seleccionado para ver todo el contenido.',
         prefixTokens: 'Tokens de prefijo',
         seed: 'Semilla aleatoria',
         report: 'Informe',

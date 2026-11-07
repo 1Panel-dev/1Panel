@@ -1794,6 +1794,11 @@ const message = {
                     'Docker içindeki NVIDIA çalışma zamanı yapılandırmasını kontrol edip yeniden deneyin.',
                 monitorUnaffected: 'Bu sorun ana makine GPU izlemesini etkilemez.',
                 title: 'Ortam denetimleri',
+                passedLabel: 'Kontrol başarılı',
+                issuesLabel: 'Ortam sorunları · {count}',
+                loadFailedLabel: 'Kontrol başarısız',
+                notDetectedLabel: 'Cihaz algılanmadı',
+                unknownLabel: 'Durum bilinmiyor',
                 passed: 'Ortam denetimleri başarılı',
                 issues: '{count} ortam sorunu algılandı. Denetlemek için yönergeleri izleyin.',
                 recheck: 'Yeniden denetle',
@@ -2150,6 +2155,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        logAutoRefresh: 'Otomatik yenileme',
+        logWindowHelp:
+            'Yalnızca son günlük kayıtları gösterilir. Tam içeriği görmek için seçili günlük dosyasını indirin.',
         prefixTokens: 'Önek token sayısı',
         seed: 'Rastgelelik tohumu',
         report: 'Rapor',

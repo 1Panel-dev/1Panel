@@ -1760,6 +1760,11 @@ const message = {
                 dockerActionHelp: 'پیکربندی محیط اجرای NVIDIA در Docker را بررسی کنید و سپس دوباره بررسی کنید.',
                 monitorUnaffected: 'این مشکل بر پایش GPU میزبان تأثیری ندارد.',
                 title: 'بررسی محیط',
+                passedLabel: 'بررسی موفق',
+                issuesLabel: 'مشکلات محیط · {count}',
+                loadFailedLabel: 'بررسی ناموفق',
+                notDetectedLabel: 'دستگاهی شناسایی نشد',
+                unknownLabel: 'وضعیت نامشخص',
                 passed: 'بررسی‌های محیط با موفقیت انجام شد',
                 issues: '{count} مشکل در محیط شناسایی شد. برای بررسی آن‌ها راهنما را دنبال کنید.',
                 recheck: 'بررسی دوباره',
@@ -2111,6 +2116,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        logAutoRefresh: 'بازخوانی خودکار',
+        logWindowHelp:
+            'فقط بخش اخیر گزارش نمایش داده می‌شود. برای مشاهده محتوای کامل، فایل گزارش انتخاب‌شده را دانلود کنید.',
         prefixTokens: 'تعداد توکن\u200cهای پیشوند',
         seed: 'بذر تصادفی',
         report: 'گزارش',
