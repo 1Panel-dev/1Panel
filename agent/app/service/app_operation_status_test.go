@@ -37,7 +37,7 @@ func operationStatusTestDB(t *testing.T) (*gorm.DB, *gorm.DB, model.AppInstall) 
 	taskDB := open("tasks.db", &model.Task{})
 	install := model.AppInstall{
 		Name: "gb10-ds-vision", AppId: 1, AppDetailId: 1,
-		Version: "nvidia-gb10-dspark-0.1.1", ContainerName: "vllm-dspark-1", ServiceName: "vllm-dspark",
+		Version: "nvidia-0.25-optimized-for-ds-v4-flash", ContainerName: "vllm-dspark-1", ServiceName: "vllm-dspark",
 		Status: constant.StatusStarting, Env: `{"MODEL_DIR":"/models/vision"}`,
 	}
 	if err := appDB.Omit(clause.Associations).Create(&install).Error; err != nil {
