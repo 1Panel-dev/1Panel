@@ -48,6 +48,7 @@
                 <ComplexTable
                     v-model:selects="selects"
                     :data="containerPageRows"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :heightDiff="320"
                     row-key="key"
@@ -169,6 +170,7 @@
                     v-model:selects="orphanSelects"
                     v-loading="loading"
                     :data="orphanPageRows"
+                    :cache-pagination="false"
                     :pagination-config="orphanPaginationConfig"
                     row-key="policyUUID"
                     max-height="calc(100vh - 220px)"

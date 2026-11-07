@@ -15,7 +15,7 @@
             <el-menu
                 v-else
                 :default-active="activeMenu"
-                :router="true"
+                :router="false"
                 :collapse="isCollapse"
                 :collapse-transition="false"
                 :unique-opened="!menuAccordion"

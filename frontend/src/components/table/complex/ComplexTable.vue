@@ -175,6 +175,8 @@ import { useCardColumns } from './useCardColumns';
 import { useContextMenu } from './useContextMenu';
 import { useResponsivePagination } from './useResponsivePagination';
 import { useTableSelection } from './useTableSelection';
+import { useRoute } from 'vue-router';
+import { usePaginationCache } from './usePaginationCache';
 const slots = useSlots();
 const attrs = useAttrs();
 const { isMobile, openMenuTabs, currentNode } = useGlobalStore();
@@ -187,11 +189,16 @@ type ViewMode = 'table' | 'card';
 const props = defineProps({
     header: String,
     data: { type: Array as PropType<any[]>, default: () => [] },
+    loading: { type: Boolean, default: false },
     selectionContext: { type: [String, Number, Array, Object, Function], default: undefined },
     paginationConfig: {
         type: Object,
         required: false,
     },
+    cachePagination: { type: Boolean, default: undefined },
+    refreshOnRestore: { type: Boolean, default: true },
+    cacheId: String,
+    cacheScope: [String, Number],
     pageSizes: {
         type: Array as PropType<number[]>,
         default: () => [5, 10, 20, 50, 100, 200, 500],
@@ -217,6 +224,15 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(['search', 'update:selects', 'update:paginationConfig', 'update:viewMode']);
+usePaginationCache({
+    pagePath: useRoute().path,
+    pagination: () => props.paginationConfig as { currentPage: number; pageSize: number; cacheSizeKey?: string },
+    enabled: () => props.cachePagination,
+    id: () => props.cacheId,
+    scope: () => props.cacheScope,
+    search: () => emit('search'),
+    refreshOnRestore: () => props.refreshOnRestore,
+});
 const tableRef = ref();
 const complexTableRef = ref<HTMLElement>();
 const tableHeight = ref<number | string>('');
@@ -343,10 +359,10 @@ const handleRightClick = (row, column, event) => {
 };
 
 watch(
-    () => props.data,
+    () => [props.data, props.loading],
     () => {
         const pagination = props.paginationConfig;
-        if (!pagination || !pagination.pageSize) return;
+        if (props.loading || !pagination || !pagination.pageSize) return;
         const lastPage = Math.max(1, Math.ceil(pagination.total / pagination.pageSize));
         if (pagination.currentPage > lastPage) {
             pagination.currentPage = lastPage;
@@ -361,7 +377,7 @@ function currentChange() {
 }
 
 function sizeChange() {
-    if (props.paginationConfig.cacheSizeKey) {
+    if (props.cachePagination === false && props.paginationConfig.cacheSizeKey) {
         writePanelCache(
             'pagination',
             panelCacheKey(`size:${props.paginationConfig.cacheSizeKey}`),

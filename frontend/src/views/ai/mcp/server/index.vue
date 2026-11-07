@@ -16,7 +16,12 @@
                 <TableRefresh @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    :data="items"
+                    @search="search()"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

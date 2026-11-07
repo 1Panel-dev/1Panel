@@ -78,7 +78,13 @@
                 <TableSetting title="operation-log-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="330">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    :data="data"
+                    @search="search"
+                    :heightDiff="330"
+                >
                     <el-table-column :label="$t('logs.resource')" prop="group" fix>
                         <template #default="{ row }">
                             <span v-if="row.source && row.source.indexOf('-') === -1">

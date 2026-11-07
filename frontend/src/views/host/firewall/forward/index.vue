@@ -66,6 +66,7 @@
                                         row.interface,
                                     ])
                             "
+                            :cache-pagination="false"
                             :pagination-config="paginationConfig"
                             v-model:selects="selects"
                             @search="search"

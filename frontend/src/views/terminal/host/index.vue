@@ -23,6 +23,7 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     v-model:selects="selects"
                     :data="data"
@@ -90,11 +91,11 @@ const paginationConfig = reactive({
     total: 0,
 });
 const info = ref();
-useSearchState(
-    'terminal/host/index',
-    { search: info, page: toRef(paginationConfig, 'currentPage'), pageSize: toRef(paginationConfig, 'pageSize') },
-    { onRevisit: () => search() },
-);
+useSearchState('terminal/host/index', {
+    search: info,
+    page: toRef(paginationConfig, 'currentPage'),
+    pageSize: toRef(paginationConfig, 'pageSize'),
+});
 const group = ref<string>('');
 
 const opRef = ref();

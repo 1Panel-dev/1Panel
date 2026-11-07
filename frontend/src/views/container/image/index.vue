@@ -36,6 +36,7 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :data="data"
                     @sort-change="search"
