@@ -21,7 +21,7 @@
                             <el-tooltip
                                 v-if="row.type === 'DnsPod'"
                                 :content="$t('ssl.dnsPodRemovedTip')"
-                                placement="top"
+                                v-bind="TABLE_TOOLTIP_OPTIONS"
                             >
                                 <el-tag type="danger" size="small" class="ml-2">
                                     {{ $t('ssl.dnsPodRemoved') }}
@@ -45,6 +45,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { readCachedPageSize } from '@/utils/panel-cache';
 import Create from './create/index.vue';
 import { Website } from '@/api/interface/website';

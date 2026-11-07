@@ -7,7 +7,12 @@
             <el-button v-permission @click="batchDelete(null)">
                 {{ $t('commons.button.delete') }}
             </el-button>
-            <el-table :data="data" class="mt-5" @selection-change="handleSelectionChange">
+            <el-table
+                :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
+                :data="data"
+                class="mt-5"
+                @selection-change="handleSelectionChange"
+            >
                 <el-table-column type="selection" fix />
                 <el-table-column :label="$t('commons.table.name')" min-width="50" show-overflow-tooltip>
                     <template #default="{ row }">
@@ -75,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { Command } from '@/api/interface/command';
 import { deleteCommand, getCommandPage, addCommand, editCommand } from '@/api/modules/command';
 import { reactive, ref } from 'vue';

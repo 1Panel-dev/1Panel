@@ -307,7 +307,7 @@
                                     :key="item"
                                     :hide-after="20"
                                     :content="item"
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-button
                                         v-if="item.indexOf('->') !== -1"
@@ -484,6 +484,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import PruneDialog from '@/views/container/container/prune/index.vue';
 import RenameDialog from '@/views/container/container/rename/index.vue';

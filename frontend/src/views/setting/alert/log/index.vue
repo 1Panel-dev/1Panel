@@ -44,7 +44,12 @@
                                 :type="statusConfig(row).type"
                                 :link="statusConfig(row).link"
                             >
-                                <el-tooltip v-if="row.message" :content="row.message" placement="top" trigger="click">
+                                <el-tooltip
+                                    v-if="row.message"
+                                    :content="row.message"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
+                                    trigger="click"
+                                >
                                     {{ $t(statusConfig(row).text) }}
                                 </el-tooltip>
                                 <template v-else>
@@ -82,6 +87,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { toRef } from 'vue';
 import { useSearchState } from '@/utils/search-reset';
 import { onMounted, reactive, ref } from 'vue';

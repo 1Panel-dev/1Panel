@@ -98,7 +98,7 @@
                             <el-tooltip
                                 v-if="row.authMethod === 'api_key' && row.apiKeyID"
                                 :content="row.apiKeyID"
-                                placement="top"
+                                v-bind="TABLE_TOOLTIP_OPTIONS"
                             >
                                 <el-text type="info" size="small">
                                     API Key · {{ row.apiKeyName || row.apiKeyID }}
@@ -139,6 +139,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import LogRouter from '@/views/log/router/index.vue';

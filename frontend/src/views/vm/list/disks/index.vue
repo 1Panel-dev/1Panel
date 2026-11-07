@@ -12,7 +12,7 @@
             <div class="mb-4">
                 <el-button :disabled="loading" @click="search">{{ $t('commons.button.refresh') }}</el-button>
             </div>
-            <el-table v-loading="loading" :data="items">
+            <el-table :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS" v-loading="loading" :data="items">
                 <el-table-column prop="target" :label="$t('xpack.vm.diskTarget')" width="85" />
                 <el-table-column :label="$t('xpack.vm.diskSize')" width="110">
                     <template #default="{ row }">{{ row.capacity > 0 ? computeSize(row.capacity) : '-' }}</template>
@@ -70,6 +70,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref } from 'vue';
 import type { FormInstance } from 'element-plus';
 import DrawerPro from '@/components/drawer-pro/index.vue';

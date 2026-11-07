@@ -69,7 +69,7 @@
                                                 : 'aiTools.model.cloudService',
                                         )
                                     "
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-icon
                                         class="service-source-icon"
@@ -133,7 +133,7 @@
                                             .map((item) => item.id)
                                             .join(', ')
                                     "
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-button size="small" class="model-more">+{{ row.models.length - 1 }}</el-button>
                                 </el-tooltip>
@@ -144,7 +144,10 @@
                     <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
                         <template #default="{ row }">
                             <div class="verification-status">
-                                <el-tooltip :disabled="!row.verifiedAt && !row.verifyError" placement="top">
+                                <el-tooltip
+                                    :disabled="!row.verifiedAt && !row.verifyError"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
+                                >
                                     <template #content>
                                         <div v-if="row.verifiedAt">
                                             {{ $t('aiTools.model.verifiedAt') }}:
@@ -164,7 +167,7 @@
                                 <el-tooltip
                                     v-if="row.validateAvailability"
                                     :content="$t('aiTools.model.reverify')"
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-button
                                         v-permission
@@ -273,7 +276,7 @@ import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
 import { Cloudy, Connection, Monitor, RefreshRight } from '@element-plus/icons-vue';
 import type { AI } from '@/api/interface/ai';
-import type { FuTableColumnConfig } from '@/components/table/shared';
+import { TABLE_TOOLTIP_OPTIONS, type FuTableColumnConfig } from '@/components/table/shared';
 import { deleteAgentAccount, getAgentProviders, pageAgentAccounts, verifyAgentAccount } from '@/api/modules/ai';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { getAgentProviderDisplayName } from '@/utils/agent';

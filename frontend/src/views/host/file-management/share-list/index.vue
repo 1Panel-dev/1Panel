@@ -4,7 +4,7 @@
             <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search">
                 <el-table-column :label="$t('file.path')" show-overflow-tooltip prop="path" min-width="250">
                     <template #default="{ row }">
-                        <el-tooltip class="box-item" effect="dark" :content="row.path" placement="top">
+                        <el-tooltip class="box-item" effect="dark" :content="row.path" v-bind="TABLE_TOOLTIP_OPTIONS">
                             <span class="table-link text-ellipsis" @click="viewDetail(row)" type="primary">
                                 <svg-icon className="table-icon" iconName="p-file-normal"></svg-icon>
                                 {{ row.fileName }}
@@ -24,6 +24,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { readCachedPageSize } from '@/utils/panel-cache';
 import { removeFileShare, searchFileShare } from '@/api/modules/files';
 import { File } from '@/api/interface/file';

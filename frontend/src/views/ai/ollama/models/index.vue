@@ -83,14 +83,18 @@
                             <el-tag v-if="row.status === 'Deleted'" type="info">
                                 {{ $t('commons.status.notfound') }}
                             </el-tag>
-                            <el-tooltip v-if="row.status === 'Unknown'" :content="row.message" placement="top">
+                            <el-tooltip
+                                v-if="row.status === 'Unknown'"
+                                :content="row.message"
+                                v-bind="TABLE_TOOLTIP_OPTIONS"
+                            >
                                 <el-tag type="warning">{{ $t('commons.status.unknown') }}</el-tag>
                             </el-tooltip>
                             <el-tooltip
                                 v-if="row.status === 'Canceled'"
                                 :content="row.message"
                                 :disabled="!row.message"
-                                placement="top"
+                                v-bind="TABLE_TOOLTIP_OPTIONS"
                             >
                                 <el-tag type="danger">{{ $t('commons.status.systemrestart') }}</el-tag>
                             </el-tooltip>
@@ -150,6 +154,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import AddDialog from '@/views/ai/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';

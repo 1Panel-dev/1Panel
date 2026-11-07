@@ -20,7 +20,7 @@
             </el-table-column>
             <el-table-column :label="$t('nginx.buildStatus')" min-width="160" align="center">
                 <template #default="{ row }">
-                    <el-tooltip v-if="row.lastError" :content="row.lastError" placement="top">
+                    <el-tooltip v-if="row.lastError" :content="row.lastError" v-bind="TABLE_TOOLTIP_OPTIONS">
                         <el-tag :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
                     </el-tooltip>
                     <el-tag v-else :type="statusType(row.buildStatus)">{{ $t('nginx.' + row.buildStatus) }}</el-tag>
@@ -47,6 +47,7 @@
     </div>
 </template>
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { getNginxModules, updateNginxModule } from '@/api/modules/nginx';
 import i18n from '@/lang';
 import { Nginx } from '@/api/interface/nginx';

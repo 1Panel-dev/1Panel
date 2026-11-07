@@ -369,7 +369,7 @@
                                     <el-tooltip
                                         v-if="canOpenCreateTaskLog(row)"
                                         :content="$t('commons.button.log')"
-                                        placement="top"
+                                        v-bind="TABLE_TOOLTIP_OPTIONS"
                                     >
                                         <el-icon
                                             class="vm-create-failed-log"
@@ -478,6 +478,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';

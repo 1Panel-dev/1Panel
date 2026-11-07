@@ -58,7 +58,7 @@
                             <el-tooltip
                                 v-if="row.dnsAccount && row.dnsAccount.type === 'DnsPod'"
                                 :content="$t('ssl.dnsPodRemovedSSLTip')"
-                                placement="top"
+                                v-bind="TABLE_TOOLTIP_OPTIONS"
                             >
                                 <el-tag type="danger" size="small" class="ml-2">
                                     DnsPod {{ $t('ssl.dnsPodRemoved') }}
@@ -218,6 +218,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import { toRef, defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { deleteSSL, downloadFile, pushSSLToNode, searchSSL, updateSSL } from '@/api/modules/website';
