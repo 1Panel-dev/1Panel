@@ -51,7 +51,7 @@
                             v-for="item in userDatabases(row).slice(0, 1)"
                             :key="row.username + '@' + row.host + item"
                             :content="item"
-                            placement="top"
+                            v-bind="TABLE_TOOLTIP_OPTIONS"
                         >
                             <el-tag size="small">{{ item }}</el-tag>
                         </el-tooltip>
@@ -66,7 +66,7 @@
                                     v-for="item in userDatabases(row)"
                                     :key="row.username + '@' + row.host + item"
                                     :content="item"
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-tag size="small">{{ item }}</el-tag>
                                 </el-tooltip>
@@ -203,6 +203,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref } from 'vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import i18n from '@/lang';

@@ -527,9 +527,6 @@
                                 show-overflow-tooltip
                                 :sortable="'custom'"
                                 prop="name"
-                                :tooltip-options="{
-                                    placement: 'bottom-start',
-                                }"
                             >
                                 <template #default="{ row }">
                                     <div class="file-row">

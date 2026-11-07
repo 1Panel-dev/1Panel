@@ -216,6 +216,7 @@
                             <el-divider class="!my-3" />
 
                             <el-table
+                                :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
                                 v-if="composeContainers.length > 0"
                                 :data="tableData"
                                 size="small"
@@ -522,6 +523,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import { computed, h, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';

@@ -17,7 +17,7 @@
                 <template #default="{ row }">
                     <el-select v-if="row.type === 'volume'" filterable v-model="row.sourceDir">
                         <div v-for="(item, indexV) of volumeOptions" :key="indexV">
-                            <el-tooltip :hide-after="20" :content="item.option" placement="top">
+                            <el-tooltip :hide-after="20" :content="item.option" v-bind="TABLE_TOOLTIP_OPTIONS">
                                 <el-option :value="item.option" :label="item.option.substring(0, 30)" />
                             </el-tooltip>
                         </div>
@@ -82,6 +82,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { Container } from '@/api/interface/container';
 import { listVolume } from '@/api/modules/container';
 import { ref, onMounted } from 'vue';

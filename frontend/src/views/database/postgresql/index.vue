@@ -104,7 +104,9 @@
                             <Tooltip v-if="!row.isDelete" :islink="false" :text="row.name" />
                             <div v-else>
                                 <span v-if="row.name.length < 15">{{ row.name }}</span>
-                                <el-tooltip v-else :content="row.name">{{ row.name.substring(0, 10) }}...</el-tooltip>
+                                <el-tooltip v-else :content="row.name" v-bind="TABLE_TOOLTIP_OPTIONS">
+                                    {{ row.name.substring(0, 10) }}...
+                                </el-tooltip>
                                 <el-tag round type="info" class="ml-1" size="small">
                                     {{ $t('database.isDelete') }}
                                 </el-tag>
@@ -241,6 +243,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import BindDialog from '@/views/database/postgresql/bind/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';

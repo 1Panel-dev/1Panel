@@ -120,7 +120,7 @@
             </el-tab-pane>
 
             <el-tab-pane :label="$t('container.volume')" name="storage">
-                <el-table :data="inspectData?.Mounts" border>
+                <el-table :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS" :data="inspectData?.Mounts" border>
                     <el-table-column :label="$t('commons.table.type')" width="100">
                         <template #default="{ row }">
                             <el-tag size="small">
@@ -169,6 +169,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
 import { routerToFileWithPath } from '@/utils/router';

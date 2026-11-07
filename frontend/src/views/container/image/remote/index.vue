@@ -12,7 +12,7 @@
                 <span class="input-help">{{ $t('container.imageRemoteSearchHelper') }}</span>
             </el-form-item>
         </el-form>
-        <el-table v-loading="loading" :data="items">
+        <el-table :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS" v-loading="loading" :data="items">
             <el-table-column prop="name" :label="$t('container.imageName')" min-width="180" />
             <el-table-column
                 prop="description"
@@ -42,6 +42,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { onBeforeUnmount, ref, watch } from 'vue';
 import { searchRemoteImages, type RemoteImage } from '@/api/modules/container';
 import { getSettingBaseInfo } from '@/api/modules/setting';

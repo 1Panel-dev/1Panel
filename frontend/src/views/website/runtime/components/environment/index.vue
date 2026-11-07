@@ -52,7 +52,13 @@
             :closable="false"
             :title="$t('runtime.envImportError', [parsed.error.line, $t('runtime.' + parsed.error.reason)])"
         />
-        <el-table v-else-if="parsed.entries.length" :data="parsed.entries" max-height="260" class="mt-3">
+        <el-table
+            :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
+            v-else-if="parsed.entries.length"
+            :data="parsed.entries"
+            max-height="260"
+            class="mt-3"
+        >
             <el-table-column prop="key" :label="$t('runtime.envKey')" min-width="120" show-overflow-tooltip />
             <el-table-column prop="value" :label="$t('runtime.envValue')" min-width="180" show-overflow-tooltip />
         </el-table>
@@ -71,6 +77,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref } from 'vue';
 import { FormRules } from 'element-plus';
 import { Rules } from '@/global/form-rules';

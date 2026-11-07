@@ -1,6 +1,6 @@
 <template>
     <div class="tooltip-container">
-        <el-tooltip :disabled="showTooltip">
+        <el-tooltip :disabled="showTooltip" v-bind="TABLE_TOOLTIP_OPTIONS">
             <template #content>
                 <div :style="{ width: tootipWidth, 'word-break': 'break-all' }">{{ text }}</div>
             </template>
@@ -13,6 +13,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { onMounted, ref } from 'vue';
 
 defineOptions({ name: 'Tooltip' });

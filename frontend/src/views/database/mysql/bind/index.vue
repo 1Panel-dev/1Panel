@@ -10,7 +10,11 @@
                     {{ $t('database.addUserAuthorization') }}
                 </el-button>
             </div>
-            <el-table :data="authorizedUsers" :empty-text="$t('commons.msg.noneData')">
+            <el-table
+                :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
+                :data="authorizedUsers"
+                :empty-text="$t('commons.msg.noneData')"
+            >
                 <el-table-column :label="$t('commons.table.user')" show-overflow-tooltip min-width="180">
                     <template #default="{ row }">{{ row.username }}@{{ row.host }}</template>
                 </el-table-column>
@@ -160,6 +164,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import Tooltip from '@/components/tooltip/index.vue';

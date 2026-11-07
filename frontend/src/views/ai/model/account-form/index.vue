@@ -38,6 +38,7 @@
             >
                 <el-select
                     v-model="form.localEngineId"
+                    fit-input-width
                     filterable
                     :loading="loadingEngines"
                     @change="handleLocalEngineChange"
@@ -45,26 +46,13 @@
                     <el-option v-for="item in localEngines" :key="item.id" :label="item.name" :value="item.id">
                         <div class="local-engine-option">
                             <span class="local-engine-option__name" :title="item.name">{{ item.name }}</span>
-                            <el-tag
+                            <AiModelList
                                 v-if="item.models.length"
-                                size="small"
-                                type="info"
-                                class="local-engine-option__model"
-                            >
-                                <span :title="item.models[0]">{{ item.models[0] }}</span>
-                            </el-tag>
-                            <el-popover v-if="item.models.length > 1" trigger="click" placement="bottom" :width="320">
-                                <template #reference>
-                                    <el-button size="small" class="local-engine-option__more" @click.stop>
-                                        +{{ item.models.length - 1 }}
-                                    </el-button>
-                                </template>
-                                <div class="local-engine-models">
-                                    <el-tag v-for="model in item.models.slice(1)" :key="model" size="small" type="info">
-                                        {{ model }}
-                                    </el-tag>
-                                </div>
-                            </el-popover>
+                                class="local-engine-option__models"
+                                :models="item.models"
+                                :visible-count="1"
+                                tag-type="info"
+                            />
                         </div>
                     </el-option>
                 </el-select>
@@ -331,6 +319,7 @@
 </template>
 
 <script setup lang="ts">
+import AiModelList from '@/components/ai-model-list/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { FormInstance } from 'element-plus';
 import { AI } from '@/api/interface/ai';
@@ -992,34 +981,8 @@ defineExpose({
         text-overflow: ellipsis;
     }
 
-    &__model {
-        max-width: 55%;
-        min-width: 0;
-
-        :deep(.el-tag__content) {
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-
-    &__more {
-        flex-shrink: 0;
-    }
-}
-
-.local-engine-models {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    max-height: 240px;
-    overflow: auto;
-
-    .el-tag {
-        height: auto;
-        padding: 4px 6px;
-        white-space: normal;
-        overflow-wrap: anywhere;
-        max-width: 100%;
+    &__models {
+        max-width: 65%;
     }
 }
 

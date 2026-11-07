@@ -1,5 +1,5 @@
 <template>
-    <el-tooltip placement="top-start">
+    <el-tooltip v-bind="TABLE_TOOLTIP_OPTIONS">
         <template #content>
             <div class="info-break" :style="{ width: width + 'px' }">{{ info }}</div>
         </template>
@@ -7,6 +7,8 @@
     </el-tooltip>
 </template>
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
+
 defineProps({
     width: {
         type: String,

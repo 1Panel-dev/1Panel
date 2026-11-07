@@ -72,9 +72,6 @@
                     :columns="columns"
                     localKey="websiteColumn"
                     v-model:selects="selects"
-                    :tooltip-options="{
-                        placement: 'bottom-start',
-                    }"
                 >
                     <el-table-column type="selection" width="32" />
                     <el-table-column

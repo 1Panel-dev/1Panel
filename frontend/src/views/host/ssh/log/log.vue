@@ -42,7 +42,12 @@
                                 <el-tag type="success">{{ $t('commons.status.success') }}</el-tag>
                             </div>
                             <div v-else>
-                                <el-tooltip class="box-item" effect="dark" :content="row.message" placement="top-start">
+                                <el-tooltip
+                                    class="box-item"
+                                    effect="dark"
+                                    :content="row.message"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
+                                >
                                     <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
                                 </el-tooltip>
                             </div>
@@ -93,6 +98,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
 import { dateFormatServerTimezone } from '@/utils/date';

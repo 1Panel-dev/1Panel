@@ -5,7 +5,13 @@
             <span>{{ $t('xpack.vm.orphanSelected', [selected.length, computeSize(selectedSize)]) }}</span>
             <el-button :loading="scanning" @click="scan">{{ $t('xpack.vm.orphanScan') }}</el-button>
         </div>
-        <el-table v-loading="scanning" :data="items" max-height="420" @selection-change="selectionChange">
+        <el-table
+            :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
+            v-loading="scanning"
+            :data="items"
+            max-height="420"
+            @selection-change="selectionChange"
+        >
             <el-table-column type="selection" width="48" />
             <el-table-column :label="$t('commons.table.name')" min-width="280" show-overflow-tooltip>
                 <template #default="scope">{{ scope.row.path }}</template>
@@ -30,6 +36,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';

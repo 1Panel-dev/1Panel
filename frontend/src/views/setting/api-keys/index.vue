@@ -28,7 +28,7 @@
                                 <el-tooltip
                                     v-if="row.kind === 'legacy'"
                                     :content="$t('apiKeyManagement.legacyHelp')"
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                     :trigger="isMobile ? 'click' : 'hover'"
                                     :popper-style="{ maxWidth: 'min(360px, calc(100vw - 32px))' }"
                                 >
@@ -198,7 +198,7 @@ import { generateApiKey, getUserInfo } from '@/api/modules/auth';
 import APIKeyEditor from '@/components/api-key-management/editor.vue';
 import APIKeySummary from '@/components/api-key-management/summary.vue';
 import DrawerPro from '@/components/drawer-pro/index.vue';
-import type { FuTableOperationButton } from '@/components/table/shared';
+import { TABLE_TOOLTIP_OPTIONS, type FuTableOperationButton } from '@/components/table/shared';
 import { isAnyAPIKeyIP, normalizeAPIKeyIPs } from '@/utils/api-key';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { copyText } from '@/utils/clipboard';

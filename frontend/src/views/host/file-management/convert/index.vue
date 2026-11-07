@@ -93,14 +93,18 @@
                             ></el-table-column>
                             <el-table-column :label="$t('commons.button.log')" prop="log" min-width="160">
                                 <template #default="{ row }">
-                                    <el-tooltip :content="row.log" placement="top">
+                                    <el-tooltip :content="row.log" v-bind="TABLE_TOOLTIP_OPTIONS">
                                         {{ row.log }}
                                     </el-tooltip>
                                 </template>
                             </el-table-column>
                             <el-table-column :label="$t('commons.table.message')" prop="status" width="100">
                                 <template #default="{ row }">
-                                    <el-tooltip v-if="row.status === 'FAILED'" :content="row.message" placement="top">
+                                    <el-tooltip
+                                        v-if="row.status === 'FAILED'"
+                                        :content="row.message"
+                                        v-bind="TABLE_TOOLTIP_OPTIONS"
+                                    >
                                         <el-button type="danger" link>
                                             {{ $t('commons.status.' + row.status.toLowerCase()) }}
                                         </el-button>
@@ -132,6 +136,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { readCachedPageSize } from '@/utils/panel-cache';
 import i18n from '@/lang';
 import { reactive, ref } from 'vue';

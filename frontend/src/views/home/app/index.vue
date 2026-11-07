@@ -4,7 +4,12 @@
             <template #header-r>
                 <el-popover placement="left" :width="226" trigger="click">
                     <el-input size="small" v-model="filter" clearable @input="loadOption()" />
-                    <el-table :show-header="false" :data="options" max-height="150px">
+                    <el-table
+                        :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS"
+                        :show-header="false"
+                        :data="options"
+                        max-height="150px"
+                    >
                         <el-table-column prop="key" width="120" show-overflow-tooltip />
                         <el-table-column prop="name">
                             <template #default="{ row }">
@@ -143,6 +148,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { getAppIconUrl, installedOp } from '@/api/modules/app';
 import { changeLauncherStatus, loadAppLauncher, loadAppLauncherOption } from '@/api/modules/dashboard';
 import i18n from '@/lang';
