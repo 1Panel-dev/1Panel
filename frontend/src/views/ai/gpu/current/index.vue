@@ -3,44 +3,36 @@
         <RouterMenu :history-disabled="historyDisabled" />
         <div>
             <LayoutContent v-loading="loading" :title="$t('aiTools.gpu.monitoringTitle')">
-                <template v-if="loadFailed || gpuInfo.environment || gpuInfo.warnings?.length" #app>
-                    <div class="app-status">
-                        <el-card>
-                            <div class="flex w-full flex-col gap-4 md:flex-row md:items-center">
-                                <div class="flex flex-wrap items-center gap-4 ml-3">
-                                    <el-tag effect="dark" type="primary">
-                                        {{ $t('aiTools.gpu.environment.title') }}
-                                    </el-tag>
-                                    <el-text :type="environmentPassed ? 'success' : loadFailed ? 'danger' : 'warning'">
-                                        {{ environmentSummary }}
-                                    </el-text>
-                                </div>
-                                <div class="flex shrink-0 items-center">
-                                    <el-button type="primary" link @click="environmentDialogVisible = true">
-                                        {{ $t('aiTools.gpu.environment.details') }}
-                                    </el-button>
-                                    <el-divider direction="vertical" />
-                                    <el-button type="primary" link :disabled="loading" @click="refresh()">
-                                        {{ $t('aiTools.gpu.environment.recheck') }}
-                                    </el-button>
-                                </div>
-                            </div>
-                        </el-card>
+                <template #leftToolBar>
+                    <div class="monitor-heading">
+                        <h3 class="environment-heading">{{ $t('aiTools.gpu.monitoringTitle') }}</h3>
+                        <template v-if="loadFailed || gpuInfo.environment || gpuInfo.warnings?.length">
+                            <el-text
+                                :type="environmentPassed ? 'success' : loadFailed ? 'danger' : 'warning'"
+                                size="small"
+                            >
+                                {{ environmentSummary }}
+                            </el-text>
+                            <el-button class="environment-detail-link" link @click="environmentDialogVisible = true">
+                                {{ $t('aiTools.gpu.environment.details') }}
+                            </el-button>
+                        </template>
                     </div>
                 </template>
-                <template #leftToolBar>
-                    <h3 class="environment-heading">
-                        {{ $t('aiTools.gpu.monitoringTitle') }}
-                    </h3>
-                </template>
                 <template #rightToolBar>
+                    <span v-if="hasAccelerators && gpuInfo.collectedAt" class="collection-time">
+                        {{ $t('aiTools.gpu.collectedAt') }}:
+                        {{ new Date(gpuInfo.collectedAt).toLocaleString() }}
+                    </span>
                     <TableSetting title="gpu-refresh" @search="search()" />
+                    <el-tooltip :content="$t('aiTools.gpu.environment.recheck')">
+                        <TableRefresh :disabled="loading" @search="refresh()" />
+                    </el-tooltip>
                 </template>
                 <template #main>
                     <div v-for="summary in overviewRows" :key="summary.vendor" class="device-overview mb-2">
-                        <div class="overview-item">
-                            <span>{{ $t('aiTools.gpu.environment.vendor') }}</span>
-                            <strong>{{ vendorTitle(summary.vendor) }}</strong>
+                        <div class="overview-item overview-model">
+                            <strong>{{ commonDeviceModels[summary.vendor] || vendorTitle(summary.vendor) }}</strong>
                         </div>
                         <div class="overview-item">
                             <span>{{ $t('aiTools.gpu.driverVersion') }}</span>
@@ -104,10 +96,6 @@
                             </el-tooltip>
                         </div>
                     </div>
-                    <div v-if="hasAccelerators && gpuInfo.collectedAt" class="input-help">
-                        {{ $t('aiTools.gpu.collectedAt') }}:
-                        {{ new Date(gpuInfo.collectedAt).toLocaleString() }}
-                    </div>
                     <el-empty
                         v-if="!hasAccelerators && !loading && !loadFailed && !showEnvironment"
                         :description="emptyDescription"
@@ -142,13 +130,18 @@
                                                     "
                                                 ></span>
                                                 <strong>{{ deviceTitle(item) }}</strong>
-                                                <span class="card-product-name">· {{ item.productName }}</span>
+                                                <span
+                                                    v-if="!commonDeviceModels[item.type]"
+                                                    class="card-product-name"
+                                                    :title="item.productName"
+                                                >
+                                                    · {{ item.productName }}
+                                                </span>
                                             </div>
                                             <div class="device-actions">
                                                 <el-button
                                                     type="primary"
-                                                    plain
-                                                    round
+                                                    link
                                                     size="small"
                                                     class="process-count"
                                                     @click.stop="openGPUProcesses(item)"
@@ -189,7 +182,7 @@
                                                 v-if="isAvailable(deviceUtil(item))"
                                                 :percentage="percentage(deviceUtil(item))"
                                                 :show-text="false"
-                                                :stroke-width="5"
+                                                :stroke-width="2"
                                             />
                                         </div>
                                         <div class="metric-item metric-primary metric-memory">
@@ -208,12 +201,23 @@
                                                     <el-icon><InfoFilled /></el-icon>
                                                 </el-tooltip>
                                             </span>
-                                            <strong>{{ formatMemory(item.memUsed, item.memTotal) }}</strong>
+                                            <strong>
+                                                <span
+                                                    v-for="(part, index) in formatMemory(
+                                                        item.memUsed,
+                                                        item.memTotal,
+                                                    ).split(' / ')"
+                                                    :key="index"
+                                                    :class="{ 'memory-total': index > 0 }"
+                                                >
+                                                    {{ index ? ' / ' : '' }}{{ part }}
+                                                </span>
+                                            </strong>
                                             <el-progress
                                                 v-if="memoryPercentage(item) !== null"
                                                 :percentage="memoryPercentage(item) || 0"
                                                 :show-text="false"
-                                                :stroke-width="5"
+                                                :stroke-width="2"
                                             />
                                         </div>
                                         <div class="metric-item metric-temperature">
@@ -224,7 +228,7 @@
                                     <div class="device-secondary-metrics">
                                         <div class="metric-item">
                                             <span>{{ $t('aiTools.gpu.powerUsage') }}</span>
-                                            <strong>{{ formatPower(item) || 'N/A' }}</strong>
+                                            <strong :title="formatPower(item)">{{ item.powerDraw || 'N/A' }}</strong>
                                         </div>
                                         <div class="metric-item">
                                             <span>
@@ -272,14 +276,19 @@
                                         <div class="device-card-header">
                                             <div class="device-title">
                                                 <strong>XPU {{ item.basic.deviceID }}</strong>
-                                                <span class="card-product-name">· {{ item.basic.deviceName }}</span>
+                                                <span
+                                                    v-if="!commonDeviceModels.intel && !commonDeviceModels.xpu"
+                                                    class="card-product-name"
+                                                    :title="item.basic.deviceName"
+                                                >
+                                                    · {{ item.basic.deviceName }}
+                                                </span>
                                             </div>
                                             <div class="device-actions">
                                                 <el-button
                                                     type="primary"
                                                     size="small"
-                                                    plain
-                                                    round
+                                                    link
                                                     class="process-count"
                                                     @click.stop="openXPUProcesses(item.basic.deviceID)"
                                                 >
@@ -309,7 +318,7 @@
                                         </div>
                                     </template>
 
-                                    <div class="device-metrics xpu-metrics">
+                                    <div class="device-metrics">
                                         <div class="metric-item metric-primary">
                                             <span>{{ $t('aiTools.gpu.gpuUtil') }}</span>
                                             <strong>{{ item.stats.gpuUtil || 'N/A' }}</strong>
@@ -317,13 +326,22 @@
                                                 v-if="isAvailable(item.stats.gpuUtil)"
                                                 :percentage="percentage(item.stats.gpuUtil)"
                                                 :show-text="false"
-                                                :stroke-width="5"
+                                                :stroke-width="2"
                                             />
                                         </div>
                                         <div class="metric-item metric-primary metric-memory">
                                             <span>{{ $t('aiTools.gpu.memoryUsed') }}</span>
                                             <strong>
-                                                {{ formatMemory(item.stats.memoryUsed, item.basic.memory) }}
+                                                <span
+                                                    v-for="(part, index) in formatMemory(
+                                                        item.stats.memoryUsed,
+                                                        item.basic.memory,
+                                                    ).split(' / ')"
+                                                    :key="index"
+                                                    :class="{ 'memory-total': index > 0 }"
+                                                >
+                                                    {{ index ? ' / ' : '' }}{{ part }}
+                                                </span>
                                             </strong>
                                             <el-progress
                                                 v-if="
@@ -335,7 +353,7 @@
                                                     0
                                                 "
                                                 :show-text="false"
-                                                :stroke-width="5"
+                                                :stroke-width="2"
                                             />
                                         </div>
                                         <div class="metric-item metric-temperature">
@@ -419,7 +437,7 @@
                         <div class="environment-identity">
                             <el-icon :size="22"><Box /></el-icon>
                             <div>
-                                <strong>{{ $t('aiTools.gpu.environment.containerGPU') }}</strong>
+                                <strong>NVIDIA · {{ $t('aiTools.gpu.environment.containerGPU') }}</strong>
                                 <div class="environment-description">
                                     <span v-for="check in containerChecks" :key="check.item">
                                         {{ checkTitle(check) }} · {{ checkStatus(check) }}
@@ -784,7 +802,25 @@ const overviewRows = computed(() => {
     ];
 });
 
-const environmentChecks = computed(() => gpuInfo.value.environment?.checks || []);
+const commonDeviceModels = computed<Record<string, string>>(() => {
+    const models: Record<string, string> = {};
+    for (const summary of overviewRows.value) {
+        const names =
+            summary.vendor === 'intel' || summary.vendor === 'xpu'
+                ? xpuInfo.value.xpu.map((device) => device.basic.deviceName)
+                : [...gpuInfo.value.gpu, ...gpuInfo.value.npu]
+                      .filter((device) => device.type === summary.vendor)
+                      .map((device) => device.productName);
+        if (names.length && names[0] && names.every((name) => name === names[0])) {
+            models[summary.vendor] = names[0];
+        }
+    }
+    return models;
+});
+
+const environmentChecks = computed(() =>
+    (gpuInfo.value.environment?.checks || []).filter((check) => check.item === 'driver' || check.vendor === 'nvidia'),
+);
 const environmentIssueCount = computed(
     () =>
         environmentChecks.value.filter((check) => check.status !== 'passed').length +
@@ -1423,6 +1459,21 @@ onBeforeUnmount(invalidateRequest);
 </script>
 
 <style lang="scss" scoped>
+.monitor-heading {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+}
+.environment-detail-link {
+    font-size: 12px;
+    color: var(--el-text-color-regular);
+}
+.collection-time {
+    align-self: center;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+}
 .environment-heading {
     margin: 0;
     font-size: 16px;
@@ -1515,7 +1566,7 @@ onBeforeUnmount(invalidateRequest);
     gap: 0;
     flex-wrap: wrap;
     min-height: 44px;
-    padding: 9px 14px;
+    padding: 12px 16px;
     border: 1px solid var(--el-border-color-lighter);
     border-radius: 8px;
 }
@@ -1536,9 +1587,18 @@ onBeforeUnmount(invalidateRequest);
     }
     strong {
         color: var(--el-text-color-primary);
-        font-size: 14px;
-        font-weight: 600;
+        font-size: 12px;
+        font-weight: 400;
         line-height: 18px;
+    }
+}
+.overview-model {
+    max-width: 100%;
+    white-space: normal;
+    strong {
+        overflow-wrap: anywhere;
+        font-size: 14px;
+        font-weight: 500;
     }
 }
 .gpu-group-list {
@@ -1602,7 +1662,7 @@ onBeforeUnmount(invalidateRequest);
 .device-card-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
+    gap: 14px;
     align-items: stretch;
 }
 .device-card {
@@ -1610,22 +1670,22 @@ onBeforeUnmount(invalidateRequest);
     width: 100%;
     min-width: 0;
     border: 1px solid var(--el-border-color-lighter);
-    border-radius: 10px;
+    border-radius: 7px;
     outline: none;
     background: var(--el-bg-color);
     transition: border-color 0.2s;
     &:hover {
-        border-color: var(--el-color-primary-light-5);
+        border-color: var(--el-border-color);
     }
     :deep(.el-card__header) {
         display: flex;
         align-items: center;
         box-sizing: border-box;
-        min-height: 51px;
-        padding: 13px 16px;
+        padding: 16px 20px 0;
+        border-bottom: 0;
     }
     :deep(.el-card__body) {
-        padding: 16px;
+        padding: 16px 20px;
     }
 }
 .device-card:only-child {
@@ -1637,8 +1697,8 @@ onBeforeUnmount(invalidateRequest);
     min-width: 0;
     strong {
         color: var(--el-text-color-primary);
-        font-size: 16px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 500;
         line-height: 20px;
         white-space: nowrap;
     }
@@ -1655,22 +1715,35 @@ onBeforeUnmount(invalidateRequest);
     flex-shrink: 0;
     gap: 12px;
     margin-left: 12px;
+    .el-button {
+        font-size: 12px;
+        font-weight: 400;
+        &:not(.is-disabled) {
+            color: var(--el-text-color-regular);
+            &:hover,
+            &:focus-visible {
+                color: var(--el-color-primary);
+            }
+        }
+    }
     .el-button + .el-button {
         margin-left: 0;
     }
 }
-.process-count {
-    font-size: 12px;
+.device-actions .process-count {
+    padding-right: 12px;
+    border-right: 1px solid var(--el-border-color-lighter);
+    border-radius: 0;
     white-space: nowrap;
 }
 .device-metrics {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 20px;
+    grid-template-columns: 1fr 1.05fr 0.6fr;
+    gap: 16px 24px;
 }
 .metric-item {
     min-width: 0;
-    span {
+    > span {
         display: block;
         margin-bottom: 6px;
         color: var(--el-text-color-secondary);
@@ -1693,18 +1766,30 @@ onBeforeUnmount(invalidateRequest);
     }
 }
 .device-secondary-metrics {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 16px 20px;
-    margin-top: 16px;
-    padding-top: 16px;
-    border-top: 1px solid var(--el-border-color-lighter);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 14px;
+    .metric-item {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        > span {
+            margin-bottom: 0;
+        }
+        strong {
+            color: var(--el-text-color-regular);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 18px;
+        }
+    }
 }
 .metric-primary {
-    min-height: 67px;
+    min-height: 62px;
     strong {
         font-size: 20px;
-        font-weight: 600;
+        font-weight: 500;
         line-height: 26px;
     }
     :deep(.el-progress) {
@@ -1712,26 +1797,19 @@ onBeforeUnmount(invalidateRequest);
     }
 }
 .metric-memory {
-    min-width: 0;
-}
-.metric-temperature {
-    position: relative;
-    &::before {
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: -10px;
-        border-left: 1px solid var(--el-border-color-lighter);
-        content: '';
-    }
     strong {
-        font-size: 18px;
-        font-weight: 600;
-        line-height: 26px;
+        font-size: 17px;
+        font-weight: 400;
+    }
+    .memory-total {
+        color: var(--el-text-color-secondary);
+        font-size: 13px;
     }
 }
-.xpu-metrics {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+.metric-temperature strong {
+    font-size: 17px;
+    font-weight: 400;
+    line-height: 26px;
 }
 @media (max-width: 1200px) {
     .device-card-grid {
@@ -1740,26 +1818,43 @@ onBeforeUnmount(invalidateRequest);
 }
 
 @media (max-width: 768px) {
+    .collection-time {
+        width: 100%;
+    }
     .device-overview {
-        flex-wrap: wrap;
-        gap: 8px 0;
+        gap: 8px 16px;
         padding: 10px 12px;
+    }
+    .overview-item + .overview-item {
+        margin-left: 0;
+        padding-left: 0;
+        border-left: 0;
+    }
+    .overview-model {
+        flex-basis: 100%;
+    }
+    .device-card-header {
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .device-title {
+        flex-basis: 100%;
+    }
+    .device-actions {
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-left: 0;
     }
     .device-metrics {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
-    .device-secondary-metrics {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        .metric-item:last-child {
-            grid-column: 1 / -1;
-        }
-    }
     .metric-temperature {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
         grid-column: 1 / -1;
-        padding-top: 12px;
-        border-top: 1px solid var(--el-border-color-lighter);
-        &::before {
-            display: none;
+        > span {
+            margin-bottom: 0;
         }
     }
 }
