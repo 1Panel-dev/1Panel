@@ -5,22 +5,22 @@ import (
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/utils/ai_tools/vllm"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
 )
 
 const (
-	vllmAppKeyForUpgrade  = "vllm"
-	vllmGB10VersionPrefix = "nvidia-gb10-dspark-"
-	vllmImageEnvKey       = "IMAGE"
-	vllmImageTypeNvidia   = "nvidia"
-	vllmImageTypeIntel    = "intel"
-	vllmImageTypeAscend   = "ascend"
+	vllmAppKeyForUpgrade = "vllm"
+	vllmImageEnvKey      = "IMAGE"
+	vllmImageTypeNvidia  = "nvidia"
+	vllmImageTypeIntel   = "intel"
+	vllmImageTypeAscend  = "ascend"
 )
 
 func isVllmProOnlyVersion(appKey, version string) bool {
 	return strings.EqualFold(strings.TrimSpace(appKey), vllmAppKeyForUpgrade) &&
-		strings.HasPrefix(strings.ToLower(strings.TrimSpace(version)), vllmGB10VersionPrefix)
+		vllm.IsGB10Version(version)
 }
 
 func canAccessVllmVersion(appKey, version string) bool {
@@ -58,9 +58,6 @@ func resolveVllmVersionFamily(version, image string) string {
 func trimVllmVersionFamily(version string) string {
 	trimmed := strings.TrimSpace(version)
 	normalized := strings.ToLower(trimmed)
-	if strings.HasPrefix(normalized, vllmGB10VersionPrefix) {
-		return strings.TrimSpace(trimmed[len(vllmGB10VersionPrefix):])
-	}
 	for _, family := range []string{vllmImageTypeNvidia, vllmImageTypeIntel, vllmImageTypeAscend} {
 		prefix := family + "-"
 		if strings.HasPrefix(normalized, prefix) {
@@ -71,10 +68,10 @@ func trimVllmVersionFamily(version string) string {
 }
 
 func buildDefaultVllmImageByVersion(version string) string {
-	tag := trimVllmVersionFamily(version)
-	if strings.HasPrefix(strings.ToLower(strings.TrimSpace(version)), vllmGB10VersionPrefix) {
-		return "1panel/vllm-gb10-dspark:" + tag
+	if image := vllm.GB10Image(version); image != "" {
+		return image
 	}
+	tag := trimVllmVersionFamily(version)
 	family := resolveVllmVersionFamily(version, "")
 	if family == vllmImageTypeIntel {
 		return "intel/llm-scaler-vllm:" + tag
@@ -89,8 +86,8 @@ func buildDefaultVllmImageByVersion(version string) string {
 }
 
 func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage string) bool {
-	currentGB10 := strings.HasPrefix(strings.ToLower(strings.TrimSpace(currentVersion)), vllmGB10VersionPrefix)
-	targetGB10 := strings.HasPrefix(strings.ToLower(strings.TrimSpace(targetVersion)), vllmGB10VersionPrefix)
+	currentGB10 := vllm.IsGB10Version(currentVersion)
+	targetGB10 := vllm.IsGB10Version(targetVersion)
 	if currentGB10 != targetGB10 {
 		return false
 	}
