@@ -1789,6 +1789,11 @@ const message = {
                 dockerActionHelp: 'Проверьте настройки среды выполнения NVIDIA в Docker и повторите проверку.',
                 monitorUnaffected: 'Эта проблема не влияет на мониторинг GPU хоста.',
                 title: 'Проверка окружения',
+                passedLabel: 'Проверка пройдена',
+                issuesLabel: 'Проблемы окружения · {count}',
+                loadFailedLabel: 'Ошибка проверки',
+                notDetectedLabel: 'Устройства не обнаружены',
+                unknownLabel: 'Статус неизвестен',
                 passed: 'Проверки окружения пройдены',
                 issues: 'Обнаружено проблем окружения: {count}. Проверьте их согласно подсказкам.',
                 recheck: 'Проверить снова',
@@ -2150,6 +2155,9 @@ const message = {
         statusUnavailable: 'Service status unavailable. Refresh to retry.',
     },
     benchmarkPlan: {
+        logAutoRefresh: 'Автообновление',
+        logWindowHelp:
+            'Показана только последняя часть журнала. Скачайте выбранный файл, чтобы посмотреть его полностью.',
         prefixTokens: 'Токены префикса',
         seed: 'Начальное значение генератора случайных чисел',
         report: 'Отчёт',

@@ -7,12 +7,13 @@
                     <div class="monitor-heading">
                         <h3 class="environment-heading">{{ $t('aiTools.gpu.monitoringTitle') }}</h3>
                         <template v-if="loadFailed || gpuInfo.environment || gpuInfo.warnings?.length">
-                            <el-text
-                                :type="environmentPassed ? 'success' : loadFailed ? 'danger' : 'warning'"
-                                size="small"
-                            >
-                                {{ environmentSummary }}
-                            </el-text>
+                            <el-tag :type="environmentPassed ? 'success' : loadFailed ? 'danger' : 'warning'">
+                                {{
+                                    $t(`aiTools.gpu.environment.${environmentStatus}Label`, {
+                                        count: environmentIssueCount,
+                                    })
+                                }}
+                            </el-tag>
                             <el-button class="environment-detail-link" link @click="environmentDialogVisible = true">
                                 {{ $t('aiTools.gpu.environment.details') }}
                             </el-button>
@@ -492,7 +493,7 @@
                 </section>
                 <el-empty
                     v-if="!loadFailed && !showEnvironment && !environmentChecks.length && !gpuInfo.warnings?.length"
-                    :description="environmentSummary"
+                    :description="$t(`aiTools.gpu.environment.${environmentStatus}`, { count: environmentIssueCount })"
                 />
                 <el-collapse
                     v-if="!loadFailed && (environmentChecks.length || gpuInfo.warnings?.length)"
@@ -829,17 +830,11 @@ const environmentIssueCount = computed(
 const environmentPassed = computed(
     () => !loadFailed.value && environmentChecks.value.length > 0 && environmentIssueCount.value === 0,
 );
-const environmentSummary = computed(() => {
-    if (loadFailed.value) return i18n.global.t('aiTools.gpu.environment.loadFailed');
-    if (environmentPassed.value) return i18n.global.t('aiTools.gpu.environment.passed');
-    if (environmentIssueCount.value) {
-        return i18n.global.t('aiTools.gpu.environment.issues', { count: environmentIssueCount.value });
-    }
-    return i18n.global.t(
-        gpuInfo.value.environment?.hardwareStatus === 'not_detected'
-            ? 'aiTools.gpu.environment.notDetected'
-            : 'aiTools.gpu.environment.unknown',
-    );
+const environmentStatus = computed(() => {
+    if (loadFailed.value) return 'loadFailed';
+    if (environmentPassed.value) return 'passed';
+    if (environmentIssueCount.value) return 'issues';
+    return gpuInfo.value.environment?.hardwareStatus === 'not_detected' ? 'notDetected' : 'unknown';
 });
 const historyDisabled = computed(
     () =>
