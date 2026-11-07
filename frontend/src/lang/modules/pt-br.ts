@@ -2382,6 +2382,12 @@ const message = {
         missing: 'Não existe',
     },
     container: {
+        nvidiaSupport: 'Suporte a GPU NVIDIA',
+        nvidiaHelper:
+            'Registra o runtime de contêiner NVIDIA. Instale primeiro o NVIDIA Container Toolkit. Atribua GPUs a cada contêiner separadamente.',
+        nvidiaLocalOnly: 'Apenas o socket padrão do Docker local é suportado.',
+        nvidiaChangeHelper:
+            'Desativar pode impedir a inicialização de contêineres que usam o runtime NVIDIA. Esta opção não bloqueia o acesso à GPU.',
         imageRemoteSearch: 'Pesquisa remota',
         imageRemoteSearchHelper: 'Apenas imagens de repositórios do Docker Hub podem ser pesquisadas',
         imageRemoteSearchProxyRequired:

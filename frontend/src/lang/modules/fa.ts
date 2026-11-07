@@ -2324,6 +2324,12 @@ const message = {
         missing: 'ناموجود',
     },
     container: {
+        nvidiaSupport: 'پشتیبانی از GPU انویدیا',
+        nvidiaHelper:
+            'محیط اجرای کانتینر NVIDIA را ثبت می‌کند. ابتدا NVIDIA Container Toolkit را نصب کنید. GPU را جداگانه به هر کانتینر اختصاص دهید.',
+        nvidiaLocalOnly: 'فقط سوکت پیش‌فرض Docker محلی پشتیبانی می‌شود.',
+        nvidiaChangeHelper:
+            'غیرفعال‌سازی ممکن است مانع شروع کانتینرهای دارای محیط اجرای NVIDIA شود. این کلید دسترسی به GPU را مسدود نمی‌کند.',
         imageRemoteSearch: 'جستجوی راه دور',
         imageRemoteSearchHelper: 'فقط جستجوی تصاویر مخزن Docker Hub پشتیبانی می\u200cشود',
         imageRemoteSearchProxyRequired: 'برای جستجوی تصاویر راه دور در محیط فعلی، ابتدا یک سرور پروکسی پیکربندی کنید.',

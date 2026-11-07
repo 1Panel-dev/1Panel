@@ -2375,6 +2375,12 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        nvidiaSupport: 'Sokongan GPU NVIDIA',
+        nvidiaHelper:
+            'Daftarkan runtime kontena NVIDIA. Pasang NVIDIA Container Toolkit dahulu. Peruntukkan GPU kepada setiap kontena secara berasingan.',
+        nvidiaLocalOnly: 'Hanya soket Docker lalai setempat disokong.',
+        nvidiaChangeHelper:
+            'Melumpuhkan mungkin menghalang kontena yang menggunakan runtime NVIDIA daripada bermula. Suis ini tidak menyekat akses GPU.',
         imageRemoteSearch: 'Carian jauh',
         imageRemoteSearchHelper: 'Hanya imej repositori Docker Hub boleh dicari',
         imageRemoteSearchProxyRequired:

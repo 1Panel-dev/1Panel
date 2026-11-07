@@ -2350,6 +2350,12 @@ const message = {
         missing: 'Missing',
     },
     container: {
+        nvidiaSupport: 'NVIDIA GPU support',
+        nvidiaHelper:
+            'Register the NVIDIA container runtime. Install NVIDIA Container Toolkit first. Assign GPUs to each container separately.',
+        nvidiaLocalOnly: 'Only the local default Docker socket is supported.',
+        nvidiaChangeHelper:
+            'Disabling may prevent containers using the NVIDIA runtime from starting. This switch does not block GPU access.',
         imageRemoteSearch: 'Remote search',
         imageRemoteSearchHelper: 'Only Docker Hub repository images can be searched',
         imageRemoteSearchProxyRequired:

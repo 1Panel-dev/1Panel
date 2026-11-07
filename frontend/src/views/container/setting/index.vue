@@ -149,6 +149,18 @@
                                 <el-switch v-permission v-model="form.iptables" @change="handleIptables"></el-switch>
                                 <span class="input-help">{{ $t('container.iptablesHelper1') }}</span>
                             </el-form-item>
+                            <el-form-item :label="$t('container.nvidiaSupport')" prop="nvidia">
+                                <el-switch
+                                    v-permission
+                                    v-model="form.nvidia"
+                                    :disabled="!form.nvidiaSupported"
+                                    @change="handleNVIDIA"
+                                />
+                                <span class="input-help">{{ $t('container.nvidiaHelper') }}</span>
+                                <span v-if="!form.nvidiaSupported" class="input-help">
+                                    {{ $t('container.nvidiaLocalOnly') }}
+                                </span>
+                            </el-form-item>
                             <el-form-item label="Live restore" prop="liveRestore">
                                 <el-switch
                                     v-permission
@@ -239,6 +251,7 @@
         <ConfirmDialog ref="confirmDialogRefIpv6" @confirm="onSaveIPv6" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefIptable" @confirm="onSubmitOpenIPtable" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefLog" @confirm="onSubmitSaveLog" @cancel="search" />
+        <ConfirmDialog ref="confirmDialogRefNVIDIA" @confirm="onSubmitSaveNVIDIA" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefLive" @confirm="onSubmitSaveLive" @cancel="search" />
         <ConfirmDialog ref="confirmDialogRefCgroup" @confirm="onSubmitSaveCgroup" @cancel="search" />
 
@@ -288,6 +301,7 @@ const confirmDialogRefLog = ref();
 const mirrorRef = ref();
 const registriesRef = ref();
 const confirmDialogRefLive = ref();
+const confirmDialogRefNVIDIA = ref();
 const confirmDialogRefCgroup = ref();
 const confirmDialogRefIptable = ref();
 const confirmDialogRefIpv6 = ref();
@@ -302,6 +316,8 @@ const form = reactive({
     mirrors: '',
     registries: '',
     liveRestore: false,
+    nvidia: false,
+    nvidiaSupported: false,
     iptables: true,
     cgroupDriver: '',
 
@@ -407,6 +423,19 @@ const onSubmitOpenIPtable = () => {
     save('IPtables', 'enable');
 };
 
+const handleNVIDIA = () => {
+    confirmDialogRefNVIDIA.value.acceptParams({
+        header: i18n.global.t('database.confChange'),
+        operationInfo: form.nvidia
+            ? i18n.global.t('container.restartHelper')
+            : `${i18n.global.t('container.nvidiaChangeHelper')} ${i18n.global.t('container.restartHelper')}`,
+        submitInputInfo: i18n.global.t('database.restartNow'),
+    });
+};
+const onSubmitSaveNVIDIA = () => {
+    save('NVIDIA', form.nvidia ? 'enable' : 'disable');
+};
+
 const handleLive = async () => {
     let params = {
         header: i18n.global.t('database.confChange'),
@@ -509,6 +538,8 @@ const search = async () => {
     form.version = res.data.version;
     form.cgroupDriver = res.data.cgroupDriver || 'cgroupfs';
     form.liveRestore = res.data.liveRestore;
+    form.nvidia = res.data.nvidia;
+    form.nvidiaSupported = res.data.nvidiaSupported;
     form.iptables = res.data.iptables;
     form.mirrors = res.data.registryMirrors ? res.data.registryMirrors.join('\n') : '';
     form.registries = res.data.insecureRegistries ? res.data.insecureRegistries.join('\n') : '';

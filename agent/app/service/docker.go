@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"path/filepath"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -213,6 +215,8 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 	if err != nil {
 		return &data, err
 	}
+	defer client.Close()
+	data.NVIDIASupported = client.DaemonHost() == "unix:///var/run/docker.sock"
 	itemVersion, err := client.ServerVersion(ctx)
 	if err == nil {
 		data.Version = itemVersion.Version
@@ -225,6 +229,9 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 	daemonMap, err := readDockerDaemonConfig()
 	if err != nil {
 		return &data, nil
+	}
+	if runtimes, ok := daemonMap["runtimes"].(map[string]interface{}); ok {
+		_, data.NVIDIA = runtimes["nvidia"]
 	}
 	var conf daemonJsonItem
 	arr, err := json.Marshal(daemonMap)
@@ -258,6 +265,9 @@ func (u *DockerService) LoadDockerConf() (*dto.DaemonJsonConf, error) {
 }
 
 func (u *DockerService) UpdateConf(req dto.SettingUpdate, withRestart bool) error {
+	if req.Key == "NVIDIA" {
+		return updateDockerNVIDIA(req.Value, withRestart)
+	}
 	err := createIfNotExistDaemonJsonFile()
 	if err != nil {
 		return err
@@ -559,4 +569,201 @@ func validateDockerConfig() error {
 		return fmt.Errorf("Docker configuration validation failed, %v", err)
 	}
 	return nil
+}
+
+func updateDockerNVIDIA(value string, withRestart bool) error {
+	if value != "enable" && value != "disable" {
+		return fmt.Errorf("unsupported NVIDIA setting %q", value)
+	}
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+	if client.DaemonHost() != "unix:///var/run/docker.sock" {
+		return fmt.Errorf("NVIDIA configuration is only supported for the local default Docker socket")
+	}
+	enabled := value == "enable"
+	original, readErr := os.ReadFile(constant.DaemonJsonPath)
+	existed := readErr == nil
+	if readErr != nil && !os.IsNotExist(readErr) {
+		return readErr
+	}
+	daemonMap := make(map[string]interface{})
+	if existed {
+		if err := json.Unmarshal(original, &daemonMap); err != nil {
+			return fmt.Errorf("failed to parse Docker configuration: %w", err)
+		}
+		if daemonMap == nil {
+			return fmt.Errorf("Docker configuration must be a JSON object")
+		}
+	}
+	runtimePath, err := applyDockerNVIDIAConfig(daemonMap, enabled)
+	if err != nil {
+		return err
+	}
+	if enabled {
+		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		check := checkNVIDIAToolkit(ctx, func(name string) string {
+			if name == "nvidia-container-runtime" {
+				return runtimePath
+			}
+			return findGPUContainerCommand(name)
+		}, func(ctx context.Context, executable string) (string, error) {
+			return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(3*time.Second)).RunWithStdout(executable, "--version")
+		})
+		cancel()
+		if check.Status != "passed" {
+			return fmt.Errorf("NVIDIA Container Toolkit is not ready: %s", check.Reason)
+		}
+	}
+	updated, err := json.MarshalIndent(daemonMap, "", "\t")
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(path.Dir(constant.DaemonJsonPath), 0755); err != nil {
+		return err
+	}
+	if err := writeDockerNVIDIAConfig(updated); err != nil {
+		return err
+	}
+	restore := func(cause error, restart bool) error {
+		var restoreErr error
+		if existed {
+			restoreErr = writeDockerNVIDIAConfig(original)
+		} else {
+			restoreErr = os.Remove(constant.DaemonJsonPath)
+		}
+		if restoreErr != nil {
+			return fmt.Errorf("%v; failed to restore Docker configuration: %w", cause, restoreErr)
+		}
+		if restart {
+			if err := controller.HandleRestart("docker"); err != nil {
+				return fmt.Errorf("%v; configuration restored but Docker restart failed: %w", cause, err)
+			}
+		}
+		return cause
+	}
+	if global.CACHE != nil {
+		defer global.CACHE.Del(gpuEnvironmentCacheKey)
+	}
+	if err := validateDockerConfig(); err != nil {
+		return restore(err, false)
+	}
+	if !withRestart {
+		return nil
+	}
+	if err := controller.HandleRestart("docker"); err != nil {
+		return restore(fmt.Errorf("failed to restart Docker: %w", err), true)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	info, err := client.Info(ctx)
+	if err != nil {
+		return restore(fmt.Errorf("failed to verify Docker NVIDIA runtime: %w", err), true)
+	}
+	if enabled {
+		check := checkNVIDIADockerConfig(info, readDockerDaemonConfig, findGPUContainerCommand)
+		if check.Status != "passed" {
+			return restore(fmt.Errorf("Docker NVIDIA runtime did not become available: %s", check.Reason), true)
+		}
+	} else if _, registered := info.Runtimes["nvidia"]; registered {
+		return restore(fmt.Errorf("Docker still registers the NVIDIA runtime; check other Docker configuration sources"), true)
+	}
+	return nil
+}
+
+func applyDockerNVIDIAConfig(config map[string]interface{}, enabled bool) (string, error) {
+	runtimes, ok := config["runtimes"].(map[string]interface{})
+	if config["runtimes"] != nil && !ok {
+		return "", fmt.Errorf("Docker runtimes configuration must be a JSON object")
+	}
+	if !enabled {
+		delete(runtimes, "nvidia")
+		if len(runtimes) == 0 {
+			delete(config, "runtimes")
+		}
+		if config["default-runtime"] == "nvidia" {
+			delete(config, "default-runtime")
+		}
+		return "", nil
+	}
+	if runtimes == nil {
+		runtimes = make(map[string]interface{})
+		config["runtimes"] = runtimes
+	}
+	nvidia, ok := runtimes["nvidia"].(map[string]interface{})
+	if runtimes["nvidia"] != nil && !ok {
+		return "", fmt.Errorf("Docker NVIDIA runtime configuration must be a JSON object")
+	}
+	if nvidia == nil {
+		nvidia = map[string]interface{}{"runtimeArgs": []string{}}
+		runtimes["nvidia"] = nvidia
+	}
+	configured, ok := nvidia["path"].(string)
+	if nvidia["path"] != nil && !ok {
+		return "", fmt.Errorf("Docker NVIDIA runtime path must be a string")
+	}
+	runtimePath := findNVIDIAContainerCommand("nvidia-container-runtime", config)
+	if runtimePath == "" || !cmd.Which(runtimePath) {
+		if configured != "" {
+			return "", fmt.Errorf("configured NVIDIA runtime %q is not executable", configured)
+		}
+		return "", fmt.Errorf("nvidia-container-runtime is not installed or executable")
+	}
+	if configured == "" {
+		nvidia["path"] = runtimePath
+	}
+	return runtimePath, nil
+}
+
+func writeDockerNVIDIAConfig(data []byte) error {
+	target := constant.DaemonJsonPath
+	mode := os.FileMode(0640)
+	info, err := os.Lstat(target)
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	if err == nil {
+		target, err = filepath.EvalSymlinks(target)
+		if err != nil {
+			return err
+		}
+		info, err = os.Stat(target)
+		if err != nil {
+			return err
+		}
+		if !info.Mode().IsRegular() {
+			return fmt.Errorf("Docker configuration must be a regular file")
+		}
+		mode = info.Mode().Perm()
+	}
+	temp, err := os.CreateTemp(filepath.Dir(target), ".daemon-nvidia-*.json")
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = temp.Close()
+		_ = os.Remove(temp.Name())
+	}()
+	if info != nil {
+		if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+			if err := temp.Chown(int(stat.Uid), int(stat.Gid)); err != nil {
+				return err
+			}
+		}
+	}
+	if err := temp.Chmod(mode); err != nil {
+		return err
+	}
+	if _, err := temp.Write(data); err != nil {
+		return err
+	}
+	if err := temp.Sync(); err != nil {
+		return err
+	}
+	if err := temp.Close(); err != nil {
+		return err
+	}
+	return os.Rename(temp.Name(), target)
 }

@@ -10,6 +10,9 @@ type DockerStatus struct {
 }
 
 type DaemonJsonConf struct {
+	NVIDIA          bool `json:"nvidia"`
+	NVIDIASupported bool `json:"nvidiaSupported"`
+
 	IsSwarm      bool     `json:"isSwarm"`
 	Version      string   `json:"version"`
 	Mirrors      []string `json:"registryMirrors"`
