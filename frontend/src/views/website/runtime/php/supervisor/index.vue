@@ -81,7 +81,7 @@
                                         <span>{{ $t('tool.supervisor.' + row.status[0].status) }}</span>
                                     </el-button>
                                 </template>
-                                <el-table :data="row.status">
+                                <el-table :data="row.status" :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS">
                                     <el-table-column
                                         property="name"
                                         :label="$t('commons.table.name')"
@@ -129,6 +129,7 @@
 </template>
 
 <script setup lang="ts">
+import { TABLE_OVERFLOW_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { ref } from 'vue';
 import Create from './create/index.vue';
 import File from './file/index.vue';

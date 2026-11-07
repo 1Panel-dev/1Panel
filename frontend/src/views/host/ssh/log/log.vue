@@ -47,7 +47,6 @@
                                     effect="dark"
                                     :content="row.message"
                                     v-bind="TABLE_TOOLTIP_OPTIONS"
-                                    placement="bottom-start"
                                 >
                                     <el-tag type="danger">{{ $t('commons.status.failed') }}</el-tag>
                                 </el-tooltip>

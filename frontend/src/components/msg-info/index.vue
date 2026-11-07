@@ -1,5 +1,5 @@
 <template>
-    <el-tooltip v-bind="TABLE_TOOLTIP_OPTIONS" placement="bottom-start">
+    <el-tooltip v-bind="TABLE_TOOLTIP_OPTIONS">
         <template #content>
             <div class="info-break" :style="{ width: width + 'px' }">{{ info }}</div>
         </template>

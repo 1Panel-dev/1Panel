@@ -5,7 +5,7 @@
         :aria-disabled="isDisabled"
         @click.capture="handlePermissionClick"
     >
-        <el-tooltip v-if="msg && msg != ''" effect="dark" placement="bottom">
+        <el-tooltip v-if="msg && msg != ''" effect="dark" v-bind="TABLE_TOOLTIP_OPTIONS">
             <template #content>
                 <div class="content">{{ msg }}</div>
             </template>
@@ -40,6 +40,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, ref } from 'vue';
 
 const props = defineProps({

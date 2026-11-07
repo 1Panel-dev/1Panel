@@ -115,29 +115,17 @@
                     </el-table-column>
                     <el-table-column prop="models" :label="$t('aiTools.model.model')" min-width="200">
                         <template #default="{ row }">
-                            <div v-if="row.models?.length" class="model-line">
-                                <span class="cell-ellipsis" :title="row.models[0].id">{{ row.models[0].id }}</span>
-                                <el-button
-                                    v-if="!row.appInstallId && row.models.length > 1"
-                                    size="small"
-                                    class="model-more"
-                                    @click="poolRef.open(row)"
-                                >
-                                    +{{ row.models.length - 1 }}
-                                </el-button>
-                                <el-tooltip
-                                    v-if="row.appInstallId && row.models.length > 1"
-                                    :content="
-                                        row.models
-                                            .slice(1)
-                                            .map((item) => item.id)
-                                            .join(', ')
-                                    "
-                                    v-bind="TABLE_TOOLTIP_OPTIONS"
-                                >
-                                    <el-button size="small" class="model-more">+{{ row.models.length - 1 }}</el-button>
-                                </el-tooltip>
-                            </div>
+                            <AiModelList
+                                v-if="row.models?.length"
+                                :models="row.models.map((item) => item.id)"
+                                :visible-count="1"
+                            >
+                                <template v-if="!row.appInstallId" #footer>
+                                    <el-button link type="primary" @click="poolRef.open(row)">
+                                        {{ $t('aiTools.agents.modelPool') }}
+                                    </el-button>
+                                </template>
+                            </AiModelList>
                             <span v-if="!row.models?.length">—</span>
                         </template>
                     </el-table-column>
@@ -271,6 +259,7 @@
 </template>
 
 <script setup lang="ts">
+import AiModelList from '@/components/ai-model-list/index.vue';
 import { computed, reactive, ref, toRef, watch } from 'vue';
 import { useRoute } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
@@ -589,14 +578,6 @@ watch(
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-}
-.model-line {
-    display: flex;
-    align-items: center;
-}
-.model-more {
-    flex-shrink: 0;
-    margin-left: 8px;
 }
 .model-filter {
     width: 220px;

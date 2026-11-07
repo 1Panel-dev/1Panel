@@ -29,15 +29,11 @@ export interface FuTableOperationButton<Row = any> {
 
 export const FU_TABLE_STORAGE_PREFIX = 'FU-T-';
 
-export const TABLE_TOOLTIP_OPTIONS: Pick<UseTooltipProps, 'placement' | 'fallbackPlacements'> = {
+export const TABLE_TOOLTIP_OPTIONS: Pick<UseTooltipProps, 'placement'> = {
     placement: 'bottom',
-    fallbackPlacements: ['bottom', 'bottom-start', 'bottom-end'],
 };
 
-export const TABLE_OVERFLOW_TOOLTIP_OPTIONS: Pick<UseTooltipProps, 'placement' | 'fallbackPlacements'> = {
-    placement: 'bottom-start',
-    fallbackPlacements: ['bottom-start', 'bottom', 'bottom-end'],
-};
+export const TABLE_OVERFLOW_TOOLTIP_OPTIONS = TABLE_TOOLTIP_OPTIONS;
 
 export const isElTableColumnVNode = (vnode: VNode) => {
     const type = vnode.type as any;

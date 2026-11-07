@@ -50,6 +50,7 @@
                             </el-text>
                             <div class="float-right">
                                 <el-tooltip
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                     :content="row.isPinned ? $t('commons.table.unpin') : $t('commons.table.pin')"
                                 >
                                     <el-button
@@ -161,6 +162,7 @@
 </template>
 
 <script lang="ts" setup>
+import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
 import { toRef, reactive, ref, computed, watch, onActivated, onDeactivated, onBeforeUnmount } from 'vue';
 import { useRoute, useRouter } from 'vue-router';

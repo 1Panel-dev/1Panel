@@ -447,7 +447,12 @@
                         <el-checkbox border v-model="showIPv6Ports">IPv6</el-checkbox>
                     </div>
                     <div v-if="filteredPorts.length" class="container-port-dialog">
-                        <el-tooltip v-for="item in filteredPorts" :key="item" :content="item" placement="top">
+                        <el-tooltip
+                            v-for="item in filteredPorts"
+                            :key="item"
+                            :content="item"
+                            v-bind="TABLE_TOOLTIP_OPTIONS"
+                        >
                             <el-button
                                 :icon="item.indexOf('->') !== -1 ? 'Position' : undefined"
                                 plain

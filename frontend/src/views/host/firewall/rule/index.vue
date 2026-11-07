@@ -244,7 +244,7 @@
                                                         v-for="entry in usageEntriesByRow[row.rowKey]"
                                                         :key="`${row.rowKey}:${entry.key}`"
                                                         :content="usageEntryLabel(entry)"
-                                                        placement="top"
+                                                        v-bind="TABLE_TOOLTIP_OPTIONS"
                                                     >
                                                         <el-tag
                                                             class="cursor-pointer firewall-used-popover-entry"

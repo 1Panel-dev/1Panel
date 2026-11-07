@@ -66,7 +66,7 @@
                                     v-for="item in userDatabases(row)"
                                     :key="row.username + '@' + row.host + item"
                                     :content="item"
-                                    placement="top"
+                                    v-bind="TABLE_TOOLTIP_OPTIONS"
                                 >
                                     <el-tag size="small">{{ item }}</el-tag>
                                 </el-tooltip>

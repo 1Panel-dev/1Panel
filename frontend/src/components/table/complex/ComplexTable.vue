@@ -170,7 +170,7 @@
 import { panelCacheKey, writePanelCache } from '@/utils/panel-cache';
 import { computed, onDeactivated, onMounted, ref, useAttrs } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { flattenVNodes, type FuTableOperationButton } from '@/components/table/shared';
+import { flattenVNodes, TABLE_OVERFLOW_TOOLTIP_OPTIONS, type FuTableOperationButton } from '@/components/table/shared';
 import { useCardColumns } from './useCardColumns';
 import { useContextMenu } from './useContextMenu';
 import { useResponsivePagination } from './useResponsivePagination';
@@ -274,7 +274,7 @@ const scheduleCardContentHeightSync = () => {
     });
 };
 const resolvedTooltipOptions = computed(() => ({
-    placement: 'bottom-start',
+    ...TABLE_OVERFLOW_TOOLTIP_OPTIONS,
     ...((attrs.tooltipOptions ?? attrs['tooltip-options']) as Record<string, unknown> | undefined),
 }));
 const getRowKey = (row: any, index: number) => {
