@@ -771,6 +771,9 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	if err != nil {
 		return "", err
 	}
+	if err = mapImagesForLoong64(composeMap); err != nil {
+		return "", err
+	}
 	envs := make(map[string]interface{})
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
 		return "", err

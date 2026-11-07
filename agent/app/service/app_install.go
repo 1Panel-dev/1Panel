@@ -552,6 +552,9 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 				return err
 			}
 		}
+		if err = mapImagesForLoong64(composeMap); err != nil {
+			return err
+		}
 		if req.Advanced && !req.SkipComposeCommonConfig {
 			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params); err != nil {
 				return err
