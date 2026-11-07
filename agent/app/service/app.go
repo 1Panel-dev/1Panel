@@ -518,7 +518,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	appInstall.ServiceName = serviceName
 
 	if !req.SkipComposeCommonConfig {
-		if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params); err != nil {
+		if err = addDockerComposeCommonParam(composeMap, appInstall.ServiceName, req.AppContainerConfig, req.Params, app.Key); err != nil {
 			return
 		}
 	}

@@ -781,7 +781,7 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		envs[constant.ContainerName] = install.ContainerName
 	}
 	config.Advanced = true
-	if err := addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs); err != nil {
+	if err := addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs, install.App.Key); err != nil {
 		return "", err
 	}
 	paramByte, err := json.Marshal(envs)
@@ -1495,6 +1495,24 @@ func doNotNeedSync(installed model.AppInstall) bool {
 
 func synAppInstall(containers map[string]container.Summary, appInstall *model.AppInstall, force bool) {
 	oldStatus := appInstall.Status
+	oldContainerName := appInstall.ContainerName
+	if appInstall.App.Key == "vllm" && !strings.Contains(appInstall.ContainerName, ",") {
+		if _, exists := containers["/"+appInstall.ContainerName]; !exists {
+			matchedNames := make(map[string]struct{})
+			for _, con := range containers {
+				if con.Labels["com.docker.compose.project.working_dir"] == appInstall.GetPath() &&
+					con.Labels["com.docker.compose.service"] == appInstall.ServiceName &&
+					!strings.EqualFold(con.Labels["com.docker.compose.oneoff"], "true") && len(con.Names) > 0 {
+					matchedNames[strings.TrimPrefix(con.Names[0], "/")] = struct{}{}
+				}
+			}
+			if len(matchedNames) == 1 {
+				for name := range matchedNames {
+					appInstall.ContainerName = name
+				}
+			}
+		}
+	}
 	containerNames := strings.Split(appInstall.ContainerName, ",")
 	if len(containers) == 0 {
 		if appInstall.Status == constant.StatusUpErr && !force {
@@ -1538,7 +1556,7 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		appInstall.Status = constant.StatusStopped
 	case runningCount == total:
 		appInstall.Status = constant.StatusRunning
-		if oldStatus == constant.StatusRunning {
+		if oldStatus == constant.StatusRunning && oldContainerName == appInstall.ContainerName {
 			return
 		}
 	case restartingCount == total:
@@ -1813,7 +1831,7 @@ func updateToolApp(installed *model.AppInstall) {
 	}
 }
 
-func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName string, req request.AppContainerConfig, params map[string]interface{}) error {
+func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName string, req request.AppContainerConfig, params map[string]interface{}, appKey string) error {
 	services, serviceValid := composeMap["services"].(map[string]interface{})
 	if !serviceValid {
 		return buserr.New("ErrFileParse")
@@ -1839,6 +1857,11 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 		return buserr.New("ErrFileParse")
 	}
 	serviceValue := service.(map[string]interface{})
+	if appKey == "vllm" {
+		if name, _ := serviceValue["container_name"].(string); strings.TrimSpace(name) == "" {
+			serviceValue["container_name"] = "${CONTAINER_NAME}"
+		}
+	}
 
 	deploy := map[string]interface{}{}
 	if de, ok := serviceValue["deploy"]; ok {
@@ -1877,15 +1900,44 @@ func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	ports, ok := serviceValue["ports"].([]interface{})
 	if ok {
 		for i, port := range ports {
-			portStr, portOK := port.(string)
-			if !portOK {
+			if config, ok := port.(map[string]interface{}); ok {
+				config["host_ip"] = "${HOST_IP}"
+				if req.Advanced && req.AllowPort && req.SpecifyIP == "" {
+					delete(config, "host_ip")
+				}
 				continue
 			}
-			portArray := strings.Split(portStr, ":")
-			if len(portArray) == 2 {
-				portArray = append([]string{"${HOST_IP}"}, portArray...)
+			portStr := fmt.Sprint(port)
+			parts := []string{}
+			depth, start := 0, 0
+			for index, char := range portStr {
+				switch char {
+				case '[', '{':
+					depth++
+				case ']', '}':
+					depth--
+				case ':':
+					if depth == 0 {
+						parts = append(parts, portStr[start:index])
+						start = index + 1
+					}
+				}
 			}
-			ports[i] = strings.Join(portArray, ":")
+			parts = append(parts, portStr[start:])
+			switch len(parts) {
+			case 1:
+				parts = []string{"", "", parts[0]}
+			case 2:
+				parts = append([]string{""}, parts...)
+			case 3:
+			default:
+				return fmt.Errorf("invalid port mapping: %s", portStr)
+			}
+			parts[0] = "${HOST_IP}"
+			if req.Advanced && req.AllowPort && strings.Contains(req.SpecifyIP, ":") {
+				parts[0] = "[${HOST_IP}]"
+			}
+			ports[i] = strings.Join(parts, ":")
 		}
 		serviceValue["ports"] = ports
 	}

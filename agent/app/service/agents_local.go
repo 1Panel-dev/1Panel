@@ -117,6 +117,30 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 	return account, nil
 }
 
+func UpdateLocalModelAccountAddress(accountID uint, previousURL, baseURL string) (*model.AgentAccount, error) {
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
+	account, err := agentAccountRepo.GetFirst(repo.WithByID(accountID))
+	if err != nil {
+		return nil, err
+	}
+	if strings.TrimRight(account.BaseURL, "/") != previousURL || account.BaseURL == baseURL {
+		return account, nil
+	}
+	account.BaseURL = baseURL
+	if account.ValidateAvailability {
+		account.Verified = false
+		account.VerifiedAt = nil
+		account.VerifyError = ""
+	}
+	if err := agentAccountRepo.Save(account); err != nil {
+		return nil, err
+	}
+	terminalai.InvalidateTerminalRuntimeCache()
+	terminalai.InvalidateFileAIRuntimeCache()
+	return account, nil
+}
+
 func SyncOllamaModelAccount(createIfMissing bool) error {
 	app, err := appRepo.GetFirst(appRepo.WithKey("ollama"))
 	if errors.Is(err, gorm.ErrRecordNotFound) {

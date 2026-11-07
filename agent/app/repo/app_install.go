@@ -48,7 +48,7 @@ func NewIAppInstallRepo() IAppInstallRepo {
 
 func (a *AppInstallRepo) UpdateStatus(install *model.AppInstall) error {
 	return getDb().Model(&model.AppInstall{}).Where("id = ? AND updated_at = ?", install.ID, install.UpdatedAt).
-		Updates(map[string]interface{}{"status": install.Status, "message": install.Message}).Error
+		Updates(map[string]interface{}{"status": install.Status, "message": install.Message, "container_name": install.ContainerName}).Error
 }
 
 func (a *AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {
