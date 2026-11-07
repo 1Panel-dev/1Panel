@@ -2305,6 +2305,12 @@ const message = {
         missing: '없음',
     },
     container: {
+        nvidiaSupport: 'NVIDIA GPU 지원',
+        nvidiaHelper:
+            'NVIDIA 컨테이너 런타임을 등록합니다. 먼저 NVIDIA Container Toolkit을 설치하세요. GPU는 각 컨테이너에 별도로 할당해야 합니다.',
+        nvidiaLocalOnly: '로컬 기본 Docker 소켓만 지원합니다.',
+        nvidiaChangeHelper:
+            '비활성화하면 NVIDIA 런타임을 사용하는 컨테이너가 시작되지 않을 수 있습니다. 이 스위치는 GPU 접근을 차단하지 않습니다.',
         imageRemoteSearch: '원격 검색',
         imageRemoteSearchHelper: 'Docker Hub 저장소 이미지만 검색할 수 있습니다',
         imageRemoteSearchProxyRequired: '현재 실행 환경에서 원격 이미지를 검색하려면 먼저 프록시 서버를 설정하세요.',

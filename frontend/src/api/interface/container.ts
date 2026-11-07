@@ -416,6 +416,8 @@ export namespace Container {
         isExist: boolean;
     }
     export interface DaemonJsonConf {
+        nvidia: boolean;
+        nvidiaSupported: boolean;
         isSwarm: boolean;
         isExist: boolean;
         isActive: boolean;

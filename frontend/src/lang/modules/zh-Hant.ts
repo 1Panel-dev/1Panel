@@ -2208,6 +2208,10 @@ const message = {
         missing: '不存在',
     },
     container: {
+        nvidiaSupport: 'NVIDIA GPU 支援',
+        nvidiaHelper: '註冊 NVIDIA 容器執行環境，需先安裝 NVIDIA Container Toolkit。各容器仍需個別分配 GPU。',
+        nvidiaLocalOnly: '僅支援本機預設 Docker Socket。',
+        nvidiaChangeHelper: '關閉後，使用 NVIDIA 執行環境的容器可能無法啟動；此開關不會禁止容器存取 GPU。',
         imageRemoteSearch: '遠端搜尋',
         imageRemoteSearchHelper: '僅支援搜尋 Docker Hub 倉庫映像',
         imageRemoteSearchProxyRequired: '目前運行環境下，如需搜尋遠端映像，請先設定代理伺服器',

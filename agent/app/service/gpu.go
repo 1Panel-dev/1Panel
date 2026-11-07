@@ -226,9 +226,23 @@ func findGPUContainerCommand(name string) string {
 	return ""
 }
 
+func findNVIDIAContainerCommand(name string, config map[string]interface{}) string {
+	if name == "nvidia-container-runtime" {
+		runtimes, _ := config["runtimes"].(map[string]interface{})
+		nvidia, _ := runtimes["nvidia"].(map[string]interface{})
+		if configured, ok := nvidia["path"].(string); ok && configured != "" {
+			name = configured
+		}
+	}
+	return findGPUContainerCommand(name)
+}
+
 func checkNVIDIAContainerEnvironment(ctx context.Context) []dto.GPUEnvironmentCheck {
+	config, configErr := readDockerDaemonConfig()
 	toolkitCtx, cancelToolkit := context.WithTimeout(ctx, 5*time.Second)
-	toolkit := checkNVIDIAToolkit(toolkitCtx, findGPUContainerCommand, func(ctx context.Context, path string) (string, error) {
+	toolkit := checkNVIDIAToolkit(toolkitCtx, func(name string) string {
+		return findNVIDIAContainerCommand(name, config)
+	}, func(ctx context.Context, path string) (string, error) {
 		return cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(3*time.Second)).RunWithStdout(path, "--version")
 	})
 	cancelToolkit()
@@ -243,7 +257,7 @@ func checkNVIDIAContainerEnvironment(ctx context.Context) []dto.GPUEnvironmentCh
 		if err == nil {
 			dockerCheck = checkNVIDIADockerInfo(info, false)
 			if cli.DaemonHost() == "unix:///var/run/docker.sock" {
-				dockerCheck = checkNVIDIADockerConfig(info, readDockerDaemonConfig, findGPUContainerCommand)
+				dockerCheck = checkNVIDIADockerConfig(info, func() (map[string]interface{}, error) { return config, configErr }, findGPUContainerCommand)
 			} else {
 				dockerCheck.Status = "unknown"
 				dockerCheck.Reason = "The selected Docker daemon's NVIDIA runtime cannot be verified using local executables or the default daemon.json."

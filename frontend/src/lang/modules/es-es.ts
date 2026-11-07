@@ -2383,6 +2383,12 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        nvidiaSupport: 'Compatibilidad con GPU NVIDIA',
+        nvidiaHelper:
+            'Registra el entorno de ejecución de NVIDIA. Instala primero NVIDIA Container Toolkit. Asigna las GPU a cada contenedor por separado.',
+        nvidiaLocalOnly: 'Solo se admite el socket predeterminado de Docker local.',
+        nvidiaChangeHelper:
+            'Al desactivar, los contenedores que usan el entorno de NVIDIA podrían no iniciarse. Este interruptor no bloquea el acceso a la GPU.',
         imageRemoteSearch: 'Búsqueda remota',
         imageRemoteSearchHelper: 'Solo se pueden buscar imágenes de repositorios de Docker Hub',
         imageRemoteSearchProxyRequired:
