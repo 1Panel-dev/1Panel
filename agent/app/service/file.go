@@ -287,11 +287,8 @@ func (f *FileService) Create(op request.FileCreate) error {
 }
 
 func (f *FileService) Delete(op request.FileDelete) error {
-	if op.IsDir {
-		excludeDir := global.Dir.DataDir
-		if path.Base(op.Path) == ".1panel_clash" || op.Path == excludeDir {
-			return buserr.New("ErrPathNotDelete")
-		}
+	if err := files.CheckFileDeletePaths(op.Path); err != nil {
+		return err
 	}
 	fo := files.NewFileOp()
 	recycleBinStatus, _ := settingRepo.Get(settingRepo.WithByKey("FileRecycleBin"))
@@ -307,6 +304,9 @@ func (f *FileService) Delete(op request.FileDelete) error {
 		}
 	}
 	if op.ForceDelete {
+		if err := files.CheckFileDeletePaths(op.Path); err != nil {
+			return err
+		}
 		var err error
 		if op.IsDir {
 			err = fo.DeleteDir(op.Path)
@@ -324,6 +324,9 @@ func (f *FileService) Delete(op request.FileDelete) error {
 	}
 	info, _ := fo.Fs.Stat(op.Path)
 	if info == nil || files.IsSymlink(info.Mode()) {
+		if err := files.CheckFileDeletePaths(op.Path); err != nil {
+			return err
+		}
 		if err := os.Remove(op.Path); err != nil {
 			return err
 		}
@@ -331,6 +334,9 @@ func (f *FileService) Delete(op request.FileDelete) error {
 		return nil
 	}
 
+	if err := files.CheckFileDeletePaths(op.Path); err != nil {
+		return err
+	}
 	if err := NewIRecycleBinService().Create(request.RecycleBinCreate{SourcePath: op.Path}); err != nil {
 		return err
 	}
@@ -338,33 +344,117 @@ func (f *FileService) Delete(op request.FileDelete) error {
 }
 
 func (f *FileService) BatchDelete(op request.FileBatchDelete) error {
+	plans, err := f.prepareBatchFileDelete(op)
+	if err != nil {
+		return err
+	}
 	fo := files.NewFileOp()
-	if op.IsDir {
-		for _, file := range op.Paths {
-			targets, err := f.collectPermanentDeleteTargets(file, true)
-			if err != nil {
-				return err
-			}
-			if err := fo.DeleteDir(file); err != nil {
-				return err
-			}
-			if err := cleanupTrashInfoByEntryPath(file); err != nil {
-				global.LOG.Warnf("cleanup trashinfo failed for %s: %v", file, err)
-			}
-			f.cleanupPermanentDeleteHistory(targets)
+	for _, plan := range plans {
+		if err := files.CheckFileDeletePaths(plan.path); err != nil {
+			return err
 		}
-	} else {
-		for _, file := range op.Paths {
-			if err := fo.DeleteFile(file); err != nil {
-				return err
-			}
-			if err := cleanupTrashInfoByEntryPath(file); err != nil {
-				global.LOG.Warnf("cleanup trashinfo failed for %s: %v", file, err)
-			}
-			f.cleanupPermanentDeleteHistory([]string{file})
+		if op.IsDir {
+			err = fo.DeleteDir(plan.path)
+		} else {
+			err = fo.DeleteFile(plan.path)
 		}
+		if err != nil {
+			return err
+		}
+		if err := cleanupTrashInfoByEntryPath(plan.path); err != nil {
+			global.LOG.Warnf("cleanup trashinfo failed for %s: %v", plan.path, err)
+		}
+		f.cleanupPermanentDeleteHistory(plan.historyTargets)
 	}
 	return nil
+}
+
+type batchFileDeletePlan struct {
+	path           string
+	historyTargets []string
+	absolute       string
+	physical       string
+	info           os.FileInfo
+}
+
+func (f *FileService) prepareBatchFileDelete(op request.FileBatchDelete) ([]batchFileDeletePlan, error) {
+	if err := files.CheckFileDeletePaths(op.Paths...); err != nil {
+		return nil, err
+	}
+	plans := make([]batchFileDeletePlan, 0, len(op.Paths))
+	for _, target := range op.Paths {
+		info, err := os.Lstat(target)
+		if err != nil {
+			return nil, err
+		}
+		absolute, err := filepath.Abs(target)
+		if err != nil {
+			return nil, err
+		}
+		physicalInput := target
+		if !filepath.IsAbs(physicalInput) {
+			cwd, err := os.Getwd()
+			if err != nil {
+				return nil, err
+			}
+			physicalInput = cwd + string(filepath.Separator) + physicalInput
+		}
+		physical, resolveErr := filepath.EvalSymlinks(physicalInput)
+		if resolveErr != nil && !os.IsNotExist(resolveErr) {
+			return nil, resolveErr
+		}
+		if resolveErr == nil {
+			physical, err = filepath.Abs(physical)
+			if err != nil {
+				return nil, err
+			}
+		}
+		plan := batchFileDeletePlan{path: target, absolute: absolute, physical: physical, info: info}
+		for _, previous := range plans {
+			if fileDeletePlansOverlap(previous, plan) {
+				return nil, buserr.New("ErrInvalidParams")
+			}
+		}
+		// Keep isDir=false as Remove, rather than silently upgrading to recursion.
+		if !op.IsDir && info.IsDir() {
+			entries, err := os.ReadDir(target)
+			if err != nil {
+				return nil, err
+			}
+			if len(entries) > 0 {
+				return nil, &os.PathError{Op: "remove", Path: target, Err: syscall.ENOTEMPTY}
+			}
+		}
+		historyTargets, err := f.collectPermanentDeleteTargets(target, op.IsDir)
+		if err != nil {
+			return nil, err
+		}
+		plan.historyTargets = historyTargets
+		plans = append(plans, plan)
+	}
+	return plans, nil
+}
+
+func fileDeletePlansOverlap(a, b batchFileDeletePlan) bool {
+	contains := func(parent, child string) bool {
+		if parent == "" || child == "" {
+			return false
+		}
+		relative, err := filepath.Rel(parent, child)
+		return err == nil && relative != ".." && !strings.HasPrefix(relative, ".."+string(filepath.Separator))
+	}
+	if contains(a.absolute, b.absolute) || contains(b.absolute, a.absolute) {
+		return true
+	}
+	if a.info.IsDir() && contains(a.physical, b.physical) || b.info.IsDir() && contains(b.physical, a.physical) {
+		return true
+	}
+	if os.SameFile(a.info, b.info) && strings.EqualFold(filepath.Base(a.absolute), filepath.Base(b.absolute)) {
+		parentA, errA := os.Stat(filepath.Dir(a.absolute))
+		parentB, errB := os.Stat(filepath.Dir(b.absolute))
+		return errA == nil && errB == nil && os.SameFile(parentA, parentB)
+	}
+	return false
 }
 
 func (f *FileService) ChangeMode(op request.FileCreate) error {
@@ -879,6 +969,9 @@ func (f *FileService) SaveContent(edit request.FileEdit) error {
 }
 
 func (f *FileService) ChangeName(req request.FileRename) error {
+	if err := files.CheckFileDeletePaths(req.OldName, req.NewName); err != nil {
+		return err
+	}
 	if hasInvalidFileName(req.NewName) {
 		return buserr.New("ErrInvalidChar")
 	}
@@ -894,6 +987,9 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 	}
 	fo := files.NewFileOp()
 	content, mode, shouldRecordHistory := readEditableFileHistoryContent(req.OldName)
+	if err := files.CheckFileDeletePaths(req.OldName, req.NewName); err != nil {
+		return err
+	}
 	if err := fo.Rename(req.OldName, req.NewName); err != nil {
 		return err
 	}
@@ -983,6 +1079,9 @@ func (f *FileService) StopMvFile(taskID string) error {
 }
 
 func validateFileMove(fo files.FileOp, m request.FileMove) error {
+	if err := checkFileMoveDeletePaths(m); err != nil {
+		return err
+	}
 	if !fo.Stat(m.NewPath) {
 		return buserr.New("ErrPathNotFound")
 	}
@@ -1000,6 +1099,9 @@ func validateFileMove(fo files.FileOp, m request.FileMove) error {
 }
 
 func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMove) error {
+	if err := checkFileMoveDeletePaths(m); err != nil {
+		return err
+	}
 	fo := files.NewFileOp()
 	type moveSnapshot struct {
 		path    string
@@ -1019,12 +1121,18 @@ func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMov
 				if err := ctx.Err(); err != nil {
 					return err
 				}
+				if err := checkFileMoveDeletePaths(request.FileMove{Type: "cut", CoverPaths: []string{src}, NewPath: m.NewPath}); err != nil {
+					return err
+				}
 				if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, "", true); err != nil {
 					errs = append(errs, err)
 					global.LOG.Errorf("cut copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
 					continue
 				}
 				if err := ctx.Err(); err != nil {
+					return err
+				}
+				if err := files.CheckFileDeletePaths(src); err != nil {
 					return err
 				}
 				if err := fo.DeleteDir(src); err != nil {
@@ -1034,7 +1142,14 @@ func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMov
 				}
 			}
 		}
-		if err := fo.CutWithContext(ctx, m.OldPaths, m.NewPath, m.Name, m.Cover); err != nil {
+		cutSources, cutDestination, err := absoluteFileCutOperands(m.OldPaths, m.NewPath)
+		if err != nil {
+			return err
+		}
+		if err := checkFileMoveDeletePaths(request.FileMove{Type: "cut", OldPaths: cutSources, NewPath: cutDestination, Name: m.Name, Cover: m.Cover}); err != nil {
+			return err
+		}
+		if err := fo.CutWithContext(ctx, cutSources, cutDestination, m.Name, m.Cover); err != nil {
 			return err
 		}
 		for _, snapshot := range snapshots {
@@ -1049,6 +1164,9 @@ func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMov
 	}
 	if m.Type == "copy" {
 		for _, src := range m.OldPaths {
+			if err := checkFileMoveDeletePaths(request.FileMove{Type: "copy", OldPaths: []string{src}, NewPath: m.NewPath, Name: m.Name, Cover: m.Cover}); err != nil {
+				return err
+			}
 			if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, m.Name, m.Cover); err != nil {
 				errs = append(errs, err)
 				global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
@@ -1056,6 +1174,9 @@ func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMov
 		}
 		if len(m.CoverPaths) > 0 {
 			for _, src := range m.CoverPaths {
+				if err := checkFileMoveDeletePaths(request.FileMove{Type: "copy", CoverPaths: []string{src}, NewPath: m.NewPath}); err != nil {
+					return err
+				}
 				if err := fo.CopyAndReNameWithContext(ctx, src, m.NewPath, "", true); err != nil {
 					errs = append(errs, err)
 					global.LOG.Errorf("copy file [%s] to [%s] failed, err: %s", src, m.NewPath, err.Error())
@@ -1065,6 +1186,100 @@ func (f *FileService) moveFileWithContext(ctx context.Context, m request.FileMov
 	}
 
 	return aggregateFileMoveErrors(errs)
+}
+
+func absoluteFileCutOperands(sources []string, destination string) ([]string, string, error) {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return nil, "", err
+	}
+	absolute := func(value string) string {
+		if filepath.IsAbs(value) {
+			return value
+		}
+		return cwd + string(filepath.Separator) + value
+	}
+	result := make([]string, len(sources))
+	for i, source := range sources {
+		result[i] = absolute(source)
+	}
+	return result, absolute(destination), nil
+}
+
+func checkFileMoveDeletePaths(m request.FileMove) error {
+	if m.Type != "cut" && m.Type != "copy" {
+		return nil
+	}
+	if m.Type == "cut" {
+		if err := files.CheckFileDeletePaths(append(append([]string{}, m.OldPaths...), m.CoverPaths...)...); err != nil {
+			return err
+		}
+	}
+	var destinations []string
+	commandTarget := func(operand, source string) (string, error) {
+		info, err := os.Stat(operand)
+		if err != nil && !os.IsNotExist(err) {
+			return "", err
+		}
+		if err == nil && info.IsDir() {
+			return operand + string(filepath.Separator) + filepath.Base(filepath.Clean(source)), nil
+		}
+		return operand, nil
+	}
+	copyTarget := func(source, name string, cover bool) (string, error) {
+		source = path.Clean("/" + source)
+		destination := path.Clean("/" + m.NewPath)
+		info, err := os.Stat(source)
+		if err != nil {
+			return "", err
+		}
+		operand := destination
+		if info.IsDir() {
+			if name != "" && !cover {
+				operand = filepath.Join(destination, name)
+			}
+		} else {
+			operand = filepath.Join(destination, name)
+			if cover {
+				operand = destination
+			}
+		}
+		return commandTarget(operand, source)
+	}
+	if m.Type == "cut" && len(m.OldPaths) > 0 {
+		operand := m.NewPath
+		if m.Name != "" {
+			operand = filepath.Join(m.NewPath, m.Name)
+			if _, err := os.Stat(operand); err == nil {
+				operand = m.NewPath
+			} else if !os.IsNotExist(err) {
+				return err
+			}
+		}
+		for _, source := range m.OldPaths {
+			target, err := commandTarget(operand, source)
+			if err != nil {
+				return err
+			}
+			destinations = append(destinations, target)
+		}
+	} else if m.Type == "copy" {
+		for _, source := range m.OldPaths {
+			target, err := copyTarget(source, m.Name, m.Cover)
+			if err != nil {
+				return err
+			}
+			destinations = append(destinations, target)
+		}
+	}
+	for _, source := range m.CoverPaths {
+		target, err := copyTarget(source, "", true)
+		if err != nil {
+			return err
+		}
+		destinations = append(destinations, target)
+	}
+	return files.CheckFileDeletePaths(destinations...)
 }
 
 func readEditableFileHistoryContent(filePath string) ([]byte, os.FileMode, bool) {
