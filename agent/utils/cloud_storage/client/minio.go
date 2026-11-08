@@ -2,10 +2,8 @@ package client
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"strings"
 
@@ -29,14 +27,10 @@ func NewMinIoClient(vars map[string]interface{}) (*minIoClient, error) {
 		return nil, buserr.WithDetail("ErrInvalidParams", "ssl", fmt.Errorf("no such proto in ssl: %s", ssl))
 	}
 
-	secure := false
-	tlsConfig := &tls.Config{}
-	if ssl == "https" {
-		secure = true
-		tlsConfig.InsecureSkipVerify = true
-	}
-	var transport http.RoundTripper = &http.Transport{
-		TLSClientConfig: tlsConfig,
+	secure := ssl == "https"
+	transport, err := newStorageHTTPTransport(vars)
+	if err != nil {
+		return nil, err
 	}
 	client, err := minio.New(strings.ReplaceAll(endpoint, ssl+"://", ""), &minio.Options{
 		Creds:     credentials.NewStaticV4(accessKeyID, secretAccessKey, ""),

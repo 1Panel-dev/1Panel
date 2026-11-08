@@ -3931,6 +3931,9 @@ const message = {
             'Jika penyedia awan serasi dengan protokol S3, anda boleh menggunakan Amazon S3 secara langsung untuk sandaran.',
         domain: 'Domain pemecutan',
         backupAccount: 'Akaun sandaran | Akaun sandaran',
+        backupCACert: 'Sijil CA (PEM)',
+        backupCACertHelp:
+            'Biarkan kosong untuk menggunakan CA sistem. Untuk storan HTTPS yang dihos sendiri, tampal sijil CA. Pengesahan sijil sentiasa diaktifkan.',
         loadBucket: 'Dapatkan baldi',
         accountName: 'Nama akaun',
         accountKey: 'Kunci akaun',

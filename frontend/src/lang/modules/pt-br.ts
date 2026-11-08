@@ -3936,6 +3936,9 @@ const message = {
             'Se um provedor de nuvem for compatível com o protocolo S3, você pode usar diretamente o Amazon S3 para backup.',
         domain: 'Domínio de aceleração',
         backupAccount: 'Conta de backup | Contas de backup',
+        backupCACert: 'Certificado de CA (PEM)',
+        backupCACertHelp:
+            'Deixe em branco para usar as CAs do sistema. Para armazenamento HTTPS próprio, cole o certificado da CA. A verificação de certificados permanece ativa.',
         loadBucket: 'Obter bucket',
         accountName: 'Nome da conta',
         accountKey: 'Chave da conta',

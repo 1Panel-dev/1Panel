@@ -3632,6 +3632,8 @@ const message = {
         backupAlert: '理論上只要雲廠商相容 S3 協議，就可以用現有的亞馬遜 S3 雲端儲存來備份，詳細設定請參考 ',
         domain: '加速域名',
         backupAccount: '備份帳號',
+        backupCACert: 'CA 憑證（PEM）',
+        backupCACertHelp: '留空時使用系統信任的 CA。自架 HTTPS 儲存服務可貼上 CA 憑證，憑證驗證始終開啟。',
         loadBucket: '取得桶',
         accountName: '帳戶名稱',
         accountKey: '帳戶金鑰',

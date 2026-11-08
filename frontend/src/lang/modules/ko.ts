@@ -3781,6 +3781,9 @@ const message = {
         backupAlert: 'S3 프로토콜을 지원하는 클라우드 공급자는 Amazon S3 를 사용하여 백업할 수 있습니다.',
         domain: '가속 도메인',
         backupAccount: '백업 계정 | 백업 계정',
+        backupCACert: 'CA 인증서(PEM)',
+        backupCACertHelp:
+            '비워 두면 시스템 CA를 사용합니다. 자체 호스팅 HTTPS 저장소의 CA 인증서를 붙여 넣으세요. 인증서 검증은 항상 활성화됩니다.',
         loadBucket: '버킷 가져오기',
         accountName: '계정 이름',
         accountKey: '계정 키',

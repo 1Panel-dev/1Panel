@@ -3770,6 +3770,9 @@ const message = {
         backupAlert: 'ຫາກຜູ້ໃຫ້ບໍລິການຄລາວຮອງຮັບໂປຣໂຕຄໍ S3, ທ່ານສາມາດໃຊ້ Amazon S3 ໃນການສຳຮອງຂໍ້ມູນໄດ້ໂດຍກົງ.',
         domain: 'ໂດເມນເລັ່ງຄວາມໄວ',
         backupAccount: 'ບັນຊີສຳຮອງ',
+        backupCACert: 'ໃບຢັ້ງຢືນ CA (PEM)',
+        backupCACertHelp:
+            'ປ່ອຍວ່າງເພື່ອໃຊ້ CA ຂອງລະບົບ. ສຳລັບບ່ອນເກັບຂໍ້ມູນ HTTPS ທີ່ໂຮສເອງ ໃຫ້ວາງໃບຢັ້ງຢືນ CA. ການກວດສອບໃບຢັ້ງຢືນຈະເປີດຢູ່ສະເໝີ.',
         loadBucket: 'ຮັບ Bucket',
         accountName: 'ຊື່ບັນຊີ',
         accountKey: 'Account key',

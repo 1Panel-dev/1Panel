@@ -3839,6 +3839,9 @@ const message = {
             '理論的には、クラウドプロバイダーがS3プロトコルに対応していれば、現行のAmazon S3クラウドストレージを使ってバックアップできます。具体的な設定については、',
         domain: 'ドメインを加速します',
         backupAccount: 'バックアップアカウント|バックアップアカウント',
+        backupCACert: 'CA 証明書（PEM）',
+        backupCACertHelp:
+            '空欄の場合はシステムの CA を使用します。自前の HTTPS ストレージには CA 証明書を貼り付けてください。証明書の検証は常に有効です。',
         loadBucket: 'バケツを入手してください',
         accountName: 'アカウント名',
         accountKey: 'アカウントキー',

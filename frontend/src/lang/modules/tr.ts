@@ -3935,6 +3935,9 @@ const message = {
             'Bir bulut sağlayıcısı S3 protokolüyle uyumluysa, yedekleme için doğrudan Amazon S3 kullanılabilir.',
         domain: 'Hızlandırma alanı',
         backupAccount: 'Yedekleme hesabı | Yedekleme hesapları',
+        backupCACert: 'CA sertifikası (PEM)',
+        backupCACertHelp:
+            "Sistem CA'larını kullanmak için boş bırakın. Kendi HTTPS depolamanız için CA sertifikasını yapıştırın. Sertifika doğrulaması her zaman etkindir.",
         loadBucket: 'Kova al',
         accountName: 'Hesap adı',
         accountKey: 'Hesap anahtarı',

@@ -3656,6 +3656,8 @@ const message = {
         backupAlert: '理论上只要云厂商兼容 S3 协议，就可以用现有的亚马逊 S3 云存储来备份，具体配置参考',
         domain: '加速域名',
         backupAccount: '备份账号',
+        backupCACert: 'CA 证书（PEM）',
+        backupCACertHelp: '留空时使用系统信任的 CA。自建 HTTPS 存储可粘贴其 CA 证书，证书校验始终开启。',
         loadBucket: '获取桶',
         accountName: '账户名称',
         accountKey: '账户密钥',

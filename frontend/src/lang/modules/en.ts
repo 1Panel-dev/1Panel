@@ -3887,6 +3887,9 @@ const message = {
             'If a cloud provider is compatible with the S3 protocol, you can directly use Amazon S3 for backup. ',
         domain: 'Accelerate domain',
         backupAccount: 'Backup account | Backup accounts',
+        backupCACert: 'CA certificate (PEM)',
+        backupCACertHelp:
+            'Leave empty to use system CAs. For self-hosted HTTPS storage, paste its CA certificate. Certificate verification remains enabled.',
         loadBucket: 'Get bucket',
         accountName: 'Account name',
         accountKey: 'Account key',

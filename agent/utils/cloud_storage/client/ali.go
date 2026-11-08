@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -11,8 +10,6 @@ import (
 	"os"
 	"path"
 	"strings"
-
-	"github.com/go-resty/resty/v2"
 )
 
 type aliClient struct {
@@ -58,10 +55,7 @@ func (a aliClient) Delete(pathItem string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"drive_id": a.driveID,
 		"file_id":  fileInfo.FileID,
@@ -108,10 +102,7 @@ func (a aliClient) Upload(ctx context.Context, src, target string) (bool, error)
 		"size":            fileInfo.Size(),
 		"check_name_mode": "auto_rename",
 	}
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	url := "https://api.alipan.com/v2/file/create"
 
 	resp, err := client.R().
@@ -146,10 +137,7 @@ func (a aliClient) Download(src, target string) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	if fileInfo.Size > 100*1024*1024 {
 		return false, fmt.Errorf("The translation file %s exceeds 100MB, please download it through the client.", src)
 	}
@@ -266,10 +254,7 @@ func (a aliClient) loadDirWithPath(path string) ([]fileInfo, error) {
 }
 
 func (a aliClient) loadFileWithParentID(parentID string) ([]fileInfo, error) {
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"drive_id":       a.driveID,
 		"fields":         "*",
@@ -338,10 +323,7 @@ func (a aliClient) mkdirWithPath(target string) (string, error) {
 }
 
 func (a aliClient) mkdir(parentID, name string) (string, error) {
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"drive_id":       a.driveID,
 		"name":           name,
@@ -472,10 +454,7 @@ func (a aliClient) handleDownload(uri string, target string) error {
 }
 
 func (a *aliClient) completeUpload(ctx context.Context, uploadID, fileID string) error {
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"drive_id":  a.driveID,
 		"upload_id": uploadID,
@@ -504,10 +483,7 @@ type tokenResp struct {
 }
 
 func loadToken(refresh_token string) (string, error) {
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"grant_type":    "refresh_token",
 		"refresh_token": refresh_token,
@@ -536,10 +512,7 @@ func RefreshALIToken(varMap map[string]interface{}) (string, error) {
 	if len(refresh_token) == 0 {
 		return "", errors.New("no such refresh token find in db")
 	}
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALIHTTPClient()
 	data := map[string]interface{}{
 		"grant_type":    "refresh_token",
 		"refresh_token": refresh_token,

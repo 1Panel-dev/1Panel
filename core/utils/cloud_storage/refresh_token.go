@@ -35,10 +35,7 @@ func RefreshALIToken(varMap map[string]interface{}) (string, error) {
 	if len(refresh_token) == 0 {
 		return "", errors.New("no such refresh token find in db")
 	}
-	client := resty.New()
-	client.SetTLSClientConfig(&tls.Config{
-		InsecureSkipVerify: true,
-	})
+	client := newALITokenHTTPClient()
 	data := map[string]interface{}{
 		"grant_type":    "refresh_token",
 		"refresh_token": refresh_token,
@@ -60,6 +57,10 @@ func RefreshALIToken(varMap map[string]interface{}) (string, error) {
 		return "", err
 	}
 	return respItem.RefreshToken, nil
+}
+
+func newALITokenHTTPClient() *resty.Client {
+	return resty.New().SetTLSClientConfig(&tls.Config{})
 }
 
 func RefreshToken(grantType string, tokenType string, varMap map[string]interface{}) (string, error) {
