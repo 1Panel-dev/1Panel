@@ -1147,6 +1147,17 @@ const message = {
             serviceAddressHelper:
                 'Use the container address for container apps and the external address for host or external apps.',
             externalAddress: 'External address',
+            createVllmInstance: 'Create vLLM instance',
+            previewDeployment: 'Preview deployment configuration',
+            deploymentOverview: 'Deployment overview',
+            backToForm: 'Back to edit',
+            composePreviewHelper:
+                'Add fields not available in the form here. Change existing settings in the form. Compose edits do not update the form or account synchronization settings.',
+            envPreviewHelper: 'Environment variables are generated from the form. Return to the form to make changes.',
+            generateCompose: 'Generate and preview',
+            saveDeploy: 'Save and deploy',
+            composeRegenerateHelper:
+                'The form has changed. Regenerating Compose will overwrite manual edits. Continue?',
             deploymentNameHelper:
                 'Application instance name, used for the installation directory and fixed after creation. Set an alias to change the display name.',
             deploymentAliasHelper:

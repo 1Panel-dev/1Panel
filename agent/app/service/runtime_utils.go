@@ -554,7 +554,7 @@ func handleParams(create request.RuntimeCreate, projectDir string) (composeConte
 	}
 
 	newMap := make(map[string]string)
-	handleMap(create.Params, newMap)
+	MergeAppEnvironment(create.Params, newMap)
 	maps.Copy(env, newMap)
 
 	envStr, err := gotenv.Marshal(env)

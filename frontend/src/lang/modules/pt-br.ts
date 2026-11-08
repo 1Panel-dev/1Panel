@@ -1154,6 +1154,18 @@ const message = {
             serviceAddressHelper:
                 'Use o endereço do contêiner para aplicativos em contêineres e o endereço externo para aplicativos do host ou externos.',
             externalAddress: 'Endereço externo',
+            createVllmInstance: 'Criar instância vLLM',
+            previewDeployment: 'Prévia da configuração de implantação',
+            deploymentOverview: 'Resumo da implantação',
+            backToForm: 'Voltar para editar',
+            composePreviewHelper:
+                'Adicione campos não disponíveis no formulário. Altere as configurações existentes no formulário. Editar o Compose não atualiza o formulário nem a sincronização de contas.',
+            envPreviewHelper:
+                'As variáveis de ambiente são geradas a partir do formulário. Volte ao formulário para alterá-las.',
+            generateCompose: 'Gerar e visualizar',
+            saveDeploy: 'Salvar e implantar',
+            composeRegenerateHelper:
+                'O formulário foi alterado. Gerar o Compose novamente substituirá as edições manuais. Continuar?',
             deploymentNameHelper:
                 'Nome da instância, usado no diretório de instalação e fixo após a criação. Defina um alias para alterar o nome exibido.',
             deploymentAliasHelper:

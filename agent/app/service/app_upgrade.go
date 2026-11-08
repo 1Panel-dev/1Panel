@@ -866,7 +866,7 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 	if err := json.Unmarshal([]byte(install.Env), &envs); err != nil {
 		return nil, err
 	}
-	handleMap(envs, params)
+	MergeAppEnvironment(envs, params)
 	if install.App.Key == "openlist" {
 		// The upgrade script updates this too late for the pre-pull phase.
 		image := "openlistteam/openlist:v" + strings.TrimPrefix(install.Version, "v")

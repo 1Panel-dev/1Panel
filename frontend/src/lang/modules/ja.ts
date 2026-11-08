@@ -1133,6 +1133,17 @@ const message = {
             serviceAddressHelper:
                 'コンテナ内のアプリにはコンテナアドレスを、ホスト上または外部のアプリには外部アドレスを使用してください。',
             externalAddress: '外部アクセスアドレス',
+            createVllmInstance: 'vLLM インスタンスを作成',
+            previewDeployment: 'デプロイ設定のプレビュー',
+            deploymentOverview: 'デプロイ概要',
+            backToForm: '戻って編集',
+            composePreviewHelper:
+                'フォームにない項目を追加できます。既存の設定はフォームで変更してください。Compose の編集はフォームやアカウント同期設定に反映されません。',
+            envPreviewHelper: '環境変数はフォームから生成されます。変更するにはフォームに戻ってください。',
+            generateCompose: '設定を生成してプレビュー',
+            saveDeploy: '保存してデプロイ',
+            composeRegenerateHelper:
+                'フォームが変更されています。Compose を再生成すると手動の編集内容が上書きされます。続行しますか？',
             deploymentNameHelper:
                 'アプリのインスタンス名です。インストール先ディレクトリに使用され、作成後は変更できません。表示名を変更するには別名を設定してください。',
             deploymentAliasHelper:

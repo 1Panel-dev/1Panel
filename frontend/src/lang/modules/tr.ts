@@ -1155,6 +1155,17 @@ const message = {
             serviceAddressHelper:
                 'Konteyner uygulamaları için konteyner adresini, ana makine veya harici uygulamalar için harici adresi kullanın.',
             externalAddress: 'Harici adres',
+            createVllmInstance: 'vLLM örneği oluştur',
+            previewDeployment: 'Dağıtım yapılandırmasını önizle',
+            deploymentOverview: 'Dağıtım özeti',
+            backToForm: 'Düzenlemeye dön',
+            composePreviewHelper:
+                'Formda bulunmayan alanları ekleyebilirsiniz. Mevcut ayarları formdan değiştirin. Compose düzenlemeleri formu veya hesap eşitleme ayarlarını güncellemez.',
+            envPreviewHelper: 'Ortam değişkenleri formdan oluşturulur. Değişiklik yapmak için forma dönün.',
+            generateCompose: 'Oluştur ve önizle',
+            saveDeploy: 'Kaydet ve dağıt',
+            composeRegenerateHelper:
+                'Form değiştirildi. Compose yeniden oluşturulursa elle yapılan düzenlemeler silinir. Devam edilsin mi?',
             deploymentNameHelper:
                 'Uygulama örneğinin adı, kurulum dizininde kullanılır ve oluşturulduktan sonra değiştirilemez. Görünen adı değiştirmek için takma ad belirleyin.',
             deploymentAliasHelper:

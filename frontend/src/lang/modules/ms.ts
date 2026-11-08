@@ -1159,6 +1159,18 @@ const message = {
             serviceAddressHelper:
                 'Gunakan alamat bekas untuk aplikasi dalam bekas dan alamat luaran untuk aplikasi hos atau luaran.',
             externalAddress: 'Alamat luaran',
+            createVllmInstance: 'Cipta tika vLLM',
+            previewDeployment: 'Pratonton konfigurasi pelaksanaan',
+            deploymentOverview: 'Ringkasan pelaksanaan',
+            backToForm: 'Kembali untuk mengedit',
+            composePreviewHelper:
+                'Tambah medan yang tiada dalam borang. Ubah tetapan sedia ada dalam borang. Suntingan Compose tidak mengemas kini borang atau tetapan penyegerakan akaun.',
+            envPreviewHelper:
+                'Pemboleh ubah persekitaran dijana daripada borang. Kembali ke borang untuk membuat perubahan.',
+            generateCompose: 'Jana dan pratonton',
+            saveDeploy: 'Simpan dan laksanakan',
+            composeRegenerateHelper:
+                'Borang telah berubah. Penjanaan semula Compose akan menimpa suntingan manual. Teruskan?',
             deploymentNameHelper:
                 'Nama instans aplikasi, digunakan untuk direktori pemasangan dan tidak boleh diubah selepas penciptaan. Tetapkan alias untuk mengubah nama paparan.',
             deploymentAliasHelper:

@@ -1391,7 +1391,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		return err
 	}
 	newMap := make(map[string]string)
-	handleMap(create.Params, newMap)
+	MergeAppEnvironment(create.Params, newMap)
 	maps.Copy(envs, newMap)
 	envs["PANEL_APP_PORT_HTTP"] = runtime.Port
 	envStr, err := gotenv.Marshal(envs)
