@@ -35,6 +35,10 @@ func bindAPIKeyRequest(c *gin.Context, value interface{}) bool {
 func apiKeyError(c *gin.Context, err error) {
 	var business buserr.BusinessError
 	if errors.As(err, &business) {
+		if business.Msg == "ErrPasswordExpired" {
+			helper.ErrorWithDetail(c, 313, business.Msg, nil)
+			return
+		}
 		helper.ErrorWithDetail(c, http.StatusBadRequest, business.Msg, business.Err)
 		return
 	}
