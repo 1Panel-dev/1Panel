@@ -55,9 +55,9 @@ func (t TarGzArchiver) Compress(ctx context.Context, sourcePaths []string, dstFi
 		aheadDir = "/"
 	}
 	if len(secret) != 0 {
-		err = runTarGzEncryptToFile(cmd.NewCommandMgr(cmd.WithContext(ctx)), tmpFile, secret, append([]string{"-C", aheadDir}, itemDirs...)...)
+		err = runTarGzEncryptToFile(cmd.NewCommandMgr(cmd.WithContext(ctx)), tmpFile, secret, append([]string{"-C", aheadDir, "--"}, itemDirs...)...)
 	} else {
-		err = runTarGzToFile(cmd.NewCommandMgr(cmd.WithContext(ctx)), tmpFile, append([]string{"-C", aheadDir}, itemDirs...)...)
+		err = runTarGzToFile(cmd.NewCommandMgr(cmd.WithContext(ctx)), tmpFile, append([]string{"-C", aheadDir, "--"}, itemDirs...)...)
 	}
 	if err != nil {
 		return err
