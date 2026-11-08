@@ -1154,6 +1154,12 @@ const message = {
             serviceAddressHelper:
                 'Use o endereço do contêiner para aplicativos em contêineres e o endereço externo para aplicativos do host ou externos.',
             externalAddress: 'Endereço externo',
+            deploymentNameHelper:
+                'Nome da instância, usado no diretório de instalação e fixo após a criação. Defina um alias para alterar o nome exibido.',
+            deploymentAliasHelper:
+                'Nome opcional para a lista. Deixe vazio para usar o nome do aplicativo. Alterar apenas o alias não reinicia o contêiner.',
+            deploymentContainerNameHelper:
+                'Nome do contêiner Docker. Por padrão, usa o nome do aplicativo e pode ser definido separadamente. Alterá-lo recria o contêiner.',
             imageVersion: 'Versão da imagem',
             deployments: 'Implantação de modelos',
             files: 'Preparação de modelos',

@@ -1074,6 +1074,11 @@ const message = {
             serviceAPIHelper: '此服務提供 OpenAI 相容介面。',
             serviceAddressHelper: '容器內應用程式使用容器位址，本機或外部應用程式使用外部位址。',
             externalAddress: '外部存取位址',
+            deploymentNameHelper: '應用程式執行個體名稱，用於安裝目錄，建立後無法修改。如需調整顯示名稱，請設定別名。',
+            deploymentAliasHelper:
+                '選填，用於清單顯示，可隨時修改；留空時顯示應用程式名稱。僅修改別名不會重新啟動容器。',
+            deploymentContainerNameHelper:
+                'Docker 容器名稱，預設與應用程式名稱相同，可另外設定。修改後會重新建立容器。',
             imageVersion: '映像版本',
             deployments: '模型部署',
             files: '模型準備',

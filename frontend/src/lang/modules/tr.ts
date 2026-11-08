@@ -1155,6 +1155,12 @@ const message = {
             serviceAddressHelper:
                 'Konteyner uygulamaları için konteyner adresini, ana makine veya harici uygulamalar için harici adresi kullanın.',
             externalAddress: 'Harici adres',
+            deploymentNameHelper:
+                'Uygulama örneğinin adı, kurulum dizininde kullanılır ve oluşturulduktan sonra değiştirilemez. Görünen adı değiştirmek için takma ad belirleyin.',
+            deploymentAliasHelper:
+                'Listede gösterilecek isteğe bağlı ad. Boş bırakılırsa uygulama adı kullanılır. Yalnızca takma adı değiştirmek konteyneri yeniden başlatmaz.',
+            deploymentContainerNameHelper:
+                'Docker konteyner adı. Varsayılan olarak uygulama adı kullanılır ve ayrı ayarlanabilir. Değiştirilirse konteyner yeniden oluşturulur.',
             imageVersion: 'İmaj sürümü',
             deployments: 'Model dağıtımı',
             files: 'Model hazırlığı',

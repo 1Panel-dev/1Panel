@@ -1133,6 +1133,12 @@ const message = {
             serviceAddressHelper:
                 'コンテナ内のアプリにはコンテナアドレスを、ホスト上または外部のアプリには外部アドレスを使用してください。',
             externalAddress: '外部アクセスアドレス',
+            deploymentNameHelper:
+                'アプリのインスタンス名です。インストール先ディレクトリに使用され、作成後は変更できません。表示名を変更するには別名を設定してください。',
+            deploymentAliasHelper:
+                '一覧の表示名（任意）。空欄の場合はアプリ名を表示します。別名のみの変更ではコンテナは再起動しません。',
+            deploymentContainerNameHelper:
+                'Docker コンテナ名です。初期値はアプリ名で、個別に設定できます。変更するとコンテナが再作成されます。',
             imageVersion: 'イメージバージョン',
             deployments: 'モデルデプロイ',
             files: 'モデル準備',
