@@ -408,6 +408,10 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 		helper.BadAuth(c, "ErrApiConfigDisable", nil)
 		return
 	}
+	if err := appauth.RequireUnexpiredPassword(c, xpack.AuthProvider); err != nil {
+		apiKeyError(c, err)
+		return
+	}
 	apiKey, err := xpack.AuthProvider.GenerateApiKey(c)
 	if err != nil {
 		helper.InternalServer(c, err)
@@ -431,6 +435,10 @@ func (b *BaseApi) GenerateApiKey(c *gin.Context) {
 func (b *BaseApi) UpdateApiConfig(c *gin.Context) {
 	if _, err := appauth.RequireAPIKeySession(c); err != nil {
 		helper.BadAuth(c, "ErrApiConfigDisable", nil)
+		return
+	}
+	if err := appauth.RequireUnexpiredPassword(c, xpack.AuthProvider); err != nil {
+		apiKeyError(c, err)
 		return
 	}
 	var req dto.ApiInterfaceConfig
@@ -465,6 +473,10 @@ func (b *BaseApi) GetCurrentUser(c *gin.Context) {
 		return
 	}
 	if c.GetBool("API_AUTH") || appauth.HasAPICredentials(c) {
+		userInfo.ApiKey = ""
+	} else if expired, policyErr := appauth.IsPasswordExpired(c, xpack.AuthProvider); expired || policyErr != nil {
+		// Bootstrap must remain usable for password recovery. Policy failures
+		// never disclose a reusable legacy secret through this read endpoint.
 		userInfo.ApiKey = ""
 	}
 	c.Header("Cache-Control", "no-store")

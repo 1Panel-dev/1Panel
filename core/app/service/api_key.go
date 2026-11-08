@@ -52,6 +52,11 @@ func (s *APIKeyService) owner(c *gin.Context) (auth.APIKeyOwner, error) {
 	return s.Provider.CurrentAPIKeyOwner(c)
 }
 
+func (s *APIKeyService) requireUnexpiredOwnerPassword(c *gin.Context) error {
+	policy, _ := s.Provider.(auth.PasswordExpirationProvider)
+	return auth.RequireUnexpiredPassword(c, policy)
+}
+
 func (s *APIKeyService) managementOwner(c *gin.Context) (auth.APIKeyOwner, error) {
 	if _, err := auth.RequireAPIKeyManagement(c); err != nil {
 		return auth.APIKeyOwner{}, err
@@ -171,6 +176,9 @@ func (s *APIKeyService) Create(c *gin.Context, req dto.APIKeyCreate) (*dto.APIKe
 	if err != nil {
 		return nil, err
 	}
+	if err := s.requireUnexpiredOwnerPassword(c); err != nil {
+		return nil, err
+	}
 	if req.RequestID == "" {
 		req.RequestID = uuid.NewString()
 	} else if _, err = uuid.Parse(req.RequestID); err != nil {
@@ -249,6 +257,9 @@ func (s *APIKeyService) Update(c *gin.Context, req dto.APIKeyUpdate) error {
 	if err != nil {
 		return err
 	}
+	if err := s.requireUnexpiredOwnerPassword(c); err != nil {
+		return err
+	}
 	if req.ID == "legacy" {
 		return s.updateLegacy(c, owner, req.APIKeyMutation, &req.APIKeyFields, "update", "")
 	}
@@ -279,6 +290,11 @@ func (s *APIKeyService) Status(c *gin.Context, req dto.APIKeyStatus) error {
 	}
 	if req.Status != constant.StatusEnable && req.Status != constant.StatusDisable {
 		return buserr.New("ErrInvalidParams")
+	}
+	if req.Status == constant.StatusEnable {
+		if err := s.requireUnexpiredOwnerPassword(c); err != nil {
+			return err
+		}
 	}
 	action := "disable"
 	if req.Status == constant.StatusEnable {
@@ -341,6 +357,9 @@ func (s *APIKeyService) Delete(c *gin.Context, req dto.APIKeyMutation) error {
 func (s *APIKeyService) Reveal(c *gin.Context, req dto.APIKeyMutation) (*dto.APIKeyRevealed, error) {
 	owner, err := s.owner(c)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.requireUnexpiredOwnerPassword(c); err != nil {
 		return nil, err
 	}
 	if req.ID == "" || req.ID == "legacy" || req.Revision == 0 {
@@ -509,6 +528,9 @@ func (s *APIKeyService) revokeAPIKeyTerminals(c *gin.Context, owner auth.APIKeyO
 func (s *APIKeyService) PrepareAppBinding(c *gin.Context, id string) (*auth.APIKeyBinding, error) {
 	owner, err := s.owner(c)
 	if err != nil {
+		return nil, err
+	}
+	if err := s.requireUnexpiredOwnerPassword(c); err != nil {
 		return nil, err
 	}
 	if id == "" {
