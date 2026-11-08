@@ -2,7 +2,6 @@ package req_helper
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"io"
 	"net"
@@ -21,10 +20,7 @@ import (
 )
 
 func HandleGet(url string) (*http.Response, error) {
-	client := &http.Client{
-		Timeout: time.Second * 300,
-	}
-	client.Transport = loadRequestTransport()
+	client := newExternalHTTPClient(loadRequestTransport(), time.Second*300)
 	defer client.CloseIdleConnections()
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
@@ -53,8 +49,9 @@ func HandleGet(url string) (*http.Response, error) {
 
 func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	transport := xpack.MultiNodeProvider.LoadRequestTransport()
-	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
-	return HandleRequestWithClient(&client, url, method, timeout)
+	client := newExternalHTTPClient(transport, time.Duration(timeout)*time.Second)
+	defer client.CloseIdleConnections()
+	return HandleRequestWithClient(client, url, method, timeout)
 }
 
 func HandleRequestWithClient(client *http.Client, url, method string, timeout int) (int, []byte, error) {
@@ -136,7 +133,8 @@ func RequestFile(url, method string, timeout int) (io.ReadCloser, context.Cancel
 		}
 	}()
 	transport := xpack.MultiNodeProvider.LoadRequestTransport()
-	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	client := newExternalHTTPClient(transport, time.Duration(timeout)*time.Second)
+	defer client.CloseIdleConnections()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
 	if err != nil {
@@ -156,7 +154,6 @@ func RequestFile(url, method string, timeout int) (io.ReadCloser, context.Cancel
 
 func loadRequestTransport() *http.Transport {
 	return &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
 			Timeout:   60 * time.Second,
 			KeepAlive: 60 * time.Second,
