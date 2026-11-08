@@ -109,6 +109,7 @@
                             <ComplexTable
                                 :selection-context="() => [searchName, selectedRuleFilters]"
                                 v-model:selects="selects"
+                                :cache-pagination="false"
                                 :pagination-config="paginationConfig"
                                 :data="allRows"
                                 :heightDiff="320 + noticeHeight"

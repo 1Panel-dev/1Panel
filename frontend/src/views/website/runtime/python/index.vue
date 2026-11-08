@@ -13,7 +13,13 @@
                 <TableSetting title="python-runtime-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="items" @search="search()" :heightDiff="260">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    :data="items"
+                    @search="search()"
+                    :heightDiff="260"
+                >
                     <el-table-column
                         :label="$t('commons.table.name')"
                         fix

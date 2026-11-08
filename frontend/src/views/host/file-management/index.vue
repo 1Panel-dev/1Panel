@@ -506,6 +506,7 @@
                     <template #main>
                         <ComplexTable
                             class="file-table"
+                            :cache-pagination="false"
                             :pagination-config="paginationConfig"
                             v-model:selects="selects"
                             :ref="(el) => setTableRef(item.id, el)"

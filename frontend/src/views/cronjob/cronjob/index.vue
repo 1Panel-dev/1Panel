@@ -55,6 +55,7 @@
                 <ComplexTable
                     :selection-context="() => [searchName, searchGroupID]"
                     row-key="id"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :default-sort="
                         paginationConfig.order !== 'null'

@@ -52,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { routerToNameWithQuery, routerToPathWithQuery } from '@/utils/router';
+import { openPage } from '@/utils/router';
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { hasPermissionMetaAccess, hasRouteAccess } from '@/utils/rbac';
@@ -101,8 +101,8 @@ const handleChange = async (label: string) => {
         return;
     }
     try {
-        if (btn.path) await routerToPathWithQuery(btn.path, { uncached: 'true' });
-        else if (btn.name) await routerToNameWithQuery(btn.name, { uncached: 'true' });
+        if (btn.path) await openPage({ path: btn.path });
+        else if (btn.name) await openPage({ name: btn.name });
     } finally {
         syncActiveName();
     }

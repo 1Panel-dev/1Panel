@@ -70,6 +70,7 @@
                     :selection-context="() => [searchInfo, group]"
                     row-key="id"
                     v-model:selects="selects"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :data="data"
                     @search="search"

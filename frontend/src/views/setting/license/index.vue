@@ -14,7 +14,13 @@
                 <TableSetting title="backup-account-refresh" @search="search()" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @sort-change="search"
+                    @search="search"
+                    :data="data"
+                >
                     <el-table-column
                         :label="$t('license.authorizationId')"
                         :min-width="80"

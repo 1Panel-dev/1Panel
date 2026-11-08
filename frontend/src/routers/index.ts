@@ -1,4 +1,4 @@
-import { panelCacheKey, readPanelCache, writePanelCache, removePanelCache, prunePanelCache } from '@/utils/panel-cache';
+import { panelCacheKey, writePanelCache, prunePanelCache } from '@/utils/panel-cache';
 import router from '@/routers/router';
 import NProgress from '@/config/nprogress';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -11,7 +11,6 @@ import { TerminalDockSessionStore, TerminalSessionStore } from '@/store';
 
 const axiosCanceler = new AxiosCanceler();
 
-let isRedirecting = false;
 const enterpriseLicenseCheckWhiteList = ['EnterpriseLicenseRequired', 'entrance', 'login', 'Expired'];
 const noLoginWhiteList = ['entrance', 'login', 'file-share', '404', 'Expired'];
 
@@ -30,7 +29,7 @@ const clearLoginStatus = () => {
     TerminalDockSessionStore().closeAll();
 };
 
-router.beforeEach(async (to, from) => {
+router.beforeEach(async (to) => {
     const { entrance, isEnterprise, isEnterpriseLicenseLoaded, isEnterpriseLicensed, isLogin, isOnRestart } =
         useGlobalStore();
     NProgress.start();
@@ -103,34 +102,11 @@ router.beforeEach(async (to, from) => {
     if (to.name === 'Expired') {
         return true;
     }
-    const activeMenuKey = panelCacheKey(String(to.meta.activeMenu || ''));
+    // Compatibility for old links: explicit navigation no longer needs to clear a cache.
     if (to.query.uncached != undefined) {
         const query = { ...to.query };
         delete query.uncached;
-        removePanelCache('tabs', activeMenuKey);
-        return { path: to.path, query };
-    }
-
-    const cachedRoute = readPanelCache<string>('tabs', activeMenuKey);
-    if (
-        to.meta.activeMenu &&
-        to.meta.activeMenu != from.meta.activeMenu &&
-        typeof cachedRoute === 'string' &&
-        cachedRoute &&
-        cachedRoute !== to.path &&
-        !isRedirecting
-    ) {
-        const cachedRouteInfo = router.resolve(cachedRoute);
-        if (
-            cachedRouteInfo.matched.length > 0 &&
-            cachedRouteInfo.meta.activeMenu === to.meta.activeMenu &&
-            hasRouteAccess(cachedRouteInfo)
-        ) {
-            isRedirecting = true;
-            NProgress.done();
-            return cachedRoute;
-        }
-        removePanelCache('tabs', activeMenuKey);
+        return { path: to.path, query, hash: to.hash };
     }
 
     if (!hasRouteAccess(to)) {
@@ -144,11 +120,10 @@ router.beforeEach(async (to, from) => {
 router.afterEach((to, _from, failure) => {
     prunePanelCache();
     if (failure) {
-        isRedirecting = false;
         NProgress.done();
         return;
     }
-    if (to.meta.activeMenu && !to.meta.ignoreTab && !isRedirecting) {
+    if (to.meta.activeMenu && !to.meta.ignoreTab) {
         let notMathParam = true;
         if (to.matched.some((record) => record.path.includes(':'))) {
             notMathParam = false;
@@ -166,7 +141,6 @@ router.afterEach((to, _from, failure) => {
         }
     }
 
-    isRedirecting = false;
     NProgress.done();
 });
 

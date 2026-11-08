@@ -23,7 +23,7 @@
                 </el-button>
             </template>
             <template #rightToolBar>
-                <TableSearch @search="search()" v-model:searchName="req.domain" />
+                <TableSearch @search="searchByDomain" v-model:searchName="req.domain" />
                 <TableRefresh @search="search()" />
                 <fu-table-column-select
                     :columns="columns"
@@ -36,6 +36,7 @@
             <template #main>
                 <ComplexTable
                     :data="data"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     @search="search()"
                     v-model:selects="selects"
@@ -433,6 +434,11 @@ const search = () => {
         .finally(() => {
             loading.value = false;
         });
+};
+
+const searchByDomain = () => {
+    paginationConfig.currentPage = 1;
+    search();
 };
 
 const updateDesc = (row: Website.SSLDTO, bulr: Function) => {

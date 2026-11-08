@@ -14,7 +14,12 @@
                 </div>
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search()">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    :data="data"
+                    @search="search()"
+                >
                     <el-table-column :label="$t('xpack.alert.alertMsg')" prop="message" show-overflow-tooltip>
                         <template #default="{ row }">
                             {{ formatMessage(row.alertDetail) }}

@@ -53,6 +53,7 @@
                 <ComplexTable
                     :data="connections"
                     row-key="id"
+                    :cache-pagination="false"
                     :pagination-config="pagination"
                     :columns="accountColumns"
                     local-key="modelServiceColumn"

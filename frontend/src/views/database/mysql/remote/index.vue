@@ -10,7 +10,13 @@
                 <TableSearch @search="search()" v-model:searchName="searchName" />
             </template>
             <template #main>
-                <ComplexTable :pagination-config="paginationConfig" @sort-change="search" @search="search" :data="data">
+                <ComplexTable
+                    :cache-pagination="false"
+                    :pagination-config="paginationConfig"
+                    @sort-change="search"
+                    @search="search"
+                    :data="data"
+                >
                     <el-table-column show-overflow-tooltip :label="$t('commons.table.name')" prop="name" sortable />
                     <el-table-column show-overflow-tooltip :label="$t('database.address')" prop="address" />
                     <el-table-column :label="$t('commons.login.username')" prop="username" />

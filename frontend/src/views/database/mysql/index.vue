@@ -118,6 +118,7 @@
             <template #main>
                 <ComplexTable
                     v-if="currentDB"
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :class="{ mask: maskShow }"
                     @sort-change="search"

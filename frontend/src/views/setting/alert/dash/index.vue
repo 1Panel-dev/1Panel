@@ -75,6 +75,7 @@
             </template>
             <template #main>
                 <ComplexTable
+                    :cache-pagination="false"
                     :pagination-config="paginationConfig"
                     :data="data"
                     :height-diff="380"
