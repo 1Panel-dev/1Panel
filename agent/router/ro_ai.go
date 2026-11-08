@@ -26,7 +26,11 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/domain/update", baseApi.UpdateBindDomain)
 
 		aiToolsRouter.GET("/gpu/load", baseApi.LoadGpuInfo)
+		aiToolsRouter.GET("/gpu/groups", baseApi.ListGPUGroups)
+		aiToolsRouter.POST("/gpu/groups/save", baseApi.SaveGPUGroup)
+		aiToolsRouter.POST("/gpu/groups/del", baseApi.DeleteGPUGroup)
 		aiToolsRouter.GET("/model/gpu/devices", baseApi.LoadModelGPUDevices)
+		aiToolsRouter.POST("/model/gpu/usage", baseApi.LoadModelGPUUsage)
 		aiToolsRouter.POST("/gpu/search", baseApi.LoadGPUMonitor)
 		aiToolsRouter.GET("/gpu/options", baseApi.GetCPUOptions)
 		aiToolsRouter.POST("/vllm/monitor/search", baseApi.LoadVLLMMonitor)

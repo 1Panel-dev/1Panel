@@ -1957,3 +1957,10 @@ var AddAgentAccountVerificationResult = &gormigrate.Migration{
 		return tx.Model(&model.AgentAccount{}).Where("validate_availability IS NULL").Update("validate_availability", true).Error
 	},
 }
+
+var AddGPUGroup = &gormigrate.Migration{
+	ID: "20261108-add-gpu-groups",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.GPUGroup{})
+	},
+}

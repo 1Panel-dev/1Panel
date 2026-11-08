@@ -780,6 +780,48 @@ const message = {
         localIP: 'Yerel IP',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                'İlişkiler, bu düğümde 1Panel tarafından yönetilen uygulama yapılandırmalarından alınır; bellek değerleri GPU’nun tamamı için ölçülür.',
+            usageTitle: 'GPU kullanımı',
+            usageHelp:
+                'Seçilen GPU’lar başka dağıtımlar tarafından kullanılıyor olabilir. Devam etmek GPU belleğinin yetersiz kalmasına veya performansın düşmesine neden olabilir. Yine de devam edebilirsiniz.',
+            usageUnknown: 'GPU kullanımı tam olarak kontrol edilemedi. Devam etmeden önce kaynakları doğrulayın.',
+            usagePossible: 'Sayıya göre ayrılır; bu GPU kullanılabilir',
+            usageMemory: 'GPU belleği (kullanılan / toplam)',
+            dimension: 'Boyut',
+            namePlaceholder: 'Örn. Üretim çıkarımı GPU çifti',
+            descriptionPlaceholder: 'İsteğe bağlı: grubun amacını veya kullanımını açıklayın',
+            selectedGPU: '{count} GPU seçildi',
+
+            byGroup: 'Gruba göre',
+            byNUMA: 'NUMA düğümüne göre',
+            ungrouped: 'Gruplanmamış',
+
+            unknownNode: 'NUMA düğümü bilinmiyor',
+            memoryNode: 'Bellek düğümü',
+            selectNode: 'Bu düğümün GPU birimlerini seç',
+            noDevices: 'Bu düğümde GPU yok',
+            affinity: 'CPU / bellek yakınlığı',
+            followGPU: 'GPU düğümlerini izle',
+            bindingPreview: 'Bağlama önizlemesi',
+
+            overview: 'Cihaz özeti',
+            groups: 'GPU grupları',
+            history: 'İzleme geçmişi',
+            source: 'Yapılandırma',
+            custom: 'Özel',
+            selectRequired: 'Bir GPU grubu seçin',
+            snapshotHelp:
+                'Dağıtımlar mevcut yapılandırmayı kaydeder. Grup değişiklikleri mevcut dağıtımlara otomatik uygulanmaz.',
+            changed: 'Kaynak grup değiştirildi veya silindi. Kaydedilen yapılandırma kullanılmaya devam ediyor.',
+            applyLatest: 'En son grup yapılandırmasını uygula',
+            deployments: 'İlişkili dağıtımlar',
+            help: 'Gruplar GPU ve NUMA ayarlarını yeniden kullanır. Cihazlar birden fazla grupta olabilir; özel GPU tahsisi veya bellek yalıtımı sağlanmaz.',
+            deleteHelp: '“{name}” grubu silinsin mi? Mevcut dağıtımlar yapılandırmalarını koruyacak.',
+            vendor: 'Cihaz türü',
+            topology: 'NUMA topolojisi',
+        },
         agents: {
             feishuUpgradeNotice:
                 'Yükseltmeden önce eski Feishu eklentisi ele alınmalıdır. Tam yedek gerekir; hata durumunda eski imaj ve verileri geri yüklenir. Yapılandırılmamış eklenti yalnızca devre dışı bırakılır.',
@@ -1082,6 +1124,22 @@ const message = {
             vllmVersion: 'vLLM sürümü',
             vllmImage: 'vLLM imajı',
             servicePort: 'Hizmet portu',
+            numaBinding: 'NUMA bağlama',
+            numaOff: 'Bağlama yok',
+            numaAuto: 'Otomatik',
+            numaManual: 'Elle',
+            numaNodes: 'NUMA düğümleri',
+            numaHint: 'Performans ayarı gerekmiyorsa bağlamayı kapalı bırakın.',
+            numaHelp:
+                'Uygulamayı seçilen CPU ve bellek düğümlerine bağlar. Otomatik eşleştirme GPU yakınındaki düğümleri seçer.',
+            numaRequirements:
+                'İmaj numactl içermelidir. Bağlama etkinleştirildiğinde gerekirse SYS_NICE otomatik eklenir.',
+            numaUnknown:
+                'GPU ile ilişkili CPU ve bellek düğümü belirlenemedi. Bağlamayı kapalı bırakın veya donanım düzenini biliyorsanız düğümleri elle seçin.',
+            numaCross: 'Seçilen GPU aygıtları birden fazla NUMA düğümüne yayılıyor. Elle seçin.',
+            numaCount: 'Otomatik bağlama için belirli GPU aygıtlarını veya tümünü seçin.',
+            numaRequired: 'En az bir NUMA düğümü seçin.',
+            numaUnavailable: 'NUMA düğümü kullanılamıyor veya CPU ya da belleği yok.',
             gpuAcceleration: 'GPU hızlandırma',
             gpuMode: 'Hızlandırıcı seçimi',
             gpuAll: 'Tüm hızlandırıcılar',

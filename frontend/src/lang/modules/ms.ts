@@ -784,6 +784,48 @@ const message = {
         localIP: 'IP Tempatan',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                'Perkaitan berdasarkan konfigurasi aplikasi yang diurus oleh 1Panel pada nod ini; nilai memori diukur untuk seluruh GPU.',
+            usageTitle: 'Penggunaan GPU',
+            usageHelp:
+                'GPU yang dipilih mungkin digunakan oleh pengerahan lain. Meneruskan boleh menyebabkan kekurangan memori GPU atau prestasi menurun. Anda masih boleh meneruskan.',
+            usageUnknown: 'Penggunaan GPU tidak dapat disemak sepenuhnya. Sahkan sumber sebelum meneruskan.',
+            usagePossible: 'Diperuntukkan mengikut bilangan; mungkin menggunakan GPU ini',
+            usageMemory: 'Memori GPU (digunakan / jumlah)',
+            dimension: 'Dimensi',
+            namePlaceholder: 'Cth. pasangan GPU inferens produksi',
+            descriptionPlaceholder: 'Pilihan: terangkan tujuan atau penggunaan kumpulan',
+            selectedGPU: '{count} GPU dipilih',
+
+            byGroup: 'Mengikut kumpulan',
+            byNUMA: 'Mengikut NUMA',
+            ungrouped: 'Tanpa kumpulan',
+
+            unknownNode: 'Nod NUMA tidak diketahui',
+            memoryNode: 'Nod memori',
+            selectNode: 'Pilih GPU dalam nod ini',
+            noDevices: 'Tiada GPU dalam nod ini',
+            affinity: 'Afiniti CPU / memori',
+            followGPU: 'Ikut nod GPU',
+            bindingPreview: 'Pratonton pengikatan',
+
+            overview: 'Gambaran peranti',
+            groups: 'Kumpulan GPU',
+            history: 'Sejarah pemantauan',
+            source: 'Konfigurasi',
+            custom: 'Tersuai',
+            selectRequired: 'Pilih kumpulan GPU',
+            snapshotHelp:
+                'Pelaksanaan menyimpan konfigurasi semasa. Perubahan kumpulan tidak mengemas kini pelaksanaan sedia ada secara automatik.',
+            changed: 'Kumpulan asal telah berubah atau dipadam. Konfigurasi tersimpan masih digunakan.',
+            applyLatest: 'Gunakan konfigurasi kumpulan terkini',
+            deployments: 'Pelaksanaan berkaitan',
+            help: 'Kumpulan menggunakan semula tetapan GPU dan NUMA. Peranti boleh berada dalam beberapa kumpulan; tiada penggunaan GPU eksklusif atau pengasingan memori.',
+            deleteHelp: 'Padam kumpulan “{name}”? Pelaksanaan sedia ada akan mengekalkan konfigurasi.',
+            vendor: 'Jenis peranti',
+            topology: 'Topologi NUMA',
+        },
         agents: {
             feishuUpgradeNotice:
                 'Pemalam Feishu lama perlu ditangani sebelum naik taraf. Sandaran aplikasi penuh diperlukan; kegagalan memulihkan imej lama dan datanya. Pemalam tanpa konfigurasi hanya dinyahaktifkan.',
@@ -1085,6 +1127,22 @@ const message = {
             vllmVersion: 'Versi vLLM',
             vllmImage: 'Imej vLLM',
             servicePort: 'Port perkhidmatan',
+            numaBinding: 'Pengikatan NUMA',
+            numaOff: 'Tanpa pengikatan',
+            numaAuto: 'Automatik',
+            numaManual: 'Manual',
+            numaNodes: 'Nod NUMA',
+            numaHint: 'Biarkan pengikatan dimatikan kecuali untuk penalaan prestasi.',
+            numaHelp:
+                'Mengikat aplikasi kepada nod CPU dan memori yang dipilih. Padanan automatik memilih nod berhampiran GPU.',
+            numaRequirements:
+                'Imej mesti mengandungi numactl. Mengaktifkan pengikatan menambah SYS_NICE secara automatik jika perlu.',
+            numaUnknown:
+                'Nod CPU dan memori yang berkaitan dengan GPU tidak dapat dikenal pasti. Biarkan pengikatan dimatikan atau pilih nod secara manual jika anda mengetahui susun atur perkakasan.',
+            numaCross: 'GPU yang dipilih merentasi beberapa nod NUMA. Pilih secara manual.',
+            numaCount: 'Pengikatan automatik memerlukan GPU tertentu atau semua GPU.',
+            numaRequired: 'Pilih sekurang-kurangnya satu nod NUMA.',
+            numaUnavailable: 'Nod NUMA tidak tersedia atau tiada CPU atau memori.',
             gpuAcceleration: 'Pecutan GPU',
             gpuMode: 'Pemilihan pemecut',
             gpuAll: 'Semua pemecut',

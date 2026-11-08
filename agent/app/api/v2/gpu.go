@@ -57,3 +57,49 @@ func (b *BaseApi) LoadGPUMonitor(c *gin.Context) {
 	}
 	helper.SuccessWithData(c, data)
 }
+
+func (b *BaseApi) ListGPUGroups(c *gin.Context) {
+	result, err := gpuGroupService.List()
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+func (b *BaseApi) SaveGPUGroup(c *gin.Context) {
+	var req dto.GPUGroupSave
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := gpuGroupService.Save(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func (b *BaseApi) DeleteGPUGroup(c *gin.Context) {
+	var req dto.OperateByID
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := gpuGroupService.Delete(req.ID); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+func (b *BaseApi) LoadModelGPUUsage(c *gin.Context) {
+	var req dto.ModelGPUUsageRequest
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	result, err := service.LoadModelGPUUsage(c.Request.Context(), req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}

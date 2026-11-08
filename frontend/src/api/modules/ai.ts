@@ -43,8 +43,12 @@ export const updateBindDomain = (req: AI.BindDomain) => {
     return http.post(`/ai/domain/update`, req);
 };
 
-export const loadModelGPUDevices = () => {
-    return http.get<{ devices: AI.ModelGPUDevice[]; warnings: string[] }>('/ai/model/gpu/devices');
+export const loadModelGPUDevices = (currentNode?: string) => {
+    return http.get<{ devices: AI.ModelGPUDevice[]; warnings: string[]; numaNodes: AI.ModelNUMANode[] }>(
+        '/ai/model/gpu/devices',
+        {},
+        { headers: currentNode ? { CurrentNode: currentNode } : undefined },
+    );
 };
 
 export const loadGPUInfo = (refresh = false, currentNode?: string) => {
@@ -416,3 +420,16 @@ export const uninstallAgentSkill = (req: AI.AgentSkillUninstallReq) => {
 export const approveAgentChannelPairing = (req: AI.AgentChannelPairingApproveReq) => {
     return http.post(`/ai/agents/channel/pairing/approve`, req, TimeoutEnum.T_5M);
 };
+
+export const listGPUGroups = (currentNode?: string) =>
+    http.get<AI.GPUGroup[]>('/ai/gpu/groups', {}, { headers: currentNode ? { CurrentNode: currentNode } : undefined });
+export const saveGPUGroup = (data: Pick<AI.GPUGroup, 'id' | 'name' | 'description' | 'imageType' | 'gpu'>) =>
+    http.post('/ai/gpu/groups/save', data);
+export const deleteGPUGroup = (id: number) => http.post('/ai/gpu/groups/del', { id });
+
+export const loadModelGPUUsage = (params: {
+    dockerCompose: string;
+    env: string;
+    imageType: string;
+    excludeInstallID: number;
+}) => http.post<AI.ModelGPUUsage>('/ai/model/gpu/usage', params);

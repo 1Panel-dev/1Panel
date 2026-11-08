@@ -3,6 +3,7 @@ package service
 import "github.com/1Panel-dev/1Panel/agent/app/repo"
 
 var (
+	gpuGroupRepo           = &repo.GPUGroupRepo{}
 	vmRepo                 = repo.NewIVMRepo()
 	appRepo                = repo.NewIAppRepo()
 	appTagRepo             = repo.NewIAppTagRepo()
