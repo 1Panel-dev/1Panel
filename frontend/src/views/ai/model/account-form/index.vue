@@ -147,6 +147,7 @@
                         </el-radio-group>
                         <el-button
                             v-if="supportsModelDiscovery && modelConfigMode === 'discover'"
+                            v-permission="'ai_model_manage'"
                             type="primary"
                             plain
                             :loading="discovering"
