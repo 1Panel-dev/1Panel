@@ -1147,6 +1147,12 @@ const message = {
             serviceAddressHelper:
                 'Use the container address for container apps and the external address for host or external apps.',
             externalAddress: 'External address',
+            deploymentNameHelper:
+                'Application instance name, used for the installation directory and fixed after creation. Set an alias to change the display name.',
+            deploymentAliasHelper:
+                'Optional display name for the list. Leave empty to use the application name. Changing only the alias does not restart the container.',
+            deploymentContainerNameHelper:
+                'Docker container name. Defaults to the application name and can be set separately. Changing it recreates the container.',
             imageVersion: 'Image version',
             deployments: 'Model deployment',
             files: 'Model preparation',

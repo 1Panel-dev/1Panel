@@ -1120,6 +1120,12 @@ const message = {
             serviceAPIHelper: '이 서비스는 OpenAI 호환 API를 제공합니다.',
             serviceAddressHelper: '컨테이너 앱에는 컨테이너 주소를, 호스트 또는 외부 앱에는 외부 주소를 사용하세요.',
             externalAddress: '외부 접속 주소',
+            deploymentNameHelper:
+                '앱 인스턴스 이름으로, 설치 디렉터리에 사용되며 생성 후 변경할 수 없습니다. 표시 이름을 바꾸려면 별칭을 설정하세요.',
+            deploymentAliasHelper:
+                '목록에 표시할 이름입니다(선택 사항). 비워 두면 앱 이름을 표시합니다. 별칭만 변경하면 컨테이너가 재시작되지 않습니다.',
+            deploymentContainerNameHelper:
+                'Docker 컨테이너 이름입니다. 기본값은 앱 이름이며 별도로 설정할 수 있습니다. 변경하면 컨테이너가 다시 생성됩니다.',
             imageVersion: '이미지 버전',
             deployments: '모델 배포',
             files: '모델 준비',

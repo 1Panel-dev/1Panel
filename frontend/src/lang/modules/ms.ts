@@ -1159,6 +1159,12 @@ const message = {
             serviceAddressHelper:
                 'Gunakan alamat bekas untuk aplikasi dalam bekas dan alamat luaran untuk aplikasi hos atau luaran.',
             externalAddress: 'Alamat luaran',
+            deploymentNameHelper:
+                'Nama instans aplikasi, digunakan untuk direktori pemasangan dan tidak boleh diubah selepas penciptaan. Tetapkan alias untuk mengubah nama paparan.',
+            deploymentAliasHelper:
+                'Nama paparan pilihan untuk senarai. Biarkan kosong untuk menggunakan nama aplikasi. Mengubah alias sahaja tidak memulakan semula kontena.',
+            deploymentContainerNameHelper:
+                'Nama kontena Docker. Secara lalai sama dengan nama aplikasi dan boleh ditetapkan secara berasingan. Mengubahnya akan mencipta semula kontena.',
             imageVersion: 'Versi imej',
             deployments: 'Pengerahan model',
             files: 'Penyediaan model',
