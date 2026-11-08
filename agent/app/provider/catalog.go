@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"net/url"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/aihttp"
 )
 
 type APIConfig struct {
@@ -373,7 +375,7 @@ func ResolveBaseURL(key, apiType, requested string) (string, error) {
 		return "", fmt.Errorf("base url is required")
 	}
 	parsed, err := url.Parse(baseURL)
-	if err != nil || parsed.Scheme == "" || parsed.Host == "" {
+	if err != nil || aihttp.ValidateURL(baseURL) != nil {
 		return "", fmt.Errorf("invalid base url")
 	}
 	if key == "custom" && (IsImageAPIType(config.APIType) || IsEmbeddingAPIType(config.APIType)) {

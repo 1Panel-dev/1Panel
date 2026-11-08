@@ -6,34 +6,46 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+
+	"github.com/1Panel-dev/1Panel/agent/utils/aihttp"
 )
 
 func DiscoverModels(baseURL, apiKey string) ([]string, error) {
 	req, err := http.NewRequest(http.MethodGet, buildModelDiscoveryURL(baseURL), nil)
 	if err != nil {
-		return nil, err
+		return nil, aihttp.ErrTarget
 	}
 	req.Header.Set("Authorization", "Bearer "+apiKey)
-	resp, err := (&http.Client{Timeout: defaultVerifyTimeout}).Do(req)
+	resp, err := aihttp.NewClient(defaultVerifyTimeout).Do(req)
+	if err != nil {
+		return nil, aihttp.SafeError(err)
+	}
+	defer resp.Body.Close()
+	body, err := aihttp.ReadResponseBody(resp.Body)
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
-	if resp.StatusCode >= http.StatusBadRequest {
-		return nil, fmt.Errorf("request failed: %s", resp.Status)
+	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
+		return nil, fmt.Errorf("request failed: status %d", resp.StatusCode)
 	}
 	var payload struct {
 		Data []struct {
 			ID string `json:"id"`
 		} `json:"data"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&payload); err != nil {
-		return nil, err
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return nil, aihttp.ErrResponse
+	}
+	if len(payload.Data) > aihttp.MaxDiscoveredModels {
+		return nil, fmt.Errorf("model discovery exceeded the model limit")
 	}
 	models := make([]string, 0, len(payload.Data))
 	seen := make(map[string]struct{}, len(payload.Data))
 	for _, item := range payload.Data {
 		id := strings.TrimSpace(item.ID)
+		if len(id) > 512 {
+			return nil, aihttp.ErrResponse
+		}
 		if id == "" {
 			continue
 		}

@@ -1,17 +1,12 @@
 package service
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
-	"io"
-	"net/http"
 	"path"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -40,11 +35,9 @@ import (
 type McpServerService struct{}
 
 const (
-	defaultMcpGatewayImageNpx        = "supercorp/supergateway:3.4.3"
-	defaultMcpGatewayImageUvx        = "supercorp/supergateway:uvx"
-	defaultMcpProtocolVersion        = "2025-06-18"
-	mcpOutputTransportSSE            = "sse"
-	mcpOutputTransportStreamableHTTP = "streamableHttp"
+	defaultMcpGatewayImageNpx = "supercorp/supergateway:3.4.3"
+	defaultMcpGatewayImageUvx = "supercorp/supergateway:uvx"
+	defaultMcpProtocolVersion = "2025-06-18"
 )
 
 type IMcpServerService interface {
@@ -352,70 +345,8 @@ func (m McpServerService) TestConnection(req request.McpServerConnectionTest) (r
 		return res, nil
 	}
 
-	client := &http.Client{Timeout: 10 * time.Second}
-	if mcpServer.OutputTransport == mcpOutputTransportSSE {
-		httpReq, err := http.NewRequest(http.MethodGet, endpoint, nil)
-		if err != nil {
-			res.Message = err.Error()
-			return res, nil
-		}
-		httpRes, err := client.Do(httpReq)
-		if err != nil {
-			res.Message = err.Error()
-			return res, nil
-		}
-		defer httpRes.Body.Close()
-		contentType := httpRes.Header.Get("Content-Type")
-		if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 && strings.Contains(contentType, "text/event-stream") {
-			res.Success = true
-			res.Message = "ok"
-			return res, nil
-		}
-		res.Message = fmt.Sprintf("unexpected response: status=%d content-type=%s", httpRes.StatusCode, contentType)
-		return res, nil
-	}
-
-	payload := map[string]interface{}{
-		"jsonrpc": "2.0",
-		"id":      1,
-		"method":  "initialize",
-		"params": map[string]interface{}{
-			"protocolVersion": mcpServer.ProtocolVersion,
-			"capabilities":    map[string]interface{}{},
-			"clientInfo": map[string]string{
-				"name":    "1Panel",
-				"version": "1.0.0",
-			},
-		},
-	}
-	body, _ := json.Marshal(payload)
-	httpReq, err := http.NewRequest(http.MethodPost, endpoint, bytes.NewReader(body))
-	if err != nil {
-		res.Message = err.Error()
-		return res, nil
-	}
-	httpReq.Header.Set("Content-Type", "application/json")
-	httpReq.Header.Set("Accept", "application/json, text/event-stream")
-	httpRes, err := client.Do(httpReq)
-	if err != nil {
-		res.Message = err.Error()
-		return res, nil
-	}
-	defer httpRes.Body.Close()
-	res.Success, res.Message = handleMcpConnectionHTTPResponse(httpRes)
+	res.Success, res.Message = probeMcpConnection(endpoint, mcpServer.OutputTransport, mcpServer.ProtocolVersion)
 	return res, nil
-}
-
-func handleMcpConnectionHTTPResponse(httpRes *http.Response) (bool, string) {
-	if httpRes.StatusCode >= 200 && httpRes.StatusCode < 300 {
-		return true, "ok"
-	}
-	respBody, _ := io.ReadAll(httpRes.Body)
-	message := strings.TrimSpace(string(respBody))
-	if message == "" {
-		message = httpRes.Status
-	}
-	return false, message
 }
 
 func (m McpServerService) GetBindDomain() (response.McpBindDomainRes, error) {
