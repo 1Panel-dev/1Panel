@@ -61,7 +61,7 @@ func (b *BaseApi) Login(c *gin.Context) {
 
 	user, msgKey, err := xpack.AuthProvider.Login(c, req, string(entrance))
 	if user == nil || user.MfaStatus != constant.StatusEnable {
-		go saveLoginLogs(c, req.Name, wrapLoginErr(msgKey, err))
+		go saveLoginLogs(snapshotLoginLog(c, req.Name, wrapLoginErr(msgKey, err)))
 	}
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" || msgKey == "ErrNoneNode" {
 		if msgKey == "ErrAuth" {
@@ -108,7 +108,7 @@ func (b *BaseApi) MFALogin(c *gin.Context) {
 	}
 
 	user, msgKey, err := xpack.AuthProvider.MFALogin(c, req, string(entrance))
-	go saveLoginLogs(c, loginLogUserName(user, req.SessionID), wrapLoginErr(msgKey, err))
+	go saveLoginLogs(snapshotLoginLog(c, loginLogUserName(user, req.SessionID), wrapLoginErr(msgKey, err)))
 	if msgKey == "ErrNoneNode" {
 		helper.BadAuth(c, msgKey, err)
 		return
@@ -167,7 +167,7 @@ func (b *BaseApi) PasskeyFinishLogin(c *gin.Context) {
 	sessionID := c.GetHeader("Passkey-Session")
 	entrance := loadEntranceFromRequest(c)
 	user, msgKey, err := xpack.AuthProvider.PasskeyFinishLogin(c, sessionID, entrance)
-	go saveLoginLogs(c, loginLogUserName(user, ""), wrapLoginErr(msgKey, err))
+	go saveLoginLogs(snapshotLoginLog(c, loginLogUserName(user, ""), wrapLoginErr(msgKey, err)))
 	if msgKey == "ErrAuth" || msgKey == "ErrEntrance" || msgKey == "ErrNoneNode" {
 		if msgKey == "ErrAuth" {
 			global.IPTracker.SetNeedCaptcha(common.GetRealClientIP(c))
@@ -513,7 +513,10 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 	helper.Success(c)
 }
 
-func saveLoginLogs(c *gin.Context, userName string, err error) {
+// Capture request and authentication values synchronously. Arguments to the go
+// statement are evaluated before it starts; the DB writer never keeps a Gin
+// context that may already have been reset for another request.
+func snapshotLoginLog(c *gin.Context, userName string, err error) model.LoginLog {
 	var logs model.LoginLog
 	if err != nil {
 		logs.Status = constant.StatusFailed
@@ -521,9 +524,13 @@ func saveLoginLogs(c *gin.Context, userName string, err error) {
 	} else {
 		logs.Status = constant.StatusSuccess
 	}
-	logs.IP = c.ClientIP()
+	logs.IP = common.AuditClientIP(c)
 	logs.User = userName
 	logs.Agent = c.GetHeader("User-Agent")
+	return logs
+}
+
+func saveLoginLogs(logs model.LoginLog) {
 	_ = logService.CreateLoginLog(logs)
 }
 

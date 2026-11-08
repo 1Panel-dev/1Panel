@@ -23,6 +23,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/global"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
@@ -57,7 +58,7 @@ func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
 		record := &model.OperationLog{
 			Source:    source,
 			Node:      currentNode,
-			IP:        c.ClientIP(),
+			IP:        common.AuditClientIP(c),
 			Method:    strings.ToLower(c.Request.Method),
 			Path:      pathItem,
 			UserAgent: c.Request.UserAgent(),
@@ -127,10 +128,8 @@ func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
 		}
 
 		record.User = LoadOperationUser(c)
+		record.IP = common.AuditClientIP(c)
 		if c.GetBool("API_AUTH") {
-			if clientIP := c.GetString("API_AUTH_CLIENT_IP"); clientIP != "" {
-				record.IP = clientIP
-			}
 			record.AuthMethod = "api_key"
 			record.APIKeyID = c.GetString("API_AUTH_KEY_ID")
 			record.APIKeyName = c.GetString("API_AUTH_KEY_NAME")
