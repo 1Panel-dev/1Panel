@@ -553,7 +553,7 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 			}
 		}
 		if req.Advanced && !req.SkipComposeCommonConfig {
-			if err = addDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params, installed.App.Key); err != nil {
+			if err = AddDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params, installed.App.Key); err != nil {
 				return err
 			}
 		}
@@ -608,7 +608,7 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 		return err
 	}
 	backupEnvMaps := maps.Clone(oldEnvMaps)
-	handleMap(req.Params, oldEnvMaps)
+	MergeAppEnvironment(req.Params, oldEnvMaps)
 	paramByte, err := json.Marshal(oldEnvMaps)
 	if err != nil {
 		return err

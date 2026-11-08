@@ -1074,6 +1074,16 @@ const message = {
             serviceAPIHelper: '此服務提供 OpenAI 相容介面。',
             serviceAddressHelper: '容器內應用程式使用容器位址，本機或外部應用程式使用外部位址。',
             externalAddress: '外部存取位址',
+            createVllmInstance: '建立 vLLM 執行個體',
+            previewDeployment: '預覽部署設定',
+            deploymentOverview: '部署概覽',
+            backToForm: '返回修改',
+            composePreviewHelper:
+                '可補充表單未提供的欄位。已有設定請返回表單修改；Compose 編輯不會回填表單，也不會更新帳號同步設定。',
+            envPreviewHelper: '環境變數依表單產生，如需修改請返回表單。',
+            generateCompose: '產生設定並預覽',
+            saveDeploy: '儲存並部署',
+            composeRegenerateHelper: '表單已修改，重新產生 Compose 將覆蓋手動編輯的內容。是否繼續？',
             deploymentNameHelper: '應用程式執行個體名稱，用於安裝目錄，建立後無法修改。如需調整顯示名稱，請設定別名。',
             deploymentAliasHelper:
                 '選填，用於清單顯示，可隨時修改；留空時顯示應用程式名稱。僅修改別名不會重新啟動容器。',

@@ -609,7 +609,7 @@ func buildRecoverEnv(appEnv string, backupEnvMap, installedEnvMap map[string]int
 		backupEnvMap["PANEL_DB_HOST"] = currentHostVal
 	}
 	newEnvMap := make(map[string]string, len(backupEnvMap))
-	handleMap(backupEnvMap, newEnvMap)
+	MergeAppEnvironment(backupEnvMap, newEnvMap)
 	mergedEnvContent, err := gotenv.Marshal(newEnvMap)
 	if err != nil {
 		return appEnv, "", err

@@ -1120,6 +1120,17 @@ const message = {
             serviceAPIHelper: '이 서비스는 OpenAI 호환 API를 제공합니다.',
             serviceAddressHelper: '컨테이너 앱에는 컨테이너 주소를, 호스트 또는 외부 앱에는 외부 주소를 사용하세요.',
             externalAddress: '외부 접속 주소',
+            createVllmInstance: 'vLLM 인스턴스 생성',
+            previewDeployment: '배포 설정 미리보기',
+            deploymentOverview: '배포 개요',
+            backToForm: '돌아가서 수정',
+            composePreviewHelper:
+                '양식에 없는 필드를 추가할 수 있습니다. 기존 설정은 양식에서 변경하세요. Compose 편집은 양식이나 계정 동기화 설정에 반영되지 않습니다.',
+            envPreviewHelper: '환경 변수는 양식에서 생성됩니다. 수정하려면 양식으로 돌아가세요.',
+            generateCompose: '설정 생성 및 미리보기',
+            saveDeploy: '저장 및 배포',
+            composeRegenerateHelper:
+                '양식이 변경되었습니다. Compose를 다시 생성하면 수동 편집 내용이 덮어써집니다. 계속할까요?',
             deploymentNameHelper:
                 '앱 인스턴스 이름으로, 설치 디렉터리에 사용되며 생성 후 변경할 수 없습니다. 표시 이름을 바꾸려면 별칭을 설정하세요.',
             deploymentAliasHelper:

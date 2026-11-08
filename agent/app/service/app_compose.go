@@ -14,6 +14,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/subosito/gotenv"
 	"gopkg.in/yaml.v3"
 )
 
@@ -86,4 +87,15 @@ func cacheAppDetailCompose(detail *model.AppDetail, content []byte) error {
 	}
 	detail.DockerCompose = string(content)
 	return nil
+}
+
+func LoadAppPackageEnvironment(app model.App, detail model.AppDetail) (map[string]string, error) {
+	if err := downloadApp(app, detail, nil, nil); err != nil {
+		return nil, err
+	}
+	values, err := gotenv.Read(filepath.Join(app.GetAppResourcePath(), detail.Version, ".env"))
+	if os.IsNotExist(err) {
+		return make(map[string]string), nil
+	}
+	return values, err
 }

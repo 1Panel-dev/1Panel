@@ -1114,6 +1114,16 @@ const message = {
             serviceAPIHelper: 'ບໍລິການນີ້ໃຫ້ API ທີ່ເຂົ້າກັນໄດ້ກັບ OpenAI.',
             serviceAddressHelper: 'ແອັບໃນຄອນເທນເນີໃຊ້ທີ່ຢູ່ຄອນເທນເນີ; ແອັບໃນໂຮສ ຫຼື ພາຍນອກໃຊ້ທີ່ຢູ່ພາຍນອກ.',
             externalAddress: 'ທີ່ຢູ່ພາຍນອກ',
+            createVllmInstance: 'ສ້າງອິນສະແຕນ vLLM',
+            previewDeployment: 'ເບິ່ງຕົວຢ່າງການຕັ້ງຄ່າຕິດຕັ້ງ',
+            deploymentOverview: 'ພາບລວມການຕິດຕັ້ງ',
+            backToForm: 'ກັບໄປແກ້ໄຂ',
+            composePreviewHelper:
+                'ເພີ່ມຟິວທີ່ບໍ່ມີໃນແບບຟອມໄດ້. ແກ້ໄຂຄ່າເດີມໃນແບບຟອມ. ການແກ້ໄຂ Compose ຈະບໍ່ປ່ຽນແບບຟອມ ຫຼື ຄ່າການຊິງຄ໌ບັນຊີ.',
+            envPreviewHelper: 'ຕົວແປສະພາບແວດລ້ອມຖືກສ້າງຈາກແບບຟອມ. ຫາກຕ້ອງການແກ້ໄຂ ກະລຸນາກັບໄປທີ່ແບບຟອມ.',
+            generateCompose: 'ສ້າງການຕັ້ງຄ່າແລະເບິ່ງຕົວຢ່າງ',
+            saveDeploy: 'ບັນທຶກແລະຕິດຕັ້ງ',
+            composeRegenerateHelper: 'ແບບຟອມຖືກປ່ຽນແລ້ວ. ການສ້າງ Compose ໃໝ່ຈະຂຽນທັບສິ່ງທີ່ແກ້ໄຂດ້ວຍຕົນເອງ. ສືບຕໍ່ບໍ?',
             deploymentNameHelper:
                 'ຊື່ອິນສະແຕນຂອງແອັບ ໃຊ້ສຳລັບໂຟນເດີຕິດຕັ້ງ ແລະ ປ່ຽນບໍ່ໄດ້ຫຼັງສ້າງ. ຕັ້ງຊື່ຫຼິ້ນເພື່ອປ່ຽນຊື່ທີ່ສະແດງ.',
             deploymentAliasHelper:

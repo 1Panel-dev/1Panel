@@ -781,7 +781,7 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 		envs[constant.ContainerName] = install.ContainerName
 	}
 	config.Advanced = true
-	if err := addDockerComposeCommonParam(composeMap, install.ServiceName, config, envs, install.App.Key); err != nil {
+	if err := AddDockerComposeCommonParam(composeMap, install.ServiceName, config, envs, install.App.Key); err != nil {
 		return "", err
 	}
 	paramByte, err := json.Marshal(envs)
@@ -866,7 +866,7 @@ func coverEnvJsonToStr(envJson string) (string, error) {
 	envMap := make(map[string]interface{})
 	_ = json.Unmarshal([]byte(envJson), &envMap)
 	newEnvMap := make(map[string]string, len(envMap))
-	handleMap(envMap, newEnvMap)
+	MergeAppEnvironment(envMap, newEnvMap)
 	envStr, err := gotenv.Marshal(newEnvMap)
 	if err != nil {
 		return "", err
@@ -894,7 +894,7 @@ func checkRequiredAndLimit(app model.App) error {
 	return nil
 }
 
-func handleMap(params map[string]interface{}, envParams map[string]string) {
+func MergeAppEnvironment(params map[string]interface{}, envParams map[string]string) {
 	for k, v := range params {
 		switch t := v.(type) {
 		case string:
@@ -912,7 +912,7 @@ func handleMap(params map[string]interface{}, envParams map[string]string) {
 			}
 			envParams[k] = strings.Join(strArray, ",")
 		case map[string]interface{}:
-			handleMap(t, envParams)
+			MergeAppEnvironment(t, envParams)
 		}
 	}
 }
@@ -1059,7 +1059,7 @@ func copyData(task *task.Task, app model.App, appDetail model.AppDetail, appInst
 			envParams = make(map[string]string)
 		}
 	}
-	handleMap(req.Params, envParams)
+	MergeAppEnvironment(req.Params, envParams)
 	if err = env.Write(envParams, envPath); err != nil {
 		return
 	}
@@ -1811,7 +1811,7 @@ func updateToolApp(installed *model.AppInstall) {
 		return
 	}
 	envFileMap := make(map[string]string)
-	handleMap(envMap, envFileMap)
+	MergeAppEnvironment(envMap, envFileMap)
 	if err = env.Write(envFileMap, envPath); err != nil {
 		global.LOG.Errorf("update tool app [%s] error : %s", toolInstall.Name, err.Error())
 		return
@@ -1831,7 +1831,7 @@ func updateToolApp(installed *model.AppInstall) {
 	}
 }
 
-func addDockerComposeCommonParam(composeMap map[string]interface{}, serviceName string, req request.AppContainerConfig, params map[string]interface{}, appKey string) error {
+func AddDockerComposeCommonParam(composeMap map[string]interface{}, serviceName string, req request.AppContainerConfig, params map[string]interface{}, appKey string) error {
 	services, serviceValid := composeMap["services"].(map[string]interface{})
 	if !serviceValid {
 		return buserr.New("ErrFileParse")
