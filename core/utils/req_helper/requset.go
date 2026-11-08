@@ -2,7 +2,6 @@ package req_helper
 
 import (
 	"context"
-	"crypto/tls"
 	"errors"
 	"io"
 	"net"
@@ -17,7 +16,6 @@ import (
 
 func HandleRequest(url, method string, timeout int) (int, []byte, error) {
 	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
 			Timeout:   60 * time.Second,
 			KeepAlive: 60 * time.Second,
@@ -42,7 +40,8 @@ func handleRequestWithTransport(url, method string, transport *http.Transport, t
 		}
 	}()
 
-	client := http.Client{Timeout: time.Duration(timeout) * time.Second, Transport: transport}
+	client := newExternalHTTPClient(transport, time.Duration(timeout)*time.Second)
+	defer client.CloseIdleConnections()
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(timeout)*time.Second)
 	defer cancel()
 	request, err := http.NewRequestWithContext(ctx, method, url, nil)
@@ -65,7 +64,6 @@ func handleRequestWithTransport(url, method string, transport *http.Transport, t
 
 func HandleGet(url string) (*http.Response, error) {
 	transport := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		DialContext: (&net.Dialer{
 			Timeout:   60 * time.Second,
 			KeepAlive: 60 * time.Second,
@@ -83,10 +81,7 @@ func HandleGetWithProxy(url string) (*http.Response, error) {
 }
 
 func handleGetWithTransport(url string, transport *http.Transport) (*http.Response, error) {
-	client := &http.Client{
-		Timeout: time.Second * 300,
-	}
-	client.Transport = transport
+	client := newExternalHTTPClient(transport, time.Second*300)
 	defer client.CloseIdleConnections()
 
 	req, err := http.NewRequestWithContext(context.Background(), "GET", url, nil)
