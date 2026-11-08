@@ -2,13 +2,10 @@ package client
 
 import (
 	"context"
-	"crypto/tls"
 	"fmt"
 	"io"
-	"net/http"
 	"os"
 	"path"
-	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/cloud_storage/client/helper/webdav"
@@ -39,12 +36,9 @@ func newWebDAVClient(ctx context.Context, vars map[string]interface{}) (*webDAVC
 		url = address
 	}
 	client := webdav.NewClient(url, username, password)
-	tlsConfig := &tls.Config{}
-	if strings.HasPrefix(address, "https") {
-		tlsConfig.InsecureSkipVerify = true
-	}
-	var transport http.RoundTripper = &http.Transport{
-		TLSClientConfig: tlsConfig,
+	transport, err := newStorageHTTPTransport(vars)
+	if err != nil {
+		return nil, err
 	}
 	client.SetTransport(transport)
 	if err := client.ConnectWithContext(ctx); err != nil {

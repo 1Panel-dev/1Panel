@@ -2,8 +2,6 @@ package client
 
 import (
 	"context"
-	"crypto/tls"
-	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -48,14 +46,10 @@ func NewS3Client(vars map[string]interface{}) (*s3Client, error) {
 	}
 
 	ssl := strings.Split(endpoint, ":")[0]
-	secure := false
-	tlsConfig := &tls.Config{}
-	if ssl == "https" {
-		secure = true
-		tlsConfig.InsecureSkipVerify = true
-	}
-	var transport http.RoundTripper = &http.Transport{
-		TLSClientConfig: tlsConfig,
+	secure := ssl == "https"
+	transport, err := newStorageHTTPTransport(vars)
+	if err != nil {
+		return nil, err
 	}
 
 	endpoint = strings.TrimPrefix(endpoint, ssl+"://")

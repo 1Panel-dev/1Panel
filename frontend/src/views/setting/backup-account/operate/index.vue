@@ -184,6 +184,15 @@
                     </template>
                 </el-input>
             </el-form-item>
+            <el-form-item v-if="supportsCustomCA" :label="$t('setting.backupCACert')" prop="varsJson.caCertPEM">
+                <el-input
+                    v-model="dialogData.rowData!.varsJson['caCertPEM']"
+                    type="textarea"
+                    :rows="5"
+                    :spellcheck="false"
+                />
+                <span class="input-help">{{ $t('setting.backupCACertHelp') }}</span>
+            </el-form-item>
             <el-form-item v-if="hasAccessKey()" label="Bucket" prop="bucket" :rules="Rules.requiredInput">
                 <el-checkbox v-model="dialogData.rowData!.bucketInput" :label="$t('container.input')" />
                 <el-input clearable v-if="dialogData.rowData!.bucketInput" v-model="dialogData.rowData!.bucket" />
@@ -452,10 +461,27 @@ const dialogData = ref<DialogProps>({
     title: '',
 });
 
+const supportsCustomCA = computed(() => {
+    const row = dialogData.value.rowData;
+    if (!row) return false;
+    if (row.type === 'S3' || row.type === 'MINIO') return domainProto.value === 'https';
+    return row.type === 'WebDAV' && /^https:\/\//i.test(String(row.varsJson?.['address'] || '').trim());
+});
+
 const formWatcher = computed(() => {
     const { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson } =
         dialogData.value.rowData || {};
-    return { type, isPublic, accessKey, bucket, credential, backupPath, bucketInput, varsJson };
+    return {
+        type,
+        isPublic,
+        accessKey,
+        bucket,
+        credential,
+        backupPath,
+        bucketInput,
+        varsJson,
+        protocol: domainProto.value,
+    };
 });
 const startWatcher = () => {
     if (stopWatch.value) {

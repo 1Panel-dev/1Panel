@@ -3,6 +3,7 @@ package ssh
 import (
 	"bufio"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"fmt"
 	"net"
@@ -20,17 +21,25 @@ type HTTPProxyDialer struct {
 }
 
 func HTTPDial(dialer HTTPProxyDialer, network, addr string) (net.Conn, error) {
+	return dialHTTPProxy(dialer, network, addr, nil)
+}
+
+func dialHTTPProxy(dialer HTTPProxyDialer, network, addr string, rootCAs *x509.CertPool) (net.Conn, error) {
 	var conn net.Conn
 	var err error
 
 	global.LOG.Debugf("Dialing HTTP proxy %s for %s", dialer.URL, addr)
 	dialer.URL = strings.TrimPrefix(dialer.URL, dialer.Type+"://")
 	if dialer.Type == "https" {
+		host, _, splitErr := net.SplitHostPort(dialer.URL)
+		if splitErr != nil {
+			return nil, splitErr
+		}
 		conn, err = tls.DialWithDialer(
 			&net.Dialer{Timeout: 30 * time.Second},
 			network,
 			dialer.URL,
-			&tls.Config{InsecureSkipVerify: true},
+			&tls.Config{RootCAs: rootCAs, ServerName: host},
 		)
 	} else {
 		conn, err = net.DialTimeout(network, dialer.URL, 30*time.Second)
