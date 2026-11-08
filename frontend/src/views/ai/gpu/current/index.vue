@@ -75,7 +75,14 @@
                                 :disabled="!summary.sharedMemoryOnly && !summary.memoryPartial"
                                 :content="summaryMemoryTooltip(summary)"
                             >
-                                <strong>
+                                <strong v-if="!summary.sharedMemoryOnly && summary.memoryUsage">
+                                    {{ $t('home.used') }} {{ formatSummaryMemory(summary.memoryUsage.used) }} /
+                                    {{ formatSummaryMemory(summary.memoryUsage.total) }}
+                                    <template v-if="summary.memoryUsage.percentage !== null">
+                                        ({{ summary.memoryUsage.percentage }}%)
+                                    </template>
+                                </strong>
+                                <strong v-else>
                                     {{
                                         formatSummaryMemory(
                                             summary.sharedMemoryOnly ? summary.sharedMemoryTotal : summary.memoryTotal,
@@ -732,6 +739,41 @@ const formatSummaryMemory = (value: number | null) => {
     return value === null || !Number.isFinite(value) ? '—' : computeSizeForDocker(value);
 };
 
+const summaryMemoryUsage = (vendor?: string) => {
+    const devices = [
+        ...[...gpuInfo.value.gpu, ...gpuInfo.value.npu]
+            .filter(
+                (device) => (!vendor || device.type === vendor) && (device.type === 'ascend' || !device.sharedMemory),
+            )
+            .map((device) => ({ id: deviceKey(device), used: device.memUsed, total: device.memTotal })),
+        ...(!vendor || vendor === 'intel' || vendor === 'xpu' ? xpuInfo.value.xpu : []).map((device) => ({
+            id: `xpu-${device.basic.deviceID}`,
+            used: device.stats.memoryUsed,
+            total: device.basic.memory,
+        })),
+    ];
+    if (!devices.length) return null;
+    let used: number | null = 0;
+    let total: number | null = 0;
+    const seen = new Set<string>();
+    for (const device of devices) {
+        if (seen.has(device.id)) continue;
+        seen.add(device.id);
+        const deviceUsed = memoryMiB(device.used || '');
+        const deviceTotal = memoryMiB(device.total || '');
+        used = used !== null && deviceUsed !== null && deviceUsed >= 0 ? used + deviceUsed * 1024 ** 2 : null;
+        total = total !== null && deviceTotal !== null && deviceTotal >= 0 ? total + deviceTotal * 1024 ** 2 : null;
+    }
+    return {
+        used,
+        total,
+        percentage:
+            used !== null && total !== null && total > 0
+                ? Math.min(100, Number(((used / total) * 100).toFixed(1)))
+                : null,
+    };
+};
+
 const overviewRows = computed(() => {
     if (gpuInfo.value.summaries?.length) {
         return gpuInfo.value.summaries
@@ -748,6 +790,7 @@ const overviewRows = computed(() => {
                     devices.length && !devices.some((device) => device.sharedMemory) ? null : summary.sharedMemoryTotal;
                 return {
                     ...summary,
+                    memoryUsage: summaryMemoryUsage(summary.vendor),
                     sharedMemoryTotal,
                     cardCountText: summary.cardCount === null ? '—' : String(summary.cardCount),
                     sharedMemoryOnly:
@@ -796,6 +839,7 @@ const overviewRows = computed(() => {
             cudaVersion: gpuInfo.value.cudaVersion,
             cardCountText: deviceCountText.value,
             memoryTotal,
+            memoryUsage: summaryMemoryUsage(),
             sharedMemoryTotal,
             sharedMemoryOnly: sharedMemoryTotal !== null && memoryDevices.every((device) => device.shared),
             memoryPartial,
