@@ -29,8 +29,6 @@ import (
 	"sync"
 	"syscall"
 	"time"
-	"unicode"
-	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 
@@ -399,8 +397,7 @@ func downloadResponseFilename(header string) string {
 		return ""
 	}
 	name := strings.TrimSpace(params["filename"])
-	if name == "" || name == "." || name == ".." || len(name) > 255 || !utf8.ValidString(name) ||
-		strings.ContainsAny(name, "/\\:") || strings.IndexFunc(name, unicode.IsControl) >= 0 {
+	if !validDownloadFilename(name) {
 		return ""
 	}
 	return name
