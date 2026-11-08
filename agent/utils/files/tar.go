@@ -43,7 +43,7 @@ func (t TarArchiver) Compress(ctx context.Context, sourcePaths []string, dstFile
 		return err
 	}
 	baseDir := filepath.Dir(sourcePaths[0])
-	args := []string{t.getOptionStr("compress"), dstFile, "-C", baseDir}
+	args := []string{t.getOptionStr("compress"), dstFile, "-C", baseDir, "--"}
 	for _, sourcePath := range sourcePaths {
 		args = append(args, filepath.Base(sourcePath))
 	}
