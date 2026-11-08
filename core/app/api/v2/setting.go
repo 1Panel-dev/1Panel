@@ -416,7 +416,7 @@ func (b *BaseApi) UpdatePort(c *gin.Context) {
 // @Router /core/settings/ssl/reload [post]
 // @x-panel-log {"bodyKeys":[],"paramKeys":[],"BeforeFunctions":[],"formatZH":"重载系统 SSL","formatEN":"reload system SSL"}
 func (b *BaseApi) ReloadSSL(c *gin.Context) {
-	clientIP := c.ClientIP()
+	clientIP := common.GetRealClientIP(c)
 	if ip := net.ParseIP(clientIP); ip == nil || !ip.IsLoopback() {
 		helper.InternalServer(c, errors.New("only localhost can reload ssl"))
 		return

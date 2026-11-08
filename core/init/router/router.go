@@ -70,6 +70,8 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 
 func Routers() *gin.Engine {
 	Router = gin.New()
+	_ = Router.SetTrustedProxies(nil)
+	Router.Use(middleware.AuditClientIP())
 	Router.Use(middleware.MCPErrorMetadata())
 	Router.Use(middleware.MCPTokenBoundary())
 	Router.Use(middleware.MCPAPIIdentity())

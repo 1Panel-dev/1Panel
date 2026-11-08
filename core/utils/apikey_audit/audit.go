@@ -9,6 +9,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/app/repo"
 	"github.com/1Panel-dev/1Panel/core/constant"
 	"github.com/1Panel-dev/1Panel/core/init/session/psession"
+	"github.com/1Panel-dev/1Panel/core/utils/common"
 	"github.com/gin-gonic/gin"
 )
 
@@ -80,7 +81,7 @@ func Build(c *gin.Context, event Event) (*model.OperationLog, error) {
 			record.Path = c.Request.URL.Path
 			record.Method = strings.ToLower(c.Request.Method)
 			record.UserAgent = c.Request.UserAgent()
-			record.IP = c.ClientIP()
+			record.IP = common.AuditClientIP(c)
 		}
 		if c.GetBool("API_AUTH") && event.Action != "app_binding" {
 			record.AuthMethod = "api_key"
@@ -88,9 +89,6 @@ func Build(c *gin.Context, event Event) (*model.OperationLog, error) {
 			record.APIKeyName = c.GetString("API_AUTH_KEY_NAME")
 			if c.GetString("API_AUTH_KEY_KIND") == "legacy" {
 				record.APIKeyID = "legacy:" + c.GetString("API_AUTH_OWNER_TYPE") + ":" + c.GetString("API_AUTH_OWNER_ID")
-			}
-			if clientIP := c.GetString("API_AUTH_CLIENT_IP"); clientIP != "" {
-				record.IP = clientIP
 			}
 		}
 	}
