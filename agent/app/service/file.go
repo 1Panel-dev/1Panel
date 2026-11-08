@@ -907,6 +907,10 @@ func (f *FileService) ChangeName(req request.FileRename) error {
 
 func (f *FileService) Wget(w request.FileWget) (string, error) {
 	fo := files.NewFileOp()
+	destination, err := files.ResolveDownloadDestination(w.Path, w.Name)
+	if err != nil {
+		return "", err
+	}
 	key := "file-wget-" + common.GetUuid()
 	options := files.DownloadOptions{
 		IgnoreCertificate: w.IgnoreCertificate,
@@ -925,7 +929,7 @@ func (f *FileService) Wget(w request.FileWget) (string, error) {
 			Password: systemProxy.Password,
 		}
 	}
-	return key, fo.DownloadFileWithProcess(w.Url, filepath.Join(w.Path, w.Name), key, options)
+	return key, fo.DownloadFileWithProcess(w.Url, destination, key, options)
 }
 
 func logFileTaskSources(t *task.Task, sources []string) {
