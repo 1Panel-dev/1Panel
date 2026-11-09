@@ -477,6 +477,22 @@ const init = async (create: boolean) => {
         const { data } = devicesResult.value;
         if (version !== requestVersion) return;
         gpuDevices.value = data.devices || [];
+        if (props.imageType === 'nvidia' && model.value.mode === 'devices') {
+            model.value.deviceIDs = [
+                ...new Set(
+                    model.value.deviceIDs.map(
+                        (id) =>
+                            gpuDevices.value.find(
+                                (device) =>
+                                    device.type === 'nvidia' &&
+                                    (device.id === id ||
+                                        (device.uuid && `nvidia:${device.uuid}` === id) ||
+                                        (device.index !== undefined && `nvidia:${device.index}` === id)),
+                            )?.id || id,
+                    ),
+                ),
+            ];
+        }
         numaNodes.value = data.numaNodes || [];
         gpuWarnings.value = data.warnings || [];
         if (create) model.value.enabled = hasSupportedGPU.value;

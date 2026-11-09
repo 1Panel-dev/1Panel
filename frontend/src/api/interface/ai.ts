@@ -2,6 +2,7 @@ import { ReqPage } from '.';
 
 export namespace AI {
     export interface ModelGPUDevice {
+        index?: number;
         id: string;
         name: string;
         type: string;
