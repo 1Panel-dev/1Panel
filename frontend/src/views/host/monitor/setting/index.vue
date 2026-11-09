@@ -117,48 +117,7 @@
                                     {{ $t('monitor.cleanMonitor') }}
                                 </el-button>
                             </el-form-item>
-                            <el-divider />
-                            <h3 class="mb-4">{{ $t('monitor.vllmMonitor') }}</h3>
-                            <el-form-item :label="$t('monitor.enableMonitor')" prop="vllmMonitorStatus">
-                                <el-switch
-                                    v-permission
-                                    v-node-admin
-                                    @change="onSaveStatus('VLLMMonitorStatus', form.vllmMonitorStatus)"
-                                    v-model="form.vllmMonitorStatus"
-                                    active-value="Enable"
-                                    inactive-value="Disable"
-                                />
-                            </el-form-item>
-                            <el-form-item :label="$t('monitor.storeDays')" prop="vllmMonitorStoreDays">
-                                <el-input disabled v-model="form.vllmMonitorStoreDays">
-                                    <template #append>
-                                        <el-button
-                                            v-permission
-                                            v-node-admin
-                                            @click="
-                                                onChangeStoreDays('VLLMMonitorStoreDays', form.vllmMonitorStoreDays)
-                                            "
-                                            icon="Setting"
-                                        >
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
-                            <el-form-item :label="$t('monitor.interval')" prop="vllmMonitorIntervalItem">
-                                <el-input disabled v-model="form.vllmMonitorIntervalItem">
-                                    <template #append>
-                                        <el-button
-                                            v-permission
-                                            v-node-admin
-                                            @click="onChangeInterval('VLLMMonitorInterval', form.vllmMonitorInterval)"
-                                            icon="Setting"
-                                        >
-                                            {{ $t('commons.button.set') }}
-                                        </el-button>
-                                    </template>
-                                </el-input>
-                            </el-form-item>
+                            <MonitorExtensionSettings />
                         </el-col>
                     </el-row>
                 </el-form>
@@ -173,7 +132,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, reactive, ref } from 'vue';
+import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { cleanMonitors, loadMonitorSetting, updateMonitorSetting } from '@/api/modules/host';
 import MonitorRouter from '@/views/host/monitor/index.vue';
@@ -184,16 +143,14 @@ import IO from '@/views/host/monitor/setting/default-io/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { splitTimeFromSecond, transTimeUnit } from '@/utils/validate';
+import { loadExtensionComponent } from '@/extensions/optional';
+const MonitorExtensionSettings = defineAsyncComponent(() => loadExtensionComponent('/monitor/extension-settings.vue'));
 const loading = ref();
 const form = reactive({
     gpuMonitorStatus: 'Disable',
     gpuMonitorStoreDays: 30,
     gpuMonitorInterval: 300,
     gpuMonitorIntervalItem: '',
-    vllmMonitorStatus: 'Disable',
-    vllmMonitorStoreDays: 30,
-    vllmMonitorInterval: 300,
-    vllmMonitorIntervalItem: '',
     monitorStatus: 'Disable',
     monitorStoreDays: 30,
     monitorInterval: 300,
@@ -214,11 +171,6 @@ const search = async () => {
     form.gpuMonitorInterval = Number(res.data.gpuMonitorInterval);
     const gpuInterval = splitTimeFromSecond(form.gpuMonitorInterval);
     form.gpuMonitorIntervalItem = transTimeUnit(gpuInterval.timeItem + gpuInterval.timeUnit);
-    form.vllmMonitorStatus = res.data.vllmMonitorStatus;
-    form.vllmMonitorStoreDays = Number(res.data.vllmMonitorStoreDays);
-    form.vllmMonitorInterval = Number(res.data.vllmMonitorInterval);
-    const vllmInterval = splitTimeFromSecond(form.vllmMonitorInterval);
-    form.vllmMonitorIntervalItem = transTimeUnit(vllmInterval.timeItem + vllmInterval.timeUnit);
     form.monitorStatus = res.data.monitorStatus;
     form.monitorInterval = Number(res.data.monitorInterval);
     const item = splitTimeFromSecond(form.monitorInterval);
@@ -230,7 +182,7 @@ const search = async () => {
     form.defaultIO = res.data.defaultIO === 'all' ? i18n.global.t('commons.table.all') : res.data.defaultIO;
 };
 
-const onSaveStatus = async (key: 'MonitorStatus' | 'GPUMonitorStatus' | 'VLLMMonitorStatus', value: string) => {
+const onSaveStatus = async (key: 'MonitorStatus' | 'GPUMonitorStatus', value: string) => {
     loading.value = true;
     await updateMonitorSetting(key, value)
         .then(() => {
@@ -243,10 +195,10 @@ const onSaveStatus = async (key: 'MonitorStatus' | 'GPUMonitorStatus' | 'VLLMMon
         });
 };
 
-const onChangeStoreDays = (key: 'MonitorStoreDays' | 'GPUMonitorStoreDays' | 'VLLMMonitorStoreDays', value: number) => {
+const onChangeStoreDays = (key: 'MonitorStoreDays' | 'GPUMonitorStoreDays', value: number) => {
     daysRef.value.acceptParams({ key, monitorStoreDays: value });
 };
-const onChangeInterval = (key: 'MonitorInterval' | 'GPUMonitorInterval' | 'VLLMMonitorInterval', value: number) => {
+const onChangeInterval = (key: 'MonitorInterval' | 'GPUMonitorInterval', value: number) => {
     const interval = splitTimeFromSecond(value);
     intervalRef.value.acceptParams({ key, timeItem: interval.timeItem, timeUnit: interval.timeUnit });
 };

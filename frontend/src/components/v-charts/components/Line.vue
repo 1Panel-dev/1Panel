@@ -134,6 +134,7 @@ function initChart() {
             series.push({
                 name: item?.name,
                 type: 'line',
+                smooth: true,
                 itemStyle: item.itemStyle ?? seriesStyle[index + 2],
                 areaStyle: item.areaStyle ?? seriesStyle[index],
                 data: item?.data,

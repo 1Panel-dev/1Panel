@@ -56,9 +56,6 @@ type IMonitorService interface {
 
 	LoadIOOptions() []string
 	LoadNetworkOptions() []string
-	LoadVLLMMonitorData(ctx context.Context, req dto.MonitorVLLMSearch) (dto.MonitorVLLMData, error)
-	LoadVLLMCurrent(ctx context.Context, req dto.MonitorVLLMCurrent) (dto.MonitorVLLMCurrentData, error)
-	CleanVLLMMonitor(req dto.MonitorVLLMClean) error
 	LoadGPUOptions() dto.MonitorGPUOptions
 	LoadGPUMonitorData(req dto.MonitorGPUSearch) (dto.MonitorGPUData, error)
 
@@ -345,16 +342,16 @@ func (m *MonitorService) UpdateSetting(key, value string) error {
 	monitorSettingMutex.Lock()
 	defer monitorSettingMutex.Unlock()
 	switch key {
-	case "MonitorStatus", "GPUMonitorStatus", "VLLMMonitorStatus":
+	case "MonitorStatus", "GPUMonitorStatus":
 		if value != constant.StatusEnable && value != constant.StatusDisable {
 			return fmt.Errorf("invalid monitoring status")
 		}
-	case "MonitorInterval", "GPUMonitorInterval", "VLLMMonitorInterval":
+	case "MonitorInterval", "GPUMonitorInterval":
 		interval, err := strconv.Atoi(value)
 		if err != nil || interval < 10 || interval > 43200 {
 			return fmt.Errorf("monitoring interval must be between 10 and 43200 seconds")
 		}
-	case "MonitorStoreDays", "GPUMonitorStoreDays", "VLLMMonitorStoreDays":
+	case "MonitorStoreDays", "GPUMonitorStoreDays":
 		days, err := strconv.Atoi(value)
 		if err != nil || days < 1 {
 			return fmt.Errorf("monitoring retention must be a positive integer")
@@ -411,30 +408,7 @@ func (m *MonitorService) UpdateSetting(key, value string) error {
 				return err
 			}
 		}
-	case "VLLMMonitorStatus":
-		if value == constant.StatusEnable && global.VLLMMonitorCronID == 0 {
-			interval, err := settingRepo.GetValueByKey("VLLMMonitorInterval")
-			if err != nil {
-				return err
-			}
-			if err := StartVLLMMonitor(interval); err != nil {
-				return err
-			}
-		}
-		if value == constant.StatusDisable && global.VLLMMonitorCronID != 0 {
-			global.Cron.Remove(global.VLLMMonitorCronID)
-			global.VLLMMonitorCronID = 0
-		}
-	case "VLLMMonitorInterval":
-		status, err := settingRepo.GetValueByKey("VLLMMonitorStatus")
-		if err != nil {
-			return err
-		}
-		if status == constant.StatusEnable {
-			if err := StartVLLMMonitor(value); err != nil {
-				return err
-			}
-		}
+
 	}
 	return settingRepo.Update(key, value)
 }
