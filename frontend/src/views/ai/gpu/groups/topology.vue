@@ -367,16 +367,6 @@ watch(
     border-color: var(--el-border-color-lighter);
     border-radius: 8px;
 }
-.relation-board::before {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 0;
-    bottom: 16px;
-    width: 1px;
-    background: var(--el-border-color-extra-light);
-    pointer-events: none;
-}
 .relation-board {
     position: relative;
     display: grid;

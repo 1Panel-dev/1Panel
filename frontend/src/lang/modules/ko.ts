@@ -1766,6 +1766,22 @@ const message = {
             extraHeaders: '추가 헤더',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                '큰 숫자는 선택한 높은 동시 요청 구간의 평균값입니다. 아래 값은 이후 옵션으로 정한 구간 종료 후 {0}분간의 평균값입니다. 변화 비교용이며 정상 기준값은 아닙니다.',
+            chartHelp: {
+                running:
+                    '대기 중인 요청을 제외한 처리 중인 요청 수입니다. 높을수록 동시에 처리하는 요청이 많으며, 반드시 성능이 더 좋은 것은 아닙니다.',
+                generationThroughput:
+                    '서비스 전체가 초당 생성하는 출력 토큰 수입니다. 높을수록 전체 처리량이 많으며, 개별 요청이 더 빠르다는 뜻은 아닙니다.',
+                timeToFirstToken:
+                    '요청 도착부터 첫 토큰 생성까지의 평균 대기 시간입니다. 낮을수록 응답이 더 빨리 시작됩니다.',
+                timePerOutputToken:
+                    '첫 토큰 이후 후속 토큰을 생성하는 데 걸리는 평균 시간입니다. 낮을수록 이후 내용이 더 빠르게 출력됩니다.',
+                averagePromptTokens:
+                    '요청당 평균 입력 토큰 수입니다. 높을수록 입력이 길며, 그 자체로 좋고 나쁨을 의미하지 않습니다.',
+                averageGenerationTokens:
+                    '요청당 평균 출력 토큰 수입니다. 높을수록 답변이 길며, 생성 속도가 더 빠르다는 뜻은 아닙니다.',
+            },
             averagePromptTokens: '요청당 평균 입력 토큰 수',
             itl: '평균 ITL',
             peakITLHelper:

@@ -1809,6 +1809,22 @@ const message = {
             extraHeaders: 'Ek Başlıklar',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                'Büyük sayılar seçilen yüksek eşzamanlılık döneminin ortalamalarıdır. Alttaki değerler, Sonra seçeneğiyle belirlenen sonraki {0} dakikanın ortalamalarıdır. Karşılaştırma içindir, normal değerleri göstermez.',
+            chartHelp: {
+                running:
+                    'Kuyruktakiler hariç işlenen istek sayısıdır. Yüksek değer daha fazla eşzamanlı iş demektir; mutlaka daha iyi performans anlamına gelmez.',
+                generationThroughput:
+                    'Hizmetin saniyede ürettiği toplam çıktı token sayısıdır. Yüksek değer toplam verimin arttığını gösterir, her isteğin daha hızlı olduğunu değil.',
+                timeToFirstToken:
+                    'İsteğin gelişinden ilk token üretilene kadar ortalama bekleme süresidir. Düşük değer yanıtın daha erken başlaması demektir.',
+                timePerOutputToken:
+                    'İlk tokendan sonraki tokenların ortalama üretim süresidir. Düşük değer sonraki içeriğin daha hızlı üretilmesi demektir.',
+                averagePromptTokens:
+                    'İstek başına ortalama girdi token sayısıdır. Yüksek değer daha uzun girdi demektir; tek başına iyi veya kötü değildir.',
+                averageGenerationTokens:
+                    'İstek başına ortalama çıktı token sayısıdır. Yüksek değer daha uzun yanıt demektir, daha hızlı üretim değil.',
+            },
             averagePromptTokens: 'İstek başına ortalama girdi token sayısı',
             itl: 'Ortalama ITL',
             peakITLHelper:

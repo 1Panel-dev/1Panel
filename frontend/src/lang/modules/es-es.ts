@@ -1813,6 +1813,22 @@ const message = {
             extraHeaders: 'Encabezados adicionales',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                'Las cifras grandes son los promedios del periodo seleccionado de alta concurrencia. Debajo se muestran los promedios de los {0} minutos siguientes, definidos en Después. Sirven para comparar, no como valores normales.',
+            chartHelp: {
+                running:
+                    'Número de solicitudes en proceso, sin las que están en cola. Un valor mayor indica más trabajo simultáneo, no necesariamente mejor rendimiento.',
+                generationThroughput:
+                    'Total de tokens de salida generados por segundo por el servicio. Un valor mayor indica más capacidad global, no solicitudes individuales más rápidas.',
+                timeToFirstToken:
+                    'Espera media desde la llegada de la solicitud hasta el primer token. Un valor menor significa que la respuesta empieza antes.',
+                timePerOutputToken:
+                    'Tiempo medio para generar cada token posterior al primero. Un valor menor significa que el resto del contenido se genera más rápido.',
+                averagePromptTokens:
+                    'Media de tokens de entrada por solicitud. Un valor mayor significa entradas más largas, sin ser mejor ni peor por sí mismo.',
+                averageGenerationTokens:
+                    'Media de tokens de salida por solicitud. Un valor mayor significa respuestas más largas, no una generación más rápida.',
+            },
             averagePromptTokens: 'Tokens de entrada medios por solicitud',
             itl: 'ITL medio',
             peakITLHelper:
