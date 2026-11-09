@@ -2916,6 +2916,7 @@ const message = {
         default_download_path: 'Enlace de descarga predeterminado',
         saveLocal: 'Retener respaldos locales (igual al número de copias en la nube)',
         url: 'Dirección URL',
+        userAgentInvalid: 'User-Agent must not contain line breaks or NUL characters',
         urlHelper: 'Por favor ingrese una dirección URL válida',
         targetHelper: 'Las cuentas de respaldo se gestionan en los ajustes del panel.',
         withImageHelper:

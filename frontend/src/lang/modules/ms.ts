@@ -2895,6 +2895,7 @@ const message = {
         default_download_path: 'Pautan muat turun lalai',
         saveLocal: 'Simpan sandaran tempatan (sama seperti bilangan salinan storan awan)',
         url: 'Alamat URL',
+        userAgentInvalid: 'User-Agent must not contain line breaks or NUL characters',
         urlHelper: 'Sila masukkan alamat URL yang sah',
         targetHelper: 'Akaun sandaran diselenggara dalam tetapan panel.',
         withImageHelper: 'Sandarkan imej kedai aplikasi, tetapi ini akan meningkatkan saiz fail snapshot.',

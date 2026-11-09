@@ -1946,3 +1946,13 @@ var AddGPUGroup = &gormigrate.Migration{
 		return tx.AutoMigrate(&model.GPUGroup{})
 	},
 }
+
+var AddCronjobURLItems = &gormigrate.Migration{
+	ID: "20261109-cronjob-url-items",
+	Migrate: func(tx *gorm.DB) error {
+		if tx.Migrator().HasColumn(&model.Cronjob{}, "URLItemsJSON") {
+			return nil
+		}
+		return tx.Migrator().AddColumn(&model.Cronjob{}, "URLItemsJSON")
+	},
+}

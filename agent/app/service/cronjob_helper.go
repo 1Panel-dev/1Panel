@@ -109,10 +109,9 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 		u.handleShell(*cronjob, taskItem)
 		u.removeExpiredLog(*cronjob)
 	case "curl":
-		if len(cronjob.URL) == 0 {
-			return fmt.Errorf("the url is empty and is skipped")
+		if err := u.handleCurl(*cronjob, taskItem); err != nil {
+			return err
 		}
-		u.handleCurl(*cronjob, taskItem)
 		u.removeExpiredLog(*cronjob)
 	case "ntp":
 		u.handleNtpSync(*cronjob, taskItem)
@@ -197,18 +196,24 @@ func (u *CronjobService) handleShell(cronjob model.Cronjob, taskItem *task.Task)
 	}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 }
 
-func (u *CronjobService) handleCurl(cronjob model.Cronjob, taskItem *task.Task) {
-	urls := strings.Split(cronjob.URL, ",")
-	for _, url := range urls {
-		if len(strings.TrimSpace(url)) == 0 {
-			continue
-		}
+func (u *CronjobService) handleCurl(cronjob model.Cronjob, taskItem *task.Task) error {
+	items, err := loadCronjobURLs(cronjob)
+	if err != nil {
+		return err
+	}
+	if err := validateCronjobURLs(items); err != nil {
+		return err
+	}
+	for _, item := range items {
+		url := item.URL
+		args := cronjobCurlArgs(item)
 		taskItem.AddSubTaskWithOps(i18n.GetWithName("HandleCurl", url), func(t *task.Task) error {
 			taskItem.LogStart(i18n.GetWithName("HandleCurl", url))
 			cmdMgr := cmd.NewCommandMgr(cmd.WithTask(*taskItem))
-			return cmdMgr.Run("curl", url)
+			return cmdMgr.Run("curl", args...)
 		}, nil, int(cronjob.RetryTimes), time.Duration(cronjob.Timeout)*time.Second)
 	}
+	return nil
 }
 
 func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Task) {

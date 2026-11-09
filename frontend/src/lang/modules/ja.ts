@@ -2845,6 +2845,7 @@ const message = {
         default_download_path: 'デフォルトのダウンロードリンク',
         saveLocal: 'ローカルバックアップを保持します（クラウドストレージコピーの数と同じ）',
         url: 'URLアドレス',
+        userAgentInvalid: 'User-Agent must not contain line breaks or NUL characters',
         urlHelper: '正しいURLアドレスを入力してください',
         targetHelper: 'バックアップアカウントは、パネル設定で維持されます。',
         withImageHelper:

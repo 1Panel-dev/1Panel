@@ -115,6 +115,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddLocalModelAccountLink,
 		migrations.AddOllamaModelAccountSync,
 		migrations.AddContainerImageCheckUpdates,
+		migrations.AddCronjobURLItems,
 		migrations.AddModelQuickJump,
 		migrations.MigrateVMDatabase,
 		migrations.UpdateModelServicesQuickJumpRouter,

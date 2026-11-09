@@ -2890,6 +2890,7 @@ const message = {
         default_download_path: 'Ссылка для скачивания по умолчанию',
         saveLocal: 'Сохранять локальные резервные копии (столько же, сколько копий в облачном хранилище)',
         url: 'URL-адрес',
+        userAgentInvalid: 'User-Agent must not contain line breaks or NUL characters',
         urlHelper: 'Пожалуйста, введите действительный URL-адрес',
         targetHelper: 'Учетные записи резервного копирования управляются в настройках панели.',
         withImageHelper: 'Резервное копирование образов из магазина приложений увеличит размер файла снимка.',
