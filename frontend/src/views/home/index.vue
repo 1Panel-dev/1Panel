@@ -1577,7 +1577,7 @@ onBeforeUnmount(() => {
 
 .monitor-tags {
     position: absolute;
-    top: -10px;
+    top: -30px;
     display: flex;
     flex-wrap: wrap;
     gap: 10px;

@@ -512,7 +512,6 @@ const init = async (create: boolean) => {
         if (version !== requestVersion) return;
         if (groupsResult.status === 'fulfilled') groups.value = groupsResult.value.data || [];
         else groupsFailed.value = true;
-        if (create && compatibleGroups.value.length) selectionMode.value = 'group';
         if (devicesResult.status === 'rejected') throw devicesResult.reason;
         const { data } = devicesResult.value;
         if (version !== requestVersion) return;

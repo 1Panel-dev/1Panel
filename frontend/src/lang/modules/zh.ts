@@ -1696,6 +1696,17 @@ const message = {
             extraHeaders: '额外请求头',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                '大字显示所选高并发时段内的平均值；下方显示该时段结束后 {0} 分钟内的平均值，时长由“向后”选项决定，用于对比变化，不代表正常值。',
+            chartHelp: {
+                running: '正在处理的请求数，不含排队请求。越高表示同时处理的请求越多，不直接代表性能更好。',
+                generationThroughput:
+                    '服务每秒生成的输出 Token 总数。越高表示整体输出吞吐量越大，不代表每个请求都更快。',
+                timeToFirstToken: '从请求到达到生成第一个 Token 的平均等待时间。越低表示越快开始返回内容。',
+                timePerOutputToken: '首个 Token 之后，生成后续 Token 的平均耗时。越低表示后续内容输出得越快。',
+                averagePromptTokens: '每个请求的平均输入 Token 数。越高表示输入内容越长，本身没有好坏之分。',
+                averageGenerationTokens: '每个请求的平均输出 Token 数。越高表示回答越长，不代表生成速度更快。',
+            },
             averagePromptTokens: '每请求平均输入 Token 数',
             itl: '平均 ITL',
             peakITLHelper: '输入、输出长度按请求数加权；ITL 按输出间隔样本数加权，使用已有监控数据。',
@@ -1713,7 +1724,7 @@ const message = {
             peakNearby: '峰值附近性能',
             peakDuration: '采样跨度',
             peakHelper:
-                '基于原始采样识别时段，单点跨度为 0。TPS 按时长加权，TTFT 按请求数加权；统计按采样时刻归属，可能跨越区间边界。曲线反映时间关联，不代表同一批请求的性能。',
+                '选择一个高并发时段，查看前后的吞吐量和响应耗时变化。数据来自定时采样，用于观察整体趋势，不代表同一批请求的性能。',
             concurrency: '当前并发',
             sampleMoment: '采样时刻',
             sampleWindow: '统计区间',

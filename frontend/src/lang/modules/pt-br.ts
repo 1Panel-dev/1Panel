@@ -1814,6 +1814,22 @@ const message = {
             extraHeaders: 'Cabeçalhos extras',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                'Os números grandes são as médias do período selecionado de alta concorrência. Abaixo estão as médias dos {0} minutos seguintes, definidos em Depois. Servem para comparação, não como valores normais.',
+            chartHelp: {
+                running:
+                    'Número de requisições em processamento, excluindo as da fila. Quanto maior, mais trabalho simultâneo, não necessariamente melhor desempenho.',
+                generationThroughput:
+                    'Total de tokens de saída gerados pelo serviço por segundo. Quanto maior, maior a vazão total, não necessariamente a velocidade de cada requisição.',
+                timeToFirstToken:
+                    'Espera média desde a chegada da requisição até o primeiro token. Quanto menor, mais cedo a resposta começa.',
+                timePerOutputToken:
+                    'Tempo médio para gerar os tokens após o primeiro. Quanto menor, mais rápido o restante do conteúdo é gerado.',
+                averagePromptTokens:
+                    'Média de tokens de entrada por requisição. Quanto maior, mais longa a entrada, sem ser algo bom ou ruim por si só.',
+                averageGenerationTokens:
+                    'Média de tokens de saída por requisição. Quanto maior, mais longas as respostas, não mais rápida a geração.',
+            },
             averagePromptTokens: 'Média de tokens de entrada por requisição',
             itl: 'ITL médio',
             peakITLHelper:

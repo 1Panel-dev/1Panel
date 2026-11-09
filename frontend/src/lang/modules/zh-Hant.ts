@@ -1685,6 +1685,17 @@ const message = {
             extraHeaders: '額外請求標頭',
         },
         vllmMonitor: {
+            peakSummaryHelp:
+                '大字顯示所選高並行請求時段內的平均值；下方顯示該時段結束後 {0} 分鐘內的平均值，時長由「向後」選項決定，用於比較變化，不代表正常值。',
+            chartHelp: {
+                running: '正在處理的請求數，不含排隊請求。越高表示同時處理的請求越多，不直接代表效能更好。',
+                generationThroughput:
+                    '服務每秒產生的輸出 Token 總數。越高表示整體輸出吞吐量越大，不代表每個請求都更快。',
+                timeToFirstToken: '從請求到達到產生第一個 Token 的平均等待時間。越低表示越快開始回傳內容。',
+                timePerOutputToken: '第一個 Token 之後，產生後續 Token 的平均耗時。越低表示後續內容輸出得越快。',
+                averagePromptTokens: '每個請求的平均輸入 Token 數。越高表示輸入內容越長，本身沒有好壞之分。',
+                averageGenerationTokens: '每個請求的平均輸出 Token 數。越高表示回答越長，不代表產生速度更快。',
+            },
             averagePromptTokens: '每請求平均輸入 Token 數',
             itl: '平均 ITL',
             peakITLHelper: '輸入、輸出長度依請求數加權；ITL 依輸出間隔樣本數加權，使用既有監控資料。',
@@ -1702,7 +1713,7 @@ const message = {
             peakNearby: '峰值附近效能',
             peakDuration: '取樣跨度',
             peakHelper:
-                '依原始取樣識別時段，單點跨度為 0。TPS 依時長加權，TTFT 依請求數加權；統計歸屬於取樣時刻，可能跨越區間邊界。曲線反映時間關聯，不代表同一批請求的效能。',
+                '選擇一個高並行請求時段，查看前後的吞吐量和回應耗時變化。資料來自定時取樣，用於觀察整體趨勢，不代表同一批請求的效能。',
             concurrency: '目前並行請求',
             sampleMoment: '取樣時刻',
             sampleWindow: '統計區間',
