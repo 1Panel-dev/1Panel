@@ -652,18 +652,18 @@ func (u *ContainerService) ComposeLogClean(req dto.ComposeLogClean) error {
 // loadComposeProjectNameForLog returns the project name that Compose uses for
 // the containers of composePath. Apps and runtimes pass their display name,
 // which can differ from the project name, for example in letter case.
+// An existing project matching name must also match composePath.
 // If several projects use composePath and none of them matches name, it
 // returns an error rather than picking one of them.
 func loadComposeProjectNameForLog(list []container.Summary, name, composePath string) (string, error) {
-	for _, item := range list {
-		if item.Labels[composeProjectLabel] == name {
-			return name, nil
-		}
-	}
 	target := filepath.Clean(strings.TrimSpace(primaryComposePath(composePath)))
+	nameExists := false
 	var candidates []string
 	for _, item := range list {
 		projectName := item.Labels[composeProjectLabel]
+		if projectName != "" && projectName == name {
+			nameExists = true
+		}
 		if projectName == "" || slices.Contains(candidates, projectName) {
 			continue
 		}
@@ -671,6 +671,12 @@ func loadComposeProjectNameForLog(list []container.Summary, name, composePath st
 		if configFile != "" && filepath.Clean(configFile) == target {
 			candidates = append(candidates, projectName)
 		}
+	}
+	if nameExists {
+		if slices.Contains(candidates, name) {
+			return name, nil
+		}
+		return "", fmt.Errorf("cannot verify that compose project %s uses compose file %s", name, target)
 	}
 	switch len(candidates) {
 	case 0:
