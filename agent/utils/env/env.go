@@ -135,6 +135,7 @@ func escapeDoubleQuotedEnvValue(s string) string {
 	replacer := strings.NewReplacer(
 		`\`, `\\`,
 		`"`, `\"`,
+		`$`, `\$`,
 		"\n", `\n`,
 	)
 	return replacer.Replace(s)
