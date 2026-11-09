@@ -2,6 +2,10 @@ import { ReqPage } from '.';
 import type { CronjobAlertTriggerMode } from '@/utils/cronjob-alert';
 
 export namespace Cronjob {
+    export interface URLItem {
+        url: string;
+        header: string;
+    }
     export interface Search extends ReqPage {
         info: string;
         groupIDs: Array<number>;
@@ -35,7 +39,7 @@ export namespace Cronjob {
         dbType: string;
         dbName: string;
         url: string;
-        urlItems: Array<string>;
+        urlItems: Array<URLItem>;
         isDir: boolean;
         files: Array<Item>;
         sourceDir: string;
@@ -92,6 +96,7 @@ export namespace Cronjob {
         dbType: string;
         dbName: string;
         url: string;
+        urlItems?: Array<URLItem>;
         isDir: boolean;
         sourceDir: string;
         snapshotRule: snapshotRule;
@@ -134,6 +139,7 @@ export namespace Cronjob {
         containerName: string;
         user: string;
         url: string;
+        urlItems?: Array<URLItem>;
 
         scriptName: string;
         apps: Array<TransHelper>;

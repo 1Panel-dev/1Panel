@@ -2923,6 +2923,7 @@ const message = {
         default_download_path: 'Link de download padrão',
         saveLocal: 'Manter backups locais (o mesmo número de cópias na nuvem)',
         url: 'Endereço URL',
+        userAgentInvalid: 'User-Agent não pode conter quebras de linha ou caracteres NUL',
         urlHelper: 'Por favor insira um endereço URL válido',
         targetHelper: 'As contas de backup são mantidas nas configurações do painel.',
         withImageHelper:

@@ -376,20 +376,30 @@
                                         </el-radio-group>
                                     </el-form-item>
                                 </LayoutCol>
-                                <LayoutCol v-if="form.type === 'curl'">
+                                <LayoutCol :span="20" v-if="form.type === 'curl'">
                                     <el-form-item :label="$t('cronjob.url')" prop="urlItems">
-                                        <div v-for="(_, index) of form.urlItems" :key="index" class="w-full">
-                                            <el-input class="mt-2" v-model="form.urlItems[index]">
-                                                <template #append>
-                                                    <el-button
-                                                        link
-                                                        icon="Delete"
-                                                        @click="form.urlItems.splice(index, 1)"
-                                                    />
-                                                </template>
-                                            </el-input>
+                                        <div v-for="(item, index) of form.urlItems" :key="index" class="curl-url-group">
+                                            <el-input
+                                                v-model="item.url"
+                                                :aria-label="$t('cronjob.url')"
+                                                :placeholder="$t('cronjob.url')"
+                                            />
+                                            <el-input
+                                                v-model="item.header"
+                                                type="textarea"
+                                                :autosize="{ minRows: 1, maxRows: 4 }"
+                                                aria-label="User-Agent"
+                                                placeholder="User-Agent"
+                                            />
+                                            <el-button
+                                                link
+                                                icon="Delete"
+                                                :aria-label="$t('commons.button.delete')"
+                                                :disabled="form.urlItems.length <= 1"
+                                                @click="form.urlItems.length > 1 && form.urlItems.splice(index, 1)"
+                                            />
                                         </div>
-                                        <el-button class="mt-2" @click="form.urlItems.push('')">
+                                        <el-button class="mt-2" @click="form.urlItems.push({ url: '', header: '' })">
                                             {{ $t('commons.button.add') }}
                                         </el-button>
                                     </el-form-item>
@@ -1019,7 +1029,7 @@ const form = reactive<Cronjob.CronjobInfo>({
     dbType: 'mysql',
     dbName: '',
     url: '',
-    urlItems: [''],
+    urlItems: [{ url: '', header: '' }],
     isDir: true,
     files: [],
     sourceDir: '',
@@ -1082,7 +1092,12 @@ const search = async () => {
 
                 form.script = res.data.script;
                 form.scriptMode = res.data.scriptMode;
-                form.urlItems = res.data.url.split(',') || [];
+                form.urlItems =
+                    res.data.urlItems?.map((item) => ({ ...item })) ??
+                    (res.data.url || '')
+                        .split(',')
+                        .filter(Boolean)
+                        .map((url) => ({ url, header: '' }));
 
                 form.containerName = res.data.containerName;
                 form.user = res.data.user;
@@ -1211,7 +1226,7 @@ const verifyUrlItems = () => {
         return false;
     }
     for (const item of form.urlItems) {
-        if (!item) {
+        if (!item.url.trim()) {
             return false;
         }
     }
@@ -1641,6 +1656,10 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         MsgError(i18n.global.t('cronjob.urlHelper'));
         return;
     }
+    if (form.type === 'curl' && form.urlItems.some((item) => /[\r\n\0]/.test(item.header))) {
+        MsgError(i18n.global.t('cronjob.userAgentInvalid'));
+        return;
+    }
     if (!form.specCustom) {
         for (const item of form.specObjs) {
             const itemSpec = transObjToSpec(item.specType, item.week, item.day, item.hour, item.minute, item.second);
@@ -1660,7 +1679,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         }
         form.sourceDir = files.join(',');
     }
-    form.url = form.urlItems.join(',');
+    form.url = form.urlItems.map((item) => item.url.trim()).join(',');
     form.sourceAccountIDs = form.sourceAccountItems.join(',');
     form.spec = specs.join('&&');
     form.args = form.argItems.join(',');
@@ -1718,6 +1737,23 @@ onMounted(() => {
 });
 </script>
 <style scoped lang="scss">
+.curl-url-group {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 12px;
+    width: 100%;
+    margin-top: 8px;
+}
+@media only screen and (max-width: 600px) {
+    .curl-url-group {
+        grid-template-columns: minmax(0, 1fr) auto;
+        > :first-child {
+            grid-column: 1 / -1;
+        }
+    }
+}
+
 .specClass {
     width: 17% !important;
     margin-left: 20px;

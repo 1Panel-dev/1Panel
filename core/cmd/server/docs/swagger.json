@@ -37335,6 +37335,16 @@
 			},
 			"type": "object"
 		},
+ 		"dto.CronjobURL": {
+			"type": "object",
+			"properties": {
+				"url": { "type": "string" },
+				"header": {
+					"type": "string",
+					"description": "Optional User-Agent value for this URL"
+				}
+			}
+		},
 		"dto.CronjobOperate": {
 			"properties": {
 				"alertCount": {
@@ -37435,6 +37445,12 @@
 				},
 				"type": {
 					"type": "string"
+				},
+				"urlItems": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dto.CronjobURL"
+					}
 				},
 				"url": {
 					"type": "string"
@@ -37561,6 +37577,12 @@
 				},
 				"type": {
 					"type": "string"
+				},
+				"urlItems": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dto.CronjobURL"
+					}
 				},
 				"url": {
 					"type": "string"
