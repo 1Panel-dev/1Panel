@@ -5690,9 +5690,50 @@ const message = {
             history: 'Sejarah Eksport',
             setting: 'Tetapan',
             page: {
+                coreArchiveMasterOnly:
+                    'Rekod laporan sebelum naik taraf ditemui. Minta pentadbir melihat fail asal pada nod induk.',
+                legacyHistoryReports: 'Laporan sebelum naik taraf',
+                legacyHistoryManageHint: 'Lihat dan urus laporan sebelum naik taraf di sini.',
+                legacyHistoryIntegrityHint: 'Integriti fail disahkan semasa muat turun.',
+                legacyHistoryListFailed: 'Tidak dapat memuatkan laporan lama. Segarkan senarai dan cuba lagi.',
+                legacyHistoryDownloadFailed: 'Muat turun gagal. Semak status fail laporan atau cuba lagi kemudian.',
+                legacyHistoryFileExists: 'Fail wujud',
+                legacyHistoryFileMissing: 'Fail tiada',
+                legacyHistoryFileUnavailable: 'Fail tidak tersedia',
+                legacyHistoryNoFile: 'Tiada fail',
+                legacyHistoryFileMissingHint:
+                    'Fail asal tidak lagi wujud dan tidak boleh dimuat turun. Rekodnya boleh dipadam.',
+                legacyHistoryFileUnavailableHint:
+                    'Laluan atau metadata pengesahan fail tidak sah. Muat turun tidak tersedia.',
+                legacyHistoryNoFileHint: 'Rekod penjanaan ini tidak mempunyai fail laporan yang berkaitan.',
+                legacyHistoryRemove: 'Padam',
+                legacyHistoryRemoveSelected: 'Padam pilihan ({0})',
+                legacyHistoryRemoveAll: 'Kosongkan semua',
+                legacyHistorySelectedScope:
+                    'Padam {0} laporan lama yang dipilih dan failnya? Tindakan ini tidak boleh dibuat asal.',
+                legacyHistorySelectionChanged: 'Skop laporan telah berubah. Segarkan senarai dan pilih semula.',
+                legacyHistoryQueryFailed: 'Tidak dapat menyemak sejarah laporan sebelum naik taraf.',
+                legacyHistoryCleanup: 'Bersihkan laporan lama',
+                legacyHistoryCleanupScope:
+                    'Padam semua laporan lama dan fail pada nod induk, termasuk sejarah lama semua nod? Tindakan ini tidak boleh dibuat asal.',
+                legacyHistoryCleanupFailed: 'Pembersihan belum selesai. Segarkan senarai sebelum mencuba lagi.',
+                legacyHistoryCleanupPartial:
+                    '{0} rekod lama tidak dapat dibersihkan. Semak kebenaran fail atau log pada nod induk sebelum mencuba lagi.',
+                legacyHistoryCleanupSuccess: 'Laporan lama yang dipilih telah dipadam.',
+
+                licenseRequired:
+                    'Lesen yang sah diperlukan untuk melihat laporan dan sejarah. Perbaharui atau import lesen yang sah.',
+                agentUpgradeRequired:
+                    'Naik taraf Agent pada nod ini kepada versi yang menyokong laporan operasi setempat.',
+                contextFailed:
+                    'Maklumat laporan nod ini tidak dapat dimuatkan. Semak sambungan nod dan kebenaran untuk membaca laporan.',
+                generationPending:
+                    'Permintaan ini masih diproses. Semak status dalam sejarah laporan sebelum menjana laporan semula.',
+                notApplicable: 'Tidak berkenaan',
+                panelNotApplicable: 'Tiada panel dipasang pada nod ini. Maklumat khusus panel tidak berkenaan.',
+
                 enterprise: 'Edisi Perusahaan',
                 reportNode: 'Nod Laporan',
-                selectReportNode: 'Pilih nod laporan',
                 currentNode: 'Semasa',
                 scoreMeta: 'Potongan {0} mata · {1} risiko',
                 hostAddress: 'Alamat Hos',
@@ -5770,9 +5811,16 @@ const message = {
                 statSslDesc: '{0} sijil diperiksa',
                 statContainerDesc: '{0} bekas diperiksa',
                 assetHostDesc: 'Penggunaan cakera maksimum {0}%',
-                assetWebsiteDesc: '{0} sijil hampir tamat tempoh, {1} laman web tidak normal',
+                assetWebsiteDesc: '{0} sijil telah tamat atau hampir tamat tempoh, {1} laman web tidak normal',
                 assetResourceDesc: '{0} aplikasi tidak normal, {1} bekas tidak normal',
-                assetCronjobDesc: '{0} rekod kegagalan dalam 7 hari terakhir, {1} tugas dilumpuhkan',
+
+                scoreDataUnavailable:
+                    'Data penting tiada, jadi skor tidak dipaparkan. Risiko yang diketahui masih disenaraikan. Muat semula untuk mencuba lagi.',
+                scoreDataProvisional: 'Sesetengah data tiada atau anggaran. Skor ini adalah sementara.',
+                reportWindow: 'Tempoh laporan: {0} hingga {1} ({2})',
+                snapshotScoreScope:
+                    'Skor hos menggunakan ukuran semasa; trend 24 jam dipaparkan berasingan. Eksport manual mengumpul semula, jadi nilai langsung mungkin berubah.',
+                assetCronjobDesc: '{0} rekod kegagalan dalam 24 jam terakhir, {1} tugas dilumpuhkan',
                 app: 'Aplikasi',
                 website: 'Laman Web',
                 websiteSsl: 'Laman Web / Sijil',
@@ -6033,7 +6081,7 @@ const message = {
                 wafSourceIpTop: 'IP Sumber WAF TOP5',
                 wafAffectedSiteTop: 'Tapak Terjejas TOP5',
                 sslRisk: 'Risiko Sijil',
-                sslExpiring: 'Sijil Hampir Tamat',
+                sslExpiring: 'Risiko Tamat Tempoh Sijil',
                 includedInReport: 'Dimasukkan dalam laporan',
                 needRenewal: 'Disarankan perbaharui',
                 fromExpireInfo: 'Daripada maklumat tamat tempoh',

@@ -39,6 +39,7 @@ type AppInstallService struct {
 
 type IAppInstallService interface {
 	Page(req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error)
+	PageWithContext(ctx context.Context, req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error)
 	CheckExist(req request.AppInstalledInfo) (*response.AppInstalledCheck, error)
 	LoadPort(req dto.OperationWithNameAndType) (int64, error)
 	LoadConnInfo(req dto.OperationWithNameAndType) (response.DatabaseConn, error)
@@ -76,6 +77,13 @@ func (a *AppInstallService) GetInstallList() ([]dto.AppInstallInfo, error) {
 }
 
 func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error) {
+	return a.PageWithContext(context.Background(), req)
+}
+
+func (a *AppInstallService) PageWithContext(ctx context.Context, req request.AppInstalledSearch) (int64, []response.AppInstallDTO, error) {
+	if err := ctx.Err(); err != nil {
+		return 0, nil, err
+	}
 	var (
 		opts     []repo.DBOption
 		total    int64
@@ -111,18 +119,18 @@ func (a *AppInstallService) Page(req request.AppInstalledSearch) (int64, []respo
 	}
 
 	if req.Update {
-		installs, err = appInstallRepo.ListBy(context.Background(), opts...)
+		installs, err = appInstallRepo.ListBy(ctx, opts...)
 		if err != nil {
 			return 0, nil, err
 		}
 	} else {
-		total, installs, err = appInstallRepo.Page(req.Page, req.PageSize, opts...)
+		total, installs, err = appInstallRepo.PageWithContext(ctx, req.Page, req.PageSize, opts...)
 		if err != nil {
 			return 0, nil, err
 		}
 	}
 
-	installDTOs, err := handleInstalled(installs, req.Update, req.Sync, req.CheckUpdate)
+	installDTOs, err := handleInstalledWithContext(ctx, installs, req.Update, req.Sync, req.CheckUpdate)
 	if err != nil {
 		return 0, nil, err
 	}
