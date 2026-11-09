@@ -126,8 +126,7 @@ func syncBeforeStart() {
 		global.LOG.Errorf("load remote time with [%s] failed, err: %v", ntpSite.Value, err)
 		return
 	}
-	ts := ntime.Format(constant.DateTimeLayout)
-	if err := ntp.UpdateSystemTime(ts); err != nil {
+	if err := ntp.UpdateSystemTime(ntime); err != nil {
 		global.LOG.Errorf("failed to synchronize system time with [%s], err: %v", ntpSite.Value, err)
 	}
 	global.LOG.Debugf("synchronize system time with [%s] successful!", ntpSite.Value)

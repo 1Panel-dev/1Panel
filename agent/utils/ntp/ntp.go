@@ -59,11 +59,11 @@ func GetRemoteTime(site string) (time.Time, error) {
 	return showtime, nil
 }
 
-func UpdateSystemTime(dateTime string) error {
+func UpdateSystemTime(ntime time.Time) error {
 	system := runtime.GOOS
 	if system == "linux" {
 		cmdMgr := cmd.NewCommandMgr()
-		if err := cmdMgr.RunWithOptionalSudo("date", "-s", dateTime); err != nil {
+		if err := cmdMgr.RunWithOptionalSudo("date", "-s", ntime.Format("2006-01-02 15:04:05 -0700")); err != nil {
 			return fmt.Errorf("update system time failed, %v", err)
 		}
 		return nil
