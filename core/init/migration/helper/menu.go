@@ -132,6 +132,7 @@ func LoadMenus() string {
 				{ID: "118", Disabled: false, Title: "xpack.app.app", IsShow: true, Label: "XApp", Path: "/xpack/app", Sort: 100},
 				{ID: "112", Disabled: false, Title: "xpack.waf.name", IsShow: true, Label: "Dashboard", Path: "/xpack/waf/dashboard", Sort: 200},
 				{ID: "111", Disabled: false, Title: "xpack.node.nodeManagement", IsShow: true, Label: "NodeDashboard", Path: "/xpack/node/dashboard", Sort: 300},
+				{ID: "122", Disabled: false, Title: "xpack.opsReport.name", IsShow: true, Label: "OpsReport", Path: "/xpack/ops-report", Sort: 500},
 				{ID: "113", Disabled: false, Title: "xpack.monitor.name", IsShow: true, Label: "MonitorDashboard", Path: "/xpack/monitor/dashboard", Sort: 600},
 				{ID: "115", Disabled: false, Title: "xpack.sync.menu", IsShow: true, Label: "Sync", Path: "/xpack/sync", Sort: 700},
 				{ID: "114", Disabled: false, Title: "xpack.tamper.tamper", IsShow: true, Label: "Tamper", Path: "/xpack/tamper", Sort: 1000},
@@ -185,15 +186,7 @@ func LoadMenus() string {
 				Path:     "/enterprise/users",
 				Sort:     400,
 			}, "NodeDashboard")
-			item[i].Children = UpsertMenuByLabel(item[i].Children, dto.ShowMenu{
-				ID:       "122",
-				Disabled: false,
-				Title:    "xpack.opsReport.name",
-				IsShow:   true,
-				Label:    "OpsReport",
-				Path:     "/enterprise/ops-report",
-				Sort:     500,
-			}, "UserManagement")
+
 			break
 		}
 	}

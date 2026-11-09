@@ -77,5 +77,6 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.UpdateAiModelManagementMenus,
 		migrations.AddModelServicesMenu,
 		migrations.UpdateAiMenus,
+		migrations.MoveOpsReportMenuToAgent,
 	}
 }

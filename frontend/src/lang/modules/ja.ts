@@ -5569,9 +5569,50 @@ const message = {
             history: 'エクスポート履歴',
             setting: '設定',
             page: {
+                coreArchiveMasterOnly:
+                    'アップグレード前のレポート記録が見つかりました。元のファイルは管理者がマスターノードで確認してください。',
+                legacyHistoryReports: 'アップグレード前のレポート',
+                legacyHistoryManageHint: 'アップグレード前のレポートをここで確認・管理できます。',
+                legacyHistoryIntegrityHint: 'ダウンロード時にファイルの整合性を検証します。',
+                legacyHistoryListFailed: '旧レポート一覧を読み込めません。一覧を更新して再試行してください。',
+                legacyHistoryDownloadFailed:
+                    'ダウンロードに失敗しました。ファイルの状態を確認するか、後で再試行してください。',
+                legacyHistoryFileExists: 'ファイルあり',
+                legacyHistoryFileMissing: 'ファイルなし',
+                legacyHistoryFileUnavailable: 'ファイル利用不可',
+                legacyHistoryNoFile: 'ファイル未生成',
+                legacyHistoryFileMissingHint:
+                    '元のファイルが存在しないためダウンロードできません。対応する記録は削除できます。',
+                legacyHistoryFileUnavailableHint:
+                    'ファイルパスまたは検証情報が要件を満たさないためダウンロードできません。',
+                legacyHistoryNoFileHint: 'この生成記録に対応するレポートファイルはありません。',
+                legacyHistoryRemove: '削除',
+                legacyHistoryRemoveSelected: '選択項目を削除（{0}）',
+                legacyHistoryRemoveAll: 'すべて削除',
+                legacyHistorySelectedScope:
+                    '選択した {0} 件の旧レポートとファイルを削除しますか？この操作は取り消せません。',
+                legacyHistorySelectionChanged: 'レポートの範囲が変わりました。一覧を更新して選択し直してください。',
+                legacyHistoryQueryFailed: 'アップグレード前のレポート履歴を確認できません。',
+                legacyHistoryCleanup: '旧レポートを削除',
+                legacyHistoryCleanupScope:
+                    '各ノードの旧履歴を含め、マスターノードに保存されたすべての旧レポートとファイルを削除しますか？この操作は取り消せません。',
+                legacyHistoryCleanupFailed: '削除が完了しませんでした。一覧を更新してから再試行してください。',
+                legacyHistoryCleanupPartial:
+                    '{0} 件の旧記録を削除できませんでした。マスターノードのファイル権限またはログを確認してから再試行してください。',
+                legacyHistoryCleanupSuccess: '対象の旧レポートを削除しました。',
+
+                licenseRequired:
+                    'レポートと履歴の閲覧には有効なライセンスが必要です。ライセンスを更新するか、有効なライセンスをインポートしてください。',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'エンタープライズ',
                 reportNode: 'レポートノード',
-                selectReportNode: 'レポートノードを選択',
                 currentNode: '現在のノード',
                 scoreMeta: '{0} 点減点 · リスク {1} 件',
                 hostAddress: 'ホストアドレス',
@@ -5648,9 +5689,16 @@ const message = {
                 statSslDesc: '証明書 {0} 枚を検査',
                 statContainerDesc: 'コンテナ {0} 個を検査',
                 assetHostDesc: 'ディスク最大使用率 {0}%',
-                assetWebsiteDesc: '{0} 枚の証明書が期限間近、{1} 個のWebサイトの状態が異常',
+                assetWebsiteDesc: '{0} 枚の証明書が期限切れまたは期限間近、{1} 個のWebサイトの状態が異常',
                 assetResourceDesc: '{0} 個のアプリが異常、{1} 個のコンテナが異常',
-                assetCronjobDesc: '過去7日間に {0} 件の失敗記録、{1} 個のタスクが無効',
+
+                scoreDataUnavailable:
+                    '重要なデータが不足しているため採点できません。確認済みのリスクは以下に残ります。再読み込みしてください。',
+                scoreDataProvisional: '一部のデータが不足または概算のため、このスコアは暫定値です。',
+                reportWindow: '集計期間：{0} ～ {1}（{2}）',
+                snapshotScoreScope:
+                    'ホスト評価は収集時の値を使用し、24時間の推移は別途表示します。手動エクスポートでは再収集するため、値が変わる場合があります。',
+                assetCronjobDesc: '過去24時間に {0} 件の失敗記録、{1} 個のタスクが無効',
                 app: 'アプリ',
                 website: 'Webサイト',
                 websiteSsl: 'Webサイト / 証明書',
@@ -5911,7 +5959,7 @@ const message = {
                 wafSourceIpTop: 'WAF 遮断元IP TOP5',
                 wafAffectedSiteTop: '影響を受けたサイト TOP5',
                 sslRisk: '証明書リスク',
-                sslExpiring: '期限間近の証明書',
+                sslExpiring: '証明書の期限リスク',
                 includedInReport: 'レポートに含まれる',
                 needRenewal: '更新を推奨',
                 fromExpireInfo: '期限切れ情報より',

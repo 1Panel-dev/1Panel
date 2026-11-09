@@ -5680,9 +5680,49 @@ const message = {
             history: 'Dışa Aktarma Geçmişi',
             setting: 'Ayarlar',
             page: {
+                coreArchiveMasterOnly:
+                    'Yükseltme öncesi rapor kayıtları bulundu. Asıl dosyaları ana düğümde görüntülemek için bir yöneticiye başvurun.',
+                legacyHistoryReports: 'Yükseltme öncesi raporlar',
+                legacyHistoryManageHint: 'Yükseltme öncesi raporları burada görüntüleyip yönetebilirsiniz.',
+                legacyHistoryIntegrityHint: 'İndirme sırasında dosya bütünlüğü doğrulanır.',
+                legacyHistoryListFailed: 'Eski raporlar yüklenemedi. Listeyi yenileyip tekrar deneyin.',
+                legacyHistoryDownloadFailed:
+                    'İndirme başarısız oldu. Dosya durumunu kontrol edin veya daha sonra tekrar deneyin.',
+                legacyHistoryFileExists: 'Dosya mevcut',
+                legacyHistoryFileMissing: 'Dosya eksik',
+                legacyHistoryFileUnavailable: 'Dosya kullanılamıyor',
+                legacyHistoryNoFile: 'Dosya yok',
+                legacyHistoryFileMissingHint:
+                    'Asıl dosya artık mevcut değil ve indirilemiyor. İlgili kayıt silinebilir.',
+                legacyHistoryFileUnavailableHint:
+                    'Dosya yolu veya doğrulama bilgileri geçersiz. İndirme kullanılamıyor.',
+                legacyHistoryNoFileHint: 'Bu oluşturma kaydına bağlı bir rapor dosyası yok.',
+                legacyHistoryRemove: 'Sil',
+                legacyHistoryRemoveSelected: 'Seçilenleri sil ({0})',
+                legacyHistoryRemoveAll: 'Tümünü temizle',
+                legacyHistorySelectedScope: 'Seçilen {0} eski rapor ve dosyaları silinsin mi? Bu işlem geri alınamaz.',
+                legacyHistorySelectionChanged: 'Rapor kapsamı değişti. Listeyi yenileyip tekrar seçin.',
+                legacyHistoryQueryFailed: 'Yükseltme öncesi rapor geçmişi sorgulanamadı.',
+                legacyHistoryCleanup: 'Eski raporları temizle',
+                legacyHistoryCleanupScope:
+                    'Tüm düğümlerin eski geçmişi dahil ana düğümdeki tüm eski raporlar ve dosyaları silinsin mi? Bu işlem geri alınamaz.',
+                legacyHistoryCleanupFailed: 'Temizleme tamamlanmadı. Yeniden denemeden önce listeyi yenileyin.',
+                legacyHistoryCleanupPartial:
+                    '{0} eski kayıt temizlenemedi. Tekrar denemeden önce ana düğümdeki dosya izinlerini veya günlükleri kontrol edin.',
+                legacyHistoryCleanupSuccess: 'Seçilen eski raporlar silindi.',
+
+                licenseRequired:
+                    'Raporları ve geçmişi görüntülemek için geçerli bir lisans gereklidir. Lisansı yenileyin veya geçerli bir lisansı içe aktarın.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'Kurumsal',
                 reportNode: 'Rapor Düğümü',
-                selectReportNode: 'Rapor düğümü seçin',
                 currentNode: 'Geçerli Düğüm',
                 scoreMeta: '{0} puan düşüldü · {1} risk',
                 hostAddress: 'Ana Makine Adresi',
@@ -5759,9 +5799,16 @@ const message = {
                 statSslDesc: '{0} sertifika kontrol edildi',
                 statContainerDesc: '{0} konteyner kontrol edildi',
                 assetHostDesc: 'Disk en yüksek kullanım %{0}',
-                assetWebsiteDesc: '{0} sertifika süresi dolmak üzere, {1} anormal web sitesi',
+                assetWebsiteDesc: '{0} sertifikanın süresi dolmuş veya dolmak üzere, {1} anormal web sitesi',
                 assetResourceDesc: '{0} anormal uygulama, {1} anormal konteyner',
-                assetCronjobDesc: 'Son 7 günde {0} başarısızlık kaydı, {1} görev devre dışı',
+
+                scoreDataUnavailable:
+                    'Önemli veriler eksik olduğu için puan gösterilmiyor. Bilinen riskler aşağıda listelenir. Yenileyip tekrar deneyin.',
+                scoreDataProvisional: 'Bazı veriler eksik veya yaklaşık. Bu puan geçicidir.',
+                reportWindow: 'Rapor dönemi: {0} - {1} ({2})',
+                snapshotScoreScope:
+                    'Ana makine puanı güncel ölçümleri kullanır; 24 saatlik eğilimler ayrı gösterilir. Elle dışa aktarma verileri yeniden toplar, değerler değişebilir.',
+                assetCronjobDesc: 'Son 24 saatte {0} başarısızlık kaydı, {1} görev devre dışı',
                 app: 'Uygulamalar',
                 website: 'Web Siteleri',
                 websiteSsl: 'Web Siteleri / Sertifikalar',
@@ -6016,7 +6063,7 @@ const message = {
                 wafSourceIpTop: 'WAF Kaynak IP TOP5',
                 wafAffectedSiteTop: 'Etkilenen Siteler TOP5',
                 sslRisk: 'Sertifika Riskleri',
-                sslExpiring: 'Süresi Dolan Sertifikalar',
+                sslExpiring: 'Sertifika Süre Sonu Riskleri',
                 includedInReport: 'Rapora dahil edildi',
                 needRenewal: 'Yenileme öneriliyor',
                 fromExpireInfo: 'Son kullanma bilgisinden',

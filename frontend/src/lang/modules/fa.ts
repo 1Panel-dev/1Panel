@@ -5543,9 +5543,50 @@ const message = {
             history: 'تاریخچه خروجی',
             setting: 'تنظیمات',
             page: {
+                coreArchiveMasterOnly:
+                    'سوابق گزارش‌های پیش از ارتقا یافت شد. برای مشاهده فایل‌های اصلی در گره اصلی از مدیر کمک بگیرید.',
+                legacyHistoryReports: 'گزارش‌های پیش از ارتقا',
+                legacyHistoryManageHint: 'گزارش‌های پیش از ارتقا را در اینجا مشاهده و مدیریت کنید.',
+                legacyHistoryIntegrityHint: 'هنگام دانلود، یکپارچگی فایل بررسی می‌شود.',
+                legacyHistoryListFailed: 'بارگذاری گزارش‌های قدیمی ممکن نیست. فهرست را تازه‌سازی و دوباره تلاش کنید.',
+                legacyHistoryDownloadFailed:
+                    'دانلود ناموفق بود. وضعیت فایل گزارش را بررسی کنید یا بعداً دوباره تلاش کنید.',
+                legacyHistoryFileExists: 'فایل موجود است',
+                legacyHistoryFileMissing: 'فایل یافت نشد',
+                legacyHistoryFileUnavailable: 'فایل در دسترس نیست',
+                legacyHistoryNoFile: 'بدون فایل',
+                legacyHistoryFileMissingHint:
+                    'فایل اصلی دیگر وجود ندارد و قابل دانلود نیست. می‌توانید سابقه آن را حذف کنید.',
+                legacyHistoryFileUnavailableHint: 'مسیر یا اطلاعات اعتبارسنجی فایل معتبر نیست. دانلود ممکن نیست.',
+                legacyHistoryNoFileHint: 'این سابقه تولید، فایل گزارش مرتبطی ندارد.',
+                legacyHistoryRemove: 'حذف',
+                legacyHistoryRemoveSelected: 'حذف موارد انتخاب‌شده ({0})',
+                legacyHistoryRemoveAll: 'حذف همه',
+                legacyHistorySelectedScope:
+                    'آیا {0} گزارش قدیمی انتخاب‌شده و فایل‌های آن‌ها حذف شوند؟ این عملیات قابل بازگشت نیست.',
+                legacyHistorySelectionChanged:
+                    'محدوده گزارش‌ها تغییر کرده است. فهرست را تازه‌سازی و دوباره انتخاب کنید.',
+                legacyHistoryQueryFailed: 'بررسی تاریخچه گزارش‌های پیش از ارتقا ممکن نیست.',
+                legacyHistoryCleanup: 'پاک‌سازی گزارش‌های قدیمی',
+                legacyHistoryCleanupScope:
+                    'آیا همه گزارش‌های قدیمی و فایل‌های گره اصلی، شامل تاریخچه قدیمی همه گره‌ها، حذف شوند؟ این عملیات قابل بازگشت نیست.',
+                legacyHistoryCleanupFailed: 'پاک‌سازی کامل نشد. پیش از تلاش مجدد، فهرست را تازه‌سازی کنید.',
+                legacyHistoryCleanupPartial:
+                    'پاک‌سازی {0} سابقه قدیمی ممکن نشد. پیش از تلاش مجدد، مجوزهای فایل یا گزارش‌های گره اصلی را بررسی کنید.',
+                legacyHistoryCleanupSuccess: 'گزارش‌های قدیمی انتخاب‌شده حذف شدند.',
+
+                licenseRequired:
+                    'برای مشاهده گزارش‌ها و تاریخچه، مجوز معتبر لازم است. مجوز را تمدید یا یک مجوز معتبر وارد کنید.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'سازمانی',
                 reportNode: 'گره گزارش',
-                selectReportNode: 'انتخاب گره گزارش',
                 currentNode: 'جاری',
                 scoreMeta: '{0} امتیاز کسر شد · {1} ریسک',
                 hostAddress: 'آدرس میزبان',
@@ -5630,9 +5671,16 @@ const message = {
                 statContainerDesc: '{0} کانتینر بررسی شد',
                 statAlertDesc: '{0} وظیفه فعال · {1} کانال',
                 assetHostDesc: 'حداکثر استفاده از دیسک {0}%',
-                assetWebsiteDesc: '{0} گواهی به زودی منقضی می‌شود، {1} وب‌سایت غیرعادی',
+                assetWebsiteDesc: '{0} گواهی منقضی شده یا در آستانه انقضا، {1} وب\u200cسایت غیرعادی',
                 assetResourceDesc: '{0} برنامه غیرعادی، {1} کانتینر غیرعادی',
-                assetCronjobDesc: '{0} رکورد شکست در ۷ روز گذشته، {1} وظیفه غیرفعال',
+
+                scoreDataUnavailable:
+                    'داده‌های کلیدی موجود نیست؛ امتیاز نمایش داده نمی‌شود. خطرهای شناسایی‌شده در فهرست باقی می‌مانند. صفحه را تازه‌سازی کنید.',
+                scoreDataProvisional: 'برخی داده‌ها موجود نیستند یا تقریبی هستند. این امتیاز موقت است.',
+                reportWindow: 'بازه گزارش: {0} تا {1} ({2})',
+                snapshotScoreScope:
+                    'امتیاز میزبان از اندازه‌گیری فعلی استفاده می‌کند و روند ۲۴ ساعته جداگانه نمایش داده می‌شود. خروجی دستی داده‌ها را دوباره جمع‌آوری می‌کند و مقادیر ممکن است تغییر کنند.',
+                assetCronjobDesc: '{0} رکورد شکست در ۲۴ ساعت گذشته، {1} وظیفه غیرفعال',
                 assetAlertDesc: '{0} لاگ شکست، {1} لاگ در انتظار همگام‌سازی',
                 app: 'برنامه‌ها',
                 website: 'وب‌سایت‌ها',
@@ -5879,7 +5927,7 @@ const message = {
                 wafSourceIpTop: '۵ IP برتر مبدأ WAF',
                 wafAffectedSiteTop: '۵ سایت متأثر برتر',
                 sslRisk: 'ریسک‌های گواهی',
-                sslExpiring: 'گواهی‌های در حال انقضا',
+                sslExpiring: 'خطر انقضای گواهی',
                 includedInReport: 'در گزارش گنجانده شده است',
                 needRenewal: 'تمدید توصیه می‌شود',
                 fromExpireInfo: 'از اطلاعات انقضا',

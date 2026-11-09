@@ -5670,9 +5670,50 @@ const message = {
             history: 'История экспорта',
             setting: 'Настройки',
             page: {
+                coreArchiveMasterOnly:
+                    'Найдены записи отчетов до обновления. Попросите администратора просмотреть исходные файлы на главном узле.',
+                legacyHistoryReports: 'Отчеты до обновления',
+                legacyHistoryManageHint: 'Здесь можно просматривать отчеты до обновления и управлять ими.',
+                legacyHistoryIntegrityHint: 'При скачивании проверяется целостность файла.',
+                legacyHistoryListFailed: 'Не удалось загрузить старые отчеты. Обновите список и повторите попытку.',
+                legacyHistoryDownloadFailed:
+                    'Не удалось скачать файл. Проверьте его состояние или повторите попытку позже.',
+                legacyHistoryFileExists: 'Файл существует',
+                legacyHistoryFileMissing: 'Файл отсутствует',
+                legacyHistoryFileUnavailable: 'Файл недоступен',
+                legacyHistoryNoFile: 'Без файла',
+                legacyHistoryFileMissingHint:
+                    'Исходный файл больше не существует и недоступен для скачивания. Его запись можно удалить.',
+                legacyHistoryFileUnavailableHint:
+                    'Путь или проверочные данные файла недопустимы. Скачивание недоступно.',
+                legacyHistoryNoFileHint: 'У этой записи создания нет связанного файла отчета.',
+                legacyHistoryRemove: 'Удалить',
+                legacyHistoryRemoveSelected: 'Удалить выбранные ({0})',
+                legacyHistoryRemoveAll: 'Очистить все',
+                legacyHistorySelectedScope:
+                    'Удалить выбранные старые отчеты ({0}) и их файлы? Это действие нельзя отменить.',
+                legacyHistorySelectionChanged: 'Состав отчетов изменился. Обновите список и выберите записи заново.',
+                legacyHistoryQueryFailed: 'Не удалось проверить историю отчетов до обновления.',
+                legacyHistoryCleanup: 'Очистить старые отчеты',
+                legacyHistoryCleanupScope:
+                    'Удалить все старые отчеты и файлы на главном узле, включая старую историю всех узлов? Это действие нельзя отменить.',
+                legacyHistoryCleanupFailed: 'Очистка не завершена. Обновите список перед повторной попыткой.',
+                legacyHistoryCleanupPartial:
+                    'Не удалось очистить {0} старых записей. Перед повторной попыткой проверьте права доступа к файлам или журналы на главном узле.',
+                legacyHistoryCleanupSuccess: 'Выбранные старые отчеты удалены.',
+
+                licenseRequired:
+                    'Для просмотра отчётов и истории требуется действующая лицензия. Продлите или импортируйте действующую лицензию.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'Корпоративная версия',
                 reportNode: 'Узел отчёта',
-                selectReportNode: 'Выберите узел отчёта',
                 currentNode: 'Текущий',
                 scoreMeta: 'Снято {0} баллов · рисков: {1}',
                 hostAddress: 'Адрес узла',
@@ -5750,9 +5791,16 @@ const message = {
                 statSslDesc: 'Проверено сертификатов: {0}',
                 statContainerDesc: 'Проверено контейнеров: {0}',
                 assetHostDesc: 'Максимальная заполненность диска — {0}%',
-                assetWebsiteDesc: '{0} сертификатов скоро истекут, {1} сайтов с аномалиями',
+                assetWebsiteDesc: '{0} сертификатов просрочены или скоро истекут, {1} сайтов с аномалиями',
                 assetResourceDesc: '{0} приложений с аномалиями, {1} аномальных контейнеров',
-                assetCronjobDesc: '{0} записей о сбоях за 7 дней, {1} задач отключено',
+
+                scoreDataUnavailable:
+                    'Нет ключевых данных, поэтому оценка не показана. Известные риски остаются в списке. Обновите страницу и повторите.',
+                scoreDataProvisional: 'Некоторые данные отсутствуют или приблизительны. Оценка предварительная.',
+                reportWindow: 'Период отчета: с {0} по {1} ({2})',
+                snapshotScoreScope:
+                    'Оценка хоста использует текущие измерения; тренды за 24 часа показаны отдельно. При ручном экспорте данные собираются заново, поэтому значения могут измениться.',
+                assetCronjobDesc: '{0} записей о сбоях за 24 часа, {1} задач отключено',
                 app: 'Приложения',
                 website: 'Сайты',
                 websiteSsl: 'Сайты / Сертификаты',
@@ -6012,7 +6060,7 @@ const message = {
                 wafSourceIpTop: 'WAF — TOP5 IP-источников перехвата',
                 wafAffectedSiteTop: 'TOP5 затронутых сайтов',
                 sslRisk: 'Риски сертификатов',
-                sslExpiring: 'Срок действия сертификатов истекает',
+                sslExpiring: 'Риски истечения сертификатов',
                 includedInReport: 'Включено в отчёт',
                 needRenewal: 'Рекомендуется продлить',
                 fromExpireInfo: 'Из информации об истечении',

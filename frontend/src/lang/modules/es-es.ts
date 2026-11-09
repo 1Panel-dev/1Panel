@@ -5678,9 +5678,52 @@ const message = {
             history: 'Historial de exportación',
             setting: 'Configuración',
             page: {
+                coreArchiveMasterOnly:
+                    'Se encontraron registros de informes anteriores a la actualización. Solicite a un administrador que consulte los archivos originales en el nodo principal.',
+                legacyHistoryReports: 'Informes anteriores a la actualización',
+                legacyHistoryManageHint: 'Consulte y gestione aquí los informes anteriores a la actualización.',
+                legacyHistoryIntegrityHint: 'La integridad del archivo se verifica al descargarlo.',
+                legacyHistoryListFailed:
+                    'No se pudieron cargar los informes anteriores. Actualice la lista e inténtelo de nuevo.',
+                legacyHistoryDownloadFailed:
+                    'La descarga falló. Compruebe el estado del archivo o inténtelo más tarde.',
+                legacyHistoryFileExists: 'El archivo existe',
+                legacyHistoryFileMissing: 'Archivo ausente',
+                legacyHistoryFileUnavailable: 'Archivo no disponible',
+                legacyHistoryNoFile: 'Sin archivo',
+                legacyHistoryFileMissingHint:
+                    'El archivo original ya no existe y no se puede descargar. Puede eliminar su registro.',
+                legacyHistoryFileUnavailableHint:
+                    'La ruta o los datos de verificación del archivo no son válidos. No se puede descargar.',
+                legacyHistoryNoFileHint: 'Este registro de generación no tiene un archivo de informe asociado.',
+                legacyHistoryRemove: 'Eliminar',
+                legacyHistoryRemoveSelected: 'Eliminar seleccionados ({0})',
+                legacyHistoryRemoveAll: 'Borrar todo',
+                legacyHistorySelectedScope:
+                    '¿Eliminar los {0} informes anteriores seleccionados y sus archivos? Esta acción no se puede deshacer.',
+                legacyHistorySelectionChanged:
+                    'El conjunto de informes ha cambiado. Actualice la lista y vuelva a seleccionar.',
+                legacyHistoryQueryFailed: 'No se pudo consultar el historial de informes anterior a la actualización.',
+                legacyHistoryCleanup: 'Limpiar informes anteriores',
+                legacyHistoryCleanupScope:
+                    '¿Eliminar todos los informes anteriores y archivos del nodo principal, incluido el historial antiguo de todos los nodos? Esta acción no se puede deshacer.',
+                legacyHistoryCleanupFailed: 'La limpieza no se completó. Actualice la lista antes de reintentarlo.',
+                legacyHistoryCleanupPartial:
+                    'No se pudieron limpiar {0} registros antiguos. Revise los permisos de archivos o los registros del nodo principal antes de reintentarlo.',
+                legacyHistoryCleanupSuccess: 'Se han eliminado los informes anteriores seleccionados.',
+
+                licenseRequired:
+                    'Se requiere una licencia válida para ver informes e historial. Renueve o importe una licencia válida.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'Edición Empresarial',
                 reportNode: 'Nodo de informe',
-                selectReportNode: 'Seleccionar nodo de informe',
                 currentNode: 'Actual',
                 scoreMeta: '{0} puntos deducidos · {1} riesgos',
                 hostAddress: 'Dirección del host',
@@ -5759,9 +5802,16 @@ const message = {
                 statSslDesc: '{0} certificados verificados',
                 statContainerDesc: '{0} contenedores verificados',
                 assetHostDesc: 'Uso máximo de disco {0}%',
-                assetWebsiteDesc: '{0} certificados por vencer, {1} sitios web anómalos',
+                assetWebsiteDesc: '{0} certificados vencidos o próximos a vencer, {1} sitios web anómalos',
                 assetResourceDesc: '{0} aplicaciones anómalas, {1} contenedores anómalos',
-                assetCronjobDesc: '{0} registros de fallos en los últimos 7 días, {1} tareas deshabilitadas',
+
+                scoreDataUnavailable:
+                    'Faltan datos clave, por lo que no se muestra la puntuación. Los riesgos conocidos siguen en la lista. Actualice e inténtelo de nuevo.',
+                scoreDataProvisional: 'Faltan datos o son aproximados. Esta puntuación es provisional.',
+                reportWindow: 'Periodo del informe: {0} a {1} ({2})',
+                snapshotScoreScope:
+                    'La puntuación del host usa mediciones actuales; las tendencias de 24 horas se muestran aparte. La exportación manual vuelve a recopilar datos y los valores pueden cambiar.',
+                assetCronjobDesc: '{0} registros de fallos en las últimas 24 horas, {1} tareas deshabilitadas',
                 app: 'Aplicaciones',
                 website: 'Sitios web',
                 websiteSsl: 'Sitios web / Certificados',
@@ -6025,7 +6075,7 @@ const message = {
                 wafSourceIpTop: 'IPs fuente WAF TOP5',
                 wafAffectedSiteTop: 'Sitios afectados TOP5',
                 sslRisk: 'Riesgos de certificados',
-                sslExpiring: 'Certificados por vencer',
+                sslExpiring: 'Riesgos de vencimiento de certificados',
                 includedInReport: 'Incluido en el informe',
                 needRenewal: 'Renovación recomendada',
                 fromExpireInfo: 'Desde información de vencimiento',

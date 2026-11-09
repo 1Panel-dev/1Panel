@@ -35,6 +35,7 @@ type IDockerService interface {
 	UpdateIpv6Option(req dto.Ipv6Option) error
 	UpdateConfByFile(info dto.DaemonJsonUpdateByFile) error
 	LoadDockerStatus() *dto.DockerStatus
+	LoadDockerStatusWithContext(ctx context.Context) (*dto.DockerStatus, error)
 	LoadDockerConf() (*dto.DaemonJsonConf, error)
 	OperateDocker(req dto.DockerOperation) error
 }
@@ -171,27 +172,40 @@ type logOption struct {
 }
 
 func (u *DockerService) LoadDockerStatus() *dto.DockerStatus {
-	ctx := context.Background()
+	data, _ := u.LoadDockerStatusWithContext(context.Background())
+	return data
+}
+
+func (u *DockerService) LoadDockerStatusWithContext(ctx context.Context) (*dto.DockerStatus, error) {
 	var data dto.DockerStatus
+	if err := ctx.Err(); err != nil {
+		return &data, err
+	}
 	if !cmd.Which("docker") {
 		data.IsExist = false
-		return &data
+		return &data, nil
 	}
 	data.IsExist = true
 	data.IsActive = true
-	client, err := docker.NewDockerClient()
+	client, err := docker.NewDockerClientWithContext(ctx)
 	if err != nil {
 		global.LOG.Errorf("load docker client failed, err: %v", err)
 		data.IsActive = false
-		return &data
+		if ctx.Err() != nil {
+			return &data, ctx.Err()
+		}
+		return &data, nil
 	}
 	defer client.Close()
 	if _, err := client.Ping(ctx); err != nil {
 		global.LOG.Errorf("ping docker client failed, err: %v", err)
 		data.IsActive = false
+		if ctx.Err() != nil {
+			return &data, ctx.Err()
+		}
 	}
 
-	return &data
+	return &data, nil
 }
 
 func readDockerDaemonConfig() (map[string]interface{}, error) {

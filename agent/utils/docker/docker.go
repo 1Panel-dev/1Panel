@@ -27,8 +27,18 @@ import (
 var ErrUnavailable = errors.New("Docker is unavailable")
 
 func NewDockerClient() (*client.Client, error) {
+	return NewDockerClientWithContext(context.Background())
+}
+
+func NewDockerClientWithContext(ctx context.Context) (*client.Client, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var settingItem model.Setting
-	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
+	_ = global.DB.WithContext(ctx).Where("key = ?", "DockerSockPath").First(&settingItem).Error
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if len(settingItem.Value) == 0 {
 		settingItem.Value = "unix:///var/run/docker.sock"
 	}
@@ -40,12 +50,11 @@ func NewDockerClient() (*client.Client, error) {
 }
 
 func NewClient() (Client, error) {
-	var settingItem model.Setting
-	_ = global.DB.Where("key = ?", "DockerSockPath").First(&settingItem).Error
-	if len(settingItem.Value) == 0 {
-		settingItem.Value = "unix:///var/run/docker.sock"
-	}
-	cli, err := client.NewClientWithOpts(client.FromEnv, client.WithHost(settingItem.Value), client.WithAPIVersionNegotiation())
+	return NewClientWithContext(context.Background())
+}
+
+func NewClientWithContext(ctx context.Context) (Client, error) {
+	cli, err := NewDockerClientWithContext(ctx)
 	if err != nil {
 		return Client{}, err
 	}
@@ -96,11 +105,15 @@ func (c Client) ListContainersByName(names []string) ([]container.Summary, error
 	return res, nil
 }
 func (c Client) ListAllContainers() ([]container.Summary, error) {
+	return c.ListAllContainersWithContext(context.Background())
+}
+
+func (c Client) ListAllContainersWithContext(ctx context.Context) ([]container.Summary, error) {
 	var (
 		options container.ListOptions
 	)
 	options.All = true
-	containers, err := c.cli.ContainerList(context.Background(), options)
+	containers, err := c.cli.ContainerList(ctx, options)
 	if err != nil {
 		return nil, err
 	}

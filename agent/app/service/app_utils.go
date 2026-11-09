@@ -1591,6 +1591,13 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
+	return handleInstalledWithContext(context.Background(), appInstallList, updated, sync, checkUpdate)
+}
+
+func handleInstalledWithContext(ctx context.Context, appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var (
 		res           []response.AppInstallDTO
 		containersMap map[string]container.Summary
@@ -1603,12 +1610,12 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 		}
 	}
 	if syncContainers {
-		cli, err := docker.NewClient()
+		cli, err := docker.NewClientWithContext(ctx)
 		if err != nil {
 			return nil, err
 		}
 		defer cli.Close()
-		containers, err := cli.ListAllContainers()
+		containers, err := cli.ListAllContainersWithContext(ctx)
 		if err != nil {
 			return nil, err
 		}
@@ -1619,6 +1626,9 @@ func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpda
 	}
 
 	for _, installed := range appInstallList {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
 		localEngine := installed.App.Key == "ollama" || installed.App.Key == "vllm"
 		if localEngine {
 			operationTask, err := taskRepo.GetExecutingTask(task.TaskScopeApp, installed.ID)

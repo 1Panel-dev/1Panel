@@ -5467,9 +5467,48 @@ const message = {
             history: '내보내기 기록',
             setting: '설정',
             page: {
+                coreArchiveMasterOnly:
+                    '업그레이드 이전 보고서 기록이 있습니다. 관리자에게 마스터 노드에서 원본 파일을 확인하도록 요청하세요.',
+                legacyHistoryReports: '업그레이드 이전 보고서',
+                legacyHistoryManageHint: '업그레이드 이전 보고서를 여기서 확인하고 관리할 수 있습니다.',
+                legacyHistoryIntegrityHint: '다운로드할 때 파일 무결성을 확인합니다.',
+                legacyHistoryListFailed: '이전 보고서 목록을 불러올 수 없습니다. 새로 고친 후 다시 시도하세요.',
+                legacyHistoryDownloadFailed: '다운로드에 실패했습니다. 파일 상태를 확인하거나 나중에 다시 시도하세요.',
+                legacyHistoryFileExists: '파일 있음',
+                legacyHistoryFileMissing: '파일 누락',
+                legacyHistoryFileUnavailable: '파일 사용 불가',
+                legacyHistoryNoFile: '파일 없음',
+                legacyHistoryFileMissingHint:
+                    '원본 파일이 없어 다운로드할 수 없습니다. 해당 기록은 삭제할 수 있습니다.',
+                legacyHistoryFileUnavailableHint: '파일 경로 또는 검증 정보가 올바르지 않아 다운로드할 수 없습니다.',
+                legacyHistoryNoFileHint: '이 생성 기록에는 연결된 보고서 파일이 없습니다.',
+                legacyHistoryRemove: '삭제',
+                legacyHistoryRemoveSelected: '선택 항목 삭제 ({0})',
+                legacyHistoryRemoveAll: '모두 삭제',
+                legacyHistorySelectedScope:
+                    '선택한 이전 보고서 {0}개와 해당 파일을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+                legacyHistorySelectionChanged: '보고서 범위가 변경되었습니다. 목록을 새로 고친 후 다시 선택하세요.',
+                legacyHistoryQueryFailed: '업그레이드 이전 보고서 기록을 확인할 수 없습니다.',
+                legacyHistoryCleanup: '이전 보고서 정리',
+                legacyHistoryCleanupScope:
+                    '모든 노드의 이전 기록을 포함하여 마스터 노드에 저장된 이전 보고서와 파일을 모두 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+                legacyHistoryCleanupFailed: '삭제가 완료되지 않았습니다. 목록을 새로 고친 후 다시 시도하세요.',
+                legacyHistoryCleanupPartial:
+                    '이전 기록 {0}개를 정리하지 못했습니다. 마스터 노드의 파일 권한 또는 로그를 확인한 후 재시도하세요.',
+                legacyHistoryCleanupSuccess: '대상 이전 보고서를 삭제했습니다.',
+
+                licenseRequired:
+                    '보고서와 기록을 보려면 유효한 라이선스가 필요합니다. 라이선스를 갱신하거나 유효한 라이선스를 가져오세요.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: '엔터프라이즈',
                 reportNode: '보고서 노드',
-                selectReportNode: '보고서 노드 선택',
                 currentNode: '현재 노드',
                 scoreMeta: '감점 {0}점 · 위험 {1}건',
                 hostAddress: '호스트 주소',
@@ -5546,9 +5585,16 @@ const message = {
                 statSslDesc: '총 {0}매 인증서 검사',
                 statContainerDesc: '총 {0}개 컨테이너 검사',
                 assetHostDesc: '디스크 최대 사용률 {0}%',
-                assetWebsiteDesc: '{0}매 인증서 만료 임박, {1}개 웹사이트 상태 비정상',
+                assetWebsiteDesc: '{0}개 인증서가 만료되었거나 만료 임박, {1}개 웹사이트 상태 비정상',
                 assetResourceDesc: '{0}개 앱 비정상, {1}개 컨테이너 비정상',
-                assetCronjobDesc: '최근 7일간 {0}건 실패 기록, {1}개 작업 미활성화',
+
+                scoreDataUnavailable:
+                    '주요 데이터가 없어 점수를 표시하지 않습니다. 확인된 위험은 아래에 유지됩니다. 새로 고침 후 다시 시도하세요.',
+                scoreDataProvisional: '일부 데이터가 없거나 근사치이므로 이 점수는 잠정 결과입니다.',
+                reportWindow: '통계 기간: {0} ~ {1} ({2})',
+                snapshotScoreScope:
+                    '호스트 점수는 수집 시점의 값을 사용하며 24시간 추이는 별도로 표시합니다. 수동 내보내기는 다시 수집하므로 실시간 값이 달라질 수 있습니다.',
+                assetCronjobDesc: '최근 24시간 {0}건 실패 기록, {1}개 작업 미활성화',
                 app: '애플리케이션',
                 website: '웹사이트',
                 websiteSsl: '웹사이트 / 인증서',
@@ -5804,7 +5850,7 @@ const message = {
                 wafSourceIpTop: 'WAF 차단 출처 IP TOP5',
                 wafAffectedSiteTop: '영향받은 사이트 TOP5',
                 sslRisk: '인증서 위험',
-                sslExpiring: '인증서 만료 임박',
+                sslExpiring: '인증서 만료 위험',
                 includedInReport: '보고서 포함',
                 needRenewal: '갱신 권장',
                 fromExpireInfo: '만료 정보 기반',

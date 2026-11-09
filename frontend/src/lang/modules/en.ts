@@ -5588,9 +5588,49 @@ const message = {
             history: 'Export History',
             setting: 'Settings',
             page: {
+                coreArchiveMasterOnly:
+                    'Pre-upgrade report records were found. Ask an administrator to view the original files on the master node.',
+                legacyHistoryReports: 'Pre-upgrade reports',
+                legacyHistoryManageHint: 'View and manage pre-upgrade reports here.',
+                legacyHistoryIntegrityHint: 'File integrity is verified when downloading.',
+                legacyHistoryListFailed: 'Unable to load pre-upgrade reports. Refresh the list and retry.',
+                legacyHistoryDownloadFailed: 'Download failed. Check the report file status or retry later.',
+                legacyHistoryFileExists: 'File exists',
+                legacyHistoryFileMissing: 'File missing',
+                legacyHistoryFileUnavailable: 'File unavailable',
+                legacyHistoryNoFile: 'No file',
+                legacyHistoryFileMissingHint:
+                    'The original file no longer exists and cannot be downloaded. Its record can be removed.',
+                legacyHistoryFileUnavailableHint:
+                    'The file path or verification metadata is invalid. Download is unavailable.',
+                legacyHistoryNoFileHint: 'This generation record has no associated report file.',
+                legacyHistoryRemove: 'Remove',
+                legacyHistoryRemoveSelected: 'Remove selected ({0})',
+                legacyHistoryRemoveAll: 'Clear all',
+                legacyHistorySelectedScope:
+                    'Remove the {0} selected pre-upgrade reports and their files? This cannot be undone.',
+                legacyHistorySelectionChanged: 'The report scope changed. Refresh the list and select again.',
+                legacyHistoryQueryFailed: 'Unable to check pre-upgrade report history.',
+                legacyHistoryCleanup: 'Clean up pre-upgrade reports',
+                legacyHistoryCleanupScope:
+                    'Remove all pre-upgrade reports and files stored on the master node, including old history for every node? This cannot be undone.',
+                legacyHistoryCleanupFailed: 'Cleanup was not completed. Refresh the list before retrying.',
+                legacyHistoryCleanupPartial:
+                    '{0} old records could not be cleared. Check file permissions or logs on the master node before retrying.',
+                legacyHistoryCleanupSuccess: 'Pre-upgrade reports have been removed.',
+
+                licenseRequired:
+                    'A valid license is required to view reports and history. Renew or import a valid license.',
+                agentUpgradeRequired:
+                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                contextFailed:
+                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
+                generationPending: 'This request is still running. Check report history before generating again.',
+                notApplicable: 'Not applicable',
+                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+
                 enterprise: 'Enterprise',
                 reportNode: 'Report Node',
-                selectReportNode: 'Select report node',
                 currentNode: 'Current',
                 scoreMeta: '{0} points deducted · {1} risks',
                 hostAddress: 'Host Address',
@@ -5676,9 +5716,16 @@ const message = {
                 statContainerDesc: '{0} containers checked',
                 statAlertDesc: '{0} enabled tasks · {1} channels',
                 assetHostDesc: 'Max disk usage {0}%',
-                assetWebsiteDesc: '{0} certificates expiring soon, {1} abnormal websites',
+                assetWebsiteDesc: '{0} certificates expired or expiring soon, {1} abnormal websites',
                 assetResourceDesc: '{0} abnormal apps, {1} abnormal containers',
-                assetCronjobDesc: '{0} failure records in the last 7 days, {1} disabled jobs',
+
+                scoreDataUnavailable:
+                    'Key data is missing, so no score is shown. Known risks remain listed below. Refresh to try again.',
+                scoreDataProvisional: 'Some data is missing or approximate. This score is provisional.',
+                reportWindow: 'Report period: {0} to {1} ({2})',
+                snapshotScoreScope:
+                    'Host scoring uses current measurements; 24-hour trends are shown separately. Manual export collects again, so live values may change.',
+                assetCronjobDesc: '{0} failure records in the last 24 hours, {1} disabled jobs',
                 assetAlertDesc: '{0} failed logs, {1} pending sync logs',
                 app: 'Apps',
                 website: 'Websites',
@@ -5926,7 +5973,7 @@ const message = {
                 wafSourceIpTop: 'WAF Source IP TOP5',
                 wafAffectedSiteTop: 'Affected Sites TOP5',
                 sslRisk: 'Certificate Risks',
-                sslExpiring: 'Expiring Certificates',
+                sslExpiring: 'Certificate Expiry Risks',
                 includedInReport: 'Included in report',
                 needRenewal: 'Renewal recommended',
                 fromExpireInfo: 'From expiry information',

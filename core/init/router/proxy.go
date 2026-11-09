@@ -120,6 +120,9 @@ func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 		for _, policy := range policies {
 			if policy.grant != nil {
 				policy.grant(c, useLocalAgent)
+				if c.IsAborted() {
+					return
+				}
 			}
 		}
 
@@ -154,6 +157,7 @@ func isInternalOnlyAgentEndpoint(reqPath string) bool {
 	normalizedPath := path.Clean(reqPath)
 	return normalizedPath == "/api/v2/xpack/alert/offline/email" ||
 		strings.HasPrefix(normalizedPath, "/api/v2/internal/mcp/") ||
+		strings.HasPrefix(normalizedPath, "/api/v2/internal/ops-report/") ||
 		normalizedPath == "/api/v2/xpack/alert/offline/webhook" ||
 		normalizedPath == "/api/v2/hosts/firewall/port" ||
 		normalizedPath == "/api/v2/internal/terminal/sessions/revoke" ||
