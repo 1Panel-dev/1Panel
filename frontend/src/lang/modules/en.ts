@@ -776,6 +776,48 @@ const message = {
         localIP: 'Local IP',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                'Associations come from application configurations managed by 1Panel on this node; memory values are sampled for the whole GPU.',
+            usageTitle: 'GPU usage',
+            usageHelp:
+                'Selected GPUs may be used by other deployments. Continuing may cause insufficient GPU memory or reduced performance. You can still proceed.',
+            usageUnknown: 'GPU usage could not be fully checked. Verify resources before continuing.',
+            usagePossible: 'Allocated by count; may use this GPU',
+            usageMemory: 'GPU memory (used / total)',
+            dimension: 'Dimension',
+            namePlaceholder: 'e.g. Production inference pair',
+            descriptionPlaceholder: 'Optional: describe the purpose or usage of this group',
+            selectedGPU: '{count} GPUs selected',
+
+            byGroup: 'By group',
+            byNUMA: 'By NUMA',
+            ungrouped: 'Ungrouped',
+
+            unknownNode: 'Unknown NUMA affinity',
+            memoryNode: 'Memory node',
+            selectNode: 'Select GPUs in this node',
+            noDevices: 'No GPUs in this node',
+            affinity: 'CPU / memory affinity',
+            followGPU: 'Follow GPU nodes',
+            bindingPreview: 'Binding preview',
+
+            overview: 'Device overview',
+            groups: 'GPU groups',
+            history: 'Monitoring history',
+            source: 'Configuration',
+            custom: 'Custom',
+            selectRequired: 'Select a GPU group',
+            snapshotHelp:
+                'Deployments save a configuration snapshot. Group changes do not update existing deployments automatically.',
+            changed: 'The source group has changed or been deleted. The saved configuration is still in use.',
+            applyLatest: 'Apply latest group configuration',
+            deployments: 'Related deployments',
+            help: 'Groups reuse GPU and NUMA settings. Membership may overlap; GPUs and memory are not reserved or isolated.',
+            deleteHelp: 'Delete group “{name}”? Existing deployments will keep their configuration.',
+            vendor: 'Device type',
+            topology: 'NUMA topology',
+        },
         agents: {
             feishuUpgradeNotice:
                 'Legacy Feishu must be handled before upgrading. A full application backup is required; failure restores the old image and matching data. An unconfigured legacy plugin is only disabled.',
@@ -1074,6 +1116,21 @@ const message = {
             vllmVersion: 'vLLM Version',
             vllmImage: 'vLLM Image',
             servicePort: 'Service Port',
+            numaBinding: 'NUMA binding',
+            numaOff: 'No binding',
+            numaAuto: 'Automatic',
+            numaManual: 'Manual',
+            numaNodes: 'NUMA nodes',
+            numaHint: 'Leave binding off unless you need performance tuning.',
+            numaHelp:
+                'Binds the application to selected CPU and memory nodes. Automatic matching selects nodes near the GPUs.',
+            numaRequirements: 'The image must include numactl. Enabling binding automatically adds SYS_NICE if needed.',
+            numaUnknown:
+                'Could not identify the CPU and memory node associated with the GPU. Leave binding off, or select nodes manually if you know the hardware layout.',
+            numaCross: 'Selected GPUs span multiple NUMA nodes. Select nodes manually.',
+            numaCount: 'Automatic binding requires specific GPUs or all GPUs.',
+            numaRequired: 'Select at least one NUMA node.',
+            numaUnavailable: 'NUMA node is unavailable or has no CPUs or memory.',
             gpuAcceleration: 'GPU acceleration',
             gpuMode: 'Accelerator selection',
             gpuAll: 'All accelerators',

@@ -13,6 +13,13 @@ const aiRouter = {
     },
     children: [
         {
+            path: '/ai/gpu/groups',
+            name: 'GPUGroups',
+            component: () => import('@/views/ai/gpu/groups/index.vue'),
+            hidden: true,
+            meta: { title: 'aiTools.gpuGroup.groups', activeMenu: '/ai/gpu/current', permission: 'ai_gpu_view' },
+        },
+        {
             path: '/ai/gpu/current',
             name: 'GPU',
             component: () => import('@/views/ai/gpu/current/index.vue'),

@@ -779,6 +779,48 @@ const message = {
         localIP: 'IP local',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                'Las asociaciones proceden de las configuraciones de aplicaciones gestionadas por 1Panel en este nodo; la memoria se mide para toda la GPU.',
+            usageTitle: 'Uso de GPU',
+            usageHelp:
+                'Otras implementaciones podrían usar las GPU seleccionadas. Continuar puede causar falta de memoria o reducir el rendimiento. Puede continuar.',
+            usageUnknown: 'No se pudo comprobar todo el uso de GPU. Verifique los recursos antes de continuar.',
+            usagePossible: 'Asignación por cantidad; podría usar esta GPU',
+            usageMemory: 'Memoria de GPU (usada / total)',
+            dimension: 'Dimensión',
+            namePlaceholder: 'Ej.: par de GPU para inferencia',
+            descriptionPlaceholder: 'Opcional: describa el propósito o uso del grupo',
+            selectedGPU: '{count} GPU seleccionadas',
+
+            byGroup: 'Por grupo',
+            byNUMA: 'Por NUMA',
+            ungrouped: 'Sin grupo',
+
+            unknownNode: 'Nodo NUMA desconocido',
+            memoryNode: 'Nodo de memoria',
+            selectNode: 'Seleccionar las GPU de este nodo',
+            noDevices: 'No hay GPU en este nodo',
+            affinity: 'Afinidad de CPU / memoria',
+            followGPU: 'Seguir los nodos de las GPU',
+            bindingPreview: 'Vista previa de vinculación',
+
+            overview: 'Resumen de dispositivos',
+            groups: 'Grupos de GPU',
+            history: 'Historial de supervisión',
+            source: 'Configuración',
+            custom: 'Personalizada',
+            selectRequired: 'Seleccione un grupo de GPU',
+            snapshotHelp:
+                'Los despliegues guardan la configuración actual. Los cambios del grupo no actualizan los despliegues existentes automáticamente.',
+            changed: 'El grupo de origen cambió o se eliminó. Se sigue usando la configuración guardada.',
+            applyLatest: 'Aplicar la configuración más reciente',
+            deployments: 'Despliegues asociados',
+            help: 'Los grupos reutilizan ajustes de GPU y NUMA. Los dispositivos pueden pertenecer a varios grupos, sin exclusividad ni aislamiento de memoria.',
+            deleteHelp: '¿Eliminar el grupo «{name}»? Los despliegues existentes conservarán su configuración.',
+            vendor: 'Tipo de dispositivo',
+            topology: 'Topología NUMA',
+        },
         agents: {
             feishuUpgradeNotice:
                 'Antes de actualizar se debe tratar el complemento Feishu antiguo. Se requiere una copia completa; si falla, se restauran la imagen anterior y sus datos. Un complemento sin configurar solo se desactiva.',
@@ -1076,6 +1118,22 @@ const message = {
             vllmVersion: 'Versión de vLLM',
             vllmImage: 'Imagen de vLLM',
             servicePort: 'Puerto del servicio',
+            numaBinding: 'Afinidad NUMA',
+            numaOff: 'Sin afinidad',
+            numaAuto: 'Automática',
+            numaManual: 'Manual',
+            numaNodes: 'Nodos NUMA',
+            numaHint: 'Deje la afinidad desactivada salvo que necesite ajustar el rendimiento.',
+            numaHelp:
+                'Vincula la aplicación a los nodos de CPU y memoria seleccionados. La selección automática elige nodos cercanos a las GPU.',
+            numaRequirements:
+                'La imagen debe incluir numactl. Al activar la afinidad se añade SYS_NICE automáticamente si es necesario.',
+            numaUnknown:
+                'No se pudo identificar el nodo de CPU y memoria asociado a la GPU. Deje la afinidad desactivada o seleccione los nodos manualmente si conoce la distribución del hardware.',
+            numaCross: 'Las GPU seleccionadas abarcan varios nodos NUMA. Selecciónelos manualmente.',
+            numaCount: 'La afinidad automática requiere GPU específicas o todas las GPU.',
+            numaRequired: 'Seleccione al menos un nodo NUMA.',
+            numaUnavailable: 'El nodo NUMA no está disponible o carece de CPU o memoria.',
             gpuAcceleration: 'Aceleración GPU',
             gpuMode: 'Selección de aceleradores',
             gpuAll: 'Todos los aceleradores',

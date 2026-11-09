@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -18,6 +19,11 @@ import (
 
 func LoadModelGPUDevices() dto.ModelGPUDevices {
 	result := dto.ModelGPUDevices{Devices: []dto.ModelGPUDevice{}, Warnings: []string{}}
+	nodes, topologyErr := loadModelNUMANodes("/sys")
+	result.NUMANodes = nodes
+	if topologyErr != nil {
+		result.Warnings = append(result.Warnings, topologyErr.Error())
+	}
 	ok, client := accelerator.New()
 	if !ok {
 		return result
@@ -32,7 +38,7 @@ func LoadModelGPUDevices() dto.ModelGPUDevices {
 		if monitored.ParentID != "" {
 			continue
 		}
-		device := dto.ModelGPUDevice{Available: true}
+		device := dto.ModelGPUDevice{Available: true, Index: monitored.Index, MemoryUsed: monitored.Metrics.MemoryUsed.Display, MemoryTotal: monitored.Metrics.MemoryTotal.Display}
 		devicePath := ""
 		switch {
 		case monitored.GPU != nil:
@@ -83,6 +89,7 @@ func LoadModelGPUDevices() dto.ModelGPUDevices {
 				result.Warnings = append(result.Warnings, err.Error())
 			}
 		}
+		device.NUMANode = loadModelGPUNode("/sys", monitored.BusID)
 		result.Devices = append(result.Devices, device)
 	}
 	return result
@@ -95,9 +102,38 @@ func ApplyModelGPU(service map[string]interface{}, config *dto.ModelGPUConfig, p
 	if err := validateModelGPU(config, imageType); err != nil {
 		return err
 	}
+	if config.Enabled && config.Group != nil {
+		if config.Mode != "devices" {
+			return fmt.Errorf("GPU groups require specific GPU devices")
+		}
+		topology := LoadModelGPUDevices()
+		if err := validateGPUGroupDevices(config, topology, imageType); err != nil {
+			return err
+		}
+		if config.NUMA != nil && config.NUMA.Mode == "auto" {
+			nodes, err := resolveModelNUMANodes(config, topology, imageType, "")
+			if err != nil {
+				return err
+			}
+			snapshot := *config
+			snapshot.NUMA = &dto.ModelNUMAConfig{Mode: "manual", Nodes: nodes}
+			config = &snapshot
+		}
+	}
+	if err := applyModelNUMA(service, config, params, imageType); err != nil {
+		return err
+	}
 	resolved, err := resolveModelGPUService(service, params, false)
 	if err != nil {
 		return err
+	}
+	delete(service, modelGPUGroupKey)
+	if config.Enabled && config.Group != nil {
+		data, err := json.Marshal(config.Group)
+		if err != nil {
+			return err
+		}
+		service[modelGPUGroupKey] = string(data)
 	}
 	devicePaths := []string{}
 	ids := []string{}
@@ -317,7 +353,23 @@ func ApplyModelGPU(service map[string]interface{}, config *dto.ModelGPUConfig, p
 	return nil
 }
 
-func ReadModelGPU(service map[string]interface{}, params map[string]interface{}, imageType string) *dto.ModelGPUConfig {
+func ReadModelGPU(service map[string]interface{}, params map[string]interface{}, imageType string) (result *dto.ModelGPUConfig) {
+	defer func() {
+		if value, ok := service[modelGPUGroupKey].(string); ok && result.Enabled {
+			var source dto.GPUGroupSource
+			if err := json.Unmarshal([]byte(value), &source); err != nil {
+				result.Error = err.Error()
+			} else {
+				result.Group = &source
+			}
+		}
+		state, err := readModelNUMAState(service)
+		if err != nil {
+			result.Error = err.Error()
+		} else if state != nil {
+			result.NUMA = &state.Config
+		}
+	}()
 	resolved, err := resolveModelGPUService(service, params, true)
 	if err != nil {
 		return &dto.ModelGPUConfig{Mode: "devices", DeviceIDs: []string{}, Capabilities: []string{"gpu"}, Error: err.Error()}

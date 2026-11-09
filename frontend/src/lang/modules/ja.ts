@@ -775,6 +775,47 @@ const message = {
         localIP: 'ローカルIP',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                '関連情報は、このノードで 1Panel が管理するアプリの設定に基づきます。メモリ値は GPU 全体の測定値です。',
+            usageTitle: 'GPU 使用状況',
+            usageHelp:
+                '選択した GPU は他のデプロイで使用されている可能性があります。続行すると GPU メモリ不足や性能低下が発生する場合がありますが、続行できます。',
+            usageUnknown: 'GPU の使用状況を完全に確認できませんでした。リソースを確認してから続行してください。',
+            usagePossible: '台数で割り当てるため、この GPU を使用する可能性があります',
+            usageMemory: 'GPU メモリ（使用量 / 合計）',
+            dimension: '表示軸',
+            namePlaceholder: '例：本番推論用 GPU ペア',
+            descriptionPlaceholder: '任意：グループの用途や運用ルールを記入',
+            selectedGPU: 'GPU を {count} 台選択',
+
+            byGroup: 'グループ別',
+            byNUMA: 'NUMA 別',
+            ungrouped: '未分類',
+
+            unknownNode: 'NUMA 所属不明',
+            memoryNode: 'メモリノード',
+            selectNode: 'このノードの GPU を選択',
+            noDevices: 'このノードに GPU はありません',
+            affinity: 'CPU / メモリアフィニティ',
+            followGPU: 'GPU の所属ノードに従う',
+            bindingPreview: 'バインドのプレビュー',
+
+            overview: 'デバイス概要',
+            groups: 'GPU グループ',
+            history: '監視履歴',
+            source: '設定方法',
+            custom: 'カスタム',
+            selectRequired: 'GPU グループを選択してください',
+            snapshotHelp: 'デプロイには現在の設定が保存されます。グループの変更は既存のデプロイに自動適用されません。',
+            changed: '元のグループが変更または削除されました。保存済みの設定を使用しています。',
+            applyLatest: '最新のグループ設定を適用',
+            deployments: '関連するデプロイ',
+            help: 'GPU と NUMA の設定を再利用します。デバイスの重複は可能ですが、GPU の専有やメモリの分離は行いません。',
+            deleteHelp: 'グループ「{name}」を削除しますか？既存のデプロイは設定を保持します。',
+            vendor: 'デバイスの種類',
+            topology: 'NUMA トポロジー',
+        },
         agents: {
             feishuUpgradeNotice:
                 '更新前に旧 Feishu プラグインを処理します。アプリ全体のバックアップが必要です。失敗時は旧イメージと対応するデータを復元します。未設定の旧プラグインは無効化のみ行います。',
@@ -1062,6 +1103,22 @@ const message = {
             vllmVersion: 'vLLM バージョン',
             vllmImage: 'vLLM イメージ',
             servicePort: 'サービスポート',
+            numaBinding: 'NUMA バインド',
+            numaOff: 'バインドなし',
+            numaAuto: '自動',
+            numaManual: '手動',
+            numaNodes: 'NUMA ノード',
+            numaHint: '通常は「バインドなし」にし、性能調整が必要な場合に有効にしてください。',
+            numaHelp:
+                'アプリを指定した CPU とメモリのノードにバインドします。自動設定では GPU に近いノードを選択します。',
+            numaRequirements:
+                'イメージに numactl が必要です。バインドを有効にすると、必要に応じて SYS_NICE 権限が自動追加されます。',
+            numaUnknown:
+                'GPU に対応する CPU とメモリのノードを特定できません。バインドなしにするか、ハードウェア構成が分かる場合は手動で選択してください。',
+            numaCross: '選択した GPU は複数の NUMA ノードに属しています。手動で選択してください。',
+            numaCount: '自動バインドには特定の GPU またはすべての GPU を選択してください。',
+            numaRequired: 'NUMA ノードを少なくとも 1 つ選択してください。',
+            numaUnavailable: 'NUMA ノードが利用できないか、CPU またはメモリがありません。',
             gpuAcceleration: 'GPU アクセラレーション',
             gpuMode: 'アクセラレーターの選択',
             gpuAll: 'すべてのアクセラレーター',

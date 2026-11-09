@@ -2,13 +2,40 @@ import { ReqPage } from '.';
 
 export namespace AI {
     export interface ModelGPUDevice {
+        index?: number;
         id: string;
         name: string;
         type: string;
         uuid?: string;
+        numaNode?: number;
         available: boolean;
     }
+    export interface ModelGPUUsage {
+        devices: (ModelGPUDevice & {
+            memoryUsed: string;
+            memoryTotal: string;
+            possible: boolean;
+            deployments: { name: string; status: string; possible: boolean }[];
+        })[];
+        warnings: string[];
+    }
+    export interface ModelNUMANode {
+        id: number;
+        cpus: string;
+        memory: boolean;
+    }
+    export interface GPUGroup {
+        description: string;
+        id: number;
+        name: string;
+        imageType: string;
+        revision: number;
+        gpu: ModelGPUConfig;
+        deployments: string[];
+    }
     export interface ModelGPUConfig {
+        group?: { id: number; name: string; revision: number };
+        numa?: { mode: 'off' | 'auto' | 'manual'; nodes: number[] };
         mode: 'all' | 'count' | 'devices';
         count?: number;
         error?: string;

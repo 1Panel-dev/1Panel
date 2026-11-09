@@ -777,6 +777,48 @@ const message = {
         localIP: 'IP local',
     },
     aiTools: {
+        gpuGroup: {
+            usageScope:
+                'As associações vêm das configurações de aplicativos gerenciados pelo 1Panel neste nó; a memória é medida para toda a GPU.',
+            usageTitle: 'Uso de GPU',
+            usageHelp:
+                'Outras implantações podem usar as GPUs selecionadas. Continuar pode causar falta de memória ou reduzir o desempenho. Você ainda pode prosseguir.',
+            usageUnknown: 'Não foi possível verificar todo o uso de GPU. Verifique os recursos antes de continuar.',
+            usagePossible: 'Alocação por quantidade; pode usar esta GPU',
+            usageMemory: 'Memória de GPU (usada / total)',
+            dimension: 'Dimensão',
+            namePlaceholder: 'Ex.: par de GPUs para inferência',
+            descriptionPlaceholder: 'Opcional: descreva a finalidade ou o uso do grupo',
+            selectedGPU: '{count} GPUs selecionadas',
+
+            byGroup: 'Por grupo',
+            byNUMA: 'Por NUMA',
+            ungrouped: 'Sem grupo',
+
+            unknownNode: 'Nó NUMA desconhecido',
+            memoryNode: 'Nó de memória',
+            selectNode: 'Selecionar GPUs deste nó',
+            noDevices: 'Nenhuma GPU neste nó',
+            affinity: 'Afinidade de CPU / memória',
+            followGPU: 'Seguir os nós das GPUs',
+            bindingPreview: 'Prévia da vinculação',
+
+            overview: 'Visão geral dos dispositivos',
+            groups: 'Grupos de GPU',
+            history: 'Histórico de monitoramento',
+            source: 'Configuração',
+            custom: 'Personalizada',
+            selectRequired: 'Selecione um grupo de GPU',
+            snapshotHelp:
+                'As implantações salvam a configuração atual. Alterações no grupo não atualizam implantações existentes automaticamente.',
+            changed: 'O grupo de origem foi alterado ou excluído. A configuração salva continua em uso.',
+            applyLatest: 'Aplicar a configuração mais recente',
+            deployments: 'Implantações associadas',
+            help: 'Os grupos reutilizam configurações de GPU e NUMA. Dispositivos podem participar de vários grupos, sem exclusividade ou isolamento de memória.',
+            deleteHelp: 'Excluir o grupo “{name}”? As implantações existentes manterão a configuração.',
+            vendor: 'Tipo de dispositivo',
+            topology: 'Topologia NUMA',
+        },
         agents: {
             feishuUpgradeNotice:
                 'O plugin Feishu antigo deve ser tratado antes da atualização. É necessário um backup completo; em caso de falha, a imagem anterior e seus dados serão restaurados. Um plugin não configurado será apenas desativado.',
@@ -1080,6 +1122,22 @@ const message = {
             vllmVersion: 'Versão do vLLM',
             vllmImage: 'Imagem do vLLM',
             servicePort: 'Porta do serviço',
+            numaBinding: 'Afinidade NUMA',
+            numaOff: 'Sem afinidade',
+            numaAuto: 'Automática',
+            numaManual: 'Manual',
+            numaNodes: 'Nós NUMA',
+            numaHint: 'Deixe a afinidade desativada, salvo para ajustar o desempenho.',
+            numaHelp:
+                'Vincula o aplicativo aos nós de CPU e memória selecionados. A seleção automática escolhe nós próximos às GPUs.',
+            numaRequirements:
+                'A imagem deve incluir numactl. Ativar a afinidade adiciona SYS_NICE automaticamente, se necessário.',
+            numaUnknown:
+                'Não foi possível identificar o nó de CPU e memória associado à GPU. Deixe a afinidade desativada ou selecione os nós manualmente se conhecer a disposição do hardware.',
+            numaCross: 'As GPUs selecionadas abrangem vários nós NUMA. Selecione-os manualmente.',
+            numaCount: 'A afinidade automática exige GPUs específicas ou todas as GPUs.',
+            numaRequired: 'Selecione pelo menos um nó NUMA.',
+            numaUnavailable: 'O nó NUMA está indisponível ou não possui CPU ou memória.',
             gpuAcceleration: 'Aceleração de GPU',
             gpuMode: 'Seleção de aceleradores',
             gpuAll: 'Todos os aceleradores',
