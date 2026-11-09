@@ -54,7 +54,7 @@
                 >
                     {{ $t('menu.terminal') }}
                 </el-button>
-                <el-button @click="goDashboard()" type="primary" plain>PGAdmin4</el-button>
+                <AppDashboard app-key="pgadmin4" @not-installed="goDashboard">PGAdmin4</AppDashboard>
             </template>
             <template #rightToolBar>
                 <el-select v-model="currentDBName" @change="changeDatabase()" class="p-w-200" v-if="currentDB">
@@ -238,7 +238,6 @@
         <AppResources ref="checkRef"></AppResources>
         <DeleteDialog ref="deleteRef" @search="search" />
 
-        <PortJumpDialog ref="dialogPortJumpRef" />
         <TerminalDialog ref="dialogTerminalRef" />
     </div>
 </template>
@@ -257,7 +256,7 @@ import AppResources from '@/views/database/postgresql/check/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';
-import PortJumpDialog from '@/components/port-jump/index.vue';
+import AppDashboard from '@/components/app-dashboard/index.vue';
 import Tooltip from '@/components/tooltip/index.vue';
 import { dateFormat } from '@/utils/date';
 import { toRef, onMounted, reactive, ref } from 'vue';
@@ -271,7 +270,6 @@ import {
 import i18n from '@/lang';
 import { Database } from '@/api/interface/database';
 import { App } from '@/api/interface/app';
-import { getAppPort } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { useOperateNodeContext } from '@/composables/useOperateNodeContext';
@@ -298,14 +296,11 @@ const bindRef = ref();
 const privilegesRef = ref();
 const dialogTerminalRef = ref();
 
-const pgadminPort = ref();
 const dashboardName = ref();
 const dashboardKey = ref();
 const open = ref(false);
 
 const appStatusRef = ref();
-
-const dialogPortJumpRef = ref();
 
 const data = ref();
 const paginationConfig = reactive({
@@ -447,24 +442,14 @@ const onChange = async (info: any) => {
     MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
-const goDashboard = async () => {
-    if (pgadminPort.value === 0) {
-        dashboardName.value = 'PGAdmin4';
-        dashboardKey.value = 'pgadmin4';
-        open.value = true;
-        return;
-    }
-    dialogPortJumpRef.value.acceptParams({ port: pgadminPort.value });
-    return;
+const goDashboard = () => {
+    dashboardName.value = 'PGAdmin4';
+    dashboardKey.value = 'pgadmin4';
+    open.value = true;
 };
 
 const getAppDetail = () => {
     routerToNameWithQuery('AppAll', { install: dashboardKey.value });
-};
-
-const loadPGAdminPort = async () => {
-    const res = await getAppPort('pgadmin4', '');
-    pgadminPort.value = res.data;
 };
 
 const checkExist = (data: App.CheckInstalled) => {
@@ -623,7 +608,6 @@ const buttons = [
 
 onMounted(() => {
     loadDBOptions();
-    loadPGAdminPort();
 });
 </script>
 
