@@ -59,7 +59,7 @@ func setWebStatic(rootRouter *gin.RouterGroup) {
 		if !security.CheckSecurity(c) {
 			return
 		}
-		entrance = authService.GetSecurityEntrance()
+		entrance := authService.GetSecurityEntrance()
 		if entrance != "" {
 			appauth.SetSecurityEntranceCookie(c, entrance)
 		}
