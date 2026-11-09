@@ -778,6 +778,20 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate:
+                'Nenhuma GPU disponível foi detectada no NUMA {node}. Não é possível criar um grupo a partir deste nó.',
+            inspectNUMA:
+                'Execute estes comandos somente de leitura no terminal do nó atual e compare os endereços PCI para verificar a localização NUMA das GPUs:',
+            numaQueryHint:
+                'numa_node contém o ID do nó NUMA; -1 indica que o sistema não informou a localização. Se os resultados diferirem desta página, atualize e tente novamente.',
+            relationTopology: 'Topologia de relações',
+            relationHelp: 'Selecione uma GPU ou um grupo para destacar suas relações de associação.',
+            selectionHelp:
+                'Selecione GPUs do mesmo tipo de dispositivo e avance para configurar o grupo. Linhas tracejadas indicam associações não salvas.',
+            allRelations: 'Mostrar todas as relações',
+            pendingChanges: 'Não salvo',
+            hardware: 'Localização do hardware',
+            editMembers: 'Editar membros',
             usageScope:
                 'As associações vêm das configurações de aplicativos gerenciados pelo 1Panel neste nó; a memória é medida para toda a GPU.',
             usageTitle: 'Uso de GPU',
@@ -1127,9 +1141,11 @@ const message = {
             numaAuto: 'Automática',
             numaManual: 'Manual',
             numaNodes: 'Nós NUMA',
-            numaHint: 'Deixe a afinidade desativada, salvo para ajustar o desempenho.',
-            numaHelp:
-                'Vincula o aplicativo aos nós de CPU e memória selecionados. A seleção automática escolhe nós próximos às GPUs.',
+            numaOffHelp: 'Usa as GPUs selecionadas enquanto o sistema gerencia CPU e memória.',
+            numaAutoHelp: 'Vincula CPU e memória ao nó NUMA das GPUs selecionadas.',
+            numaManualHelp: 'Especifica os nós de CPU e memória sem alterar a seleção de GPU.',
+            numaResolved: 'Será vinculado ao NUMA {node}.',
+            numaHelp: 'A seleção de GPU define quais GPUs usar; a afinidade define os nós de CPU e memória.',
             numaRequirements:
                 'A imagem deve incluir numactl. Ativar a afinidade adiciona SYS_NICE automaticamente, se necessário.',
             numaUnknown:
@@ -1289,8 +1305,11 @@ const message = {
                 ascendA3: 'Versão oficial Ascend A3 para dispositivos da série Ascend A3.',
                 ascendA5: 'Versão oficial Ascend A5 para dispositivos 950DT.',
                 ascend310P: 'Versão oficial Ascend 310P para dispositivos Atlas 300I DUO e Atlas 200I Pro.',
-                default: 'Versão padrão oficial com CUDA 13.0, para drivers recentes e GPUs de novas arquiteturas.',
-                dspark: 'Versão personalizada do NVIDIA GB10 para dois dispositivos, com uma imagem mantida pelo 1Panel.',
+                default:
+                    'Versão padrão oficial da comunidade vLLM com CUDA 13.0, para drivers e arquiteturas de GPU mais recentes.',
+                rtxPro5000:
+                    'Versão personalizada para NVIDIA RTX Pro 5000, otimizada para DeepSeek-V4.1-Flash-1017. A imagem é mantida pelo 1Panel.',
+                dspark: 'Versão personalizada para dois dispositivos NVIDIA GB10, otimizada para DeepSeek-V4-Flash. A imagem é mantida pelo 1Panel.',
             },
             vllmDeployProfile: 'Modelo de implantação',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',

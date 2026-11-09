@@ -777,6 +777,20 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate:
+                'No available GPUs were detected under NUMA {node}. A group cannot be created from this node.',
+            inspectNUMA:
+                'Run these read-only commands in the current node’s terminal and match PCI addresses to check GPU NUMA placement:',
+            numaQueryHint:
+                'numa_node contains the NUMA node ID; -1 means the system has not reported a placement. If the results differ from this page, refresh and try again.',
+            relationTopology: 'Relationship topology',
+            relationHelp: 'Select a GPU or group to highlight its memberships.',
+            selectionHelp:
+                'Select GPUs of the same device type, then continue to configure the group. Dashed lines show unsaved memberships.',
+            allRelations: 'Show all relationships',
+            pendingChanges: 'Unsaved',
+            hardware: 'Hardware placement',
+            editMembers: 'Edit members',
             usageScope:
                 'Associations come from application configurations managed by 1Panel on this node; memory values are sampled for the whole GPU.',
             usageTitle: 'GPU usage',
@@ -1121,9 +1135,12 @@ const message = {
             numaAuto: 'Automatic',
             numaManual: 'Manual',
             numaNodes: 'NUMA nodes',
-            numaHint: 'Leave binding off unless you need performance tuning.',
+            numaOffHelp: 'Use the selected GPUs while the system schedules CPU and memory use.',
+            numaAutoHelp: 'Bind CPU and memory use to the NUMA node containing the selected GPUs.',
+            numaManualHelp: 'Specify CPU and memory nodes for the application without changing GPU selection.',
+            numaResolved: 'Will bind to NUMA {node}.',
             numaHelp:
-                'Binds the application to selected CPU and memory nodes. Automatic matching selects nodes near the GPUs.',
+                'GPU selection determines which graphics devices to use; affinity determines which CPU and memory nodes to use.',
             numaRequirements: 'The image must include numactl. Enabling binding automatically adds SYS_NICE if needed.',
             numaUnknown:
                 'Could not identify the CPU and memory node associated with the GPU. Leave binding off, or select nodes manually if you know the hardware layout.',
@@ -1280,8 +1297,11 @@ const message = {
                 ascendA3: 'Official Ascend A3 version for Ascend A3 series devices.',
                 ascendA5: 'Official Ascend A5 version for 950DT devices.',
                 ascend310P: 'Official Ascend 310P version for Atlas 300I DUO and Atlas 200I Pro devices.',
-                default: 'Official standard version with CUDA 13.0, for newer drivers and newer GPU architectures.',
-                dspark: 'NVIDIA GB10 dual-device custom version, using a custom image maintained by 1Panel.',
+                default:
+                    'Official vLLM community standard version with CUDA 13.0, for newer drivers and newer GPU architectures.',
+                rtxPro5000:
+                    'Custom version for NVIDIA RTX Pro 5000, optimized for DeepSeek-V4.1-Flash-1017. The image is maintained by 1Panel.',
+                dspark: 'Custom version for two NVIDIA GB10 devices, optimized for DeepSeek-V4-Flash. The image is maintained by 1Panel.',
             },
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',

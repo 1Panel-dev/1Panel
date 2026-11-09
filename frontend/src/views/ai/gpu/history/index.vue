@@ -86,7 +86,14 @@
                     :closable="false"
                     show-icon
                 />
-                <el-empty v-else-if="!loading" :description="$t('aiTools.gpu.environment.notDetected')" />
+                <el-empty
+                    v-else-if="!loading"
+                    :description="
+                        environment.status === 'passed'
+                            ? $t('commons.msg.noneData')
+                            : $t(`aiTools.gpu.environment.${environment.status}`, { count: environment.issueCount })
+                    "
+                />
             </template>
         </LayoutContent>
     </div>
@@ -96,8 +103,9 @@
 import { ref, computed, watch, onBeforeUnmount, h } from 'vue';
 import { useRoute } from 'vue-router';
 import { InfoFilled } from '@element-plus/icons-vue';
-import { loadGPUMonitor, getGPUOptions } from '@/api/modules/ai';
+import { loadGPUMonitor, getGPUOptions, loadGPUInfo } from '@/api/modules/ai';
 import RouterMenu from '@/views/ai/gpu/index.vue';
+import { getGPUEnvironmentState } from '../environment';
 import { shortcuts } from '@/utils/shortcuts';
 import i18n from '@/lang';
 import { AI } from '@/api/interface/ai';
@@ -108,6 +116,8 @@ const { isMobile } = useGlobalStore();
 const loading = ref(false);
 const failed = ref(false);
 const supported = ref(false);
+const gpuInfo = ref<AI.Info>();
+const environment = computed(() => getGPUEnvironmentState(gpuInfo.value, failed.value));
 const options = ref<(AI.ChartHide & { value: string; label: string })[]>([]);
 const selectedDevice = ref('');
 const aggregation = ref<'avg' | 'max'>('avg');
@@ -362,6 +372,11 @@ const loadOptions = async () => {
                     .replace(/^(\d+) - /, `${item.type === 'xpu' ? 'XPU' : 'GPU'} $1 · `)
                     .replace(' - ', ' · '),
             }));
+        if (!options.value.length) {
+            const infoResult = await loadGPUInfo(true);
+            if (id !== requestID) return;
+            gpuInfo.value = infoResult.data;
+        }
         if (!currentDevice.value && !route.query.deviceID) selectedDevice.value = options.value[0]?.value || '';
         await search();
     } catch {

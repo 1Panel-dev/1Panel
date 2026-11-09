@@ -20,14 +20,14 @@ const props = defineProps({
 
 const buttons = computed(() => [
     {
-        label: i18n.global.t('aiTools.gpuGroup.overview'),
+        label: i18n.global.t('aiTools.gpu.current'),
         path: '/ai/gpu/current',
     },
-    { label: i18n.global.t('aiTools.gpuGroup.groups'), path: '/ai/gpu/groups' },
     {
-        label: i18n.global.t('aiTools.gpuGroup.history'),
+        label: i18n.global.t('aiTools.gpu.history'),
         path: '/ai/gpu/history',
         disabled: props.historyDisabled,
     },
+    { label: i18n.global.t('website.groupSetting'), path: '/ai/gpu/groups' },
 ]);
 </script>

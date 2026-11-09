@@ -5,7 +5,12 @@ import "strings"
 const (
 	gb10VersionPrefix = "nvidia-"
 	gb10VersionSuffix = "-optimized-for-ds-v4-flash"
+	rtxVersionSuffix  = "-optimized-for-ds-v4.1-flash"
 )
+
+func IsRTXVersion(version string) bool {
+	return strings.HasSuffix(strings.ToLower(strings.TrimSpace(version)), rtxVersionSuffix)
+}
 
 func IsGB10Version(version string) bool {
 	normalized := strings.ToLower(strings.TrimSpace(version))

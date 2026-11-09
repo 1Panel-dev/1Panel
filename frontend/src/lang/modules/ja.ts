@@ -776,6 +776,20 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate:
+                'NUMA {node} に利用可能な GPU が検出されなかったため、このノードからグループを作成できません。',
+            inspectNUMA:
+                '現在のノードの端末で次の読み取り専用コマンドを実行し、PCI アドレスを照合して GPU の NUMA 所属を確認してください：',
+            numaQueryHint:
+                'numa_node は NUMA ノード番号を示します。-1 はシステムが所属を報告していないことを意味します。結果が画面と異なる場合は、更新して再試行してください。',
+            relationTopology: '関係トポロジー',
+            relationHelp: 'GPU またはグループを選択すると、所属関係が強調表示されます。',
+            selectionHelp:
+                '同じデバイス種類の GPU を選択し、次へ進んでグループを設定します。破線は未保存の所属関係を示します。',
+            allRelations: 'すべての関係を表示',
+            pendingChanges: '未保存',
+            hardware: 'ハードウェア配置',
+            editMembers: 'メンバーを編集',
             usageScope:
                 '関連情報は、このノードで 1Panel が管理するアプリの設定に基づきます。メモリ値は GPU 全体の測定値です。',
             usageTitle: 'GPU 使用状況',
@@ -1108,9 +1122,11 @@ const message = {
             numaAuto: '自動',
             numaManual: '手動',
             numaNodes: 'NUMA ノード',
-            numaHint: '通常は「バインドなし」にし、性能調整が必要な場合に有効にしてください。',
-            numaHelp:
-                'アプリを指定した CPU とメモリのノードにバインドします。自動設定では GPU に近いノードを選択します。',
+            numaOffHelp: '選択した GPU を使用し、CPU とメモリの割り当てはシステムに任せます。',
+            numaAutoHelp: 'CPU とメモリを、選択した GPU が属する NUMA ノードにバインドします。',
+            numaManualHelp: 'GPU の選択を変えずに、アプリが使用する CPU とメモリのノードを指定します。',
+            numaResolved: 'NUMA {node} にバインドします。',
+            numaHelp: 'GPU の選択は使用する GPU を決め、親和性は CPU とメモリに使用するノードを決めます。',
             numaRequirements:
                 'イメージに numactl が必要です。バインドを有効にすると、必要に応じて SYS_NICE 権限が自動追加されます。',
             numaUnknown:
@@ -1265,8 +1281,10 @@ const message = {
                 ascendA5: '950DT 向けの Ascend 公式 A5 版です。',
                 ascend310P: 'Atlas 300I DUO および Atlas 200I Pro 向けの Ascend 公式 310P 版です。',
                 default:
-                    '公式の標準バージョン。CUDA 13.0 を使用し、新しいドライバーと新しい GPU アーキテクチャに対応します。',
-                dspark: 'NVIDIA GB10 の 2 台構成向けカスタム版。1Panel が独自に保守するカスタムイメージです。',
+                    'vLLM 公式コミュニティの標準版。CUDA 13.0 を使用し、新しいドライバーと新しい GPU アーキテクチャに対応します。',
+                rtxPro5000:
+                    'NVIDIA RTX Pro 5000 向けカスタム版。DeepSeek-V4.1-Flash-1017 向けに最適化されており、イメージは 1Panel が保守しています。',
+                dspark: 'NVIDIA GB10 の 2 台構成向けカスタム版。DeepSeek-V4-Flash 向けに最適化されており、イメージは 1Panel が保守しています。',
             },
             vllmDeployProfile: 'デプロイモデル',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
