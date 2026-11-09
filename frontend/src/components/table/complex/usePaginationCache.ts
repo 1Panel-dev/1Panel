@@ -14,6 +14,7 @@ interface Options {
     id: () => string | undefined;
     scope: () => string | number | undefined;
     search: () => void;
+    pageSizes?: () => readonly number[];
     refreshOnRestore?: () => boolean;
 }
 
@@ -65,8 +66,11 @@ export const usePaginationCache = (options: Options) => {
         }
         const initial = defaults.get(pagination)!;
         const saved = readPanelCache<Partial<Pagination>>('pagination', activeKey);
-        const page = positiveInteger(saved?.currentPage) ? saved.currentPage : initial.currentPage;
-        const size = positiveInteger(saved?.pageSize) ? saved.pageSize : initial.pageSize;
+        const pageSizes = options.pageSizes?.();
+        const validSize =
+            positiveInteger(saved?.pageSize) && (!pageSizes?.length || pageSizes.includes(saved.pageSize));
+        const size = validSize ? saved.pageSize : initial.pageSize;
+        const page = validSize && positiveInteger(saved?.currentPage) ? saved.currentPage : initial.currentPage;
         const changed = pagination.currentPage !== page || pagination.pageSize !== size;
         restoring = true;
         try {
@@ -75,6 +79,7 @@ export const usePaginationCache = (options: Options) => {
         } finally {
             restoring = false;
         }
+        if (saved && !validSize) writePanelCache('pagination', activeKey, { currentPage: page, pageSize: size });
         return changed;
     };
     // The initial restore deliberately does not emit: the parent owns its first query.

@@ -231,6 +231,7 @@ usePaginationCache({
     id: () => props.cacheId,
     scope: () => props.cacheScope,
     search: () => emit('search'),
+    pageSizes: () => props.pageSizes,
     refreshOnRestore: () => props.refreshOnRestore,
 });
 const tableRef = ref();

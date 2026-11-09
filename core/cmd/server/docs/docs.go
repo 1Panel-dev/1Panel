@@ -33895,7 +33895,7 @@ const docTemplate = `{
 				},
 				"pageSize": {
 					"example": 20,
-					"maximum": 100,
+					"maximum": 500,
 					"minimum": 1,
 					"type": "integer"
 				}

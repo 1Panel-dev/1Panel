@@ -11,6 +11,7 @@
                 <ComplexTable
                     :data="items"
                     :pagination-config="pagination"
+                    :page-sizes="apiKeyPageSizes"
                     :scrollbar-always-on="isMobile"
                     @search="search"
                 >
@@ -215,6 +216,7 @@ const detailVisible = ref(false);
 const secret = ref('');
 const secretBusy = ref(false);
 const secretAction = ref<'reveal' | 'copy'>('reveal');
+const apiKeyPageSizes = [5, 10, 20, 50, 100, 200, 500];
 const pagination = reactive({ currentPage: 1, pageSize: 20, total: 0 });
 let searchVersion = 0;
 let secretRequestVersion = 0;

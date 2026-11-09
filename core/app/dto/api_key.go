@@ -23,7 +23,7 @@ type APIKeyItem struct {
 
 type APIKeySearch struct {
 	Page           int  `json:"page" minimum:"1" example:"1"`
-	PageSize       int  `json:"pageSize" minimum:"1" maximum:"100" example:"20"`
+	PageSize       int  `json:"pageSize" minimum:"1" maximum:"500" example:"20"`
 	ExcludeRevoked bool `json:"excludeRevoked" default:"false"`
 }
 type APIKeyPage struct {
