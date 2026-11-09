@@ -544,23 +544,30 @@
                                             ></svg-icon>
                                         </div>
                                         <div class="file-name">
-                                            <el-input
+                                            <div
                                                 v-if="
                                                     isEdit &&
                                                     fileRename.oldPath === row.path &&
                                                     fileRename.tabId === item.id
                                                 "
-                                                v-model.trim="fileRename.newName"
-                                                :ref="(el) => setRenameRef(item.id, el)"
-                                                :autofocus="isEdit"
-                                                :readonly="renameSubmitting"
-                                                class="table-link table-input"
-                                                placeholder="file name"
-                                                @compositionstart="renameComposing = true"
-                                                @compositionend="onRenameCompositionEnd($event, row)"
-                                                @keydown.enter="onRenameEnter($event, row)"
-                                                @blur="onRenameBlur($event, row)"
-                                            />
+                                                v-click-outside="() => onRenameLeave(row)"
+                                                class="min-w-0"
+                                                @click.stop
+                                                @keydown.esc="onRenameEscape($event, row)"
+                                            >
+                                                <el-input
+                                                    v-model.trim="fileRename.newName"
+                                                    :ref="(el) => setRenameRef(item.id, el)"
+                                                    :autofocus="isEdit"
+                                                    :readonly="renameSubmitting"
+                                                    :aria-label="$t('commons.table.name')"
+                                                    class="table-input"
+                                                    @compositionstart="renameComposing = true"
+                                                    @compositionend="onRenameCompositionEnd($event, row)"
+                                                    @keydown.enter="onRenameEnter($event, row)"
+                                                    @keydown.tab="onRenameLeave(row)"
+                                                />
+                                            </div>
                                             <span v-else class="table-link" @click="open(row)" type="primary">
                                                 {{ row.name }}
                                             </span>
@@ -591,7 +598,7 @@
                                             ></el-button>
                                             <div v-else>
                                                 <el-button
-                                                    v-if="hoveredRowPath === row.path"
+                                                    v-if="hoveredRowPath === row.path && !isCurrentRename(row)"
                                                     v-permission
                                                     v-node-admin
                                                     link
@@ -802,6 +809,7 @@ import TerminalDialog from './terminal/index.vue';
 import { Dashboard } from '@/api/interface/dashboard';
 import { CompressExtension, MimetypeByExtensionObject } from '@/enums/files';
 import type { TabPaneName } from 'element-plus';
+import { ClickOutside as vClickOutside } from 'element-plus';
 import { getComponentInfo } from '@/api/modules/host';
 import { routerToNameWithQuery } from '@/utils/router';
 import { loadBaseDir } from '@/api/modules/setting';
@@ -876,7 +884,8 @@ const fileUpload = reactive({ path: '', isAppendOnly: false });
 const fileRename = reactive({ path: '', oldPath: '', oldName: '', newName: '', tabId: '' });
 const renameSubmitting = ref(false);
 const renameComposing = ref(false);
-let renameBlurPending = false;
+const renameFailedName = ref<string | null>(null);
+const renameLeavePending = ref(false);
 const fileWget = reactive({ path: '', isAppendOnly: false });
 const fileMove = reactive({ oldPaths: [''], allNames: [''], type: '', path: '', name: '', count: 0, isDir: false });
 const fileConvert = reactive<{
@@ -1752,7 +1761,8 @@ const openRename = (item: File.File, source: string) => {
     fileRename.newName = fileRename.oldName;
     fileRename.tabId = editableTabsKey.value;
     renameComposing.value = false;
-    renameBlurPending = false;
+    renameFailedName.value = null;
+    renameLeavePending.value = false;
     if (source === 'right') {
         isEdit.value = true;
         nextTick(() => {
@@ -1778,29 +1788,41 @@ const onRenameCompositionEnd = (event: CompositionEvent, row: File.File) => {
     if (!isCurrentRename(row)) return;
     fileRename.newName = (event.target as HTMLInputElement).value.trim();
     renameComposing.value = false;
-    if (renameBlurPending) {
-        renameBlurPending = false;
-        return handleRename(row);
+    if (renameLeavePending.value) {
+        renameLeavePending.value = false;
+        return onRenameLeave(row);
     }
 };
 
-const onRenameBlur = async (e: FocusEvent, row: File.File) => {
+const cancelRename = (row: File.File) => {
+    if (!isEdit.value || renameSubmitting.value || fileRename.oldPath !== row.path) return;
+    isEdit.value = false;
+    fileRename.newName = fileRename.oldName;
+    renameComposing.value = false;
+    renameFailedName.value = null;
+    renameLeavePending.value = false;
+};
+
+const onRenameEscape = (event: KeyboardEvent, row: File.File) => {
+    if (event.isComposing || event.keyCode === 229 || renameComposing.value) return;
+    event.preventDefault();
+    event.stopPropagation();
+    cancelRename(row);
+};
+
+const onRenameLeave = async (row: File.File) => {
     if (!isCurrentRename(row) || renameSubmitting.value) return;
-    const related = e.relatedTarget as HTMLElement | null;
-    if (
-        related &&
-        (related.closest('.fu-table-more-button') || related.closest('.fu-table-more-button .el-dropdown__item'))
-    ) {
-        setTimeout(() => {
-            getCurrentRename()?.focus();
-        }, 0);
-        return;
-    }
     if (renameComposing.value) {
-        renameBlurPending = true;
+        renameLeavePending.value = true;
         return;
     }
     await nextTick();
+    if (!isCurrentRename(row) || renameSubmitting.value || renameComposing.value) return;
+    // Keep failed-name state after the toast disappears; leaving must not retry it.
+    if (renameFailedName.value === fileRename.newName.trim()) {
+        cancelRename(row);
+        return;
+    }
     return handleRename(row);
 };
 
@@ -1808,13 +1830,12 @@ const handleRename = async (row: File.File): Promise<void> => {
     if (!isCurrentRename(row) || renameSubmitting.value || renameComposing.value) return;
     const newName = fileRename.newName.trim();
     if (!newName) {
+        renameFailedName.value = newName;
         MsgWarning(i18n.global.t('commons.rule.requiredInput'));
-        getCurrentRename()?.focus();
         return;
     }
     if (newName === fileRename.oldName) {
-        isEdit.value = false;
-        fileRename.oldName = '';
+        cancelRename(row);
         return;
     }
     const addItem: File.FileRename = {
@@ -1823,21 +1844,18 @@ const handleRename = async (row: File.File): Promise<void> => {
     };
     const namePrefix = row.name.substring(0, row.name.lastIndexOf('/') + 1);
     renameSubmitting.value = true;
-    loading.value = true;
     try {
         await renameRile(addItem);
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
         isEdit.value = false;
         fileRename.oldName = '';
+        renameFailedName.value = null;
         row.name = namePrefix + newName;
         row.path = addItem.newName;
     } catch (error) {
+        renameFailedName.value = newName;
         console.error(error);
-        nextTick(() => {
-            if (isCurrentRename(row)) getCurrentRename()?.focus();
-        });
     } finally {
-        loading.value = false;
         renameSubmitting.value = false;
     }
 };
