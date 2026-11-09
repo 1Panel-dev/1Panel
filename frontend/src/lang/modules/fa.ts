@@ -2868,6 +2868,7 @@ const message = {
         default_download_path: 'لینک دانلود پیش‌فرض',
         saveLocal: 'نگهداری پشتیبان‌های محلی (به تعداد کپی‌های ذخیره‌سازی ابری)',
         url: 'آدرس URL',
+        userAgentInvalid: 'User-Agent نباید شامل شکست خط یا نویسه‌های NUL باشد',
         urlHelper: 'یک آدرس URL معتبر وارد کنید',
         targetHelper: 'حساب‌های پشتیبان در تنظیمات پنل نگهداری می‌شوند.',
         withImageHelper:

@@ -2721,6 +2721,7 @@ const message = {
         default_download_path: '默认下载地址',
         saveLocal: '同时保留本地备份（和云存储保留份数一致）',
         url: 'URL 地址',
+        userAgentInvalid: 'User-Agent 不能包含换行或空字符',
         urlHelper: '请输入正确的 URL 地址',
         targetHelper: '备份账号可在面板设置中维护',
         withImageHelper: '备份应用商店镜像，但是会增大快照文件体积。',

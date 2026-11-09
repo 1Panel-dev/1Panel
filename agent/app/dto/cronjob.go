@@ -1,6 +1,9 @@
 package dto
 
 import (
+	"bytes"
+	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -14,6 +17,35 @@ type PageCronjob struct {
 
 type CronjobSpec struct {
 	Spec string `json:"spec" validate:"required"`
+}
+
+// CronjobURL pairs a URL with its optional User-Agent value.
+type CronjobURL struct {
+	URL    string `json:"url"`
+	Header string `json:"header"`
+}
+
+// UnmarshalJSON accepts URL strings submitted by older frontends.
+func (item *CronjobURL) UnmarshalJSON(data []byte) error {
+	data = bytes.TrimSpace(data)
+	if bytes.Equal(data, []byte("null")) {
+		return fmt.Errorf("URL group must not be null")
+	}
+	if len(data) > 0 && data[0] == '"' {
+		var url string
+		if err := json.Unmarshal(data, &url); err != nil {
+			return err
+		}
+		*item = CronjobURL{URL: url}
+		return nil
+	}
+	type plain CronjobURL
+	var decoded plain
+	if err := json.Unmarshal(data, &decoded); err != nil {
+		return err
+	}
+	*item = CronjobURL(decoded)
+	return nil
 }
 
 type CronjobOperate struct {
@@ -38,6 +70,7 @@ type CronjobOperate struct {
 	DBType         string       `json:"dbType"`
 	DBName         string       `json:"dbName"`
 	URL            string       `json:"url"`
+	URLItems       []CronjobURL `json:"urlItems"`
 	IsDir          bool         `json:"isDir"`
 	SourceDir      string       `json:"sourceDir"`
 	SnapshotRule   SnapshotRule `json:"snapshotRule"`
@@ -141,13 +174,14 @@ type CronjobTrans struct {
 	SpecCustom bool   `json:"specCustom"`
 	Spec       string `json:"spec"`
 
-	Executor      string `json:"executor"`
-	ScriptMode    string `json:"scriptMode"`
-	Script        string `json:"script"`
-	Command       string `json:"command"`
-	ContainerName string `json:"containerName"`
-	User          string `json:"user"`
-	URL           string `json:"url"`
+	Executor      string       `json:"executor"`
+	ScriptMode    string       `json:"scriptMode"`
+	Script        string       `json:"script"`
+	Command       string       `json:"command"`
+	ContainerName string       `json:"containerName"`
+	User          string       `json:"user"`
+	URL           string       `json:"url"`
+	URLItems      []CronjobURL `json:"urlItems"`
 
 	ScriptName string        `json:"scriptName"`
 	Apps       []TransHelper `json:"apps"`

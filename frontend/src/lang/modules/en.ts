@@ -2897,6 +2897,7 @@ const message = {
         default_download_path: 'Default download link',
         saveLocal: 'Retain local backups (the same as the number of cloud storage copies)',
         url: 'URL Address',
+        userAgentInvalid: 'User-Agent must not contain line breaks or NUL characters',
         urlHelper: 'Enter a valid URL address',
         targetHelper: 'Backup accounts are maintained in panel settings.',
         withImageHelper: 'Backup app store images, but this will increase the snapshot file size.',

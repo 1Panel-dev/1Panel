@@ -57,6 +57,9 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 		repo.WithByGroups(search.GroupIDs),
 		repo.WithByLikeName(search.Info),
 		repo.WithOrderRuleBy(search.OrderBy, search.Order))
+	if err != nil {
+		return 0, nil, err
+	}
 	var dtoCronjobs []dto.CronjobInfo
 	for _, cronjob := range cronjobs {
 		var item dto.CronjobInfo
@@ -92,6 +95,9 @@ func (u *CronjobService) SearchWithPage(search dto.PageCronjob) (int64, interfac
 
 func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, error) {
 	cronjob, err := cronjobRepo.Get(repo.WithByID(req.ID))
+	if err != nil {
+		return nil, err
+	}
 	var item dto.CronjobOperate
 	if err := copier.Copy(&item, &cronjob); err != nil {
 		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
@@ -115,6 +121,7 @@ func (u *CronjobService) LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, err
 	if cronjob.Type == "cleanLog" {
 		_ = json.Unmarshal([]byte(cronjob.Config), &item.CleanLogConfig)
 	}
+	item.URLItems, err = loadCronjobURLs(cronjob)
 	return &item, err
 }
 
@@ -148,6 +155,10 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			IgnoreErr:      cronjob.IgnoreErr,
 			Secret:         cronjob.Secret,
 			Args:           cronjob.Args,
+		}
+		item.URLItems, err = loadCronjobURLs(cronjob)
+		if err != nil {
+			return "", err
 		}
 		switch cronjob.Type {
 		case "app":
@@ -219,6 +230,15 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 
 func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 	for _, item := range req {
+		if item.Type == "curl" {
+			items := item.URLItems
+			if items == nil {
+				items = legacyCronjobURLs(item.URL)
+			}
+			if err := validateCronjobURLs(items); err != nil {
+				return err
+			}
+		}
 		advanced, err := cronJobAlertAdvancedParams(item.AlertTriggerMode)
 		if err != nil {
 			return err
@@ -255,6 +275,9 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 			IgnoreErr:      item.IgnoreErr,
 			Secret:         item.Secret,
 			Args:           item.Args,
+		}
+		if err := storeCronjobURLs(&cronjob, item.URLItems); err != nil {
+			return err
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -605,6 +628,9 @@ func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
 	if err := copier.Copy(&cronjob, &req); err != nil {
 		return buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 	}
+	if err := storeCronjobURLs(&cronjob, req.URLItems); err != nil {
+		return err
+	}
 	if cronjob.Type == "snapshot" {
 		rule, err := json.Marshal(req.SnapshotRule)
 		if err != nil {
@@ -754,6 +780,9 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string
 	upMap := make(map[string]interface{})
 	cronjob.EntryIDs = cronModel.EntryIDs
 	cronjob.Type = cronModel.Type
+	if err := storeCronjobURLs(&cronjob, req.URLItems); err != nil {
+		return err
+	}
 	spec := cronjob.Spec
 	if cronModel.Status == constant.StatusEnable {
 		newEntryIDs, err := u.StartJob(&cronjob, true)
@@ -789,7 +818,8 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string
 	upMap["exclusion_rules"] = req.ExclusionRules
 	upMap["db_type"] = req.DBType
 	upMap["db_name"] = req.DBName
-	upMap["url"] = req.URL
+	upMap["url"] = cronjob.URL
+	upMap["url_items"] = cronjob.URLItemsJSON
 	upMap["is_dir"] = req.IsDir
 	upMap["source_dir"] = req.SourceDir
 	upMap["snapshot_rule"] = cronjob.SnapshotRule
@@ -877,4 +907,76 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	}
 	global.LOG.Infof("start cronjob entryID: %d", entryID)
 	return int(entryID), nil
+}
+
+func legacyCronjobURLs(raw string) []dto.CronjobURL {
+	items := make([]dto.CronjobURL, 0)
+	for _, value := range strings.Split(raw, ",") {
+		if value = strings.TrimSpace(value); value != "" {
+			items = append(items, dto.CronjobURL{URL: value})
+		}
+	}
+	return items
+}
+
+func loadCronjobURLs(job model.Cronjob) ([]dto.CronjobURL, error) {
+	if job.URLItemsJSON == "" {
+		return legacyCronjobURLs(job.URL), nil
+	}
+	var items []dto.CronjobURL
+	if err := json.Unmarshal([]byte(job.URLItemsJSON), &items); err != nil {
+		return nil, fmt.Errorf("invalid cronjob URL configuration")
+	}
+	return items, nil
+}
+
+func validateCronjobURLs(items []dto.CronjobURL) error {
+	if len(items) == 0 {
+		return fmt.Errorf("at least one URL is required")
+	}
+	for i, item := range items {
+		if strings.TrimSpace(item.URL) == "" || strings.ContainsAny(item.URL, "\r\n\x00") {
+			return fmt.Errorf("invalid URL in group %d", i+1)
+		}
+		if strings.ContainsAny(item.Header, "\r\n\x00") {
+			return fmt.Errorf("User-Agent in group %d must not contain line breaks or NUL", i+1)
+		}
+	}
+	return nil
+}
+
+func storeCronjobURLs(job *model.Cronjob, items []dto.CronjobURL) error {
+	job.URLItemsJSON = ""
+	if job.Type != "curl" {
+		return nil
+	}
+	// A missing field indicates a legacy API request or import.
+	if items == nil {
+		items = legacyCronjobURLs(job.URL)
+	}
+	if err := validateCronjobURLs(items); err != nil {
+		return err
+	}
+	normalized := make([]dto.CronjobURL, len(items))
+	urls := make([]string, len(items))
+	for i, item := range items {
+		item.URL = strings.TrimSpace(item.URL)
+		normalized[i] = item
+		urls[i] = item.URL
+	}
+	data, err := json.Marshal(normalized)
+	if err != nil {
+		return err
+	}
+	job.URLItemsJSON = string(data)
+	job.URL = strings.Join(urls, ",")
+	return nil
+}
+
+func cronjobCurlArgs(item dto.CronjobURL) []string {
+	args := make([]string, 0, 4)
+	if item.Header != "" {
+		args = append(args, "--user-agent", item.Header)
+	}
+	return append(args, "--", item.URL)
 }

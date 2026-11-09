@@ -26,6 +26,7 @@ type Cronjob struct {
 	DBType         string `json:"dbType"`
 	DBName         string `json:"dbName"`
 	URL            string `json:"url"`
+	URLItemsJSON   string `gorm:"column:url_items;type:text" json:"-"`
 	IsDir          bool   `json:"isDir"`
 	SourceDir      string `json:"sourceDir"`
 	SnapshotRule   string `json:"snapshotRule"`

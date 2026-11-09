@@ -2812,6 +2812,7 @@ const message = {
         default_download_path: 'ລິ້ງດາວໂຫຼດເລີ່ມຕົ້ນ',
         saveLocal: 'ເກັບໄຟລ໌ສຳຮອງໄວ້ໃນເຄື່ອງ (ຈຳນວນເທົ່າກັບໃນ cloud)',
         url: 'ທີ່ຢູ່ URL',
+        userAgentInvalid: 'User-Agent ຕ້ອງບໍ່ມີການຂຶ້ນແຖວໃໝ່ ຫຼື ຕົວອັກສອນ NUL',
         urlHelper: 'ປ້ອນທີ່ຢູ່ URL ທີ່ຖືກຕ້ອງ',
         targetHelper: 'ບັນຊີສຳຮອງຂໍ້ມູນຖືກຈັດການໃນການຕັ້ງຄ່າ panel.',
         withImageHelper: 'ສຳຮອງ Image ຂອງແອັບດ້ວຍ, ແຕ່ຈະເຮັດໃຫ້ຂະໜາດ snapshot ໃຫຍ່ຂຶ້ນ.',

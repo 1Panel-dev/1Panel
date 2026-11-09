@@ -177,6 +177,23 @@ const checkDataFormat = (item: any) => {
     if (!item.type || cronjobTypes.indexOf(item.type) === -1) {
         return false;
     }
+    if (item.type === 'curl' && item.urlItems != null) {
+        return (
+            Array.isArray(item.urlItems) &&
+            item.urlItems.length > 0 &&
+            item.urlItems.every((group: any) => {
+                const url = typeof group === 'string' ? group : group?.url;
+                const header = typeof group === 'string' ? '' : (group?.header ?? '');
+                return (
+                    typeof url === 'string' &&
+                    url.trim().length > 0 &&
+                    !/[\r\n\0]/.test(url) &&
+                    typeof header === 'string' &&
+                    !/[\r\n\0]/.test(header)
+                );
+            })
+        );
+    }
     return true;
 };
 
