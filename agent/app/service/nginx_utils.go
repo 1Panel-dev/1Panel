@@ -91,7 +91,12 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 		block = servers[0]
 	}
 	for _, key := range keys {
-		dirs := block.FindDirectives(key)
+		var dirs []components.IDirective
+		if scope == constant.NginxScopeHttp {
+			dirs = findDirectNginxDirectives(block, key)
+		} else {
+			dirs = block.FindDirectives(key)
+		}
 		for _, dir := range dirs {
 			nginxParam := response.NginxParam{
 				Name:   dir.GetName(),
@@ -108,6 +113,80 @@ func getNginxParamsByKeys(scope string, keys []string, website *model.Website) (
 		}
 	}
 	return res, nil
+}
+
+// findDirectNginxDirectives returns the directives set directly in the block.
+// FindDirectives also descends into server and location blocks, whose values
+// do not apply to the block itself, so reading http settings through it would
+// report a site value as the global one.
+func findDirectNginxDirectives(block components.IBlock, name string) []components.IDirective {
+	var dirs []components.IDirective
+	for _, dir := range block.GetDirectives() {
+		if dir.GetName() == name {
+			dirs = append(dirs, dir)
+		}
+	}
+	return dirs
+}
+
+// fillNginxIncludedHTTPParams completes the params nginx.conf leaves unset
+// with the value an included file sets at its top level, which nginx applies
+// at http level too. Values inside server or location blocks belong to a
+// site and are skipped. Source records the file, so the settings page shows
+// where the value is set instead of offering to write a second copy into
+// nginx.conf, which nginx would reject as a duplicate.
+func fillNginxIncludedHTTPParams(params []response.NginxParam, paths []string) []response.NginxParam {
+	missing := make(map[string]int)
+	for i, param := range params {
+		if len(param.Params) == 0 {
+			missing[param.Name] = i
+		}
+	}
+	for _, filePath := range paths {
+		if len(missing) == 0 {
+			break
+		}
+		content, err := os.ReadFile(filePath)
+		if err != nil || !nginxContentMentionsAny(string(content), missing) {
+			continue
+		}
+		config, err := parseUserNginxConfig(string(content))
+		if err != nil {
+			continue
+		}
+		for _, dir := range config.GetDirectives() {
+			index, ok := missing[dir.GetName()]
+			if !ok || dir.GetBlock() != nil {
+				continue
+			}
+			params[index].Params = dir.GetParameters()
+			params[index].Source = filePath
+			delete(missing, dir.GetName())
+		}
+	}
+	return params
+}
+
+// nginxContentMentionsAny skips parsing the many site configs that cannot
+// set any of the names.
+func nginxContentMentionsAny(content string, names map[string]int) bool {
+	for name := range names {
+		if strings.Contains(content, name) {
+			return true
+		}
+	}
+	return false
+}
+
+// parseUserNginxConfig parses a file the user may have left with a syntax
+// error. The parser panics on one instead of returning it.
+func parseUserNginxConfig(content string) (config *components.Config, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = fmt.Errorf("parse nginx config: %v", r)
+		}
+	}()
+	return parser.NewStringParser(content).Parse()
 }
 
 func updateDefaultServerConfig(enable bool) error {

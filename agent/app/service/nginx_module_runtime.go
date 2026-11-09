@@ -154,9 +154,15 @@ func nginxModuleUserConfigPaths(install model.AppInstall) []string {
 // directory is injected so unit tests do not need the settings database.
 func nginxModuleUserConfigPathsWithSiteDir(install model.AppInstall, siteDir string) []string {
 	paths := []string{nginxMainConfigPath(install)}
-	paths = append(paths, globConfFiles(path.Join(siteDir, "conf.d"))...)
-	paths = append(paths, globConfFiles(path.Join(install.GetPath(), nginxModuleConfDir, "default"))...)
-	return paths
+	return append(paths, nginxHTTPUserIncludePaths(install, siteDir)...)
+}
+
+// nginxHTTPUserIncludePaths lists the files nginx.conf includes at http level
+// that users edit: site configs and anything else dropped into conf.d, and
+// the default server. http.d and the WAF config are written by the panel.
+func nginxHTTPUserIncludePaths(install model.AppInstall, siteDir string) []string {
+	paths := globConfFiles(path.Join(siteDir, "conf.d"))
+	return append(paths, globConfFiles(path.Join(install.GetPath(), nginxModuleConfDir, "default"))...)
 }
 
 func globConfFiles(dir string) []string {
