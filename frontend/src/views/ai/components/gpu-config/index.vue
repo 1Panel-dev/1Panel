@@ -35,13 +35,23 @@
                     prop="gpu.group"
                     :rules="groupRules"
                 >
-                    <el-select :model-value="model.group?.id" class="w-full" @change="applyGroup">
+                    <el-select :model-value="model.group?.id" class="w-full" fit-input-width @change="applyGroup">
                         <el-option
                             v-for="group in compatibleGroups"
                             :key="group.id"
+                            class="gpu-group-option"
                             :value="group.id"
                             :label="group.name"
-                        />
+                        >
+                            <span class="gpu-group-option-name" :title="group.name">{{ group.name }}</span>
+                            <span
+                                v-if="group.description"
+                                class="gpu-group-option-description"
+                                :title="group.description"
+                            >
+                                {{ group.description }}
+                            </span>
+                        </el-option>
                         <el-option
                             v-if="model.group && !compatibleGroups.some((group) => group.id === model.group?.id)"
                             :value="model.group.id"
@@ -121,17 +131,25 @@
                         prop="gpu.deviceIDs"
                         :rules="gpuDeviceRules"
                     >
+                        <template v-if="groupEditor" #label>
+                            <span class="group-device-label">
+                                {{ $t('aiTools.model.gpuDevices') }}
+                                <span>{{ $t('aiTools.gpuGroup.selectedGPU', { count: model.deviceIDs.length }) }}</span>
+                            </span>
+                        </template>
                         <GPUTopology
                             v-model="model.deviceIDs"
                             :devices="(gpuDevices || []).filter((device) => device.type === imageType)"
                             :nodes="numaNodes"
-                            :cards="groupEditor"
+                            cards
                             selectable
                             @update:model-value="model.error = undefined"
                         >
-                            <template #device-meta="{ device }"><slot name="device-meta" :device="device" /></template>
+                            <template #device-meta="{ device }">
+                                <slot name="device-meta" :device="device" />
+                            </template>
                         </GPUTopology>
-                        <span class="input-help w-full">
+                        <span v-if="!groupEditor" class="input-help w-full">
                             {{ $t('aiTools.gpuGroup.selectedGPU', { count: model.deviceIDs.length }) }}
                         </span>
                     </el-form-item>
@@ -140,17 +158,14 @@
                             :label="$t('aiTools.gpuGroup.affinity')"
                             prop="gpu.numa.mode"
                             :rules="numaRules"
-                            :show-message="model.numa.mode !== 'manual'"
+                            :show-message="false"
                         >
                             <template #label>
                                 <span class="gpu-capabilities-label">
                                     {{ $t('aiTools.gpuGroup.affinity') }}
                                     <el-tooltip placement="top">
                                         <template #content>
-                                            <div class="gpu-capabilities-help">
-                                                <div>{{ $t('aiTools.model.numaHelp') }}</div>
-                                                <div class="mt-2">{{ $t('aiTools.model.numaHint') }}</div>
-                                            </div>
+                                            <div class="gpu-capabilities-help">{{ $t('aiTools.model.numaHelp') }}</div>
                                         </template>
                                         <el-icon tabindex="0" :aria-label="$t('aiTools.model.numaHelp')">
                                             <InfoFilled />
@@ -165,6 +180,28 @@
                                 </el-radio-button>
                                 <el-radio-button value="manual">{{ $t('aiTools.model.numaManual') }}</el-radio-button>
                             </el-radio-group>
+                            <div class="numa-strategy-help" aria-live="polite">
+                                <p class="input-help">
+                                    {{
+                                        $t(
+                                            model.numa.mode === 'off'
+                                                ? 'aiTools.model.numaOffHelp'
+                                                : model.numa.mode === 'auto'
+                                                  ? 'aiTools.model.numaAutoHelp'
+                                                  : 'aiTools.model.numaManualHelp',
+                                        )
+                                    }}
+                                </p>
+                                <p
+                                    v-if="model.numa.mode === 'auto' && !loading"
+                                    :class="numaError ? 'numa-strategy-warning' : 'input-help'"
+                                >
+                                    {{
+                                        numaError ||
+                                        $t('aiTools.model.numaResolved', { node: selectedNUMAGPUs[0]?.numaNode })
+                                    }}
+                                </p>
+                            </div>
                         </el-form-item>
                         <el-form-item
                             v-if="model.numa.mode === 'manual'"
@@ -327,6 +364,9 @@ const numaError = computed(() => {
     let ids = config.nodes;
     if (config.mode === 'auto') {
         if (model.value.mode === 'count') return i18n.global.t('aiTools.model.numaCount');
+        if (!gpuDevices.value) return i18n.global.t('aiTools.model.loadFailed');
+        if (model.value.mode === 'devices' && !model.value.deviceIDs.length)
+            return i18n.global.t('aiTools.model.gpuSelectRequired');
         const devices = selectedNUMAGPUs.value;
         if (
             !devices.length ||
@@ -511,14 +551,56 @@ defineExpose({ init, loading });
 @use '@/components/form-section/index.scss';
 .group-editor {
     border: 0;
+    border-top: 1px solid var(--el-border-color-lighter);
+    padding-top: 20px;
     background: transparent;
 }
 .group-editor > .form-section-body {
     padding: 0;
     border: 0;
 }
+.group-device-label {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-weight: 600;
+}
+.group-device-label > span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--el-text-color-secondary);
+}
+.group-editor :deep(.el-form-item__label) {
+    width: 100%;
+}
 .group-editor .input-help {
     width: 100%;
+}
+.gpu-group-option {
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    line-height: 20px;
+}
+.gpu-group-option-name {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-weight: 500;
+}
+.gpu-group-option-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    overflow-wrap: anywhere;
+    white-space: normal;
+    margin-top: 3px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    font-weight: 400;
+    line-height: 18px;
 }
 :deep(.el-form-item__error) {
     position: static;
@@ -540,5 +622,20 @@ defineExpose({ init, loading });
 .gpu-capabilities-help {
     max-width: 360px;
     white-space: pre-line;
+}
+.numa-strategy-help {
+    width: 100%;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 20px;
+}
+.numa-strategy-help p {
+    margin: 0;
+}
+.numa-strategy-warning {
+    color: var(--el-color-warning);
 }
 </style>

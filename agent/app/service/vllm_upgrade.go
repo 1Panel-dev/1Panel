@@ -86,6 +86,11 @@ func buildDefaultVllmImageByVersion(version string) string {
 }
 
 func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage string) bool {
+	currentRTX := vllm.IsRTXVersion(currentVersion)
+	targetRTX := vllm.IsRTXVersion(targetVersion)
+	if currentRTX != targetRTX {
+		return false
+	}
 	currentGB10 := vllm.IsGB10Version(currentVersion)
 	targetGB10 := vllm.IsGB10Version(targetVersion)
 	if currentGB10 != targetGB10 {

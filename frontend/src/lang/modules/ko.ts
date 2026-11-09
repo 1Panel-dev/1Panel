@@ -767,6 +767,20 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate:
+                'NUMA {node}에서 사용 가능한 GPU를 찾지 못했습니다. 이 노드에서 그룹을 생성할 수 없습니다.',
+            inspectNUMA:
+                '현재 노드의 터미널에서 다음 읽기 전용 명령을 실행하고 PCI 주소를 대조하여 GPU의 NUMA 소속을 확인하세요:',
+            numaQueryHint:
+                'numa_node 값은 NUMA 노드 번호입니다. -1은 시스템이 소속 정보를 보고하지 않았음을 나타냅니다. 결과가 페이지와 다르면 새로 고침 후 다시 시도하세요.',
+            relationTopology: '관계 토폴로지',
+            relationHelp: 'GPU 또는 그룹을 선택하면 소속 관계가 강조 표시됩니다.',
+            selectionHelp:
+                '동일한 장치 유형의 GPU를 선택한 후 다음 단계에서 그룹을 설정하세요. 점선은 저장되지 않은 소속 관계를 나타냅니다.',
+            allRelations: '모든 관계 표시',
+            pendingChanges: '저장되지 않음',
+            hardware: '하드웨어 배치',
+            editMembers: '구성원 편집',
             usageScope:
                 '연결 정보는 이 노드에서 1Panel이 관리하는 앱 설정을 기준으로 합니다. 메모리는 전체 GPU의 측정값입니다.',
             usageTitle: 'GPU 사용 현황',
@@ -1096,8 +1110,11 @@ const message = {
             numaAuto: '자동 매칭',
             numaManual: '수동 선택',
             numaNodes: 'NUMA 노드',
-            numaHint: '일반적으로 바인딩하지 않고, 성능 조정이 필요할 때 활성화하세요.',
-            numaHelp: '앱을 지정한 CPU와 메모리 노드에 바인딩합니다. 자동 매칭은 GPU 근처의 노드를 선택합니다.',
+            numaOffHelp: '선택한 GPU를 사용하고 CPU와 메모리는 시스템이 관리합니다.',
+            numaAutoHelp: '선택한 GPU가 속한 NUMA 노드에 CPU와 메모리를 바인딩합니다.',
+            numaManualHelp: 'GPU 선택을 변경하지 않고 앱이 사용할 CPU와 메모리 노드를 지정합니다.',
+            numaResolved: 'NUMA {node}에 바인딩됩니다.',
+            numaHelp: 'GPU 선택은 사용할 GPU를 결정하고, 선호도는 CPU와 메모리에 사용할 노드를 결정합니다.',
             numaRequirements:
                 '이미지에 numactl이 필요합니다. 바인딩을 활성화하면 필요한 경우 SYS_NICE 권한이 자동으로 추가됩니다.',
             numaUnknown:
@@ -1249,8 +1266,11 @@ const message = {
                 ascendA3: 'Ascend A3 시리즈 장치용 Ascend 공식 A3 버전입니다.',
                 ascendA5: '950DT 장치용 Ascend 공식 A5 버전입니다.',
                 ascend310P: 'Atlas 300I DUO 및 Atlas 200I Pro 장치용 Ascend 공식 310P 버전입니다.',
-                default: '공식 표준 버전으로, CUDA 13.0을 사용하며 최신 드라이버와 새로운 GPU 아키텍처에 적합합니다.',
-                dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, 1Panel이 자체 유지 관리하는 맞춤 이미지입니다.',
+                default:
+                    'vLLM 공식 커뮤니티 표준 버전으로, CUDA 13.0을 사용하며 최신 드라이버와 최신 GPU 아키텍처에 적합합니다.',
+                rtxPro5000:
+                    'NVIDIA RTX Pro 5000용 맞춤 버전으로, DeepSeek-V4.1-Flash-1017에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
+                dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, DeepSeek-V4-Flash에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
             },
             vllmDeployProfile: '배포 모델',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',

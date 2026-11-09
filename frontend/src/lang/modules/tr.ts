@@ -781,6 +781,19 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate: 'NUMA {node} altında kullanılabilir GPU algılanmadı. Bu düğümden grup oluşturulamaz.',
+            inspectNUMA:
+                'GPU NUMA yerleşimini kontrol etmek için mevcut düğümün terminalinde bu salt okunur komutları çalıştırın ve PCI adreslerini eşleştirin:',
+            numaQueryHint:
+                'numa_node, NUMA düğüm kimliğini içerir; -1, sistemin yerleşimi bildirmediği anlamına gelir. Sonuçlar bu sayfadan farklıysa yenileyip tekrar deneyin.',
+            relationTopology: 'İlişki topolojisi',
+            relationHelp: 'Üyelik ilişkilerini vurgulamak için bir GPU veya grup seçin.',
+            selectionHelp:
+                'Aynı aygıt türündeki GPU’ları seçin ve grubu yapılandırmak için ilerleyin. Kesik çizgiler kaydedilmemiş üyelikleri gösterir.',
+            allRelations: 'Tüm ilişkileri göster',
+            pendingChanges: 'Kaydedilmedi',
+            hardware: 'Donanım yerleşimi',
+            editMembers: 'Üyeleri düzenle',
             usageScope:
                 'İlişkiler, bu düğümde 1Panel tarafından yönetilen uygulama yapılandırmalarından alınır; bellek değerleri GPU’nun tamamı için ölçülür.',
             usageTitle: 'GPU kullanımı',
@@ -1129,9 +1142,11 @@ const message = {
             numaAuto: 'Otomatik',
             numaManual: 'Elle',
             numaNodes: 'NUMA düğümleri',
-            numaHint: 'Performans ayarı gerekmiyorsa bağlamayı kapalı bırakın.',
-            numaHelp:
-                'Uygulamayı seçilen CPU ve bellek düğümlerine bağlar. Otomatik eşleştirme GPU yakınındaki düğümleri seçer.',
+            numaOffHelp: 'Seçilen GPU’lar kullanılır; CPU ve bellek sistem tarafından yönetilir.',
+            numaAutoHelp: 'CPU ve bellek, seçilen GPU’ların bulunduğu NUMA düğümüne bağlanır.',
+            numaManualHelp: 'GPU seçimini değiştirmeden uygulamanın CPU ve bellek düğümlerini belirtin.',
+            numaResolved: 'NUMA {node} düğümüne bağlanacak.',
+            numaHelp: 'GPU seçimi kullanılacak GPU’ları, yakınlık ise CPU ve bellek düğümlerini belirler.',
             numaRequirements:
                 'İmaj numactl içermelidir. Bağlama etkinleştirildiğinde gerekirse SYS_NICE otomatik eklenir.',
             numaUnknown:
@@ -1288,8 +1303,11 @@ const message = {
                 ascendA3: 'Ascend A3 serisi cihazlar için resmi Ascend A3 sürümü.',
                 ascendA5: '950DT cihazları için resmi Ascend A5 sürümü.',
                 ascend310P: 'Atlas 300I DUO ve Atlas 200I Pro cihazları için resmi Ascend 310P sürümü.',
-                default: 'Yeni sürücüler ve yeni GPU mimarileri için CUDA 13.0 içeren resmi standart sürüm.',
-                dspark: '1Panel tarafından bakımı yapılan özel imajı kullanan, iki cihaz için NVIDIA GB10 özel sürümü.',
+                default:
+                    'Yeni sürücüler ve yeni GPU mimarileri için CUDA 13.0 içeren resmî vLLM topluluk standart sürümü.',
+                rtxPro5000:
+                    'NVIDIA RTX Pro 5000 için DeepSeek-V4.1-Flash-1017’ye optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
+                dspark: 'İki NVIDIA GB10 cihazı için DeepSeek-V4-Flash’a optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
             },
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',

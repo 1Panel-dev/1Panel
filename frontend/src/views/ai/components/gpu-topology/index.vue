@@ -4,9 +4,9 @@
             v-for="section in sections"
             :key="section.id ?? 'unknown'"
             class="numa-node"
-            :class="{ unknown: section.id === undefined }"
+            :class="{ unknown: section.id === undefined, unassigned: cards && section.id === undefined }"
         >
-            <header class="numa-node-header">
+            <header v-if="section.id !== undefined || !cards" class="numa-node-header">
                 <div>
                     <strong>
                         {{ section.id === undefined ? $t('aiTools.gpuGroup.unknownNode') : `NUMA ${section.id}` }}
@@ -87,7 +87,7 @@ const sections = computed(() => {
     );
     const unknown = props.devices.filter((device) => !props.nodes.some((node) => node.id === device.numaNode));
     if (unknown.length) result.push({ devices: unknown });
-    return result;
+    return result.filter((section) => !props.selectable || section.devices.length > 0);
 });
 const missingDevices = computed(() => selected.value.filter((id) => !props.devices.some((device) => device.id === id)));
 const toggleDevice = (id: string, checked: boolean) => {
@@ -108,14 +108,18 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
     gap: 24px;
 }
 .topology-cards {
-    grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr));
-    gap: 20px;
-    align-items: stretch;
+    grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
+    gap: 16px;
+    align-items: start;
 }
 .topology-cards > .numa-node {
     border: 1px solid var(--el-border-color-lighter);
-    border-radius: 10px;
+    border-radius: 8px;
     padding: 20px;
+}
+.gpu-topology.topology-cards > .numa-node.unassigned {
+    border: 0;
+    padding: 0;
 }
 .topology-cards .numa-node-header {
     margin-bottom: 16px;
@@ -125,6 +129,33 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
 }
 .topology-cards .topology-device {
     align-content: start;
+}
+.topology-cards .numa-devices {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+}
+.topology-cards .topology-device {
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    padding: 10px 12px;
+}
+.topology-cards .topology-device + .topology-device {
+    border-top-color: var(--el-border-color-extra-light);
+}
+.topology-cards .topology-device.selected {
+    background: var(--el-color-primary-light-9);
+    border-color: var(--el-color-primary-light-5);
+}
+.topology-cards.selectable .numa-devices {
+    gap: 6px;
+}
+.topology-cards.selectable .unassigned .numa-devices {
+    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+    gap: 12px;
+}
+.topology-cards.selectable .unassigned .topology-device:not(.selected) {
+    border-color: var(--el-border-color-lighter);
 }
 .topology-cards.selectable {
     grid-template-columns: minmax(0, 1fr);

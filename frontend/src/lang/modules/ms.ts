@@ -785,6 +785,20 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
+            emptyNodeCreate:
+                'Tiada GPU tersedia dikesan pada NUMA {node}. Kumpulan tidak boleh dicipta daripada nod ini.',
+            inspectNUMA:
+                'Jalankan arahan baca sahaja ini dalam terminal nod semasa dan padankan alamat PCI untuk menyemak penempatan NUMA GPU:',
+            numaQueryHint:
+                'numa_node mengandungi ID nod NUMA; -1 bermaksud sistem belum melaporkan penempatan. Jika keputusan berbeza daripada halaman ini, muat semula dan cuba lagi.',
+            relationTopology: 'Topologi hubungan',
+            relationHelp: 'Pilih GPU atau kumpulan untuk menyerlahkan hubungan keahliannya.',
+            selectionHelp:
+                'Pilih GPU daripada jenis peranti yang sama, kemudian teruskan untuk mengkonfigurasi kumpulan. Garis putus-putus menunjukkan keahlian yang belum disimpan.',
+            allRelations: 'Tunjukkan semua hubungan',
+            pendingChanges: 'Belum disimpan',
+            hardware: 'Penempatan perkakasan',
+            editMembers: 'Sunting ahli',
             usageScope:
                 'Perkaitan berdasarkan konfigurasi aplikasi yang diurus oleh 1Panel pada nod ini; nilai memori diukur untuk seluruh GPU.',
             usageTitle: 'Penggunaan GPU',
@@ -1132,9 +1146,11 @@ const message = {
             numaAuto: 'Automatik',
             numaManual: 'Manual',
             numaNodes: 'Nod NUMA',
-            numaHint: 'Biarkan pengikatan dimatikan kecuali untuk penalaan prestasi.',
-            numaHelp:
-                'Mengikat aplikasi kepada nod CPU dan memori yang dipilih. Padanan automatik memilih nod berhampiran GPU.',
+            numaOffHelp: 'Gunakan GPU yang dipilih sementara sistem mengurus CPU dan memori.',
+            numaAutoHelp: 'Ikat CPU dan memori pada nod NUMA yang menempatkan GPU terpilih.',
+            numaManualHelp: 'Tentukan nod CPU dan memori aplikasi tanpa mengubah pilihan GPU.',
+            numaResolved: 'Akan diikat pada NUMA {node}.',
+            numaHelp: 'Pilihan GPU menentukan GPU yang digunakan; afiniti menentukan nod CPU dan memori.',
             numaRequirements:
                 'Imej mesti mengandungi numactl. Mengaktifkan pengikatan menambah SYS_NICE secara automatik jika perlu.',
             numaUnknown:
@@ -1294,8 +1310,11 @@ const message = {
                 ascendA3: 'Versi rasmi Ascend A3 untuk peranti siri Ascend A3.',
                 ascendA5: 'Versi rasmi Ascend A5 untuk peranti 950DT.',
                 ascend310P: 'Versi rasmi Ascend 310P untuk peranti Atlas 300I DUO dan Atlas 200I Pro.',
-                default: 'Versi standard rasmi dengan CUDA 13.0, untuk pemacu baharu dan seni bina GPU baharu.',
-                dspark: 'Versi tersuai NVIDIA GB10 untuk dua peranti, menggunakan imej tersuai yang diselenggara oleh 1Panel.',
+                default:
+                    'Versi standard komuniti rasmi vLLM dengan CUDA 13.0, sesuai untuk pemacu dan seni bina GPU yang lebih baharu.',
+                rtxPro5000:
+                    'Versi tersuai untuk NVIDIA RTX Pro 5000, dioptimumkan untuk DeepSeek-V4.1-Flash-1017. Imej diselenggara oleh 1Panel.',
+                dspark: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4-Flash. Imej diselenggara oleh 1Panel.',
             },
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',

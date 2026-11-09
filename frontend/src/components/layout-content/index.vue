@@ -19,7 +19,7 @@
         </div>
         <div class="content-container__main" v-if="slots.main">
             <el-card>
-                <div v-if="hasTitleContent" class="content-container__title">
+                <div v-if="hasTitleContent()" class="content-container__title">
                     <slot name="title">
                         <div v-if="showBack" class="flex flex-wrap gap-4 sm:justify-between">
                             <back-button
@@ -60,7 +60,7 @@
                 <div v-if="slots.prompt" class="prompt">
                     <slot name="prompt"></slot>
                 </div>
-                <div class="main-content" :class="{ 'main-content--compact': !hasMainTopGap }">
+                <div class="main-content" :class="{ 'main-content--compact': !hasMainTopGap() }">
                     <slot name="main"></slot>
                 </div>
             </el-card>
@@ -87,12 +87,12 @@ const showBack = computed(() => {
     const { backPath, backName, backTo, reload } = prop;
     return backPath || backName || backTo || reload;
 });
-const hasTitleContent = computed(() => {
+const hasTitleContent = () => {
     return Boolean(
         slots.title || slots.leftToolBar || slots.rightToolBar || slots.toolbar || prop.divider || showBack.value,
     );
-});
-const hasMainTopGap = computed(() => hasTitleContent.value || Boolean(slots.prompt));
+};
+const hasMainTopGap = () => hasTitleContent() || Boolean(slots.prompt);
 </script>
 
 <style lang="scss" scoped>
