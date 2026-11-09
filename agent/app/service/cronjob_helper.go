@@ -222,7 +222,7 @@ func (u *CronjobService) handleNtpSync(cronjob model.Cronjob, taskItem *task.Tas
 		if err != nil {
 			return err
 		}
-		if err := ntp.UpdateSystemTime(ntime.Format(constant.DateTimeLayout)); err != nil {
+		if err := ntp.UpdateSystemTime(ntime); err != nil {
 			return err
 		}
 		return nil

@@ -13,7 +13,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
-	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
@@ -156,8 +155,7 @@ func (u *DeviceService) Update(key, value string) error {
 		if err != nil {
 			return err
 		}
-		ts := ntime.Format(constant.DateTimeLayout)
-		if err := ntp.UpdateSystemTime(ts); err != nil {
+		if err := ntp.UpdateSystemTime(ntime); err != nil {
 			return err
 		}
 	default:
