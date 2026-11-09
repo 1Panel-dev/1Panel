@@ -5604,12 +5604,14 @@ const message = {
                 licenseRequired:
                     'レポートと履歴の閲覧には有効なライセンスが必要です。ライセンスを更新するか、有効なライセンスをインポートしてください。',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                    'このノードの Agent を、ローカル運用レポートに対応したバージョンにアップグレードしてください。',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'このノードのレポート情報を読み込めません。ノードへの接続とレポートの閲覧権限を確認してください。',
+                generationPending:
+                    'このリクエストはまだ処理中です。再生成する前にレポート履歴で状態を確認してください。',
+                notApplicable: '対象外',
+                panelNotApplicable:
+                    'このノードにはパネルがインストールされていないため、パネル固有の情報は対象外です。',
 
                 enterprise: 'エンタープライズ',
                 reportNode: 'レポートノード',

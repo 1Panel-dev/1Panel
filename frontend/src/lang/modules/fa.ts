@@ -5578,12 +5578,12 @@ const message = {
                 licenseRequired:
                     'برای مشاهده گزارش‌ها و تاریخچه، مجوز معتبر لازم است. مجوز را تمدید یا یک مجوز معتبر وارد کنید.',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
-                contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'Agent این گره را به نسخه‌ای ارتقا دهید که از گزارش‌های عملیاتی محلی پشتیبانی می‌کند.',
+                contextFailed: 'اطلاعات گزارش این گره بارگیری نشد. اتصال گره و مجوز خواندن گزارش‌ها را بررسی کنید.',
+                generationPending:
+                    'این درخواست هنوز در حال اجرا است. پیش از تولید دوباره گزارش، وضعیت را در تاریخچه گزارش‌ها بررسی کنید.',
+                notApplicable: 'قابل اعمال نیست',
+                panelNotApplicable: 'روی این گره پنلی نصب نشده است. اطلاعات اختصاصی پنل قابل اعمال نیست.',
 
                 enterprise: 'سازمانی',
                 reportNode: 'گره گزارش',

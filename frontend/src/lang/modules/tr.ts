@@ -5714,12 +5714,13 @@ const message = {
                 licenseRequired:
                     'Raporları ve geçmişi görüntülemek için geçerli bir lisans gereklidir. Lisansı yenileyin veya geçerli bir lisansı içe aktarın.',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                    'Bu düğümün Agent bileşenini yerel operasyon raporlarını destekleyen bir sürüme yükseltin.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'Bu düğümün rapor bilgileri yüklenemedi. Düğüm bağlantısını ve rapor okuma izinlerini kontrol edin.',
+                generationPending:
+                    'Bu istek hâlâ işleniyor. Raporu yeniden oluşturmadan önce rapor geçmişinden durumunu kontrol edin.',
+                notApplicable: 'Uygulanamaz',
+                panelNotApplicable: 'Bu düğümde panel kurulu değil. Panele özgü bilgiler uygulanamaz.',
 
                 enterprise: 'Kurumsal',
                 reportNode: 'Rapor Düğümü',

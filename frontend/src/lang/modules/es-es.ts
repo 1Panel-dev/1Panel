@@ -5715,12 +5715,14 @@ const message = {
                 licenseRequired:
                     'Se requiere una licencia válida para ver informes e historial. Renueve o importe una licencia válida.',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                    'Actualice el Agent de este nodo a una versión compatible con los informes de operaciones locales.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'No se pudo cargar la información del informe de este nodo. Compruebe la conexión del nodo y los permisos de lectura de informes.',
+                generationPending:
+                    'Esta solicitud sigue en curso. Compruebe su estado en el historial de informes antes de volver a generar el informe.',
+                notApplicable: 'No aplicable',
+                panelNotApplicable:
+                    'No hay un panel instalado en este nodo. La información específica del panel no es aplicable.',
 
                 enterprise: 'Edición Empresarial',
                 reportNode: 'Nodo de informe',

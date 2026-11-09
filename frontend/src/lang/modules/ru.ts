@@ -5705,12 +5705,13 @@ const message = {
                 licenseRequired:
                     'Для просмотра отчётов и истории требуется действующая лицензия. Продлите или импортируйте действующую лицензию.',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                    'Обновите Agent этого узла до версии с поддержкой локальных операционных отчётов.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'Не удалось загрузить сведения об отчётах этого узла. Проверьте подключение к узлу и права на чтение отчётов.',
+                generationPending:
+                    'Этот запрос ещё выполняется. Проверьте его состояние в истории отчётов, прежде чем создавать отчёт повторно.',
+                notApplicable: 'Неприменимо',
+                panelNotApplicable: 'На этом узле панель не установлена. Сведения, относящиеся к панели, неприменимы.',
 
                 enterprise: 'Корпоративная версия',
                 reportNode: 'Узел отчёта',

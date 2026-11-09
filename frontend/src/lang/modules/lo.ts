@@ -5441,15 +5441,14 @@ const message = {
 
                 licenseRequired:
                     'ຕ້ອງມີໃບອະນຸຍາດທີ່ຍັງໃຊ້ໄດ້ເພື່ອເບິ່ງລາຍງານ ແລະປະຫວັດ. ກະລຸນາຕໍ່ອາຍຸ ຫຼືນຳເຂົ້າໃບອະນຸຍາດທີ່ຖືກຕ້ອງ.',
-                agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                agentUpgradeRequired: 'ກະລຸນາອັບເກຣດ Agent ຂອງໂນດນີ້ເປັນເວີຊັນທີ່ຮອງຮັບລາຍງານການປະຕິບັດການພາຍໃນໂນດ.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'ບໍ່ສາມາດໂຫຼດຂໍ້ມູນລາຍງານຂອງໂນດນີ້ໄດ້. ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ໂນດ ແລະສິດໃນການອ່ານລາຍງານ.',
+                generationPending: 'ຄຳຮ້ອງນີ້ຍັງກຳລັງດຳເນີນການ. ກະລຸນາກວດສອບສະຖານະໃນປະຫວັດລາຍງານກ່ອນສ້າງລາຍງານອີກຄັ້ງ.',
+                notApplicable: 'ບໍ່ກ່ຽວຂ້ອງ',
+                panelNotApplicable: 'ໂນດນີ້ບໍ່ໄດ້ຕິດຕັ້ງແຜງຄວບຄຸມ. ຂໍ້ມູນສະເພາະຂອງແຜງຄວບຄຸມຈຶ່ງບໍ່ກ່ຽວຂ້ອງ.',
 
-                enterprise: 'Enterprise',
+                enterprise: 'ສະບັບວິສາຫະກິດ',
                 reportNode: 'Node ທີ່ລາຍງານ',
                 currentNode: 'ປະຈຸບັນ',
                 scoreMeta: 'ຖືກຫັກ {0} ຄະແນນ · ພົບ {1} ຄວາມສ່ຽງ',
@@ -5732,7 +5731,7 @@ const message = {
                 alertTimeRuleShort: 'ແຈ້ງເຕືອນພາຍໃນ {0} ວັນ, ສົ່ງ {1} ຄັ້ງ',
                 alertSendCountRuleShort: 'ສົ່ງ {0} ຄັ້ງຕໍ່ວັນ',
                 failedExecutionRecords: 'ບັນທຶກການເຮັດວຽກທີ່ລົ້ມເຫຼວ',
-                taskID: 'Task ID',
+                taskID: 'ລະຫັດວຽກ',
                 executeTime: 'ເວລາເຮັດວຽກ',
                 backupTasks: 'ວຽກສຳຮອງຂໍ້ມູນ',
                 systemMetrics: 'ຕົວຊີ້ວັດການເຮັດວຽກ',

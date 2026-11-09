@@ -5499,13 +5499,13 @@ const message = {
 
                 licenseRequired:
                     '보고서와 기록을 보려면 유효한 라이선스가 필요합니다. 라이선스를 갱신하거나 유효한 라이선스를 가져오세요.',
-                agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                agentUpgradeRequired: '이 노드의 Agent를 로컬 운영 보고서를 지원하는 버전으로 업그레이드하세요.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    '이 노드의 보고서 정보를 불러올 수 없습니다. 노드 연결 및 보고서 조회 권한을 확인하세요.',
+                generationPending:
+                    '이 요청은 아직 처리 중입니다. 보고서를 다시 생성하기 전에 보고서 기록에서 상태를 확인하세요.',
+                notApplicable: '해당 없음',
+                panelNotApplicable: '이 노드에는 패널이 설치되어 있지 않아 패널 전용 정보는 해당되지 않습니다.',
 
                 enterprise: '엔터프라이즈',
                 reportNode: '보고서 노드',

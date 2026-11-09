@@ -5705,12 +5705,13 @@ const message = {
                 licenseRequired:
                     'Lesen yang sah diperlukan untuk melihat laporan dan sejarah. Perbaharui atau import lesen yang sah.',
                 agentUpgradeRequired:
-                    'This node must be upgraded to an Agent version that supports local operations reports.',
+                    'Naik taraf Agent pada nod ini kepada versi yang menyokong laporan operasi setempat.',
                 contextFailed:
-                    'Unable to load this node’s report context. Check node connectivity and report access permissions.',
-                generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
+                    'Maklumat laporan nod ini tidak dapat dimuatkan. Semak sambungan nod dan kebenaran untuk membaca laporan.',
+                generationPending:
+                    'Permintaan ini masih diproses. Semak status dalam sejarah laporan sebelum menjana laporan semula.',
+                notApplicable: 'Tidak berkenaan',
+                panelNotApplicable: 'Tiada panel dipasang pada nod ini. Maklumat khusus panel tidak berkenaan.',
 
                 enterprise: 'Edisi Perusahaan',
                 reportNode: 'Nod Laporan',

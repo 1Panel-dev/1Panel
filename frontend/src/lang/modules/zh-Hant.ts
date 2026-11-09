@@ -5202,11 +5202,11 @@ const message = {
                 legacyHistoryCleanupSuccess: '升級前報表已清除。',
 
                 licenseRequired: '運維報表及歷史檢視需要有效授權，請續期或匯入有效許可證。',
-                agentUpgradeRequired: '请将此节点升级到支持本机运维报表的 Agent 版本。',
-                contextFailed: '无法加载此节点的报表信息，请检查节点连接及报表读取权限。',
-                generationPending: '此请求仍在生成，请先到历史报表核对状态，再决定是否重新生成。',
-                notApplicable: '不适用',
-                panelNotApplicable: '此节点未部署面板，面板专属信息不适用。',
+                agentUpgradeRequired: '請將此節點的 Agent 升級至支援本機運維報表的版本。',
+                contextFailed: '無法載入此節點的報表資訊，請檢查節點連線及報表讀取權限。',
+                generationPending: '此請求仍在處理中，請先至報表歷史確認狀態，再決定是否重新產生報表。',
+                notApplicable: '不適用',
+                panelNotApplicable: '此節點未部署面板，面板專屬資訊不適用。',
 
                 enterprise: '企業版',
                 reportNode: '報表節點',
