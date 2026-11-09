@@ -816,7 +816,10 @@ var InitLocalSSHConn = &gormigrate.Migration{
 			itemPath = path.Join(currentInfo.HomeDir, ".ssh/id_ed25519_1panel")
 		}
 		if _, err := os.Stat(itemPath); err != nil {
-			_ = service.NewISSHService().CreateRootCert(dto.RootCertOperate{EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"})
+			if err := service.NewISSHService().CreateRootCert(dto.RootCertOperate{Mode: "generate", EncryptionMode: "ed25519", Name: "id_ed25519_1panel", Description: "1Panel Terminal"}); err != nil {
+				global.LOG.Errorf("initialize local SSH key failed: %v", err)
+				return nil
+			}
 		}
 		privateKey, _ := os.ReadFile(itemPath)
 		connWithKey := ssh.ConnInfo{
@@ -826,9 +829,11 @@ var InitLocalSSHConn = &gormigrate.Migration{
 			AuthMode:   "key",
 			PrivateKey: privateKey,
 		}
-		if _, err := ssh.NewClient(connWithKey); err != nil {
+		client, err := ssh.NewClient(connWithKey)
+		if err != nil {
 			return nil
 		}
+		defer client.Close()
 		var conn model.LocalConnInfo
 		_ = copier.Copy(&conn, &connWithKey)
 		conn.PrivateKey = string(privateKey)
