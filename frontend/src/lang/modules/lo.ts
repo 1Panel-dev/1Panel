@@ -4541,6 +4541,8 @@ const message = {
         proxyConnectTimeoutHelper: 'ເວລາໝົດອາຍຸການເຊື່ອມຕໍ່ກັບ Backend',
         proxySendTimeoutHelper: 'ເວລາໝົດອາຍຸການສົ່ງຄຳຮ້ອງຂໍໄປຫາ Backend',
         proxyReadTimeoutHelper: 'ເວລາໝົດອາຍຸການລໍຖ້າການຕອບກັບຈາກ Backend',
+        timeValueError: 'ຮູບແບບບໍ່ຖືກຕ້ອງ, ຕົວຢ່າງ: 60s, 5m, 1m30s',
+        directiveSourceHelper: 'ຕັ້ງຄ່າໃນ {0}; ກະລຸນາແກ້ໄຂໃນໄຟລ໌ນັ້ນ',
         gzipMinLengthHelper: 'ຂະໜາດໄຟລ໌ຕ່ຳສຸດທີ່ຈະບີບອັດ',
         gzipCompLevelHelper: 'ອັດຕາການບີບອັດ',
         gzipHelper: 'ເປີດໃຊ້ການບີບອັດໃນການຮັບສົ່ງຂໍ້ມູນ',

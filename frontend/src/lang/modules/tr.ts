@@ -4748,6 +4748,8 @@ const message = {
         proxyConnectTimeoutHelper: 'Arka uca bağlantı kurma zaman aşımı',
         proxySendTimeoutHelper: 'Arka uca istek gönderme zaman aşımı',
         proxyReadTimeoutHelper: 'Arka uç yanıtını bekleme zaman aşımı',
+        timeValueError: 'Geçersiz süre, örn. 60s, 5m, 1m30s',
+        directiveSourceHelper: '{0} dosyasında ayarlanmış; o dosyada düzenleyin',
         gzipMinLengthHelper: 'Minimum Sıkıştırılmış Dosya',
         gzipCompLevelHelper: 'Sıkıştırma Oranı',
         gzipHelper: 'İletim için sıkıştırmayı etkinleştir',

@@ -4672,6 +4672,8 @@ const message = {
         proxyConnectTimeoutHelper: 'Timeout for establishing a connection to the backend',
         proxySendTimeoutHelper: 'Timeout for sending a request to the backend',
         proxyReadTimeoutHelper: 'Timeout for waiting for a response from the backend',
+        timeValueError: 'Invalid duration, e.g. 60s, 5m, 1m30s',
+        directiveSourceHelper: 'Set in {0}; edit it in that file',
         gzipMinLengthHelper: 'Minimum Compressed File',
         gzipCompLevelHelper: 'Compression Rate',
         gzipHelper: 'Enable compression for transmission',

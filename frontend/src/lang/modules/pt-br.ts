@@ -4760,6 +4760,8 @@ const message = {
         proxyConnectTimeoutHelper: 'Tempo limite para estabelecer a conexão com o backend',
         proxySendTimeoutHelper: 'Tempo limite para enviar a requisição ao backend',
         proxyReadTimeoutHelper: 'Tempo limite para aguardar a resposta do backend',
+        timeValueError: 'Duração inválida, ex.: 60s, 5m, 1m30s',
+        directiveSourceHelper: 'Definido em {0}; edite nesse arquivo',
         gzipMinLengthHelper: 'Tamanho mínimo para compressão',
         gzipCompLevelHelper: 'Nível de compressão',
         gzipHelper: 'Ativar compressão na transmissão',

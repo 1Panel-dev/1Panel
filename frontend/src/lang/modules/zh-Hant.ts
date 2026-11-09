@@ -4357,6 +4357,8 @@ const message = {
         proxyConnectTimeoutHelper: '與後端建立連線的逾時時間',
         proxySendTimeoutHelper: '向後端傳送請求的逾時時間',
         proxyReadTimeoutHelper: '等待後端回應的逾時時間',
+        timeValueError: '格式不正確，範例：60s、5m、1m30s',
+        directiveSourceHelper: '由 {0} 設定，請在該檔案中修改',
         gzipMinLengthHelper: '最小壓縮檔案',
         gzipCompLevelHelper: '壓縮率',
         gzipHelper: '是否開啟壓縮傳輸',

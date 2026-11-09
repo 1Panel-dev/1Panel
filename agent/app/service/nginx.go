@@ -70,7 +70,15 @@ func (n NginxService) GetConfigByScope(req request.NginxScopeReq) (interface{}, 
 	if !ok || len(keys) == 0 {
 		return nil, nil
 	}
-	return getNginxParamsByKeys(constant.NginxScopeHttp, keys, nil)
+	params, err := getNginxParamsByKeys(constant.NginxScopeHttp, keys, nil)
+	if err != nil {
+		return nil, err
+	}
+	install, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return nil, err
+	}
+	return fillNginxIncludedHTTPParams(params, nginxHTTPUserIncludePaths(install, GetWebSiteRootDir())), nil
 }
 
 func (n NginxService) UpdateConfigByScope(req request.NginxConfigUpdate) error {

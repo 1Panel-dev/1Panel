@@ -4572,6 +4572,8 @@ const message = {
         proxyConnectTimeoutHelper: '백엔드 연결 수립 시간 초과',
         proxySendTimeoutHelper: '백엔드 요청 전송 시간 초과',
         proxyReadTimeoutHelper: '백엔드 응답 대기 시간 초과',
+        timeValueError: '형식이 올바르지 않습니다. 예: 60s, 5m, 1m30s',
+        directiveSourceHelper: '{0}에서 설정되어 있습니다. 해당 파일에서 수정하세요',
         gzipMinLengthHelper: '최소 압축 파일 크기',
         gzipCompLevelHelper: '압축률',
         gzipHelper: '전송을 위한 압축 활성화',

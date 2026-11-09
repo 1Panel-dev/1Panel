@@ -4630,6 +4630,8 @@ const message = {
         proxyConnectTimeoutHelper: 'مهلت برقراری اتصال با بک‌اند',
         proxySendTimeoutHelper: 'مهلت ارسال درخواست به بک‌اند',
         proxyReadTimeoutHelper: 'مهلت انتظار برای پاسخ بک‌اند',
+        timeValueError: 'مدت زمان نامعتبر است، مثال: 60s، 5m، 1m30s',
+        directiveSourceHelper: 'در {0} تنظیم شده است؛ آن را در همان فایل ویرایش کنید',
         gzipMinLengthHelper: 'حداقل فایل فشرده',
         gzipCompLevelHelper: 'نرخ فشرده‌سازی',
         gzipHelper: 'فعال‌سازی فشرده‌سازی برای انتقال',

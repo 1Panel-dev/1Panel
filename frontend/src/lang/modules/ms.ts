@@ -4743,6 +4743,8 @@ const message = {
         proxyConnectTimeoutHelper: 'Masa tamat untuk mewujudkan sambungan ke backend',
         proxySendTimeoutHelper: 'Masa tamat untuk menghantar permintaan ke backend',
         proxyReadTimeoutHelper: 'Masa tamat untuk menunggu respons daripada backend',
+        timeValueError: 'Tempoh tidak sah, cth. 60s, 5m, 1m30s',
+        directiveSourceHelper: 'Ditetapkan dalam {0}; edit dalam fail tersebut',
         gzipMinLengthHelper: 'Saiz minimum fail untuk pemampatan',
         gzipCompLevelHelper: 'Kadar mampatan',
         gzipHelper: 'Aktifkan pemampatan untuk penghantaran',

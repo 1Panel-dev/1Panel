@@ -15,6 +15,9 @@ type NginxStatus struct {
 type NginxParam struct {
 	Name   string   `json:"name"`
 	Params []string `json:"params"`
+	// Source is the included file that sets an http-level directive missing
+	// from nginx.conf. Empty when the value comes from nginx.conf itself.
+	Source string `json:"source,omitempty"`
 }
 
 // NginxBrotliRes carries the brotli settings together with where they live.

@@ -4654,6 +4654,8 @@ const message = {
         proxyConnectTimeoutHelper: 'バックエンドとの接続確立のタイムアウト',
         proxySendTimeoutHelper: 'バックエンドへのリクエスト送信のタイムアウト',
         proxyReadTimeoutHelper: 'バックエンドからの応答待ちのタイムアウト',
+        timeValueError: '形式が正しくありません。例：60s、5m、1m30s',
+        directiveSourceHelper: '{0} で設定されています。そのファイルで変更してください',
         gzipMinLengthHelper: '最小圧縮ファイル',
         gzipCompLevelHelper: '圧縮率',
         gzipHelper: '伝送の圧縮を有効にします',
