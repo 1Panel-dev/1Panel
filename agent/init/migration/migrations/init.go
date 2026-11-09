@@ -1836,13 +1836,6 @@ var AddAcceleratorMetrics = &gormigrate.Migration{
 	},
 }
 
-var AddVLLMMonitor = &gormigrate.Migration{
-	ID: "20260928-vllm-monitor",
-	Migrate: func(tx *gorm.DB) error {
-		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
-	},
-}
-
 var AddMonitorSettings = &gormigrate.Migration{
 	ID: "20260929-monitor-settings",
 	Migrate: func(tx *gorm.DB) error {
@@ -1851,27 +1844,11 @@ var AddMonitorSettings = &gormigrate.Migration{
 			if err := tx.Where("key = ?", key).First(&setting).Error; err != nil {
 				return err
 			}
-			for _, prefix := range []string{"GPU", "VLLM"} {
-				if err := tx.Where("key = ?", prefix+key).FirstOrCreate(&model.Setting{Key: prefix + key, Value: setting.Value}).Error; err != nil {
-					return err
-				}
+			if err := tx.Where("key = ?", "GPU"+key).FirstOrCreate(&model.Setting{Key: "GPU" + key, Value: setting.Value}).Error; err != nil {
+				return err
 			}
 		}
 		return nil
-	},
-}
-
-var AddVLLMRequestMetrics = &gormigrate.Migration{
-	ID: "20261010-vllm-request-metrics",
-	Migrate: func(tx *gorm.DB) error {
-		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
-	},
-}
-
-var AddVLLMSampleInterval = &gormigrate.Migration{
-	ID: "20261016-vllm-sample-interval",
-	Migrate: func(tx *gorm.DB) error {
-		return global.VLLMMonitorDB.AutoMigrate(&model.MonitorVLLM{})
 	},
 }
 

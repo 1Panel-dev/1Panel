@@ -23,10 +23,13 @@ import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { updateMonitorSetting } from '@/api/modules/host';
 
+const props = defineProps({
+    updateSetting: { type: Function, default: updateMonitorSetting },
+});
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
-    key: 'MonitorStoreDays' | 'GPUMonitorStoreDays' | 'VLLMMonitorStoreDays';
+    key: string;
     monitorStoreDays: number;
 }
 const settingKey = ref<DialogProps['key']>('MonitorStoreDays');
@@ -50,7 +53,8 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateMonitorSetting(settingKey.value, form.monitorStoreDays + '')
+        await props
+            .updateSetting(settingKey.value, form.monitorStoreDays + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

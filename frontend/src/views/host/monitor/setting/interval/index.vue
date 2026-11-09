@@ -31,10 +31,13 @@ import { FormInstance } from 'element-plus';
 import { Rules } from '@/global/form-rules';
 import { updateMonitorSetting } from '@/api/modules/host';
 import { transferTimeToSecond } from '@/utils/validate';
+const props = defineProps({
+    updateSetting: { type: Function, default: updateMonitorSetting },
+});
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 interface DialogProps {
-    key: 'MonitorInterval' | 'GPUMonitorInterval' | 'VLLMMonitorInterval';
+    key: string;
     timeItem: number;
     timeUnit: string;
 }
@@ -78,7 +81,8 @@ const onSave = async (formEl: FormInstance | undefined) => {
     formEl.validate(async (valid) => {
         if (!valid) return;
         loading.value = true;
-        await updateMonitorSetting(settingKey.value, form.monitorInterval + '')
+        await props
+            .updateSetting(settingKey.value, form.monitorInterval + '')
             .then(() => {
                 loading.value = false;
                 handleClose();

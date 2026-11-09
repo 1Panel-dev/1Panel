@@ -33,9 +33,6 @@ func (a *AIToolsRouter) InitRouter(Router *gin.RouterGroup) {
 		aiToolsRouter.POST("/model/gpu/usage", baseApi.LoadModelGPUUsage)
 		aiToolsRouter.POST("/gpu/search", baseApi.LoadGPUMonitor)
 		aiToolsRouter.GET("/gpu/options", baseApi.GetCPUOptions)
-		aiToolsRouter.POST("/vllm/monitor/search", baseApi.LoadVLLMMonitor)
-		aiToolsRouter.POST("/vllm/monitor/current", baseApi.LoadVLLMCurrent)
-		aiToolsRouter.POST("/vllm/monitor/clean", baseApi.CleanVLLMMonitor)
 
 		aiToolsRouter.POST("/mcp/search", baseApi.PageMcpServers)
 		aiToolsRouter.POST("/mcp/server/detail", baseApi.LoadMcpServerDetail)
