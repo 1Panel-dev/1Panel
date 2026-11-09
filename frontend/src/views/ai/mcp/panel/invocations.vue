@@ -22,13 +22,7 @@
             </el-button>
         </div>
         <div class="w-full min-w-0 overflow-x-auto" v-loading="loading">
-            <ComplexTable
-                :data="displayItems"
-                :pagination-config="pagination"
-                :page-sizes="[10, 20, 50, 100]"
-                :height="500"
-                @search="search"
-            >
+            <ComplexTable :data="displayItems" :pagination-config="pagination" :height="500" @search="search">
                 <el-table-column
                     :label="$t('commons.table.date')"
                     prop="startedAt"

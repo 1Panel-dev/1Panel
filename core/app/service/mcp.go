@@ -148,7 +148,7 @@ func (s *MCPService) ManagementOwner(c *gin.Context, write bool) (auth.APIKeyOwn
 	}
 	return owner, nil
 }
-func validMCPPage(page, size int) bool { return page > 0 && page <= 1000000 && size > 0 && size <= 100 }
+func validMCPPage(page, size int) bool { return page > 0 && page <= 1000000 && size > 0 && size <= 500 }
 func (s *MCPService) catalog() ([]contract.Tool, error) {
 	unavailable := func() error {
 		return contract.Fail("MCP_CATALOG_UNAVAILABLE", 503, "The installed MCP tool catalog is unavailable or incompatible")

@@ -32,6 +32,8 @@ import (
 
 var apiKeyMutationMu sync.Mutex
 
+const apiKeyMaxPageSize = 500
+
 type APIKeyService struct {
 	Provider        auth.APIKeyOwnerProvider
 	RevokeTerminals terminalsession.RevokeFunc
@@ -105,7 +107,7 @@ func (s *APIKeyService) Search(c *gin.Context, req dto.APIKeySearch) (*dto.APIKe
 	if err != nil {
 		return nil, err
 	}
-	if req.Page < 1 || req.PageSize < 1 || req.PageSize > 100 {
+	if req.Page < 1 || req.PageSize < 1 || req.PageSize > apiKeyMaxPageSize {
 		return nil, buserr.New("ErrInvalidParams")
 	}
 	keys, err := repo.NewAPIKeyRepo().List(owner.Type, owner.ID, req.ExcludeRevoked)
