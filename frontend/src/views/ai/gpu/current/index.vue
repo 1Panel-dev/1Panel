@@ -75,7 +75,7 @@
                                 :disabled="!summary.sharedMemoryOnly && !summary.memoryPartial"
                                 :content="summaryMemoryTooltip(summary)"
                             >
-                                <strong v-if="!summary.sharedMemoryOnly && summary.memoryUsage">
+                                <strong v-if="summary.memoryUsage">
                                     {{ $t('home.used') }} {{ formatSummaryMemory(summary.memoryUsage.used) }} /
                                     {{ formatSummaryMemory(summary.memoryUsage.total) }}
                                     <template v-if="summary.memoryUsage.percentage !== null">
@@ -97,9 +97,14 @@
                                 <span class="whitespace-normal">
                                     {{
                                         $t('aiTools.gpu.environment.sharedMemory', {
-                                            memory: formatSummaryMemory(summary.sharedMemoryTotal),
+                                            memory: sharedMemoryUsage
+                                                ? `${$t('home.used')} ${formatSummaryMemory(sharedMemoryUsage.used)} / ${formatSummaryMemory(sharedMemoryUsage.total)}`
+                                                : formatSummaryMemory(summary.sharedMemoryTotal),
                                         })
                                     }}
+                                    <template v-if="sharedMemoryUsage && sharedMemoryUsage.percentage !== null">
+                                        ({{ sharedMemoryUsage.percentage }}%)
+                                    </template>
                                 </span>
                             </el-tooltip>
                         </div>
@@ -740,6 +745,18 @@ const formatSummaryMemory = (value: number | null) => {
     return value === null || !Number.isFinite(value) ? '—' : computeSizeForDocker(value);
 };
 
+const sharedMemoryUsage = computed(() => {
+    const device = gpuInfo.value.gpu.find((device) => device.sharedMemory);
+    if (!device) return null;
+    const used = memoryMiB(device.memUsed);
+    const total = memoryMiB(device.memTotal);
+    return {
+        used: used !== null && used >= 0 ? used * 1024 ** 2 : null,
+        total: total !== null && total >= 0 ? total * 1024 ** 2 : null,
+        percentage: used !== null && used >= 0 ? memoryPercentage(device) : null,
+    };
+});
+
 const summaryMemoryUsage = (vendor?: string) => {
     const devices = [
         ...[...gpuInfo.value.gpu, ...gpuInfo.value.npu]
@@ -789,15 +806,16 @@ const overviewRows = computed(() => {
                 const devices = gpuInfo.value.gpu.filter((device) => device.type === summary.vendor);
                 const sharedMemoryTotal =
                     devices.length && !devices.some((device) => device.sharedMemory) ? null : summary.sharedMemoryTotal;
+                const sharedMemoryOnly =
+                    summary.memoryTotal === null &&
+                    sharedMemoryTotal !== null &&
+                    devices.every((device) => device.sharedMemory);
                 return {
                     ...summary,
-                    memoryUsage: summaryMemoryUsage(summary.vendor),
+                    memoryUsage: sharedMemoryOnly ? sharedMemoryUsage.value : summaryMemoryUsage(summary.vendor),
                     sharedMemoryTotal,
                     cardCountText: summary.cardCount === null ? '—' : String(summary.cardCount),
-                    sharedMemoryOnly:
-                        summary.memoryTotal === null &&
-                        sharedMemoryTotal !== null &&
-                        devices.every((device) => device.sharedMemory),
+                    sharedMemoryOnly,
                 };
             });
     }
@@ -833,6 +851,7 @@ const overviewRows = computed(() => {
             memoryTotal = (memoryTotal ?? 0) + bytes;
         }
     }
+    const sharedMemoryOnly = sharedMemoryTotal !== null && memoryDevices.every((device) => device.shared);
     return [
         {
             vendor: gpuInfo.value.type,
@@ -840,9 +859,9 @@ const overviewRows = computed(() => {
             cudaVersion: gpuInfo.value.cudaVersion,
             cardCountText: deviceCountText.value,
             memoryTotal,
-            memoryUsage: summaryMemoryUsage(),
+            memoryUsage: sharedMemoryOnly ? sharedMemoryUsage.value : summaryMemoryUsage(),
             sharedMemoryTotal,
-            sharedMemoryOnly: sharedMemoryTotal !== null && memoryDevices.every((device) => device.shared),
+            sharedMemoryOnly,
             memoryPartial,
         },
     ];
