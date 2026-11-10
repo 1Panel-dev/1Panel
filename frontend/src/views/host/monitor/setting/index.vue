@@ -117,7 +117,6 @@
                                     {{ $t('monitor.cleanMonitor') }}
                                 </el-button>
                             </el-form-item>
-                            <MonitorExtensionSettings />
                         </el-col>
                     </el-row>
                 </el-form>
@@ -132,7 +131,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import { cleanMonitors, loadMonitorSetting, updateMonitorSetting } from '@/api/modules/host';
 import MonitorRouter from '@/views/host/monitor/index.vue';
@@ -143,8 +142,6 @@ import IO from '@/views/host/monitor/setting/default-io/index.vue';
 import i18n from '@/lang';
 import { MsgSuccess } from '@/utils/message';
 import { splitTimeFromSecond, transTimeUnit } from '@/utils/validate';
-import { loadExtensionComponent } from '@/extensions/optional';
-const MonitorExtensionSettings = defineAsyncComponent(() => loadExtensionComponent('/monitor/extension-settings.vue'));
 const loading = ref();
 const form = reactive({
     gpuMonitorStatus: 'Disable',
