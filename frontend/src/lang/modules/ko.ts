@@ -5536,6 +5536,20 @@ const message = {
                     '이전 기록 {0}개를 정리하지 못했습니다. 마스터 노드의 파일 권한 또는 로그를 확인한 후 재시도하세요.',
                 legacyHistoryCleanupSuccess: '대상 이전 보고서를 삭제했습니다.',
 
+                introContactAdmin: '라이선스 또는 노드 업그레이드 문제는 관리자에게 문의하세요.',
+                introDescription:
+                    '이 노드의 실행 상태, 보안 위험 및 작업 실행 현황을 확인하고 보고서 내보내기와 자동 일일 보고서를 사용할 수 있습니다.',
+                introNodeOverview: '노드 개요',
+                introReportExport: '보고서 내보내기',
+                introDaily: '자동 일일 보고서',
+                introSecurityDescription:
+                    '호스트 리소스, 로그인 보안 및 웹사이트 인증서의 위험과 점수, 감점 사유를 확인합니다.',
+                introNodeDescription: '이 노드의 애플리케이션, 컨테이너, 예약 작업 및 알림 현황을 확인합니다.',
+                introExportDescription: '보고서를 PDF, HTML 또는 Markdown 형식으로 내보내 보관합니다.',
+                introDailyDescription:
+                    '활성화하면 노드의 현지 시간대를 기준으로 매일 09:00에 일일 보고서를 생성합니다.',
+                introNodeManagement: '노드 관리로 이동',
+
                 licenseRequired:
                     '보고서와 기록을 보려면 유효한 라이선스가 필요합니다. 라이선스를 갱신하거나 유효한 라이선스를 가져오세요.',
                 agentUpgradeRequired: '이 노드의 Agent를 로컬 운영 보고서를 지원하는 버전으로 업그레이드하세요.',
@@ -5849,12 +5863,12 @@ const message = {
                 dataSource: '데이터 소스',
                 noHighUsagePeriod: '고부하 시간대가 없습니다',
                 monitorDisabledOrNoData: '호스트 모니터링이 미활성화되었거나 모니터 데이터가 없습니다',
-                systemHealthStatus: '최근 24시간 호스트 실행 위험 상태',
+                systemHealthStatus: '호스트 실행 위험 상태',
                 mainReasons: '주요 원인',
                 viewHostMonitor: '호스트 모니터 보기',
                 systemHealthAttentionDesc:
-                    '최근 24시간 동안 {0}개의 위험 항목이 감지되었습니다. 리소스 피크와 디스크 사용률을 우선 확인하세요.',
-                systemHealthNormalDesc: '최근 24시간 호스트 실행 지표가 정상 상태입니다',
+                    '이번 평가에서 위험 항목 {0}개가 발견되었습니다. 아래 지표를 확인하세요.',
+                systemHealthNormalDesc: '이번 평가에서는 호스트 실행 위험이 발견되지 않았습니다.',
                 monitorEnabled: '모니터링 활성화됨',
                 cpuCoreUsage: '{0} / {1}코어',
                 load1Minute: '1분 부하',
@@ -6010,7 +6024,9 @@ const message = {
                 receiver: '수신 대상',
                 systemThreshold: '시스템 임계값',
                 metric: '지표',
-                currentRule: '현재 규칙',
+                currentRule: '판정 조건 충족 여부',
+                criteriaMet: '충족',
+                criteriaNotMet: '미충족',
                 hostMonitor: '호스트 모니터링',
                 monitorInterval: '모니터링 간격',
                 exportSettings: '내보내기 설정',

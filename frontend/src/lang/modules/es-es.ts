@@ -5749,6 +5749,22 @@ const message = {
                     'No se pudieron limpiar {0} registros antiguos. Revise los permisos de archivos o los registros del nodo principal antes de reintentarlo.',
                 legacyHistoryCleanupSuccess: 'Se han eliminado los informes anteriores seleccionados.',
 
+                introContactAdmin:
+                    'Contacte con un administrador para resolver los problemas de licencia o actualización del nodo.',
+                introDescription:
+                    'Consulte el estado de ejecución, los riesgos de seguridad y las tareas de este nodo, con exportación de informes e informes diarios automáticos.',
+                introNodeOverview: 'Resumen del nodo',
+                introReportExport: 'Exportación de informes',
+                introDaily: 'Informes diarios automáticos',
+                introSecurityDescription:
+                    'Revise los riesgos de recursos del host, seguridad de acceso y certificados web, con puntuaciones y motivos de deducción.',
+                introNodeDescription:
+                    'Consulte las aplicaciones, los contenedores, las tareas programadas y las alertas de este nodo.',
+                introExportDescription: 'Exporte informes en formato PDF, HTML o Markdown para archivarlos.',
+                introDailyDescription:
+                    'Al activarse, genera un informe diario a las 09:00 en la zona horaria local del nodo.',
+                introNodeManagement: 'Ir a la gestión de nodos',
+
                 licenseRequired:
                     'Se requiere una licencia válida para ver informes e historial. Renueve o importe una licencia válida.',
                 agentUpgradeRequired:
@@ -6072,13 +6088,13 @@ const message = {
                 dataSource: 'Fuente de datos',
                 noHighUsagePeriod: 'Sin períodos de alto uso',
                 monitorDisabledOrNoData: 'El monitoreo del host está deshabilitado o no hay datos disponibles',
-                systemHealthStatus: 'Estado de riesgo de ejecución del host en las últimas 24 h',
+                systemHealthStatus: 'Estado de riesgo de ejecución del host',
                 mainReasons: 'Causas principales',
                 viewHostMonitor: 'Ver monitoreo del host',
                 systemHealthAttentionDesc:
-                    '{0} elementos de riesgo detectados en las últimas 24 horas. Priorice los picos de recursos y el uso de disco.',
+                    'Esta evaluación detectó {0} riesgos. Revise las métricas siguientes.',
                 systemHealthNormalDesc:
-                    'Las métricas de ejecución del host estuvieron normales en las últimas 24 horas',
+                    'Esta evaluación no detectó riesgos de ejecución del host.',
                 monitorEnabled: 'Monitoreo habilitado',
                 cpuCoreUsage: '{0} / {1} núcleos',
                 load1Minute: 'Carga 1 min',
@@ -6235,7 +6251,9 @@ const message = {
                 receiver: 'Destinatario',
                 systemThreshold: 'Umbral del sistema',
                 metric: 'Métrica',
-                currentRule: 'Regla actual',
+                currentRule: 'Cumple los criterios',
+                criteriaMet: 'Cumple',
+                criteriaNotMet: 'No cumple',
                 hostMonitor: 'Monitoreo del host',
                 monitorInterval: 'Intervalo de monitoreo',
                 exportSettings: 'Configuración de exportación',

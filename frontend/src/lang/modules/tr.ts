@@ -5748,6 +5748,21 @@ const message = {
                     '{0} eski kayıt temizlenemedi. Tekrar denemeden önce ana düğümdeki dosya izinlerini veya günlükleri kontrol edin.',
                 legacyHistoryCleanupSuccess: 'Seçilen eski raporlar silindi.',
 
+                introContactAdmin: 'Lisans veya düğüm yükseltme sorunlarını çözmek için yöneticiyle iletişime geçin.',
+                introDescription:
+                    'Bu düğümün çalışma durumunu, güvenlik risklerini ve görev yürütmesini görüntüleyin; raporları dışa aktarın ve otomatik günlük raporları kullanın.',
+                introNodeOverview: 'Düğüm özeti',
+                introReportExport: 'Rapor dışa aktarma',
+                introDaily: 'Otomatik günlük raporlar',
+                introSecurityDescription:
+                    'Ana makine kaynakları, giriş güvenliği ve web sitesi sertifika risklerini; puanları ve puan kesintisi nedenlerini inceleyin.',
+                introNodeDescription:
+                    'Bu düğümün uygulamalarını, konteynerlerini, zamanlanmış görevlerini ve uyarılarını görüntüleyin.',
+                introExportDescription: 'Arşivlemek için raporları PDF, HTML veya Markdown biçiminde dışa aktarın.',
+                introDailyDescription:
+                    "Etkinleştirildiğinde, düğümün yerel saat diliminde her gün 09:00'da günlük rapor oluşturur.",
+                introNodeManagement: 'Düğüm yönetimine git',
+
                 licenseRequired:
                     'Raporları ve geçmişi görüntülemek için geçerli bir lisans gereklidir. Lisansı yenileyin veya geçerli bir lisansı içe aktarın.',
                 agentUpgradeRequired:
@@ -6061,12 +6076,12 @@ const message = {
                 dataSource: 'Veri Kaynağı',
                 noHighUsagePeriod: 'Yüksek kullanım dönemi yok',
                 monitorDisabledOrNoData: 'Ana makine izleme devre dışı veya izleme verisi yok',
-                systemHealthStatus: 'Son 24 saat ana makine çalışma risk durumu',
+                systemHealthStatus: 'Ana makine çalışma risk durumu',
                 mainReasons: 'Başlıca Nedenler',
                 viewHostMonitor: 'Ana Makine İzlemeyi Gör',
                 systemHealthAttentionDesc:
-                    'Son 24 saatte {0} risk öğesi algılandı. Kaynak zirvelerine ve disk kullanımına öncelik verin.',
-                systemHealthNormalDesc: 'Son 24 saatte ana makine çalışma metrikleri normaldi',
+                    'Bu değerlendirmede {0} risk öğesi bulundu. Aşağıdaki metrikleri inceleyin.',
+                systemHealthNormalDesc: 'Bu değerlendirmede ana makine çalışma riski bulunmadı.',
                 monitorEnabled: 'İzleme Etkin',
                 cpuCoreUsage: '{0} / {1} çekirdek',
                 load1Minute: '1 dk yük',
@@ -6222,7 +6237,9 @@ const message = {
                 receiver: 'Alıcı',
                 systemThreshold: 'Sistem eşiği',
                 metric: 'Metrik',
-                currentRule: 'Mevcut Kural',
+                currentRule: 'Ölçütleri karşılıyor mu',
+                criteriaMet: 'Karşılıyor',
+                criteriaNotMet: 'Karşılamıyor',
                 hostMonitor: 'Ana Makine İzleme',
                 monitorInterval: 'İzleme Aralığı',
                 exportSettings: 'Dışa Aktarma Ayarları',
