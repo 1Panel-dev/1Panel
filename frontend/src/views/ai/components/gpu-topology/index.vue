@@ -4,14 +4,24 @@
             v-for="section in sections"
             :key="section.id ?? 'unknown'"
             class="numa-node"
-            :class="{ unknown: section.id === undefined, unassigned: cards && section.id === undefined }"
+            :class="{ unknown: section.id === undefined }"
         >
-            <header v-if="section.id !== undefined || !cards" class="numa-node-header">
+            <header class="numa-node-header">
                 <div>
                     <strong>
                         {{ section.id === undefined ? $t('aiTools.gpuGroup.unknownNode') : `NUMA ${section.id}` }}
+                        <el-tooltip
+                            v-if="section.id === undefined"
+                            :content="$t('aiTools.model.numaUnknown')"
+                            placement="top"
+                            :popper-style="{ maxWidth: 'min(320px, calc(100vw - 32px))' }"
+                        >
+                            <el-icon class="numa-info" tabindex="0" :aria-label="$t('aiTools.model.numaUnknown')">
+                                <InfoFilled />
+                            </el-icon>
+                        </el-tooltip>
                     </strong>
-                    <div class="numa-resources">
+                    <div v-if="section.id !== undefined" class="numa-resources">
                         <span>CPU {{ section.node?.cpus || '—' }}</span>
                         <span>
                             {{ $t('aiTools.gpuGroup.memoryNode') }}
@@ -70,6 +80,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { InfoFilled } from '@element-plus/icons-vue';
 import { AI } from '@/api/interface/ai';
 
 const props = withDefaults(
@@ -117,9 +128,8 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
     border-radius: 8px;
     padding: 20px;
 }
-.gpu-topology.topology-cards > .numa-node.unassigned {
-    border: 0;
-    padding: 0;
+.topology-cards > .numa-node.unknown {
+    border-style: dashed;
 }
 .topology-cards .numa-node-header {
     margin-bottom: 16px;
@@ -148,13 +158,9 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
     border-color: var(--el-color-primary-light-5);
 }
 .topology-cards.selectable .numa-devices {
-    gap: 6px;
-}
-.topology-cards.selectable .unassigned .numa-devices {
-    grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
     gap: 12px;
 }
-.topology-cards.selectable .unassigned .topology-device:not(.selected) {
+.topology-cards.selectable .topology-device:not(.selected) {
     border-color: var(--el-border-color-lighter);
 }
 .topology-cards.selectable {
@@ -201,6 +207,11 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
 }
 .unknown .numa-node-header strong::before {
     background: var(--el-text-color-placeholder);
+}
+.numa-info {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    cursor: help;
 }
 .numa-resources {
     display: flex;

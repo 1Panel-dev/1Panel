@@ -1847,6 +1847,8 @@ const message = {
             peakAfterWindow: 'Janela posterior',
             peakNearby: 'Desempenho próximo ao pico',
             peakDuration: 'Intervalo entre amostras',
+            peakSingleSample: 'Amostra única',
+            peakSingleSampleHelp: 'Apenas uma amostra atende aos critérios. Não é possível determinar a duração real.',
             peakHelper:
                 'Os períodos são identificados nas amostras originais; uma amostra isolada abrange 0 segundos. TPS é ponderado pelo tempo e TTFT pelo número de requisições. As estatísticas pertencem ao instante da amostra e podem cruzar limites. As curvas mostram correlação temporal, não o desempenho das mesmas requisições.',
             concurrency: 'Concorrência atual',

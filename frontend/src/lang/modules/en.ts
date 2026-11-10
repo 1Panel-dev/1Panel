@@ -1835,6 +1835,8 @@ const message = {
             peakAfterWindow: 'Following window',
             peakNearby: 'Performance around peaks',
             peakDuration: 'Sample span',
+            peakSingleSample: 'Single sample',
+            peakSingleSampleHelp: 'Only one sample meets the criteria. The actual duration cannot be determined.',
             peakHelper:
                 'Periods are identified from raw samples; a single sample spans 0 seconds. TPS is time-weighted and TTFT is request-weighted. Statistics belong to their sample timestamp and may cross period boundaries. Curves show time correlation, not the performance of the same requests.',
             concurrency: 'Current concurrency',

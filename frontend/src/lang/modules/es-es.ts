@@ -1846,6 +1846,8 @@ const message = {
             peakAfterWindow: 'Ventana posterior',
             peakNearby: 'Rendimiento alrededor del pico',
             peakDuration: 'Duración entre muestras',
+            peakSingleSample: 'Una sola muestra',
+            peakSingleSampleHelp: 'Solo una muestra cumple los criterios. No se puede determinar la duración real.',
             peakHelper:
                 'Los periodos se identifican con muestras originales; una sola muestra abarca 0 segundos. TPS se pondera por tiempo y TTFT por solicitudes. Las estadísticas se asignan a la fecha de la muestra y pueden cruzar límites. Las curvas muestran correlación temporal, no el rendimiento de las mismas solicitudes.',
             concurrency: 'Concurrencia actual',

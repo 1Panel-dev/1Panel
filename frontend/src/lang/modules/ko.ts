@@ -1799,6 +1799,8 @@ const message = {
             peakAfterWindow: '후속 관찰 구간',
             peakNearby: '최대 동시 실행 전후 성능',
             peakDuration: '샘플 시간 폭',
+            peakSingleSample: '단일 샘플',
+            peakSingleSampleHelp: '조건을 충족하는 샘플이 하나뿐이므로 실제 지속 시간을 확인할 수 없습니다.',
             peakHelper:
                 '원본 샘플로 구간을 식별하며 단일 샘플의 시간 폭은 0초입니다. TPS는 시간, TTFT는 요청 수로 가중합니다. 통계는 샘플 시각에 귀속되므로 구간 경계를 넘을 수 있습니다. 곡선은 시간적 연관성을 나타내며 동일한 요청 집합의 성능을 의미하지 않습니다.',
             concurrency: '현재 동시 요청',

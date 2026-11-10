@@ -53,23 +53,18 @@
                 @submit.prevent
             >
                 <h3 class="group-form-heading">{{ $t('home.baseInfo') }}</h3>
-                <div class="group-form-basics">
-                    <el-form-item :label="$t('commons.table.name')" prop="name">
-                        <el-input v-model.trim="form.name" maxlength="128" clearable />
-                    </el-form-item>
-                    <el-form-item :label="$t('aiTools.gpuGroup.vendor')" prop="imageType">
-                        <el-select v-model="form.imageType" @change="changeVendor">
-                            <el-option
-                                v-for="vendor in ['nvidia', 'intel', 'ascend']"
-                                :key="vendor"
-                                :value="vendor"
-                                :label="vendor === 'nvidia' ? 'NVIDIA' : vendor === 'intel' ? 'Intel' : 'Ascend'"
-                            />
-                        </el-select>
-                    </el-form-item>
-                </div>
-                <el-form-item :label="$t('commons.table.description')" prop="description">
-                    <el-input v-model="form.description" type="textarea" :rows="2" maxlength="500" show-word-limit />
+                <el-form-item :label="$t('commons.table.name')" prop="name">
+                    <el-input v-model.trim="form.name" maxlength="128" clearable />
+                </el-form-item>
+                <el-form-item :label="$t('aiTools.gpuGroup.vendor')" prop="imageType">
+                    <el-select v-model="form.imageType" @change="changeVendor">
+                        <el-option
+                            v-for="vendor in ['nvidia', 'intel', 'ascend']"
+                            :key="vendor"
+                            :value="vendor"
+                            :label="vendor === 'nvidia' ? 'NVIDIA' : vendor === 'intel' ? 'Intel' : 'Ascend'"
+                        />
+                    </el-select>
                 </el-form-item>
                 <GPUConfig ref="gpuRef" v-model="form.gpu" :image-type="form.imageType" group-editor>
                     <template #device-meta="{ device }">
@@ -90,6 +85,9 @@
                     </template>
                 </GPUConfig>
                 <div v-if="form.id" class="input-help">{{ $t('aiTools.gpuGroup.snapshotHelp') }}</div>
+                <el-form-item :label="$t('commons.table.description')" prop="description">
+                    <el-input v-model="form.description" type="textarea" :rows="2" maxlength="500" show-word-limit />
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button :disabled="saving" @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
@@ -273,20 +271,10 @@ watch(currentNode, () => {
     font-weight: 600;
     margin: 0 0 16px;
 }
-.group-form-basics {
-    display: grid;
-    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
-    gap: 16px;
-}
 .device-existing-groups {
     width: 100%;
     font-size: 12px;
     line-height: 20px;
     color: var(--el-text-color-secondary);
-}
-@media (max-width: 480px) {
-    .group-form-basics {
-        grid-template-columns: minmax(0, 1fr);
-    }
 }
 </style>

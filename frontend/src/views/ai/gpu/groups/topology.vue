@@ -10,14 +10,27 @@
                     v-for="section in sections"
                     :key="section.key"
                     class="numa-section"
-                    :class="{
-                        unassigned: section.key === 'unassigned',
-                        separated: section.key === 'unassigned' && nodes.length > 0,
-                    }"
+                    :class="{ unassigned: section.key === 'unassigned' }"
                 >
                     <header v-if="section.label">
                         <div>
-                            <strong>{{ section.label }}</strong>
+                            <strong>
+                                {{ section.label }}
+                                <el-tooltip
+                                    v-if="section.key === 'unassigned'"
+                                    :content="$t('aiTools.model.numaUnknown')"
+                                    placement="top"
+                                    :popper-style="{ maxWidth: 'min(320px, calc(100vw - 32px))' }"
+                                >
+                                    <el-icon
+                                        class="numa-info"
+                                        tabindex="0"
+                                        :aria-label="$t('aiTools.model.numaUnknown')"
+                                    >
+                                        <InfoFilled />
+                                    </el-icon>
+                                </el-tooltip>
+                            </strong>
                             <div v-if="section.node" class="input-help">CPU {{ section.node.cpus || '—' }}</div>
                         </div>
                         <el-button
@@ -213,6 +226,7 @@
 
 <script setup lang="ts">
 import { computed, h, nextTick, ref, watch } from 'vue';
+import { InfoFilled } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 import { useResizeObserver } from '@vueuse/core';
 import { AI } from '@/api/interface/ai';
@@ -247,7 +261,8 @@ const sections = computed(() => {
             node: undefined,
             devices: missing,
         });
-    if (unassigned.length) result.push({ key: 'unassigned', label: '', devices: unassigned });
+    if (unassigned.length)
+        result.push({ key: 'unassigned', label: i18n.global.t('aiTools.gpuGroup.unknownNode'), devices: unassigned });
     return result;
 });
 const activeGroups = computed(
@@ -414,14 +429,18 @@ h3 {
 .numa-section header {
     margin-bottom: 12px;
 }
-.numa-section.unassigned {
-    border: 0;
-    padding: 0;
+.numa-section header strong {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
-.numa-section.unassigned.separated {
-    border-top: 1px solid var(--el-border-color-lighter);
-    border-radius: 0;
-    padding-top: 16px;
+.numa-info {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    cursor: help;
+}
+.numa-section.unassigned {
+    border-style: dashed;
 }
 .device-node,
 .relation-group {

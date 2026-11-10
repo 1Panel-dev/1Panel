@@ -1842,6 +1842,8 @@ const message = {
             peakAfterWindow: 'Sonraki gözlem aralığı',
             peakNearby: 'Tepe çevresindeki performans',
             peakDuration: 'Örnekler arası süre',
+            peakSingleSample: 'Tek örnek',
+            peakSingleSampleHelp: 'Yalnızca bir örnek koşulları karşılıyor. Gerçek süre belirlenemiyor.',
             peakHelper:
                 'Dönemler ham örneklerden belirlenir; tek örneğin süresi 0 saniyedir. TPS zamanla, TTFT istek sayısıyla ağırlıklandırılır. İstatistikler örnek zamanına aittir ve dönem sınırlarını aşabilir. Eğriler aynı isteklerin performansını değil, zamansal ilişkiyi gösterir.',
             concurrency: 'Mevcut eşzamanlı istekler',
