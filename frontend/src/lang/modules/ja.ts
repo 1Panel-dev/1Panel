@@ -1817,6 +1817,8 @@ const message = {
             peakAfterWindow: '後続の観測期間',
             peakNearby: 'ピーク前後の性能',
             peakDuration: 'サンプル間隔幅',
+            peakSingleSample: '単一サンプル',
+            peakSingleSampleHelp: '条件を満たすサンプルは1つだけです。実際の継続時間は判断できません。',
             peakHelper:
                 '期間は元のサンプルから特定し、単一サンプルの幅は 0 秒です。TPS は時間、TTFT はリクエスト数で加重します。統計はサンプル時刻に属し、期間の境界をまたぐ場合があります。曲線は時間的な関連を示し、同じリクエスト群の性能を示すものではありません。',
             concurrency: '現在の同時リクエスト',

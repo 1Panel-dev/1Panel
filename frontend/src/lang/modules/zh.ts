@@ -786,7 +786,7 @@ const message = {
             byNUMA: '按 NUMA',
             ungrouped: '未分组',
 
-            unknownNode: 'NUMA 归属未知',
+            unknownNode: 'NUMA 未知',
             memoryNode: '内存节点',
             selectNode: '选择本节点 GPU',
             noDevices: '此节点下没有 GPU',
@@ -1723,6 +1723,8 @@ const message = {
             peakAfterWindow: '后续观察窗口',
             peakNearby: '峰值附近性能',
             peakDuration: '采样跨度',
+            peakSingleSample: '单次采样',
+            peakSingleSampleHelp: '仅一个采样点满足条件，无法确定实际持续时间。',
             peakHelper:
                 '选择一个高并发时段，查看前后的吞吐量和响应耗时变化。数据来自定时采样，用于观察整体趋势，不代表同一批请求的性能。',
             concurrency: '当前并发',

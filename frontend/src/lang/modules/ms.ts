@@ -1850,6 +1850,8 @@ const message = {
             peakAfterWindow: 'Tetingkap pemerhatian berikutnya',
             peakNearby: 'Prestasi sekitar puncak',
             peakDuration: 'Rentang sampel',
+            peakSingleSample: 'Satu sampel',
+            peakSingleSampleHelp: 'Hanya satu sampel memenuhi kriteria. Tempoh sebenar tidak dapat ditentukan.',
             peakHelper:
                 'Tempoh dikenal pasti daripada sampel asal; satu sampel mempunyai rentang 0 saat. TPS diwajarkan mengikut masa dan TTFT mengikut bilangan permintaan. Statistik dipadankan dengan masa sampel dan mungkin merentasi sempadan tempoh. Lengkung menunjukkan perkaitan masa, bukan prestasi kumpulan permintaan yang sama.',
             concurrency: 'Permintaan serentak semasa',

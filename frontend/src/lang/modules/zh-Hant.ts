@@ -769,7 +769,7 @@ const message = {
             byNUMA: '依 NUMA',
             ungrouped: '未分組',
 
-            unknownNode: 'NUMA 歸屬未知',
+            unknownNode: 'NUMA 未知',
             memoryNode: '記憶體節點',
             selectNode: '選擇此節點 GPU',
             noDevices: '此節點下沒有 GPU',
@@ -1712,6 +1712,8 @@ const message = {
             peakAfterWindow: '後續觀察視窗',
             peakNearby: '峰值附近效能',
             peakDuration: '取樣跨度',
+            peakSingleSample: '單次取樣',
+            peakSingleSampleHelp: '僅一個取樣點符合條件，無法確定實際持續時間。',
             peakHelper:
                 '選擇一個高並行請求時段，查看前後的吞吐量和回應耗時變化。資料來自定時取樣，用於觀察整體趨勢，不代表同一批請求的效能。',
             concurrency: '目前並行請求',
