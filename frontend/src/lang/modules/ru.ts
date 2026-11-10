@@ -1127,6 +1127,8 @@ const message = {
             vllmVersion: 'Версия vLLM',
             vllmImage: 'Образ vLLM',
             servicePort: 'Порт сервиса',
+            vllmAPIKeyHelper:
+                'Укажите API Key, чтобы включить аутентификацию. Оставьте поле пустым, чтобы отключить её.',
             numaBinding: 'Привязка NUMA',
             numaOff: 'Без привязки',
             numaAuto: 'Автоматически',

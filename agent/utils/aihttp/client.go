@@ -70,7 +70,7 @@ func (guard *guardedTransport) RoundTrip(request *http.Request) (*http.Response,
 		}
 		resolved, err := resolver.LookupIPAddr(request.Context(), hostname)
 		if err != nil {
-			return nil, ErrTarget
+			return nil, err
 		}
 		for _, item := range resolved {
 			if item.Zone != "" || !allowedIP(item.IP) {
@@ -92,7 +92,7 @@ func (guard *guardedTransport) RoundTrip(request *http.Request) (*http.Response,
 	normalized.Host = canonical.Host
 	response, err := webhook_sender.RoundTripPinned(normalized, addresses, guard.transport)
 	if err != nil {
-		return nil, ErrRequest
+		return nil, err
 	}
 	return response, nil
 }
@@ -193,23 +193,10 @@ func sameOrigin(first, second *url.URL) bool {
 	return port(first) == port(second)
 }
 
-func SafeError(err error) error {
-	if errors.Is(err, ErrTarget) {
-		return ErrTarget
-	}
-	if errors.Is(err, ErrResponseTooLarge) {
-		return ErrResponseTooLarge
-	}
-	if errors.Is(err, ErrResponse) {
-		return ErrResponse
-	}
-	return ErrRequest
-}
-
 func ReadResponseBody(body io.Reader) ([]byte, error) {
 	content, err := io.ReadAll(io.LimitReader(body, MaxResponseBytes+1))
 	if err != nil {
-		return nil, ErrResponse
+		return nil, SafeError(err)
 	}
 	if len(content) > MaxResponseBytes {
 		return nil, ErrResponseTooLarge

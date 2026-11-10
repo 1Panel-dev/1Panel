@@ -1099,6 +1099,7 @@ const message = {
             vllmVersion: 'ເວີຊັນ vLLM',
             vllmImage: 'ອິມເມຈ vLLM',
             servicePort: 'ພອດບໍລິການ',
+            vllmAPIKeyHelper: 'ປ້ອນ API Key ເພື່ອເປີດໃຊ້ການຢືນຢັນຕົວຕົນ. ປ່ອຍວ່າງເພື່ອປິດໃຊ້.',
             numaBinding: 'ການຜູກ NUMA',
             numaOff: 'ບໍ່ຜູກ',
             numaAuto: 'ອັດຕະໂນມັດ',

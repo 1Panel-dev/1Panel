@@ -1136,6 +1136,8 @@ const message = {
             vllmVersion: 'vLLM sürümü',
             vllmImage: 'vLLM imajı',
             servicePort: 'Hizmet portu',
+            vllmAPIKeyHelper:
+                'Kimlik doğrulamayı etkinleştirmek için bir API anahtarı girin. Devre dışı bırakmak için boş bırakın.',
             numaBinding: 'NUMA bağlama',
             numaOff: 'Bağlama yok',
             numaAuto: 'Otomatik',

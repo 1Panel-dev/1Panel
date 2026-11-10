@@ -15,10 +15,12 @@ func DiscoverModels(baseURL, apiKey string) ([]string, error) {
 	if err != nil {
 		return nil, aihttp.ErrTarget
 	}
-	req.Header.Set("Authorization", "Bearer "+apiKey)
+	if strings.TrimSpace(apiKey) != "" {
+		req.Header.Set("Authorization", "Bearer "+apiKey)
+	}
 	resp, err := aihttp.NewClient(defaultVerifyTimeout).Do(req)
 	if err != nil {
-		return nil, aihttp.SafeError(err)
+		return nil, aihttp.SafeError(err, req.URL.String(), apiKey)
 	}
 	defer resp.Body.Close()
 	body, err := aihttp.ReadResponseBody(resp.Body)
@@ -26,7 +28,7 @@ func DiscoverModels(baseURL, apiKey string) ([]string, error) {
 		return nil, err
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return nil, fmt.Errorf("request failed: status %d", resp.StatusCode)
+		return nil, aihttp.HTTPError(resp.StatusCode, body, req.URL.String(), apiKey)
 	}
 	var payload struct {
 		Data []struct {

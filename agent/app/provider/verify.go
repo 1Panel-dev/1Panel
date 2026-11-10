@@ -3,8 +3,6 @@ package provider
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
-	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -37,7 +35,7 @@ func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) e
 	httpReq.Header.Set("Accept", "application/json")
 	resp, err := aihttp.NewClient(defaultVerifyTimeout).Do(httpReq)
 	if err != nil {
-		return buserr.WithErr("ErrAgentAccountUnavailable", aihttp.SafeError(err))
+		return buserr.WithErr("ErrAgentAccountUnavailable", aihttp.SafeError(err, req.URL, apiKey))
 	}
 	defer resp.Body.Close()
 	body, readErr := aihttp.ReadResponseBody(resp.Body)
@@ -45,7 +43,7 @@ func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) e
 		return buserr.WithErr("ErrAgentAccountUnavailable", readErr)
 	}
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
-		return buserr.WithErr("ErrAgentAccountUnavailable", errors.New(verifyHTTPError(resp.StatusCode, body)))
+		return buserr.WithErr("ErrAgentAccountUnavailable", aihttp.HTTPError(resp.StatusCode, body, req.URL, apiKey))
 	}
 	return nil
 }
@@ -128,6 +126,9 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		}
 		request.Body = mustJSON(body)
 	}
+	if strings.TrimSpace(apiKey) == "" && (provider == "vllm" || provider == "ollama" || provider == "llmman") {
+		delete(headers, "Authorization")
+	}
 	return request
 }
 
@@ -147,10 +148,6 @@ func imageVerifyURL(provider, baseURL, endpoint string) string {
 		return baseURL
 	}
 	return baseURL + endpoint
-}
-
-func verifyHTTPError(statusCode int, _ []byte) string {
-	return fmt.Sprintf("validation request returned status %d", statusCode)
 }
 
 func mustJSON(value interface{}) []byte {

@@ -1070,6 +1070,7 @@ const message = {
             vllmVersion: 'vLLM 版本',
             vllmImage: 'vLLM 镜像',
             servicePort: '服务端口',
+            vllmAPIKeyHelper: '填写后启用 API Key 鉴权，留空则不启用。',
             numaBinding: 'NUMA 绑定',
             numaOff: '不绑定',
             numaAuto: '自动匹配',

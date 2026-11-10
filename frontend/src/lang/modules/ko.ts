@@ -1103,6 +1103,7 @@ const message = {
             vllmVersion: 'vLLM 버전',
             vllmImage: 'vLLM 이미지',
             servicePort: '서비스 포트',
+            vllmAPIKeyHelper: 'API Key를 입력하면 인증이 활성화됩니다. 비워 두면 인증이 비활성화됩니다.',
             numaBinding: 'NUMA 바인딩',
             numaOff: '바인딩 안 함',
             numaAuto: '자동 매칭',

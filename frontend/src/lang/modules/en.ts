@@ -1128,6 +1128,7 @@ const message = {
             vllmVersion: 'vLLM Version',
             vllmImage: 'vLLM Image',
             servicePort: 'Service Port',
+            vllmAPIKeyHelper: 'Enter an API Key to enable authentication. Leave empty to disable it.',
             numaBinding: 'NUMA binding',
             numaOff: 'No binding',
             numaAuto: 'Automatic',
