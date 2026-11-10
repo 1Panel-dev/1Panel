@@ -73,10 +73,10 @@ func RevokeWithRetry(scope, userID, authSessionID string, revoke RevokeFunc) err
 	}
 	if !terminalRevocations.enqueue(target, nextRevokeAttempt(err, revoke), time.Now()) {
 		err = errors.Join(err, errors.New("terminal revocation retry capacity exceeded"))
+		logRevokeFailure(target, err)
 	} else {
 		startRevocationWorker.Do(func() { go runRevocationRetries() })
 	}
-	logRevokeFailure(target, err)
 	return fmt.Errorf("terminal closure is pending: %w", err)
 }
 
@@ -131,9 +131,10 @@ func runRevocationRetries() {
 				continue
 			}
 			err := item.revoke(item.target.scope, item.target.userID, item.target.authSessionID)
-			terminalRevocations.complete(item, err, time.Now())
-			if err != nil {
-				logRevokeFailure(item.target, err)
+			completedAt := time.Now()
+			terminalRevocations.complete(item, err, completedAt)
+			if err != nil && !completedAt.Before(item.deadline) {
+				logRevokeFailure(item.target, fmt.Errorf("revocation retries exhausted: %w", err))
 			}
 		}
 	}

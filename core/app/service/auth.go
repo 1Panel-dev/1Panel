@@ -69,9 +69,7 @@ func (u *AuthService) LogOut(c *gin.Context) error {
 }
 
 func CloseTerminalSessions(scope, userID, authSessionID string) {
-	if err := terminalsession.RevokeWithRetry(scope, userID, authSessionID, xpack.AuthProvider.RevokeTerminalSessions); err != nil {
-		global.LOG.Warnf("revoke terminal sessions failed, scope=%s, err: %v", scope, err)
-	}
+	_ = terminalsession.RevokeWithRetry(scope, userID, authSessionID, xpack.AuthProvider.RevokeTerminalSessions)
 }
 
 func (u *AuthService) VerifyCode(code string) (bool, error) {

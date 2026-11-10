@@ -557,6 +557,7 @@ const {
     isAdminOrNodeAdmin,
     isXpackOrEE,
     isProductPro,
+    isEnterprise,
     currentNode,
 } = useGlobalStore();
 
@@ -1244,7 +1245,7 @@ const hideEntrance = () => {
 };
 
 const loadUpgradeStatus = async () => {
-    if (!isAdmin.value) {
+    if (!isAdmin.value || isEnterprise.value) {
         return;
     }
     const res = await loadUpgradeInfo();
