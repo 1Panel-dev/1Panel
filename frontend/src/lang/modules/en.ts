@@ -5665,10 +5665,7 @@ const message = {
                 contextFailed:
                     'Unable to load this node’s report context. Check node connectivity and report access permissions.',
                 generationPending: 'This request is still running. Check report history before generating again.',
-                notApplicable: 'Not applicable',
-                panelNotApplicable: 'No panel is deployed on this node. Panel-specific information is not applicable.',
 
-                enterprise: 'Enterprise',
                 reportNode: 'Report Node',
                 currentNode: 'Current',
                 scoreMeta: '{0} points deducted · {1} risks',
@@ -5954,7 +5951,6 @@ const message = {
                 alertTimeRuleShort: 'Trigger within {0} days, send {1} times',
                 alertSendCountRuleShort: 'Send {0} times per day',
                 failedExecutionRecords: 'Failed Execution Records',
-                taskID: 'Task ID',
                 executeTime: 'Execution Time',
                 backupTasks: 'Backup Tasks',
                 systemMetrics: 'Runtime Metrics',

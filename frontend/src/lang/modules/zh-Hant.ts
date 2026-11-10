@@ -5234,10 +5234,7 @@ const message = {
                 agentUpgradeRequired: '請將此節點的 Agent 升級至支援本機運維報表的版本。',
                 contextFailed: '無法載入此節點的報表資訊，請檢查節點連線及報表讀取權限。',
                 generationPending: '此請求仍在處理中，請先至報表歷史確認狀態，再決定是否重新產生報表。',
-                notApplicable: '不適用',
-                panelNotApplicable: '此節點未部署面板，面板專屬資訊不適用。',
 
-                enterprise: '企業版',
                 reportNode: '報表節點',
                 currentNode: '當前節點',
                 scoreMeta: '扣分 {0} 分 · 風險 {1} 項',
@@ -5518,7 +5515,6 @@ const message = {
                 statAlertDesc: '啟用任務 {0} 個 · 通道 {1} 個',
                 assetAlertDesc: '{0} 條失敗日誌，{1} 條待同步日誌',
                 failedExecutionRecords: '失敗執行記錄',
-                taskID: '任務 ID',
                 executeTime: '執行時間',
                 backupTasks: '備份類任務',
                 systemMetrics: '執行指標',

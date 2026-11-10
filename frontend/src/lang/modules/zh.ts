@@ -6000,10 +6000,7 @@ const message = {
                 agentUpgradeRequired: '请将此节点升级到支持本机运维报表的 Agent 版本。',
                 contextFailed: '无法加载此节点的报表信息，请检查节点连接及报表读取权限。',
                 generationPending: '此请求仍在生成，请先到历史报表核对状态，再决定是否重新生成。',
-                notApplicable: '不适用',
-                panelNotApplicable: '此节点未部署面板，面板专属信息不适用。',
 
-                enterprise: '企业版',
                 reportNode: '报表节点',
                 currentNode: '当前节点',
                 scoreMeta: '扣分 {0} 分 · 风险 {1} 项',
@@ -6283,7 +6280,6 @@ const message = {
                 alertTimeRuleShort: '剩余 {0} 天内触发，发送 {1} 次',
                 alertSendCountRuleShort: '每天发送 {0} 次',
                 failedExecutionRecords: '失败执行记录',
-                taskID: '任务 ID',
                 executeTime: '执行时间',
                 backupTasks: '备份类任务',
                 systemMetrics: '运行指标',

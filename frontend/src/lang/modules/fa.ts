@@ -5619,10 +5619,7 @@ const message = {
                 contextFailed: 'اطلاعات گزارش این گره بارگیری نشد. اتصال گره و مجوز خواندن گزارش‌ها را بررسی کنید.',
                 generationPending:
                     'این درخواست هنوز در حال اجرا است. پیش از تولید دوباره گزارش، وضعیت را در تاریخچه گزارش‌ها بررسی کنید.',
-                notApplicable: 'قابل اعمال نیست',
-                panelNotApplicable: 'روی این گره پنلی نصب نشده است. اطلاعات اختصاصی پنل قابل اعمال نیست.',
 
-                enterprise: 'سازمانی',
                 reportNode: 'گره گزارش',
                 currentNode: 'جاری',
                 scoreMeta: '{0} امتیاز کسر شد · {1} ریسک',
@@ -5906,7 +5903,6 @@ const message = {
                 alertTimeRuleShort: 'در {0} روز فعال شود، {1} بار ارسال شود',
                 alertSendCountRuleShort: '{0} بار در روز ارسال شود',
                 failedExecutionRecords: 'رکوردهای اجرای ناموفق',
-                taskID: 'شناسه وظیفه',
                 executeTime: 'زمان اجرا',
                 backupTasks: 'وظایف پشتیبان',
                 systemMetrics: 'معیارهای زمان اجرا',

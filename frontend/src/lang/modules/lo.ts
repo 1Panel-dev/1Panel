@@ -5483,10 +5483,7 @@ const message = {
                 contextFailed:
                     'ບໍ່ສາມາດໂຫຼດຂໍ້ມູນລາຍງານຂອງໂນດນີ້ໄດ້. ກະລຸນາກວດສອບການເຊື່ອມຕໍ່ໂນດ ແລະສິດໃນການອ່ານລາຍງານ.',
                 generationPending: 'ຄຳຮ້ອງນີ້ຍັງກຳລັງດຳເນີນການ. ກະລຸນາກວດສອບສະຖານະໃນປະຫວັດລາຍງານກ່ອນສ້າງລາຍງານອີກຄັ້ງ.',
-                notApplicable: 'ບໍ່ກ່ຽວຂ້ອງ',
-                panelNotApplicable: 'ໂນດນີ້ບໍ່ໄດ້ຕິດຕັ້ງແຜງຄວບຄຸມ. ຂໍ້ມູນສະເພາະຂອງແຜງຄວບຄຸມຈຶ່ງບໍ່ກ່ຽວຂ້ອງ.',
 
-                enterprise: 'ສະບັບວິສາຫະກິດ',
                 reportNode: 'Node ທີ່ລາຍງານ',
                 currentNode: 'ປະຈຸບັນ',
                 scoreMeta: 'ຖືກຫັກ {0} ຄະແນນ · ພົບ {1} ຄວາມສ່ຽງ',
@@ -5769,7 +5766,6 @@ const message = {
                 alertTimeRuleShort: 'ແຈ້ງເຕືອນພາຍໃນ {0} ວັນ, ສົ່ງ {1} ຄັ້ງ',
                 alertSendCountRuleShort: 'ສົ່ງ {0} ຄັ້ງຕໍ່ວັນ',
                 failedExecutionRecords: 'ບັນທຶກການເຮັດວຽກທີ່ລົ້ມເຫຼວ',
-                taskID: 'ລະຫັດວຽກ',
                 executeTime: 'ເວລາເຮັດວຽກ',
                 backupTasks: 'ວຽກສຳຮອງຂໍ້ມູນ',
                 systemMetrics: 'ຕົວຊີ້ວັດການເຮັດວຽກ',
