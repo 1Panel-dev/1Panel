@@ -28,6 +28,7 @@ const hostRouter = {
             component: () => import('@/views/host/monitor/monitor/index.vue'),
             meta: {
                 icon: 'p-system-monitor-menu',
+                activeMenu: '/hosts/monitor/monitor',
                 title: 'menu.monitor',
                 permission: 'host_monitor_view',
             },

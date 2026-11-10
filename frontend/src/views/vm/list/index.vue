@@ -478,6 +478,8 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchState } from '@/utils/search-reset';
+
 import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { computed, reactive, ref, watch } from 'vue';
 import { useRoute } from 'vue-router';
@@ -524,6 +526,10 @@ const getStoredViewMode = (): VMListViewMode => {
 const loading = ref(false);
 const fullPageLoading = ref(false);
 const searchName = ref('');
+
+useSearchState('1Panel/vm/list/index', {
+    searchName: searchName,
+});
 const viewMode = ref<VMListViewMode>(getStoredViewMode());
 const items = ref<VM.Item[]>([]);
 const resourceItems = ref<VM.Item[]>([]);
@@ -554,7 +560,7 @@ const getQueryName = () => {
     return Array.isArray(name) ? name[0] || '' : String(name || '');
 };
 
-searchName.value = getQueryName();
+if (typeof route.query.name === 'string') searchName.value = getQueryName();
 
 const paginationConfig = reactive({
     currentPage: 1,
@@ -963,7 +969,7 @@ watch(
 watch(
     () => route.query.name,
     () => {
-        searchName.value = getQueryName();
+        if (typeof route.query.name === 'string') searchName.value = getQueryName();
         paginationConfig.currentPage = 1;
         if (props.vmEnvironmentLoaded && !vmUnavailable.value) {
             search();

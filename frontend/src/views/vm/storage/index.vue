@@ -125,6 +125,8 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchState } from '@/utils/search-reset';
+
 import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { ElMessageBox } from 'element-plus';
@@ -142,6 +144,10 @@ const props = defineProps<{
 }>();
 const loading = ref(false);
 const searchName = ref('');
+
+useSearchState('1Panel/vm/storage/index', {
+    searchName: searchName,
+});
 const items = ref<VM.StorageItem[]>([]);
 const switchingIds = ref<number[]>([]);
 const statusSwitchingIds = ref<number[]>([]);
