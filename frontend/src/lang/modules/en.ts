@@ -5658,6 +5658,19 @@ const message = {
                     '{0} old records could not be cleared. Check file permissions or logs on the master node before retrying.',
                 legacyHistoryCleanupSuccess: 'Pre-upgrade reports have been removed.',
 
+                introContactAdmin: 'Contact an administrator to resolve licensing or node upgrade issues.',
+                introDescription:
+                    'View this node’s running status, security risks, and task execution, with report export and automatic daily reports.',
+                introNodeOverview: 'Node overview',
+                introReportExport: 'Report export',
+                introDaily: 'Automatic daily reports',
+                introSecurityDescription:
+                    'Review host resource, login security, and website certificate risks, including scores and deduction reasons.',
+                introNodeDescription: 'View this node’s applications, containers, scheduled tasks, and alerts.',
+                introExportDescription: 'Export reports in PDF, HTML, or Markdown format for archiving.',
+                introDailyDescription: 'When enabled, generates a daily report at 09:00 in the node’s local time zone.',
+                introNodeManagement: 'Go to node management',
+
                 licenseRequired:
                     'A valid license is required to view reports and history. Renew or import a valid license.',
                 agentUpgradeRequired:
@@ -5972,12 +5985,11 @@ const message = {
                 dataSource: 'Data Source',
                 noHighUsagePeriod: 'No high usage periods',
                 monitorDisabledOrNoData: 'Host monitoring is disabled or no monitor data is available',
-                systemHealthStatus: 'Last 24h Host Runtime Risk',
+                systemHealthStatus: 'Host Runtime Risk',
                 mainReasons: 'Main Reasons',
                 viewHostMonitor: 'View Host Monitor',
-                systemHealthAttentionDesc:
-                    '{0} risk items detected in the last 24 hours. Prioritize resource peaks and disk usage.',
-                systemHealthNormalDesc: 'Host runtime metrics were normal in the last 24 hours',
+                systemHealthAttentionDesc: 'This assessment found {0} risk items. Review the metrics below.',
+                systemHealthNormalDesc: 'No host runtime risk was found in this assessment.',
                 monitorEnabled: 'Monitoring Enabled',
                 cpuCoreUsage: '{0} / {1} cores',
                 load1Minute: '1-min load',
@@ -6133,7 +6145,9 @@ const message = {
                 receiver: 'Receiver',
                 systemThreshold: 'System Threshold',
                 metric: 'Metric',
-                currentRule: 'Current Rule',
+                currentRule: 'Meets Criteria',
+                criteriaMet: 'Met',
+                criteriaNotMet: 'Not met',
                 hostMonitor: 'Host Monitor',
                 monitorInterval: 'Monitor Interval',
                 exportSettings: 'Export Settings',

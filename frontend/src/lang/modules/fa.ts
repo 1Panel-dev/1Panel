@@ -5612,6 +5612,19 @@ const message = {
                     'پاک‌سازی {0} سابقه قدیمی ممکن نشد. پیش از تلاش مجدد، مجوزهای فایل یا گزارش‌های گره اصلی را بررسی کنید.',
                 legacyHistoryCleanupSuccess: 'گزارش‌های قدیمی انتخاب‌شده حذف شدند.',
 
+                introContactAdmin: 'برای رفع مشکلات مجوز یا ارتقای گره با مدیر تماس بگیرید.',
+                introDescription:
+                    'وضعیت اجرا، خطرهای امنیتی و اجرای وظایف این گره را با امکان خروجی گزارش و گزارش‌های روزانه خودکار مشاهده کنید.',
+                introNodeOverview: 'نمای کلی گره',
+                introReportExport: 'خروجی گزارش',
+                introDaily: 'گزارش‌های روزانه خودکار',
+                introSecurityDescription:
+                    'خطرهای منابع میزبان، امنیت ورود و گواهی‌های وب‌سایت را همراه با امتیاز و دلایل کسر امتیاز بررسی کنید.',
+                introNodeDescription: 'برنامه‌ها، کانتینرها، وظایف زمان‌بندی‌شده و هشدارهای این گره را مشاهده کنید.',
+                introExportDescription: 'گزارش‌ها را برای بایگانی در قالب PDF، HTML یا Markdown خروجی بگیرید.',
+                introDailyDescription: 'پس از فعال‌سازی، هر روز ساعت 09:00 به وقت محلی گره گزارش تولید می‌شود.',
+                introNodeManagement: 'رفتن به مدیریت گره‌ها',
+
                 licenseRequired:
                     'برای مشاهده گزارش‌ها و تاریخچه، مجوز معتبر لازم است. مجوز را تمدید یا یک مجوز معتبر وارد کنید.',
                 agentUpgradeRequired:
@@ -5924,12 +5937,12 @@ const message = {
                 dataSource: 'منبع داده',
                 noHighUsagePeriod: 'هیچ دوره استفاده بالا وجود ندارد',
                 monitorDisabledOrNoData: 'نظارت بر میزبان غیرفعال است یا داده نظارتی در دسترس نیست',
-                systemHealthStatus: 'ریسک زمان اجرای میزبان در ۲۴ ساعت گذشته',
+                systemHealthStatus: 'وضعیت ریسک عملکرد میزبان',
                 mainReasons: 'دلایل اصلی',
                 viewHostMonitor: 'مشاهده نظارت بر میزبان',
                 systemHealthAttentionDesc:
-                    '{0} مورد ریسک در ۲۴ ساعت گذشته شناسایی شد. اوج منابع و استفاده از دیسک را در اولویت قرار دهید.',
-                systemHealthNormalDesc: 'معیارهای زمان اجرای میزبان در ۲۴ ساعت گذشته عادی بود',
+                    'این ارزیابی {0} مورد ریسک شناسایی کرد. معیارهای زیر را بررسی کنید.',
+                systemHealthNormalDesc: 'در این ارزیابی هیچ ریسکی در عملکرد میزبان شناسایی نشد.',
                 monitorEnabled: 'نظارت فعال',
                 cpuCoreUsage: '{0} / {1} هسته',
                 load1Minute: 'بار ۱ دقیقه',
@@ -6085,7 +6098,9 @@ const message = {
                 receiver: 'گیرنده',
                 systemThreshold: 'آستانه سیستم',
                 metric: 'معیار',
-                currentRule: 'قانون فعلی',
+                currentRule: 'برآورده شدن معیارها',
+                criteriaMet: 'برآورده شده',
+                criteriaNotMet: 'برآورده نشده',
                 hostMonitor: 'نظارت بر میزبان',
                 monitorInterval: 'فاصله نظارت',
                 exportSettings: 'تنظیمات خروجی',

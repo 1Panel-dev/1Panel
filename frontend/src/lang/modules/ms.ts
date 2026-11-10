@@ -5740,6 +5740,20 @@ const message = {
                     '{0} rekod lama tidak dapat dibersihkan. Semak kebenaran fail atau log pada nod induk sebelum mencuba lagi.',
                 legacyHistoryCleanupSuccess: 'Laporan lama yang dipilih telah dipadam.',
 
+                introContactAdmin: 'Hubungi pentadbir untuk menyelesaikan masalah lesen atau naik taraf nod.',
+                introDescription:
+                    'Lihat status operasi, risiko keselamatan dan pelaksanaan tugas nod ini, dengan eksport laporan dan laporan harian automatik.',
+                introNodeOverview: 'Gambaran nod',
+                introReportExport: 'Eksport laporan',
+                introDaily: 'Laporan harian automatik',
+                introSecurityDescription:
+                    'Semak risiko sumber hos, keselamatan log masuk dan sijil laman web, termasuk skor dan sebab potongan mata.',
+                introNodeDescription: 'Lihat aplikasi, kontena, tugas berjadual dan amaran nod ini.',
+                introExportDescription: 'Eksport laporan dalam format PDF, HTML atau Markdown untuk diarkibkan.',
+                introDailyDescription:
+                    'Apabila diaktifkan, laporan harian dijana setiap hari pada 09:00 mengikut zon waktu tempatan nod.',
+                introNodeManagement: 'Pergi ke pengurusan nod',
+
                 licenseRequired:
                     'Lesen yang sah diperlukan untuk melihat laporan dan sejarah. Perbaharui atau import lesen yang sah.',
                 agentUpgradeRequired:
@@ -6060,12 +6074,12 @@ const message = {
                 dataSource: 'Sumber Data',
                 noHighUsagePeriod: 'Tiada tempoh penggunaan tinggi',
                 monitorDisabledOrNoData: 'Pemantauan hos dilumpuhkan atau tiada data pemantauan',
-                systemHealthStatus: 'Status Risiko Operasi Hos 24 Jam Terakhir',
+                systemHealthStatus: 'Status Risiko Operasi Hos',
                 mainReasons: 'Sebab Utama',
                 viewHostMonitor: 'Lihat Pemantauan Hos',
                 systemHealthAttentionDesc:
-                    '{0} item risiko dikesan dalam 24 jam terakhir. Utamakan puncak sumber dan penggunaan cakera.',
-                systemHealthNormalDesc: 'Metrik operasi hos adalah normal dalam 24 jam terakhir',
+                    'Penilaian ini menemui {0} risiko. Semak metrik di bawah.',
+                systemHealthNormalDesc: 'Tiada risiko operasi hos ditemui dalam penilaian ini.',
                 monitorEnabled: 'Pemantauan Didayakan',
                 cpuCoreUsage: '{0} / {1} teras',
                 load1Minute: 'Beban 1 minit',
@@ -6219,7 +6233,9 @@ const message = {
                 receiver: 'Penerima',
                 systemThreshold: 'Ambang Sistem',
                 metric: 'Metrik',
-                currentRule: 'Peraturan Semasa',
+                currentRule: 'Memenuhi kriteria',
+                criteriaMet: 'Memenuhi',
+                criteriaNotMet: 'Tidak memenuhi',
                 hostMonitor: 'Pemantauan Hos',
                 monitorInterval: 'Selang Pemantauan',
                 exportSettings: 'Tetapan Eksport',

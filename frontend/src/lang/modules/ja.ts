@@ -5638,6 +5638,22 @@ const message = {
                     '{0} 件の旧記録を削除できませんでした。マスターノードのファイル権限またはログを確認してから再試行してください。',
                 legacyHistoryCleanupSuccess: '対象の旧レポートを削除しました。',
 
+                introContactAdmin:
+                    'ライセンスまたはノードのアップグレードに関する問題は、管理者にお問い合わせください。',
+                introDescription:
+                    'このノードの稼働状況、セキュリティリスク、タスクの実行状況を確認し、レポートの出力や日次レポートの自動生成を利用できます。',
+                introNodeOverview: 'ノード概要',
+                introReportExport: 'レポート出力',
+                introDaily: '日次レポート自動生成',
+                introSecurityDescription:
+                    'ホストリソース、ログインセキュリティ、Web サイト証明書のリスクと、スコアや減点理由を確認できます。',
+                introNodeDescription:
+                    'このノードのアプリケーション、コンテナ、スケジュールタスク、アラートを確認できます。',
+                introExportDescription: 'PDF、HTML、Markdown 形式でレポートを出力し、保管できます。',
+                introDailyDescription:
+                    '有効にすると、ノードのローカルタイムゾーンで毎日 09:00 に日次レポートを生成します。',
+                introNodeManagement: 'ノード管理へ',
+
                 licenseRequired:
                     'レポートと履歴の閲覧には有効なライセンスが必要です。ライセンスを更新するか、有効なライセンスをインポートしてください。',
                 agentUpgradeRequired:
@@ -5957,12 +5973,12 @@ const message = {
                 dataSource: 'データソース',
                 noHighUsagePeriod: '高負荷時間帯がありません',
                 monitorDisabledOrNoData: 'ホスト監視が無効または監視データがありません',
-                systemHealthStatus: '過去24時間のホスト実行リスク',
+                systemHealthStatus: 'ホスト稼働リスク',
                 mainReasons: '主な原因',
                 viewHostMonitor: 'ホスト監視を表示',
                 systemHealthAttentionDesc:
-                    '過去24時間に {0} 件のリスク項目を検出しました。リソースピークとディスク使用率を優先的に確認してください。',
-                systemHealthNormalDesc: '過去24時間のホスト実行指標は正常です',
+                    '今回の評価で {0} 件のリスクが検出されました。以下の指標を確認してください。',
+                systemHealthNormalDesc: '今回の評価ではホスト稼働リスクは検出されませんでした。',
                 monitorEnabled: '監視有効',
                 cpuCoreUsage: '{0} / {1} コア',
                 load1Minute: '1分負荷',
@@ -6119,7 +6135,9 @@ const message = {
                 receiver: '受信者',
                 systemThreshold: 'システムしきい値',
                 metric: '指標',
-                currentRule: '現在のルール',
+                currentRule: '判定条件を満たすか',
+                criteriaMet: '満たす',
+                criteriaNotMet: '満たさない',
                 hostMonitor: 'ホスト監視',
                 monitorInterval: '監視間隔',
                 exportSettings: 'エクスポート設定',
