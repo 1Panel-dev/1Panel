@@ -3,7 +3,7 @@ import { ReqPage } from '.';
 export namespace Backup {
     export interface SearchWithType extends ReqPage {
         type: string;
-        name: string;
+        info: string;
     }
     export interface BackupOption {
         id: number;

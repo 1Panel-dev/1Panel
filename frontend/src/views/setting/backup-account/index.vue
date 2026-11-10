@@ -162,7 +162,7 @@ const search = async () => {
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         type: paginationConfig.type,
-        name: paginationConfig.name,
+        info: paginationConfig.name,
     };
     loading.value = true;
     await searchBackup(params)
