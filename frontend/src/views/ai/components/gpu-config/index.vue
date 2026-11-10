@@ -22,43 +22,70 @@
             </el-text>
         </summary>
         <div v-if="model.enabled || model.error" v-show="!loading" class="form-section-body">
-            <template v-if="!groupEditor && model.enabled">
-                <el-form-item :label="$t('aiTools.gpuGroup.source')">
-                    <el-radio-group v-model="selectionMode" @change="changeSource">
-                        <el-radio-button value="group">{{ $t('aiTools.gpuGroup.groups') }}</el-radio-button>
-                        <el-radio-button value="custom">{{ $t('aiTools.gpuGroup.custom') }}</el-radio-button>
-                    </el-radio-group>
-                </el-form-item>
+            <el-form-item
+                v-show="!groupEditor"
+                prop="gpu.mode"
+                :rules="gpuModeRules"
+                :error="model.error"
+                :label="model.enabled ? $t('aiTools.gpuGroup.source') : undefined"
+            >
+                <el-select
+                    v-if="model.enabled && !groupEditor"
+                    :model-value="gpuSource"
+                    class="w-full"
+                    @change="changeSource"
+                >
+                    <el-option value="all" :label="$t('aiTools.model.gpuAll')" />
+                    <el-option value="devices" :label="$t('aiTools.model.gpuSpecific')" />
+                    <el-option v-if="imageType === 'nvidia'" value="count" :label="$t('aiTools.model.gpuCount')" />
+                    <el-option v-if="hasMultipleGPUs" value="group" :label="$t('aiTools.gpuGroup.groups')" />
+                </el-select>
+                <span v-if="model.enabled && gpuSource === 'all'" class="input-help">
+                    {{ $t('aiTools.model.gpuAllHelper') }}
+                </span>
+                <span v-if="model.enabled && gpuSource === 'count'" class="input-help">
+                    {{ $t('aiTools.model.gpuCountHelper') }}
+                </span>
+                <span v-if="model.enabled && gpuSource === 'devices'" class="input-help">
+                    {{ $t('aiTools.model.gpuSpecificHelper') }}
+                </span>
+            </el-form-item>
+            <template v-if="!groupEditor && model.enabled && hasMultipleGPUs">
                 <el-form-item
                     v-if="selectionMode === 'group'"
                     :label="$t('aiTools.gpuGroup.groups')"
                     prop="gpu.group"
                     :rules="groupRules"
                 >
-                    <el-select :model-value="model.group?.id" class="w-full" fit-input-width @change="applyGroup">
-                        <el-option
-                            v-for="group in compatibleGroups"
-                            :key="group.id"
-                            class="gpu-group-option"
-                            :value="group.id"
-                            :label="group.name"
-                        >
-                            <span class="gpu-group-option-name" :title="group.name">{{ group.name }}</span>
-                            <span
-                                v-if="group.description"
-                                class="gpu-group-option-description"
-                                :title="group.description"
+                    <div class="gpu-group-control">
+                        <el-select :model-value="model.group?.id" class="w-full" fit-input-width @change="applyGroup">
+                            <el-option
+                                v-for="group in compatibleGroups"
+                                :key="group.id"
+                                class="gpu-group-option"
+                                :value="group.id"
+                                :label="group.name"
                             >
-                                {{ group.description }}
-                            </span>
-                        </el-option>
-                        <el-option
-                            v-if="model.group && !compatibleGroups.some((group) => group.id === model.group?.id)"
-                            :value="model.group.id"
-                            :label="model.group.name"
-                            disabled
-                        />
-                    </el-select>
+                                <span class="gpu-group-option-name" :title="group.name">{{ group.name }}</span>
+                                <span
+                                    v-if="group.description"
+                                    class="gpu-group-option-description"
+                                    :title="group.description"
+                                >
+                                    {{ group.description }}
+                                </span>
+                            </el-option>
+                            <el-option
+                                v-if="model.group && !compatibleGroups.some((group) => group.id === model.group?.id)"
+                                :value="model.group.id"
+                                :label="model.group.name"
+                                disabled
+                            />
+                        </el-select>
+                        <el-button v-permission="'ai_gpu_manage'" @click="groupEditorVisible = true">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
+                    </div>
                     <span class="input-help">{{ $t('aiTools.gpuGroup.snapshotHelp') }}</span>
                     <span v-if="groupsFailed" class="input-help">{{ $t('aiTools.model.loadFailed') }}</span>
                     <template v-if="model.group">
@@ -80,35 +107,7 @@
                     </template>
                 </el-form-item>
             </template>
-            <div v-show="groupEditor || selectionMode === 'custom'">
-                <el-form-item
-                    v-show="!groupEditor"
-                    prop="gpu.mode"
-                    :rules="gpuModeRules"
-                    :error="model.error"
-                    :label="model.enabled ? $t('aiTools.model.gpuMode') : undefined"
-                >
-                    <el-radio-group v-if="model.enabled && !groupEditor" v-model="model.mode" @change="changeMode">
-                        <el-radio-button value="all">
-                            {{ $t('aiTools.model.gpuAll') }}
-                        </el-radio-button>
-                        <el-radio-button v-if="imageType === 'nvidia'" value="count">
-                            {{ $t('aiTools.model.gpuCount') }}
-                        </el-radio-button>
-                        <el-radio-button value="devices">
-                            {{ $t('aiTools.model.gpuSpecific') }}
-                        </el-radio-button>
-                    </el-radio-group>
-                    <span v-if="model.enabled && model.mode === 'all'" class="input-help">
-                        {{ $t('aiTools.model.gpuAllHelper') }}
-                    </span>
-                    <span v-if="model.enabled && model.mode === 'count'" class="input-help">
-                        {{ $t('aiTools.model.gpuCountHelper') }}
-                    </span>
-                    <span v-if="model.enabled && model.mode === 'devices'" class="input-help">
-                        {{ $t('aiTools.model.gpuSpecificHelper') }}
-                    </span>
-                </el-form-item>
+            <div v-show="groupEditor || !hasMultipleGPUs || selectionMode === 'custom'">
                 <template v-if="model.enabled">
                     <el-form-item
                         v-if="model.mode === 'count'"
@@ -153,82 +152,111 @@
                             {{ $t('aiTools.gpuGroup.selectedGPU', { count: model.deviceIDs.length }) }}
                         </span>
                     </el-form-item>
-                    <template v-if="model.numa">
-                        <el-form-item
-                            :label="$t('aiTools.gpuGroup.affinity')"
-                            prop="gpu.numa.mode"
-                            :rules="numaRules"
-                            :show-message="false"
-                        >
-                            <template #label>
-                                <span class="gpu-capabilities-label">
-                                    {{ $t('aiTools.gpuGroup.affinity') }}
-                                    <el-tooltip placement="top">
-                                        <template #content>
-                                            <div class="gpu-capabilities-help">{{ $t('aiTools.model.numaHelp') }}</div>
-                                        </template>
-                                        <el-icon tabindex="0" :aria-label="$t('aiTools.model.numaHelp')">
-                                            <InfoFilled />
-                                        </el-icon>
-                                    </el-tooltip>
-                                </span>
-                            </template>
-                            <el-radio-group v-model="model.numa.mode">
-                                <el-radio-button value="off">{{ $t('aiTools.model.numaOff') }}</el-radio-button>
-                                <el-radio-button value="auto" :disabled="model.mode === 'count'">
-                                    {{ $t('aiTools.gpuGroup.followGPU') }}
-                                </el-radio-button>
-                                <el-radio-button value="manual">{{ $t('aiTools.model.numaManual') }}</el-radio-button>
-                            </el-radio-group>
-                            <div class="numa-strategy-help" aria-live="polite">
-                                <p class="input-help">
-                                    {{
-                                        $t(
-                                            model.numa.mode === 'off'
-                                                ? 'aiTools.model.numaOffHelp'
-                                                : model.numa.mode === 'auto'
-                                                  ? 'aiTools.model.numaAutoHelp'
-                                                  : 'aiTools.model.numaManualHelp',
-                                        )
-                                    }}
-                                </p>
-                                <p
-                                    v-if="model.numa.mode === 'auto' && !loading"
-                                    :class="numaError ? 'numa-strategy-warning' : 'input-help'"
-                                >
-                                    {{
-                                        numaError ||
-                                        $t('aiTools.model.numaResolved', { node: selectedNUMAGPUs[0]?.numaNode })
-                                    }}
-                                </p>
-                            </div>
-                        </el-form-item>
-                        <el-form-item
-                            v-if="model.numa.mode === 'manual'"
-                            :label="$t('aiTools.model.numaNodes')"
-                            prop="gpu.numa.nodes"
-                            :rules="numaRules"
-                        >
-                            <el-select v-model="model.numa.nodes" multiple class="w-full">
-                                <el-option
-                                    v-for="node in numaNodes"
-                                    :key="node.id"
-                                    :value="node.id"
-                                    :label="`NUMA ${node.id} · CPU ${node.cpus || '—'}`"
-                                    :disabled="!node.cpus || !node.memory"
-                                />
-                                <el-option
-                                    v-for="id in missingNUMANodes"
-                                    :key="id"
-                                    :value="id"
-                                    :label="`NUMA ${id} (${$t('aiTools.model.numaUnavailable')})`"
-                                    disabled
-                                />
-                            </el-select>
-                        </el-form-item>
-                    </template>
                 </template>
             </div>
+            <p v-if="model.enabled && !numaNodes.length" class="input-help">
+                {{ $t('aiTools.model.numaTopologyUnavailable') }}
+            </p>
+            <details
+                v-if="model.enabled && model.numa && (numaNodes.length > 1 || numaBound)"
+                :open="numaBound"
+                class="form-section"
+            >
+                <summary class="form-section-header">
+                    {{ $t('app.advanced') }} · {{ $t('aiTools.gpuGroup.affinity') }}
+                </summary>
+                <div class="form-section-body">
+                    <el-form-item
+                        :label="$t('aiTools.gpuGroup.affinity')"
+                        prop="gpu.numa.mode"
+                        :rules="numaRules"
+                        :show-message="false"
+                    >
+                        <template #label>
+                            <span class="gpu-capabilities-label">
+                                {{ $t('aiTools.gpuGroup.affinity') }}
+                                <el-tooltip placement="top">
+                                    <template #content>
+                                        <div class="gpu-capabilities-help">{{ $t('aiTools.model.numaHelp') }}</div>
+                                    </template>
+                                    <el-icon tabindex="0" :aria-label="$t('aiTools.model.numaHelp')">
+                                        <InfoFilled />
+                                    </el-icon>
+                                </el-tooltip>
+                            </span>
+                        </template>
+                        <el-radio-group
+                            v-model="model.numa.mode"
+                            @change="
+                                selectionMode = 'custom';
+                                model.group = undefined;
+                            "
+                        >
+                            <el-radio-button value="off">{{ $t('aiTools.model.numaOff') }}</el-radio-button>
+                            <el-radio-button value="auto" :disabled="numaNodes.length <= 1 || model.mode === 'count'">
+                                {{ $t('aiTools.gpuGroup.followGPU') }}
+                            </el-radio-button>
+                            <el-radio-button value="manual" :disabled="numaNodes.length <= 1">
+                                {{ $t('aiTools.model.numaManual') }}
+                            </el-radio-button>
+                        </el-radio-group>
+                        <div class="numa-strategy-help" aria-live="polite">
+                            <p class="input-help">
+                                {{
+                                    $t(
+                                        model.numa.mode === 'off'
+                                            ? 'aiTools.model.numaOffHelp'
+                                            : model.numa.mode === 'auto'
+                                              ? 'aiTools.model.numaAutoHelp'
+                                              : 'aiTools.model.numaManualHelp',
+                                    )
+                                }}
+                            </p>
+                            <p
+                                v-if="model.numa.mode === 'auto' && !loading"
+                                :class="numaError ? 'numa-strategy-warning' : 'input-help'"
+                            >
+                                {{
+                                    numaError ||
+                                    $t('aiTools.model.numaResolved', { node: selectedNUMAGPUs[0]?.numaNode })
+                                }}
+                            </p>
+                        </div>
+                    </el-form-item>
+                    <el-form-item
+                        v-if="model.numa.mode === 'manual'"
+                        :label="$t('aiTools.model.numaNodes')"
+                        prop="gpu.numa.nodes"
+                        :rules="numaRules"
+                    >
+                        <el-select
+                            v-model="model.numa.nodes"
+                            multiple
+                            class="w-full"
+                            :disabled="numaNodes.length <= 1"
+                            @change="
+                                selectionMode = 'custom';
+                                model.group = undefined;
+                            "
+                        >
+                            <el-option
+                                v-for="node in numaNodes"
+                                :key="node.id"
+                                :value="node.id"
+                                :label="`NUMA ${node.id} · CPU ${node.cpus || '—'}`"
+                                :disabled="!node.cpus || !node.memory"
+                            />
+                            <el-option
+                                v-for="id in missingNUMANodes"
+                                :key="id"
+                                :value="id"
+                                :label="`NUMA ${id} (${$t('aiTools.model.numaUnavailable')})`"
+                                disabled
+                            />
+                        </el-select>
+                    </el-form-item>
+                </div>
+            </details>
             <p v-if="!groupEditor && model.enabled && model.numa && model.numa.mode !== 'off'" class="input-help">
                 {{ $t('aiTools.model.numaRequirements') }}
             </p>
@@ -261,30 +289,45 @@
             <span v-if="selectingDevices && gpuWarnings.length" class="input-help">{{ gpuWarnings.join('; ') }}</span>
         </div>
     </component>
+    <GroupOperate
+        v-if="!groupEditor && groupEditorVisible"
+        v-model:visible="groupEditorVisible"
+        :groups="groups"
+        :devices="gpuDevices || []"
+        :image-type="imageType"
+        @saved="groupCreated"
+    />
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, defineAsyncComponent, onBeforeUnmount, ref, watch } from 'vue';
 import { InfoFilled } from '@element-plus/icons-vue';
 import GPUTopology from '@/views/ai/components/gpu-topology/index.vue';
 import { AI } from '@/api/interface/ai';
 import { loadModelGPUDevices, listGPUGroups } from '@/api/modules/ai';
 import i18n from '@/lang';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 
 const props = withDefaults(defineProps<{ imageType?: string; collapsed?: boolean; groupEditor?: boolean }>(), {
     imageType: 'nvidia',
     collapsed: false,
     groupEditor: false,
 });
+const GroupOperate = defineAsyncComponent(() => import('@/views/ai/gpu/groups/operate/index.vue'));
+const groupEditorVisible = ref(false);
+const { currentNode } = useGlobalStore();
 const model = defineModel<AI.ModelGPUConfig>({ required: true });
 const sectionRef = ref<HTMLDetailsElement>();
 const loading = ref(false);
 const gpuWarnings = ref<string[]>([]);
 const gpuDevices = ref<AI.ModelGPUDevice[]>();
+const hasMultipleGPUs = computed(() => (gpuDevices.value?.length || 0) > 1);
 const numaNodes = ref<AI.ModelNUMANode[]>([]);
+const numaBound = computed(() => Boolean(model.value.numa && model.value.numa.mode !== 'off'));
 const groups = ref<AI.GPUGroup[]>([]);
 const groupsFailed = ref(false);
 const selectionMode = ref<'group' | 'custom'>('custom');
+const gpuSource = computed(() => (selectionMode.value === 'group' ? 'group' : model.value.mode));
 const compatibleGroups = computed(() => groups.value.filter((group) => group.imageType === props.imageType));
 const currentGroup = computed(() => compatibleGroups.value.find((group) => group.id === model.value.group?.id));
 const sourceChanged = computed(
@@ -298,6 +341,7 @@ const groupSummary = computed(() => {
         .map((id) => gpuDevices.value?.find((device) => device.id === id)?.name || id)
         .join(', ');
     const config = model.value.numa;
+    if (numaNodes.value.length <= 1 && !numaBound.value) return devices;
     const nodes =
         config?.mode === 'auto'
             ? [...new Set(selectedNUMAGPUs.value.map((device) => device.numaNode).filter((id) => id !== undefined))]
@@ -316,7 +360,7 @@ const groupRules = [
     {
         validator: (_rule: unknown, _value: unknown, callback: (error?: Error) => void) => {
             let error = '';
-            if (model.value.enabled && selectionMode.value === 'group') {
+            if (model.value.enabled && hasMultipleGPUs.value && selectionMode.value === 'group') {
                 if (!model.value.group) error = i18n.global.t('aiTools.gpuGroup.selectRequired');
                 else if (numaError.value) error = numaError.value;
                 else if (!gpuDevices.value) error = i18n.global.t('aiTools.model.loadFailed');
@@ -336,8 +380,19 @@ const groupRules = [
         trigger: 'change',
     },
 ];
-const changeSource = () => {
-    if (selectionMode.value === 'custom') model.value.group = undefined;
+const changeSource = (source: 'group' | AI.ModelGPUConfig['mode']) => {
+    if (source === 'group') {
+        selectionMode.value = 'group';
+        return;
+    }
+    selectionMode.value = 'custom';
+    model.value.group = undefined;
+    model.value.error = undefined;
+    if (model.value.mode !== source) {
+        model.value.mode = source;
+        model.value.deviceIDs = [];
+        model.value.count = source === 'count' ? 1 : undefined;
+    }
 };
 const applyGroup = (id: number) => {
     const group = compatibleGroups.value.find((item) => item.id === id);
@@ -348,6 +403,26 @@ const applyGroup = (id: number) => {
         group: { id: group.id, name: group.name, revision: group.revision },
     };
 };
+const groupCreated = async (name: string) => {
+    const version = requestVersion;
+    const node = currentNode.value;
+    loading.value = true;
+    try {
+        const { data } = await listGPUGroups(node);
+        if (version !== requestVersion || node !== currentNode.value) return;
+        groups.value = data || [];
+        groupsFailed.value = false;
+        const group = compatibleGroups.value.find((item) => item.name === name);
+        if (group && selectionMode.value === 'group' && model.value.enabled) applyGroup(group.id);
+    } catch {
+        if (version === requestVersion && node === currentNode.value) groupsFailed.value = true;
+    } finally {
+        if (version === requestVersion) loading.value = false;
+    }
+};
+watch([() => props.imageType, currentNode], () => {
+    groupEditorVisible.value = false;
+});
 const selectedNUMAGPUs = computed(() =>
     (gpuDevices.value || []).filter(
         (device) =>
@@ -462,12 +537,6 @@ const gpuDeviceRules = [
     },
 ];
 
-const changeMode = () => {
-    model.value.error = undefined;
-    model.value.deviceIDs = [];
-    model.value.count = model.value.mode === 'count' ? 1 : undefined;
-};
-
 const changeEnabled = () => {
     model.value.error = undefined;
     if (model.value.enabled && sectionRef.value) {
@@ -486,6 +555,7 @@ const changeEnabled = () => {
 let requestVersion = 0;
 const init = async (create: boolean) => {
     const version = ++requestVersion;
+    groupEditorVisible.value = false;
     loading.value = true;
 
     gpuDevices.value = undefined;
@@ -505,15 +575,7 @@ const init = async (create: boolean) => {
     groups.value = [];
     groupsFailed.value = false;
     try {
-        const [devicesResult, groupsResult] = await Promise.allSettled([
-            loadModelGPUDevices(),
-            props.groupEditor ? Promise.resolve({ data: [] as AI.GPUGroup[] }) : listGPUGroups(),
-        ]);
-        if (version !== requestVersion) return;
-        if (groupsResult.status === 'fulfilled') groups.value = groupsResult.value.data || [];
-        else groupsFailed.value = true;
-        if (devicesResult.status === 'rejected') throw devicesResult.reason;
-        const { data } = devicesResult.value;
+        const { data } = await loadModelGPUDevices();
         if (version !== requestVersion) return;
         gpuDevices.value = data.devices || [];
         if (props.imageType === 'nvidia' && model.value.mode === 'devices') {
@@ -535,6 +597,18 @@ const init = async (create: boolean) => {
         numaNodes.value = data.numaNodes || [];
         gpuWarnings.value = data.warnings || [];
         if (create) model.value.enabled = hasSupportedGPU.value;
+        if (!hasMultipleGPUs.value) {
+            selectionMode.value = 'custom';
+            model.value.group = undefined;
+        } else if (!props.groupEditor) {
+            try {
+                const { data: groupData } = await listGPUGroups();
+                if (version !== requestVersion) return;
+                groups.value = groupData || [];
+            } catch {
+                if (version === requestVersion) groupsFailed.value = true;
+            }
+        }
     } catch {
     } finally {
         if (version === requestVersion) {
@@ -543,7 +617,11 @@ const init = async (create: boolean) => {
     }
 };
 
-defineExpose({ init, loading });
+onBeforeUnmount(() => {
+    requestVersion++;
+});
+
+defineExpose({ init, loading: computed(() => loading.value || groupEditorVisible.value) });
 </script>
 
 <style lang="scss" scoped>
@@ -575,6 +653,15 @@ defineExpose({ init, loading });
 }
 .group-editor .input-help {
     width: 100%;
+}
+.gpu-group-control {
+    display: flex;
+    gap: 8px;
+    width: 100%;
+}
+.gpu-group-control > .el-select {
+    flex: 1;
+    min-width: 0;
 }
 .gpu-group-option {
     height: auto;

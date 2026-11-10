@@ -776,12 +776,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate:
-                'NUMA {node} に利用可能な GPU が検出されなかったため、このノードからグループを作成できません。',
-            inspectNUMA:
-                '現在のノードの端末で次の読み取り専用コマンドを実行し、PCI アドレスを照合して GPU の NUMA 所属を確認してください：',
-            numaQueryHint:
-                'numa_node は NUMA ノード番号を示します。-1 はシステムが所属を報告していないことを意味します。結果が画面と異なる場合は、更新して再試行してください。',
+            singleGPU:
+                'GPU グループは複数の GPU を搭載したマシン向けです。このノードには GPU が 1 基しかないため、グループ化は不要です。',
             relationTopology: '関係トポロジー',
             relationHelp: 'GPU またはグループを選択すると、所属関係が強調表示されます。',
             selectionHelp:
@@ -808,6 +804,8 @@ const message = {
             ungrouped: '未分類',
 
             unknownNode: 'NUMA 所属不明',
+            unknownNodeHelp:
+                'これらの GPU の NUMA 所属はシステムから報告されていません。GPU の選択とグループ化には影響しません。',
             memoryNode: 'メモリノード',
             selectNode: 'このノードの GPU を選択',
             noDevices: 'このノードに GPU はありません',
@@ -818,7 +816,7 @@ const message = {
             overview: 'デバイス概要',
             groups: 'GPU グループ',
             history: '監視履歴',
-            source: '設定方法',
+            source: 'GPU の選択元',
             custom: 'カスタム',
             selectRequired: 'GPU グループを選択してください',
             snapshotHelp: 'デプロイには現在の設定が保存されます。グループの変更は既存のデプロイに自動適用されません。',
@@ -1134,6 +1132,7 @@ const message = {
             numaCross: '選択した GPU は複数の NUMA ノードに属しています。手動で選択してください。',
             numaCount: '自動バインドには特定の GPU またはすべての GPU を選択してください。',
             numaRequired: 'NUMA ノードを少なくとも 1 つ選択してください。',
+            numaTopologyUnavailable: 'NUMA トポロジー情報を取得できません。',
             numaUnavailable: 'NUMA ノードが利用できないか、CPU またはメモリがありません。',
             gpuAcceleration: 'GPU アクセラレーション',
             gpuMode: 'アクセラレーターの選択',

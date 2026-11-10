@@ -775,11 +775,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate: 'В NUMA {node} не обнаружены доступные GPU. Создать группу из этого узла невозможно.',
-            inspectNUMA:
-                'Выполните эти команды только для чтения в терминале текущего узла и сопоставьте адреса PCI, чтобы проверить принадлежность GPU к NUMA:',
-            numaQueryHint:
-                'numa_node содержит номер узла NUMA; -1 означает, что система не сообщила принадлежность. Если результаты отличаются от страницы, обновите её и повторите попытку.',
+            singleGPU:
+                'Группы GPU предназначены для машин с несколькими GPU. На этом узле только один GPU, поэтому группировка не требуется.',
             relationTopology: 'Топология связей',
             relationHelp: 'Выберите GPU или группу, чтобы выделить связи участия.',
             selectionHelp:
@@ -806,6 +803,8 @@ const message = {
             ungrouped: 'Без группы',
 
             unknownNode: 'Узел NUMA неизвестен',
+            unknownNodeHelp:
+                'Система не сообщила о привязке этих GPU к узлам NUMA. Выбор и группировка GPU по-прежнему доступны.',
             memoryNode: 'Узел памяти',
             selectNode: 'Выбрать GPU этого узла',
             noDevices: 'В этом узле нет GPU',
@@ -816,7 +815,7 @@ const message = {
             overview: 'Обзор устройств',
             groups: 'Группы GPU',
             history: 'История мониторинга',
-            source: 'Настройка',
+            source: 'Источник GPU',
             custom: 'Вручную',
             selectRequired: 'Выберите группу GPU',
             snapshotHelp:
@@ -1145,6 +1144,7 @@ const message = {
             numaCross: 'Выбранные GPU относятся к разным узлам NUMA. Выберите узлы вручную.',
             numaCount: 'Для автоматической привязки выберите конкретные GPU или все GPU.',
             numaRequired: 'Выберите хотя бы один узел NUMA.',
+            numaTopologyUnavailable: 'Информация о топологии NUMA недоступна.',
             numaUnavailable: 'Узел NUMA недоступен либо не имеет процессоров или памяти.',
             gpuAcceleration: 'Ускорение GPU',
             gpuMode: 'Выбор ускорителей',

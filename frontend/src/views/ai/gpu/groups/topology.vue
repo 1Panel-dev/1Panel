@@ -1,5 +1,6 @@
 <template>
     <el-card shadow="never" class="relation-card">
+        <p v-if="!nodes.length" class="input-help">{{ $t('aiTools.model.numaTopologyUnavailable') }}</p>
         <div ref="board" class="relation-board">
             <svg class="relation-lines" aria-hidden="true">
                 <path v-for="line in lines" :key="line.key" :d="line.path" :class="{ active: line.active }" />
@@ -18,14 +19,14 @@
                                 {{ section.label }}
                                 <el-tooltip
                                     v-if="section.key === 'unassigned'"
-                                    :content="$t('aiTools.model.numaUnknown')"
+                                    :content="$t('aiTools.gpuGroup.unknownNodeHelp')"
                                     placement="top"
                                     :popper-style="{ maxWidth: 'min(320px, calc(100vw - 32px))' }"
                                 >
                                     <el-icon
                                         class="numa-info"
                                         tabindex="0"
-                                        :aria-label="$t('aiTools.model.numaUnknown')"
+                                        :aria-label="$t('aiTools.gpuGroup.unknownNodeHelp')"
                                     >
                                         <InfoFilled />
                                     </el-icon>
@@ -33,15 +34,6 @@
                             </strong>
                             <div v-if="section.node" class="input-help">CPU {{ section.node.cpus || '—' }}</div>
                         </div>
-                        <el-button
-                            v-if="section.node"
-                            v-permission="'ai_gpu_manage'"
-                            link
-                            type="primary"
-                            @click="createFromNode(section.node.id, section.devices)"
-                        >
-                            {{ $t('commons.button.create') }}
-                        </el-button>
                     </header>
                     <div
                         v-for="device in section.devices"
@@ -66,17 +58,6 @@
                         <el-tag v-if="!device.available" size="small" type="warning">
                             {{ $t('aiTools.model.gpuMissing') }}
                         </el-tag>
-                        <el-button
-                            v-permission="'ai_gpu_manage'"
-                            link
-                            type="primary"
-                            class="device-create"
-                            :disabled="!device.available"
-                            :aria-label="`${$t('commons.button.create')} · ${device.name}`"
-                            @click="$emit('create', [device.id])"
-                        >
-                            {{ $t('commons.button.create') }}
-                        </el-button>
                         <span class="relation-port" />
                     </div>
                     <span v-if="!section.devices.length" class="input-help">
@@ -106,7 +87,7 @@
                                         : { type: 'group', id: group.id }
                             "
                         >
-                            <strong>{{ group.name || $t('commons.button.create') }}</strong>
+                            <strong>{{ group.name }}</strong>
                             <span class="input-help">{{ group.gpu.deviceIDs.length }} GPU · {{ group.imageType }}</span>
                         </button>
                         <span class="relation-port" />
@@ -136,7 +117,7 @@
             </div>
             <p v-if="focusedGroup.description" class="detail-description">{{ focusedGroup.description }}</p>
             <dl class="detail-fields">
-                <div>
+                <div v-if="nodes.length > 1 || (focusedGroup.gpu.numa && focusedGroup.gpu.numa.mode !== 'off')">
                     <dt>{{ $t('aiTools.gpuGroup.affinity') }}</dt>
                     <dd>
                         <span>
@@ -188,15 +169,6 @@
                         {{ $t('aiTools.model.gpuMissing') }}
                     </el-tag>
                 </div>
-                <el-button
-                    v-permission="'ai_gpu_manage'"
-                    link
-                    type="primary"
-                    :disabled="!focusedDevice.available"
-                    @click="$emit('create', [focusedDevice.id])"
-                >
-                    {{ $t('commons.button.create') }}
-                </el-button>
             </div>
             <dl class="detail-fields device-fields">
                 <div>
@@ -225,10 +197,9 @@
 </template>
 
 <script setup lang="ts">
-import { computed, h, nextTick, ref, watch } from 'vue';
-import { InfoFilled } from '@element-plus/icons-vue';
-import { ElMessageBox } from 'element-plus';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useResizeObserver } from '@vueuse/core';
+import { InfoFilled } from '@element-plus/icons-vue';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
 
@@ -237,13 +208,14 @@ const props = defineProps<{
     nodes: AI.ModelNUMANode[];
     groups: AI.GPUGroup[];
 }>();
-const emit = defineEmits<{ create: [ids: string[]]; edit: [group: AI.GPUGroup]; remove: [group: AI.GPUGroup] }>();
+defineEmits<{ edit: [group: AI.GPUGroup]; remove: [group: AI.GPUGroup] }>();
 const focus = ref<{ type: 'device'; id: string } | { type: 'group'; id: number }>();
 const board = ref<HTMLElement>();
 const hardware = ref<HTMLElement>();
 const groupColumn = ref<HTMLElement>();
 const lines = ref<{ key: string; path: string; active: boolean }[]>([]);
 const sections = computed(() => {
+    if (!props.nodes.length) return [{ key: 'devices', label: '', devices: props.devices }];
     const available = props.devices.filter((device) => device.available);
     const result: { key: string; label: string; node?: AI.ModelNUMANode; devices: AI.ModelGPUDevice[] }[] =
         props.nodes.map((node) => ({
@@ -293,34 +265,6 @@ const focusedGroup = computed(() =>
 const focusedDevice = computed(() =>
     props.devices.find((device) => focus.value?.type === 'device' && device.id === focus.value.id),
 );
-const createFromNode = async (node: number, devices: AI.ModelGPUDevice[]) => {
-    const available = devices.filter((device) => device.available);
-    if (!available.length) {
-        await ElMessageBox.alert(
-            h('div', [
-                h('p', i18n.global.t('aiTools.gpuGroup.emptyNodeCreate', { node })),
-                h('p', { class: 'mt-3' }, i18n.global.t('aiTools.gpuGroup.inspectNUMA')),
-                h(
-                    'pre',
-                    { class: 'my-3', style: { whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' } },
-                    'lspci -Dnn\ngrep -H . /sys/bus/pci/devices/*/numa_node',
-                ),
-                h('p', i18n.global.t('aiTools.gpuGroup.numaQueryHint')),
-            ]),
-            i18n.global.t('commons.msg.infoTitle'),
-            {
-                type: 'info',
-                confirmButtonText: i18n.global.t('commons.button.confirm'),
-                customStyle: { width: '640px', maxWidth: 'calc(100vw - 32px)' },
-            },
-        ).catch(() => {});
-        return;
-    }
-    emit(
-        'create',
-        available.filter((device) => device.type === available[0].type).map((device) => device.id),
-    );
-};
 const drawLines = () => {
     if (!board.value) return;
     const rect = board.value.getBoundingClientRect();
@@ -434,11 +378,6 @@ h3 {
     align-items: center;
     gap: 8px;
 }
-.numa-info {
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-    cursor: help;
-}
 .numa-section.unassigned {
     border-style: dashed;
 }
@@ -461,10 +400,6 @@ h3 {
     flex: 1;
     min-width: 0;
     width: auto;
-}
-.device-create {
-    flex-shrink: 0;
-    margin-left: auto;
 }
 .device-node.active,
 .relation-group.active {
@@ -630,5 +565,11 @@ h3 {
     .relation-board {
         grid-template-columns: minmax(0, 1fr) 32px minmax(0, 1fr);
     }
+}
+
+.numa-info {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    cursor: help;
 }
 </style>

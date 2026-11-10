@@ -785,12 +785,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate:
-                'Tiada GPU tersedia dikesan pada NUMA {node}. Kumpulan tidak boleh dicipta daripada nod ini.',
-            inspectNUMA:
-                'Jalankan arahan baca sahaja ini dalam terminal nod semasa dan padankan alamat PCI untuk menyemak penempatan NUMA GPU:',
-            numaQueryHint:
-                'numa_node mengandungi ID nod NUMA; -1 bermaksud sistem belum melaporkan penempatan. Jika keputusan berbeza daripada halaman ini, muat semula dan cuba lagi.',
+            singleGPU:
+                'Kumpulan GPU adalah untuk mesin dengan berbilang GPU. Nod ini hanya mempunyai satu GPU dan tidak memerlukan pengumpulan.',
             relationTopology: 'Topologi hubungan',
             relationHelp: 'Pilih GPU atau kumpulan untuk menyerlahkan hubungan keahliannya.',
             selectionHelp:
@@ -817,6 +813,8 @@ const message = {
             ungrouped: 'Tanpa kumpulan',
 
             unknownNode: 'Nod NUMA tidak diketahui',
+            unknownNodeHelp:
+                'Sistem tidak melaporkan perkaitan NUMA bagi GPU ini. Pemilihan dan pengumpulan GPU masih tersedia.',
             memoryNode: 'Nod memori',
             selectNode: 'Pilih GPU dalam nod ini',
             noDevices: 'Tiada GPU dalam nod ini',
@@ -827,7 +825,7 @@ const message = {
             overview: 'Gambaran peranti',
             groups: 'Kumpulan GPU',
             history: 'Sejarah pemantauan',
-            source: 'Konfigurasi',
+            source: 'Sumber GPU',
             custom: 'Tersuai',
             selectRequired: 'Pilih kumpulan GPU',
             snapshotHelp:
@@ -1158,6 +1156,7 @@ const message = {
             numaCross: 'GPU yang dipilih merentasi beberapa nod NUMA. Pilih secara manual.',
             numaCount: 'Pengikatan automatik memerlukan GPU tertentu atau semua GPU.',
             numaRequired: 'Pilih sekurang-kurangnya satu nod NUMA.',
+            numaTopologyUnavailable: 'Maklumat topologi NUMA tidak tersedia.',
             numaUnavailable: 'Nod NUMA tidak tersedia atau tiada CPU atau memori.',
             gpuAcceleration: 'Pecutan GPU',
             gpuMode: 'Pemilihan pemecut',

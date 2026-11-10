@@ -772,11 +772,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate: 'در NUMA {node} هیچ GPU قابل استفاده‌ای شناسایی نشد. ایجاد گروه از این گره ممکن نیست.',
-            inspectNUMA:
-                'این فرمان‌های فقط‌خواندنی را در پایانه گره فعلی اجرا کنید و با تطبیق آدرس‌های PCI، وابستگی GPU به NUMA را بررسی کنید:',
-            numaQueryHint:
-                'مقدار numa_node شناسه گره NUMA است؛ -1 یعنی سیستم وابستگی را گزارش نکرده است. اگر نتایج با صفحه متفاوت است، صفحه را تازه‌سازی کرده و دوباره تلاش کنید.',
+            singleGPU:
+                'گروه\u200cبندی GPU برای دستگاه\u200cهای دارای چند GPU است. این گره تنها یک GPU دارد و نیازی به گروه\u200cبندی ندارد.',
             relationTopology: 'توپولوژی روابط',
             relationHelp: 'برای برجسته کردن روابط عضویت، یک GPU یا گروه را انتخاب کنید.',
             selectionHelp:
@@ -803,6 +800,8 @@ const message = {
             ungrouped: 'بدون گروه',
 
             unknownNode: 'گره NUMA نامشخص',
+            unknownNodeHelp:
+                'سیستم وابستگی NUMA این GPUها را گزارش نکرده است. انتخاب و گروه\u200cبندی GPUها همچنان امکان\u200cپذیر است.',
             memoryNode: 'گره حافظه',
             selectNode: 'انتخاب GPUهای این گره',
             noDevices: 'این گره GPU ندارد',
@@ -813,7 +812,7 @@ const message = {
             overview: 'نمای کلی دستگاه‌ها',
             groups: 'گروه‌های GPU',
             history: 'تاریخچه پایش',
-            source: 'پیکربندی',
+            source: 'منبع GPU',
             custom: 'سفارشی',
             selectRequired: 'یک گروه GPU انتخاب کنید',
             snapshotHelp:
@@ -1131,6 +1130,7 @@ const message = {
             numaCross: 'پردازنده‌های گرافیکی انتخاب‌شده در چند گره NUMA قرار دارند. دستی انتخاب کنید.',
             numaCount: 'اتصال خودکار به انتخاب پردازنده‌های گرافیکی مشخص یا همه آن‌ها نیاز دارد.',
             numaRequired: 'حداقل یک گره NUMA انتخاب کنید.',
+            numaTopologyUnavailable: 'اطلاعات توپولوژی NUMA در دسترس نیست.',
             numaUnavailable: 'گره NUMA در دسترس نیست یا پردازنده یا حافظه ندارد.',
             gpuAcceleration: 'شتاب‌دهی GPU',
             gpuMode: 'انتخاب شتاب‌دهنده',

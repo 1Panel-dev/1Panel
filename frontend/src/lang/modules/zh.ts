@@ -760,10 +760,7 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate: 'NUMA {node} 下未检测到可用的 GPU，无法从此节点创建分组。',
-            inspectNUMA: '请在当前节点的终端执行以下只读命令，按 PCI 地址对照 GPU 与 NUMA 归属：',
-            numaQueryHint:
-                'numa_node 的值是 NUMA 节点编号；-1 表示系统未报告归属。若检测结果与页面不一致，请刷新后重试。',
+            singleGPU: 'GPU 分组仅适用于多卡机器，当前节点只有一张 GPU，无需分组。',
             relationTopology: '关系拓扑',
             relationHelp: '点击 GPU 或分组，高亮成员关系。',
             selectionHelp: '选择同一设备类型的 GPU，点击下一步配置分组；虚线表示待保存的成员关系。',
@@ -787,6 +784,7 @@ const message = {
             ungrouped: '未分组',
 
             unknownNode: 'NUMA 未知',
+            unknownNodeHelp: '系统未报告这些 GPU 的 NUMA 归属，不影响选卡和分组。',
             memoryNode: '内存节点',
             selectNode: '选择本节点 GPU',
             noDevices: '此节点下没有 GPU',
@@ -797,7 +795,7 @@ const message = {
             overview: '设备概览',
             groups: 'GPU 分组',
             history: '历史监控',
-            source: '配置方式',
+            source: 'GPU 来源',
             custom: '自定义',
             selectRequired: '请选择 GPU 分组',
             snapshotHelp: '部署保存当前配置，分组变更不会自动影响已有部署。',
@@ -1087,6 +1085,7 @@ const message = {
             numaCross: '所选 GPU 跨多个 NUMA 节点，请手动选择。',
             numaCount: '自动匹配需要选择具体 GPU 或全部 GPU。',
             numaRequired: '请至少选择一个 NUMA 节点。',
+            numaTopologyUnavailable: 'NUMA 拓扑信息不可用。',
             numaUnavailable: 'NUMA 节点不可用或缺少 CPU、内存。',
             gpuAcceleration: 'GPU 加速',
             gpuMode: '加速卡选择',

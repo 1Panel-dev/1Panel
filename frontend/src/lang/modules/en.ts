@@ -777,12 +777,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate:
-                'No available GPUs were detected under NUMA {node}. A group cannot be created from this node.',
-            inspectNUMA:
-                'Run these read-only commands in the current node’s terminal and match PCI addresses to check GPU NUMA placement:',
-            numaQueryHint:
-                'numa_node contains the NUMA node ID; -1 means the system has not reported a placement. If the results differ from this page, refresh and try again.',
+            singleGPU:
+                'GPU groups are intended for multi-GPU machines. This node has only one GPU and does not need grouping.',
             relationTopology: 'Relationship topology',
             relationHelp: 'Select a GPU or group to highlight its memberships.',
             selectionHelp:
@@ -809,6 +805,8 @@ const message = {
             ungrouped: 'Ungrouped',
 
             unknownNode: 'Unknown NUMA affinity',
+            unknownNodeHelp:
+                'The system has not reported the NUMA affinity of these GPUs. GPU selection and grouping are still available.',
             memoryNode: 'Memory node',
             selectNode: 'Select GPUs in this node',
             noDevices: 'No GPUs in this node',
@@ -819,7 +817,7 @@ const message = {
             overview: 'Device overview',
             groups: 'GPU groups',
             history: 'Monitoring history',
-            source: 'Configuration',
+            source: 'GPU source',
             custom: 'Custom',
             selectRequired: 'Select a GPU group',
             snapshotHelp:
@@ -1147,6 +1145,7 @@ const message = {
             numaCross: 'Selected GPUs span multiple NUMA nodes. Select nodes manually.',
             numaCount: 'Automatic binding requires specific GPUs or all GPUs.',
             numaRequired: 'Select at least one NUMA node.',
+            numaTopologyUnavailable: 'NUMA topology is unavailable.',
             numaUnavailable: 'NUMA node is unavailable or has no CPUs or memory.',
             gpuAcceleration: 'GPU acceleration',
             gpuMode: 'Accelerator selection',
