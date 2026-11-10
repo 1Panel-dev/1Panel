@@ -86,7 +86,7 @@ func (u *BackupService) SearchWithPage(req dto.SearchPageWithType) (int64, inter
 		options = append(options, repo.WithByType(req.Type))
 	}
 	if len(req.Info) != 0 {
-		options = append(options, repo.WithByType(req.Info))
+		options = append(options, repo.WithByLikeName(req.Info))
 	}
 	count, accounts, err := backupRepo.Page(req.Page, req.PageSize, options...)
 	if err != nil {
