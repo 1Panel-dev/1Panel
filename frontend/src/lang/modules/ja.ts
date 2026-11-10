@@ -1115,6 +1115,7 @@ const message = {
             vllmVersion: 'vLLM バージョン',
             vllmImage: 'vLLM イメージ',
             servicePort: 'サービスポート',
+            vllmAPIKeyHelper: 'API Key を入力すると認証が有効になります。空欄にすると認証は無効になります。',
             numaBinding: 'NUMA バインド',
             numaOff: 'バインドなし',
             numaAuto: '自動',

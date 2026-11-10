@@ -1139,6 +1139,7 @@ const message = {
             vllmVersion: 'Versi vLLM',
             vllmImage: 'Imej vLLM',
             servicePort: 'Port perkhidmatan',
+            vllmAPIKeyHelper: 'Masukkan API Key untuk mengaktifkan pengesahan. Biarkan kosong untuk menyahaktifkannya.',
             numaBinding: 'Pengikatan NUMA',
             numaOff: 'Tanpa pengikatan',
             numaAuto: 'Automatik',

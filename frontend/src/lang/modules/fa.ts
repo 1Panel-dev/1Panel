@@ -1112,6 +1112,8 @@ const message = {
             vllmVersion: 'نسخه vLLM',
             vllmImage: 'ایمیج vLLM',
             servicePort: 'پورت سرویس',
+            vllmAPIKeyHelper:
+                'برای فعال‌سازی احراز هویت، کلید API را وارد کنید. برای غیرفعال‌سازی، این فیلد را خالی بگذارید.',
             numaBinding: 'اتصال NUMA',
             numaOff: 'بدون اتصال',
             numaAuto: 'خودکار',

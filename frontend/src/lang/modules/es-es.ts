@@ -1130,6 +1130,7 @@ const message = {
             vllmVersion: 'Versión de vLLM',
             vllmImage: 'Imagen de vLLM',
             servicePort: 'Puerto del servicio',
+            vllmAPIKeyHelper: 'Introduce una clave API para activar la autenticación. Déjalo vacío para desactivarla.',
             numaBinding: 'Afinidad NUMA',
             numaOff: 'Sin afinidad',
             numaAuto: 'Automática',
