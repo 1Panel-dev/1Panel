@@ -5787,11 +5787,7 @@ const message = {
                     'Não foi possível carregar as informações de relatório deste nó. Verifique a conexão do nó e as permissões de leitura dos relatórios.',
                 generationPending:
                     'Esta solicitação ainda está em andamento. Verifique o status no histórico de relatórios antes de gerar o relatório novamente.',
-                notApplicable: 'Não aplicável',
-                panelNotApplicable:
-                    'Nenhum painel está instalado neste nó. As informações específicas do painel não se aplicam.',
 
-                enterprise: 'Edição Empresarial',
                 reportNode: 'Nó do relatório',
                 currentNode: 'Nó atual',
                 scoreMeta: '{0} pontos deduzidos · {1} riscos',
@@ -6079,7 +6075,6 @@ const message = {
                 statAlertDesc: '{0} tarefas ativadas · {1} canais',
                 assetAlertDesc: '{0} registros com falha, {1} registros pendentes de sincronização',
                 failedExecutionRecords: 'Registros de execução com falha',
-                taskID: 'ID da tarefa',
                 executeTime: 'Tempo de execução',
                 backupTasks: 'Tarefas de backup',
                 systemMetrics: 'Métricas de execução',

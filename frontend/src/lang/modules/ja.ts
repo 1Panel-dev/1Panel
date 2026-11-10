@@ -5646,11 +5646,7 @@ const message = {
                     'このノードのレポート情報を読み込めません。ノードへの接続とレポートの閲覧権限を確認してください。',
                 generationPending:
                     'このリクエストはまだ処理中です。再生成する前にレポート履歴で状態を確認してください。',
-                notApplicable: '対象外',
-                panelNotApplicable:
-                    'このノードにはパネルがインストールされていないため、パネル固有の情報は対象外です。',
 
-                enterprise: 'エンタープライズ',
                 reportNode: 'レポートノード',
                 currentNode: '現在のノード',
                 scoreMeta: '{0} 点減点 · リスク {1} 件',
@@ -5940,7 +5936,6 @@ const message = {
                 statAlertDesc: '有効タスク {0} 個 · チャネル {1} 個',
                 assetAlertDesc: '失敗ログ {0} 件、同期待ちログ {1} 件',
                 failedExecutionRecords: '失敗実行記録',
-                taskID: 'タスクID',
                 executeTime: '実行時間',
                 backupTasks: 'バックアップタスク',
                 systemMetrics: '実行指標',

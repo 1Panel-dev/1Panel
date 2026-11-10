@@ -5748,10 +5748,7 @@ const message = {
                     'Maklumat laporan nod ini tidak dapat dimuatkan. Semak sambungan nod dan kebenaran untuk membaca laporan.',
                 generationPending:
                     'Permintaan ini masih diproses. Semak status dalam sejarah laporan sebelum menjana laporan semula.',
-                notApplicable: 'Tidak berkenaan',
-                panelNotApplicable: 'Tiada panel dipasang pada nod ini. Maklumat khusus panel tidak berkenaan.',
 
-                enterprise: 'Edisi Perusahaan',
                 reportNode: 'Nod Laporan',
                 currentNode: 'Semasa',
                 scoreMeta: 'Potongan {0} mata · {1} risiko',
@@ -6042,7 +6039,6 @@ const message = {
                 statAlertDesc: '{0} tugas didayakan · {1} saluran',
                 assetAlertDesc: '{0} log gagal, {1} log menunggu sync',
                 failedExecutionRecords: 'Rekod Pelaksanaan Gagal',
-                taskID: 'ID Tugas',
                 executeTime: 'Masa Pelaksanaan',
                 backupTasks: 'Tugas Sandaran',
                 systemMetrics: 'Metrik Masa Jalan',

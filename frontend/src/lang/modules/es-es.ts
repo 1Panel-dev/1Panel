@@ -5757,11 +5757,7 @@ const message = {
                     'No se pudo cargar la información del informe de este nodo. Compruebe la conexión del nodo y los permisos de lectura de informes.',
                 generationPending:
                     'Esta solicitud sigue en curso. Compruebe su estado en el historial de informes antes de volver a generar el informe.',
-                notApplicable: 'No aplicable',
-                panelNotApplicable:
-                    'No hay un panel instalado en este nodo. La información específica del panel no es aplicable.',
 
-                enterprise: 'Edición Empresarial',
                 reportNode: 'Nodo de informe',
                 currentNode: 'Actual',
                 scoreMeta: '{0} puntos deducidos · {1} riesgos',
@@ -6055,7 +6051,6 @@ const message = {
                 statAlertDesc: '{0} tareas habilitadas · {1} canales',
                 assetAlertDesc: '{0} registros fallidos, {1} registros pendientes de sincronización',
                 failedExecutionRecords: 'Registros de ejecución fallidos',
-                taskID: 'ID de tarea',
                 executeTime: 'Tiempo de ejecución',
                 backupTasks: 'Tareas de copia de seguridad',
                 systemMetrics: 'Métricas de ejecución',

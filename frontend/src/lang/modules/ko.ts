@@ -5543,10 +5543,7 @@ const message = {
                     '이 노드의 보고서 정보를 불러올 수 없습니다. 노드 연결 및 보고서 조회 권한을 확인하세요.',
                 generationPending:
                     '이 요청은 아직 처리 중입니다. 보고서를 다시 생성하기 전에 보고서 기록에서 상태를 확인하세요.',
-                notApplicable: '해당 없음',
-                panelNotApplicable: '이 노드에는 패널이 설치되어 있지 않아 패널 전용 정보는 해당되지 않습니다.',
 
-                enterprise: '엔터프라이즈',
                 reportNode: '보고서 노드',
                 currentNode: '현재 노드',
                 scoreMeta: '감점 {0}점 · 위험 {1}건',
@@ -5831,7 +5828,6 @@ const message = {
                 statAlertDesc: '활성 작업 {0}개 · 채널 {1}개',
                 assetAlertDesc: '실패 로그 {0}건, 동기화 대기 {1}건',
                 failedExecutionRecords: '실패 실행 기록',
-                taskID: '작업 ID',
                 executeTime: '실행 시간',
                 backupTasks: '백업 작업',
                 systemMetrics: '실행 지표',

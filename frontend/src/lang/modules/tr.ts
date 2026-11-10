@@ -5756,10 +5756,7 @@ const message = {
                     'Bu düğümün rapor bilgileri yüklenemedi. Düğüm bağlantısını ve rapor okuma izinlerini kontrol edin.',
                 generationPending:
                     'Bu istek hâlâ işleniyor. Raporu yeniden oluşturmadan önce rapor geçmişinden durumunu kontrol edin.',
-                notApplicable: 'Uygulanamaz',
-                panelNotApplicable: 'Bu düğümde panel kurulu değil. Panele özgü bilgiler uygulanamaz.',
 
-                enterprise: 'Kurumsal',
                 reportNode: 'Rapor Düğümü',
                 currentNode: 'Geçerli Düğüm',
                 scoreMeta: '{0} puan düşüldü · {1} risk',
@@ -6043,7 +6040,6 @@ const message = {
                 statAlertDesc: '{0} etkin görev · {1} kanal',
                 assetAlertDesc: '{0} başarısız günlük, {1} senkronizasyon bekleyen günlük',
                 failedExecutionRecords: 'Başarısız Yürütme Kayıtları',
-                taskID: 'Görev ID',
                 executeTime: 'Yürütme Zamanı',
                 backupTasks: 'Yedekleme Görevleri',
                 systemMetrics: 'Çalışma Metrikleri',
