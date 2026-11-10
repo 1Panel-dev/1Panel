@@ -7041,6 +7041,7 @@ const message = {
             local: '本機路徑',
             remote: '遠端連結',
             imagePrefix: '映像前綴',
+            disableImagePrefixConfirm: '確定取消使用映像前綴並清除目前的前綴嗎？',
             imagePrefixHelper:
                 '作用：自訂映像前綴，修改 compose 檔案中的映像欄位，例：當映像前綴設定為 1panel/custom 時，MaxKB 的映像欄位將變更為 1panel/custom/maxkb:v1.10.0',
             closeHelper: '是否取消使用自訂應用倉庫',

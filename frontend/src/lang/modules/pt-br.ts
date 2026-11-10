@@ -7799,6 +7799,7 @@ const message = {
             local: 'Caminho Local',
             remote: 'Link Remoto',
             imagePrefix: 'Prefixo de Imagem',
+            disableImagePrefixConfirm: 'Deseja desativar o prefixo de imagem e limpar o valor atual?',
             imagePrefixHelper:
                 'Função: Personalize o prefixo da imagem e modifique o campo de imagem no arquivo compose. Por exemplo, quando o prefixo da imagem é configurado como 1panel/custom, o campo de imagem do MaxKB mudará para 1panel/custom/maxkb:v1.10.0',
             closeHelper: 'Cancelar o uso do repositório de aplicativos personalizados',

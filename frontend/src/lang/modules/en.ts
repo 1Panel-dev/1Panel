@@ -7634,6 +7634,7 @@ const message = {
             local: 'Local Path',
             remote: 'Remote Link',
             imagePrefix: 'Image Prefix',
+            disableImagePrefixConfirm: 'Disable the image prefix and clear its current value?',
             imagePrefixHelper:
                 'Function: Customize the image prefix and modify the image field in the compose file. For example, when the image prefix is set to 1panel/custom, the image field for MaxKB will change to 1panel/custom/maxkb:v1.10.0',
             closeHelper: 'Cancel using custom app repository',

@@ -7755,6 +7755,7 @@ const message = {
             local: 'Yerel Yol',
             remote: 'Uzak Bağlantı',
             imagePrefix: 'Görüntü Öneki',
+            disableImagePrefixConfirm: 'Görüntü önekini devre dışı bırakıp mevcut değeri temizlemek istiyor musunuz?',
             imagePrefixHelper:
                 'İşlev: Görüntü önekini özelleştirir ve compose dosyasındaki görüntü alanını değiştirir. Örneğin, görüntü öneki 1panel/custom olarak ayarlandığında, MaxKB için görüntü alanı 1panel/custom/maxkb:v1.10.0 olarak değişir',
             closeHelper: 'Özel uygulama deposunu kullanmayı iptal et',

@@ -7775,6 +7775,7 @@ const message = {
             local: 'Ruta Local',
             remote: 'Enlace Remoto',
             imagePrefix: 'Prefijo de Imagen',
+            disableImagePrefixConfirm: '¿Desea desactivar el prefijo de imagen y borrar el valor actual?',
             imagePrefixHelper:
                 'Función: Personaliza el prefijo de la imagen y modifica el campo image en el archivo compose. Ejemplo: si el prefijo es 1panel/custom, la imagen de MaxKB pasará a ser 1panel/custom/maxkb:v1.10.0',
             closeHelper: 'Cancelar el uso del repositorio de apps personalizadas',

@@ -7586,6 +7586,7 @@ const message = {
             local: 'مسیر محلی',
             remote: 'لینک از راه دور',
             imagePrefix: 'پیشوند تصویر',
+            disableImagePrefixConfirm: 'آیا می‌خواهید پیشوند تصویر را غیرفعال کنید و مقدار فعلی آن را پاک کنید؟',
             imagePrefixHelper:
                 'عملکرد: سفارشی‌سازی پیشوند تصویر و تغییر فیلد تصویر در فایل compose. به عنوان مثال، وقتی پیشوند تصویر روی 1panel/custom تنظیم شود، فیلد تصویر برای MaxKB به 1panel/custom/maxkb:v1.10.0 تغییر می‌کند',
             closeHelper: 'لغو استفاده از مخزن برنامه سفارشی',
