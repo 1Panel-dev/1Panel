@@ -7750,6 +7750,7 @@ const message = {
             local: 'Laluan Tempatan',
             remote: 'Pautan Jauh',
             imagePrefix: 'Awalan Imej',
+            disableImagePrefixConfirm: 'Nyahaktifkan awalan imej dan kosongkan nilai semasa?',
             imagePrefixHelper:
                 'Fungsi: Sesuaikan awalan imej dan ubah medan imej dalam fail compose. Contohnya, apabila awalan imej ditetapkan kepada 1panel/custom, medan imej untuk MaxKB akan bertukar kepada 1panel/custom/maxkb:v1.10.0',
             closeHelper: 'Batalkan penggunaan repositori aplikasi khusus',

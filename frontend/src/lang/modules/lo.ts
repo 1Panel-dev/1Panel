@@ -7377,6 +7377,7 @@ const message = {
             local: 'ທີ່ຢູ່ພາຍໃນເຄື່ອງ',
             remote: 'ລິ້ງທາງໄກ',
             imagePrefix: 'Image Prefix',
+            disableImagePrefixConfirm: 'ຕ້ອງການປິດການໃຊ້ Prefix ຂອງ Image ແລະ ລ້າງຄ່າປັດຈຸບັນບໍ?',
             imagePrefixHelper:
                 'ຟັງຊັນ: ກຳນົດ Prefix ຂອງ Image ເອງ. ຕົວຢ່າງ: ຫາກຕັ້ງເປັນ 1panel/custom, image ຂອງ MaxKB ຈະປ່ຽນເປັນ 1panel/custom/maxkb:v1.10.0',
             closeHelper: 'ຍົກເລີກການໃຊ້ຄັງແອັບກຳນົດເອງ',

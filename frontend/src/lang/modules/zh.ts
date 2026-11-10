@@ -7095,6 +7095,7 @@ const message = {
             local: '本地',
             remote: '远程',
             imagePrefix: '镜像前缀',
+            disableImagePrefixConfirm: '确定取消使用镜像前缀并清空当前前缀吗？',
             imagePrefixHelper:
                 '用于自定义镜像前缀，自动修改 Compose 文件中的镜像字段。\n 例如，当镜像前缀设置为 1panel/custom 时，MaxKB 的镜像将变更为 1panel/custom/maxkb:v1.10.0。',
             closeHelper: '是否取消使用自定义仓库',

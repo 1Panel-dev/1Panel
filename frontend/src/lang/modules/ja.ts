@@ -7623,6 +7623,7 @@ const message = {
             local: 'ローカルパス',
             remote: 'リモートリンク',
             imagePrefix: 'イメージプレフィックス',
+            disableImagePrefixConfirm: 'イメージプレフィックスを無効にし、現在の値をクリアしますか？',
             imagePrefixHelper:
                 '機能: イメージプレフィックスをカスタマイズし、composeファイル内のイメージフィールドを変更します。例えば、イメージプレフィックスを1panel/customに設定した場合、MaxKBのイメージフィールドは1panel/custom/maxkb:v1.10.0に変更されます',
             closeHelper: 'カスタムアプリリポジトリの使用をキャンセルしますか',

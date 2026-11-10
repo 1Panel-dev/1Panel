@@ -7466,6 +7466,7 @@ const message = {
             local: '로컬 경로',
             remote: '원격 링크',
             imagePrefix: '이미지 접두사',
+            disableImagePrefixConfirm: '이미지 접두사 사용을 중지하고 현재 접두사를 지우시겠습니까?',
             imagePrefixHelper:
                 '기능: 이미지 접두사를 사용자 정의하고 compose 파일의 이미지 필드를 수정합니다. 예를 들어 이미지 접두사를 1panel/custom으로 설정하면 MaxKB의 이미지 필드는 1panel/custom/maxkb:v1.10.0으로 변경됩니다',
             closeHelper: '사용자 정의 앱 저장소 사용 취소',
