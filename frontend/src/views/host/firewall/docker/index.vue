@@ -222,7 +222,7 @@
 
 <script lang="ts" setup>
 import { useSearchState } from '@/utils/search-reset';
-import { computed, reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch, toRef } from 'vue';
 import FireRouter from '@/views/host/firewall/index.vue';
 import DockerGuardStatus from '@/views/host/firewall/docker/status/index.vue';
 import DockerGuardDetail from '@/views/host/firewall/docker/detail/index.vue';
@@ -371,6 +371,9 @@ const orphanPaginationConfig = reactive({
     pageSize: 20,
     total: computed(() => orphanRows.value.length),
 });
+useSearchState('host/firewall/docker/pagination', { pageSize: toRef(paginationConfig, 'pageSize') });
+useSearchState('host/firewall/docker/orphan-pagination', { pageSize: toRef(orphanPaginationConfig, 'pageSize') });
+
 const containerPageRows = computed(() => {
     const start = (paginationConfig.currentPage - 1) * paginationConfig.pageSize;
     return containerRows.value.slice(start, start + paginationConfig.pageSize);

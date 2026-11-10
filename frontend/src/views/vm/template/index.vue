@@ -86,6 +86,8 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchState } from '@/utils/search-reset';
+
 import { computed, ref, watch } from 'vue';
 import { ElMessageBox } from 'element-plus';
 import i18n from '@/lang';
@@ -105,6 +107,10 @@ const vmUnavailable = computed(() => props.vmUnavailable);
 const loading = ref(false);
 const deleteLoading = ref(false);
 const searchName = ref('');
+
+useSearchState('1Panel/vm/template/index', {
+    searchName: searchName,
+});
 const items = ref<VM.TemplateItem[]>([]);
 const taskLogRef = ref();
 

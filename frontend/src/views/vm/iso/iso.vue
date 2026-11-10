@@ -100,6 +100,8 @@
 </template>
 
 <script setup lang="ts">
+import { useSearchState } from '@/utils/search-reset';
+
 import { computed, reactive, ref, watch } from 'vue';
 import i18n from '@/lang';
 import { VM } from '@/api/interface/vm';
@@ -132,6 +134,10 @@ const props = defineProps<{
 const vmUnavailable = computed(() => props.vmUnavailable);
 const loading = ref(false);
 const searchName = ref('');
+
+useSearchState('1Panel/vm/iso/iso', {
+    searchName: searchName,
+});
 const items = ref<VM.IsoItem[]>([]);
 const operateRef = ref();
 const deleteRef = ref();
