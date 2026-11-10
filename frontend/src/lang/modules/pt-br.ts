@@ -778,12 +778,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate:
-                'Nenhuma GPU disponível foi detectada no NUMA {node}. Não é possível criar um grupo a partir deste nó.',
-            inspectNUMA:
-                'Execute estes comandos somente de leitura no terminal do nó atual e compare os endereços PCI para verificar a localização NUMA das GPUs:',
-            numaQueryHint:
-                'numa_node contém o ID do nó NUMA; -1 indica que o sistema não informou a localização. Se os resultados diferirem desta página, atualize e tente novamente.',
+            singleGPU:
+                'Os grupos de GPU são destinados a máquinas com várias GPUs. Este nó tem apenas uma GPU e não precisa de agrupamento.',
             relationTopology: 'Topologia de relações',
             relationHelp: 'Selecione uma GPU ou um grupo para destacar suas relações de associação.',
             selectionHelp:
@@ -810,6 +806,8 @@ const message = {
             ungrouped: 'Sem grupo',
 
             unknownNode: 'Nó NUMA desconhecido',
+            unknownNodeHelp:
+                'O sistema não informou a afinidade NUMA destas GPUs. A seleção e o agrupamento de GPUs continuam disponíveis.',
             memoryNode: 'Nó de memória',
             selectNode: 'Selecionar GPUs deste nó',
             noDevices: 'Nenhuma GPU neste nó',
@@ -820,7 +818,7 @@ const message = {
             overview: 'Visão geral dos dispositivos',
             groups: 'Grupos de GPU',
             history: 'Histórico de monitoramento',
-            source: 'Configuração',
+            source: 'Origem da GPU',
             custom: 'Personalizada',
             selectRequired: 'Selecione um grupo de GPU',
             snapshotHelp:
@@ -1153,6 +1151,7 @@ const message = {
             numaCross: 'As GPUs selecionadas abrangem vários nós NUMA. Selecione-os manualmente.',
             numaCount: 'A afinidade automática exige GPUs específicas ou todas as GPUs.',
             numaRequired: 'Selecione pelo menos um nó NUMA.',
+            numaTopologyUnavailable: 'A topologia NUMA está indisponível.',
             numaUnavailable: 'O nó NUMA está indisponível ou não possui CPU ou memória.',
             gpuAcceleration: 'Aceleração de GPU',
             gpuMode: 'Seleção de aceleradores',

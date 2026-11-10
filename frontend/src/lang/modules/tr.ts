@@ -781,11 +781,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate: 'NUMA {node} altında kullanılabilir GPU algılanmadı. Bu düğümden grup oluşturulamaz.',
-            inspectNUMA:
-                'GPU NUMA yerleşimini kontrol etmek için mevcut düğümün terminalinde bu salt okunur komutları çalıştırın ve PCI adreslerini eşleştirin:',
-            numaQueryHint:
-                'numa_node, NUMA düğüm kimliğini içerir; -1, sistemin yerleşimi bildirmediği anlamına gelir. Sonuçlar bu sayfadan farklıysa yenileyip tekrar deneyin.',
+            singleGPU:
+                'GPU grupları birden fazla GPU bulunan makineler içindir. Bu düğümde yalnızca bir GPU olduğundan gruplama gerekmez.',
             relationTopology: 'İlişki topolojisi',
             relationHelp: 'Üyelik ilişkilerini vurgulamak için bir GPU veya grup seçin.',
             selectionHelp:
@@ -812,6 +809,8 @@ const message = {
             ungrouped: 'Gruplanmamış',
 
             unknownNode: 'NUMA düğümü bilinmiyor',
+            unknownNodeHelp:
+                'Sistem bu GPU’ların NUMA ilişkisini bildirmedi. GPU seçimi ve gruplama kullanılmaya devam edilebilir.',
             memoryNode: 'Bellek düğümü',
             selectNode: 'Bu düğümün GPU birimlerini seç',
             noDevices: 'Bu düğümde GPU yok',
@@ -822,7 +821,7 @@ const message = {
             overview: 'Cihaz özeti',
             groups: 'GPU grupları',
             history: 'İzleme geçmişi',
-            source: 'Yapılandırma',
+            source: 'GPU kaynağı',
             custom: 'Özel',
             selectRequired: 'Bir GPU grubu seçin',
             snapshotHelp:
@@ -1154,6 +1153,7 @@ const message = {
             numaCross: 'Seçilen GPU aygıtları birden fazla NUMA düğümüne yayılıyor. Elle seçin.',
             numaCount: 'Otomatik bağlama için belirli GPU aygıtlarını veya tümünü seçin.',
             numaRequired: 'En az bir NUMA düğümü seçin.',
+            numaTopologyUnavailable: 'NUMA topolojisi bilgisi kullanılamıyor.',
             numaUnavailable: 'NUMA düğümü kullanılamıyor veya CPU ya da belleği yok.',
             gpuAcceleration: 'GPU hızlandırma',
             gpuMode: 'Hızlandırıcı seçimi',

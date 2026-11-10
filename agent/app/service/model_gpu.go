@@ -20,9 +20,11 @@ import (
 func LoadModelGPUDevices() dto.ModelGPUDevices {
 	result := dto.ModelGPUDevices{Devices: []dto.ModelGPUDevice{}, Warnings: []string{}}
 	nodes, topologyErr := loadModelNUMANodes("/sys")
-	result.NUMANodes = nodes
 	if topologyErr != nil {
+		result.NUMANodes = []dto.ModelNUMANode{}
 		result.Warnings = append(result.Warnings, topologyErr.Error())
+	} else {
+		result.NUMANodes = nodes
 	}
 	ok, client := accelerator.New()
 	if !ok {

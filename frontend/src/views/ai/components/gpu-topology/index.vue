@@ -4,19 +4,23 @@
             v-for="section in sections"
             :key="section.id ?? 'unknown'"
             class="numa-node"
-            :class="{ unknown: section.id === undefined }"
+            :class="{ unknown: showTopology && section.id === undefined }"
         >
-            <header class="numa-node-header">
+            <header v-if="showTopology" class="numa-node-header">
                 <div>
                     <strong>
                         {{ section.id === undefined ? $t('aiTools.gpuGroup.unknownNode') : `NUMA ${section.id}` }}
                         <el-tooltip
                             v-if="section.id === undefined"
-                            :content="$t('aiTools.model.numaUnknown')"
+                            :content="$t('aiTools.gpuGroup.unknownNodeHelp')"
                             placement="top"
                             :popper-style="{ maxWidth: 'min(320px, calc(100vw - 32px))' }"
                         >
-                            <el-icon class="numa-info" tabindex="0" :aria-label="$t('aiTools.model.numaUnknown')">
+                            <el-icon
+                                class="numa-info"
+                                tabindex="0"
+                                :aria-label="$t('aiTools.gpuGroup.unknownNodeHelp')"
+                            >
                                 <InfoFilled />
                             </el-icon>
                         </el-tooltip>
@@ -88,7 +92,9 @@ const props = withDefaults(
     { selectable: false, cards: false },
 );
 const selected = defineModel<string[]>({ default: () => [] });
+const showTopology = computed(() => props.nodes.length > 1 || (props.nodes.length === 1 && props.devices.length > 1));
 const sections = computed(() => {
+    if (!showTopology.value) return props.devices.length ? [{ devices: props.devices }] : [];
     const result: { id?: number; node?: AI.ModelNUMANode; devices: AI.ModelGPUDevice[] }[] = props.nodes.map(
         (node) => ({
             id: node.id,
@@ -208,11 +214,6 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
 .unknown .numa-node-header strong::before {
     background: var(--el-text-color-placeholder);
 }
-.numa-info {
-    color: var(--el-text-color-secondary);
-    font-size: 12px;
-    cursor: help;
-}
 .numa-resources {
     display: flex;
     flex-wrap: wrap;
@@ -284,5 +285,11 @@ const toggleNode = (devices: AI.ModelGPUDevice[], checked: boolean) => {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.numa-info {
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    cursor: help;
 }
 </style>

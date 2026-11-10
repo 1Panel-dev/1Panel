@@ -767,12 +767,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate:
-                'NUMA {node}에서 사용 가능한 GPU를 찾지 못했습니다. 이 노드에서 그룹을 생성할 수 없습니다.',
-            inspectNUMA:
-                '현재 노드의 터미널에서 다음 읽기 전용 명령을 실행하고 PCI 주소를 대조하여 GPU의 NUMA 소속을 확인하세요:',
-            numaQueryHint:
-                'numa_node 값은 NUMA 노드 번호입니다. -1은 시스템이 소속 정보를 보고하지 않았음을 나타냅니다. 결과가 페이지와 다르면 새로 고침 후 다시 시도하세요.',
+            singleGPU:
+                'GPU 그룹은 여러 GPU가 있는 시스템용입니다. 현재 노드에는 GPU가 하나뿐이므로 그룹화가 필요하지 않습니다.',
             relationTopology: '관계 토폴로지',
             relationHelp: 'GPU 또는 그룹을 선택하면 소속 관계가 강조 표시됩니다.',
             selectionHelp:
@@ -799,6 +795,8 @@ const message = {
             ungrouped: '미분류',
 
             unknownNode: 'NUMA 소속 알 수 없음',
+            unknownNodeHelp:
+                '시스템에서 이 GPU들의 NUMA 소속을 보고하지 않았습니다. GPU 선택 및 그룹화에는 영향을 주지 않습니다.',
             memoryNode: '메모리 노드',
             selectNode: '이 노드의 GPU 선택',
             noDevices: '이 노드에 GPU가 없습니다',
@@ -809,7 +807,7 @@ const message = {
             overview: '장치 개요',
             groups: 'GPU 그룹',
             history: '모니터링 기록',
-            source: '설정 방식',
+            source: 'GPU 소스',
             custom: '사용자 지정',
             selectRequired: 'GPU 그룹을 선택하세요',
             snapshotHelp: '배포는 현재 설정을 저장합니다. 그룹 변경은 기존 배포에 자동 적용되지 않습니다.',
@@ -1122,6 +1120,7 @@ const message = {
             numaCross: '선택한 GPU가 여러 NUMA 노드에 걸쳐 있습니다. 수동으로 선택하세요.',
             numaCount: '자동 바인딩에는 특정 GPU 또는 모든 GPU를 선택해야 합니다.',
             numaRequired: 'NUMA 노드를 하나 이상 선택하세요.',
+            numaTopologyUnavailable: 'NUMA 토폴로지 정보를 사용할 수 없습니다.',
             numaUnavailable: 'NUMA 노드를 사용할 수 없거나 CPU 또는 메모리가 없습니다.',
             gpuAcceleration: 'GPU 가속',
             gpuMode: '가속기 선택',

@@ -766,11 +766,8 @@ const message = {
     },
     aiTools: {
         gpuGroup: {
-            emptyNodeCreate: 'ບໍ່ພົບ GPU ທີ່ໃຊ້ໄດ້ໃນ NUMA {node}. ບໍ່ສາມາດສ້າງກຸ່ມຈາກໂນດນີ້ໄດ້.',
-            inspectNUMA:
-                'ໃຫ້ເອີ້ນໃຊ້ຄຳສັ່ງອ່ານຢ່າງດຽວນີ້ໃນເທີມິນອລຂອງໂນດປັດຈຸບັນ ແລະ ທຽບທີ່ຢູ່ PCI ເພື່ອກວດສອບ NUMA ຂອງ GPU:',
-            numaQueryHint:
-                'ຄ່າ numa_node ແມ່ນໝາຍເລກໂນດ NUMA; -1 ໝາຍເຖິງລະບົບບໍ່ໄດ້ລາຍງານການສັງກັດ. ຖ້າຜົນບໍ່ກົງກັບໜ້ານີ້ ໃຫ້ໂຫຼດໃໝ່ແລ້ວລອງອີກຄັ້ງ.',
+            singleGPU:
+                'ການຈັດກຸ່ມ GPU ໃຊ້ສຳລັບເຄື່ອງທີ່ມີ GPU ຫຼາຍຕົວ. ໂນດນີ້ມີ GPU ພຽງໜຶ່ງຕົວ ຈຶ່ງບໍ່ຈຳເປັນຕ້ອງຈັດກຸ່ມ.',
             relationTopology: 'ໂຄງສ້າງຄວາມສຳພັນ',
             relationHelp: 'ເລືອກ GPU ຫຼື ກຸ່ມເພື່ອເນັ້ນຄວາມສຳພັນຂອງສະມາຊິກ.',
             selectionHelp:
@@ -797,6 +794,8 @@ const message = {
             ungrouped: 'ຍັງບໍ່ມີກຸ່ມ',
 
             unknownNode: 'ບໍ່ຮູ້ໂນດ NUMA',
+            unknownNodeHelp:
+                'ລະບົບບໍ່ໄດ້ລາຍງານວ່າ GPU ເຫຼົ່ານີ້ຂຶ້ນກັບໂນດ NUMA ໃດ. ທ່ານຍັງສາມາດເລືອກ ແລະ ຈັດກຸ່ມ GPU ໄດ້.',
             memoryNode: 'ໂນດໜ່ວຍຄວາມຈຳ',
             selectNode: 'ເລືອກ GPU ໃນໂນດນີ້',
             noDevices: 'ບໍ່ມີ GPU ໃນໂນດນີ້',
@@ -807,7 +806,7 @@ const message = {
             overview: 'ພາບລວມອຸປະກອນ',
             groups: 'ກຸ່ມ GPU',
             history: 'ປະຫວັດການຕິດຕາມ',
-            source: 'ການຕັ້ງຄ່າ',
+            source: 'ແຫຼ່ງ GPU',
             custom: 'ກຳນົດເອງ',
             selectRequired: 'ເລືອກກຸ່ມ GPU',
             snapshotHelp: 'ການຕິດຕັ້ງບັນທຶກຄ່າປັດຈຸບັນ. ການປ່ຽນກຸ່ມຈະບໍ່ປ່ຽນການຕິດຕັ້ງເກົ່າອັດຕະໂນມັດ.',
@@ -1116,6 +1115,7 @@ const message = {
             numaCross: 'GPU ທີ່ເລືອກຢູ່ຫຼາຍໂນດ NUMA. ກະລຸນາເລືອກເອງ.',
             numaCount: 'ການຜູກອັດຕະໂນມັດຕ້ອງເລືອກ GPU ສະເພາະ ຫຼື GPU ທັງໝົດ.',
             numaRequired: 'ກະລຸນາເລືອກຢ່າງໜ້ອຍໜຶ່ງໂນດ NUMA.',
+            numaTopologyUnavailable: 'ບໍ່ມີຂໍ້ມູນໂຄງສ້າງ NUMA.',
             numaUnavailable: 'ໂນດ NUMA ບໍ່ພ້ອມໃຊ້ ຫຼື ບໍ່ມີ CPU ຫຼື ໜ່ວຍຄວາມຈຳ.',
             gpuAcceleration: 'ການເລັ່ງ GPU',
             gpuMode: 'ເລືອກຕົວເລັ່ງ',
