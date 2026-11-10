@@ -282,6 +282,11 @@ func loadDbConn(snap *snapHelper, targetDir string, req dto.SnapshotCreate) erro
 		if err != nil {
 			return err
 		}
+		for _, name := range []string{"vllm_monitor", "vllm_monitor.db", "vllm_monitor.db-wal", "vllm_monitor.db-shm"} {
+			if err := os.RemoveAll(path.Join(targetDir, "db", name)); err != nil {
+				return err
+			}
+		}
 	}
 	if !req.WithTaskLog {
 		err = os.Remove(path.Join(targetDir, "db/task.db"))

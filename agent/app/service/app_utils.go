@@ -491,6 +491,11 @@ func deleteAppInstall(deleteReq request.AppInstallDelete) error {
 		if install.App.Key == "ollama" || install.App.Key == "vllm" {
 			CleanupLocalModelAccount(install.ID)
 		}
+		if install.App.Key == "vllm" && global.CleanupVLLMMonitor != nil {
+			if err := global.CleanupVLLMMonitor(install.ID); err != nil {
+				global.LOG.Errorf("Remove vLLM monitoring database for %d failed: %v", install.ID, err)
+			}
+		}
 
 		existApps, _ := appInstallRepo.ListBy(context.Background(), appInstallRepo.WithAppId(install.AppId))
 		if len(existApps) == 0 {

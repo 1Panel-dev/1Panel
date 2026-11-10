@@ -33,6 +33,8 @@ var (
 	MonitorCronID    cron.EntryID
 	GPUMonitorCronID cron.EntryID
 
+	CleanupVLLMMonitor func(uint) error
+
 	IsMaster bool
 
 	I18n *i18n.Localizer
