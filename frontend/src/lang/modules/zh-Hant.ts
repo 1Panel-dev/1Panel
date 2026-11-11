@@ -1030,6 +1030,21 @@ const message = {
             validateImageAvailabilityHelper: '驗證時會實際產生一張最小圖片，可能產生費用',
         },
         model: {
+            externalInspect: '檢查並取得',
+            externalHealthPassed: '健康檢查通過',
+            externalHealthFailed: '健康檢查失敗',
+            externalServiceAddress: '存取位址',
+            externalAddressHelper: '支援 HTTP/HTTPS，連接埠填寫在位址中。',
+            externalMetricsURL: '自訂監控位址',
+            externalAccessToken: 'API Key（Bearer Token）',
+            externalAccessTokenHelper: '填寫遠端服務設定的 API Key 或存取權杖，用於介面驗證。',
+            metricsURLHelper: '留空使用預設的 /metrics 位址。',
+            addExternal: '新增外部實例',
+            external: '外部',
+            externalTokenHelper: '留空保留原權杖。',
+            clearAccessToken: '清除存取權杖',
+            deleteExternalHelper: '刪除連線記錄及監控歷史，不影響外部服務。',
+
             searchTitle: '搜尋並下載模型',
             searchHelper: '從 ModelScope 或 Hugging Face 尋找模型，下載後可在模型準備中部署或建立 Recipe。',
             modelScopeSearchHelper: '中國大陸存取穩定',
@@ -1151,8 +1166,7 @@ const message = {
             saveDeploy: '儲存並部署',
             composeRegenerateHelper: '表單已修改，重新產生 Compose 將覆蓋手動編輯的內容。是否繼續？',
             deploymentNameHelper: '應用程式執行個體名稱，用於安裝目錄，建立後無法修改。如需調整顯示名稱，請設定別名。',
-            deploymentAliasHelper:
-                '選填，用於清單顯示，可隨時修改；留空時顯示應用程式名稱。僅修改別名不會重新啟動容器。',
+            deploymentAliasHelper: '選填，用於列表顯示；留空時顯示執行個體名稱。修改別名不會重新啟動服務。',
             deploymentContainerNameHelper:
                 'Docker 容器名稱，預設與應用程式名稱相同，可另外設定。修改後會重新建立容器。',
             imageVersion: '映像版本',

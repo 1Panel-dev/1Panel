@@ -1084,6 +1084,22 @@ const message = {
             validateImageAvailabilityHelper: '保存前に最小画像を1枚生成するため、料金が発生する場合があります',
         },
         model: {
+            externalInspect: '確認して取得',
+            externalHealthPassed: 'ヘルスチェック成功',
+            externalHealthFailed: 'ヘルスチェック失敗',
+            externalServiceAddress: '接続先アドレス',
+            externalAddressHelper: 'HTTP/HTTPS に対応。ポートはアドレスに含めてください。',
+            externalMetricsURL: 'カスタム監視 URL',
+            externalAccessToken: 'API Key（Bearer Token）',
+            externalAccessTokenHelper:
+                'リモートサービスに設定された API キーまたはアクセストークンを入力してください。API リクエストの認証に使用します。',
+            metricsURLHelper: '空欄の場合、既定の /metrics URL を使用します。',
+            addExternal: '外部インスタンスを追加',
+            external: '外部',
+            externalTokenHelper: '空欄の場合、現在のトークンを保持します。',
+            clearAccessToken: 'アクセストークンを削除',
+            deleteExternalHelper: '接続と監視履歴を削除します。外部サービスには影響しません。',
+
             searchTitle: 'モデルを検索してダウンロード',
             searchHelper:
                 'ModelScope または Hugging Face でモデルを検索し、ダウンロード後にモデル準備でデプロイまたは Recipe を作成できます。',
@@ -1220,7 +1236,7 @@ const message = {
             deploymentNameHelper:
                 'アプリのインスタンス名です。インストール先ディレクトリに使用され、作成後は変更できません。表示名を変更するには別名を設定してください。',
             deploymentAliasHelper:
-                '一覧の表示名（任意）。空欄の場合はアプリ名を表示します。別名のみの変更ではコンテナは再起動しません。',
+                '一覧表示用の任意の別名です。空欄の場合はインスタンス名を表示します。別名を変更してもサービスは再起動されません。',
             deploymentContainerNameHelper:
                 'Docker コンテナ名です。初期値はアプリ名で、個別に設定できます。変更するとコンテナが再作成されます。',
             imageVersion: 'イメージバージョン',

@@ -133,20 +133,24 @@
                         </el-select>
                         <el-select
                             v-if="chartOption === 'vllm'"
-                            v-model="vllmInstallID"
+                            v-model="vllmID"
                             class="p-w-200 float-right"
                             :placeholder="$t('aiTools.model.deployments')"
                             @visible-change="(visible) => visible && loadVllmOptions()"
                         >
                             <el-option
                                 v-for="item in vllmOptions"
-                                :key="item.appInstallId"
-                                :label="item.name + (item.servedModelName ? ' · ' + item.servedModelName : '')"
-                                :value="item.appInstallId"
-                                :disabled="item.status !== 'Running'"
+                                :key="item.id"
+                                :label="
+                                    (item.alias || item.name) +
+                                    (item.servedModelName ? ' · ' + item.servedModelName : '')
+                                "
+                                :value="item.id"
+                                :disabled="item.source !== 'external' && item.status !== 'Running'"
                             >
                                 <span>
-                                    {{ item.name }}{{ item.servedModelName ? ' · ' + item.servedModelName : '' }}
+                                    {{ item.alias || item.name
+                                    }}{{ item.servedModelName ? ' · ' + item.servedModelName : '' }}
                                 </span>
                                 <Status class="ml-2" :status="item.status" />
                             </el-option>
@@ -562,13 +566,17 @@ const {
 } = useGlobalStore();
 
 interface VllmDeployment {
-    appInstallId: number;
+    id: number;
+    alias: string;
+    source?: 'local' | 'external';
     name: string;
     servedModelName: string;
     status: string;
 }
 interface VllmSnapshot {
     appInstallID: number;
+    isExternal: boolean;
+    vllmID: number;
     createdAt: string;
     status: string;
     intervalSeconds: number;
@@ -591,7 +599,7 @@ const VllmMonitor = defineAsyncComponent(() => loadExtensionComponent('/vllm/mon
 const vllmMonitorRef = ref();
 const canViewVllm = useCan('ai_model_view');
 const vllmOptions = ref<VllmDeployment[]>([]);
-const vllmInstallID = ref<number>();
+const vllmID = ref<number>();
 const vllmCurrent = ref<VllmSnapshot>();
 const vllmLoadFailed = ref(false);
 const vllmPoints = ref<Array<{ time: string; prompt: number | null; generation: number | null }>>([]);
@@ -599,7 +607,7 @@ let vllmTimer: ReturnType<typeof setTimeout>;
 let vllmController: AbortController;
 let vllmOptionsVersion = 0;
 const hasVllm = computed(() => isProductPro.value && canViewVllm.value && vllmOptions.value.length > 0);
-const selectedVllm = computed(() => vllmOptions.value.find((item) => item.appInstallId === vllmInstallID.value));
+const selectedVllm = computed(() => vllmOptions.value.find((item) => item.id === vllmID.value));
 const formatVllmMetric = (value?: number | null) =>
     value == null || !Number.isFinite(value) ? '--' : Number(value.toFixed(2)).toString();
 const vllmMonitorMessage = computed(() => {
@@ -650,8 +658,10 @@ const loadVllmOptions = async () => {
         });
         if (version !== vllmOptionsVersion || node !== currentNode.value) return;
         vllmOptions.value = items;
-        if (!items.some((item) => item.appInstallId === vllmInstallID.value && item.status === 'Running')) {
-            vllmInstallID.value = items.find((item) => item.status === 'Running')?.appInstallId;
+        if (
+            !items.some((item) => item.id === vllmID.value && (item.source === 'external' || item.status === 'Running'))
+        ) {
+            vllmID.value = items.find((item) => item.source === 'external' || item.status === 'Running')?.id;
         }
         if (!items.length && chartOption.value === 'vllm') chartOption.value = 'network';
     } catch {
@@ -673,7 +683,7 @@ const refreshVllmMonitor = async () => {
     const controller = new AbortController();
     vllmController = controller;
     try {
-        const { data } = await vllmAPI.loadVllmCurrent(vllmInstallID.value, controller.signal);
+        const { data } = await vllmAPI.loadVllmCurrent(vllmID.value, controller.signal);
         if (controller.signal.aborted) return;
         const wasUnavailable = vllmCurrent.value?.status === 'unavailable';
         vllmCurrent.value = vllmMetrics.calculateCurrentMetrics(data, vllmCurrent.value);
@@ -1370,16 +1380,16 @@ watch(
         vllmOptionsVersion++;
         stopVllmMonitor();
         vllmOptions.value = [];
-        vllmInstallID.value = undefined;
+        vllmID.value = undefined;
         if (chartOption.value === 'vllm') chartOption.value = 'network';
         void loadVllmOptions();
     },
     { immediate: true, flush: 'sync' },
 );
 
-watch([chartOption, vllmInstallID, isActive], ([, installID], [, previousInstallID]) => {
-    stopVllmMonitor(installID !== previousInstallID);
-    if (chartOption.value === 'vllm' && hasVllm.value && vllmInstallID.value && isActive.value) {
+watch([chartOption, vllmID, isActive], ([, instanceID], [, previousInstanceID]) => {
+    stopVllmMonitor(instanceID !== previousInstanceID);
+    if (chartOption.value === 'vllm' && hasVllm.value && vllmID.value && isActive.value) {
         void refreshVllmMonitor();
     }
 });

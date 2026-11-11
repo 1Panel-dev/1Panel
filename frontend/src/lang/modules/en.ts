@@ -1097,6 +1097,22 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            externalInspect: 'Check and fetch',
+            externalHealthPassed: 'Health check passed',
+            externalHealthFailed: 'Health check failed',
+            externalServiceAddress: 'Service address',
+            externalAddressHelper: 'Supports HTTP/HTTPS. Include the port in the address.',
+            externalMetricsURL: 'Custom metrics URL',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'Enter the API key or access token configured for the remote service to authenticate API requests.',
+            metricsURLHelper: 'Leave blank to use the default /metrics URL.',
+            addExternal: 'Add external instance',
+            external: 'External',
+            externalTokenHelper: 'Leave blank to keep the existing token.',
+            clearAccessToken: 'Clear access token',
+            deleteExternalHelper: 'Delete the connection and monitoring history. The external service is unaffected.',
+
             searchTitle: 'Search and download models',
             searchHelper:
                 'Find models on ModelScope or Hugging Face, then deploy them or create a Recipe in Model Preparation.',
@@ -1235,7 +1251,7 @@ const message = {
             deploymentNameHelper:
                 'Application instance name, used for the installation directory and fixed after creation. Set an alias to change the display name.',
             deploymentAliasHelper:
-                'Optional display name for the list. Leave empty to use the application name. Changing only the alias does not restart the container.',
+                'Optional display alias. Leave empty to use the instance name. Changing the alias does not restart the service.',
             deploymentContainerNameHelper:
                 'Docker container name. Defaults to the application name and can be set separately. Changing it recreates the container.',
             imageVersion: 'Image version',
