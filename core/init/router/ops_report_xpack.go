@@ -46,7 +46,7 @@ func opsReportProxyPolicy() agentProxyPolicy {
 			if name == "" {
 				name = "local"
 			}
-			manage := strings.HasSuffix(c.Request.URL.Path, "/generate") || strings.HasSuffix(c.Request.URL.Path, "/download") || strings.HasSuffix(c.Request.URL.Path, "/setting/update")
+			manage := strings.HasSuffix(c.Request.URL.Path, "/generate") || strings.HasSuffix(c.Request.URL.Path, "/download") || strings.HasSuffix(c.Request.URL.Path, "/setting/update") || strings.HasSuffix(c.Request.URL.Path, "/runs/delete")
 			if err := authorizer.AuthorizeOpsReport(c, name, manage); err != nil {
 				helper.ErrorWithDetail(c, http.StatusForbidden, "ErrRBAC", err)
 				c.Abort()

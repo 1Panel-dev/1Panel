@@ -5972,6 +5972,10 @@ const message = {
             history: '导出历史',
             setting: '设置',
             page: {
+                historyDeleteConfirm: '确定删除节点“{0}”所选的 {1} 条报表记录及对应文件？删除后不可恢复。',
+                historyClearConfirm:
+                    '确定清除节点“{0}”的全部已结束报表记录及对应文件？包含成功和失败记录，不受当前筛选限制；正在生成的报表和升级前历史将保留。清除后不可恢复。',
+                historyDeleteResult: '已删除 {0} 条，跳过 {1} 条，失败 {2} 条。',
                 coreArchiveMasterOnly: '升级前生成的报表，请由管理员在主节点的文件管理中查看。',
                 legacyHistoryReports: '升级前报表',
                 legacyHistoryManageHint: '升级前报表可在此查看和管理。',

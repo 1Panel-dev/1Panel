@@ -5206,6 +5206,10 @@ const message = {
             history: '匯出歷史',
             setting: '設置',
             page: {
+                historyDeleteConfirm: '確定刪除節點「{0}」所選的 {1} 筆報表記錄及對應檔案？刪除後無法復原。',
+                historyClearConfirm:
+                    '確定清除節點「{0}」全部已結束的報表記錄及對應檔案？包含成功和失敗記錄，不受目前篩選限制；正在產生的報表和升級前歷史將保留。清除後無法復原。',
+                historyDeleteResult: '已刪除 {0} 筆，略過 {1} 筆，失敗 {2} 筆。',
                 coreArchiveMasterOnly: '偵測到升級前報表記錄，原始檔案請由管理員在主節點查看。',
                 legacyHistoryReports: '升級前報表',
                 legacyHistoryManageHint: '升級前報表可在此查看及管理。',
