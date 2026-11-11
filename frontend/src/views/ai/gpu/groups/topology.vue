@@ -70,98 +70,101 @@
                 <div class="group-nodes">
                     <el-empty v-if="!groups.length" :image-size="60" />
                     <div
-                        v-for="group in groups"
+                        v-for="group in orderedGroups"
                         :key="group.id"
                         :data-group="group.id"
                         class="relation-group"
                         :class="{ active: activeGroups.has(group.id) }"
+                        @click="
+                            focus =
+                                focus?.type === 'group' && focus.id === group.id
+                                    ? undefined
+                                    : { type: 'group', id: group.id }
+                        "
                     >
-                        <button
-                            type="button"
-                            class="node-button"
-                            :aria-pressed="focus?.type === 'group' && focus.id === group.id"
-                            @click="
-                                focus =
-                                    focus?.type === 'group' && focus.id === group.id
-                                        ? undefined
-                                        : { type: 'group', id: group.id }
-                            "
-                        >
-                            <strong>{{ group.name }}</strong>
-                            <span class="input-help">{{ group.gpu.deviceIDs.length }} GPU · {{ group.imageType }}</span>
-                        </button>
+                        <div class="group-heading">
+                            <button
+                                type="button"
+                                class="node-button"
+                                :aria-pressed="focus?.type === 'group' && focus.id === group.id"
+                            >
+                                <strong>{{ group.name }}</strong>
+                                <span class="input-help">
+                                    {{ group.gpu.deviceIDs.length }} GPU · {{ group.imageType }}
+                                </span>
+                            </button>
+                            <div class="group-actions" @click.stop>
+                                <el-tooltip :content="$t('commons.button.edit')" placement="top">
+                                    <el-button
+                                        v-permission="'ai_gpu_manage'"
+                                        text
+                                        :icon="EditPen"
+                                        :aria-label="$t('commons.button.edit')"
+                                        @click="$emit('edit', group)"
+                                    />
+                                </el-tooltip>
+                                <el-tooltip :content="$t('commons.button.delete')" placement="top">
+                                    <el-button
+                                        v-permission="'ai_gpu_manage'"
+                                        text
+                                        :icon="Delete"
+                                        :aria-label="$t('commons.button.delete')"
+                                        @click="$emit('remove', group)"
+                                    />
+                                </el-tooltip>
+                            </div>
+                        </div>
+                        <p v-if="group.description" class="detail-description">{{ group.description }}</p>
+                        <dl class="detail-fields">
+                            <div v-if="nodes.length > 1 || (group.gpu.numa && group.gpu.numa.mode !== 'off')">
+                                <dt>{{ $t('aiTools.gpuGroup.affinity') }}</dt>
+                                <dd>
+                                    <span>
+                                        {{
+                                            $t(
+                                                group.gpu.numa?.mode === 'auto'
+                                                    ? 'aiTools.gpuGroup.followGPU'
+                                                    : group.gpu.numa?.mode === 'manual'
+                                                      ? 'aiTools.model.numaManual'
+                                                      : 'aiTools.model.numaOff',
+                                            )
+                                        }}
+                                    </span>
+                                    <div v-if="group.gpu.numa?.mode === 'manual'" class="detail-tags">
+                                        <el-tag
+                                            v-for="node in group.gpu.numa.nodes"
+                                            :key="node"
+                                            size="small"
+                                            type="info"
+                                            effect="plain"
+                                        >
+                                            NUMA {{ node }}
+                                        </el-tag>
+                                    </div>
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>{{ $t('aiTools.gpuGroup.deployments') }}</dt>
+                                <dd class="detail-tags">
+                                    <el-tag
+                                        v-for="deployment in group.deployments"
+                                        :key="deployment"
+                                        size="small"
+                                        type="info"
+                                        effect="plain"
+                                    >
+                                        {{ deployment }}
+                                    </el-tag>
+                                    <span v-if="!group.deployments.length" class="detail-empty">—</span>
+                                </dd>
+                            </div>
+                        </dl>
                         <span class="relation-port" />
                     </div>
                 </div>
             </div>
         </div>
-        <div v-if="focusedGroup" class="relation-detail">
-            <div class="detail-heading">
-                <div class="detail-title">
-                    <strong>{{ focusedGroup.name }}</strong>
-                    <el-tag size="small" type="info" effect="plain">{{ focusedGroup.gpu.deviceIDs.length }} GPU</el-tag>
-                </div>
-                <div class="detail-actions">
-                    <el-button v-permission="'ai_gpu_manage'" link type="primary" @click="$emit('edit', focusedGroup)">
-                        {{ $t('commons.button.edit') }}
-                    </el-button>
-                    <el-button
-                        v-permission="'ai_gpu_manage'"
-                        link
-                        type="primary"
-                        @click="$emit('remove', focusedGroup)"
-                    >
-                        {{ $t('commons.button.delete') }}
-                    </el-button>
-                </div>
-            </div>
-            <p v-if="focusedGroup.description" class="detail-description">{{ focusedGroup.description }}</p>
-            <dl class="detail-fields">
-                <div v-if="nodes.length > 1 || (focusedGroup.gpu.numa && focusedGroup.gpu.numa.mode !== 'off')">
-                    <dt>{{ $t('aiTools.gpuGroup.affinity') }}</dt>
-                    <dd>
-                        <span>
-                            {{
-                                $t(
-                                    focusedGroup.gpu.numa?.mode === 'auto'
-                                        ? 'aiTools.gpuGroup.followGPU'
-                                        : focusedGroup.gpu.numa?.mode === 'manual'
-                                          ? 'aiTools.model.numaManual'
-                                          : 'aiTools.model.numaOff',
-                                )
-                            }}
-                        </span>
-                        <div v-if="focusedGroup.gpu.numa?.mode === 'manual'" class="detail-tags">
-                            <el-tag
-                                v-for="node in focusedGroup.gpu.numa.nodes"
-                                :key="node"
-                                size="small"
-                                type="info"
-                                effect="plain"
-                            >
-                                NUMA {{ node }}
-                            </el-tag>
-                        </div>
-                    </dd>
-                </div>
-                <div>
-                    <dt>{{ $t('aiTools.gpuGroup.deployments') }}</dt>
-                    <dd class="detail-tags">
-                        <el-tag
-                            v-for="deployment in focusedGroup.deployments"
-                            :key="deployment"
-                            size="small"
-                            type="info"
-                            effect="plain"
-                        >
-                            {{ deployment }}
-                        </el-tag>
-                        <span v-if="!focusedGroup.deployments.length" class="detail-empty">—</span>
-                    </dd>
-                </div>
-            </dl>
-        </div>
-        <div v-else-if="focusedDevice" class="relation-detail">
+        <div v-if="focusedDevice" class="relation-detail">
             <div class="detail-heading">
                 <div class="detail-title">
                     <strong>{{ focusedDevice.name }}</strong>
@@ -199,7 +202,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue';
 import { useResizeObserver } from '@vueuse/core';
-import { InfoFilled } from '@element-plus/icons-vue';
+import { Delete, EditPen, InfoFilled } from '@element-plus/icons-vue';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
 
@@ -217,8 +220,11 @@ const lines = ref<{ key: string; path: string; active: boolean }[]>([]);
 const sections = computed(() => {
     if (!props.nodes.length) return [{ key: 'devices', label: '', devices: props.devices }];
     const available = props.devices.filter((device) => device.available);
-    const result: { key: string; label: string; node?: AI.ModelNUMANode; devices: AI.ModelGPUDevice[] }[] =
-        props.nodes.map((node) => ({
+    const result: { key: string; label: string; node?: AI.ModelNUMANode; devices: AI.ModelGPUDevice[] }[] = [
+        ...props.nodes,
+    ]
+        .sort((a, b) => a.id - b.id)
+        .map((node) => ({
             key: `numa-${node.id}`,
             label: `NUMA ${node.id}`,
             node,
@@ -236,6 +242,23 @@ const sections = computed(() => {
     if (unassigned.length)
         result.push({ key: 'unassigned', label: i18n.global.t('aiTools.gpuGroup.unknownNode'), devices: unassigned });
     return result;
+});
+const orderedGroups = computed(() => {
+    const deviceOrder = new Map(
+        sections.value.flatMap((section) => section.devices).map((device, index) => [device.id, index]),
+    );
+    const groupOrder = new Map(
+        props.groups.map((group) => [
+            group.id,
+            Math.min(...group.gpu.deviceIDs.map((id) => deviceOrder.get(id) ?? Infinity)),
+        ]),
+    );
+    return [...props.groups].sort(
+        (a, b) =>
+            groupOrder.get(a.id)! - groupOrder.get(b.id)! ||
+            a.name.localeCompare(b.name, undefined, { numeric: true }) ||
+            a.id - b.id,
+    );
 });
 const activeGroups = computed(
     () =>
@@ -258,9 +281,6 @@ const activeDevices = computed(
                       .filter((group) => activeGroups.value.has(group.id))
                       .flatMap((group) => group.gpu.deviceIDs),
         ),
-);
-const focusedGroup = computed(() =>
-    props.groups.find((group) => focus.value?.type === 'group' && group.id === focus.value.id),
 );
 const focusedDevice = computed(() =>
     props.devices.find((device) => focus.value?.type === 'device' && device.id === focus.value.id),
@@ -339,14 +359,14 @@ watch(
     grid-column: 3;
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 16px;
 }
 .group-nodes {
     display: flex;
     flex: 1;
     flex-direction: column;
-    justify-content: space-around;
-    gap: 20px;
+    justify-content: center;
+    gap: 16px;
     padding-bottom: 16px;
 }
 .hardware-column,
@@ -410,7 +430,47 @@ h3 {
     color: var(--el-text-color-secondary);
 }
 .relation-group {
-    padding: 16px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 13px;
+    line-height: 20px;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+}
+.group-heading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.group-heading > .node-button {
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+}
+.relation-group .detail-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid var(--el-border-color-lighter);
+}
+.relation-group .detail-fields > div {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 4px 12px;
+}
+.relation-group .detail-fields dt {
+    margin-bottom: 0;
+}
+.relation-group .detail-fields dd {
+    flex: 1;
+    min-width: 80px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
 }
 .node-button {
     position: relative;
@@ -488,14 +548,24 @@ h3 {
     font-size: 15px;
     font-weight: 600;
 }
-.detail-actions {
+.group-actions {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 4px;
     flex-shrink: 0;
 }
-.detail-actions :deep(.el-button + .el-button) {
+.group-actions :deep(.el-button + .el-button) {
     margin-left: 0;
+}
+.group-actions .el-button {
+    width: 28px;
+    height: 28px;
+    padding: 4px;
+    color: var(--el-text-color-regular);
+}
+.group-actions .el-button:hover,
+.group-actions .el-button:focus-visible {
+    color: var(--el-color-primary);
 }
 .detail-description {
     margin: 0;
