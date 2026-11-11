@@ -4,7 +4,7 @@ import "strings"
 
 const (
 	gb10VersionPrefix = "nvidia-"
-	gb10VersionSuffix = "-optimized-for-ds-v4-flash"
+	gb10VersionSuffix = "-optimized-for-2-gb10-ds-v4-flash"
 	rtxVersionSuffix  = "-optimized-for-ds-v4.1-flash"
 )
 
