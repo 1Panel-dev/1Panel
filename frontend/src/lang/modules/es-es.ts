@@ -1099,6 +1099,22 @@ const message = {
             validateImageAvailabilityHelper: 'Genera una imagen mínima antes de guardar y puede generar costes',
         },
         model: {
+            externalInspect: 'Comprobar y obtener',
+            externalHealthPassed: 'Comprobación de salud correcta',
+            externalHealthFailed: 'Falló la comprobación de salud',
+            externalServiceAddress: 'Dirección del servicio',
+            externalAddressHelper: 'Admite HTTP/HTTPS. Incluya el puerto en la dirección.',
+            externalMetricsURL: 'URL de métricas personalizada',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'Introduzca la clave API o el token de acceso configurado para el servicio remoto para autenticar las solicitudes a la API.',
+            metricsURLHelper: 'Déjelo vacío para usar la URL /metrics predeterminada.',
+            addExternal: 'Añadir instancia externa',
+            external: 'Externo',
+            externalTokenHelper: 'Déjelo vacío para conservar el token actual.',
+            clearAccessToken: 'Borrar token de acceso',
+            deleteExternalHelper: 'Eliminar la conexión y el historial de supervisión sin afectar al servicio externo.',
+
             searchTitle: 'Buscar y descargar modelos',
             searchHelper:
                 'Busca modelos en ModelScope o Hugging Face y luego despliégalos o crea una Recipe en Preparación de modelos.',
@@ -1239,7 +1255,7 @@ const message = {
             deploymentNameHelper:
                 'Nombre de la instancia, usado en el directorio de instalación y fijo tras crearla. Configure un alias para cambiar el nombre mostrado.',
             deploymentAliasHelper:
-                'Nombre opcional para la lista. Si se deja vacío, se muestra el nombre de la aplicación. Cambiar solo el alias no reinicia el contenedor.',
+                'Alias opcional para la lista. Si se deja vacío, se muestra el nombre de la instancia. Cambiar el alias no reinicia el servicio.',
             deploymentContainerNameHelper:
                 'Nombre del contenedor Docker. Por defecto coincide con la aplicación y puede configurarse por separado. Cambiarlo vuelve a crear el contenedor.',
             imageVersion: 'Versión de la imagen',
@@ -6098,10 +6114,8 @@ const message = {
                 systemHealthStatus: 'Estado de riesgo de ejecución del host',
                 mainReasons: 'Causas principales',
                 viewHostMonitor: 'Ver monitoreo del host',
-                systemHealthAttentionDesc:
-                    'Esta evaluación detectó {0} riesgos. Revise las métricas siguientes.',
-                systemHealthNormalDesc:
-                    'Esta evaluación no detectó riesgos de ejecución del host.',
+                systemHealthAttentionDesc: 'Esta evaluación detectó {0} riesgos. Revise las métricas siguientes.',
+                systemHealthNormalDesc: 'Esta evaluación no detectó riesgos de ejecución del host.',
                 monitorEnabled: 'Monitoreo habilitado',
                 cpuCoreUsage: '{0} / {1} núcleos',
                 load1Minute: 'Carga 1 min',

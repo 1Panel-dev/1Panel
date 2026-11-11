@@ -1074,6 +1074,22 @@ const message = {
             validateImageAvailabilityHelper: '저장 전에 최소 이미지 한 장을 생성하며 비용이 발생할 수 있습니다',
         },
         model: {
+            externalInspect: '확인 및 가져오기',
+            externalHealthPassed: '상태 확인 성공',
+            externalHealthFailed: '상태 확인 실패',
+            externalServiceAddress: '접속 주소',
+            externalAddressHelper: 'HTTP/HTTPS를 지원합니다. 주소에 포트를 포함하세요.',
+            externalMetricsURL: '사용자 지정 모니터링 주소',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                '원격 서비스에 설정된 API 키 또는 액세스 토큰을 입력하세요. API 요청 인증에 사용됩니다.',
+            metricsURLHelper: '비워 두면 기본 /metrics 주소를 사용합니다.',
+            addExternal: '외부 인스턴스 추가',
+            external: '외부',
+            externalTokenHelper: '비워 두면 기존 토큰을 유지합니다.',
+            clearAccessToken: '액세스 토큰 삭제',
+            deleteExternalHelper: '연결과 모니터링 기록을 삭제합니다. 외부 서비스에는 영향이 없습니다.',
+
             searchTitle: '모델 검색 및 다운로드',
             searchHelper:
                 'ModelScope 또는 Hugging Face에서 모델을 찾아 다운로드한 후 모델 준비에서 배포하거나 Recipe를 만들 수 있습니다.',
@@ -1207,7 +1223,7 @@ const message = {
             deploymentNameHelper:
                 '앱 인스턴스 이름으로, 설치 디렉터리에 사용되며 생성 후 변경할 수 없습니다. 표시 이름을 바꾸려면 별칭을 설정하세요.',
             deploymentAliasHelper:
-                '목록에 표시할 이름입니다(선택 사항). 비워 두면 앱 이름을 표시합니다. 별칭만 변경하면 컨테이너가 재시작되지 않습니다.',
+                '목록에 표시할 별칭입니다. 비워 두면 인스턴스 이름이 표시됩니다. 별칭을 변경해도 서비스는 다시 시작되지 않습니다.',
             deploymentContainerNameHelper:
                 'Docker 컨테이너 이름입니다. 기본값은 앱 이름이며 별도로 설정할 수 있습니다. 변경하면 컨테이너가 다시 생성됩니다.',
             imageVersion: '이미지 버전',
@@ -5873,8 +5889,7 @@ const message = {
                 systemHealthStatus: '호스트 실행 위험 상태',
                 mainReasons: '주요 원인',
                 viewHostMonitor: '호스트 모니터 보기',
-                systemHealthAttentionDesc:
-                    '이번 평가에서 위험 항목 {0}개가 발견되었습니다. 아래 지표를 확인하세요.',
+                systemHealthAttentionDesc: '이번 평가에서 위험 항목 {0}개가 발견되었습니다. 아래 지표를 확인하세요.',
                 systemHealthNormalDesc: '이번 평가에서는 호스트 실행 위험이 발견되지 않았습니다.',
                 monitorEnabled: '모니터링 활성화됨',
                 cpuCoreUsage: '{0} / {1}코어',

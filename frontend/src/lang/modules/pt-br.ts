@@ -1103,6 +1103,22 @@ const message = {
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
         model: {
+            externalInspect: 'Verificar e obter',
+            externalHealthPassed: 'Verificação de integridade aprovada',
+            externalHealthFailed: 'Falha na verificação de integridade',
+            externalServiceAddress: 'Endereço do serviço',
+            externalAddressHelper: 'Aceita HTTP/HTTPS. Inclua a porta no endereço.',
+            externalMetricsURL: 'URL personalizada de métricas',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'Informe a chave de API ou o token de acesso configurado no serviço remoto para autenticar as solicitações à API.',
+            metricsURLHelper: 'Deixe vazio para usar a URL /metrics padrão.',
+            addExternal: 'Adicionar instância externa',
+            external: 'Externo',
+            externalTokenHelper: 'Deixe vazio para manter o token atual.',
+            clearAccessToken: 'Apagar token de acesso',
+            deleteExternalHelper: 'Excluir a conexão e o histórico de monitoramento sem afetar o serviço externo.',
+
             searchTitle: 'Pesquisar e baixar modelos',
             searchHelper:
                 'Encontre modelos no ModelScope ou Hugging Face e depois implante-os ou crie uma Recipe em Preparação de modelos.',
@@ -1243,7 +1259,7 @@ const message = {
             deploymentNameHelper:
                 'Nome da instância, usado no diretório de instalação e fixo após a criação. Defina um alias para alterar o nome exibido.',
             deploymentAliasHelper:
-                'Nome opcional para a lista. Deixe vazio para usar o nome do aplicativo. Alterar apenas o alias não reinicia o contêiner.',
+                'Apelido opcional para a lista. Deixe vazio para exibir o nome da instância. Alterar o apelido não reinicia o serviço.',
             deploymentContainerNameHelper:
                 'Nome do contêiner Docker. Por padrão, usa o nome do aplicativo e pode ser definido separadamente. Alterá-lo recria o contêiner.',
             imageVersion: 'Versão da imagem',
@@ -6121,8 +6137,7 @@ const message = {
                 systemHealthStatus: 'Risco de execução do host',
                 mainReasons: 'Principais motivos',
                 viewHostMonitor: 'Ver monitor do host',
-                systemHealthAttentionDesc:
-                    'Esta avaliação encontrou {0} riscos. Verifique as métricas abaixo.',
+                systemHealthAttentionDesc: 'Esta avaliação encontrou {0} riscos. Verifique as métricas abaixo.',
                 systemHealthNormalDesc: 'Nenhum risco de execução do host foi encontrado nesta avaliação.',
                 monitorEnabled: 'Monitoramento ativado',
                 cpuCoreUsage: '{0} / {1} núcleos',

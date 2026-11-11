@@ -1071,6 +1071,22 @@ const message = {
             validateImageAvailabilityHelper: 'ສ້າງຮູບຂະໜາດນ້ອຍໜຶ່ງຮູບກ່ອນບັນທຶກ ແລະ ອາດມີຄ່າໃຊ້ຈ່າຍ',
         },
         model: {
+            externalInspect: 'ກວດສອບ ແລະ ດຶງຂໍ້ມູນ',
+            externalHealthPassed: 'ກວດສອບສະຖານະຜ່ານ',
+            externalHealthFailed: 'ກວດສອບສະຖານະບໍ່ຜ່ານ',
+            externalServiceAddress: 'ທີ່ຢູ່ບໍລິການ',
+            externalAddressHelper: 'ຮອງຮັບ HTTP/HTTPS. ໃສ່ພອດໃນທີ່ຢູ່.',
+            externalMetricsURL: 'URL ຕິດຕາມທີ່ກຳນົດເອງ',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'ປ້ອນຄີ API ຫຼື ໂທເຄັນເຂົ້າໃຊ້ທີ່ຕັ້ງຄ່າໄວ້ໃນບໍລິການທາງໄກ ເພື່ອຢືນຢັນຕົວຕົນສຳລັບຄຳຮ້ອງຂໍ API.',
+            metricsURLHelper: 'ປ່ອຍວ່າງເພື່ອໃຊ້ທີ່ຢູ່ /metrics ເລີ່ມຕົ້ນ.',
+            addExternal: 'ເພີ່ມອິນສະແຕນພາຍນອກ',
+            external: 'ພາຍນອກ',
+            externalTokenHelper: 'ປ່ອຍວ່າງເພື່ອຮັກສາໂທເຄັນເດີມ.',
+            clearAccessToken: 'ລຶບໂທເຄັນເຂົ້າໃຊ້',
+            deleteExternalHelper: 'ລຶບການເຊື່ອມຕໍ່ ແລະ ປະຫວັດຕິດຕາມ ໂດຍບໍ່ກະທົບບໍລິການພາຍນອກ.',
+
             searchTitle: 'ຄົ້ນຫາ ແລະ ດາວໂຫຼດໂມເດວ',
             searchHelper: 'ຄົ້ນຫາໂມເດວໃນ ModelScope ຫຼື Hugging Face ແລ້ວນຳໃຊ້ ຫຼື ສ້າງ Recipe ໃນການກະກຽມໂມເດວ.',
             modelScopeSearchHelper: 'ເຂົ້າເຖິງໄດ້ສະຖຽນໃນຈີນແຜ່ນດິນໃຫຍ່',
@@ -1199,7 +1215,7 @@ const message = {
             deploymentNameHelper:
                 'ຊື່ອິນສະແຕນຂອງແອັບ ໃຊ້ສຳລັບໂຟນເດີຕິດຕັ້ງ ແລະ ປ່ຽນບໍ່ໄດ້ຫຼັງສ້າງ. ຕັ້ງຊື່ຫຼິ້ນເພື່ອປ່ຽນຊື່ທີ່ສະແດງ.',
             deploymentAliasHelper:
-                'ຊື່ສະແດງໃນລາຍການ ບໍ່ບັງຄັບ. ຖ້າປະວ່າງຈະໃຊ້ຊື່ແອັບ. ການປ່ຽນພຽງຊື່ຫຼິ້ນຈະບໍ່ເລີ່ມຄອນເທນເນີໃໝ່.',
+                'ຊື່ຫຼິ້ນສຳລັບສະແດງໃນລາຍການ ຈະລະບຸຫຼືບໍ່ກໍໄດ້. ຖ້າປະໄວ້ຫວ່າງ ຈະສະແດງຊື່ອິນສະແຕນ. ການປ່ຽນຊື່ຫຼິ້ນຈະບໍ່ເລີ່ມບໍລິການໃໝ່.',
             deploymentContainerNameHelper:
                 'ຊື່ຄອນເທນເນີ Docker ເລີ່ມຕົ້ນເປັນຊື່ແອັບ ແລະ ຕັ້ງແຍກໄດ້. ການປ່ຽນຊື່ນີ້ຈະສ້າງຄອນເທນເນີໃໝ່.',
             imageVersion: 'ເວີຊັນອິມເມຈ',
@@ -5812,8 +5828,7 @@ const message = {
                 systemHealthStatus: 'ສະຖານະຄວາມສ່ຽງການເຮັດວຽກຂອງ Host',
                 mainReasons: 'ສາເຫດຫຼັກ',
                 viewHostMonitor: 'ເບິ່ງການຕິດຕາມ Host',
-                systemHealthAttentionDesc:
-                    'ການປະເມີນຄັ້ງນີ້ພົບຄວາມສ່ຽງ {0} ລາຍການ. ກະລຸນາກວດສອບຕົວຊີ້ວັດດ້ານລຸ່ມ.',
+                systemHealthAttentionDesc: 'ການປະເມີນຄັ້ງນີ້ພົບຄວາມສ່ຽງ {0} ລາຍການ. ກະລຸນາກວດສອບຕົວຊີ້ວັດດ້ານລຸ່ມ.',
                 systemHealthNormalDesc: 'ການປະເມີນຄັ້ງນີ້ບໍ່ພົບຄວາມສ່ຽງການເຮັດວຽກຂອງ Host.',
                 monitorEnabled: 'ເປີດການຕິດຕາມແລ້ວ',
                 cpuCoreUsage: '{0} / {1} ຄໍຣ໌',

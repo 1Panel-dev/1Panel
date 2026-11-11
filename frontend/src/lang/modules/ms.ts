@@ -1108,6 +1108,22 @@ const message = {
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
+            externalInspect: 'Semak dan dapatkan',
+            externalHealthPassed: 'Semakan kesihatan berjaya',
+            externalHealthFailed: 'Semakan kesihatan gagal',
+            externalServiceAddress: 'Alamat perkhidmatan',
+            externalAddressHelper: 'Menyokong HTTP/HTTPS. Sertakan port dalam alamat.',
+            externalMetricsURL: 'URL metrik tersuai',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'Masukkan kunci API atau token akses yang dikonfigurasi untuk perkhidmatan jauh bagi mengesahkan permintaan API.',
+            metricsURLHelper: 'Biarkan kosong untuk menggunakan URL /metrics lalai.',
+            addExternal: 'Tambah instans luaran',
+            external: 'Luaran',
+            externalTokenHelper: 'Biarkan kosong untuk mengekalkan token semasa.',
+            clearAccessToken: 'Padam token akses',
+            deleteExternalHelper: 'Padam sambungan dan sejarah pemantauan tanpa menjejaskan perkhidmatan luaran.',
+
             searchTitle: 'Cari dan muat turun model',
             searchHelper:
                 'Cari model di ModelScope atau Hugging Face, kemudian gunakan model atau cipta Recipe dalam Persediaan Model.',
@@ -1248,7 +1264,7 @@ const message = {
             deploymentNameHelper:
                 'Nama instans aplikasi, digunakan untuk direktori pemasangan dan tidak boleh diubah selepas penciptaan. Tetapkan alias untuk mengubah nama paparan.',
             deploymentAliasHelper:
-                'Nama paparan pilihan untuk senarai. Biarkan kosong untuk menggunakan nama aplikasi. Mengubah alias sahaja tidak memulakan semula kontena.',
+                'Alias pilihan untuk paparan senarai. Biarkan kosong untuk menggunakan nama instans. Menukar alias tidak memulakan semula perkhidmatan.',
             deploymentContainerNameHelper:
                 'Nama kontena Docker. Secara lalai sama dengan nama aplikasi dan boleh ditetapkan secara berasingan. Mengubahnya akan mencipta semula kontena.',
             imageVersion: 'Versi imej',
@@ -6084,8 +6100,7 @@ const message = {
                 systemHealthStatus: 'Status Risiko Operasi Hos',
                 mainReasons: 'Sebab Utama',
                 viewHostMonitor: 'Lihat Pemantauan Hos',
-                systemHealthAttentionDesc:
-                    'Penilaian ini menemui {0} risiko. Semak metrik di bawah.',
+                systemHealthAttentionDesc: 'Penilaian ini menemui {0} risiko. Semak metrik di bawah.',
                 systemHealthNormalDesc: 'Tiada risiko operasi hos ditemui dalam penilaian ini.',
                 monitorEnabled: 'Pemantauan Didayakan',
                 cpuCoreUsage: '{0} / {1} teras',

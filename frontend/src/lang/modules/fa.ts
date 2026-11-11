@@ -1081,6 +1081,22 @@ const message = {
             validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
         model: {
+            externalInspect: 'بررسی و دریافت',
+            externalHealthPassed: 'بررسی سلامت موفق بود',
+            externalHealthFailed: 'بررسی سلامت ناموفق بود',
+            externalServiceAddress: 'نشانی سرویس',
+            externalAddressHelper: 'از HTTP/HTTPS پشتیبانی می‌کند. پورت را در نشانی وارد کنید.',
+            externalMetricsURL: 'نشانی سفارشی متریک‌ها',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'کلید API یا توکن دسترسی تنظیم‌شده برای سرویس راه دور را وارد کنید؛ برای احراز هویت درخواست‌های API استفاده می‌شود.',
+            metricsURLHelper: 'برای استفاده از نشانی پیش‌فرض /metrics خالی بگذارید.',
+            addExternal: 'افزودن نمونه خارجی',
+            external: 'خارجی',
+            externalTokenHelper: 'برای حفظ توکن فعلی خالی بگذارید.',
+            clearAccessToken: 'حذف توکن دسترسی',
+            deleteExternalHelper: 'حذف اتصال و تاریخچه پایش بدون تأثیر بر سرویس خارجی.',
+
             searchTitle: 'جستجو و دانلود مدل‌ها',
             searchHelper:
                 'مدل‌ها را در ModelScope یا Hugging Face پیدا کنید، سپس در آماده‌سازی مدل آن‌ها را مستقر کنید یا یک Recipe بسازید.',
@@ -1218,7 +1234,7 @@ const message = {
             deploymentNameHelper:
                 'نام نمونهٔ برنامه برای پوشهٔ نصب استفاده می\u200cشود و پس از ایجاد قابل تغییر نیست. برای تغییر نام نمایشی، نام مستعار تعیین کنید.',
             deploymentAliasHelper:
-                'نام نمایشی اختیاری برای فهرست. اگر خالی باشد، نام برنامه نمایش داده می\u200cشود. تغییر فقط نام مستعار، کانتینر را راه\u200cاندازی مجدد نمی\u200cکند.',
+                'نام مستعار اختیاری برای نمایش در فهرست. اگر خالی باشد، نام نمونه نمایش داده می‌شود. تغییر نام مستعار سرویس را مجدداً راه‌اندازی نمی‌کند.',
             deploymentContainerNameHelper:
                 'نام کانتینر Docker به\u200cطور پیش\u200cفرض همان نام برنامه است و جداگانه قابل تنظیم است. تغییر آن کانتینر را دوباره ایجاد می\u200cکند.',
             imageVersion: 'نسخه ایمیج',
@@ -5949,8 +5965,7 @@ const message = {
                 systemHealthStatus: 'وضعیت ریسک عملکرد میزبان',
                 mainReasons: 'دلایل اصلی',
                 viewHostMonitor: 'مشاهده نظارت بر میزبان',
-                systemHealthAttentionDesc:
-                    'این ارزیابی {0} مورد ریسک شناسایی کرد. معیارهای زیر را بررسی کنید.',
+                systemHealthAttentionDesc: 'این ارزیابی {0} مورد ریسک شناسایی کرد. معیارهای زیر را بررسی کنید.',
                 systemHealthNormalDesc: 'در این ارزیابی هیچ ریسکی در عملکرد میزبان شناسایی نشد.',
                 monitorEnabled: 'نظارت فعال',
                 cpuCoreUsage: '{0} / {1} هسته',

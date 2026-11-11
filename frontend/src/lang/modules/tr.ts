@@ -1106,6 +1106,22 @@ const message = {
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
+            externalInspect: 'Kontrol et ve getir',
+            externalHealthPassed: 'Sağlık kontrolü başarılı',
+            externalHealthFailed: 'Sağlık kontrolü başarısız',
+            externalServiceAddress: 'Hizmet adresi',
+            externalAddressHelper: 'HTTP/HTTPS desteklenir. Portu adrese ekleyin.',
+            externalMetricsURL: 'Özel metrik URL’si',
+            externalAccessToken: 'API Key (Bearer Token)',
+            externalAccessTokenHelper:
+                'API isteklerinin kimliğini doğrulamak için uzak hizmette yapılandırılan API anahtarını veya erişim tokenını girin.',
+            metricsURLHelper: 'Varsayılan /metrics adresi için boş bırakın.',
+            addExternal: 'Harici örnek ekle',
+            external: 'Harici',
+            externalTokenHelper: 'Mevcut tokenı korumak için boş bırakın.',
+            clearAccessToken: 'Erişim tokenını sil',
+            deleteExternalHelper: 'Bağlantıyı ve izleme geçmişini siler. Harici hizmet etkilenmez.',
+
             searchTitle: 'Model ara ve indir',
             searchHelper:
                 'ModelScope veya Hugging Face üzerinde model bulun, ardından Model Hazırlığı bölümünde dağıtın veya bir Recipe oluşturun.',
@@ -1244,7 +1260,7 @@ const message = {
             deploymentNameHelper:
                 'Uygulama örneğinin adı, kurulum dizininde kullanılır ve oluşturulduktan sonra değiştirilemez. Görünen adı değiştirmek için takma ad belirleyin.',
             deploymentAliasHelper:
-                'Listede gösterilecek isteğe bağlı ad. Boş bırakılırsa uygulama adı kullanılır. Yalnızca takma adı değiştirmek konteyneri yeniden başlatmaz.',
+                'Listede gösterilecek isteğe bağlı takma ad. Boş bırakılırsa örnek adı kullanılır. Takma adı değiştirmek hizmeti yeniden başlatmaz.',
             deploymentContainerNameHelper:
                 'Docker konteyner adı. Varsayılan olarak uygulama adı kullanılır ve ayrı ayarlanabilir. Değiştirilirse konteyner yeniden oluşturulur.',
             imageVersion: 'İmaj sürümü',
@@ -6088,8 +6104,7 @@ const message = {
                 systemHealthStatus: 'Ana makine çalışma risk durumu',
                 mainReasons: 'Başlıca Nedenler',
                 viewHostMonitor: 'Ana Makine İzlemeyi Gör',
-                systemHealthAttentionDesc:
-                    'Bu değerlendirmede {0} risk öğesi bulundu. Aşağıdaki metrikleri inceleyin.',
+                systemHealthAttentionDesc: 'Bu değerlendirmede {0} risk öğesi bulundu. Aşağıdaki metrikleri inceleyin.',
                 systemHealthNormalDesc: 'Bu değerlendirmede ana makine çalışma riski bulunmadı.',
                 monitorEnabled: 'İzleme Etkin',
                 cpuCoreUsage: '{0} / {1} çekirdek',
