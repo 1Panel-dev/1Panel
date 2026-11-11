@@ -5746,6 +5746,11 @@ const message = {
             history: 'Histórico de exportação',
             setting: 'Configurações',
             page: {
+                historyDeleteConfirm:
+                    'Excluir os {1} registros de relatórios selecionados e seus arquivos do nó “{0}”? Esta ação não pode ser desfeita.',
+                historyClearConfirm:
+                    'Limpar todos os registros de relatórios finalizados e seus arquivos do nó “{0}”, incluindo os bem-sucedidos e os que falharam, independentemente dos filtros atuais? Os relatórios em geração e o histórico anterior à atualização serão mantidos. Esta ação não pode ser desfeita.',
+                historyDeleteResult: 'Excluídos: {0}; ignorados: {1}; falhas: {2}.',
                 coreArchiveMasterOnly:
                     'Foram encontrados registros de relatórios anteriores à atualização. Peça a um administrador para consultar os arquivos originais no nó principal.',
                 legacyHistoryReports: 'Relatórios anteriores à atualização',

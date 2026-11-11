@@ -5629,6 +5629,11 @@ const message = {
             history: 'Export History',
             setting: 'Settings',
             page: {
+                historyDeleteConfirm:
+                    'Delete the {1} selected report records and their files from node “{0}”? This cannot be undone.',
+                historyClearConfirm:
+                    'Clear all finished report records and their files from node “{0}”, including successful and failed reports regardless of the current filters? Reports being generated and pre-upgrade history are kept. This cannot be undone.',
+                historyDeleteResult: 'Deleted: {0}; skipped: {1}; failed: {2}.',
                 coreArchiveMasterOnly:
                     'Pre-upgrade report records were found. Ask an administrator to view the original files on the master node.',
                 legacyHistoryReports: 'Pre-upgrade reports',

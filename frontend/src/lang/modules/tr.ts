@@ -5721,6 +5721,11 @@ const message = {
             history: 'Dışa Aktarma Geçmişi',
             setting: 'Ayarlar',
             page: {
+                historyDeleteConfirm:
+                    '“{0}” düğümünden seçilen {1} rapor kaydı ve bunların dosyaları silinsin mi? Bu işlem geri alınamaz.',
+                historyClearConfirm:
+                    '“{0}” düğümündeki tüm tamamlanmış rapor kayıtları ve dosyaları temizlensin mi? Geçerli filtrelerden bağımsız olarak başarılı ve başarısız kayıtlar dahildir. Oluşturulmakta olan raporlar ve yükseltme öncesi geçmiş korunur. Bu işlem geri alınamaz.',
+                historyDeleteResult: 'Silinen: {0}; atlanan: {1}; başarısız: {2}.',
                 coreArchiveMasterOnly:
                     'Yükseltme öncesi rapor kayıtları bulundu. Asıl dosyaları ana düğümde görüntülemek için bir yöneticiye başvurun.',
                 legacyHistoryReports: 'Yükseltme öncesi raporlar',

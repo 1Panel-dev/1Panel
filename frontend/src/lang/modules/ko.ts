@@ -5508,6 +5508,11 @@ const message = {
             history: '내보내기 기록',
             setting: '설정',
             page: {
+                historyDeleteConfirm:
+                    '노드 “{0}”에서 선택한 보고서 기록 {1}개와 해당 파일을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.',
+                historyClearConfirm:
+                    '노드 “{0}”의 종료된 보고서 기록과 해당 파일을 모두 비우시겠습니까? 현재 필터와 관계없이 성공 및 실패 기록이 포함됩니다. 생성 중인 보고서와 업그레이드 이전 기록은 유지됩니다. 이 작업은 되돌릴 수 없습니다.',
+                historyDeleteResult: '삭제: {0}개, 건너뜀: {1}개, 실패: {2}개.',
                 coreArchiveMasterOnly:
                     '업그레이드 이전 보고서 기록이 있습니다. 관리자에게 마스터 노드에서 원본 파일을 확인하도록 요청하세요.',
                 legacyHistoryReports: '업그레이드 이전 보고서',

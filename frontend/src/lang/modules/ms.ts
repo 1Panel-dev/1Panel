@@ -5711,6 +5711,11 @@ const message = {
             history: 'Sejarah Eksport',
             setting: 'Tetapan',
             page: {
+                historyDeleteConfirm:
+                    'Padam {1} rekod laporan yang dipilih dan failnya daripada nod “{0}”? Tindakan ini tidak boleh dibuat asal.',
+                historyClearConfirm:
+                    'Kosongkan semua rekod laporan yang telah tamat dan failnya daripada nod “{0}”, termasuk rekod berjaya dan gagal tanpa mengira penapis semasa? Laporan yang sedang dijana dan sejarah sebelum naik taraf akan dikekalkan. Tindakan ini tidak boleh dibuat asal.',
+                historyDeleteResult: 'Dipadam: {0}; dilangkau: {1}; gagal: {2}.',
                 coreArchiveMasterOnly:
                     'Rekod laporan sebelum naik taraf ditemui. Minta pentadbir melihat fail asal pada nod induk.',
                 legacyHistoryReports: 'Laporan sebelum naik taraf',

@@ -5717,6 +5717,11 @@ const message = {
             history: 'Historial de exportación',
             setting: 'Configuración',
             page: {
+                historyDeleteConfirm:
+                    '¿Eliminar los {1} registros de informes seleccionados y sus archivos del nodo «{0}»? Esta acción no se puede deshacer.',
+                historyClearConfirm:
+                    '¿Borrar todos los registros de informes finalizados y sus archivos del nodo «{0}», incluidos los correctos y fallidos, sin aplicar los filtros actuales? Se conservarán los informes en generación y el historial anterior a la actualización. Esta acción no se puede deshacer.',
+                historyDeleteResult: 'Eliminados: {0}; omitidos: {1}; fallidos: {2}.',
                 coreArchiveMasterOnly:
                     'Se encontraron registros de informes anteriores a la actualización. Solicite a un administrador que consulte los archivos originales en el nodo principal.',
                 legacyHistoryReports: 'Informes anteriores a la actualización',
