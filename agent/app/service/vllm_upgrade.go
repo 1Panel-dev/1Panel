@@ -68,37 +68,15 @@ func trimVllmVersionFamily(version string) string {
 }
 
 func buildDefaultVllmImageByVersion(version string) string {
-	if image := vllm.GB10Image(version); image != "" {
-		return image
-	}
-	tag := trimVllmVersionFamily(version)
-	family := resolveVllmVersionFamily(version, "")
-	if family == vllmImageTypeIntel {
-		return "intel/llm-scaler-vllm:" + tag
-	}
-	if tag != "" && !strings.HasPrefix(strings.ToLower(tag), "v") {
-		tag = "v" + tag
-	}
-	if family == vllmImageTypeAscend {
-		return "quay.io/ascend/vllm-ascend:" + tag
-	}
-	return "vllm/vllm-openai:" + tag
+	return vllm.ResolveImage("", resolveVllmVersionFamily(version, ""), trimVllmVersionFamily(version))
 }
 
 func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage string) bool {
-	currentRTX := vllm.IsRTXVersion(currentVersion)
-	targetRTX := vllm.IsRTXVersion(targetVersion)
-	if currentRTX != targetRTX {
-		return false
-	}
-	currentGB10 := vllm.IsGB10Version(currentVersion)
-	targetGB10 := vllm.IsGB10Version(targetVersion)
-	if currentGB10 != targetGB10 {
-		return false
-	}
 	currentFamily := resolveVllmVersionFamily(currentVersion, currentImage)
 	targetFamily := resolveVllmVersionFamily(targetVersion, "")
-	return currentFamily == targetFamily
+	_, currentSuffix, _ := strings.Cut(trimVllmVersionFamily(currentVersion), "-")
+	_, targetSuffix, _ := strings.Cut(trimVllmVersionFamily(targetVersion), "-")
+	return currentFamily == targetFamily && currentSuffix == targetSuffix
 }
 
 func hasVllmVersionFamilyPrefix(version string) bool {
@@ -124,8 +102,8 @@ func isVllmUpgradeCandidate(currentVersion, targetVersion, currentImage string) 
 }
 
 func buildVllmUpgradeImage(currentImage, currentVersion, targetVersion string) string {
-	trimmedImage := strings.TrimSpace(currentImage)
-	if trimmedImage == "" || trimmedImage == buildDefaultVllmImageByVersion(currentVersion) {
+	trimmedImage := vllm.ResolveImage(currentImage, resolveVllmVersionFamily(currentVersion, currentImage), trimVllmVersionFamily(currentVersion))
+	if trimmedImage == buildDefaultVllmImageByVersion(currentVersion) {
 		return buildDefaultVllmImageByVersion(targetVersion)
 	}
 	return trimmedImage

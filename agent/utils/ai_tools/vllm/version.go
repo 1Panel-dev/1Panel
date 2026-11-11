@@ -19,10 +19,38 @@ func IsGB10Version(version string) bool {
 		strings.TrimSpace(strings.TrimSuffix(tag, gb10VersionSuffix)) != ""
 }
 
-func GB10Image(version string) string {
-	trimmed := strings.TrimSpace(version)
-	if !IsGB10Version(trimmed) {
-		return ""
+func ResolveImage(image, imageType, tag string) string {
+	image = strings.TrimSpace(image)
+	tag = strings.TrimSpace(tag)
+	defaultImage := ""
+	switch imageType {
+	case "intel":
+		defaultImage = "intel/llm-scaler-vllm:" + tag
+	case "ascend":
+		if tag != "" && !strings.HasPrefix(strings.ToLower(tag), "v") {
+			tag = "v" + tag
+		}
+		defaultImage = "quay.io/ascend/vllm-ascend:" + tag
+	default:
+		if tag != "" && !strings.HasPrefix(strings.ToLower(tag), "v") {
+			tag = "v" + tag
+		}
+		defaultImage = "vllm/vllm-openai:" + tag
+		_, suffix, _ := strings.Cut(tag, "-")
+		switch suffix {
+		case "optimized-for-ds-v4-flash":
+			defaultImage = "1panel/vllm-gb10-dual-node:" + strings.TrimPrefix(tag, "v")
+		case "optimized-for-2-gb10-ds-v4-flash":
+			defaultImage = "1panel/vllm:" + strings.TrimPrefix(tag, "v")
+		case "optimized-for-ds-v4.1-flash":
+			defaultImage = "1panel/vllm:" + tag
+		}
+		if defaultImage != "vllm/vllm-openai:"+tag && image == "vllm/vllm-openai:"+tag {
+			image = ""
+		}
 	}
-	return "1panel/vllm-gb10-dual-node:" + strings.TrimSpace(trimmed[len(gb10VersionPrefix):])
+	if image == "" {
+		return defaultImage
+	}
+	return image
 }

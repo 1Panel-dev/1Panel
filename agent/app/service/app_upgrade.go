@@ -283,9 +283,7 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		}
 		image := buildVllmUpgradeImage(loadVllmImageFromEnv(stagedInstall.Env), u.original.Version, u.detail.Version)
 		envs[vllmImageEnvKey] = image
-		if vllm.IsGB10Version(u.detail.Version) {
-			envs["DSPARK_VLLM_IMAGE"] = image
-		}
+		envs["DSPARK_VLLM_IMAGE"] = image
 		paramBytes, marshalErr := json.Marshal(envs)
 		if marshalErr != nil {
 			return marshalErr
