@@ -777,6 +777,28 @@ const message = {
         localIP: 'IP local',
     },
     aiTools: {
+        chat: {
+            outputLimit:
+                'A resposta atingiu o limite de saída do modelo e está incompleta. Esta interação não será incluída nas próximas mensagens. Você pode enviá-la novamente.',
+            filtered:
+                'O serviço do modelo interrompeu a resposta devido à filtragem de conteúdo. Esta interação não será incluída nas próximas mensagens. Você pode enviá-la novamente.',
+            incomplete:
+                'O modelo não concluiu a resposta. Esta interação não será incluída nas próximas mensagens. Você pode enviá-la novamente.',
+            limitReached: 'O limite de 100 turnos foi atingido. Limpe esta conversa para continuar.',
+            welcome: 'Inicie uma nova conversa',
+            temporary: 'A conversa é temporária e será apagada ao fechar o painel ou atualizar a página.',
+            title: 'Conversa',
+            empty: 'Envie uma mensagem para conversar com este modelo',
+            you: 'Você',
+            thinking: 'Raciocínio',
+            placeholder: 'Enter para enviar, Shift+Enter para uma nova linha',
+            clear: 'Limpar conversa atual',
+            send: 'Enviar',
+            failed: 'Falha na solicitação de conversa',
+            interrupted:
+                'A geração foi parada ou interrompida. Esta interação não será incluída nas próximas mensagens. Você pode enviá-la novamente.',
+            waiting: 'Gerando…',
+        },
         gpuGroup: {
             singleGPU:
                 'Os grupos de GPU são destinados a máquinas com várias GPUs. Este nó tem apenas uma GPU e não precisa de agrupamento.',

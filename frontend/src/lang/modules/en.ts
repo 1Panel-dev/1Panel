@@ -776,6 +776,28 @@ const message = {
         localIP: 'Local IP',
     },
     aiTools: {
+        chat: {
+            outputLimit:
+                'The response reached the model output limit and is incomplete. This turn will not be included in subsequent messages. You can send it again.',
+            filtered:
+                'The model service stopped the response due to content filtering. This turn will not be included in subsequent messages. You can send it again.',
+            incomplete:
+                'The model did not finish the response. This turn will not be included in subsequent messages. You can send it again.',
+            limitReached: 'The 100-turn limit has been reached. Clear this conversation to continue.',
+            welcome: 'Start a new conversation',
+            temporary: 'This conversation is temporary and clears when you close the drawer or refresh the page.',
+            title: 'Chat',
+            empty: 'Send a message to chat with this model',
+            you: 'You',
+            thinking: 'Reasoning',
+            placeholder: 'Enter to send, Shift+Enter for a new line',
+            clear: 'Clear current conversation',
+            send: 'Send',
+            failed: 'Chat request failed',
+            interrupted:
+                'Generation stopped or was interrupted. This turn will not be included in subsequent messages. You can send it again.',
+            waiting: 'Generating…',
+        },
         gpuGroup: {
             singleGPU:
                 'GPU groups are intended for multi-GPU machines. This node has only one GPU and does not need grouping.',

@@ -784,6 +784,28 @@ const message = {
         localIP: 'IP Tempatan',
     },
     aiTools: {
+        chat: {
+            outputLimit:
+                'Respons mencapai had output model dan tidak lengkap. Giliran ini tidak akan disertakan dalam mesej seterusnya. Anda boleh menghantarnya semula.',
+            filtered:
+                'Perkhidmatan model menghentikan respons kerana penapisan kandungan. Giliran ini tidak akan disertakan dalam mesej seterusnya. Anda boleh menghantarnya semula.',
+            incomplete:
+                'Model tidak menyelesaikan respons. Giliran ini tidak akan disertakan dalam mesej seterusnya. Anda boleh menghantarnya semula.',
+            limitReached: 'Had 100 giliran telah dicapai. Kosongkan perbualan ini untuk meneruskan.',
+            welcome: 'Mulakan perbualan baharu',
+            temporary: 'Perbualan ini sementara dan dipadam apabila panel ditutup atau halaman dimuat semula.',
+            title: 'Sembang',
+            empty: 'Hantar mesej untuk berbual dengan model ini',
+            you: 'Anda',
+            thinking: 'Penaakulan',
+            placeholder: 'Enter untuk hantar, Shift+Enter untuk baris baharu',
+            clear: 'Kosongkan perbualan semasa',
+            send: 'Hantar',
+            failed: 'Permintaan sembang gagal',
+            interrupted:
+                'Penjanaan dihentikan atau terganggu. Pertukaran ini tidak akan disertakan dalam mesej seterusnya. Anda boleh menghantarnya semula.',
+            waiting: 'Sedang menjana…',
+        },
         gpuGroup: {
             singleGPU:
                 'Kumpulan GPU adalah untuk mesin dengan berbilang GPU. Nod ini hanya mempunyai satu GPU dan tidak memerlukan pengumpulan.',
