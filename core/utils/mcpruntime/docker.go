@@ -19,7 +19,7 @@ import (
 
 const (
 	DockerImageRepository = "1panel/mcp-server"
-	DefaultDockerImage    = DockerImageRepository + ":v1.0.0"
+	DefaultDockerImage    = DockerImageRepository + ":v2.0.0"
 	DockerContainerName   = "1panel-mcp"
 	dockerAgentEndpoint   = "http://agent/internal/mcp/docker"
 )
