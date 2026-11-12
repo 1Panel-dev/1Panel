@@ -1,7 +1,7 @@
 import type { PanelMCP } from '@/api/interface/panel-mcp';
 import { isAxiosError } from 'axios';
 
-export const DEFAULT_MCP_DOCKER_IMAGE = '1panel/mcp-server:v1.0.0';
+export const DEFAULT_MCP_DOCKER_IMAGE = '1panel/mcp-server:v2.0.0';
 const dockerPathComponent = '[a-z0-9]+(?:(?:[._]|__|-+)[a-z0-9]+)*';
 const dockerDomainComponent = '(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])';
 const dockerRegistryHost = `(?:${dockerDomainComponent}(?:\\.${dockerDomainComponent})*|\\[[a-fA-F0-9:]+\\])`;

@@ -53,7 +53,7 @@ type MCPInvocation struct {
 
 type MCPSetting struct {
 	RuntimeType      string `gorm:"not null;default:docker"`
-	DockerImage      string `gorm:"not null;default:1panel/mcp-server:v1.0.0"`
+	DockerImage      string `gorm:"not null;default:1panel/mcp-server:v2.0.0"`
 	ID               uint   `gorm:"primaryKey"`
 	Enabled          bool   `gorm:"not null;default:false"`
 	ListenPort       int    `gorm:"not null;default:18081"`
