@@ -27,6 +27,14 @@
                     </div>
                 </div>
                 <div class="service-actions">
+                    <el-button
+                        v-if="supportsModelChat(account.apiType)"
+                        v-permission
+                        :disabled="!account.models?.length"
+                        @click="emit('chat')"
+                    >
+                        {{ $t('aiTools.chat.title') }}
+                    </el-button>
                     <el-button v-permission :icon="Edit" :disabled="verifying" @click="emit('edit')">
                         {{ $t('commons.button.edit') }}
                     </el-button>
@@ -176,6 +184,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { supportsModelChat } from '@/api/modules/model-chat';
 import { useRouter } from 'vue-router';
 import type { TagProps } from 'element-plus';
 import { ArrowRight, Box, CircleCheck, Connection, Edit, RefreshRight } from '@element-plus/icons-vue';
@@ -192,7 +201,7 @@ const props = defineProps<{
     verifying: boolean;
 }>();
 const visible = defineModel<boolean>({ default: false });
-const emit = defineEmits<{ edit: []; models: []; verify: [] }>();
+const emit = defineEmits<{ edit: []; models: []; verify: []; chat: [] }>();
 const router = useRouter();
 const { isMobile } = useGlobalStore();
 const providerName = computed(() => getAgentProviderDisplayName(props.account.provider, props.account.providerName));

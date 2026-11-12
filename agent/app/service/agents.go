@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 	"os"
 	"path"
 	"sort"
@@ -33,6 +34,7 @@ import (
 var agentAccountMutationMu sync.Mutex
 
 type IAgentService interface {
+	ChatAccount(ctx context.Context, req dto.ModelChat) (*http.Response, error)
 	Create(req dto.AgentCreateReq) (*dto.AgentItem, error)
 	BatchInstall(req dto.AgentBatchInstallReq) (*dto.AgentItem, error)
 	BatchUpgrade(req dto.AgentBatchUpgradeReq) ([]dto.AgentBatchUpgradeResult, error)

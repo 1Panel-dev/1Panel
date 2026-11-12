@@ -780,6 +780,28 @@ const message = {
         localIP: 'Yerel IP',
     },
     aiTools: {
+        chat: {
+            outputLimit:
+                'Yanıt modelin çıktı sınırına ulaştı ve tamamlanamadı. Bu tur sonraki mesajlara dahil edilmeyecek. Yeniden gönderebilirsiniz.',
+            filtered:
+                'Model hizmeti içerik filtrelemesi nedeniyle yanıtı durdurdu. Bu tur sonraki mesajlara dahil edilmeyecek. Yeniden gönderebilirsiniz.',
+            incomplete:
+                'Model yanıtı tamamlamadı. Bu tur sonraki mesajlara dahil edilmeyecek. Yeniden gönderebilirsiniz.',
+            limitReached: '100 tur sınırına ulaşıldı. Devam etmek için mevcut sohbeti temizleyin.',
+            welcome: 'Yeni bir sohbet başlatın',
+            temporary: 'Sohbet geçicidir; paneli kapattığınızda veya sayfayı yenilediğinizde temizlenir.',
+            title: 'Sohbet',
+            empty: 'Bu modelle sohbet etmek için mesaj gönderin',
+            you: 'Siz',
+            thinking: 'Akıl yürütme',
+            placeholder: 'Göndermek için Enter, yeni satır için Shift+Enter',
+            clear: 'Mevcut sohbeti temizle',
+            send: 'Gönder',
+            failed: 'Sohbet isteği başarısız oldu',
+            interrupted:
+                'Üretim durduruldu veya kesildi. Bu tur sonraki mesajlara dahil edilmeyecek. Yeniden gönderebilirsiniz.',
+            waiting: 'Üretiliyor…',
+        },
         gpuGroup: {
             singleGPU:
                 'GPU grupları birden fazla GPU bulunan makineler içindir. Bu düğümde yalnızca bir GPU olduğundan gruplama gerekmez.',

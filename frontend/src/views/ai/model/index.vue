@@ -252,8 +252,10 @@
             @update:model-value="!$event && (detailAccountID = undefined)"
             @edit="createRef.openAccount(detailAccount)"
             @models="poolRef.open(detailAccount)"
+            @chat="openChat(detailAccount)"
             @verify="verifyTarget = { account: detailAccount, node: currentNode }"
         />
+        <ModelChat ref="chatRef" />
         <CreateService ref="createRef" @search="search" />
         <ModelPool ref="poolRef" @updated="search" />
     </div>
@@ -276,6 +278,8 @@ import { MsgError, MsgSuccess } from '@/utils/message';
 import { useSearchState } from '@/utils/search-reset';
 import CreateService from './create/index.vue';
 import ModelPool from './model-pool/index.vue';
+import ModelChat from '@/components/model-chat/index.vue';
+import { supportsModelChat } from '@/api/modules/model-chat';
 import ServiceDetails from './details/index.vue';
 import ProviderLabel from '@/components/agent-provider-label/index.vue';
 
@@ -285,6 +289,7 @@ const isCurrentPage = computed(() => route.path === pagePath);
 const { isIntl, isMobile, currentNode } = useGlobalStore();
 const createRef = ref();
 const poolRef = ref();
+const chatRef = ref<InstanceType<typeof ModelChat>>();
 const loading = ref(false);
 const verifyingAccounts = reactive(new Set<string>());
 const verifyTarget = ref<{ account: AI.AgentAccountItem; node: string }>();
@@ -429,7 +434,24 @@ const verifyAccount = async () => {
         if (currentNode.value === node) await search();
     }
 };
+const openChat = (row: AI.AgentAccountItem) => {
+    const models = row.models || [];
+    chatRef.value?.open({
+        kind: 'account',
+        id: row.id,
+        name: row.name,
+        model: models.find((item) => item.id === row.verifyModel)?.id || models[0]?.id || '',
+        models,
+    });
+};
 const accountButtons = [
+    {
+        label: i18n.global.t('aiTools.chat.title'),
+        permission: true,
+        show: (row: AI.AgentAccountItem) => supportsModelChat(row.apiType),
+        disabled: (row: AI.AgentAccountItem) => !row.models?.length,
+        click: openChat,
+    },
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
