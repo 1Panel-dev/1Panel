@@ -11,6 +11,10 @@ var AuthProvider = helper.NewIAuthProvider()
 
 var MultiNodeProvider = helper.NewIMultiNodeProvider()
 
+func IsMasterProductPro() bool {
+	return false
+}
+
 func VMCountLimit(_ *gin.Context) int {
 	return 1
 }
