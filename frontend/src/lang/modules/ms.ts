@@ -308,7 +308,7 @@ const message = {
             simplePassword:
                 'Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-30 aksara.',
             dbName: 'Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-64 aksara.',
-            imageName: 'Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, nombor, :@/.-_, panjang 1-256',
+            imageName: "Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, nombor, :{'@'}/.-_, panjang 1-256",
             composeName:
                 'Menyokong aksara bukan khas pada permulaan, huruf kecil, nombor, "-", dan "_", dengan panjang 1-256 aksara.',
             volumeName:

@@ -304,7 +304,7 @@ const message = {
             simplePassword:
                 'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 1-30.',
             dbName: 'Este campo não deve começar com "_" e deve conter letras, números e "_" com comprimento de 1-64.',
-            imageName: 'Suporta não começar com caracteres especiais, inglês, números, :@/.-_, comprimento 1-256',
+            imageName: "Suporta não começar com caracteres especiais, inglês, números, :{'@'}/.-_, comprimento 1-256",
             composeName:
                 'Deve começar com caracteres não especiais, conter letras minúsculas, números, "-" e "_" com comprimento de 1-256.',
             volumeName: 'Este campo deve conter letras, números, ".", "-", e "_" com comprimento de 2-30.',

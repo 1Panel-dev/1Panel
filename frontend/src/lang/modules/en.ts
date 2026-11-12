@@ -305,7 +305,7 @@ const message = {
                 'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-30.',
             dbName: 'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-64.',
             imageName:
-                'This field must consist of English, numbers, ":", "@", "/", ".", "-", and "_" characters with a length of 1-256.',
+                `This field must consist of English, numbers, ":", "{'@'}", "/", ".", "-", and "_" characters with a length of 1-256.`,
             volumeName:
                 'This field must consist of English, numbers, ".", "-", and "_" characters with a length of 2-30.',
             supervisorName:
