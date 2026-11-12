@@ -1,6 +1,13 @@
 <template>
     <DrawerPro v-model="drawerVisible" :header="$t('setting.runtimeEnv')" @close="handleClose" size="small">
-        <el-form ref="formRef" label-position="top" :model="form" @submit.prevent v-loading="loading">
+        <el-form
+            ref="formRef"
+            label-position="top"
+            :model="form"
+            @submit.prevent
+            v-loading="loading"
+            element-loading-background="color-mix(in srgb, var(--el-bg-color) 80%, transparent)"
+        >
             <el-form-item :label="$t('setting.region')" prop="edition">
                 <el-radio-group v-model="form.edition">
                     <el-radio value="cn">

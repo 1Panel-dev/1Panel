@@ -2,7 +2,7 @@
     <DrawerPro v-model="drawerVisible" :header="$t('commons.button.upgrade')" @close="handleClose" size="large">
         <div class="panel-MdEditor">
             <div class="default-theme">
-                <h2 class="inline-block">{{ $t('app.version') }}</h2>
+                <h2 class="inline-block">{{ versionTitle }}</h2>
             </div>
             <el-radio-group class="inline-block tag" v-model="upgradeVersion" @change="changeOption">
                 <el-radio v-if="upgradeInfo.newVersion" :value="upgradeInfo.newVersion">
@@ -32,13 +32,16 @@
 import MarkDownEditor from '@/components/mkdown-editor/index.vue';
 
 import { loadReleaseNotes, upgrade } from '@/api/modules/setting';
-import i18n from '@/lang';
+import i18n, { loadLocaleMessages } from '@/lang';
 import { MsgSuccess } from '@/utils/message';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { ElMessageBox } from 'element-plus';
 
-const { isLoading, isOnRestart } = useGlobalStore();
+const { isLoading, isOnRestart, isIntl } = useGlobalStore();
+
+const releaseNotesLocale = computed(() => (isIntl.value ? 'en' : 'zh'));
+const versionTitle = computed(() => i18n.global.t('app.version', {}, { locale: releaseNotesLocale.value }));
 
 const drawerVisible = ref(false);
 const upgradeInfo = ref();
@@ -49,7 +52,8 @@ interface DialogProps {
     upgradeInfo: number;
     upgradeVersion: string;
 }
-const acceptParams = (params: DialogProps): void => {
+const acceptParams = async (params: DialogProps): Promise<void> => {
+    await loadLocaleMessages(releaseNotesLocale.value);
     upgradeInfo.value = params.upgradeInfo;
     upgradeVersion.value = params.upgradeVersion;
     drawerVisible.value = true;

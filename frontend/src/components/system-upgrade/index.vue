@@ -90,7 +90,7 @@ const toEdition = () => {
 const onLoadUpgradeInfo = async () => {
     loading.value = true;
     await loadUpgradeInfo()
-        .then((res) => {
+        .then(async (res) => {
             loading.value = false;
             if (res.data.testVersion || res.data.newVersion || res.data.latestVersion) {
                 upgradeInfo.value = res.data;
@@ -101,7 +101,10 @@ const onLoadUpgradeInfo = async () => {
                 } else if (upgradeInfo.value.newVersion) {
                     upgradeVersion.value = upgradeInfo.value.newVersion;
                 }
-                upgradeRef.value.acceptParams({ upgradeInfo: upgradeInfo.value, upgradeVersion: upgradeVersion.value });
+                await upgradeRef.value.acceptParams({
+                    upgradeInfo: upgradeInfo.value,
+                    upgradeVersion: upgradeVersion.value,
+                });
             } else {
                 MsgSuccess(i18n.global.t('setting.noUpgrade'));
                 return;
