@@ -2922,6 +2922,9 @@ const message = {
         exportOptionsFailed: '无法加载以下指标的设备列表，请刷新页面后重试：{0}',
         selectMetrics: '请至少选择一个导出指标',
         selectTimeRange: '请选择导出时间范围',
+        exportProgress: '已获取至 {0} 的数据',
+        exportCancelled: '已取消导出',
+        exportFailed: '{0} 之后的数据多次重试仍获取失败，导出已中止。请检查网络或缩小时间范围后重试。',
     },
     terminal: {
         showTerminalButton: '终端快捷入口',

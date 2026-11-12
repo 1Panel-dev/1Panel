@@ -2899,6 +2899,9 @@ const message = {
         exportOptionsFailed: '無法載入以下指標的裝置清單，請重新整理後重試：{0}',
         selectMetrics: '請至少選擇一個匯出指標',
         selectTimeRange: '請選擇匯出時間範圍',
+        exportProgress: '已取得至 {0} 的資料',
+        exportCancelled: '已取消匯出',
+        exportFailed: '{0} 之後的資料多次重試仍取得失敗，匯出已中止。請檢查網路或縮小時間範圍後重試。',
     },
     terminal: {
         showTerminalButton: '終端捷徑',

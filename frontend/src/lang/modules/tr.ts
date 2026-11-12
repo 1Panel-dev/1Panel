@@ -3139,6 +3139,10 @@ const message = {
         exportOptionsFailed: 'Şu metrikler için aygıt listesi yüklenemedi: {0}. Sayfayı yenileyip tekrar deneyin.',
         selectMetrics: 'Dışa aktarmak için en az bir metrik seçin',
         selectTimeRange: 'Dışa aktarılacak zaman aralığını seçin',
+        exportProgress: '{0} tarihine kadar olan veriler alındı',
+        exportCancelled: 'Dışa aktarma iptal edildi',
+        exportFailed:
+            '{0} sonrasındaki veriler birkaç denemeye rağmen alınamadı, dışa aktarma durduruldu. Ağı kontrol edin veya zaman aralığını daraltıp tekrar deneyin.',
     },
     terminal: {
         showTerminalButton: 'Terminal kısayolu',

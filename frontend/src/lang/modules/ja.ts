@@ -3090,6 +3090,10 @@ const message = {
         exportOptionsFailed: '次の指標のデバイス一覧を読み込めませんでした。再読み込みして再試行してください: {0}',
         selectMetrics: 'エクスポートする指標を 1 つ以上選択してください',
         selectTimeRange: 'エクスポートする期間を選択してください',
+        exportProgress: '{0} までのデータを取得しました',
+        exportCancelled: 'エクスポートをキャンセルしました',
+        exportFailed:
+            '{0} 以降のデータの取得が再試行後も失敗したため、エクスポートを中止しました。ネットワークを確認するか、期間を短くして再試行してください。',
     },
     terminal: {
         showTerminalButton: 'ターミナルへのショートカット',
