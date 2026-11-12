@@ -27,7 +27,7 @@ func (c Client) LoadInfo() (*Info, error) {
 }
 
 func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(2*time.Second))
 	data, err := cmdMgr.RunWithStdout(xpuSMICommand, "discovery", "-j")
 	if err != nil {
 		return nil, fmt.Errorf("calling %s failed: %w", xpuSMICommand, err)
@@ -108,7 +108,7 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 	var wgCmd sync.WaitGroup
 	wgCmd.Add(2)
 
-	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
+	cmdMgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(2*time.Second))
 	go func() {
 		defer wgCmd.Done()
 		xpuData, xpuErr = cmdMgr.RunWithStdout(xpuSMICommand, "discovery", "-d", strconv.Itoa(device.DeviceID), "-j")
@@ -121,54 +121,41 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 
 	wgCmd.Wait()
 
+	var info discoveryDevice
 	if xpuErr != nil {
 		xpu.ReadError = fmt.Sprintf("xpu-smi device %d: %v", device.DeviceID, xpuErr)
-		mu.Lock()
-		res.Warnings = append(res.Warnings, xpu.ReadError)
-		res.Devices = append(res.Devices, xpu)
-		mu.Unlock()
-		return
-	}
-
-	var info discoveryDevice
-	if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
+	} else if err := json.Unmarshal([]byte(xpuData), &info); err != nil {
 		xpu.ReadError = fmt.Sprintf("xpu-smi device %d output: %v", device.DeviceID, err)
-		mu.Lock()
-		res.Warnings = append(res.Warnings, xpu.ReadError)
-		res.Devices = append(res.Devices, xpu)
-		mu.Unlock()
-		return
-	}
-
-	if info.DrmDevice != "" {
-		xpu.Basic.DrmDevice = info.DrmDevice
-	}
-	xpu.Basic.DriverVersion = info.DriverVersion
-
-	bytes, err := strconv.ParseInt(info.MemoryPhysicalSizeByte, 10, 64)
-	if err != nil {
-		global.LOG.Warnf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
-		xpu.Basic.Memory = info.MemoryPhysicalSizeByte
 	} else {
-		xpu.Basic.Memory = formatMemoryBytes(bytes)
+		if info.DrmDevice != "" {
+			xpu.Basic.DrmDevice = info.DrmDevice
+		}
+		xpu.Basic.DriverVersion = info.DriverVersion
+
+		bytes, err := strconv.ParseInt(string(info.MemoryPhysicalSizeByte), 10, 64)
+		if err != nil {
+			global.LOG.Warnf("Error parsing memory size for device %d, err: %v", device.DeviceID, err)
+			xpu.Basic.Memory = string(info.MemoryPhysicalSizeByte)
+		} else {
+			xpu.Basic.Memory = formatMemoryBytes(bytes)
+		}
+		freeBytes, err := strconv.ParseInt(string(info.MemoryFreeSizeByte), 10, 64)
+		if err != nil {
+			xpu.Basic.FreeMemory = string(info.MemoryFreeSizeByte)
+		} else {
+			xpu.Basic.FreeMemory = formatMemoryBytes(freeBytes)
+		}
 	}
-	freeBytes, err := strconv.ParseInt(info.MemoryFreeSizeByte, 10, 64)
-	if err != nil {
-		xpu.Basic.FreeMemory = info.MemoryFreeSizeByte
-	} else {
-		xpu.Basic.FreeMemory = formatMemoryBytes(freeBytes)
+	if xpu.ReadError != "" {
+		xpu.Warnings = append(xpu.Warnings, xpu.ReadError)
 	}
 
 	if statsErr != nil {
-		mu.Lock()
-		res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi stats %d: %v", device.DeviceID, statsErr))
-		mu.Unlock()
+		xpu.Warnings = append(xpu.Warnings, fmt.Sprintf("xpu-smi stats %d: %v", device.DeviceID, statsErr))
 	} else {
 		var stats DeviceStats
 		if err := json.Unmarshal([]byte(statsData), &stats); err != nil {
-			mu.Lock()
-			res.Warnings = append(res.Warnings, fmt.Sprintf("xpu-smi stats %d output: %v", device.DeviceID, err))
-			mu.Unlock()
+			xpu.Warnings = append(xpu.Warnings, fmt.Sprintf("xpu-smi stats %d output: %v", device.DeviceID, err))
 		} else {
 			loadStats(&xpu.Stats, stats.DeviceLevel)
 			for _, tile := range stats.TileLevel {
@@ -181,7 +168,7 @@ func (c Client) loadDeviceInfo(ctx context.Context, device discoveryDevice, wg *
 
 	mu.Lock()
 	if res.DriverVersion == "" {
-		res.DriverVersion = info.DriverVersion
+		res.DriverVersion = xpu.Basic.DriverVersion
 	}
 	res.Devices = append(res.Devices, xpu)
 	mu.Unlock()

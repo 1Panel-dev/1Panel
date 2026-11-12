@@ -31,11 +31,14 @@ func LoadModelGPUDevices() dto.ModelGPUDevices {
 		return result
 	}
 	snapshot, err := client.Collect(context.Background())
-	if err != nil {
+	if err != nil && snapshot == nil {
 		result.Warnings = append(result.Warnings, err.Error())
+	}
+	if snapshot == nil {
 		return result
 	}
 	result.Warnings = append(result.Warnings, snapshot.Info.Warnings...)
+	result.VendorWarnings = snapshot.Info.VendorWarnings
 	for _, monitored := range snapshot.Devices {
 		if monitored.ParentID != "" {
 			continue
@@ -44,39 +47,46 @@ func LoadModelGPUDevices() dto.ModelGPUDevices {
 		devicePath := ""
 		switch {
 		case monitored.GPU != nil:
+			device.Warnings = append(device.Warnings, monitored.GPU.Warnings...)
 			if monitored.Vendor == "nvidia" && !re.GetRegex(re.NvidiaGPUUUIDPattern).MatchString(monitored.GPU.UUID) {
-				result.Warnings = append(result.Warnings, fmt.Sprintf("invalid NVIDIA GPU UUID from nvidia-smi: %s", monitored.GPU.UUID))
-				continue
+				device.Available = false
+				device.Warnings = append(device.Warnings, fmt.Sprintf("invalid NVIDIA GPU UUID from nvidia-smi: %s", monitored.GPU.UUID))
 			}
 			device.ID = monitored.ID
 			device.Name = fmt.Sprintf("GPU %d · %s", monitored.Index, monitored.Name)
 			device.Type = monitored.Vendor
 			device.UUID = monitored.GPU.UUID
 		case monitored.XPU != nil:
+			device.Warnings = append(device.Warnings, monitored.XPU.Warnings...)
+			device.ID = monitored.ID
+			device.Name = fmt.Sprintf("XPU %d · %s", monitored.Index, monitored.Name)
+			device.Type = "intel"
 			devicePath = monitored.XPU.Basic.DrmDevice
 			if !re.GetRegex(re.IntelGPUDevicePathPattern).MatchString(devicePath) {
+				devicePath = ""
 				directory := filepath.Join("/sys/bus/pci/devices", filepath.Base(monitored.BusID), "drm")
 				entries, err := os.ReadDir(directory)
 				if err != nil {
-					result.Warnings = append(result.Warnings, fmt.Sprintf("resolve Intel GPU %d render device: %v", monitored.Index, err))
-					continue
-				}
-				devicePath = ""
-				for _, entry := range entries {
-					if re.GetRegex(re.IntelGPURenderNamePattern).MatchString(entry.Name()) {
-						devicePath = filepath.Join("/dev/dri", entry.Name())
-						break
+					device.Warnings = append(device.Warnings, fmt.Sprintf("resolve Intel GPU %d render device: %v", monitored.Index, err))
+				} else {
+					for _, entry := range entries {
+						if re.GetRegex(re.IntelGPURenderNamePattern).MatchString(entry.Name()) {
+							devicePath = filepath.Join("/dev/dri", entry.Name())
+							break
+						}
+					}
+					if devicePath == "" {
+						device.Warnings = append(device.Warnings, fmt.Sprintf("Intel GPU %d has no render device", monitored.Index))
 					}
 				}
-				if devicePath == "" {
-					result.Warnings = append(result.Warnings, fmt.Sprintf("Intel GPU %d has no render device", monitored.Index))
-					continue
-				}
 			}
-			device.ID = "intel:" + devicePath
-			device.Name = fmt.Sprintf("XPU %d · %s", monitored.Index, monitored.Name)
-			device.Type = "intel"
+			if devicePath == "" {
+				device.Available = false
+			} else {
+				device.ID = "intel:" + devicePath
+			}
 		case monitored.NPU != nil:
+			device.Warnings = append(device.Warnings, monitored.NPU.Warnings...)
 			device.ID = fmt.Sprintf("ascend:%d", monitored.Index)
 			device.Name = fmt.Sprintf("NPU %d · Chip %d · %s", monitored.NPUIndex, monitored.ChipIndex, monitored.Name)
 			device.Type = "ascend"
@@ -88,7 +98,7 @@ func LoadModelGPUDevices() dto.ModelGPUDevices {
 			info, err := os.Stat(devicePath)
 			device.Available = err == nil && info.Mode()&os.ModeCharDevice != 0
 			if err != nil {
-				result.Warnings = append(result.Warnings, err.Error())
+				device.Warnings = append(device.Warnings, err.Error())
 			}
 		}
 		device.NUMANode = loadModelGPUNode("/sys", monitored.BusID)

@@ -8,10 +8,11 @@ type Info struct {
 }
 
 type Device struct {
-	AICPUUtil    string `json:"aiCPUUtil"`
-	CtrlCPUUtil  string `json:"ctrlCPUUtil"`
-	DDRBandwidth string `json:"ddrBandwidth"`
-	HBMBandwidth string `json:"hbmBandwidth"`
+	Warnings     []string `json:"warnings,omitempty"`
+	AICPUUtil    string   `json:"aiCPUUtil"`
+	CtrlCPUUtil  string   `json:"ctrlCPUUtil"`
+	DDRBandwidth string   `json:"ddrBandwidth"`
+	HBMBandwidth string   `json:"hbmBandwidth"`
 
 	ProcessStatus string `json:"processStatus"`
 

@@ -69,6 +69,13 @@
                         {{ $t('aiTools.model.gpuMissing') }}
                     </el-tag>
                     <slot name="device-meta" :device="device" />
+                    <p
+                        v-for="warning in device.warnings || []"
+                        :key="warning"
+                        class="input-help whitespace-normal break-words"
+                    >
+                        {{ warning }}
+                    </p>
                 </div>
             </div>
             <div v-else class="numa-empty">{{ $t('aiTools.gpuGroup.noDevices') }}</div>

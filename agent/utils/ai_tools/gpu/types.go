@@ -1,7 +1,8 @@
 package gpu
 
 type Info struct {
-	Warnings []string `json:"warnings"`
+	VendorWarnings map[string][]string `json:"vendorWarnings,omitempty"`
+	Warnings       []string            `json:"warnings"`
 
 	CudaVersion   string `json:"cudaVersion"`
 	DriverVersion string `json:"driverVersion"`
@@ -17,6 +18,7 @@ type ECCError struct {
 }
 
 type Device struct {
+	Warnings           []string   `json:"warnings,omitempty"`
 	SharedMemory       bool       `json:"sharedMemory"`
 	ECCPending         string     `json:"eccPending"`
 	ECCErrors          []ECCError `json:"eccErrors"`

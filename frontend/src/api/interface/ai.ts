@@ -2,6 +2,7 @@ import { ReqPage } from '.';
 
 export namespace AI {
     export interface ModelGPUDevice {
+        warnings?: string[];
         index?: number;
         id: string;
         name: string;
@@ -87,6 +88,7 @@ export namespace AI {
         memoryPartial: boolean;
     }
     export interface Info {
+        vendorWarnings?: Record<string, string[]>;
         collectedAt?: string;
         warnings?: string[];
         cudaVersion: string;
@@ -100,6 +102,7 @@ export namespace AI {
         summaries?: GPUSummary[];
     }
     export interface GPU {
+        warnings?: string[];
         sharedMemory?: boolean;
         eccPending?: string;
         eccErrors?: { scope: string; correctable: string; uncorrectable: string }[];
@@ -150,6 +153,7 @@ export namespace AI {
         processes: Process[];
     }
     export interface NPU {
+        warnings?: string[];
         aiCPUUtil?: string;
         ctrlCPUUtil?: string;
         ddrBandwidth?: string;
@@ -271,6 +275,7 @@ export namespace AI {
     }
 
     interface Xpu {
+        warnings?: string[];
         tiles?: { tileID: number; stats: Stats }[];
         processStatus?: string;
         basic: Basic;

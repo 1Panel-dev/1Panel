@@ -31,84 +31,124 @@
                     </el-tooltip>
                 </template>
                 <template #main>
-                    <div v-for="summary in overviewRows" :key="summary.vendor" class="device-overview mb-2">
-                        <div class="overview-item overview-model">
-                            <strong>{{ commonDeviceModels[summary.vendor] || vendorTitle(summary.vendor) }}</strong>
-                        </div>
-                        <div class="overview-item">
-                            <span>{{ $t('aiTools.gpu.driverVersion') }}</span>
-                            <strong>{{ displayValue(summary.driverVersion) }}</strong>
-                        </div>
-                        <div class="overview-item">
-                            <span>{{ $t('aiTools.gpu.cudaVersion') }}</span>
-                            <el-tooltip
-                                v-if="summary.vendor === 'nvidia' || summary.cudaVersion"
-                                :content="$t('aiTools.gpu.environment.cudaHelper')"
-                            >
-                                <strong>{{ displayValue(summary.cudaVersion) }}</strong>
-                            </el-tooltip>
-                            <strong v-else>{{ $t('aiTools.gpu.environment.notApplicable') }}</strong>
-                        </div>
-                        <div class="overview-item">
-                            <span>
-                                {{
-                                    $t(
-                                        summary.vendor === 'intel' || summary.vendor === 'xpu'
-                                            ? 'aiTools.gpu.environment.gpuCount'
-                                            : 'aiTools.gpu.environment.cardCount',
-                                    )
-                                }}
-                            </span>
-                            <strong>{{ summary.cardCountText }}</strong>
-                        </div>
-                        <div class="overview-item">
-                            <span>
-                                {{
-                                    $t(
-                                        summary.sharedMemoryOnly
-                                            ? 'aiTools.gpu.systemMemory'
-                                            : 'aiTools.gpu.memoryTotal',
-                                    )
-                                }}
-                            </span>
-                            <el-tooltip
-                                :disabled="!summary.sharedMemoryOnly && !summary.memoryPartial"
-                                :content="summaryMemoryTooltip(summary)"
-                            >
-                                <strong v-if="summary.memoryUsage">
-                                    {{ $t('home.used') }} {{ formatSummaryMemory(summary.memoryUsage.used) }} /
-                                    {{ formatSummaryMemory(summary.memoryUsage.total) }}
-                                    <template v-if="summary.memoryUsage.percentage !== null">
-                                        ({{ summary.memoryUsage.percentage }}%)
-                                    </template>
-                                </strong>
-                                <strong v-else>
+                    <el-alert
+                        v-if="loadFailed"
+                        :title="$t('aiTools.gpu.environment.loadFailed')"
+                        type="error"
+                        :closable="false"
+                        class="mb-2"
+                    />
+                    <el-alert
+                        v-for="warning in gpuInfo.warnings || []"
+                        :key="warning"
+                        :title="warning"
+                        type="warning"
+                        :closable="false"
+                        class="mb-2"
+                    />
+                    <div v-for="summary in overviewRows" :key="summary.vendor" class="mb-2">
+                        <div class="device-overview">
+                            <div class="overview-item overview-model">
+                                <strong>{{ commonDeviceModels[summary.vendor] || vendorTitle(summary.vendor) }}</strong>
+                            </div>
+                            <div class="overview-item">
+                                <span>{{ $t('aiTools.gpu.driverVersion') }}</span>
+                                <strong>{{ displayValue(summary.driverVersion) }}</strong>
+                            </div>
+                            <div class="overview-item">
+                                <span>{{ $t('aiTools.gpu.cudaVersion') }}</span>
+                                <el-tooltip
+                                    v-if="summary.vendor === 'nvidia' || summary.cudaVersion"
+                                    :content="$t('aiTools.gpu.environment.cudaHelper')"
+                                >
+                                    <strong>{{ displayValue(summary.cudaVersion) }}</strong>
+                                </el-tooltip>
+                                <strong v-else>{{ $t('aiTools.gpu.environment.notApplicable') }}</strong>
+                            </div>
+                            <div class="overview-item">
+                                <span>
                                     {{
-                                        formatSummaryMemory(
-                                            summary.sharedMemoryOnly ? summary.sharedMemoryTotal : summary.memoryTotal,
+                                        $t(
+                                            summary.vendor === 'intel' || summary.vendor === 'xpu'
+                                                ? 'aiTools.gpu.environment.gpuCount'
+                                                : 'aiTools.gpu.environment.cardCount',
                                         )
                                     }}
-                                </strong>
-                            </el-tooltip>
-                            <el-tooltip
-                                v-if="!summary.sharedMemoryOnly && summary.sharedMemoryTotal !== null"
-                                :content="$t('aiTools.gpu.systemMemoryHelper')"
-                            >
-                                <span class="whitespace-normal">
-                                    {{
-                                        $t('aiTools.gpu.environment.sharedMemory', {
-                                            memory: sharedMemoryUsage
-                                                ? `${$t('home.used')} ${formatSummaryMemory(sharedMemoryUsage.used)} / ${formatSummaryMemory(sharedMemoryUsage.total)}`
-                                                : formatSummaryMemory(summary.sharedMemoryTotal),
-                                        })
-                                    }}
-                                    <template v-if="sharedMemoryUsage && sharedMemoryUsage.percentage !== null">
-                                        ({{ sharedMemoryUsage.percentage }}%)
-                                    </template>
                                 </span>
-                            </el-tooltip>
+                                <strong>{{ summary.cardCountText }}</strong>
+                            </div>
+                            <div class="overview-item">
+                                <span>
+                                    {{
+                                        $t(
+                                            summary.sharedMemoryOnly
+                                                ? 'aiTools.gpu.systemMemory'
+                                                : 'aiTools.gpu.memoryTotal',
+                                        )
+                                    }}
+                                </span>
+                                <el-tooltip
+                                    :disabled="!summary.sharedMemoryOnly && !summary.memoryPartial"
+                                    :content="summaryMemoryTooltip(summary)"
+                                >
+                                    <strong v-if="summary.memoryUsage">
+                                        {{ $t('home.used') }} {{ formatSummaryMemory(summary.memoryUsage.used) }} /
+                                        {{ formatSummaryMemory(summary.memoryUsage.total) }}
+                                        <template v-if="summary.memoryUsage.percentage !== null">
+                                            ({{ summary.memoryUsage.percentage }}%)
+                                        </template>
+                                    </strong>
+                                    <strong v-else>
+                                        {{
+                                            formatSummaryMemory(
+                                                summary.sharedMemoryOnly
+                                                    ? summary.sharedMemoryTotal
+                                                    : summary.memoryTotal,
+                                            )
+                                        }}
+                                    </strong>
+                                </el-tooltip>
+                                <el-tooltip
+                                    v-if="!summary.sharedMemoryOnly && summary.sharedMemoryTotal !== null"
+                                    :content="$t('aiTools.gpu.systemMemoryHelper')"
+                                >
+                                    <span class="whitespace-normal">
+                                        {{
+                                            $t('aiTools.gpu.environment.sharedMemory', {
+                                                memory: sharedMemoryUsage
+                                                    ? `${$t('home.used')} ${formatSummaryMemory(sharedMemoryUsage.used)} / ${formatSummaryMemory(sharedMemoryUsage.total)}`
+                                                    : formatSummaryMemory(summary.sharedMemoryTotal),
+                                            })
+                                        }}
+                                        <template v-if="sharedMemoryUsage && sharedMemoryUsage.percentage !== null">
+                                            ({{ sharedMemoryUsage.percentage }}%)
+                                        </template>
+                                    </span>
+                                </el-tooltip>
+                            </div>
                         </div>
+                        <el-alert
+                            v-for="warning in gpuInfo.vendorWarnings?.[summary.vendor] || []"
+                            :key="warning"
+                            :title="warning"
+                            type="warning"
+                            :closable="false"
+                            class="mt-1"
+                        />
                     </div>
+                    <section v-for="(warnings, vendor) in gpuInfo.vendorWarnings || {}" :key="vendor" class="mb-2">
+                        <template v-if="warnings?.length && !overviewRows.some((summary) => summary.vendor === vendor)">
+                            <strong>{{ vendorTitle(String(vendor)) }}</strong>
+                            <el-alert
+                                v-for="warning in warnings"
+                                :key="warning"
+                                :title="warning"
+                                type="warning"
+                                :closable="false"
+                                class="mt-1"
+                            />
+                        </template>
+                    </section>
                     <el-empty
                         v-if="!hasAccelerators && !loading && !loadFailed && !showEnvironment"
                         :description="emptyDescription"
@@ -185,6 +225,14 @@
                                         </div>
                                     </template>
 
+                                    <el-alert
+                                        v-for="warning in item.warnings || []"
+                                        :key="warning"
+                                        :title="warning"
+                                        type="warning"
+                                        :closable="false"
+                                        class="mb-2"
+                                    />
                                     <div class="device-metrics">
                                         <div class="metric-item metric-primary">
                                             <span>
@@ -331,6 +379,14 @@
                                         </div>
                                     </template>
 
+                                    <el-alert
+                                        v-for="warning in item.warnings || []"
+                                        :key="warning"
+                                        :title="warning"
+                                        type="warning"
+                                        :closable="false"
+                                        class="mb-2"
+                                    />
                                     <div class="device-metrics">
                                         <div class="metric-item metric-primary">
                                             <span>{{ $t('aiTools.gpu.gpuUtil') }}</span>
@@ -527,9 +583,6 @@
                             <pre v-if="check.reason" class="whitespace-pre-wrap break-words mt-1">{{
                                 check.reason
                             }}</pre>
-                        </div>
-                        <div v-for="warning in gpuInfo.warnings || []" :key="warning" class="break-words">
-                            {{ warning }}
                         </div>
                     </el-collapse-item>
                 </el-collapse>
@@ -891,9 +944,7 @@ const environmentStatus = computed(() => environment.value.status);
 const historyDisabled = computed(
     () =>
         (loading.value && !gpuInfo.value.environment && !hasAccelerators.value) ||
-        environmentChecks.value.some(
-            (check) => check.item === 'driver' && check.status !== 'passed' && (check.vendor || !hasAccelerators.value),
-        ),
+        (driverChecks.value.length > 0 && driverChecks.value.every((check) => check.status !== 'passed')),
 );
 const driverChecks = computed(() => environmentChecks.value.filter((check) => check.item === 'driver'));
 const containerChecks = computed(() => environmentChecks.value.filter((check) => check.item !== 'driver'));
@@ -905,7 +956,7 @@ const showEnvironment = computed(
 const hostEnvironmentStatus = computed<{ type: 'success' | 'warning' | 'info'; label: string }>(() => {
     const hasDriverIssue = driverChecks.value.some((check) => check.status !== 'passed');
     if (hasAccelerators.value && (!hasDriverIssue || driverChecks.value.some((check) => check.status === 'passed'))) {
-        return hasDriverIssue
+        return hasDriverIssue || environment.value.monitorIssueCount > 0
             ? { type: 'warning', label: 'monitorPartial' }
             : { type: 'success', label: 'monitorAvailable' };
     }
