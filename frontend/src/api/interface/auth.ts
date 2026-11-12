@@ -81,6 +81,7 @@ export namespace Login {
         theme: string;
         isOffline: boolean;
         isEnterprise: boolean;
+        isMasterProductPro: boolean;
         needCaptcha: boolean;
         passkeySetting: boolean;
     }
