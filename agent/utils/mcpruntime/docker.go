@@ -415,15 +415,27 @@ func (c *Controller) verify(ctx context.Context, cli DockerClient, id string) (v
 		probeCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
 		defer cancel()
 		version, err := c.probe(probeCtx, cli, id, "--version", 4096)
-		if err != nil || json.Unmarshal(version, &cached.metadata) != nil || !validMetadata(cached.metadata) {
+		if err != nil {
+			return verifiedImage{}, fmt.Errorf("MCP image version probe failed: %w", err)
+		}
+		if json.Unmarshal(version, &cached.metadata) != nil {
+			return verifiedImage{}, errors.New("MCP image version response is invalid JSON")
+		}
+		if !validMetadata(cached.metadata) {
 			return verifiedImage{}, errors.New("MCP image version or contract is incompatible with this panel")
 		}
 		cached.catalog, err = c.probe(probeCtx, cli, id, "--catalog", maxCatalogBytes)
+		if err != nil {
+			return verifiedImage{}, fmt.Errorf("MCP image catalog probe failed: %w", err)
+		}
 		var manifest struct {
 			ContractVersion int               `json:"contractVersion"`
 			Tools           []json.RawMessage `json:"tools"`
 		}
-		if err != nil || json.Unmarshal(cached.catalog, &manifest) != nil || manifest.ContractVersion != contractVersion || len(manifest.Tools) > 256 {
+		if json.Unmarshal(cached.catalog, &manifest) != nil {
+			return verifiedImage{}, errors.New("MCP image catalog response is invalid JSON")
+		}
+		if manifest.ContractVersion != contractVersion || len(manifest.Tools) > 256 {
 			return verifiedImage{}, errors.New("MCP image catalog is invalid or incompatible")
 		}
 		c.cacheMu.Lock()
