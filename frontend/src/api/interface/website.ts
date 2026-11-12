@@ -32,6 +32,8 @@ export namespace Website {
     }
 
     export interface WebsiteDTO extends Website {
+        status: string;
+        expireDate: string;
         errorLogPath: string;
         accessLogPath: string;
         sitePath: string;
