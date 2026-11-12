@@ -18,8 +18,9 @@ const (
 )
 
 type Info struct {
-	CollectedAt time.Time `json:"collectedAt"`
-	Warnings    []string  `json:"warnings"`
+	VendorWarnings map[string][]string `json:"vendorWarnings,omitempty"`
+	CollectedAt    time.Time           `json:"collectedAt"`
+	Warnings       []string            `json:"warnings"`
 
 	Type             string       `json:"type"`
 	CudaVersion      string       `json:"cudaVersion"`
@@ -124,12 +125,13 @@ func (s Snapshot) Warning() error {
 }
 
 type ProviderSnapshot struct {
-	Warnings      []string
-	Type          string
-	DriverVersion string
-	CudaVersion   string
-	GPUs          []gpu.Device
-	NPUs          []npu.Device
-	XPUs          []xpu.Device
-	Devices       []Device
+	VendorWarnings map[string][]string
+	Warnings       []string
+	Type           string
+	DriverVersion  string
+	CudaVersion    string
+	GPUs           []gpu.Device
+	NPUs           []npu.Device
+	XPUs           []xpu.Device
+	Devices        []Device
 }

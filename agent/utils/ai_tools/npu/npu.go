@@ -38,7 +38,6 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 
 	info := parseAscendSMI(itemData)
 	var wg sync.WaitGroup
-	warnings := make([]string, len(info.Devices))
 	for i := range info.Devices {
 		wg.Add(1)
 		go func(index int) {
@@ -47,18 +46,13 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 			mgr := cmd.NewCommandMgr(cmd.WithContext(ctx), cmd.WithTimeout(5*time.Second))
 			data, err := mgr.RunWithStdout(ascendSMICommand, "info", "-t", "usages", "-i", strconv.FormatUint(uint64(device.NPUIndex), 10), "-c", strconv.FormatUint(uint64(device.ChipIndex), 10))
 			if err != nil {
-				warnings[index] = fmt.Sprintf("npu-smi usages %d/%d: %v", device.NPUIndex, device.ChipIndex, err)
+				device.Warnings = append(device.Warnings, fmt.Sprintf("npu-smi usages %d/%d: %v", device.NPUIndex, device.ChipIndex, err))
 				return
 			}
 			applyAscendUsages(device, data)
 		}(i)
 	}
 	wg.Wait()
-	for _, warning := range warnings {
-		if warning != "" {
-			info.Warnings = append(info.Warnings, warning)
-		}
-	}
 	return info, nil
 }
 

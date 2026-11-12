@@ -19,6 +19,7 @@ import (
 func LoadModelGPUUsage(ctx context.Context, req dto.ModelGPUUsageRequest) (dto.ModelGPUUsage, error) {
 	topology := LoadModelGPUDevices()
 	result := dto.ModelGPUUsage{Devices: []dto.ModelGPUUsageDevice{}, Warnings: topology.Warnings}
+	result.Warnings = append(result.Warnings, topology.VendorWarnings[req.ImageType]...)
 	values, err := godotenv.Unmarshal(req.Env)
 	if err != nil {
 		return result, err

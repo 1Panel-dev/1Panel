@@ -44,11 +44,12 @@ export const updateBindDomain = (req: AI.BindDomain) => {
 };
 
 export const loadModelGPUDevices = (currentNode?: string) => {
-    return http.get<{ devices: AI.ModelGPUDevice[]; warnings: string[]; numaNodes: AI.ModelNUMANode[] }>(
-        '/ai/model/gpu/devices',
-        {},
-        { headers: currentNode ? { CurrentNode: currentNode } : undefined },
-    );
+    return http.get<{
+        devices: AI.ModelGPUDevice[];
+        warnings: string[];
+        vendorWarnings?: Record<string, string[]>;
+        numaNodes: AI.ModelNUMANode[];
+    }>('/ai/model/gpu/devices', {}, { headers: currentNode ? { CurrentNode: currentNode } : undefined });
 };
 
 export const loadGPUInfo = (refresh = false, currentNode?: string) => {

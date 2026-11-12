@@ -1,5 +1,23 @@
 package xpu
 
+import "encoding/json"
+
+type memorySizeString string
+
+func (s *memorySizeString) UnmarshalJSON(data []byte) error {
+	var value string
+	if err := json.Unmarshal(data, &value); err == nil {
+		*s = memorySizeString(value)
+		return nil
+	}
+	var number json.Number
+	if err := json.Unmarshal(data, &number); err != nil {
+		return err
+	}
+	*s = memorySizeString(number.String())
+	return nil
+}
+
 type DeviceUtilByProc struct {
 	DeviceID      int     `json:"device_id"`
 	MemSize       float64 `json:"mem_size"`
@@ -23,9 +41,9 @@ type discoveryDevice struct {
 	UUID               string `json:"uuid"`
 	VendorName         string `json:"vendor_name"`
 
-	MemoryPhysicalSizeByte string `json:"memory_physical_size_byte"`
-	MemoryFreeSizeByte     string `json:"memory_free_size_byte"`
-	DriverVersion          string `json:"driver_version"`
+	MemoryPhysicalSizeByte memorySizeString `json:"memory_physical_size_byte"`
+	MemoryFreeSizeByte     memorySizeString `json:"memory_free_size_byte"`
+	DriverVersion          string           `json:"driver_version"`
 }
 
 type discoveryInfo struct {
@@ -63,6 +81,7 @@ type Info struct {
 }
 
 type Device struct {
+	Warnings      []string    `json:"warnings,omitempty"`
 	ReadError     string      `json:"-"`
 	Tiles         []TileStats `json:"tiles"`
 	ProcessStatus string      `json:"processStatus"`

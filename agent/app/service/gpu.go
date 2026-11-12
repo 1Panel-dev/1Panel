@@ -52,19 +52,18 @@ func LoadGPUInfo(ctx context.Context, refresh bool) (*dto.GPURealtimeInfo, error
 		collectErr = err
 		if collected != nil {
 			snapshot = collected
+		} else if err != nil {
+			snapshot.Info.Warnings = append(snapshot.Info.Warnings, err.Error())
 		}
 	}
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	if collectErr != nil {
-		snapshot.Info.Warnings = append(snapshot.Info.Warnings, collectErr.Error())
-	}
 	if snapshot.Info.CollectedAt.IsZero() {
 		snapshot.Info.CollectedAt = time.Now()
 	}
 	if global.LOG != nil {
-		for _, warning := range snapshot.Info.Warnings {
+		for _, warning := range snapshot.Warnings {
 			global.LOG.Warnf("load realtime accelerator data: %s", warning)
 		}
 	}
@@ -167,7 +166,7 @@ func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummar
 	}
 	for _, vendor := range gpuVendors {
 		index := slices.IndexFunc(summaries, func(item dto.GPUSummary) bool { return item.Vendor == vendor })
-		if index < 0 && probe.Hardware[vendor] == 0 && !(probe.HardwareError != "" && probe.Commands[vendor] && collectErr != nil) {
+		if index < 0 && probe.Hardware[vendor] == 0 && len(info.VendorWarnings[vendor]) == 0 && !(probe.HardwareError != "" && probe.Commands[vendor] && collectErr != nil) {
 			continue
 		}
 		check := dto.GPUEnvironmentCheck{Vendor: vendor, Item: "driver", Status: "unknown"}
@@ -176,32 +175,23 @@ func assembleGPUEnvironment(probe gpuEnvironmentProbe, summaries []dto.GPUSummar
 			check.Status = "passed"
 			check.Version = summaries[index].DriverVersion
 			if vendor == "intel" {
-				var readErrors []string
+				unreadable := 0
 				for _, device := range info.XPUs {
-					if device.ReadError != "" {
-						readErrors = append(readErrors, device.ReadError)
+					if device.ReadError != "" && device.Stats == (xpu.Stats{}) && !slices.ContainsFunc(device.Tiles, func(tile xpu.TileStats) bool { return tile.Stats != (xpu.Stats{}) }) {
+						unreadable++
 					}
 				}
-				if len(readErrors) > 0 {
-					check.Status = "unknown"
-					if len(readErrors) == len(info.XPUs) {
-						check.Status = "failed"
-					}
-					check.Reason = strings.Join(readErrors, "; ")
+				if unreadable > 0 && unreadable == len(info.XPUs) {
+					check.Status = "failed"
 				}
 			}
+		case len(info.VendorWarnings[vendor]) > 0:
+			check.Status = "failed"
 		case !probe.Commands[vendor]:
 			check.Status = "missing"
 			check.Reason = "The device management utility was not found; check the driver and management tool installation."
-		case collectErr != nil:
-			check.Status = "failed"
-			check.Reason = collectErr.Error()
 		default:
 			check.Reason = "The management utility returned no readable devices."
-			if len(info.Warnings) > 0 {
-				check.Status = "failed"
-				check.Reason = strings.Join(info.Warnings, "; ")
-			}
 		}
 		result.Checks = append(result.Checks, check)
 	}

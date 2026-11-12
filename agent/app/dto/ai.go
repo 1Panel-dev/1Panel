@@ -3,21 +3,23 @@ package dto
 import "time"
 
 type ModelGPUDevice struct {
-	Index       int    `json:"index"`
-	MemoryUsed  string `json:"memoryUsed"`
-	MemoryTotal string `json:"memoryTotal"`
-	ID          string `json:"id"`
-	Name        string `json:"name"`
-	Type        string `json:"type"`
-	UUID        string `json:"uuid,omitempty"`
-	Available   bool   `json:"available"`
-	NUMANode    *int   `json:"numaNode,omitempty"`
+	Warnings    []string `json:"warnings,omitempty"`
+	Index       int      `json:"index"`
+	MemoryUsed  string   `json:"memoryUsed"`
+	MemoryTotal string   `json:"memoryTotal"`
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Type        string   `json:"type"`
+	UUID        string   `json:"uuid,omitempty"`
+	Available   bool     `json:"available"`
+	NUMANode    *int     `json:"numaNode,omitempty"`
 }
 
 type ModelGPUDevices struct {
-	Devices   []ModelGPUDevice `json:"devices"`
-	Warnings  []string         `json:"warnings"`
-	NUMANodes []ModelNUMANode  `json:"numaNodes"`
+	VendorWarnings map[string][]string `json:"vendorWarnings,omitempty"`
+	Devices        []ModelGPUDevice    `json:"devices"`
+	Warnings       []string            `json:"warnings"`
+	NUMANodes      []ModelNUMANode     `json:"numaNodes"`
 }
 
 type ModelNUMANode struct {

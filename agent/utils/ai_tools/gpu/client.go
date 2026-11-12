@@ -19,8 +19,9 @@ type Client struct {
 }
 
 type providerResult struct {
-	info *Info
-	err  error
+	vendor string
+	info   *Info
+	err    error
 }
 
 func ManagementCommands() map[string]string {
@@ -57,12 +58,18 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
+			switch item.(type) {
+			case nvidiaSMI:
+				results[index].vendor = "nvidia"
+			case amdSMI:
+				results[index].vendor = "amd"
+			}
 			results[index].info, results[index].err = item.LoadInfo(ctx)
 		}()
 	}
 	wg.Wait()
 
-	merged := &Info{}
+	merged := &Info{VendorWarnings: map[string][]string{}}
 	var (
 		errs           []error
 		types          []string
@@ -71,12 +78,15 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 	for _, result := range results {
 		if result.err != nil {
 			errs = append(errs, result.err)
+			merged.VendorWarnings[result.vendor] = append(merged.VendorWarnings[result.vendor], result.err.Error())
 			continue
 		}
 		if result.info == nil {
 			continue
 		}
-		merged.Warnings = append(merged.Warnings, result.info.Warnings...)
+		if len(result.info.Warnings) > 0 {
+			merged.VendorWarnings[result.vendor] = append(merged.VendorWarnings[result.vendor], result.info.Warnings...)
+		}
 		if result.info.Type != "" {
 			types = append(types, result.info.Type)
 		}
@@ -97,10 +107,7 @@ func (c Client) LoadInfoContext(ctx context.Context) (*Info, error) {
 	merged.Type = mergeTypes(types)
 	merged.DriverVersion = mergeDriverVersions(driverVersions)
 	if len(merged.Devices) == 0 && len(errs) > 0 {
-		return nil, fmt.Errorf("calling GPU monitoring tools failed: %w", errors.Join(errs...))
-	}
-	for _, err := range errs {
-		merged.Warnings = append(merged.Warnings, err.Error())
+		return merged, fmt.Errorf("calling GPU monitoring tools failed: %w", errors.Join(errs...))
 	}
 	return merged, nil
 }

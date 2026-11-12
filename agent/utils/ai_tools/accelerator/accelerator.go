@@ -18,6 +18,7 @@ type Client struct {
 }
 
 type providerResult struct {
+	kind     Kind
 	snapshot *ProviderSnapshot
 	err      error
 }
@@ -48,7 +49,7 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 	if err := ctx.Err(); err != nil {
 		return nil, err
 	}
-	ctx, cancel := context.WithTimeout(ctx, 15*time.Second)
+	collectCtx, cancel := context.WithTimeout(ctx, 15*time.Second)
 	defer cancel()
 	results := make([]providerResult, len(c.providers))
 	var wg sync.WaitGroup
@@ -56,11 +57,11 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			providerSnapshot, err := item.Collect(ctx)
+			providerSnapshot, err := item.Collect(collectCtx)
 			if err != nil {
 				err = fmt.Errorf("%s provider failed: %w", item.Kind(), err)
 			}
-			results[index] = providerResult{snapshot: providerSnapshot, err: err}
+			results[index] = providerResult{kind: item.Kind(), snapshot: providerSnapshot, err: err}
 		}()
 	}
 	wg.Wait()
@@ -68,20 +69,40 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 		return nil, err
 	}
 
-	snapshot := &Snapshot{}
+	snapshot := &Snapshot{Info: Info{VendorWarnings: map[string][]string{}}}
 	var (
 		errs       []error
 		active     []*ProviderSnapshot
 		xpuVersion string
 	)
+	if err := collectCtx.Err(); err != nil {
+		snapshot.Info.Warnings = append(snapshot.Info.Warnings, err.Error())
+	}
 	for _, result := range results {
-		if result.err != nil {
-			errs = append(errs, result.err)
-			continue
+		vendor := ""
+		switch result.kind {
+		case KindXPU:
+			vendor = "intel"
+		case KindNPU:
+			vendor = "ascend"
+		}
+		if result.err != nil && (result.snapshot == nil || len(result.snapshot.VendorWarnings) == 0) {
+			if vendor == "" {
+				snapshot.Info.Warnings = append(snapshot.Info.Warnings, result.err.Error())
+			} else {
+				snapshot.Info.VendorWarnings[vendor] = append(snapshot.Info.VendorWarnings[vendor], result.err.Error())
+			}
 		}
 		if result.snapshot != nil {
-			for _, warning := range result.snapshot.Warnings {
-				errs = append(errs, errors.New(warning))
+			for key, warnings := range result.snapshot.VendorWarnings {
+				if len(warnings) > 0 {
+					snapshot.Info.VendorWarnings[key] = append(snapshot.Info.VendorWarnings[key], warnings...)
+				}
+			}
+			if vendor != "" && len(result.snapshot.Warnings) > 0 {
+				snapshot.Info.VendorWarnings[vendor] = append(snapshot.Info.VendorWarnings[vendor], result.snapshot.Warnings...)
+			} else {
+				snapshot.Info.Warnings = append(snapshot.Info.Warnings, result.snapshot.Warnings...)
 			}
 		}
 		if result.snapshot == nil || len(result.snapshot.Devices) == 0 {
@@ -100,17 +121,33 @@ func (c Client) Collect(ctx context.Context) (*Snapshot, error) {
 			xpuVersion = item.DriverVersion
 		}
 	}
-	snapshot.Warnings = append(snapshot.Warnings, errs...)
-	if len(snapshot.Devices) == 0 && len(errs) > 0 {
-		return nil, fmt.Errorf("calling accelerator monitoring tools failed: %w", errors.Join(errs...))
+	warnings := append([]string{}, snapshot.Info.Warnings...)
+	for _, vendorWarnings := range snapshot.Info.VendorWarnings {
+		warnings = append(warnings, vendorWarnings...)
 	}
-
+	for _, device := range snapshot.Devices {
+		if device.ParentID != "" {
+			continue
+		}
+		switch {
+		case device.GPU != nil:
+			warnings = append(warnings, device.GPU.Warnings...)
+		case device.NPU != nil:
+			warnings = append(warnings, device.NPU.Warnings...)
+		case device.XPU != nil:
+			warnings = append(warnings, device.XPU.Warnings...)
+		}
+	}
+	for _, warning := range warnings {
+		errs = append(errs, errors.New(warning))
+	}
+	snapshot.Warnings = errs
 	snapshot.Info.CollectedAt = time.Now()
-	for _, err := range errs {
-		snapshot.Info.Warnings = append(snapshot.Info.Warnings, err.Error())
-	}
 	snapshot.Info.XPUDriverVersion = xpuVersion
 	snapshot.Info.Type, snapshot.Info.DriverVersion = mergeProviderMetadata(active)
+	if len(snapshot.Devices) == 0 && len(errs) > 0 {
+		return snapshot, fmt.Errorf("calling accelerator monitoring tools failed: %w", errors.Join(errs...))
+	}
 	return snapshot, nil
 }
 

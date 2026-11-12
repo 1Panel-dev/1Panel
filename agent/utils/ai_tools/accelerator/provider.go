@@ -22,20 +22,21 @@ func (p gpuProvider) Kind() Kind { return KindGPU }
 
 func (p gpuProvider) Collect(ctx context.Context) (*ProviderSnapshot, error) {
 	info, err := p.client.LoadInfoContext(ctx)
-	if err != nil {
+	if info == nil {
 		return nil, err
 	}
 	result := &ProviderSnapshot{
-		Type:          info.Type,
-		Warnings:      info.Warnings,
-		DriverVersion: info.DriverVersion,
-		CudaVersion:   info.CudaVersion,
-		GPUs:          info.Devices,
+		VendorWarnings: info.VendorWarnings,
+		Type:           info.Type,
+		Warnings:       info.Warnings,
+		DriverVersion:  info.DriverVersion,
+		CudaVersion:    info.CudaVersion,
+		GPUs:           info.Devices,
 	}
 	for index := range result.GPUs {
 		result.Devices = append(result.Devices, normalizeGPU(&result.GPUs[index]))
 	}
-	return result, nil
+	return result, err
 }
 
 type npuProvider struct {

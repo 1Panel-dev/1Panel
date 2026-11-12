@@ -286,8 +286,37 @@
                     <el-checkbox value="compute">compute</el-checkbox>
                 </el-checkbox-group>
             </el-form-item>
-            <span v-if="selectingDevices && gpuWarnings.length" class="input-help">{{ gpuWarnings.join('; ') }}</span>
         </div>
+        <template v-if="!loading">
+            <p v-for="warning in gpuWarnings" :key="warning" class="input-help">{{ warning }}</p>
+            <el-alert
+                v-for="warning in vendorWarnings[imageType] || []"
+                :key="warning"
+                :title="warning"
+                type="warning"
+                :closable="false"
+                class="mt-2"
+            />
+            <template v-if="!selectingDevices || (!groupEditor && hasMultipleGPUs && selectionMode !== 'custom')">
+                <div
+                    v-for="device in (gpuDevices || []).filter(
+                        (item) => item.type === imageType && item.warnings?.length,
+                    )"
+                    :key="device.id"
+                    class="mt-2"
+                >
+                    <span>{{ device.name }}</span>
+                    <el-alert
+                        v-for="warning in device.warnings"
+                        :key="warning"
+                        :title="warning"
+                        type="warning"
+                        :closable="false"
+                        class="mt-1"
+                    />
+                </div>
+            </template>
+        </template>
     </component>
     <GroupOperate
         v-if="!groupEditor && groupEditorVisible"
@@ -320,6 +349,7 @@ const model = defineModel<AI.ModelGPUConfig>({ required: true });
 const sectionRef = ref<HTMLDetailsElement>();
 const loading = ref(false);
 const gpuWarnings = ref<string[]>([]);
+const vendorWarnings = ref<Record<string, string[]>>({});
 const gpuDevices = ref<AI.ModelGPUDevice[]>();
 const hasMultipleGPUs = computed(() => (gpuDevices.value?.length || 0) > 1);
 const numaNodes = ref<AI.ModelNUMANode[]>([]);
@@ -560,6 +590,7 @@ const init = async (create: boolean) => {
 
     gpuDevices.value = undefined;
     gpuWarnings.value = [];
+    vendorWarnings.value = {};
     numaNodes.value = [];
     model.value.numa ??= { mode: 'off', nodes: [] };
     if (create) {
@@ -596,6 +627,7 @@ const init = async (create: boolean) => {
         }
         numaNodes.value = data.numaNodes || [];
         gpuWarnings.value = data.warnings || [];
+        vendorWarnings.value = data.vendorWarnings || {};
         if (create) model.value.enabled = hasSupportedGPU.value;
         if (!hasMultipleGPUs.value) {
             selectionMode.value = 'custom';

@@ -29,7 +29,11 @@ func (n nvidiaSMI) LoadInfo(ctx context.Context) (*Info, error) {
 	if slices.ContainsFunc(info.Devices, func(device Device) bool { return device.SharedMemory }) {
 		memory, err := mem.VirtualMemoryWithContext(ctx)
 		if err != nil {
-			info.Warnings = append(info.Warnings, fmt.Sprintf("read system shared memory: %v", err))
+			for index := range info.Devices {
+				if info.Devices[index].SharedMemory {
+					info.Devices[index].Warnings = append(info.Devices[index].Warnings, fmt.Sprintf("read system shared memory: %v", err))
+				}
+			}
 		} else {
 			for index := range info.Devices {
 				device := &info.Devices[index]
