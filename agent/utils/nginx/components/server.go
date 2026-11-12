@@ -1,8 +1,10 @@
 package components
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -289,6 +291,91 @@ func (s *Server) UpdateServerName(names []string) {
 
 func (s *Server) UpdateRoot(path string) {
 	s.UpdateDirective("root", []string{path})
+}
+
+const StopPageRoot = "/usr/share/nginx/html/stop"
+const stopPageComment = "# 1Panel managed stop page"
+
+const stopPagePattern = `"^/(?![.]well-known/acme-challenge(?:/|$))"`
+
+// EnableStopPage reports whether the configuration needs to be written.
+func (s *Server) EnableStopPage() bool {
+	httpsOnly := slices.ContainsFunc(s.Directives, isHTTP2HTTPSRedirect)
+	if s.HasStopPage() && stopPageRewrite(s.Directives[0]) != nil &&
+		(s.Directives[0].GetName() == "if") == httpsOnly {
+		return false
+	}
+	s.DisableStopPage()
+	// Includes resolve inside OpenResty. Give each activation its own exact
+	// location instead of claiming a fixed URI from the site's namespace.
+	uri := "/.1panel-stop/" + rand.Text() + "/index.html"
+	var rewrite IDirective = &Directive{
+		Name: "rewrite", Comment: stopPageComment,
+		Parameters: []string{stopPagePattern, uri, "last"},
+	}
+	if httpsOnly {
+		// Let HTTP requests follow the site's existing redirect, including its port.
+		rewrite = &Directive{Name: "if", Parameters: []string{"(", "$scheme", "=", "https", ")"},
+			Block: &Block{Directives: []IDirective{rewrite}}}
+	}
+	location := &Directive{
+		Name: "location", Parameters: []string{"=", uri},
+		Block: &Block{Directives: []IDirective{
+			&Directive{Name: "root", Parameters: []string{StopPageRoot}},
+			&Directive{Name: "try_files", Parameters: []string{"/index.html", "=404"}},
+		}},
+	}
+	s.Directives = append([]IDirective{rewrite, location}, s.Directives...)
+	return true
+}
+
+func stopPageRewrite(dir IDirective) IDirective {
+	if dir.GetName() == "if" && dir.GetBlock() != nil {
+		children := dir.GetBlock().GetDirectives()
+		if len(children) != 1 || strings.Join(dir.GetParameters(), "") != "($scheme=https)" {
+			return nil
+		}
+		dir = children[0]
+	}
+	if dir.GetName() == "rewrite" && dir.GetComment() == stopPageComment && len(dir.GetParameters()) == 3 {
+		return dir
+	}
+	return nil
+}
+
+func (s *Server) DisableStopPage() {
+	for _, dir := range s.Directives {
+		if rewrite := stopPageRewrite(dir); rewrite != nil {
+			uri := rewrite.GetParameters()[1]
+			s.Directives = slices.DeleteFunc(s.Directives, func(d IDirective) bool {
+				return d == dir || d.GetName() == "location" && slices.Equal(d.GetParameters(), []string{"=", uri})
+			})
+			return
+		}
+	}
+}
+
+func (s *Server) HasStopPage() bool {
+	for _, dir := range s.Directives {
+		rewrite := stopPageRewrite(dir)
+		if rewrite == nil {
+			continue
+		}
+		params := rewrite.GetParameters()
+		if params[0] != stopPagePattern || params[2] != "last" {
+			return false
+		}
+		for _, location := range s.Directives {
+			if location.GetName() != "location" || !slices.Equal(location.GetParameters(), []string{"=", params[1]}) || location.GetBlock() == nil {
+				continue
+			}
+			children := location.GetBlock().GetDirectives()
+			return len(children) == 2 && children[0].GetName() == "root" &&
+				slices.Equal(children[0].GetParameters(), []string{StopPageRoot}) &&
+				children[1].GetName() == "try_files" && slices.Equal(children[1].GetParameters(), []string{"/index.html", "=404"})
+		}
+	}
+	return false
 }
 
 func (s *Server) UpdateRootProxyForAi(proxy []string) {

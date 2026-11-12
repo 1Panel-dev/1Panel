@@ -1428,7 +1428,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 				server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
 			}
 		}
-		if req.RuntimeID > 0 && site.Status != constant.WebStopped {
+		if req.RuntimeID > 0 && (site.Status != constant.WebStopped || server.HasStopPage()) {
 			updated := false
 			for _, location := range server.FindDirectives("location") {
 				if strings.Join(location.GetParameters(), " ") == "~ [^/]\\.php(/|$)" && location.GetBlock() != nil {

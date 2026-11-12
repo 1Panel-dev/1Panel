@@ -13,6 +13,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -1096,6 +1097,9 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 }
 
 func applyWebsiteSSLConfig(server *components.Server, website model.Website, plan websiteTLSPlan, req request.WebsiteHTTPSOp) {
+	if server.HasStopPage() {
+		defer server.EnableStopPage()
+	}
 	for _, port := range plan.httpsPorts {
 		portStr := strconv.Itoa(port)
 		server.RemoveListenByBind(portStr)
@@ -1255,108 +1259,28 @@ func opWebsite(website *model.Website, operate string) error {
 	}
 	server := servers[0]
 	if operate == constant.StopWeb {
-		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
-		server.RemoveDirective("include", []string{proxyInclude})
-		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
-		server.RemoveDirective("include", []string{rewriteInclude})
-		redirectInclude := getWebsiteRedirectInclude(*website)
-		server.RemoveDirective("include", []string{redirectInclude})
-
-		switch website.Type {
-		case constant.Deployment:
-			server.RemoveDirective("location", []string{"/"})
-		case constant.Runtime:
-			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
-			if err != nil {
-				return err
-			}
-			if runtime.Type == constant.RuntimePHP {
-				server.RemoveDirective("location", []string{"~", "[^/]\\.php(/|$)"})
-			} else {
-				server.RemoveDirective("location", []string{"/"})
+		changed := false
+		for _, siteServer := range servers {
+			if siteServer.EnableStopPage() {
+				changed = true
 			}
 		}
-		server.UpdateRoot("/usr/share/nginx/html/stop")
 		website.Status = constant.WebStopped
+		if !changed {
+			return nil
+		}
 	}
 	if operate == constant.StartWeb {
-		absoluteIncludeDir := GetSitePath(*website, SiteProxyDir)
-		fileOp := files.NewFileOp()
-		if fileOp.Stat(absoluteIncludeDir) && !files.IsEmptyDir(absoluteIncludeDir) {
-			proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
-			server.UpdateDirective("include", []string{proxyInclude})
+		for _, siteServer := range servers {
+			siteServer.DisableStopPage()
 		}
-		rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
-		absoluteRewritePath := GetSitePath(*website, SiteReWritePath)
-		if fileOp.Stat(absoluteRewritePath) {
-			server.UpdateDirective("include", []string{rewriteInclude})
-		}
-		redirectInclude := getWebsiteRedirectInclude(*website)
-		absoluteRedirectPath := GetSitePath(*website, SiteRedirectDir)
-		if fileOp.Stat(absoluteRedirectPath) {
-			server.UpdateDirective("include", []string{redirectInclude})
-		}
-		rootIndex := path.Join("/www/sites", website.Alias, "index")
-		if website.SiteDir != "/" {
-			rootIndex = path.Join(rootIndex, website.SiteDir)
-		}
-		switch website.Type {
-		case constant.Deployment:
-			server.RemoveDirective("root", nil)
-			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
-			if err != nil {
-				return err
-			}
-			proxy, err := getAppInstallProxyPass(&appInstall)
-			if err != nil {
-				return err
-			}
-			server.UpdateRootProxy([]string{proxy})
-		case constant.Static:
-			server.UpdateRoot(rootIndex)
-			server.UpdateRootLocation()
-		case constant.Proxy:
-			server.RemoveDirective("root", nil)
-		case constant.Runtime:
-			server.UpdateRoot(rootIndex)
-			localPath := ""
-			runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
-			if err != nil {
-				return err
-			}
-			if runtime.Type == constant.RuntimePHP {
-				if website.ProxyType == constant.RuntimeProxyUnix || website.ProxyType == constant.RuntimeProxyTcp {
-					localPath = path.Join(rootIndex, "index.php")
-				}
-				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
-			} else {
-				proxy := normalizeProxyPass(website.Proxy)
-				server.UpdateRootProxy([]string{proxy})
-			}
-		case constant.Subsite:
-			parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
-			if err != nil {
-				return err
-			}
-			website.Proxy = parentWebsite.Proxy
-			rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
-			if parentWebsite.Type == constant.Runtime {
-				parentRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(parentWebsite.RuntimeID))
-				if err != nil {
+		// Older agents stopped sites by replacing the root and deleting routes.
+		for _, directive := range server.Directives {
+			if directive.GetName() == "root" && slices.Equal(directive.GetParameters(), []string{components.StopPageRoot}) {
+				if err := restoreLegacyWebsiteRoutes(server, website); err != nil {
 					return err
 				}
-				website.RuntimeID = parentRuntime.ID
-				if parentRuntime.Type == constant.RuntimePHP {
-					server.UpdateRoot(rootIndex)
-					localPath := ""
-					if parentRuntime.Resource == constant.ResourceLocal {
-						localPath = path.Join(rootIndex, "index.php")
-					}
-					server.UpdatePHPProxy([]string{website.Proxy}, localPath)
-				}
-			}
-			if parentWebsite.Type == constant.Static {
-				server.UpdateRoot(rootIndex)
+				break
 			}
 		}
 		website.Status = constant.WebRunning
@@ -1371,6 +1295,89 @@ func opWebsite(website *model.Website, operate string) error {
 		return err
 	}
 	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
+}
+
+func restoreLegacyWebsiteRoutes(server *components.Server, website *model.Website) error {
+	absoluteIncludeDir := GetSitePath(*website, SiteProxyDir)
+	fileOp := files.NewFileOp()
+	if fileOp.Stat(absoluteIncludeDir) && !files.IsEmptyDir(absoluteIncludeDir) {
+		proxyInclude := fmt.Sprintf("/www/sites/%s/proxy/*.conf", website.Alias)
+		server.UpdateDirective("include", []string{proxyInclude})
+	}
+	rewriteInclude := fmt.Sprintf("/www/sites/%s/rewrite/%s.conf", website.Alias, website.Alias)
+	absoluteRewritePath := GetSitePath(*website, SiteReWritePath)
+	if fileOp.Stat(absoluteRewritePath) {
+		server.UpdateDirective("include", []string{rewriteInclude})
+	}
+	redirectInclude := getWebsiteRedirectInclude(*website)
+	absoluteRedirectPath := GetSitePath(*website, SiteRedirectDir)
+	if fileOp.Stat(absoluteRedirectPath) {
+		server.UpdateDirective("include", []string{redirectInclude})
+	}
+	rootIndex := path.Join("/www/sites", website.Alias, "index")
+	if website.SiteDir != "/" {
+		rootIndex = path.Join(rootIndex, website.SiteDir)
+	}
+	switch website.Type {
+	case constant.Deployment:
+		server.RemoveDirective("root", nil)
+		appInstall, err := appInstallRepo.GetFirst(repo.WithByID(website.AppInstallID))
+		if err != nil {
+			return err
+		}
+		proxy, err := getAppInstallProxyPass(&appInstall)
+		if err != nil {
+			return err
+		}
+		server.UpdateRootProxy([]string{proxy})
+	case constant.Static:
+		server.UpdateRoot(rootIndex)
+		server.UpdateRootLocation()
+	case constant.Proxy:
+		server.RemoveDirective("root", nil)
+	case constant.Runtime:
+		server.UpdateRoot(rootIndex)
+		localPath := ""
+		runtime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+		if err != nil {
+			return err
+		}
+		if runtime.Type == constant.RuntimePHP {
+			if website.ProxyType == constant.RuntimeProxyUnix || website.ProxyType == constant.RuntimeProxyTcp {
+				localPath = path.Join(rootIndex, "index.php")
+			}
+			server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+		} else {
+			proxy := normalizeProxyPass(website.Proxy)
+			server.UpdateRootProxy([]string{proxy})
+		}
+	case constant.Subsite:
+		parentWebsite, err := websiteRepo.GetFirst(repo.WithByID(website.ParentWebsiteID))
+		if err != nil {
+			return err
+		}
+		website.Proxy = parentWebsite.Proxy
+		rootIndex = path.Join("/www/sites", parentWebsite.Alias, "index", website.SiteDir)
+		if parentWebsite.Type == constant.Runtime {
+			parentRuntime, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(parentWebsite.RuntimeID))
+			if err != nil {
+				return err
+			}
+			website.RuntimeID = parentRuntime.ID
+			if parentRuntime.Type == constant.RuntimePHP {
+				server.UpdateRoot(rootIndex)
+				localPath := ""
+				if parentRuntime.Resource == constant.ResourceLocal {
+					localPath = path.Join(rootIndex, "index.php")
+				}
+				server.UpdatePHPProxy([]string{website.Proxy}, localPath)
+			}
+		}
+		if parentWebsite.Type == constant.Static {
+			server.UpdateRoot(rootIndex)
+		}
+	}
+	return nil
 }
 
 func changeIPV6(website model.Website, enable bool) error {
