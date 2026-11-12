@@ -776,6 +776,7 @@ import { useMultipleSearchable } from './hooks/searchable';
 import { mergeDirSizeCache, sortFilesByDisplaySize, updateDirSizeCache } from './size-cache';
 import { ResultData } from '@/api/interface';
 import { useGlobalStore } from '@/composables/useGlobalStore';
+import { resolveMaybeFn, type FuTableOperationButton } from '@/components/table/shared';
 import { Download as ElDownload, Upload as ElUpload, View, Hide } from '@element-plus/icons-vue';
 
 import i18n from '@/lang';
@@ -845,7 +846,7 @@ const setTableRef = (key: string, el: any) => {
 };
 const getCurrentTable = () => tableRefs.value[editableTabsKey.value];
 
-let selects = ref<any>([]);
+const selects = ref<File.File[]>([]);
 
 const initData = () => ({
     path: '/',
@@ -1013,11 +1014,11 @@ const getCurrentBtnWrapper = () => btnWrapperRefs.value[editableTabsKey.value];
 const toolButtons = ref([
     {
         label: 'commons.button.copy',
-        action: () => openMove('copy'),
+        action: () => openMove('copy', selects.value),
     },
     {
         label: 'file.move',
-        action: () => openMove('cut'),
+        action: () => openMove('cut', selects.value),
     },
     {
         label: 'file.compress',
@@ -1421,8 +1422,8 @@ const delFile = async (row: File.File | null) => {
     deleteRef.value.acceptParams([row], currentNode.value);
 };
 
-const batchDelFiles = () => {
-    deleteRef.value.acceptParams(selects.value, currentNode.value);
+const batchDelFiles = (items: File.File[] = selects.value) => {
+    deleteRef.value.acceptParams([...items], currentNode.value);
 };
 
 const formatFileSize = (size: number) => {
@@ -1864,23 +1865,23 @@ const getPath = (path: string, name: string) => {
     return path === '/' ? path + name : path + '/' + name;
 };
 
-const openMove = (type: string) => {
+const openMove = (type: string, items: File.File[]) => {
     fileMove.type = type;
     fileMove.name = '';
     fileMove.allNames = [];
     fileMove.isDir = false;
     const oldPaths = [];
-    for (const s of selects.value) {
+    for (const s of items) {
         oldPaths.push(s['path']);
     }
-    fileMove.count = selects.value.length;
+    fileMove.count = items.length;
     fileMove.oldPaths = oldPaths;
-    if (selects.value.length == 1) {
-        fileMove.name = selects.value[0].name;
-        fileMove.isDir = selects.value[0].isDir;
+    if (items.length == 1) {
+        fileMove.name = items[0].name;
+        fileMove.isDir = items[0].isDir;
     } else {
         const allNames = [];
-        for (const s of selects.value) {
+        for (const s of items) {
             allNames.push(s['name']);
         }
         fileMove.allNames = allNames;
@@ -1892,12 +1893,6 @@ const openMove = (type: string) => {
         MsgSuccess(i18n.global.t('file.copySuccess') + '! ' + i18n.global.t('file.pasteMsg'));
     }
     updateButtons();
-};
-
-const openMoveBtn = (type: string, item: File.File) => {
-    selects.value = [];
-    selects.value.push(item);
-    openMove(type);
 };
 
 const closeMove = () => {
@@ -2071,7 +2066,13 @@ const openRemark = async (row: File.File) => {
     }
 };
 
-const beforeButtons = [
+type FileOperationButton = FuTableOperationButton<File.File> & {
+    batchClick?: (items: File.File[]) => void;
+    allowMultiple?: boolean;
+    hideOnRemarkBlackList?: boolean;
+};
+
+const beforeButtons: FileOperationButton[] = [
     {
         label: i18n.global.t('commons.button.open'),
         click: open,
@@ -2102,16 +2103,19 @@ const beforeButtons = [
         label: i18n.global.t('commons.button.copy'),
         permission: true,
         nodeAdmin: true,
-        click: (row: File.File) => openMoveBtn('copy', row),
+        click: (row: File.File) => openMove('copy', [row]),
+        batchClick: (items) => openMove('copy', items),
     },
     {
         label: i18n.global.t('file.move'),
         permission: true,
         nodeAdmin: true,
-        click: (row: File.File) => openMoveBtn('cut', row),
+        click: (row: File.File) => openMove('cut', [row]),
+        batchClick: (items) => openMove('cut', items),
     },
     {
         label: i18n.global.t('file.paste'),
+        allowMultiple: true,
         permission: true,
         nodeAdmin: true,
         click: openPaste,
@@ -2126,6 +2130,7 @@ const beforeButtons = [
         click: (row: File.File) => {
             openCompress([row]);
         },
+        batchClick: openCompress,
     },
     {
         label: i18n.global.t('file.deCompress'),
@@ -2141,6 +2146,7 @@ const beforeButtons = [
         click: (row: File.File) => {
             openBatchRole([row]);
         },
+        batchClick: openBatchRole,
     },
     {
         label: i18n.global.t('file.setRemark'),
@@ -2152,7 +2158,7 @@ const beforeButtons = [
         },
     },
 ];
-const afterButtons = [
+const afterButtons: FileOperationButton[] = [
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
@@ -2161,6 +2167,7 @@ const afterButtons = [
             return row.name == '.1panel_clash';
         },
         click: delFile,
+        batchClick: batchDelFiles,
         divided: true,
     },
     {
@@ -2227,7 +2234,7 @@ const afterButtons = [
     },
 ];
 
-const rightBtnRename = [
+const rightBtnRename: FileOperationButton[] = [
     {
         label: i18n.global.t('file.rename'),
         permission: true,
@@ -2237,7 +2244,7 @@ const rightBtnRename = [
         },
     },
 ];
-const moreBtnRename = [
+const moreBtnRename: FileOperationButton[] = [
     {
         label: i18n.global.t('file.rename'),
         permission: true,
@@ -2248,14 +2255,42 @@ const moreBtnRename = [
     },
 ];
 
-const filterRemarkButtons = (buttons: any[]) => {
+const filterRemarkButtons = (buttons: FileOperationButton[]) => {
     if (!isInRemarkBlackList(req.path)) {
         return buttons;
     }
     return buttons.filter((btn) => !btn.hideOnRemarkBlackList);
 };
 
-const rightButtons = computed(() => filterRemarkButtons([...beforeButtons, ...rightBtnRename, ...afterButtons]));
+const getContextMenuFiles = (row: File.File | null): File.File[] => {
+    if (!row) return [];
+    return selects.value.some((item) => item.path === row.path) ? [...selects.value] : [row];
+};
+
+const rightButtons = computed(() =>
+    filterRemarkButtons([...beforeButtons, ...rightBtnRename, ...afterButtons]).map((button) => ({
+        ...button,
+        show: (row: File.File) => {
+            const items = getContextMenuFiles(row);
+            return (
+                items.length > 0 &&
+                (items.length === 1 || !!button.batchClick || button.allowMultiple === true) &&
+                items.every((item) => resolveMaybeFn(button.show ?? true, item))
+            );
+        },
+        disabled: (row: File.File) =>
+            getContextMenuFiles(row).some((item) => resolveMaybeFn(button.disabled ?? false, item)),
+        click: (row: File.File) => {
+            // Only the context menu expands the operation to the current selection.
+            const items = getContextMenuFiles(row);
+            if (button.batchClick) {
+                button.batchClick(items);
+            } else {
+                button.click?.(row);
+            }
+        },
+    })),
+);
 const tableMoreButtons = computed(() => filterRemarkButtons([...beforeButtons, ...moreBtnRename, ...afterButtons]));
 const openConvert = (item: File.File) => {
     if (!ffmpegExist.value) {
