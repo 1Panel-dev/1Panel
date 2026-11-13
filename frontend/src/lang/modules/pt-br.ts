@@ -1366,6 +1366,10 @@ const message = {
             container_conn_helper: 'Use este endereço para acesso ou conexão entre contêineres',
             from_remote: 'Este modelo não foi baixado pelo 1Panel; não há logs de download relacionados.',
             no_logs: 'Os logs de download deste modelo foram excluídos e não podem ser visualizados.',
+            composeFile: 'Arquivo de Orquestração',
+            imageCategory: 'Tipo de imagem',
+            standardImage: 'Imagem padrão',
+            customImage: 'Imagem personalizada',
             vllmVersionHelper: {
                 ascend: 'Versão padrão oficial do Ascend para dispositivos da série Ascend A2.',
                 ascendA3: 'Versão oficial Ascend A3 para dispositivos da série Ascend A3.',

@@ -1338,6 +1338,10 @@ const message = {
             container_conn_helper: 'コンテナ間のアクセスまたは接続にこのアドレスを使用',
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
+            composeFile: 'オーケストレーションファイル',
+            imageCategory: 'イメージの種類',
+            standardImage: '標準イメージ',
+            customImage: 'カスタムイメージ',
             vllmVersionHelper: {
                 ascend: 'Ascend A2 シリーズ向けの Ascend 公式標準版です。',
                 ascendA3: 'Ascend A3 シリーズ向けの Ascend 公式 A3 版です。',
