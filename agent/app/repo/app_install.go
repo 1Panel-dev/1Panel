@@ -31,7 +31,8 @@ type IAppInstallRepo interface {
 	GetFirst(opts ...DBOption) (model.AppInstall, error)
 	Create(ctx context.Context, install *model.AppInstall) error
 	Save(ctx context.Context, install *model.AppInstall) error
-	UpdateStatus(install *model.AppInstall) error
+	UpdateWebUI(id uint, address string) error
+	UpdateStatus(install *model.AppInstall, matchUpdatedAt bool) error
 	DeleteBy(opts ...DBOption) error
 	Delete(ctx context.Context, install model.AppInstall) error
 	Page(page, size int, opts ...DBOption) (int64, []model.AppInstall, error)
@@ -47,9 +48,20 @@ func NewIAppInstallRepo() IAppInstallRepo {
 	return &AppInstallRepo{}
 }
 
-func (a *AppInstallRepo) UpdateStatus(install *model.AppInstall) error {
-	return getDb().Model(&model.AppInstall{}).Where("id = ? AND updated_at = ?", install.ID, install.UpdatedAt).
-		Updates(map[string]interface{}{"status": install.Status, "message": install.Message, "container_name": install.ContainerName}).Error
+func (a *AppInstallRepo) UpdateWebUI(id uint, address string) error {
+	result := getDb().Model(&model.AppInstall{}).Where("id = ?", id).Update("web_ui", address)
+	if result.Error == nil && result.RowsAffected == 0 {
+		return gorm.ErrRecordNotFound
+	}
+	return result.Error
+}
+
+func (a *AppInstallRepo) UpdateStatus(install *model.AppInstall, matchUpdatedAt bool) error {
+	db := getDb().Model(&model.AppInstall{}).Where("id = ?", install.ID)
+	if matchUpdatedAt {
+		db = db.Where("updated_at = ?", install.UpdatedAt)
+	}
+	return db.Updates(map[string]interface{}{"status": install.Status, "message": install.Message, "container_name": install.ContainerName}).Error
 }
 
 func (a *AppInstallRepo) WithDetailIdsIn(detailIds []uint) DBOption {
@@ -151,7 +163,7 @@ func (a *AppInstallRepo) Create(ctx context.Context, install *model.AppInstall) 
 }
 
 func (a *AppInstallRepo) Save(ctx context.Context, install *model.AppInstall) error {
-	return getTx(ctx).Omit("App").Save(&install).Error
+	return getTx(ctx).Omit("App").Save(install).Error
 }
 
 func (a *AppInstallRepo) DeleteBy(opts ...DBOption) error {

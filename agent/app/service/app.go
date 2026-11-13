@@ -599,7 +599,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 		if _, err = SyncLocalModelAccount(*appInstall, 0, modelAccountBaseURL, nil, false, true, nil); err != nil {
 			appInstall.Status = constant.StatusInstallErr
 			appInstall.Message = err.Error()
-			_ = appInstallRepo.Save(context.Background(), appInstall)
+			_ = appInstallRepo.UpdateStatus(appInstall, false)
 			return
 		}
 	}
@@ -608,7 +608,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	if err != nil {
 		appInstall.Status = constant.StatusInstallErr
 		appInstall.Message = err.Error()
-		if saveErr := appInstallRepo.Save(context.Background(), appInstall); saveErr != nil {
+		if saveErr := appInstallRepo.UpdateStatus(appInstall, false); saveErr != nil {
 			err = fmt.Errorf("%w; save failed install status: %v", err, saveErr)
 		}
 		return
@@ -650,7 +650,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	handleAppStatus := func(t *task.Task) {
 		appInstall.Status = constant.StatusUpErr
 		appInstall.Message = installTask.Task.ErrorMsg
-		_ = appInstallRepo.Save(context.Background(), appInstall)
+		_ = appInstallRepo.UpdateStatus(appInstall, false)
 	}
 
 	installTimeout := time.Hour
@@ -666,7 +666,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 			if strings.Contains(taskErr.Error(), "Timeout") && strings.Contains(taskErr.Error(), "Pulling") {
 				appInstall.Message = buserr.New("PullImageTimeout").Error() + appInstall.Message
 			}
-			_ = appInstallRepo.Save(context.Background(), appInstall)
+			_ = appInstallRepo.UpdateStatus(appInstall, false)
 		}
 	}()
 
