@@ -305,7 +305,7 @@ const message = {
                 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 30.',
             dbName: 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 64.',
             imageName:
-                'Este campo debe estar compuesto por letras, números, ":", "@", "/", ".", "-", y "_" con una longitud de 1 a 256.',
+                `Este campo debe estar compuesto por letras, números, ":", "{'@'}", "/", ".", "-", y "_" con una longitud de 1 a 256.`,
             volumeName:
                 'Este campo debe estar compuesto por letras, números, ".", "-", y "_" con una longitud de 2 a 30.',
             supervisorName:

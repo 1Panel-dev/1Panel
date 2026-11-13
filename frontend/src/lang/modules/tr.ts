@@ -308,7 +308,7 @@ const message = {
                 'Bu alan alt çizgi karakteriyle başlamamalı ve İngilizce, rakam, ve "_" karakterlerinden oluşmalı, uzunluk 1-30 olmalıdır.',
             dbName: 'Bu alan alt çizgi karakteriyle başlamamalı ve İngilizce, rakam, ve "_" karakterlerinden oluşmalı, uzunluk 1-64 olmalıdır.',
             imageName:
-                'Bu alan İngilizce, rakam, ":", "@", "/", ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-256 olmalıdır.',
+                `Bu alan İngilizce, rakam, ":", "{'@'}", "/", ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-256 olmalıdır.`,
             volumeName: 'Bu alan İngilizce, rakam, ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 2-30 olmalıdır.',
             supervisorName:
                 'Bu alan özel olmayan karakterlerle başlamalı ve İngilizce, rakam, "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-128 olmalıdır.',
