@@ -272,8 +272,13 @@ func deleteNginxConfig(scope string, params []dto.NginxParam, website *model.Web
 		block = config.Config.Block
 	}
 
+	server, isServer := block.(*components.Server)
+	wasStopped := isServer && server.HasStopPage()
 	for _, param := range params {
 		block.RemoveDirective(param.Name, param.Params)
+	}
+	if wasStopped {
+		server.EnableStopPage()
 	}
 
 	if err := nginx.WriteConfig(config.Config, nginx.IndentedStyle); err != nil {
