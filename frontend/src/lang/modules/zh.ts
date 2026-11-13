@@ -1270,8 +1270,9 @@ const message = {
             from_remote: '该模型并非通过 1Panel 下载，无相关拉取日志。',
             no_logs: '该模型的拉取日志已被删除，无法查看相关日志。',
             composeFile: 'Compose 文件',
-            officialImage: '官方',
-            customImage: '定制',
+            imageCategory: '镜像类型',
+            standardImage: '标准镜像',
+            customImage: '定制镜像',
             vllmVersionHelper: {
                 ascend: 'Ascend 官方标准版本，适用于 Ascend A2 系列设备。',
                 ascendA3: 'Ascend 官方 A3 版本，适用于 Ascend A3 系列设备。',

@@ -1363,8 +1363,9 @@ const message = {
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
             composeFile: 'Archivo de Orquestación',
-            officialImage: 'Oficial',
-            customImage: 'Personalizada',
+            imageCategory: 'Tipo de imagen',
+            standardImage: 'Imagen estándar',
+            customImage: 'Imagen personalizada',
             vllmVersionHelper: {
                 ascend: 'Versión estándar oficial de Ascend para dispositivos de la serie Ascend A2.',
                 ascendA3: 'Versión oficial Ascend A3 para dispositivos de la serie Ascend A3.',

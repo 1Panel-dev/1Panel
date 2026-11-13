@@ -1358,8 +1358,9 @@ const message = {
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
             composeFile: 'Compose File',
-            officialImage: 'Official',
-            customImage: 'Custom',
+            imageCategory: 'Image type',
+            standardImage: 'Standard image',
+            customImage: 'Custom image',
             vllmVersionHelper: {
                 ascend: 'Official Ascend standard version for Ascend A2 series devices.',
                 ascendA3: 'Official Ascend A3 version for Ascend A3 series devices.',

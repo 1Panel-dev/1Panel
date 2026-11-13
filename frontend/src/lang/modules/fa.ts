@@ -1339,8 +1339,9 @@ const message = {
             from_remote: 'این مدل از طریق 1Panel دانلود نشده است، لاگ مربوط به دریافت وجود ندارد.',
             no_logs: 'لاگ دریافت این مدل حذف شده است و قابل مشاهده نیست.',
             composeFile: 'فایل Compose',
-            officialImage: 'رسمی',
-            customImage: 'سفارشی',
+            imageCategory: 'نوع ایمیج',
+            standardImage: 'ایمیج استاندارد',
+            customImage: 'ایمیج سفارشی',
             vllmVersionHelper: {
                 ascend: 'نسخه استاندارد رسمی Ascend برای دستگاه‌های سری Ascend A2.',
                 ascendA3: 'نسخه رسمی Ascend A3 برای دستگاه‌های سری Ascend A3.',

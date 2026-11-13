@@ -1315,8 +1315,9 @@ const message = {
             from_remote: 'ໂມເດວນີ້ບໍ່ໄດ້ດາວໂຫຼດຜ່ານ 1Panel, ບໍ່ມີລັອກການດຶງຂໍ້ມູນທີ່ກ່ຽວຂ້ອງ.',
             no_logs: 'ລັອກການດຶງຂໍ້ມູນຂອງໂມເດວນີ້ຖືກລຶບແລ້ວ ແລະ ບໍ່ສາມາດເບິ່ງໄດ້.',
             composeFile: 'ໄຟລ໌ Compose',
-            officialImage: 'ທາງການ',
-            customImage: 'ປັບແຕ່ງ',
+            imageCategory: 'ປະເພດອິມເມຈ',
+            standardImage: 'ອິມເມຈມາດຕະຖານ',
+            customImage: 'ອິມເມຈປັບແຕ່ງ',
             vllmVersionHelper: {
                 ascend: 'ເວີຊັນມາດຕະຖານທາງການຂອງ Ascend ສຳລັບອຸປະກອນຊຸດ Ascend A2.',
                 ascendA3: 'ເວີຊັນ Ascend A3 ທາງການ ສຳລັບອຸປະກອນຊຸດ Ascend A3.',

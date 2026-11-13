@@ -1358,8 +1358,9 @@ const message = {
             from_remote: 'Эта модель не была загружена через 1Panel, нет связанных журналов извлечения.',
             no_logs: 'Журналы извлечения для этой модели были удалены и не могут быть просмотрены.',
             composeFile: 'Файл Оркестрации',
-            officialImage: 'Официальный',
-            customImage: 'Настроенный',
+            imageCategory: 'Тип образа',
+            standardImage: 'Стандартный образ',
+            customImage: 'Настроенный образ',
             vllmVersionHelper: {
                 ascend: 'Официальная стандартная версия Ascend для устройств серии Ascend A2.',
                 ascendA3: 'Официальная версия Ascend A3 для устройств серии Ascend A3.',
