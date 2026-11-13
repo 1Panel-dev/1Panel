@@ -1209,26 +1209,20 @@ func upApp(task *task.Task, appInstall *model.AppInstall, pullImages, useLifecyc
 		task.LogSuccess(logStr)
 		return
 	}
-	exist, _ := appInstallRepo.GetFirst(repo.WithByID(appInstall.ID))
-	if exist.ID > 0 {
-		containerNames, err := getContainerNames(*appInstall)
-		if err == nil {
-			if len(containerNames) > 0 {
-				appInstall.ContainerName = strings.Join(containerNames, ",")
-			}
-			_ = appInstallRepo.Save(context.Background(), appInstall)
-		}
+	if containerNames, err := getContainerNames(*appInstall); err == nil && len(containerNames) > 0 {
+		appInstall.ContainerName = strings.Join(containerNames, ",")
+		_ = appInstallRepo.BatchUpdateBy(map[string]interface{}{"container_name": appInstall.ContainerName}, repo.WithByID(appInstall.ID))
 	}
 	if err := upProject(appInstall); err != nil {
 		if appInstall.Message == "" {
 			appInstall.Message = err.Error()
 		}
 		appInstall.Status = constant.StatusUpErr
-		_ = appInstallRepo.Save(context.Background(), appInstall)
+		_ = appInstallRepo.UpdateStatus(appInstall, false)
 		return err
 	} else {
 		appInstall.Status = constant.StatusRunning
-		_ = appInstallRepo.Save(context.Background(), appInstall)
+		_ = appInstallRepo.UpdateStatus(appInstall, false)
 		return nil
 	}
 }
@@ -1525,11 +1519,7 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		}
 		appInstall.Status = constant.StatusError
 		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
-		if appInstall.App.Key == "ollama" || appInstall.App.Key == "vllm" {
-			_ = appInstallRepo.UpdateStatus(appInstall)
-		} else {
-			_ = appInstallRepo.Save(context.Background(), appInstall)
-		}
+		_ = appInstallRepo.UpdateStatus(appInstall, true)
 		return
 	}
 	notFoundNames := make([]string, 0)
@@ -1588,11 +1578,7 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		appInstall.Message = msg
 		appInstall.Status = constant.StatusUnHealthy
 	}
-	if appInstall.App.Key == "ollama" || appInstall.App.Key == "vllm" {
-		_ = appInstallRepo.UpdateStatus(appInstall)
-	} else {
-		_ = appInstallRepo.Save(context.Background(), appInstall)
-	}
+	_ = appInstallRepo.UpdateStatus(appInstall, true)
 }
 
 func handleInstalled(appInstallList []model.AppInstall, updated, sync, checkUpdate bool) ([]response.AppInstallDTO, error) {

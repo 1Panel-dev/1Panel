@@ -455,15 +455,7 @@ func operateAppTask(install model.AppInstall, req request.AppInstalledOperate, o
 }
 
 func (a *AppInstallService) UpdateAppConfig(req request.AppConfigUpdate) error {
-	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallID))
-	if err != nil {
-		return err
-	}
-	installed.WebUI = ""
-	if req.WebUI != "" {
-		installed.WebUI = req.WebUI
-	}
-	return appInstallRepo.Save(context.Background(), &installed)
+	return appInstallRepo.UpdateWebUI(req.InstallID, req.WebUI)
 }
 
 func (a *AppInstallService) UpdateSort(req request.AppInstallSort) error {
