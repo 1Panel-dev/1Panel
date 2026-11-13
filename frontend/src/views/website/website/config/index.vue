@@ -11,28 +11,30 @@
         <LayoutContent :title="$t('website.websiteConfig')" :back-name="'Website'" v-loading="loading">
             <template #app>
                 <WebsiteStatus
-                    v-if="website.id > 0"
+                    v-if="website"
+                    :id="id"
+                    @select="selectWebsite"
                     :primary-domain="website.primaryDomain"
                     :status="website.status"
                     :expire-date="website.expireDate"
                 />
             </template>
             <template #leftToolBar>
-                <el-button type="primary" :plain="index !== 'basic'" @click="changeTab('basic')">
+                <el-button type="primary" :plain="props.tab !== 'basic'" @click="changeTab('basic')">
                     {{ $t('website.basic') }}
                 </el-button>
-                <el-button type="primary" :plain="index !== 'log'" @click="changeTab('log')">
+                <el-button type="primary" :plain="props.tab !== 'log'" @click="changeTab('log')">
                     {{ $t('commons.button.log') }}
                 </el-button>
-                <el-button type="primary" :plain="index !== 'resource'" @click="changeTab('resource')">
+                <el-button type="primary" :plain="props.tab !== 'resource'" @click="changeTab('resource')">
                     {{ $t('website.source', 2) }}
                 </el-button>
             </template>
             <template #main>
-                <MainDiv :heightDiff="260">
-                    <Basic :website="website" v-if="index === 'basic' && website.id" :heightDiff="320"></Basic>
-                    <Log :id="id" v-if="index === 'log'"></Log>
-                    <Resource :id="id" v-if="index === 'resource'"></Resource>
+                <MainDiv v-if="website" :heightDiff="260">
+                    <Basic :website="website" v-if="props.tab === 'basic'" :heightDiff="320"></Basic>
+                    <Log :id="id" v-if="props.tab === 'log'"></Log>
+                    <Resource :id="id" v-if="props.tab === 'resource'"></Resource>
                 </MainDiv>
             </template>
         </LayoutContent>
@@ -40,13 +42,13 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref } from 'vue';
 import Basic from './basic/index.vue';
 import Resource from './resource/index.vue';
 import Log from './log/index.vue';
 import WebsiteStatus from '@/views/website/website/status/index.vue';
 import { getWebsite } from '@/api/modules/website';
-import { GetRuntime } from '@/api/modules/runtime';
+import type { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
 import MainDiv from '@/components/main-div/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
@@ -66,34 +68,19 @@ const props = defineProps({
     },
 });
 
-const id = ref(0);
-const index = ref('basic');
-const website = ref<any>({});
-const loading = ref(false);
-const configPHP = ref(false);
+const id = Number(props.id);
+const website = ref<Website.WebsiteDTO>();
+const loading = ref(true);
 
-watch(index, (curr, old) => {
-    if (curr != old) {
-        changeTab(curr);
-    }
-});
-
-const changeTab = (index: string) => {
-    routerToNameWithParams('WebsiteConfig', { id: id.value, tab: index });
-};
+const changeTab = (tab: string) => routerToNameWithParams('WebsiteConfig', { id, tab });
+const selectWebsite = (id: number) => routerToNameWithParams('WebsiteConfig', { id, tab: props.tab });
 
 onMounted(async () => {
-    index.value = props.tab;
-    id.value = Number(props.id);
-    loading.value = true;
-    const res = await getWebsite(id.value);
-    website.value = res.data;
-    if (res.data.type === 'runtime') {
-        const runRes = await GetRuntime(res.data.runtimeID);
-        if (runRes.data.type == 'php' && runRes.data.resource === 'appstore') {
-            configPHP.value = true;
-        }
+    try {
+        const { data } = await getWebsite(id);
+        website.value = data;
+    } finally {
+        loading.value = false;
     }
-    loading.value = false;
 });
 </script>
