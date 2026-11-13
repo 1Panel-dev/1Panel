@@ -8,107 +8,6 @@
 		"formatZH": "更新 Ollama 绑定域名 [domain]",
 		"formatEN": "update Ollama bind domain [domain]"
 	},
-	"/xpack/model/downloader/featured/sync/status": {
-		"bodyKeys": [
-			"value"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新推荐模型自动同步 [value]",
-		"formatEN": "update featured model automatic synchronization [value]"
-	},
-	"/xpack/model/downloader/hf/download": {
-		"bodyKeys": [
-			"repoID",
-			"revision"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "下载 Hugging Face 模型 [repoID]",
-		"formatEN": "download Hugging Face model [repoID]"
-	},
-	"/xpack/model/downloader/local/delete": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除本地模型 [name]",
-		"formatEN": "delete local model [name]"
-	},
-	"/xpack/model/downloader/modelscope/download": {
-		"bodyKeys": [
-			"repoID",
-			"revision"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "下载 ModelScope 模型 [repoID]",
-		"formatEN": "download ModelScope model [repoID]"
-	},
-	"/xpack/model/downloader/settings": {
-		"bodyKeys": [
-			"modelDir"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新模型下载设置 [modelDir]",
-		"formatEN": "update model downloader settings [modelDir]"
-	},
-	"/xpack/model/downloader/tasks/cancel": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "model_download_tasks",
-				"output_column": "repo_id",
-				"output_value": "repoID"
-			}
-		],
-		"formatZH": "取消模型下载任务 [repoID]",
-		"formatEN": "cancel model download task [repoID]"
-	},
-	"/xpack/model/downloader/tasks/remove": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "model_download_tasks",
-				"output_column": "repo_id",
-				"output_value": "repoID"
-			}
-		],
-		"formatZH": "移除模型下载任务 [repoID]",
-		"formatEN": "remove model download task [repoID]"
-	},
-	"/xpack/model/downloader/tasks/retry": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "model_download_tasks",
-				"output_column": "repo_id",
-				"output_value": "repoID"
-			}
-		],
-		"formatZH": "重试模型下载任务 [repoID]",
-		"formatEN": "retry model download task [repoID]"
-	},
 	"/ai/ollama/close": {
 		"bodyKeys": [
 			"name"
@@ -3815,6 +3714,25 @@
 		"formatZH": "[domain] PHP 配置修改",
 		"formatEN": "[domain] PHP conf update"
 	},
+	"/runtimes/php/extensions/import": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步 PHP 扩展模版 [name]",
+		"formatEN": "Sync PHP extension template [name]"
+	},
+	"/runtimes/php/extensions/push": {
+		"bodyKeys": [
+			"sourceNode",
+			"targetNodes"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "推送 PHP 扩展模版 [sourceNode] 至 [targetNodes]",
+		"formatEN": "Push PHP extension template from [sourceNode] to [targetNodes]"
+	},
 	"/runtimes/php/update": {
 		"bodyKeys": [
 			"websiteId"
@@ -4210,6 +4128,282 @@
 		"beforeFunctions": [],
 		"formatZH": "扫描系统垃圾文件",
 		"formatEN": "scan System Junk Files"
+	},
+	"/vms": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name]",
+		"formatEN": "create VM [name]"
+	},
+	"/vms/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "virtual_machines",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机 [name]",
+		"formatEN": "delete VM [name]"
+	},
+	"/vms/disks/resize": {
+		"bodyKeys": [
+			"name",
+			"target",
+			"sizeGiB"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
+		"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB"
+	},
+	"/vms/environment/enable": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "启用虚拟机运行环境",
+		"formatEN": "enable VM runtime environment"
+	},
+	"/vms/iso": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机镜像 [name] [type]",
+		"formatEN": "create VM ISO [name] [type]"
+	},
+	"/vms/iso/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_isos",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机镜像 [name]",
+		"formatEN": "delete VM ISO [name]"
+	},
+	"/vms/iso/update": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机镜像 [name] [type]",
+		"formatEN": "update VM ISO [name] [type]"
+	},
+	"/vms/networks": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机网络 [name] [type]",
+		"formatEN": "create VM network [name] [type]"
+	},
+	"/vms/networks/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机网络 [name]",
+		"formatEN": "delete VM network [name]"
+	},
+	"/vms/networks/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_networks",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机网络 [name]",
+		"formatEN": "update VM network [name]"
+	},
+	"/vms/operate": {
+		"bodyKeys": [
+			"name",
+			"operate"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "操作虚拟机 [name] [operate]",
+		"formatEN": "operate VM [name] [operate]"
+	},
+	"/vms/orphans/clean": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "清理虚拟机孤立数据",
+		"formatEN": "clean VM orphaned data"
+	},
+	"/vms/rename": {
+		"bodyKeys": [
+			"name",
+			"newName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "重命名虚拟机 [name] 为 [newName]",
+		"formatEN": "rename VM [name] to [newName]"
+	},
+	"/vms/snapshots": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "create VM [name] snapshot [snapshotName]"
+	},
+	"/vms/snapshots/del": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "delete VM [name] snapshot [snapshotName]"
+	},
+	"/vms/snapshots/recover": {
+		"bodyKeys": [
+			"name",
+			"snapshotName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
+		"formatEN": "recover VM [name] snapshot [snapshotName]"
+	},
+	"/vms/storages": {
+		"bodyKeys": [
+			"name",
+			"type"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机存储 [name] [type]",
+		"formatEN": "create VM storage [name] [type]"
+	},
+	"/vms/storages/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机存储 [name]",
+		"formatEN": "delete VM storage [name]"
+	},
+	"/vms/storages/update": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_storages",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "更新虚拟机存储 [name]",
+		"formatEN": "update VM storage [name]"
+	},
+	"/vms/sync": {
+		"bodyKeys": [],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "同步虚拟机",
+		"formatEN": "sync virtual machines"
+	},
+	"/vms/templates": {
+		"bodyKeys": [
+			"name",
+			"templateName"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
+		"formatEN": "create VM [name] template [templateName]"
+	},
+	"/vms/templates/del": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "vm_templates",
+				"output_column": "name",
+				"output_value": "name"
+			}
+		],
+		"formatZH": "删除虚拟机模板 [name]",
+		"formatEN": "delete VM template [name]"
+	},
+	"/vms/update": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新虚拟机 [name]",
+		"formatEN": "update VM [name]"
 	},
 	"/websites": {
 		"bodyKeys": [
@@ -5011,6 +5205,107 @@
 		"formatZH": "更新离线告警日志 [id]",
 		"formatEN": "update offline alert log [id]"
 	},
+	"/xpack/model/downloader/featured/sync/status": {
+		"bodyKeys": [
+			"value"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新推荐模型自动同步 [value]",
+		"formatEN": "update featured model automatic synchronization [value]"
+	},
+	"/xpack/model/downloader/hf/download": {
+		"bodyKeys": [
+			"repoID",
+			"revision"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载 Hugging Face 模型 [repoID]",
+		"formatEN": "download Hugging Face model [repoID]"
+	},
+	"/xpack/model/downloader/local/delete": {
+		"bodyKeys": [
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除本地模型 [name]",
+		"formatEN": "delete local model [name]"
+	},
+	"/xpack/model/downloader/modelscope/download": {
+		"bodyKeys": [
+			"repoID",
+			"revision"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "下载 ModelScope 模型 [repoID]",
+		"formatEN": "download ModelScope model [repoID]"
+	},
+	"/xpack/model/downloader/settings": {
+		"bodyKeys": [
+			"modelDir"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "更新模型下载设置 [modelDir]",
+		"formatEN": "update model downloader settings [modelDir]"
+	},
+	"/xpack/model/downloader/tasks/cancel": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "取消模型下载任务 [repoID]",
+		"formatEN": "cancel model download task [repoID]"
+	},
+	"/xpack/model/downloader/tasks/remove": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "移除模型下载任务 [repoID]",
+		"formatEN": "remove model download task [repoID]"
+	},
+	"/xpack/model/downloader/tasks/retry": {
+		"bodyKeys": [
+			"id"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [
+			{
+				"input_column": "id",
+				"input_value": "id",
+				"isList": false,
+				"db": "model_download_tasks",
+				"output_column": "repo_id",
+				"output_value": "repoID"
+			}
+		],
+		"formatZH": "重试模型下载任务 [repoID]",
+		"formatEN": "retry model download task [repoID]"
+	},
 	"/xpack/monitor/config/global": {
 		"bodyKeys": [],
 		"paramKeys": [],
@@ -5130,6 +5425,17 @@
 		"formatZH": "创建 vLLM [name]",
 		"formatEN": "create vLLM [name]"
 	},
+	"/xpack/vllm/monitor/setting/update": {
+		"bodyKeys": [
+			"vllmID",
+			"key",
+			"value"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改 vLLM [vllmID] 监控设置 [key]-[value]",
+		"formatEN": "update vLLM [vllmID] monitor setting [key]-[value]"
+	},
 	"/xpack/vllm/operate": {
 		"bodyKeys": [
 			"id",
@@ -5158,282 +5464,6 @@
 		"beforeFunctions": [],
 		"formatZH": "更新 vLLM [name]",
 		"formatEN": "update vLLM [name]"
-	},
-	"/vms": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name]",
-		"formatEN": "create VM [name]"
-	},
-	"/vms/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "virtual_machines",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机 [name]",
-		"formatEN": "delete VM [name]"
-	},
-	"/vms/disks/resize": {
-		"bodyKeys": [
-			"name",
-			"target",
-			"sizeGiB"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "扩容虚拟机 [name] 磁盘 [target] 至 [sizeGiB] GiB",
-		"formatEN": "expand VM [name] disk [target] to [sizeGiB] GiB"
-	},
-	"/vms/environment/enable": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "启用虚拟机运行环境",
-		"formatEN": "enable VM runtime environment"
-	},
-	"/vms/iso": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机镜像 [name] [type]",
-		"formatEN": "create VM ISO [name] [type]"
-	},
-	"/vms/iso/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_isos",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机镜像 [name]",
-		"formatEN": "delete VM ISO [name]"
-	},
-	"/vms/iso/update": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新虚拟机镜像 [name] [type]",
-		"formatEN": "update VM ISO [name] [type]"
-	},
-	"/vms/networks": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机网络 [name] [type]",
-		"formatEN": "create VM network [name] [type]"
-	},
-	"/vms/networks/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_networks",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机网络 [name]",
-		"formatEN": "delete VM network [name]"
-	},
-	"/vms/networks/update": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_networks",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新虚拟机网络 [name]",
-		"formatEN": "update VM network [name]"
-	},
-	"/vms/operate": {
-		"bodyKeys": [
-			"name",
-			"operate"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "操作虚拟机 [name] [operate]",
-		"formatEN": "operate VM [name] [operate]"
-	},
-	"/vms/orphans/clean": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "清理虚拟机孤立数据",
-		"formatEN": "clean VM orphaned data"
-	},
-	"/vms/rename": {
-		"bodyKeys": [
-			"name",
-			"newName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "重命名虚拟机 [name] 为 [newName]",
-		"formatEN": "rename VM [name] to [newName]"
-	},
-	"/vms/snapshots": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "create VM [name] snapshot [snapshotName]"
-	},
-	"/vms/snapshots/del": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "delete VM [name] snapshot [snapshotName]"
-	},
-	"/vms/snapshots/recover": {
-		"bodyKeys": [
-			"name",
-			"snapshotName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "恢复虚拟机 [name] 快照 [snapshotName]",
-		"formatEN": "recover VM [name] snapshot [snapshotName]"
-	},
-	"/vms/storages": {
-		"bodyKeys": [
-			"name",
-			"type"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机存储 [name] [type]",
-		"formatEN": "create VM storage [name] [type]"
-	},
-	"/vms/storages/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_storages",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机存储 [name]",
-		"formatEN": "delete VM storage [name]"
-	},
-	"/vms/storages/update": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_storages",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "更新虚拟机存储 [name]",
-		"formatEN": "update VM storage [name]"
-	},
-	"/vms/sync": {
-		"bodyKeys": [],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "同步虚拟机",
-		"formatEN": "sync virtual machines"
-	},
-	"/vms/templates": {
-		"bodyKeys": [
-			"name",
-			"templateName"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建虚拟机 [name] 模板 [templateName]",
-		"formatEN": "create VM [name] template [templateName]"
-	},
-	"/vms/templates/del": {
-		"bodyKeys": [
-			"id"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [
-			{
-				"input_column": "id",
-				"input_value": "id",
-				"isList": false,
-				"db": "vm_templates",
-				"output_column": "name",
-				"output_value": "name"
-			}
-		],
-		"formatZH": "删除虚拟机模板 [name]",
-		"formatEN": "delete VM template [name]"
-	},
-	"/vms/update": {
-		"bodyKeys": [
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "更新虚拟机 [name]",
-		"formatEN": "update VM [name]"
 	},
 	"/xpack/waf/block/export": {
 		"bodyKeys": [],

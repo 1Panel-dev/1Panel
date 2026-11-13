@@ -307,7 +307,7 @@
 						"Timestamp": []
 					}
 				],
-				"summary": "Update model service model",
+				"summary": "Update model service models",
 				"tags": [
 					"AI"
 				]
@@ -32664,6 +32664,9 @@
 		},
 		"dto.AgentAccountCreateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -32722,11 +32725,17 @@
 		},
 		"dto.AgentAccountInfo": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
 				"apiType": {
 					"type": "string"
+				},
+				"appInstallId": {
+					"type": "integer"
 				},
 				"authMode": {
 					"type": "string"
@@ -32764,8 +32773,18 @@
 				"rememberApiKey": {
 					"type": "boolean"
 				},
+				"validateAvailability": {
+					"type": "boolean"
+				},
 				"verified": {
 					"type": "boolean"
+				},
+				"verifiedAt": {
+					"format": "date-time",
+					"type": "string"
+				},
+				"verifyError": {
+					"type": "string"
 				},
 				"verifyModel": {
 					"type": "string"
@@ -32819,25 +32838,33 @@
 		},
 		"dto.AgentAccountModelDiscoverReq": {
 			"properties": {
+				"accountId": {
+					"description": "Existing account ID. When provided, connection settings are loaded from the saved account.",
+					"type": "integer"
+				},
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"apiType": {
+					"description": "Required when accountId is not provided.",
+					"type": "string"
+				},
+				"authMode": {
 					"type": "string"
 				},
 				"baseURL": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"provider": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				}
 			},
-			"required": [
-				"apiKey",
-				"apiType",
-				"baseURL",
-				"provider"
-			],
 			"type": "object"
 		},
 		"dto.AgentAccountModelReq": {
@@ -32856,18 +32883,31 @@
 				"accountId": {
 					"type": "integer"
 				},
-				"model": {
-					"$ref": "#/definitions/dto.AgentAccountModel"
+				"models": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					}
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"required": [
 				"accountId",
-				"model"
+				"models"
 			],
 			"type": "object"
 		},
 		"dto.AgentAccountProviderCountReq": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"providers": {
 					"items": {
 						"type": "string"
@@ -32879,6 +32919,12 @@
 		},
 		"dto.AgentAccountSearch": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"apiType": {
 					"type": "string"
 				},
@@ -32906,6 +32952,9 @@
 		},
 		"dto.AgentAccountUpdateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -32920,6 +32969,12 @@
 				},
 				"id": {
 					"type": "integer"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
 				},
 				"name": {
 					"type": "string"
@@ -43051,8 +43106,28 @@
 			},
 			"type": "object"
 		},
+		"dto.ProviderAccountTypeInfo": {
+			"properties": {
+				"apiTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAPIInfo"
+					},
+					"type": "array"
+				},
+				"key": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ProviderInfo": {
 			"properties": {
+				"accountTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAccountTypeInfo"
+					},
+					"type": "array"
+				},
 				"apiTypes": {
 					"items": {
 						"$ref": "#/definitions/dto.ProviderAPIInfo"

@@ -1,77 +1,89 @@
 <template>
-    <DrawerPro v-model="open" :header="headerTitle" size="large" @close="handleClose">
+    <DrawerPro
+        v-model="open"
+        :header="headerTitle"
+        size="large"
+        :auto-close="!saving && !discovering"
+        @close="handleClose"
+    >
         <template #content>
             <div v-loading="loading">
-                <div v-if="!readOnly" class="toolbar">
-                    <el-button v-permission type="primary" @click="openCreate">
-                        {{ $t('commons.button.add') }}
-                    </el-button>
-                </div>
-                <p v-if="account.validateAvailability && items.length" class="input-help verification-help">
-                    {{ $t('aiTools.agents.verifyModelHelper') }}
-                    {{ $t('aiTools.model.verifyModelChangeHelper') }}
-                </p>
-                <ComplexTable :data="items">
-                    <el-table-column
-                        v-if="account.validateAvailability"
-                        :label="$t('aiTools.model.verify')"
-                        width="90"
-                        align="center"
-                    >
-                        <template #default="{ row }">
-                            <el-radio
-                                v-permission
-                                class="verification-radio"
-                                :model-value="verifyModelRecordID"
-                                :value="row.recordId"
-                                :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
-                                :disabled="readOnly || selectingVerifyModel || saving"
-                                @change="selectVerifyModel(row)"
-                            >
-                                <span />
-                            </el-radio>
-                        </template>
-                    </el-table-column>
-                    <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
-                    <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
-                    <fu-table-operations
-                        v-if="!readOnly"
-                        :buttons="buttons"
-                        :label="$t('commons.table.operate')"
-                        :width="localOllama ? 80 : 140"
-                        fixed="right"
+                <template v-if="!account.appInstallId">
+                    <ModelEditor
+                        ref="modelEditorRef"
+                        v-model="items"
+                        v-model:verify-index="draftVerifyIndex"
+                        v-model:discovering="discovering"
+                        :supports-discovery="supportsDiscovery"
+                        :request="discoveryRequest"
+                        :validate-availability="account.validateAvailability"
+                        :disabled="saving"
                     />
-                </ComplexTable>
+                    <p class="input-help">{{ $t('aiTools.model.poolSaveHelp') }}</p>
+                </template>
+                <template v-else>
+                    <div v-if="!readOnly" class="toolbar">
+                        <el-button v-permission type="primary" @click="ollamaAddRef.acceptParams()">
+                            {{ $t('commons.button.add') }}
+                        </el-button>
+                    </div>
+                    <p v-if="account.validateAvailability && items.length" class="input-help verification-help">
+                        {{ $t('aiTools.agents.verifyModelHelper') }}
+                        {{ $t('aiTools.model.verifyModelChangeHelper') }}
+                    </p>
+                    <ComplexTable :data="items">
+                        <el-table-column
+                            v-if="account.validateAvailability"
+                            :label="$t('aiTools.model.verify')"
+                            width="90"
+                            align="center"
+                        >
+                            <template #default="{ row }">
+                                <el-radio
+                                    v-permission
+                                    class="verification-radio"
+                                    :model-value="verifyModelRecordID"
+                                    :value="row.recordId"
+                                    :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
+                                    :disabled="readOnly || selectingVerifyModel || saving"
+                                    @change="selectVerifyModel(row)"
+                                >
+                                    <span />
+                                </el-radio>
+                            </template>
+                        </el-table-column>
+                        <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
+                        <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
+                        <fu-table-operations
+                            v-if="!readOnly"
+                            :buttons="buttons"
+                            :label="$t('commons.table.operate')"
+                            :width="80"
+                            fixed="right"
+                        />
+                    </ComplexTable>
+                </template>
             </div>
         </template>
         <template #footer>
             <span class="dialog-footer">
-                <el-button @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button :disabled="saving || discovering" @click="open = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button
+                    v-if="!account.appInstallId"
+                    v-permission
+                    type="primary"
+                    :loading="saving"
+                    :disabled="loading || discovering"
+                    @click="saveModels"
+                >
+                    {{ $t('commons.button.save') }}
+                </el-button>
             </span>
         </template>
     </DrawerPro>
 
-    <DialogPro v-model="editorOpen" :title="editorTitle" size="normal" @close="handleEditorClose">
-        <el-form ref="formRef" :model="form" label-position="top" class="mt-5" :rules="rules" v-loading="saving">
-            <el-form-item :label="$t('aiTools.model.model')" prop="id">
-                <el-input v-model="form.id" clearable />
-                <span v-if="account.provider === 'ollama'" class="input-help">
-                    {{ $t('aiTools.agents.ollamaRegisterOnly') }}
-                </span>
-            </el-form-item>
-            <el-form-item :label="$t('commons.table.name')" prop="name">
-                <el-input v-model="form.name" />
-            </el-form-item>
-        </el-form>
-        <template #footer>
-            <span class="dialog-footer">
-                <el-button :disabled="saving" @click="editorOpen = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="saving" type="primary" @click="submit">
-                    {{ form.recordId ? $t('commons.button.confirm') : $t('commons.button.add') }}
-                </el-button>
-            </span>
-        </template>
-    </DialogPro>
     <OllamaAdd ref="ollamaAddRef" :account-id="account.id" @log="onPullLog" />
     <TaskLog ref="taskLogRef" width="70%" @close="refresh" />
     <OpDialog ref="deleteRef" @search="refresh">
@@ -84,40 +96,42 @@
 </template>
 
 <script setup lang="ts">
+import ModelEditor from '../model-editor/index.vue';
 import { computed, reactive, ref } from 'vue';
-import type { FormInstance } from 'element-plus';
 import OllamaAdd from '@/views/ai/ollama/add/index.vue';
 import TaskLog from '@/components/log/task/index.vue';
 import OpDialog from '@/components/del-dialog/index.vue';
 import {
-    createAgentAccountModel,
+    getAgentProviders,
+    updateAgentAccountModel,
     deleteAgentAccountModel,
     getAgentAccountModels,
-    updateAgentAccountModel,
     updateAgentAccountVerifyModel,
 } from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import i18n from '@/lang';
-import { MsgError, MsgSuccess } from '@/utils/message';
+import { MsgSuccess } from '@/utils/message';
 import { getAgentProviderDisplayName } from '@/utils/agent';
-import { Rules } from '@/global/form-rules';
 
 const emit = defineEmits(['updated']);
 
 const open = ref(false);
 const readOnly = ref(false);
-const editorOpen = ref(false);
 const loading = ref(false);
 const saving = ref(false);
 const selectingVerifyModel = ref(false);
-const formRef = ref<FormInstance>();
+const discovering = ref(false);
+const supportsDiscovery = ref(false);
+const draftVerifyIndex = ref(-1);
+const modelEditorRef = ref<InstanceType<typeof ModelEditor>>();
+const discoveryRequest = computed(() => ({ accountId: account.id }));
+let openVersion = 0;
 const items = ref<AI.AgentAccountModel[]>([]);
 const verifyModelRecordID = computed(() => items.value.find((item) => item.isVerifyModel)?.recordId);
 const ollamaAddRef = ref();
 const taskLogRef = ref();
 const deleteRef = ref();
 const deleteFiles = ref(false);
-const localOllama = computed(() => account.provider === 'ollama' && account.appInstallId > 0);
 
 const account = reactive({
     id: 0,
@@ -127,33 +141,12 @@ const account = reactive({
     validateAvailability: true,
 });
 
-const form = reactive<AI.AgentAccountModel>({
-    recordId: 0,
-    id: '',
-    name: '',
-});
-
 const headerTitle = computed(() => {
     const accountName = account.name || getAgentProviderDisplayName(account.provider, account.provider);
     return `${accountName} · ${i18n.global.t('aiTools.agents.modelPool')}`;
 });
 
-const editorTitle = computed(() =>
-    form.recordId ? i18n.global.t('commons.button.edit') : i18n.global.t('commons.button.add'),
-);
-
-const rules = reactive({
-    id: [Rules.requiredInput, Rules.noSpace],
-});
-
 const buttons = [
-    {
-        label: i18n.global.t('commons.button.edit'),
-        permission: true,
-        disabled: () => selectingVerifyModel.value,
-        click: (row: AI.AgentAccountModel) => openEdit(row),
-        show: () => !localOllama.value,
-    },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
@@ -189,70 +182,15 @@ const search = async () => {
         return;
     }
     loading.value = true;
+    const requestedAccountID = account.id;
+    const version = openVersion;
     try {
-        const res = await getAgentAccountModels({ accountId: account.id });
+        const res = await getAgentAccountModels({ accountId: requestedAccountID });
+        if (!open.value || requestedAccountID !== account.id || version !== openVersion) return;
         items.value = (res.data || []).map((item) => buildModelItem(item));
+        draftVerifyIndex.value = items.value.findIndex((item) => item.isVerifyModel);
     } finally {
-        loading.value = false;
-    }
-};
-
-const resetForm = () => {
-    form.recordId = 0;
-    form.id = '';
-    form.name = '';
-};
-
-const openCreate = () => {
-    if (localOllama.value) {
-        ollamaAddRef.value.acceptParams();
-        return;
-    }
-    resetForm();
-    editorOpen.value = true;
-};
-
-const openEdit = (row: AI.AgentAccountModel) => {
-    Object.assign(form, buildModelItem(row));
-    editorOpen.value = true;
-};
-
-const submit = async () => {
-    if (!account.id || !formRef.value) {
-        return;
-    }
-    await formRef.value.validate();
-    const duplicate = items.value.some((item) => item.id === form.id && item.recordId !== form.recordId);
-    if (duplicate) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsDuplicate'));
-        return;
-    }
-    saving.value = true;
-    try {
-        if (form.recordId) {
-            await updateAgentAccountModel({
-                accountId: account.id,
-                model: buildModelItem(form),
-            });
-        } else {
-            await createAgentAccountModel({
-                accountId: account.id,
-                model: buildModelItem(form),
-            });
-        }
-        editorOpen.value = false;
-        await search();
-        emit('updated');
-    } catch (error: any) {
-        MsgError(
-            String(
-                error?.response?.data?.message ||
-                    (error?.code === 'ECONNABORTED' ? i18n.global.t('commons.msg.requestTimeout') : error?.message) ||
-                    i18n.global.t('commons.res.commonError'),
-            ),
-        );
-    } finally {
-        saving.value = false;
+        if (version === openVersion) loading.value = false;
     }
 };
 
@@ -281,21 +219,16 @@ const onDelete = (row: AI.AgentAccountModel) => {
     });
 };
 
-const handleEditorClose = () => {
-    formRef.value?.resetFields();
-    resetForm();
-    saving.value = false;
-};
-
 const handleClose = () => {
+    openVersion++;
+    saving.value = false;
+    discovering.value = false;
     loading.value = false;
     account.id = 0;
     account.name = '';
     account.provider = '';
     account.appInstallId = 0;
     items.value = [];
-    editorOpen.value = false;
-    handleEditorClose();
 };
 
 const openDrawer = async (row: AI.AgentAccountItem) => {
@@ -306,7 +239,46 @@ const openDrawer = async (row: AI.AgentAccountItem) => {
     account.provider = row.provider;
     account.validateAvailability = row.validateAvailability;
     open.value = true;
+    supportsDiscovery.value = false;
+    items.value = [];
+    draftVerifyIndex.value = -1;
+    const version = ++openVersion;
     await search();
+    if (row.appInstallId || version !== openVersion) return;
+    loading.value = true;
+    try {
+        const { data } = await getAgentProviders();
+        if (version !== openVersion) return;
+        const provider = data.find((item) => item.provider === row.provider);
+        const preset = provider?.accountTypes.find((item) => item.key === row.accountType);
+        supportsDiscovery.value = Boolean(
+            (preset?.apiTypes || provider?.apiTypes)?.find((item) => item.apiType === row.apiType)
+                ?.supportsModelDiscovery,
+        );
+    } finally {
+        if (version === openVersion) loading.value = false;
+    }
+};
+
+const saveModels = async () => {
+    if (saving.value || discovering.value) return;
+    const models = modelEditorRef.value?.validate();
+    if (!models) return;
+    const version = openVersion;
+    saving.value = true;
+    try {
+        await updateAgentAccountModel({
+            accountId: account.id,
+            models,
+            verifyModel: models[draftVerifyIndex.value]?.id || '',
+        });
+        emit('updated');
+        if (version !== openVersion) return;
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        open.value = false;
+    } finally {
+        if (version === openVersion) saving.value = false;
+    }
 };
 
 defineExpose({

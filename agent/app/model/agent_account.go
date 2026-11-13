@@ -4,6 +4,7 @@ import "time"
 
 type AgentAccount struct {
 	BaseModel
+	AccountType          string     `json:"accountType"`
 	AppInstallID         uint       `json:"appInstallId"`
 	Provider             string     `json:"provider"`
 	Name                 string     `json:"name"`

@@ -50,11 +50,11 @@ func ResolveGeneratorConfig(accountID uint) (GeneratorConfig, time.Duration, err
 	if provider == "" {
 		return GeneratorConfig{}, 0, fmt.Errorf("agent account provider is required")
 	}
-	apiType := strings.TrimSpace(account.APIType)
-	if providercatalog.IsImageAPIType(apiType) {
+	apiType := normalizeClientAPIType(provider, account.APIType)
+	if providercatalog.Purpose(apiType) != "text" {
 		return GeneratorConfig{}, 0, fmt.Errorf("api type %s does not support text generation", apiType)
 	}
-	model, err := resolveAccountModelConfig(account.ID, provider)
+	model, err := resolveAccountModelConfig(account.ID)
 	if err != nil {
 		return GeneratorConfig{}, 0, err
 	}
@@ -90,15 +90,7 @@ func lookupProviderAPIKey(provider string) string {
 	return strings.TrimSpace(os.Getenv(envKey))
 }
 
-func defaultModelForProvider(provider string) string {
-	meta, ok := providercatalog.Get(provider)
-	if !ok || len(meta.Models) == 0 {
-		return ""
-	}
-	return meta.Models[0].ID
-}
-
-func resolveAccountModelConfig(accountID uint, provider string) (string, error) {
+func resolveAccountModelConfig(accountID uint) (string, error) {
 	if accountID > 0 {
 		rows, err := agentAccountModelRepo.List(repo.WithByAccountID(accountID), repo.WithOrderAsc("sort_order"), repo.WithOrderAsc("id"))
 		if err != nil {
@@ -108,7 +100,7 @@ func resolveAccountModelConfig(accountID uint, provider string) (string, error) 
 			return strings.TrimSpace(rows[0].Model), nil
 		}
 	}
-	return defaultModelForProvider(provider), nil
+	return "", nil
 }
 
 func ResolveGeneratorConfigFromAgentSettings() (GeneratorConfig, uint, time.Duration, error) {

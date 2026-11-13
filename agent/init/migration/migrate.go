@@ -120,6 +120,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.MigrateVMDatabase,
 		migrations.UpdateModelServicesQuickJumpRouter,
 		migrations.AddAgentAccountVerificationResult,
+		migrations.AddAgentAccountType,
 		migrations.AddGPUGroup,
 	}
 }

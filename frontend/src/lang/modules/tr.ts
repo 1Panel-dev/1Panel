@@ -1128,6 +1128,34 @@ const message = {
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
+            poolEditHelp: 'Modelleri çevrimiçi alın veya elle ekleyin. Tüm modeller düzenlenebilir.',
+            poolUnavailable:
+                'Bu sağlayıcı türü ve API çevrimiçi model almayı desteklemiyor. Model kimliklerini elle ekleyin.',
+            poolEmpty: 'Model yok. Çevrimiçi alın veya elle ekleyin.',
+            poolOverwrite:
+                'Başarılı bir alma işlemi, elle eklenenler ve düzenlenenler dahil tüm listeyi değiştirecek. Devam edilsin mi?',
+            poolFetchEmpty: 'Model alınamadı. Liste korundu. Yeniden deneyin veya elle ekleyin.',
+            poolFetchFailed:
+                'Alma işlemi başarısız. Liste korundu. URL, API anahtarı ve ağı kontrol edin ya da elle düzenleyin.',
+            poolSaveHelp: 'Değişiklikler kaydedilince uygulanır. Kullanımdaki modeller kaldırılamaz.',
+
+            accountType: 'Hesap türü',
+            accountTypes: {
+                default: 'Varsayılan',
+                payAsYouGo: 'Kullandıkça öde',
+                chinaApi: 'Çin API',
+                globalApi: 'Küresel API',
+                chinaCodingPlan: 'Çin Coding Plan',
+                globalCodingPlan: 'Küresel Coding Plan',
+                chinaTokenPlan: 'Çin Token Plan',
+                globalTokenPlan: 'Küresel Token Plan',
+                speech: 'Konuşma hizmetleri',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Kontrol et ve getir',
             externalHealthPassed: 'Sağlık kontrolü başarılı',
             externalHealthFailed: 'Sağlık kontrolü başarısız',

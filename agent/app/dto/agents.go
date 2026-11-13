@@ -317,10 +317,13 @@ type AgentAccountVerifyModelUpdateReq struct {
 }
 
 type AgentAccountModelDiscoverReq struct {
-	Provider string `json:"provider" validate:"required"`
-	BaseURL  string `json:"baseURL" validate:"required"`
-	APIKey   string `json:"apiKey" validate:"required"`
-	APIType  string `json:"apiType" validate:"required"`
+	AccountID   uint   `json:"accountId"`
+	AccountType string `json:"accountType"`
+	Provider    string `json:"provider" validate:"required_without=AccountID"`
+	BaseURL     string `json:"baseURL" validate:"required_without=AccountID"`
+	APIKey      string `json:"apiKey" validate:"required_without=AccountID"`
+	APIType     string `json:"apiType" validate:"required_without=AccountID"`
+	AuthMode    string `json:"authMode"`
 }
 
 type AgentAccountModelCreateReq struct {
@@ -330,8 +333,9 @@ type AgentAccountModelCreateReq struct {
 }
 
 type AgentAccountModelUpdateReq struct {
-	AccountID uint              `json:"accountId" validate:"required"`
-	Model     AgentAccountModel `json:"model" validate:"required"`
+	AccountID   uint                `json:"accountId" validate:"required"`
+	Models      []AgentAccountModel `json:"models" validate:"required,min=1"`
+	VerifyModel string              `json:"verifyModel"`
 }
 
 type AgentAccountModelDeleteReq struct {
@@ -341,6 +345,7 @@ type AgentAccountModelDeleteReq struct {
 }
 
 type AgentAccountCreateReq struct {
+	AccountType          string              `json:"accountType"`
 	Provider             string              `json:"provider" validate:"required"`
 	Name                 string              `json:"name" validate:"required"`
 	APIKey               string              `json:"apiKey" validate:"required"`
@@ -355,6 +360,7 @@ type AgentAccountCreateReq struct {
 }
 
 type AgentAccountUpdateReq struct {
+	AccountType          string              `json:"accountType"`
 	ID                   uint                `json:"id" validate:"required"`
 	Name                 string              `json:"name" validate:"required"`
 	APIKey               string              `json:"apiKey" validate:"required"`
@@ -385,17 +391,20 @@ type AgentAccountDeleteReq struct {
 
 type AgentAccountSearch struct {
 	PageInfo
-	Provider string `json:"provider"`
-	APIType  string `json:"apiType"`
-	TextOnly bool   `json:"textOnly"`
-	Name     string `json:"name"`
+	ExcludeCodingPlanProviders []string `json:"excludeCodingPlanProviders"`
+	Provider                   string   `json:"provider"`
+	APIType                    string   `json:"apiType"`
+	TextOnly                   bool     `json:"textOnly"`
+	Name                       string   `json:"name"`
 }
 
 type AgentAccountProviderCountReq struct {
-	Providers []string `json:"providers"`
+	ExcludeCodingPlanProviders []string `json:"excludeCodingPlanProviders"`
+	Providers                  []string `json:"providers"`
 }
 
 type AgentAccountInfo struct {
+	AccountType          string              `json:"accountType"`
 	AppInstallID         uint                `json:"appInstallId"`
 	ID                   uint                `json:"id"`
 	MasterAccountID      uint                `json:"masterAccountId"`
@@ -433,13 +442,14 @@ type ProviderAPIInfo struct {
 }
 
 type ProviderInfo struct {
-	Sort           uint                `json:"-"`
-	Provider       string              `json:"provider"`
-	DisplayName    string              `json:"displayName"`
-	BaseURL        string              `json:"baseUrl"`
-	DefaultAPIType string              `json:"defaultApiType"`
-	APITypes       []ProviderAPIInfo   `json:"apiTypes"`
-	Models         []ProviderModelInfo `json:"models"`
+	AccountTypes   []ProviderAccountTypeInfo `json:"accountTypes"`
+	Sort           uint                      `json:"-"`
+	Provider       string                    `json:"provider"`
+	DisplayName    string                    `json:"displayName"`
+	BaseURL        string                    `json:"baseUrl"`
+	DefaultAPIType string                    `json:"defaultApiType"`
+	APITypes       []ProviderAPIInfo         `json:"apiTypes"`
+	Models         []ProviderModelInfo       `json:"models"`
 }
 
 type AgentFeishuConfigReq struct {
@@ -851,4 +861,9 @@ type AgentSkillInstallReq struct {
 type AgentSkillUninstallReq struct {
 	AgentID uint   `json:"agentId" validate:"required"`
 	Name    string `json:"name" validate:"required"`
+}
+
+type ProviderAccountTypeInfo struct {
+	Key      string            `json:"key"`
+	APITypes []ProviderAPIInfo `json:"apiTypes"`
 }

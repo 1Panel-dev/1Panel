@@ -3,6 +3,7 @@ package provider
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 	"time"
@@ -24,6 +25,14 @@ const (
 )
 
 func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) error {
+	if Purpose(apiType) == "speech" || Purpose(apiType) == "transcription" {
+		return fmt.Errorf("%s verification requires audio input; disable automatic verification and test with an audio client", apiType)
+	}
+	switch apiType {
+	case "openai-completions", "openai-responses", "anthropic-messages", "gemini-generate-content", "openai-embeddings", "openai-images", "dashscope-images", "minimax-images", "openrouter-images", "tokenhub-images", "siliconflow-images", "rerank":
+	default:
+		return fmt.Errorf("automatic verification is not supported for %s", apiType)
+	}
 	req := BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model)
 	httpReq, err := http.NewRequest(req.Method, req.URL, bytes.NewReader(req.Body))
 	if err != nil {
@@ -56,8 +65,8 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 	headers := map[string]string{"Content-Type": "application/json"}
 	request := VerifyRequest{Method: http.MethodPost, Headers: headers}
 
-	if provider == "gemini" {
-		request.URL = baseURL + "/v1beta/models/" + strings.TrimSpace(model) + ":generateContent"
+	if apiType == "gemini-generate-content" {
+		request.URL = BuildTextRequestURL(apiType, baseURL, model)
 		headers["x-goog-api-key"] = apiKey
 		request.Body = mustJSON(map[string]interface{}{
 			"contents": []map[string]interface{}{{"parts": []map[string]string{{"text": "test"}}}},
@@ -66,6 +75,26 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 	}
 
 	switch apiType {
+	case "rerank":
+		request.URL = strings.TrimRight(baseURL, "/") + "/rerank"
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "query": "test", "documents": []string{"test"}})
+		if provider == "bailian" {
+			if model == "qwen3-rerank" {
+				request.URL = baseURL + "/compatible-api/v1/reranks"
+			} else {
+				request.URL = baseURL + "/api/v1/services/rerank/text-rerank/text-rerank"
+				request.Body = mustJSON(map[string]interface{}{"model": model, "input": map[string]interface{}{"query": "test", "documents": []string{"test"}}})
+			}
+		}
+	case "tokenhub-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/v1/wand/hunyuan-image/v3-generation")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test"})
+	case "siliconflow-images":
+		request.URL = imageVerifyURL(provider, baseURL, "/images/generations")
+		headers["Authorization"] = "Bearer " + apiKey
+		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test", "image_size": "1024x1024", "batch_size": 1})
 	case "openai-embeddings":
 		request.URL = embeddingVerifyURL(baseURL)
 		headers["Authorization"] = "Bearer " + apiKey
@@ -93,7 +122,7 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		headers["Authorization"] = "Bearer " + apiKey
 		request.Body = mustJSON(map[string]interface{}{"model": model, "prompt": "test", "n": 1, "response_format": "url"})
 	case "anthropic-messages":
-		request.URL = baseURL + "/v1/messages"
+		request.URL = BuildTextRequestURL(apiType, baseURL, model)
 		if authMode == AuthModeBearer {
 			headers["Authorization"] = "Bearer " + apiKey
 		} else {
@@ -110,11 +139,11 @@ func BuildVerifyRequest(provider, apiType, authMode, baseURL, apiKey, model stri
 		}
 		request.Body = mustJSON(body)
 	case "openai-responses":
-		request.URL = baseURL + "/responses"
+		request.URL = BuildTextRequestURL(apiType, baseURL, model)
 		headers["Authorization"] = "Bearer " + apiKey
 		request.Body = mustJSON(map[string]interface{}{"model": model, "input": "test", "max_output_tokens": defaultVerifyMaxTokens, "stream": false})
 	default:
-		request.URL = baseURL + "/chat/completions"
+		request.URL = BuildTextRequestURL(apiType, baseURL, model)
 		if (provider != "ollama" && provider != "llmman") || strings.TrimSpace(apiKey) != "" {
 			headers["Authorization"] = "Bearer " + apiKey
 		}
@@ -137,7 +166,7 @@ func embeddingVerifyURL(baseURL string) string {
 	if strings.HasSuffix(lowerBaseURL, "/embeddings") {
 		return baseURL
 	}
-	if strings.HasSuffix(lowerBaseURL, "/v1") {
+	if hasAPIVersionSuffix(lowerBaseURL) {
 		return baseURL + "/embeddings"
 	}
 	return baseURL + "/v1/embeddings"

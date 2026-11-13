@@ -1121,6 +1121,34 @@ const message = {
             validateImageAvailabilityHelper: 'Genera una imagen mínima antes de guardar y puede generar costes',
         },
         model: {
+            poolEditHelp: 'Obtenga modelos en línea o añádalos manualmente. Todos se pueden editar.',
+            poolUnavailable:
+                'Este tipo de proveedor y API no permite obtener modelos en línea. Añada los ID manualmente.',
+            poolEmpty: 'No hay modelos. Obténgalos en línea o añádalos manualmente.',
+            poolOverwrite:
+                'Si la consulta tiene éxito, se reemplazará toda la lista, incluidas las adiciones y ediciones manuales. ¿Continuar?',
+            poolFetchEmpty: 'No se recibieron modelos. La lista se conserva. Reintente o añádalos manualmente.',
+            poolFetchFailed:
+                'Error al obtener modelos. La lista se conserva. Revise la URL, la clave API y la red, o edite manualmente.',
+            poolSaveHelp: 'Los cambios se aplican al guardar. No se pueden quitar modelos en uso.',
+
+            accountType: 'Tipo de cuenta',
+            accountTypes: {
+                default: 'Predeterminado',
+                payAsYouGo: 'Pago por uso',
+                chinaApi: 'API de China',
+                globalApi: 'API global',
+                chinaCodingPlan: 'Coding Plan de China',
+                globalCodingPlan: 'Coding Plan global',
+                chinaTokenPlan: 'Token Plan de China',
+                globalTokenPlan: 'Token Plan global',
+                speech: 'Servicios de voz',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Comprobar y obtener',
             externalHealthPassed: 'Comprobación de salud correcta',
             externalHealthFailed: 'Falló la comprobación de salud',

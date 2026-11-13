@@ -114,14 +114,14 @@ func ensureContainerRunning(containerName string) error {
 	return nil
 }
 
-func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, modelID string, validateAvailability, allowEmptyModel bool) (resolvedAgentAccountInput, error) {
+func resolveAgentAccountInput(provider, apiType, authMode, apiKey, baseURL, modelID string, validateAvailability, allowEmptyModel bool, accountType ...string) (resolvedAgentAccountInput, error) {
 	resolvedAPIKey := strings.TrimSpace(apiKey)
 	resolvedAPIType := strings.TrimSpace(apiType)
-	resolvedAuthMode, err := providercatalog.ResolveAuthMode(provider, resolvedAPIType, authMode)
+	resolvedAuthMode, err := providercatalog.ResolveAuthMode(provider, resolvedAPIType, authMode, accountType...)
 	if err != nil {
 		return resolvedAgentAccountInput{}, err
 	}
-	resolvedBaseURL, err := providercatalog.ResolveBaseURL(provider, resolvedAPIType, baseURL)
+	resolvedBaseURL, err := providercatalog.ResolveBaseURL(provider, resolvedAPIType, baseURL, accountType...)
 	if err != nil {
 		if strings.Contains(err.Error(), "base url is required") {
 			return resolvedAgentAccountInput{}, buserr.New("ErrAgentBaseURLRequired")
@@ -774,10 +774,6 @@ type modelEntry struct {
 	MaxTokens     int      `json:"maxTokens,omitempty"`
 }
 
-func requiresOpenclawProviderModels(provider string) bool {
-	return provider != "gemini"
-}
-
 func applyOpenclawModelsConfig(conf map[string]interface{}, models *modelsConfig) error {
 	if models == nil {
 		delete(conf, "models")
@@ -1265,7 +1261,7 @@ func buildOpenclawModelsFromAccount(account *model.AgentAccount, selectedModel s
 	if primaryModel == "" {
 		return "", nil, nil, buserr.New("ErrAgentModelNotInAccount")
 	}
-	if !requiresOpenclawProviderModels(account.Provider) {
+	if account.Provider == "gemini" && providerCfg.Api == "google-generative-ai" {
 		return primaryModel, defaultsModels, nil, nil
 	}
 	providerCfg.Models = entries
@@ -1349,21 +1345,7 @@ func buildInitialAgentAccountModels(account *model.AgentAccount, requested []dto
 	if len(requested) > 0 {
 		return normalizeAgentAccountModels(account, requested)
 	}
-	defaultModels := providercatalog.DefaultModels(account.Provider, account.APIType)
-	if len(defaultModels) == 0 {
-		if requiresInitialAgentAccountModels(account.Provider) {
-			return nil, buserr.New("ErrAgentAccountModelsRequired")
-		}
-		return nil, nil
-	}
-	requested = make([]dto.AgentAccountModel, 0, len(defaultModels))
-	for _, item := range defaultModels {
-		requested = append(requested, dto.AgentAccountModel{
-			ID:   item.ID,
-			Name: item.Name,
-		})
-	}
-	return normalizeAgentAccountModels(account, requested)
+	return nil, buserr.New("ErrAgentAccountModelsRequired")
 }
 
 func buildDiscoveredAgentAccountModels(modelIDs []string) []dto.AgentAccountModel {
@@ -1400,39 +1382,6 @@ func loadAgentAccountModels(account *model.AgentAccount) ([]dto.AgentAccountMode
 		return nil, fmt.Errorf("account is required")
 	}
 	return listPersistedAgentAccountModels(account.ID)
-}
-
-func MergeCatalogAgentAccountModelsForMigration(account *model.AgentAccount, existing []dto.AgentAccountModel) ([]dto.AgentAccountModel, error) {
-	if account == nil {
-		return nil, fmt.Errorf("account is required")
-	}
-	meta, ok := providercatalog.Get(account.Provider)
-	if !ok || len(meta.Models) == 0 {
-		return append([]dto.AgentAccountModel(nil), existing...), nil
-	}
-	requested := append([]dto.AgentAccountModel(nil), existing...)
-	seen := make(map[string]struct{}, len(existing))
-	for _, item := range existing {
-		target := strings.TrimSpace(item.ID)
-		if target == "" {
-			continue
-		}
-		seen[target] = struct{}{}
-	}
-	for _, item := range meta.Models {
-		target := strings.TrimSpace(item.ID)
-		if _, ok := seen[target]; ok {
-			continue
-		}
-		requested = append(requested, dto.AgentAccountModel{
-			ID:   item.ID,
-			Name: item.Name,
-		})
-	}
-	if len(requested) == len(existing) {
-		return append([]dto.AgentAccountModel(nil), existing...), nil
-	}
-	return normalizeAgentAccountModels(account, requested)
 }
 
 func listPersistedAgentAccountModels(accountID uint) ([]dto.AgentAccountModel, error) {
@@ -1487,10 +1436,14 @@ func normalizeAgentAccountModels(account *model.AgentAccount, models []dto.Agent
 		if strings.TrimSpace(normalizedItem.ID) == "" {
 			continue
 		}
-		if _, ok := seen[normalizedItem.ID]; ok {
+		modelKey := normalizedItem.ID
+		if account.Provider == "ollama" && !strings.Contains(path.Base(modelKey), ":") {
+			modelKey += ":latest"
+		}
+		if _, ok := seen[modelKey]; ok {
 			continue
 		}
-		seen[normalizedItem.ID] = struct{}{}
+		seen[modelKey] = struct{}{}
 		normalized = append(normalized, normalizedItem)
 	}
 	if len(normalized) == 0 {
@@ -1513,15 +1466,6 @@ func normalizeAgentAccountModel(account *model.AgentAccount, model dto.AgentAcco
 		ID:   modelID,
 		Name: name,
 	}, nil
-}
-
-func requiresInitialAgentAccountModels(provider string) bool {
-	switch provider {
-	case "custom", "vllm", "ollama", "llmman":
-		return true
-	default:
-		return false
-	}
 }
 
 func sameProviderModelID(provider, left, right string) bool {

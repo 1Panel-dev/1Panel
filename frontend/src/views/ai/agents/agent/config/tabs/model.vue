@@ -257,7 +257,13 @@ const load = async (params: AgentModelLoadParams) => {
             getAgentModelConfig({ agentId: params.agentId }),
         ]);
         const items = accountsRes.data.items || [];
-        accountOptions.value = isIntl.value ? items.filter((item) => !blockedProviders.has(item.provider)) : items;
+        accountOptions.value = isIntl.value
+            ? items.filter(
+                  (item) =>
+                      !blockedProviders.has(item.provider) &&
+                      !(['bailian', 'ark'].includes(item.provider) && item.accountType === 'codingPlan'),
+              )
+            : items;
         if (accountOptions.value.length === 0) {
             form.accountId = undefined as unknown as number;
             form.model = '';

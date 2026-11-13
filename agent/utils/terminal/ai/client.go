@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -102,6 +101,9 @@ func NewClient(cfg ClientConfig) (Client, error) {
 	cfg.Provider = providerKey
 	cfg.BaseURL = baseURL
 	cfg.APIType = normalizeClientAPIType(providerKey, cfg.APIType)
+	if providercatalog.Purpose(cfg.APIType) != "text" {
+		return nil, fmt.Errorf("api type %s does not support text generation", cfg.APIType)
+	}
 	authMode, err := providercatalog.ResolveAuthMode(providerKey, cfg.APIType, cfg.AuthMode)
 	if err != nil {
 		return nil, err
@@ -149,7 +151,7 @@ func (c *terminalAIClient) chatCompletionOpenAI(ctx context.Context, req ChatCom
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildChatCompletionsURL(c.config.BaseURL), bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, providercatalog.BuildTextRequestURL(c.config.APIType, c.config.BaseURL, c.config.Model), bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -193,7 +195,7 @@ func (c *terminalAIClient) chatCompletionOpenAIResponses(ctx context.Context, re
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildResponsesURL(c.config.BaseURL), bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, providercatalog.BuildTextRequestURL(c.config.APIType, c.config.BaseURL, c.config.Model), bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -241,7 +243,7 @@ func (c *terminalAIClient) chatCompletionAnthropic(ctx context.Context, req Chat
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildAnthropicMessagesURL(c.config.BaseURL), bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, providercatalog.BuildTextRequestURL(c.config.APIType, c.config.BaseURL, c.config.Model), bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -291,7 +293,7 @@ func (c *terminalAIClient) chatCompletionGemini(ctx context.Context, req ChatCom
 	if err != nil {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
-	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, buildGeminiGenerateContentURL(c.config.BaseURL, strings.TrimSpace(c.config.Model)), bytes.NewReader(body))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, providercatalog.BuildTextRequestURL(c.config.APIType, c.config.BaseURL, c.config.Model), bytes.NewReader(body))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -507,81 +509,6 @@ func normalizeBaseURL(provider, rawBaseURL string) string {
 		}
 	}
 	return strings.TrimRight(baseURL, "/")
-}
-
-func buildChatCompletionsURL(baseURL string) string {
-	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
-	if strings.HasSuffix(baseURL, "/chat/completions") {
-		return baseURL
-	}
-	parsed, err := url.Parse(baseURL)
-	if err != nil {
-		return baseURL + "/chat/completions"
-	}
-	switch {
-	case strings.HasSuffix(parsed.Path, "/v1"):
-		parsed.Path += "/chat/completions"
-	case strings.HasSuffix(parsed.Path, "/v1beta"):
-		parsed.Path += "/chat/completions"
-	default:
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/v1/chat/completions"
-	}
-	return strings.TrimRight(parsed.String(), "/")
-}
-
-func buildResponsesURL(baseURL string) string {
-	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
-	if strings.HasSuffix(baseURL, "/responses") {
-		return baseURL
-	}
-	parsed, err := url.Parse(baseURL)
-	if err != nil {
-		return baseURL + "/responses"
-	}
-	if strings.HasSuffix(parsed.Path, "/v1") {
-		parsed.Path += "/responses"
-	} else {
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/v1/responses"
-	}
-	return strings.TrimRight(parsed.String(), "/")
-}
-
-func buildAnthropicMessagesURL(baseURL string) string {
-	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
-	if strings.HasSuffix(baseURL, "/messages") {
-		return baseURL
-	}
-	parsed, err := url.Parse(baseURL)
-	if err != nil {
-		return baseURL + "/messages"
-	}
-	if strings.HasSuffix(parsed.Path, "/v1") {
-		parsed.Path += "/messages"
-	} else {
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/v1/messages"
-	}
-	return strings.TrimRight(parsed.String(), "/")
-}
-
-func buildGeminiGenerateContentURL(baseURL, model string) string {
-	baseURL = strings.TrimRight(strings.TrimSpace(baseURL), "/")
-	model = strings.TrimSpace(model)
-	if model == "" {
-		model = "gemini-3-flash-preview"
-	}
-	parsed, err := url.Parse(baseURL)
-	if err != nil {
-		return strings.TrimRight(baseURL, "/") + "/v1beta/models/" + model + ":generateContent"
-	}
-	if strings.Contains(parsed.Path, "/models/") && strings.HasSuffix(parsed.Path, ":generateContent") {
-		return parsed.String()
-	}
-	if strings.Contains(parsed.Path, "/v1beta") {
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/models/" + model + ":generateContent"
-	} else {
-		parsed.Path = strings.TrimRight(parsed.Path, "/") + "/v1beta/models/" + model + ":generateContent"
-	}
-	return parsed.String()
 }
 
 func thinkingModeForModel(model string) *ThinkingMode {

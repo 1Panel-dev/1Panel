@@ -1104,6 +1104,33 @@ const message = {
             validateImageAvailabilityHelper: '保存前に最小画像を1枚生成するため、料金が発生する場合があります',
         },
         model: {
+            poolEditHelp: 'オンラインで取得するか手動で追加できます。すべてのモデルを編集できます。',
+            poolUnavailable:
+                'このプロバイダー種別と API はオンライン取得に対応していません。モデル ID を手動で追加してください。',
+            poolEmpty: 'モデルがありません。オンラインで取得するか手動で追加してください。',
+            poolOverwrite: '取得に成功すると、手動で追加・編集した内容を含む一覧全体が置き換わります。続行しますか？',
+            poolFetchEmpty: 'モデルが返されませんでした。一覧は保持されています。再試行するか手動で追加してください。',
+            poolFetchFailed:
+                '取得に失敗しました。一覧は保持されています。URL、API キー、ネットワークを確認して再試行するか、手動で編集してください。',
+            poolSaveHelp: '保存後に反映されます。使用中のモデルは削除できません。',
+
+            accountType: 'アカウント種別',
+            accountTypes: {
+                default: '既定',
+                payAsYouGo: '従量課金',
+                chinaApi: '中国 API',
+                globalApi: '国際 API',
+                chinaCodingPlan: '中国 Coding Plan',
+                globalCodingPlan: '国際 Coding Plan',
+                chinaTokenPlan: '中国 Token Plan',
+                globalTokenPlan: '国際 Token Plan',
+                speech: '音声サービス',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: '確認して取得',
             externalHealthPassed: 'ヘルスチェック成功',
             externalHealthFailed: 'ヘルスチェック失敗',
