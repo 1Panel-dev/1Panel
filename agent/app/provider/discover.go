@@ -105,7 +105,7 @@ func DiscoverProtocolModels(provider string, config APIConfig, baseURL, apiKey, 
 	if config.DiscoveryAuthMode != "" && provider != "custom" && provider != "vllm" {
 		authMode = config.DiscoveryAuthMode
 	}
-	if config.Route != config.DiscoveryRoute && provider != "custom" && provider != "vllm" {
+	if config.Route != config.DiscoveryRoute && provider != "custom" && provider != "vllm" && config.Discovery != "DiscoveryOllamaModels" {
 		baseURL = strings.TrimSuffix(strings.TrimRight(baseURL, "/"), config.Route) + config.DiscoveryRoute
 	}
 	endpoint := buildModelDiscoveryURL(baseURL)
