@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
@@ -909,6 +910,9 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	if pemData == nil || cert == nil {
 		return buserr.New("ErrSSLCertificateFormat")
 	}
+	if _, err := tls.X509KeyPair([]byte(websiteSSL.Pem), []byte(websiteSSL.PrivateKey)); err != nil {
+		return buserr.WithErr("ErrSSLKeyFormat", err)
+	}
 
 	websiteSSL.ExpireDate = cert.NotAfter
 	websiteSSL.StartDate = cert.NotBefore
@@ -939,10 +943,10 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 	websiteSSL.Domains = strings.Join(domains, ",")
 
 	if websiteSSL.ID > 0 {
-		if err := UpdateSSLConfig(*websiteSSL); err != nil {
+		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
 			return err
 		}
-		if err := websiteSSLRepo.Save(websiteSSL); err != nil {
+		if err := UpdateSSLConfig(*websiteSSL); err != nil {
 			return err
 		}
 		return pushSSLToNodeWithNewLogger(websiteSSL)

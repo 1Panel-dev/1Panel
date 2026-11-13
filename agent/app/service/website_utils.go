@@ -1589,7 +1589,10 @@ func GetSystemSSL() (bool, uint) {
 }
 
 func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
-	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	websites, err := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	if err != nil {
+		return err
+	}
 	if len(websites) > 0 {
 		for _, website := range websites {
 			if err := createPemFile(website, websiteSSL); err != nil {
@@ -1597,11 +1600,11 @@ func UpdateSSLConfig(websiteSSL model.WebsiteSSL) error {
 			}
 		}
 		nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
-		if err != nil {
-			return err
+		if err == nil {
+			err = opNginx(nginxInstall.ContainerName, constant.NginxReload)
 		}
-		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-			return buserr.WithErr("ErrSSLApply", err)
+		if err != nil {
+			global.LOG.Warnf("Certificate for %s saved, but OpenResty reload failed: %v", websiteSSL.PrimaryDomain, err)
 		}
 	}
 	if !global.IsMaster {
