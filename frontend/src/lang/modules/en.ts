@@ -1119,6 +1119,33 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            poolEditHelp: 'Fetch online or add manually. Every model in this list is editable.',
+            poolUnavailable: 'Online discovery is unavailable for this provider type and API. Add model IDs manually.',
+            poolEmpty: 'No models yet. Fetch online or add a model manually.',
+            poolOverwrite:
+                'A successful fetch will replace the entire list, including manual additions and edits. Continue?',
+            poolFetchEmpty: 'No models returned. Your list is unchanged. Retry or add models manually.',
+            poolFetchFailed:
+                'Fetch failed. Your list is unchanged. Check the URL, API key and network, then retry or edit manually.',
+            poolSaveHelp: 'Changes take effect when saved. Models currently in use cannot be removed.',
+
+            accountType: 'Account type',
+            accountTypes: {
+                default: 'Default',
+                payAsYouGo: 'Pay as you go',
+                chinaApi: 'China API',
+                globalApi: 'Global API',
+                chinaCodingPlan: 'China Coding Plan',
+                globalCodingPlan: 'Global Coding Plan',
+                chinaTokenPlan: 'China Token Plan',
+                globalTokenPlan: 'Global Token Plan',
+                speech: 'Speech services',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Check and fetch',
             externalHealthPassed: 'Health check passed',
             externalHealthFailed: 'Health check failed',

@@ -314,7 +314,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update model service model",
+				"summary": "Update model service models",
 				"tags": [
 					"AI"
 				]
@@ -33977,6 +33977,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountCreateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34035,6 +34038,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountInfo": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34080,8 +34086,18 @@ const docTemplate = `{
 				"rememberApiKey": {
 					"type": "boolean"
 				},
+				"validateAvailability": {
+					"type": "boolean"
+				},
 				"verified": {
 					"type": "boolean"
+				},
+				"verifiedAt": {
+					"format": "date-time",
+					"type": "string"
+				},
+				"verifyError": {
+					"type": "string"
 				},
 				"verifyModel": {
 					"type": "string"
@@ -34135,25 +34151,33 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountModelDiscoverReq": {
 			"properties": {
+				"accountId": {
+					"description": "Existing account ID. When provided, connection settings are loaded from the saved account.",
+					"type": "integer"
+				},
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"apiType": {
+					"description": "Required when accountId is not provided.",
+					"type": "string"
+				},
+				"authMode": {
 					"type": "string"
 				},
 				"baseURL": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"provider": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				}
 			},
-			"required": [
-				"apiKey",
-				"apiType",
-				"baseURL",
-				"provider"
-			],
 			"type": "object"
 		},
 		"dto.AgentAccountModelReq": {
@@ -34172,18 +34196,31 @@ const docTemplate = `{
 				"accountId": {
 					"type": "integer"
 				},
-				"model": {
-					"$ref": "#/definitions/dto.AgentAccountModel"
+				"models": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					}
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"required": [
 				"accountId",
-				"model"
+				"models"
 			],
 			"type": "object"
 		},
 		"dto.AgentAccountProviderCountReq": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"providers": {
 					"items": {
 						"type": "string"
@@ -34195,6 +34232,12 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountSearch": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"apiType": {
 					"type": "string"
 				},
@@ -34222,6 +34265,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountUpdateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34236,6 +34282,12 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
 				},
 				"name": {
 					"type": "string"
@@ -44654,8 +44706,28 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ProviderAccountTypeInfo": {
+			"properties": {
+				"apiTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAPIInfo"
+					},
+					"type": "array"
+				},
+				"key": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ProviderInfo": {
 			"properties": {
+				"accountTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAccountTypeInfo"
+					},
+					"type": "array"
+				},
 				"apiTypes": {
 					"items": {
 						"$ref": "#/definitions/dto.ProviderAPIInfo"

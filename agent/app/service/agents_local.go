@@ -338,6 +338,34 @@ func deleteRemoteOllamaModel(account *model.AgentAccount, modelName string) erro
 	return nil
 }
 
+func resolveUpdatedOllamaModels(baseURL, apiKey string, previousModels, models []dto.AgentAccountModel) error {
+	var available []string
+	for index, item := range models {
+		if _, ok := findAgentAccountModelForProvider("ollama", previousModels, item.ID); ok {
+			continue
+		}
+		if available == nil {
+			var err error
+			available, err = providercatalog.DiscoverModels(baseURL, apiKey)
+			if err != nil {
+				return buserr.WithErr("ErrAgentAccountUnavailable", err)
+			}
+		}
+		found := false
+		for _, id := range available {
+			if sameProviderModelID("ollama", id, item.ID) {
+				models[index].ID = id
+				found = true
+				break
+			}
+		}
+		if !found {
+			return buserr.New("ErrRecordNotFound")
+		}
+	}
+	return nil
+}
+
 func resolveExistingOllamaModel(account *model.AgentAccount, modelID string) (string, error) {
 	available, err := providercatalog.DiscoverModels(account.BaseURL, account.APIKey)
 	if err != nil {

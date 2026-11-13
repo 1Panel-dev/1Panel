@@ -23,7 +23,7 @@ func BuildOpenClawProviderPatch(provider, modelName, apiType, authMode, baseURL,
 	if _, ok := FindAPIConfig(provider, resolvedAPIType); !ok {
 		resolvedAPIType = DefaultAPIType(provider)
 	}
-	if IsImageAPIType(resolvedAPIType) || IsEmbeddingAPIType(resolvedAPIType) {
+	if Purpose(resolvedAPIType) != "text" {
 		return nil, fmt.Errorf("api type %s does not support text generation", resolvedAPIType)
 	}
 	resolvedAuthMode, err := ResolveAuthMode(provider, resolvedAPIType, authMode)
@@ -37,12 +37,12 @@ func BuildOpenClawProviderPatch(provider, modelName, apiType, authMode, baseURL,
 	switch provider {
 	case "gemini":
 		providerKey = "google"
-		resolvedAPIType = "google-generative-ai"
+		if resolvedAPIType == "gemini-generate-content" {
+			resolvedAPIType = "google-generative-ai"
+		}
 		usesBearer = false
 	case "moonshot", "kimi":
 		providerKey = "moonshot"
-		resolvedAPIType = "openai-completions"
-		usesBearer = false
 	case "ollama", "llmman":
 		apiKey = provider
 		usesBearer = false

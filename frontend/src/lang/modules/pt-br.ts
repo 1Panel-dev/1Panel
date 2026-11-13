@@ -1125,6 +1125,34 @@ const message = {
             validateImageAvailabilityHelper: 'Gera uma imagem mínima antes de salvar e pode gerar custos',
         },
         model: {
+            poolEditHelp: 'Busque modelos online ou adicione manualmente. Todos podem ser editados.',
+            poolUnavailable:
+                'Este tipo de provedor e API não permite buscar modelos online. Adicione os IDs manualmente.',
+            poolEmpty: 'Nenhum modelo. Busque online ou adicione manualmente.',
+            poolOverwrite:
+                'Uma busca bem-sucedida substituirá toda a lista, incluindo adições e edições manuais. Continuar?',
+            poolFetchEmpty: 'Nenhum modelo retornado. A lista foi mantida. Tente novamente ou adicione manualmente.',
+            poolFetchFailed:
+                'Falha na busca. A lista foi mantida. Verifique a URL, a chave API e a rede ou edite manualmente.',
+            poolSaveHelp: 'As alterações entram em vigor ao salvar. Modelos em uso não podem ser removidos.',
+
+            accountType: 'Tipo de conta',
+            accountTypes: {
+                default: 'Padrão',
+                payAsYouGo: 'Pagamento por uso',
+                chinaApi: 'API da China',
+                globalApi: 'API global',
+                chinaCodingPlan: 'Coding Plan da China',
+                globalCodingPlan: 'Coding Plan global',
+                chinaTokenPlan: 'Token Plan da China',
+                globalTokenPlan: 'Token Plan global',
+                speech: 'Serviços de voz',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Verificar e obter',
             externalHealthPassed: 'Verificação de integridade aprovada',
             externalHealthFailed: 'Falha na verificação de integridade',

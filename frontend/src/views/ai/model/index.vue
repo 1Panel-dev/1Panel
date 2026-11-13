@@ -349,7 +349,15 @@ useSearchState(
     },
 );
 const apiTypeOptions = computed(() =>
-    Array.from(new Set(providers.value.flatMap((item) => item.apiTypes.map((api) => api.apiType)))).sort(),
+    Array.from(
+        new Set(
+            providers.value.flatMap((item) =>
+                (item.accountTypes?.flatMap((accountType) => accountType.apiTypes) || item.apiTypes).map(
+                    (api) => api.apiType,
+                ),
+            ),
+        ),
+    ).sort(),
 );
 const providerOptions = computed(() =>
     providers.value

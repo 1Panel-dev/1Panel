@@ -251,7 +251,10 @@ export const updateAgentAccountVerifyModel = (req: AI.AgentAccountVerifyModelUpd
 };
 
 export const discoverAgentAccountModels = (req: AI.AgentAccountModelDiscoverReq) => {
-    return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req);
+    return http.postWithConfig<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req, {
+        timeout: TimeoutEnum.T_60S,
+        errorMessageMode: 'manual',
+    });
 };
 
 export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {

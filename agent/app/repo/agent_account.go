@@ -21,7 +21,7 @@ type IAgentAccountRepo interface {
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	Count() (int64, error)
-	CountTextByProviders(providers []string) (map[string]int64, error)
+	CountTextByProviders(providers []string, opts ...DBOption) (map[string]int64, error)
 	SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
 
@@ -102,7 +102,7 @@ func (a AgentAccountRepo) Count() (int64, error) {
 	return count, err
 }
 
-func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]int64, error) {
+func (a AgentAccountRepo) CountTextByProviders(providers []string, opts ...DBOption) (map[string]int64, error) {
 	normalizedProviders := normalizeProviders(providers)
 	counts := make(map[string]int64, len(normalizedProviders))
 	for _, provider := range normalizedProviders {
@@ -117,7 +117,7 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 		Count    int64
 	}
 	var rows []providerCount
-	if err := getDb().
+	if err := getDb(opts...).
 		Model(&model.AgentAccount{}).
 		Select("provider, COUNT(*) as count").
 		Where("provider IN ?", normalizedProviders).

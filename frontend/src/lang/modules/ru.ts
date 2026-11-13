@@ -1118,6 +1118,33 @@ const message = {
                 'Перед сохранением создаётся одно минимальное изображение; возможна оплата',
         },
         model: {
+            poolEditHelp: 'Загрузите модели онлайн или добавьте вручную. Все модели можно редактировать.',
+            poolUnavailable:
+                'Этот тип провайдера и API не поддерживает загрузку списка онлайн. Добавьте ID моделей вручную.',
+            poolEmpty: 'Моделей нет. Загрузите список онлайн или добавьте модели вручную.',
+            poolOverwrite: 'Успешная загрузка заменит весь список, включая ручные добавления и изменения. Продолжить?',
+            poolFetchEmpty: 'Модели не получены. Список сохранён. Повторите попытку или добавьте модели вручную.',
+            poolFetchFailed:
+                'Ошибка загрузки. Список сохранён. Проверьте URL, ключ API и сеть или отредактируйте список вручную.',
+            poolSaveHelp: 'Изменения применяются после сохранения. Используемые модели удалить нельзя.',
+
+            accountType: 'Тип аккаунта',
+            accountTypes: {
+                default: 'По умолчанию',
+                payAsYouGo: 'Оплата по использованию',
+                chinaApi: 'API Китая',
+                globalApi: 'Международный API',
+                chinaCodingPlan: 'Coding Plan Китая',
+                globalCodingPlan: 'Международный Coding Plan',
+                chinaTokenPlan: 'Token Plan Китая',
+                globalTokenPlan: 'Международный Token Plan',
+                speech: 'Речевые сервисы',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Проверить и получить',
             externalHealthPassed: 'Проверка работоспособности пройдена',
             externalHealthFailed: 'Проверка работоспособности не пройдена',

@@ -1103,6 +1103,34 @@ const message = {
             validateImageAvailabilityHelper: 'پیش از ذخیره یک تصویر حداقلی تولید می‌شود و ممکن است هزینه داشته باشد',
         },
         model: {
+            poolEditHelp: 'مدل‌ها را آنلاین دریافت یا دستی اضافه کنید. همه مدل‌ها قابل ویرایش هستند.',
+            poolUnavailable:
+                'این نوع ارائه‌دهنده و API از دریافت آنلاین پشتیبانی نمی‌کند. شناسه مدل‌ها را دستی اضافه کنید.',
+            poolEmpty: 'مدلی وجود ندارد. آنلاین دریافت یا دستی اضافه کنید.',
+            poolOverwrite:
+                'دریافت موفق، کل فهرست از جمله موارد افزوده یا ویرایش‌شده دستی را جایگزین می‌کند. ادامه می‌دهید؟',
+            poolFetchEmpty: 'مدلی دریافت نشد. فهرست فعلی حفظ شد. دوباره تلاش کنید یا دستی اضافه کنید.',
+            poolFetchFailed:
+                'دریافت ناموفق بود. فهرست حفظ شد. نشانی، کلید API و شبکه را بررسی کنید یا دستی ویرایش کنید.',
+            poolSaveHelp: 'تغییرات پس از ذخیره اعمال می‌شوند. مدل‌های در حال استفاده قابل حذف نیستند.',
+
+            accountType: 'نوع حساب',
+            accountTypes: {
+                default: 'پیش‌فرض',
+                payAsYouGo: 'پرداخت بر اساس مصرف',
+                chinaApi: 'API چین',
+                globalApi: 'API جهانی',
+                chinaCodingPlan: 'Coding Plan چین',
+                globalCodingPlan: 'Coding Plan جهانی',
+                chinaTokenPlan: 'Token Plan چین',
+                globalTokenPlan: 'Token Plan جهانی',
+                speech: 'خدمات گفتار',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'بررسی و دریافت',
             externalHealthPassed: 'بررسی سلامت موفق بود',
             externalHealthFailed: 'بررسی سلامت ناموفق بود',

@@ -24,6 +24,20 @@
                     </el-option>
                 </el-select>
             </el-form-item>
+            <el-form-item
+                v-if="accountTypeOptions.length > 1"
+                :label="$t('aiTools.model.accountType')"
+                prop="accountType"
+            >
+                <el-select v-model="form.accountType" :disabled="form.id > 0" @change="handleAccountTypeChange">
+                    <el-option
+                        v-for="item in accountTypeOptions"
+                        :key="item.key"
+                        :label="$t(`aiTools.model.accountTypes.${item.key}`)"
+                        :value="item.key"
+                    />
+                </el-select>
+            </el-form-item>
             <el-form-item v-if="canSelectLocalEngine" :label="$t('ssh.createMode')">
                 <el-radio-group v-model="connectionMode" @change="handleConnectionModeChange">
                     <el-radio-button value="manual">{{ $t('ssh.input') }}</el-radio-button>
@@ -127,163 +141,20 @@
                     }}
                 </span>
             </el-form-item>
-            <template v-if="showModelPool">
-                <el-divider content-position="left">{{ $t('aiTools.agents.modelPool') }}</el-divider>
-                <div class="model-discovery">
-                    <div class="model-discovery__header">
-                        <el-radio-group v-model="modelConfigMode" size="small" @change="handleModelConfigModeChange">
-                            <el-radio-button v-if="supportsModelDiscovery || defaultModels.length" value="discover">
-                                {{
-                                    $t(
-                                        supportsModelDiscovery
-                                            ? 'aiTools.agents.automaticModelDiscovery'
-                                            : 'aiTools.agents.defaultModel',
-                                    )
-                                }}
-                            </el-radio-button>
-                            <el-radio-button value="manual">
-                                {{ $t('aiTools.agents.manualModelConfiguration') }}
-                            </el-radio-button>
-                        </el-radio-group>
-                        <el-button
-                            v-if="supportsModelDiscovery && modelConfigMode === 'discover'"
-                            v-permission="'ai_model_manage'"
-                            type="primary"
-                            plain
-                            :loading="discovering"
-                            @click="discoverModels"
-                        >
-                            {{ $t('aiTools.agents.discoverModels') }}
-                        </el-button>
-                    </div>
-                    <div
-                        v-if="supportsModelDiscovery && modelConfigMode === 'discover'"
-                        class="input-help model-discovery__help"
-                    >
-                        {{ $t('aiTools.agents.discoverModelsHelper') }}
-                    </div>
-                    <div
-                        v-if="form.validateAvailability && (modelConfigMode === 'manual' || discoveredModels.length)"
-                        class="input-help model-discovery__help"
-                    >
-                        {{ $t('aiTools.agents.verifyModelHelper') }}
-                    </div>
-                    <el-alert
-                        v-if="modelDiscoveryFailed"
-                        type="warning"
-                        :closable="false"
-                        show-icon
-                        :title="
-                            $t(
-                                defaultModels.length
-                                    ? 'aiTools.agents.discoverModelsFailedUseDefaults'
-                                    : 'aiTools.agents.discoverModelsFailedFallback',
-                            )
-                        "
-                    />
-                    <el-table
-                        v-if="modelConfigMode === 'discover' && discoveredModels.length"
-                        :data="discoveredModels"
-                        max-height="320"
-                    >
-                        <el-table-column
-                            v-if="form.validateAvailability"
-                            :label="$t('aiTools.model.verify')"
-                            width="90"
-                            align="center"
-                        >
-                            <template #default="{ row }">
-                                <el-radio
-                                    v-model="form.verifyModel"
-                                    class="verification-radio"
-                                    :value="row.id"
-                                    :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
-                                >
-                                    <span />
-                                </el-radio>
-                            </template>
-                        </el-table-column>
-                        <el-table-column :label="$t('aiTools.model.model')" prop="id" min-width="220" />
-                        <el-table-column :label="$t('commons.table.name')" prop="name" min-width="180" />
-                    </el-table>
-                    <template v-if="modelConfigMode === 'manual'">
-                        <el-table :data="manualModels" max-height="320">
-                            <el-table-column
-                                v-if="form.validateAvailability"
-                                :label="$t('aiTools.model.verify')"
-                                width="90"
-                                align="center"
-                            >
-                                <template #default="{ row, $index }">
-                                    <el-radio
-                                        v-model="manualVerifyIndex"
-                                        class="verification-radio"
-                                        :value="$index"
-                                        :disabled="!row.id.trim()"
-                                        :aria-label="$t('aiTools.agents.verifyModel') + ': ' + row.id"
-                                    >
-                                        <span />
-                                    </el-radio>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('aiTools.model.model')" min-width="220">
-                                <template #default="{ row }">
-                                    <el-select
-                                        v-if="localModelOptions.length"
-                                        v-model="row.id"
-                                        filterable
-                                        allow-create
-                                        default-first-option
-                                    >
-                                        <el-option
-                                            v-for="model in localModelOptions"
-                                            :key="model"
-                                            :label="model"
-                                            :value="model"
-                                        />
-                                    </el-select>
-                                    <el-input v-else v-model="row.id" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('commons.table.name')" min-width="180">
-                                <template #default="{ row }">
-                                    <el-input v-model="row.name" />
-                                </template>
-                            </el-table-column>
-                            <el-table-column
-                                v-if="!singleModelOnly"
-                                :label="$t('commons.table.operate')"
-                                width="90"
-                                align="center"
-                            >
-                                <template #default="{ $index }">
-                                    <el-button
-                                        type="primary"
-                                        link
-                                        :disabled="
-                                            form.validateAvailability &&
-                                            Boolean(form.id) &&
-                                            manualVerifyIndex === $index
-                                        "
-                                        @click="removeManualModel($index)"
-                                    >
-                                        {{ $t('commons.button.delete') }}
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <el-button
-                            v-if="!singleModelOnly"
-                            class="model-discovery__add"
-                            type="primary"
-                            plain
-                            @click="addManualModel"
-                        >
-                            {{ $t('commons.button.add') }}
-                        </el-button>
-                    </template>
-                </div>
-            </template>
+            <ModelEditor
+                v-if="showModelPool"
+                ref="modelEditorRef"
+                v-model="manualModels"
+                v-model:verify-index="manualVerifyIndex"
+                v-model:discovering="discovering"
+                :supports-discovery="supportsModelDiscovery"
+                :request="discoveryRequest"
+                :validate-availability="form.validateAvailability"
+                :single-model-only="singleModelOnly"
+                :local-models="localModelOptions"
+                :disabled="loading"
+                :before-discover="validateDiscovery"
+            />
             <el-form-item
                 v-if="showVerifyModelSelect"
                 :label="$t('aiTools.agents.verifyModel')"
@@ -311,7 +182,7 @@
         <template v-if="!inline" #footer>
             <span class="dialog-footer">
                 <el-button :disabled="loading" @click="open = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button v-permission :disabled="loading || disabled" type="primary" @click="submit">
+                <el-button v-permission :disabled="loading || disabled || discovering" type="primary" @click="submit">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -320,18 +191,13 @@
 </template>
 
 <script setup lang="ts">
+import ModelEditor from '../model-editor/index.vue';
 import AiModelList from '@/components/ai-model-list/index.vue';
 import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { FormInstance } from 'element-plus';
 import { AI } from '@/api/interface/ai';
 import { Rules } from '@/global/form-rules';
-import {
-    createAgentAccount,
-    discoverAgentAccountModels,
-    getAgentProviders,
-    searchOllamaModel,
-    updateAgentAccount,
-} from '@/api/modules/ai';
+import { createAgentAccount, getAgentProviders, searchOllamaModel, updateAgentAccount } from '@/api/modules/ai';
 import { checkAppInstalled } from '@/api/modules/app';
 import i18n from '@/lang';
 import { getAgentProviderDisplayName } from '@/utils/agent';
@@ -362,16 +228,25 @@ const emit = defineEmits(['search', 'close']);
 
 const open = ref(false);
 const formRef = ref<FormInstance>();
-const providerOptions = ref<Array<{ label: string; value: string }>>([]);
+const providerOptions = computed(() =>
+    Object.values(providers.value)
+        .filter(
+            (item) =>
+                !['bailian-coding-plan', 'ark-coding-plan', 'kimi-coding', 'moonshot'].includes(item.provider) ||
+                (form.id > 0 && item.provider === form.provider),
+        )
+        .map((item) => ({
+            value: item.provider,
+            label: getAgentProviderDisplayName(item.provider, item.displayName),
+        })),
+);
 const providers = ref<Record<string, AI.ProviderInfo>>({});
 const loading = ref(false);
 const discovering = ref(false);
-const discoveredModels = ref<AI.AgentAccountModel[]>([]);
+const modelEditorRef = ref<InstanceType<typeof ModelEditor>>();
 const manualModels = ref<AI.AgentAccountModel[]>([]);
 const manualVerifyIndex = ref(-1);
 const editModels = ref<AI.AgentAccountModel[]>([]);
-const modelConfigMode = ref<'discover' | 'manual'>('discover');
-const modelDiscoveryFailed = ref(false);
 const { isIntl, isProductPro } = useGlobalStore();
 const connectionMode = ref<'manual' | 'local'>('manual');
 const loadingEngines = ref(false);
@@ -383,6 +258,7 @@ const form = reactive({
     appInstallId: 0,
     localEngineId: undefined as number | undefined,
     provider: 'custom',
+    accountType: '',
     name: '',
     baseURL: '',
     apiType: 'openai-completions',
@@ -400,6 +276,19 @@ const headerTitle = computed(() =>
 );
 
 const selectedProvider = computed(() => providers.value[form.provider]);
+const accountTypeOptions = computed(() =>
+    (selectedProvider.value?.accountTypes || []).filter(
+        (item) => !isIntl.value || !['bailian', 'ark'].includes(form.provider) || item.key !== 'codingPlan',
+    ),
+);
+const selectedAccountType = computed(
+    () =>
+        selectedProvider.value?.accountTypes.find((item) => item.key === form.accountType) ||
+        accountTypeOptions.value[0],
+);
+const availableAPIConfigs = computed(
+    () => selectedAccountType.value?.apiTypes || selectedProvider.value?.apiTypes || [],
+);
 const singleModelOnly = computed(() => !form.id && ['vllm', 'llmman'].includes(form.provider));
 const canSelectLocalEngine = computed(() => !form.id && ['ollama', 'vllm'].includes(form.provider));
 const localModelOptions = computed(() =>
@@ -409,26 +298,19 @@ const localModelOptions = computed(() =>
 );
 const disabled = computed(
     () =>
-        connectionMode.value === 'local' &&
-        (loadingEngines.value || !localEngines.value.some((item) => item.id === form.localEngineId)),
+        discovering.value ||
+        (connectionMode.value === 'local' &&
+            (loadingEngines.value || !localEngines.value.some((item) => item.id === form.localEngineId))),
 );
-const selectedAPIConfig = computed(() =>
-    selectedProvider.value?.apiTypes.find((item) => item.apiType === form.apiType),
-);
+const selectedAPIConfig = computed(() => availableAPIConfigs.value.find((item) => item.apiType === form.apiType));
 const isImageAPIType = computed(() => form.apiType.endsWith('-images'));
 const supportsModelDiscovery = computed(() => Boolean(selectedAPIConfig.value?.supportsModelDiscovery));
-const defaultModels = computed(() => {
-    if (selectedAPIConfig.value?.models.length) {
-        return selectedAPIConfig.value.models;
-    }
-    return isImageAPIType.value ? [] : selectedProvider.value?.models || [];
-});
 const showModelPool = computed(() => !form.appInstallId);
-const verifyModelOptions = computed(() => (form.id ? editModels.value : defaultModels.value));
+const verifyModelOptions = computed(() => (form.id ? editModels.value : manualModels.value));
 const showVerifyModelSelect = computed(
     () => form.validateAvailability && verifyModelOptions.value.length > 0 && !showModelPool.value,
 );
-const apiTypeOptions = computed(() => selectedProvider.value?.apiTypes.map((item) => item.apiType) || []);
+const apiTypeOptions = computed(() => availableAPIConfigs.value.map((item) => item.apiType) || []);
 const authModeOptions = computed(() => selectedAPIConfig.value?.authModes || []);
 const apiTypeURLHints: Record<string, { requestPath: string; example: string; endpointSuffixes: string[] }> = {
     'openai-completions': {
@@ -545,148 +427,42 @@ const resetManualModels = () => {
     manualVerifyIndex.value = singleModelOnly.value ? 0 : -1;
 };
 
-const loadDefaultModels = () => {
-    discoveredModels.value = defaultModels.value.map((item) => ({
-        recordId: 0,
-        id: item.id,
-        name: item.name,
-    }));
-    modelDiscoveryFailed.value = false;
-    form.verifyModel = '';
-};
-
 const resetModelDiscovery = () => {
     discovering.value = false;
-    modelConfigMode.value = supportsModelDiscovery.value || defaultModels.value.length ? 'discover' : 'manual';
     resetManualModels();
-    loadDefaultModels();
 };
 
-const handleModelConfigModeChange = () => {
-    modelDiscoveryFailed.value = false;
-    form.verifyModel = '';
-};
-
-const addManualModel = () => {
-    if (singleModelOnly.value && manualModels.value.length > 0) {
-        return;
-    }
-    manualModels.value.push(buildInitialModel());
-    if (singleModelOnly.value) {
-        manualVerifyIndex.value = 0;
-    }
-};
-
-const removeManualModel = (index: number) => {
-    manualModels.value.splice(index, 1);
-    if (manualVerifyIndex.value === index) {
-        manualVerifyIndex.value = -1;
-    } else if (manualVerifyIndex.value > index) {
-        manualVerifyIndex.value -= 1;
-    }
-};
-
-const normalizeManualModels = () => {
-    const models = manualModels.value.map((item) => ({
-        recordId: 0,
-        id: String(item.id || '').trim(),
-        name: String(item.name || '').trim(),
-    }));
-    if (models.some((item) => !item.id)) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
-        return null;
-    }
-    if (models.some((item) => item.id.includes(' '))) {
-        MsgError(i18n.global.t('setting.noSpace'));
-        return null;
-    }
-    if (new Set(models.map((item) => item.id)).size !== models.length) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsDuplicate'));
-        return null;
-    }
-    return models;
-};
-
-const discoverModels = async () => {
-    if (!formRef.value) {
-        return;
-    }
+const discoveryRequest = computed(() => ({
+    provider: form.provider,
+    accountType: form.accountType,
+    apiType: form.apiType,
+    baseURL: form.baseURL,
+    apiKey: form.apiKey,
+    authMode: form.authMode,
+}));
+const validateDiscovery = async () => {
     try {
-        await formRef.value.validateField(['apiKey', 'baseURL']);
+        await formRef.value?.validateField(['apiKey', 'baseURL']);
+        return true;
     } catch {
-        return;
-    }
-    discovering.value = true;
-    try {
-        const res = await discoverAgentAccountModels({
-            provider: form.provider,
-            baseURL: form.baseURL,
-            apiKey: form.apiKey,
-            apiType: form.apiType,
-        });
-        discoveredModels.value = res.data || [];
-        form.verifyModel = '';
-        if (discoveredModels.value.length === 0) {
-            if (defaultModels.value.length > 0) {
-                loadDefaultModels();
-            } else {
-                modelConfigMode.value = 'manual';
-            }
-            modelDiscoveryFailed.value = true;
-        } else {
-            modelDiscoveryFailed.value = false;
-        }
-    } catch (error: any) {
-        if (defaultModels.value.length > 0) {
-            loadDefaultModels();
-            modelDiscoveryFailed.value = true;
-        } else {
-            discoveredModels.value = [];
-            modelConfigMode.value = 'manual';
-        }
-        modelDiscoveryFailed.value = true;
-        MsgError(String(error?.message || i18n.global.t('commons.res.commonError')));
-    } finally {
-        discovering.value = false;
+        return false;
     }
 };
 
 const submit = async () => {
-    if (!formRef.value || disabled.value) {
+    if (!formRef.value || disabled.value || discovering.value) {
         return;
     }
     await formRef.value.validate();
-    let accountModels: AI.AgentAccountModel[] = [];
-    if (showModelPool.value && modelConfigMode.value === 'manual') {
-        const models = normalizeManualModels();
-        if (!models) {
-            return;
-        }
-        accountModels = models;
-    } else if (showModelPool.value) {
-        accountModels = discoveredModels.value;
-    }
-    if ((!form.id || showModelPool.value) && accountModels.length === 0) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsRequired'));
-        return;
-    }
-    if (singleModelOnly.value && accountModels.length > 1) {
-        MsgError(i18n.global.t('aiTools.agents.accountModelsSingle'));
-        return;
-    }
-    let verifyModel = form.verifyModel;
-    if (modelConfigMode.value === 'manual' && showModelPool.value) {
-        verifyModel = accountModels[manualVerifyIndex.value]?.id || '';
-    }
-    if (form.validateAvailability && !verifyModel && (!form.id || editModels.value.length > 0)) {
-        MsgError(i18n.global.t('aiTools.agents.verifyModelRequired'));
-        return;
-    }
+    const accountModels = showModelPool.value ? modelEditorRef.value?.validate() : [];
+    if (!accountModels) return;
+    const verifyModel = showModelPool.value ? accountModels[manualVerifyIndex.value]?.id || '' : form.verifyModel;
     loading.value = true;
     try {
         if (form.id) {
             await updateAgentAccount({
                 id: form.id,
+                accountType: form.accountType,
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
@@ -702,6 +478,7 @@ const submit = async () => {
         } else {
             await createAgentAccount({
                 provider: form.provider,
+                accountType: form.accountType,
                 name: form.name,
                 baseURL: form.baseURL,
                 apiKey: form.apiKey,
@@ -736,6 +513,7 @@ const handleClose = () => {
     form.id = 0;
     form.appInstallId = 0;
     form.provider = 'custom';
+    form.accountType = '';
     form.name = '';
     form.baseURL = '';
     form.apiType = 'openai-completions';
@@ -754,6 +532,7 @@ interface OpenParams {
     id?: number;
     appInstallId?: number;
     provider?: string;
+    accountType?: string;
     name?: string;
     baseURL?: string;
     apiKey?: string;
@@ -778,6 +557,7 @@ const openDrawer = async (params?: OpenParams) => {
         form.id = params.id;
         form.appInstallId = params.appInstallId || 0;
         form.provider = params.provider || '';
+        form.accountType = params.accountType || '';
         form.name = params.name || '';
         form.baseURL = params.baseURL || '';
         form.apiKey = params.apiKey || '';
@@ -785,12 +565,14 @@ const openDrawer = async (params?: OpenParams) => {
         form.validateAvailability = params.validateAvailability ?? true;
         editModels.value = params.models || [];
         const provider = providers.value[form.provider];
-        form.apiType = provider?.apiTypes.some((item) => item.apiType === params.apiType)
+        form.apiType = availableAPIConfigs.value.some((item) => item.apiType === params.apiType)
             ? String(params.apiType)
             : provider?.defaultApiType || '';
+        if (selectedAPIConfig.value && !selectedAPIConfig.value.editableBaseUrl) {
+            form.baseURL = selectedAPIConfig.value.baseUrl;
+        }
         form.authMode = params.authMode || selectedAPIConfig.value?.defaultAuthMode || '';
         resetModelDiscovery();
-        modelConfigMode.value = 'manual';
         manualModels.value = editModels.value.length
             ? editModels.value.map((item) => ({ ...item }))
             : [buildInitialModel()];
@@ -825,13 +607,7 @@ const openDrawer = async (params?: OpenParams) => {
 const loadProviders = async () => {
     const res = await getAgentProviders();
     const data = res.data || [];
-    const blockedProviders = new Set(['ark-coding-plan', 'bailian-coding-plan']);
-    const filteredData = isIntl.value ? data.filter((item) => !blockedProviders.has(item.provider)) : data;
-    providers.value = Object.fromEntries(filteredData.map((item) => [item.provider, item]));
-    providerOptions.value = filteredData.map((item) => ({
-        value: item.provider,
-        label: getAgentProviderDisplayName(item.provider, item.displayName),
-    }));
+    providers.value = Object.fromEntries(data.map((item) => [item.provider, item]));
     if (!form.provider && providerOptions.value.length > 0) {
         form.provider = providers.value.custom ? 'custom' : providerOptions.value[0].value;
         handleProviderChange();
@@ -846,9 +622,14 @@ const handleProviderChange = () => {
     }
     connectionMode.value = 'manual';
     form.localEngineId = undefined;
-    const provider = selectedProvider.value;
-    form.apiType = provider?.defaultApiType || '';
-    const config = provider?.apiTypes.find((item) => item.apiType === form.apiType);
+    form.accountType = accountTypeOptions.value[0]?.key || '';
+    handleAccountTypeChange();
+};
+
+const handleAccountTypeChange = () => {
+    const configs = availableAPIConfigs.value;
+    const config = configs.find((item) => item.apiType === selectedProvider.value?.defaultApiType) || configs[0];
+    form.apiType = config?.apiType || '';
     form.baseURL = config?.baseUrl || '';
     form.authMode = config?.defaultAuthMode || '';
     resetModelDiscovery();
@@ -925,18 +706,12 @@ const handleAPITypeChange = () => {
         return;
     }
     form.authMode = config.defaultAuthMode || '';
-    const providerURLs = selectedProvider.value?.apiTypes.map((item) => item.baseUrl).filter(Boolean) || [];
+    const providerURLs = availableAPIConfigs.value.map((item) => item.baseUrl).filter(Boolean) || [];
     if (!config.editableBaseUrl || !form.baseURL || providerURLs.includes(form.baseURL)) {
         form.baseURL = config.baseUrl || '';
     }
     resetModelDiscovery();
 };
-
-watch([() => form.apiKey, () => form.baseURL], () => {
-    if (!form.id && showModelPool.value) {
-        loadDefaultModels();
-    }
-});
 
 watch(open, (value) => {
     if (props.inline && !value) handleClose();
@@ -993,39 +768,5 @@ defineExpose({
 
 .validate-availability-label {
     margin-left: 12px;
-}
-
-.model-discovery {
-    margin-bottom: 18px;
-}
-
-.model-discovery__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    margin-bottom: 12px;
-}
-
-.model-discovery__help {
-    margin-bottom: 12px;
-}
-
-.model-discovery .el-alert {
-    margin-bottom: 12px;
-}
-
-.model-discovery__add {
-    display: inline-block;
-    margin-top: 12px;
-}
-
-.verification-radio {
-    margin-right: 0;
-    height: 32px;
-
-    :deep(.el-radio__label) {
-        display: none;
-    }
 }
 </style>

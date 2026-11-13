@@ -1130,6 +1130,34 @@ const message = {
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
+            poolEditHelp: 'Dapatkan model dalam talian atau tambah secara manual. Semua model boleh disunting.',
+            poolUnavailable:
+                'Jenis pembekal dan API ini tidak menyokong pengambilan dalam talian. Tambah ID model secara manual.',
+            poolEmpty: 'Tiada model. Dapatkan dalam talian atau tambah secara manual.',
+            poolOverwrite:
+                'Pengambilan yang berjaya akan menggantikan seluruh senarai, termasuk tambahan dan suntingan manual. Teruskan?',
+            poolFetchEmpty: 'Tiada model diterima. Senarai dikekalkan. Cuba lagi atau tambah secara manual.',
+            poolFetchFailed:
+                'Pengambilan gagal. Senarai dikekalkan. Semak URL, kunci API dan rangkaian atau sunting secara manual.',
+            poolSaveHelp: 'Perubahan berkuat kuasa selepas disimpan. Model yang sedang digunakan tidak boleh dibuang.',
+
+            accountType: 'Jenis akaun',
+            accountTypes: {
+                default: 'Lalai',
+                payAsYouGo: 'Bayar mengikut penggunaan',
+                chinaApi: 'API China',
+                globalApi: 'API global',
+                chinaCodingPlan: 'Coding Plan China',
+                globalCodingPlan: 'Coding Plan global',
+                chinaTokenPlan: 'Token Plan China',
+                globalTokenPlan: 'Token Plan global',
+                speech: 'Perkhidmatan suara',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Semak dan dapatkan',
             externalHealthPassed: 'Semakan kesihatan berjaya',
             externalHealthFailed: 'Semakan kesihatan gagal',

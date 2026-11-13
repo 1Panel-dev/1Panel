@@ -713,6 +713,7 @@ func (a AgentService) ensureBatchInstallAccount(req dto.AgentBatchInstallReq) (u
 	}
 	account.MasterAccountID = req.MasterAccountID
 	account.Provider = snapshot.Provider
+	account.AccountType = snapshot.AccountType
 	account.Name = snapshot.Name
 	account.APIKey = snapshot.APIKey
 	account.RememberAPIKey = snapshot.RememberAPIKey
@@ -1000,32 +1001,19 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 	definitions := providercatalog.All()
 	providers := make([]dto.ProviderInfo, 0, len(definitions))
 	for key, def := range definitions {
-		models := make([]dto.ProviderModelInfo, 0, len(def.Models))
-		for _, item := range def.Models {
-			models = append(models, dto.ProviderModelInfo{
-				ID:   item.ID,
-				Name: item.Name,
-			})
-		}
-		apiTypes := make([]dto.ProviderAPIInfo, 0, len(def.APIConfigs))
-		for _, item := range def.APIConfigs {
-			apiModels := make([]dto.ProviderModelInfo, 0, len(item.Models))
-			for _, model := range item.Models {
-				apiModels = append(apiModels, dto.ProviderModelInfo{
-					ID:   model.ID,
-					Name: model.Name,
+		accountTypes := make([]dto.ProviderAccountTypeInfo, 0, len(def.AccountTypes))
+		for _, preset := range def.AccountTypes {
+			item := dto.ProviderAccountTypeInfo{Key: preset.Key, APITypes: []dto.ProviderAPIInfo{}}
+			for _, config := range preset.APIConfigs {
+				item.APITypes = append(item.APITypes, dto.ProviderAPIInfo{
+					APIType: config.APIType, BaseURL: config.BaseURL, EditableBaseURL: config.EditableBaseURL,
+					SupportsModelDiscovery: config.DiscoverModels, DefaultAuthMode: config.DefaultAuthMode,
+					AuthModes: config.AuthModes, Models: []dto.ProviderModelInfo{},
 				})
 			}
-			apiTypes = append(apiTypes, dto.ProviderAPIInfo{
-				APIType:                item.APIType,
-				BaseURL:                item.BaseURL,
-				EditableBaseURL:        item.EditableBaseURL,
-				SupportsModelDiscovery: item.DiscoverModels,
-				DefaultAuthMode:        item.DefaultAuthMode,
-				AuthModes:              item.AuthModes,
-				Models:                 apiModels,
-			})
+			accountTypes = append(accountTypes, item)
 		}
+		apiTypes := accountTypes[0].APITypes
 		baseURL, _ := providercatalog.DefaultBaseURL(key)
 		providers = append(providers, dto.ProviderInfo{
 			Sort:           def.Sort,
@@ -1034,7 +1022,8 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 			BaseURL:        baseURL,
 			DefaultAPIType: def.DefaultAPIType,
 			APITypes:       apiTypes,
-			Models:         models,
+			Models:         []dto.ProviderModelInfo{},
+			AccountTypes:   accountTypes,
 		})
 	}
 	sort.Slice(providers, func(i, j int) bool {
@@ -1045,6 +1034,11 @@ func (a AgentService) GetProviders() ([]dto.ProviderInfo, error) {
 
 func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	provider := req.Provider
+	preset, ok := providercatalog.FindAccountType(provider, req.AccountType)
+	if !ok {
+		return buserr.WithDetail("ErrInvalidParams", "unsupported provider type", nil)
+	}
+	req.AccountType = preset.Key
 	if err := ensureAgentAccountNameAvailable(provider, req.Name, 0); err != nil {
 		return err
 	}
@@ -1057,7 +1051,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		return err
 	}
 	validateAvailability := req.ValidateAvailability == nil || *req.ValidateAvailability
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, validateAvailability, false)
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, validateAvailability, false, req.AccountType)
 	if err != nil {
 		return err
 	}
@@ -1068,6 +1062,7 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 	}
 	account := &model.AgentAccount{
 		Provider:             resolvedInput.Provider,
+		AccountType:          req.AccountType,
 		Name:                 req.Name,
 		APIKey:               resolvedInput.APIKey,
 		RememberAPIKey:       req.RememberAPIKey,
@@ -1105,6 +1100,9 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	}
 	if req.APIType != account.APIType {
 		return buserr.WithDetail("ErrInvalidParams", "API type cannot be changed", nil)
+	}
+	if req.AccountType != "" && req.AccountType != account.AccountType {
+		return buserr.WithDetail("ErrInvalidParams", "account type cannot be changed", nil)
 	}
 	provider := account.Provider
 	if err := ensureAgentAccountNameAvailable(provider, req.Name, account.ID); err != nil {
@@ -1144,9 +1142,18 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 	if req.ValidateAvailability != nil {
 		validateAvailability = *req.ValidateAvailability
 	}
-	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, false, account.AppInstallID != 0 && len(models) == 0)
+	resolvedInput, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, false, account.AppInstallID != 0 && len(models) == 0, account.AccountType)
 	if err != nil {
 		return err
+	}
+	if provider == "ollama" && req.Models != nil {
+		if err := resolveUpdatedOllamaModels(resolvedInput.BaseURL, resolvedInput.APIKey, previousModels, models); err != nil {
+			return err
+		}
+		verifyModel, err = resolveAgentAccountVerifyModel(provider, verifyModel, models)
+		if err != nil {
+			return err
+		}
 	}
 	previousVerifyModel := account.VerifyModel
 	if previousVerifyModel == "" && len(previousModels) > 0 {
@@ -1156,7 +1163,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		account.APIType != resolvedInput.APIType || account.AuthMode != resolvedInput.AuthMode || !sameProviderModelID(provider, previousVerifyModel, verifyModel)
 	shouldVerify := validateAvailability && (connectionChanged || !account.ValidateAvailability)
 	if shouldVerify {
-		if _, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, true, false); err != nil {
+		if _, err := resolveAgentAccountInput(provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, verifyModel, true, false, account.AccountType); err != nil {
 			return err
 		}
 	}
@@ -1217,7 +1224,7 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 }
 
 func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.AgentAccountInfo, error) {
-	var opts []repo.DBOption
+	opts := []repo.DBOption{repo.WithExcludeCodingPlanProviders(req.ExcludeCodingPlanProviders)}
 	if strings.TrimSpace(req.Provider) != "" {
 		opts = append(opts, repo.WithByProvider(req.Provider))
 	}
@@ -1261,6 +1268,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 			appInstallID = item.AppInstallID
 		}
 		items = append(items, dto.AgentAccountInfo{
+			AccountType:          item.AccountType,
 			AppInstallID:         appInstallID,
 			ID:                   item.ID,
 			MasterAccountID:      item.MasterAccountID,
@@ -1307,7 +1315,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 }
 
 func (a AgentService) CountAccountsByProviders(req dto.AgentAccountProviderCountReq) (map[string]int64, error) {
-	return agentAccountRepo.CountTextByProviders(req.Providers)
+	return agentAccountRepo.CountTextByProviders(req.Providers, repo.WithExcludeCodingPlanProviders(req.ExcludeCodingPlanProviders))
 }
 
 func (a AgentService) GetAccountModels(req dto.AgentAccountModelReq) ([]dto.AgentAccountModel, error) {
@@ -1363,15 +1371,31 @@ func (a AgentService) UpdateAccountVerifyModel(req dto.AgentAccountVerifyModelUp
 }
 
 func (a AgentService) DiscoverAccountModels(req dto.AgentAccountModelDiscoverReq) ([]dto.AgentAccountModel, error) {
-	config, ok := providercatalog.FindAPIConfig(req.Provider, req.APIType)
+	if req.AccountID != 0 {
+		account, err := agentAccountRepo.GetFirst(repo.WithByID(req.AccountID))
+		if err != nil {
+			return nil, err
+		}
+		req.Provider, req.AccountType, req.APIType = account.Provider, account.AccountType, account.APIType
+		req.BaseURL, req.APIKey, req.AuthMode = account.BaseURL, account.APIKey, account.AuthMode
+	}
+	config, ok := providercatalog.FindAPIConfig(req.Provider, req.APIType, req.AccountType)
 	if !ok || !config.DiscoverModels {
 		return nil, buserr.New("ErrAgentAccountModelsRequired")
 	}
-	baseURL, err := providercatalog.ResolveBaseURL(req.Provider, req.APIType, req.BaseURL)
-	if err != nil {
-		return nil, buserr.WithErr("ErrAgentAccountUnavailable", err)
+	baseURL := req.BaseURL
+	if req.AccountID == 0 {
+		var err error
+		baseURL, err = providercatalog.ResolveBaseURL(req.Provider, req.APIType, req.BaseURL, req.AccountType)
+		if err != nil {
+			return nil, buserr.WithErr("ErrAgentAccountUnavailable", err)
+		}
 	}
-	models, err := providercatalog.DiscoverModels(baseURL, req.APIKey)
+	authMode, err := providercatalog.ResolveAuthMode(req.Provider, req.APIType, req.AuthMode, req.AccountType)
+	if err != nil {
+		return nil, err
+	}
+	models, err := providercatalog.DiscoverProtocolModels(req.Provider, config, baseURL, req.APIKey, authMode)
 	if err != nil {
 		return nil, buserr.WithErr("ErrAgentAccountUnavailable", err)
 	}
@@ -1443,74 +1467,43 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 	if err != nil {
 		return err
 	}
-	record, err := agentAccountModelRepo.GetFirst(repo.WithByID(req.Model.RecordID), repo.WithByAccountID(req.AccountID))
+	if account.AppInstallID != 0 {
+		return buserr.WithDetail("ErrInvalidParams", "local model pool is managed by the deployment", nil)
+	}
+	previousModels, err := loadAgentAccountModels(account)
 	if err != nil {
 		return err
 	}
-	models, err := loadAgentAccountModels(account)
+	models, err := normalizeAgentAccountModels(account, req.Models)
 	if err != nil {
 		return err
 	}
-	nextModel, err := normalizeAgentAccountModel(account, req.Model)
-	if err != nil {
-		return err
-	}
-	if account.Provider == "ollama" && !sameProviderModelID("ollama", record.Model, nextModel.ID) {
-		if account.AppInstallID != 0 {
-			return buserr.New("ErrInvalidParams")
-		}
-		nextModel.ID, err = resolveExistingOllamaModel(account, nextModel.ID)
-		if err != nil {
+	if account.Provider == "ollama" {
+		if err := resolveUpdatedOllamaModels(account.BaseURL, account.APIKey, previousModels, models); err != nil {
 			return err
 		}
 	}
-	nextModel.RecordID = req.Model.RecordID
-	for _, item := range models {
-		if item.RecordID == req.Model.RecordID {
-			continue
-		}
-		if sameProviderModelID(account.Provider, item.ID, nextModel.ID) {
-			return buserr.New("ErrRecordExist")
-		}
-	}
-	nextModels := make([]dto.AgentAccountModel, 0, len(models))
-	for _, item := range models {
-		if item.RecordID == req.Model.RecordID {
-			nextModels = append(nextModels, nextModel)
-			continue
-		}
-		nextModels = append(nextModels, item)
-	}
-	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
-		return err
-	}
 	agentAccountMutationMu.Lock()
 	defer agentAccountMutationMu.Unlock()
-	if err := ensureAgentAccountUnchanged(account, models); err != nil {
+	if err := ensureAgentAccountUnchanged(account, previousModels); err != nil {
 		return err
 	}
-	if err := ensureAccountModelsNotBound(account, nextModels); err != nil {
+	if err := ensureAccountModelsNotBound(account, models); err != nil {
 		return err
 	}
-	previousModelID := record.Model
-	record.Model = nextModel.ID
-	record.Name = nextModel.Name
-	verifyModel := account.VerifyModel
-	if verifyModel == "" && len(models) > 0 {
-		verifyModel = models[0].ID
-	}
-	if sameProviderModelID(account.Provider, verifyModel, previousModelID) && !sameProviderModelID(account.Provider, previousModelID, nextModel.ID) {
-		if account.ValidateAvailability {
-			account.Verified = false
-			account.VerifiedAt = nil
-			account.VerifyError = ""
-		}
-		account.VerifyModel = nextModel.ID
-		err = agentAccountModelRepo.SaveWithAccount(record, account)
-	} else {
-		err = agentAccountModelRepo.Save(record)
-	}
+	verifyModel, err := resolveAgentAccountVerifyModel(account.Provider, req.VerifyModel, models)
 	if err != nil {
+		return err
+	}
+	if account.ValidateAvailability && !sameProviderModelID(account.Provider, account.VerifyModel, verifyModel) {
+		account.Verified, account.VerifiedAt, account.VerifyError = false, nil, ""
+	}
+	account.VerifyModel = verifyModel
+	rows := make([]model.AgentAccountModel, 0, len(models))
+	for _, item := range models {
+		rows = append(rows, model.AgentAccountModel{Model: item.ID, Name: item.Name})
+	}
+	if err := agentAccountRepo.SaveWithModels(account, rows); err != nil {
 		return err
 	}
 	terminalai.InvalidateTerminalRuntimeCache()
@@ -1632,7 +1625,7 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	}
 	verifyModel, verifyErr := resolveAgentAccountVerifyModel(account.Provider, account.VerifyModel, models)
 	if verifyErr == nil {
-		_, verifyErr = resolveAgentAccountInput(account.Provider, account.APIType, account.AuthMode, account.APIKey, account.BaseURL, verifyModel, true, false)
+		verifyErr = providercatalog.VerifyAccount(account.Provider, account.APIType, account.AuthMode, account.BaseURL, account.APIKey, verifyModel)
 	}
 	agentAccountMutationMu.Lock()
 	defer agentAccountMutationMu.Unlock()
