@@ -1366,6 +1366,9 @@ const message = {
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
+            composeFile: 'Düzenleme Dosyası',
+            officialImage: 'Resmî',
+            customImage: 'Özelleştirilmiş',
             vllmVersionHelper: {
                 ascend: 'Ascend A2 serisi cihazlar için resmi Ascend standart sürümü.',
                 ascendA3: 'Ascend A3 serisi cihazlar için resmi Ascend A3 sürümü.',

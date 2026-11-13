@@ -1371,6 +1371,9 @@ const message = {
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
+            composeFile: 'Fail Susunan',
+            officialImage: 'Rasmi',
+            customImage: 'Tersuai',
             vllmVersionHelper: {
                 ascend: 'Versi standard rasmi Ascend untuk peranti siri Ascend A2.',
                 ascendA3: 'Versi rasmi Ascend A3 untuk peranti siri Ascend A3.',

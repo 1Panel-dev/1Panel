@@ -1257,6 +1257,9 @@ const message = {
             container_conn_helper: '容器間瀏覽或連接使用此地址',
             from_remote: '該模型並非透過 1Panel 下載，無相關拉取日誌。',
             no_logs: '該模型的拉取日誌已被刪除，無法檢視相關日誌。',
+            composeFile: 'Compose 檔案',
+            officialImage: '官方',
+            customImage: '客製',
             vllmVersionHelper: {
                 ascend: 'Ascend 官方標準版本，適用於 Ascend A2 系列裝置。',
                 ascendA3: 'Ascend 官方 A3 版本，適用於 Ascend A3 系列裝置。',

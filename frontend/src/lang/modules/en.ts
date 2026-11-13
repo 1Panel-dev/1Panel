@@ -1357,6 +1357,9 @@ const message = {
             container_conn_helper: 'Use this address for inter-container access or connection',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
+            composeFile: 'Compose File',
+            officialImage: 'Official',
+            customImage: 'Custom',
             vllmVersionHelper: {
                 ascend: 'Official Ascend standard version for Ascend A2 series devices.',
                 ascendA3: 'Official Ascend A3 version for Ascend A3 series devices.',

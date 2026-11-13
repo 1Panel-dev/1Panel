@@ -1325,6 +1325,9 @@ const message = {
             container_conn_helper: '컨테이너 간 접근 또는 연결에 이 주소를 사용',
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
+            composeFile: '컴포즈 파일',
+            officialImage: '공식',
+            customImage: '맞춤',
             vllmVersionHelper: {
                 ascend: 'Ascend A2 시리즈 장치용 Ascend 공식 표준 버전입니다.',
                 ascendA3: 'Ascend A3 시리즈 장치용 Ascend 공식 A3 버전입니다.',
