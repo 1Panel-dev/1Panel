@@ -193,6 +193,10 @@ const changeNode = async (command: string) => {
                         await loadCurrentUser('local');
                     }
                     await loadGlobalSetting('local');
+                    if (!isEnterprise.value && !item.isXpack) {
+                        globalStore.isProductPro = false;
+                        globalStore.productProExpires = 0;
+                    }
                     currentNode.value = 'local';
                     currentNodeAddr.value = item.addr;
                     localStorage.removeItem('dashboardCache');
@@ -216,6 +220,10 @@ const changeNode = async (command: string) => {
                 await loadGlobalSetting(command);
                 localStorage.removeItem('dashboardCache');
                 localStorage.removeItem('upgradeChecked');
+                if (!isEnterprise.value && !item.isXpack) {
+                    globalStore.isProductPro = false;
+                    globalStore.productProExpires = 0;
+                }
                 currentNode.value = command;
                 currentNodeAddr.value = item.addr;
                 if (isEnterprise.value) {
