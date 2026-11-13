@@ -3076,6 +3076,10 @@ const message = {
         exportOptionsFailed: '다음 지표의 장치 목록을 불러오지 못했습니다. 새로고침 후 다시 시도하세요: {0}',
         selectMetrics: '보낼 지표를 하나 이상 선택하세요',
         selectTimeRange: '보낼 기간을 선택하세요',
+        exportProgress: '{0}까지의 데이터를 가져왔습니다',
+        exportCancelled: '내보내기가 취소되었습니다',
+        exportFailed:
+            '{0} 이후 데이터를 여러 번 재시도했지만 가져오지 못해 내보내기를 중단했습니다. 네트워크를 확인하거나 기간을 줄여 다시 시도하세요.',
     },
     terminal: {
         showTerminalButton: '터미널 바로가기',

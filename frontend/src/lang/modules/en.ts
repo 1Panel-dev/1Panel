@@ -3136,6 +3136,10 @@ const message = {
         exportOptionsFailed: 'Failed to load the device list for: {0}. Refresh the page and retry.',
         selectMetrics: 'Select at least one metric to export.',
         selectTimeRange: 'Select the time range to export.',
+        exportProgress: 'Fetched data up to {0}',
+        exportCancelled: 'Export cancelled',
+        exportFailed:
+            'Fetching data after {0} kept failing after several retries, so the export stopped. Check the network or narrow the time range and try again.',
     },
     terminal: {
         showTerminalButton: 'Terminal Shortcut',

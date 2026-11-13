@@ -3190,6 +3190,10 @@ const message = {
             'Falha ao carregar a lista de dispositivos para: {0}. Atualize a página e tente novamente.',
         selectMetrics: 'Selecione pelo menos uma métrica para exportar',
         selectTimeRange: 'Selecione o período para exportar',
+        exportProgress: 'Dados obtidos até {0}',
+        exportCancelled: 'Exportação cancelada',
+        exportFailed:
+            'Não foi possível obter os dados após {0} mesmo após várias tentativas, então a exportação foi interrompida. Verifique a rede ou reduza o período e tente novamente.',
     },
     terminal: {
         showTerminalButton: 'Atalho para o terminal',

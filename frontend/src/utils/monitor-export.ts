@@ -1,11 +1,27 @@
 import { dateFormatRFC3339 } from '@/utils/date';
-import { downloadBlob } from '@/utils/file';
 
-export interface MonitorExportTable {
+export interface MonitorExportColumns {
     name: string;
     fields: string[];
     headers: string[];
-    rows: any[][];
+}
+
+export interface MonitorExportFile {
+    content: Blob;
+    fileName: string;
+    type: string;
+    // names of tables whose rows were cut to fit format limits
+    truncated: string[];
+}
+
+// Writes an export incrementally: every batch of rows is encoded as soon as it arrives and moved into
+// Blob chunks, so finished batches leave the JS heap (browsers may page large blobs to disk) and memory
+// stays flat no matter how long the exported range is.
+export interface MonitorExportWriter {
+    // rows of one table must be appended in time order
+    append(name: string, rows: any[][]): Promise<void>;
+    rowCount(name: string): number;
+    finish(): Promise<MonitorExportFile>;
 }
 
 const formatCell = (cell: any): string => {
@@ -21,34 +37,57 @@ const formatCell = (cell: any): string => {
 
 const isNumberCell = (cell: any): boolean => typeof cell === 'number' && Number.isFinite(cell);
 
-export function buildMonitorCSV(table: MonitorExportTable): string {
-    const escape = (value: string) => {
-        // neutralize formula execution when a non-numeric cell starts with = + - @ or a control char
-        let sanitized = value;
-        if (/^[=+\-@\t]/.test(sanitized) && Number.isNaN(Number(sanitized))) {
-            sanitized = `'${sanitized}`;
-        }
-        return /[",\n\r]/.test(sanitized) ? `"${sanitized.replace(/"/g, '""')}"` : sanitized;
-    };
-    const lines = [table.headers.map(escape).join(',')];
-    for (const row of table.rows) {
-        lines.push(row.map((cell) => escape(formatCell(cell))).join(','));
+const csvEscape = (value: string) => {
+    // neutralize formula execution when a non-numeric cell starts with = + - @ or a control char
+    let sanitized = value;
+    if (/^[=+\-@\t]/.test(sanitized) && Number.isNaN(Number(sanitized))) {
+        sanitized = `'${sanitized}`;
     }
-    return String.fromCharCode(0xfeff) + lines.join('\r\n');
-}
+    return /[",\n\r]/.test(sanitized) ? `"${sanitized.replace(/"/g, '""')}"` : sanitized;
+};
 
-export function buildMonitorJSON(tables: MonitorExportTable[]): string {
-    const data: Record<string, any[]> = {};
-    for (const table of tables) {
-        data[table.name] = table.rows.map((row) => {
-            const item: Record<string, any> = {};
-            table.fields.forEach((field, i) => {
-                item[field] = row[i] instanceof Date ? formatCell(row[i]) : (row[i] ?? null);
-            });
-            return item;
-        });
+const csvLine = (cells: any[]) => cells.map((cell) => csvEscape(formatCell(cell))).join(',');
+
+const jsonItem = (columns: MonitorExportColumns, row: any[]) => {
+    const item: Record<string, any> = {};
+    columns.fields.forEach((field, i) => {
+        item[field] = row[i] instanceof Date ? formatCell(row[i]) : (row[i] ?? null);
+    });
+    // indented to sit inside the top-level object exactly like JSON.stringify(data, null, 2)
+    return '    ' + JSON.stringify(item, null, 2).replace(/\n/g, '\n    ');
+};
+
+const FLUSH_BYTES = 4 * 1024 * 1024;
+
+// collects output parts and periodically folds them into a Blob so the source strings and arrays can be freed
+class BlobBuffer {
+    private blobs: Blob[] = [];
+    private pending: Array<string | Uint8Array<ArrayBuffer>> = [];
+    private pendingSize = 0;
+
+    push(part: string | Uint8Array<ArrayBuffer>) {
+        if (part.length === 0) {
+            return;
+        }
+        this.pending.push(part);
+        this.pendingSize += typeof part === 'string' ? part.length : part.byteLength;
+        if (this.pendingSize >= FLUSH_BYTES) {
+            this.flush();
+        }
     }
-    return JSON.stringify(data, null, 2);
+
+    toBlob(): Blob {
+        this.flush();
+        return new Blob(this.blobs);
+    }
+
+    private flush() {
+        if (this.pending.length > 0) {
+            this.blobs.push(new Blob(this.pending));
+            this.pending = [];
+            this.pendingSize = 0;
+        }
+    }
 }
 
 // minimal zip writer for csv bundles and xlsx containers: deflate when the runtime offers it, store otherwise
@@ -64,12 +103,11 @@ const crcTable = (() => {
     return table;
 })();
 
-const crc32 = (data: Uint8Array): number => {
-    let crc = 0xffffffff;
+const crc32Update = (crc: number, data: Uint8Array): number => {
     for (let i = 0; i < data.length; i++) {
         crc = crcTable[(crc ^ data[i]) & 0xff] ^ (crc >>> 8);
     }
-    return (crc ^ 0xffffffff) >>> 0;
+    return crc;
 };
 
 const dosDateTime = (date: Date) => {
@@ -80,48 +118,96 @@ const dosDateTime = (date: Date) => {
     return { time, day };
 };
 
-export interface ZipEntry {
-    name: string;
-    content: string | Uint8Array<ArrayBuffer>;
-}
-
-// deflate-raw through the browser's native CompressionStream; null means unsupported, caller stores instead
-const deflateRaw = async (data: Uint8Array<ArrayBuffer>): Promise<Uint8Array<ArrayBuffer> | null> => {
+// deflate-raw through the browser's native CompressionStream; null means unsupported, the entry is stored instead
+const createDeflateStream = (): CompressionStream | null => {
     if (typeof CompressionStream === 'undefined') {
         return null;
     }
     try {
-        const stream = new Blob([data]).stream().pipeThrough(new CompressionStream('deflate-raw'));
-        return new Uint8Array(await new Response(stream).arrayBuffer());
+        return new CompressionStream('deflate-raw');
     } catch {
         // engines that predate the 'deflate-raw' format throw on construction
         return null;
     }
 };
 
-export async function zipFiles(entries: ZipEntry[]): Promise<Uint8Array<ArrayBuffer>> {
-    const encoder = new TextEncoder();
-    const chunks: Uint8Array[] = [];
-    const central: Uint8Array[] = [];
+interface ZipEntryData {
+    nameBytes: Uint8Array<ArrayBuffer>;
+    crc: number;
+    size: number;
+    method: number;
+    data: Blob;
+}
+
+const encoder = new TextEncoder();
+
+// streams one zip entry: tracks the CRC and size of the raw bytes while compressing them on the fly
+class ZipEntryWriter {
+    private crc = 0xffffffff;
+    private size = 0;
+    private out = new BlobBuffer();
+    private writer: WritableStreamDefaultWriter<BufferSource> | null = null;
+    private drained: Promise<void> = Promise.resolve();
+    private method = 0;
+    private name: string;
+
+    constructor(name: string) {
+        this.name = name;
+        const stream = createDeflateStream();
+        if (stream) {
+            this.method = 8;
+            this.writer = stream.writable.getWriter();
+            this.drained = (async () => {
+                const reader = stream.readable.getReader();
+                for (;;) {
+                    const { done, value } = await reader.read();
+                    if (done) {
+                        return;
+                    }
+                    this.out.push(value as Uint8Array<ArrayBuffer>);
+                }
+            })();
+            // surfaced through close(); keeps an early stream failure from becoming an unhandled rejection
+            this.drained.catch(() => undefined);
+        }
+    }
+
+    async write(content: string | Uint8Array<ArrayBuffer>) {
+        const bytes = typeof content === 'string' ? encoder.encode(content) : content;
+        if (bytes.length === 0) {
+            return;
+        }
+        this.crc = crc32Update(this.crc, bytes);
+        this.size += bytes.length;
+        if (this.writer) {
+            await this.writer.write(bytes);
+        } else {
+            this.out.push(bytes);
+        }
+    }
+
+    async close(): Promise<ZipEntryData> {
+        if (this.writer) {
+            await this.writer.close();
+            await this.drained;
+        }
+        return {
+            nameBytes: encoder.encode(this.name),
+            crc: (this.crc ^ 0xffffffff) >>> 0,
+            size: this.size,
+            method: this.method,
+            data: this.out.toBlob(),
+        };
+    }
+}
+
+const buildZip = (entries: ZipEntryData[]): Blob => {
+    const parts: BlobPart[] = [];
+    const central: Uint8Array<ArrayBuffer>[] = [];
     let offset = 0;
     const { time, day } = dosDateTime(new Date());
 
-    const prepared = await Promise.all(
-        entries.map(async (entry) => {
-            const raw = typeof entry.content === 'string' ? encoder.encode(entry.content) : entry.content;
-            const deflated = await deflateRaw(raw);
-            const useDeflate = deflated !== null && deflated.length < raw.length;
-            return {
-                nameBytes: encoder.encode(entry.name),
-                crc: crc32(raw),
-                size: raw.length,
-                method: useDeflate ? 8 : 0,
-                data: useDeflate ? deflated : raw,
-            };
-        }),
-    );
-
-    for (const item of prepared) {
+    for (const item of entries) {
         const local = new DataView(new ArrayBuffer(30));
         local.setUint32(0, 0x04034b50, true);
         local.setUint16(4, 20, true);
@@ -130,10 +216,10 @@ export async function zipFiles(entries: ZipEntry[]): Promise<Uint8Array<ArrayBuf
         local.setUint16(10, time, true);
         local.setUint16(12, day, true);
         local.setUint32(14, item.crc, true);
-        local.setUint32(18, item.data.length, true);
+        local.setUint32(18, item.data.size, true);
         local.setUint32(22, item.size, true);
         local.setUint16(26, item.nameBytes.length, true);
-        chunks.push(new Uint8Array(local.buffer), item.nameBytes, item.data);
+        parts.push(new Uint8Array(local.buffer), item.nameBytes, item.data);
 
         const header = new DataView(new ArrayBuffer(46));
         header.setUint32(0, 0x02014b50, true);
@@ -144,37 +230,30 @@ export async function zipFiles(entries: ZipEntry[]): Promise<Uint8Array<ArrayBuf
         header.setUint16(12, time, true);
         header.setUint16(14, day, true);
         header.setUint32(16, item.crc, true);
-        header.setUint32(20, item.data.length, true);
+        header.setUint32(20, item.data.size, true);
         header.setUint32(24, item.size, true);
         header.setUint16(28, item.nameBytes.length, true);
         header.setUint32(42, offset, true);
         central.push(new Uint8Array(header.buffer), item.nameBytes);
 
-        offset += 30 + item.nameBytes.length + item.data.length;
+        offset += 30 + item.nameBytes.length + item.data.size;
     }
 
-    const centralOffset = offset;
-    let centralSize = 0;
-    for (const chunk of central) {
-        centralSize += chunk.length;
-    }
+    const centralSize = central.reduce((sum, chunk) => sum + chunk.length, 0);
     const end = new DataView(new ArrayBuffer(22));
     end.setUint32(0, 0x06054b50, true);
     end.setUint16(8, entries.length, true);
     end.setUint16(10, entries.length, true);
     end.setUint32(12, centralSize, true);
-    end.setUint32(16, centralOffset, true);
-    chunks.push(...central, new Uint8Array(end.buffer));
+    end.setUint32(16, offset, true);
+    return new Blob([...parts, ...central, new Uint8Array(end.buffer)]);
+};
 
-    const total = chunks.reduce((sum, chunk) => sum + chunk.length, 0);
-    const result = new Uint8Array(total);
-    let pos = 0;
-    for (const chunk of chunks) {
-        result.set(chunk, pos);
-        pos += chunk.length;
-    }
-    return result;
-}
+const zipStatic = async (name: string, content: string) => {
+    const entry = new ZipEntryWriter(name);
+    await entry.write(content);
+    return entry.close();
+};
 
 const xmlEscape = (value: string) =>
     value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -193,35 +272,26 @@ const xlsxColumnName = (index: number): string => {
 // Excel serial keeps the local wall-clock time so the displayed value matches the panel UI
 const xlsxDateSerial = (date: Date) => (date.getTime() - date.getTimezoneOffset() * 60000) / 86400000 + 25569;
 
-const xlsxSheet = (table: MonitorExportTable): string => {
-    const parts = [
-        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>`,
-        `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>`,
-    ];
-    const writeRow = (index: number, cells: any[], isHeader = false) => {
-        parts.push(`<row r="${index}">`);
-        cells.forEach((cell, i) => {
-            const ref = `${xlsxColumnName(i)}${index}`;
-            if (!isHeader && cell instanceof Date) {
-                parts.push(`<c r="${ref}" s="1"><v>${xlsxDateSerial(cell)}</v></c>`);
-            } else if (!isHeader && isNumberCell(cell)) {
-                parts.push(`<c r="${ref}"><v>${cell}</v></c>`);
-            } else {
-                parts.push(`<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(formatCell(cell))}</t></is></c>`);
-            }
-        });
-        parts.push(`</row>`);
-    };
-    writeRow(1, table.headers, true);
-    table.rows.forEach((row, i) => writeRow(i + 2, row));
-    parts.push(`</sheetData></worksheet>`);
+const xlsxRow = (index: number, cells: any[], isHeader = false) => {
+    const parts = [`<row r="${index}">`];
+    cells.forEach((cell, i) => {
+        const ref = `${xlsxColumnName(i)}${index}`;
+        if (!isHeader && cell instanceof Date) {
+            parts.push(`<c r="${ref}" s="1"><v>${xlsxDateSerial(cell)}</v></c>`);
+        } else if (!isHeader && isNumberCell(cell)) {
+            parts.push(`<c r="${ref}"><v>${cell}</v></c>`);
+        } else {
+            parts.push(`<c r="${ref}" t="inlineStr"><is><t>${xmlEscape(formatCell(cell))}</t></is></c>`);
+        }
+    });
+    parts.push(`</row>`);
     return parts.join('');
 };
 
-export function buildMonitorXLSX(tables: MonitorExportTable[]): Promise<Uint8Array<ArrayBuffer>> {
-    const sheets = tables.map(
-        (table, i) => `<sheet name="${xmlEscape(table.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`,
-    );
+const xlsxStaticEntries = (tables: MonitorExportColumns[]) => {
+    const sheets = tables
+        .map((table, i) => `<sheet name="${xmlEscape(table.name)}" sheetId="${i + 1}" r:id="rId${i + 1}"/>`)
+        .join('');
     const overrides = tables
         .map(
             (_table, i) =>
@@ -234,8 +304,7 @@ export function buildMonitorXLSX(tables: MonitorExportTable[]): Promise<Uint8Arr
                 `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`,
         )
         .join('');
-
-    const entries: ZipEntry[] = [
+    return [
         {
             name: '[Content_Types].xml',
             content:
@@ -261,7 +330,7 @@ export function buildMonitorXLSX(tables: MonitorExportTable[]): Promise<Uint8Arr
             content:
                 `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
                 `<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">` +
-                `<sheets>${sheets.join('')}</sheets></workbook>`,
+                `<sheets>${sheets}</sheets></workbook>`,
         },
         {
             name: 'xl/_rels/workbook.xml.rels',
@@ -289,50 +358,195 @@ export function buildMonitorXLSX(tables: MonitorExportTable[]): Promise<Uint8Arr
                 `</styleSheet>`,
         },
     ];
-    tables.forEach((table, i) => {
-        entries.push({ name: `xl/worksheets/sheet${i + 1}.xml`, content: xlsxSheet(table) });
-    });
-    return zipFiles(entries);
-}
+};
 
 // Excel worksheets are limited to 1,048,576 rows (header included)
 export const XLSX_MAX_DATA_ROWS = 1048575;
 
-// returns the names of tables whose rows were truncated to fit format limits
-export async function exportMonitorTables(
-    tables: MonitorExportTable[],
+interface TableState {
+    columns: MonitorExportColumns;
+    rows: number;
+    truncated: boolean;
+}
+
+const createTableStates = (tables: MonitorExportColumns[]) => {
+    const states = new Map<string, TableState>();
+    for (const columns of tables) {
+        states.set(columns.name, { columns, rows: 0, truncated: false });
+    }
+    const get = (name: string) => {
+        const state = states.get(name);
+        if (!state) {
+            throw new Error(`unknown export table: ${name}`);
+        }
+        return state;
+    };
+    return { states, get };
+};
+
+const truncatedNames = (states: Map<string, TableState>) =>
+    [...states.values()].filter((state) => state.truncated).map((state) => state.columns.name);
+
+const createCSVWriter = (tables: MonitorExportColumns[], baseName: string): MonitorExportWriter => {
+    const { get } = createTableStates(tables);
+    if (tables.length === 1) {
+        const buffer = new BlobBuffer();
+        buffer.push(String.fromCharCode(0xfeff) + csvLine(tables[0].headers));
+        return {
+            async append(name, rows) {
+                const state = get(name);
+                if (rows.length > 0) {
+                    buffer.push(rows.map((row) => '\r\n' + csvLine(row)).join(''));
+                    state.rows += rows.length;
+                }
+            },
+            rowCount: (name) => get(name).rows,
+            async finish() {
+                return {
+                    content: buffer.toBlob(),
+                    fileName: `${baseName}-${tables[0].name}.csv`,
+                    type: 'text/csv',
+                    truncated: [],
+                };
+            },
+        };
+    }
+    // several metrics: one csv per metric packed into a zip, each entry compressed while it is written
+    const entries = new Map<string, ZipEntryWriter>();
+    const ready = Promise.all(
+        tables.map((columns) => {
+            const entry = new ZipEntryWriter(`monitor-${columns.name}.csv`);
+            entries.set(columns.name, entry);
+            return entry.write(String.fromCharCode(0xfeff) + csvLine(columns.headers));
+        }),
+    );
+    // awaited by append/finish; this only keeps an early failure from being reported as unhandled
+    ready.catch(() => undefined);
+    return {
+        async append(name, rows) {
+            await ready;
+            const state = get(name);
+            if (rows.length > 0) {
+                await entries.get(name)!.write(rows.map((row) => '\r\n' + csvLine(row)).join(''));
+                state.rows += rows.length;
+            }
+        },
+        rowCount: (name) => get(name).rows,
+        async finish() {
+            await ready;
+            const closed = await Promise.all(tables.map((columns) => entries.get(columns.name)!.close()));
+            return {
+                content: buildZip(closed),
+                fileName: `${baseName}.zip`,
+                type: 'application/zip',
+                truncated: [],
+            };
+        },
+    };
+};
+
+const createJSONWriter = (tables: MonitorExportColumns[], baseName: string): MonitorExportWriter => {
+    const { get } = createTableStates(tables);
+    const buffers = new Map(tables.map((columns) => [columns.name, new BlobBuffer()]));
+    return {
+        async append(name, rows) {
+            const state = get(name);
+            if (rows.length === 0) {
+                return;
+            }
+            const items = rows.map((row) => jsonItem(state.columns, row)).join(',\n');
+            buffers.get(name)!.push(state.rows > 0 ? ',\n' + items : items);
+            state.rows += rows.length;
+        },
+        rowCount: (name) => get(name).rows,
+        async finish() {
+            const parts: BlobPart[] = ['{\n'];
+            tables.forEach((columns, i) => {
+                const key = `  ${JSON.stringify(columns.name)}: `;
+                const separator = i < tables.length - 1 ? ',\n' : '\n';
+                if (get(columns.name).rows === 0) {
+                    parts.push(`${key}[]${separator}`);
+                } else {
+                    parts.push(`${key}[\n`, buffers.get(columns.name)!.toBlob(), `\n  ]${separator}`);
+                }
+            });
+            parts.push('}');
+            return {
+                content: new Blob(parts),
+                fileName: `${baseName}.json`,
+                type: 'application/json',
+                truncated: [],
+            };
+        },
+    };
+};
+
+const createXLSXWriter = (tables: MonitorExportColumns[], baseName: string): MonitorExportWriter => {
+    const { states, get } = createTableStates(tables);
+    const sheets = new Map<string, ZipEntryWriter>();
+    const ready = Promise.all(
+        tables.map((columns, i) => {
+            const sheet = new ZipEntryWriter(`xl/worksheets/sheet${i + 1}.xml`);
+            sheets.set(columns.name, sheet);
+            return sheet.write(
+                `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+                    `<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>` +
+                    xlsxRow(1, columns.headers, true),
+            );
+        }),
+    );
+    ready.catch(() => undefined);
+    return {
+        async append(name, rows) {
+            await ready;
+            const state = get(name);
+            const room = XLSX_MAX_DATA_ROWS - state.rows;
+            if (rows.length > room) {
+                state.truncated = true;
+            }
+            const accepted = rows.length > room ? rows.slice(0, Math.max(0, room)) : rows;
+            if (accepted.length === 0) {
+                return;
+            }
+            // header occupies row 1, so data row n lands on sheet row n + 1
+            const xml = accepted.map((row, i) => xlsxRow(state.rows + i + 2, row)).join('');
+            await sheets.get(name)!.write(xml);
+            state.rows += accepted.length;
+        },
+        rowCount: (name) => get(name).rows,
+        async finish() {
+            await ready;
+            const staticEntries = await Promise.all(
+                xlsxStaticEntries(tables).map((entry) => zipStatic(entry.name, entry.content)),
+            );
+            const sheetEntries = await Promise.all(
+                tables.map(async (columns) => {
+                    const sheet = sheets.get(columns.name)!;
+                    await sheet.write(`</sheetData></worksheet>`);
+                    return sheet.close();
+                }),
+            );
+            return {
+                content: buildZip([...staticEntries, ...sheetEntries]),
+                fileName: `${baseName}.xlsx`,
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                truncated: truncatedNames(states),
+            };
+        },
+    };
+};
+
+export function createMonitorExportWriter(
+    tables: MonitorExportColumns[],
     format: string,
     baseName: string,
-): Promise<string[]> {
+): MonitorExportWriter {
     switch (format) {
         case 'json':
-            downloadBlob(buildMonitorJSON(tables), `${baseName}.json`, 'application/json');
-            return [];
-        case 'xlsx': {
-            const truncated: string[] = [];
-            const limited = tables.map((table) => {
-                if (table.rows.length <= XLSX_MAX_DATA_ROWS) {
-                    return table;
-                }
-                truncated.push(table.name);
-                return { ...table, rows: table.rows.slice(0, XLSX_MAX_DATA_ROWS) };
-            });
-            downloadBlob(
-                await buildMonitorXLSX(limited),
-                `${baseName}.xlsx`,
-                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            );
-            return truncated;
-        }
+            return createJSONWriter(tables, baseName);
+        case 'xlsx':
+            return createXLSXWriter(tables, baseName);
         default:
-            if (tables.length === 1) {
-                downloadBlob(buildMonitorCSV(tables[0]), `${baseName}-${tables[0].name}.csv`, 'text/csv');
-            } else {
-                const bundle = await zipFiles(
-                    tables.map((table) => ({ name: `monitor-${table.name}.csv`, content: buildMonitorCSV(table) })),
-                );
-                downloadBlob(bundle, `${baseName}.zip`, 'application/zip');
-            }
-            return [];
+            return createCSVWriter(tables, baseName);
     }
 }

@@ -3176,6 +3176,10 @@ const message = {
         exportOptionsFailed: 'Gagal memuat senarai peranti untuk: {0}. Muat semula halaman dan cuba lagi.',
         selectMetrics: 'Pilih sekurang-kurangnya satu metrik untuk dieksport',
         selectTimeRange: 'Pilih julat masa untuk dieksport',
+        exportProgress: 'Data telah diambil sehingga {0}',
+        exportCancelled: 'Eksport dibatalkan',
+        exportFailed:
+            'Data selepas {0} masih gagal diambil selepas beberapa percubaan semula, jadi eksport dihentikan. Semak rangkaian atau kecilkan julat masa dan cuba lagi.',
     },
     terminal: {
         showTerminalButton: 'Pintasan Terminal',

@@ -3198,6 +3198,10 @@ const message = {
         exportOptionsFailed: 'No se pudo cargar la lista de dispositivos para: {0}. Actualiza la página y reintenta.',
         selectMetrics: 'Selecciona al menos una métrica para exportar',
         selectTimeRange: 'Selecciona el intervalo de tiempo a exportar',
+        exportProgress: 'Datos obtenidos hasta {0}',
+        exportCancelled: 'Exportación cancelada',
+        exportFailed:
+            'No se pudieron obtener los datos posteriores a {0} tras varios reintentos, por lo que la exportación se detuvo. Comprueba la red o reduce el intervalo de tiempo e inténtalo de nuevo.',
     },
     terminal: {
         showTerminalButton: 'Acceso rápido al terminal',
