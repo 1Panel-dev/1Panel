@@ -443,6 +443,7 @@ export namespace Website {
     }
 
     export interface ProxyConfig {
+        serviceStatus?: 'healthy' | 'unhealthy' | 'stopped' | 'unknown';
         id: number;
         operate: string;
         enable: boolean;

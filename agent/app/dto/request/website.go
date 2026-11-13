@@ -258,6 +258,7 @@ type WebsiteUpdateDirPermission struct {
 }
 
 type WebsiteProxyConfig struct {
+	ServiceStatus   string            `json:"serviceStatus,omitempty"`
 	ID              uint              `json:"id" validate:"required"`
 	Operate         string            `json:"operate" validate:"required"`
 	Enable          bool              `json:"enable" `
