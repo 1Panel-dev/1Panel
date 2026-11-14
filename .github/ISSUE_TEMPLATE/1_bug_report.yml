@@ -15,12 +15,24 @@ body:
   - type: markdown
     attributes:
       value: "## Environment Information"
+  - type: dropdown
+    validations:
+      required: true
+    attributes:
+      label: "Product"
+      description: "Please select the product you want to give feedback on."
+      options:
+        - "1Panel"
+        - "AI Gateway"
+        - "Other"
   - type: input
     validations:
       required: true
     attributes:
-      label: "1Panel Version"
-      description: "Log in to the 1Panel Web console and check the current version at the bottom right of the page."
+      label: "Version"
+      description: |
+        Log in to the 1Panel Web console and check the current version at the bottom right of the page;
+        or log in to the AI gateway and click *About* in the upper right corner to view the current version.
   - type: markdown
     attributes:
       value: "## Detailed information"
