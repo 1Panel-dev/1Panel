@@ -2,13 +2,20 @@
     <el-row :gutter="20" v-loading="loading">
         <el-col :xs="24" :sm="20" :md="16" :lg="14" :xl="14">
             <el-form ref="nginxForm" label-position="right" label-width="140px" :model="form">
-                <el-form-item :label="$t('commons.table.status')" prop="enable">
+                <el-form-item :label="$t('nginx.defaultHttpsStatus')" prop="enable">
                     <el-switch v-model="enable"></el-switch>
                     <span class="input-help">{{ $t('nginx.defaultHttpsHelper1') }}</span>
                 </el-form-item>
                 <el-form-item :label="$t('nginx.sslRejectHandshake')" prop="sslRejectHandshake">
                     <el-switch v-model="form.sslRejectHandshake"></el-switch>
                     <span class="input-help">{{ $t('nginx.sslRejectHandshakeHelper') }}</span>
+                </el-form-item>
+                <el-form-item
+                    :label="$t('nginx.httpsRedirectCustomPort')"
+                    prop="httpsRedirectCustomPort"
+                >
+                    <el-switch v-model="form.httpsRedirectCustomPort"></el-switch>
+                    <span class="input-help">{{ $t('nginx.httpsRedirectCustomPortHelper') }}</span>
                 </el-form-item>
                 <el-form-item>
                     <el-button v-permission type="primary" @click="submit()" :disabled="loading">
@@ -31,6 +38,7 @@ const loading = ref(false);
 const form = reactive({
     operate: 'enable',
     sslRejectHandshake: false,
+    httpsRedirectCustomPort: true,
 });
 
 const getStatus = async () => {
@@ -38,6 +46,7 @@ const getStatus = async () => {
         const res = await getHttpsStatus();
         enable.value = res.data.https;
         form.sslRejectHandshake = res.data.sslRejectHandshake;
+        form.httpsRedirectCustomPort = res.data.httpsRedirectCustomPort;
         showPage.value = true;
     } catch {}
 };

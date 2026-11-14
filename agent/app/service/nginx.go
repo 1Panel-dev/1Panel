@@ -1,9 +1,8 @@
 package service
 
 import (
+	"errors"
 	"fmt"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"io"
 	"net/http"
 	"os"
@@ -25,6 +24,9 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
+	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 )
 
 type NginxService struct {
@@ -393,6 +395,8 @@ func (n NginxService) UpdateModule(req request.NginxModuleUpdate) error {
 }
 
 func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) error {
+	websiteListenMutation.Lock()
+	defer websiteListenMutation.Unlock()
 	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -437,7 +441,24 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) e
 			return err
 		}
 	}
-	return nginxCheckAndReload(string(content), defaultConfigPath, appInstall.ContainerName)
+	if err = nginxCheckAndReload(string(content), defaultConfigPath, appInstall.ContainerName); err != nil {
+		return err
+	}
+	if req.HTTPSRedirectCustomPort == nil {
+		return nil
+	}
+	previousUseCustomPort := getHTTPSRedirectCustomPort()
+	if err = updateWebsiteHTTPSRedirectCustomPort(*req.HTTPSRedirectCustomPort); err != nil {
+		return err
+	}
+	value := constant.StatusDisable
+	if *req.HTTPSRedirectCustomPort {
+		value = constant.StatusEnable
+	}
+	if err = settingRepo.UpdateOrCreate(constant.HTTPSRedirectCustomPortKey, value); err != nil {
+		return errors.Join(err, updateWebsiteHTTPSRedirectCustomPort(previousUseCustomPort))
+	}
+	return nil
 }
 
 func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) {
@@ -456,7 +477,9 @@ func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) 
 	}
 	defaultConfig.FilePath = defaultConfigPath
 	defaultServer := defaultConfig.FindServers()[0]
-	res := &response.NginxConfigRes{}
+	res := &response.NginxConfigRes{
+		HTTPSRedirectCustomPort: getHTTPSRedirectCustomPort(),
+	}
 	for _, directive := range defaultServer.GetDirectives() {
 		if directive.GetName() == "include" && directive.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
 			res.Https = true
@@ -467,4 +490,112 @@ func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) 
 		}
 	}
 	return res, nil
+}
+
+type websiteHTTPSRedirectConfig struct {
+	filePath   string
+	oldContent []byte
+	newContent []byte
+}
+
+func updateWebsiteHTTPSRedirectCustomPort(useCustomPort bool) (err error) {
+	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return err
+	}
+	websites, err := websiteRepo.List()
+	if err != nil {
+		return err
+	}
+
+	var updates []websiteHTTPSRedirectConfig
+	for _, website := range websites {
+		if website.Type == constant.Stream || website.WebsiteSSLID == 0 {
+			continue
+		}
+		httpConfig := website.HttpConfig
+		if httpConfig == "" {
+			httpConfig = constant.HTTPToHTTPS
+		}
+		if httpConfig != constant.HTTPToHTTPS {
+			continue
+		}
+		domains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
+		if err != nil {
+			return err
+		}
+		plan := buildWebsiteTLSPlan(domains, appInstall.HttpPort, appInstall.HttpsPort)
+		if plan.redirectPort == 0 {
+			continue
+		}
+
+		filePath := GetWebsiteConfigPath(website)
+		content, err := os.ReadFile(filePath)
+		if os.IsNotExist(err) {
+			continue
+		}
+		if err != nil {
+			return err
+		}
+		config, err := parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return err
+		}
+		servers := config.FindServers()
+		if len(servers) == 0 {
+			return fmt.Errorf("website nginx server block is missing: %s", website.PrimaryDomain)
+		}
+		server := servers[0]
+		server.AddHTTP2HTTPS(plan.redirectPort, useCustomPort)
+		target := components.HTTPSRedirectTarget(plan.redirectPort, useCustomPort)
+		server.UpdateDirective("error_page", []string{"497", target})
+		config.FilePath = filePath
+		newContent := []byte(nginx.DumpConfig(config, nginx.IndentedStyle))
+		if string(newContent) == string(content) {
+			continue
+		}
+		updates = append(updates, websiteHTTPSRedirectConfig{
+			filePath:   filePath,
+			oldContent: content,
+			newContent: newContent,
+		})
+	}
+	if len(updates) == 0 {
+		return nil
+	}
+
+	written := 0
+	reloadAttempted := false
+	defer func() {
+		if err == nil {
+			return
+		}
+		for _, update := range updates[:written] {
+			if restoreErr := os.WriteFile(update.filePath, update.oldContent, constant.FilePerm); restoreErr != nil {
+				err = errors.Join(err, fmt.Errorf("restore %s: %w", update.filePath, restoreErr))
+			}
+		}
+		if reloadAttempted {
+			if checkErr := opNginx(appInstall.ContainerName, constant.NginxCheck); checkErr != nil {
+				err = errors.Join(err, fmt.Errorf("check restored nginx configuration: %w", checkErr))
+			} else if reloadErr := opNginx(appInstall.ContainerName, constant.NginxReload); reloadErr != nil {
+				err = errors.Join(err, fmt.Errorf("reload restored nginx configuration: %w", reloadErr))
+			}
+		}
+	}()
+
+	for _, update := range updates {
+		written++
+		if err = os.WriteFile(update.filePath, update.newContent, constant.FilePerm); err != nil {
+			return err
+		}
+	}
+	reloadAttempted = true
+	if err = opNginx(appInstall.ContainerName, constant.NginxCheck); err != nil {
+		return err
+	}
+	if err = opNginx(appInstall.ContainerName, constant.NginxReload); err != nil {
+		return err
+	}
+	return nil
 }
