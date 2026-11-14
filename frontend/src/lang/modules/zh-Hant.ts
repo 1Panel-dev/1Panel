@@ -1269,6 +1269,7 @@ const message = {
                 default: 'vLLM 官方社群標準版本，CUDA 13.0，適用於新驅動程式和新架構顯示卡。',
                 rtxPro5000: 'NVIDIA RTX Pro 5000 客製版，針對 DeepSeek-V4.1-Flash-1017 最佳化，映像由 1Panel 維護。',
                 dspark: 'NVIDIA GB10 雙裝置客製版，針對 DeepSeek-V4-Flash 最佳化，映像由 1Panel 維護。',
+                dspark4: 'NVIDIA GB10 四裝置客製版，針對 DeepSeek-V4.1-Flash 最佳化。',
             },
             vllmDeployProfile: '部署模型',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1280,6 +1281,10 @@ const message = {
             customAddress: '自訂地址',
             downloader: '模型下載',
             modelDirectoryHelper: '模型列表預設來自「模型準備 > 設定」中配置的模型目錄，顯示該目錄下已下載的模型。',
+            vllmGB10DualNodeModelHelper:
+                '僅支援 DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp，兩台裝置須在相同路徑放置完整模型。',
+            vllmGB10FourNodeModelHelper:
+                '僅支援 DeepSeek-V4.1-Flash，四台裝置須在相同路徑放置完整模型。',
             modelDirectoryPlaceholder: '搜尋模型或輸入完整路徑',
             selectModel: '選擇模型',
             selectModelDirectory: '選擇目錄',

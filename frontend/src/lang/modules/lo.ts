@@ -1328,6 +1328,7 @@ const message = {
                 rtxPro5000:
                     'ເວີຊັນປັບແຕ່ງສຳລັບ NVIDIA RTX Pro 5000, ປັບໃຫ້ເໝາະກັບ DeepSeek-V4.1-Flash-1017. ອິມເມຈດູແລໂດຍ 1Panel.',
                 dspark: 'ເວີຊັນປັບແຕ່ງສຳລັບ NVIDIA GB10 ສອງອຸປະກອນ, ປັບໃຫ້ເໝາະກັບ DeepSeek-V4-Flash. ອິມເມຈດູແລໂດຍ 1Panel.',
+                dspark4: 'ເວີຊັນປັບແຕ່ງສຳລັບ NVIDIA GB10 ສີ່ອຸປະກອນ, ປັບໃຫ້ເໝາະກັບ DeepSeek-V4.1-Flash.',
             },
             vllmDeployProfile: 'ໂມເດວສຳລັບຕິດຕັ້ງ',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1340,6 +1341,10 @@ const message = {
             downloader: 'ດາວໂຫຼດໂມເດວ',
             modelDirectoryHelper:
                 'ໂດຍຄ່າເລີ່ມຕົ້ນ ລາຍຊື່ໂມເດວຈະສະແດງໂມເດວທີ່ດາວໂຫຼດໄວ້ໃນໄດເຣັກທໍຣີທີ່ກຳນົດໃນ “ການກະກຽມໂມເດວ > ການຕັ້ງຄ່າ”.',
+            vllmGB10DualNodeModelHelper:
+                'ຮອງຮັບສະເພາະ DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp. ທັງສອງອຸປະກອນຕ້ອງມີໂມເດວຄົບຊຸດໃນເສັ້ນທາງດຽວກັນ.',
+            vllmGB10FourNodeModelHelper:
+                'ຮອງຮັບສະເພາະ DeepSeek-V4.1-Flash. ທັງສີ່ອຸປະກອນຕ້ອງມີໂມເດວຄົບຊຸດໃນເສັ້ນທາງດຽວກັນ.',
             modelDirectoryPlaceholder: 'ຄົ້ນຫາໂມເດວ ຫຼື ປ້ອນເສັ້ນທາງເຕັມ',
             selectModel: 'ເລືອກໂມເດວ',
             selectModelDirectory: 'ເລືອກໄດເຣັກທໍຣີ',

@@ -1380,6 +1380,7 @@ const message = {
                 rtxPro5000:
                     'NVIDIA RTX Pro 5000 için DeepSeek-V4.1-Flash-1017’ye optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
                 dspark: 'İki NVIDIA GB10 cihazı için DeepSeek-V4-Flash’a optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
+                dspark4: 'Dört NVIDIA GB10 cihazı için DeepSeek-V4.1-Flash’a optimize edilmiş özel sürüm.',
             },
             vllmDeployProfile: 'Dağıtım modeli',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1392,6 +1393,10 @@ const message = {
             downloader: 'Model indirme',
             modelDirectoryHelper:
                 'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
+            vllmGB10DualNodeModelHelper:
+                'Yalnızca DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp desteklenir. İki cihazda da aynı yolda eksiksiz model bulunmalıdır.',
+            vllmGB10FourNodeModelHelper:
+                'Yalnızca DeepSeek-V4.1-Flash desteklenir. Dört cihazda da aynı yolda eksiksiz model bulunmalıdır.',
             modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
             selectModel: 'Model seç',
             selectModelDirectory: 'Dizin seç',

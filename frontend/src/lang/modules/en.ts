@@ -1371,6 +1371,7 @@ const message = {
                 rtxPro5000:
                     'Custom version for NVIDIA RTX Pro 5000, optimized for DeepSeek-V4.1-Flash-1017. The image is maintained by 1Panel.',
                 dspark: 'Custom version for two NVIDIA GB10 devices, optimized for DeepSeek-V4-Flash. The image is maintained by 1Panel.',
+                dspark4: 'Custom version for four NVIDIA GB10 devices, optimized for DeepSeek-V4.1-Flash.',
             },
             vllmDeployProfile: 'Deployment model',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1383,6 +1384,10 @@ const message = {
             downloader: 'Model Downloads',
             modelDirectoryHelper:
                 'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
+            vllmGB10DualNodeModelHelper:
+                'Only DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp is supported. Both devices need the complete model at the same path.',
+            vllmGB10FourNodeModelHelper:
+                'Only DeepSeek-V4.1-Flash is supported. All four devices need the complete model at the same path.',
             modelDirectoryPlaceholder: 'Search models or enter a full path',
             selectModel: 'Select model',
             selectModelDirectory: 'Select directory',

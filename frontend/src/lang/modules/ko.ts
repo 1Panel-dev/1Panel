@@ -1339,6 +1339,7 @@ const message = {
                 rtxPro5000:
                     'NVIDIA RTX Pro 5000용 맞춤 버전으로, DeepSeek-V4.1-Flash-1017에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
                 dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, DeepSeek-V4-Flash에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
+                dspark4: 'NVIDIA GB10 장치 4대 구성용 맞춤 버전으로, DeepSeek-V4.1-Flash에 최적화되어 있습니다.',
             },
             vllmDeployProfile: '배포 모델',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1351,6 +1352,10 @@ const message = {
             downloader: '모델 다운로드',
             modelDirectoryHelper:
                 '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
+            vllmGB10DualNodeModelHelper:
+                'DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp만 지원합니다. 장치 2대 모두 동일한 경로에 전체 모델을 배치하세요.',
+            vllmGB10FourNodeModelHelper:
+                'DeepSeek-V4.1-Flash만 지원합니다. 장치 4대 모두 동일한 경로에 전체 모델을 배치하세요.',
             modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
             selectModel: '모델 선택',
             selectModelDirectory: '디렉터리 선택',
