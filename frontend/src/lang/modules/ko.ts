@@ -4987,11 +4987,15 @@ const message = {
         packagesHelper: '예: git,curl 쉼표로 구분',
         scriptHelper: '컴파일 전에 실행할 스크립트, 일반적으로 모듈 소스 코드 다운로드, 종속성 설치 등',
         buildHelper: '동적 모듈은 빌드 후 설정을 통해 로드되며, 정적 모듈은 여전히 OpenResty를 다시 빌드합니다.',
-        defaultHttps: 'HTTPS 변조 방지',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '변조 방지 상태',
         defaultHttpsHelper1: '이를 활성화하면 HTTPS 변조 문제를 해결할 수 있습니다.',
         sslRejectHandshake: '기본 SSL 핸드셰이크 거부',
         sslRejectHandshakeHelper:
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
+        httpsRedirectCustomPort: '사용자 지정 포트로 리디렉션',
+        httpsRedirectCustomPortHelper:
+            '활성화하면 HTTP에서 HTTPS로 리디렉션할 때 사용자 지정 HTTPS 포트를 사용합니다.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

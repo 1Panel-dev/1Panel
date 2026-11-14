@@ -5174,11 +5174,15 @@ const message = {
             'Skrip yang dilaksanakan sebelum penyusunan, biasanya untuk memuat turun sumber kod modul, memasang kebergantungan, dll.',
         buildHelper:
             'Modul dinamik dimuatkan melalui konfigurasi selepas dibina; modul statik tetap membina semula OpenResty.',
-        defaultHttps: 'Anti-usikan HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Status anti-usikan',
         defaultHttpsHelper1: 'Mengaktifkan pilihan ini boleh menyelesaikan masalah usikan HTTPS.',
         sslRejectHandshake: 'Tolak jabat tangan SSL lalai',
         sslRejectHandshakeHelper:
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
+        httpsRedirectCustomPort: 'Guna ubah hala port tersuai',
+        httpsRedirectCustomPortHelper:
+            'Apabila didayakan, ubah hala HTTP ke HTTPS menggunakan port HTTPS tersuai.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

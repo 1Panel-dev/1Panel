@@ -5054,11 +5054,15 @@ const message = {
             'اسکریپت‌هایی که قبل از کامپایل اجرا می‌شوند، معمولاً برای دانلود کد منبع ماژول، نصب وابستگی‌ها و غیره.',
         buildHelper:
             'ماژول‌های پویا پس از ساخت از طریق پیکربندی بارگذاری می‌شوند؛ ماژول‌های ایستا همچنان OpenResty را دوباره می‌سازند.',
-        defaultHttps: 'ضد دستکاری HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'وضعیت ضد دستکاری',
         defaultHttpsHelper1: 'فعال‌سازی این گزینه می‌تواند مشکلات دستکاری HTTPS را حل کند.',
         sslRejectHandshake: 'رد دست دادن SSL پیش‌فرض',
         sslRejectHandshakeHelper:
             'فعال‌سازی این گزینه می‌تواند از نشت گواهی جلوگیری کند، تنظیم یک وب‌سایت پیش‌فرض این تنظیم را بی‌اثر می‌کند',
+        httpsRedirectCustomPort: 'استفاده از تغییرمسیر با پورت سفارشی',
+        httpsRedirectCustomPortHelper:
+            'در صورت فعال بودن، تغییرمسیر HTTP به HTTPS از پورت HTTPS سفارشی استفاده می‌کند.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

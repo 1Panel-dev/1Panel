@@ -594,24 +594,17 @@ func (s *Server) RemoveListenByBind(bind string) {
 	s.Listens = listens
 }
 
-func (s *Server) AddHTTP2HTTPS(httpsPort int) {
+func (s *Server) AddHTTP2HTTPS(httpsPort int, useCustomPort bool) {
 	newDir := Directive{
 		Name:       "if",
 		Parameters: []string{"($scheme = http)"},
 		Block:      &Block{},
 	}
 	block := &Block{}
-	if httpsPort == 443 {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", "https://$host$request_uri"},
-		})
-	} else {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", fmt.Sprintf("https://$host:%d$request_uri", httpsPort)},
-		})
-	}
+	block.AppendDirectives(&Directive{
+		Name:       "return",
+		Parameters: []string{"301", HTTPSRedirectTarget(httpsPort, useCustomPort)},
+	})
 
 	newDir.Block = block
 	directives := make([]IDirective, 0, len(s.Directives)+1)
@@ -660,10 +653,23 @@ func isHTTP2HTTPSRedirect(dir IDirective) bool {
 	if len(params) != 2 || params[0] != "301" {
 		return false
 	}
-	if params[1] == "https://$host$request_uri" {
+	return IsHTTPToHTTPSRedirectTarget(params[1])
+}
+
+// HTTPSRedirectTarget builds the redirect target used by HTTP-to-HTTPS rules.
+func HTTPSRedirectTarget(httpsPort int, useCustomPort bool) string {
+	if !useCustomPort || httpsPort == 443 {
+		return "https://$host$request_uri"
+	}
+	return fmt.Sprintf("https://$host:%d$request_uri", httpsPort)
+}
+
+// IsHTTPToHTTPSRedirectTarget reports whether target is a managed HTTP-to-HTTPS redirect.
+func IsHTTPToHTTPSRedirectTarget(target string) bool {
+	if target == "https://$host$request_uri" {
 		return true
 	}
-	port, ok := strings.CutPrefix(params[1], "https://$host:")
+	port, ok := strings.CutPrefix(target, "https://$host:")
 	if !ok || !strings.HasSuffix(port, "$request_uri") {
 		return false
 	}
