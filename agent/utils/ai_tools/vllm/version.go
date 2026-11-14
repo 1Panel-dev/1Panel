@@ -4,7 +4,6 @@ import "strings"
 
 const (
 	gb10VersionPrefix = "nvidia-"
-	gb10VersionSuffix = "-optimized-for-2-gb10-ds-v4-flash"
 	rtxVersionSuffix  = "-optimized-for-ds-v4.1-flash"
 )
 
@@ -13,10 +12,24 @@ func IsRTXVersion(version string) bool {
 }
 
 func IsGB10Version(version string) bool {
+	return GB10NodeCount(version) > 0
+}
+
+func GB10NodeCount(version string) int {
 	normalized := strings.ToLower(strings.TrimSpace(version))
 	tag := strings.TrimPrefix(normalized, gb10VersionPrefix)
-	return tag != normalized && strings.HasSuffix(tag, gb10VersionSuffix) &&
-		strings.TrimSpace(strings.TrimSuffix(tag, gb10VersionSuffix)) != ""
+	if tag == normalized {
+		return 0
+	}
+	for suffix, nodes := range map[string]int{
+		"-optimized-for-2-gb10-ds-v4-flash":   2,
+		"-optimized-for-4-gb10-ds-v4.1-flash": 4,
+	} {
+		if strings.HasSuffix(tag, suffix) && strings.TrimSpace(strings.TrimSuffix(tag, suffix)) != "" {
+			return nodes
+		}
+	}
+	return 0
 }
 
 func ResolveImage(image, imageType, tag string) string {
@@ -42,6 +55,8 @@ func ResolveImage(image, imageType, tag string) string {
 			defaultImage = "1panel/vllm-gb10-dual-node:" + strings.TrimPrefix(tag, "v")
 		case "optimized-for-2-gb10-ds-v4-flash":
 			defaultImage = "1panel/vllm:" + strings.TrimPrefix(tag, "v")
+		case "optimized-for-4-gb10-ds-v4.1-flash":
+			defaultImage = "eugr/spark-vllm-b12x:latest"
 		case "optimized-for-ds-v4.1-flash":
 			defaultImage = "1panel/vllm:" + tag
 		}

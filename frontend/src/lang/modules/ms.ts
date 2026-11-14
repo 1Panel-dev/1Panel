@@ -1385,6 +1385,7 @@ const message = {
                 rtxPro5000:
                     'Versi tersuai untuk NVIDIA RTX Pro 5000, dioptimumkan untuk DeepSeek-V4.1-Flash-1017. Imej diselenggara oleh 1Panel.',
                 dspark: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4-Flash. Imej diselenggara oleh 1Panel.',
+                dspark4: 'Versi tersuai untuk empat peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4.1-Flash.',
             },
             vllmDeployProfile: 'Model penggunaan',
             vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
@@ -1397,6 +1398,10 @@ const message = {
             downloader: 'Muat turun model',
             modelDirectoryHelper:
                 'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
+            vllmGB10DualNodeModelHelper:
+                'Hanya DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp disokong. Kedua-dua peranti memerlukan model lengkap pada laluan yang sama.',
+            vllmGB10FourNodeModelHelper:
+                'Hanya DeepSeek-V4.1-Flash disokong. Keempat-empat peranti memerlukan model lengkap pada laluan yang sama.',
             modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
             selectModel: 'Pilih model',
             selectModelDirectory: 'Pilih direktori',
