@@ -32,6 +32,11 @@ func GB10NodeCount(version string) int {
 	return 0
 }
 
+func IsGB10TileLangVersion(version string) bool {
+	tag := strings.TrimPrefix(strings.ToLower(strings.TrimSpace(version)), gb10VersionPrefix)
+	return strings.TrimPrefix(tag, "v") == "2026.11.15-optimized-for-4-gb10-ds-v4.1-flash"
+}
+
 func ResolveImage(image, imageType, tag string) string {
 	image = strings.TrimSpace(image)
 	tag = strings.TrimSpace(tag)
@@ -57,6 +62,9 @@ func ResolveImage(image, imageType, tag string) string {
 			defaultImage = "1panel/vllm:" + strings.TrimPrefix(tag, "v")
 		case "optimized-for-4-gb10-ds-v4.1-flash":
 			defaultImage = "eugr/spark-vllm-b12x:latest"
+			if IsGB10TileLangVersion(tag) {
+				defaultImage = "spark-ds41f:1107"
+			}
 		case "optimized-for-ds-v4.1-flash":
 			defaultImage = "1panel/vllm:" + tag
 		}
