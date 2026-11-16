@@ -2514,7 +2514,8 @@ const message = {
         mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
         goImages: 'Ir ao gerenciamento de imagens',
         goModels: 'Ir aos downloads de modelos',
-        tokenizerHelp: 'Selecione um tokenizador ou modelo no nó principal para codificar o texto de teste e contar tokens.',
+        tokenizerHelp:
+            'Selecione um tokenizador ou modelo no nó principal para codificar o texto de teste e contar tokens.',
         tokenizerInvalid: 'Este tokenizador está indisponível. Selecione outro ou baixe novamente.',
         schemeHelp:
             'Os planos de teste definem os parâmetros de solicitação, a concorrência e as regras de execução. Prepare pelo menos um plano disponível.',
