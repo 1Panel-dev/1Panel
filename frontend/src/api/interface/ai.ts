@@ -795,7 +795,7 @@ export namespace AI {
         apiType: string;
         authMode: string;
         verifyModel: string;
-        verified: boolean;
+        status: string;
         validateAvailability: boolean;
         verifiedAt?: string | null;
         verifyError?: string;

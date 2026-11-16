@@ -420,7 +420,7 @@ type AgentAccountInfo struct {
 	VerifyModel          string              `json:"verifyModel"`
 	VerifiedAt           *time.Time          `json:"verifiedAt"`
 	VerifyError          string              `json:"verifyError"`
-	Verified             bool                `json:"verified"`
+	Status               string              `json:"status"`
 	ValidateAvailability bool                `json:"validateAvailability"`
 	Remark               string              `json:"remark"`
 	CreatedAt            time.Time           `json:"createdAt"`

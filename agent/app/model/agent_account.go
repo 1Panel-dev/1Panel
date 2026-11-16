@@ -16,7 +16,7 @@ type AgentAccount struct {
 	RememberAPIKey       bool       `json:"rememberApiKey"`
 	VerifiedAt           *time.Time `json:"verifiedAt"`
 	VerifyError          string     `json:"verifyError"`
-	Verified             bool       `json:"verified"`
+	Status               string     `json:"status"`
 	ValidateAvailability bool       `json:"validateAvailability"`
 	Remark               string     `json:"remark"`
 	MasterAccountID      uint       `json:"masterAccountId" gorm:"index"`

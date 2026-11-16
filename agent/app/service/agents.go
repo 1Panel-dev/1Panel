@@ -198,7 +198,7 @@ func (a AgentService) Create(req dto.AgentCreateReq) (*dto.AgentItem, error) {
 		if err != nil {
 			return nil, err
 		}
-		if account.ValidateAvailability && !account.Verified {
+		if account.ValidateAvailability && account.Status != constant.StatusSuccess {
 			return nil, buserr.New("ErrAgentAccountNotVerified")
 		}
 		provider = account.Provider
@@ -721,7 +721,7 @@ func (a AgentService) ensureBatchInstallAccount(req dto.AgentBatchInstallReq) (u
 	account.APIType = snapshot.APIType
 	account.AuthMode = snapshot.AuthMode
 	account.Remark = snapshot.Remark
-	account.Verified = true
+	account.Status = constant.StatusSuccess
 
 	initialModels, err := buildInitialAgentAccountModels(account, req.AccountModels)
 	if err != nil {
@@ -1070,11 +1070,12 @@ func (a AgentService) CreateAccount(req dto.AgentAccountCreateReq) error {
 		APIType:              resolvedInput.APIType,
 		AuthMode:             resolvedInput.AuthMode,
 		VerifyModel:          verifyModel,
-		Verified:             validateAvailability,
+		Status:               constant.StatusPending,
 		ValidateAvailability: validateAvailability,
 		Remark:               req.Remark,
 	}
 	if validateAvailability {
+		account.Status = constant.StatusSuccess
 		now := time.Now()
 		account.VerifiedAt = &now
 	}
@@ -1181,13 +1182,13 @@ func (a AgentService) UpdateAccount(req dto.AgentAccountUpdateReq) error {
 		}
 	}
 	if account.ValidateAvailability && (!validateAvailability || connectionChanged) {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
 	if shouldVerify {
 		now := time.Now()
-		account.Verified = true
+		account.Status = constant.StatusSuccess
 		account.VerifiedAt = &now
 		account.VerifyError = ""
 	}
@@ -1282,7 +1283,7 @@ func (a AgentService) PageAccounts(req dto.AgentAccountSearch) (int64, []dto.Age
 			APIType:              item.APIType,
 			AuthMode:             item.AuthMode,
 			VerifyModel:          item.VerifyModel,
-			Verified:             item.Verified,
+			Status:               item.Status,
 			ValidateAvailability: item.ValidateAvailability,
 			VerifiedAt:           item.VerifiedAt,
 			VerifyError:          item.VerifyError,
@@ -1357,7 +1358,7 @@ func (a AgentService) UpdateAccountVerifyModel(req dto.AgentAccountVerifyModelUp
 		previousVerifyModel = models[0].ID
 	}
 	if account.ValidateAvailability && !sameProviderModelID(account.Provider, previousVerifyModel, record.Model) {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
@@ -1496,7 +1497,7 @@ func (a AgentService) UpdateAccountModel(req dto.AgentAccountModelUpdateReq) err
 		return err
 	}
 	if account.ValidateAvailability && !sameProviderModelID(account.Provider, account.VerifyModel, verifyModel) {
-		account.Verified, account.VerifiedAt, account.VerifyError = false, nil, ""
+		account.Status, account.VerifiedAt, account.VerifyError = constant.StatusPending, nil, ""
 	}
 	account.VerifyModel = verifyModel
 	rows := make([]model.AgentAccountModel, 0, len(models))
@@ -1612,9 +1613,14 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 		_, err := resolveAgentAccountInput(req.Provider, req.APIType, req.AuthMode, req.APIKey, req.BaseURL, req.Model, true, false)
 		return err
 	}
+	agentAccountMutationMu.Lock()
+	defer agentAccountMutationMu.Unlock()
 	account, err := agentAccountRepo.GetFirst(repo.WithByID(req.ID))
 	if err != nil {
 		return err
+	}
+	if account.Status == constant.StatusWaiting {
+		return buserr.WithDetail("ErrInvalidParams", "model service verification is already in progress", nil)
 	}
 	if !account.ValidateAvailability {
 		return nil
@@ -1623,21 +1629,27 @@ func (a AgentService) VerifyAccount(req dto.AgentAccountVerifyReq) error {
 	if err != nil {
 		return err
 	}
+	if err := agentAccountRepo.UpdateStatus(account.ID, constant.StatusWaiting, ""); err != nil {
+		return err
+	}
+	account.Status = constant.StatusWaiting
+	account.VerifyError = ""
+	agentAccountMutationMu.Unlock()
 	verifyModel, verifyErr := resolveAgentAccountVerifyModel(account.Provider, account.VerifyModel, models)
 	if verifyErr == nil {
 		verifyErr = providercatalog.VerifyAccount(account.Provider, account.APIType, account.AuthMode, account.BaseURL, account.APIKey, verifyModel)
 	}
 	agentAccountMutationMu.Lock()
-	defer agentAccountMutationMu.Unlock()
 	if err := ensureAgentAccountUnchanged(account, models); err != nil {
-		return err
+		return errors.Join(err, agentAccountRepo.UpdateStatus(account.ID, constant.StatusFailed, err.Error()))
 	}
 	now := time.Now()
 	account.VerifyModel = verifyModel
 	account.VerifiedAt = &now
-	account.Verified = verifyErr == nil
+	account.Status = constant.StatusSuccess
 	account.VerifyError = ""
 	if verifyErr != nil {
+		account.Status = constant.StatusFailed
 		account.VerifyError = verifyErr.Error()
 	}
 	err = agentAccountRepo.UpdateVerification(account)

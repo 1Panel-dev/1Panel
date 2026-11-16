@@ -122,6 +122,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddAgentAccountVerificationResult,
 		migrations.AddAgentAccountType,
 		migrations.AddGPUGroup,
+		migrations.AddAgentAccountStatus,
 	}
 }
 

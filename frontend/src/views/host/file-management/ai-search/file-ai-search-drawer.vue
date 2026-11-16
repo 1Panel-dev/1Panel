@@ -651,7 +651,7 @@ const fileAiAgentAccountOptions = ref<
         name: string;
         provider?: string;
         providerName?: string;
-        verified?: boolean;
+        status?: string;
         validateAvailability?: boolean;
     }>
 >([]);
@@ -667,14 +667,14 @@ const loadFileAiAgentAccounts = async () => {
     fileAiAgentAccountOptions.value = res.data?.items || [];
 };
 
-const fileAiVerificationLabel = (item: { provider?: string; verified?: boolean; validateAvailability?: boolean }) => {
+const fileAiVerificationLabel = (item: { provider?: string; status?: string; validateAvailability?: boolean }) => {
     if (item.validateAvailability === false) return i18n.global.t('aiTools.agents.verifySkipped');
-    return item.verified ? 'OK' : 'N/A';
+    return item.status === 'Success' ? 'OK' : 'N/A';
 };
 
-const fileAiVerificationTagType = (item: { provider?: string; verified?: boolean; validateAvailability?: boolean }) => {
+const fileAiVerificationTagType = (item: { provider?: string; status?: string; validateAvailability?: boolean }) => {
     if (item.validateAvailability === false) return 'info';
-    return item.verified ? 'success' : 'warning';
+    return item.status === 'Success' ? 'success' : 'warning';
 };
 
 const saveFileAiManageSettings = async () => {
