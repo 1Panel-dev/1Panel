@@ -2506,9 +2506,7 @@ const message = {
         mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
         goImages: 'İmaj yönetimine git',
         goModels: 'Model indirmelerine git',
-        tokenizerHelp: 'Test metnini kodlamak ve token saymak için tokenizer dizininden bir tokenizer seçin.',
-        tokenizerEmpty: 'Kullanılabilir model yok. Model indirmelerinden tokenizer dosyaları içeren bir model indirin.',
-        tokenizerEmptyWithDownload: 'Kullanılabilir tokenizer yok. İndirmek için {download} sayfasını açın.',
+        tokenizerHelp: 'Test metnini kodlamak ve token saymak için ana düğümde bir tokenizer veya model seçin.',
         tokenizerInvalid: 'Bu tokenizer kullanılamıyor. Başka birini seçin veya yeniden indirin.',
         schemeHelp:
             'Test planları istek parametrelerini, eşzamanlılığı ve yürütme kurallarını tanımlar. En az bir kullanılabilir plan hazırlayın.',

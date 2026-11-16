@@ -2508,10 +2508,7 @@ const message = {
         mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
         goImages: 'Ke pengurusan imej',
         goModels: 'Ke muat turun model',
-        tokenizerHelp: 'Pilih tokenizer daripada direktori tokenizer untuk mengekod teks ujian dan mengira token.',
-        tokenizerEmpty:
-            'Tiada model tersedia. Muat turun model yang mengandungi fail tokenizer di halaman muat turun model.',
-        tokenizerEmptyWithDownload: 'Tiada tokenizer tersedia. Buka {download} untuk memuat turun.',
+        tokenizerHelp: 'Pilih tokenizer atau model pada nod utama untuk mengekod teks ujian dan mengira token.',
         tokenizerInvalid: 'Tokenizer ini tidak tersedia. Pilih yang lain atau muat turun semula.',
         schemeHelp:
             'Skema ujian menentukan parameter permintaan, keserentakan dan peraturan pelaksanaan. Sediakan sekurang-kurangnya satu skema yang tersedia.',

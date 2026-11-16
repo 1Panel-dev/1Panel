@@ -2416,9 +2416,7 @@ const message = {
         mainNodeHelp: 'ການທົດສອບແລ່ນຢູ່ໂນດຫຼັກ. ກະກຽມອິມເມຈ ແລະ tokenizer ຢູ່ໂນດນັ້ນ.',
         goImages: 'ໄປຈັດການອິມເມຈ',
         goModels: 'ໄປດາວໂຫຼດໂມເດວ',
-        tokenizerHelp: 'ເລືອກ tokenizer ຈາກໂຟນເດີ tokenizer ເພື່ອເຂົ້າລະຫັດຂໍ້ຄວາມທົດສອບ ແລະ ນັບ token.',
-        tokenizerEmpty: 'ບໍ່ມີໂມເດວທີ່ໃຊ້ໄດ້. ດາວໂຫຼດໂມເດວທີ່ມີໄຟລ໌ tokenizer ໃນໜ້າດາວໂຫຼດໂມເດວ.',
-        tokenizerEmptyWithDownload: 'ບໍ່ມີ tokenizer ທີ່ໃຊ້ໄດ້. ເປີດ {download} ເພື່ອດາວໂຫຼດ.',
+        tokenizerHelp: 'ເລືອກ tokenizer ຫຼື ໂມເດວໃນໂນດຫຼັກ ເພື່ອເຂົ້າລະຫັດຂໍ້ຄວາມທົດສອບ ແລະ ນັບ token.',
         tokenizerInvalid: 'Tokenizer ນີ້ໃຊ້ບໍ່ໄດ້. ເລືອກອັນອື່ນ ຫຼື ດາວໂຫຼດຄືນ.',
         schemeHelp:
             'ແຜນທົດສອບກຳນົດພາລາມິເຕີຄຳຮ້ອງຂໍ, ຈຳນວນການເຮັດວຽກພ້ອມກັນ ແລະກົດການແລ່ນ. ກະກຽມຢ່າງໜ້ອຍໜຶ່ງແຜນທີ່ໃຊ້ໄດ້.',
