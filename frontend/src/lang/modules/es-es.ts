@@ -2516,11 +2516,7 @@ const message = {
         mainNodeHelp: 'Las pruebas se ejecutan en el nodo principal. Prepare la imagen y el tokenizador en ese nodo.',
         goImages: 'Ir a la gestión de imágenes',
         goModels: 'Ir a las descargas de modelos',
-        tokenizerHelp:
-            'Seleccione un tokenizador del directorio de tokenizadores para codificar el texto de prueba y contar tokens.',
-        tokenizerEmpty:
-            'No hay modelos disponibles. Descargue un modelo que incluya archivos de tokenizador en las descargas de modelos.',
-        tokenizerEmptyWithDownload: 'No hay tokenizadores disponibles. Abra {download} para descargar uno.',
+        tokenizerHelp: 'Seleccione un tokenizador o modelo en el nodo principal para codificar el texto de prueba y contar tokens.',
         tokenizerInvalid: 'Este tokenizador no está disponible. Seleccione otro o descárguelo de nuevo.',
         schemeHelp:
             'Los planes de prueba definen los parámetros de solicitud, la concurrencia y las reglas de ejecución. Prepare al menos un plan disponible.',

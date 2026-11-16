@@ -2485,9 +2485,7 @@ const message = {
         mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
         goImages: 'Go to image management',
         goModels: 'Go to model downloads',
-        tokenizerHelp: 'Select a tokenizer from the tokenizer directory to encode test text and count tokens.',
-        tokenizerEmpty: 'No models are available. Download a model containing tokenizer files in model downloads.',
-        tokenizerEmptyWithDownload: 'No tokenizers are available. Open {download} to download one.',
+        tokenizerHelp: 'Select a tokenizer or model on the main node to encode test text and count tokens.',
         tokenizerInvalid: 'This tokenizer is unavailable. Select another or download it again in model downloads.',
         schemeHelp:
             'Test schemes define request parameters, concurrency, and execution rules. Prepare at least one available scheme.',
