@@ -122,7 +122,12 @@
                                 :visible-count="1"
                             >
                                 <template v-if="!row.appInstallId" #footer>
-                                    <el-button link type="primary" @click="poolRef.open(row)">
+                                    <el-button
+                                        link
+                                        type="primary"
+                                        :disabled="row.status === 'Waiting'"
+                                        @click="poolRef.open(row)"
+                                    >
                                         {{ $t('aiTools.agents.modelPool') }}
                                     </el-button>
                                 </template>
@@ -130,7 +135,7 @@
                             <span v-if="!row.models?.length">—</span>
                         </template>
                     </el-table-column>
-                    <el-table-column prop="verified" :label="$t('aiTools.model.connectionStatus')" min-width="130">
+                    <el-table-column prop="status" :label="$t('aiTools.model.connectionStatus')" min-width="130">
                         <template #default="{ row }">
                             <div class="verification-status">
                                 <el-tooltip
@@ -164,7 +169,7 @@
                                         type="primary"
                                         :icon="RefreshRight"
                                         :aria-label="$t('aiTools.model.reverify')"
-                                        :disabled="verifyingAccounts.has(`${currentNode}:${row.id}`)"
+                                        :disabled="row.status === 'Waiting'"
                                         @click="verifyTarget = { account: row, node: currentNode }"
                                     />
                                 </el-tooltip>
@@ -248,7 +253,7 @@
             :model-value="true"
             :account="detailAccount"
             :status="connectionStatus(detailAccount)"
-            :verifying="verifyingAccounts.has(`${currentNode}:${detailAccount.id}`)"
+            :verifying="detailAccount.status === 'Waiting'"
             @update:model-value="!$event && (detailAccountID = undefined)"
             @edit="createRef.openAccount(detailAccount)"
             @models="poolRef.open(detailAccount)"
@@ -291,7 +296,6 @@ const createRef = ref();
 const poolRef = ref();
 const chatRef = ref<InstanceType<typeof ModelChat>>();
 const loading = ref(false);
-const verifyingAccounts = reactive(new Set<string>());
 const verifyTarget = ref<{ account: AI.AgentAccountItem; node: string }>();
 const verifyDialogVisible = computed({
     get: () => Boolean(verifyTarget.value),
@@ -409,18 +413,18 @@ const search = async () => {
 };
 
 const connectionStatus = (row: AI.AgentAccountItem) => {
-    if (verifyingAccounts.has(`${currentNode.value}:${row.id}`)) {
+    if (row.status === 'Waiting') {
         return { type: 'info' as const, label: i18n.global.t('aiTools.model.verifying') };
     }
     if (!row.validateAvailability) {
         return { type: 'success' as const, label: i18n.global.t('aiTools.agents.verifySkipped') };
     }
-    if (row.verifyError) {
+    if (row.status === 'Failed') {
         return { type: 'danger' as const, label: i18n.global.t('aiTools.model.verifyFailed') };
     }
     return {
-        type: row.verified ? ('success' as const) : ('warning' as const),
-        label: i18n.global.t(row.verified ? 'aiTools.agents.verified' : 'aiTools.model.unverified'),
+        type: row.status === 'Success' ? ('success' as const) : ('warning' as const),
+        label: i18n.global.t(row.status === 'Success' ? 'aiTools.agents.verified' : 'aiTools.model.unverified'),
     };
 };
 
@@ -428,17 +432,16 @@ const verifyAccount = async () => {
     if (!verifyTarget.value) return;
     const { account: row, node } = verifyTarget.value;
     verifyTarget.value = undefined;
-    const key = `${node}:${row.id}`;
-    if (!row.validateAvailability || currentNode.value !== node || !isCurrentPage.value || verifyingAccounts.has(key))
+    if (!row.validateAvailability || currentNode.value !== node || !isCurrentPage.value || row.status === 'Waiting')
         return;
-    verifyingAccounts.add(key);
+    row.status = 'Waiting';
+    row.verifyError = '';
     try {
         await verifyAgentAccount({ id: row.id }, node);
         MsgSuccess(i18n.global.t('aiTools.agents.verified'));
     } catch (error: any) {
         MsgError(String(error?.response?.data?.message || error?.message || i18n.global.t('commons.res.commonError')));
     } finally {
-        verifyingAccounts.delete(key);
         if (currentNode.value === node) await search();
     }
 };
@@ -463,16 +466,18 @@ const accountButtons = [
     {
         label: i18n.global.t('commons.button.edit'),
         permission: true,
+        disabled: (row: AI.AgentAccountItem) => row.status === 'Waiting',
         click: (row: AI.AgentAccountItem) => createRef.value.openAccount(row),
     },
     {
         label: i18n.global.t('aiTools.agents.modelPool'),
-        disabled: (row: AI.AgentAccountItem) => row.provider === 'vllm',
+        disabled: (row: AI.AgentAccountItem) => row.provider === 'vllm' || row.status === 'Waiting',
         click: (row: AI.AgentAccountItem) => poolRef.value.open(row),
     },
     {
         label: i18n.global.t('commons.button.delete'),
         permission: true,
+        disabled: (row: AI.AgentAccountItem) => row.status === 'Waiting',
         click: async (row: AI.AgentAccountItem) => {
             await ElMessageBox.confirm(
                 i18n.global.t('commons.msg.delete', [row.name]),

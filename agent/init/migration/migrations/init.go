@@ -1234,6 +1234,9 @@ var NormalizeAgentAccountVerifiedStatus = &gormigrate.Migration{
 		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
 			return err
 		}
+		if !tx.Migrator().HasColumn(&model.AgentAccount{}, "verified") {
+			return nil
+		}
 		return tx.Model(&model.AgentAccount{}).
 			Where("provider IN ?", []string{"custom", "ollama", "kimi-coding"}).
 			Update("verified", false).Error
@@ -1954,5 +1957,31 @@ var AddCronjobURLItems = &gormigrate.Migration{
 			return nil
 		}
 		return tx.Migrator().AddColumn(&model.Cronjob{}, "URLItemsJSON")
+	},
+}
+
+var AddAgentAccountStatus = &gormigrate.Migration{
+	ID: "20261116-add-agent-account-status",
+	Migrate: func(tx *gorm.DB) error {
+		if err := tx.AutoMigrate(&model.AgentAccount{}); err != nil {
+			return err
+		}
+		if err := tx.Model(&model.AgentAccount{}).Where("status IS NULL OR status = ?", "").Update("status", constant.StatusPending).Error; err != nil {
+			return err
+		}
+		if tx.Migrator().HasColumn(&model.AgentAccount{}, "verified") {
+			if err := tx.Model(&model.AgentAccount{}).Where("verified = ?", true).Update("status", constant.StatusSuccess).Error; err != nil {
+				return err
+			}
+		}
+		if tx.Migrator().HasColumn(&model.AgentAccount{}, "verify_error") {
+			if err := tx.Model(&model.AgentAccount{}).Where("verify_error <> ?", "").Update("status", constant.StatusFailed).Error; err != nil {
+				return err
+			}
+		}
+		if tx.Migrator().HasColumn(&model.AgentAccount{}, "verifying") {
+			return tx.Model(&model.AgentAccount{}).Where("verifying = ?", true).Update("status", constant.StatusWaiting).Error
+		}
+		return nil
 	},
 }

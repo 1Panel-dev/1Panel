@@ -58,7 +58,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		if install.App.Key == "ollama" {
 			apiType, apiKey = "openai-responses", "ollama-local"
 		}
-		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, ValidateAvailability: true}
+		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, ValidateAvailability: true, Status: constant.StatusPending}
 	}
 	accountChanged := account.ID == 0 || account.AppInstallID != install.ID || (updateBaseURL && account.BaseURL != baseURL)
 	if apiKey != nil && account.APIKey != strings.TrimSpace(*apiKey) {
@@ -82,7 +82,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		accountChanged = true
 	}
 	if accountChanged && account.ValidateAvailability {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
@@ -129,7 +129,7 @@ func UpdateLocalModelAccountAddress(accountID uint, previousURL, baseURL string)
 	}
 	account.BaseURL = baseURL
 	if account.ValidateAvailability {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
@@ -211,7 +211,7 @@ func updateOllamaModelPool(modelName string, remove bool) error {
 		if sameProviderModelID("ollama", account.VerifyModel, modelName) {
 			account.VerifyModel = ""
 			if account.ValidateAvailability {
-				account.Verified = false
+				account.Status = constant.StatusPending
 				account.VerifiedAt = nil
 				account.VerifyError = ""
 			}

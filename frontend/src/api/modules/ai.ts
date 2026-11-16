@@ -267,7 +267,7 @@ export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
 
 export const verifyAgentAccount = (req: { id: number }, currentNode: string) => {
     return http.postWithConfig(`/ai/accounts/verify`, req, {
-        timeout: TimeoutEnum.T_60S,
+        timeout: 20_000,
         errorMessageMode: 'manual',
         headers: { CurrentNode: currentNode },
     });

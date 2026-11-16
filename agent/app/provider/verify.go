@@ -42,7 +42,7 @@ func VerifyAccount(provider, apiType, authMode, baseURL, apiKey, model string) e
 		httpReq.Header.Set(key, value)
 	}
 	httpReq.Header.Set("Accept", "application/json")
-	resp, err := aihttp.NewClient(defaultVerifyTimeout).Do(httpReq)
+	resp, err := aihttp.NewClient(15 * time.Second).Do(httpReq)
 	if err != nil {
 		return buserr.WithErr("ErrAgentAccountUnavailable", aihttp.SafeError(err, req.URL, apiKey))
 	}

@@ -2,8 +2,10 @@ package repo
 
 import (
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
 )
@@ -17,6 +19,8 @@ type IAgentAccountRepo interface {
 	Create(account *model.AgentAccount) error
 	Save(account *model.AgentAccount) error
 	UpdateVerification(account *model.AgentAccount) error
+	UpdateStatus(id uint, status, verifyError string) error
+	InterruptVerification() error
 	ResetVerificationByAppInstallID(appInstallID uint) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
@@ -62,7 +66,7 @@ func (a AgentAccountRepo) Save(account *model.AgentAccount) error {
 
 func (a AgentAccountRepo) UpdateVerification(account *model.AgentAccount) error {
 	result := getDb().Model(&model.AgentAccount{}).Where("id = ?", account.ID).Updates(map[string]interface{}{
-		"verified":     account.Verified,
+		"status":       account.Status,
 		"verified_at":  account.VerifiedAt,
 		"verify_error": account.VerifyError,
 		"verify_model": account.VerifyModel,
@@ -76,9 +80,21 @@ func (a AgentAccountRepo) UpdateVerification(account *model.AgentAccount) error 
 	return nil
 }
 
+func (a AgentAccountRepo) UpdateStatus(id uint, status, verifyError string) error {
+	return getDb().Model(&model.AgentAccount{}).Where("id = ?", id).UpdateColumns(map[string]interface{}{"status": status, "verify_error": verifyError}).Error
+}
+
+func (a AgentAccountRepo) InterruptVerification() error {
+	return getDb().Model(&model.AgentAccount{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{
+		"status":       constant.StatusFailed,
+		"verified_at":  time.Now(),
+		"verify_error": constant.InterruptedMsg,
+	}).Error
+}
+
 func (a AgentAccountRepo) ResetVerificationByAppInstallID(appInstallID uint) error {
 	return getDb().Model(&model.AgentAccount{}).Where("app_install_id = ? AND validate_availability = ?", appInstallID, true).Updates(map[string]interface{}{
-		"verified":     false,
+		"status":       constant.StatusPending,
 		"verified_at":  nil,
 		"verify_error": "",
 	}).Error
