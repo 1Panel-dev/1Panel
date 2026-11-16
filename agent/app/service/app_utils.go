@@ -1513,15 +1513,6 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 		}
 	}
 	containerNames := strings.Split(appInstall.ContainerName, ",")
-	if len(containers) == 0 {
-		if appInstall.Status == constant.StatusUpErr && !force {
-			return
-		}
-		appInstall.Status = constant.StatusError
-		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(containerNames, ",")).Error()
-		_ = appInstallRepo.UpdateStatus(appInstall, true)
-		return
-	}
 	notFoundNames := make([]string, 0)
 	exitNames := make([]string, 0)
 	exitedCount := 0
@@ -1559,11 +1550,20 @@ func synAppInstall(containers map[string]container.Summary, appInstall *model.Ap
 	case pausedCount == total:
 		appInstall.Status = constant.StatusPaused
 	case len(notFoundNames) == total:
-		if appInstall.Status == constant.StatusUpErr && !force {
-			return
+		if appInstall.App.Key == "vllm" {
+			switch oldStatus {
+			case constant.StatusInstallErr, constant.StatusUpgradeErr, constant.StatusUpErr:
+				return
+			}
+			appInstall.Status = constant.StatusStopped
+			appInstall.Message = ""
+		} else {
+			if appInstall.Status == constant.StatusUpErr && !force {
+				return
+			}
+			appInstall.Status = constant.StatusError
+			appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
 		}
-		appInstall.Status = constant.StatusError
-		appInstall.Message = buserr.WithName("ErrContainerNotFound", strings.Join(notFoundNames, ",")).Error()
 	default:
 		var msg string
 		if exitedCount > 0 {
