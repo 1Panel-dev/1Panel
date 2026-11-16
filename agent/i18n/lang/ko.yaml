@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트�
 ErrPHPExtensionsConflict: "같은 이름에 내용이 다른 PHP 확장 템플릿이 이미 있어 덮어쓰지 않았습니다"
 
 ErrModelTokenizerDirOverlap: "모델 디렉터리와 토크나이저 디렉터리는 서로 달라야 하며 서로 포함할 수 없습니다"
+
+ProxyCacheClear: "리버스 프록시 캐시 비우기"
+ProxyCacheEmpty: "비울 캐시 없음"
+ProxyCacheSummary: "완료 {{ .cleared }}개, 비울 캐시 없음 {{ .skipped }}개, 실패 {{ .failed }}개"
+ProxyCacheReloadFailed: "캐시는 비웠지만 OpenResty를 다시 로드하지 못했습니다"

@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "目前運行環境下，如需檢查映像是否更
 ErrPHPExtensionsConflict: "同名 PHP 擴充模版已存在且內容不同，未覆蓋"
 
 ErrModelTokenizerDirOverlap: "模型目錄和分詞器目錄不能相同或互相包含"
+
+ProxyCacheClear: "清空反代快取"
+ProxyCacheEmpty: "無需清理"
+ProxyCacheSummary: "已清空 {{ .cleared }} 個，無需清理 {{ .skipped }} 個，失敗 {{ .failed }} 個"
+ProxyCacheReloadFailed: "快取已清空，OpenResty 重新載入失敗"

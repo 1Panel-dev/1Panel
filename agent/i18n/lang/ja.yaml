@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "現在の実行環境でイメージの更新を確
 ErrPHPExtensionsConflict: "同じ名前で内容が異なる PHP 拡張機能テンプレートが既に存在するため、上書きしませんでした"
 
 ErrModelTokenizerDirOverlap: "モデルとトークナイザーのディレクトリは別々にし、一方が他方を含まないようにしてください"
+
+ProxyCacheClear: "リバースプロキシキャッシュを消去"
+ProxyCacheEmpty: "消去するキャッシュはありません"
+ProxyCacheSummary: "消去済み {{ .cleared }} 件、消去不要 {{ .skipped }} 件、失敗 {{ .failed }} 件"
+ProxyCacheReloadFailed: "キャッシュは消去されましたが、OpenResty の再読み込みに失敗しました"

@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "Para comprobar actualizaciones de imágenes en el e
 ErrPHPExtensionsConflict: "Ya existe una plantilla de extensiones PHP con este nombre y contenido diferente; no se ha sobrescrito"
 
 ErrModelTokenizerDirOverlap: "Los directorios de modelos y tokenizadores deben ser distintos y ninguno puede contener al otro"
+
+ProxyCacheClear: "Vaciar la caché del proxy inverso"
+ProxyCacheEmpty: "Nada que vaciar"
+ProxyCacheSummary: "Sitios con caché vaciada: {{ .cleared }}. Sin caché que vaciar: {{ .skipped }}. Con errores: {{ .failed }}."
+ProxyCacheReloadFailed: "Se ha vaciado la caché, pero no se ha podido recargar OpenResty"

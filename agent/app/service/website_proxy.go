@@ -460,13 +460,33 @@ func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
 	if err != nil {
 		return err
 	}
-	cacheDir := GetSitePath(website, SiteCacheDir)
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(cacheDir) {
-		if err = fileOp.CleanDir(cacheDir); err != nil {
-			return err
+	if _, err := cleanWebsiteProxyCache(GetSiteDir(""), website.Alias); err != nil {
+		return err
+	}
+	return reloadProxyCacheNginx()
+}
+
+func cleanWebsiteProxyCache(sitesDir, alias string) (bool, error) {
+	if alias == "" || alias == "." || alias == ".." || filepath.Base(alias) != alias {
+		return false, fmt.Errorf("invalid website alias %q", alias)
+	}
+	cacheDir := filepath.Join(sitesDir, alias, "cache")
+	for _, dir := range []string{filepath.Dir(cacheDir), cacheDir} {
+		info, err := os.Lstat(dir)
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if !info.IsDir() {
+			return false, fmt.Errorf("%s is not a directory", dir)
 		}
 	}
+	return files.NewFileOp().CleanDir(cacheDir)
+}
+
+func reloadProxyCacheNginx() error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err

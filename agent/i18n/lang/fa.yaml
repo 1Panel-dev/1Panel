@@ -821,3 +821,8 @@ ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصا�
 ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"
 
 ErrModelTokenizerDirOverlap: "پوشه‌های مدل و توکن‌ساز باید متفاوت باشند و هیچ‌کدام نباید درون دیگری قرار گیرد"
+
+ProxyCacheClear: "پاک‌سازی کش پراکسی معکوس"
+ProxyCacheEmpty: "چیزی برای پاک‌سازی وجود ندارد"
+ProxyCacheSummary: "پاک‌شده: {{ .cleared }}، بدون نیاز به پاک‌سازی: {{ .skipped }}، ناموفق: {{ .failed }}"
+ProxyCacheReloadFailed: "کش پاک شد، اما بارگذاری مجدد OpenResty ناموفق بود"

@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "To check for image updates in the current runtime e
 ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
 
 ErrModelTokenizerDirOverlap: "The model and tokenizer directories must be different, and neither can contain the other"
+
+ProxyCacheClear: "Clear reverse proxy caches"
+ProxyCacheEmpty: "Nothing to clear"
+ProxyCacheSummary: "Cleared {{ .cleared }}, nothing to clear {{ .skipped }}, failed {{ .failed }}"
+ProxyCacheReloadFailed: "Caches cleared, OpenResty reload failed"

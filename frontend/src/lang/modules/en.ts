@@ -5064,6 +5064,8 @@ const message = {
         status: 'Current Status',
         configResource: 'Configuration',
         saveAndReload: 'Save and reload',
+        batchClearProxyCacheWarn:
+            'Clear the reverse proxy caches of {0} selected websites? The next request for previously cached content will reach the origin server.',
         clearProxyCache: 'Clean reverse proxy cache',
         clearProxyCacheWarn: 'This action will delete all files in the cache directory. Continue?',
         create: 'Add a new module',

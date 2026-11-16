@@ -4955,6 +4955,8 @@ const message = {
         status: '현재 상태',
         configResource: '구성',
         saveAndReload: '저장 및 다시 로드',
+        batchClearProxyCacheWarn:
+            '선택한 웹사이트 {0}개의 리버스 프록시 캐시를 비울까요? 캐시되어 있던 콘텐츠에 대한 다음 요청은 원본 서버로 전달됩니다.',
         clearProxyCache: '리버스 프록시 캐시 삭제',
         clearProxyCacheWarn:
             '캐시가 구성된 모든 웹사이트에 영향을 미치며 OpenResty 가 다시 시작됩니다. 계속하시겠습니까?',

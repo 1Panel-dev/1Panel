@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "Для проверки обновлений обр
 ErrPHPExtensionsConflict: "Шаблон расширений PHP с таким именем уже существует и имеет другое содержимое; перезапись не выполнена"
 
 ErrModelTokenizerDirOverlap: "Каталоги моделей и токенизаторов должны различаться и не могут быть вложены друг в друга"
+
+ProxyCacheClear: "Очистить кэш обратного прокси"
+ProxyCacheEmpty: "Кэш пуст"
+ProxyCacheSummary: "Кэш очищен: {{ .cleared }}, кэш пуст: {{ .skipped }}, ошибок: {{ .failed }}"
+ProxyCacheReloadFailed: "Кэш очищен, но не удалось перезагрузить конфигурацию OpenResty"

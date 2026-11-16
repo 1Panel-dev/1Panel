@@ -820,3 +820,8 @@ ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemeleri
 ErrPHPExtensionsConflict: "Bu ada sahip ancak içeriği farklı bir PHP uzantı şablonu zaten mevcut; üzerine yazılmadı"
 
 ErrModelTokenizerDirOverlap: "Model ve tokenizer dizinleri farklı olmalı ve biri diğerini içermemelidir"
+
+ProxyCacheClear: "Ters vekil önbelleğini temizle"
+ProxyCacheEmpty: "Temizlenecek önbellek yok"
+ProxyCacheSummary: "Temizlenen: {{ .cleared }}, temizlenecek önbelleği olmayan: {{ .skipped }}, başarısız: {{ .failed }}"
+ProxyCacheReloadFailed: "Önbellek temizlendi ancak OpenResty yeniden yüklenemedi"
