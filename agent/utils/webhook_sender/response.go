@@ -32,7 +32,7 @@ func validateResponse(preset Preset, statusCode int, body []byte) error {
 		return errors.New("unsupported webhook preset")
 	}
 
-	reason, failed := businessResponseFailure(body)
+	reason, failed := businessResponseFailure(preset, body)
 	if preset == PresetSlack && reason == "" {
 		switch value := strings.TrimSpace(string(body)); value {
 		case "invalid_payload", "no_text", "invalid_token", "no_service", "no_service_id",
@@ -57,7 +57,7 @@ func validateResponse(preset Preset, statusCode int, body []byte) error {
 	return nil
 }
 
-func businessResponseFailure(body []byte) (string, bool) {
+func businessResponseFailure(preset Preset, body []byte) (string, bool) {
 	var response map[string]json.RawMessage
 	if err := json.Unmarshal(body, &response); err != nil || response == nil {
 		return "", false
@@ -82,10 +82,14 @@ func businessResponseFailure(body []byte) (string, bool) {
 			}
 		}
 	}
+	hasSuccessMarker := false
 	for _, key := range []string{"success", "ok"} {
 		var success bool
-		if raw, exists := response[key]; exists && string(raw) != "null" && json.Unmarshal(raw, &success) == nil && !success {
-			return responseFailureReason(key, "false", message), true
+		if raw, exists := response[key]; exists && string(raw) != "null" && json.Unmarshal(raw, &success) == nil {
+			if !success {
+				return responseFailureReason(key, "false", message), true
+			}
+			hasSuccessMarker = true
 		}
 	}
 	if raw, exists := response["error"]; exists {
@@ -110,6 +114,10 @@ func businessResponseFailure(body []byte) (string, bool) {
 				}
 			}
 		}
+	}
+
+	if preset == PresetGeneric && hasSuccessMarker {
+		return message, false
 	}
 
 	if message != "" {
