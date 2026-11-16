@@ -1283,8 +1283,7 @@ const message = {
             modelDirectoryHelper: '模型列表預設來自「模型準備 > 設定」中配置的模型目錄，顯示該目錄下已下載的模型。',
             vllmGB10DualNodeModelHelper:
                 '僅支援 DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp，兩台裝置須在相同路徑放置完整模型。',
-            vllmGB10FourNodeModelHelper:
-                '僅支援 DeepSeek-V4.1-Flash，四台裝置須在相同路徑放置完整模型。',
+            vllmGB10FourNodeModelHelper: '僅支援 DeepSeek-V4.1-Flash，四台裝置須在相同路徑放置完整模型。',
             modelDirectoryPlaceholder: '搜尋模型或輸入完整路徑',
             selectModel: '選擇模型',
             selectModelDirectory: '選擇目錄',

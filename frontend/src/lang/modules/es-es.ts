@@ -304,8 +304,7 @@ const message = {
             simplePassword:
                 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 30.',
             dbName: 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 64.',
-            imageName:
-                `Este campo debe estar compuesto por letras, números, ":", "{'@'}", "/", ".", "-", y "_" con una longitud de 1 a 256.`,
+            imageName: `Este campo debe estar compuesto por letras, números, ":", "{'@'}", "/", ".", "-", y "_" con una longitud de 1 a 256.`,
             volumeName:
                 'Este campo debe estar compuesto por letras, números, ".", "-", y "_" con una longitud de 2 a 30.',
             supervisorName:
@@ -2516,7 +2515,8 @@ const message = {
         mainNodeHelp: 'Las pruebas se ejecutan en el nodo principal. Prepare la imagen y el tokenizador en ese nodo.',
         goImages: 'Ir a la gestión de imágenes',
         goModels: 'Ir a las descargas de modelos',
-        tokenizerHelp: 'Seleccione un tokenizador o modelo en el nodo principal para codificar el texto de prueba y contar tokens.',
+        tokenizerHelp:
+            'Seleccione un tokenizador o modelo en el nodo principal para codificar el texto de prueba y contar tokens.',
         tokenizerInvalid: 'Este tokenizador no está disponible. Seleccione otro o descárguelo de nuevo.',
         schemeHelp:
             'Los planes de prueba definen los parámetros de solicitud, la concurrencia y las reglas de ejecución. Prepare al menos un plan disponible.',
