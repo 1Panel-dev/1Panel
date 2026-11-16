@@ -93,7 +93,9 @@ func isVllmUpgradeCandidate(currentVersion, targetVersion, currentImage string) 
 	if !isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage) {
 		return false
 	}
-	if common.CompareVersion(trimVllmVersionFamily(targetVersion), trimVllmVersionFamily(currentVersion)) {
+	currentNumber, _, _ := strings.Cut(trimVllmVersionFamily(currentVersion), "-")
+	targetNumber, _, _ := strings.Cut(trimVllmVersionFamily(targetVersion), "-")
+	if common.CompareVersion(targetNumber, currentNumber) {
 		return true
 	}
 	return !hasVllmVersionFamilyPrefix(currentVersion) &&
