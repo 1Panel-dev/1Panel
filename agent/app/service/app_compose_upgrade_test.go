@@ -324,3 +324,20 @@ func TestVllmManagedComposeDoesNotRequireOfficialTemplate(t *testing.T) {
 		t.Fatalf("managed template attempted %d official resource requests", calls.Load())
 	}
 }
+
+func TestUpgradeComposeWithoutInstalledServiceIsRejected(t *testing.T) {
+	db, _, install, details := composeUpgradeDB(t, "http://127.0.0.1:1")
+	// A multi-service template whose service keys do not include the install's service name.
+	template := "services:\n  signer:\n    image: signer:1.0\n  sign-proxy:\n    image: sign-proxy:1.0\n"
+	if err := db.Model(&details[1]).UpdateColumn("docker_compose", template).Error; err != nil {
+		t.Fatal(err)
+	}
+	if isEditCompose(install) {
+		t.Fatal("a template without the installed service was reported as edited")
+	}
+	for _, compose := range []string{template, "services: []"} {
+		if _, err := handleUpgradeCompose(install, model.AppDetail{DockerCompose: compose}); err == nil {
+			t.Fatalf("template %q was accepted", compose)
+		}
+	}
+}
