@@ -1,5 +1,5 @@
 # base errors
-ErrInvalidParams: 'Bad request: {{ .detail }}'
+ErrInvalidParams: 'Bad request{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Invalid MCP custom argument format'
 ErrMcpGatewayArgsConflict: 'Argument {{ .name }} is managed by 1Panel and cannot be set in custom arguments'
 ErrTokenParse: 'Token error: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: 'Local database name already exists'
 RemoteBackup: 'Start local DB container with image {{ .name }} before backing up remote DB'
 RemoteRecover: 'Start local DB container with image {{ .name }} before restoring remote DB'
 Arg: "Argument"
+
+#PostgreSQL
+ErrPgUserProtected: "System users and the current connection user are protected from this operation"
+ErrPgSuperUserGrant: "Superusers can access all databases and do not require individual grants or revocations"
+ErrPgUserUsed: "This user is used by linked applications or websites; update their connection accounts first"
+ErrPgUserBound: "Revoke this user's database authorizations first"
+ErrPgUserPasswordSync: "The user password was changed, but password synchronization failed for these applications: {{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: 'Backup file type does not match current persistence mode'

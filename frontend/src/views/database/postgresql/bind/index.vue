@@ -8,7 +8,7 @@
             size="small"
         >
             <el-form v-loading="loading" ref="changeFormRef" :model="form" :rules="rules" label-position="top">
-                <el-alert type="warning" :title="$t('database.pgBindHelper')" :closable="false" />
+                <el-alert type="warning" :title="$t('database.pgAuthorizationHelper')" :closable="false" />
                 <el-form-item class="mt-5" :label="$t('database.userBind')" prop="username">
                     <el-input v-model="form.username" />
                 </el-form-item>

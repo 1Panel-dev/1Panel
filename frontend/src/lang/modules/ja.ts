@@ -622,6 +622,7 @@ const message = {
         loadFromRemote: '同期',
         userBind: 'バインドユーザー',
         noUserBind: '未バインド',
+        connectionUser: '接続ユーザー',
         userAuthorization: 'ユーザー権限',
         noUserAuthorization: '権限を付与しない',
         authorizedDatabaseCount: '{0} データベースに権限付与済み',
@@ -632,9 +633,12 @@ const message = {
         revokeAuthorization: '権限を取り消す',
         revokeAuthorizationHelper: 'ユーザー {0} のデータベース {1} へのアクセス権を取り消しますか？',
         supplementPassword: 'パスワードを登録',
-        supplementPasswordHelper: '既存のパスワードを 1Panel に保存するだけで、MySQL のパスワードは変更しません。',
-        pgBindHelper:
-            'この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。',
+        supplementPasswordHelper:
+            '既存のパスワードを 1Panel に保存するだけで、データベースユーザーのパスワードは変更しません。',
+        pgAuthorizationHelper:
+            'スーパーユーザーは紐付けなしでこのインスタンスの全データベースにアクセスできます。一般ユーザーはデータベース単位の権限のみ管理し、テーブル権限は含みません。',
+        pgRevokeAuthorizationHelper:
+            '権限を取り消してもユーザーは削除されません。PUBLIC や他のロール経由のアクセスが残る場合があります。',
         pgSuperUser: 'スーパーユーザー',
         loadFromRemoteHelper: 'サーバー上のデータベース、ユーザー、権限情報を 1Panel に同期します。続行しますか？',
         passwordHelper: '取得できません、クリックして修正',

@@ -623,6 +623,7 @@ const message = {
         loadFromRemote: 'Sincronizar desde el servidor',
         userBind: 'Vincular usuario',
         noUserBind: 'Sin vinculación',
+        connectionUser: 'Usuario de conexión',
         userAuthorization: 'Autorización de usuario',
         noUserAuthorization: 'No autorizar',
         authorizedDatabaseCount: '{0} base(s) de datos autorizada(s)',
@@ -633,9 +634,12 @@ const message = {
         revokeAuthorization: 'Revocar autorización',
         revokeAuthorizationHelper: '¿Revocar el acceso del usuario {0} a la base de datos {1}?',
         supplementPassword: 'Añadir contraseña',
-        supplementPasswordHelper: 'Solo guarda la contraseña existente en 1Panel; no cambia la contraseña en MySQL.',
-        pgBindHelper:
-            'Esta operación se utiliza para crear un nuevo usuario y vincularlo a la base de datos destino. Actualmente no se admite seleccionar usuarios ya existentes en la base de datos.',
+        supplementPasswordHelper:
+            'Solo guarda la contraseña existente en 1Panel, sin cambiar la contraseña del usuario de la base de datos.',
+        pgAuthorizationHelper:
+            'Los superusuarios acceden a todas las bases de datos de esta instancia sin vinculación. Para usuarios normales solo se gestionan permisos de base de datos, no de tablas.',
+        pgRevokeAuthorizationHelper:
+            'Revocar la autorización no elimina al usuario. Puede conservar el acceso mediante PUBLIC u otros roles.',
         pgSuperUser: 'Superusuario',
         loadFromRemoteHelper:
             'Esto sincronizará las bases de datos, los usuarios y las autorizaciones del servidor con 1Panel. ¿Desea continuar?',

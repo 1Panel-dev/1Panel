@@ -1,5 +1,5 @@
 # temel hatalar
-ErrInvalidParams: 'İstek geçersiz: {{ .detail }}'
+ErrInvalidParams: 'İstek geçersiz{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP özel bağımsız değişken biçimi geçersiz'
 ErrMcpGatewayArgsConflict: '{{ .name }} bağımsız değişkeni 1Panel tarafından yönetilir ve özel bağımsız değişkenlerde ayarlanamaz'
 ErrTokenParse: 'Token hatası: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: 'Yerel veritabanında bu ad zaten mevcut, lütfen değiştirin ve
 RemoteBackup: 'Uzak veritabanını yedeklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin...'
 RemoteRecover: 'Uzak veritabanını geri yüklemek için önce {{ .name }} görüntüsü kullanılarak yerel konteyner veritabanı hizmetinin başlatılması gerekiyor, lütfen bekleyin...'
 Arg: 'Argüman'
+
+#PostgreSQL
+ErrPgUserProtected: "Sistem kullanıcıları ve mevcut bağlantı kullanıcısı bu işleme karşı korunur"
+ErrPgSuperUserGrant: "Süper kullanıcılar tüm veritabanlarına erişebilir; ayrı yetki verme veya iptal işlemi gerektirmez"
+ErrPgUserUsed: "Bağlı uygulamalar veya web siteleri bu kullanıcıyı kullanıyor; önce bağlantı hesaplarını değiştirin"
+ErrPgUserBound: "Önce bu kullanıcının veritabanı yetkilerini iptal edin"
+ErrPgUserPasswordSync: "Kullanıcı parolası değiştirildi ancak şu uygulamalarda parola eşitlemesi başarısız oldu: {{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: 'Kurtarma dosyası türü mevcut kalıcılık yöntemiyle eşleşmiyor, lütfen değiştirin ve tekrar deneyin'

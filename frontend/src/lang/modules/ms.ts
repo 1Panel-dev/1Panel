@@ -628,6 +628,7 @@ const message = {
             'Port ini adalah port yang didedahkan oleh kontena. Anda perlu menyimpan pengubahsuaian secara berasingan dan memulakan semula kontena!',
         loadFromRemote: 'Selaras',
         userBind: 'Kaitkan pengguna',
+        connectionUser: 'Pengguna sambungan',
         userAuthorization: 'Kebenaran pengguna',
         noUserAuthorization: 'Jangan beri kebenaran',
         authorizedDatabaseCount: '{0} pangkalan data dibenarkan',
@@ -638,10 +639,13 @@ const message = {
         revokeAuthorization: 'Tarik balik kebenaran',
         revokeAuthorizationHelper: 'Tarik balik akses pengguna {0} kepada pangkalan data {1}?',
         supplementPassword: 'Tambah kata laluan',
-        supplementPasswordHelper: 'Hanya menyimpan kata laluan sedia ada ke 1Panel dan tidak mengubahnya dalam MySQL.',
+        supplementPasswordHelper:
+            'Hanya menyimpan kata laluan sedia ada dalam 1Panel tanpa menukar kata laluan pengguna pangkalan data.',
         noUserBind: 'Tiada kaitan',
-        pgBindHelper:
-            'Operasi ini digunakan untuk mencipta pengguna baharu dan mengaitkannya dengan pangkalan data sasaran. Pada masa ini, memilih pengguna yang sudah wujud dalam pangkalan data tidak disokong.',
+        pgAuthorizationHelper:
+            'Pengguna super boleh mengakses semua pangkalan data dalam tika ini tanpa pautan. Pengguna biasa hanya mengurus kebenaran pangkalan data, bukan kebenaran jadual.',
+        pgRevokeAuthorizationHelper:
+            'Pembatalan kebenaran tidak memadamkan pengguna. Akses melalui PUBLIC atau peranan lain mungkin kekal.',
         pgSuperUser: 'Pengguna Super',
         loadFromRemoteHelper:
             'Ini akan menyelaraskan pangkalan data, pengguna dan kebenaran dari pelayan ke 1Panel. Teruskan?',

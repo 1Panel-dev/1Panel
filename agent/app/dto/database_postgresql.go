@@ -33,14 +33,15 @@ type PostgresqlOption struct {
 }
 
 type PostgresqlDBCreate struct {
-	Name        string `json:"name" validate:"required"`
-	From        string `json:"from" validate:"required,oneof=local remote"`
-	Database    string `json:"database" validate:"required"`
-	Format      string `json:"format"`
-	Username    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required"`
-	SuperUser   bool   `json:"superUser"`
-	Description string `json:"description"`
+	ExistingUser bool   `json:"existingUser"`
+	Name         string `json:"name" validate:"required"`
+	From         string `json:"from" validate:"required,oneof=local remote"`
+	Database     string `json:"database" validate:"required"`
+	Format       string `json:"format"`
+	Username     string `json:"username" validate:"required"`
+	Password     string `json:"password"`
+	SuperUser    bool   `json:"superUser"`
+	Description  string `json:"description"`
 }
 
 type PostgresqlBindUser struct {
@@ -76,4 +77,49 @@ type PostgresqlDBDelete struct {
 	Database     string `json:"database" validate:"required"`
 	ForceDelete  bool   `json:"forceDelete"`
 	DeleteBackup bool   `json:"deleteBackup"`
+}
+
+type PostgresqlUserSearch struct {
+	Database string `json:"database" validate:"required"`
+}
+
+type PostgresqlUser struct {
+	Username    string   `json:"username"`
+	Password    string   `json:"password"`
+	Description string   `json:"description"`
+	SuperUser   bool     `json:"superUser"`
+	Protected   bool     `json:"protected"`
+	Databases   []string `json:"databases"`
+}
+
+type PostgresqlUserCreate struct {
+	Database    string `json:"database" validate:"required"`
+	Username    string `json:"username" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	Description string `json:"description"`
+	SuperUser   bool   `json:"superUser"`
+}
+
+type PostgresqlUserUpdate struct {
+	Database    string `json:"database" validate:"required"`
+	Username    string `json:"username" validate:"required"`
+	Description string `json:"description"`
+	SuperUser   bool   `json:"superUser"`
+}
+
+type PostgresqlUserPassword struct {
+	Database string `json:"database" validate:"required"`
+	Username string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required"`
+}
+
+type PostgresqlUserDelete struct {
+	Database string `json:"database" validate:"required"`
+	Username string `json:"username" validate:"required"`
+}
+
+type PostgresqlUserGrant struct {
+	Database string `json:"database" validate:"required"`
+	Name     string `json:"name" validate:"required"`
+	Username string `json:"username" validate:"required"`
 }

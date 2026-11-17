@@ -1,5 +1,5 @@
 # ralat asas
-ErrInvalidParams: 'Permintaan tidak sah: {{ .detail }}'
+ErrInvalidParams: 'Permintaan tidak sah{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Format argumen tersuai MCP tidak sah'
 ErrMcpGatewayArgsConflict: 'Argumen {{ .name }} diurus oleh 1Panel dan tidak boleh ditetapkan dalam argumen tersuai'
 ErrTokenParse: 'Token tidak sah: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: 'Nama sudah wujud dalam pangkalan data tempatan, sila ubah suai d
 RemoteBackup: 'Untuk menyandarkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
 RemoteRecover: 'Untuk memulihkan pangkalan data jauh, perkhidmatan pangkalan data bekas tempatan perlu dimulakan terlebih dahulu menggunakan imej {{ .name }}, sila tunggu...'
 Arg: 'Hujah'
+
+#PostgreSQL
+ErrPgUserProtected: "Pengguna sistem dan pengguna sambungan semasa dilindungi daripada operasi ini"
+ErrPgSuperUserGrant: "Pengguna super boleh mengakses semua pangkalan data dan tidak memerlukan pemberian atau pembatalan kebenaran individu"
+ErrPgUserUsed: "Aplikasi atau laman web terpaut menggunakan pengguna ini; tukar akaun sambungan dahulu"
+ErrPgUserBound: "Batalkan kebenaran pangkalan data pengguna ini dahulu"
+ErrPgUserPasswordSync: "Kata laluan pengguna telah diubah, tetapi penyegerakan kata laluan gagal untuk aplikasi berikut: {{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: 'Jenis fail pemulihan tidak sepadan dengan kaedah kegigihan semasa, sila ubah suai dan cuba lagi'

@@ -297,6 +297,26 @@ export namespace Database {
         type: string;
         database: string;
     }
+    export interface PostgresqlUser {
+        username: string;
+        password: string;
+        description: string;
+        superUser: boolean;
+        protected: boolean;
+        databases: string[];
+    }
+    export interface PostgresqlUserCreate {
+        database: string;
+        username: string;
+        password: string;
+        superUser: boolean;
+        description: string;
+    }
+    export interface PostgresqlUserGrant {
+        database: string;
+        name: string;
+        username: string;
+    }
     export interface PostgresqlDBInfo {
         id: number;
         createdAt: Date;
@@ -316,6 +336,7 @@ export namespace Database {
         file: string;
     }
     export interface PostgresqlDBCreate {
+        existingUser?: boolean;
         name: string;
         from: string;
         database: string;

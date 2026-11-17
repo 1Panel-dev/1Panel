@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -21,21 +22,30 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/postgresql/client"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jinzhu/copier"
+	"gorm.io/gorm"
 )
 
 type PostgresqlService struct{}
 
 type IPostgresqlService interface {
+	ListUsers(req dto.PostgresqlUserSearch) ([]dto.PostgresqlUser, error)
+	CreateUser(req dto.PostgresqlUserCreate) error
+	UpdateUser(req dto.PostgresqlUserUpdate) error
+	ChangeUserPassword(req dto.PostgresqlUserPassword) error
+	SaveUserPassword(req dto.PostgresqlUserPassword) error
+	DeleteUser(req dto.PostgresqlUserDelete) error
+	GrantUser(req dto.PostgresqlUserGrant) error
+	RevokeUser(req dto.PostgresqlUserGrant) error
 	SearchWithPage(search dto.PostgresqlDBSearch) (int64, interface{}, error)
 	ListDBOption() ([]dto.PostgresqlOption, error)
 	BindUser(req dto.PostgresqlBindUser) error
 	Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error)
 	LoadFromRemote(database string) error
-	ChangePrivileges(req dto.PostgresqlPrivileges) error
-	ChangePassword(info dto.ChangeDBInfo) error
 	UpdateDescription(req dto.UpdateDescription) error
 	DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]dto.DBResource, error)
 	Delete(ctx context.Context, req dto.PostgresqlDBDelete) error
+	ChangePrivileges(req dto.PostgresqlPrivileges) error
+	ChangePassword(info dto.ChangeDBInfo) error
 }
 
 func NewIPostgresqlService() IPostgresqlService {
@@ -87,49 +97,56 @@ func (u *PostgresqlService) ListDBOption() ([]dto.PostgresqlOption, error) {
 }
 
 func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password) || strings.Contains(req.Password, " ") {
-		return buserr.New("ErrCmdIllegal")
-	}
 	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
 	if err != nil {
 		return err
 	}
-
-	pgClient, err := LoadPostgresqlClientByFrom(req.Database)
+	if err := u.CreateUser(dto.PostgresqlUserCreate{Database: req.Database, Username: req.Username, Password: req.Password, SuperUser: req.SuperUser}); err != nil {
+		return err
+	}
+	if !req.SuperUser {
+		if err := u.GrantUser(dto.PostgresqlUserGrant{Database: req.Database, Name: req.Name, Username: req.Username}); err != nil {
+			return err
+		}
+	}
+	if dbItem.Username != "" {
+		return nil
+	}
+	password, err := encrypt.StringEncrypt(req.Password)
 	if err != nil {
 		return err
 	}
-	if err := pgClient.CreateUser(client.CreateInfo{
-		Name:      req.Name,
-		Username:  req.Username,
-		Password:  req.Password,
-		SuperUser: req.SuperUser,
-		Timeout:   300,
-	}, false); err != nil {
-		return err
-	}
-	pass, err := encrypt.StringEncrypt(req.Password)
-	if err != nil {
-		return fmt.Errorf("decrypt database db password failed, err: %v", err)
-	}
-	if err := postgresqlRepo.Update(dbItem.ID, map[string]interface{}{
-		"username":   req.Username,
-		"password":   pass,
-		"super_user": req.SuperUser,
-	}); err != nil {
-		return err
-	}
-	return nil
+	return postgresqlRepo.Update(dbItem.ID, map[string]interface{}{"username": req.Username, "password": password, "super_user": req.SuperUser})
 }
 
 func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error) {
-	if cmd.CheckIllegal(req.Name, req.Username, req.Password, req.Format) || strings.Contains(req.Password, " ") {
+	if cmd.CheckIllegal(req.Name, req.Format) || (!req.ExistingUser && (cmd.CheckIllegal(req.Username, req.Password) || strings.Contains(req.Password, " "))) {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
 
 	pgsql, _ := postgresqlRepo.Get(repo.WithByName(req.Name), postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByFrom(req.From))
 	if pgsql.ID != 0 {
 		return nil, buserr.New("ErrRecordExist")
+	}
+
+	if req.ExistingUser {
+		users, err := u.ListUsers(dto.PostgresqlUserSearch{Database: req.Database})
+		if err != nil {
+			return nil, err
+		}
+		found := false
+		for _, user := range users {
+			if user.Username == req.Username {
+				req.Password, req.SuperUser = user.Password, user.SuperUser
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil, buserr.New("ErrRecordNotFound")
+		}
+	} else if req.Password == "" {
+		return nil, buserr.New("ErrInvalidParams")
 	}
 
 	var createItem model.DatabasePostgresql
@@ -144,13 +161,13 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	defer cli.Close()
 
 	createItem.PostgresqlName = req.Database
-	defer cli.Close()
 	if err := cli.Create(client.CreateInfo{
-		Name:      req.Name,
-		Username:  req.Username,
-		Password:  req.Password,
-		SuperUser: req.SuperUser,
-		Timeout:   300,
+		ExistingUser: req.ExistingUser,
+		Name:         req.Name,
+		Username:     req.Username,
+		Password:     req.Password,
+		SuperUser:    req.SuperUser,
+		Timeout:      300,
 	}); err != nil {
 		return nil, err
 	}
@@ -159,45 +176,18 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	if err := postgresqlRepo.Create(ctx, &createItem); err != nil {
 		return nil, err
 	}
-	return &createItem, nil
-}
-
-func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, error) {
-	var (
-		dbInfo client.DBInfo
-		err    error
-	)
-
-	dbInfo.Timeout = 300
-	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
-	if err != nil {
-		return nil, err
-	}
-	dbInfo.From = databaseItem.From
-	dbInfo.Database = database
-	if dbInfo.From != "local" {
-		dbInfo.Address = databaseItem.Address
-		dbInfo.Port = databaseItem.Port
-		dbInfo.Username = databaseItem.Username
-		dbInfo.Password = databaseItem.Password
-		dbInfo.InitialDB = databaseItem.InitialDB
-	} else {
-		app, err := appInstallRepo.LoadBaseInfo(databaseItem.Type, database)
-		if err != nil {
-			return nil, err
+	if !req.ExistingUser {
+		user, err := databaseUserRepo.GetEncryptedWithContext(ctx, repo.WithByType("postgresql"), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, ""))
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return &createItem, err
 		}
-		dbInfo.From = "local"
-		dbInfo.Address = app.ContainerName
-		dbInfo.Username = app.UserName
-		dbInfo.Password = app.Password
-		dbInfo.Port = uint(app.Port)
+		user.Type, user.Database, user.Username, user.Host = "postgresql", req.Database, req.Username, ""
+		user.Password, user.Description, user.IsDelete = createItem.Password, "", false
+		if err := databaseUserRepo.SaveEncryptedWithContext(ctx, &user); err != nil {
+			return &createItem, err
+		}
 	}
-
-	cli, err := postgresql.NewPostgresqlClient(dbInfo)
-	if err != nil {
-		return nil, err
-	}
-	return cli, nil
+	return &createItem, nil
 }
 
 func (u *PostgresqlService) LoadFromRemote(database string) error {
@@ -302,8 +292,8 @@ func (u *PostgresqlService) DeleteCheck(req dto.PostgresqlDBDeleteCheck) ([]dto.
 }
 
 func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDelete) error {
-	db, err := postgresqlRepo.Get(repo.WithByID(req.ID))
-	if err != nil && !req.ForceDelete {
+	db, err := postgresqlRepo.Get(repo.WithByID(req.ID), postgresqlRepo.WithByPostgresqlName(req.Database))
+	if err != nil {
 		return err
 	}
 	cli, err := LoadPostgresqlClientByFrom(req.Database)
@@ -311,15 +301,26 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		return err
 	}
 	defer cli.Close()
+	if db.Username != "" {
+		user, err := databaseUserRepo.GetEncryptedWithContext(ctx, repo.WithByType("postgresql"), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(db.Username, ""))
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			password, encryptErr := encrypt.StringEncrypt(db.Password)
+			if encryptErr != nil {
+				return encryptErr
+			}
+			user = model.DatabaseUser{Type: "postgresql", Database: req.Database, Username: db.Username, Password: password}
+			if err := databaseUserRepo.SaveEncryptedWithContext(ctx, &user); err != nil {
+				return err
+			}
+		} else if err != nil {
+			return err
+		}
+	}
 	if err := cli.Delete(client.DeleteInfo{
 		Name:        db.Name,
-		Username:    db.Username,
 		ForceDelete: req.ForceDelete,
 		Timeout:     300,
 	}); err != nil && !req.ForceDelete {
-		if strings.HasPrefix(err.Error(), "drop user") {
-			_ = postgresqlRepo.Update(db.ID, map[string]interface{}{"is_delete": true})
-		}
 		return err
 	}
 
@@ -336,101 +337,40 @@ func (u *PostgresqlService) Delete(ctx context.Context, req dto.PostgresqlDBDele
 		global.LOG.Infof("delete database %s-%s backups successful", req.Database, db.Name)
 	}
 
-	_ = postgresqlRepo.Delete(ctx, repo.WithByID(db.ID))
-	return nil
+	return postgresqlRepo.Delete(ctx, repo.WithByID(db.ID))
 }
 
 func (u *PostgresqlService) ChangePrivileges(req dto.PostgresqlPrivileges) error {
-	if cmd.CheckIllegal(req.Database, req.Username) {
-		return buserr.New("ErrCmdIllegal")
-	}
-	dbItem, err := postgresqlRepo.Get(postgresqlRepo.WithByPostgresqlName(req.Database), repo.WithByName(req.Name))
+	user, err := u.loadPostgresqlUser(req.Database, req.Username)
 	if err != nil {
 		return err
 	}
-	cli, err := LoadPostgresqlClientByFrom(req.Database)
-	if err != nil {
-		return err
-	}
-	defer cli.Close()
-
-	if err := cli.ChangePrivileges(client.Privileges{Username: req.Username, SuperUser: req.SuperUser, Timeout: 300}); err != nil {
-		return err
-	}
-	if err := postgresqlRepo.Update(dbItem.ID, map[string]interface{}{
-		"super_user": req.SuperUser,
-	}); err != nil {
-		return err
-	}
-	return nil
+	return u.UpdateUser(dto.PostgresqlUserUpdate{Database: req.Database, Username: req.Username, SuperUser: req.SuperUser, Description: user.Description})
 }
 
 func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 	if cmd.CheckIllegal(req.Value) || strings.Contains(req.Value, " ") {
 		return buserr.New("ErrCmdIllegal")
 	}
+	if req.ID != 0 {
+		db, err := postgresqlRepo.Get(repo.WithByID(req.ID), postgresqlRepo.WithByPostgresqlName(req.Database))
+		if err != nil {
+			return err
+		}
+		return u.ChangeUserPassword(dto.PostgresqlUserPassword{Database: req.Database, Username: db.Username, Password: req.Value})
+	}
 	cli, err := LoadPostgresqlClientByFrom(req.Database)
 	if err != nil {
 		return err
 	}
 	defer cli.Close()
-	var (
-		postgresqlData model.DatabasePostgresql
-		passwordInfo   client.PasswordChangeInfo
-	)
-	passwordInfo.Password = req.Value
-	passwordInfo.Timeout = 300
-
-	if req.ID != 0 {
-		postgresqlData, err = postgresqlRepo.Get(repo.WithByID(req.ID))
-		if err != nil {
-			return err
-		}
-		passwordInfo.Username = postgresqlData.Username
-	} else {
-		dbItem, err := databaseRepo.Get(repo.WithByType(req.Type), repo.WithByFrom(req.From))
-		if err != nil {
-			return err
-		}
-		passwordInfo.Username = dbItem.Username
-	}
-	if err := cli.ChangePassword(passwordInfo); err != nil {
+	dbItem, err := databaseRepo.Get(repo.WithByName(req.Database))
+	if err != nil {
 		return err
 	}
-
-	if req.ID != 0 {
-		var appRess []model.AppInstallResource
-		if req.From == "local" {
-			app, err := appInstallRepo.LoadBaseInfo(req.Type, req.Database)
-			if err != nil {
-				return err
-			}
-			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithLinkId(app.ID), appInstallResourceRepo.WithResourceId(postgresqlData.ID))
-		} else {
-			appRess, _ = appInstallResourceRepo.GetBy(appInstallResourceRepo.WithResourceId(postgresqlData.ID))
-		}
-		for _, appRes := range appRess {
-			appInstall, err := appInstallRepo.GetFirst(repo.WithByID(appRes.AppInstallId))
-			if err != nil {
-				return err
-			}
-			appModel, err := appRepo.GetFirst(repo.WithByID(appInstall.AppId))
-			if err != nil {
-				return err
-			}
-
-			global.LOG.Infof("start to update postgresql password used by app %s-%s", appModel.Key, appInstall.Name)
-			if err := updateInstallInfoInDB(appModel.Key, appInstall.Name, "user-password", req.Value); err != nil {
-				return err
-			}
-		}
-		global.LOG.Info("execute password change sql successful")
-		pass, err := encrypt.StringEncrypt(req.Value)
-		if err != nil {
-			return fmt.Errorf("decrypt database db password failed, err: %v", err)
-		}
-		_ = postgresqlRepo.Update(postgresqlData.ID, map[string]interface{}{"password": pass})
-		return nil
+	passwordInfo := client.PasswordChangeInfo{Username: dbItem.Username, Password: req.Value, Timeout: 300}
+	if err := cli.ChangePassword(passwordInfo); err != nil {
+		return err
 	}
 
 	if err := updateInstallInfoInDB(req.Type, req.Database, "password", req.Value); err != nil {
@@ -448,4 +388,45 @@ func (u *PostgresqlService) ChangePassword(req dto.ChangeDBInfo) error {
 		_ = databaseRepo.Update(remote.ID, map[string]interface{}{"password": pass})
 	}
 	return nil
+}
+
+func LoadPostgresqlClientByFrom(database string) (postgresql.PostgresqlClient, error) {
+	var (
+		dbInfo client.DBInfo
+		err    error
+	)
+
+	dbInfo.Timeout = 300
+	databaseItem, err := databaseRepo.Get(repo.WithByName(database))
+	if err != nil {
+		return nil, err
+	}
+	if databaseItem.Type != constant.AppPostgresql && databaseItem.Type != constant.AppPostgresqlCluster && databaseItem.Type != constant.AppPostgres {
+		return nil, buserr.New("ErrInvalidParams")
+	}
+	dbInfo.From = databaseItem.From
+	dbInfo.Database = database
+	if dbInfo.From != "local" {
+		dbInfo.Address = databaseItem.Address
+		dbInfo.Port = databaseItem.Port
+		dbInfo.Username = databaseItem.Username
+		dbInfo.Password = databaseItem.Password
+		dbInfo.InitialDB = databaseItem.InitialDB
+	} else {
+		app, err := appInstallRepo.LoadBaseInfo(databaseItem.Type, database)
+		if err != nil {
+			return nil, err
+		}
+		dbInfo.From = "local"
+		dbInfo.Address = app.ContainerName
+		dbInfo.Username = app.UserName
+		dbInfo.Password = app.Password
+		dbInfo.Port = uint(app.Port)
+	}
+
+	cli, err := postgresql.NewPostgresqlClient(dbInfo)
+	if err != nil {
+		return nil, err
+	}
+	return cli, nil
 }

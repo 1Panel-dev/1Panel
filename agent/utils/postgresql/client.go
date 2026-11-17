@@ -14,6 +14,8 @@ import (
 )
 
 type PostgresqlClient interface {
+	ExecSQL(command string, timeout uint) error
+	ExecSQLForRows(command string, timeout uint) ([]string, error)
 	Create(info client.CreateInfo) error
 	CreateUser(info client.CreateInfo, withDeleteDB bool) error
 	Delete(info client.DeleteInfo) error
@@ -28,7 +30,7 @@ type PostgresqlClient interface {
 
 func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	if conn.From == "local" {
-		connArgs := []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", conn.Password), conn.Address, "psql", "-t", "-U", conn.Username, "-c"}
+		connArgs := []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", conn.Password), conn.Address, "psql", "-A", "-t", "-U", conn.Username, "-c"}
 		return client.NewLocal(connArgs, conn.Address, conn.Username, conn.Password, conn.Database), nil
 	}
 	escapedUsername := url.QueryEscape(conn.Username)
@@ -45,6 +47,7 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(conn.Timeout)*time.Second)
 	defer cancel()
 	if err := db.PingContext(ctx); err != nil {
+		_ = db.Close()
 		return nil, err
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {

@@ -1,5 +1,5 @@
 # 基本エラー
-ErrInvalidParams: '不正なリクエスト: {{ .detail }}'
+ErrInvalidParams: '不正なリクエスト{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP カスタム引数の形式が正しくありません'
 ErrMcpGatewayArgsConflict: '引数 {{ .name }} は 1Panel によって管理されているため、カスタム引数には設定できません'
 ErrTokenParse: 'トークンエラー: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: '名前はローカル データベースに既に存在します
 RemoteBackup: 'リモートデータベースをバックアップするには、まずイメージ {{ .name }} を使用してローカルコンテナデータベースサービスを起動する必要があります。しばらくお待ちください...'
 RemoteRecover: 'リモートデータベースを復元するには、まずイメージ {{ .name }} を使用してローカルコンテナデータベースサービスを起動する必要があります。しばらくお待ちください...'
 Arg: '引数'
+
+#PostgreSQL
+ErrPgUserProtected: "システムユーザーと現在の接続ユーザーは保護されているため、この操作は実行できません"
+ErrPgSuperUserGrant: "スーパーユーザーは全データベースにアクセスでき、個別の権限付与や取り消しは不要です"
+ErrPgUserUsed: "関連アプリまたはウェブサイトがこのユーザーを使用しています。先に接続アカウントを変更してください"
+ErrPgUserBound: "先にこのユーザーのデータベース権限を取り消してください"
+ErrPgUserPasswordSync: "ユーザーのパスワードは変更されましたが、次のアプリへのパスワード同期に失敗しました：{{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: 'リカバリ ファイルの種類が現在の永続化方法と一致しません。変更して再試行してください'

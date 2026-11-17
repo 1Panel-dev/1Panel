@@ -1,5 +1,5 @@
 # erros básicos
-ErrInvalidParams: 'Requisição inválida: {{ .detail }}'
+ErrInvalidParams: 'Requisição inválida{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Formato inválido dos argumentos personalizados do MCP'
 ErrMcpGatewayArgsConflict: 'O argumento {{ .name }} é gerenciado pelo 1Panel e não pode ser definido nos argumentos personalizados'
 ErrTokenParse: 'Erro de token: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: 'O nome já existe no banco de dados local, modifique-o e'
 RemoteBackup: 'Para fazer backup do banco de dados remoto, o serviço de banco de dados do contêiner local precisa ser iniciado primeiro usando a imagem {{ .name }} aguarde...'
 RemoteRecover: 'Para restaurar o banco de dados remoto, o serviço de banco de dados do contêiner local precisa ser iniciado primeiro usando a imagem {{ .name }} aguarde...'
 Arg: 'Argumento'
+
+#PostgreSQL
+ErrPgUserProtected: "Usuários do sistema e o usuário da conexão atual estão protegidos contra esta operação"
+ErrPgSuperUserGrant: "Superusuários acessam todos os bancos de dados e não precisam de concessões ou revogações individuais"
+ErrPgUserUsed: "Aplicativos ou sites vinculados usam este usuário; altere primeiro suas contas de conexão"
+ErrPgUserBound: "Primeiro revogue as autorizações de banco de dados deste usuário"
+ErrPgUserPasswordSync: "A senha do usuário foi alterada, mas a sincronização falhou nestes aplicativos: {{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: 'O tipo de arquivo de recuperação não corresponde ao método de persistência atual, modifique-o e'

@@ -70,58 +70,49 @@ func NewRemote(db Remote) *Remote {
 	return &db
 }
 func (r *Remote) Create(info CreateInfo) error {
-	createSql := fmt.Sprintf("CREATE DATABASE \"%s\"", info.Name)
-	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
+	if err := r.ExecSQL("CREATE DATABASE "+QuoteIdentifier(info.Name), info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
 	}
-	if err := r.CreateUser(info, true); err != nil {
+	var err error
+	if info.ExistingUser {
+		if !info.SuperUser {
+			err = GrantUser(r, info.Name, info.Username, false)
+		}
+	} else {
+		err = r.CreateUser(info, false)
+	}
+	if err != nil {
+		if cleanupErr := r.ExecSQL("DROP DATABASE "+QuoteIdentifier(info.Name), info.Timeout); cleanupErr != nil {
+			return fmt.Errorf("%w; cleanup database: %v", err, cleanupErr)
+		}
 		return err
 	}
 	return nil
 }
 
 func (r *Remote) CreateUser(info CreateInfo, withDeleteDB bool) error {
-	createSql := fmt.Sprintf("CREATE USER \"%s\" WITH PASSWORD '%s'", info.Username, info.Password)
-	if err := r.ExecSQL(createSql, info.Timeout); err != nil {
+	privileges := "NOSUPERUSER"
+	if info.SuperUser {
+		privileges = "SUPERUSER"
+	}
+	statement := "CREATE USER " + QuoteIdentifier(info.Username) + " WITH " + privileges + " PASSWORD " + QuoteLiteral(info.Password)
+	if err := r.ExecSQL(statement, info.Timeout); err != nil {
 		if strings.Contains(strings.ToLower(err.Error()), "already exists") {
 			return buserr.New("ErrUserIsExist")
 		}
-		if withDeleteDB {
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Username:    info.Username,
-				ForceDelete: true,
-				Timeout:     300})
-		}
 		return err
 	}
-	if info.SuperUser {
-		if err := r.ChangePrivileges(Privileges{SuperUser: true, Username: info.Username, Timeout: info.Timeout}); err != nil {
-			if withDeleteDB {
-				_ = r.Delete(DeleteInfo{
-					Name:        info.Name,
-					Username:    info.Username,
-					ForceDelete: true,
-					Timeout:     300})
+	if info.Name != "" && !info.SuperUser {
+		if err := GrantUser(r, info.Name, info.Username, false); err != nil {
+			if cleanupErr := r.ExecSQL("DROP USER "+QuoteIdentifier(info.Username), info.Timeout); cleanupErr != nil {
+				return fmt.Errorf("%w; cleanup user: %v", err, cleanupErr)
 			}
 			return err
 		}
 	}
-	grantSql := fmt.Sprintf("GRANT ALL PRIVILEGES ON DATABASE \"%s\" TO \"%s\"", info.Name, info.Username)
-	if err := r.ExecSQL(grantSql, info.Timeout); err != nil {
-		if withDeleteDB {
-			_ = r.Delete(DeleteInfo{
-				Name:        info.Name,
-				Username:    info.Username,
-				ForceDelete: true,
-				Timeout:     300})
-		}
-		return err
-	}
-
 	return nil
 }
 
@@ -134,12 +125,15 @@ func (r *Remote) Delete(info DeleteInfo) error {
 		if inUse && !info.ForceDelete {
 			return buserr.WithDetail("ErrInUsed", info.Name, nil)
 		}
-		dropSql := fmt.Sprintf("DROP DATABASE \"%s\"", info.Name)
+		dropSql := "DROP DATABASE " + QuoteIdentifier(info.Name)
 		if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 			return fmt.Errorf("drop database failed, err: %v", err)
 		}
 	}
-	dropSql := fmt.Sprintf("DROP USER \"%s\"", info.Username)
+	if info.Username == "" {
+		return nil
+	}
+	dropSql := "DROP USER " + QuoteIdentifier(info.Username)
 	if err := r.ExecSQL(dropSql, info.Timeout); err != nil && !info.ForceDelete {
 		return fmt.Errorf("drop user failed, err: %v", err)
 	}
@@ -169,11 +163,11 @@ func (r *Remote) ChangePrivileges(info Privileges) error {
 	if !info.SuperUser {
 		super = "NOSUPERUSER"
 	}
-	return r.ExecSQL(fmt.Sprintf("ALTER USER \"%s\" WITH %s", info.Username, super), info.Timeout)
+	return r.ExecSQL("ALTER USER "+QuoteIdentifier(info.Username)+" WITH "+super, info.Timeout)
 }
 
 func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
-	return r.ExecSQL(fmt.Sprintf("ALTER USER \"%s\" WITH ENCRYPTED PASSWORD '%s'", info.Username, info.Password), info.Timeout)
+	return r.ExecSQL("ALTER USER "+QuoteIdentifier(info.Username)+" WITH PASSWORD "+QuoteLiteral(info.Password), info.Timeout)
 }
 
 func (r *Remote) Backup(info BackupInfo) error {

@@ -19,10 +19,11 @@ type DBInfo struct {
 }
 
 type CreateInfo struct {
-	Name      string `json:"name"`
-	Username  string `json:"userName"`
-	Password  string `json:"password"`
-	SuperUser bool   `json:"superUser"`
+	ExistingUser bool   `json:"existingUser"`
+	Name         string `json:"name"`
+	Username     string `json:"userName"`
+	Password     string `json:"password"`
+	SuperUser    bool   `json:"superUser"`
 
 	Timeout uint `json:"timeout"` // second
 }

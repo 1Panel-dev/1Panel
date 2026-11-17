@@ -621,6 +621,7 @@ const message = {
             'Esta porta é a porta exposta do container. Você precisa salvar a modificação separadamente e reiniciar o container!',
         loadFromRemote: 'Sincronizar',
         userBind: 'Vincular usuário',
+        connectionUser: 'Usuário de conexão',
         userAuthorization: 'Autorização de usuário',
         noUserAuthorization: 'Não autorizar',
         authorizedDatabaseCount: '{0} banco(s) de dados autorizado(s)',
@@ -631,10 +632,13 @@ const message = {
         revokeAuthorization: 'Revogar autorização',
         revokeAuthorizationHelper: 'Revogar o acesso do usuário {0} ao banco de dados {1}?',
         supplementPassword: 'Adicionar senha',
-        supplementPasswordHelper: 'Apenas salva a senha existente no 1Panel; não altera a senha no MySQL.',
+        supplementPasswordHelper:
+            'Salva apenas a senha existente no 1Panel, sem alterar a senha do usuário do banco de dados.',
         noUserBind: 'Sem vínculo',
-        pgBindHelper:
-            'Esta operação cria um novo usuário e o vincula ao banco de dados alvo. A seleção de usuários já existentes no banco de dados não é suportada.',
+        pgAuthorizationHelper:
+            'Superusuários acessam todos os bancos desta instância sem vínculo. Para usuários comuns, são gerenciadas apenas permissões de banco, sem permissões de tabelas.',
+        pgRevokeAuthorizationHelper:
+            'Revogar a autorização não exclui o usuário. O acesso por PUBLIC ou outros papéis pode permanecer.',
         pgSuperUser: 'Superusuário',
         loadFromRemoteHelper:
             'Isso sincronizará bancos de dados, usuários e autorizações do servidor com o 1Panel. Deseja continuar?',
