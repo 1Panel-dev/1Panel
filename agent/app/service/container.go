@@ -881,6 +881,8 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 		// logs before handling its result, or a ready error channel can drop the tail.
 		if err := <-errors; err != nil {
 			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
+		} else {
+			_, _ = io.WriteString(w, "event: complete\ndata: {}\n\n")
 		}
 		return false
 	}
@@ -982,7 +984,9 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 			return
 		}
 	}
-	_ = dockerCmd.Wait()
+	if err := dockerCmd.Wait(); err != nil {
+		errorChan <- err
+	}
 }
 
 func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error {
@@ -1054,12 +1058,12 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 			global.LOG.Errorf("os.Remove() failed: %v", err)
 		}
 	}()
-	copyErr := copyContainerLogOutput(tempFile, stdout)
-	waitErr := dockerCmd.Wait()
-	if copyErr != nil {
+	if copyErr := copyContainerLogOutput(tempFile, stdout); copyErr != nil {
+		killContainerLogProcess(dockerCmd)
+		_ = dockerCmd.Wait()
 		return copyErr
 	}
-	if waitErr != nil {
+	if waitErr := dockerCmd.Wait(); waitErr != nil {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}
@@ -1068,7 +1072,10 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if _, err := tempFile.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
-	info, _ := tempFile.Stat()
+	info, err := tempFile.Stat()
+	if err != nil {
+		return err
+	}
 
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))
