@@ -3521,6 +3521,10 @@ const message = {
         compressSuccess: 'فشرده‌سازی با موفقیت انجام شد',
         deCompressSuccess: 'باز کردن فشرده با موفقیت انجام شد',
         deCompressDst: 'مسیر باز کردن فشرده',
+        decompressConflictPolicy: 'فایل‌های موجود',
+        keepExisting: 'نگه داشتن فایل‌های موجود',
+        decompressConflictHelper:
+            'با نگه داشتن فایل‌های موجود، موارد دارای تداخل رد می‌شوند. پوشه‌های هم‌نام همچنان ادغام می‌شوند.',
         linkType: 'نوع لینک',
         softLink: 'لینک نرم',
         hardLink: 'لینک سخت',

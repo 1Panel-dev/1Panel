@@ -86,11 +86,12 @@ type FileCompressStopReq struct {
 }
 
 type FileDeCompress struct {
-	Dst    string `json:"dst"  validate:"required"`
-	Type   string `json:"type"  validate:"required"`
-	Path   string `json:"path" validate:"required"`
-	Secret string `json:"secret"`
-	TaskID string `json:"taskID"`
+	Dst       string `json:"dst"  validate:"required"`
+	Type      string `json:"type"  validate:"required"`
+	Path      string `json:"path" validate:"required"`
+	Secret    string `json:"secret"`
+	TaskID    string `json:"taskID"`
+	Overwrite *bool  `json:"overwrite,omitempty" default:"true"`
 }
 
 type FileDeCompressStopReq struct {

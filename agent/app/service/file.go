@@ -602,6 +602,7 @@ func (f *FileService) StopDeCompress(taskID string) error {
 
 func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
+	overwrite := c.Overwrite == nil || *c.Overwrite
 	if c.Type == "tar" && len(c.Secret) != 0 {
 		c.Type = "tar.gz"
 	}
@@ -631,7 +632,7 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 			success := false
 			defer func() {
 				_ = os.RemoveAll(tempDst)
-				if !success && !dstExisted {
+				if !success && !dstExisted && overwrite {
 					_ = os.RemoveAll(c.Dst)
 				}
 			}()
@@ -641,10 +642,12 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 			}); err != nil {
 				return err
 			}
-			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
-				return err
+			if overwrite {
+				if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
+					return err
+				}
 			}
-			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst); err != nil {
+			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst, overwrite); err != nil {
 				return err
 			}
 			success = true
@@ -655,7 +658,13 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	return nil
 }
 
-func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
+func copyDecompressTree(ctx context.Context, srcDir, dstDir string, overwrite ...bool) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if len(overwrite) > 0 && !overwrite[0] {
+		return copyDecompressTreeKeep(ctx, srcDir, dstDir)
+	}
 	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
 	entries, err := os.ReadDir(srcDir)
 	if err != nil {
@@ -686,7 +695,10 @@ func decompressHardlinkIdentity(info os.FileInfo) (decompressFileIdentity, bool)
 	return decompressFileIdentity{device: uint64(stat.Dev), inode: uint64(stat.Ino)}, true
 }
 
-func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
+func copyDecompressEntry(ctx context.Context, srcPath, dstPath string, overwrite ...bool) (retErr error) {
+	if len(overwrite) > 0 && !overwrite[0] {
+		return copyDecompressEntryKeep(ctx, srcPath, dstPath)
+	}
 	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
 	return copyDecompressEntryWithState(ctx, srcPath, dstPath, &state)
 }

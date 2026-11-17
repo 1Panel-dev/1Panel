@@ -3602,6 +3602,10 @@ const message = {
         compressSuccess: 'Berjaya dimampatkan',
         deCompressSuccess: 'Berjaya dinyahmampatkan',
         deCompressDst: 'Laluan nyahmampatan',
+        decompressConflictPolicy: 'Fail sedia ada',
+        keepExisting: 'Kekalkan fail sedia ada',
+        decompressConflictHelper:
+            'Mengekalkan fail sedia ada akan melangkau entri yang bercanggah. Direktori dengan nama yang sama masih digabungkan.',
         linkType: 'Jenis pautan',
         softLink: 'Pautan lembut',
         hardLink: 'Pautan keras',

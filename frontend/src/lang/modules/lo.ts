@@ -3444,6 +3444,10 @@ const message = {
         compressSuccess: 'ບີບອັດສຳເລັດແລ້ວ',
         deCompressSuccess: 'ແຕກໄຟລ໌ສຳເລັດແລ້ວ',
         deCompressDst: 'ເສັ້ນທາງການແຕກໄຟລ໌',
+        decompressConflictPolicy: 'ໄຟລ໌ທີ່ມີຢູ່',
+        keepExisting: 'ເກັບໄຟລ໌ທີ່ມີຢູ່ໄວ້',
+        decompressConflictHelper:
+            'ເມື່ອເກັບໄຟລ໌ທີ່ມີຢູ່ໄວ້ ລາຍການທີ່ຂັດແຍ່ງຈະຖືກຂ້າມ. ໂຟນເດີທີ່ມີຊື່ດຽວກັນຍັງຖືກລວມເຂົ້າກັນ.',
         linkType: 'ປະເພດລີ້ງ',
         softLink: 'Soft link',
         hardLink: 'Hard link',

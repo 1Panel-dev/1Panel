@@ -3532,6 +3532,10 @@ const message = {
         compressSuccess: '正常に圧縮されました',
         deCompressSuccess: '減圧は成功しました',
         deCompressDst: 'パスを減圧します',
+        decompressConflictPolicy: '同名ファイルの処理',
+        keepExisting: '既存ファイルを保持',
+        decompressConflictHelper:
+            '既存ファイルを保持する場合は競合する項目をスキップします。同名のディレクトリは引き続きマージされます。',
         linkType: 'リンクタイプ',
         softLink: 'ソフトリンク',
         hardLink: 'ハードリンク',
