@@ -1282,6 +1282,7 @@ const message = {
                 'フォームが変更されています。Compose を再生成すると手動の編集内容が上書きされます。続行しますか？',
             deploymentNameHelper:
                 'アプリのインスタンス名です。インストール先ディレクトリに使用され、作成後は変更できません。表示名を変更するには別名を設定してください。',
+            deploymentAlias: 'インスタンスの別名',
             deploymentAliasHelper:
                 '一覧表示用の任意の別名です。空欄の場合はインスタンス名を表示します。別名を変更してもサービスは再起動されません。',
             deploymentContainerNameHelper:

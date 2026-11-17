@@ -1303,6 +1303,7 @@ const message = {
                 'El formulario ha cambiado. Regenerar Compose sobrescribirá los cambios manuales. ¿Continuar?',
             deploymentNameHelper:
                 'Nombre de la instancia, usado en el directorio de instalación y fijo tras crearla. Configure un alias para cambiar el nombre mostrado.',
+            deploymentAlias: 'Alias de la instancia',
             deploymentAliasHelper:
                 'Alias opcional para la lista. Si se deja vacío, se muestra el nombre de la instancia. Cambiar el alias no reinicia el servicio.',
             deploymentContainerNameHelper:

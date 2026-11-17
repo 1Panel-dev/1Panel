@@ -1270,6 +1270,7 @@ const message = {
                 '양식이 변경되었습니다. Compose를 다시 생성하면 수동 편집 내용이 덮어써집니다. 계속할까요?',
             deploymentNameHelper:
                 '앱 인스턴스 이름으로, 설치 디렉터리에 사용되며 생성 후 변경할 수 없습니다. 표시 이름을 바꾸려면 별칭을 설정하세요.',
+            deploymentAlias: '인스턴스 별칭',
             deploymentAliasHelper:
                 '목록에 표시할 별칭입니다. 비워 두면 인스턴스 이름이 표시됩니다. 별칭을 변경해도 서비스는 다시 시작되지 않습니다.',
             deploymentContainerNameHelper:

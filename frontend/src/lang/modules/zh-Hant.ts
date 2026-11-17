@@ -1209,6 +1209,7 @@ const message = {
             saveDeploy: '儲存並部署',
             composeRegenerateHelper: '表單已修改，重新產生 Compose 將覆蓋手動編輯的內容。是否繼續？',
             deploymentNameHelper: '應用程式執行個體名稱，用於安裝目錄，建立後無法修改。如需調整顯示名稱，請設定別名。',
+            deploymentAlias: '執行個體別名',
             deploymentAliasHelper: '選填，用於列表顯示；留空時顯示執行個體名稱。修改別名不會重新啟動服務。',
             deploymentContainerNameHelper:
                 'Docker 容器名稱，預設與應用程式名稱相同，可另外設定。修改後會重新建立容器。',

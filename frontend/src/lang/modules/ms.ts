@@ -1313,6 +1313,7 @@ const message = {
                 'Borang telah berubah. Penjanaan semula Compose akan menimpa suntingan manual. Teruskan?',
             deploymentNameHelper:
                 'Nama instans aplikasi, digunakan untuk direktori pemasangan dan tidak boleh diubah selepas penciptaan. Tetapkan alias untuk mengubah nama paparan.',
+            deploymentAlias: 'Alias instans',
             deploymentAliasHelper:
                 'Alias pilihan untuk paparan senarai. Biarkan kosong untuk menggunakan nama instans. Menukar alias tidak memulakan semula perkhidmatan.',
             deploymentContainerNameHelper:
