@@ -1298,6 +1298,7 @@ const message = {
                 'The form has changed. Regenerating Compose will overwrite manual edits. Continue?',
             deploymentNameHelper:
                 'Application instance name, used for the installation directory and fixed after creation. Set an alias to change the display name.',
+            deploymentAlias: 'Instance alias',
             deploymentAliasHelper:
                 'Optional display alias. Leave empty to use the instance name. Changing the alias does not restart the service.',
             deploymentContainerNameHelper:

@@ -50,6 +50,35 @@
                                     {{ $t('aiTools.chat.waiting') }}
                                 </el-text>
                             </div>
+                            <div class="chat-message-meta">
+                                <span class="chat-message-time">
+                                    <el-icon><Clock /></el-icon>
+                                    <time :datetime="message.createdAt">
+                                        {{ dateFormatForSecond(message.createdAt).slice(0, 5) }}
+                                    </time>
+                                </span>
+                                <el-tooltip :content="$t('commons.button.copy')">
+                                    <el-button
+                                        link
+                                        size="small"
+                                        :disabled="!message.content"
+                                        :aria-label="$t('commons.button.copy')"
+                                        @click="copyText(message.content)"
+                                    >
+                                        <el-icon><CopyDocument /></el-icon>
+                                    </el-button>
+                                </el-tooltip>
+                                <el-tooltip v-if="message.role === 'user'" :content="$t('commons.button.edit')">
+                                    <el-button
+                                        link
+                                        size="small"
+                                        :icon="EditPen"
+                                        :disabled="sending"
+                                        :aria-label="$t('commons.button.edit')"
+                                        @click="edit(index)"
+                                    />
+                                </el-tooltip>
+                            </div>
                         </article>
                     </div>
                 </div>
@@ -62,15 +91,9 @@
                         :closable="false"
                         show-icon
                     />
-                    <el-alert
-                        class="chat-notice"
-                        :title="$t('aiTools.chat.temporary')"
-                        type="warning"
-                        :closable="false"
-                        show-icon
-                    />
                     <div class="chat-composer">
                         <el-input
+                            ref="inputRef"
                             v-model="input"
                             type="textarea"
                             :autosize="{ minRows: 3, maxRows: 7 }"
@@ -123,6 +146,7 @@
                             </el-tooltip>
                         </div>
                     </div>
+                    <p class="chat-notice">{{ $t('aiTools.chat.temporary') }}</p>
                 </div>
             </div>
         </template>
@@ -130,14 +154,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, ref, watch } from 'vue';
-import { ChatDotRound, Delete, Promotion, VideoPause } from '@element-plus/icons-vue';
+import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue';
+import { ChatDotRound, Clock, Delete, CopyDocument, EditPen, Promotion, VideoPause } from '@element-plus/icons-vue';
 import { useRoute } from 'vue-router';
 import DrawerPro from '@/components/drawer-pro/index.vue';
 import Markdown from '@/components/mkdown-editor/index.vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { chatModel, type ModelChatMessage, type ModelChatTarget } from '@/api/modules/model-chat';
 import i18n from '@/lang';
+import { copyText } from '@/utils/clipboard';
+import { dateFormatForSecond } from '@/utils/date';
+import type { InputInstance } from 'element-plus';
 
 const { currentNode, isMobile } = useGlobalStore();
 const route = useRoute();
@@ -146,9 +173,10 @@ const target = ref<ModelChatTarget>();
 const name = computed(() => target.value?.name || '');
 const model = ref('');
 const input = ref('');
+const inputRef = ref<InputInstance>();
 const error = ref('');
 const sending = ref(false);
-const messages = ref<(ModelChatMessage & { reasoning?: string; complete?: boolean })[]>([]);
+const messages = ref<(ModelChatMessage & { createdAt: string; reasoning?: string; complete?: boolean })[]>([]);
 const remainingRounds = computed(() =>
     Math.max(0, 100 - messages.value.filter((message) => message.role === 'user' && message.complete).length),
 );
@@ -172,6 +200,12 @@ const open = (options: ModelChatTarget) => {
     model.value = options.model;
     visible.value = true;
 };
+const edit = async (index: number) => {
+    if (sending.value) return;
+    input.value = messages.value[index].content;
+    await nextTick();
+    inputRef.value?.focus();
+};
 const send = async () => {
     if (!target.value || sending.value || !input.value.trim() || remainingRounds.value === 0) return;
     const content = input.value.trim();
@@ -180,7 +214,11 @@ const send = async () => {
         .map(({ role, content }) => ({ role, content }));
     const request = new AbortController();
     controller = request;
-    messages.value.push({ role: 'user', content }, { role: 'assistant', content: '', reasoning: '' });
+    const createdAt = new Date().toISOString();
+    messages.value.push(
+        { role: 'user', content, createdAt },
+        { role: 'assistant', content: '', reasoning: '', createdAt },
+    );
     const user = messages.value[messages.value.length - 2];
     const reply = messages.value[messages.value.length - 1];
     input.value = '';
@@ -391,16 +429,31 @@ defineExpose({ open });
     padding-top: 0;
 }
 .chat-notice {
-    margin: 0 0 6px;
-    border: 1px solid var(--el-color-warning-light-7);
-    border-radius: 8px;
-    :deep(.el-alert__title) {
-        font-size: 12px;
-        line-height: 1.5;
+    margin: 8px 0 0;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    line-height: 1.5;
+    text-align: center;
+}
+.chat-bottom > .el-alert {
+    margin-bottom: 12px;
+}
+.chat-message-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    color: var(--el-text-color-secondary);
+    font-size: 12px;
+    .el-button + .el-button {
+        margin-left: 0;
     }
 }
-.chat-bottom > .el-alert:not(.chat-notice) {
-    margin-bottom: 12px;
+.chat-message-time {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
 }
 .chat-composer {
     padding: 12px;

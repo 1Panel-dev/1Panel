@@ -1222,6 +1222,7 @@ const message = {
             saveDeploy: '保存并部署',
             composeRegenerateHelper: '表单已修改，重新生成 Compose 将覆盖手动编辑的内容。是否继续？',
             deploymentNameHelper: '应用实例名称，用于安装目录，创建后不可修改。需要调整展示名称时，请设置别名。',
+            deploymentAlias: '实例别名',
             deploymentAliasHelper: '选填，用于列表展示；留空时显示实例名称。修改别名不会重启服务。',
             deploymentContainerNameHelper: 'Docker 容器名称，默认与应用名称相同，可单独设置。修改后会重新创建容器。',
             imageVersion: '镜像版本',

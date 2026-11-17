@@ -1308,6 +1308,7 @@ const message = {
                 'O formulário foi alterado. Gerar o Compose novamente substituirá as edições manuais. Continuar?',
             deploymentNameHelper:
                 'Nome da instância, usado no diretório de instalação e fixo após a criação. Defina um alias para alterar o nome exibido.',
+            deploymentAlias: 'Alias da instância',
             deploymentAliasHelper:
                 'Apelido opcional para a lista. Deixe vazio para exibir o nome da instância. Alterar o apelido não reinicia o serviço.',
             deploymentContainerNameHelper:

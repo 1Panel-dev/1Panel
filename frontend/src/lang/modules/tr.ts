@@ -1308,6 +1308,7 @@ const message = {
                 'Form değiştirildi. Compose yeniden oluşturulursa elle yapılan düzenlemeler silinir. Devam edilsin mi?',
             deploymentNameHelper:
                 'Uygulama örneğinin adı, kurulum dizininde kullanılır ve oluşturulduktan sonra değiştirilemez. Görünen adı değiştirmek için takma ad belirleyin.',
+            deploymentAlias: 'Örnek takma adı',
             deploymentAliasHelper:
                 'Listede gösterilecek isteğe bağlı takma ad. Boş bırakılırsa örnek adı kullanılır. Takma adı değiştirmek hizmeti yeniden başlatmaz.',
             deploymentContainerNameHelper:
