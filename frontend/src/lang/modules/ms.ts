@@ -1376,6 +1376,7 @@ const message = {
             standardImage: 'Imej standard',
             customImage: 'Imej tersuai',
             vllmVersionHelper: {
+                qwen38: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'Versi standard rasmi Ascend untuk peranti siri Ascend A2.',
                 ascendA3: 'Versi rasmi Ascend A3 untuk peranti siri Ascend A3.',
                 ascendA5: 'Versi rasmi Ascend A5 untuk peranti 950DT.',
@@ -1387,9 +1388,6 @@ const message = {
                 dspark: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4-Flash. Imej diselenggara oleh 1Panel.',
                 dspark4: 'Versi tersuai untuk empat peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'Model penggunaan',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
@@ -1398,6 +1396,8 @@ const message = {
             downloader: 'Muat turun model',
             modelDirectoryHelper:
                 'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
+            vllmGB10Qwen38ModelHelper:
+                'Hanya model Qwen3.8-Flash-Next-NVFP4 disokong. Kedua-dua peranti memerlukan model lengkap pada laluan yang sama.',
             vllmGB10DualNodeModelHelper:
                 'Hanya DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp disokong. Kedua-dua peranti memerlukan model lengkap pada laluan yang sama.',
             vllmGB10FourNodeModelHelper:

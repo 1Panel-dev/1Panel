@@ -1318,6 +1318,7 @@ const message = {
             standardImage: 'ອິມເມຈມາດຕະຖານ',
             customImage: 'ອິມເມຈປັບແຕ່ງ',
             vllmVersionHelper: {
+                qwen38: 'ເວີຊັນກຳນົດເອງສຳລັບ NVIDIA GB10 ສອງເຄື່ອງ, ປັບແຕ່ງສຳລັບ Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'ເວີຊັນມາດຕະຖານທາງການຂອງ Ascend ສຳລັບອຸປະກອນຊຸດ Ascend A2.',
                 ascendA3: 'ເວີຊັນ Ascend A3 ທາງການ ສຳລັບອຸປະກອນຊຸດ Ascend A3.',
                 ascendA5: 'ເວີຊັນ Ascend A5 ທາງການ ສຳລັບອຸປະກອນ 950DT.',
@@ -1329,9 +1330,6 @@ const message = {
                 dspark: 'ເວີຊັນປັບແຕ່ງສຳລັບ NVIDIA GB10 ສອງອຸປະກອນ, ປັບໃຫ້ເໝາະກັບ DeepSeek-V4-Flash. ອິມເມຈດູແລໂດຍ 1Panel.',
                 dspark4: 'ເວີຊັນປັບແຕ່ງສຳລັບ NVIDIA GB10 ສີ່ອຸປະກອນ, ປັບໃຫ້ເໝາະກັບ DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'ໂມເດວສຳລັບຕິດຕັ້ງ',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'ຊິ້ງຄ໌ໄປຍັງບໍລິການໂມເດວ',
             modelAccountAddressHelper:
                 'ທີ່ຢູ່ຄອນເທນເນີແມ່ນສຳລັບຄອນເທນເນີຕົວແທນ; 127.0.0.1, IP ລະບົບ, ຫຼື ທີ່ຢູ່ກຳນົດເອງແມ່ນສຳລັບ AI Gateway ຫຼື ບໍລິການພາຍນອກ.',
@@ -1340,6 +1338,8 @@ const message = {
             downloader: 'ດາວໂຫຼດໂມເດວ',
             modelDirectoryHelper:
                 'ໂດຍຄ່າເລີ່ມຕົ້ນ ລາຍຊື່ໂມເດວຈະສະແດງໂມເດວທີ່ດາວໂຫຼດໄວ້ໃນໄດເຣັກທໍຣີທີ່ກຳນົດໃນ “ການກະກຽມໂມເດວ > ການຕັ້ງຄ່າ”.',
+            vllmGB10Qwen38ModelHelper:
+                'ຮອງຮັບສະເພາະໂມເດວ Qwen3.8-Flash-Next-NVFP4. ທັງສອງເຄື່ອງຕ້ອງມີໂມເດວຄົບຖ້ວນຢູ່ໃນເສັ້ນທາງດຽວກັນ.',
             vllmGB10DualNodeModelHelper:
                 'ຮອງຮັບສະເພາະ DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp. ທັງສອງອຸປະກອນຕ້ອງມີໂມເດວຄົບຊຸດໃນເສັ້ນທາງດຽວກັນ.',
             vllmGB10FourNodeModelHelper:

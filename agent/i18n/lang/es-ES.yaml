@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'No se pudo analizar el nombre del proyecto desde la
 ErrComposeProjectNameEmpty: 'No se pudo derivar un nombre de proyecto desde la configuración de Docker Compose ni desde el directorio padre del archivo. Introduzca un nombre e inténtelo de nuevo.'
 ErrComposeNameInvalid: 'Nombre de proyecto Compose no válido: debe comenzar con una letra minúscula o un número, contener solo letras minúsculas, números, guiones y guiones bajos, y tener entre 1 y 256 caracteres.'
 ErrAppVersionUnavailable: 'Esta versión de la aplicación se ha eliminado del servicio remoto. Seleccione otra versión e inténtelo de nuevo.'
-ErrVllmGB10ProOnly: 'Esta versión de vLLM solo está disponible en 1Panel Professional Edition.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway solo puede actualizarse dentro del mismo tipo de base de datos (SQLite o PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'La copia de seguridad de AI Gateway y la aplicación de destino deben usar el mismo tipo de base de datos (SQLite o PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent solo puede actualizarse a una versión reconocida más reciente permitida por la configuración de actualización entre versiones principales. Para volver a una versión anterior, restaure una copia de seguridad.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Esperar a que la aplicación esté lista'
 UpgradeBackupDisabled: 'La copia de actualización está desactivada; los cambios de datos de los scripts no se pueden revertir por completo'
 UpgradeRollbackFailed: 'Error al revertir'
 ErrDatabaseNotFound: 'La base de datos {{ .name }} no existe'
+
+# vLLM
+ErrVllmGB10ProOnly: 'Esta versión de vLLM solo está disponible en 1Panel Professional Edition.'
+ErrVllmGB10ModelUnsupported: 'Esta versión solo admite DeepSeek-V4-Flash-0731 o DeepSeek-V4-Flash-Vision-Exp. Seleccione el directorio del modelo correspondiente.'
 
 # SSH
 ExportIP: 'IP de inicio de sesión'

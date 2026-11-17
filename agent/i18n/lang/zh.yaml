@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: "解析 Docker Compose 配置输出中的项目名�
 ErrComposeProjectNameEmpty: "无法从 Docker Compose 配置或文件父目录中推导出项目名称，请填写名称后重试"
 ErrComposeNameInvalid: "Compose 项目名称格式错误：必须以小写字母或数字开头，仅支持小写字母、数字、- 和 _，长度为 1-256 个字符"
 ErrAppVersionUnavailable: "当前应用版本已从远程服务下架，请选择其他版本后重试"
-ErrVllmGB10ProOnly: "该 vLLM 版本仅支持 1Panel 专业版"
 ErrAIGatewayDatabaseTypeMismatch: 'AI 网关只能在相同数据库类型（SQLite 或 PostgreSQL）之间升级。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI 网关备份与目标应用的数据库类型（SQLite 或 PostgreSQL）必须一致，无法跨数据库类型恢复。'
 ErrHermesUpgradeVersion: 'Hermes Agent 只能升级到可识别且符合跨版本升级设置的更新版本。如需恢复旧版本，请使用备份恢复。'
@@ -170,6 +169,10 @@ UpgradeWaitReady: "等待应用就绪"
 UpgradeBackupDisabled: "未启用升级备份，升级脚本产生的数据变更无法完整回滚"
 UpgradeRollbackFailed: "回滚失败"
 ErrDatabaseNotFound: "数据库 {{ .name }} 不存在"
+
+# vLLM
+ErrVllmGB10ProOnly: "该 vLLM 版本仅支持 1Panel 专业版"
+ErrVllmGB10ModelUnsupported: '该版本仅支持 DeepSeek-V4-Flash-0731 或 DeepSeek-V4-Flash-Vision-Exp，请选择对应的模型目录。'
 
 # SSH
 ExportIP: "登录 IP"

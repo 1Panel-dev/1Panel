@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'تجزیه نام پروژه از خروجی پیک
 ErrComposeProjectNameEmpty: 'نام پروژه از پیکربندی Docker Compose یا پوشه والد فایل قابل استخراج نیست. یک نام وارد کرده و دوباره تلاش کنید.'
 ErrComposeNameInvalid: 'نام پروژه Compose نامعتبر است: باید با حرف کوچک یا عدد شروع شود، فقط شامل حروف کوچک، اعداد، خط تیره و زیرخط باشد و ۱ تا ۲۵۶ نویسه داشته باشد.'
 ErrAppVersionUnavailable: 'این نسخه برنامه از سرویس راه دور حذف شده است. لطفاً نسخه دیگری را انتخاب کرده و دوباره تلاش کنید.'
-ErrVllmGB10ProOnly: 'این نسخه vLLM فقط در نسخه حرفه‌ای 1Panel در دسترس است.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway فقط در همان نوع پایگاه داده (SQLite یا PostgreSQL) قابل ارتقا است.'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'نسخه پشتیبان AI Gateway و برنامه مقصد باید از یک نوع پایگاه داده (SQLite یا PostgreSQL) استفاده کنند.'
 ErrHermesUpgradeVersion: 'Hermes Agent فقط می‌تواند به نسخه جدیدتر و شناخته‌شده‌ای ارتقا یابد که تنظیمات ارتقا بین نسخه‌های اصلی اجازه می‌دهد. برای بازگشت به نسخه قدیمی، نسخه پشتیبان را بازیابی کنید.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'انتظار برای آماده شدن برنامه'
 UpgradeBackupDisabled: 'پشتیبان ارتقاء غیرفعال است؛ تغییرات داده اسکریپت‌های ارتقاء کاملاً قابل بازگشت نیست'
 UpgradeRollbackFailed: 'بازگشت ناموفق بود'
 ErrDatabaseNotFound: 'پایگاه داده یافت نشد: {{ .name }}'
+
+# vLLM
+ErrVllmGB10ProOnly: 'این نسخه vLLM فقط در نسخه حرفه‌ای 1Panel در دسترس است.'
+ErrVllmGB10ModelUnsupported: 'این نسخه فقط از DeepSeek-V4-Flash-0731 یا DeepSeek-V4-Flash-Vision-Exp پشتیبانی می‌کند. پوشه مدل مربوطه را انتخاب کنید.'
 
 # SSH
 ExportIP: "IP ورود"

@@ -1330,6 +1330,7 @@ const message = {
             standardImage: '표준 이미지',
             customImage: '맞춤 이미지',
             vllmVersionHelper: {
+                qwen38: 'NVIDIA GB10 두 대용 사용자 지정 버전으로, Qwen3.8-Flash-Next-NVFP4에 최적화되어 있습니다.',
                 ascend: 'Ascend A2 시리즈 장치용 Ascend 공식 표준 버전입니다.',
                 ascendA3: 'Ascend A3 시리즈 장치용 Ascend 공식 A3 버전입니다.',
                 ascendA5: '950DT 장치용 Ascend 공식 A5 버전입니다.',
@@ -1341,9 +1342,6 @@ const message = {
                 dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, DeepSeek-V4-Flash에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
                 dspark4: 'NVIDIA GB10 장치 4대 구성용 맞춤 버전으로, DeepSeek-V4.1-Flash에 최적화되어 있습니다.',
             },
-            vllmDeployProfile: '배포 모델',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: '모델 서비스에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
@@ -1352,6 +1350,8 @@ const message = {
             downloader: '모델 다운로드',
             modelDirectoryHelper:
                 '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
+            vllmGB10Qwen38ModelHelper:
+                'Qwen3.8-Flash-Next-NVFP4 모델만 지원합니다. 두 장치 모두 동일한 경로에 전체 모델이 있어야 합니다.',
             vllmGB10DualNodeModelHelper:
                 'DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp만 지원합니다. 장치 2대 모두 동일한 경로에 전체 모델을 배치하세요.',
             vllmGB10FourNodeModelHelper:
