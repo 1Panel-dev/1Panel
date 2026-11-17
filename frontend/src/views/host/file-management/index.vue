@@ -208,8 +208,8 @@
                         <div class="file-search-input-shell w-full min-w-0">
                             <el-input
                                 v-model="req.search"
-                                @clear="search()"
-                                @keydown.enter="search()"
+                                @clear="searchFromStart"
+                                @keydown.enter="searchFromStart"
                                 :placeholder="$t('file.search')"
                             >
                                 <template #prepend>
@@ -218,7 +218,7 @@
                                     </el-checkbox>
                                 </template>
                                 <template #append>
-                                    <el-button icon="Search" @click="search" round />
+                                    <el-button icon="Search" @click="searchFromStart" round />
                                 </template>
                             </el-input>
                         </div>
@@ -745,7 +745,18 @@
 
 <script setup lang="ts">
 import { useSearchState } from '@/utils/search-reset';
-import { toRef, computed, nextTick, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import {
+    toRef,
+    computed,
+    nextTick,
+    onActivated,
+    onBeforeUnmount,
+    onDeactivated,
+    onMounted,
+    reactive,
+    ref,
+    watch,
+} from 'vue';
 import {
     addFavorite,
     batchGetFileRemarks,
@@ -774,6 +785,7 @@ import { useRouter } from 'vue-router';
 import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useMultipleSearchable } from './hooks/searchable';
 import { mergeDirSizeCache, sortFilesByDisplaySize, updateDirSizeCache } from './size-cache';
+import { createFileListRequest } from './list-request';
 import { ResultData } from '@/api/interface';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { resolveMaybeFn, type FuTableOperationButton } from '@/components/table/shared';
@@ -860,7 +872,9 @@ const initData = () => ({
     sortOrder: 'ascending',
 });
 let req = reactive(initData());
-let loading = ref(false);
+const listLoading = ref(false);
+const moveLoading = ref(false);
+const loading = computed(() => listLoading.value || moveLoading.value);
 const paths = ref<FilePaths[]>([]);
 const breadcrumbVisiblePaths = ref<FilePaths[]>([]);
 const breadcrumbHiddenPaths = ref<FilePaths[]>([]);
@@ -1087,34 +1101,47 @@ const updateButtons = async () => {
     moreButtons.value = toolButtons.value.slice(visibleCount);
 };
 
+let filePageUnmounted = false;
+
+const fileListRequest = createFileListRequest(
+    (params: File.ReqFile, node, signal) => getFilesList(params, node, { signal }),
+    () => ({ node: currentNode.value, tab: editableTabsKey.value, path: req.path }),
+    (value) => {
+        listLoading.value = value;
+    },
+);
+
+watch([currentNode, editableTabsKey, () => req.path], () => fileListRequest.cancel(), { flush: 'sync' });
+
+const resetPagination = () => {
+    paginationConfig.currentPage = 1;
+    req.page = 1;
+    req.pageSize = paginationConfig.pageSize;
+};
+
 const search = async () => {
-    dirTotalSize.value = -1;
-    await getWgetProcess();
-    loading.value = true;
+    void getWgetProcess();
     if (req.search != '') {
         req.sortBy = 'name';
         req.sortOrder = 'ascending';
-        getCurrentTable().clearSort();
+        getCurrentTable()?.clearSort();
     }
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
-    await getFilesList(req)
-        .then((res) => {
-            handleSearchResult(res);
-        })
-        .finally(() => {
-            loading.value = false;
-        });
+    const result = await searchFile();
+    if (result?.isCurrent()) {
+        handleSearchResult(result.response);
+    }
 };
 
-const searchFile = async () => {
-    loading.value = true;
+const searchFromStart = () => {
+    resetPagination();
+    return search();
+};
+
+const searchFile = () => {
     dirTotalSize.value = -1;
-    try {
-        return await getFilesList(req);
-    } finally {
-        loading.value = false;
-    }
+    return fileListRequest.load(req);
 };
 
 const resetDirSizeCache = () => {
@@ -1169,6 +1196,7 @@ const findExistingPath = async (filePath: string) => {
 
 const loadInitialExistingPath = async (url: string) => {
     const existingPath = await findExistingPath(url);
+    if (filePageUnmounted) return;
     if (existingPath === normalizeFilePath(url)) {
         return;
     }
@@ -1182,6 +1210,7 @@ const loadInitialExistingPath = async (url: string) => {
         sortOrder: oldSortOrder,
         showHidden,
     });
+    resetPagination();
     lastFilePath.value = req.path;
     getPaths(req.path);
     updateTab(req.path);
@@ -1193,8 +1222,10 @@ const loadInitialExistingPath = async (url: string) => {
 const viewHideFile = async () => {
     req.showHidden = !req.showHidden;
     localStorage.setItem('show-hidden', req.showHidden ? 'true' : 'false');
-    let searchResult = await searchFile();
-    handleSearchResult(searchResult);
+    resetPagination();
+    const result = await searchFile();
+    if (!result?.isCurrent()) return;
+    handleSearchResult(result.response);
 };
 
 const open = async (row: File.File) => {
@@ -1206,17 +1237,8 @@ const open = async (row: File.File) => {
             MsgWarning(i18n.global.t('file.clashOpenAlert'));
             return;
         }
-        const name = row.name;
-        if (req.path.endsWith('/')) {
-            req.path = req.path + name;
-        } else {
-            req.path = req.path + '/' + name;
-        }
-        paths.value.push({
-            url: req.path,
-            name: name,
-        });
-        await jump(req.path);
+        const targetPath = `${req.path}${req.path.endsWith('/') ? '' : '/'}${row.name}`;
+        await jump(targetPath);
     } else {
         openView(row);
     }
@@ -1353,11 +1375,15 @@ const jump = async (url: string) => {
         sortOrder: oldSortOrder,
         showHidden,
     });
-    let searchResult = await searchFile();
+    resetPagination();
+    const result = await searchFile();
+    if (!result?.isCurrent()) return;
+    const searchResult = result.response;
     if (!searchResult.data.path) {
         req.path = oldUrl;
         lastFilePath.value = req.path;
         MsgWarning(i18n.global.t('commons.res.notFound'));
+        await search();
         return;
     }
     req.path = searchResult.data.path;
@@ -1384,8 +1410,10 @@ const backForwardJump = async (url: string) => {
         sortOrder: oldSortOrder,
         showHidden,
     });
-    let searchResult = await searchFile();
-    handleSearchResult(searchResult);
+    resetPagination();
+    const result = await searchFile();
+    if (!result?.isCurrent()) return;
+    handleSearchResult(result.response);
     getPaths(req.path);
     updateTab(req.path);
     await nextTick(function () {
@@ -1913,7 +1941,7 @@ const openPaste = () => {
 };
 
 function onLoading(isLoading: boolean) {
-    loading.value = isLoading;
+    moveLoading.value = isLoading;
 }
 
 const openDownload = (file: File.File) => {
@@ -1974,10 +2002,9 @@ const changeSort = ({ prop, order }) => {
     req.sortBy = prop;
     req.sortOrder = order;
     req.search = '';
-    req.page = 1;
-    req.pageSize = paginationConfig.pageSize;
+    resetPagination();
     req.containSub = false;
-    search();
+    return search();
 };
 
 const showFavorite = (row: File.File) => {
@@ -2451,7 +2478,9 @@ function buildPaths(path: string) {
 
 async function initHistory() {
     await loadInitialExistingPath(req.path);
+    if (filePageUnmounted) return;
     await search();
+    if (filePageUnmounted) return;
     history.push(req.path);
     pointer = history.length - 1;
 }
@@ -2564,6 +2593,7 @@ const changeTab = (targetPath: TabPaneName) => {
     saveStorageTabsKey();
     if (req.path !== current?.path) {
         resetDirSizeCache();
+        resetPagination();
     }
     req.path = current ? current.path : '';
     lastFilePath.value = req.path;
@@ -2606,7 +2636,9 @@ const updateHeight = () => {
 
 onMounted(async () => {
     await loadPath();
+    if (filePageUnmounted) return;
     await nextTick();
+    if (filePageUnmounted) return;
     watchTitleHeight();
     window.addEventListener('resize', watchTitleHeight);
     updateHeight();
@@ -2614,15 +2646,23 @@ onMounted(async () => {
     initShowHidden();
     initTabsAndPaths();
     await getHostMount();
+    if (filePageUnmounted) return;
     await initHistory();
+    if (filePageUnmounted) return;
     checkFFmpeg();
     await nextTick(function () {
+        if (filePageUnmounted) return;
         handlePath();
         observeResize();
     });
 });
 
+onActivated(() => fileListRequest.resume());
+onDeactivated(() => fileListRequest.pause());
+
 onBeforeUnmount(() => {
+    filePageUnmounted = true;
+    fileListRequest.dispose();
     if (resizeObserver) resizeObserver.disconnect();
     window.removeEventListener('resize', watchTitleHeight);
     window.removeEventListener('resize', updateHeight);

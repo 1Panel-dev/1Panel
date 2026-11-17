@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
@@ -14,6 +16,7 @@ type IFavoriteRepo interface {
 	Delete(opts ...DBOption) error
 	GetFirst(opts ...DBOption) (model.Favorite, error)
 	All() ([]model.Favorite, error)
+	ListByPaths(ctx context.Context, paths []string) ([]model.Favorite, error)
 	WithByPath(path string) DBOption
 }
 
@@ -61,6 +64,43 @@ func (f *FavoriteRepo) All() ([]model.Favorite, error) {
 	var favorites []model.Favorite
 	if err := getDb().Find(&favorites).Error; err != nil {
 		return nil, err
+	}
+	return favorites, nil
+}
+
+const filePathQueryBatchSize = 900
+
+func uniqueFilePaths(paths []string) []string {
+	unique := make([]string, 0, len(paths))
+	seen := make(map[string]struct{}, len(paths))
+	for _, path := range paths {
+		if _, ok := seen[path]; ok {
+			continue
+		}
+		seen[path] = struct{}{}
+		unique = append(unique, path)
+	}
+	return unique
+}
+
+func (f *FavoriteRepo) ListByPaths(ctx context.Context, paths []string) ([]model.Favorite, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	paths = uniqueFilePaths(paths)
+	favorites := make([]model.Favorite, 0, len(paths))
+	for start := 0; start < len(paths); start += filePathQueryBatchSize {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		end := min(start+filePathQueryBatchSize, len(paths))
+		db := getTx(ctx).WithContext(ctx)
+		firstIDs := db.Model(&model.Favorite{}).Select("MIN(id)").Where("path IN ?", paths[start:end]).Group("path")
+		var batch []model.Favorite
+		if err := db.Where("id IN (?)", firstIDs).Order("id ASC").Find(&batch).Error; err != nil {
+			return nil, err
+		}
+		favorites = append(favorites, batch...)
 	}
 	return favorites, nil
 }

@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"context"
+
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
@@ -15,6 +17,7 @@ type IFileShareRepo interface {
 	Delete(opts ...DBOption) error
 	GetFirst(opts ...DBOption) (model.FileShare, error)
 	All() ([]model.FileShare, error)
+	ListByPaths(ctx context.Context, paths []string) ([]model.FileShare, error)
 	WithByPath(path string) DBOption
 	WithByCode(code string) DBOption
 }
@@ -72,6 +75,26 @@ func (r *FileShareRepo) All() ([]model.FileShare, error) {
 	var items []model.FileShare
 	if err := getDb().Order("path asc").Find(&items).Error; err != nil {
 		return nil, err
+	}
+	return items, nil
+}
+
+func (r *FileShareRepo) ListByPaths(ctx context.Context, paths []string) ([]model.FileShare, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	paths = uniqueFilePaths(paths)
+	items := make([]model.FileShare, 0, len(paths))
+	for start := 0; start < len(paths); start += filePathQueryBatchSize {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		end := min(start+filePathQueryBatchSize, len(paths))
+		var batch []model.FileShare
+		if err := getTx(ctx).WithContext(ctx).Where("path IN ?", paths[start:end]).Order("path ASC").Find(&batch).Error; err != nil {
+			return nil, err
+		}
+		items = append(items, batch...)
 	}
 	return items, nil
 }
