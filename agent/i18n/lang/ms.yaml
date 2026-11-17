@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Gagal menghurai nama projek daripada output konfigu
 ErrComposeProjectNameEmpty: 'Nama projek tidak dapat diperoleh daripada konfigurasi Docker Compose atau direktori induk fail. Masukkan nama dan cuba lagi.'
 ErrComposeNameInvalid: 'Nama projek Compose tidak sah: mesti bermula dengan huruf kecil atau nombor, hanya mengandungi huruf kecil, nombor, tanda sempang dan garis bawah, serta sepanjang 1-256 aksara.'
 ErrAppVersionUnavailable: 'Versi aplikasi ini telah dialih keluar daripada perkhidmatan jauh. Sila pilih versi lain dan cuba lagi.'
-ErrVllmGB10ProOnly: 'Versi vLLM ini hanya tersedia dalam 1Panel Edisi Profesional.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway hanya boleh dinaik taraf dalam jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'Sandaran AI Gateway dan aplikasi sasaran mesti menggunakan jenis pangkalan data yang sama (SQLite atau PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent hanya boleh dinaik taraf kepada keluaran lebih baharu yang dikenal pasti dan dibenarkan oleh tetapan naik taraf antara versi utama. Untuk kembali kepada versi lama, pulihkan sandaran.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Tunggu aplikasi sedia'
 UpgradeBackupDisabled: 'Sandaran naik taraf dilumpuhkan; perubahan data oleh skrip naik taraf tidak dapat diundur sepenuhnya'
 UpgradeRollbackFailed: 'Undur gagal'
 ErrDatabaseNotFound: 'Pangkalan data {{ .name }} tidak wujud'
+
+# vLLM
+ErrVllmGB10ProOnly: 'Versi vLLM ini hanya tersedia dalam 1Panel Edisi Profesional.'
+ErrVllmGB10ModelUnsupported: 'Versi ini hanya menyokong DeepSeek-V4-Flash-0731 atau DeepSeek-V4-Flash-Vision-Exp. Pilih direktori model yang sepadan.'
 
 # SSH
 ExportIP: 'IP Log Masuk'

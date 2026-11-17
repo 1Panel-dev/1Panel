@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Docker Compose 設定出力からプロジェクト
 ErrComposeProjectNameEmpty: 'Docker Compose 設定またはファイルの親ディレクトリからプロジェクト名を推定できません。名前を入力して再試行してください。'
 ErrComposeNameInvalid: 'Compose プロジェクト名の形式が正しくありません。小文字または数字で始まり、小文字、数字、ハイフン、アンダースコアのみを使用した 1～256 文字にしてください。'
 ErrAppVersionUnavailable: '現在のアプリケーションバージョンはリモートサービスから削除されています。別のバージョンを選択して再試行してください。'
-ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway は同じデータベース種別（SQLite または PostgreSQL）間でのみアップグレードできます。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway のバックアップと復元先アプリのデータベース種別（SQLite または PostgreSQL）は一致している必要があります。'
 ErrHermesUpgradeVersion: 'Hermes Agent は、認識可能でメジャーバージョン間のアップグレード設定に適合する新しいリリースにのみアップグレードできます。以前のバージョンに戻すには、バックアップから復元してください。'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'アプリケーションの準備完了を待機'
 UpgradeBackupDisabled: 'アップグレードバックアップが無効なため、アップグレードスクリプトによるデータ変更を完全にはロールバックできません'
 UpgradeRollbackFailed: 'ロールバックに失敗しました'
 ErrDatabaseNotFound: 'データベース {{ .name }} は存在しません'
+
+# vLLM
+ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
+ErrVllmGB10ModelUnsupported: 'このバージョンは DeepSeek-V4-Flash-0731 または DeepSeek-V4-Flash-Vision-Exp のみ対応しています。対応するモデルディレクトリを選択してください。'
 
 # SSH
 ExportIP: 'ログインIP'

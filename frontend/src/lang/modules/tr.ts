@@ -1370,6 +1370,7 @@ const message = {
             standardImage: 'Standart imaj',
             customImage: 'Özelleştirilmiş imaj',
             vllmVersionHelper: {
+                qwen38: 'İki NVIDIA GB10 cihazı için Qwen3.8-Flash-Next-NVFP4 modeline göre optimize edilmiş özel sürüm.',
                 ascend: 'Ascend A2 serisi cihazlar için resmi Ascend standart sürümü.',
                 ascendA3: 'Ascend A3 serisi cihazlar için resmi Ascend A3 sürümü.',
                 ascendA5: '950DT cihazları için resmi Ascend A5 sürümü.',
@@ -1381,9 +1382,6 @@ const message = {
                 dspark: 'İki NVIDIA GB10 cihazı için DeepSeek-V4-Flash’a optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
                 dspark4: 'Dört NVIDIA GB10 cihazı için DeepSeek-V4.1-Flash’a optimize edilmiş özel sürüm.',
             },
-            vllmDeployProfile: 'Dağıtım modeli',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
@@ -1392,6 +1390,8 @@ const message = {
             downloader: 'Model indirme',
             modelDirectoryHelper:
                 'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
+            vllmGB10Qwen38ModelHelper:
+                'Yalnızca Qwen3.8-Flash-Next-NVFP4 modeli desteklenir. Her iki cihazda da modelin tamamı aynı yolda bulunmalıdır.',
             vllmGB10DualNodeModelHelper:
                 'Yalnızca DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp desteklenir. İki cihazda da aynı yolda eksiksiz model bulunmalıdır.',
             vllmGB10FourNodeModelHelper:

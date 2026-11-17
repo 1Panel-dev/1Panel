@@ -1361,6 +1361,7 @@ const message = {
             standardImage: 'Standard image',
             customImage: 'Custom image',
             vllmVersionHelper: {
+                qwen38: 'Custom version for two NVIDIA GB10 devices, optimized for Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'Official Ascend standard version for Ascend A2 series devices.',
                 ascendA3: 'Official Ascend A3 version for Ascend A3 series devices.',
                 ascendA5: 'Official Ascend A5 version for 950DT devices.',
@@ -1372,9 +1373,6 @@ const message = {
                 dspark: 'Custom version for two NVIDIA GB10 devices, optimized for DeepSeek-V4-Flash. The image is maintained by 1Panel.',
                 dspark4: 'Custom version for four NVIDIA GB10 devices, optimized for DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'Deployment model',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Sync to model service',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
@@ -1383,6 +1381,8 @@ const message = {
             downloader: 'Model Downloads',
             modelDirectoryHelper:
                 'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
+            vllmGB10Qwen38ModelHelper:
+                'Only the Qwen3.8-Flash-Next-NVFP4 model is supported. Both devices need the complete model at the same path.',
             vllmGB10DualNodeModelHelper:
                 'Only DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp is supported. Both devices need the complete model at the same path.',
             vllmGB10FourNodeModelHelper:

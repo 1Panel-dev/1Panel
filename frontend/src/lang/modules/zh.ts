@@ -1274,6 +1274,7 @@ const message = {
             standardImage: '标准镜像',
             customImage: '定制镜像',
             vllmVersionHelper: {
+                qwen38: 'NVIDIA GB10 双设备定制版，针对 Qwen3.8-Flash-Next-NVFP4 优化。',
                 ascend: 'Ascend 官方标准版本，适用于 Ascend A2 系列设备。',
                 ascendA3: 'Ascend 官方 A3 版本，适用于 Ascend A3 系列设备。',
                 ascendA5: 'Ascend 官方 A5 版本，适用于 950DT 设备。',
@@ -1283,9 +1284,6 @@ const message = {
                 dspark: 'NVIDIA GB10 双设备定制版，针对 DeepSeek-V4-Flash 优化，镜像由 1Panel 维护。',
                 dspark4: 'NVIDIA GB10 四设备定制版，针对 DeepSeek-V4.1-Flash 优化。',
             },
-            vllmDeployProfile: '部署模型',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: '同步到模型服务',
             modelAccountAddressHelper:
                 '容器地址适合智能体容器调用；127.0.0.1、本机 IP 或自定义地址适合 AI 网关或外部服务调用。',
@@ -1293,6 +1291,7 @@ const message = {
             customAddress: '自定义地址',
             downloader: '模型下载',
             modelDirectoryHelper: '模型列表默认来自“模型准备 > 设置”中配置的模型目录，展示该目录下已下载的模型。',
+            vllmGB10Qwen38ModelHelper: '仅支持 Qwen3.8-Flash-Next-NVFP4，两台设备需在相同路径放置完整模型。',
             vllmGB10DualNodeModelHelper:
                 '仅支持 DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp，两台设备需在相同路径放置完整模型。',
             vllmGB10FourNodeModelHelper: '仅支持 DeepSeek-V4.1-Flash，四台设备需在相同路径放置完整模型。',

@@ -3,8 +3,9 @@ package vllm
 import "strings"
 
 const (
-	gb10VersionPrefix = "nvidia-"
-	rtxVersionSuffix  = "-optimized-for-ds-v4.1-flash"
+	gb10VersionPrefix   = "nvidia-"
+	qwen38VersionSuffix = "-optimized-for-2-gb10-qwen3.8-flash-next-nvfp4"
+	rtxVersionSuffix    = "-optimized-for-ds-v4.1-flash"
 )
 
 func IsRTXVersion(version string) bool {
@@ -15,6 +16,10 @@ func IsGB10Version(version string) bool {
 	return GB10NodeCount(version) > 0
 }
 
+func IsQwen38GB10Version(version string) bool {
+	return IsGB10Version(version) && strings.HasSuffix(strings.ToLower(strings.TrimSpace(version)), qwen38VersionSuffix)
+}
+
 func GB10NodeCount(version string) int {
 	normalized := strings.ToLower(strings.TrimSpace(version))
 	tag := strings.TrimPrefix(normalized, gb10VersionPrefix)
@@ -23,6 +28,7 @@ func GB10NodeCount(version string) int {
 	}
 	for suffix, nodes := range map[string]int{
 		"-optimized-for-2-gb10-ds-v4-flash":   2,
+		qwen38VersionSuffix:                   2,
 		"-optimized-for-4-gb10-ds-v4.1-flash": 4,
 	} {
 		if strings.HasSuffix(tag, suffix) && strings.TrimSpace(strings.TrimSuffix(tag, suffix)) != "" {
@@ -49,8 +55,10 @@ func ResolveImage(image, imageType, tag string) string {
 			tag = "v" + tag
 		}
 		defaultImage = "vllm/vllm-openai:" + tag
-		_, suffix, _ := strings.Cut(tag, "-")
+		versionTag, suffix, _ := strings.Cut(tag, "-")
 		switch suffix {
+		case strings.TrimPrefix(qwen38VersionSuffix, "-"):
+			defaultImage = "vllm/vllm-openai:" + versionTag
 		case "optimized-for-ds-v4-flash":
 			defaultImage = "1panel/vllm-gb10-dual-node:" + strings.TrimPrefix(tag, "v")
 		case "optimized-for-2-gb10-ds-v4-flash", "optimized-for-4-gb10-ds-v4.1-flash":

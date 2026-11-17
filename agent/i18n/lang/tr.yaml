@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Docker Compose yapılandırma çıktısından proje
 ErrComposeProjectNameEmpty: 'Docker Compose yapılandırmasından veya dosyanın üst dizininden proje adı türetilemedi. Bir ad girip yeniden deneyin.'
 ErrComposeNameInvalid: 'Geçersiz Compose proje adı: küçük harf veya rakamla başlamalı, yalnızca küçük harf, rakam, kısa çizgi ve alt çizgi içermeli ve 1-256 karakter uzunluğunda olmalıdır.'
 ErrAppVersionUnavailable: 'Bu uygulama sürümü uzak hizmetten kaldırıldı. Lütfen başka bir sürüm seçip tekrar deneyin.'
-ErrVllmGB10ProOnly: 'Bu vLLM sürümü yalnızca 1Panel Professional Edition sürümünde kullanılabilir.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway yalnızca aynı veritabanı türü (SQLite veya PostgreSQL) içinde yükseltilebilir.'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway yedeği ve hedef uygulama aynı veritabanı türünü (SQLite veya PostgreSQL) kullanmalıdır.'
 ErrHermesUpgradeVersion: 'Hermes Agent yalnızca ana sürümler arası yükseltme ayarının izin verdiği, tanınan daha yeni bir sürüme yükseltilebilir. Eski bir sürüme dönmek için yedekten geri yükleyin.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Uygulamanın hazır olmasını bekle'
 UpgradeBackupDisabled: 'Yükseltme yedeği devre dışı; yükseltme betiklerinin veri değişiklikleri tamamen geri alınamaz'
 UpgradeRollbackFailed: 'Geri alma başarısız'
 ErrDatabaseNotFound: '{{ .name }} veritabanı mevcut değil'
+
+# vLLM
+ErrVllmGB10ProOnly: 'Bu vLLM sürümü yalnızca 1Panel Professional Edition sürümünde kullanılabilir.'
+ErrVllmGB10ModelUnsupported: 'Bu sürüm yalnızca DeepSeek-V4-Flash-0731 veya DeepSeek-V4-Flash-Vision-Exp modellerini destekler. İlgili model dizinini seçin.'
 
 # SSH
 ExportIP: 'Giriş IP'

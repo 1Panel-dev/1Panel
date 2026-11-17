@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Failed to parse the project name from Docker Compos
 ErrComposeProjectNameEmpty: 'Unable to derive a project name from Docker Compose config or the file parent directory. Enter a name and try again.'
 ErrComposeNameInvalid: 'Invalid Compose project name: it must start with a lowercase letter or number, contain only lowercase letters, numbers, hyphens, and underscores, and be 1-256 characters long.'
 ErrAppVersionUnavailable: 'This application version has been removed from the remote service. Please select another version and try again.'
-ErrVllmGB10ProOnly: 'This vLLM version is available only in 1Panel Professional Edition.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway can only upgrade within the same database type (SQLite or PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'The AI Gateway backup and target application must use the same database type (SQLite or PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent can only upgrade to a newer recognized release allowed by its cross-version upgrade policy. Restore an older version from a backup instead.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Wait for application readiness'
 UpgradeBackupDisabled: 'Upgrade backup is disabled; data changes made by upgrade scripts cannot be fully rolled back'
 UpgradeRollbackFailed: 'Rollback failed'
 ErrDatabaseNotFound: 'Database not found: {{ .name }}'
+
+# vLLM
+ErrVllmGB10ProOnly: 'This vLLM version is available only in 1Panel Professional Edition.'
+ErrVllmGB10ModelUnsupported: 'This version only supports DeepSeek-V4-Flash-0731 or DeepSeek-V4-Flash-Vision-Exp. Select the corresponding model directory.'
 
 # SSH
 ExportIP: "Login IP"
