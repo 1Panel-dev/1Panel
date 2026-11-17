@@ -4886,6 +4886,8 @@ const message = {
         batchInput: 'バッチ入力',
         domainNotFQDN: 'このドメインはパブリックネットワークからアクセスできない可能性があります',
         domainInvalid: 'ドメイン形式が正しくありません',
+        allowFirewall: 'ファイアウォールで許可',
+        allowFirewallHelp: 'サイト作成後、この TCP ポートを使用するすべてのドメインに対してポートを開放します。',
         domainBatchHelper: '1行に1ドメイン、形式: domain:port@ssl\n例: example.com:443@ssl または example.com',
         generateDomain: '生成',
         global: 'グローバル',

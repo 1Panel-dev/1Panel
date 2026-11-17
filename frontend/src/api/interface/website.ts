@@ -178,6 +178,7 @@ export namespace Website {
     }
 
     interface SubDomain {
+        allowFirewall?: boolean;
         domain: string;
         port: number;
         ssl: boolean;

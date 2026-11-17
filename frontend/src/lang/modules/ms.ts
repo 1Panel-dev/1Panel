@@ -4977,6 +4977,8 @@ const message = {
         batchInput: 'Input Kelompok',
         domainNotFQDN: 'Domain ini mungkin tidak boleh diakses di rangkaian awam',
         domainInvalid: 'Format domain tidak sah',
+        allowFirewall: 'Benarkan dalam tembok api',
+        allowFirewallHelp: 'Buka port TCP ini selepas laman dicipta untuk semua domain yang menggunakannya.',
         domainBatchHelper:
             'Satu domain per baris, format: domain:port@ssl\nContoh: example.com:443@ssl atau example.com',
         generateDomain: 'Hasilkan',

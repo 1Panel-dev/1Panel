@@ -4588,6 +4588,8 @@ const message = {
         batchInput: '批量编辑',
         domainNotFQDN: '该域名可能无法在公网访问',
         domainInvalid: '域名格式不正确',
+        allowFirewall: '防火墙放行',
+        allowFirewallHelp: '建站成功后放行此 TCP 端口，对使用该端口的所有域名生效。',
         domainBatchHelper: '一行一个域名，格式：域名:端口\n示例：example.com',
         generateDomain: '生成',
         global: '全局',

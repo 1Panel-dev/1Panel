@@ -4861,6 +4861,8 @@ const message = {
         batchInput: 'ورودی دسته‌ای',
         domainNotFQDN: 'این دامنه ممکن است در شبکه عمومی قابل دسترسی نباشد',
         domainInvalid: 'فرمت دامنه نامعتبر است',
+        allowFirewall: 'اجازه در فایروال',
+        allowFirewallHelp: 'پس از ساخت سایت این پورت TCP برای تمام دامنه‌هایی که از آن استفاده می‌کنند باز می‌شود.',
         domainBatchHelper: 'هر خط یک دامنه، فرمت: domain:port@ssl\nمثال: example.com:443@ssl یا example.com',
         generateDomain: 'تولید',
         global: 'جهانی',

@@ -191,9 +191,10 @@ type WebsiteDomainUpdate struct {
 }
 
 type WebsiteDomain struct {
-	Domain string `json:"domain" validate:"required"`
-	Port   int    `json:"port"`
-	SSL    bool   `json:"ssl"`
+	AllowFirewall bool   `json:"allowFirewall"`
+	Domain        string `json:"domain" validate:"required"`
+	Port          int    `json:"port"`
+	SSL           bool   `json:"ssl"`
 }
 
 type WebsiteDomainDelete struct {

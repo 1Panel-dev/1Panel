@@ -194,6 +194,7 @@
                 </div>
                 <div v-else>
                     <DomainCreate
+                        show-firewall
                         v-model:form="website"
                         @gengerate="websiteForm.clearValidate()"
                         @domain-blur="handleFirstDomainBlur"

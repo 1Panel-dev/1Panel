@@ -4985,6 +4985,8 @@ const message = {
         batchInput: 'Entrada por Lotes',
         domainNotFQDN: 'Este dominio puede no ser accesible en la red pública',
         domainInvalid: 'Formato de dominio inválido',
+        allowFirewall: 'Permitir en el cortafuegos',
+        allowFirewallHelp: 'Abre este puerto TCP al crear el sitio para todos los dominios que lo usan.',
         domainBatchHelper:
             'Un dominio por línea, formato: dominio:puerto@ssl\nEjemplo: example.com:443@ssl o example.com',
         generateDomain: 'Generar',

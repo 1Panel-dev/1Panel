@@ -4906,6 +4906,8 @@ const message = {
         batchInput: 'Batch Input',
         domainNotFQDN: 'This domain may not be accessible on the public network',
         domainInvalid: 'Invalid domain format',
+        allowFirewall: 'Allow in firewall',
+        allowFirewallHelp: 'Open this TCP port after site creation for all domains using it.',
         domainBatchHelper: 'One domain per line, format: domain:port@ssl\nExample: example.com:443@ssl or example.com',
         generateDomain: 'Generate',
         global: 'Global',

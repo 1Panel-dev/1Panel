@@ -350,6 +350,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		runtime       *model.Runtime
 		primaryDomain string
 		initialSSL    *websiteInitialSSL
+		firewallPorts []int
 	)
 	if website.Type == constant.Stream {
 		if create.StreamConfig.StreamPorts == "" {
@@ -370,6 +371,7 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		if err != nil {
 			return err
 		}
+		firewallPorts = selectedWebsiteFirewallPorts(create.Domains, defaultHttpPort)
 		primaryDomain = domains[0].Domain
 		if domains[0].Port != defaultHttpPort {
 			primaryDomain = fmt.Sprintf("%s:%v", domains[0].Domain, domains[0].Port)
@@ -653,6 +655,12 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		createTask.AddSubTaskWithIgnoreErr(i18n.GetWithName("ConfigFTP", create.FtpUser), createFtpUser)
 	}
 
+	if len(firewallPorts) > 0 {
+		step := fmt.Sprintf("%s (TCP %v)", i18n.GetMsgByKey("FirewallCreateRulesStep"), firewallPorts)
+		createTask.AddSubTaskWithIgnoreErr(step, func(_ *task.Task) error {
+			return ensureFirewallPorts(firewallPorts)
+		})
+	}
 	if err := createTask.Execute(); err != nil {
 		return err
 	}
@@ -660,6 +668,21 @@ func (w WebsiteService) CreateWebsite(create request.WebsiteCreate) (err error) 
 		global.LOG.Errorf("bind deployment website to agent failed: %v", err)
 	}
 	return nil
+}
+
+func selectedWebsiteFirewallPorts(domains []request.WebsiteDomain, defaultPort int) []int {
+	var ports []int
+	for _, domain := range domains {
+		if domain.AllowFirewall && domain.Domain != "" {
+			port := domain.Port
+			if port == 0 {
+				port = defaultPort
+			}
+			ports = append(ports, port)
+		}
+	}
+	slices.Sort(ports)
+	return slices.Compact(ports)
 }
 
 func (w WebsiteService) OpWebsite(req request.WebsiteOp) error {
