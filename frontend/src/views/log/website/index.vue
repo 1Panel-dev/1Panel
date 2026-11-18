@@ -30,7 +30,7 @@
                     ></el-option>
                 </el-select>
                 <el-button>
-                    <el-checkbox v-model="tailLog" @change="changeTail" :disabled="logConfig.id == undefined">
+                    <el-checkbox v-model="logConfig.tail" @change="changeTail" :disabled="logConfig.id == undefined">
                         {{ $t('commons.button.watch') }}
                     </el-checkbox>
                 </el-button>
@@ -72,12 +72,12 @@ const logConfig = reactive({
     id: undefined,
     name: 'access.log',
     colorMode: 'nginx',
+    tail: false,
 });
 const showLog = ref(false);
 const loading = ref(false);
 const websites = ref();
 const confirmDialogRef = ref();
-const tailLog = ref(false);
 const logRef = ref();
 const hasContent = ref(false);
 
