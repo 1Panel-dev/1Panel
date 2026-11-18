@@ -28,6 +28,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	vllmTools "github.com/1Panel-dev/1Panel/agent/utils/ai_tools/vllm"
 	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
@@ -1132,6 +1133,9 @@ func runScript(task *task.Task, appInstall *model.AppInstall, operate string) er
 	timeout := 10 * time.Minute
 	if operate == "start" || operate == "restart" {
 		timeout = time.Hour
+		if appInstall.App.Key == "vllm" && vllmTools.IsGB10Version(appInstall.Version) {
+			timeout = 2 * time.Hour
+		}
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(timeout), cmd.WithWorkDir(workDir), cmd.WithTask(*task))
 	if err := cmdMgr.Run("bash", scriptPath); err != nil {
