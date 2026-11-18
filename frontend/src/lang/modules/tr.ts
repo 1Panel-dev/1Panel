@@ -4697,6 +4697,7 @@ const message = {
         isEdirWarn: 'docker-compose.yml dosyasında değişiklikler algılandı. Lütfen farkları inceleyin.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Sertifika alan adları web sitesinin alan adlarıyla eşleşmiyor',
         primaryDomain: 'Birincil alan adı',
         otherDomains: 'Diğer alan adları',
         static: 'Statik',

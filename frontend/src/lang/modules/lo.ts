@@ -4486,6 +4486,7 @@ const message = {
         isEdirWarn: 'ກວດພົບການປ່ຽນແປງໃນ docker-compose.yml. ກະລຸນາກວດສອບຄວາມແຕກຕ່າງ.',
     },
     website: {
+        sslDomainMismatchWebsite: 'ໂດເມນຂອງໃບຢັ້ງຢືນບໍ່ກົງກັບໂດເມນຂອງເວັບໄຊ',
         primaryDomain: 'ໂດເມນຫຼັກ',
         otherDomains: 'ໂດເມນອື່ນໆ',
         static: 'ສະແຕຕິກ (Static)',

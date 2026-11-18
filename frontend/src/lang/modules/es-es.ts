@@ -4712,6 +4712,7 @@ const message = {
         isEdirWarn: 'Se detectaron cambios en el archivo docker-compose.yml. Revise la comparación.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Los dominios del certificado no coinciden con los dominios del sitio web',
         primaryDomain: 'Dominio principal',
         otherDomains: 'Otros dominios',
         static: 'Estático',
