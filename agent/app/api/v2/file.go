@@ -123,7 +123,7 @@ func (b *BaseApi) ListFiles(c *gin.Context) {
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	fileList, err := fileService.GetFileList(req)
+	fileList, err := fileService.GetFileListWithContext(c.Request.Context(), req)
 	if err != nil {
 		helper.InternalServer(c, err)
 		return

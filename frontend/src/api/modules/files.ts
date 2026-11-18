@@ -10,13 +10,15 @@ export type FileUploadRequestConfig = AxiosRequestConfig & {
     skipErrorMessage?: boolean;
 };
 
-export const getFilesList = (params: File.ReqFile, currentNode?: string) => {
-    return http.post<File.File>(
-        'files/search',
-        params,
-        TimeoutEnum.T_5M,
-        currentNode ? { CurrentNode: currentNode } : undefined,
-    );
+export const getFilesList = (params: File.ReqFile, currentNode?: string, config?: AxiosRequestConfig) => {
+    return http.postWithConfig<File.File>('files/search', params, {
+        timeout: TimeoutEnum.T_5M,
+        ...config,
+        headers: {
+            ...config?.headers,
+            ...(currentNode ? { CurrentNode: currentNode } : {}),
+        },
+    });
 };
 
 export const fileAiSearch = (params: File.FileAISearchReq) => {

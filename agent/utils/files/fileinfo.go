@@ -2,7 +2,9 @@ package files
 
 import (
 	"bufio"
+	"context"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"os"
@@ -141,6 +143,13 @@ type FileSearchInfo struct {
 }
 
 func NewFileInfo(op FileOption) (*FileInfo, error) {
+	return NewFileInfoWithContext(context.Background(), op)
+}
+
+func NewFileInfoWithContext(ctx context.Context, op FileOption) (*FileInfo, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	var appFs = afero.NewOsFs()
 
 	info, err := appFs.Stat(op.Path)
@@ -167,15 +176,12 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		Uid:       strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Uid), 10),
 		Gid:       strconv.FormatUint(uint64(info.Sys().(*syscall.Stat_t).Gid), 10),
 		Group:     GetGroup(info.Sys().(*syscall.Stat_t).Gid),
-		MimeType:  GetMimeType(op.Path),
 		IsDetail:  op.IsDetail,
 	}
-	favoriteRepo := repo.NewIFavoriteRepo()
-	favorite, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(op.Path))
-	if favorite.ID > 0 {
-		file.FavoriteID = favorite.ID
+	if info.Mode().IsRegular() {
+		file.MimeType = GetMimeType(op.Path)
 	}
-	file.IsAppendOnly, file.IsImmutable = getFileAttributes(op.Path)
+	file.IsAppendOnly, file.IsImmutable = getFileAttributes(ctx, op.Path)
 
 	if file.IsSymlink {
 		linkPath := GetSymlink(op.Path)
@@ -200,15 +206,20 @@ func NewFileInfo(op FileOption) (*FileInfo, error) {
 		file.Extension = filepath.Ext(file.LinkPath)
 	}
 	if op.Expand {
-		if err := handleExpansion(file, op); err != nil {
+		if err := handleExpansion(ctx, file, op); err != nil {
+			return nil, err
+		}
+	}
+	if !op.Expand || !file.IsDir {
+		if err := file.loadFavorites(ctx); err != nil {
 			return nil, err
 		}
 	}
 	return file, nil
 }
 
-func getFileAttributes(filePath string) (bool, bool) {
-	output, err := exec.Command("lsattr", "-d", "--", filePath).Output()
+func getFileAttributes(ctx context.Context, filePath string) (bool, bool) {
+	output, err := exec.CommandContext(ctx, "lsattr", "-d", "--", filePath).Output()
 	if err != nil {
 		return false, false
 	}
@@ -219,9 +230,9 @@ func getFileAttributes(filePath string) (bool, bool) {
 	return strings.Contains(fields[0], "a"), strings.Contains(fields[0], "i")
 }
 
-func handleExpansion(file *FileInfo, op FileOption) error {
+func handleExpansion(ctx context.Context, file *FileInfo, op FileOption) error {
 	if file.IsDir {
-		return file.listChildren(op)
+		return file.listChildrenWithContext(ctx, op)
 	}
 
 	if !file.IsDetail {
@@ -231,224 +242,312 @@ func handleExpansion(file *FileInfo, op FileOption) error {
 	return nil
 }
 
-func (f *FileInfo) search(search string, count int) (files []FileSearchInfo, total int, err error) {
-	cmd := exec.Command("find", f.Path, "-name", fmt.Sprintf("*%s*", search))
+func (f *FileInfo) search(ctx context.Context, search string, count int) (files []FileSearchInfo, total int, err error) {
+	searchCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	cmd := exec.CommandContext(searchCtx, "find", f.Path, "-name", fmt.Sprintf("*%s*", search), "-print0")
 	output, err := cmd.StdoutPipe()
 	if err != nil {
-		return
+		return nil, 0, err
 	}
-	if err = cmd.Start(); err != nil {
-		return
+	if err := cmd.Start(); err != nil {
+		return nil, 0, err
 	}
-	defer func() {
-		_ = cmd.Wait()
-		_ = cmd.Process.Kill()
-	}()
-
-	scanner := bufio.NewScanner(output)
-	for scanner.Scan() {
-		line := scanner.Text()
-		info, err := os.Stat(line)
+	reader := bufio.NewReader(output)
+	for {
+		if err = ctx.Err(); err != nil {
+			break
+		}
+		var entry string
+		entry, err = reader.ReadString(0)
 		if err != nil {
+			break
+		}
+		entry = strings.TrimSuffix(entry, "\x00")
+		info, statErr := os.Stat(entry)
+		if statErr != nil {
 			continue
 		}
 		total++
-		if total > count {
-			continue
+		if total <= count {
+			files = append(files, FileSearchInfo{Path: entry, FileInfo: info})
 		}
-		files = append(files, FileSearchInfo{
-			Path:     line,
-			FileInfo: info,
-		})
 	}
-	if err = scanner.Err(); err != nil {
-		return
+	if err != nil && err != io.EOF {
+		cancel()
+	}
+	_ = cmd.Wait()
+	if contextErr := ctx.Err(); contextErr != nil {
+		return nil, 0, contextErr
+	}
+	if err == io.EOF {
+		err = nil
 	}
 	return
 }
 
 func sortFileList(list []FileSearchInfo, sortBy, sortOrder string) {
+	_ = sortFileListWithContext(context.Background(), list, sortBy, sortOrder)
+}
+
+func sortFileListWithContext(ctx context.Context, list []FileSearchInfo, sortBy, sortOrder string) error {
+	var less func(i, j int) bool
 	switch sortBy {
 	case "name":
-		if sortOrder == "ascending" {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].Name() < list[j].Name()
-			})
-		} else {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].Name() > list[j].Name()
-			})
-		}
+		less = func(i, j int) bool { return list[i].Name() < list[j].Name() }
 	case "size":
-		if sortOrder == "ascending" {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].Size() < list[j].Size()
-			})
-		} else {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].Size() > list[j].Size()
-			})
-		}
+		less = func(i, j int) bool { return list[i].Size() < list[j].Size() }
 	case "modTime":
-		if sortOrder == "ascending" {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].ModTime().Before(list[j].ModTime())
-			})
-		} else {
-			sort.Slice(list, func(i, j int) bool {
-				return list[i].ModTime().After(list[j].ModTime())
-			})
-		}
+		less = func(i, j int) bool { return list[i].ModTime().Before(list[j].ModTime()) }
+	default:
+		return ctx.Err()
 	}
+	return sortSliceWithContext(ctx, list, func(i, j int) bool {
+		if sortOrder != "ascending" {
+			i, j = j, i
+		}
+		return less(i, j)
+	})
+}
+
+func sortSliceWithContext(ctx context.Context, items interface{}, less func(i, j int) bool) (err error) {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if ctx.Done() == nil {
+		sort.Slice(items, less)
+		return nil
+	}
+	canceled := &struct{ marker byte }{}
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			if recovered != canceled {
+				panic(recovered)
+			}
+			err = ctx.Err()
+		}
+	}()
+	comparisons := 0
+	sort.Slice(items, func(i, j int) bool {
+		if comparisons%256 == 0 && ctx.Err() != nil {
+			panic(canceled)
+		}
+		comparisons++
+		return less(i, j)
+	})
+	return ctx.Err()
 }
 
 func (f *FileInfo) listChildren(option FileOption) error {
-	var (
-		files []FileSearchInfo
-		err   error
-		total int
-	)
+	return f.listChildrenWithContext(context.Background(), option)
+}
 
-	if option.Search != "" && option.ContainSub {
-		files, total, err = f.search(option.Search, option.Page*option.PageSize)
-		if err != nil {
-			return err
-		}
-	} else {
-		files, err = f.getFiles(option)
-		if err != nil {
-			return err
-		}
+func (f *FileInfo) listChildrenWithContext(ctx context.Context, option FileOption) error {
+	if err := ctx.Err(); err != nil {
+		return err
 	}
-
-	items, err := f.processFiles(files, option)
+	maxInt := int(^uint(0) >> 1)
+	if option.Page < 1 || option.PageSize < 1 || option.Page > maxInt/option.PageSize {
+		return fmt.Errorf("invalid file pagination")
+	}
+	var (
+		entries []FileSearchInfo
+		total   int
+		err     error
+	)
+	if option.Search != "" && option.ContainSub {
+		entries, total, err = f.search(ctx, option.Search, option.Page*option.PageSize)
+	} else {
+		entries, err = f.getFiles(ctx, option)
+	}
 	if err != nil {
 		return err
 	}
 
-	if option.ContainSub {
-		f.ItemTotal = total
-	}
-	start := (option.Page - 1) * option.PageSize
-	end := option.PageSize + start
-	var result []*FileInfo
-	if start < 0 || start > f.ItemTotal || end < 0 || start > end {
-		result = items
-	} else {
-		if end > f.ItemTotal {
-			result = items[start:]
-		} else {
-			result = items[start:end]
+	candidates := entries[:0]
+	for _, entry := range entries {
+		if err := ctx.Err(); err != nil {
+			return err
 		}
-	}
-
-	f.Items = result
-	return nil
-}
-
-func (f *FileInfo) getFiles(option FileOption) ([]FileSearchInfo, error) {
-	infos, err := os.ReadDir(f.Path)
-	if err != nil {
-		return nil, err
-	}
-	var (
-		dirs     []FileSearchInfo
-		fileList []FileSearchInfo
-	)
-
-	for _, file := range infos {
-		fileInfo, err := file.Info()
-		if err != nil {
+		if shouldSkipFile(entry, option) {
 			continue
 		}
-		info := FileSearchInfo{
-			Path:     f.Path,
-			FileInfo: fileInfo,
-		}
-		if file.IsDir() {
-			dirs = append(dirs, info)
-		} else {
-			fileList = append(fileList, info)
-		}
-	}
-
-	sortFileList(dirs, option.SortBy, option.SortOrder)
-	sortFileList(fileList, option.SortBy, option.SortOrder)
-
-	return append(dirs, fileList...), nil
-}
-
-func (f *FileInfo) processFiles(files []FileSearchInfo, option FileOption) ([]*FileInfo, error) {
-	var items []*FileInfo
-
-	for _, df := range files {
-		if shouldSkipFile(df, option) {
-			continue
-		}
-
-		name, fPath := f.getFilePathAndName(option, df)
-
+		name, _ := f.getFilePathAndName(option, entry)
 		if !option.ShowHidden && IsHidden(name) {
 			continue
 		}
-		f.ItemTotal++
+		candidates = append(candidates, entry)
+	}
+	f.ItemTotal = len(candidates)
+	if option.ContainSub {
+		f.ItemTotal = total
+	}
 
-		isSymlink, isInvalidLink := f.checkSymlink(df)
+	page := candidates
+	if !option.ContainSub || option.Search != "" {
+		start := (option.Page - 1) * option.PageSize
+		end := option.Page * option.PageSize
+		if start >= len(candidates) {
+			page = nil
+		} else {
+			if end > len(candidates) {
+				end = len(candidates)
+			}
+			page = candidates[start:end]
+		}
+	}
+	f.Items, err = f.processFiles(ctx, page, option)
+	if err != nil {
+		return err
+	}
+	return f.loadFavorites(ctx)
+}
 
+func readDirWithContext(ctx context.Context, dirPath string) ([]os.DirEntry, error) {
+	dir, err := os.Open(dirPath)
+	if err != nil {
+		return nil, err
+	}
+	defer dir.Close()
+	var entries []os.DirEntry
+	for {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		batch, err := dir.ReadDir(256)
+		entries = append(entries, batch...)
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := sortSliceWithContext(ctx, entries, func(i, j int) bool { return entries[i].Name() < entries[j].Name() }); err != nil {
+		return nil, err
+	}
+	return entries, nil
+}
+
+func (f *FileInfo) getFiles(ctx context.Context, option FileOption) ([]FileSearchInfo, error) {
+	entries, err := readDirWithContext(ctx, f.Path)
+	if err != nil {
+		return nil, err
+	}
+	var dirs, fileList []FileSearchInfo
+	for _, entry := range entries {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		info, err := entry.Info()
+		if err != nil {
+			continue
+		}
+		item := FileSearchInfo{Path: f.Path, FileInfo: info}
+		if entry.IsDir() {
+			dirs = append(dirs, item)
+		} else {
+			fileList = append(fileList, item)
+		}
+	}
+	if err := sortFileListWithContext(ctx, dirs, option.SortBy, option.SortOrder); err != nil {
+		return nil, err
+	}
+	if err := sortFileListWithContext(ctx, fileList, option.SortBy, option.SortOrder); err != nil {
+		return nil, err
+	}
+	return append(dirs, fileList...), ctx.Err()
+}
+
+func (f *FileInfo) processFiles(ctx context.Context, entries []FileSearchInfo, option FileOption) ([]*FileInfo, error) {
+	var items []*FileInfo
+	users := make(map[uint32]string)
+	groups := make(map[uint32]string)
+	for _, entry := range entries {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		name, filePath := f.getFilePathAndName(option, entry)
+		stat := entry.Sys().(*syscall.Stat_t)
+		username, ok := users[stat.Uid]
+		if !ok {
+			username = GetUsername(stat.Uid)
+			users[stat.Uid] = username
+		}
+		group, ok := groups[stat.Gid]
+		if !ok {
+			group = GetGroup(stat.Gid)
+			groups[stat.Gid] = group
+		}
+		isSymlink, isInvalidLink := f.checkSymlink(entry)
 		file := &FileInfo{
-			Fs:        f.Fs,
-			Name:      name,
-			Size:      df.Size(),
-			ModTime:   df.ModTime(),
-			FileMode:  df.Mode(),
-			IsDir:     df.IsDir(),
-			IsSymlink: isSymlink,
-			IsHidden:  IsHidden(fPath),
-			Extension: filepath.Ext(name),
-			Path:      fPath,
-			Mode:      fmt.Sprintf("%04o", df.Mode().Perm()),
-			User:      GetUsername(df.Sys().(*syscall.Stat_t).Uid),
-			Group:     GetGroup(df.Sys().(*syscall.Stat_t).Gid),
-			Uid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Uid), 10),
-			Gid:       strconv.FormatUint(uint64(df.Sys().(*syscall.Stat_t).Gid), 10),
+			Fs: f.Fs, Name: name, Path: filePath,
+			Size: entry.Size(), ModTime: entry.ModTime(), FileMode: entry.Mode(),
+			IsDir: entry.IsDir(), IsSymlink: isSymlink, IsHidden: IsHidden(filePath),
+			Extension: filepath.Ext(name), Mode: fmt.Sprintf("%04o", entry.Mode().Perm()),
+			User: username, Group: group,
+			Uid: strconv.FormatUint(uint64(stat.Uid), 10),
+			Gid: strconv.FormatUint(uint64(stat.Gid), 10),
 		}
-		favoriteRepo := repo.NewIFavoriteRepo()
-		favorite, _ := favoriteRepo.GetFirst(favoriteRepo.WithByPath(fPath))
-		if favorite.ID > 0 {
-			file.FavoriteID = favorite.ID
-		}
+		mimeInfo := entry.FileInfo
 		if isSymlink {
-			linkPath := GetSymlink(fPath)
+			linkPath := GetSymlink(filePath)
 			if !filepath.IsAbs(linkPath) {
-				dir := filepath.Dir(fPath)
-				var err error
-				linkPath, err = filepath.Abs(filepath.Join(dir, linkPath))
+				resolved, err := filepath.Abs(filepath.Join(filepath.Dir(filePath), linkPath))
 				if err != nil {
 					return nil, err
 				}
+				linkPath = resolved
 			}
 			file.LinkPath = linkPath
 			targetInfo, err := file.Fs.Stat(linkPath)
+			mimeInfo = targetInfo
 			if err != nil {
 				file.IsDir = false
-				file.Mode = "-"
-				file.User = "-"
-				file.Group = "-"
+				file.Mode, file.User, file.Group = "-", "-", "-"
 			} else {
 				file.IsDir = targetInfo.IsDir()
 			}
 			file.Extension = filepath.Ext(file.LinkPath)
 		}
-		if df.Size() > 0 {
-			file.MimeType = GetMimeType(fPath)
+		if entry.Size() > 0 && mimeInfo != nil && mimeInfo.Mode().IsRegular() {
+			file.MimeType = getMimeTypeFromFS(f.Fs, filePath)
 		}
 		if isInvalidLink {
 			file.Type = "invalid_link"
 		}
 		items = append(items, file)
 	}
+	return items, ctx.Err()
+}
 
-	return items, nil
+func (f *FileInfo) loadFavorites(ctx context.Context) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	paths := make([]string, 0, len(f.Items)+1)
+	paths = append(paths, f.Path)
+	for _, item := range f.Items {
+		paths = append(paths, item.Path)
+	}
+	favorites, err := repo.NewIFavoriteRepo().ListByPaths(ctx, paths)
+	if ctx.Err() != nil {
+		return ctx.Err()
+	}
+	if err != nil {
+		return nil
+	}
+	ids := make(map[string]uint, len(favorites))
+	for _, favorite := range favorites {
+		if id, ok := ids[favorite.Path]; !ok || favorite.ID < id {
+			ids[favorite.Path] = favorite.ID
+		}
+	}
+	f.FavoriteID = ids[f.Path]
+	for _, item := range f.Items {
+		item.FavoriteID = ids[item.Path]
+	}
+	return nil
 }
 
 func shouldSkipFile(df FileSearchInfo, option FileOption) bool {

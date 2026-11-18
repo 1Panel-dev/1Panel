@@ -54,8 +54,11 @@ const fileHistorySnapshotMaxSize = 10 * 1024 * 1024
 
 var fileTransferLocks = newFileTransferLocks()
 
+var fileListSlots = make(chan struct{}, 2)
+
 type IFileService interface {
 	GetFileList(op request.FileOption) (response.FileInfo, error)
+	GetFileListWithContext(ctx context.Context, op request.FileOption) (response.FileInfo, error)
 	SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error)
 	GetFileTree(op request.FileOption) ([]response.FileTree, error)
 	Create(op request.FileCreate) error
@@ -100,19 +103,53 @@ func NewIFileService() IFileService {
 }
 
 func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
+	return f.GetFileListWithContext(context.Background(), op)
+}
+
+func acquireFileListSlot(ctx context.Context) (func(), error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	select {
+	case fileListSlots <- struct{}{}:
+		if err := ctx.Err(); err != nil {
+			<-fileListSlots
+			return nil, err
+		}
+		return func() { <-fileListSlots }, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (f *FileService) GetFileListWithContext(ctx context.Context, op request.FileOption) (response.FileInfo, error) {
 	var fileInfo response.FileInfo
+	release, err := acquireFileListSlot(ctx)
+	if err != nil {
+		return fileInfo, err
+	}
+	defer release()
+
 	data, err := os.Stat(op.Path)
-	if err != nil && os.IsNotExist(err) {
-		return fileInfo, nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			return fileInfo, nil
+		}
+		return fileInfo, err
 	}
 	if !data.IsDir() {
 		op.FileOption.Path = filepath.Dir(op.FileOption.Path)
 	}
-	info, err := files.NewFileInfo(op.FileOption)
+	info, err := files.NewFileInfoWithContext(ctx, op.FileOption)
 	if err != nil {
 		return fileInfo, err
 	}
-	shareMap, err := NewIFileShareService().SharePathCodeMap()
+	paths := make([]string, 0, len(info.Items)+1)
+	paths = append(paths, info.Path)
+	for _, item := range info.Items {
+		paths = append(paths, item.Path)
+	}
+	shareMap, err := NewIFileShareService().SharePathCodeMapForPaths(ctx, paths)
 	if err != nil {
 		return fileInfo, err
 	}
@@ -841,7 +878,7 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
-		Expand:   true,
+		Expand:   !op.IsDetail,
 		IsDetail: op.IsDetail,
 	})
 	if err != nil {
