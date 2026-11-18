@@ -1,5 +1,5 @@
 # 基礎錯誤
-ErrInvalidParams: '請求參數錯誤: {{ .detail }}'
+ErrInvalidParams: '請求參數錯誤{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP 自訂參數格式錯誤'
 ErrMcpGatewayArgsConflict: '參數 {{ .name }} 由 1Panel 管理，不能在自訂參數中設定'
 ErrTokenParse: 'Token 產生錯誤: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: '本機資料庫已存在該名稱，請修改後重試'
 RemoteBackup: '備份遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候...'
 RemoteRecover: '復原遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候...'
 Arg: '參數'
+
+#PostgreSQL
+ErrPgUserProtected: "系統使用者或目前連線使用者受到保護，無法執行此操作"
+ErrPgSuperUserGrant: "超級使用者可存取所有資料庫，無需單獨授權或撤銷授權"
+ErrPgUserUsed: "關聯應用程式或網站正在使用此使用者，請先調整連線帳號"
+ErrPgUserBound: "請先撤銷此使用者的資料庫授權"
+ErrPgUserPasswordSync: "使用者密碼已修改，但以下應用程式的密碼同步失敗：{{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: '復原檔案類型與目前持久化方式不符，請修改後重試'

@@ -603,6 +603,7 @@ const message = {
 
         loadFromRemote: '从服务器同步',
         userBind: '绑定用户',
+        connectionUser: '连接用户',
         userAuthorization: '用户授权',
         noUserAuthorization: '不授权',
         authorizedDatabaseCount: '已授权 {0} 个数据库',
@@ -613,9 +614,11 @@ const message = {
         revokeAuthorization: '撤销授权',
         revokeAuthorizationHelper: '确定撤销用户 {0} 对数据库 {1} 的访问授权吗？',
         supplementPassword: '补充密码',
-        supplementPasswordHelper: '仅将现有密码保存到 1Panel，不会修改 MySQL 用户密码。',
+        supplementPasswordHelper: '仅将现有密码保存到 1Panel，不会修改数据库用户密码。',
         noUserBind: '不绑定',
-        pgBindHelper: '该操作用于创建新用户并将其绑定到目标数据库，暂不支持选择已存在于数据库中的用户。',
+        pgAuthorizationHelper:
+            '超级用户可访问此实例的所有数据库，无需单独授权。普通用户仅管理数据库级授权，不包含表级权限。',
+        pgRevokeAuthorizationHelper: '撤销授权不会删除用户，用户仍可能通过公共权限或其他角色访问该数据库。',
         pgSuperUser: '超级用户',
         loadFromRemoteHelper: '此操作将同步服务器上的数据库、用户及授权信息到 1Panel，是否继续？',
         passwordHelper: '无法获取，可点击修改',

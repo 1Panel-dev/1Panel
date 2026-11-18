@@ -621,6 +621,7 @@ const message = {
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
         loadFromRemote: 'Sync from server',
         userBind: 'Bind user',
+        connectionUser: 'Connection user',
         userAuthorization: 'User authorization',
         noUserAuthorization: 'Do not authorize',
         authorizedDatabaseCount: '{0} authorized database(s)',
@@ -631,10 +632,13 @@ const message = {
         revokeAuthorization: 'Revoke authorization',
         revokeAuthorizationHelper: "Revoke user {0}'s access to database {1}?",
         supplementPassword: 'Add password',
-        supplementPasswordHelper: 'This only saves the existing password to 1Panel and does not change it in MySQL.',
+        supplementPasswordHelper:
+            'This only saves the existing password to 1Panel and does not change the database user password.',
         noUserBind: 'No binding',
-        pgBindHelper:
-            'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',
+        pgAuthorizationHelper:
+            'Superusers can access all databases in this instance without binding. Ordinary users receive database-level grants only, without table permissions.',
+        pgRevokeAuthorizationHelper:
+            'Revoking authorization does not delete the user. Access through PUBLIC or other roles may remain.',
         pgSuperUser: 'Superuser',
         loadFromRemoteHelper: 'Sync databases, users, and authorizations from the server to 1Panel. Continue?',
         passwordHelper: 'Not available, click to update',

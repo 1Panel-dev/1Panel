@@ -232,3 +232,139 @@ func (b *BaseApi) DeletePostgresql(c *gin.Context) {
 	tx.Commit()
 	helper.Success(c)
 }
+
+func (b *BaseApi) ListPostgresqlUsers(c *gin.Context) {
+	var req dto.PostgresqlUserSearch
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	result, err := postgresqlService.ListUsers(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, result)
+}
+
+// @Router /databases/pg/users [post]
+// @x-panel-log {"bodyKeys":["database","username"],"paramKeys":[],"formatZH":"创建 PostgreSQL 实例 [database] 用户 [username]","formatEN":"create PostgreSQL instance [database] user [username]","BeforeFunctions":[]}
+func (b *BaseApi) CreatePostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlUserCreate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	password, err := base64.StdEncoding.DecodeString(req.Password)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	req.Password = string(password)
+	if err := postgresqlService.CreateUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Router /databases/pg/users/update [post]
+// @x-panel-log {"bodyKeys":["database","username"],"paramKeys":[],"formatZH":"修改 PostgreSQL 实例 [database] 用户 [username]","formatEN":"update PostgreSQL instance [database] user [username]","BeforeFunctions":[]}
+func (b *BaseApi) UpdatePostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlUserUpdate
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := postgresqlService.UpdateUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Router /databases/pg/users/password [post]
+// @x-panel-log {"bodyKeys":["database","username"],"paramKeys":[],"formatZH":"修改 PostgreSQL 实例 [database] 用户 [username] 密码","formatEN":"change PostgreSQL instance [database] user [username] password","BeforeFunctions":[]}
+func (b *BaseApi) ChangePostgresqlUserPassword(c *gin.Context) {
+	var req dto.PostgresqlUserPassword
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	password, err := base64.StdEncoding.DecodeString(req.Password)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	req.Password = string(password)
+	if err := postgresqlService.ChangeUserPassword(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Tags Database PostgreSQL
+// @Summary Save postgresql user password locally
+// @Accept json
+// @Param request body dto.PostgresqlUserPassword true "request"
+// @Success 200
+// @Security ApiKeyAuth
+// @Security Timestamp
+// @Router /databases/pg/users/password/save [post]
+// @x-panel-log {"bodyKeys":["database","username"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"补充 PostgreSQL 实例 [database] 用户 [username] 密码","formatEN":"save PostgreSQL instance [database] user [username] password locally"}
+func (b *BaseApi) SavePostgresqlUserPassword(c *gin.Context) {
+	var req dto.PostgresqlUserPassword
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	password, err := base64.StdEncoding.DecodeString(req.Password)
+	if err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	req.Password = string(password)
+	if err := postgresqlService.SaveUserPassword(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Router /databases/pg/users/del [post]
+// @x-panel-log {"bodyKeys":["database","username"],"paramKeys":[],"formatZH":"删除 PostgreSQL 实例 [database] 用户 [username]","formatEN":"delete PostgreSQL instance [database] user [username]","BeforeFunctions":[]}
+func (b *BaseApi) DeletePostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlUserDelete
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := postgresqlService.DeleteUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Router /databases/pg/grants [post]
+// @x-panel-log {"bodyKeys":["database","username","name"],"paramKeys":[],"formatZH":"绑定 PostgreSQL 实例 [database] 数据库 [name] 用户 [username]","formatEN":"bind PostgreSQL instance [database] database [name] user [username]","BeforeFunctions":[]}
+func (b *BaseApi) GrantPostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlUserGrant
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := postgresqlService.GrantUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}
+
+// @Router /databases/pg/grants/del [post]
+// @x-panel-log {"bodyKeys":["database","username","name"],"paramKeys":[],"formatZH":"撤销 PostgreSQL 实例 [database] 数据库 [name] 用户 [username] 绑定","formatEN":"revoke PostgreSQL instance [database] database [name] user [username] binding","BeforeFunctions":[]}
+func (b *BaseApi) RevokePostgresqlUser(c *gin.Context) {
+	var req dto.PostgresqlUserGrant
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := postgresqlService.RevokeUser(req); err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.Success(c)
+}

@@ -622,6 +622,7 @@ const message = {
             'Bu port konteynerin açığa çıkan portudur. Değişikliği ayrı olarak kaydetmeniz ve konteyneri yeniden başlatmanız gerekir!',
         loadFromRemote: 'Sunucudan senkronize et',
         userBind: 'Kullanıcı bağla',
+        connectionUser: 'Bağlantı kullanıcısı',
         userAuthorization: 'Kullanıcı yetkilendirmesi',
         noUserAuthorization: 'Yetki verme',
         authorizedDatabaseCount: '{0} veritabanı yetkisi',
@@ -632,10 +633,13 @@ const message = {
         revokeAuthorization: 'Yetkiyi kaldır',
         revokeAuthorizationHelper: '{0} kullanıcısının {1} veritabanına erişimi kaldırılsın mı?',
         supplementPassword: 'Parola ekle',
-        supplementPasswordHelper: 'Yalnızca mevcut parolayı 1Panel içine kaydeder; MySQL parolasını değiştirmez.',
+        supplementPasswordHelper:
+            'Yalnızca mevcut parolayı 1Panel içine kaydeder; veritabanı kullanıcısının parolasını değiştirmez.',
         noUserBind: 'Bağlantı yok',
-        pgBindHelper:
-            'Bu işlem yeni bir kullanıcı oluşturmak ve hedef veritabanına bağlamak için kullanılır. Şu anda veritabanında mevcut olan kullanıcıları seçmek desteklenmiyor.',
+        pgAuthorizationHelper:
+            'Süper kullanıcılar bu örnekteki tüm veritabanlarına bağlama gerekmeden erişir. Normal kullanıcılar için yalnızca veritabanı izinleri yönetilir, tablo izinleri dahil değildir.',
+        pgRevokeAuthorizationHelper:
+            'Yetkinin iptal edilmesi kullanıcıyı silmez. PUBLIC veya diğer roller üzerinden erişim devam edebilir.',
         pgSuperUser: 'Süper Kullanıcı',
         loadFromRemoteHelper:
             'Sunucudaki veritabanlarını, kullanıcıları ve yetkilendirmeleri 1Panel ile eşitler. Devam edilsin mi?',

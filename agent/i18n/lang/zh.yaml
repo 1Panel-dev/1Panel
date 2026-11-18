@@ -1,5 +1,5 @@
 # 基础错误
-ErrInvalidParams: "参数错误: {{ .detail }}"
+ErrInvalidParams: "参数错误{{ if .detail }}: {{ .detail }}{{ end }}"
 ErrMcpGatewayArgsParse: "MCP 自定义参数格式错误"
 ErrMcpGatewayArgsConflict: "参数 {{ .name }} 由 1Panel 管理，不能在自定义参数中设置"
 ErrTokenParse: "Token 错误: {{ .detail }}"
@@ -291,6 +291,13 @@ ErrLocalExist: "本地数据库已存在该名称，请修改后重试"
 RemoteBackup: "备份远程数据库前需先用镜像 {{ .name }} 启动本地容器数据库服务，请稍候"
 RemoteRecover: "恢复远程数据库前需先用镜像 {{ .name }} 启动本地容器数据库服务，请稍候"
 Arg: "参数"
+
+#PostgreSQL
+ErrPgUserProtected: "系统用户或当前连接用户受保护，无法执行此操作"
+ErrPgSuperUserGrant: "超级用户可访问所有数据库，无需单独授权或撤销授权"
+ErrPgUserUsed: "该用户正在被关联应用或网站使用，请先调整连接账号"
+ErrPgUserBound: "请先撤销该用户的数据库授权"
+ErrPgUserPasswordSync: "用户密码已修改，但以下应用的密码同步失败：{{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: "恢复文件类型与当前持久化方式不符，请修改后重试"

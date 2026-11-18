@@ -617,6 +617,7 @@ const message = {
         loadFromRemote: 'همگام‌سازی از سرور',
         userBind: 'اتصال کاربر',
         noUserBind: 'بدون اتصال',
+        connectionUser: 'کاربر اتصال',
         userAuthorization: 'مجوز کاربر',
         noUserAuthorization: 'بدون اعطای مجوز',
         authorizedDatabaseCount: '{0} پایگاه داده مجاز',
@@ -627,9 +628,12 @@ const message = {
         revokeAuthorization: 'لغو مجوز',
         revokeAuthorizationHelper: 'دسترسی کاربر {0} به پایگاه داده {1} لغو شود؟',
         supplementPassword: 'افزودن گذرواژه',
-        supplementPasswordHelper: 'فقط گذرواژه فعلی را در 1Panel ذخیره می‌کند و گذرواژه MySQL را تغییر نمی‌دهد.',
-        pgBindHelper:
-            'این عملیات برای ایجاد کاربر جدید و اتصال آن به پایگاه داده هدف استفاده می‌شود. در حال حاضر انتخاب کاربرانی که از قبل در پایگاه داده وجود دارند پشتیبانی نمی‌شود.',
+        supplementPasswordHelper:
+            'فقط گذرواژه موجود را در 1Panel ذخیره می‌کند و گذرواژه کاربر پایگاه داده را تغییر نمی‌دهد.',
+        pgAuthorizationHelper:
+            'ابرکاربران بدون پیوند به همه پایگاه‌های داده این نمونه دسترسی دارند. برای کاربران عادی فقط مجوزهای سطح پایگاه داده مدیریت می‌شود، نه مجوز جدول‌ها.',
+        pgRevokeAuthorizationHelper:
+            'لغو مجوز کاربر را حذف نمی‌کند. دسترسی از طریق PUBLIC یا نقش‌های دیگر ممکن است باقی بماند.',
         pgSuperUser: 'کاربر فوق‌العاده',
         loadFromRemoteHelper: 'پایگاه‌های داده، کاربران و مجوزها از سرور با 1Panel همگام شوند؟',
         passwordHelper: 'در دسترس نیست، برای به‌روزرسانی کلیک کنید',

@@ -615,6 +615,7 @@ const message = {
         loadFromRemote: '동기화',
         userBind: '사용자 바인딩',
         noUserBind: '바인딩 없음',
+        connectionUser: '연결 사용자',
         userAuthorization: '사용자 권한',
         noUserAuthorization: '권한 부여 안 함',
         authorizedDatabaseCount: '데이터베이스 {0}개 권한 보유',
@@ -625,9 +626,12 @@ const message = {
         revokeAuthorization: '권한 취소',
         revokeAuthorizationHelper: '사용자 {0}의 데이터베이스 {1} 접근 권한을 취소하시겠습니까?',
         supplementPassword: '비밀번호 추가',
-        supplementPasswordHelper: '기존 비밀번호를 1Panel에만 저장하며 MySQL 비밀번호는 변경하지 않습니다.',
-        pgBindHelper:
-            '이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.',
+        supplementPasswordHelper:
+            '기존 비밀번호를 1Panel에 저장하기만 하며 데이터베이스 사용자 비밀번호는 변경하지 않습니다.',
+        pgAuthorizationHelper:
+            '슈퍼유저는 연결 설정 없이 이 인스턴스의 모든 데이터베이스에 접근합니다. 일반 사용자는 데이터베이스 권한만 관리하며 테이블 권한은 포함하지 않습니다.',
+        pgRevokeAuthorizationHelper:
+            '권한을 철회해도 사용자는 삭제되지 않습니다. PUBLIC 또는 다른 역할을 통한 접근 권한은 남을 수 있습니다.',
         pgSuperUser: '슈퍼 사용자',
         loadFromRemoteHelper: '서버의 데이터베이스, 사용자 및 권한 정보를 1Panel로 동기화합니다. 계속하시겠습니까?',
         passwordHelper: '확인 불가, 수정하려면 클릭',

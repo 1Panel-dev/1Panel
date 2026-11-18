@@ -2790,6 +2790,78 @@
 		"formatZH": "创建 postgresql 数据库 [name]",
 		"formatEN": "create postgresql database [name]"
 	},
+	"/databases/pg/users": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "create PostgreSQL instance [database] user [username]"
+	},
+	"/databases/pg/users/update": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "update PostgreSQL instance [database] user [username]"
+	},
+	"/databases/pg/users/password/save": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "补充 PostgreSQL 实例 [database] 用户 [username] 密码",
+		"formatEN": "save PostgreSQL instance [database] user [username] password locally"
+	},
+	"/databases/pg/users/password": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username] 密码",
+		"formatEN": "change PostgreSQL instance [database] user [username] password"
+	},
+	"/databases/pg/users/del": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "delete PostgreSQL instance [database] user [username]"
+	},
+	"/databases/pg/grants": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "绑定 PostgreSQL 实例 [database] 数据库 [name] 用户 [username]",
+		"formatEN": "bind PostgreSQL instance [database] database [name] user [username]"
+	},
+	"/databases/pg/grants/del": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "撤销 PostgreSQL 实例 [database] 数据库 [name] 用户 [username] 绑定",
+		"formatEN": "revoke PostgreSQL instance [database] database [name] user [username] binding"
+	},
 	"/databases/pg/bind": {
 		"bodyKeys": [
 			"name",

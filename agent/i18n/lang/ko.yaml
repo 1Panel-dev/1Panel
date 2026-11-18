@@ -1,5 +1,5 @@
 # 기본 오류
-ErrInvalidParams: '잘못된 요청: {{ .detail }}'
+ErrInvalidParams: '잘못된 요청{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP 사용자 지정 인수 형식이 잘못되었습니다'
 ErrMcpGatewayArgsConflict: '{{ .name }} 인수는 1Panel에서 관리하므로 사용자 지정 인수에 설정할 수 없습니다'
 ErrTokenParse: '토큰 오류: {{ .detail }}'
@@ -291,6 +291,13 @@ ErrLocalExist: '이름이 로컬 데이터베이스에 이미 존재합니다. �
 RemoteBackup: '원격 데이터베이스를 백업하려면 먼저 이미지 {{ .name }}을(를) 사용하여 로컬 컨테이너 데이터베이스 서비스를 시작해야 합니다. 잠시만 기다려 주세요...'
 RemoteRecover: '원격 데이터베이스를 복원하려면 먼저 이미지 {{ .name }}을(를) 사용하여 로컬 컨테이너 데이터베이스 서비스를 시작해야 합니다. 잠시만 기다려 주세요...'
 Arg: '인수'
+
+#PostgreSQL
+ErrPgUserProtected: "시스템 사용자와 현재 연결 사용자는 보호되어 이 작업을 수행할 수 없습니다"
+ErrPgSuperUserGrant: "슈퍼유저는 모든 데이터베이스에 접근할 수 있어 개별 권한 부여나 철회가 필요하지 않습니다"
+ErrPgUserUsed: "연결된 앱 또는 웹사이트가 이 사용자를 사용 중입니다. 먼저 연결 계정을 변경하세요"
+ErrPgUserBound: "먼저 이 사용자의 데이터베이스 권한을 철회하세요"
+ErrPgUserPasswordSync: "사용자 비밀번호는 변경되었지만 다음 앱의 비밀번호 동기화에 실패했습니다: {{ .detail }}"
 
 # Redis
 ErrTypeOfRedis: '복구 파일 유형이 현재 지속성 방법과 일치하지 않습니다. 수정하고 다시 시도하세요'
