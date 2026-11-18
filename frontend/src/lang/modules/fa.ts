@@ -2543,6 +2543,8 @@ const message = {
         missing: 'ناموجود',
     },
     container: {
+        logDisconnected:
+            'جریان گزارش قطع شده است. برای بارگیری گزارش‌های اخیر و ادامه دریافت گزارش‌ها، دوباره متصل شوید.',
         nvidiaSupport: 'پشتیبانی از GPU انویدیا',
         nvidiaHelper:
             'محیط اجرای کانتینر NVIDIA را ثبت می‌کند. ابتدا NVIDIA Container Toolkit را نصب کنید. GPU را جداگانه به هر کانتینر اختصاص دهید.',
@@ -5403,6 +5405,8 @@ const message = {
         editRuleConfirm: 'آیا از تغییر این قانون مطمئن هستید؟',
     },
     runtime: {
+        statusMessageUnavailable:
+            'اطلاعات دقیقی درباره وضعیت در دسترس نیست. برای جزئیات، گزارش‌های محیط اجرا را بررسی کنید.',
         importEnv: 'وارد کردن متغیرهای محیطی',
         envImportError: 'خط {0}: {1}',
         envInvalidAssignment: 'یک عبارت معتبر NAME=value لازم است',

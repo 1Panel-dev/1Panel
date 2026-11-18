@@ -2549,6 +2549,8 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        logDisconnected:
+            'ログストリームが切断されました。再接続して最近のログを読み込み、リアルタイムのログ受信を再開してください。',
         nvidiaSupport: 'NVIDIA GPU サポート',
         nvidiaHelper:
             'NVIDIA コンテナーランタイムを登録します。先に NVIDIA Container Toolkit をインストールしてください。GPU はコンテナーごとに割り当てる必要があります。',
@@ -5425,6 +5427,7 @@ const message = {
         editRuleConfirm: 'このルールを変更してもよろしいですか？',
     },
     runtime: {
+        statusMessageUnavailable: '詳細なステータス情報はありません。実行環境のログで詳細を確認してください。',
         importEnv: '環境変数をインポート',
         envImportError: '{0} 行目：{1}',
         envInvalidAssignment: '有効な NAME=value 形式で入力してください',

@@ -881,6 +881,8 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 		// logs before handling its result, or a ready error channel can drop the tail.
 		if err := <-errors; err != nil {
 			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
+		} else {
+			_, _ = fmt.Fprint(w, "event: complete\ndata: {}\n\n")
 		}
 		return false
 	}

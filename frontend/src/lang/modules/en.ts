@@ -2566,6 +2566,7 @@ const message = {
         missing: 'Missing',
     },
     container: {
+        logDisconnected: 'The log stream has disconnected. Reconnect to load recent logs and resume streaming.',
         nvidiaSupport: 'NVIDIA GPU support',
         nvidiaHelper:
             'Register the NVIDIA container runtime. Install NVIDIA Container Toolkit first. Assign GPUs to each container separately.',
@@ -5447,6 +5448,7 @@ const message = {
         editRuleConfirm: 'Are you sure you want to modify this rule?',
     },
     runtime: {
+        statusMessageUnavailable: 'No detailed status information is available. Check the runtime logs for details.',
         importEnv: 'Import Environment Variables',
         envImportError: 'Line {0}: {1}',
         envInvalidAssignment: 'Expected a valid NAME=value assignment',

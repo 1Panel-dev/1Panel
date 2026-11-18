@@ -2601,6 +2601,8 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        logDisconnected:
+            'El flujo de registros se ha desconectado. Vuelve a conectarte para cargar los registros recientes y reanudar la transmisión.',
         nvidiaSupport: 'Compatibilidad con GPU NVIDIA',
         nvidiaHelper:
             'Registra el entorno de ejecución de NVIDIA. Instala primero NVIDIA Container Toolkit. Asigna las GPU a cada contenedor por separado.',
@@ -5529,6 +5531,8 @@ const message = {
         editRuleConfirm: '¿Confirma que desea modificar esta regla?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'No hay información detallada sobre el estado. Consulta los registros del entorno de ejecución para obtener más detalles.',
         importEnv: 'Importar variables de entorno',
         envImportError: 'Línea {0}: {1}',
         envInvalidAssignment: 'Se esperaba una asignación NOMBRE=valor válida',

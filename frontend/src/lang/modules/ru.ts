@@ -2593,6 +2593,8 @@ const message = {
         missing: 'Отсутствует',
     },
     container: {
+        logDisconnected:
+            'Поток журналов отключён. Подключитесь повторно, чтобы загрузить последние записи и возобновить получение журналов.',
         nvidiaSupport: 'Поддержка GPU NVIDIA',
         nvidiaHelper:
             'Регистрирует среду выполнения контейнеров NVIDIA. Сначала установите NVIDIA Container Toolkit. Назначайте GPU каждому контейнеру отдельно.',
@@ -5528,6 +5530,7 @@ const message = {
         editRuleConfirm: 'Вы уверены, что хотите изменить это правило?',
     },
     runtime: {
+        statusMessageUnavailable: 'Подробная информация о состоянии недоступна. Проверьте журналы среды выполнения.',
         importEnv: 'Импорт переменных окружения',
         envImportError: 'Строка {0}: {1}',
         envInvalidAssignment: 'Ожидается корректное присваивание NAME=value',

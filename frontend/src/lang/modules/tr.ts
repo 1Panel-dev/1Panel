@@ -2588,6 +2588,8 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        logDisconnected:
+            'Günlük akışının bağlantısı kesildi. Son günlükleri yüklemek ve akışı sürdürmek için yeniden bağlanın.',
         nvidiaSupport: 'NVIDIA GPU desteği',
         nvidiaHelper:
             'NVIDIA konteyner çalışma zamanını kaydeder. Önce NVIDIA Container Toolkit kurun. GPU’ları her konteynere ayrı ayrı atayın.',
@@ -5536,6 +5538,8 @@ const message = {
         editRuleConfirm: 'Bu kuralı değiştirmek istediğinizden emin misiniz?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'Ayrıntılı durum bilgisi mevcut değil. Ayrıntılar için çalışma ortamı günlüklerini kontrol edin.',
         importEnv: 'Ortam Değişkenlerini İçe Aktar',
         envImportError: 'Satır {0}: {1}',
         envInvalidAssignment: 'Geçerli bir NAME=value ataması bekleniyor',

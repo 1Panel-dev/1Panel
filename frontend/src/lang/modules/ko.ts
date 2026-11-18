@@ -2519,6 +2519,8 @@ const message = {
         missing: '없음',
     },
     container: {
+        logDisconnected:
+            '로그 스트림 연결이 끊어졌습니다. 다시 연결하여 최근 로그를 불러오고 실시간 로그 수신을 재개하세요.',
         nvidiaSupport: 'NVIDIA GPU 지원',
         nvidiaHelper:
             'NVIDIA 컨테이너 런타임을 등록합니다. 먼저 NVIDIA Container Toolkit을 설치하세요. GPU는 각 컨테이너에 별도로 할당해야 합니다.',
@@ -5327,6 +5329,7 @@ const message = {
         editRuleConfirm: '이 규칙을 수정하시겠습니까?',
     },
     runtime: {
+        statusMessageUnavailable: '자세한 상태 정보가 없습니다. 실행 환경 로그에서 자세한 내용을 확인하세요.',
         importEnv: '환경 변수 가져오기',
         envImportError: '{0}행: {1}',
         envInvalidAssignment: '유효한 NAME=value 형식이 필요합니다',

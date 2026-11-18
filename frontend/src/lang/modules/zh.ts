@@ -2403,6 +2403,7 @@ const message = {
         missing: '不存在',
     },
     container: {
+        logDisconnected: '日志流已断开，请重新连接以加载最近日志并继续接收实时日志。',
         nvidiaSupport: 'NVIDIA GPU 支持',
         nvidiaHelper: '注册 NVIDIA 容器运行时，需要先安装 NVIDIA Container Toolkit。具体容器仍需单独分配 GPU。',
         nvidiaLocalOnly: '仅支持本机默认 Docker Socket。',
@@ -5076,6 +5077,7 @@ const message = {
         editRuleConfirm: '是否确认修改该规则？',
     },
     runtime: {
+        statusMessageUnavailable: '暂无详细状态信息，请点击日志列的“查看”排查具体原因。',
         importEnv: '导入环境变量',
         envImportError: '第 {0} 行：{1}',
         envInvalidAssignment: '应为有效的变量名=value',

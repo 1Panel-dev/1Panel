@@ -2593,6 +2593,8 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        logDisconnected:
+            'Sambungan strim log telah terputus. Sambung semula untuk memuatkan log terkini dan meneruskan penstriman.',
         nvidiaSupport: 'Sokongan GPU NVIDIA',
         nvidiaHelper:
             'Daftarkan runtime kontena NVIDIA. Pasang NVIDIA Container Toolkit dahulu. Peruntukkan GPU kepada setiap kontena secara berasingan.',
@@ -5527,6 +5529,8 @@ const message = {
         editRuleConfirm: 'Adakah anda pasti mahu mengubah peraturan ini?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'Maklumat status terperinci tidak tersedia. Semak log persekitaran masa jalan untuk butiran lanjut.',
         importEnv: 'Import Pemboleh Ubah Persekitaran',
         envImportError: 'Baris {0}: {1}',
         envInvalidAssignment: 'Penetapan NAME=value yang sah diperlukan',

@@ -2492,6 +2492,8 @@ const message = {
         missing: 'ບໍ່ມີ',
     },
     container: {
+        logDisconnected:
+            'ການເຊື່ອມຕໍ່ສະຕຣີມບັນທຶກຖືກຕັດ. ກະລຸນາເຊື່ອມຕໍ່ໃໝ່ເພື່ອໂຫຼດບັນທຶກຫຼ້າສຸດ ແລະ ຮັບບັນທຶກແບບເວລາຈິງຕໍ່.',
         nvidiaSupport: 'ຮອງຮັບ NVIDIA GPU',
         nvidiaHelper:
             'ລົງທະບຽນ NVIDIA runtime ສຳລັບຄອນເທນເນີ. ຕິດຕັ້ງ NVIDIA Container Toolkit ກ່ອນ ແລະ ຈັດສັນ GPU ໃຫ້ແຕ່ລະຄອນເທນເນີແຍກກັນ.',
@@ -5271,6 +5273,8 @@ const message = {
         editRuleConfirm: 'ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການແກ້ໄຂກົດນີ້?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'ບໍ່ມີຂໍ້ມູນສະຖານະແບບລະອຽດ. ກະລຸນາກວດເບິ່ງບັນທຶກຂອງສະພາບແວດລ້ອມການເຮັດວຽກເພື່ອເບິ່ງລາຍລະອຽດ.',
         importEnv: 'ນຳເຂົ້າຕົວແປສະພາບແວດລ້ອມ',
         envImportError: 'ແຖວ {0}: {1}',
         envInvalidAssignment: 'ຕ້ອງເປັນຮູບແບບ NAME=value ທີ່ຖືກຕ້ອງ',

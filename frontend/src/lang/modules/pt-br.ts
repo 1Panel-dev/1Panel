@@ -2601,6 +2601,8 @@ const message = {
         missing: 'Não existe',
     },
     container: {
+        logDisconnected:
+            'O fluxo de logs foi desconectado. Reconecte para carregar os logs recentes e retomar a transmissão.',
         nvidiaSupport: 'Suporte a GPU NVIDIA',
         nvidiaHelper:
             'Registra o runtime de contêiner NVIDIA. Instale primeiro o NVIDIA Container Toolkit. Atribua GPUs a cada contêiner separadamente.',
@@ -5561,6 +5563,8 @@ const message = {
         editRuleConfirm: 'Tem certeza de que deseja modificar esta regra?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'Não há informações detalhadas sobre o status. Consulte os logs do ambiente de execução para obter mais detalhes.',
         importEnv: 'Importar variáveis de ambiente',
         envImportError: 'Linha {0}: {1}',
         envInvalidAssignment: 'Era esperada uma atribuição NOME=valor válida',
