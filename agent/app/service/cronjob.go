@@ -784,7 +784,7 @@ func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string
 		return err
 	}
 	spec := cronjob.Spec
-	if cronModel.Status == constant.StatusEnable {
+	if cronModel.Status == constant.StatusEnable || cronModel.Status == constant.StatusPending {
 		newEntryIDs, err := u.StartJob(&cronjob, true)
 		if err != nil {
 			return err
