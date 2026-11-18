@@ -45,6 +45,7 @@
                                 </div>
                             </div>
                             <div class="snapshot-meta">
+                                <span v-if="row.disks?.length">{{ $t('xpack.vm.disks') }}: {{ row.disks.length }}</span>
                                 <span>
                                     {{ $t('xpack.vm.snapshotSize') }}：{{ row.size ? computeSize(row.size) : '-' }}
                                 </span>

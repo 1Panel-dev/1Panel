@@ -8355,6 +8355,11 @@ const message = {
             createFromTemplate: 'Cipta daripada templat',
             template: 'Templat',
             templateName: 'Nama templat',
+            dataDisks: 'Cakera data',
+            dataDiskHelper:
+                'Cakera data dicipta kosong. Pilih kumpulan storan bagi setiap cakera; jenis bas adalah sama dengan cakera sistem. Sehingga 9 cakera boleh ditambah.',
+            templateSystemDiskHelper:
+                'Templat hanya menyalin cakera sistem tanpa kandungan cakera data. Cakera data kosong boleh ditambah semasa mencipta VM daripada templat. Semak pelekap /etc/fstab serta laluan pangkalan data dan aplikasi yang bergantung pada cakera data. UUID cakera baharu mungkin berbeza; panel tidak mengubah konfigurasi tetamu secara automatik.',
             convertToTemplate: 'Tukar kepada templat',
             sourceVM: 'VM sumber',
             templateSize: 'Saiz templat',
@@ -8471,7 +8476,7 @@ const message = {
             currentSnapshot: 'Semasa',
             snapshotEmpty: 'Tiada syot kilat',
             snapshotHelper:
-                'Syot kilat menyimpan keadaan semasa VM sebagai titik pemulihan. Perubahan data seterusnya direkodkan dalam fail delta tanpa mengubah cakera asal. Memulihkan syot kilat mengembalikan VM ke keadaan tersebut.',
+                'Petikan menyimpan dan memulihkan semua cakera terurus yang boleh ditulis bersama-sama, tanpa memori. Matikan VM sebelum pemulihan; set cakera mesti sepadan dengan petikan. Cakera boleh tulis yang dikongsi atau tidak disokong menghalang penciptaan petikan.',
             snapshotOperationHelper:
                 'Syot kilat semasa tidak boleh dipadam. Syot kilat hanya boleh dipulihkan apabila mesin maya dimatikan.',
             snapshotRecoverConfirm:

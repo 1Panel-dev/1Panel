@@ -1,5 +1,6 @@
 <template>
     <DialogPro v-model="visible" :title="$t('xpack.vm.convertToTemplate') + ' - ' + (source?.name || '')" size="small">
+        <el-alert class="mb-4" type="warning" :closable="false" :title="$t('xpack.vm.templateSystemDiskHelper')" />
         <el-form ref="formRef" v-loading="storageLoading" label-position="top" :model="form" :rules="rules">
             <el-form-item :label="$t('xpack.vm.templateName')" prop="templateName">
                 <el-input v-model.trim="form.templateName" :maxlength="vmNameMaxLength" show-word-limit />

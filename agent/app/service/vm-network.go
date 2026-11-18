@@ -15,6 +15,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/vm/types"
 	"gorm.io/gorm"
 )
@@ -25,6 +26,9 @@ func (v *VMService) ListNetworks() ([]dto.VMNetworkItem, error) {
 		return nil, err
 	}
 	items := v.networkRecordsToItems(records)
+	if err := fillVMNetworkInterfaces(items, "/sys/class/net"); err != nil {
+		global.LOG.Warnf("[xpack] read VM network interfaces failed, retaining network metadata: %v", err)
+	}
 	return items, nil
 }
 
@@ -293,6 +297,56 @@ func (v *VMService) DeleteNetwork(req dto.VMResourceDelete) error {
 		}
 	}
 	return vmRepo.DeleteNetwork(repo.WithByID(req.ID))
+}
+
+func fillVMNetworkInterfaces(items []dto.VMNetworkItem, netClassPath string) error {
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return err
+	}
+	byName := make(map[string]dto.VMNetworkInterfaceItem, len(interfaces))
+	for _, iface := range interfaces {
+		addresses, err := iface.Addrs()
+		if err != nil {
+			global.LOG.Warnf("[xpack] read addresses for interface %s failed: %v", iface.Name, err)
+		}
+		item := dto.VMNetworkInterfaceItem{Name: iface.Name, Addresses: []string{}}
+		for _, address := range addresses {
+			item.Addresses = append(item.Addresses, address.String())
+		}
+		byName[iface.Name] = item
+	}
+	for i := range items {
+		item := &items[i]
+		item.Addresses = []string{}
+		item.Interfaces = []dto.VMNetworkInterfaceItem{}
+		switch item.Type {
+		case "macvtap":
+			if iface, ok := byName[item.SourceInterface]; ok {
+				item.Interfaces = append(item.Interfaces, iface)
+			}
+		case "bridge":
+			if iface, ok := byName[item.BridgeName]; ok {
+				item.Addresses = iface.Addresses
+			}
+			if item.BridgeName == "" || filepath.Base(item.BridgeName) != item.BridgeName {
+				continue
+			}
+			members, err := os.ReadDir(filepath.Join(netClassPath, item.BridgeName, "brif"))
+			if err != nil {
+				if !os.IsNotExist(err) {
+					global.LOG.Warnf("[xpack] read bridge %s interfaces failed: %v", item.BridgeName, err)
+				}
+				continue
+			}
+			for _, member := range members {
+				if iface, ok := byName[member.Name()]; ok {
+					item.Interfaces = append(item.Interfaces, iface)
+				}
+			}
+		}
+	}
+	return nil
 }
 
 func (v *VMService) networkRecordsToItems(records []model.VMNetwork) []dto.VMNetworkItem {

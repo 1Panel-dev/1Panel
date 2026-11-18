@@ -343,8 +343,12 @@ func loadVMResourceRefs(resourceType string) map[string][]dto.VMResourceRef {
 				refs[record.Network] = append(refs[record.Network], ref)
 			}
 		case "storagePool":
-			if record.StoragePool != "" {
-				refs[record.StoragePool] = append(refs[record.StoragePool], ref)
+			seen := map[string]bool{}
+			for _, pool := range append([]string{record.StoragePool}, record.DataStoragePools...) {
+				if pool != "" && !seen[pool] {
+					refs[pool] = append(refs[pool], ref)
+					seen[pool] = true
+				}
 			}
 		}
 	}

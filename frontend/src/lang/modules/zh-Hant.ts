@@ -7614,6 +7614,11 @@ const message = {
             createFromTemplate: '從範本啟動',
             template: '範本',
             templateName: '範本名稱',
+            dataDisks: '資料磁碟',
+            dataDiskHelper:
+                '資料磁碟建立為空白磁碟，可分別選擇儲存池，與系統磁碟使用相同的匯流排類型；最多可新增 9 個。',
+            templateSystemDiskHelper:
+                '範本僅複製系統磁碟，不包含資料磁碟內容。從範本建立時可新增空白資料磁碟。請檢查 /etc/fstab 掛載設定及資料庫、應用程式路徑對資料磁碟的依賴；新磁碟的 UUID 可能不同，面板不會自動修改客體設定。',
             convertToTemplate: '轉為範本',
             sourceVM: '來源虛擬機',
             templateSize: '範本大小',
@@ -7725,7 +7730,7 @@ const message = {
             currentSnapshot: '目前',
             snapshotEmpty: '暫無快照',
             snapshotHelper:
-                '快照會將虛擬機目前狀態儲存為還原點，後續資料變更會記錄在差異檔案中，不會影響原始磁碟。還原快照時，虛擬機會回到該時間點狀態。',
+                '快照統一儲存和還原所有受管理的可寫磁碟，不包含記憶體。還原前需關機，且磁碟集合必須與快照一致。共用或不支援快照的可寫磁碟會阻止建立快照。',
             snapshotOperationHelper: '目前快照無法刪除；僅能在虛擬機關機時還原快照。',
             snapshotRecoverConfirm: '確認將虛擬機 [{1}] 恢復到快照 [{0}]？恢復後虛擬機磁碟會回到該快照狀態。',
             interface: '網路介面',

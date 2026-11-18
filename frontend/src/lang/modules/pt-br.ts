@@ -8415,6 +8415,11 @@ const message = {
             createFromTemplate: 'Criar a partir de modelo',
             template: 'Modelo',
             templateName: 'Nome do modelo',
+            dataDisks: 'Discos de dados',
+            dataDiskHelper:
+                'Os discos de dados são criados vazios. Selecione um pool de armazenamento para cada disco; o tipo de barramento é o mesmo do disco do sistema. É possível adicionar até 9 discos.',
+            templateSystemDiskHelper:
+                'Os modelos copiam apenas o disco do sistema, sem o conteúdo dos discos de dados. Ao criar uma VM a partir de um modelo, você pode adicionar discos vazios. Verifique as montagens em /etc/fstab e as dependências de caminhos de bancos de dados e aplicativos. Os UUIDs podem mudar; o painel não altera automaticamente a configuração do sistema convidado.',
             convertToTemplate: 'Converter em modelo',
             sourceVM: 'VM de origem',
             templateSize: 'Tamanho do modelo',
@@ -8532,7 +8537,7 @@ const message = {
             currentSnapshot: 'Atual',
             snapshotEmpty: 'Nenhum snapshot',
             snapshotHelper:
-                'Um snapshot salva o estado atual da VM como ponto de restauração. As alterações posteriores são registradas em um arquivo delta sem modificar o disco original. Restaurar um snapshot devolve a VM a esse estado.',
+                'Os snapshots salvam e restauram todos os discos gerenciados graváveis em conjunto, sem incluir a memória. Desligue a VM antes de restaurar; o conjunto de discos deve corresponder ao snapshot. Discos graváveis compartilhados ou incompatíveis impedem a criação.',
             snapshotOperationHelper:
                 'O snapshot atual não pode ser excluído. Snapshots só podem ser restaurados quando a máquina virtual estiver desligada.',
             snapshotRecoverConfirm:

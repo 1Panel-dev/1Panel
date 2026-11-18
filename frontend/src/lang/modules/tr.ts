@@ -8363,6 +8363,11 @@ const message = {
             createFromTemplate: 'Şablondan oluştur',
             template: 'Şablon',
             templateName: 'Şablon adı',
+            dataDisks: 'Veri diskleri',
+            dataDiskHelper:
+                'Veri diskleri boş oluşturulur. Her disk için bir depolama havuzu seçilebilir; veri yolu türü sistem diskiyle aynıdır. En fazla 9 disk eklenebilir.',
+            templateSystemDiskHelper:
+                'Şablonlar yalnızca sistem diskini kopyalar; veri disklerinin içeriği dahil edilmez. Şablondan VM oluştururken boş veri diskleri ekleyebilirsiniz. /etc/fstab bağlamalarını ve veri disklerine bağımlı veritabanı veya uygulama yollarını kontrol edin. Yeni disklerin UUID değerleri farklı olabilir; panel konuk yapılandırmasını otomatik değiştirmez.',
             convertToTemplate: 'Şablona dönüştür',
             sourceVM: 'Kaynak VM',
             templateSize: 'Şablon boyutu',
@@ -8481,7 +8486,7 @@ const message = {
             currentSnapshot: 'Geçerli',
             snapshotEmpty: 'Anlık görüntü yok',
             snapshotHelper:
-                'Anlık görüntü, geçerli VM durumunu geri yükleme noktası olarak kaydeder. Sonraki veri değişiklikleri özgün diski değiştirmeden bir fark dosyasına kaydedilir. Anlık görüntünün geri yüklenmesi VM’yi bu duruma döndürür.',
+                'Anlık görüntüler, yönetilen tüm yazılabilir diskleri birlikte kaydeder ve geri yükler; bellek dahil değildir. Geri yüklemeden önce VM kapatılmalı ve disk kümesi anlık görüntüyle eşleşmelidir. Paylaşılan veya desteklenmeyen yazılabilir diskler oluşturmayı engeller.',
             snapshotOperationHelper:
                 'Geçerli anlık görüntü silinemez. Anlık görüntüler yalnızca sanal makine kapalıyken geri yüklenebilir.',
             snapshotRecoverConfirm:
