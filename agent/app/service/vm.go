@@ -43,6 +43,7 @@ type vmLockEntry struct {
 // Share the lock across service instances. The metadata written before the
 // asynchronous task starts reserves a slot, including while a VM is creating.
 var vmCreateMu sync.Mutex
+var vmDiskMu sync.RWMutex
 
 const (
 	defaultVMResourceName = "default"
@@ -120,6 +121,8 @@ type IVMService interface {
 }
 
 func (v *VMService) ScanOrphans() ([]dto.VMOrphanItem, error) {
+	vmDiskMu.Lock()
+	defer vmDiskMu.Unlock()
 	paths, err := protectedVMPaths(0)
 	if err != nil {
 		return nil, err
@@ -128,6 +131,8 @@ func (v *VMService) ScanOrphans() ([]dto.VMOrphanItem, error) {
 }
 
 func (v *VMService) CleanOrphans(req dto.VMOrphanClean) ([]dto.VMOrphanItem, error) {
+	vmDiskMu.Lock()
+	defer vmDiskMu.Unlock()
 	paths, err := protectedVMPaths(0)
 	if err != nil {
 		return nil, err
@@ -481,7 +486,22 @@ func (v *VMService) Create(req dto.VMCreate, limit int) (dto.VMTaskResp, error) 
 			cfg.StoragePool = template.StoragePool
 		}
 	}
-	if err := v.validateDiskLimit(cfg.DiskSizeGiB, cfg.StoragePool); err != nil {
+	if cfg.StoragePool == "" {
+		cfg.StoragePool = defaultVMResourceName
+	}
+	if cfg.DiskSizeGiB < vmDiskMinGiB || cfg.DiskSizeGiB > 8388607 || len(req.DataDisks) > 9 {
+		return dto.VMTaskResp{}, buserr.WithDetail("ErrVMInvalidInput", "invalid disk capacity or disk count", nil)
+	}
+	for _, disk := range req.DataDisks {
+		if disk.SizeGiB < vmDiskMinGiB || disk.SizeGiB > 8388607 {
+			return dto.VMTaskResp{}, buserr.WithDetail("ErrVMInvalidInput", "invalid data disk capacity", nil)
+		}
+		if disk.StoragePool == "" {
+			disk.StoragePool = cfg.StoragePool
+		}
+		cfg.DataDisks = append(cfg.DataDisks, types.VMDataDisk(disk))
+	}
+	if err := v.validateDiskLimit(cfg); err != nil {
 		return dto.VMTaskResp{}, err
 	}
 	createMetadataReq := v.buildCreateMetadataReq(req, cfg)
@@ -505,7 +525,7 @@ func (v *VMService) Create(req dto.VMCreate, limit int) (dto.VMTaskResp, error) 
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(taskName, func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
+		return v.withVMDiskLock(req.Name, func() error {
 			var domain dto.VMInfo
 			var err error
 			if req.TemplateID != 0 {
@@ -573,7 +593,7 @@ func (v *VMService) CreateTemplate(req dto.VMTemplateCreate) (dto.VMTaskResp, er
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(taskName, func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
+		return v.withVMDiskLock(req.Name, func() error {
 			tpl, err := v.provider.CreateTemplate(context.Background(), types.VMTemplateCreate{
 				Name: req.TemplateName, SourceName: req.Name, StoragePool: storagePool,
 			})
@@ -667,7 +687,7 @@ func (v *VMService) ResizeDisk(req dto.VMDiskResize) (dto.VMTaskResp, error) {
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(taskName, func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
+		return v.withVMDiskLock(req.Name, func() error {
 			domain, err := v.provider.ResizeDisk(context.Background(), req)
 			if err != nil {
 				return err
@@ -733,7 +753,7 @@ func (v *VMService) Delete(req dto.VMDelete) (dto.VMTaskResp, error) {
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(taskName, func(t *task.Task) error {
-		return v.withVMLock(record.Name, func() error {
+		return v.withVMDiskLock(record.Name, func() error {
 			if !v.helperExists() {
 				if !req.Force {
 					return buserr.New("ErrVMHelperNotFound")
@@ -802,7 +822,7 @@ func (v *VMService) CreateSnapshot(req dto.VMSnapshotReq) (dto.VMTaskResp, error
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(vmSnapshotTaskName("VMSnapshotCreateStep", req), func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
+		return v.withVMDiskLock(req.Name, func() error {
 			return v.provider.CreateSnapshot(context.Background(), req.Name, req.SnapshotName, req.Description)
 		})
 	}, nil, 0, 30*time.Minute)
@@ -823,8 +843,9 @@ func (v *VMService) RecoverSnapshot(req dto.VMSnapshotReq) (dto.VMTaskResp, erro
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(vmSnapshotTaskName("VMSnapshotRecoverStep", req), func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
-			if err := v.provider.RecoverSnapshot(context.Background(), req.Name, req.SnapshotName); err != nil {
+		return v.withVMDiskLock(req.Name, func() error {
+			oldRestoreDisks, err := v.provider.RecoverSnapshot(context.Background(), req.Name, req.SnapshotName)
+			if err != nil {
 				return err
 			}
 			domain, err := v.provider.Get(context.Background(), req.Name, false)
@@ -836,6 +857,17 @@ func (v *VMService) RecoverSnapshot(req dto.VMSnapshotReq) (dto.VMTaskResp, erro
 			}
 			if err := vmRepo.Update(record.ID, map[string]interface{}{"disk_path": domain.DiskPath, "disk_size": domain.DiskSize}); err != nil {
 				return buserr.WithErr("ErrVMSnapshotMetadataSync", err)
+			}
+			if len(oldRestoreDisks) > 0 {
+				paths, err := protectedVMPaths(0)
+				if err == nil {
+					ctx, cancel := context.WithTimeout(context.Background(), 2*time.Minute)
+					defer cancel()
+					_, err = v.provider.CleanOrphans(ctx, oldRestoreDisks, paths)
+				}
+				if err != nil {
+					global.LOG.Warnf("[xpack] VM %s restored and metadata synced, old restore disk cleanup failed: %v", req.Name, err)
+				}
 			}
 			return nil
 		})
@@ -857,7 +889,7 @@ func (v *VMService) DeleteSnapshot(req dto.VMSnapshotReq) (dto.VMTaskResp, error
 		return dto.VMTaskResp{}, err
 	}
 	taskItem.AddSubTaskWithOps(vmSnapshotTaskName("VMSnapshotDeleteStep", req), func(t *task.Task) error {
-		return v.withVMLock(req.Name, func() error {
+		return v.withVMDiskLock(req.Name, func() error {
 			return v.provider.DeleteSnapshot(context.Background(), req.Name, req.SnapshotName)
 		})
 	}, nil, 0, 30*time.Minute)
@@ -929,6 +961,14 @@ func (v *VMService) withVMLock(name string, fn func() error) error {
 	return fn()
 }
 
+func (v *VMService) withVMDiskLock(name string, fn func() error) error {
+	return v.withVMLock(name, func() error {
+		vmDiskMu.RLock()
+		defer vmDiskMu.RUnlock()
+		return fn()
+	})
+}
+
 func (v *VMService) acquireVMLock(name string) *vmLockEntry {
 	v.locksMu.Lock()
 	if v.locks == nil {
@@ -960,7 +1000,9 @@ func (v *VMService) withVMRenameLock(name string, newName string, fn func() erro
 		name, newName = newName, name
 	}
 	return v.withVMLock(name, func() error {
-		return v.withVMLock(newName, fn)
+		lock := v.acquireVMLock(newName)
+		defer v.releaseVMLock(newName, lock)
+		return fn()
 	})
 }
 
@@ -979,6 +1021,13 @@ func (v *VMService) saveMetadata(req dto.VMCreate, domain dto.VMInfo, taskID str
 		ImagePath: req.ImagePath, Network: req.Network, BootOrder: req.BootOrder,
 		AutoStart: req.AutoStart, TaskID: taskID, CreateTaskID: taskID, Description: req.Description,
 	}
+	seenPools := map[string]bool{req.StoragePool: true}
+	for _, disk := range req.DataDisks {
+		if disk.StoragePool != "" && !seenPools[disk.StoragePool] {
+			data.DataStoragePools = append(data.DataStoragePools, disk.StoragePool)
+			seenPools[disk.StoragePool] = true
+		}
+	}
 	if err == nil && record.ID != 0 {
 		return vmRepo.Update(record.ID, metadataUpdateMap(*data))
 	}
@@ -994,6 +1043,10 @@ func (v *VMService) buildCreateMetadataReq(req dto.VMCreate, cfg types.VMConfig)
 	out.DiskBus = cfg.DiskBus
 	out.DiskPath = cfg.DiskPath
 	out.StoragePool = cfg.StoragePool
+	out.DataDisks = make([]dto.VMDataDisk, 0, len(cfg.DataDisks))
+	for _, disk := range cfg.DataDisks {
+		out.DataDisks = append(out.DataDisks, dto.VMDataDisk(disk))
+	}
 	out.ISOPaths = cfg.ISOPaths
 	out.BootOrder = cfg.BootOrder
 	if out.StoragePool == "" {
@@ -1101,22 +1154,33 @@ func vmMemoryAllocatedStatus(status string) bool {
 	}
 }
 
-func (v *VMService) validateDiskLimit(diskSizeGiB int64, storagePool string) error {
-	if diskSizeGiB < vmDiskMinGiB {
-		return buserr.WithDetail("ErrVMInvalidInput", fmt.Sprintf("disk size must be at least %d GiB", vmDiskMinGiB), nil)
+func (v *VMService) validateDiskLimit(cfg types.VMConfig) error {
+	sizes := map[string]int64{cfg.StoragePool: cfg.DiskSizeGiB}
+	for _, disk := range cfg.DataDisks {
+		sizes[disk.StoragePool] += disk.SizeGiB
 	}
-	if storagePool == "" {
-		storagePool = defaultVMResourceName
-	}
-	live, ok, err := v.findVMResource("storagePool", storagePool)
+	pools, err := v.provider.ListResources(context.Background(), "storagePool")
 	if err != nil {
 		return err
 	}
-	if !ok || live.Available == 0 {
-		return nil
-	}
-	if uint64(diskSizeGiB)*bytePerGiB > live.Available {
-		return buserr.WithDetail("ErrVMInvalidInput", fmt.Sprintf("disk size exceeds storage pool available space: %d GiB", live.Available/bytePerGiB), nil)
+	for name, size := range sizes {
+		found := false
+		for _, pool := range pools {
+			if pool.Name != name {
+				continue
+			}
+			found = true
+			if vmResourceCreationIncomplete(pool.Status) || normalizeVMResourceStatus(pool.Status) == constant.StatusDeleted {
+				return buserr.WithDetail("ErrVMInvalidInput", fmt.Sprintf("storage pool %s is unavailable", name), nil)
+			}
+			if uint64(size)*bytePerGiB > pool.Available && !(pool.Status == "inactive" && pool.Available == 0) {
+				return buserr.WithDetail("ErrVMInvalidInput", fmt.Sprintf("disk size exceeds storage pool %s available space: %d GiB", name, pool.Available/bytePerGiB), nil)
+			}
+			break
+		}
+		if !found && name != defaultVMResourceName {
+			return buserr.WithDetail("ErrResourceNotExists", name, nil)
+		}
 	}
 	return nil
 }
@@ -1131,7 +1195,11 @@ func (v *VMService) syncCreatedDefaultResourceMetadata(cfg types.VMConfig) {
 	if storagePool == "" {
 		storagePool = defaultVMResourceName
 	}
-	if storagePool == defaultVMResourceName {
+	usesDefault := storagePool == defaultVMResourceName
+	for _, disk := range cfg.DataDisks {
+		usesDefault = usesDefault || disk.StoragePool == defaultVMResourceName
+	}
+	if usesDefault {
 		if err := v.upsertStorageMetadata(defaultVMResourceName); err != nil {
 			global.LOG.Warnf("[xpack] sync default VM storage metadata failed: %v", err)
 		}
@@ -1254,7 +1322,7 @@ func (v *VMService) renameMetadata(record model.VirtualMachine, req dto.VMRename
 func metadataUpdateMap(vm model.VirtualMachine) map[string]interface{} {
 	return map[string]interface{}{
 		"uuid": vm.UUID, "cpu": vm.CPU, "memory": vm.Memory, "disk_size": vm.DiskSize, "disk_bus": vm.DiskBus,
-		"disk_path": vm.DiskPath, "storage_pool": vm.StoragePool, "iso_paths": vm.ISOPaths,
+		"disk_path": vm.DiskPath, "storage_pool": vm.StoragePool, "data_storage_pools": vm.DataStoragePools, "iso_paths": vm.ISOPaths,
 		"image_path": vm.ImagePath, "network": vm.Network, "boot_order": vm.BootOrder,
 		"auto_start": vm.AutoStart, "task_id": vm.TaskID, "create_task_id": vm.CreateTaskID, "description": vm.Description,
 	}

@@ -7669,6 +7669,10 @@ const message = {
             createFromTemplate: '从模板启动',
             template: '模板',
             templateName: '模板名称',
+            dataDisks: '数据盘',
+            dataDiskHelper: '数据盘创建为空盘，可分别选择存储池，与系统盘使用相同的总线类型；最多可添加 9 块。',
+            templateSystemDiskHelper:
+                '模板仅复制系统盘，不包含数据盘内容。从模板创建时可添加空白数据盘。请检查系统盘中的 /etc/fstab 挂载配置及数据库、应用路径对数据盘的依赖；新磁盘的 UUID 可能不同，面板不会自动修改客户机配置。',
             convertToTemplate: '转为模板',
             sourceVM: '来源虚拟机',
             templateSize: '模板大小',
@@ -7780,7 +7784,7 @@ const message = {
             currentSnapshot: '当前',
             snapshotEmpty: '暂无快照',
             snapshotHelper:
-                '快照会保存虚拟机当前状态作为还原点，后续数据变化会记录在差分文件中，不影响原始磁盘。恢复快照时，虚拟机会回到该时间点状态。',
+                '快照统一保存和恢复全部受管理的可写磁盘，不包含内存。恢复前需关机，且磁盘集合必须与快照一致。共享盘或不支持快照的可写磁盘会阻止创建快照。',
             snapshotOperationHelper: '当前快照无法删除；仅可在虚拟机关机时恢复快照。',
             snapshotRecoverConfirm: '确认将虚拟机 [{1}] 恢复到快照 [{0}]？恢复后虚拟机磁盘会回到该快照状态。',
             interface: '网络接口',

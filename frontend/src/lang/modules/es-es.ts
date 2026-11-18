@@ -8383,6 +8383,11 @@ const message = {
             createFromTemplate: 'Crear desde plantilla',
             template: 'Plantilla',
             templateName: 'Nombre de la plantilla',
+            dataDisks: 'Discos de datos',
+            dataDiskHelper:
+                'Los discos de datos se crean vacíos. Puede elegir un grupo de almacenamiento para cada disco; el tipo de bus es el mismo que el del disco del sistema. Se pueden añadir hasta 9 discos.',
+            templateSystemDiskHelper:
+                'Las plantillas copian solo el disco del sistema, sin los datos de otros discos. Al crear una VM desde una plantilla puede añadir discos de datos vacíos. Revise los montajes de /etc/fstab y las rutas de bases de datos o aplicaciones que dependan de esos discos. Los UUID pueden cambiar; el panel no modifica automáticamente la configuración del invitado.',
             convertToTemplate: 'Convertir en plantilla',
             sourceVM: 'VM de origen',
             templateSize: 'Tamaño de la plantilla',
@@ -8503,7 +8508,7 @@ const message = {
             currentSnapshot: 'Actual',
             snapshotEmpty: 'No hay instantáneas',
             snapshotHelper:
-                'Una instantánea guarda el estado actual de la VM como punto de restauración. Los cambios posteriores se registran en un archivo delta sin modificar el disco original. Al restaurarla, la VM vuelve a ese momento.',
+                'Las instantáneas guardan y restauran juntos todos los discos administrados con escritura, sin incluir la memoria. Apague la VM antes de restaurar; los discos deben coincidir con la instantánea. Los discos compartidos o no compatibles con escritura impiden crear instantáneas.',
             snapshotOperationHelper:
                 'La instantánea actual no se puede eliminar. Las instantáneas solo se pueden restaurar cuando la máquina virtual está apagada.',
             snapshotRecoverConfirm:

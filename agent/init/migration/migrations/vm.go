@@ -20,6 +20,13 @@ var MigrateVMDatabase = &gormigrate.Migration{
 	},
 }
 
+var AddVMDataStoragePools = &gormigrate.Migration{
+	ID: "20261118-add-vm-data-storage-pools",
+	Migrate: func(db *gorm.DB) error {
+		return db.AutoMigrate(&model.VirtualMachine{})
+	},
+}
+
 func migrateVMDatabase(db *gorm.DB, dbDir string) error {
 	var legacy *gorm.DB
 	legacyPath := filepath.Join(dbDir, "xpack.db")

@@ -8228,6 +8228,11 @@ const message = {
             createFromTemplate: 'Create from template',
             template: 'Template',
             templateName: 'Template Name',
+            dataDisks: 'Data disks',
+            dataDiskHelper:
+                'Data disks are created empty. Select a storage pool for each disk; the bus type is shared with the system disk. Up to 9 data disks can be added.',
+            templateSystemDiskHelper:
+                'Templates copy only the system disk, excluding data disk contents. You can add empty data disks when creating a VM from a template. Check /etc/fstab mounts and database or application paths that depend on data disks. New disk UUIDs may differ; the panel does not modify guest configuration automatically.',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
@@ -8345,7 +8350,7 @@ const message = {
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
             snapshotHelper:
-                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
+                'Snapshots capture and restore all managed writable disks together, excluding memory. Shut down the VM before restoring; its disk set must match the snapshot. Shared or unsupported writable disks prevent snapshot creation.',
             snapshotOperationHelper:
                 'The current snapshot cannot be deleted. Snapshots can be recovered only when the virtual machine is shut off.',
             snapshotRecoverConfirm:

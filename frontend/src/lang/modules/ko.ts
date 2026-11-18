@@ -8052,6 +8052,11 @@ const message = {
             createFromTemplate: '템플릿에서 생성',
             template: '템플릿',
             templateName: '템플릿 이름',
+            dataDisks: '데이터 디스크',
+            dataDiskHelper:
+                '데이터 디스크는 빈 디스크로 생성됩니다. 디스크마다 스토리지 풀을 선택할 수 있으며 버스 유형은 시스템 디스크와 동일합니다. 최대 9개까지 추가할 수 있습니다.',
+            templateSystemDiskHelper:
+                '템플릿은 시스템 디스크만 복사하며 데이터 디스크 내용은 포함하지 않습니다. 템플릿으로 생성할 때 빈 데이터 디스크를 추가할 수 있습니다. /etc/fstab 마운트와 데이터베이스 및 앱 경로의 데이터 디스크 의존성을 확인하세요. 새 디스크의 UUID가 다를 수 있으며 게스트 설정은 자동 변경되지 않습니다.',
             convertToTemplate: '템플릿으로 변환',
             sourceVM: '원본 VM',
             templateSize: '템플릿 크기',
@@ -8168,7 +8173,7 @@ const message = {
             currentSnapshot: '현재',
             snapshotEmpty: '스냅샷 없음',
             snapshotHelper:
-                '스냅샷은 현재 VM 상태를 복원 지점으로 저장합니다. 이후 데이터 변경은 원본 디스크를 변경하지 않고 델타 파일에 기록됩니다. 스냅샷을 복구하면 VM이 해당 시점의 상태로 돌아갑니다.',
+                '스냅샷은 관리되는 모든 쓰기 가능한 디스크를 함께 저장하고 복원하며 메모리는 포함하지 않습니다. 복원 전 VM을 종료해야 하며 디스크 구성이 스냅샷과 일치해야 합니다. 공유 또는 미지원 쓰기 가능 디스크가 있으면 생성할 수 없습니다.',
             snapshotOperationHelper:
                 '현재 스냅샷은 삭제할 수 없습니다. 가상 머신이 종료된 경우에만 스냅샷을 복구할 수 있습니다.',
             snapshotRecoverConfirm:

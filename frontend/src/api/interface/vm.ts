@@ -39,6 +39,7 @@ export namespace VM {
     }
 
     export interface Disk {
+        system: boolean;
         capacity: number;
         format: string;
         readOnly: boolean;
@@ -124,7 +125,13 @@ export namespace VM {
         description: string;
     }
 
+    export interface DataDisk {
+        sizeGiB: number;
+        storagePool: string;
+    }
+
     export interface Create {
+        dataDisks?: DataDisk[];
         taskID?: string;
         name: string;
         cpu: number;
@@ -215,6 +222,7 @@ export namespace VM {
     }
 
     export interface SnapshotItem {
+        disks?: { target: string; path: string }[];
         name: string;
         description: string;
         createdAt: number;
@@ -294,6 +302,8 @@ export namespace VM {
     }
 
     export interface NetworkItem {
+        addresses?: string[];
+        interfaces?: NetworkInterfaceItem[];
         id: number;
         name: string;
         type: 'nat' | 'bridge' | 'macvtap' | string;

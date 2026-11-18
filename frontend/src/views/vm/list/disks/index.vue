@@ -13,7 +13,12 @@
                 <el-button :disabled="loading" @click="search">{{ $t('commons.button.refresh') }}</el-button>
             </div>
             <el-table :tooltip-options="TABLE_OVERFLOW_TOOLTIP_OPTIONS" v-loading="loading" :data="items">
-                <el-table-column prop="target" :label="$t('xpack.vm.diskTarget')" width="85" />
+                <el-table-column prop="target" :label="$t('xpack.vm.diskTarget')" width="160">
+                    <template #default="{ row }">
+                        {{ row.target }}
+                        <el-tag v-if="row.system" class="ml-2" size="small">{{ $t('disk.systemDisk') }}</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column :label="$t('xpack.vm.diskSize')" width="110">
                     <template #default="{ row }">{{ row.capacity > 0 ? computeSize(row.capacity) : '-' }}</template>
                 </el-table-column>
