@@ -4991,6 +4991,8 @@ const message = {
         batchInput: 'Toplu Giriş',
         domainNotFQDN: 'Bu alan adı genel ağda erişilebilir olmayabilir',
         domainInvalid: 'Geçersiz alan adı biçimi',
+        allowFirewall: 'Güvenlik duvarında izin ver',
+        allowFirewallHelp: 'Site oluşturulduktan sonra bu TCP bağlantı noktasını kullanan tüm alan adları için açar.',
         domainBatchHelper:
             'Bir satırda bir alan adı, format: domain:port@ssl\nÖrnek: example.com:443@ssl veya example.com',
         generateDomain: 'Oluştur',

@@ -4769,6 +4769,8 @@ const message = {
         batchInput: 'ປ້ອນຂໍ້ມູນແບບກຸ່ມ',
         domainNotFQDN: 'ໂດເມນນີ້ອາດຈະບໍ່ສາມາດເຂົ້າເຖິງໄດ້ໃນເຄືອຂ່າຍສາທາລະນະ',
         domainInvalid: 'ຮູບແບບໂດເມນບໍ່ຖືກຕ້ອງ',
+        allowFirewall: 'ອະນຸຍາດໃນໄຟວໍ',
+        allowFirewallHelp: 'ເປີດພອດ TCP ນີ້ຫຼັງຈາກສ້າງເວັບໄຊ ສຳລັບທຸກໂດເມນທີ່ໃຊ້ພອດນີ້.',
         domainBatchHelper: 'ໜຶ່ງໂດເມນຕໍ່ແຖວ, ຮູບແບບ: domain:port@ssl\nຕົວຢ່າງ: example.com:443@ssl ຫຼື example.com',
         generateDomain: 'ສ້າງ',
         global: 'ທົ່ວໂລກ (Global)',

@@ -1,6 +1,12 @@
 <template>
     <div>
-        <el-row class="domain-create-row" :gutter="22" v-for="(domain, index) of create.domains" :key="index">
+        <el-row
+            class="domain-create-row"
+            :class="{ 'with-firewall': showFirewall }"
+            :gutter="22"
+            v-for="(domain, index) of create.domains"
+            :key="index"
+        >
             <el-col class="domain-create-field domain-create-domain" :span="6" :xs="24">
                 <el-form-item
                     :label="index == 0 ? $t('website.domain') : ''"
@@ -32,7 +38,14 @@
                     :prop="`domains.${index}.port`"
                     :rules="rules.port"
                 >
-                    <el-input type="number" v-model.number="create.domains[index].port"></el-input>
+                    <el-input type="number" v-model.number="domain.port" @input="onPortInput(domain)"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col v-if="showFirewall" class="domain-create-field" :span="3">
+                <el-form-item :label="index == 0 ? $t('website.allowFirewall') : ''">
+                    <el-tooltip :content="$t('website.allowFirewallHelp')" placement="top">
+                        <el-checkbox v-model="domain.allowFirewall" :aria-label="$t('website.allowFirewall')" />
+                    </el-tooltip>
                 </el-form-item>
             </el-col>
             <el-col class="domain-create-field domain-create-ssl" :span="2" :xs="6">
@@ -44,14 +57,19 @@
                     ></el-checkbox>
                 </el-form-item>
             </el-col>
-            <el-col class="domain-create-field domain-create-operation" :span="4" :xs="6" v-if="index == 0">
+            <el-col
+                class="domain-create-field domain-create-operation"
+                :span="showFirewall ? 3 : 4"
+                :xs="6"
+                v-if="index == 0"
+            >
                 <el-form-item :label="$t('commons.table.operate')">
                     <el-button v-permission :aria-label="$t('commons.button.add')" @click="addDomain">
                         <el-icon><Plus /></el-icon>
                     </el-button>
                 </el-form-item>
             </el-col>
-            <el-col class="domain-create-field domain-create-operation" :span="4" :xs="6" v-else>
+            <el-col class="domain-create-field domain-create-operation" :span="showFirewall ? 3 : 4" :xs="6" v-else>
                 <el-form-item>
                     <el-button v-permission :aria-label="$t('commons.button.delete')" @click="removeDomain(index)">
                         <el-icon><Delete /></el-icon>
@@ -85,12 +103,13 @@ import { checkAppInstalled } from '@/api/modules/app';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { MsgError } from '@/utils/message';
 import { toASCII } from 'punycode';
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, nextTick, toRaw } from 'vue';
 import { useI18n } from 'vue-i18n';
 
 const i18n = useI18n();
 
 const props = defineProps({
+    showFirewall: Boolean,
     form: {
         type: Object,
         default: function () {
@@ -222,6 +241,7 @@ const initDomain = () => ({
     host: '',
     port: defaultPort.value,
     ssl: false,
+    allowFirewall: false,
 });
 const create = ref({
     websiteID: 0,
@@ -229,23 +249,19 @@ const create = ref({
     domainStr: '',
 });
 
-const domainToString = (domain: { domain: string; port: number; ssl: boolean }): string => {
-    if (!domain.domain) return '';
-    let str = domain.domain;
-
-    if (domain.port && domain.port !== 80 && isIPv6(str.replace(/^\[|\]$/g, ''))) {
-        if (!str.startsWith('[')) {
-            str = `[${str}]`;
-        }
-    }
-
-    if (domain.port && domain.port !== 80) {
-        str += `:${domain.port}`;
-    }
-    return str;
+const explicitPorts = new WeakSet<object>();
+const onPortInput = (row: ReturnType<typeof initDomain>) => {
+    explicitPorts.add(toRaw(row));
+    row.allowFirewall = false;
 };
 
-const stringToDomain = (line: string): { domain: string; host: string; port: number; ssl: boolean } | null => {
+const domainToString = ({ domain, port }: { domain: string; port: number }): string => {
+    if (!domain || !port) return domain;
+    const host = domain.replace(/^\[|\]$/g, '');
+    return isIPv6(host) ? `[${host}]:${port}` : `${domain}:${port}`;
+};
+
+const stringToDomain = (line: string) => {
     if (!line.trim()) return null;
 
     let ssl = false;
@@ -295,7 +311,7 @@ const stringToDomain = (line: string): { domain: string; host: string; port: num
         ssl = false;
     }
 
-    return { domain, host, port, ssl };
+    return { domain, host, port, ssl, explicitPort: !!portStr };
 };
 
 const openBatchDialog = () => {
@@ -317,7 +333,9 @@ const saveBatchInput = () => {
         return true;
     }
     const lines = create.value.domainStr.split(/\r?\n/);
-    const newDomains: { domain: string; host: string; port: number; ssl: boolean }[] = [];
+    const newDomains: ReturnType<typeof initDomain>[] = [];
+    const selected = new Set(create.value.domains.filter((row) => row.allowFirewall).map(domainToString));
+    const seen = new Set<string>();
     let hasError = false;
 
     const isFirstBatchInput = create.value.domains.length === 1 && !create.value.domains[0].domain;
@@ -335,8 +353,12 @@ const saveBatchInput = () => {
             return;
         }
 
-        if (!newDomains.some((d) => d.domain === domain && d.port === port)) {
-            newDomains.push({ domain, host, port, ssl });
+        const key = domainToString(parsed);
+        if (!seen.has(key)) {
+            seen.add(key);
+            const row = { domain, host, port, ssl, allowFirewall: selected.has(key) };
+            if (parsed.explicitPort) explicitPorts.add(row);
+            newDomains.push(row);
         }
 
         if (isFirstBatchInput && index === 0) {
@@ -366,19 +388,22 @@ const handleParams = () => {
     props.form.domains = create.value.domains;
 };
 
-const getOprensty = async () => {
+const loadDefaultPort = async () => {
     try {
-        await checkAppInstalled('openresty', '')
-            .then((res) => {
-                defaultPort.value = res.data.httpPort || 80;
-                create.value.domains[0].port = defaultPort.value;
-            })
-            .catch(() => {});
-    } catch (error) {}
+        const res = await checkAppInstalled('openresty', '');
+        defaultPort.value = res.data.httpPort || 80;
+        for (const row of create.value.domains) {
+            if (!explicitPorts.has(toRaw(row)) && !row.allowFirewall) {
+                row.port = defaultPort.value;
+            }
+        }
+    } catch {
+        // Keep the initial HTTP port if OpenResty settings are unavailable.
+    }
 };
 
 onMounted(() => {
-    getOprensty();
+    loadDefaultPort();
     handleParams();
 });
 </script>
@@ -388,6 +413,18 @@ onMounted(() => {
     .domain-create-row {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(64px, 84px) minmax(64px, 84px);
+    }
+
+    .domain-create-row.with-firewall {
+        grid-template-columns: minmax(0, 1fr) auto auto auto;
+
+        .domain-create-ssl {
+            grid-column: 3;
+        }
+
+        .domain-create-operation {
+            grid-column: 4;
+        }
     }
 
     .domain-create-field {

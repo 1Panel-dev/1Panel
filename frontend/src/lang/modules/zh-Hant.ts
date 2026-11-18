@@ -4559,6 +4559,8 @@ const message = {
         batchInput: '批次輸入',
         domainNotFQDN: '此域名可能無法在公網存取',
         domainInvalid: '網域格式不正確',
+        allowFirewall: '防火牆放行',
+        allowFirewallHelp: '建站成功後放行此 TCP 連接埠，對使用該連接埠的所有網域生效。',
         domainBatchHelper: '一行一個域名，格式：域名:埠@ssl\n範例：example.com:443@ssl 或 example.com',
         generateDomain: '生成',
         global: '全域',

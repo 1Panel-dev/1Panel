@@ -4981,6 +4981,8 @@ const message = {
         batchInput: 'Пакетный ввод',
         domainNotFQDN: 'Этот домен может быть недоступен в публичной сети',
         domainInvalid: 'Неверный формат домена',
+        allowFirewall: 'Разрешить в брандмауэре',
+        allowFirewallHelp: 'После создания сайта открыть этот TCP-порт для всех доменов, которые его используют.',
         domainBatchHelper: 'Один домен на строку, формат: domain:port@ssl\nПример: example.com:443@ssl или example.com',
         generateDomain: 'Сгенерировать',
         global: 'Глобальный',
