@@ -3596,6 +3596,10 @@ const message = {
         compressSuccess: 'Успешно сжато',
         deCompressSuccess: 'Успешно распаковано',
         deCompressDst: 'Путь распаковки',
+        decompressConflictPolicy: 'Существующие файлы',
+        keepExisting: 'Сохранить существующие файлы',
+        decompressConflictHelper:
+            'При сохранении существующих файлов конфликтующие элементы пропускаются. Каталоги с одинаковыми именами по-прежнему объединяются.',
         linkType: 'Тип ссылки',
         softLink: 'Символическая ссылка',
         hardLink: 'Жесткая ссылка',

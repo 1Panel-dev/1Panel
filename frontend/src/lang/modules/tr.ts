@@ -3596,6 +3596,10 @@ const message = {
         compressSuccess: 'Başarıyla sıkıştırıldı',
         deCompressSuccess: 'Sıkıştırma başarıyla açıldı',
         deCompressDst: 'Sıkıştırma açma yolu',
+        decompressConflictPolicy: 'Mevcut dosyalar',
+        keepExisting: 'Mevcut dosyaları koru',
+        decompressConflictHelper:
+            'Mevcut dosyalar korunurken çakışan öğeler atlanır. Aynı adlı dizinler birleştirilmeye devam eder.',
         linkType: 'Bağlantı türü',
         softLink: 'Yumuşak bağlantı',
         hardLink: 'Sert bağlantı',

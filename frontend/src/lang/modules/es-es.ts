@@ -3617,6 +3617,10 @@ const message = {
         compressSuccess: 'Compresión completada correctamente',
         deCompressSuccess: 'Descompresión completada correctamente',
         deCompressDst: 'Ruta de descompresión',
+        decompressConflictPolicy: 'Archivos existentes',
+        keepExisting: 'Conservar archivos existentes',
+        decompressConflictHelper:
+            'Al conservar los archivos existentes, se omiten las entradas en conflicto. Los directorios con el mismo nombre se siguen combinando.',
         linkType: 'Tipo de enlace',
         softLink: 'Enlace simbólico',
         hardLink: 'Enlace físico',

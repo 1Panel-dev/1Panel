@@ -3482,6 +3482,10 @@ const message = {
         compressSuccess: '압축 성공',
         deCompressSuccess: '압축 해제 성공',
         deCompressDst: '압축 해제 경로',
+        decompressConflictPolicy: '기존 파일 처리',
+        keepExisting: '기존 파일 유지',
+        decompressConflictHelper:
+            '기존 파일을 유지하면 충돌하는 항목을 건너뜁니다. 이름이 같은 디렉터리는 계속 병합됩니다.',
         linkType: '링크 유형',
         softLink: '소프트 링크',
         hardLink: '하드 링크',

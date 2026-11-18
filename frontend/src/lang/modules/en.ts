@@ -3556,6 +3556,10 @@ const message = {
         compressSuccess: 'Compressed successfully',
         deCompressSuccess: 'Decompress succeeded',
         deCompressDst: 'Decompress path',
+        decompressConflictPolicy: 'Existing files',
+        keepExisting: 'Keep existing files',
+        decompressConflictHelper:
+            'Keeping existing files skips conflicting entries. Directories with the same name are still merged.',
         linkType: 'Link type',
         softLink: 'Soft link',
         hardLink: 'Hard link',

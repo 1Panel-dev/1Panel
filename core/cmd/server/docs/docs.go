@@ -49860,6 +49860,11 @@ const docTemplate = `{
 				"dst": {
 					"type": "string"
 				},
+				"overwrite": {
+					"default": true,
+					"description": "Overwrite existing entries; defaults to true when omitted. False preserves existing entries and merges directories.",
+					"type": "boolean"
+				},
 				"path": {
 					"type": "string"
 				},

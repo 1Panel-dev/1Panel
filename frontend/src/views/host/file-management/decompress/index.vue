@@ -47,6 +47,15 @@
                         </template>
                     </el-input>
                 </el-form-item>
+                <el-form-item :label="$t('file.decompressConflictPolicy')" prop="overwrite">
+                    <div class="w-full">
+                        <el-radio-group v-model="form.overwrite" class="flex flex-wrap gap-x-4 gap-y-2">
+                            <el-radio :value="true" class="!mr-0">{{ $t('file.replace') }}</el-radio>
+                            <el-radio :value="false" class="!mr-0">{{ $t('file.keepExisting') }}</el-radio>
+                        </el-radio-group>
+                        <span class="input-help">{{ $t('file.decompressConflictHelper') }}</span>
+                    </div>
+                </el-form-item>
                 <el-form-item :label="$t('setting.compressPassword')" prop="secret" v-if="name.includes('tar.gz')">
                     <el-input v-model="form.secret"></el-input>
                 </el-form-item>
@@ -55,7 +64,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <template v-if="!currentTaskID">
-                    <el-button :type="loading ? 'danger' : 'default'" :loading="canceling" @click="handleClose">
+                    <el-button :loading="canceling" @click="handleClose">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button v-if="!loading" type="primary" @click="submit(fileForm)">
@@ -63,12 +72,7 @@
                     </el-button>
                 </template>
                 <template v-else>
-                    <el-button
-                        v-if="isTaskExecuting || loading"
-                        type="danger"
-                        :loading="stopping"
-                        @click="stopCurrentTask"
-                    >
+                    <el-button v-if="isTaskExecuting || loading" :loading="stopping" @click="stopCurrentTask">
                         {{ $t('commons.button.cancel') }}
                     </el-button>
                     <el-button v-if="currentTaskID" @click="openTaskLog">
@@ -119,7 +123,7 @@ const loading = ref(false);
 const canceling = ref(false);
 const stopping = ref(false);
 const abortController = ref<AbortController | null>(null);
-const form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '', secret: '' });
+const form = ref<File.FileDeCompress>({ type: 'zip', dst: '', path: '', secret: '', overwrite: true });
 const open = ref(false);
 const title = ref('');
 const fileRef = ref();
@@ -343,6 +347,7 @@ const acceptParams = async (props: DecompressProps) => {
     form.value.dst = props.dst;
     form.value.path = props.path;
     form.value.secret = '';
+    form.value.overwrite = true;
     name.value = props.name;
     abortController.value = null;
     canceling.value = false;
