@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
 	"sync"
@@ -14,6 +13,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 )
 
@@ -77,7 +77,7 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 	baseInfo.BanAction = values["banaction"]
 	baseInfo.LogPath = values["logpath"]
 	baseInfo.Mode = values["mode"]
-	if match := regexp.MustCompile(`(?:\[|,)\s*mode\s*=\s*([^,\]]+)`).FindStringSubmatch(values["filter"]); len(match) == 2 {
+	if match := re.GetRegex(re.Fail2BanModeValuePattern).FindStringSubmatch(values["filter"]); len(match) == 2 {
 		baseInfo.Mode = strings.Trim(strings.TrimSpace(match[1]), `"'`)
 	}
 	if baseInfo.Mode == "" {
@@ -193,8 +193,13 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			continue
 		}
 		if section == "sshd" && req.Key == "mode" && key == "filter" {
-			pattern := regexp.MustCompile(`([\[,]\s*mode\s*=\s*)[^,\]]+`)
-			lines[index] = pattern.ReplaceAllString(line, "${1}"+req.Value)
+			pattern := re.GetRegex(re.Fail2BanModeAssignmentPattern)
+			if pattern.MatchString(line) {
+				lines[index] = pattern.ReplaceAllString(line, "${1}"+req.Value)
+			} else {
+				pattern = re.GetRegex(re.Fail2BanFilterNamePattern)
+				lines[index] = pattern.ReplaceAllString(line, "${1}[mode="+req.Value+"]")
+			}
 		}
 		if section != "sshd" || key != req.Key {
 			continue
