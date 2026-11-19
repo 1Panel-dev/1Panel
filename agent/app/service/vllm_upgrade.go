@@ -74,9 +74,22 @@ func buildDefaultVllmImageByVersion(version string) string {
 func isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage string) bool {
 	currentFamily := resolveVllmVersionFamily(currentVersion, currentImage)
 	targetFamily := resolveVllmVersionFamily(targetVersion, "")
-	_, currentSuffix, _ := strings.Cut(trimVllmVersionFamily(currentVersion), "-")
-	_, targetSuffix, _ := strings.Cut(trimVllmVersionFamily(targetVersion), "-")
+	_, currentSuffix := splitVllmVersion(currentVersion)
+	_, targetSuffix := splitVllmVersion(targetVersion)
 	return currentFamily == targetFamily && currentSuffix == targetSuffix
+}
+
+// splitVllmVersion separates the version number from the variant suffix
+// (310p, a3, optimized-for-...). Image build tags such as the Intel b2 or
+// b8.3.1 belong to the version number, so they do not mark a variant.
+func splitVllmVersion(version string) (string, string) {
+	trimmed := trimVllmVersionFamily(version)
+	number, suffix, _ := strings.Cut(trimmed, "-")
+	rest, ok := strings.CutPrefix(suffix, "b")
+	if ok && rest != "" && strings.Trim(rest, "0123456789.") == "" {
+		return trimmed, ""
+	}
+	return number, suffix
 }
 
 func hasVllmVersionFamilyPrefix(version string) bool {
@@ -93,8 +106,8 @@ func isVllmUpgradeCandidate(currentVersion, targetVersion, currentImage string) 
 	if !isVllmUpgradeVersionAllowed(currentVersion, targetVersion, currentImage) {
 		return false
 	}
-	currentNumber, _, _ := strings.Cut(trimVllmVersionFamily(currentVersion), "-")
-	targetNumber, _, _ := strings.Cut(trimVllmVersionFamily(targetVersion), "-")
+	currentNumber, _ := splitVllmVersion(currentVersion)
+	targetNumber, _ := splitVllmVersion(targetVersion)
 	if common.CompareVersion(targetNumber, currentNumber) {
 		return true
 	}
