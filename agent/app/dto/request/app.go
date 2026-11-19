@@ -73,6 +73,7 @@ type AppInstalledSearch struct {
 	All         bool     `json:"all"`
 	Sync        bool     `json:"sync"`
 	CheckUpdate bool     `json:"checkUpdate"`
+	AppStore    bool     `json:"appStore"`
 }
 
 type AppInstalledInfo struct {

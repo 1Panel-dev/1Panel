@@ -92,6 +92,15 @@ func (a *AppInstallService) PageWithContext(ctx context.Context, req request.App
 	)
 	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
 	opts = append(opts, repo.WithOrderRuleBy("sort_order", "ascending"))
+	if req.AppStore {
+		appIDs, err := appRepo.GetIDs(ctx, appRepo.WithKeyIn([]string{constant.AppOpenclaw, constant.AppCopaw, constant.AppHermesAgent, constant.AppDeepSeekHarness, constant.AppOctop, "vllm"}))
+		if err != nil {
+			return 0, nil, err
+		}
+		if len(appIDs) > 0 {
+			opts = append(opts, appInstallRepo.WithAppIdsNotIn(appIDs))
+		}
+	}
 
 	if req.Name != "" {
 		opts = append(opts, repo.WithByLikeName(req.Name))

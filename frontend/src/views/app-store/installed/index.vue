@@ -203,6 +203,7 @@ const composeLogRef = ref();
 const dialogTerminalRef = ref();
 const taskLogRef = ref();
 const searchReq = reactive({
+    appStore: true,
     page: 1,
     pageSize: 20,
     name: '',
@@ -250,6 +251,7 @@ const search = async () => {
 const sync = async () => {
     loading.value = true;
     const searchItem = {
+        appStore: true,
         page: paginationConfig.currentPage,
         pageSize: paginationConfig.pageSize,
         name: searchReq.name,
@@ -475,7 +477,15 @@ const enterSortMode = async () => {
     sortMode.value = true;
     clearInterval(Number(timer));
     timer = null;
-    const res = await searchAppInstalled({ page: 1, pageSize: 10000, name: '', tags: [], update: false, sync: false });
+    const res = await searchAppInstalled({
+        page: 1,
+        pageSize: 10000,
+        name: '',
+        tags: [],
+        update: false,
+        sync: false,
+        appStore: true,
+    });
     data.value = res.data.items;
     await nextTick();
     const el = sortContainer.value?.$el;
