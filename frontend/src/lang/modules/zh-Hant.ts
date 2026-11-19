@@ -3061,6 +3061,12 @@ const message = {
             dnsTestFailed: 'DNS 設定資訊不可用，請修改後重試',
         },
         fail2ban: {
+            mode: '偵測模式',
+            modeHelper: '決定哪些 SSH 連線行為會被計為失敗，達到設定次數後封鎖 IP。需要 Fail2ban 0.10 及以上版本。',
+            modeNormal: '預設：記錄密碼錯誤、使用者名稱不存在等登入失敗。',
+            modeDdos: '在預設模式基礎上，也記錄連線逾時、尚未登入就中斷等行為。',
+            modeExtra: '在預設模式基礎上，也記錄伺服器不支援用戶端連線方式等失敗。',
+            modeAggressive: '記錄以上所有行為，攔截更嚴格，也更容易誤封正常使用者。',
             sshPort: '監聽 SSH 埠',
             sshPortHelper: '目前 Fail2ban 監聽主機 SSH 連接埠',
             unActive: '尚未啟用 Fail2ban 服務，請先啟用',

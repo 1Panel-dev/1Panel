@@ -3085,6 +3085,12 @@ const message = {
             dnsTestFailed: 'DNS 配置信息不可用，请修改后重试！',
         },
         fail2ban: {
+            mode: '检测模式',
+            modeHelper: '决定哪些 SSH 连接行为会被计为失败，达到设定次数后封禁 IP。需要 Fail2ban 0.10 及以上版本。',
+            modeNormal: '默认：记录密码错误、用户名不存在等登录失败。',
+            modeDdos: '在默认模式基础上，也记录连接超时、未登录就断开等行为。',
+            modeExtra: '在默认模式基础上，也记录客户端连接方式不被服务器支持等失败。',
+            modeAggressive: '记录以上所有行为，拦截更严格，也更容易误封正常用户。',
             sshPort: '监听 SSH 端口',
             sshPortHelper: '当前 Fail2ban 监听主机 SSH 连接端口',
             unActive: '当前未开启 Fail2ban 服务，请先开启！',
