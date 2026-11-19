@@ -4287,6 +4287,17 @@ const message = {
         isEdirWarn: '偵測到 docker-compose.yml 檔案被修改，請檢視對比',
     },
     website: {
+        batchPHP: '切換 PHP 版本',
+        batchPHPHelper: '僅對 PHP 網站生效，其他網站自動略過。不支援本機 PHP 環境。',
+        batchPHPCount: '已選擇 {0} 個網站，其中 PHP 網站 {1} 個，其他 {2} 個。',
+        notPHP: '非 PHP 網站',
+        localPHP: '不支援本機 PHP 環境',
+        samePHP: '已使用目標 PHP 環境',
+        batchPHPResult: '處理結果',
+        batchPHPStatus_success: '成功',
+        batchPHPStatus_failed: '失敗',
+        batchPHPStatus_skipped: '略過',
+
         primaryDomain: '主域名',
         otherDomains: '其他域名',
         static: '靜態網站',

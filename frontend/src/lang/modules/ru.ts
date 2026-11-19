@@ -4689,6 +4689,18 @@ const message = {
         isEdirWarn: 'Обнаружены изменения в файле docker-compose.yml. Проверьте различия.',
     },
     website: {
+        batchPHP: 'Переключить версию PHP',
+        batchPHPHelper:
+            'Изменения применяются только к сайтам PHP. Остальные сайты будут пропущены. Локальные окружения PHP не поддерживаются.',
+        batchPHPCount: 'Выбрано сайтов: {0}; сайтов PHP: {1}; остальных: {2}.',
+        notPHP: 'Не является сайтом PHP',
+        localPHP: 'Локальные окружения PHP не поддерживаются',
+        samePHP: 'Уже используется целевое окружение PHP',
+        batchPHPResult: 'Результаты',
+        batchPHPStatus_success: 'Успешно',
+        batchPHPStatus_failed: 'Ошибка',
+        batchPHPStatus_skipped: 'Пропущено',
+
         primaryDomain: 'Основной домен',
         otherDomains: 'Другие домены',
         static: 'Статический',

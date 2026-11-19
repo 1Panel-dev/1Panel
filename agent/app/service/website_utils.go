@@ -41,6 +41,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -2135,4 +2137,24 @@ func getManualWebsiteSSL(req request.WebsiteHTTPSOp) (model.WebsiteSSL, error) {
 	websiteSSL.Pem = certificate
 	websiteSSL.Status = constant.SSLReady
 	return websiteSSL, nil
+}
+
+type websitePHPImageInspector interface {
+	ImageInspect(context.Context, string, ...client.ImageInspectOption) (image.InspectResponse, error)
+}
+
+// Let Docker resolve the full reference, including registries, tags, digests and IDs.
+// A missing source image must not prevent switching away from that environment.
+func validateWebsitePHPImage(ctx context.Context, inspector websitePHPImageInspector, reference, name string) error {
+	if strings.TrimSpace(reference) == "" {
+		return buserr.WithName("ErrImageNotExist", name)
+	}
+	_, err := inspector.ImageInspect(ctx, reference)
+	if client.IsErrNotFound(err) {
+		return buserr.WithName("ErrImageNotExist", name)
+	}
+	if err != nil {
+		return fmt.Errorf("inspect PHP runtime %s image %s: %w", name, reference, err)
+	}
+	return nil
 }

@@ -4486,6 +4486,17 @@ const message = {
         isEdirWarn: 'ກວດພົບການປ່ຽນແປງໃນ docker-compose.yml. ກະລຸນາກວດສອບຄວາມແຕກຕ່າງ.',
     },
     website: {
+        batchPHP: 'ປ່ຽນເວີຊັນ PHP',
+        batchPHPHelper: 'ປ່ຽນແປງສະເພາະເວັບໄຊ PHP. ເວັບໄຊອື່ນຈະຖືກຂ້າມ. ບໍ່ຮອງຮັບສະພາບແວດລ້ອມ PHP ພາຍໃນເຄື່ອງ.',
+        batchPHPCount: 'ເວັບໄຊທີ່ເລືອກ: {0}; ເວັບໄຊ PHP: {1}; ອື່ນໆ: {2}.',
+        notPHP: 'ບໍ່ແມ່ນເວັບໄຊ PHP',
+        localPHP: 'ບໍ່ຮອງຮັບສະພາບແວດລ້ອມ PHP ພາຍໃນເຄື່ອງ',
+        samePHP: 'ກຳລັງໃຊ້ສະພາບແວດລ້ອມ PHP ເປົ້າໝາຍແລ້ວ',
+        batchPHPResult: 'ຜົນການດຳເນີນງານ',
+        batchPHPStatus_success: 'ສຳເລັດ',
+        batchPHPStatus_failed: 'ລົ້ມເຫຼວ',
+        batchPHPStatus_skipped: 'ຂ້າມແລ້ວ',
+
         primaryDomain: 'ໂດເມນຫຼັກ',
         otherDomains: 'ໂດເມນອື່ນໆ',
         static: 'ສະແຕຕິກ (Static)',

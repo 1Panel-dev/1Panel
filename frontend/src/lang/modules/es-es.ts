@@ -4712,6 +4712,18 @@ const message = {
         isEdirWarn: 'Se detectaron cambios en el archivo docker-compose.yml. Revise la comparación.',
     },
     website: {
+        batchPHP: 'Cambiar versión de PHP',
+        batchPHPHelper:
+            'Solo se modificarán los sitios PHP. Los demás se omitirán. No se admiten entornos PHP locales.',
+        batchPHPCount: 'Sitios seleccionados: {0}; sitios PHP: {1}; otros: {2}.',
+        notPHP: 'No es un sitio PHP',
+        localPHP: 'No se admiten entornos PHP locales',
+        samePHP: 'Ya utiliza el entorno PHP de destino',
+        batchPHPResult: 'Resultados',
+        batchPHPStatus_success: 'Correcto',
+        batchPHPStatus_failed: 'Error',
+        batchPHPStatus_skipped: 'Omitido',
+
         primaryDomain: 'Dominio principal',
         otherDomains: 'Otros dominios',
         static: 'Estático',

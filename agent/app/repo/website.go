@@ -18,6 +18,7 @@ type IWebsiteRepo interface {
 	WithDefaultServer() DBOption
 	WithDomainLike(domain string) DBOption
 	WithSearchKeyword(keyword string, ids []uint) DBOption
+	WithRuntimeType(runtimeType string) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
 	WithParentID(websiteID uint) DBOption
 	WithType(websiteType string) DBOption
@@ -57,6 +58,13 @@ func (w *WebsiteRepo) WithAppInstallIds(appInstallIDs []uint) DBOption {
 			return db
 		}
 		return db.Where("app_install_id in (?)", appInstallIDs)
+	}
+}
+
+func (w *WebsiteRepo) WithRuntimeType(runtimeType string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		runtimes := db.Session(&gorm.Session{NewDB: true}).Model(&model.Runtime{}).Select("id").Where("type = ?", runtimeType)
+		return db.Where("type = ? AND runtime_id IN (?)", "runtime", runtimes)
 	}
 }
 

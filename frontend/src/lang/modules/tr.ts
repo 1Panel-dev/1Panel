@@ -4697,6 +4697,17 @@ const message = {
         isEdirWarn: 'docker-compose.yml dosyasında değişiklikler algılandı. Lütfen farkları inceleyin.',
     },
     website: {
+        batchPHP: 'PHP sürümünü değiştir',
+        batchPHPHelper: 'Yalnızca PHP siteleri değiştirilir. Diğer siteler atlanır. Yerel PHP ortamları desteklenmez.',
+        batchPHPCount: 'Seçilen siteler: {0}; PHP siteleri: {1}; diğerleri: {2}.',
+        notPHP: 'PHP sitesi değil',
+        localPHP: 'Yerel PHP ortamları desteklenmez',
+        samePHP: 'Hedef PHP ortamı zaten kullanılıyor',
+        batchPHPResult: 'Sonuçlar',
+        batchPHPStatus_success: 'Başarılı',
+        batchPHPStatus_failed: 'Başarısız',
+        batchPHPStatus_skipped: 'Atlandı',
+
         primaryDomain: 'Birincil alan adı',
         otherDomains: 'Diğer alan adları',
         static: 'Statik',

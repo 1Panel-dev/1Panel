@@ -4695,6 +4695,18 @@ const message = {
         isEdirWarn: 'Perubahan pada fail docker-compose.yml telah dikesan. Sila semak perbezaannya.',
     },
     website: {
+        batchPHP: 'Tukar versi PHP',
+        batchPHPHelper:
+            'Hanya laman PHP akan diubah. Laman lain akan dilangkau. Persekitaran PHP setempat tidak disokong.',
+        batchPHPCount: 'Laman dipilih: {0}; laman PHP: {1}; lain-lain: {2}.',
+        notPHP: 'Bukan laman PHP',
+        localPHP: 'Persekitaran PHP setempat tidak disokong',
+        samePHP: 'Sudah menggunakan persekitaran PHP sasaran',
+        batchPHPResult: 'Keputusan',
+        batchPHPStatus_success: 'Berjaya',
+        batchPHPStatus_failed: 'Gagal',
+        batchPHPStatus_skipped: 'Dilangkau',
+
         primaryDomain: 'Domain Utama',
         otherDomains: 'Domain Lain',
         static: 'Statik',

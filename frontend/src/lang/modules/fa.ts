@@ -4582,6 +4582,18 @@ const message = {
         isEdirWarn: 'تغییرات در docker-compose.yml شناسایی شد. لطفاً تفاوت را بررسی کنید.',
     },
     website: {
+        batchPHP: 'تغییر نسخه PHP',
+        batchPHPHelper:
+            'فقط سایت‌های PHP تغییر می‌کنند. سایر سایت‌ها نادیده گرفته می‌شوند. محیط‌های PHP محلی پشتیبانی نمی‌شوند.',
+        batchPHPCount: 'سایت‌های انتخاب‌شده: {0}؛ سایت‌های PHP: {1}؛ سایر: {2}.',
+        notPHP: 'سایت PHP نیست',
+        localPHP: 'محیط‌های PHP محلی پشتیبانی نمی‌شوند',
+        samePHP: 'از قبل از محیط PHP مقصد استفاده می‌کند',
+        batchPHPResult: 'نتایج',
+        batchPHPStatus_success: 'موفق',
+        batchPHPStatus_failed: 'ناموفق',
+        batchPHPStatus_skipped: 'رد شد',
+
         primaryDomain: 'دامنه اصلی',
         otherDomains: 'سایر دامنه‌ها',
         static: 'ایستا',

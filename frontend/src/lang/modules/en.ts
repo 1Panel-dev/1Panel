@@ -4625,6 +4625,18 @@ const message = {
         isEdirWarn: 'Changes to docker-compose.yml were detected. Please review the diff.',
     },
     website: {
+        batchPHP: 'Switch PHP version',
+        batchPHPHelper:
+            'Only PHP websites will be changed. Other websites are skipped. Local PHP environments are not supported.',
+        batchPHPCount: 'Selected: {0}; PHP websites: {1}; others: {2}.',
+        notPHP: 'Not a PHP website',
+        localPHP: 'Local PHP is not supported',
+        samePHP: 'Already using the target PHP environment',
+        batchPHPResult: 'Results',
+        batchPHPStatus_success: 'Succeeded',
+        batchPHPStatus_failed: 'Failed',
+        batchPHPStatus_skipped: 'Skipped',
+
         primaryDomain: 'Primary domain',
         otherDomains: 'Other domains',
         static: 'Static',

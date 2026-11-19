@@ -128,3 +128,10 @@ type Database struct {
 	From         string `json:"from"`
 	ID           uint   `json:"id"`
 }
+
+type WebsiteBatchPHPVersionResult struct {
+	ID      uint   `json:"id"`
+	Domain  string `json:"domain"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
+}
