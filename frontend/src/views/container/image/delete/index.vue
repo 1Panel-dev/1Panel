@@ -73,6 +73,7 @@ const handleClose = () => {
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const onSearch = () => {
+    handleClose();
     emit('search');
 };
 
