@@ -307,7 +307,7 @@ const onDelete = (row: Container.ImageInfo) => {
     names.value = [row.id.replaceAll('sha256:', '').substring(0, 12)];
     opRef.value.acceptParams({
         title: i18n.global.t('commons.button.delete'),
-        names: names.value,
+        names: row.tags?.length ? row.tags : names.value,
         msg: i18n.global.t('commons.msg.operatorHelper', [
             i18n.global.t('container.image'),
             i18n.global.t('commons.button.delete'),
