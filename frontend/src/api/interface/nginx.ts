@@ -87,6 +87,7 @@ export namespace Nginx {
 
     export interface NginxHttpsStatus {
         https: boolean;
+        httpsPort: number;
         sslRejectHandshake: boolean;
         httpsRedirectCustomPort: boolean;
     }

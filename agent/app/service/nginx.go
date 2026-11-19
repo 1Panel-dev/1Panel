@@ -444,7 +444,7 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) e
 	if err = nginxCheckAndReload(string(content), defaultConfigPath, appInstall.ContainerName); err != nil {
 		return err
 	}
-	if req.HTTPSRedirectCustomPort == nil {
+	if req.HTTPSRedirectCustomPort == nil || appInstall.HttpsPort == 443 {
 		return nil
 	}
 	previousUseCustomPort := getHTTPSRedirectCustomPort()
@@ -479,6 +479,7 @@ func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) 
 	defaultServer := defaultConfig.FindServers()[0]
 	res := &response.NginxConfigRes{
 		HTTPSRedirectCustomPort: getHTTPSRedirectCustomPort(),
+		HTTPSPort:               appInstall.HttpsPort,
 	}
 	for _, directive := range defaultServer.GetDirectives() {
 		if directive.GetName() == "include" && directive.GetParameters()[0] == "/usr/local/openresty/nginx/conf/ssl/root_ssl.conf" {
@@ -518,6 +519,9 @@ func updateWebsiteHTTPSRedirectCustomPort(useCustomPort bool) (err error) {
 			httpConfig = constant.HTTPToHTTPS
 		}
 		if httpConfig != constant.HTTPToHTTPS {
+			continue
+		}
+		if normalizeWebsiteHTTPSRedirectPort(website.HTTPSRedirectPort) != constant.HTTPSRedirectPortInherit {
 			continue
 		}
 		domains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))

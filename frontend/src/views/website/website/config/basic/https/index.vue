@@ -72,6 +72,9 @@ let form = reactive({
     privateKeyPath: '',
     certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
+    httpsRedirectPort: 'inherit',
+    httpsRedirectCustomPort: true,
+    nginxHttpsPort: 0,
     hsts: true,
     hstsIncludeSubDomains: false,
     algorithm:
@@ -110,6 +113,9 @@ const get = () => {
             if (data.httpConfig != '') {
                 form.httpConfig = data.httpConfig;
             }
+            form.httpsRedirectPort = data.httpsRedirectPort || 'inherit';
+            form.httpsRedirectCustomPort = data.httpsRedirectCustomPort;
+            form.nginxHttpsPort = data.nginxHttpsPort;
             if (data.SSLProtocol && data.SSLProtocol.length > 0) {
                 form.SSLProtocol = data.SSLProtocol;
             }

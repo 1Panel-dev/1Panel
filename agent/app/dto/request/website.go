@@ -143,6 +143,7 @@ type BatchWebsiteHttps struct {
 	CertificatePath       string   `json:"certificatePath"`
 	ImportType            string   `json:"importType"`
 	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	HTTPSRedirectPort     string   `json:"httpsRedirectPort" validate:"omitempty,oneof=inherit default standard"`
 	SSLProtocol           []string `json:"SSLProtocol"`
 	Algorithm             string   `json:"algorithm"`
 	Hsts                  bool     `json:"hsts"`
@@ -212,6 +213,7 @@ type WebsiteHTTPSOp struct {
 	CertificatePath       string   `json:"certificatePath"`
 	ImportType            string   `json:"importType"`
 	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	HTTPSRedirectPort     string   `json:"httpsRedirectPort" validate:"omitempty,oneof=inherit default standard"`
 	SSLProtocol           []string `json:"SSLProtocol"`
 	Algorithm             string   `json:"algorithm"`
 	Hsts                  bool     `json:"hsts"`

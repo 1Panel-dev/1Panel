@@ -84,6 +84,7 @@ func (w WebsiteService) BatchSetHttps(ctx context.Context, req request.BatchWebs
 		CertificatePath:       req.CertificatePath,
 		ImportType:            req.ImportType,
 		HttpConfig:            req.HttpConfig,
+		HTTPSRedirectPort:     req.HTTPSRedirectPort,
 		SSLProtocol:           req.SSLProtocol,
 		Algorithm:             req.Algorithm,
 		Hsts:                  req.Hsts,
