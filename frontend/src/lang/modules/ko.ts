@@ -3224,6 +3224,13 @@ const message = {
             syncSiteHelper: '{0}을(를) 기준으로 시스템 시간을 동기화하시겠습니까?',
         },
         fail2ban: {
+            mode: '탐지 모드',
+            modeHelper:
+                '어떤 SSH 연결 동작을 실패로 셀지 선택합니다. 설정한 횟수에 도달하면 IP를 차단합니다. Fail2ban 0.10 이상이 필요합니다.',
+            modeNormal: '기본값: 잘못된 비밀번호나 존재하지 않는 사용자 이름 등 로그인 실패를 셉니다.',
+            modeDdos: '기본 탐지에 더해 연결 시간 초과나 로그인 전 연결 종료도 셉니다.',
+            modeExtra: '기본 탐지에 더해 서버가 지원하지 않는 연결 방식으로 인한 실패도 셉니다.',
+            modeAggressive: '위의 모든 동작을 셉니다. 더 엄격하게 차단하므로 정상 사용자도 차단될 가능성이 높아집니다.',
             sshPort: 'SSH 포트 청취',
             sshPortHelper: '현재 Fail2ban 은 호스트의 SSH 연결 포트를 청취합니다.',
             unActive: '현재 Fail2ban 서비스가 활성화되어 있지 않습니다.',

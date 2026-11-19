@@ -3330,6 +3330,14 @@ const message = {
             syncSiteHelper: 'Sistem saati {0} ile eşitlensin mi?',
         },
         fail2ban: {
+            mode: 'Algılama modu',
+            modeHelper:
+                'IP engellemesi için hangi SSH bağlantı olaylarının hata sayılacağını seçin. Fail2ban 0.10 veya üzeri gerekir.',
+            modeNormal: 'Varsayılan: yanlış parola veya bilinmeyen kullanıcı adı gibi başarısız girişleri sayar.',
+            modeDdos: 'Zaman aşımına uğrayan veya giriş yapılmadan kesilen bağlantıları da sayar.',
+            modeExtra: 'Sunucunun desteklemediği bağlantı yöntemlerinden kaynaklanan hataları da sayar.',
+            modeAggressive:
+                'Yukarıdakilerin tümünü sayar. Daha katıdır, ancak meşru kullanıcıların engellenme olasılığı da artar.',
             sshPort: 'SSH portunu dinle',
             sshPortHelper: 'Mevcut Fail2ban ana bilgisayarın SSH bağlantı portunu dinler',
             unActive: 'Fail2ban servisi şu anda etkin değil.',

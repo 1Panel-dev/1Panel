@@ -3354,6 +3354,14 @@ const message = {
             dnsTestFailed: 'Configuração DNS indisponível.',
         },
         fail2ban: {
+            mode: 'Modo de detecção',
+            modeHelper:
+                'Escolha quais eventos de conexão SSH contam como falhas para bloquear um IP. Requer Fail2ban 0.10 ou superior.',
+            modeNormal: 'Padrão: conta falhas de login, como senhas incorretas ou usuários inexistentes.',
+            modeDdos: 'Também conta conexões que excedem o tempo limite ou são encerradas antes do login.',
+            modeExtra: 'Também conta falhas causadas por métodos de conexão que o servidor não aceita.',
+            modeAggressive:
+                'Conta todos os casos acima. É mais rigoroso, mas aumenta a chance de bloquear usuários legítimos.',
             sshPort: 'Monitorar porta SSH',
             sshPortHelper: 'O Fail2ban atual monitora a porta SSH de conexão do host',
             unActive: 'O serviço Fail2ban não está habilitado no momento.',

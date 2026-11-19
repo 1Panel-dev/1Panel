@@ -66,6 +66,7 @@ export namespace Toolbox {
         findTime: string;
         banAction: string;
         logPath: string;
+        mode: string;
     }
 
     export interface Fail2banSearch {

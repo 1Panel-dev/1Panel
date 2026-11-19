@@ -3355,6 +3355,15 @@ const message = {
             syncSiteHelper: '¿Sincronizar la hora del sistema con {0}?',
         },
         fail2ban: {
+            mode: 'Modo de detección',
+            modeHelper:
+                'Elija qué eventos de conexión SSH cuentan como fallos para bloquear una IP. Requiere Fail2ban 0.10 o posterior.',
+            modeNormal:
+                'Predeterminado: cuenta accesos fallidos, como contraseñas incorrectas o usuarios inexistentes.',
+            modeDdos: 'También cuenta conexiones que agotan el tiempo de espera o se cortan antes de iniciar sesión.',
+            modeExtra: 'También cuenta fallos por métodos de conexión que el servidor no admite.',
+            modeAggressive:
+                'Cuenta todos los casos anteriores. Es más estricto, pero puede bloquear a más usuarios legítimos.',
             sshPort: 'Puerto SSH',
             sshPortHelper: 'Fail2ban escucha el puerto SSH del host',
             unActive: 'El servicio Fail2ban no está habilitado actualmente.',
