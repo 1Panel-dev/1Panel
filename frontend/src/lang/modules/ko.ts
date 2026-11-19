@@ -2519,6 +2519,8 @@ const message = {
         missing: '없음',
     },
     container: {
+        logsUnavailable:
+            '컨테이너가 존재하지 않거나 삭제되었습니다. 컨테이너 로그를 확인할 수 없습니다. 컨테이너를 다시 생성한 후 재시도하세요.',
         nvidiaSupport: 'NVIDIA GPU 지원',
         nvidiaHelper:
             'NVIDIA 컨테이너 런타임을 등록합니다. 먼저 NVIDIA Container Toolkit을 설치하세요. GPU는 각 컨테이너에 별도로 할당해야 합니다.',

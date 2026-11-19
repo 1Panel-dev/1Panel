@@ -2593,6 +2593,8 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        logsUnavailable:
+            'Kontena tidak wujud atau telah dipadamkan. Log kontena tidak tersedia. Cipta semula kontena dan cuba lagi.',
         nvidiaSupport: 'Sokongan GPU NVIDIA',
         nvidiaHelper:
             'Daftarkan runtime kontena NVIDIA. Pasang NVIDIA Container Toolkit dahulu. Peruntukkan GPU kepada setiap kontena secara berasingan.',

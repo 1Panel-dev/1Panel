@@ -2601,6 +2601,8 @@ const message = {
         missing: 'Não existe',
     },
     container: {
+        logsUnavailable:
+            'O contêiner não existe ou foi excluído. Os logs do contêiner não estão disponíveis. Recrie o contêiner e tente novamente.',
         nvidiaSupport: 'Suporte a GPU NVIDIA',
         nvidiaHelper:
             'Registra o runtime de contêiner NVIDIA. Instale primeiro o NVIDIA Container Toolkit. Atribua GPUs a cada contêiner separadamente.',

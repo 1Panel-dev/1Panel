@@ -2492,6 +2492,8 @@ const message = {
         missing: 'ບໍ່ມີ',
     },
     container: {
+        logsUnavailable:
+            'ຄອນເທນເນີບໍ່ມີຢູ່ ຫຼື ຖືກລຶບແລ້ວ. ບໍ່ສາມາດເບິ່ງບັນທຶກຂອງຄອນເທນເນີໄດ້. ກະລຸນາສ້າງຄອນເທນເນີໃໝ່ ແລ້ວລອງອີກຄັ້ງ.',
         nvidiaSupport: 'ຮອງຮັບ NVIDIA GPU',
         nvidiaHelper:
             'ລົງທະບຽນ NVIDIA runtime ສຳລັບຄອນເທນເນີ. ຕິດຕັ້ງ NVIDIA Container Toolkit ກ່ອນ ແລະ ຈັດສັນ GPU ໃຫ້ແຕ່ລະຄອນເທນເນີແຍກກັນ.',

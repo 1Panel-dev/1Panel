@@ -880,6 +880,10 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 		// The collector closes both channels when it finishes. Drain all buffered
 		// logs before handling its result, or a ready error channel can drop the tail.
 		if err := <-errors; err != nil {
+			if err == errLogContainerMissing {
+				_, _ = fmt.Fprint(w, "event: container-missing\ndata: {}\n\n")
+				return false
+			}
 			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
 		}
 		return false
@@ -889,6 +893,10 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- string, errorChan chan<- error) {
 	defer close(messageChan)
 	defer close(errorChan)
+	if err := checkLogContainers(params); err != nil {
+		errorChan <- err
+		return
+	}
 	var cmdArgs []string
 	cmdArgs = append(cmdArgs, "logs")
 	if params.Follow {
