@@ -149,6 +149,7 @@ export namespace App {
     }
 
     export interface AppInstallSearch extends ReqPage {
+        appStore?: boolean;
         name?: string;
         tags?: string[];
         update?: boolean;
