@@ -1,6 +1,6 @@
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
-import http from '@/api';
+import http, { type RequestConfig } from '@/api';
 import { ResPage, SearchWithPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
 
@@ -65,13 +65,12 @@ export const getGPUOptions = (currentNode?: string) => {
         currentNode ? { headers: { CurrentNode: currentNode } } : {},
     );
 };
-export const loadGPUMonitor = (param: AI.MonitorGPUSearch, currentNode?: string) => {
-    return http.post<AI.MonitorGPUData>(
-        `/ai/gpu/search`,
-        param,
-        TimeoutEnum.T_60S,
-        currentNode ? { CurrentNode: currentNode } : undefined,
-    );
+export const loadGPUMonitor = (param: AI.MonitorGPUSearch, currentNode?: string, config?: RequestConfig) => {
+    return http.postWithConfig<AI.MonitorGPUData>(`/ai/gpu/search`, param, {
+        timeout: TimeoutEnum.T_60S,
+        ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}),
+        ...config,
+    });
 };
 
 export const pageMcpServer = (req: AI.McpServerSearch) => {
