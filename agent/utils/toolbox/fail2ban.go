@@ -1,6 +1,7 @@
 package toolbox
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
@@ -9,6 +10,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/controller"
+	"github.com/1Panel-dev/1Panel/agent/utils/firewall/lifecycle"
 )
 
 type Fail2ban struct{}
@@ -47,12 +49,12 @@ func (f *Fail2ban) Status() (bool, bool, bool) {
 }
 
 func (f *Fail2ban) Version() string {
-	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("fail2ban-client", "version")
+	stdout, err := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second)).RunWithStdout("fail2ban-client", "--version")
 	if err != nil {
 		global.LOG.Errorf("load the fail2ban version failed, %v", err)
 		return "-"
 	}
-	return strings.ReplaceAll(stdout, "\n", "")
+	return strings.TrimPrefix(strings.TrimSpace(stdout), "Fail2Ban v")
 }
 
 func (f *Fail2ban) Operate(operate string) error {
@@ -139,11 +141,6 @@ func (f *Fail2ban) ListIgnore() ([]string, error) {
 }
 
 func initLocalFile() error {
-	f, err := os.Create(defaultPath)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
 	initFile := `#DEFAULT-START
 [DEFAULT]
 bantime = 600
@@ -157,6 +154,7 @@ action = %(action_mwl)s
 ignoreip = 127.0.0.1/8
 enabled = true
 filter = sshd
+journalmatch = _SYSTEMD_UNIT=ssh.service + _SYSTEMD_UNIT=sshd.service + _COMM=sshd + _COMM=sshd-session
 port = 22
 maxretry = 5
 findtime = 300
@@ -165,13 +163,23 @@ banaction = $banaction
 action = %(action_mwl)s
 logpath = $logpath`
 
-	banaction := ""
+	banaction := "iptables-allports"
 	if active, _ := controller.CheckActive("firewalld"); active {
 		banaction = "firewallcmd-ipset"
-	} else if active, _ := controller.CheckActive("ufw"); active {
-		banaction = "ufw"
 	} else {
-		banaction = "iptables-allports"
+		client, err := lifecycle.NewClient("ufw")
+		if err != nil && !errors.Is(err, lifecycle.ErrNotInstalled) {
+			return err
+		}
+		if err == nil {
+			active, err := client.Status()
+			if err != nil {
+				return err
+			}
+			if active {
+				banaction = "ufw"
+			}
+		}
 	}
 	initFile = strings.ReplaceAll(initFile, "$banaction", banaction)
 

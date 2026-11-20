@@ -12,6 +12,8 @@ import (
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 )
 
@@ -41,7 +43,7 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 		return baseInfo, err
 	}
 	baseInfo.IsEnable, baseInfo.IsActive, baseInfo.IsExist = client.Status()
-	if !baseInfo.IsActive {
+	if !baseInfo.IsExist {
 		baseInfo.Version = "-"
 	} else {
 		baseInfo.Version = client.Version()
@@ -74,6 +76,13 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 	baseInfo.BanTime = values["bantime"]
 	baseInfo.BanAction = values["banaction"]
 	baseInfo.LogPath = values["logpath"]
+	baseInfo.Mode = values["mode"]
+	if match := re.GetRegex(re.Fail2BanModeValuePattern).FindStringSubmatch(values["filter"]); len(match) == 2 {
+		baseInfo.Mode = strings.Trim(strings.TrimSpace(match[1]), `"'`)
+	}
+	if baseInfo.Mode == "" {
+		baseInfo.Mode = "normal"
+	}
 
 	return baseInfo, nil
 }
@@ -120,6 +129,20 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 	fail2BanConfigMu.Lock()
 	defer fail2BanConfigMu.Unlock()
 	req.Value = strings.TrimSpace(req.Value)
+	if req.Key == "mode" {
+		switch req.Value {
+		case "normal", "ddos", "extra", "aggressive":
+		default:
+			return fmt.Errorf("invalid Fail2ban mode: %s", req.Value)
+		}
+		client, err := toolbox.NewFail2Ban()
+		if err != nil {
+			return err
+		}
+		if common.CompareVersion("0.10.0", client.Version()) {
+			return fmt.Errorf("Fail2ban mode requires version 0.10.0 or later")
+		}
+	}
 
 	if req.Key == "banaction" {
 		if req.Value == "firewallcmd-ipset" || req.Value == "ufw" {
@@ -168,6 +191,15 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 				hasSection = true
 			}
 			continue
+		}
+		if section == "sshd" && req.Key == "mode" && key == "filter" {
+			pattern := re.GetRegex(re.Fail2BanModeAssignmentPattern)
+			if pattern.MatchString(line) {
+				lines[index] = pattern.ReplaceAllString(line, "${1}"+req.Value)
+			} else {
+				pattern = re.GetRegex(re.Fail2BanFilterNamePattern)
+				lines[index] = pattern.ReplaceAllString(line, "${1}[mode="+req.Value+"]")
+			}
 		}
 		if section != "sshd" || key != req.Key {
 			continue

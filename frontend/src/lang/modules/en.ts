@@ -2566,6 +2566,9 @@ const message = {
         missing: 'Missing',
     },
     container: {
+        logDisconnected: 'The log stream has disconnected. Reconnect to load recent logs and resume streaming.',
+        logsUnavailable:
+            'The container does not exist or has been deleted. Container logs are unavailable. Recreate the container and try again.',
         nvidiaSupport: 'NVIDIA GPU support',
         nvidiaHelper:
             'Register the NVIDIA container runtime. Install NVIDIA Container Toolkit first. Assign GPUs to each container separately.',
@@ -3294,6 +3297,14 @@ const message = {
             syncSiteHelper: 'Sync system time with {0}. Continue?',
         },
         fail2ban: {
+            mode: 'Detection mode',
+            modeHelper:
+                'Choose which SSH connection events count as failures toward an IP ban. Requires Fail2ban 0.10 or later.',
+            modeNormal: 'Default: count failed logins, such as wrong passwords or unknown usernames.',
+            modeDdos: 'Also count connections that time out or disconnect before login.',
+            modeExtra: 'Also count failures caused by connection methods the server does not support.',
+            modeAggressive:
+                'Count all of the above. Stricter protection, with a greater chance of blocking legitimate users.',
             sshPort: 'Listen to SSH port',
             sshPortHelper: 'Current Fail2ban listens to the SSH connection port of the host',
             unActive: 'The Fail2ban service is not enabled at present.',
@@ -4636,7 +4647,7 @@ const message = {
         batchPHPStatus_success: 'Succeeded',
         batchPHPStatus_failed: 'Failed',
         batchPHPStatus_skipped: 'Skipped',
-
+        sslDomainMismatchWebsite: 'The certificate domains do not match the website domains',
         primaryDomain: 'Primary domain',
         otherDomains: 'Other domains',
         static: 'Static',
@@ -5459,6 +5470,7 @@ const message = {
         editRuleConfirm: 'Are you sure you want to modify this rule?',
     },
     runtime: {
+        statusMessageUnavailable: 'No detailed status information is available. Check the runtime logs for details.',
         importEnv: 'Import Environment Variables',
         envImportError: 'Line {0}: {1}',
         envInvalidAssignment: 'Expected a valid NAME=value assignment',

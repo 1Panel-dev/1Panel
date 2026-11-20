@@ -2,6 +2,7 @@ import { CommonModel, ReqPage } from '.';
 
 export namespace Website {
     export interface Website extends CommonModel {
+        sslDomainMismatch?: boolean;
         primaryDomain: string;
         type: string;
         alias: string;
@@ -53,6 +54,7 @@ export namespace Website {
     }
 
     export interface WebsiteRes extends CommonModel {
+        sslDomainMismatch: boolean;
         protocol: string;
         primaryDomain: string;
         type: string;

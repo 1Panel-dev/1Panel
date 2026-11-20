@@ -2601,6 +2601,10 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        logDisconnected:
+            'El flujo de registros se ha desconectado. Vuelve a conectarte para cargar los registros recientes y reanudar la transmisión.',
+        logsUnavailable:
+            'El contenedor no existe o se ha eliminado. Los registros del contenedor no están disponibles. Vuelva a crear el contenedor e inténtelo de nuevo.',
         nvidiaSupport: 'Compatibilidad con GPU NVIDIA',
         nvidiaHelper:
             'Registra el entorno de ejecución de NVIDIA. Instala primero NVIDIA Container Toolkit. Asigna las GPU a cada contenedor por separado.',
@@ -3355,6 +3359,15 @@ const message = {
             syncSiteHelper: '¿Sincronizar la hora del sistema con {0}?',
         },
         fail2ban: {
+            mode: 'Modo de detección',
+            modeHelper:
+                'Elija qué eventos de conexión SSH cuentan como fallos para bloquear una IP. Requiere Fail2ban 0.10 o posterior.',
+            modeNormal:
+                'Predeterminado: cuenta accesos fallidos, como contraseñas incorrectas o usuarios inexistentes.',
+            modeDdos: 'También cuenta conexiones que agotan el tiempo de espera o se cortan antes de iniciar sesión.',
+            modeExtra: 'También cuenta fallos por métodos de conexión que el servidor no admite.',
+            modeAggressive:
+                'Cuenta todos los casos anteriores. Es más estricto, pero puede bloquear a más usuarios legítimos.',
             sshPort: 'Puerto SSH',
             sshPortHelper: 'Fail2ban escucha el puerto SSH del host',
             unActive: 'El servicio Fail2ban no está habilitado actualmente.',
@@ -4723,7 +4736,7 @@ const message = {
         batchPHPStatus_success: 'Correcto',
         batchPHPStatus_failed: 'Error',
         batchPHPStatus_skipped: 'Omitido',
-
+        sslDomainMismatchWebsite: 'Los dominios del certificado no coinciden con los dominios del sitio web',
         primaryDomain: 'Dominio principal',
         otherDomains: 'Otros dominios',
         static: 'Estático',
@@ -5541,6 +5554,8 @@ const message = {
         editRuleConfirm: '¿Confirma que desea modificar esta regla?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'No hay información detallada sobre el estado. Consulta los registros del entorno de ejecución para obtener más detalles.',
         importEnv: 'Importar variables de entorno',
         envImportError: 'Línea {0}: {1}',
         envInvalidAssignment: 'Se esperaba una asignación NOMBRE=valor válida',

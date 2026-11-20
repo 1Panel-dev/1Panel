@@ -93,6 +93,13 @@
                                 >
                                     {{ row.primaryDomain }}
                                 </el-text>
+                                <el-tooltip
+                                    v-if="row.sslDomainMismatch"
+                                    :content="$t('website.sslDomainMismatchWebsite')"
+                                    placement="top"
+                                >
+                                    <el-icon class="ml-1" color="var(--el-color-warning)"><WarningFilled /></el-icon>
+                                </el-tooltip>
                                 <Domain
                                     class="website-card-domain__actions"
                                     :row="row"
@@ -340,6 +347,7 @@
 </template>
 
 <script lang="ts" setup>
+import { WarningFilled } from '@element-plus/icons-vue';
 import { useSearchState } from '@/utils/search-reset';
 import Backups from '@/components/backup/index.vue';
 import UploadDialog from '@/components/upload/index.vue';

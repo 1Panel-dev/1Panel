@@ -2403,6 +2403,8 @@ const message = {
         missing: '不存在',
     },
     container: {
+        logDisconnected: '日志流已断开，请重新连接以加载最近日志并继续接收实时日志。',
+        logsUnavailable: '容器不存在或已被删除，暂无可查看的容器日志。请重新创建容器后再试。',
         nvidiaSupport: 'NVIDIA GPU 支持',
         nvidiaHelper: '注册 NVIDIA 容器运行时，需要先安装 NVIDIA Container Toolkit。具体容器仍需单独分配 GPU。',
         nvidiaLocalOnly: '仅支持本机默认 Docker Socket。',
@@ -3085,6 +3087,12 @@ const message = {
             dnsTestFailed: 'DNS 配置信息不可用，请修改后重试！',
         },
         fail2ban: {
+            mode: '检测模式',
+            modeHelper: '决定哪些 SSH 连接行为会被计为失败，达到设定次数后封禁 IP。需要 Fail2ban 0.10 及以上版本。',
+            modeNormal: '默认：记录密码错误、用户名不存在等登录失败。',
+            modeDdos: '在默认模式基础上，也记录连接超时、未登录就断开等行为。',
+            modeExtra: '在默认模式基础上，也记录客户端连接方式不被服务器支持等失败。',
+            modeAggressive: '记录以上所有行为，拦截更严格，也更容易误封正常用户。',
             sshPort: '监听 SSH 端口',
             sshPortHelper: '当前 Fail2ban 监听主机 SSH 连接端口',
             unActive: '当前未开启 Fail2ban 服务，请先开启！',
@@ -4331,7 +4339,7 @@ const message = {
         batchPHPStatus_success: '成功',
         batchPHPStatus_failed: '失败',
         batchPHPStatus_skipped: '跳过',
-
+        sslDomainMismatchWebsite: '证书域名与网站域名不匹配',
         primaryDomain: '主域名',
         otherDomains: '其他域名',
         static: '静态网站',
@@ -5087,6 +5095,7 @@ const message = {
         editRuleConfirm: '是否确认修改该规则？',
     },
     runtime: {
+        statusMessageUnavailable: '暂无详细状态信息，请点击日志列的“查看”排查具体原因。',
         importEnv: '导入环境变量',
         envImportError: '第 {0} 行：{1}',
         envInvalidAssignment: '应为有效的变量名=value',

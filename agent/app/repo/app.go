@@ -28,6 +28,7 @@ type IAppRepo interface {
 	Page(page, size int, opts ...DBOption) (int64, []model.App, error)
 	GetFirst(opts ...DBOption) (model.App, error)
 	GetBy(opts ...DBOption) ([]model.App, error)
+	GetIDs(ctx context.Context, opts ...DBOption) ([]uint, error)
 	BatchCreate(ctx context.Context, apps []model.App) error
 	Create(ctx context.Context, app *model.App) error
 	Save(ctx context.Context, app *model.App) error
@@ -135,6 +136,12 @@ func (a AppRepo) GetBy(opts ...DBOption) ([]model.App, error) {
 		return apps, err
 	}
 	return apps, nil
+}
+
+func (a AppRepo) GetIDs(ctx context.Context, opts ...DBOption) ([]uint, error) {
+	var ids []uint
+	err := getDb(opts...).WithContext(ctx).Model(&model.App{}).Pluck("id", &ids).Error
+	return ids, err
 }
 
 func (a AppRepo) GetTopRecommend() ([]string, error) {

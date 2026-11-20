@@ -2519,6 +2519,10 @@ const message = {
         missing: '없음',
     },
     container: {
+        logDisconnected:
+            '로그 스트림 연결이 끊어졌습니다. 다시 연결하여 최근 로그를 불러오고 실시간 로그 수신을 재개하세요.',
+        logsUnavailable:
+            '컨테이너가 존재하지 않거나 삭제되었습니다. 컨테이너 로그를 확인할 수 없습니다. 컨테이너를 다시 생성한 후 재시도하세요.',
         nvidiaSupport: 'NVIDIA GPU 지원',
         nvidiaHelper:
             'NVIDIA 컨테이너 런타임을 등록합니다. 먼저 NVIDIA Container Toolkit을 설치하세요. GPU는 각 컨테이너에 별도로 할당해야 합니다.',
@@ -3224,6 +3228,13 @@ const message = {
             syncSiteHelper: '{0}을(를) 기준으로 시스템 시간을 동기화하시겠습니까?',
         },
         fail2ban: {
+            mode: '탐지 모드',
+            modeHelper:
+                '어떤 SSH 연결 동작을 실패로 셀지 선택합니다. 설정한 횟수에 도달하면 IP를 차단합니다. Fail2ban 0.10 이상이 필요합니다.',
+            modeNormal: '기본값: 잘못된 비밀번호나 존재하지 않는 사용자 이름 등 로그인 실패를 셉니다.',
+            modeDdos: '기본 탐지에 더해 연결 시간 초과나 로그인 전 연결 종료도 셉니다.',
+            modeExtra: '기본 탐지에 더해 서버가 지원하지 않는 연결 방식으로 인한 실패도 셉니다.',
+            modeAggressive: '위의 모든 동작을 셉니다. 더 엄격하게 차단하므로 정상 사용자도 차단될 가능성이 높아집니다.',
             sshPort: 'SSH 포트 청취',
             sshPortHelper: '현재 Fail2ban 은 호스트의 SSH 연결 포트를 청취합니다.',
             unActive: '현재 Fail2ban 서비스가 활성화되어 있지 않습니다.',
@@ -4534,7 +4545,7 @@ const message = {
         batchPHPStatus_success: '성공',
         batchPHPStatus_failed: '실패',
         batchPHPStatus_skipped: '건너뜀',
-
+        sslDomainMismatchWebsite: '인증서 도메인이 웹사이트 도메인과 일치하지 않습니다',
         primaryDomain: '기본 도메인',
         otherDomains: '기타 도메인',
         static: '정적',
@@ -5338,6 +5349,7 @@ const message = {
         editRuleConfirm: '이 규칙을 수정하시겠습니까?',
     },
     runtime: {
+        statusMessageUnavailable: '자세한 상태 정보가 없습니다. 실행 환경 로그에서 자세한 내용을 확인하세요.',
         importEnv: '환경 변수 가져오기',
         envImportError: '{0}행: {1}',
         envInvalidAssignment: '유효한 NAME=value 형식이 필요합니다',
