@@ -110,6 +110,8 @@ export namespace App {
         required: boolean;
         default: any;
         envKey: string;
+        disabled?: boolean;
+        rule?: string;
         key?: string;
         values?: ServiceParam[];
         child?: FromFieldChild;
@@ -183,6 +185,12 @@ export namespace App {
         appStatus?: string;
         appType?: string;
         version?: string;
+    }
+
+    export interface ClusterReplicaSource {
+        host: string;
+        port: number;
+        internal: boolean;
     }
 
     export interface AppInstalledInfo {

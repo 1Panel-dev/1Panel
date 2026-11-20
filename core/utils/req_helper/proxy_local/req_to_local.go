@@ -20,6 +20,14 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
+type AgentResponseError struct {
+	Code    int
+	Message string
+	Data    interface{}
+}
+
+func (e *AgentResponseError) Error() string { return e.Message }
+
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
 	client := NewReusableClient()
 	defer client.CloseIdleConnections()
@@ -127,7 +135,7 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 		if global.I18n != nil {
 			message = strings.ReplaceAll(message, i18n.Get("ErrInternalServerKey"), "")
 		}
-		return nil, errors.New(message)
+		return nil, &AgentResponseError{Code: respJson.Code, Message: message, Data: respJson.Data}
 	}
 
 	return respJson.Data, nil

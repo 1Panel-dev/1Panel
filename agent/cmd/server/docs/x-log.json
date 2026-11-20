@@ -2005,6 +2005,16 @@
 		"formatZH": "删除集群 [clusterName] 节点 [clusterNodeID]",
 		"formatEN": "delete node [clusterNodeID] from cluster [clusterName]"
 	},
+	"/core/xpack/cluster/node/params/reveal": {
+		"bodyKeys": [
+			"id",
+			"key"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "查看服务器 [server] 上集群成员 [id] 的敏感参数 [key]",
+		"formatEN": "reveal parameter [key] for cluster member [id] on server [server]"
+	},
 	"/core/xpack/exchange/file": {
 		"bodyKeys": [
 			"sourceNode",

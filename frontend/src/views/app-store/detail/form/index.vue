@@ -34,7 +34,17 @@
                         <el-input v-model.trim="formData.name"></el-input>
                     </el-form-item>
                     <el-form-item :label="$t('app.version')" prop="version">
-                        <el-select v-model="formData.version" @change="handleVersionChange">
+                        <el-input
+                            v-if="clusterVersionLocked"
+                            :model-value="formData.version?.replace(/-slave$/, '') || ''"
+                            readonly
+                        />
+                        <el-select
+                            v-else
+                            v-model="formData.version"
+                            :disabled="!!clusterVersionNotice"
+                            @change="handleVersionChange"
+                        >
                             <el-option
                                 v-for="(version, index) in appVersions"
                                 :key="index"
@@ -42,6 +52,12 @@
                                 :value="version"
                             ></el-option>
                         </el-select>
+                        <el-text v-if="clusterVersionNotice" class="mt-1 w-full" type="warning" role="status">
+                            {{ $t(clusterVersionNotice) }}
+                        </el-text>
+                        <el-text v-else-if="clusterVersionLocked && formData.version" class="mt-1 w-full" type="info">
+                            {{ $t('xpack.cluster.versionLocked') }}
+                        </el-text>
                     </el-form-item>
 
                     <Params
@@ -50,6 +66,7 @@
                         v-model:form="formData.params"
                         v-model:params="installParams"
                         v-model:rules="formRules.params"
+                        :fallback-descriptions="fallbackDescriptions"
                         :propStart="'params.'"
                     />
                 </div>
@@ -163,7 +180,8 @@ import { getAppByKey, getAppDetail, getAppInstalledByID } from '@/api/modules/ap
 import { getAppStoreConfig } from '@/api/modules/setting';
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import { FormInstance, FormRules } from 'element-plus';
-import { ref, watch } from 'vue';
+import { onBeforeUnmount, ref, watch } from 'vue';
+import { useI18n } from 'vue-i18n';
 import Params from '../params/index.vue';
 import { Container } from '@/api/interface/container';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';
@@ -171,6 +189,7 @@ import { computeSizeFromMB } from '@/utils/size';
 import { loadResourceLimit } from '@/api/modules/container';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 const { isMaster, isOffline, isXpackOrEE } = useGlobalStore();
+const { locale, t } = useI18n();
 
 const PushToNode = defineAsyncComponent(async () => {
     const modules = import.meta.glob('@/xpack/views/ssl/index.vue');
@@ -187,8 +206,10 @@ interface ClusterProps {
     masterNode: string;
     appInstallID: number;
     masterVersion: string;
-    masterNodeAddr: string;
-    role: string;
+    primaryLabel: string;
+    loadReplicaSource?: () => Promise<App.ClusterReplicaSource>;
+    role: 'master' | 'slave';
+    excludedMasterVersions: readonly string[];
 }
 interface Props {
     loading?: boolean;
@@ -196,6 +217,7 @@ interface Props {
     batchInstallSupport?: boolean;
     sectioned?: boolean;
     hideGpuConfig?: boolean;
+    fallbackDescriptions?: Record<string, string>;
 }
 
 const limits = ref<Container.ResourceLimit>({
@@ -225,9 +247,13 @@ const oldMemory = ref<number>(0);
 const showParams = ref(false);
 const currentApp = ref<any>({});
 const appVersions = ref<string[]>([]);
+const clusterVersionNotice = ref('');
+const clusterVersionLocked = ref(false);
+let clusterFormRequest = 0;
 const operateNode = ref();
 const env = ref();
-const masterNodeAddr = ref();
+const primaryLabel = ref('');
+const replicaSource = ref<App.ClusterReplicaSource>();
 
 const formRules = ref<FormRules>({
     name: [Rules.appName],
@@ -298,6 +324,7 @@ const handleVersionChange = async (version: string) => {
 };
 
 const getVersionDetail = async (version: string) => {
+    const request = clusterFormRequest;
     formData.value.appDetailId = 0;
     formData.value.dockerCompose = '';
     formData.value.params = {};
@@ -309,7 +336,7 @@ const getVersionDetail = async (version: string) => {
 
     try {
         const res = await getAppDetail(currentApp.value.id, version, 'app', operateNode.value);
-        if (formData.value.version !== version) {
+        if (request !== clusterFormRequest || formData.value.version !== version) {
             return;
         }
         formData.value.appDetailId = res.data.id;
@@ -327,25 +354,21 @@ const getVersionDetail = async (version: string) => {
     } catch (error) {}
 };
 
-const loadInstallDefaultConfig = async () => {
+const getInstallAllowPort = async (node?: string) => {
     try {
-        const res = await getAppStoreConfig(operateNode.value);
-        formData.value.allowPort = res.data.installAllowPort === 'Enable';
+        const res = await getAppStoreConfig(node);
+        return res.data.installAllowPort === 'Enable';
     } catch (error) {
-        formData.value.allowPort = false;
+        return false;
     }
 };
 
 const initForm = async (appKey: string, allowPort?: boolean) => {
     operateNode.value = undefined;
     env.value = undefined;
-    masterNodeAddr.value = undefined;
+    replicaSource.value = undefined;
     formData.value.name = appKey.replace(/^local/, '');
-    if (allowPort === undefined) {
-        await loadInstallDefaultConfig();
-    } else {
-        formData.value.allowPort = allowPort;
-    }
+    formData.value.allowPort = allowPort === undefined ? await getInstallAllowPort() : allowPort;
     const res = await getAppByKey(appKey);
     currentApp.value = res.data;
     appVersions.value = currentApp.value.versions;
@@ -362,11 +385,13 @@ const initForm = async (appKey: string, allowPort?: boolean) => {
 const getMasterAppInstall = async (appInstallID: number, masterNode: string) => {
     try {
         const res = await getAppInstalledByID(appInstallID, masterNode);
-        env.value = res.data.env;
+        return res.data;
     } catch (error) {}
 };
 
 const addMasterParams = (appParams: App.AppParams) => {
+    const source = replicaSource.value;
+    const language = locale.value.toLowerCase();
     for (const key in appParams.formFields) {
         const field = appParams.formFields[key];
         if (field?.envKey === 'MASTER_ROOT_PASSWORD') {
@@ -383,35 +408,80 @@ const addMasterParams = (appParams: App.AppParams) => {
         if (field?.envKey === 'REPLICATION_PASSWORD') {
             field.default = env.value['REPLICATION_PASSWORD'];
         }
-        if (field?.envKey === 'MASTER_PORT') {
-            field.default = env.value['PANEL_APP_PORT_HTTP'];
+        if (field?.envKey === 'MASTER_HOST') {
+            field.default = source?.host ?? '';
+            field.disabled = false;
+            field.label = {
+                ...field.label,
+                [language]: t('xpack.cluster.replicaSourceAddress', [primaryLabel.value]),
+            };
         }
-        if (field?.envKey === 'MASTER_HOST' && masterNodeAddr.value != '127.0.0.1') {
-            field.default = masterNodeAddr.value;
+        if (field?.envKey === 'MASTER_PORT') {
+            field.default = source ? String(source.port) : '';
+            field.disabled = false;
+            field.rule = 'paramPort';
+            field.label = {
+                ...field.label,
+                [language]: t('xpack.cluster.replicaSourcePort', [primaryLabel.value]),
+            };
         }
     }
     return appParams;
 };
 
-const initClusterForm = async (props: ClusterProps) => {
-    if (props.appInstallID && props.masterNode) {
-        getMasterAppInstall(props.appInstallID, props.masterNode);
+const initClusterForm = async (config: ClusterProps) => {
+    const request = ++clusterFormRequest;
+    resetForm();
+    clusterVersionLocked.value = config.role === 'slave';
+    appVersions.value = [];
+    env.value = undefined;
+    replicaSource.value = undefined;
+    primaryLabel.value = config.primaryLabel;
+    operateNode.value = config.node;
+    formData.value.name = `${config.key}-${config.role}`;
+    if (!config.node) return;
+
+    const [appResponse, allowPort, masterInstall, source] = await Promise.all([
+        getAppByKey(config.key, config.node).catch(() => undefined),
+        getInstallAllowPort(config.node),
+        config.appInstallID && config.masterNode
+            ? getMasterAppInstall(config.appInstallID, config.masterNode)
+            : undefined,
+        config.loadReplicaSource?.().catch(() => undefined),
+    ]);
+    if (request !== clusterFormRequest || !appResponse) return;
+    if (config.role === 'slave' && !masterInstall?.env) {
+        clusterVersionNotice.value = 'xpack.cluster.masterUnavailable';
+        return;
     }
-    masterNodeAddr.value = props.masterNodeAddr;
-    operateNode.value = props.node;
-    await loadInstallDefaultConfig();
-    const res = await getAppByKey(props.key, props.node);
-    currentApp.value = res.data;
-    appVersions.value = currentApp.value.versions;
-    if (appVersions.value.length > 0) {
-        appVersions.value = appVersions.value.filter((v: string) => {
-            return v.includes(props.role) && v.includes(props.masterVersion);
-        });
-        const defaultVersion = appVersions.value[0];
-        formData.value.version = defaultVersion;
-        getVersionDetail(defaultVersion);
+
+    env.value = masterInstall?.env;
+    replicaSource.value = source;
+    formData.value.allowPort = allowPort;
+    currentApp.value = appResponse.data;
+    const versions = appResponse.data.versions ?? [];
+    if (config.role === 'slave') {
+        const version = (masterInstall?.version || config.masterVersion).replace(/-master$/, '');
+        appVersions.value = version ? versions.filter((candidate) => candidate === `${version}-slave`) : [];
+    } else {
+        const suffix = '-master';
+        appVersions.value = versions.filter(
+            (version) =>
+                version.endsWith(suffix) && !config.excludedMasterVersions.includes(version.slice(0, -suffix.length)),
+        );
     }
-    formData.value.name = props.key + '-' + props.role;
+
+    const [defaultVersion] = appVersions.value;
+    if (!defaultVersion) {
+        clusterVersionNotice.value =
+            config.role === 'slave'
+                ? 'xpack.cluster.noMatchingReplicaVersion'
+                : 'xpack.cluster.noAvailableMasterVersion';
+        return;
+    }
+
+    formData.value.version = defaultVersion;
+    await getVersionDetail(defaultVersion);
 };
 
 const resetForm = () => {
@@ -420,6 +490,8 @@ const resetForm = () => {
         formRef.value.resetFields();
     }
     Object.assign(formData.value, initFormData());
+    clusterVersionNotice.value = '';
+    clusterVersionLocked.value = false;
     isHostMode.value = false;
     memoryRequired.value = 0;
     gpuSupport.value = false;
@@ -459,6 +531,10 @@ const loadLimit = async () => {
 
 onMounted(() => {
     loadLimit();
+});
+
+onBeforeUnmount(() => {
+    clusterFormRequest++;
 });
 
 defineExpose({

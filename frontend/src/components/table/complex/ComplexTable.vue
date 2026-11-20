@@ -75,7 +75,9 @@
                                 :key="getColumnKey(contentColumn)"
                                 class="complex-table__card-item"
                             >
-                                <span class="complex-table__card-label">{{ getColumnLabel(contentColumn) }}</span>
+                                <span class="complex-table__card-label">
+                                    {{ getColumnLabel(contentColumn, cardRow) }}
+                                </span>
                                 <strong class="complex-table__card-value">
                                     <CardColumnValue :column="contentColumn" :row="cardRow" :index="cardIndex" />
                                 </strong>
@@ -87,7 +89,9 @@
                                 :key="getColumnKey(fullContentColumn)"
                                 class="complex-table__card-full-content-item"
                             >
-                                <span class="complex-table__card-label">{{ getColumnLabel(fullContentColumn) }}</span>
+                                <span class="complex-table__card-label">
+                                    {{ getColumnLabel(fullContentColumn, cardRow) }}
+                                </span>
                                 <div class="complex-table__card-full-content-value">
                                     <CardColumnValue :column="fullContentColumn" :row="cardRow" :index="cardIndex" />
                                 </div>
@@ -99,7 +103,7 @@
                                 :key="getColumnKey(descriptionColumn)"
                                 class="complex-table__card-description-item"
                             >
-                                <span>{{ getColumnLabel(descriptionColumn) }}</span>
+                                <span>{{ getColumnLabel(descriptionColumn, cardRow) }}</span>
                                 <strong>
                                     <CardColumnValue :column="descriptionColumn" :row="cardRow" :index="cardIndex" />
                                 </strong>

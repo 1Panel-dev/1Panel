@@ -83,6 +83,11 @@ export const useCardColumns = (columnNodes: () => VNode[], columns: () => unknow
         CardColumnValue: CardColumnValue as Component,
         cardColumns,
         getColumnKey: getTableColumnKey,
-        getColumnLabel: (column: VNode) => String((column.props as Record<string, any> | null)?.label || ''),
+        getColumnLabel: (column: VNode, row: unknown) => {
+            const props = column.props;
+            const cardLabel = props?.cardLabel ?? props?.['card-label'];
+            const label = typeof cardLabel === 'function' ? cardLabel(row) : props?.label;
+            return String(label || '');
+        },
     };
 };
