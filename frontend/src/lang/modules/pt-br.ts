@@ -2603,6 +2603,8 @@ const message = {
     container: {
         logDisconnected:
             'O fluxo de logs foi desconectado. Reconecte para carregar os logs recentes e retomar a transmissão.',
+        logsUnavailable:
+            'O contêiner não existe ou foi excluído. Os logs do contêiner não estão disponíveis. Recrie o contêiner e tente novamente.',
         nvidiaSupport: 'Suporte a GPU NVIDIA',
         nvidiaHelper:
             'Registra o runtime de contêiner NVIDIA. Instale primeiro o NVIDIA Container Toolkit. Atribua GPUs a cada contêiner separadamente.',
@@ -3356,6 +3358,14 @@ const message = {
             dnsTestFailed: 'Configuração DNS indisponível.',
         },
         fail2ban: {
+            mode: 'Modo de detecção',
+            modeHelper:
+                'Escolha quais eventos de conexão SSH contam como falhas para bloquear um IP. Requer Fail2ban 0.10 ou superior.',
+            modeNormal: 'Padrão: conta falhas de login, como senhas incorretas ou usuários inexistentes.',
+            modeDdos: 'Também conta conexões que excedem o tempo limite ou são encerradas antes do login.',
+            modeExtra: 'Também conta falhas causadas por métodos de conexão que o servidor não aceita.',
+            modeAggressive:
+                'Conta todos os casos acima. É mais rigoroso, mas aumenta a chance de bloquear usuários legítimos.',
             sshPort: 'Monitorar porta SSH',
             sshPortHelper: 'O Fail2ban atual monitora a porta SSH de conexão do host',
             unActive: 'O serviço Fail2ban não está habilitado no momento.',
@@ -4721,6 +4731,7 @@ const message = {
         isEdirWarn: 'Foram detectadas alterações no arquivo docker-compose.yml. Revise a comparação.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Os domínios do certificado não correspondem aos domínios do site',
         primaryDomain: 'Domínio principal',
         otherDomains: 'Outros domínios',
         static: 'Estático',

@@ -2551,6 +2551,8 @@ const message = {
     container: {
         logDisconnected:
             'ログストリームが切断されました。再接続して最近のログを読み込み、リアルタイムのログ受信を再開してください。',
+        logsUnavailable:
+            'コンテナが存在しないか、削除されています。コンテナのログは表示できません。コンテナを再作成してから、もう一度お試しください。',
         nvidiaSupport: 'NVIDIA GPU サポート',
         nvidiaHelper:
             'NVIDIA コンテナーランタイムを登録します。先に NVIDIA Container Toolkit をインストールしてください。GPU はコンテナーごとに割り当てる必要があります。',
@@ -3276,6 +3278,13 @@ const message = {
             syncSiteHelper: 'システム時刻を {0} と同期しますか？',
         },
         fail2ban: {
+            mode: '検出モード',
+            modeHelper:
+                'どの SSH 接続の動作を失敗として数えるかを選びます。設定した回数に達すると IP を遮断します。Fail2ban 0.10 以降が必要です。',
+            modeNormal: '既定：パスワードの間違いや存在しないユーザー名など、ログイン失敗を数えます。',
+            modeDdos: '既定の検出に加え、接続のタイムアウトやログイン前の切断も数えます。',
+            modeExtra: '既定の検出に加え、サーバーが対応していない接続方法による失敗も数えます。',
+            modeAggressive: '上記すべてを数えます。より厳しく制限するため、正常なユーザーも遮断されやすくなります。',
             sshPort: 'SSHポートを聞いてください',
             sshPortHelper: '現在のFAL2BANは、ホストのSSH接続ポートに耳を傾けます',
             unActive: '現在、Fail2Banサービスは有効になっていません。',
@@ -4608,6 +4617,7 @@ const message = {
         isEdirWarn: 'docker-compose.yml ファイルの変更が検出されました。差分を確認してください。',
     },
     website: {
+        sslDomainMismatchWebsite: '証明書のドメインがウェブサイトのドメインと一致しません',
         primaryDomain: 'プライマリドメイン',
         otherDomains: '他のドメイン',
         static: '静的',

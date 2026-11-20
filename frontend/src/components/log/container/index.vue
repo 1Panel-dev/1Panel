@@ -283,6 +283,13 @@ const searchLogs = async (preserveLogs = false) => {
         stopListening();
         disconnected.value = logSearch.isWatch;
     });
+    source.addEventListener('container-missing', () => {
+        if (version !== searchVersion) return;
+        stopListening();
+        const message = i18n.global.t('container.logsUnavailable');
+        term?.writeln(message);
+        MsgError(message);
+    });
     source.onmessage = (event: MessageEvent) => {
         if (version !== searchVersion) return;
         term?.write(Base64.toUint8Array(event.data));

@@ -1,9 +1,11 @@
 package service
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -16,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
 )
 
@@ -566,4 +569,48 @@ func (u *LogService) ListSystemLogFile() ([]string, error) {
 	})
 
 	return listFile, nil
+}
+
+var errLogContainerMissing = errors.New("log container missing")
+
+func checkLogContainers(params dto.StreamLog) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	command := "docker"
+	args := []string{"container", "inspect", "--format", "{{.Id}}", params.Container}
+	if params.Type == "compose" {
+		command = common.GetDockerComposeCommand()
+		args = nil
+		if command != "docker-compose" {
+			command = "docker"
+			args = append(args, "compose")
+		}
+		for _, file := range strings.Split(params.Compose, ",") {
+			if file != "" {
+				args = append(args, "-f", file)
+			}
+		}
+		args = append(args, "ps", "--all", "--quiet")
+	}
+	cmd := exec.CommandContext(ctx, command, args...)
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	output, err := cmd.Output()
+	if err != nil {
+		return logContainerPresenceResult(params.Type, stderr.String(), err)
+	}
+	return logContainerPresenceResult(params.Type, string(output), nil)
+}
+
+func logContainerPresenceResult(kind, output string, err error) error {
+	if err != nil {
+		if kind != "compose" && (strings.Contains(output, "No such container:") || strings.Contains(output, "No such object:")) {
+			return errLogContainerMissing
+		}
+		return fmt.Errorf("check log containers: %w: %s", err, strings.TrimSpace(output))
+	}
+	if strings.TrimSpace(output) == "" {
+		return errLogContainerMissing
+	}
+	return nil
 }

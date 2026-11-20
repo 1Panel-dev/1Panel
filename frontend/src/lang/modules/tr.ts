@@ -2590,6 +2590,8 @@ const message = {
     container: {
         logDisconnected:
             'Günlük akışının bağlantısı kesildi. Son günlükleri yüklemek ve akışı sürdürmek için yeniden bağlanın.',
+        logsUnavailable:
+            'Konteyner mevcut değil veya silinmiş. Konteyner günlükleri kullanılamıyor. Konteyneri yeniden oluşturup tekrar deneyin.',
         nvidiaSupport: 'NVIDIA GPU desteği',
         nvidiaHelper:
             'NVIDIA konteyner çalışma zamanını kaydeder. Önce NVIDIA Container Toolkit kurun. GPU’ları her konteynere ayrı ayrı atayın.',
@@ -3332,6 +3334,14 @@ const message = {
             syncSiteHelper: 'Sistem saati {0} ile eşitlensin mi?',
         },
         fail2ban: {
+            mode: 'Algılama modu',
+            modeHelper:
+                'IP engellemesi için hangi SSH bağlantı olaylarının hata sayılacağını seçin. Fail2ban 0.10 veya üzeri gerekir.',
+            modeNormal: 'Varsayılan: yanlış parola veya bilinmeyen kullanıcı adı gibi başarısız girişleri sayar.',
+            modeDdos: 'Zaman aşımına uğrayan veya giriş yapılmadan kesilen bağlantıları da sayar.',
+            modeExtra: 'Sunucunun desteklemediği bağlantı yöntemlerinden kaynaklanan hataları da sayar.',
+            modeAggressive:
+                'Yukarıdakilerin tümünü sayar. Daha katıdır, ancak meşru kullanıcıların engellenme olasılığı da artar.',
             sshPort: 'SSH portunu dinle',
             sshPortHelper: 'Mevcut Fail2ban ana bilgisayarın SSH bağlantı portunu dinler',
             unActive: 'Fail2ban servisi şu anda etkin değil.',
@@ -4699,6 +4709,7 @@ const message = {
         isEdirWarn: 'docker-compose.yml dosyasında değişiklikler algılandı. Lütfen farkları inceleyin.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Sertifika alan adları web sitesinin alan adlarıyla eşleşmiyor',
         primaryDomain: 'Birincil alan adı',
         otherDomains: 'Diğer alan adları',
         static: 'Statik',

@@ -2595,6 +2595,8 @@ const message = {
     container: {
         logDisconnected:
             'Sambungan strim log telah terputus. Sambung semula untuk memuatkan log terkini dan meneruskan penstriman.',
+        logsUnavailable:
+            'Kontena tidak wujud atau telah dipadamkan. Log kontena tidak tersedia. Cipta semula kontena dan cuba lagi.',
         nvidiaSupport: 'Sokongan GPU NVIDIA',
         nvidiaHelper:
             'Daftarkan runtime kontena NVIDIA. Pasang NVIDIA Container Toolkit dahulu. Peruntukkan GPU kepada setiap kontena secara berasingan.',
@@ -3341,6 +3343,15 @@ const message = {
             syncSiteHelper: 'Gunakan {0} untuk penyegerakan masa sistem. Teruskan?',
         },
         fail2ban: {
+            mode: 'Mod pengesanan',
+            modeHelper:
+                'Pilih peristiwa sambungan SSH yang dikira sebagai kegagalan untuk menyekat IP. Memerlukan Fail2ban 0.10 atau lebih baharu.',
+            modeNormal:
+                'Lalai: kira log masuk yang gagal, seperti kata laluan salah atau nama pengguna yang tidak wujud.',
+            modeDdos: 'Turut mengira sambungan yang tamat masa atau terputus sebelum log masuk.',
+            modeExtra: 'Turut mengira kegagalan akibat kaedah sambungan yang tidak disokong pelayan.',
+            modeAggressive:
+                'Mengira semua perkara di atas. Lebih ketat, tetapi lebih berkemungkinan menyekat pengguna yang sah.',
             sshPort: 'Dengar pada port SSH',
             sshPortHelper: 'Fail2ban semasa mendengar pada port sambungan SSH hos',
             unActive: 'Perkhidmatan Fail2ban tidak diaktifkan pada masa ini.',
@@ -4697,6 +4708,7 @@ const message = {
         isEdirWarn: 'Perubahan pada fail docker-compose.yml telah dikesan. Sila semak perbezaannya.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Domain sijil tidak sepadan dengan domain laman web',
         primaryDomain: 'Domain Utama',
         otherDomains: 'Domain Lain',
         static: 'Statik',

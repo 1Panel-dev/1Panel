@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"net"
 	"os"
 	"path"
 	"strconv"
@@ -35,6 +36,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"golang.org/x/net/idna"
 	gormv2 "gorm.io/gorm"
 )
 
@@ -639,6 +641,38 @@ func runShellScriptFile(workDir, shell string, logger *log.Logger) error {
 	}
 	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(30*time.Minute), cmd.WithLogger(logger), cmd.WithWorkDir(workDir))
 	return cmdMgr.Run("bash", file.Name())
+}
+
+// Domain warnings are advisory and intentionally do not check validity dates or trust.
+func websiteCertificateDomainMismatch(website model.Website, cert *x509.Certificate) bool {
+	if website.Protocol != constant.ProtocolHTTPS || cert == nil {
+		return false
+	}
+	for _, domain := range website.Domains {
+		host := strings.TrimSpace(domain.Domain)
+		if h, _, err := net.SplitHostPort(host); err == nil {
+			host = h
+		}
+		host = strings.TrimSuffix(strings.ToLower(strings.Trim(host, "[]")), ".")
+		if host == "" {
+			continue
+		}
+		if net.ParseIP(host) == nil {
+			wildcard := strings.HasPrefix(host, "*.")
+			normalized, err := idna.Lookup.ToASCII(strings.TrimPrefix(host, "*."))
+			if err != nil {
+				continue
+			}
+			host = normalized
+			if wildcard {
+				host = "*." + host
+			}
+		}
+		if cert.VerifyHostname(host) != nil {
+			return true
+		}
+	}
+	return false
 }
 
 func parseCertificatePEM(certPEM []byte) (*x509.Certificate, error) {

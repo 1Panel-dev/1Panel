@@ -62,14 +62,7 @@
                     </el-table-column>
                     <el-table-column :label="$t('commons.button.log')" prop="path" width="120px">
                         <template #default="{ row }">
-                            <el-button
-                                @click="openLog(row)"
-                                link
-                                type="primary"
-                                :disabled="
-                                    row.status !== 'Running' && row.status !== 'Rrror' && row.status !== 'Restarting'
-                                "
-                            >
+                            <el-button @click="openLog(row)" link type="primary">
                                 {{ $t('website.check') }}
                             </el-button>
                         </template>
