@@ -27,7 +27,12 @@
                         <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
 
                         <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
-                        <HttpsConfig v-model="form" :website-ssl="websiteSSL" @ssl-change="handleSSLChange" />
+                        <HttpsConfig
+                            v-model="form"
+                            :website-ssl="websiteSSL"
+                            :website-domains="websiteDomains"
+                            @ssl-change="handleSSLChange"
+                        />
                         <el-form-item>
                             <el-button v-permission type="primary" @click="submit(httpsForm)">
                                 {{ $t('commons.button.save') }}
@@ -43,7 +48,7 @@
 import HttpsConfig from '@/views/website/website/components/https/index.vue';
 
 import { Website } from '@/api/interface/website';
-import { getHTTPSConfig, updateHTTPSConfig } from '@/api/modules/website';
+import { getHTTPSConfig, updateHTTPSConfig, listDomains } from '@/api/modules/website';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { computed, onMounted, reactive, ref } from 'vue';
 import i18n from '@/lang';
@@ -82,6 +87,7 @@ let form = reactive({
 });
 const loading = ref(false);
 const websiteSSL = ref();
+const websiteDomains = ref<string[]>([]);
 const rules = ref({
     type: [Rules.requiredSelect],
     privateKey: [Rules.requiredInput],
@@ -101,6 +107,9 @@ const handleSSLChange = (ssl: Website.SSL) => {
 };
 
 const get = () => {
+    listDomains(id.value).then((res) => {
+        websiteDomains.value = (res.data || []).map((item) => item.domain);
+    });
     getHTTPSConfig(id.value).then((res) => {
         if (res.data) {
             form.type = 'existed';

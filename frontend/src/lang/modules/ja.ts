@@ -4615,6 +4615,7 @@ const message = {
         isEdirWarn: 'docker-compose.yml ファイルの変更が検出されました。差分を確認してください。',
     },
     website: {
+        sslDomainMismatchWebsite: '証明書のドメインがウェブサイトのドメインと一致しません',
         primaryDomain: 'プライマリドメイン',
         otherDomains: '他のドメイン',
         static: '静的',

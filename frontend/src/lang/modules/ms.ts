@@ -4706,6 +4706,7 @@ const message = {
         isEdirWarn: 'Perubahan pada fail docker-compose.yml telah dikesan. Sila semak perbezaannya.',
     },
     website: {
+        sslDomainMismatchWebsite: 'Domain sijil tidak sepadan dengan domain laman web',
         primaryDomain: 'Domain Utama',
         otherDomains: 'Domain Lain',
         static: 'Statik',

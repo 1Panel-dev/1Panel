@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"database/sql"
 	"encoding/base64"
 	"errors"
@@ -193,6 +194,7 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	if err != nil {
 		return 0, nil, err
 	}
+	certificates := make(map[uint]*x509.Certificate)
 	for _, web := range websites {
 		var (
 			appName      string
@@ -216,25 +218,31 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		}
 		sitePath := GetSitePath(web, SiteDir)
 
+		cert, parsed := certificates[web.WebsiteSSLID]
+		if !parsed && web.Protocol == constant.ProtocolHTTPS && web.WebsiteSSLID != 0 {
+			cert, _ = parseCertificatePEM([]byte(web.WebsiteSSL.Pem))
+			certificates[web.WebsiteSSLID] = cert
+		}
 		siteDTO := response.WebsiteRes{
-			ID:            web.ID,
-			CreatedAt:     web.CreatedAt,
-			Protocol:      web.Protocol,
-			PrimaryDomain: web.PrimaryDomain,
-			Type:          web.Type,
-			Remark:        web.Remark,
-			Status:        web.Status,
-			Alias:         web.Alias,
-			AppName:       appName,
-			ExpireDate:    web.ExpireDate,
-			SSLExpireDate: web.WebsiteSSL.ExpireDate,
-			SSLStatus:     checkSSLStatus(web.WebsiteSSL.ExpireDate),
-			RuntimeName:   runtimeName,
-			SitePath:      sitePath,
-			AppInstallID:  appInstallID,
-			RuntimeType:   runtimeType,
-			Favorite:      web.Favorite,
-			IPV6:          web.IPV6,
+			SSLDomainMismatch: websiteCertificateDomainMismatch(web, cert),
+			ID:                web.ID,
+			CreatedAt:         web.CreatedAt,
+			Protocol:          web.Protocol,
+			PrimaryDomain:     web.PrimaryDomain,
+			Type:              web.Type,
+			Remark:            web.Remark,
+			Status:            web.Status,
+			Alias:             web.Alias,
+			AppName:           appName,
+			ExpireDate:        web.ExpireDate,
+			SSLExpireDate:     web.WebsiteSSL.ExpireDate,
+			SSLStatus:         checkSSLStatus(web.WebsiteSSL.ExpireDate),
+			RuntimeName:       runtimeName,
+			SitePath:          sitePath,
+			AppInstallID:      appInstallID,
+			RuntimeType:       runtimeType,
+			Favorite:          web.Favorite,
+			IPV6:              web.IPV6,
 		}
 
 		if siteDTO.Type == constant.Subsite {

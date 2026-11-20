@@ -4635,6 +4635,7 @@ const message = {
         isEdirWarn: 'Changes to docker-compose.yml were detected. Please review the diff.',
     },
     website: {
+        sslDomainMismatchWebsite: 'The certificate domains do not match the website domains',
         primaryDomain: 'Primary domain',
         otherDomains: 'Other domains',
         static: 'Static',

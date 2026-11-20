@@ -4533,6 +4533,7 @@ const message = {
         isEdirWarn: 'docker-compose.yml 파일 변경이 감지되었습니다. 차이점을 확인해 주세요.',
     },
     website: {
+        sslDomainMismatchWebsite: '인증서 도메인이 웹사이트 도메인과 일치하지 않습니다',
         primaryDomain: '기본 도메인',
         otherDomains: '기타 도메인',
         static: '정적',

@@ -4592,6 +4592,7 @@ const message = {
         isEdirWarn: 'تغییرات در docker-compose.yml شناسایی شد. لطفاً تفاوت را بررسی کنید.',
     },
     website: {
+        sslDomainMismatchWebsite: 'دامنه‌های گواهی با دامنه‌های وب‌سایت مطابقت ندارند',
         primaryDomain: 'دامنه اصلی',
         otherDomains: 'سایر دامنه‌ها',
         static: 'ایستا',

@@ -266,6 +266,9 @@
                                     </el-tag>
                                 </el-option>
                             </el-select>
+                            <el-text v-if="sslDomainMismatch" type="warning" class="w-full mt-1">
+                                {{ $t('website.sslDomainMismatchWebsite') }}
+                            </el-text>
                         </el-form-item>
                         <el-form-item :label="' '" v-if="websiteSSL && websiteSSL.id > 0">
                             <WebsiteSSL :websiteSSL="websiteSSL" />
@@ -463,7 +466,8 @@ import {
 import { Rules, checkNumberRange } from '@/global/form-rules';
 import i18n from '@/lang';
 import { ElForm, FormInstance } from 'element-plus';
-import { reactive, ref, watch } from 'vue';
+import { computed, reactive, ref, watch } from 'vue';
+import { normalizeDomain, domainMatches, getCertificateDomains, certificateDomainMismatch } from '@/utils/ssl-domain';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { SearchRuntimes } from '@/api/modules/runtime';
 import { Runtime } from '@/api/interface/runtime';
@@ -869,39 +873,6 @@ const selectFirstAvailableSSL = () => {
     }
 };
 
-const normalizeDomain = (domain?: string) => {
-    if (!domain) {
-        return '';
-    }
-    return domain.split(':')[0].trim().toLowerCase();
-};
-
-const wildcardMatches = (pattern: string, target: string) => {
-    if (!pattern.startsWith('*.')) {
-        return false;
-    }
-    const suffix = pattern.slice(1);
-    if (!suffix) {
-        return false;
-    }
-    if (!target.endsWith(suffix)) {
-        return false;
-    }
-    const suffixLabels = suffix.slice(1).split('.');
-    const targetLabels = target.split('.');
-    return targetLabels.length > suffixLabels.length;
-};
-
-const domainMatches = (pattern: string, target: string) => {
-    if (!pattern || !target) {
-        return false;
-    }
-    if (pattern === target) {
-        return true;
-    }
-    return wildcardMatches(pattern, target);
-};
-
 const getWebsiteDomains = (): string[] => {
     const domains = new Set<string>();
     const pushDomain = (value?: string) => {
@@ -919,28 +890,9 @@ const getWebsiteDomains = (): string[] => {
     return Array.from(domains);
 };
 
-const getCertificateDomains = (ssl: SSLItem): string[] => {
-    const domains = new Set<string>();
-    const tokens: string[] = [];
-    if (ssl.primaryDomain) {
-        tokens.push(ssl.primaryDomain);
-    }
-    if (ssl.domains) {
-        ssl.domains
-            .replace(/\n/g, ',')
-            .split(',')
-            .map((item) => item.trim())
-            .filter((item) => item !== '')
-            .forEach((item) => tokens.push(item));
-    }
-    tokens.forEach((token) => {
-        const normalized = normalizeDomain(token);
-        if (normalized) {
-            domains.add(normalized);
-        }
-    });
-    return Array.from(domains);
-};
+const sslDomainMismatch = computed(
+    () => website.value.enableSSL && certificateDomainMismatch(getWebsiteDomains(), websiteSSL.value),
+);
 
 const tryAutoSelectSSL = (): boolean => {
     if (!website.value.enableSSL) {

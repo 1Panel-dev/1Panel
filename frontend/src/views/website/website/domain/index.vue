@@ -35,6 +35,13 @@
                     </span>
                 </el-text>
             </el-tooltip>
+            <el-tooltip
+                v-if="!hideName && row.sslDomainMismatch"
+                :content="$t('website.sslDomainMismatchWebsite')"
+                placement="top"
+            >
+                <el-icon class="ml-1" color="var(--el-color-warning)"><WarningFilled /></el-icon>
+            </el-tooltip>
             <el-popover
                 placement="right"
                 trigger="hover"
@@ -85,6 +92,7 @@
 </template>
 
 <script lang="ts" setup>
+import { WarningFilled } from '@element-plus/icons-vue';
 import { ref, nextTick, computed } from 'vue';
 import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';

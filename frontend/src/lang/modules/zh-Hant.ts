@@ -4294,6 +4294,7 @@ const message = {
         isEdirWarn: '偵測到 docker-compose.yml 檔案被修改，請檢視對比',
     },
     website: {
+        sslDomainMismatchWebsite: '憑證網域與網站網域不相符',
         primaryDomain: '主域名',
         otherDomains: '其他域名',
         static: '靜態網站',

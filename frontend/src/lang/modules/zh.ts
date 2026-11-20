@@ -4328,6 +4328,7 @@ const message = {
         isEdirWarn: '检测到 docker-compose.yml 文件被修改，请查看对比',
     },
     website: {
+        sslDomainMismatchWebsite: '证书域名与网站域名不匹配',
         primaryDomain: '主域名',
         otherDomains: '其他域名',
         static: '静态网站',
