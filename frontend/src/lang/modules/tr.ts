@@ -2588,6 +2588,8 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        logDisconnected:
+            'Günlük akışının bağlantısı kesildi. Son günlükleri yüklemek ve akışı sürdürmek için yeniden bağlanın.',
         logsUnavailable:
             'Konteyner mevcut değil veya silinmiş. Konteyner günlükleri kullanılamıyor. Konteyneri yeniden oluşturup tekrar deneyin.',
         nvidiaSupport: 'NVIDIA GPU desteği',
@@ -5547,6 +5549,8 @@ const message = {
         editRuleConfirm: 'Bu kuralı değiştirmek istediğinizden emin misiniz?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'Ayrıntılı durum bilgisi mevcut değil. Ayrıntılar için çalışma ortamı günlüklerini kontrol edin.',
         importEnv: 'Ortam Değişkenlerini İçe Aktar',
         envImportError: 'Satır {0}: {1}',
         envInvalidAssignment: 'Geçerli bir NAME=value ataması bekleniyor',

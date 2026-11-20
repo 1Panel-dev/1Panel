@@ -885,6 +885,8 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 				return false
 			}
 			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
+		} else {
+			_, _ = fmt.Fprint(w, "event: complete\ndata: {}\n\n")
 		}
 		return false
 	}

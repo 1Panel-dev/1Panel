@@ -213,6 +213,18 @@ func runComposeCmdWithLog(operate string, composePath string, logPath string) er
 	return nil
 }
 
+func updateRuntimeContainerError(cli docker.Client, containerID string, runtime *model.Runtime) {
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	message, err := cli.ContainerStateError(ctx, containerID)
+	if err != nil {
+		global.LOG.Warnf("Failed to inspect runtime container %s: %v", containerID, err)
+		return
+	}
+	// Clear the old summary when the engine has no error; the UI provides guidance.
+	runtime.Message = message
+}
+
 func SyncRuntimesStatus(runtimes []model.Runtime) error {
 	cli, err := docker.NewClient()
 	if err != nil {
@@ -238,6 +250,7 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 			switch contain.State {
 			case "exited":
 				runtimes[index].Status = constant.StatusError
+				updateRuntimeContainerError(cli, contain.ID, &runtimes[index])
 			case "running":
 				runtimes[index].Status = constant.StatusRunning
 			case "paused":
@@ -285,6 +298,7 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 	switch container.State {
 	case "exited":
 		runtime.Status = constant.StatusError
+		updateRuntimeContainerError(cli, container.ID, runtime)
 	case "running":
 		runtime.Status = constant.StatusRunning
 	case "paused":

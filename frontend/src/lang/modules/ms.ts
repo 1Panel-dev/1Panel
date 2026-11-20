@@ -2593,6 +2593,8 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        logDisconnected:
+            'Sambungan strim log telah terputus. Sambung semula untuk memuatkan log terkini dan meneruskan penstriman.',
         logsUnavailable:
             'Kontena tidak wujud atau telah dipadamkan. Log kontena tidak tersedia. Cipta semula kontena dan cuba lagi.',
         nvidiaSupport: 'Sokongan GPU NVIDIA',
@@ -5539,6 +5541,8 @@ const message = {
         editRuleConfirm: 'Adakah anda pasti mahu mengubah peraturan ini?',
     },
     runtime: {
+        statusMessageUnavailable:
+            'Maklumat status terperinci tidak tersedia. Semak log persekitaran masa jalan untuk butiran lanjut.',
         importEnv: 'Import Pemboleh Ubah Persekitaran',
         envImportError: 'Baris {0}: {1}',
         envInvalidAssignment: 'Penetapan NAME=value yang sah diperlukan',

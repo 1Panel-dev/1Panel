@@ -2549,6 +2549,8 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        logDisconnected:
+            'ログストリームが切断されました。再接続して最近のログを読み込み、リアルタイムのログ受信を再開してください。',
         logsUnavailable:
             'コンテナが存在しないか、削除されています。コンテナのログは表示できません。コンテナを再作成してから、もう一度お試しください。',
         nvidiaSupport: 'NVIDIA GPU サポート',
@@ -5435,6 +5437,7 @@ const message = {
         editRuleConfirm: 'このルールを変更してもよろしいですか？',
     },
     runtime: {
+        statusMessageUnavailable: '詳細なステータス情報はありません。実行環境のログで詳細を確認してください。',
         importEnv: '環境変数をインポート',
         envImportError: '{0} 行目：{1}',
         envInvalidAssignment: '有効な NAME=value 形式で入力してください',

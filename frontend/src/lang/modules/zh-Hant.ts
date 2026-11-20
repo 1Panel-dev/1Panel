@@ -2396,6 +2396,7 @@ const message = {
         missing: '不存在',
     },
     container: {
+        logDisconnected: '日誌串流已中斷，請重新連接以載入最近日誌並繼續接收即時日誌。',
         logsUnavailable: '容器不存在或已被刪除，暫無可檢視的容器日誌。請重新建立容器後再試。',
         nvidiaSupport: 'NVIDIA GPU 支援',
         nvidiaHelper: '註冊 NVIDIA 容器執行環境，需先安裝 NVIDIA Container Toolkit。各容器仍需個別分配 GPU。',
@@ -5044,6 +5045,7 @@ const message = {
         editRuleConfirm: '是否確認修改此規則？',
     },
     runtime: {
+        statusMessageUnavailable: '暫無詳細狀態資訊，請點擊日誌欄的「查看」排查具體原因。',
         importEnv: '匯入環境變數',
         envImportError: '第 {0} 行：{1}',
         envInvalidAssignment: '應為有效的變數名稱=value',

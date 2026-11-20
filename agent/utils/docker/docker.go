@@ -78,6 +78,18 @@ func (c Client) Close() {
 	_ = c.cli.Close()
 }
 
+// ContainerStateError may be empty when the application itself exits unsuccessfully.
+func (c Client) ContainerStateError(ctx context.Context, containerID string) (string, error) {
+	info, err := c.cli.ContainerInspect(ctx, containerID)
+	if err != nil {
+		return "", err
+	}
+	if info.ContainerJSONBase == nil || info.State == nil {
+		return "", nil
+	}
+	return info.State.Error, nil
+}
+
 func (c Client) ListContainersByName(names []string) ([]container.Summary, error) {
 	var (
 		options  container.ListOptions
