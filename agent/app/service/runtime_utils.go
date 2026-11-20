@@ -12,6 +12,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -595,6 +596,9 @@ func handleEnvironments(composeContent []byte, create request.RuntimeCreate, pro
 	}
 	services[serviceName] = serviceValue
 	composeMap["services"] = services
+	if err = applyRuntimeNetwork(composeMap, create.Network); err != nil {
+		return
+	}
 	composeByte, err = yaml.Marshal(composeMap)
 	if err != nil {
 		return
@@ -691,6 +695,9 @@ func handleCompose(env gotenv.Env, composeContent []byte, create request.Runtime
 
 	services[serviceName] = serviceValue
 	composeMap["services"] = services
+	if err = applyRuntimeNetwork(composeMap, create.Network); err != nil {
+		return
+	}
 	composeByte, err = yaml.Marshal(composeMap)
 	if err != nil {
 		return
@@ -945,6 +952,90 @@ func getDockerComposeExtraHosts(yml []byte) ([]request.ExtraHost, error) {
 	return res, nil
 }
 
+func applyRuntimeNetwork(composeMap map[string]interface{}, network string) error {
+	services, ok := composeMap["services"].(map[string]interface{})
+	if !ok {
+		return buserr.New("ErrFileParse")
+	}
+	network = normalizeRuntimeNetwork(network)
+	for name, service := range services {
+		serviceValue, ok := service.(map[string]interface{})
+		if !ok {
+			return buserr.New("ErrFileParse")
+		}
+		delete(serviceValue, "networks")
+		delete(serviceValue, "network_mode")
+		switch network {
+		case "host", "bridge", "none":
+			serviceValue["network_mode"] = network
+			if network == "host" {
+				delete(serviceValue, "ports")
+			}
+		default:
+			serviceValue["networks"] = []interface{}{network}
+			networks, ok := composeMap["networks"].(map[string]interface{})
+			if !ok {
+				networks = make(map[string]interface{})
+			}
+			networks[network] = map[string]interface{}{"external": true}
+			composeMap["networks"] = networks
+		}
+		services[name] = serviceValue
+	}
+	composeMap["services"] = services
+	return nil
+}
+
+func normalizeRuntimeNetwork(network string) string {
+	network = strings.TrimSpace(network)
+	if network == "" {
+		return constant.RuntimeDefaultNetwork
+	}
+	return network
+}
+
+func getDockerComposeNetwork(yml []byte) (string, error) {
+	composeMap := make(map[string]interface{})
+	if err := yaml.Unmarshal(yml, &composeMap); err != nil {
+		return "", err
+	}
+	services, ok := composeMap["services"].(map[string]interface{})
+	if !ok {
+		return "", buserr.New("ErrFileParse")
+	}
+	for _, service := range services {
+		serviceValue, ok := service.(map[string]interface{})
+		if !ok {
+			return "", buserr.New("ErrFileParse")
+		}
+		if mode, ok := serviceValue["network_mode"].(string); ok && strings.TrimSpace(mode) != "" {
+			return strings.TrimSpace(mode), nil
+		}
+		switch networks := serviceValue["networks"].(type) {
+		case string:
+			if strings.TrimSpace(networks) != "" {
+				return strings.TrimSpace(networks), nil
+			}
+		case []interface{}:
+			for _, item := range networks {
+				if network, ok := item.(string); ok && strings.TrimSpace(network) != "" {
+					return strings.TrimSpace(network), nil
+				}
+			}
+		case map[string]interface{}:
+			names := make([]string, 0, len(networks))
+			for name := range networks {
+				names = append(names, name)
+			}
+			sort.Strings(names)
+			if len(names) > 0 {
+				return names[0], nil
+			}
+		}
+	}
+	return constant.RuntimeDefaultNetwork, nil
+}
+
 func composePortCheckKey(port int, protocol string) string {
 	return fmt.Sprintf("%d/%s", port, normalizeComposeProtocol(protocol))
 }
@@ -1081,6 +1172,10 @@ func handleRuntimeDTO(res *response.RuntimeDTO, runtime model.Runtime) error {
 		res.Source = v
 	}
 	composeByte, err := files.NewFileOp().GetContent(runtime.GetComposePath())
+	if err != nil {
+		return err
+	}
+	res.Network, err = getDockerComposeNetwork(composeByte)
 	if err != nil {
 		return err
 	}

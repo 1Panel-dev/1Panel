@@ -80,6 +80,7 @@ const initData = (type: string) => ({
     environments: [],
     extraHosts: [],
     volumes: [],
+    network: '1panel-network',
     remark: '',
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('python'));
@@ -182,6 +183,7 @@ const getRuntime = async (id: number) => {
         runtime.environments = data.environments || [];
         runtime.volumes = data.volumes || [];
         runtime.extraHosts = data.extraHosts || [];
+        runtime.network = data.network || '1panel-network';
         editParams.value = data.appParams;
         open.value = true;
     } catch (error) {}

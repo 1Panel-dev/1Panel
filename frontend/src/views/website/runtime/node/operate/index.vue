@@ -109,6 +109,7 @@ const initData = (type: string) => ({
     environments: [],
     extraHosts: [],
     volumes: [],
+    network: '1panel-network',
     remark: '',
 });
 let runtime = reactive<Runtime.RuntimeCreate>(initData('node'));
@@ -243,6 +244,7 @@ const getRuntime = async (id: number) => {
         runtime.environments = data.environments || [];
         runtime.volumes = data.volumes || [];
         runtime.extraHosts = data.extraHosts || [];
+        runtime.network = data.network || '1panel-network';
         editParams.value = data.appParams;
         if (data.params['CUSTOM_SCRIPT'] == undefined || data.params['CUSTOM_SCRIPT'] == '0') {
             data.params['CUSTOM_SCRIPT'] = '0';

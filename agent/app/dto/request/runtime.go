@@ -30,6 +30,7 @@ type RuntimeCreate struct {
 type NodeConfig struct {
 	Install      *bool         `json:"install"`
 	Clean        bool          `json:"clean"`
+	Network      string        `json:"network"`
 	ExposedPorts []ExposedPort `json:"exposedPorts"`
 	Environments []Environment `json:"environments"`
 	Volumes      []Volume      `json:"volumes"`
@@ -144,6 +145,7 @@ type PHPSupervisorProcessFileReq struct {
 type PHPContainerConfig struct {
 	ID            uint          `json:"id" validate:"required"`
 	ContainerName string        `json:"containerName"`
+	Network       string        `json:"network"`
 	ExposedPorts  []ExposedPort `json:"exposedPorts"`
 	Environments  []Environment `json:"environments"`
 	Volumes       []Volume      `json:"volumes"`

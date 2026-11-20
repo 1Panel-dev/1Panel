@@ -556,6 +556,12 @@ func (r *RuntimeService) Get(id uint) (*response.RuntimeDTO, error) {
 	res.AppID = appDetail.AppId
 	switch runtime.Type {
 	case constant.RuntimePHP:
+		res.Network = constant.RuntimeDefaultNetwork
+		if composeContent, readErr := files.NewFileOp().GetContent(runtime.GetComposePath()); readErr == nil {
+			if network, parseErr := getDockerComposeNetwork(composeContent); parseErr == nil {
+				res.Network = network
+			}
+		}
 		var (
 			appForm   dto.AppForm
 			appParams []response.AppParam
@@ -746,6 +752,7 @@ func (r *RuntimeService) Update(req request.RuntimeUpdate) (err error) {
 		Remark:  req.Remark,
 		NodeConfig: request.NodeConfig{
 			Install:      req.Install,
+			Network:      req.Network,
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
 			Volumes:      req.Volumes,
@@ -1380,6 +1387,7 @@ func (r *RuntimeService) UpdatePHPContainer(req request.PHPContainerConfig) erro
 		Type:   runtime.Type,
 		Params: make(map[string]interface{}),
 		NodeConfig: request.NodeConfig{
+			Network:      req.Network,
 			ExposedPorts: req.ExposedPorts,
 			Environments: req.Environments,
 			Volumes:      req.Volumes,
@@ -1422,6 +1430,7 @@ func (r *RuntimeService) GetPHPContainerConfig(id uint) (*request.PHPContainerCo
 	res := &request.PHPContainerConfig{
 		ID:            runtime.ID,
 		ContainerName: runtime.ContainerName,
+		Network:       runtimeDTO.Network,
 		ExposedPorts:  runtimeDTO.ExposedPorts,
 		Environments:  runtimeDTO.Environments,
 		Volumes:       runtimeDTO.Volumes,

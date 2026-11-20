@@ -24,6 +24,8 @@ const (
 
 	RuntimeNpm  = "npm"
 	RuntimeYarn = "yarn"
+
+	RuntimeDefaultNetwork = "1panel-network"
 )
 
 var GoDefaultVolumes = map[string]string{

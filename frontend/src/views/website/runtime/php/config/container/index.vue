@@ -27,6 +27,9 @@
                         <el-tab-pane :label="$t('runtime.extraHosts')">
                             <ExtraHosts :extraHosts="containerConfig.extraHosts" />
                         </el-tab-pane>
+                        <el-tab-pane :label="$t('container.network')">
+                            <NetworkConfig v-model="containerConfig.network" />
+                        </el-tab-pane>
                     </el-tabs>
                     <el-form-item class="mt-2">
                         <el-button v-permission type="primary" @click="onSaveStart(runtimeForm)">
@@ -44,6 +47,7 @@ import PortConfig from '@/views/website/runtime/components/port/index.vue';
 import Environment from '@/views/website/runtime/components/environment/index.vue';
 import Volumes from '@/views/website/runtime/components/volume/index.vue';
 import ExtraHosts from '@/views/website/runtime/components/extra-hosts/index.vue';
+import NetworkConfig from '@/views/website/runtime/components/network/index.vue';
 
 import { Runtime } from '@/api/interface/runtime';
 import { getPHPContainerConfig, updatePHPContainerConfig } from '@/api/modules/runtime';
@@ -65,6 +69,7 @@ const containerConfig = ref<Runtime.PHPContainerConfig>({
     environments: [],
     volumes: [],
     extraHosts: [],
+    network: '1panel-network',
 });
 
 const rules = {
@@ -78,6 +83,7 @@ const getConfig = async () => {
     containerConfig.value.volumes = res.data.volumes || [];
     containerConfig.value.containerName = res.data.containerName || '';
     containerConfig.value.extraHosts = res.data.extraHosts || [];
+    containerConfig.value.network = res.data.network || '1panel-network';
 };
 
 const onSaveStart = async (formEl: FormInstance | undefined) => {
@@ -109,6 +115,7 @@ const submit = async () => {
             environments: containerConfig.value.environments,
             volumes: containerConfig.value.volumes,
             extraHosts: containerConfig.value.extraHosts,
+            network: containerConfig.value.network,
         });
         MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
     } catch (error) {

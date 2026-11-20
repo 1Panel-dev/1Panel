@@ -24,6 +24,7 @@ export namespace Runtime {
         port: string;
         appID: number;
         remark: string;
+        network: string;
     }
 
     export interface RuntimeReq extends ReqPage {
@@ -73,6 +74,7 @@ export namespace Runtime {
         environments?: Environment[];
         volumes?: Volume[];
         extraHosts?: ExtraHost[];
+        network?: string;
         remark?: string;
     }
 
@@ -108,6 +110,7 @@ export namespace Runtime {
         version?: string;
         rebuild?: boolean;
         install?: boolean;
+        network?: string;
     }
 
     export interface RuntimeDelete {
@@ -239,6 +242,7 @@ export namespace Runtime {
     export interface PHPContainerConfig {
         id: number;
         containerName: string;
+        network: string;
         exposedPorts: ExposedPort[];
         environments: Environment[];
         volumes: Volume[];
