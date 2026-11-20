@@ -37,14 +37,14 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <span class="dialog-footer">
+            <DeleteConfirmFooter v-model="deleteInfo" :confirmation-text="appInstallName" :disabled="loading">
                 <el-button @click="handleClose" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="submit" :disabled="loading || deleteInfo !== appInstallName">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
     <TaskLog ref="taskLogRef" @close="handleClose" />
@@ -58,6 +58,7 @@ import { getAppStoreConfig } from '@/api/modules/setting';
 import i18n from '@/lang';
 import bus from '@/global/bus';
 import TaskLog from '@/components/log/task/index.vue';
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { v4 as uuidv4 } from 'uuid';
 
 const deleteReq = ref({

@@ -122,7 +122,9 @@
                     </el-link>
                 </span>
             </div>
-            <span class="input-help" v-if="p.description">{{ getDescription(p) }}</span>
+            <span v-if="p.description || fallbackDescriptions?.[p.envKey]" class="input-help">
+                {{ getDescription(p) || fallbackDescriptions?.[p.envKey] }}
+            </span>
         </el-form-item>
         <el-form-item v-if="isMysql(form, p.envKey)" :label="$t('database.format')" prop="format">
             <el-select filterable v-model="form.format" @change="loadCollations()">
@@ -138,7 +140,7 @@
     </div>
 </template>
 <script lang="ts" setup>
-import { computed, onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, type PropType } from 'vue';
 import { getRandomStr } from '@/utils/id';
 import { getAppService } from '@/api/modules/app';
 import { Rules } from '@/global/form-rules';
@@ -179,6 +181,7 @@ const props = defineProps({
         type: String,
         default: '',
     },
+    fallbackDescriptions: Object as PropType<Record<string, string>>,
 });
 
 const form = reactive({
