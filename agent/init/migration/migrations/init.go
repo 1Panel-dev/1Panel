@@ -1985,3 +1985,10 @@ var AddAgentAccountStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddWebsiteHTTPSRedirectPort = &gormigrate.Migration{
+	ID: "20261119-add-website-https-redirect-port",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.Website{})
+	},
+}

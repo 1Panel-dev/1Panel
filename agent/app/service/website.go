@@ -285,6 +285,7 @@ func newWebsiteCreateHTTPSOp(sslID uint) request.WebsiteHTTPSOp {
 		WebsiteSSLID:          sslID,
 		Type:                  constant.SSLExisted,
 		HttpConfig:            constant.HTTPToHTTPS,
+		HTTPSRedirectPort:     constant.HTTPSRedirectPortInherit,
 		SSLProtocol:           []string{"TLSv1.3", "TLSv1.2"},
 		Algorithm:             "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED",
 		Hsts:                  true,
@@ -1026,6 +1027,13 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		httpsPorts = append(httpsPorts, strconv.Itoa(port))
 	}
 	res.HttpsPort = strings.Join(httpsPorts, ",")
+	res.HTTPSRedirectCustomPort = getHTTPSRedirectCustomPort()
+	res.HTTPSRedirectPort = normalizeWebsiteHTTPSRedirectPort(website.HTTPSRedirectPort)
+	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return response.WebsiteHTTPS{}, err
+	}
+	res.NginxHTTPSPort = nginxInstall.HttpsPort
 	if website.WebsiteSSLID == 0 {
 		res.Enable = false
 		return res, nil
@@ -1080,6 +1088,11 @@ func (w WebsiteService) OpWebsiteHTTPS(ctx context.Context, req request.WebsiteH
 	website, err := websiteRepo.GetFirst(repo.WithByID(req.WebsiteID))
 	if err != nil {
 		return nil, err
+	}
+	if req.HTTPSRedirectPort != "" {
+		website.HTTPSRedirectPort = normalizeWebsiteHTTPSRedirectPort(req.HTTPSRedirectPort)
+	} else if website.HTTPSRedirectPort == "" {
+		website.HTTPSRedirectPort = constant.HTTPSRedirectPortInherit
 	}
 	var (
 		res        response.WebsiteHTTPS

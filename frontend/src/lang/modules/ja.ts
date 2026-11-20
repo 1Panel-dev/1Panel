@@ -4753,6 +4753,10 @@ const message = {
         privateKey: 'キー（キー）',
         certificate: '証明書（PEM形式）',
         HTTPConfig: 'HTTPオプション',
+        HTTPSRedirectPort: 'HTTPS リダイレクトポート',
+        HTTPSRedirectPortInherit: '継承（{0}）',
+        HTTPSRedirectPortDefault: 'デフォルト（{0}）',
+        HTTPSRedirectPortStandard: '標準（{0}）',
         HTTPSOnly: 'HTTP要求をブロックします',
         HTTPToHTTPS: 'HTTPSにリダイレクトします',
         HTTPAlso: '直接HTTPリクエストを許可します',
@@ -5115,11 +5119,15 @@ const message = {
             'コンパイル前に実行するスクリプト、通常はモジュールソースコードのダウンロード、依存関係のインストールなど',
         buildHelper:
             '動的モジュールはビルド後に設定から読み込まれます。静的モジュールは引き続き OpenResty を再ビルドします。',
-        defaultHttps: 'HTTPS 改ざん防止',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '改ざん防止ステータス',
         defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
         sslRejectHandshake: 'デフォルト SSL ハンドシェイクを拒否',
         sslRejectHandshakeHelper:
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
+        httpsRedirectCustomPort: 'カスタムポートでリダイレクト',
+        httpsRedirectCustomPortHelper:
+            '有効にすると、HTTP から HTTPS へのリダイレクトでカスタム HTTPS ポートを使用します。',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

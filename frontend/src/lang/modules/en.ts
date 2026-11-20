@@ -4772,6 +4772,10 @@ const message = {
         privateKey: 'Key (KEY)',
         certificate: 'Certificate (PEM format)',
         HTTPConfig: 'HTTP Options',
+        HTTPSRedirectPort: 'HTTPS redirect port',
+        HTTPSRedirectPortInherit: 'Inherit ({0})',
+        HTTPSRedirectPortDefault: 'Default ({0})',
+        HTTPSRedirectPortStandard: 'Standard ({0})',
         HTTPSOnly: 'Block HTTP requests',
         HTTPToHTTPS: 'Redirect to HTTPS',
         HTTPAlso: 'Allow direct HTTP requests',
@@ -5133,11 +5137,15 @@ const message = {
             'Scripts to execute before compilation, usually for downloading module source code, installing dependencies, etc.',
         buildHelper:
             'Dynamic modules are loaded from configuration after building; static modules still rebuild OpenResty.',
-        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Anti-tampering status',
         defaultHttpsHelper1: 'Enabling this can resolve HTTPS tampering issues.',
         sslRejectHandshake: 'Reject default SSL handshake',
         sslRejectHandshakeHelper:
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
+        httpsRedirectCustomPort: 'Use custom port redirect',
+        httpsRedirectCustomPortHelper:
+            'When enabled, HTTP-to-HTTPS redirects use the configured custom HTTPS port.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

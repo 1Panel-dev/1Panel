@@ -4628,6 +4628,10 @@ const message = {
         privateKey: 'ຄີສ່ວນຕົວ (KEY)',
         certificate: 'ໃບຢັ້ງຢືນ (ຮູບແບບ PEM)',
         HTTPConfig: 'ຕົວເລືອກ HTTP',
+        HTTPSRedirectPort: 'ພອດປ່ຽນເສັ້ນທາງ HTTPS',
+        HTTPSRedirectPortInherit: 'ສືບທອດ ({0})',
+        HTTPSRedirectPortDefault: 'ຄ່າເລີ່ມຕົ້ນ ({0})',
+        HTTPSRedirectPortStandard: 'ມາດຕະຖານ ({0})',
         HTTPSOnly: 'ບລັອກການຮ້ອງຂໍ HTTP',
         HTTPToHTTPS: 'ປ່ຽນເສັ້ນທາງໄປ HTTPS',
         HTTPAlso: 'ອະນຸຍາດການຮ້ອງຂໍ HTTP ໂດຍກົງ',
@@ -4979,11 +4983,15 @@ const message = {
         packagesHelper: 'ຕົວຢ່າງ: git, curl (ແຍກດ້ວຍເຄື່ອງໝາຍຈຸດ)',
         scriptHelper: 'ສະຄຣິບທີ່ຈະເຮັດວຽກກ່ອນການຄອມໄພລ໌, ມັກໃຊ້ເພື່ອດາວໂຫຼດຊອດໂຄ້ດໂມດູນ ຫຼື ຕິດຕັ້ງ dependency',
         buildHelper: 'ໂມດູນໄດນາມິກໂຫຼດຈາກການຕັ້ງຄ່າຫຼັງຈາກບິວ; ໂມດູນສະແຕຕິກຍັງຄົງຣີບິວ OpenResty.',
-        defaultHttps: 'ການປ້ອງກັນການປອມແປງ HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'ສະຖານະປ້ອງກັນການປອມແປງ',
         defaultHttpsHelper1: 'ການເປີດໃຊ້ສິ່ງນີ້ສາມາດແກ້ໄຂບັນຫາການປອມແປງ HTTPS ໄດ້.',
         sslRejectHandshake: 'ປະຕິເສດການ handshake SSL ເລີ່ມຕົ້ນ',
         sslRejectHandshakeHelper:
             'ການເປີດໃຊ້ສິ່ງນີ້ສາມາດຫຼີກລ່ຽງການຮົ່ວໄຫຼຂອງໃບຢັ້ງຢືນ, ແຕ່ການຕັ້ງເວັບໄຊເລີ່ມຕົ້ນຈະເຮັດໃຫ້ການຕັ້ງຄ່ານີ້ບໍ່ມີຜົນ',
+        httpsRedirectCustomPort: 'ໃຊ້ພອດກຳນົດເອງໃນການປ່ຽນເສັ້ນທາງ',
+        httpsRedirectCustomPortHelper:
+            'ເມື່ອເປີດໃຊ້, ການປ່ຽນເສັ້ນທາງຈາກ HTTP ໄປ HTTPS ຈະໃຊ້ພອດ HTTPS ກຳນົດເອງ.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

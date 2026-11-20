@@ -1055,7 +1055,34 @@ func getHttpsPort(websiteID uint) map[int]struct{} {
 	return httpsPorts
 }
 
-func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPort int) []dto.NginxParam {
+func getHTTPSRedirectCustomPort() bool {
+	value, err := settingRepo.GetValueByKey(constant.HTTPSRedirectCustomPortKey)
+	return err != nil || value != constant.StatusDisable
+}
+
+// Website redirect modes override the global custom-port policy only when the
+// user has explicitly selected the default Nginx HTTPS port or standard 443.
+func normalizeWebsiteHTTPSRedirectPort(value string) string {
+	switch value {
+	case constant.HTTPSRedirectPortDefault, constant.HTTPSRedirectPortStandard:
+		return value
+	default:
+		return constant.HTTPSRedirectPortInherit
+	}
+}
+
+func websiteHTTPSRedirectUsesCustomPort(value string, globalUseCustomPort bool) bool {
+	switch normalizeWebsiteHTTPSRedirectPort(value) {
+	case constant.HTTPSRedirectPortDefault:
+		return true
+	case constant.HTTPSRedirectPortStandard:
+		return false
+	default:
+		return globalUseCustomPort
+	}
+}
+
+func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPort int, useCustomPort bool) []dto.NginxParam {
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
 	for i := range nginxParams {
 		switch nginxParams[i].Name {
@@ -1075,7 +1102,7 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 			}
 		case "error_page":
 			if len(nginxParams[i].Params) >= 2 && nginxParams[i].Params[0] == "497" && redirectPort != 443 && nginxParams[i].Params[1] == "https://$host$request_uri" {
-				nginxParams[i].Params[1] = fmt.Sprintf("https://$host:%d$request_uri", redirectPort)
+				nginxParams[i].Params[1] = components.HTTPSRedirectTarget(redirectPort, useCustomPort)
 			}
 		}
 	}
@@ -1099,6 +1126,7 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 }
 
 func applyWebsiteSSLConfig(server *components.Server, website model.Website, plan websiteTLSPlan, req request.WebsiteHTTPSOp) {
+	useCustomPort := websiteHTTPSRedirectUsesCustomPort(website.HTTPSRedirectPort, getHTTPSRedirectCustomPort())
 	if server.HasStopPage() {
 		defer server.EnableStopPage()
 	}
@@ -1123,7 +1151,7 @@ func applyWebsiteSSLConfig(server *components.Server, website model.Website, pla
 			setListen(server, defaultHTTPPort, website.IPV6, false, website.DefaultServer, false)
 		}
 		if plan.redirectPort > 0 {
-			server.AddHTTP2HTTPS(plan.redirectPort)
+			server.AddHTTP2HTTPS(plan.redirectPort, useCustomPort)
 		}
 	case constant.HTTPAlso:
 		if plan.hasDefaultHTTP {
@@ -1146,7 +1174,7 @@ func applyWebsiteSSLConfig(server *components.Server, website model.Website, pla
 		server.RemoveDirective("add_header", []string{"Alt-Svc"})
 	}
 
-	for _, param := range buildWebsiteSSLParams(website.Alias, req, plan.redirectPort) {
+	for _, param := range buildWebsiteSSLParams(website.Alias, req, plan.redirectPort, useCustomPort) {
 		server.UpdateDirective(param.Name, param.Params)
 	}
 }
