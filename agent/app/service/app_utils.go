@@ -703,7 +703,10 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 	if !ok || value == nil {
 		return nil, buserr.New("ErrFileParse")
 	}
-	servicesMap := value.(map[string]interface{})
+	servicesMap, ok := value.(map[string]interface{})
+	if !ok {
+		return nil, buserr.New("ErrFileParse")
+	}
 	if len(servicesMap) == 1 {
 		index := 0
 		oldServiceName := ""
@@ -719,7 +722,10 @@ func handleUpgradeCompose(install model.AppInstall, detail model.AppDetail) (map
 			delete(servicesMap, oldServiceName)
 		}
 	}
-	serviceValue := servicesMap[install.ServiceName].(map[string]interface{})
+	serviceValue, ok := servicesMap[install.ServiceName].(map[string]interface{})
+	if !ok {
+		return nil, buserr.New("ErrFileParse")
+	}
 
 	oldComposeMap := make(map[string]interface{})
 	if err := yaml.Unmarshal([]byte(install.DockerCompose), &oldComposeMap); err != nil {
