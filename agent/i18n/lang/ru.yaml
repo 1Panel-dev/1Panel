@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "Для проверки обновлений обр
 ErrPHPExtensionsConflict: "Шаблон расширений PHP с таким именем уже существует и имеет другое содержимое; перезапись не выполнена"
 
 ErrModelTokenizerDirOverlap: "Каталоги моделей и токенизаторов должны различаться и не могут быть вложены друг в друга"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Недопустимый выбор сайтов: {{ .value }}"
+ErrCronjobWebsiteGroup: "Нет доступа к группе сайтов {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: ни один из выбранных сайтов не существует"
+ErrCronjobWebsiteVersion: "Неподдерживаемая версия выбора сайтов: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Нельзя одновременно выбрать все сайты и отдельные сайты или группы"
+ErrCronjobWebsiteGroupName: "Название группы сайтов не может быть пустым"
+ErrCronjobWebsiteGroupMissing: "Группа сайтов «{{ .group }}» не существует, и ни один сайт из сохранённого списка не найден"
+CronjobWebsiteGroupFallback: "{{ .name }}: группа сайтов «{{ .group }}» не существует; импортирован фиксированный список сайтов, который больше не учитывает изменения состава группы"
+CronjobWebsiteMissing: "{{ .name }}: не найдены сайты: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Не найдены группы сайтов или сайты, соответствующие выбору"

@@ -91,11 +91,12 @@ func (b *BaseApi) ImportCronjob(c *gin.Context) {
 		return
 	}
 
-	if err := cronjobService.Import(req.Cronjobs, loadAuditUser(c)); err != nil {
+	warnings, err := cronjobService.Import(req.Cronjobs, loadAuditUser(c))
+	if err != nil {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, map[string]interface{}{"warnings": warnings})
 }
 
 // @Tags Cronjob

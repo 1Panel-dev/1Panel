@@ -183,11 +183,14 @@ type CronjobTrans struct {
 	URL           string       `json:"url"`
 	URLItems      []CronjobURL `json:"urlItems"`
 
-	ScriptName string        `json:"scriptName"`
-	Apps       []TransHelper `json:"apps"`
-	Websites   []string      `json:"websites"`
-	DBType     string        `json:"dbType"`
-	DBNames    []TransHelper `json:"dbName"`
+	ScriptName              string                `json:"scriptName"`
+	Apps                    []TransHelper         `json:"apps"`
+	Websites                []string              `json:"websites"`
+	WebsiteSelectionVersion int                   `json:"websiteSelectionVersion,omitempty"`
+	AllWebsites             bool                  `json:"allWebsites,omitempty"`
+	WebsiteGroups           []CronjobWebsiteGroup `json:"websiteGroups,omitempty"`
+	DBType                  string                `json:"dbType"`
+	DBNames                 []TransHelper         `json:"dbName"`
 
 	ExclusionRules string `json:"exclusionRules"`
 
@@ -243,4 +246,10 @@ type Record struct {
 	TargetPath string `json:"targetPath"`
 	Interval   int    `json:"interval"`
 	File       string `json:"file"`
+}
+
+// CronjobWebsiteGroup keeps a portable group name and a fallback snapshot.
+type CronjobWebsiteGroup struct {
+	Name     string   `json:"name"`
+	Websites []string `json:"websites"`
 }

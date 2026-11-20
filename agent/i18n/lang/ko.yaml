@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트�
 ErrPHPExtensionsConflict: "같은 이름에 내용이 다른 PHP 확장 템플릿이 이미 있어 덮어쓰지 않았습니다"
 
 ErrModelTokenizerDirOverlap: "모델 디렉터리와 토크나이저 디렉터리는 서로 달라야 하며 서로 포함할 수 없습니다"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "유효하지 않은 웹사이트 선택: {{ .value }}"
+ErrCronjobWebsiteGroup: "웹사이트 그룹 {{ .id }}에 접근할 수 없습니다"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: 선택한 웹사이트가 모두 존재하지 않습니다"
+ErrCronjobWebsiteVersion: "지원하지 않는 웹사이트 선택 버전: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "전체 웹사이트와 개별 웹사이트 또는 그룹을 동시에 선택할 수 없습니다"
+ErrCronjobWebsiteGroupName: "웹사이트 그룹 이름은 비워 둘 수 없습니다"
+ErrCronjobWebsiteGroupMissing: "웹사이트 그룹 “{{ .group }}”이 존재하지 않으며 저장된 목록과 일치하는 웹사이트도 찾을 수 없습니다"
+CronjobWebsiteGroupFallback: "{{ .name }}: 웹사이트 그룹 “{{ .group }}”이 존재하지 않아 고정 웹사이트 목록으로 가져왔습니다. 이후 그룹 변경은 자동으로 반영되지 않습니다"
+CronjobWebsiteMissing: "{{ .name }}: 다음 웹사이트를 찾을 수 없습니다: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "선택한 웹사이트 그룹 또는 웹사이트와 일치하는 항목을 찾을 수 없습니다"

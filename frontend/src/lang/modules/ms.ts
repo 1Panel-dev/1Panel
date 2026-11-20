@@ -2956,6 +2956,9 @@ const message = {
         goSetting: 'Pergi ke tetapan',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Pilihan “Semua” dalam kumpulan mengikuti perubahan ahli kumpulan; laman web yang dipilih secara individu disimpan sebagai senarai tetap.',
+        websiteSelectionMissing: 'Pilihan tidak tersedia',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
