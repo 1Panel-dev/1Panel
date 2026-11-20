@@ -466,3 +466,7 @@ export const importCA = (params: {
 }) => {
     return http.post(`/websites/ca/import`, params);
 };
+
+export const batchChangePHPVersion = (req: Website.BatchPHPVersionChange) => {
+    return http.post<Website.BatchPHPVersionResult[]>(`/websites/php/version/batch`, req, 600000);
+};

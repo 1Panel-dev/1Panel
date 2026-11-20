@@ -4617,6 +4617,17 @@ const message = {
         isEdirWarn: 'docker-compose.yml ファイルの変更が検出されました。差分を確認してください。',
     },
     website: {
+        batchPHP: 'PHP バージョンを切り替え',
+        batchPHPHelper:
+            'PHP サイトのみ変更します。他のサイトはスキップされます。ローカル PHP 環境はサポートされていません。',
+        batchPHPCount: '選択したサイト: {0}、PHP サイト: {1}、その他: {2}。',
+        notPHP: 'PHP サイトではありません',
+        localPHP: 'ローカル PHP 環境はサポートされていません',
+        samePHP: '既に対象の PHP 環境を使用しています',
+        batchPHPResult: '処理結果',
+        batchPHPStatus_success: '成功',
+        batchPHPStatus_failed: '失敗',
+        batchPHPStatus_skipped: 'スキップ',
         sslDomainMismatchWebsite: '証明書のドメインがウェブサイトのドメインと一致しません',
         primaryDomain: 'プライマリドメイン',
         otherDomains: '他のドメイン',

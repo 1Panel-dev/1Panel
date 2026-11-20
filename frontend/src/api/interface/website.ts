@@ -75,6 +75,8 @@ export namespace Website {
     }
 
     export interface WebSiteSearch extends ReqPage {
+        type?: string;
+        runtimeType?: string;
         name: string;
         orderBy: string;
         order: string;
@@ -574,6 +576,18 @@ export namespace Website {
         websiteID: number;
         name: string;
         content: string;
+    }
+
+    export interface BatchPHPVersionChange {
+        ids: number[];
+        runtimeID: number;
+    }
+
+    export interface BatchPHPVersionResult {
+        id: number;
+        domain: string;
+        status: 'success' | 'failed' | 'skipped';
+        message: string;
     }
 
     export interface PHPVersionChange {

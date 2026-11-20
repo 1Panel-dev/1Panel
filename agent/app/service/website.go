@@ -83,6 +83,7 @@ type IWebsiteService interface {
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 
 	ChangePHPVersion(req request.WebsitePHPVersionReq) error
+	BatchChangePHPVersion(req request.WebsiteBatchPHPVersionReq) ([]response.WebsiteBatchPHPVersionResult, error)
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
 	ExecComposer(req request.ExecComposerReq) error
 	ChangeGroup(group, newGroup uint) error
@@ -189,6 +190,9 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	}
 	if req.Type != "" {
 		opts = append(opts, websiteRepo.WithType(req.Type))
+	}
+	if req.RuntimeType != "" {
+		opts = append(opts, websiteRepo.WithRuntimeType(req.RuntimeType))
 	}
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
@@ -1425,14 +1429,6 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		if oldRuntime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
 		}
-		client, err := docker.NewDockerClient()
-		if err != nil {
-			return err
-		}
-		defer client.Close()
-		if !checkImageLike(client, oldRuntime.Image) {
-			return buserr.WithName("ErrImageNotExist", oldRuntime.Name)
-		}
 	}
 
 	if req.RuntimeID > 0 {
@@ -1442,6 +1438,17 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		}
 		if runtime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
+		}
+		if runtime.Type != constant.RuntimePHP {
+			return fmt.Errorf("target runtime must be PHP")
+		}
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		if err := validateWebsitePHPImage(context.Background(), client, runtime.Image, runtime.Name); err != nil {
+			return err
 		}
 		website.RuntimeID = runtime.ID
 		website.AppInstallID = 0
@@ -2684,4 +2691,60 @@ func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
 	}
 	website.StreamPorts = req.StreamConfig.StreamPorts
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) BatchChangePHPVersion(req request.WebsiteBatchPHPVersionReq) ([]response.WebsiteBatchPHPVersionResult, error) {
+	target, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.RuntimeID))
+	if err != nil {
+		return nil, err
+	}
+	if target.Type != constant.RuntimePHP {
+		return nil, fmt.Errorf("target runtime must be PHP")
+	}
+	if target.Resource == constant.ResourceLocal {
+		return nil, buserr.New("ErrPHPResource")
+	}
+	results := make([]response.WebsiteBatchPHPVersionResult, 0, len(req.IDs))
+	seen := make(map[uint]bool)
+	for _, id := range req.IDs {
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		result := response.WebsiteBatchPHPVersionResult{ID: id, Status: "failed"}
+		website, err := websiteRepo.GetFirst(repo.WithByID(id))
+		if err != nil {
+			result.Message = err.Error()
+			results = append(results, result)
+			continue
+		}
+		result.Domain = website.PrimaryDomain
+		if website.Type != constant.Runtime {
+			result.Status = "skipped"
+			result.Message = "notPHP"
+		} else {
+			runtime, lookupErr := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+			switch {
+			case lookupErr != nil:
+				result.Message = lookupErr.Error()
+			case runtime.Type != constant.RuntimePHP:
+				result.Status = "skipped"
+				result.Message = "notPHP"
+			case runtime.Resource == constant.ResourceLocal:
+				result.Status = "skipped"
+				result.Message = "localPHP"
+			case website.RuntimeID == req.RuntimeID:
+				result.Status = "skipped"
+				result.Message = "samePHP"
+			default:
+				if err := w.ChangePHPVersion(request.WebsitePHPVersionReq{WebsiteID: id, RuntimeID: req.RuntimeID}); err != nil {
+					result.Message = err.Error()
+				} else {
+					result.Status = "success"
+				}
+			}
+		}
+		results = append(results, result)
+	}
+	return results, nil
 }
