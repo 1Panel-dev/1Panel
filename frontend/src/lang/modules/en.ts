@@ -2566,6 +2566,8 @@ const message = {
         missing: 'Missing',
     },
     container: {
+        logsUnavailable:
+            'The container does not exist or has been deleted. Container logs are unavailable. Recreate the container and try again.',
         nvidiaSupport: 'NVIDIA GPU support',
         nvidiaHelper:
             'Register the NVIDIA container runtime. Install NVIDIA Container Toolkit first. Assign GPUs to each container separately.',

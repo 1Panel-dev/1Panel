@@ -2588,6 +2588,8 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        logsUnavailable:
+            'Konteyner mevcut değil veya silinmiş. Konteyner günlükleri kullanılamıyor. Konteyneri yeniden oluşturup tekrar deneyin.',
         nvidiaSupport: 'NVIDIA GPU desteği',
         nvidiaHelper:
             'NVIDIA konteyner çalışma zamanını kaydeder. Önce NVIDIA Container Toolkit kurun. GPU’ları her konteynere ayrı ayrı atayın.',

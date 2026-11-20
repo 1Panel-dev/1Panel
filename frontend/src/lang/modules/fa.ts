@@ -2543,6 +2543,8 @@ const message = {
         missing: 'ناموجود',
     },
     container: {
+        logsUnavailable:
+            'کانتینر وجود ندارد یا حذف شده است. لاگ‌های کانتینر در دسترس نیستند. کانتینر را دوباره ایجاد کنید و مجدداً تلاش کنید.',
         nvidiaSupport: 'پشتیبانی از GPU انویدیا',
         nvidiaHelper:
             'محیط اجرای کانتینر NVIDIA را ثبت می‌کند. ابتدا NVIDIA Container Toolkit را نصب کنید. GPU را جداگانه به هر کانتینر اختصاص دهید.',

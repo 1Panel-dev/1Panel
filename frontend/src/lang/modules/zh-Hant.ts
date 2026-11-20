@@ -2396,6 +2396,7 @@ const message = {
         missing: '不存在',
     },
     container: {
+        logsUnavailable: '容器不存在或已被刪除，暫無可檢視的容器日誌。請重新建立容器後再試。',
         nvidiaSupport: 'NVIDIA GPU 支援',
         nvidiaHelper: '註冊 NVIDIA 容器執行環境，需先安裝 NVIDIA Container Toolkit。各容器仍需個別分配 GPU。',
         nvidiaLocalOnly: '僅支援本機預設 Docker Socket。',

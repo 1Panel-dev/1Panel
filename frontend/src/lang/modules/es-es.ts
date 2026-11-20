@@ -2601,6 +2601,8 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        logsUnavailable:
+            'El contenedor no existe o se ha eliminado. Los registros del contenedor no están disponibles. Vuelva a crear el contenedor e inténtelo de nuevo.',
         nvidiaSupport: 'Compatibilidad con GPU NVIDIA',
         nvidiaHelper:
             'Registra el entorno de ejecución de NVIDIA. Instala primero NVIDIA Container Toolkit. Asigna las GPU a cada contenedor por separado.',

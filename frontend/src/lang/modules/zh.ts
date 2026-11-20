@@ -2403,6 +2403,7 @@ const message = {
         missing: '不存在',
     },
     container: {
+        logsUnavailable: '容器不存在或已被删除，暂无可查看的容器日志。请重新创建容器后再试。',
         nvidiaSupport: 'NVIDIA GPU 支持',
         nvidiaHelper: '注册 NVIDIA 容器运行时，需要先安装 NVIDIA Container Toolkit。具体容器仍需单独分配 GPU。',
         nvidiaLocalOnly: '仅支持本机默认 Docker Socket。',

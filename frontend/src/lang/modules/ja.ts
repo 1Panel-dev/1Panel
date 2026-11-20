@@ -2549,6 +2549,8 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        logsUnavailable:
+            'コンテナが存在しないか、削除されています。コンテナのログは表示できません。コンテナを再作成してから、もう一度お試しください。',
         nvidiaSupport: 'NVIDIA GPU サポート',
         nvidiaHelper:
             'NVIDIA コンテナーランタイムを登録します。先に NVIDIA Container Toolkit をインストールしてください。GPU はコンテナーごとに割り当てる必要があります。',
