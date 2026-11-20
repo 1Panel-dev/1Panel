@@ -12,6 +12,9 @@
         <el-tab-pane :label="$t('runtime.extraHosts')">
             <ExtraHosts :extraHosts="extraHosts" />
         </el-tab-pane>
+        <el-tab-pane :label="$t('container.network')">
+            <NetworkConfig v-model="runtime.network" />
+        </el-tab-pane>
     </el-tabs>
 </template>
 
@@ -20,6 +23,7 @@ import PortConfig from '@/views/website/runtime/components/port/index.vue';
 import Environment from '@/views/website/runtime/components/environment/index.vue';
 import Volumes from '@/views/website/runtime/components/volume/index.vue';
 import ExtraHosts from '@/views/website/runtime/components/extra-hosts/index.vue';
+import NetworkConfig from '@/views/website/runtime/components/network/index.vue';
 import { useVModel } from '@vueuse/core';
 import { computed, type PropType } from 'vue';
 
@@ -28,7 +32,10 @@ interface RuntimeConfigFields {
     environments?: any[];
     volumes?: any[];
     extraHosts?: any[];
+    network?: string;
 }
+
+type RuntimeArrayConfigKey = 'exposedPorts' | 'environments' | 'volumes' | 'extraHosts';
 
 const props = defineProps({
     modelValue: {
@@ -43,7 +50,7 @@ const emit = defineEmits<{
 
 const runtime = useVModel(props, 'modelValue', emit);
 
-const ensureConfigArray = (key: keyof RuntimeConfigFields): any[] => {
+const ensureConfigArray = (key: RuntimeArrayConfigKey): any[] => {
     if (!runtime.value[key]) {
         runtime.value[key] = [];
     }

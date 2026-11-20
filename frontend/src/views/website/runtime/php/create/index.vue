@@ -192,6 +192,11 @@
                     <el-input v-model="runtime.version" :placeholder="$t('runtime.versionHelper')"></el-input>
                 </el-form-item>
             </div>
+            <el-tabs v-if="runtime.resource === 'appstore'" type="border-card">
+                <el-tab-pane :label="$t('container.network')">
+                    <NetworkConfig v-model="runtime.network" />
+                </el-tab-pane>
+            </el-tabs>
         </el-form>
         <template #footer>
             <span>
@@ -218,6 +223,7 @@ import { reactive, ref } from 'vue';
 import { getLabel } from '@/utils/app-store';
 import { useGlobalStore } from '@/composables/useGlobalStore';
 import { resolveRuntimeAppResource } from '@/utils/runtime-app-resource';
+import NetworkConfig from '@/views/website/runtime/components/network/index.vue';
 const { docsUrl, isIntl, isOffline, isXpackOrEE } = useGlobalStore();
 
 interface OperateRrops {
@@ -294,6 +300,7 @@ const initData = (type: string) => ({
     rebuild: false,
     source: phpSources[0].value,
     environments: [],
+    network: '1panel-network',
     remark: '',
 });
 const extensions = ref();
@@ -480,6 +487,7 @@ const getRuntime = async (id: number) => {
             version: data.version,
             rebuild: true,
             source: data.source,
+            network: data.network || '1panel-network',
             remark: data.remark,
             versionn: data.version,
         });

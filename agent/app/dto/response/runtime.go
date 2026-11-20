@@ -25,6 +25,7 @@ type RuntimeDTO struct {
 	AppParams       []AppParam             `json:"appParams"`
 	Port            string                 `json:"port"`
 	Path            string                 `json:"path"`
+	Network         string                 `json:"network"`
 	ExposedPorts    []request.ExposedPort  `json:"exposedPorts"`
 	Environments    []request.Environment  `json:"environments"`
 	Volumes         []request.Volume       `json:"volumes"`

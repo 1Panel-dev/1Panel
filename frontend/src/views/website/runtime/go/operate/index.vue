@@ -101,6 +101,7 @@ const initData = (type: string) => ({
     exposedPorts: [],
     environments: [],
     volumes: [],
+    network: '1panel-network',
     remark: '',
     extraHosts: [],
 });
@@ -218,6 +219,7 @@ const getRuntime = async (id: number) => {
         runtime.environments = data.environments || [];
         runtime.volumes = data.volumes || [];
         runtime.extraHosts = data.extraHosts || [];
+        runtime.network = data.network || '1panel-network';
         editParams.value = data.appParams;
         open.value = true;
     } catch (error) {}
