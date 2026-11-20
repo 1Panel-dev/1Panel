@@ -185,6 +185,7 @@ const checkDataFormat = (item: any) => {
         'log',
         'curl',
         'cutWebsiteLog',
+        'websiteStartStop',
         'clean',
         'snapshot',
         'ntp',

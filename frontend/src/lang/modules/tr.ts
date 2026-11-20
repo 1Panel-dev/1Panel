@@ -3067,6 +3067,12 @@ const message = {
         cleanDataHelper: 'Bu görev sırasında oluşturulan yedekleme dosyasını sil.',
         noLogs: 'Henüz görev çıktısı yok...',
         errPath: 'Yedek yolu [{0}] hatası, indirilemez!',
+        websiteStartStop: 'Web sitesini başlat/durdur',
+        startTime: 'Başlatma zamanı',
+        stopTime: 'Durdurma zamanı',
+        websiteTimeHint: 'Hatırlatma: günde bir kez çalışır',
+        websiteTimeInvalid:
+            'Başlatma ve durdurma zamanlarını seçin; başlatma zamanı durdurma zamanından önce olmalıdır',
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
         syncIpGroup: 'WAF IP gruplarını senkronize et',
