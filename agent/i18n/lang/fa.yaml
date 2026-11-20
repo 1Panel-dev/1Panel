@@ -831,3 +831,15 @@ ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصا�
 ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"
 
 ErrModelTokenizerDirOverlap: "پوشه‌های مدل و توکن‌ساز باید متفاوت باشند و هیچ‌کدام نباید درون دیگری قرار گیرد"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "انتخاب وب‌سایت نامعتبر است: {{ .value }}"
+ErrCronjobWebsiteGroup: "دسترسی به گروه وب‌سایت {{ .id }} امکان‌پذیر نیست"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: هیچ‌یک از وب‌سایت‌های انتخاب‌شده وجود ندارد"
+ErrCronjobWebsiteVersion: "نسخهٔ انتخاب وب‌سایت پشتیبانی نمی‌شود: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "«همهٔ وب‌سایت‌ها» را نمی‌توان هم‌زمان با وب‌سایت‌ها یا گروه‌های مشخص انتخاب کرد"
+ErrCronjobWebsiteGroupName: "نام گروه وب‌سایت نمی‌تواند خالی باشد"
+ErrCronjobWebsiteGroupMissing: "گروه وب‌سایت «{{ .group }}» وجود ندارد و هیچ وب‌سایتی از فهرست ذخیره‌شده یافت نشد"
+CronjobWebsiteGroupFallback: "{{ .name }}: گروه وب‌سایت «{{ .group }}» وجود ندارد؛ به‌صورت فهرست ثابت وب‌سایت‌ها وارد شد و دیگر تغییرات گروه را دنبال نمی‌کند"
+CronjobWebsiteMissing: "{{ .name }}: وب‌سایت‌های زیر یافت نشدند: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "هیچ‌یک از گروه‌ها یا وب‌سایت‌های انتخاب‌شده یافت نشد"

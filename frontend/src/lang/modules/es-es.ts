@@ -2973,6 +2973,9 @@ const message = {
         exportHelper: 'Exporta las imágenes seleccionadas en un solo archivo tar.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'La opción «Todos» de un grupo sigue los cambios de sus miembros; los sitios seleccionados individualmente se guardan como una lista fija.',
+        websiteSelectionMissing: 'Selección no disponible',
         importHelper:
             'Las tareas programadas duplicadas se omitirán automáticamente durante la importación. Las tareas se establecerán en estado [Deshabilitado] por defecto, y en estado [Pendiente de edición] cuando la asociación de datos sea anormal.',
         changeStatus: 'Cambiar estado',

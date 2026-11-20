@@ -2720,6 +2720,8 @@ const message = {
         exportHelper: '將選取的映像匯出為一個 tar 檔案。',
     },
     cronjob: {
+        websiteGroupDynamicHelper: '群組內「所有」會動態跟隨群組變化；逐一選擇網站則儲存固定名單。',
+        websiteSelectionMissing: '已失效的選擇',
         importHelper:
             '匯入時將自動跳過重名計劃任務。任務預設設定為【停用】狀態，資料關聯異常時，設定為【待編輯】狀態。',
         changeStatus: '狀態修改',

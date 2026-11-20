@@ -2867,6 +2867,9 @@ const message = {
         goSetting: '설정으로 이동',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            '그룹 내 “전체”를 선택하면 그룹 구성 변경이 자동으로 반영됩니다. 개별 사이트를 선택하면 고정 목록으로 저장됩니다.',
+        websiteSelectionMissing: '유효하지 않은 선택',
         importHelper:
             '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',

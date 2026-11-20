@@ -243,38 +243,7 @@
                                         :label="form.type === 'website' ? $t('cronjob.website') : $t('menu.website')"
                                         prop="websiteList"
                                     >
-                                        <el-select
-                                            v-model="form.websiteList"
-                                            multiple
-                                            @change="
-                                                form.websiteList = form.websiteList.includes('all')
-                                                    ? ['all']
-                                                    : form.websiteList
-                                            "
-                                        >
-                                            <el-option :label="$t('commons.table.all')" value="all" />
-                                            <el-option
-                                                v-for="(item, index) in websiteOptions"
-                                                :key="index"
-                                                :value="item.id + ''"
-                                                :label="item.primaryDomain"
-                                            >
-                                                <div class="option-content">
-                                                    <el-tooltip
-                                                        :content="item.primaryDomain"
-                                                        placement="top"
-                                                        :open-delay="500"
-                                                        effect="dark"
-                                                    >
-                                                        <span class="domain-text">{{ item.primaryDomain }}</span>
-                                                    </el-tooltip>
-
-                                                    <el-tag class="tagClass">
-                                                        {{ item.alias }}
-                                                    </el-tag>
-                                                </div>
-                                            </el-option>
-                                        </el-select>
+                                        <WebsiteSelection v-model="form.websiteList" />
                                         <span class="input-help" v-if="form.type === 'cutWebsiteLog'">
                                             {{ $t('cronjob.cutWebsiteLogHelper') }}
                                         </span>
@@ -866,7 +835,7 @@ import { ElForm } from 'element-plus';
 import { Cronjob } from '@/api/interface/cronjob';
 import { addCronjob, editCronjob, loadCronjobInfo, loadNextHandle, loadScriptOptions } from '@/api/modules/cronjob';
 import { listDbItems } from '@/api/modules/database';
-import { getWebsiteOptions } from '@/api/modules/website';
+import WebsiteSelection from './website-selection.vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { useRouter } from 'vue-router';
 import { listContainer } from '@/api/modules/container';
@@ -1179,7 +1148,6 @@ const search = async () => {
     loadBackups();
     loadAppInstalls();
     loadUserOptions(true);
-    loadWebsites();
     loadContainers();
     loadScripts();
     if (form.dbType) {
@@ -1199,7 +1167,6 @@ const goWafIpGroup = async () => {
 };
 
 const containerOptions = ref([]);
-const websiteOptions = ref([]);
 const backupOptions = ref([]);
 const accountOptions = ref([]);
 const appOptions = ref([]);
@@ -1610,11 +1577,6 @@ const loadUserOptions = async (isInit: boolean) => {
 const loadAppInstalls = async () => {
     const res = await listAppInstalled();
     appOptions.value = res.data || [];
-};
-
-const loadWebsites = async () => {
-    const res = await getWebsiteOptions({});
-    websiteOptions.value = res.data || [];
 };
 
 const loadContainers = async () => {

@@ -2969,6 +2969,9 @@ const message = {
         goSetting: 'Ir para configurações',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'A opção “Todos” de um grupo acompanha as alterações dos seus membros; sites selecionados individualmente são salvos como uma lista fixa.',
+        websiteSelectionMissing: 'Seleção indisponível',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',

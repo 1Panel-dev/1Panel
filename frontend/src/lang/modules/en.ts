@@ -2920,6 +2920,9 @@ const message = {
         exportHelper: 'Export selected images to one tar file.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'All within a group follows membership changes; individual websites form a fixed list.',
+        websiteSelectionMissing: 'Unavailable selection',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',

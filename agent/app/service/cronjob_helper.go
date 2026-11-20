@@ -354,7 +354,10 @@ func (u *CronjobService) handleCutWebsiteLog(cronjob *model.Cronjob, startTime t
 		return buserr.New(i18n.GetMsgWithDetail("LoadBackupFailed", clientMap[fmt.Sprintf("%d", cronjob.DownloadAccountID)].message))
 	}
 	taskItem.AddSubTaskWithOps(i18n.GetWithName("CutWebsiteLog", cronjob.Name), func(t *task.Task) error {
-		websites := loadWebsForJob(*cronjob)
+		websites, err := loadWebsForJob(*cronjob)
+		if err != nil {
+			return err
+		}
 		fileOp := files.NewFileOp()
 		baseDir := GetOpenrestyDir(SitesRootDir)
 		for _, website := range websites {

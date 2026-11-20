@@ -2,6 +2,14 @@
     <DialogPro v-model="visible" :title="$t('commons.button.import')" size="large">
         <div>
             <el-alert :closable="false" show-icon type="info" :title="$t('cronjob.importHelper')" />
+            <el-alert
+                v-for="warning in importWarnings"
+                :key="warning"
+                :title="warning"
+                type="warning"
+                :closable="false"
+                class="mt-2"
+            />
             <el-upload
                 action="#"
                 :auto-upload="false"
@@ -88,12 +96,12 @@ import { genFileId, UploadFile, UploadFiles, UploadProps, UploadRawFile } from '
 import { MsgError, MsgSuccess } from '@/utils/message';
 import i18n from '@/lang';
 import { importCronjob } from '@/api/modules/cronjob';
-import { Cronjob } from '@/api/interface/cronjob';
 
 const emit = defineEmits<{ (e: 'search'): void }>();
 
 const visible = ref(false);
 const loading = ref();
+const importWarnings = ref<string[]>([]);
 const selects = ref<any>([]);
 const data = ref();
 
@@ -109,6 +117,7 @@ const paginationConfig = reactive({
 const acceptParams = (): void => {
     visible.value = true;
     data.value = [];
+    importWarnings.value = [];
 };
 
 const search = () => {
@@ -120,12 +129,18 @@ const search = () => {
 const fileOnChange = (_uploadFile: UploadFile, uploadFiles: UploadFiles) => {
     loading.value = true;
     data.value = [];
+    selects.value = [];
+    pageData.value = [];
+    importWarnings.value = [];
+    paginationConfig.currentPage = 1;
+    paginationConfig.total = 0;
     uploaderFiles.value = uploadFiles;
     const reader = new FileReader();
     reader.onload = (e) => {
         try {
             const content = e.target.result as string;
-            const parsed = JSON.parse(content) as Cronjob.CronjobTrans;
+            const document = JSON.parse(content);
+            const parsed = Array.isArray(document) ? document : document?.version === 2 ? document.cronjobs : null;
             if (!Array.isArray(parsed)) {
                 MsgError(i18n.global.t('commons.msg.errImportFormat'));
                 loading.value = false;
@@ -158,7 +173,7 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 };
 
 const checkDataFormat = (item: any) => {
-    if (!item.name) {
+    if (!item || typeof item !== 'object' || !item.name) {
         return false;
     }
     const cronjobTypes = [
@@ -176,6 +191,22 @@ const checkDataFormat = (item: any) => {
     ];
     if (!item.type || cronjobTypes.indexOf(item.type) === -1) {
         return false;
+    }
+    if (item.websiteSelectionVersion != null) {
+        if (
+            item.websiteSelectionVersion !== 2 ||
+            (item.websiteGroups != null &&
+                (!Array.isArray(item.websiteGroups) ||
+                    !item.websiteGroups.every(
+                        (group: any) =>
+                            group &&
+                            typeof group.name === 'string' &&
+                            Array.isArray(group.websites) &&
+                            group.websites.every((site: any) => typeof site === 'string'),
+                    )))
+        ) {
+            return false;
+        }
     }
     if (item.type === 'curl' && item.urlItems != null) {
         return (
@@ -198,9 +229,10 @@ const checkDataFormat = (item: any) => {
 };
 
 const onImport = async () => {
-    await importCronjob(selects.value).then(() => {
+    await importCronjob(selects.value).then((res) => {
+        importWarnings.value = res.data?.warnings || [];
         MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-        visible.value = false;
+        if (!importWarnings.value.length) visible.value = false;
         emit('search');
     });
 };
