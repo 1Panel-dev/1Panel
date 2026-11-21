@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'Please check the Webhook configuration. See the system lo
 
 # task - runtime
 ErrInstallExtension: 'Another extension install task is running'
+PHPExtensionsInstallWarning: "Some PHP extensions could not be installed: {{ .name }}"
+PHPExtensionsInstallManually: "Retry from the Extensions page to save successful installs to the image. To troubleshoot manually, run the following commands on the Docker host:"
 
 # alert mail template
 PanelAlertTitle: "Panel Alert Notification"

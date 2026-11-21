@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'Webhook 설정을 확인하세요. 자세한 원인은 �
 
 # 작업 - 런타임
 ErrInstallExtension: '이미 설치 작업이 진행 중입니다. 작업이 완료될 때까지 기다려 주세요.'
+PHPExtensionsInstallWarning: "일부 PHP 확장을 설치하지 못했습니다: {{ .name }}"
+PHPExtensionsInstallManually: "확장 관리 페이지에서 재시도하면 설치에 성공한 확장이 이미지에 저장됩니다. 수동으로 문제를 확인하려면 Docker 호스트에서 아래 명령을 실행하세요:"
 
 # 알림 메일 템플릿
 PanelAlertTitle: '패널 알림 통지'

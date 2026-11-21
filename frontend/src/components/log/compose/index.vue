@@ -12,13 +12,15 @@
             </el-tooltip>
         </template>
         <template #content>
-            <ContainerLog
-                :compose="compose"
-                :resource="resource"
-                :container="container"
-                :node="node"
-                :highlightDiff="highlightDiff"
-            />
+            <slot name="log" v-bind="{ compose, resource, container, node, highlightDiff }">
+                <ContainerLog
+                    :compose="compose"
+                    :resource="resource"
+                    :container="container"
+                    :node="node"
+                    :highlightDiff="highlightDiff"
+                />
+            </slot>
         </template>
     </DrawerPro>
 </template>

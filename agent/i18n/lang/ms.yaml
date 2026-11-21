@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'Sila semak konfigurasi Webhook. Lihat log sistem untuk bu
 
 # tugas - runtime
 ErrInstallExtension: 'Tugas pemasangan sudah sedang berjalan, silakan tunggu tugas selesai'
+PHPExtensionsInstallWarning: "Sesetengah sambungan PHP gagal dipasang: {{ .name }}"
+PHPExtensionsInstallManually: "Cuba lagi dari halaman Sambungan supaya pemasangan yang berjaya disimpan dalam imej. Untuk menyelesaikan masalah secara manual, jalankan arahan berikut pada hos Docker:"
 
 # templat mel amaran
 PanelAlertTitle: 'Notifikasi Amaran Panel'
