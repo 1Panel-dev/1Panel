@@ -132,7 +132,31 @@
         <Extensions ref="extensionsRef" @close="search" />
         <AppResources ref="checkRef" @close="search" @task="openCreateLog" />
         <ExtManagement ref="extManagementRef" />
-        <ComposeLogs ref="composeLogRef" :highlightDiff="200" />
+        <ComposeLogs ref="composeLogRef" :highlightDiff="200">
+            <template #log="logProps">
+                <el-alert
+                    v-if="failedExtensions.length"
+                    :title="$t('runtime.extensionInstallFailed', { extensions: failedExtensions.join(', ') })"
+                    type="warning"
+                    :closable="false"
+                    show-icon
+                />
+                <el-tabs v-model="logTab" :before-leave="waitForBuildLog" @tab-click="logTabRequest++">
+                    <el-tab-pane :label="$t('logs.runLog')" name="run">
+                        <ContainerLog v-bind="logProps" />
+                    </el-tab-pane>
+                    <el-tab-pane :label="$t('runtime.buildLog')" name="build">
+                        <LogFile
+                            ref="buildLogRef"
+                            :config="buildLogConfig"
+                            :height-diff="logProps.highlightDiff"
+                            preload
+                            @loaded="showFailedExtensions"
+                        />
+                    </el-tab-pane>
+                </el-tabs>
+            </template>
+        </ComposeLogs>
         <Config ref="configRef" />
         <Supervisor ref="supervisorRef" />
         <Terminal ref="terminalRef" />
@@ -159,7 +183,9 @@ import CreateRuntime from '@/views/website/runtime/php/create/index.vue';
 import Delete from '@/views/website/runtime/delete/index.vue';
 import RouterMenu from '../index.vue';
 import Log from '@/components/log/file-drawer/index.vue';
+import LogFile from '@/components/log/file/index.vue';
 import ComposeLogs from '@/components/log/compose/index.vue';
+import ContainerLog from '@/components/log/container/index.vue';
 import Config from '@/views/website/runtime/php/config/index.vue';
 import Supervisor from '@/views/website/runtime/php/supervisor/index.vue';
 import RuntimeStatus from '@/views/website/runtime/components/runtime-status.vue';
@@ -200,6 +226,12 @@ const createRef = ref();
 const loading = ref(false);
 const items = ref<Runtime.RuntimeDTO[]>([]);
 const composeLogRef = ref();
+const logTab = ref('run');
+const buildLogRef = ref<InstanceType<typeof LogFile>>();
+const buildLogConfig = ref({ id: 0, type: 'php', tail: false });
+const failedExtensions = ref<string[]>([]);
+let logRequest = 0;
+let logTabRequest = 0;
 const configRef = ref();
 const supervisorRef = ref();
 const terminalRef = ref();
@@ -333,15 +365,56 @@ const openTerminal = (row: Runtime.Runtime) => {
 };
 
 const openLog = (row: Runtime.RuntimeDTO) => {
-    if (row.status == 'Running') {
+    logRequest++;
+    if (row.status === 'Running') {
+        logTab.value = 'run';
+        buildLogConfig.value = { id: row.id, type: 'php', tail: false };
+        failedExtensions.value = [];
         composeLogRef.value.acceptParams({
             compose: row.path + '/docker-compose.yml',
             resource: row.name,
             container: row.container,
         });
     } else {
-        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status == 'Building' });
+        logRef.value.acceptParams({ id: row.id, type: 'php', tail: row.status === 'Building' });
     }
+};
+
+const waitForBuildLog = async (tab: string | number) => {
+    if (tab !== 'build') {
+        return true;
+    }
+    const request = logRequest;
+    const tabRequest = logTabRequest;
+    const ready = await buildLogRef.value?.waitForInitialLoad();
+    return !!ready && request === logRequest && tabRequest === logTabRequest;
+};
+
+const showFailedExtensions = (lines: string[]) => {
+    const latest = lines.slice().reverse();
+    const prefix = '1PANEL_PHP_EXTENSION_FAILURES=';
+    const marker = latest.find((line) => line.trim().startsWith(prefix));
+    if (marker) {
+        try {
+            const extensions: unknown = JSON.parse(marker.trim().slice(prefix.length));
+            if (Array.isArray(extensions)) {
+                failedExtensions.value = extensions.filter(
+                    (name): name is string => typeof name === 'string' && !!name.trim(),
+                );
+            }
+        } catch {
+            // Keep the raw log available if the failure summary is malformed.
+        }
+        return;
+    }
+    // Older installers stop after logging the failed extension as their final line.
+    const last = latest.find((line) => line.trim());
+    const failure = last
+        ?.trim()
+        .match(
+            /^------ (?:install-php-extensions|pecl install|docker-php-ext-install install|install(?: extension)?) ([\w.-]+) failed ------$/,
+        );
+    failedExtensions.value = failure ? [failure[1]] : [];
 };
 
 const openCreateLog = (taskID: string) => {

@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'Verifique a configuração do Webhook. Consulte os logs d
 
 # tarefa - runtime
 ErrInstallExtension: 'Já existe uma tarefa de instalação em andamento, aguarde a conclusão da tarefa'
+PHPExtensionsInstallWarning: "Não foi possível instalar algumas extensões do PHP: {{ .name }}"
+PHPExtensionsInstallManually: "Tente novamente na página de extensões para salvar na imagem as instalações bem-sucedidas. Para investigar manualmente, execute os seguintes comandos no host do Docker:"
 
 # modelo de e-mail de alerta
 PanelAlertTitle: 'Notificação de Alerta do Painel'

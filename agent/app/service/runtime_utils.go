@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"maps"
 	"os"
 	"os/exec"
@@ -336,15 +337,15 @@ func deleteImageByID(oldImageID, imageName string, client docker.Client) {
 }
 
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
-	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild)
+	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild, nil)
 }
 
-func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) error {
+func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool, taskLog func(string)) error {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
 	logPath := path.Join(runtimePath, "build.log")
 
-	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
+	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC|os.O_APPEND, constant.FilePerm)
 	if err != nil {
 		global.LOG.Errorf("failed to open log file: %v", err)
 		runtime.Status = constant.StatusError
@@ -433,21 +434,45 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		return err
 	}
 	deleteImageID := ""
+	var failedExtensions []string
+	buildLogger := log.New(io.MultiWriter(logFile), "", 0)
 	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
 	if extensions != "" {
 		deleteImageID, _ = client.GetImageIDByName(runtime.Image)
-		cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(60*time.Minute), cmd2.WithOutputFile(logPath))
-		if err = cmdMgr.Run("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions); err != nil {
+		cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(60*time.Minute), cmd2.WithLogger(buildLogger))
+		output, err := cmdMgr.RunWithStdout("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions, "--allow-partial")
+		if err == nil {
+			failedExtensions, err = readPHPExtensionFailures(output, extensions)
+		}
+		if err != nil {
 			runtime.Status = constant.StatusError
 			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
 			return err
 		}
-		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithOutputFile(logPath))
+		if len(failedExtensions) > 0 {
+			logPHPExtensionFailures(buildLogger, taskLog, runtime.ContainerName, failedExtensions)
+			checkMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(30*time.Second), cmd2.WithLogger(buildLogger))
+			if err := checkMgr.Run("docker", "exec", runtime.ContainerName, "php-fpm", "-t"); err != nil {
+				return stopFailedPHPRuntime(runtime, buildLogger, err)
+			}
+		}
+		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithLogger(buildLogger))
 		err = commitMgr.Run("docker", "commit", runtime.ContainerName, runtime.Image)
 		if err != nil {
 			runtime.Status = constant.StatusError
 			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
 			return err
+		}
+	}
+	handlePHPDir(*runtime)
+	if out, err := compose.DownAndUp(composePath); err != nil {
+		runtime.Status = constant.StatusStartErr
+		runtime.Message = out
+		return err
+	}
+	if len(failedExtensions) > 0 {
+		if err := waitForPHPFPM(runtime.ContainerName); err != nil {
+			return stopFailedPHPRuntime(runtime, buildLogger, err)
 		}
 	}
 	if oldImageID != "" {
@@ -456,14 +481,80 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 	if deleteImageID != "" {
 		deleteImageByID(deleteImageID, runtime.Image, client)
 	}
-	handlePHPDir(*runtime)
-	if out, err := compose.DownAndUp(composePath); err != nil {
-		runtime.Status = constant.StatusStartErr
-		runtime.Message = out
-		return err
-	}
 	runtime.Status = constant.StatusRunning
 	return nil
+}
+
+func readPHPExtensionFailures(output, requested string) ([]string, error) {
+	const failurePrefix = "1PANEL_PHP_EXTENSION_FAILURES="
+	lastLine := strings.TrimSpace(output)
+	if index := strings.LastIndexByte(lastLine, '\n'); index != -1 {
+		lastLine = lastLine[index+1:]
+	}
+	payload, found := strings.CutPrefix(lastLine, failurePrefix)
+	if !found {
+		return nil, nil
+	}
+	var failures []string
+	if err := json.Unmarshal([]byte(payload), &failures); err != nil {
+		return nil, fmt.Errorf("invalid PHP extension installation result: %w", err)
+	}
+	allowed := make(map[string]struct{})
+	for _, extension := range strings.Split(requested, ",") {
+		allowed[strings.TrimSpace(extension)] = struct{}{}
+	}
+	for _, extension := range failures {
+		if _, ok := allowed[extension]; !ok || extension == "" {
+			return nil, fmt.Errorf("unexpected PHP extension in installation result: %q", extension)
+		}
+	}
+	return failures, nil
+}
+
+func logPHPExtensionFailures(buildLogger *log.Logger, taskLog func(string), container string, extensions []string) {
+	message := i18n.GetWithName("PHPExtensionsInstallWarning", strings.Join(extensions, ", "))
+	message += "\n" + i18n.GetMsgByKey("PHPExtensionsInstallManually")
+	quote := func(value string) string {
+		return "'" + strings.ReplaceAll(value, "'", "'\\''") + "'"
+	}
+	for _, extension := range extensions {
+		message += "\ndocker exec -it " + quote(container) + " install-ext " + quote(extension)
+	}
+	buildLogger.Print(message)
+	if taskLog != nil {
+		taskLog(message)
+	}
+}
+
+func waitForPHPFPM(container string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	ticker := time.NewTicker(500 * time.Millisecond)
+	defer ticker.Stop()
+	for {
+		cmdMgr := cmd2.NewCommandMgr(cmd2.WithContext(ctx), cmd2.WithTimeout(2*time.Second))
+		err := cmdMgr.Run("docker", "exec", container, "supervisorctl", "-c", "/etc/supervisord.conf", "status", "php-fpm:*")
+		if err == nil {
+			return nil
+		}
+		select {
+		case <-ctx.Done():
+			return fmt.Errorf("%s: %w", i18n.GetMsgByKey("ErrRuntimeStart"), err)
+		case <-ticker.C:
+		}
+	}
+}
+
+func stopFailedPHPRuntime(runtime *model.Runtime, buildLogger *log.Logger, err error) error {
+	runtime.Status = constant.StatusStartErr
+	runtime.Message = err.Error()
+	buildLogger.Print(err)
+	// A running Supervisor container can otherwise mask a failed PHP-FPM process in the runtime list.
+	stopMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(15*time.Second), cmd2.WithLogger(buildLogger))
+	if stopErr := stopMgr.Run("docker", "stop", "--time", "5", runtime.ContainerName); stopErr != nil {
+		buildLogger.Print(stopErr)
+	}
+	return err
 }
 
 func handleParams(create request.RuntimeCreate, projectDir string) (composeContent []byte, envContent []byte, forms []byte, err error) {

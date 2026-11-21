@@ -5428,6 +5428,8 @@ const message = {
         editRuleConfirm: 'آیا از تغییر این قانون مطمئن هستید؟',
     },
     runtime: {
+        buildLog: 'گزارش ساخت',
+        extensionInstallFailed: 'نصب برخی از افزونه‌های PHP ناموفق بود: {extensions}',
         statusMessageUnavailable:
             'اطلاعات دقیقی درباره وضعیت در دسترس نیست. برای جزئیات، گزارش‌های محیط اجرا را بررسی کنید.',
         importEnv: 'وارد کردن متغیرهای محیطی',

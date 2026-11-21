@@ -282,7 +282,7 @@ func executeRuntimeCreateTask(create request.RuntimeCreate, runtime *model.Runti
 
 	switch create.Type {
 	case constant.RuntimePHP:
-		return buildRuntimeWithResult(runtime, "", "", false)
+		return buildRuntimeWithResult(runtime, "", "", false, taskItem.Log)
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if err := pullRuntimeImagesBeforeStart(create, runtime, taskItem); err != nil {
 			return markRuntimeCreateFailed(runtime, err)

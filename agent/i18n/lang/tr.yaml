@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'Lütfen Webhook yapılandırmasını kontrol edin. Ayrın
 
 # görev - çalışma zamanı
 ErrInstallExtension: 'Zaten devam eden bir kurulum görevi var, görevin bitmesini bekleyin'
+PHPExtensionsInstallWarning: "Bazı PHP uzantıları yüklenemedi: {{ .name }}"
+PHPExtensionsInstallManually: "Başarılı kurulumları imaja kaydetmek için Uzantılar sayfasından yeniden deneyin. Sorunu elle incelemek için aşağıdaki komutları Docker ana makinesinde çalıştırın:"
 
 # uyarı e-posta şablonu
 PanelAlertTitle: 'Panel Uyarı Bildirimi'

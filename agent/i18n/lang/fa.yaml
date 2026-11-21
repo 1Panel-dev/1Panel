@@ -649,6 +649,8 @@ ErrWebhookTestFailed: 'لطفاً پیکربندی وب‌هوک را بررسی
 
 # وظیفه - محیط اجرا
 ErrInstallExtension: 'وظیفه نصب پسوند دیگری در حال اجراست'
+PHPExtensionsInstallWarning: "نصب برخی از افزونه‌های PHP ناموفق بود: {{ .name }}"
+PHPExtensionsInstallManually: "برای ذخیره نصب موفق در ایمیج، دوباره از صفحه افزونه‌ها اقدام کنید. برای عیب‌یابی دستی، فرمان‌های زیر را در میزبان Docker اجرا کنید:"
 
 # قالب ایمیل هشدار
 PanelAlertTitle: "اعلان هشدار پنل"

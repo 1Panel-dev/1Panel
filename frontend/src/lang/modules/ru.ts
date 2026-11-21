@@ -5554,6 +5554,8 @@ const message = {
         editRuleConfirm: 'Вы уверены, что хотите изменить это правило?',
     },
     runtime: {
+        buildLog: 'Журнал сборки',
+        extensionInstallFailed: 'Не удалось установить некоторые расширения PHP: {extensions}',
         statusMessageUnavailable: 'Подробная информация о состоянии недоступна. Проверьте журналы среды выполнения.',
         importEnv: 'Импорт переменных окружения',
         envImportError: 'Строка {0}: {1}',

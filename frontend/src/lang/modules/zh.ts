@@ -5096,6 +5096,8 @@ const message = {
         editRuleConfirm: '是否确认修改该规则？',
     },
     runtime: {
+        buildLog: '构建日志',
+        extensionInstallFailed: '部分 PHP 扩展安装失败：{extensions}',
         statusMessageUnavailable: '暂无详细状态信息，请点击日志列的“查看”排查具体原因。',
         importEnv: '导入环境变量',
         envImportError: '第 {0} 行：{1}',
