@@ -253,7 +253,7 @@ func SyncRuntimesStatus(runtimes []model.Runtime) error {
 				runtimes[index].Status = constant.StatusError
 				updateRuntimeContainerError(cli, contain.ID, &runtimes[index])
 			case "running":
-				runtimes[index].Status = constant.StatusRunning
+				updateRunningStatus(&runtimes[index])
 			case "paused":
 				runtimes[index].Status = constant.StatusStopped
 			case "restarting":
@@ -301,7 +301,7 @@ func SyncRuntimeContainerStatus(runtime *model.Runtime) error {
 		runtime.Status = constant.StatusError
 		updateRuntimeContainerError(cli, container.ID, runtime)
 	case "running":
-		runtime.Status = constant.StatusRunning
+		updateRunningStatus(runtime)
 	case "paused":
 		runtime.Status = constant.StatusStopped
 	default:
@@ -453,7 +453,7 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 			logPHPExtensionFailures(buildLogger, taskLog, runtime.ContainerName, failedExtensions)
 			checkMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(30*time.Second), cmd2.WithLogger(buildLogger))
 			if err := checkMgr.Run("docker", "exec", runtime.ContainerName, "php-fpm", "-t"); err != nil {
-				return stopFailedPHPRuntime(runtime, buildLogger, err)
+				return markPHPStartFailed(runtime, buildLogger, err)
 			}
 		}
 		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithLogger(buildLogger))
@@ -472,7 +472,7 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 	}
 	if len(failedExtensions) > 0 {
 		if err := waitForPHPFPM(runtime.ContainerName); err != nil {
-			return stopFailedPHPRuntime(runtime, buildLogger, err)
+			return markPHPStartFailed(runtime, buildLogger, err)
 		}
 	}
 	if oldImageID != "" {
@@ -526,14 +526,39 @@ func logPHPExtensionFailures(buildLogger *log.Logger, taskLog func(string), cont
 	}
 }
 
+func checkPHPFPM(ctx context.Context, container string) error {
+	cmdMgr := cmd2.NewCommandMgr(cmd2.WithContext(ctx), cmd2.WithTimeout(2*time.Second))
+	output, err := cmdMgr.RunWithStdout("docker", "top", container, "-eo", "pid,stat,comm")
+	if err != nil {
+		return err
+	}
+	for line := range strings.SplitSeq(output, "\n") {
+		fields := strings.Fields(line)
+		if len(fields) == 3 && fields[2] == "php-fpm" && !strings.HasPrefix(fields[1], "Z") {
+			return nil
+		}
+	}
+	return errors.New("PHP-FPM process not found")
+}
+
+func updateRunningStatus(runtime *model.Runtime) {
+	// Supervisor can remain running even if PHP-FPM failed to start.
+	if runtime.Type == constant.RuntimePHP && runtime.Status == constant.StatusStartErr {
+		if err := checkPHPFPM(context.Background(), runtime.ContainerName); err != nil {
+			return
+		}
+		runtime.Message = ""
+	}
+	runtime.Status = constant.StatusRunning
+}
+
 func waitForPHPFPM(container string) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
 	for {
-		cmdMgr := cmd2.NewCommandMgr(cmd2.WithContext(ctx), cmd2.WithTimeout(2*time.Second))
-		err := cmdMgr.Run("docker", "exec", container, "supervisorctl", "-c", "/etc/supervisord.conf", "status", "php-fpm:*")
+		err := checkPHPFPM(ctx, container)
 		if err == nil {
 			return nil
 		}
@@ -545,15 +570,10 @@ func waitForPHPFPM(container string) error {
 	}
 }
 
-func stopFailedPHPRuntime(runtime *model.Runtime, buildLogger *log.Logger, err error) error {
+func markPHPStartFailed(runtime *model.Runtime, buildLogger *log.Logger, err error) error {
 	runtime.Status = constant.StatusStartErr
 	runtime.Message = err.Error()
 	buildLogger.Print(err)
-	// A running Supervisor container can otherwise mask a failed PHP-FPM process in the runtime list.
-	stopMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(15*time.Second), cmd2.WithLogger(buildLogger))
-	if stopErr := stopMgr.Run("docker", "stop", "--time", "5", runtime.ContainerName); stopErr != nil {
-		buildLogger.Print(stopErr)
-	}
 	return err
 }
 
