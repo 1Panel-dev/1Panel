@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose 復元作業領域をクリーンアップ'
 # ランタイム
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
+PHPBuildImage: "PHP イメージをビルド中"
+PHPBuildBaseImage: "ベースイメージ {{ .name }} を取得中"
+PHPBuildStep: "PHP イメージをビルド中（ステップ {{ .name }}）"
+PHPBuildStartContainer: "PHP コンテナを起動中"
+PHPBuildInstallExtensions: "PHP 拡張機能をインストール中"
+PHPBuildCommitImage: "拡張機能を含む PHP イメージを保存中"
+PHPBuildApplyConfig: "設定を適用して PHP 実行環境を起動中"
+PHPBuildSeeLog: "詳細は build.log を確認してください"
 ErrImageExist: 'イメージはすでに存在します！イメージ名を変更してください。'
 ErrDelWithWebsite: 'オペレーティング環境は既に Web サイトに関連付けられているため、削除できません'
 ErrRuntimeStart: '起動に失敗しました'

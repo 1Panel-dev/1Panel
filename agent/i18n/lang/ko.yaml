@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose 복원 작업 공간 정리'
 # 런타임
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다 소스 파일의 무결성을 확인하세요'
 ErrImageBuildErr: '이미지 빌드 실패'
+PHPBuildImage: "PHP 이미지 빌드 중"
+PHPBuildBaseImage: "기본 이미지 {{ .name }} 확인 중"
+PHPBuildStep: "PHP 이미지 빌드 중 (단계 {{ .name }})"
+PHPBuildStartContainer: "PHP 컨테이너 시작 중"
+PHPBuildInstallExtensions: "PHP 확장 설치 중"
+PHPBuildCommitImage: "PHP 확장이 설치된 이미지 저장 중"
+PHPBuildApplyConfig: "설정 적용 및 PHP 실행 환경 시작 중"
+PHPBuildSeeLog: "자세한 내용은 build.log를 확인하세요"
 ErrImageExist: '이미지가 이미 존재합니다 이미지 이름을 수정하세요.'
 ErrDelWithWebsite: '운영 환경이 이미 웹사이트와 연결되어 있어 삭제할 수 없습니다'
 ErrRuntimeStart: '시작 실패'

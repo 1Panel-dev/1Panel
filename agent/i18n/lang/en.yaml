@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Cleanup compose restore workspace'
 # runtime
 ErrFileNotExist: 'Source file not found: {{ .detail }}'
 ErrImageBuildErr: 'Image build failed'
+PHPBuildImage: "Building the PHP image"
+PHPBuildBaseImage: "Resolving base image {{ .name }}"
+PHPBuildStep: "Building the PHP image (step {{ .name }})"
+PHPBuildStartContainer: "Starting the PHP container"
+PHPBuildInstallExtensions: "Installing PHP extensions"
+PHPBuildCommitImage: "Saving the image with PHP extensions"
+PHPBuildApplyConfig: "Applying configuration and starting the PHP runtime"
+PHPBuildSeeLog: "See build.log for details"
 ErrImageExist: "Image already exists. Use a different image name."
 ErrDelWithWebsite: 'Runtime is linked to a website and cannot be deleted'
 ErrRuntimeStart: 'Startup failed'

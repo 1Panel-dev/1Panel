@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'پاک‌سازی فضای کاری بازیابی Compo
 # محیط اجرا
 ErrFileNotExist: 'فایل منبع یافت نشد: {{ .detail }}'
 ErrImageBuildErr: 'ساخت تصویر ناموفق بود'
+PHPBuildImage: "در حال ساخت ایمیج PHP"
+PHPBuildBaseImage: "در حال دریافت ایمیج پایه {{ .name }}"
+PHPBuildStep: "در حال ساخت ایمیج PHP (مرحله {{ .name }})"
+PHPBuildStartContainer: "در حال راه‌اندازی کانتینر PHP"
+PHPBuildInstallExtensions: "در حال نصب افزونه‌های PHP"
+PHPBuildCommitImage: "در حال ذخیره ایمیج با افزونه‌های PHP"
+PHPBuildApplyConfig: "در حال اعمال تنظیمات و راه‌اندازی محیط اجرای PHP"
+PHPBuildSeeLog: "برای جزئیات به build.log مراجعه کنید"
 ErrImageExist: "تصویر از قبل وجود دارد. از نام تصویر دیگری استفاده کنید."
 ErrDelWithWebsite: 'محیط اجرا به یک وب‌سایت متصل است و قابل حذف نیست'
 ErrRuntimeStart: 'شروع ناموفق بود'

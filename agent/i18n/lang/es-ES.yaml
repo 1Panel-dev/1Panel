@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Limpiar espacio de restauracion de compose'
 # entorno de ejecución
 ErrFileNotExist: 'El archivo {{ .detail }} no existe, verifique la integridad'
 ErrImageBuildErr: 'Fallo al construir la imagen'
+PHPBuildImage: "Construyendo la imagen de PHP"
+PHPBuildBaseImage: "Obteniendo la imagen base {{ .name }}"
+PHPBuildStep: "Construyendo la imagen de PHP (paso {{ .name }})"
+PHPBuildStartContainer: "Iniciando el contenedor PHP"
+PHPBuildInstallExtensions: "Instalando extensiones de PHP"
+PHPBuildCommitImage: "Guardando la imagen con las extensiones de PHP"
+PHPBuildApplyConfig: "Aplicando la configuración e iniciando el entorno PHP"
+PHPBuildSeeLog: "Consulte build.log para más detalles"
 ErrImageExist: 'La imagen ya existe Modifique el nombre de la imagen.'
 ErrDelWithWebsite: 'El entorno de ejecución ya está asociado a un sitio web y no puede eliminarse'
 ErrRuntimeStart: 'Fallo al iniciar'
