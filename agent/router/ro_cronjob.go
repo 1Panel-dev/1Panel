@@ -11,6 +11,7 @@ func (s *CronjobRouter) InitRouter(Router *gin.RouterGroup) {
 	cmdRouter := Router.Group("cronjobs")
 	baseApi := v2.ApiGroupApp.BaseApi
 	{
+		cmdRouter.GET("/capabilities", baseApi.CronjobCapabilities)
 		cmdRouter.POST("", baseApi.CreateCronjob)
 		cmdRouter.POST("/next", baseApi.LoadNextHandle)
 		cmdRouter.POST("/import", baseApi.ImportCronjob)

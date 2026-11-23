@@ -135,10 +135,12 @@ func importWebsiteSelection(item dto.CronjobTrans, groups []model.Group, website
 		return "all", nil, nil
 	}
 	groupIDs := map[string]uint{}
+	ambiguous := map[string]bool{}
 	for _, group := range groups {
-		if id, ok := groupIDs[group.Name]; !ok || group.ID < id {
-			groupIDs[group.Name] = group.ID
+		if _, ok := groupIDs[group.Name]; ok {
+			ambiguous[group.Name] = true
 		}
+		groupIDs[group.Name] = group.ID
 	}
 	aliases := map[string]uint{}
 	for _, web := range websites {
@@ -155,6 +157,9 @@ func importWebsiteSelection(item dto.CronjobTrans, groups []model.Group, website
 	for _, group := range item.WebsiteGroups {
 		if group.Name == "" {
 			return "", nil, errors.New(i18n.GetMsgByKey("ErrCronjobWebsiteGroupName"))
+		}
+		if ambiguous[group.Name] {
+			return "", nil, fmt.Errorf("ambiguous website group name: %s", group.Name)
 		}
 		if id, ok := groupIDs[group.Name]; ok {
 			add(fmt.Sprintf("group:%d", id))

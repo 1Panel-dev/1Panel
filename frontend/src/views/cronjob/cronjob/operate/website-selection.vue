@@ -39,14 +39,14 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { listWebsites } from '@/api/modules/website';
+import { getWebsiteOptions } from '@/api/modules/website';
 import { getAgentGroupList } from '@/api/modules/group';
 import i18n from '@/lang';
 import { Website } from '@/api/interface/website';
 
 const props = defineProps<{ modelValue: string[] }>();
 const emit = defineEmits<{ (event: 'update:modelValue', value: string[]): void }>();
-const websites = ref<Website.WebsiteDTO[]>([]);
+const websites = ref<Website.WebsiteOption[]>([]);
 const groups = ref<{ id: number; name: string }[]>([]);
 const loading = ref(true);
 const members = (id: number) =>
@@ -124,7 +124,10 @@ const changeSelection = (value: string[]) => {
     for (const group of groups.value) {
         const token = `group:${group.id}`;
         const ids = members(group.id);
-        if (!next.has(token)) continue;
+        if (!next.has(token)) {
+            if (props.modelValue.includes(token)) ids.forEach((id) => next.delete(id));
+            continue;
+        }
         // Removing a member from a dynamic group turns the remaining members into a fixed list.
         if (props.modelValue.includes(token) && ids.some((id) => !next.has(id))) {
             next.delete(token);
@@ -139,7 +142,7 @@ const changeSelection = (value: string[]) => {
 };
 onMounted(async () => {
     try {
-        const [sites, groupList] = await Promise.all([listWebsites(), getAgentGroupList('website')]);
+        const [sites, groupList] = await Promise.all([getWebsiteOptions({}), getAgentGroupList('website')]);
         websites.value = sites.data || [];
         groups.value = groupList.data || [];
     } finally {

@@ -358,3 +358,7 @@ func (b *BaseApi) HandleOnce(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+func (b *BaseApi) CronjobCapabilities(c *gin.Context) {
+	helper.SuccessWithData(c, map[string]interface{}{"websiteSelectionVersion": 2})
+}

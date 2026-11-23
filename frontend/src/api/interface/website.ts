@@ -151,6 +151,7 @@ export namespace Website {
     }
 
     export interface WebsiteOption {
+        webSiteGroupId: number;
         id: number;
         primaryDomain: string;
         alias: string;
