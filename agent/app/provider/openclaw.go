@@ -47,7 +47,7 @@ func BuildOpenClawProviderPatch(provider, modelName, apiType, authMode, baseURL,
 		apiKey = provider
 		usesBearer = false
 	case "openai", "openrouter", "anthropic":
-		preserveQualifiedModel = strings.Contains(modelName, "/")
+		preserveQualifiedModel = strings.HasPrefix(modelName, providerKey+"/")
 	}
 
 	primaryModel := providerKey + "/" + modelID
