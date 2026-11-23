@@ -3156,6 +3156,11 @@ const message = {
         selectTimeRange: 'Select the time range to export.',
     },
     terminal: {
+        passwordless: 'Passwordless',
+        bootstrapAuth: 'Initial authentication (optional)',
+        passwordlessSetupHelper:
+            'Reuse an existing SSH key or generate one automatically. Testing the connection sets up passwordless access.',
+
         showTerminalButton: 'Terminal Shortcut',
         showTerminalButtonHelper:
             'When enabled, a terminal shortcut button appears in the bottom-right corner of the page.',

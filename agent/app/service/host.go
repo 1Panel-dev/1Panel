@@ -8,6 +8,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/1Panel-dev/1Panel/agent/utils/encrypt"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssh"
 	"github.com/jinzhu/copier"
@@ -18,7 +19,7 @@ type HostService struct{}
 
 type IHostService interface {
 	TestLocalConn(id uint) bool
-	TestByInfo(req dto.HostConnTest) bool
+	TestByInfo(req dto.HostConnTest) (bool, error)
 	GetHostByID(id uint) (*dto.HostInfo, error)
 	SearchForTree(search dto.SearchForTree) ([]dto.HostTree, error)
 	SearchWithPage(search dto.SearchPageWithGroup) (int64, interface{}, error)
@@ -33,25 +34,35 @@ func NewIHostService() IHostService {
 	return &HostService{}
 }
 
-func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
+func (u *HostService) TestByInfo(req dto.HostConnTest) (bool, error) {
+	if req.ConfigurePasswordless {
+		if req.AuthMode != "passwordless" || (req.BootstrapAuth != "password" && req.BootstrapAuth != "key") {
+			return false, fmt.Errorf("invalid passwordless setup authentication")
+		}
+		req.AuthMode = req.BootstrapAuth
+		if err := u.configurePasswordless(req); err != nil {
+			return false, err
+		}
+		return true, nil
+	}
 	if req.AuthMode == "password" && len(req.Password) != 0 {
 		password, err := base64.StdEncoding.DecodeString(req.Password)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		req.Password = string(password)
 	}
 	if req.AuthMode == "key" && len(req.PrivateKey) != 0 {
 		privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
 		if err != nil {
-			return false
+			return false, nil
 		}
 		req.PrivateKey = string(privateKey)
 	}
-	if len(req.Password) == 0 && len(req.PrivateKey) == 0 {
+	if req.AuthMode != "passwordless" && len(req.Password) == 0 && len(req.PrivateKey) == 0 {
 		host, err := hostRepo.Get(repo.WithByAddr(req.Addr), hostRepo.WithByPort(req.Port))
 		if err != nil {
-			return false
+			return false, nil
 		}
 		req.Password = host.Password
 		req.AuthMode = host.AuthMode
@@ -67,10 +78,10 @@ func (u *HostService) TestByInfo(req dto.HostConnTest) bool {
 	}
 	client, err := ssh.NewClient(connInfo)
 	if err != nil {
-		return false
+		return false, nil
 	}
 	defer client.Close()
-	return true
+	return true, nil
 }
 
 func (u *HostService) TestLocalConn(id uint) bool {
@@ -255,6 +266,14 @@ func (u *HostService) Create(req dto.HostOperate) (*dto.HostInfo, error) {
 		}
 		req.Password = ""
 	}
+	if req.AuthMode == "passwordless" {
+		client, err := ssh.NewClient(ssh.ConnInfo{Addr: req.Addr, Port: int(req.Port), User: req.User, AuthMode: req.AuthMode})
+		if err != nil {
+			return nil, err
+		}
+		client.Close()
+		req.Password, req.PrivateKey, req.PassPhrase = "", "", ""
+	}
 	var host model.Host
 	if err := copier.Copy(&host, &req); err != nil {
 		return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
@@ -292,6 +311,14 @@ func (u *HostService) Delete(ids []uint) error {
 }
 
 func (u *HostService) Update(id uint, upMap map[string]interface{}) (*dto.HostInfo, error) {
+	if upMap["auth_mode"] == "passwordless" {
+		client, err := ssh.NewClient(ssh.ConnInfo{Addr: upMap["addr"].(string), Port: int(upMap["port"].(uint)), User: upMap["user"].(string), AuthMode: "passwordless"})
+		if err != nil {
+			return nil, err
+		}
+		client.Close()
+		upMap["password"], upMap["private_key"], upMap["pass_phrase"] = "", "", ""
+	}
 	if err := hostRepo.Update(id, upMap); err != nil {
 		return nil, err
 	}
@@ -310,6 +337,23 @@ func (u *HostService) EncryptHost(itemVal string) (string, error) {
 	}
 	keyItem, err := encrypt.StringEncrypt(string(privateKey))
 	return keyItem, err
+}
+
+func (u *HostService) configurePasswordless(req dto.HostConnTest) error {
+	if !global.IsMaster {
+		return fmt.Errorf("remote passwordless SSH must be configured on the master node")
+	}
+	password, err := base64.StdEncoding.DecodeString(req.Password)
+	if err != nil {
+		return err
+	}
+	privateKey, err := base64.StdEncoding.DecodeString(req.PrivateKey)
+	if err != nil {
+		return err
+	}
+	info := ssh.ConnInfo{Addr: req.Addr, Port: int(req.Port), User: req.User, AuthMode: req.AuthMode, Password: string(password), PrivateKey: privateKey, PassPhrase: []byte(req.PassPhrase)}
+
+	return ssh.ConfigurePasswordless(info)
 }
 
 func GetHostInfo(id uint) (*model.Host, error) {

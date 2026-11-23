@@ -35,7 +35,7 @@ export const testByInfo = (params: Host.HostConnTest | Host.HostOperate, nodeNam
             nodeName ? { CurrentNode: nodeName } : undefined,
         );
     }
-    return http.postLocalNode<boolean>(`/hosts/test/byinfo`, request);
+    return http.postLocalNode<boolean>(`/hosts/test/byinfo`, request, 60000);
 };
 export const testByID = (id: number) => {
     return http.postLocalNode<boolean>(`/hosts/test/byid`, { id: id });

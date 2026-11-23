@@ -44,7 +44,12 @@ func (b *BaseApi) TestByInfo(c *gin.Context) {
 		return
 	}
 
-	helper.SuccessWithData(c, hostService.TestByInfo(req))
+	connected, err := hostService.TestByInfo(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, connected)
 }
 
 // @Tags Host

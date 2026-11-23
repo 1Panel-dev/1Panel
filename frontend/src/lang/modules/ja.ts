@@ -3139,6 +3139,10 @@ const message = {
         selectTimeRange: 'エクスポートする期間を選択してください',
     },
     terminal: {
+        passwordless: 'パスワードレス',
+        bootstrapAuth: '初回認証（任意）',
+        passwordlessSetupHelper: '接続テスト時にパスワードレス接続を設定し、確認します。',
+
         showTerminalButton: 'ターミナルへのショートカット',
         showTerminalButtonHelper: '有効にすると、ページの右下にターミナルへのショートカットボタンが表示されます。',
         local: 'ローカル',
