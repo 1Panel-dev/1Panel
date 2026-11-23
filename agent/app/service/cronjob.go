@@ -236,6 +236,28 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 }
 
 func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) ([]string, error) {
+	// Skip existing names (and later duplicates in the file) before validating references.
+	if len(req) == 0 {
+		return nil, nil
+	}
+	var existing []model.Cronjob
+	if err := global.DB.Select("name").Find(&existing).Error; err != nil {
+		return nil, err
+	}
+	seenNames := make(map[string]bool, len(existing)+len(req))
+	for _, item := range existing {
+		seenNames[item.Name] = true
+	}
+	pending := make([]dto.CronjobTrans, 0, len(req))
+	for _, item := range req {
+		if seenNames[item.Name] {
+			continue
+		}
+		seenNames[item.Name] = true
+		pending = append(pending, item)
+	}
+	req = pending
+	selectionWarnings := make(map[int][]string)
 	var warnings []string
 	selections := make(map[int]string)
 	var websiteGroups []model.Group
@@ -269,6 +291,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) ([]stri
 					return nil, fmt.Errorf("%s: %w", item.Name, err)
 				}
 				selections[index] = selection
+				selectionWarnings[index] = notes
 				warnings = append(warnings, notes...)
 			}
 		}
@@ -490,6 +513,9 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) ([]stri
 		}
 		if err := cronjobRepo.Create(&cronjob); err != nil {
 			return nil, err
+		}
+		for _, warning := range selectionWarnings[index] {
+			global.LOG.Warnf("import cronjob id=%d name=%q operator=%q: %q", cronjob.ID, cronjob.Name, operator, warning)
 		}
 		if item.AlertTitle != "" && item.AlertMethod != "" {
 			advanced, _ := cronJobAlertAdvancedParams(item.AlertTriggerMode)
