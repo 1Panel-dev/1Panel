@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "Para verificar atualizações de imagens no ambient
 ErrPHPExtensionsConflict: "Já existe um modelo de extensões PHP com este nome e conteúdo diferente; ele não foi sobrescrito"
 
 ErrModelTokenizerDirOverlap: "Os diretórios de modelos e tokenizadores devem ser diferentes e nenhum pode conter o outro"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Seleção de sites inválida: {{ .value }}"
+ErrCronjobWebsiteGroup: "Não foi possível acessar o grupo de sites {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: nenhum dos sites selecionados existe"
+ErrCronjobWebsiteVersion: "Versão de seleção de sites não suportada: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Não é possível selecionar todos os sites junto com sites ou grupos específicos"
+ErrCronjobWebsiteGroupName: "O nome do grupo de sites não pode estar vazio"
+ErrCronjobWebsiteGroupMissing: "O grupo de sites “{{ .group }}” não existe e nenhum site correspondente foi encontrado na lista salva"
+CronjobWebsiteGroupFallback: "{{ .name }}: o grupo de sites “{{ .group }}” não existe; importado como uma lista fixa de sites que não acompanha mais as alterações do grupo"
+CronjobWebsiteMissing: "{{ .name }}: sites não encontrados: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Nenhum grupo ou site correspondente à seleção foi encontrado"

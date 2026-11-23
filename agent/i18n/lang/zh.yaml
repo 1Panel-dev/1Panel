@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "当前运行环境下，如需检查镜像是否更
 ErrPHPExtensionsConflict: "同名 PHP 扩展模版已存在且内容不同，未覆盖"
 
 ErrModelTokenizerDirOverlap: "模型目录和分词器目录不能相同或互相包含"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "无效的网站选择：{{ .value }}"
+ErrCronjobWebsiteGroup: "无法访问网站组 {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}：所选网站均已不存在"
+ErrCronjobWebsiteVersion: "不支持的网站选择版本：{{ .version }}"
+ErrCronjobWebsiteAllConflict: "所有网站不能与指定网站或网站组同时选择"
+ErrCronjobWebsiteGroupName: "网站组名称不能为空"
+ErrCronjobWebsiteGroupMissing: "网站组“{{ .group }}”不存在，且无法匹配快照中的任何网站"
+CronjobWebsiteGroupFallback: "{{ .name }}：网站组“{{ .group }}”不存在，已按固定网站名单导入，不再动态跟随分组变化"
+CronjobWebsiteMissing: "{{ .name }}：未找到以下网站：{{ .website }}"
+ErrCronjobWebsiteImportEmpty: "无法匹配任何所选网站组或网站"

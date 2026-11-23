@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemeleri
 ErrPHPExtensionsConflict: "Bu ada sahip ancak içeriği farklı bir PHP uzantı şablonu zaten mevcut; üzerine yazılmadı"
 
 ErrModelTokenizerDirOverlap: "Model ve tokenizer dizinleri farklı olmalı ve biri diğerini içermemelidir"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Geçersiz web sitesi seçimi: {{ .value }}"
+ErrCronjobWebsiteGroup: "{{ .id }} web sitesi grubuna erişilemiyor"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: seçilen web sitelerinin hiçbiri mevcut değil"
+ErrCronjobWebsiteVersion: "Desteklenmeyen web sitesi seçim sürümü: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Tüm web siteleri, belirli siteler veya gruplarla birlikte seçilemez"
+ErrCronjobWebsiteGroupName: "Web sitesi grubu adı boş olamaz"
+ErrCronjobWebsiteGroupMissing: "“{{ .group }}” web sitesi grubu mevcut değil ve kaydedilen listede eşleşen hiçbir web sitesi bulunamadı"
+CronjobWebsiteGroupFallback: "{{ .name }}: “{{ .group }}” web sitesi grubu mevcut değil; artık grup değişikliklerini izlemeyen sabit bir web sitesi listesi olarak içe aktarıldı"
+CronjobWebsiteMissing: "{{ .name }}: bulunamayan web siteleri: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Seçimle eşleşen hiçbir web sitesi grubu veya web sitesi bulunamadı"

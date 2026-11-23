@@ -2741,6 +2741,8 @@ const message = {
         finishTime: '上一次停止时间',
     },
     cronjob: {
+        websiteGroupDynamicHelper: '组内“所有”会动态跟随分组变化；逐个选择网站则保存固定名单。',
+        websiteSelectionMissing: '已失效的选择',
         importHelper:
             '导入时将自动跳过重名计划任务。任务默认设置为【停用】状态，数据关联异常时，设置为【待编辑】状态。',
         changeStatus: '状态修改',

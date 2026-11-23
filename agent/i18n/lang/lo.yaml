@@ -821,3 +821,15 @@ ErrImageCheckProxyRequired: "ເພື່ອກວດສອບການອັບ
 ErrPHPExtensionsConflict: "ມີແມ່ແບບສ່ວນຂະຫຍາຍ PHP ຊື່ນີ້ຢູ່ແລ້ວແຕ່ເນື້ອຫາຕ່າງກັນ; ບໍ່ໄດ້ຂຽນທັບ"
 
 ErrModelTokenizerDirOverlap: "ໂຟນເດີໂມເດວ ແລະ tokenizer ຕ້ອງແຕກຕ່າງກັນ ແລະ ບໍ່ສາມາດຢູ່ພາຍໃນກັນໄດ້"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "ການເລືອກເວັບໄຊບໍ່ຖືກຕ້ອງ: {{ .value }}"
+ErrCronjobWebsiteGroup: "ບໍ່ສາມາດເຂົ້າເຖິງກຸ່ມເວັບໄຊ {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: ບໍ່ມີເວັບໄຊທີ່ເລືອກເຫຼືອຢູ່"
+ErrCronjobWebsiteVersion: "ບໍ່ຮອງຮັບເວີຊັນການເລືອກເວັບໄຊ: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "ບໍ່ສາມາດເລືອກເວັບໄຊທັງໝົດພ້ອມກັບເວັບໄຊ ຫຼື ກຸ່ມສະເພາະ"
+ErrCronjobWebsiteGroupName: "ຊື່ກຸ່ມເວັບໄຊບໍ່ສາມາດວ່າງເປົ່າ"
+ErrCronjobWebsiteGroupMissing: "ບໍ່ມີກຸ່ມເວັບໄຊ “{{ .group }}” ແລະ ບໍ່ພົບເວັບໄຊທີ່ກົງກັບລາຍຊື່ທີ່ບັນທຶກໄວ້"
+CronjobWebsiteGroupFallback: "{{ .name }}: ບໍ່ມີກຸ່ມເວັບໄຊ “{{ .group }}”; ໄດ້ນຳເຂົ້າເປັນລາຍຊື່ເວັບໄຊຄົງທີ່ ແລະ ຈະບໍ່ຕິດຕາມການປ່ຽນແປງຂອງກຸ່ມອີກ"
+CronjobWebsiteMissing: "{{ .name }}: ບໍ່ພົບເວັບໄຊ: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "ບໍ່ພົບກຸ່ມເວັບໄຊ ຫຼື ເວັບໄຊທີ່ກົງກັບລາຍການທີ່ເລືອກ"

@@ -2953,6 +2953,9 @@ const message = {
         exportHelper: 'Seçilen imajları tek bir tar dosyasına aktarır.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Bir gruptaki “Tümü” seçeneği grup üyeliğindeki değişiklikleri izler; tek tek seçilen siteler sabit bir liste olarak kaydedilir.',
+        websiteSelectionMissing: 'Kullanılamayan seçim',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',

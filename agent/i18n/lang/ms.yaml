@@ -830,3 +830,15 @@ ErrImageCheckProxyRequired: "Untuk menyemak kemas kini imej dalam persekitaran s
 ErrPHPExtensionsConflict: "Templat sambungan PHP dengan nama ini sudah wujud tetapi kandungannya berbeza; tidak ditulis ganti"
 
 ErrModelTokenizerDirOverlap: "Direktori model dan tokenizer mestilah berbeza dan tidak boleh mengandungi satu sama lain"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Pilihan laman web tidak sah: {{ .value }}"
+ErrCronjobWebsiteGroup: "Tidak dapat mengakses kumpulan laman web {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: tiada laman web yang dipilih wujud"
+ErrCronjobWebsiteVersion: "Versi pilihan laman web tidak disokong: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Semua laman web tidak boleh dipilih bersama laman web atau kumpulan tertentu"
+ErrCronjobWebsiteGroupName: "Nama kumpulan laman web tidak boleh kosong"
+ErrCronjobWebsiteGroupMissing: "Kumpulan laman web “{{ .group }}” tidak wujud dan tiada laman web yang sepadan ditemui dalam senarai tersimpan"
+CronjobWebsiteGroupFallback: "{{ .name }}: kumpulan laman web “{{ .group }}” tidak wujud; diimport sebagai senarai laman web tetap yang tidak lagi mengikuti perubahan kumpulan"
+CronjobWebsiteMissing: "{{ .name }}: laman web tidak ditemui: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Tiada kumpulan laman web atau laman web yang sepadan dengan pilihan ditemui"
