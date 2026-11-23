@@ -830,6 +830,7 @@ ErrImageCheckProxyRequired: "Para verificar atualizações de imagens no ambient
 ErrPHPExtensionsConflict: "Já existe um modelo de extensões PHP com este nome e conteúdo diferente; ele não foi sobrescrito"
 
 ErrModelTokenizerDirOverlap: "Os diretórios de modelos e tokenizadores devem ser diferentes e nenhum pode conter o outro"
+ErrClusterAppOnly: "Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "Seleção de sites inválida: {{ .value }}"

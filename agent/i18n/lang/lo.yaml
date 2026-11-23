@@ -821,6 +821,7 @@ ErrImageCheckProxyRequired: "ເພື່ອກວດສອບການອັບ
 ErrPHPExtensionsConflict: "ມີແມ່ແບບສ່ວນຂະຫຍາຍ PHP ຊື່ນີ້ຢູ່ແລ້ວແຕ່ເນື້ອຫາຕ່າງກັນ; ບໍ່ໄດ້ຂຽນທັບ"
 
 ErrModelTokenizerDirOverlap: "ໂຟນເດີໂມເດວ ແລະ tokenizer ຕ້ອງແຕກຕ່າງກັນ ແລະ ບໍ່ສາມາດຢູ່ພາຍໃນກັນໄດ້"
+ErrClusterAppOnly: "ຕິດຕັ້ງ ແລະ ອັບເກຣດແອັບນີ້ໃນສ່ວນຄວາມພ້ອມໃຊ້ງານສູງຂອງແອັບ."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "ການເລືອກເວັບໄຊບໍ່ຖືກຕ້ອງ: {{ .value }}"

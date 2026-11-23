@@ -28,6 +28,13 @@ type AgentResponseError struct {
 
 func (e *AgentResponseError) Error() string { return e.Message }
 
+type HTTPStatusError struct {
+	StatusCode int
+	Message    string
+}
+
+func (e *HTTPStatusError) Error() string { return e.Message }
+
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
 	client := NewReusableClient()
 	defer client.CloseIdleConnections()
@@ -116,14 +123,17 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 		return nil, fmt.Errorf("read resp body from request failed, err: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
+		failure := &HTTPStatusError{
+			StatusCode: resp.StatusCode,
+			Message:    fmt.Sprintf("do request failed, err: %v", resp.Status),
+		}
 		var respJSON dto.Response
 		if err := json.Unmarshal(bodyByte, &respJSON); err == nil && respJSON.Message != "" {
-			return nil, fmt.Errorf("do request failed, status=%v, message=%s", resp.Status, respJSON.Message)
+			failure.Message = fmt.Sprintf("do request failed, status=%v, message=%s", resp.Status, respJSON.Message)
+		} else if msg := strings.TrimSpace(string(bodyByte)); msg != "" {
+			failure.Message = fmt.Sprintf("do request failed, status=%v, body=%s", resp.Status, msg)
 		}
-		if msg := strings.TrimSpace(string(bodyByte)); msg != "" {
-			return nil, fmt.Errorf("do request failed, status=%v, body=%s", resp.Status, msg)
-		}
-		return nil, fmt.Errorf("do request failed, err: %v", resp.Status)
+		return nil, failure
 	}
 
 	var respJson dto.Response

@@ -8416,6 +8416,7 @@ const message = {
             addCluster: 'Add Cluster',
             unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
             noAvailableMasterVersion: 'No primary template is available on this node.',
+            appStoreOnly: 'Install and upgrade this application in Application High Availability.',
             noMatchingReplicaVersion: 'No replica template on this node matches the primary version.',
             installNode: 'Deployment server',
             master: 'Primary database',

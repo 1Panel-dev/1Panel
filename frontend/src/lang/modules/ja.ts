@@ -8408,6 +8408,7 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
+            appStoreOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。",
             noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
             installNode: '配置先サーバー',
             master: 'プライマリデータベース',

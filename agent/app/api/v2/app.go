@@ -6,6 +6,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/api/v2/helper"
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/app/service"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 	"github.com/1Panel-dev/1Panel/agent/utils/appicon"
@@ -161,18 +163,23 @@ func (b *BaseApi) GetAppDetailByID(c *gin.Context) {
 // @Router /apps/install [post]
 // @x-panel-log {"bodyKeys":["name"],"paramKeys":[],"BeforeFunctions":[],"formatZH":"安装应用 [name]","formatEN":"Install app [name]"}
 func (b *BaseApi) InstallApp(c *gin.Context) {
+	installApp(c, appService.Install)
+}
+
+func (b *BaseApi) InstallClusterApp(c *gin.Context) {
+	installApp(c, service.AppService{}.InstallCluster)
+}
+
+func installApp(c *gin.Context, installFunc func(request.AppInstallCreate, bool) (*model.AppInstall, error)) {
 	var req request.AppInstallCreate
 	if err := helper.CheckBindAndValidate(&req, c); err != nil {
 		return
 	}
-	install, err := appService.Install(req, true)
+	install, err := installFunc(req, true)
 	if err != nil {
-		if install != nil && install.ID > 0 {
-			switch install.App.Key {
-			case constant.AppMysqlCluster, constant.AppPostgresqlCluster, constant.AppRedisCluster:
-				helper.ErrorWithDetailAndData(c, http.StatusInternalServerError, "ErrInternalServer", err, gin.H{"appInstallID": install.ID})
-				return
-			}
+		if install != nil && install.ID > 0 && constant.IsClusterApp(install.App.Key) {
+			helper.ErrorWithDetailAndData(c, http.StatusInternalServerError, "ErrInternalServer", err, gin.H{"appInstallID": install.ID})
+			return
 		}
 		helper.InternalServer(c, err)
 		return

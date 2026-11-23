@@ -7841,6 +7841,7 @@ const message = {
             addCluster: '添加集群',
             unhealthyDeleteError: '安装节点状态异常，请在节点列表检查后重试！',
             noAvailableMasterVersion: '当前节点没有可用的主库模板。',
+            appStoreOnly: '请在「应用高可用」中安装或升级此应用。',
             noMatchingReplicaVersion: '当前节点没有与主库同版本的从库模板。',
             installNode: '部署服务器',
             master: '主库',

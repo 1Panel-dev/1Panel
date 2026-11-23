@@ -830,6 +830,7 @@ ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemeleri
 ErrPHPExtensionsConflict: "Bu ada sahip ancak içeriği farklı bir PHP uzantı şablonu zaten mevcut; üzerine yazılmadı"
 
 ErrModelTokenizerDirOverlap: "Model ve tokenizer dizinleri farklı olmalı ve biri diğerini içermemelidir"
+ErrClusterAppOnly: "Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "Geçersiz web sitesi seçimi: {{ .value }}"

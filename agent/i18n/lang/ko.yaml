@@ -830,6 +830,7 @@ ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트�
 ErrPHPExtensionsConflict: "같은 이름에 내용이 다른 PHP 확장 템플릿이 이미 있어 덮어쓰지 않았습니다"
 
 ErrModelTokenizerDirOverlap: "모델 디렉터리와 토크나이저 디렉터리는 서로 달라야 하며 서로 포함할 수 없습니다"
+ErrClusterAppOnly: "이 애플리케이션은 애플리케이션 고가용성에서 설치하거나 업그레이드하세요."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "유효하지 않은 웹사이트 선택: {{ .value }}"
