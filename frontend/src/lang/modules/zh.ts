@@ -346,6 +346,7 @@ const message = {
             serviceNotStarted: '当前未启动 {0} 服务',
         },
         status: {
+            autoSync: '自动同步',
             autoSyncEnabled: '自动同步已开启',
             autoSyncDisabled: '自动同步未开启',
             running: '已启动',
@@ -2855,6 +2856,13 @@ const message = {
         unitHours: '单位：小时',
         alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
         library: {
+            executeScript: '执行脚本',
+            targetNodes: '选择执行节点',
+            switchNodeHelper: '切换节点不会中断执行；请直接在终端内输入，输入仅发送至当前节点。',
+            executorCloseHelper: '关闭将断开所有节点的终端连接，可能中断正在执行的脚本，是否继续？',
+            connecting: '连接中',
+            connected: '已连接',
+            disconnected: '已断开',
             script: '脚本',
             syncNow: '立即同步',
             autoSyncHelper: '开启自动同步后，每天凌晨更新系统脚本，自定义脚本不受影响；也可手动立即同步。',

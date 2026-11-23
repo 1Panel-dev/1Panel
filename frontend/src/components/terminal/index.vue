@@ -31,7 +31,7 @@ const { currentNode } = useGlobalStore();
 
 // session: agent side session id known (fresh or reattached)
 // expired: the agent no longer has the session; a reconnect must open a new one
-const emit = defineEmits(['session', 'expired', 'reconnect']);
+const emit = defineEmits(['session', 'expired', 'reconnect', 'connection']);
 
 // Close codes of the agent's session protocol (agent/utils/terminal/session.go).
 const CLOSE_SESSION_NOT_FOUND = 4404;
@@ -307,6 +307,7 @@ function resizeTerminal() {
 const initWebSocket = async (endpoint_: string, args: string = '') => {
     const token = ++initWebSocketToken;
     closing = false;
+    emit('connection', 'connecting');
     wsEndpoint = endpoint_;
     wsArgs = args;
     const href = window.location.href;
@@ -333,6 +334,7 @@ const initWebSocket = async (endpoint_: string, args: string = '') => {
         reconnecting = false;
         revalidating = false;
         sessionId.value = '';
+        emit('connection', 'disconnected');
         showWebSocketAuthError(authError);
         emit('expired');
         return;
@@ -365,8 +367,9 @@ const showWebSocketAuthError = (message: string) => {
 
 const runRealTerminal = () => {
     webSocketReady.value = true;
+    emit('connection', 'connected');
     changeTerminalSize();
-    term.value?.focus();
+    if (terminalElement.value?.clientWidth) term.value?.focus();
     // a reattached shell already ran its init command
     if (initCmd.value !== '' && !sessionId.value) {
         hideInitCmdEcho.value = true;
@@ -466,6 +469,7 @@ const errorRealTerminal = (ex: any) => {
 };
 
 const closeRealTerminal = (ev: CloseEvent) => {
+    emit('connection', 'disconnected');
     clearAINotice();
     webSocketReady.value = false;
     if (heartbeatTimer.value) {
@@ -679,6 +683,7 @@ defineExpose({
     getLatency: () => latency.value,
     // re-fit after the element was moved back into a visible container
     refit: () => changeTerminalSize(),
+    focus: () => term.value?.focus(),
 });
 
 onBeforeUnmount(() => {

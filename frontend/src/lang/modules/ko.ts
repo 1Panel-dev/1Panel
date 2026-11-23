@@ -360,6 +360,7 @@ const message = {
             serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
+            autoSync: '자동 동기화',
             autoSyncEnabled: '자동 동기화 켜짐',
             autoSyncDisabled: '자동 동기화 꺼짐',
             running: '실행 중',
@@ -2980,6 +2981,15 @@ const message = {
         unitHours: '단위: 시간',
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
         library: {
+            executeScript: '스크립트 실행',
+            targetNodes: '실행할 노드 선택',
+            switchNodeHelper:
+                '노드를 전환해도 실행은 계속됩니다. 터미널에 직접 입력하세요. 입력은 선택한 노드에만 전송됩니다.',
+            executorCloseHelper:
+                '닫으면 모든 노드의 터미널 연결이 해제되며 실행 중인 스크립트가 중단될 수 있습니다. 계속하시겠습니까?',
+            connecting: '연결 중',
+            connected: '연결됨',
+            disconnected: '연결 끊김',
             script: '스크립트',
             syncNow: '지금 동기화',
             autoSyncHelper:

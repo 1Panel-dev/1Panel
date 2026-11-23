@@ -367,6 +367,7 @@ const message = {
             serviceNotStarted: '{0} servisi başlatılmadı.',
         },
         status: {
+            autoSync: 'Otomatik eşitleme',
             autoSyncEnabled: 'Otomatik eşitleme açık',
             autoSyncDisabled: 'Otomatik eşitleme kapalı',
             running: 'Çalışıyor',
@@ -3072,6 +3073,15 @@ const message = {
         unitHours: 'Birim: Saat',
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',
         library: {
+            executeScript: 'Betiği çalıştır',
+            targetNodes: 'Hedef düğümleri seçin',
+            switchNodeHelper:
+                'Düğüm değiştirmek çalışmayı durdurmaz. Doğrudan terminale yazın; girdi yalnızca seçili düğüme gönderilir.',
+            executorCloseHelper:
+                'Kapatmak tüm düğüm terminallerinin bağlantısını keser ve çalışan betikleri durdurabilir. Devam edilsin mi?',
+            connecting: 'Bağlanıyor',
+            connected: 'Bağlandı',
+            disconnected: 'Bağlantı kesildi',
             script: 'Script',
             syncNow: 'Hemen Senkronize Et',
             autoSyncHelper:

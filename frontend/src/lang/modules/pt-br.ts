@@ -365,6 +365,7 @@ const message = {
             serviceNotStarted: 'O serviço {0} não está iniciado.',
         },
         status: {
+            autoSync: 'Sincronização automática',
             autoSyncEnabled: 'Sincronização automática ativada',
             autoSyncDisabled: 'Sincronização automática desativada',
             running: 'Em execução',
@@ -3076,6 +3077,15 @@ const message = {
         unitHours: 'Unidade: Horas',
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
         library: {
+            executeScript: 'Executar script',
+            targetNodes: 'Selecionar nós de destino',
+            switchNodeHelper:
+                'Alternar entre nós mantém a execução. Digite diretamente no terminal; a entrada vai apenas para o nó selecionado.',
+            executorCloseHelper:
+                'Fechar desconecta todos os terminais e pode interromper os scripts em execução. Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Agora',
             autoSyncHelper:
