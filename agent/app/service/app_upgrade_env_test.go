@@ -16,7 +16,7 @@ func TestRenderUpgradeEnvKeepsValuesExactly(t *testing.T) {
 			App: model.App{Key: "demo"},
 			Env: `{"PANEL_DB_ROOT_PASSWORD":"` + password + `"}`,
 		}
-		content, err := renderUpgradeEnv(install, []byte("PANEL_DB_ROOT_PASSWORD=\""+password+"\"\n"))
+		content, err := renderUpgradeEnv(install, []byte("PANEL_DB_ROOT_PASSWORD=\""+password+"\"\n"), "")
 		if err != nil {
 			t.Fatal(err)
 		}
