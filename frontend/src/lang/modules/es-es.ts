@@ -8247,6 +8247,31 @@ const message = {
             menu: 'Sincronización de Recursos',
             file: 'Transferencia de archivos',
             fileSyncConfirm: '¿Transferir el archivo/carpeta {1} del nodo {0} al directorio {3} del nodo {2}?',
+            fileBatchDesc:
+                'Seleccione archivos o carpetas de cualquier nodo y distribúyalos a varios nodos de destino.',
+            fileSourceTitle: 'Seleccionar archivos de origen',
+            fileSourceNode: 'Nodo de origen',
+            fileTargetDirectory: 'Directorio de destino',
+            fileBatchPath: 'Establecer directorios de destino en lote',
+            fileApplyPath: 'Aplicar a los nodos seleccionados',
+            fileSelectedCount: '{0} elementos seleccionados',
+            fileSelectedTargets: '{0} nodos seleccionados',
+            fileSelectionHint:
+                'Las carpetas se copian completas con su nombre original y conservan su estructura interna.',
+            fileRules:
+                'Se aplican las reglas de transferencia existentes: los archivos con el mismo nombre pueden actualizarse y los demás archivos del directorio de destino se conservan.',
+            fileBatchSummary: 'Distribuir {0} elementos a {1} nodos de destino',
+            fileTaskHint:
+                'Al confirmar, se crea una tarea de distribución que puede consultar en la gestión de tareas.',
+            fileBatchConfirm:
+                'Revise los nodos y las rutas de destino a continuación. Los archivos con el mismo nombre pueden sobrescribirse.',
+            fileTargetHint:
+                'Puede establecer un directorio por nodo. No se pueden seleccionar nodos desconectados, con comprobaciones fallidas o sin rsync.',
+            fileChecking: 'Comprobando',
+            fileCheckFailed: 'Error de comprobación',
+            fileRsyncMissing: 'rsync no está instalado',
+            filePathRequired: 'Introduzca una ruta absoluta para el directorio de destino que comience por /.',
+            fileSourceChanged: 'El nodo de origen ha cambiado. Vuelva a seleccionar los archivos.',
 
             image: 'Transferencia de imágenes',
             imageBatchDesc:

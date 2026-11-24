@@ -315,6 +315,8 @@ LocalNodeIpFailed: "Gagal mendapatkan IP nod induk. Edit nod induk dan tambahkan
 HandlePrivateKey: "Kendalikan kunci peribadi nod"
 HandlePublicKey: "Kendalikan kunci awam nod"
 ExchangeFile: "Mulakan penyegerakan {{ .sourcePath }} dari nod {{ .source }} ke nod {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "Edarkan {{ .count }} item daripada {{ .source }} ke {{ .targetCount }} nod"
+FileSyncSummary: "Ringkasan pengedaran fail"
 NodeFile: "Fail nod"
 ImageSyncTaskName: "Segerakkan {{ .count }} imej"
 SSLSyncTaskName: "Segerakkan {{ .count }} sijil"

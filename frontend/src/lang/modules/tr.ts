@@ -8237,6 +8237,28 @@ const message = {
             menu: 'Kaynak Senkronizasyonu',
             file: 'Dosya Aktarımı',
             fileSyncConfirm: '{0} düğümündeki {1} dosya/klasörü {2} düğümündeki {3} dizinine aktarmak istiyor musunuz?',
+            fileBatchDesc: 'Herhangi bir düğümden dosya veya klasör seçerek birden fazla hedef düğüme dağıtın.',
+            fileSourceTitle: 'Kaynak dosyaları seç',
+            fileSourceNode: 'Kaynak düğüm',
+            fileTargetDirectory: 'Hedef dizin',
+            fileBatchPath: 'Hedef dizinleri toplu ayarla',
+            fileApplyPath: 'Seçili düğümlere uygula',
+            fileSelectedCount: '{0} öğe seçildi',
+            fileSelectedTargets: '{0} düğüm seçildi',
+            fileSelectionHint: 'Klasörler özgün adlarıyla tümüyle kopyalanır ve iç dizin yapısı korunur.',
+            fileRules:
+                'Mevcut dosya aktarım kuralları uygulanır: aynı adlı dosyalar güncellenebilir, hedef dizindeki diğer dosyalar korunur.',
+            fileBatchSummary: '{0} öğeyi {1} hedef düğüme dağıt',
+            fileTaskHint: 'Onaydan sonra bir dağıtım görevi oluşturulur. Görev yönetiminden görüntüleyebilirsiniz.',
+            fileBatchConfirm:
+                'Aşağıdaki hedef düğümleri ve kayıt yollarını kontrol edin. Aynı adlı dosyaların üzerine yazılabilir.',
+            fileTargetHint:
+                'Her düğüm için ayrı bir dizin ayarlanabilir. Çevrimdışı, denetimi başarısız veya rsync kurulu olmayan düğümler seçilemez.',
+            fileChecking: 'Denetleniyor',
+            fileCheckFailed: 'Denetim başarısız',
+            fileRsyncMissing: 'rsync kurulu değil',
+            filePathRequired: '/ ile başlayan bir mutlak hedef dizin yolu girin.',
+            fileSourceChanged: 'Kaynak düğüm değiştirildi. Dosyaları yeniden seçin.',
 
             image: 'İmaj Aktarımı',
             imageBatchDesc: 'Önce kaynak düğümü ve kaynak imajları seçin, ardından iletim için hedef düğümleri seçin.',

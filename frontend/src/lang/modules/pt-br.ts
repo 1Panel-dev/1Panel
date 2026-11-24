@@ -8277,6 +8277,30 @@ const message = {
             menu: 'Sincronização de Recursos',
             file: 'Transferência de Arquivos',
             fileSyncConfirm: 'Transferir o arquivo/pasta {1} do nó {0} para o diretório {3} no nó {2}?',
+            fileBatchDesc: 'Selecione arquivos ou pastas de qualquer nó e distribua para vários nós de destino.',
+            fileSourceTitle: 'Selecionar arquivos de origem',
+            fileSourceNode: 'Nó de origem',
+            fileTargetDirectory: 'Diretório de destino',
+            fileBatchPath: 'Definir diretórios de destino em lote',
+            fileApplyPath: 'Aplicar aos nós selecionados',
+            fileSelectedCount: '{0} itens selecionados',
+            fileSelectedTargets: '{0} nós selecionados',
+            fileSelectionHint:
+                'As pastas são copiadas por inteiro com o nome original, preservando a estrutura interna.',
+            fileRules:
+                'As regras de transferência existentes são mantidas: arquivos com o mesmo nome podem ser atualizados e os demais arquivos do diretório de destino são preservados.',
+            fileBatchSummary: 'Distribuir {0} itens para {1} nós de destino',
+            fileTaskHint:
+                'Após a confirmação, uma tarefa de distribuição será criada e poderá ser consultada no gerenciamento de tarefas.',
+            fileBatchConfirm:
+                'Verifique os nós e os caminhos de destino abaixo. Arquivos com o mesmo nome podem ser sobrescritos.',
+            fileTargetHint:
+                'Cada nó pode ter seu próprio diretório. Nós offline, com falha na verificação ou sem rsync não podem ser selecionados.',
+            fileChecking: 'Verificando',
+            fileCheckFailed: 'Falha na verificação',
+            fileRsyncMissing: 'rsync não instalado',
+            filePathRequired: 'Insira um caminho absoluto para o diretório de destino que comece com /.',
+            fileSourceChanged: 'O nó de origem foi alterado. Selecione os arquivos novamente.',
 
             image: 'Transferência de Imagens',
             imageBatchDesc:

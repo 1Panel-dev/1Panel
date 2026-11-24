@@ -315,6 +315,8 @@ LocalNodeIpFailed: "無法取得主節點 IP ，請編輯主節點增加 IP 位�
 HandlePrivateKey: "處理節點私鑰"
 HandlePublicKey: "處理節點公鑰"
 ExchangeFile: "開始從 {{ .source }} 節點同步 {{ .sourcePath }} 到 {{ .dest  }} 節點 {{ .destPath }}"
+FileSyncTaskName: "檔案分發 {{ .source }}：{{ .count }} 項到 {{ .targetCount }} 個節點"
+FileSyncSummary: "檔案分發結果彙總"
 NodeFile: "節點檔案"
 ImageSyncTaskName: "映像同步 {{ .count }} 張映像"
 SSLSyncTaskName: "憑證同步 {{ .count }} 張憑證"

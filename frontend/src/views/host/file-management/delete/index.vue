@@ -63,14 +63,16 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const open = ref(false);
-const files = ref();
+const files = ref<File.File[]>([]);
 const loading = ref(false);
-const em = defineEmits(['close']);
+const em = defineEmits<{ close: [files: File.File[], node: string] }>();
 const forceDelete = ref(false);
 const recycleStatus = ref('Enable');
 const reqNode = ref('');
+let dialogVersion = 0;
 
 const acceptParams = (props: File.File[], node: string) => {
+    dialogVersion++;
     reqNode.value = '';
     if (node != '') {
         reqNode.value = node;
@@ -82,13 +84,18 @@ const acceptParams = (props: File.File[], node: string) => {
 };
 
 const getStatus = async () => {
+    const version = dialogVersion;
+    const node = reqNode.value;
     loading.value = true;
     try {
         let res;
-        if (reqNode.value != '') {
-            res = await getRecycleStatusByNode(reqNode.value);
+        if (node != '') {
+            res = await getRecycleStatusByNode(node);
         } else {
             res = await getRecycleStatus();
+        }
+        if (version !== dialogVersion) {
+            return;
         }
         recycleStatus.value = res.data;
         if (recycleStatus.value === 'Disable') {
@@ -96,20 +103,26 @@ const getStatus = async () => {
         }
     } catch (error) {
     } finally {
-        loading.value = false;
+        if (version === dialogVersion) {
+            loading.value = false;
+        }
     }
 };
 
 const onConfirm = async () => {
+    const version = dialogVersion;
+    const deletedFiles = files.value.map((file) => ({ ...file }));
+    const node = reqNode.value;
+    const force = forceDelete.value;
     loading.value = true;
     try {
         const pros = [];
         let baseDir = '';
-        if (files.value.some((item) => item['isDir'])) {
+        if (deletedFiles.some((item) => item.isDir)) {
             const pathRes = await loadBaseDir();
             baseDir = pathRes.data;
         }
-        for (const s of files.value) {
+        for (const s of deletedFiles) {
             if (s['isDir']) {
                 if (s['path'].indexOf('.1panel_clash') > -1) {
                     MsgWarning(i18n.global.t('file.clashDeleteAlert'));
@@ -120,23 +133,22 @@ const onConfirm = async () => {
                     return;
                 }
             }
-            if (reqNode.value != '') {
-                pros.push(
-                    deleteFileByNode(
-                        { path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value },
-                        reqNode.value,
-                    ),
-                );
+            if (node != '') {
+                pros.push(deleteFileByNode({ path: s['path'], isDir: s['isDir'], forceDelete: force }, node));
             } else {
-                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
+                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: force }));
             }
         }
         await Promise.all(pros);
         MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-        open.value = false;
-        em('close');
+        if (version === dialogVersion) {
+            open.value = false;
+        }
+        em('close', deletedFiles, node);
     } finally {
-        loading.value = false;
+        if (version === dialogVersion) {
+            loading.value = false;
+        }
     }
 };
 

@@ -8090,6 +8090,28 @@ const message = {
             menu: 'リソース同期',
             file: 'ファイル転送',
             fileSyncConfirm: 'ノード {0} のファイル/フォルダ {1} をノード {2} のディレクトリ {3} に転送しますか？',
+            fileBatchDesc: '任意のノードからファイルまたはフォルダを選択し、複数の宛先ノードに配布します。',
+            fileSourceTitle: '転送元ファイルを選択',
+            fileSourceNode: '転送元ノード',
+            fileTargetDirectory: '宛先ディレクトリ',
+            fileBatchPath: '宛先ディレクトリを一括設定',
+            fileApplyPath: '選択したノードに適用',
+            fileSelectedCount: '{0} 件を選択中',
+            fileSelectedTargets: '{0} ノードを選択中',
+            fileSelectionHint: 'フォルダは元の名前で全体がコピーされ、内部のディレクトリ構造は保持されます。',
+            fileRules:
+                '既存のファイル転送ルールに従います。同名のファイルは更新される場合がありますが、宛先ディレクトリの他のファイルは保持されます。',
+            fileBatchSummary: '{0} 件の項目を {1} 個の宛先ノードに配布',
+            fileTaskHint: '確認後に配布タスクが作成されます。タスク管理で確認できます。',
+            fileBatchConfirm:
+                '下記の宛先ノードと保存先パスを確認してください。同名のファイルが上書きされる場合があります。',
+            fileTargetHint:
+                'ディレクトリはノードごとに設定できます。オフライン、確認失敗、または rsync 未インストールのノードは選択できません。',
+            fileChecking: '確認中',
+            fileCheckFailed: '確認失敗',
+            fileRsyncMissing: 'rsync 未インストール',
+            filePathRequired: '/ で始まる宛先ディレクトリの絶対パスを入力してください。',
+            fileSourceChanged: '転送元ノードが変更されました。ファイルを選択し直してください。',
 
             image: 'イメージ転送',
             imageBatchDesc: 'まずソースノードとソースイメージを選択し、その後転送先ノードを選択してください。',
