@@ -8620,6 +8620,7 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
+            appStoreOnly: "Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.",
             noMatchingReplicaVersion:
                 'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',
             installNode: 'Servidor de implantação',

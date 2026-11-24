@@ -8568,6 +8568,7 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             noAvailableMasterVersion: 'Bu düğümde kullanılabilir bir birincil sunucu şablonu yok.',
+            appStoreOnly: "Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.",
             noMatchingReplicaVersion: 'Bu düğümde birincil sunucuyla aynı sürümde bir replika şablonu yok.',
             installNode: 'Dağıtım sunucusu',
             master: 'Birincil veritabanı',

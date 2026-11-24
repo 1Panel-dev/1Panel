@@ -838,6 +838,7 @@ ErrImageCheckProxyRequired: "Для проверки обновлений обр
 ErrPHPExtensionsConflict: "Шаблон расширений PHP с таким именем уже существует и имеет другое содержимое; перезапись не выполнена"
 
 ErrModelTokenizerDirOverlap: "Каталоги моделей и токенизаторов должны различаться и не могут быть вложены друг в друга"
+ErrClusterAppOnly: "Устанавливайте и обновляйте это приложение в разделе высокой доступности приложений."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "Недопустимый выбор сайтов: {{ .value }}"

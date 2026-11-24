@@ -838,6 +838,7 @@ ErrImageCheckProxyRequired: "Untuk menyemak kemas kini imej dalam persekitaran s
 ErrPHPExtensionsConflict: "Templat sambungan PHP dengan nama ini sudah wujud tetapi kandungannya berbeza; tidak ditulis ganti"
 
 ErrModelTokenizerDirOverlap: "Direktori model dan tokenizer mestilah berbeza dan tidak boleh mengandungi satu sama lain"
+ErrClusterAppOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "Pilihan laman web tidak sah: {{ .value }}"

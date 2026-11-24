@@ -839,6 +839,7 @@ ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصا�
 ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"
 
 ErrModelTokenizerDirOverlap: "پوشه‌های مدل و توکن‌ساز باید متفاوت باشند و هیچ‌کدام نباید درون دیگری قرار گیرد"
+ErrClusterAppOnly: "این برنامه را در بخش دسترس‌پذیری بالای برنامه‌ها نصب و به‌روزرسانی کنید."
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "انتخاب وب‌سایت نامعتبر است: {{ .value }}"

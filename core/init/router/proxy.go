@@ -166,6 +166,7 @@ func isInternalOnlyAgentEndpoint(reqPath string) bool {
 	return normalizedPath == "/api/v2/xpack/alert/offline/email" ||
 		strings.HasPrefix(normalizedPath, "/api/v2/internal/mcp/") ||
 		strings.HasPrefix(normalizedPath, "/api/v2/internal/ops-report/") ||
+		strings.HasPrefix(normalizedPath, "/api/v2/internal/cluster/") ||
 		normalizedPath == "/api/v2/xpack/alert/offline/webhook" ||
 		normalizedPath == "/api/v2/hosts/firewall/port" ||
 		normalizedPath == "/api/v2/internal/terminal/sessions/revoke" ||

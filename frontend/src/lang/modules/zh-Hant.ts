@@ -7799,6 +7799,7 @@ const message = {
             addCluster: '新增叢集',
             unhealthyDeleteError: '安裝節點狀態異常，請在節點列表檢查後重試',
             noAvailableMasterVersion: '目前節點沒有可用的主庫範本。',
+            appStoreOnly: "請在「應用高可用」中安裝或升級此應用。",
             noMatchingReplicaVersion: '目前節點沒有與主庫同版本的從庫範本。',
             installNode: '部署伺服器',
             master: '主庫',

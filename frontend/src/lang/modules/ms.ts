@@ -8560,6 +8560,7 @@ const message = {
             addCluster: 'Tambah Kluster',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
+            appStoreOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.",
             noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
             installNode: 'Pelayan penggunaan',
             master: 'Pangkalan data utama',

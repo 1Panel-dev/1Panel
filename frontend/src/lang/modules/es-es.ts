@@ -8592,6 +8592,7 @@ const message = {
             addCluster: 'Añadir clúster',
             unhealthyDeleteError: 'El nodo tiene estado anómalo, revisa la lista e inténtalo de nuevo',
             noAvailableMasterVersion: 'No hay una plantilla de instancia primaria disponible en este nodo.',
+            appStoreOnly: 'Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones.',
             noMatchingReplicaVersion:
                 'En este nodo no hay una plantilla de réplica con la misma versión que la instancia primaria.',
             installNode: 'Servidor de despliegue',

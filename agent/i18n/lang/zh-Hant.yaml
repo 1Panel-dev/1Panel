@@ -838,6 +838,7 @@ ErrImageCheckProxyRequired: "目前運行環境下，如需檢查映像是否更
 ErrPHPExtensionsConflict: "同名 PHP 擴充模版已存在且內容不同，未覆蓋"
 
 ErrModelTokenizerDirOverlap: "模型目錄和分詞器目錄不能相同或互相包含"
+ErrClusterAppOnly: "請在「應用高可用」中安裝或升級此應用。"
 
 # Scheduled task website selection
 ErrCronjobWebsiteSelection: "無效的網站選擇：{{ .value }}"

@@ -26,7 +26,14 @@
                         <br />
                         <div v-if="!loadingDetail" class="mb-2">
                             <el-alert
-                                v-if="!appDetail.enable"
+                                v-if="app.clusterOnly"
+                                :title="$t('xpack.cluster.appStoreOnly')"
+                                type="warning"
+                                show-icon
+                                :closable="false"
+                            />
+                            <el-alert
+                                v-else-if="!appDetail.enable"
                                 :title="$t('app.limitHelper')"
                                 type="warning"
                                 show-icon
@@ -35,7 +42,7 @@
                         </div>
                         <el-button
                             round
-                            v-if="appDetail.enable && operate === 'install'"
+                            v-if="!app.clusterOnly && appDetail.enable && operate === 'install'"
                             v-permission
                             @click="openInstall"
                             type="primary"
@@ -45,7 +52,7 @@
                         </el-button>
                     </div>
                 </div>
-                <div class="descriptions">
+                <div v-if="!app.clusterOnly" class="descriptions">
                     <el-descriptions border size="large" direction="vertical">
                         <el-descriptions-item :label="$t('app.appOfficeWebsite')">
                             <el-link @click="toLink(app.website)">
@@ -114,6 +121,7 @@ const getApp = async () => {
     try {
         const res = await getAppByKey(appKey.value);
         app.value = res.data;
+        if (app.value.clusterOnly) return;
         version.value = app.value.versions[0];
         getDetail(app.value.id, version.value);
     } finally {

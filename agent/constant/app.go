@@ -1,5 +1,7 @@
 package constant
 
+import "slices"
+
 const (
 	ContainerPrefix = "1Panel-"
 
@@ -32,6 +34,14 @@ const (
 	HostIP        = "HOST_IP"
 	ContainerName = "CONTAINER_NAME"
 )
+
+func ClusterAppKeys() []string {
+	return []string{AppMysqlCluster, AppPostgresqlCluster, AppRedisCluster}
+}
+
+func IsClusterApp(key string) bool {
+	return slices.Contains(ClusterAppKeys(), key)
+}
 
 type AppOperate string
 

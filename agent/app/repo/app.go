@@ -22,6 +22,7 @@ type IAppRepo interface {
 	WithNotLocal() DBOption
 	WithByLikeName(name string) DBOption
 	WithKeyIn(keys []string) DBOption
+	WithKeyNotIn(keys []string) DBOption
 	WithArch(arch string) DBOption
 	WithPanelVersion(panelVersion string) DBOption
 
@@ -66,6 +67,12 @@ func (a AppRepo) WithKey(key string) DBOption {
 func (a AppRepo) WithKeyIn(keys []string) DBOption {
 	return func(db *gorm.DB) *gorm.DB {
 		return db.Where("`key` in (?)", keys)
+	}
+}
+
+func (a AppRepo) WithKeyNotIn(keys []string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		return db.Where("`key` not in (?)", keys)
 	}
 }
 

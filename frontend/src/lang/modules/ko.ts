@@ -8251,6 +8251,7 @@ const message = {
             addCluster: '클러스터 추가',
             unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
             noAvailableMasterVersion: '이 노드에 사용할 수 있는 마스터 템플릿이 없습니다.',
+            appStoreOnly: "이 애플리케이션은 애플리케이션 고가용성에서 설치하거나 업그레이드하세요.",
             noMatchingReplicaVersion: '이 노드에 마스터와 버전이 같은 복제본 템플릿이 없습니다.',
             installNode: '배포 서버',
             master: '주 데이터베이스',
