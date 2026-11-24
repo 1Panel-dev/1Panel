@@ -43,6 +43,16 @@ type phpBuildProgress struct {
 }
 
 func (p *phpBuildProgress) run(phase string, timeout time.Duration, argv ...string) error {
+	return p.runWithExtraStdout(phase, timeout, nil, argv...)
+}
+
+func (p *phpBuildProgress) runWithStdout(phase string, timeout time.Duration, argv ...string) (string, error) {
+	var stdout bytes.Buffer
+	err := p.runWithExtraStdout(phase, timeout, &stdout, argv...)
+	return stdout.String(), err
+}
+
+func (p *phpBuildProgress) runWithExtraStdout(phase string, timeout time.Duration, extraStdout io.Writer, argv ...string) error {
 	if p.phase != phase && p.task != nil {
 		p.task.Log(i18n.Get(phase))
 	}
@@ -56,7 +66,11 @@ func (p *phpBuildProgress) run(phase string, timeout time.Duration, argv ...stri
 		p.seen, p.vertices = make(map[string]bool), make(map[string]string)
 	}
 	stdout, stderr := &phpProgressStream{report: p.observe}, &phpProgressStream{report: p.observe}
-	err := cmd.NewCommandMgr(options...).RunWithWriters(io.MultiWriter(p.detail, stdout), io.MultiWriter(p.detail, stderr), argv[0], argv[1:]...)
+	stdoutWriter := io.MultiWriter(p.detail, stdout)
+	if extraStdout != nil {
+		stdoutWriter = io.MultiWriter(p.detail, stdout, extraStdout)
+	}
+	err := cmd.NewCommandMgr(options...).RunWithWriters(stdoutWriter, io.MultiWriter(p.detail, stderr), argv[0], argv[1:]...)
 	stdout.flush()
 	stderr.flush()
 	if err == nil {

@@ -5315,6 +5315,8 @@ const message = {
         editRuleConfirm: 'ທ່ານແນ່ໃຈບໍວ່າຕ້ອງການແກ້ໄຂກົດນີ້?',
     },
     runtime: {
+        buildLog: 'ບັນທຶກການສ້າງ',
+        extensionInstallFailed: 'ຕິດຕັ້ງສ່ວນເສີມ PHP ບາງລາຍການບໍ່ສຳເລັດ: {extensions}',
         statusMessageUnavailable:
             'ບໍ່ມີຂໍ້ມູນສະຖານະແບບລະອຽດ. ກະລຸນາກວດເບິ່ງບັນທຶກຂອງສະພາບແວດລ້ອມການເຮັດວຽກເພື່ອເບິ່ງລາຍລະອຽດ.',
         importEnv: 'ນຳເຂົ້າຕົວແປສະພາບແວດລ້ອມ',

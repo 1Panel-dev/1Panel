@@ -647,6 +647,8 @@ ErrWebhookTestFailed: 'ກະລຸນາກວດສອບການຕັ້ງ
 
 #task - runtime
 ErrInstallExtension: 'ມີວຽກຕິດຕັ້ງສ່ວນເສີມອື່ນກຳລັງເຮັດວຽກຢູ່'
+PHPExtensionsInstallWarning: "ຕິດຕັ້ງສ່ວນເສີມ PHP ບາງລາຍການບໍ່ສຳເລັດ: {{ .name }}"
+PHPExtensionsInstallManually: "ລອງໃໝ່ຈາກໜ້າຈັດການສ່ວນເສີມເພື່ອບັນທຶກສ່ວນເສີມທີ່ຕິດຕັ້ງສຳເລັດໄວ້ໃນອິມເມຈ. ເພື່ອກວດສອບເອງ ໃຫ້ຮັນຄຳສັ່ງຕໍ່ໄປນີ້ຢູ່ໂຮສ Docker:"
 
 # alert mail template
 PanelAlertTitle: "ການແຈ້ງເຕືອນຈາກແຜງຄວບຄຸມ"

@@ -5577,6 +5577,8 @@ const message = {
         editRuleConfirm: '¿Confirma que desea modificar esta regla?',
     },
     runtime: {
+        buildLog: 'Registro de compilación',
+        extensionInstallFailed: 'No se pudieron instalar algunas extensiones de PHP: {extensions}',
         statusMessageUnavailable:
             'No hay información detallada sobre el estado. Consulta los registros del entorno de ejecución para obtener más detalles.',
         importEnv: 'Importar variables de entorno',

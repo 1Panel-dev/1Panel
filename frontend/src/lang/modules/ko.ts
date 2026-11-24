@@ -5372,6 +5372,8 @@ const message = {
         editRuleConfirm: '이 규칙을 수정하시겠습니까?',
     },
     runtime: {
+        buildLog: '빌드 로그',
+        extensionInstallFailed: '일부 PHP 확장을 설치하지 못했습니다: {extensions}',
         statusMessageUnavailable: '자세한 상태 정보가 없습니다. 실행 환경 로그에서 자세한 내용을 확인하세요.',
         importEnv: '환경 변수 가져오기',
         envImportError: '{0}행: {1}',

@@ -657,6 +657,8 @@ ErrWebhookTestFailed: "请检查 Webhook 配置，详细原因请查看系统日
 
 # 任务 - 运行环境
 ErrInstallExtension: "已有安装任务正在进行，请等待任务结束"
+PHPExtensionsInstallWarning: "部分 PHP 扩展安装失败：{{ .name }}"
+PHPExtensionsInstallManually: "可在面板的扩展管理页重试，成功后会保存到镜像。也可以在 Docker 宿主机终端执行以下命令手动排查："
 
 # 告警邮件模板
 PanelAlertTitle: "面板告警通知"

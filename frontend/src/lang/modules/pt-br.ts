@@ -5608,6 +5608,8 @@ const message = {
         editRuleConfirm: 'Tem certeza de que deseja modificar esta regra?',
     },
     runtime: {
+        buildLog: 'Log de compilação',
+        extensionInstallFailed: 'Não foi possível instalar algumas extensões do PHP: {extensions}',
         statusMessageUnavailable:
             'Não há informações detalhadas sobre o status. Consulte os logs do ambiente de execução para obter mais detalhes.',
         importEnv: 'Importar variáveis de ambiente',

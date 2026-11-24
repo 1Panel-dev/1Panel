@@ -58,7 +58,18 @@ case " $* " in
     fi ;;
   *" install-ext "*)
     echo "extension-output"
-    if [ "$PHP_TEST_FAILURE" = extension ]; then exit 7; fi ;;
+    if [ "$PHP_TEST_FAILURE" = extension ]; then exit 7; fi
+    if [ "$PHP_TEST_FAILURE" = partial ] || [ "$PHP_TEST_FAILURE" = partial-fpm-config ]; then
+      case " $* " in
+        *" --allow-partial "*) echo '1PANEL_PHP_EXTENSION_FAILURES=["imagick"]' ;;
+        *) exit 9 ;;
+      esac
+    fi ;;
+  *" php-fpm -t "*)
+    if [ "$PHP_TEST_FAILURE" = partial-fpm-config ]; then exit 78; fi ;;
+  *" top "*)
+    echo "PID STAT COMMAND"
+    echo "123 S php-fpm" ;;
   *" commit "*) echo "commit-output" ;;
   *" up -d ")
     if [ "$PHP_TEST_FAILURE" = start ] && [ -f "$PHP_TEST_DIR/started" ]; then exit 8; fi
@@ -76,12 +87,17 @@ esac
 	}
 	oldCompose := global.CONF.DockerConfig.Command
 	t.Cleanup(func() { global.CONF.DockerConfig.Command = oldCompose })
-	for _, tc := range []struct{ name, extensions, failure, result string }{
-		{"plain", "", "", ""},
-		{"extensions", "redis", "", ""},
-		{"manifest", "", "manifest", "mirror.example: EOF"},
-		{"extension-error", "redis", "extension", "exit status 7"},
-		{"final-start-error", "", "start", "exit status 8"},
+	for _, tc := range []struct {
+		name, extensions, failure, result string
+		wantTaskStatus, wantRuntimeStatus string
+	}{
+		{"plain", "", "", "", constant.StatusSuccess, constant.StatusRunning},
+		{"extensions", "redis", "", "", constant.StatusSuccess, constant.StatusRunning},
+		{"partial-extensions", "redis,imagick", "partial", "Some PHP extensions could not be installed: imagick", constant.StatusSuccess, constant.StatusRunning},
+		{"partial-fpm-config-error", "redis,imagick", "partial-fpm-config", "exit status 78", constant.StatusFailed, constant.StatusStartErr},
+		{"manifest", "", "manifest", "mirror.example: EOF", constant.StatusFailed, constant.StatusError},
+		{"extension-error", "redis", "extension", "exit status 7", constant.StatusFailed, constant.StatusError},
+		{"final-start-error", "", "start", "exit status 8", constant.StatusFailed, constant.StatusStartErr},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			global.CONF.DockerConfig.Command = "docker compose"
@@ -131,11 +147,7 @@ esac
 				t.Fatal(err)
 			}
 			summary := strings.Join(entry.Lines, "\n")
-			wantStatus := constant.StatusSuccess
-			if tc.failure != "" {
-				wantStatus = constant.StatusFailed
-			}
-			if entry.TaskStatus != wantStatus || !strings.Contains(summary, "[TASK-END]") || !strings.Contains(summary, tc.result) {
+			if entry.TaskStatus != tc.wantTaskStatus || !strings.Contains(summary, "[TASK-END]") || !strings.Contains(summary, tc.result) {
 				t.Fatalf("task %s: %s", entry.TaskStatus, summary)
 			}
 			for _, private := range []string{"private-build-command", "package-output", "extension-output", "password", "token=private"} {
@@ -150,11 +162,17 @@ esac
 			if (tc.extensions != "") != strings.Contains(summary, "Installing PHP extensions") {
 				t.Fatal(summary)
 			}
-			if tc.name == "extensions" && (!bytes.Contains(detail, []byte("extension-output")) || !bytes.Contains(detail, []byte("commit-output"))) {
+			if (tc.name == "extensions" || tc.name == "partial-extensions") && (!bytes.Contains(detail, []byte("extension-output")) || !bytes.Contains(detail, []byte("commit-output"))) {
 				t.Fatalf("incomplete build.log: %s", detail)
 			}
-			if tc.failure == "" && rt.Status != constant.StatusRunning {
-				t.Fatal(rt.Status)
+			if tc.name == "partial-extensions" {
+				wantCmd := "docker exec -it 'php-test' install-ext 'imagick'"
+				if !strings.Contains(summary, wantCmd) || !bytes.Contains(detail, []byte(`1PANEL_PHP_EXTENSION_FAILURES=["imagick"]`)) || !bytes.Contains(detail, []byte(wantCmd)) {
+					t.Fatalf("partial extension logs missing retry info:\nsummary=%s\ndetail=%s", summary, detail)
+				}
+			}
+			if rt.Status != tc.wantRuntimeStatus {
+				t.Fatalf("runtime status got %s, want %s", rt.Status, tc.wantRuntimeStatus)
 			}
 		})
 	}

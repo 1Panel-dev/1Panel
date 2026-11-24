@@ -5575,6 +5575,8 @@ const message = {
         editRuleConfirm: 'Adakah anda pasti mahu mengubah peraturan ini?',
     },
     runtime: {
+        buildLog: 'Log binaan',
+        extensionInstallFailed: 'Sesetengah sambungan PHP gagal dipasang: {extensions}',
         statusMessageUnavailable:
             'Maklumat status terperinci tidak tersedia. Semak log persekitaran masa jalan untuk butiran lanjut.',
         importEnv: 'Import Pemboleh Ubah Persekitaran',

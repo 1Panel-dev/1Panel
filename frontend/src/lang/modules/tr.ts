@@ -5583,6 +5583,8 @@ const message = {
         editRuleConfirm: 'Bu kuralı değiştirmek istediğinizden emin misiniz?',
     },
     runtime: {
+        buildLog: 'Derleme günlüğü',
+        extensionInstallFailed: 'Bazı PHP uzantıları yüklenemedi: {extensions}',
         statusMessageUnavailable:
             'Ayrıntılı durum bilgisi mevcut değil. Ayrıntılar için çalışma ortamı günlüklerini kontrol edin.',
         importEnv: 'Ortam Değişkenlerini İçe Aktar',

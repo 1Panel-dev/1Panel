@@ -657,6 +657,8 @@ ErrWebhookTestFailed: 'Webhook の設定を確認してください。詳細は�
 
 # タスク - ランタイム
 ErrInstallExtension: 'インストールタスクが進行中です、タスクが終了するのを待ってください'
+PHPExtensionsInstallWarning: "一部の PHP 拡張機能をインストールできませんでした: {{ .name }}"
+PHPExtensionsInstallManually: "拡張機能の管理画面から再試行すると、インストールに成功した拡張機能がイメージに保存されます。手動で調査するには、Docker ホストで次のコマンドを実行してください:"
 
 # アラートメールテンプレート
 PanelAlertTitle: 'パネルアラート通知'

@@ -657,6 +657,8 @@ ErrWebhookTestFailed: 'Revisa la configuración del Webhook. Consulta los regist
 
 # tarea - entorno de ejecución
 ErrInstallExtension: 'Ya hay una tarea de instalación en curso, espere a que termine'
+PHPExtensionsInstallWarning: "No se pudieron instalar algunas extensiones de PHP: {{ .name }}"
+PHPExtensionsInstallManually: "Vuelve a intentarlo desde la página de extensiones para guardar en la imagen las instalaciones correctas. Para hacer una comprobación manual, ejecuta estos comandos en el host de Docker:"
 
 # plantilla de correo de alerta
 PanelAlertTitle: 'Notificación de alerta del panel'

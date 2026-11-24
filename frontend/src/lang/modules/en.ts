@@ -5493,6 +5493,8 @@ const message = {
         editRuleConfirm: 'Are you sure you want to modify this rule?',
     },
     runtime: {
+        buildLog: 'Build log',
+        extensionInstallFailed: 'Some PHP extensions could not be installed: {extensions}',
         statusMessageUnavailable: 'No detailed status information is available. Check the runtime logs for details.',
         importEnv: 'Import Environment Variables',
         envImportError: 'Line {0}: {1}',

@@ -5471,6 +5471,8 @@ const message = {
         editRuleConfirm: 'このルールを変更してもよろしいですか？',
     },
     runtime: {
+        buildLog: 'ビルドログ',
+        extensionInstallFailed: '一部の PHP 拡張機能をインストールできませんでした: {extensions}',
         statusMessageUnavailable: '詳細なステータス情報はありません。実行環境のログで詳細を確認してください。',
         importEnv: '環境変数をインポート',
         envImportError: '{0} 行目：{1}',
