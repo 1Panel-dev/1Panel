@@ -5245,7 +5245,13 @@ const message = {
             'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Eşitleme dizini',
+        syncDirHelp: 'Hedef düğümlerdeki dizinin mutlak yolunu girin. Tüm hedef düğümlerde aynı dizin kullanılır.',
+        syncDirSingleCert:
+            'Dosyaların üzerine yazılmasını önlemek için dizin belirtirken yalnızca bir sertifika seçin.',
+        syncDirAbsolute: 'Eşitleme dizini mutlak bir yol olmalıdır.',
+
+        caUploadHelp: 'ca.crt ve ca.key içeren, indirdiğiniz ZIP dosyasını yükleyin (en fazla 10 MB).',
         deleteConfirm:
             'Aşağıdaki sertifikalar silinecek. ACME sertifikaları otomatik olarak iptal edilecek. Devam edilsin mi?',
         deleteAndRevoke: 'Sil ve iptal et',

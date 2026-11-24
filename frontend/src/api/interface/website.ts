@@ -263,6 +263,7 @@ export namespace Website {
         shell: string;
         pushNode: boolean;
         nodes: string;
+        syncDir?: string;
         privateKeyPath: string;
         certPath: string;
         isIP: boolean;
@@ -312,6 +313,7 @@ export namespace Website {
         id: number;
         pushNode: boolean;
         nodes: string;
+        syncDir?: string;
         taskID: string;
     }
 

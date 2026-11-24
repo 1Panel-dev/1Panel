@@ -5145,7 +5145,14 @@ const message = {
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '同期ディレクトリ',
+        syncDirHelp:
+            '対象ノードのディレクトリを絶対パスで入力してください。すべての対象ノードで同じディレクトリを使用します。',
+        syncDirSingleCert: 'ファイルの上書きを防ぐため、ディレクトリを指定する場合は証明書を1つだけ選択してください。',
+        syncDirAbsolute: '同期ディレクトリは絶対パスで指定してください。',
+
+        caUploadHelp:
+            'ca.crt と ca.key を含む、ダウンロードした ZIP ファイルをアップロードしてください（最大 10 MB）。',
         deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
         deleteAndRevoke: '削除して失効',
         create: 'リクエスト',

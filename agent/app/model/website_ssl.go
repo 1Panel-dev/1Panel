@@ -39,6 +39,7 @@ type WebsiteSSL struct {
 	MasterSSLID    uint      `json:"masterSslId"`
 	Nodes          string    `json:"nodes"`
 	PushNode       bool      `json:"pushNode"`
+	SyncDir        string    `json:"syncDir"`
 	PrivateKeyPath string    `json:"privateKeyPath"`
 	CertPath       string    `json:"certPath"`
 	IsIp           bool      `json:"isIP"`

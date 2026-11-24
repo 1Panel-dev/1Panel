@@ -188,6 +188,9 @@
                     :rules="pushRules"
                     v-loading="pushLoading"
                 >
+                    <el-form-item :label="$t('ssl.syncDir')" prop="syncDir">
+                        <el-input v-model="pushForm.syncDir" clearable :placeholder="$t('ssl.syncDirHelp')" />
+                    </el-form-item>
                     <PushToNode
                         v-if="isMaster && isXpackOrEE"
                         :push-node="pushForm.pushNode"
@@ -293,6 +296,7 @@ const pushForm = ref({
     id: 0,
     pushNode: true,
     pushNodes: [] as string[],
+    syncDir: '',
 });
 const pushRules = ref({
     pushNodes: [Rules.requiredSelect],
@@ -502,6 +506,7 @@ const openPush = (row: Website.SSLDTO) => {
         id: row.id,
         pushNode: true,
         pushNodes: parsePushNodes(row.nodes),
+        syncDir: row.syncDir || '',
     };
     pushOpen.value = true;
 };
@@ -513,12 +518,17 @@ const handlePushClose = () => {
         id: 0,
         pushNode: true,
         pushNodes: [],
+        syncDir: '',
     };
 };
 
 const submitPush = async () => {
     if (!pushForm.value.pushNode || pushForm.value.pushNodes.length === 0) {
         MsgError(i18n.global.t('commons.rule.requiredSelect'));
+        return;
+    }
+    if (pushForm.value.syncDir.trim() && !pushForm.value.syncDir.trim().startsWith('/')) {
+        MsgError(i18n.global.t('ssl.syncDirAbsolute'));
         return;
     }
     await pushFormRef.value?.validate();
@@ -528,6 +538,7 @@ const submitPush = async () => {
         id: pushForm.value.id,
         pushNode: pushForm.value.pushNode,
         nodes: pushForm.value.pushNodes.join(','),
+        syncDir: pushForm.value.syncDir.trim(),
         taskID,
     })
         .then(() => {

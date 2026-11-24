@@ -5163,6 +5163,11 @@ const message = {
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
     },
     ssl: {
+        syncDir: 'Sync directory',
+        syncDirHelp: 'Absolute directory on target nodes; the same directory is used on every target.',
+        syncDirSingleCert: 'Select only one certificate when specifying a directory to avoid overwriting files.',
+        syncDirAbsolute: 'The sync directory must be an absolute path.',
+
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'The following certificates will be deleted. ACME certificates will be automatically revoked. Continue?',

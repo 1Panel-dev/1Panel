@@ -5268,7 +5268,14 @@ const message = {
             'Ativar isso pode evitar vazamento de certificados, definir um site padrão invalidará esta configuração',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Diretório de sincronização',
+        syncDirHelp:
+            'Informe o caminho absoluto do diretório nos nós de destino. O mesmo diretório será usado em todos eles.',
+        syncDirSingleCert:
+            'Selecione apenas um certificado ao especificar um diretório para evitar sobrescrever arquivos.',
+        syncDirAbsolute: 'O diretório de sincronização deve ser um caminho absoluto.',
+
+        caUploadHelp: 'Envie o arquivo ZIP baixado que contém ca.crt e ca.key (máximo de 10 MB).',
         deleteConfirm:
             'Os certificados a seguir serão excluídos. Os certificados ACME serão revogados automaticamente. Continuar?',
         deleteAndRevoke: 'Excluir e revogar',
