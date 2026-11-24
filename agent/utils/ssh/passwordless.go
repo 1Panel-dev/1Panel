@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/1Panel-dev/1Panel/agent/global"
 	gossh "golang.org/x/crypto/ssh"
 	"golang.org/x/sys/unix"
 )
@@ -87,11 +88,19 @@ func LoadRemoteKey(create bool) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer lock.Close()
+	defer func() {
+		if err := lock.Close(); err != nil {
+			global.LOG.Warnf("close SSH key lock file %s failed: %v", lock.Name(), err)
+		}
+	}()
 	if err := unix.Flock(int(lock.Fd()), unix.LOCK_EX); err != nil {
 		return nil, err
 	}
-	defer unix.Flock(int(lock.Fd()), unix.LOCK_UN)
+	defer func() {
+		if err := unix.Flock(int(lock.Fd()), unix.LOCK_UN); err != nil {
+			global.LOG.Warnf("unlock SSH key lock file %s failed: %v", lock.Name(), err)
+		}
+	}()
 	data, err := os.ReadFile(name)
 	if errors.Is(err, os.ErrNotExist) {
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
