@@ -7913,6 +7913,13 @@ const message = {
             appUpgradeHelper: 'Есть {0} приложений, которые необходимо обновить',
             dashboardSetting: 'Настройки обзора',
             keepOneDashboardComponent: 'Оставьте хотя бы один раздел обзора',
+            currentNode: 'Текущий узел',
+            quickSwitch: 'Быстрое переключение',
+            allNodes: 'Все узлы',
+            nodeSearchPlaceholder: 'Поиск по имени или адресу узла',
+            currentNodeNotInResults: 'Текущий узел отсутствует на этой странице результатов',
+            upgradableApps: 'Приложения для обновления',
+            quickSwitchMore: 'Показать все подходящие узлы',
         },
         customApp: {
             name: 'Пользовательское хранилище приложений',

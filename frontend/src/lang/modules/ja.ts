@@ -7765,6 +7765,13 @@ const message = {
             appUpgradeHelper: 'アップグレードが必要なアプリが {0} 個あります',
             dashboardSetting: '概要設定',
             keepOneDashboardComponent: '概要セクションを少なくとも 1 つ残してください',
+            currentNode: '現在のノード',
+            quickSwitch: 'クイック切り替え',
+            allNodes: 'すべてのノード',
+            nodeSearchPlaceholder: 'ノード名またはアドレスで検索',
+            currentNodeNotInResults: '現在のノードはこのページの結果に含まれていません',
+            upgradableApps: 'アップグレード可能なアプリ',
+            quickSwitchMore: '一致するすべてのノードを表示',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',

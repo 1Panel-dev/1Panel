@@ -7512,6 +7512,13 @@ const message = {
             appUpgradeHelper: 'ມີ {0} ແອັບທີ່ຕ້ອງອັບເກຣດ',
             dashboardSetting: 'ຕັ້ງຄ່າພາບລວມ',
             keepOneDashboardComponent: 'ຕ້ອງເກັບໄວ້ຢ່າງໜ້ອຍໜຶ່ງສ່ວນໃນໜ້າພາບລວມ',
+            currentNode: 'ໂນດປັດຈຸບັນ',
+            quickSwitch: 'ສະຫຼັບດ່ວນ',
+            allNodes: 'ທຸກໂນດ',
+            nodeSearchPlaceholder: 'ຄົ້ນຫາຊື່ ຫຼື ທີ່ຢູ່ໂນດ',
+            currentNodeNotInResults: 'ໂນດປັດຈຸບັນບໍ່ຢູ່ໃນຜົນລັບຂອງໜ້ານີ້',
+            upgradableApps: 'ແອັບທີ່ສາມາດອັບເກຣດໄດ້',
+            quickSwitchMore: 'ເບິ່ງໂນດທີ່ກົງກັນທັງໝົດ',
         },
         customApp: {
             name: 'ຄັງແອັບກຳນົດເອງ',

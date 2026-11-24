@@ -7735,6 +7735,13 @@ const message = {
             appUpgradeHelper: '{0} برنامه نیاز به ارتقاء دارند',
             dashboardSetting: 'تنظیمات نمای کلی',
             keepOneDashboardComponent: 'حداقل یک بخش نمای کلی نگهداری کنید',
+            currentNode: 'گره فعلی',
+            quickSwitch: 'تغییر سریع',
+            allNodes: 'همه گره‌ها',
+            nodeSearchPlaceholder: 'جستجوی نام یا آدرس گره',
+            currentNodeNotInResults: 'گره فعلی در نتایج این صفحه نیست',
+            upgradableApps: 'برنامه‌های قابل ارتقاء',
+            quickSwitchMore: 'مشاهده همه گره‌های منطبق',
         },
         customApp: {
             name: 'مخزن برنامه سفارشی',

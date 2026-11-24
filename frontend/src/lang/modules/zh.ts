@@ -6073,6 +6073,13 @@ const message = {
             appUpgradeHelper: '有 {0} 个应用需要升级',
             dashboardSetting: '概览设置',
             keepOneDashboardComponent: '请至少保留一个概览板块',
+            currentNode: '当前节点',
+            quickSwitch: '快速切换',
+            allNodes: '全部节点',
+            nodeSearchPlaceholder: '搜索节点名称或地址',
+            currentNodeNotInResults: '当前节点不在本页结果中',
+            upgradableApps: '可升级应用',
+            quickSwitchMore: '查看全部匹配节点',
         },
         opsReport: {
             name: '运维报表',

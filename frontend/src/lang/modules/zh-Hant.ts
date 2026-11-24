@@ -7165,6 +7165,13 @@ const message = {
             appUpgradeHelper: '有 {0} 個應用程式需要升級',
             dashboardSetting: '概覽設定',
             keepOneDashboardComponent: '至少保留一個概覽區塊',
+            currentNode: '目前節點',
+            quickSwitch: '快速切換',
+            allNodes: '所有節點',
+            nodeSearchPlaceholder: '搜尋節點名稱或位址',
+            currentNodeNotInResults: '目前節點不在本頁結果中',
+            upgradableApps: '可升級應用程式',
+            quickSwitchMore: '查看所有符合的節點',
         },
         customApp: {
             name: '自訂應用倉庫',
