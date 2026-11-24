@@ -206,7 +206,7 @@ func (w WebsiteService) GetPathAuthBasics(req request.NginxAuthReq) (res []respo
 	}
 
 	for _, entry := range entries {
-		if !entry.IsDir() {
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".conf") {
 			name := strings.TrimSuffix(entry.Name(), ".conf")
 			pathAuth := dto.NginxPathAuth{
 				Name: name,
@@ -295,7 +295,11 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	directives := config.Directives
 	location, _ := directives[0].(*components.Location)
 	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
-	location.ChangePath("~*", fmt.Sprintf("^%s", req.Path))
+	applyPathAuthLocationMatch(location, req.Path)
+	serverPHPLoc := loadSiteServerPHPLocation(fileOp, website)
+	if err = syncPathAuthLocationPHP(location, serverPHPLoc != nil, website.Proxy, serverPHPLoc); err != nil {
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
+	}
 	var passwdHash []byte
 	passwdHash, err = bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
 	if err != nil {
@@ -314,4 +318,166 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 		return err
 	}
 	return nil
+}
+
+const phpLocationMatch = "~ [^/]\\.php(/|$)"
+
+func hasRegexMeta(pathVal string) bool {
+	return strings.ContainsAny(pathVal, "*?()[]|$\\+{}")
+}
+
+func applyPathAuthLocationMatch(location *components.Location, rawPath string) {
+	if location == nil {
+		return
+	}
+	trimmed := strings.TrimPrefix(strings.TrimSpace(rawPath), "^")
+	if trimmed == "" || hasRegexMeta(trimmed) {
+		location.ChangePath("~*", fmt.Sprintf("^%s", trimmed))
+		return
+	}
+	if !strings.HasPrefix(trimmed, "/") {
+		trimmed = "/" + trimmed
+	}
+	location.ChangePath("^~", trimmed)
+}
+
+func upgradeLegacyPathAuthLocation(location *components.Location) {
+	if location == nil || location.Modifier != "~*" {
+		return
+	}
+	rawPath := strings.TrimPrefix(location.Match, "^")
+	if rawPath == "" || !strings.HasPrefix(rawPath, "/") || hasRegexMeta(rawPath) {
+		return
+	}
+	location.ChangePath("^~", rawPath)
+}
+
+func findServerPHPLocation(server *components.Server) components.IDirective {
+	if server == nil {
+		return nil
+	}
+	for _, dir := range server.Directives {
+		if dir.GetName() == "location" && strings.Join(dir.GetParameters(), " ") == phpLocationMatch && dir.GetBlock() != nil {
+			return dir
+		}
+	}
+	return nil
+}
+
+func loadSiteServerPHPLocation(fileOp files.FileOp, website model.Website) components.IDirective {
+	configPath := GetSitePath(website, SiteConf)
+	content, err := fileOp.GetContent(configPath)
+	if err != nil {
+		return nil
+	}
+	config, err := parser.NewStringParser(string(content)).Parse()
+	if err != nil {
+		return nil
+	}
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return nil
+	}
+	return findServerPHPLocation(servers[0])
+}
+
+func cloneNginxDirective(dir components.IDirective) (components.IDirective, error) {
+	dumped := nginx.DumpDirective(dir, nginx.IndentedStyle)
+	parsed, err := parser.NewStringParser(dumped).Parse()
+	if err != nil {
+		return nil, err
+	}
+	if len(parsed.Directives) == 0 {
+		return nil, fmt.Errorf("failed to clone nginx directive")
+	}
+	return parsed.Directives[0], nil
+}
+
+func syncPathAuthLocationPHP(location *components.Location, enablePHP bool, proxy string, serverPHPLoc components.IDirective) error {
+	if location == nil {
+		return nil
+	}
+	if !enablePHP {
+		filtered := make([]components.IDirective, 0, len(location.Directives))
+		for _, dir := range location.Directives {
+			if dir.GetName() == "location" && strings.Join(dir.GetParameters(), " ") == phpLocationMatch {
+				continue
+			}
+			filtered = append(filtered, dir)
+		}
+		location.Directives = filtered
+		return nil
+	}
+	for _, dir := range location.Directives {
+		if dir.GetName() == "location" && strings.Join(dir.GetParameters(), " ") == phpLocationMatch && dir.GetBlock() != nil {
+			if proxy != "" {
+				dir.GetBlock().UpdateDirective("fastcgi_pass", []string{proxy})
+			}
+			return nil
+		}
+	}
+	var phpDir components.IDirective
+	if serverPHPLoc != nil {
+		cloned, err := cloneNginxDirective(serverPHPLoc)
+		if err != nil {
+			return err
+		}
+		if proxy != "" && cloned.GetBlock() != nil {
+			cloned.GetBlock().UpdateDirective("fastcgi_pass", []string{proxy})
+		}
+		phpDir = cloned
+	} else if proxy != "" {
+		phpDir = components.NewPHPProxyDirective([]string{proxy}, "")
+	}
+	if phpDir != nil {
+		location.Directives = append(location.Directives, phpDir)
+	}
+	return nil
+}
+
+func collectSyncedPathAuthConfigs(
+	fileOp files.FileOp,
+	authDir string,
+	enablePHP bool,
+	proxy string,
+	serverPHPLoc components.IDirective,
+) ([]*components.Config, map[string][]byte, error) {
+	if !fileOp.Stat(authDir) {
+		return nil, nil, nil
+	}
+	entries, err := os.ReadDir(authDir)
+	if err != nil {
+		return nil, nil, err
+	}
+	var syncedConfigs []*components.Config
+	oldContents := make(map[string][]byte)
+	for _, entry := range entries {
+		if entry.IsDir() || !strings.HasSuffix(entry.Name(), ".conf") {
+			continue
+		}
+		confPath := path.Join(authDir, entry.Name())
+		content, err := fileOp.GetContent(confPath)
+		if err != nil {
+			return nil, nil, err
+		}
+		config, err := parser.NewStringParser(string(content)).Parse()
+		if err != nil {
+			return nil, nil, err
+		}
+		if len(config.Directives) == 0 {
+			continue
+		}
+		location, ok := config.Directives[0].(*components.Location)
+		if !ok {
+			continue
+		}
+		upgradeLegacyPathAuthLocation(location)
+		if err = syncPathAuthLocationPHP(location, enablePHP, proxy, serverPHPLoc); err != nil {
+			return nil, nil, err
+		}
+		config.FilePath = confPath
+		syncedConfigs = append(syncedConfigs, config)
+		oldContents[confPath] = content
+	}
+	return syncedConfigs, oldContents, nil
 }
