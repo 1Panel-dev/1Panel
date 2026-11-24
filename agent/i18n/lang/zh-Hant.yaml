@@ -351,6 +351,14 @@ ComposeRecoverCleanup: '清理編排還原工作目錄'
 # 執行環境
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
 ErrImageBuildErr: '映像build 失敗'
+PHPBuildImage: "正在建置 PHP 映像檔"
+PHPBuildBaseImage: "正在取得基礎映像檔 {{ .name }}"
+PHPBuildStep: "正在建置 PHP 映像檔（步驟 {{ .name }}）"
+PHPBuildStartContainer: "正在啟動 PHP 容器"
+PHPBuildInstallExtensions: "正在安裝 PHP 擴充套件"
+PHPBuildCommitImage: "正在儲存已安裝擴充套件的映像檔"
+PHPBuildApplyConfig: "正在套用設定並啟動 PHP 執行環境"
+PHPBuildSeeLog: "請查看 build.log 以瞭解詳情"
 ErrImageExist: '映像已存在！請修改映像名稱。'
 ErrDelWithWebsite: '執行環境已經關聯網站，無法刪除'
 ErrRuntimeStart: '啟動失敗'

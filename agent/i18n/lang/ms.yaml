@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Bersihkan ruang kerja pemulihan compose'
 # runtime
 ErrFileNotExist: 'Fail {{ .detail }} tidak wujud Sila semak integriti fail sumber'
 ErrImageBuildErr: 'Pembinaan imej gagal'
+PHPBuildImage: "Membina imej PHP"
+PHPBuildBaseImage: "Mendapatkan imej asas {{ .name }}"
+PHPBuildStep: "Membina imej PHP (langkah {{ .name }})"
+PHPBuildStartContainer: "Memulakan kontena PHP"
+PHPBuildInstallExtensions: "Memasang sambungan PHP"
+PHPBuildCommitImage: "Menyimpan imej dengan sambungan PHP"
+PHPBuildApplyConfig: "Menggunakan konfigurasi dan memulakan persekitaran PHP"
+PHPBuildSeeLog: "Lihat build.log untuk butiran"
 ErrImageExist: 'Imej sudah wujud Sila ubah nama imej.'
 ErrDelWithWebsite: 'Persekitaran pengendalian sudah dikaitkan dengan tapak web dan tidak boleh dipadamkan'
 ErrRuntimeStart: 'Permulaan gagal'

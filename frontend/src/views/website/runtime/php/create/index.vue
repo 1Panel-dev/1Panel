@@ -212,7 +212,7 @@ import { CreateRuntime, GetRuntime, ListPHPExtensions, UpdateRuntime } from '@/a
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/id';
-import { MsgSuccess } from '@/utils/message';
+import { MsgInfo, MsgSuccess } from '@/utils/message';
 import { FormInstance } from 'element-plus';
 import { reactive, ref } from 'vue';
 import { getLabel } from '@/utils/app-store';
@@ -448,7 +448,11 @@ const submit = async (formEl: FormInstance | undefined) => {
                 const taskID = newUUID();
                 runtime.taskID = taskID;
                 await CreateRuntime(runtime);
-                MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                if (runtime.resource === 'appstore') {
+                    MsgInfo(i18n.global.t('commons.status.creating'));
+                } else {
+                    MsgSuccess(i18n.global.t('commons.msg.createSuccess'));
+                }
                 handleClose();
                 em('submit', taskID);
             } else {

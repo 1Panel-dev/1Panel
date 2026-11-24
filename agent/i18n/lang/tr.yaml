@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose geri yükleme çalışma alanını temizle'
 # çalışma zamanı
 ErrFileNotExist: '{{ .detail }} dosyası mevcut değil Lütfen kaynak dosyanın bütünlüğünü kontrol edin'
 ErrImageBuildErr: 'Image yapı başarısız'
+PHPBuildImage: "PHP imajı oluşturuluyor"
+PHPBuildBaseImage: "Temel imaj alınıyor: {{ .name }}"
+PHPBuildStep: "PHP imajı oluşturuluyor (adım {{ .name }})"
+PHPBuildStartContainer: "PHP konteyneri başlatılıyor"
+PHPBuildInstallExtensions: "PHP eklentileri kuruluyor"
+PHPBuildCommitImage: "PHP eklentilerini içeren imaj kaydediliyor"
+PHPBuildApplyConfig: "Yapılandırma uygulanıyor ve PHP ortamı başlatılıyor"
+PHPBuildSeeLog: "Ayrıntılar için build.log dosyasına bakın"
 ErrImageExist: 'Görüntü zaten var Lütfen görüntü adını değiştirin.'
 ErrDelWithWebsite: 'İşletim ortamı zaten bir web sitesiyle ilişkili ve silinemez'
 ErrRuntimeStart: 'Başlatma başarısız'

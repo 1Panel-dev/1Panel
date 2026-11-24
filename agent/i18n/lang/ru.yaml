@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Очистить рабочую область восс�
 # среда выполнения
 ErrFileNotExist: 'Файл {{ .detail }} не существует Проверьте целостность исходного файла'
 ErrImageBuildErr: 'Сборка образа не удалась'
+PHPBuildImage: "Сборка образа PHP"
+PHPBuildBaseImage: "Получение базового образа {{ .name }}"
+PHPBuildStep: "Сборка образа PHP (шаг {{ .name }})"
+PHPBuildStartContainer: "Запуск контейнера PHP"
+PHPBuildInstallExtensions: "Установка расширений PHP"
+PHPBuildCommitImage: "Сохранение образа с расширениями PHP"
+PHPBuildApplyConfig: "Применение настроек и запуск среды PHP"
+PHPBuildSeeLog: "Подробности см. в build.log"
 ErrImageExist: 'Изображение уже существует Пожалуйста, измените имя изображения.'
 ErrDelWithWebsite: 'Операционная среда уже связана с веб-сайтом и не может быть удалена'
 ErrRuntimeStart: 'Запуск не удался'

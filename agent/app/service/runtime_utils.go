@@ -16,8 +16,6 @@ import (
 	"strings"
 	"time"
 
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
-
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -25,11 +23,11 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/pkg/errors"
@@ -336,13 +334,13 @@ func deleteImageByID(oldImageID, imageName string, client docker.Client) {
 }
 
 func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) {
-	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild)
+	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild, nil)
 }
 
-func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool) error {
+func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool, taskItem *task.Task) (resultErr error) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
-	logPath := path.Join(runtimePath, "build.log")
+	logPath := runtime.GetLogPath()
 
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, constant.FilePerm)
 	if err != nil {
@@ -356,7 +354,15 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		_ = logFile.Close()
 	}()
 	defer func() {
-		_ = runtimeRepo.Save(runtime)
+		if resultErr != nil {
+			runtime.Message = resultErr.Error()
+			if runtime.Status != constant.StatusStartErr {
+				runtime.Status = constant.StatusError
+			}
+		}
+		if saveErr := runtimeRepo.Save(runtime); resultErr == nil {
+			resultErr = saveErr
+		}
 	}()
 
 	newPHPVersion := getRuntimeEnv(runtime.Env, "PHP_VERSION")
@@ -365,44 +371,21 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		_ = os.Rename(path.Join(runtimePath, "extensions", getExtensionDir(oldPHPVersion)), path.Join(runtimePath, "extensions", getExtensionDir(newPHPVersion)))
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-
-	dockerCommand := global.CONF.DockerConfig.Command
-	var cmd *exec.Cmd
-	if dockerCommand == "docker-compose" {
-		cmd = exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
-	} else {
-		cmd = exec.CommandContext(ctx, "docker", "compose", "-f", composePath, "build")
-	}
-	cmd.Stdout = logFile
-	var stderrBuf bytes.Buffer
-	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)
-	cmd.Stderr = multiWriterStderr
-
-	err = cmd.Run()
-	if err != nil {
-		runtime.Status = constant.StatusError
-		runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
-		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + buserr.New("ErrCmdTimeout").Error()
-		} else {
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
-		}
+	progress := phpBuildProgress{task: taskItem, detail: logFile}
+	if err = progress.run("PHPBuildImage", time.Hour, getComposeCmd(composePath, "build").Args...); err != nil {
 		return err
 	}
-	if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-		runtime.Status = constant.StatusError
-		runtime.Message = err.Error()
+	down := getComposeCmd(composePath, constant.RuntimeDown).Args
+	up := getComposeCmd(composePath, constant.RuntimeUp).Args
+	if err = progress.run("PHPBuildStartContainer", 20*time.Minute, down...); err != nil {
 		return err
 	}
 	client, err := docker.NewClient()
 	if err != nil {
-		_, _ = logFile.WriteString(fmt.Sprintf("failed to connect to docker client: %v", err))
-		runtime.Status = constant.StatusError
-		runtime.Message = err.Error()
-		return err
+		fmt.Fprintln(logFile, err)
+		return fmt.Errorf("%s: %s", i18n.Get("PHPBuildStartContainer"), i18n.Get("PHPBuildSeeLog"))
 	}
+	defer client.Close()
 	runtime.Message = ""
 	if rebuild && runtime.ID > 0 {
 		extensionsStr := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
@@ -427,26 +410,18 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		}
 	}
 
-	if out, err := compose.Up(composePath); err != nil {
+	if err = progress.run("PHPBuildStartContainer", 20*time.Minute, up...); err != nil {
 		runtime.Status = constant.StatusStartErr
-		runtime.Message = out
 		return err
 	}
 	deleteImageID := ""
 	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
 	if extensions != "" {
 		deleteImageID, _ = client.GetImageIDByName(runtime.Image)
-		cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(60*time.Minute), cmd2.WithOutputFile(logPath))
-		if err = cmdMgr.Run("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions); err != nil {
-			runtime.Status = constant.StatusError
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
+		if err = progress.run("PHPBuildInstallExtensions", time.Hour, "docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions); err != nil {
 			return err
 		}
-		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithOutputFile(logPath))
-		err = commitMgr.Run("docker", "commit", runtime.ContainerName, runtime.Image)
-		if err != nil {
-			runtime.Status = constant.StatusError
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
+		if err = progress.run("PHPBuildCommitImage", 10*time.Minute, "docker", "commit", runtime.ContainerName, runtime.Image); err != nil {
 			return err
 		}
 	}
@@ -457,10 +432,11 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		deleteImageByID(deleteImageID, runtime.Image, client)
 	}
 	handlePHPDir(*runtime)
-	if out, err := compose.DownAndUp(composePath); err != nil {
-		runtime.Status = constant.StatusStartErr
-		runtime.Message = out
-		return err
+	for _, args := range [][]string{down, up} {
+		if err = progress.run("PHPBuildApplyConfig", 20*time.Minute, args...); err != nil {
+			runtime.Status = constant.StatusStartErr
+			return err
+		}
 	}
 	runtime.Status = constant.StatusRunning
 	return nil
