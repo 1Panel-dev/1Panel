@@ -4973,6 +4973,9 @@ const message = {
         failTimeoutHelper:
             'サーバーのヘルスチェックの時間ウィンドウの長さ。この期間内に累積障害回数がしきい値に達すると、サーバーは一時的に削除され、同じ時間経過後に再試行されます。デフォルト 10 秒',
         staticChangePHPHelper: '現在は静的ウェブサイトですが、PHPウェブサイトに切り替えることができます。',
+        createDefaultIndex: 'デフォルトの {0} ファイルを作成',
+        createDefaultIndexHelper:
+            'サイトのルートディレクトリに該当ファイルが存在しない場合のみ、デフォルトページ設定の内容で作成されます。',
         proxyCache: 'リバースプロキシキャッシュ',
         cacheLimit: 'キャッシュスペース制限',
         shareCache: 'キャッシュカウントメモリサイズ',

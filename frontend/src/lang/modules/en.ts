@@ -4993,6 +4993,9 @@ const message = {
         failTimeoutHelper:
             'The time window length for server health checks. When the cumulative number of failures reaches the threshold within this period, the server will be temporarily removed and retried after the same duration. Default 10 seconds',
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
+        createDefaultIndex: 'Create default {0} file',
+        createDefaultIndexHelper:
+            'Only created when the file does not exist in the website root directory, using the default page settings',
         proxyCache: 'Reverse Proxy Cache',
         cacheLimit: 'Cache Space Limit',
         shareCache: 'Cache Count Memory Size',

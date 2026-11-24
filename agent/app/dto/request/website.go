@@ -244,8 +244,9 @@ type WebsiteDefaultUpdate struct {
 }
 
 type WebsitePHPVersionReq struct {
-	WebsiteID uint `json:"websiteID" validate:"required"`
-	RuntimeID uint `json:"runtimeID"`
+	WebsiteID       uint `json:"websiteID" validate:"required"`
+	RuntimeID       uint `json:"runtimeID"`
+	CreateIndexFile bool `json:"createIndexFile"`
 }
 
 type WebsiteUpdateDir struct {

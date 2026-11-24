@@ -33,6 +33,14 @@
                             </el-col>
                         </el-row>
                     </el-form-item>
+                    <el-form-item v-if="showCreateIndexFile">
+                        <div>
+                            <el-checkbox v-model="versionReq.createIndexFile">
+                                {{ $t('website.createDefaultIndex', [targetIndexFile]) }}
+                            </el-checkbox>
+                            <span class="input-help">{{ $t('website.createDefaultIndexHelper') }}</span>
+                        </div>
+                    </el-form-item>
                 </el-form>
             </el-tab-pane>
             <el-tab-pane
@@ -55,7 +63,7 @@
 
 <script setup lang="ts">
 import { SearchRuntimes } from '@/api/modules/runtime';
-import { onMounted, reactive, ref } from 'vue';
+import { computed, onMounted, reactive, ref, watch } from 'vue';
 import { Runtime } from '@/api/interface/runtime';
 import { Website } from '@/api/interface/website';
 import { changePHPVersion, getWebsite, operateCrossSiteAccess } from '@/api/modules/website';
@@ -73,10 +81,20 @@ const runtimeReq = reactive<Runtime.RuntimeReq>({ page: 1, pageSize: 200, type: 
 const versionReq = reactive<Website.PHPVersionChange>({
     websiteID: undefined,
     runtimeID: undefined,
+    createIndexFile: false,
 });
 const versions = ref([]);
 const loading = ref(false);
 const oldRuntimeID = ref(0);
+const showCreateIndexFile = computed(
+    () => versionReq.runtimeID !== undefined && (oldRuntimeID.value === 0) !== (versionReq.runtimeID === 0),
+);
+const targetIndexFile = computed(() => (versionReq.runtimeID > 0 ? 'index.php' : 'index.html'));
+watch(showCreateIndexFile, (visible) => {
+    if (!visible) {
+        versionReq.createIndexFile = false;
+    }
+});
 const website = ref({
     type: '',
     openBaseDir: false,
@@ -108,7 +126,10 @@ const submit = async () => {
         }).then(async () => {
             loading.value = true;
             try {
-                await changePHPVersion(versionReq);
+                await changePHPVersion({
+                    ...versionReq,
+                    createIndexFile: showCreateIndexFile.value && Boolean(versionReq.createIndexFile),
+                });
                 MsgSuccess(i18n.global.t('commons.msg.updateSuccess'));
                 getWebsiteDetail();
             } catch (error) {}
@@ -120,6 +141,7 @@ const submit = async () => {
 const getWebsiteDetail = async () => {
     const res = await getWebsite(props.id);
     versionReq.runtimeID = res.data.runtimeID;
+    versionReq.createIndexFile = false;
     oldRuntimeID.value = res.data.runtimeID;
     website.value = res.data;
     openBaseDir.value = res.data.openBaseDir || false;

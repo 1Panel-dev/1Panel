@@ -4629,6 +4629,8 @@ const message = {
         failTimeoutHelper:
             '伺服器健康檢查的時間視窗長度。在該時間段內累計失敗次數達到閾值時，伺服器將被暫時移除，並在經過相同時長後重新嘗試。預設 10 秒',
         staticChangePHPHelper: '目前為靜態網站，可切換為 PHP 網站',
+        createDefaultIndex: '建立預設 {0} 檔案',
+        createDefaultIndexHelper: '僅在網站根目錄不存在該檔案時建立，內容取自預設頁面設定',
         proxyCache: '反向代理快取',
         cacheLimit: '快取空間限制',
         shareCache: '快取計數記憶體大小',

@@ -5067,6 +5067,9 @@ const message = {
         failTimeoutHelper:
             'Panjang tetingkap masa untuk pemeriksaan kesihatan pelayan. Apabila bilangan kegagalan terkumpul mencapai ambang dalam tempoh ini, pelayan akan dikeluarkan buat sementara waktu dan dicuba semula selepas tempoh yang sama. Lalai 10 saat',
         staticChangePHPHelper: 'Kini laman web statik, boleh ditukar ke laman web PHP.',
+        createDefaultIndex: 'Cipta fail lalai {0}',
+        createDefaultIndexHelper:
+            'Hanya dicipta apabila fail tidak wujud dalam direktori akar laman web, menggunakan tetapan halaman lalai',
         proxyCache: 'Cache Proksi Terbalik',
         cacheLimit: 'Had Ruang Cache',
         shareCache: 'Saiz Memori Kiraan Cache',

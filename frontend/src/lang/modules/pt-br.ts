@@ -5093,6 +5093,9 @@ const message = {
         failTimeoutHelper:
             'O comprimento da janela de tempo para verificações de integridade do servidor. Quando o número acumulado de falhas atinge o limite dentro deste período, o servidor será removido temporariamente e repetido após a mesma duração. Padrão 10 segundos',
         staticChangePHPHelper: 'Atualmente um site estático, pode ser alterado para um site PHP.',
+        createDefaultIndex: 'Criar arquivo {0} padrão',
+        createDefaultIndexHelper:
+            'Criado apenas quando o arquivo não existe no diretório raiz do site, usando as configurações de página padrão',
         proxyCache: 'Cache de Proxy Reverso',
         cacheLimit: 'Limite de Espaço de Cache',
         shareCache: 'Tamanho da Memória de Contagem de Cache',

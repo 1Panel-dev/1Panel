@@ -1514,16 +1514,6 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		oldContents[configPath] = content
 	}
 
-	indexPath := path.Join(GetSitePath(website, SiteIndexDir), "index.html")
-	indexContent := nginx_conf.Index
-	if req.RuntimeID > 0 {
-		indexPath = path.Join(GetSitePath(website, SiteIndexDir), "index.php")
-		indexContent = nginx_conf.IndexPHP
-	}
-	if !fileOp.Stat(indexPath) {
-		_ = fileOp.WriteFile(indexPath, strings.NewReader(string(indexContent)), constant.FilePerm)
-	}
-
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -1572,7 +1562,39 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		return err
 	}
-	return tx.Commit().Error
+	if err = tx.Commit().Error; err != nil {
+		return err
+	}
+	if req.CreateIndexFile {
+		createSwitchDefaultIndexFile(fileOp, GetSitePath(website, SiteIndexDir), req.RuntimeID > 0, w.GetDefaultHtml)
+	}
+	return nil
+}
+
+func createSwitchDefaultIndexFile(
+	fileOp files.FileOp,
+	indexDir string,
+	toPHP bool,
+	getDefaultHtml func(string) (*response.WebsiteHtmlRes, error),
+) {
+	indexPath := path.Join(indexDir, "index.html")
+	resourceType := "index"
+	fallbackContent := string(nginx_conf.Index)
+	if toPHP {
+		indexPath = path.Join(indexDir, "index.php")
+		resourceType = "php"
+		fallbackContent = string(nginx_conf.IndexPHP)
+	}
+	if fileOp.Stat(indexPath) {
+		return
+	}
+	indexContent := fallbackContent
+	if getDefaultHtml != nil {
+		if res, htmlErr := getDefaultHtml(resourceType); htmlErr == nil && res != nil && res.Content != "" {
+			indexContent = res.Content
+		}
+	}
+	_ = fileOp.WriteFile(indexPath, strings.NewReader(indexContent), constant.FilePerm)
 }
 
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {

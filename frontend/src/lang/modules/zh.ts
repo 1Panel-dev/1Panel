@@ -4665,6 +4665,8 @@ const message = {
             '服务器健康检查的时间窗口长度。在该时间段内累计失败次数达到阈值时，服务器将被暂时移除，并在经过相同时长后重新尝试。默认 10 秒',
 
         staticChangePHPHelper: '当前为静态网站，可以切换为 PHP 网站',
+        createDefaultIndex: '创建默认 {0} 文件',
+        createDefaultIndexHelper: '仅当站点根目录不存在该文件时创建，内容取自默认页面设置',
         proxyCache: '反代缓存',
         cacheLimit: '缓存空间限制',
         shareCache: '缓存计数内存大小',
