@@ -80,6 +80,18 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/ssl/dns-record',
+            name: 'SSL-DNS-RECORD',
+            component: () => import('@/views/website/ssl/dns-record/index.vue'),
+            hidden: true,
+            meta: {
+                activeMenu: '/websites/ssl',
+                title: 'menu.ssl',
+                detail: 'website.dnsRecordManage',
+                permission: 'website_cert_view',
+            },
+        },
+        {
             path: '/websites/templates',
             name: 'WebsiteTemplate',
             component: () => import('@/views/website/template/index.vue'),

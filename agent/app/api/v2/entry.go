@@ -61,6 +61,7 @@ var (
 
 	websiteService            = service.NewIWebsiteService()
 	websiteDnsAccountService  = service.NewIWebsiteDnsAccountService()
+	websiteDnsRecordService   = service.NewIWebsiteDnsRecordService()
 	websiteSSLService         = service.NewIWebsiteSSLService()
 	websiteAcmeAccountService = service.NewIWebsiteAcmeAccountService()
 	websiteTemplateService    = service.NewIWebsiteTemplateService()
