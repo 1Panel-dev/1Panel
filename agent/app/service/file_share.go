@@ -404,6 +404,9 @@ func (s *FileShareService) check(code, password string) (*model.FileShare, error
 		_ = fileShareRepo.Delete(repo.WithByID(item.ID))
 		return nil, buserr.New("ErrFileSharePath")
 	}
+	if files.ShouldDenySensitiveFileRead(item.Path) {
+		return nil, buserr.New("ErrSensitiveFileRead")
+	}
 
 	return &item, nil
 }
