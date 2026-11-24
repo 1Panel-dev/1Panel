@@ -89,3 +89,45 @@ func TestCreateSwitchDefaultIndexFileUsesCustomDefaultPage(t *testing.T) {
 		}
 	})
 }
+
+func TestHasExistingIndexFile(t *testing.T) {
+	t.Run("empty directory returns false", func(t *testing.T) {
+		dir := t.TempDir()
+		if hasExistingIndexFile(dir, "index.php", "index.html", "index.htm") {
+			t.Fatal("expected false for empty directory")
+		}
+	})
+
+	t.Run("detects index.html for php website", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "index.html"), []byte("<h1>hello</h1>"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if !hasExistingIndexFile(dir, "index.php", "index.html", "index.htm") {
+			t.Fatal("expected true when index.html exists")
+		}
+	})
+
+	t.Run("detects index.htm for php and static websites", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.WriteFile(filepath.Join(dir, "index.htm"), []byte("<h1>hello</h1>"), 0o644); err != nil {
+			t.Fatal(err)
+		}
+		if !hasExistingIndexFile(dir, "index.php", "index.html", "index.htm") {
+			t.Fatal("expected true when index.htm exists")
+		}
+		if !hasExistingIndexFile(dir, "index.html", "index.htm") {
+			t.Fatal("expected true for static candidates when index.htm exists")
+		}
+	})
+
+	t.Run("ignores directory with same name", func(t *testing.T) {
+		dir := t.TempDir()
+		if err := os.Mkdir(filepath.Join(dir, "index.html"), 0o755); err != nil {
+			t.Fatal(err)
+		}
+		if hasExistingIndexFile(dir, "index.php", "index.html", "index.htm") {
+			t.Fatal("expected false when candidate is a directory")
+		}
+	})
+}
