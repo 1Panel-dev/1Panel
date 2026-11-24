@@ -116,6 +116,9 @@ func (u *CronjobService) loadTask(cronjob *model.Cronjob, record *model.JobRecor
 	case "ntp":
 		u.handleNtpSync(*cronjob, taskItem)
 		u.removeExpiredLog(*cronjob)
+	case "websiteStartStop":
+		err = u.handleWebsiteStartStop(cronjob, taskItem)
+		u.removeExpiredLog(*cronjob)
 	case "cutWebsiteLog":
 		err = u.handleCutWebsiteLog(cronjob, record.StartTime, taskItem)
 	case "clean":
@@ -533,4 +536,64 @@ func GetCleanLogConfig(cronJob model.Cronjob) dto.CleanLogConfig {
 	config := &dto.CleanLogConfig{}
 	_ = json.Unmarshal([]byte(cronJob.Config), config)
 	return *config
+}
+
+func (u *CronjobService) handleWebsiteStartStop(job *model.Cronjob, t *task.Task) error {
+	// Load the full pair for scheduled callbacks as well as manual executions.
+	stored, err := cronjobRepo.Get(repo.WithByID(job.ID))
+	if err != nil {
+		return err
+	}
+	times, err := websiteStartStopTimes(stored.Spec)
+	if err != nil {
+		return err
+	}
+	now := time.Now().In(global.Cron.Location())
+	minute := now.Hour()*60 + now.Minute()
+	operate := constant.StopWeb
+	if minute >= times[0] && minute < times[1] {
+		operate = constant.StartWeb
+	}
+	if job.Args == constant.StartWeb || job.Args == constant.StopWeb {
+		operate = job.Args
+	}
+	deadlineMinute := times[0]
+	if operate == constant.StartWeb {
+		deadlineMinute = times[1]
+	}
+	deadline := time.Date(now.Year(), now.Month(), now.Day(), deadlineMinute/60, deadlineMinute%60, 0, 0, now.Location())
+	if operate == constant.StopWeb && minute >= times[1] {
+		deadline = deadline.AddDate(0, 0, 1)
+	}
+	completed := make(map[uint]bool)
+	t.AddSubTaskWithOps(operate, func(t *task.Task) error {
+		now := time.Now().In(global.Cron.Location())
+		minute := now.Hour()*60 + now.Minute()
+		if operate == constant.StartWeb && (minute < times[0] || minute >= times[1]) {
+			return fmt.Errorf("website start window has expired")
+		}
+		if operate == constant.StopWeb && minute >= times[0] && minute < times[1] {
+			return fmt.Errorf("website stop window has expired")
+		}
+		websites, err := loadWebsForJob(stored)
+		if err != nil {
+			return err
+		}
+		ctx, cancelDeadline := context.WithDeadline(t.TaskCtx, deadline)
+		defer cancelDeadline()
+		if err := ctx.Err(); err != nil {
+			return err
+		}
+		if job.Timeout > 0 {
+			var cancel context.CancelFunc
+			ctx, cancel = context.WithTimeout(ctx, time.Duration(job.Timeout)*time.Second)
+			defer cancel()
+		}
+		err = (WebsiteService{}).batchOperateWebsites(ctx, websites, operate, t, completed)
+		if ctx.Err() != nil {
+			return ctx.Err()
+		}
+		return err
+	}, nil, int(job.RetryTimes), 0)
+	return nil
 }

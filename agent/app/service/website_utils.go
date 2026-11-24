@@ -1250,6 +1250,13 @@ func deleteWebsiteFolder(website *model.Website) error {
 }
 
 func opWebsite(website *model.Website, operate string) error {
+	return opWebsiteContext(context.Background(), website, operate)
+}
+
+func opWebsiteContext(ctx context.Context, website *model.Website, operate string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	nginxInstall, err := getNginxFull(website)
 	if err != nil {
 		return err
@@ -1260,6 +1267,7 @@ func opWebsite(website *model.Website, operate string) error {
 		return errors.New("nginx config is not valid")
 	}
 	server := servers[0]
+	before := nginx.DumpConfig(config, nginx.IndentedStyle)
 	if operate == constant.StopWeb {
 		changed := false
 		for _, siteServer := range servers {
@@ -1293,10 +1301,16 @@ func opWebsite(website *model.Website, operate string) error {
 		}
 	}
 
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if before == nginx.DumpConfig(config, nginx.IndentedStyle) {
+		return nil
+	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
+	return nginxCheckAndReloadContext(ctx, nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
 }
 
 func restoreLegacyWebsiteRoutes(server *components.Server, website *model.Website) error {

@@ -225,6 +225,7 @@ export const cronjobTypes = [
     { value: 'directory', label: i18n.global.t('cronjob.directory') },
     { value: 'log', label: i18n.global.t('cronjob.log') },
     { value: 'curl', label: i18n.global.t('cronjob.curl') },
+    { value: 'websiteStartStop', label: i18n.global.t('cronjob.websiteStartStop') },
     { value: 'cutWebsiteLog', label: i18n.global.t('cronjob.cutWebsiteLog') },
     { value: 'clean', label: i18n.global.t('setting.diskClean') },
     { value: 'snapshot', label: i18n.global.t('cronjob.snapshot') },

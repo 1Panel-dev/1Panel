@@ -195,3 +195,29 @@ func importWebsiteSelection(item dto.CronjobTrans, groups []model.Group, website
 	}
 	return strings.Join(tokens, ","), warnings, nil
 }
+
+// The ordered pair uses the existing multi-schedule storage: start, then stop.
+func websiteStartStopTimes(spec string) ([2]int, error) {
+	var times [2]int
+	invalid := fmt.Errorf("website start/stop requires two daily times at five-minute intervals, with start before stop")
+	parts := strings.Split(spec, "&&")
+	if len(parts) != 2 {
+		return times, invalid
+	}
+	for i, part := range parts {
+		fields := strings.Fields(part)
+		if len(fields) != 5 || strings.Join(fields[2:], " ") != "* * *" {
+			return times, invalid
+		}
+		minute, e1 := strconv.Atoi(fields[0])
+		hour, e2 := strconv.Atoi(fields[1])
+		if e1 != nil || e2 != nil || minute < 0 || minute > 59 || minute%5 != 0 || hour < 0 || hour > 23 {
+			return times, invalid
+		}
+		times[i] = hour*60 + minute
+	}
+	if times[0] >= times[1] {
+		return times, invalid
+	}
+	return times, nil
+}
