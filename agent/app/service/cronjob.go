@@ -40,7 +40,7 @@ type ICronjobService interface {
 	HandleStop(id uint) error
 
 	Export(req dto.OperateByIDs) (string, error)
-	Import(req []dto.CronjobTrans, operator string) error
+	Import(req []dto.CronjobTrans, operator string) ([]string, error)
 	LoadScriptOptions() []dto.ScriptOptions
 
 	LoadInfo(req dto.OperateByID) (*dto.CronjobOperate, error)
@@ -169,14 +169,11 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 			for _, app := range apps {
 				item.Apps = append(item.Apps, dto.TransHelper{Name: app.App.Key, DetailName: app.Name})
 			}
-		case "website", "cutWebsiteLog":
-			if cronjob.Website == "all" {
-				break
+		case "website", "cutWebsiteLog", "websiteStartStop":
+			if err := exportWebsiteSelection(cronjob, &item); err != nil {
+				return "", err
 			}
-			websites := loadWebsForJob(cronjob)
-			for _, website := range websites {
-				item.Websites = append(item.Websites, website.Alias)
-			}
+
 		case "database":
 			if cronjob.DBName == "all" {
 				break
@@ -221,14 +218,89 @@ func (u *CronjobService) Export(req dto.OperateByIDs) (string, error) {
 		}
 		data = append(data, item)
 	}
-	itemJson, err := json.Marshal(&data)
+	var exportData interface{} = data
+	for _, item := range data {
+		if item.WebsiteSelectionVersion == 2 {
+			exportData = struct {
+				Version  int                `json:"version"`
+				Cronjobs []dto.CronjobTrans `json:"cronjobs"`
+			}{2, data}
+			break
+		}
+	}
+	itemJson, err := json.Marshal(exportData)
 	if err != nil {
 		return "", err
 	}
 	return string(itemJson), nil
 }
 
-func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
+func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) ([]string, error) {
+	// Skip existing names (and later duplicates in the file) before validating references.
+	if len(req) == 0 {
+		return nil, nil
+	}
+	var existing []model.Cronjob
+	if err := global.DB.Select("name").Find(&existing).Error; err != nil {
+		return nil, err
+	}
+	seenNames := make(map[string]bool, len(existing)+len(req))
+	for _, item := range existing {
+		seenNames[item.Name] = true
+	}
+	pending := make([]dto.CronjobTrans, 0, len(req))
+	for _, item := range req {
+		if seenNames[item.Name] {
+			continue
+		}
+		seenNames[item.Name] = true
+		pending = append(pending, item)
+	}
+	req = pending
+	selectionWarnings := make(map[int][]string)
+	var warnings []string
+	selections := make(map[int]string)
+	var websiteGroups []model.Group
+	var websites []model.Website
+	var websiteIDs map[string]uint
+	groupsLoaded := false
+	for index, item := range req {
+		if item.Type == "websiteStartStop" {
+			if _, err := websiteStartStopTimes(item.Spec); err != nil {
+				return nil, err
+			}
+		}
+		if item.Type == "website" || item.Type == "cutWebsiteLog" || item.Type == "websiteStartStop" {
+			if websiteIDs == nil && (len(item.Websites) > 0 || len(item.WebsiteGroups) > 0) {
+				var err error
+				websites, err = websiteRepo.GetBy()
+				if err != nil {
+					return nil, err
+				}
+				websiteIDs = make(map[string]uint, len(websites))
+				for _, website := range websites {
+					websiteIDs[website.Alias] = website.ID
+				}
+			}
+			if item.WebsiteSelectionVersion != 0 || len(item.WebsiteGroups) > 0 {
+				if !groupsLoaded && len(item.WebsiteGroups) > 0 {
+					var err error
+					websiteGroups, err = groupRepo.GetList(repo.WithByType("website"))
+					if err != nil {
+						return nil, err
+					}
+					groupsLoaded = true
+				}
+				selection, notes, err := importWebsiteSelection(item, websiteGroups, websites)
+				if err != nil {
+					return nil, fmt.Errorf("%s: %w", item.Name, err)
+				}
+				selections[index] = selection
+				selectionWarnings[index] = notes
+				warnings = append(warnings, notes...)
+			}
+		}
+	}
 	for _, item := range req {
 		if item.Type == "curl" {
 			items := item.URLItems
@@ -236,20 +308,20 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 				items = legacyCronjobURLs(item.URL)
 			}
 			if err := validateCronjobURLs(items); err != nil {
-				return err
+				return nil, err
 			}
 		}
 		advanced, err := cronJobAlertAdvancedParams(item.AlertTriggerMode)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		if item.AlertCount != 0 {
 			if err := (AlertService{}).validateCronJobAlertChannels(item.Type, advanced, item.AlertMethod); err != nil {
-				return err
+				return nil, err
 			}
 		}
 	}
-	for _, item := range req {
+	for index, item := range req {
 		cronjobItem, _ := cronjobRepo.Get(repo.WithByName(item.Name))
 		if cronjobItem.ID != 0 {
 			continue
@@ -277,7 +349,7 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 			Args:           item.Args,
 		}
 		if err := storeCronjobURLs(&cronjob, item.URLItems); err != nil {
-			return err
+			return nil, err
 		}
 		hasNotFound := false
 		switch item.Type {
@@ -296,19 +368,29 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 				appIDs = append(appIDs, fmt.Sprintf("%v", appItem.ID))
 			}
 			cronjob.AppID = strings.Join(appIDs, ",")
-		case "website", "cutWebsiteLog":
+		case "website", "cutWebsiteLog", "websiteStartStop":
+			if selection, ok := selections[index]; ok {
+				cronjob.Website = selection
+				// Keep the legacy pending status for unresolved individually selected websites.
+				for _, alias := range item.Websites {
+					if _, exists := websiteIDs[alias]; !exists {
+						hasNotFound = true
+					}
+				}
+				break
+			}
 			if len(item.Websites) == 0 {
 				cronjob.Website = "all"
 				break
 			}
 			var webIDs []string
 			for _, web := range item.Websites {
-				webItem, err := websiteRepo.GetFirst(websiteRepo.WithAlias(web))
-				if err != nil {
+				websiteID, exists := websiteIDs[web]
+				if !exists {
 					hasNotFound = true
 					continue
 				}
-				webIDs = append(webIDs, fmt.Sprintf("%v", webItem.ID))
+				webIDs = append(webIDs, strconv.FormatUint(uint64(websiteID), 10))
 			}
 			cronjob.Website = strings.Join(webIDs, ",")
 		case "database":
@@ -435,7 +517,10 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 			cronjob.Status = constant.StatusDisable
 		}
 		if err := cronjobRepo.Create(&cronjob); err != nil {
-			return err
+			return nil, err
+		}
+		for _, warning := range selectionWarnings[index] {
+			global.LOG.Warnf("import cronjob id=%d name=%q operator=%q: %q", cronjob.ID, cronjob.Name, operator, warning)
 		}
 		if item.AlertTitle != "" && item.AlertMethod != "" {
 			advanced, _ := cronJobAlertAdvancedParams(item.AlertTriggerMode)
@@ -453,11 +538,11 @@ func (u *CronjobService) Import(req []dto.CronjobTrans, operator string) error {
 				AdvancedParams: advanced,
 			}
 			if err := NewIAlertService().CreateAlert(createAlert, operator); err != nil {
-				return err
+				return warnings, err
 			}
 		}
 	}
-	return nil
+	return warnings, nil
 }
 
 func (u *CronjobService) LoadScriptOptions() []dto.ScriptOptions {
@@ -611,6 +696,20 @@ func (u *CronjobService) HandleOnce(id uint) error {
 }
 
 func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
+	if req.Type == "websiteStartStop" {
+		if _, err := websiteStartStopTimes(req.Spec); err != nil {
+			return err
+		}
+		req.SpecCustom = false
+		req.RetainCopies = 7
+	}
+	if req.Type == "website" || req.Type == "cutWebsiteLog" || req.Type == "websiteStartStop" {
+		normalized, err := validateWebsiteSelection(req.Website)
+		if err != nil {
+			return err
+		}
+		req.Website = normalized
+	}
 	advanced, err := cronJobAlertAdvancedParams(req.AlertTriggerMode)
 	if err != nil {
 		return err
@@ -647,21 +746,28 @@ func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
 	}
 	cronjob.Status = constant.StatusEnable
 
-	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
-	spec := cronjob.Spec
-	entryIDs, err := u.StartJob(&cronjob, false)
-	if err != nil {
-		return err
-	}
-	cronjob.Spec = spec
-	cronjob.EntryIDs = entryIDs
 	if req.Type == "cleanLog" {
 		config, _ := json.Marshal(req.CleanLogConfig)
 		cronjob.Config = string(config)
 	}
+	// Scheduled callbacks capture copies: persist first so every copy has its real ID.
 	if err := cronjobRepo.Create(&cronjob); err != nil {
 		return err
 	}
+	entryIDs, err := u.StartJob(&cronjob, false)
+	if err != nil {
+		_ = cronjobRepo.Delete(repo.WithByID(cronjob.ID))
+		return err
+	}
+	if err := cronjobRepo.Update(cronjob.ID, map[string]interface{}{"entry_ids": entryIDs}); err != nil {
+		for _, id := range strings.Split(entryIDs, ",") {
+			entryID, _ := strconv.Atoi(id)
+			global.Cron.Remove(cron.EntryID(entryID))
+		}
+		_ = cronjobRepo.Delete(repo.WithByID(cronjob.ID))
+		return err
+	}
+	global.LOG.Infof("create cronjob %s successful, spec: %s", cronjob.Name, cronjob.Spec)
 	if req.AlertCount != 0 && req.AlertTitle != "" && req.AlertMethod != "" {
 		createAlert := dto.AlertCreate{
 			Title:          req.AlertTitle,
@@ -681,6 +787,11 @@ func (u *CronjobService) Create(req dto.CronjobOperate, operator string) error {
 }
 
 func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string, error) {
+	if cronjob.Type == "websiteStartStop" {
+		if _, err := websiteStartStopTimes(cronjob.Spec); err != nil {
+			return "", err
+		}
+	}
 	if len(cronjob.EntryIDs) != 0 && isUpdate {
 		ids := strings.Split(cronjob.EntryIDs, ",")
 		for _, id := range ids {
@@ -690,10 +801,21 @@ func (u *CronjobService) StartJob(cronjob *model.Cronjob, isUpdate bool) (string
 	}
 	specs := strings.Split(cronjob.Spec, "&&")
 	var ids []string
-	for _, spec := range specs {
-		cronjob.Spec = spec
-		entryID, err := u.AddCronJob(cronjob)
+	for index, spec := range specs {
+		job := *cronjob
+		job.Spec = spec
+		if job.Type == "websiteStartStop" {
+			job.Args = constant.StartWeb
+			if index == 1 {
+				job.Args = constant.StopWeb
+			}
+		}
+		entryID, err := u.AddCronJob(&job)
 		if err != nil {
+			for _, id := range ids {
+				registeredID, _ := strconv.Atoi(id)
+				global.Cron.Remove(cron.EntryID(registeredID))
+			}
 			return "", err
 		}
 		ids = append(ids, fmt.Sprintf("%v", entryID))
@@ -744,6 +866,20 @@ func (u *CronjobService) Delete(req dto.CronjobBatchDelete) error {
 }
 
 func (u *CronjobService) Update(id uint, req dto.CronjobOperate, operator string) error {
+	if req.Type == "websiteStartStop" {
+		if _, err := websiteStartStopTimes(req.Spec); err != nil {
+			return err
+		}
+		req.SpecCustom = false
+		req.RetainCopies = 7
+	}
+	if req.Type == "website" || req.Type == "cutWebsiteLog" || req.Type == "websiteStartStop" {
+		normalized, err := validateWebsiteSelection(req.Website)
+		if err != nil {
+			return err
+		}
+		req.Website = normalized
+	}
 	advanced, err := cronJobAlertAdvancedParams(req.AlertTriggerMode)
 	if err != nil {
 		return err
@@ -898,6 +1034,7 @@ func (u *CronjobService) UpdateGroup(req dto.ChangeGroup) error {
 
 func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	addFunc := func() {
+		global.LOG.Infof("trigger cronjob id=%d name=%s type=%s spec=%s", cronjob.ID, cronjob.Name, cronjob.Type, cronjob.Spec)
 		u.HandleJob(cronjob)
 	}
 	global.LOG.Infof("add %s job %s successful", cronjob.Type, cronjob.Name)
@@ -905,7 +1042,7 @@ func (u *CronjobService) AddCronJob(cronjob *model.Cronjob) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	global.LOG.Infof("start cronjob entryID: %d", entryID)
+	global.LOG.Infof("start cronjob entryID=%d id=%d name=%s spec=%s next=%s timezone=%s", entryID, cronjob.ID, cronjob.Name, cronjob.Spec, global.Cron.Entry(entryID).Schedule.Next(time.Now().In(global.Cron.Location())).Format(time.RFC3339), global.Cron.Location())
 	return int(entryID), nil
 }
 

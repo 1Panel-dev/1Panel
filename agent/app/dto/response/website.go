@@ -48,9 +48,10 @@ type WebsiteRes struct {
 }
 
 type WebsiteOption struct {
-	ID            uint   `json:"id"`
-	PrimaryDomain string `json:"primaryDomain"`
-	Alias         string `json:"alias"`
+	WebsiteGroupID uint   `json:"webSiteGroupId"`
+	ID             uint   `json:"id"`
+	PrimaryDomain  string `json:"primaryDomain"`
+	Alias          string `json:"alias"`
 }
 
 type WebsitePreInstallCheck struct {

@@ -1,10 +1,15 @@
 package service
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/global"
 	"github.com/jinzhu/copier"
 )
 
@@ -72,7 +77,22 @@ func (u *GroupService) Delete(id uint) error {
 		return buserr.New("ErrGroupIsDefault")
 	}
 	if group.Type == "website" {
-		websites, _ := websiteRepo.List(websiteRepo.WithGroupID(group.ID))
+		var jobs []model.Cronjob
+		if err := global.DB.Where("type IN ?", []string{"website", "cutWebsiteLog", "websiteStartStop"}).Find(&jobs).Error; err != nil {
+			return err
+		}
+		token := "group:" + strconv.FormatUint(uint64(id), 10)
+		for _, job := range jobs {
+			for _, selected := range strings.Split(job.Website, ",") {
+				if selected == token {
+					return fmt.Errorf("website group is used by scheduled task %q", job.Name)
+				}
+			}
+		}
+		websites, err := websiteRepo.List(websiteRepo.WithGroupID(group.ID))
+		if err != nil {
+			return err
+		}
 		if len(websites) > 0 {
 			return buserr.New("ErrGroupIsInWebsiteUse")
 		}
@@ -81,6 +101,19 @@ func (u *GroupService) Delete(id uint) error {
 }
 
 func (u *GroupService) Update(req dto.GroupUpdate) error {
+	current, err := groupRepo.Get(repo.WithByID(req.ID))
+	if err != nil {
+		return err
+	}
+	groups, err := groupRepo.GetList(repo.WithByType(current.Type), repo.WithByName(req.Name))
+	if err != nil {
+		return err
+	}
+	for _, group := range groups {
+		if group.ID != req.ID {
+			return buserr.New("ErrRecordExist")
+		}
+	}
 	if req.IsDefault {
 		if err := groupRepo.CancelDefault(req.Type); err != nil {
 			return err

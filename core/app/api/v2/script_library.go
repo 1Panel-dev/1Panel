@@ -196,7 +196,6 @@ func (b *BaseApi) RunScript(c *gin.Context) {
 			return
 		}
 
-		quitChan := make(chan bool, 3)
 		tty.Start(quitChan)
 		go slave.Wait(quitChan)
 	} else {

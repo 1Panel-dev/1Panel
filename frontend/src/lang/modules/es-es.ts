@@ -366,6 +366,7 @@ const message = {
             serviceNotStarted: 'El servicio {0} no está iniciado.',
         },
         status: {
+            autoSync: 'Sincronización automática',
             autoSyncEnabled: 'Sincronización automática activada',
             autoSyncDisabled: 'Sincronización automática desactivada',
             running: 'En ejecución',
@@ -2974,6 +2975,9 @@ const message = {
         exportHelper: 'Exporta las imágenes seleccionadas en un solo archivo tar.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'La opción «Todos» de un grupo sigue los cambios de sus miembros; los sitios seleccionados individualmente se guardan como una lista fija.',
+        websiteSelectionMissing: 'Selección no disponible',
         importHelper:
             'Las tareas programadas duplicadas se omitirán automáticamente durante la importación. Las tareas se establecerán en estado [Deshabilitado] por defecto, y en estado [Pendiente de edición] cuando la asociación de datos sea anormal.',
         changeStatus: 'Cambiar estado',
@@ -3089,6 +3093,11 @@ const message = {
         cleanDataHelper: 'Elimina el archivo de respaldo generado por esta tarea.',
         noLogs: 'Aún no hay salida de tareas...',
         errPath: '¡Error en la ruta de respaldo [{0}], no se puede descargar!',
+        websiteStartStop: 'Iniciar/detener sitio web',
+        startTime: 'Hora de inicio',
+        stopTime: 'Hora de parada',
+        websiteTimeHint: 'Recordatorio: se ejecuta una vez al día',
+        websiteTimeInvalid: 'Seleccione las horas de inicio y de parada; el inicio debe ser anterior a la parada',
         cutWebsiteLog: 'Rotación de logs del sitio',
         cutWebsiteLogHelper: 'Los archivos de log rotados se respaldarán en el directorio de respaldos de 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP de WAF',
@@ -3097,6 +3106,15 @@ const message = {
         unitHours: 'Unidad: Horas',
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',
         library: {
+            executeScript: 'Ejecutar script',
+            targetNodes: 'Seleccionar nodos de destino',
+            switchNodeHelper:
+                'Cambiar de nodo no interrumpe la ejecución. Escriba en el terminal; la entrada solo se envía al nodo seleccionado.',
+            executorCloseHelper:
+                'Al cerrar se desconectan todos los terminales y pueden interrumpirse los scripts en ejecución. ¿Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Ahora',
             autoSyncHelper:
@@ -3216,6 +3234,10 @@ const message = {
         selectTimeRange: 'Selecciona el intervalo de tiempo a exportar',
     },
     terminal: {
+        passwordless: 'Sin contraseña',
+        bootstrapAuth: 'Autenticación inicial (opcional)',
+        passwordlessSetupHelper: 'La prueba de conexión configura y verifica el acceso sin contraseña.',
+
         showTerminalButton: 'Acceso rápido al terminal',
         showTerminalButtonHelper:
             'Al activar esta opción, se mostrará un botón de acceso rápido al terminal en la esquina inferior derecha de la página.',
@@ -8577,6 +8599,7 @@ const message = {
             addCluster: 'Añadir clúster',
             unhealthyDeleteError: 'El nodo tiene estado anómalo, revisa la lista e inténtalo de nuevo',
             noAvailableMasterVersion: 'No hay una plantilla de instancia primaria disponible en este nodo.',
+            appStoreOnly: 'Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones.',
             noMatchingReplicaVersion:
                 'En este nodo no hay una plantilla de réplica con la misma versión que la instancia primaria.',
             installNode: 'Servidor de despliegue',

@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose 復元作業領域をクリーンアップ'
 # ランタイム
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
+PHPBuildImage: "PHP イメージをビルド中"
+PHPBuildBaseImage: "ベースイメージ {{ .name }} を取得中"
+PHPBuildStep: "PHP イメージをビルド中（ステップ {{ .name }}）"
+PHPBuildStartContainer: "PHP コンテナを起動中"
+PHPBuildInstallExtensions: "PHP 拡張機能をインストール中"
+PHPBuildCommitImage: "拡張機能を含む PHP イメージを保存中"
+PHPBuildApplyConfig: "設定を適用して PHP 実行環境を起動中"
+PHPBuildSeeLog: "詳細は build.log を確認してください"
 ErrImageExist: 'イメージはすでに存在します！イメージ名を変更してください。'
 ErrDelWithWebsite: 'オペレーティング環境は既に Web サイトに関連付けられているため、削除できません'
 ErrRuntimeStart: '起動に失敗しました'
@@ -832,3 +840,16 @@ ErrImageCheckProxyRequired: "現在の実行環境でイメージの更新を確
 ErrPHPExtensionsConflict: "同じ名前で内容が異なる PHP 拡張機能テンプレートが既に存在するため、上書きしませんでした"
 
 ErrModelTokenizerDirOverlap: "モデルとトークナイザーのディレクトリは別々にし、一方が他方を含まないようにしてください"
+ErrClusterAppOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "無効なサイト選択：{{ .value }}"
+ErrCronjobWebsiteGroup: "サイトグループ {{ .id }} にアクセスできません"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}：選択したサイトはすべて存在しません"
+ErrCronjobWebsiteVersion: "未対応のサイト選択バージョン：{{ .version }}"
+ErrCronjobWebsiteAllConflict: "「すべてのサイト」と個別のサイトまたはグループは同時に選択できません"
+ErrCronjobWebsiteGroupName: "サイトグループ名は空にできません"
+ErrCronjobWebsiteGroupMissing: "サイトグループ「{{ .group }}」が存在せず、保存された一覧に一致するサイトも見つかりませんでした"
+CronjobWebsiteGroupFallback: "{{ .name }}：サイトグループ「{{ .group }}」が存在しないため、固定のサイトリストとしてインポートしました。今後はグループの変更に追従しません"
+CronjobWebsiteMissing: "{{ .name }}：次のサイトが見つかりません：{{ .website }}"
+ErrCronjobWebsiteImportEmpty: "選択したサイトグループまたはサイトに一致するものが見つかりませんでした"

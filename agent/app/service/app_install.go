@@ -92,8 +92,15 @@ func (a *AppInstallService) PageWithContext(ctx context.Context, req request.App
 	)
 	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
 	opts = append(opts, repo.WithOrderRuleBy("sort_order", "ascending"))
+	var excludedKeys []string
 	if req.AppStore {
-		appIDs, err := appRepo.GetIDs(ctx, appRepo.WithKeyIn([]string{constant.AppOpenclaw, constant.AppCopaw, constant.AppHermesAgent, constant.AppDeepSeekHarness, constant.AppOctop, "vllm"}))
+		excludedKeys = append(excludedKeys, constant.AppOpenclaw, constant.AppCopaw, constant.AppHermesAgent, constant.AppDeepSeekHarness, constant.AppOctop, "vllm")
+	}
+	if req.AppStore || req.Update {
+		excludedKeys = append(excludedKeys, constant.ClusterAppKeys()...)
+	}
+	if len(excludedKeys) > 0 {
+		appIDs, err := appRepo.GetIDs(ctx, appRepo.WithKeyIn(excludedKeys))
 		if err != nil {
 			return 0, nil, err
 		}
@@ -275,6 +282,9 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	install, err := appInstallRepo.GetFirstByCtx(context.Background(), repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
+	}
+	if req.Operate == constant.Upgrade && constant.IsClusterApp(install.App.Key) {
+		return buserr.New("ErrClusterAppOnly")
 	}
 	if install.App.Key == "ollama" || install.App.Key == "vllm" {
 		if req.Operate != constant.Upgrade {
@@ -816,6 +826,9 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 	app, err := appRepo.GetFirst(repo.WithByID(install.AppId))
 	if err != nil {
 		return versions, err
+	}
+	if constant.IsClusterApp(app.Key) {
+		return []dto.AppVersion{}, nil
 	}
 	var feishuLegacy, feishuConfigured, feishuChecked bool
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))

@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Cleanup compose restore workspace'
 # runtime
 ErrFileNotExist: 'Source file not found: {{ .detail }}'
 ErrImageBuildErr: 'Image build failed'
+PHPBuildImage: "Building the PHP image"
+PHPBuildBaseImage: "Resolving base image {{ .name }}"
+PHPBuildStep: "Building the PHP image (step {{ .name }})"
+PHPBuildStartContainer: "Starting the PHP container"
+PHPBuildInstallExtensions: "Installing PHP extensions"
+PHPBuildCommitImage: "Saving the image with PHP extensions"
+PHPBuildApplyConfig: "Applying configuration and starting the PHP runtime"
+PHPBuildSeeLog: "See build.log for details"
 ErrImageExist: "Image already exists. Use a different image name."
 ErrDelWithWebsite: 'Runtime is linked to a website and cannot be deleted'
 ErrRuntimeStart: 'Startup failed'
@@ -832,3 +840,16 @@ ErrImageCheckProxyRequired: "To check for image updates in the current runtime e
 ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
 
 ErrModelTokenizerDirOverlap: "The model and tokenizer directories must be different, and neither can contain the other"
+ErrClusterAppOnly: "Install and upgrade this application in Application High Availability."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Invalid website selection: {{ .value }}"
+ErrCronjobWebsiteGroup: "Unable to access website group {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: none of the selected websites exist"
+ErrCronjobWebsiteVersion: "Unsupported website selection version: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "All websites cannot be combined with individual websites or groups"
+ErrCronjobWebsiteGroupName: "Website group name cannot be empty"
+ErrCronjobWebsiteGroupMissing: "Website group \"{{ .group }}\" does not exist and no snapshot websites could be matched"
+CronjobWebsiteGroupFallback: "{{ .name }}: website group \"{{ .group }}\" does not exist; imported as a fixed website list that no longer follows group changes"
+CronjobWebsiteMissing: "{{ .name }}: websites not found: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "No selected website groups or websites could be matched"

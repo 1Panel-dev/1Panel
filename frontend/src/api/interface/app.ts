@@ -6,6 +6,7 @@ export namespace App {
         enabled: boolean;
     }
     export interface App extends CommonModel {
+        clusterOnly?: boolean;
         name: string;
         icon?: string;
         key: string;

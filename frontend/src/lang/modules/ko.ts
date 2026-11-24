@@ -360,6 +360,7 @@ const message = {
             serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
+            autoSync: '자동 동기화',
             autoSyncEnabled: '자동 동기화 켜짐',
             autoSyncDisabled: '자동 동기화 꺼짐',
             running: '실행 중',
@@ -2868,6 +2869,9 @@ const message = {
         goSetting: '설정으로 이동',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            '그룹 내 “전체”를 선택하면 그룹 구성 변경이 자동으로 반영됩니다. 개별 사이트를 선택하면 고정 목록으로 저장됩니다.',
+        websiteSelectionMissing: '유효하지 않은 선택',
         importHelper:
             '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',
@@ -2972,6 +2976,11 @@ const message = {
         cleanDataHelper: '이 작업에서 생성된 백업 파일을 삭제합니다.',
         noLogs: '작업 출력이 아직 없습니다...',
         errPath: '백업 경로 [{0}] 오류, 다운로드할 수 없습니다!',
+        websiteStartStop: '웹사이트 시작/중지',
+        startTime: '시작 시간',
+        stopTime: '중지 시간',
+        websiteTimeHint: '안내: 매일 한 번 실행됩니다',
+        websiteTimeInvalid: '시작 시간과 중지 시간을 선택하세요. 시작 시간은 중지 시간보다 빨라야 합니다',
         cutWebsiteLog: '웹사이트 로그 회전',
         cutWebsiteLogHelper: '회전된 로그 파일은 1Panel 의 백업 디렉토리로 백업됩니다.',
         syncIpGroup: 'WAF IP 그룹 동기화',
@@ -2980,6 +2989,15 @@ const message = {
         unitHours: '단위: 시간',
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
         library: {
+            executeScript: '스크립트 실행',
+            targetNodes: '실행할 노드 선택',
+            switchNodeHelper:
+                '노드를 전환해도 실행은 계속됩니다. 터미널에 직접 입력하세요. 입력은 선택한 노드에만 전송됩니다.',
+            executorCloseHelper:
+                '닫으면 모든 노드의 터미널 연결이 해제되며 실행 중인 스크립트가 중단될 수 있습니다. 계속하시겠습니까?',
+            connecting: '연결 중',
+            connected: '연결됨',
+            disconnected: '연결 끊김',
             script: '스크립트',
             syncNow: '지금 동기화',
             autoSyncHelper:
@@ -3094,6 +3112,10 @@ const message = {
         selectTimeRange: '보낼 기간을 선택하세요',
     },
     terminal: {
+        passwordless: '비밀번호 없이 연결',
+        bootstrapAuth: '최초 인증 (선택 사항)',
+        passwordlessSetupHelper: '연결 테스트 시 비밀번호 없는 로그인을 설정하고 확인합니다.',
+
         showTerminalButton: '터미널 바로가기',
         showTerminalButtonHelper: '활성화하면 페이지 오른쪽 하단에 터미널 바로가기 버튼이 표시됩니다.',
         local: '로컬',
@@ -8236,6 +8258,7 @@ const message = {
             addCluster: '클러스터 추가',
             unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
             noAvailableMasterVersion: '이 노드에 사용할 수 있는 마스터 템플릿이 없습니다.',
+            appStoreOnly: "이 애플리케이션은 애플리케이션 고가용성에서 설치하거나 업그레이드하세요.",
             noMatchingReplicaVersion: '이 노드에 마스터와 버전이 같은 복제본 템플릿이 없습니다.',
             installNode: '배포 서버',
             master: '주 데이터베이스',

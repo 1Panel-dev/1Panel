@@ -365,6 +365,7 @@ const message = {
             serviceNotStarted: 'O serviço {0} não está iniciado.',
         },
         status: {
+            autoSync: 'Sincronização automática',
             autoSyncEnabled: 'Sincronização automática ativada',
             autoSyncDisabled: 'Sincronização automática desativada',
             running: 'Em execução',
@@ -2970,6 +2971,9 @@ const message = {
         goSetting: 'Ir para configurações',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'A opção “Todos” de um grupo acompanha as alterações dos seus membros; sites selecionados individualmente são salvos como uma lista fixa.',
+        websiteSelectionMissing: 'Seleção indisponível',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
@@ -3068,6 +3072,11 @@ const message = {
         cleanDataHelper: 'Excluir o arquivo de backup gerado durante esta tarefa.',
         noLogs: 'Ainda não há saída de tarefa...',
         errPath: 'Caminho de backup [{0}] com erro, não é possível fazer o download!',
+        websiteStartStop: 'Iniciar/parar site',
+        startTime: 'Horário de início',
+        stopTime: 'Horário de parada',
+        websiteTimeHint: 'Lembrete: executado uma vez por dia',
+        websiteTimeInvalid: 'Selecione os horários de início e de parada; o início deve ser anterior à parada',
         cutWebsiteLog: 'Rotação de log do site',
         cutWebsiteLogHelper: 'Os arquivos de log rotacionados serão salvos no diretório de backup do 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP do WAF',
@@ -3076,6 +3085,15 @@ const message = {
         unitHours: 'Unidade: Horas',
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
         library: {
+            executeScript: 'Executar script',
+            targetNodes: 'Selecionar nós de destino',
+            switchNodeHelper:
+                'Alternar entre nós mantém a execução. Digite diretamente no terminal; a entrada vai apenas para o nó selecionado.',
+            executorCloseHelper:
+                'Fechar desconecta todos os terminais e pode interromper os scripts em execução. Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Agora',
             autoSyncHelper:
@@ -3209,6 +3227,10 @@ const message = {
         selectTimeRange: 'Selecione o período para exportar',
     },
     terminal: {
+        passwordless: 'Sem senha',
+        bootstrapAuth: 'Autenticação inicial (opcional)',
+        passwordlessSetupHelper: 'O teste de conexão configura e verifica o acesso sem senha.',
+
         showTerminalButton: 'Atalho para o terminal',
         showTerminalButtonHelper:
             'Ao ativar esta opção, um botão de atalho para o terminal será exibido no canto inferior direito da página.',
@@ -8605,6 +8627,7 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
+            appStoreOnly: "Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.",
             noMatchingReplicaVersion:
                 'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',
             installNode: 'Servidor de implantação',

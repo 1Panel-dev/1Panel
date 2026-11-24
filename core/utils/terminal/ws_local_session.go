@@ -46,8 +46,15 @@ func (sws *LocalWsSession) handleSlaveEvent(exitCh chan bool) {
 		case <-exitCh:
 			return
 		default:
-			n, _ := sws.slave.Read(buffer)
-			_ = sws.masterWrite(buffer[:n])
+			n, err := sws.slave.Read(buffer)
+			if n > 0 {
+				if writeErr := sws.masterWrite(buffer[:n]); writeErr != nil {
+					return
+				}
+			}
+			if err != nil {
+				return
+			}
 		}
 	}
 }
@@ -112,7 +119,9 @@ func (sws *LocalWsSession) receiveWsMsg(exitCh chan bool) {
 					sws.sendWebsocketInputCommandToSshSessionStdinPipe(decodeBytes)
 				}
 			case WsMsgHeartbeat:
+				sws.writeMutex.Lock()
 				err = wsConn.WriteMessage(websocket.TextMessage, wsData)
+				sws.writeMutex.Unlock()
 				if err != nil {
 					global.LOG.Errorf("ssh sending heartbeat to webSocket failed, err: %v", err)
 				}

@@ -366,6 +366,7 @@ const message = {
             serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
+            autoSync: 'Auto-sync',
             autoSyncEnabled: 'Auto-sync enabled',
             autoSyncDisabled: 'Auto-sync disabled',
             running: 'Running',
@@ -2921,6 +2922,9 @@ const message = {
         exportHelper: 'Export selected images to one tar file.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'All within a group follows membership changes; individual websites form a fixed list.',
+        websiteSelectionMissing: 'Unavailable selection',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
@@ -3032,6 +3036,11 @@ const message = {
         cleanDataHelper: 'Delete the backup file generated during this task.',
         noLogs: 'No task output yet...',
         errPath: 'Backup path [{0}] error, cannot download!',
+        websiteStartStop: 'Website start/stop',
+        startTime: 'Start time',
+        stopTime: 'Stop time',
+        websiteTimeHint: 'Reminder: runs daily',
+        websiteTimeInvalid: 'Select both times; start must be earlier than stop',
         cutWebsiteLog: 'Website log rotation',
         cutWebsiteLogHelper: 'The rotated log files will be backed up to the backup directory of 1Panel.',
         syncIpGroup: 'Sync WAF IP groups',
@@ -3040,6 +3049,14 @@ const message = {
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
         library: {
+            executeScript: 'Run script',
+            targetNodes: 'Select target nodes',
+            switchNodeHelper:
+                'Switching nodes keeps execution active. Type directly in the terminal; input goes only to the selected node.',
+            executorCloseHelper: 'Closing disconnects all node terminals and may interrupt running scripts. Continue?',
+            connecting: 'Connecting',
+            connected: 'Connected',
+            disconnected: 'Disconnected',
             script: 'Script',
             syncNow: 'Sync Now',
             autoSyncHelper:
@@ -3153,6 +3170,11 @@ const message = {
         selectTimeRange: 'Select the time range to export.',
     },
     terminal: {
+        passwordless: 'Passwordless',
+        bootstrapAuth: 'Initial authentication (optional)',
+        passwordlessSetupHelper:
+            'Reuse an existing SSH key or generate one automatically. Testing the connection sets up passwordless access.',
+
         showTerminalButton: 'Terminal Shortcut',
         showTerminalButtonHelper:
             'When enabled, a terminal shortcut button appears in the bottom-right corner of the page.',
@@ -8415,6 +8437,7 @@ const message = {
             addCluster: 'Add Cluster',
             unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
             noAvailableMasterVersion: 'No primary template is available on this node.',
+            appStoreOnly: 'Install and upgrade this application in Application High Availability.',
             noMatchingReplicaVersion: 'No replica template on this node matches the primary version.',
             installNode: 'Deployment server',
             master: 'Primary database',

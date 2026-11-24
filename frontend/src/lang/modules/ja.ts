@@ -365,6 +365,7 @@ const message = {
             serviceNotStarted: '{0}サービスは開始されません。',
         },
         status: {
+            autoSync: '自動同期',
             autoSyncEnabled: '自動同期は有効です',
             autoSyncDisabled: '自動同期は無効です',
             running: 'ランニング',
@@ -2905,6 +2906,9 @@ const message = {
             'イメージ操作ではレジストリミラー URL を優先して使用します。空欄にするとレジストリミラーを無効にします。',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'グループ内の「すべて」は所属サイトの変更に追従します。個別に選択したサイトは固定リストとして保存されます。',
+        websiteSelectionMissing: '無効な選択',
         importHelper:
             'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
@@ -3005,6 +3009,11 @@ const message = {
         cleanDataHelper: 'このタスク中に生成されたバックアップファイルを削除します。',
         noLogs: 'タスク出力はまだありません...',
         errPath: 'バックアップパス[{0}]エラー、ダウンロードできません！',
+        websiteStartStop: 'ウェブサイトの起動・停止',
+        startTime: '起動時刻',
+        stopTime: '停止時刻',
+        websiteTimeHint: 'お知らせ：毎日1回実行されます',
+        websiteTimeInvalid: '起動時刻と停止時刻を選択してください。起動時刻は停止時刻より前に設定してください',
         cutWebsiteLog: 'ウェブサイトのログローテーション',
         cutWebsiteLogHelper: '回転したログファイルは、1パネルのバックアップディレクトリにバックアップされます。',
         syncIpGroup: 'WAF IP グループを同期',
@@ -3013,6 +3022,15 @@ const message = {
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
         library: {
+            executeScript: 'スクリプトを実行',
+            targetNodes: '実行ノードを選択',
+            switchNodeHelper:
+                'ノードを切り替えても実行は継続します。ターミナルに直接入力してください。入力は選択中のノードのみに送信されます。',
+            executorCloseHelper:
+                '閉じるとすべてのノードの接続が切れ、実行中のスクリプトが中断される場合があります。続行しますか？',
+            connecting: '接続中',
+            connected: '接続済み',
+            disconnected: '切断済み',
             script: 'スクリプト',
             syncNow: '今すぐ同期',
             autoSyncHelper:
@@ -3136,6 +3154,10 @@ const message = {
         selectTimeRange: 'エクスポートする期間を選択してください',
     },
     terminal: {
+        passwordless: 'パスワードレス',
+        bootstrapAuth: '初回認証（任意）',
+        passwordlessSetupHelper: '接続テスト時にパスワードレス接続を設定し、確認します。',
+
         showTerminalButton: 'ターミナルへのショートカット',
         showTerminalButtonHelper: '有効にすると、ページの右下にターミナルへのショートカットボタンが表示されます。',
         local: 'ローカル',
@@ -8407,6 +8429,7 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
+            appStoreOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。",
             noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
             installNode: '配置先サーバー',
             master: 'プライマリデータベース',

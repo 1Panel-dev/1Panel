@@ -346,6 +346,7 @@ const message = {
             serviceNotStarted: '尚未啟動 {0} 服務',
         },
         status: {
+            autoSync: '自動同步',
             autoSyncEnabled: '自動同步已開啟',
             autoSyncDisabled: '自動同步未開啟',
             running: '已啟動',
@@ -2721,6 +2722,8 @@ const message = {
         exportHelper: '將選取的映像匯出為一個 tar 檔案。',
     },
     cronjob: {
+        websiteGroupDynamicHelper: '群組內「所有」會動態跟隨群組變化；逐一選擇網站則儲存固定名單。',
+        websiteSelectionMissing: '已失效的選擇',
         importHelper:
             '匯入時將自動跳過重名計劃任務。任務預設設定為【停用】狀態，資料關聯異常時，設定為【待編輯】狀態。',
         changeStatus: '狀態修改',
@@ -2825,6 +2828,11 @@ const message = {
         cleanDataHelper: '刪除該任務執行過程中產生的備份檔案',
         noLogs: '暫無任務輸出...',
         errPath: '備份路徑 [{0}] 錯誤，無法下載',
+        websiteStartStop: '網站啟停',
+        startTime: '開啟時間',
+        stopTime: '停止時間',
+        websiteTimeHint: '溫馨提示：執行週期為每天一次',
+        websiteTimeInvalid: '請選擇開啟和停止時間，開啟時間必須早於停止時間',
         cutWebsiteLog: '切割網站日誌',
         cutWebsiteLogHelper: '切割的日誌檔案會備份到 1Panel 的 backup 目錄下',
         syncIpGroup: '同步 WAF IP 組',
@@ -2833,6 +2841,13 @@ const message = {
         unitHours: '單位：小時',
         alertTitle: '計劃任務-{0}「{1}」任務失敗告警',
         library: {
+            executeScript: '執行指令碼',
+            targetNodes: '選擇執行節點',
+            switchNodeHelper: '切換節點不會中斷執行；請直接在終端機內輸入，輸入僅傳送至目前節點。',
+            executorCloseHelper: '關閉將中斷所有節點的終端機連線，可能中斷正在執行的指令碼，是否繼續？',
+            connecting: '連線中',
+            connected: '已連線',
+            disconnected: '已中斷',
             script: '腳本',
             syncNow: '立即同步',
             autoSyncHelper: '開啟自動同步後，每天凌晨更新系統腳本，自訂腳本不受影響；也可手動立即同步。',
@@ -2938,6 +2953,10 @@ const message = {
         selectTimeRange: '請選擇匯出時間範圍',
     },
     terminal: {
+        passwordless: '免密',
+        bootstrapAuth: '首次驗證（選填）',
+        passwordlessSetupHelper: '自動重用或產生 SSH 金鑰，測試連線時完成免密設定。',
+
         showTerminalButton: '終端捷徑',
         showTerminalButtonHelper: '啟用後，頁面右下角會顯示終端捷徑按鈕。',
         local: '本機',
@@ -7787,6 +7806,7 @@ const message = {
             addCluster: '新增叢集',
             unhealthyDeleteError: '安裝節點狀態異常，請在節點列表檢查後重試',
             noAvailableMasterVersion: '目前節點沒有可用的主庫範本。',
+            appStoreOnly: "請在「應用高可用」中安裝或升級此應用。",
             noMatchingReplicaVersion: '目前節點沒有與主庫同版本的從庫範本。',
             installNode: '部署伺服器',
             master: '主庫',

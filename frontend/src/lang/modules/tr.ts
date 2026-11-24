@@ -367,6 +367,7 @@ const message = {
             serviceNotStarted: '{0} servisi başlatılmadı.',
         },
         status: {
+            autoSync: 'Otomatik eşitleme',
             autoSyncEnabled: 'Otomatik eşitleme açık',
             autoSyncDisabled: 'Otomatik eşitleme kapalı',
             running: 'Çalışıyor',
@@ -2953,6 +2954,9 @@ const message = {
         exportHelper: 'Seçilen imajları tek bir tar dosyasına aktarır.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Bir gruptaki “Tümü” seçeneği grup üyeliğindeki değişiklikleri izler; tek tek seçilen siteler sabit bir liste olarak kaydedilir.',
+        websiteSelectionMissing: 'Kullanılamayan seçim',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
@@ -3064,6 +3068,12 @@ const message = {
         cleanDataHelper: 'Bu görev sırasında oluşturulan yedekleme dosyasını sil.',
         noLogs: 'Henüz görev çıktısı yok...',
         errPath: 'Yedek yolu [{0}] hatası, indirilemez!',
+        websiteStartStop: 'Web sitesini başlat/durdur',
+        startTime: 'Başlatma zamanı',
+        stopTime: 'Durdurma zamanı',
+        websiteTimeHint: 'Hatırlatma: günde bir kez çalışır',
+        websiteTimeInvalid:
+            'Başlatma ve durdurma zamanlarını seçin; başlatma zamanı durdurma zamanından önce olmalıdır',
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
         syncIpGroup: 'WAF IP gruplarını senkronize et',
@@ -3072,6 +3082,15 @@ const message = {
         unitHours: 'Birim: Saat',
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',
         library: {
+            executeScript: 'Betiği çalıştır',
+            targetNodes: 'Hedef düğümleri seçin',
+            switchNodeHelper:
+                'Düğüm değiştirmek çalışmayı durdurmaz. Doğrudan terminale yazın; girdi yalnızca seçili düğüme gönderilir.',
+            executorCloseHelper:
+                'Kapatmak tüm düğüm terminallerinin bağlantısını keser ve çalışan betikleri durdurabilir. Devam edilsin mi?',
+            connecting: 'Bağlanıyor',
+            connected: 'Bağlandı',
+            disconnected: 'Bağlantı kesildi',
             script: 'Script',
             syncNow: 'Hemen Senkronize Et',
             autoSyncHelper:
@@ -3185,6 +3204,10 @@ const message = {
         selectTimeRange: 'Dışa aktarılacak zaman aralığını seçin',
     },
     terminal: {
+        passwordless: 'Parolasız',
+        bootstrapAuth: 'İlk kimlik doğrulama (isteğe bağlı)',
+        passwordlessSetupHelper: 'Bağlantı testi parolasız erişimi yapılandırır ve doğrular.',
+
         showTerminalButton: 'Terminal kısayolu',
         showTerminalButtonHelper:
             'Etkinleştirildiğinde, sayfanın sağ alt köşesinde terminal kısayol düğmesi görüntülenir.',
@@ -8553,6 +8576,7 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             noAvailableMasterVersion: 'Bu düğümde kullanılabilir bir birincil sunucu şablonu yok.',
+            appStoreOnly: "Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.",
             noMatchingReplicaVersion: 'Bu düğümde birincil sunucuyla aynı sürümde bir replika şablonu yok.',
             installNode: 'Dağıtım sunucusu',
             master: 'Birincil veritabanı',

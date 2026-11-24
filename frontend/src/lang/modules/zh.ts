@@ -346,6 +346,7 @@ const message = {
             serviceNotStarted: '当前未启动 {0} 服务',
         },
         status: {
+            autoSync: '自动同步',
             autoSyncEnabled: '自动同步已开启',
             autoSyncDisabled: '自动同步未开启',
             running: '已启动',
@@ -2741,6 +2742,8 @@ const message = {
         finishTime: '上一次停止时间',
     },
     cronjob: {
+        websiteGroupDynamicHelper: '组内“所有”会动态跟随分组变化；逐个选择网站则保存固定名单。',
+        websiteSelectionMissing: '已失效的选择',
         importHelper:
             '导入时将自动跳过重名计划任务。任务默认设置为【停用】状态，数据关联异常时，设置为【待编辑】状态。',
         changeStatus: '状态修改',
@@ -2846,6 +2849,11 @@ const message = {
         cleanDataHelper: '删除该任务执行过程中产生的备份文件',
         noLogs: '暂无任务输出...',
         errPath: '备份路径 [{0}] 错误，无法下载！',
+        websiteStartStop: '网站启停',
+        startTime: '开启时间',
+        stopTime: '停止时间',
+        websiteTimeHint: '温馨提示：执行周期为每天一次',
+        websiteTimeInvalid: '请选择开启和停止时间，开启时间必须早于停止时间',
         cutWebsiteLog: '切割网站日志',
         cutWebsiteLogHelper: '切割的日志文件会备份到 1Panel 的 backup 目录下',
         syncIpGroup: '同步 WAF IP 组',
@@ -2855,6 +2863,13 @@ const message = {
         unitHours: '单位：小时',
         alertTitle: '计划任务-{0}「 {1} 」任务失败告警',
         library: {
+            executeScript: '执行脚本',
+            targetNodes: '选择执行节点',
+            switchNodeHelper: '切换节点不会中断执行；请直接在终端内输入，输入仅发送至当前节点。',
+            executorCloseHelper: '关闭将断开所有节点的终端连接，可能中断正在执行的脚本，是否继续？',
+            connecting: '连接中',
+            connected: '已连接',
+            disconnected: '已断开',
             script: '脚本',
             syncNow: '立即同步',
             autoSyncHelper: '开启自动同步后，每天凌晨更新系统脚本，自定义脚本不受影响；也可手动立即同步。',
@@ -2961,6 +2976,10 @@ const message = {
         selectTimeRange: '请选择导出时间范围',
     },
     terminal: {
+        passwordless: '免密',
+        bootstrapAuth: '首次认证（可选）',
+        passwordlessSetupHelper: '自动复用或生成 SSH 密钥，测试连接时完成免密配置。',
+
         showTerminalButton: '终端快捷入口',
         showTerminalButtonHelper: '开启后，将在页面右下角显示终端快捷按钮。',
         local: '本机',
@@ -7841,6 +7860,7 @@ const message = {
             addCluster: '添加集群',
             unhealthyDeleteError: '安装节点状态异常，请在节点列表检查后重试！',
             noAvailableMasterVersion: '当前节点没有可用的主库模板。',
+            appStoreOnly: '请在「应用高可用」中安装或升级此应用。',
             noMatchingReplicaVersion: '当前节点没有与主库同版本的从库模板。',
             installNode: '部署服务器',
             master: '主库',

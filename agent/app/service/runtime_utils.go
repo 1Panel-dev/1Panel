@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"maps"
 	"os"
 	"os/exec"
@@ -17,8 +16,6 @@ import (
 	"strings"
 	"time"
 
-	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
-
 	"github.com/1Panel-dev/1Panel/agent/i18n"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -26,11 +23,12 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/1Panel-dev/1Panel/agent/app/task"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/cmd/server/nginx_conf"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
-	"github.com/1Panel-dev/1Panel/agent/utils/compose"
+	cmd2 "github.com/1Panel-dev/1Panel/agent/utils/cmd"
 	"github.com/1Panel-dev/1Panel/agent/utils/docker"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/pkg/errors"
@@ -340,10 +338,10 @@ func buildRuntime(runtime *model.Runtime, oldImageID string, oldEnv string, rebu
 	_ = buildRuntimeWithResult(runtime, oldImageID, oldEnv, rebuild, nil)
 }
 
-func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool, taskLog func(string)) error {
+func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv string, rebuild bool, taskItem *task.Task) (resultErr error) {
 	runtimePath := runtime.GetPath()
 	composePath := runtime.GetComposePath()
-	logPath := path.Join(runtimePath, "build.log")
+	logPath := runtime.GetLogPath()
 
 	logFile, err := os.OpenFile(logPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC|os.O_APPEND, constant.FilePerm)
 	if err != nil {
@@ -357,7 +355,15 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		_ = logFile.Close()
 	}()
 	defer func() {
-		_ = runtimeRepo.Save(runtime)
+		if resultErr != nil {
+			runtime.Message = resultErr.Error()
+			if runtime.Status != constant.StatusStartErr {
+				runtime.Status = constant.StatusError
+			}
+		}
+		if saveErr := runtimeRepo.Save(runtime); resultErr == nil {
+			resultErr = saveErr
+		}
 	}()
 
 	newPHPVersion := getRuntimeEnv(runtime.Env, "PHP_VERSION")
@@ -366,44 +372,21 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		_ = os.Rename(path.Join(runtimePath, "extensions", getExtensionDir(oldPHPVersion)), path.Join(runtimePath, "extensions", getExtensionDir(newPHPVersion)))
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Hour)
-	defer cancel()
-
-	dockerCommand := global.CONF.DockerConfig.Command
-	var cmd *exec.Cmd
-	if dockerCommand == "docker-compose" {
-		cmd = exec.CommandContext(ctx, "docker-compose", "-f", composePath, "build")
-	} else {
-		cmd = exec.CommandContext(ctx, "docker", "compose", "-f", composePath, "build")
-	}
-	cmd.Stdout = logFile
-	var stderrBuf bytes.Buffer
-	multiWriterStderr := io.MultiWriter(&stderrBuf, logFile)
-	cmd.Stderr = multiWriterStderr
-
-	err = cmd.Run()
-	if err != nil {
-		runtime.Status = constant.StatusError
-		runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
-		if errors.Is(ctx.Err(), context.DeadlineExceeded) {
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + buserr.New("ErrCmdTimeout").Error()
-		} else {
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + stderrBuf.String()
-		}
+	progress := phpBuildProgress{task: taskItem, detail: logFile}
+	if err = progress.run("PHPBuildImage", time.Hour, getComposeCmd(composePath, "build").Args...); err != nil {
 		return err
 	}
-	if err = runComposeCmdWithLog(constant.RuntimeDown, runtime.GetComposePath(), runtime.GetLogPath()); err != nil {
-		runtime.Status = constant.StatusError
-		runtime.Message = err.Error()
+	down := getComposeCmd(composePath, constant.RuntimeDown).Args
+	up := getComposeCmd(composePath, constant.RuntimeUp).Args
+	if err = progress.run("PHPBuildStartContainer", 20*time.Minute, down...); err != nil {
 		return err
 	}
 	client, err := docker.NewClient()
 	if err != nil {
-		_, _ = logFile.WriteString(fmt.Sprintf("failed to connect to docker client: %v", err))
-		runtime.Status = constant.StatusError
-		runtime.Message = err.Error()
-		return err
+		fmt.Fprintln(logFile, err)
+		return fmt.Errorf("%s: %s", i18n.Get("PHPBuildStartContainer"), i18n.Get("PHPBuildSeeLog"))
 	}
+	defer client.Close()
 	runtime.Message = ""
 	if rebuild && runtime.ID > 0 {
 		extensionsStr := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
@@ -428,51 +411,49 @@ func buildRuntimeWithResult(runtime *model.Runtime, oldImageID string, oldEnv st
 		}
 	}
 
-	if out, err := compose.Up(composePath); err != nil {
+	if err = progress.run("PHPBuildStartContainer", 20*time.Minute, up...); err != nil {
 		runtime.Status = constant.StatusStartErr
-		runtime.Message = out
 		return err
 	}
 	deleteImageID := ""
 	var failedExtensions []string
-	buildLogger := log.New(io.MultiWriter(logFile), "", 0)
 	extensions := getRuntimeEnv(runtime.Env, "PHP_EXTENSIONS")
 	if extensions != "" {
 		deleteImageID, _ = client.GetImageIDByName(runtime.Image)
-		cmdMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(60*time.Minute), cmd2.WithLogger(buildLogger))
-		output, err := cmdMgr.RunWithStdout("docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions, "--allow-partial")
-		if err == nil {
-			failedExtensions, err = readPHPExtensionFailures(output, extensions)
-		}
+		output, err := progress.runWithStdout("PHPBuildInstallExtensions", time.Hour, "docker", "exec", "-i", runtime.ContainerName, "install-ext", extensions, "--allow-partial")
 		if err != nil {
-			runtime.Status = constant.StatusError
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
 			return err
 		}
+		failedExtensions, err = readPHPExtensionFailures(output, extensions)
+		if err != nil {
+			fmt.Fprintln(logFile, err)
+			return fmt.Errorf("%s: %w", i18n.Get("PHPBuildInstallExtensions"), err)
+		}
 		if len(failedExtensions) > 0 {
-			logPHPExtensionFailures(buildLogger, taskLog, runtime.ContainerName, failedExtensions)
-			checkMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(30*time.Second), cmd2.WithLogger(buildLogger))
-			if err := checkMgr.Run("docker", "exec", runtime.ContainerName, "php-fpm", "-t"); err != nil {
-				return markPHPStartFailed(runtime, buildLogger, err)
+			logPHPExtensionFailures(logFile, taskItem, runtime.ContainerName, failedExtensions)
+			if err := progress.run("PHPBuildInstallExtensions", 30*time.Second, "docker", "exec", runtime.ContainerName, "php-fpm", "-t"); err != nil {
+				runtime.Status = constant.StatusStartErr
+				return err
 			}
 		}
-		commitMgr := cmd2.NewCommandMgr(cmd2.WithTimeout(10*time.Minute), cmd2.WithLogger(buildLogger))
-		err = commitMgr.Run("docker", "commit", runtime.ContainerName, runtime.Image)
-		if err != nil {
-			runtime.Status = constant.StatusError
-			runtime.Message = buserr.New("ErrImageBuildErr").Error() + ":" + err.Error()
+		if err = progress.run("PHPBuildCommitImage", 10*time.Minute, "docker", "commit", runtime.ContainerName, runtime.Image); err != nil {
 			return err
 		}
 	}
 	handlePHPDir(*runtime)
-	if out, err := compose.DownAndUp(composePath); err != nil {
-		runtime.Status = constant.StatusStartErr
-		runtime.Message = out
-		return err
+	for _, args := range [][]string{down, up} {
+		if err = progress.run("PHPBuildApplyConfig", 20*time.Minute, args...); err != nil {
+			runtime.Status = constant.StatusStartErr
+			return err
+		}
 	}
 	if len(failedExtensions) > 0 {
-		if err := waitForPHPFPM(runtime.ContainerName); err != nil {
-			return markPHPStartFailed(runtime, buildLogger, err)
+		var taskCtx context.Context
+		if taskItem != nil {
+			taskCtx = taskItem.TaskCtx
+		}
+		if err := waitForPHPFPM(taskCtx, runtime.ContainerName); err != nil {
+			return markPHPStartFailed(runtime, logFile, err)
 		}
 	}
 	if oldImageID != "" {
@@ -511,7 +492,7 @@ func readPHPExtensionFailures(output, requested string) ([]string, error) {
 	return failures, nil
 }
 
-func logPHPExtensionFailures(buildLogger *log.Logger, taskLog func(string), container string, extensions []string) {
+func logPHPExtensionFailures(logWriter io.Writer, taskItem *task.Task, container string, extensions []string) {
 	message := i18n.GetWithName("PHPExtensionsInstallWarning", strings.Join(extensions, ", "))
 	message += "\n" + i18n.GetMsgByKey("PHPExtensionsInstallManually")
 	quote := func(value string) string {
@@ -520,9 +501,9 @@ func logPHPExtensionFailures(buildLogger *log.Logger, taskLog func(string), cont
 	for _, extension := range extensions {
 		message += "\ndocker exec -it " + quote(container) + " install-ext " + quote(extension)
 	}
-	buildLogger.Print(message)
-	if taskLog != nil {
-		taskLog(message)
+	_, _ = fmt.Fprintln(logWriter, message)
+	if taskItem != nil {
+		taskItem.Log(message)
 	}
 }
 
@@ -552,8 +533,11 @@ func updateRunningStatus(runtime *model.Runtime) {
 	runtime.Status = constant.StatusRunning
 }
 
-func waitForPHPFPM(container string) error {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+func waitForPHPFPM(parent context.Context, container string) error {
+	if parent == nil {
+		parent = context.Background()
+	}
+	ctx, cancel := context.WithTimeout(parent, 10*time.Second)
 	defer cancel()
 	ticker := time.NewTicker(500 * time.Millisecond)
 	defer ticker.Stop()
@@ -570,10 +554,10 @@ func waitForPHPFPM(container string) error {
 	}
 }
 
-func markPHPStartFailed(runtime *model.Runtime, buildLogger *log.Logger, err error) error {
+func markPHPStartFailed(runtime *model.Runtime, logWriter io.Writer, err error) error {
 	runtime.Status = constant.StatusStartErr
 	runtime.Message = err.Error()
-	buildLogger.Print(err)
+	_, _ = fmt.Fprintln(logWriter, err)
 	return err
 }
 

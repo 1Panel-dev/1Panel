@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose 복원 작업 공간 정리'
 # 런타임
 ErrFileNotExist: '{{ .detail }} 파일이 존재하지 않습니다 소스 파일의 무결성을 확인하세요'
 ErrImageBuildErr: '이미지 빌드 실패'
+PHPBuildImage: "PHP 이미지 빌드 중"
+PHPBuildBaseImage: "기본 이미지 {{ .name }} 확인 중"
+PHPBuildStep: "PHP 이미지 빌드 중 (단계 {{ .name }})"
+PHPBuildStartContainer: "PHP 컨테이너 시작 중"
+PHPBuildInstallExtensions: "PHP 확장 설치 중"
+PHPBuildCommitImage: "PHP 확장이 설치된 이미지 저장 중"
+PHPBuildApplyConfig: "설정 적용 및 PHP 실행 환경 시작 중"
+PHPBuildSeeLog: "자세한 내용은 build.log를 확인하세요"
 ErrImageExist: '이미지가 이미 존재합니다 이미지 이름을 수정하세요.'
 ErrDelWithWebsite: '운영 환경이 이미 웹사이트와 연결되어 있어 삭제할 수 없습니다'
 ErrRuntimeStart: '시작 실패'
@@ -832,3 +840,16 @@ ErrImageCheckProxyRequired: "현재 실행 환경에서 이미지 업데이트�
 ErrPHPExtensionsConflict: "같은 이름에 내용이 다른 PHP 확장 템플릿이 이미 있어 덮어쓰지 않았습니다"
 
 ErrModelTokenizerDirOverlap: "모델 디렉터리와 토크나이저 디렉터리는 서로 달라야 하며 서로 포함할 수 없습니다"
+ErrClusterAppOnly: "이 애플리케이션은 애플리케이션 고가용성에서 설치하거나 업그레이드하세요."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "유효하지 않은 웹사이트 선택: {{ .value }}"
+ErrCronjobWebsiteGroup: "웹사이트 그룹 {{ .id }}에 접근할 수 없습니다"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: 선택한 웹사이트가 모두 존재하지 않습니다"
+ErrCronjobWebsiteVersion: "지원하지 않는 웹사이트 선택 버전: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "전체 웹사이트와 개별 웹사이트 또는 그룹을 동시에 선택할 수 없습니다"
+ErrCronjobWebsiteGroupName: "웹사이트 그룹 이름은 비워 둘 수 없습니다"
+ErrCronjobWebsiteGroupMissing: "웹사이트 그룹 “{{ .group }}”이 존재하지 않으며 저장된 목록과 일치하는 웹사이트도 찾을 수 없습니다"
+CronjobWebsiteGroupFallback: "{{ .name }}: 웹사이트 그룹 “{{ .group }}”이 존재하지 않아 고정 웹사이트 목록으로 가져왔습니다. 이후 그룹 변경은 자동으로 반영되지 않습니다"
+CronjobWebsiteMissing: "{{ .name }}: 다음 웹사이트를 찾을 수 없습니다: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "선택한 웹사이트 그룹 또는 웹사이트와 일치하는 항목을 찾을 수 없습니다"

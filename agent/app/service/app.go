@@ -69,8 +69,7 @@ func NewIAppService() IAppService {
 }
 
 func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.AppRes, error) {
-	var opts []repo.DBOption
-	opts = append(opts, appRepo.OrderByRecommend())
+	opts := []repo.DBOption{appRepo.OrderByRecommend(), appRepo.WithKeyNotIn(constant.ClusterAppKeys())}
 	if req.Name != "" {
 		opts = append(opts, appRepo.WithByLikeName(strings.TrimSpace(req.Name)))
 	}
@@ -206,6 +205,7 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 		return nil, err
 	}
 	appDTO.App = app
+	appDTO.ClusterOnly = constant.IsClusterApp(app.Key)
 	appDTO.App.Description = app.GetDescription(ctx)
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
@@ -371,15 +371,15 @@ func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (a
 	return a.InstallWithHooks(req, executeScript, nil)
 }
 
-func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks) (appInstall *model.AppInstall, err error) {
-	if err = docker.CreateDefaultDockerNetwork(); err != nil {
-		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
-		return
-	}
-	if list, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(list) > 0 {
-		err = buserr.New("ErrAppNameExist")
-		return
-	}
+func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks) (*model.AppInstall, error) {
+	return a.installWithHooks(req, executeScript, hooks, false)
+}
+
+func (a AppService) InstallCluster(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error) {
+	return a.installWithHooks(req, executeScript, nil, true)
+}
+
+func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks, cluster bool) (appInstall *model.AppInstall, err error) {
 	var (
 		httpPort  int
 		httpsPort int
@@ -392,6 +392,17 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	}
 	app, err = appRepo.GetFirst(repo.WithByID(appDetail.AppId))
 	if err != nil {
+		return
+	}
+	if err = validateClusterAppInstall(app.Key, appDetail.Version, cluster); err != nil {
+		return
+	}
+	if err = docker.CreateDefaultDockerNetwork(); err != nil {
+		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
+		return
+	}
+	if list, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(list) > 0 {
+		err = buserr.New("ErrAppNameExist")
 		return
 	}
 	if err = checkVllmVersionAccess(app.Key, appDetail.Version); err != nil {

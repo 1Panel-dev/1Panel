@@ -310,3 +310,45 @@ html {
     white-space: normal;
     overflow-wrap: anywhere;
 }
+
+.sync-dropdown-menu.el-dropdown-menu {
+    width: 260px;
+    max-width: calc(100vw - 32px);
+
+    .el-dropdown-menu__item {
+        &:not(.is-disabled):hover,
+        &:not(.is-disabled):focus {
+            background-color: transparent;
+            color: var(--el-text-color-regular);
+        }
+
+        &:focus-visible {
+            outline: 2px solid var(--el-color-primary);
+            outline-offset: -2px;
+        }
+    }
+
+    .sync-option {
+        white-space: normal;
+        cursor: default;
+    }
+
+    .sync-option-label {
+        min-width: 0;
+        overflow-wrap: anywhere;
+    }
+
+    .el-icon,
+    .el-switch {
+        flex-shrink: 0;
+    }
+
+    .sync-help {
+        margin-left: 6px;
+        color: var(--el-text-color-secondary);
+    }
+
+    .el-switch {
+        margin-left: auto;
+    }
+}

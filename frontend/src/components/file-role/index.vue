@@ -39,7 +39,7 @@ interface RoleForm {
     mode: string;
 }
 interface Props {
-    mode: string;
+    mode?: string;
 }
 
 const roles = ref<string[]>(['0', '1', '2', '3', '4', '5', '6', '7']);

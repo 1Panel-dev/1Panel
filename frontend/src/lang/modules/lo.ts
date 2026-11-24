@@ -360,6 +360,7 @@ const message = {
             serviceNotStarted: 'ການບໍລິການ {0} ຍັງບໍ່ທັນເລີ່ມ.',
         },
         status: {
+            autoSync: 'ຊິງຄ໌ອັດຕະໂນມັດ',
             autoSyncEnabled: 'ເປີດການຊິງຄ໌ອັດຕະໂນມັດແລ້ວ',
             autoSyncDisabled: 'ຍັງບໍ່ໄດ້ເປີດການຊິງຄ໌ອັດຕະໂນມັດ',
             running: 'ກຳລັງເຮັດວຽກ',
@@ -2834,6 +2835,9 @@ const message = {
         exportHelper: 'ສົ່ງອອກ Image ທີ່ເລືອກເປັນໄຟລ໌ .tar ດຽວ.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'ການເລືອກ “ທັງໝົດ” ໃນກຸ່ມຈະຕິດຕາມການປ່ຽນແປງສະມາຊິກຂອງກຸ່ມ; ການເລືອກເວັບໄຊແຕ່ລະລາຍການຈະບັນທຶກເປັນລາຍຊື່ຄົງທີ່.',
+        websiteSelectionMissing: 'ລາຍການທີ່ເລືອກບໍ່ພ້ອມໃຊ້ງານ',
         importHelper:
             'ວຽກທີ່ກຳນົດເວລາທີ່ຊ້ຳກັນຈະຖືກລະເວັ້ນອັດຕະໂນມັດລະຫວ່າງການນຳເຂົ້າ. ວຽກຈະຖືກຕັ້ງເປັນສະຖານະ [ປິດໃຊ້ງານ] ເປັນຄ່າເລີ່ມຕົ້ນ.',
         changeStatus: 'ປ່ຽນສະຖານະ',
@@ -2943,6 +2947,11 @@ const message = {
         cleanDataHelper: 'ລຶບໄຟລ໌ສຳຮອງທີ່ສ້າງຂຶ້ນລະຫວ່າງວຽກນີ້.',
         noLogs: 'ຍັງບໍ່ມີ output ຂອງວຽກ...',
         errPath: 'ເສັ້ນທາງສຳຮອງ [{0}] ຜິດພາດ, ບໍ່ສາມາດດາວໂຫຼດໄດ້!',
+        websiteStartStop: 'ເປີດ/ປິດເວັບໄຊ',
+        startTime: 'ເວລາເປີດ',
+        stopTime: 'ເວລາປິດ',
+        websiteTimeHint: 'ຄຳແນະນຳ: ເຮັດວຽກມື້ລະໜຶ່ງຄັ້ງ',
+        websiteTimeInvalid: 'ກະລຸນາເລືອກເວລາເປີດ ແລະ ເວລາປິດ; ເວລາເປີດຕ້ອງກ່ອນເວລາປິດ',
         cutWebsiteLog: 'ການໝູນວຽນບັນທຶກເວັບໄຊ (Rotation)',
         cutWebsiteLogHelper: 'ໄຟລ໌ບັນທຶກທີ່ໝູນວຽນຈະຖືກສຳຮອງໄວ້ໃນໂຟນເດີສຳຮອງຂອງ 1Panel.',
         syncIpGroup: 'ຊິງໂຄໄນກຸ່ມ IP ຂອງ WAF',
@@ -2951,6 +2960,14 @@ const message = {
         unitHours: 'ຫົວໜ່ວຍ: ຊົ່ວໂມງ',
         alertTitle: 'ວຽກທີ່ກຳນົດເວລາ - {0} 「{1}」 ແຈ້ງເຕືອນວຽກລົ້ມເຫຼວ',
         library: {
+            executeScript: 'ດຳເນີນສະຄຣິບ',
+            targetNodes: 'ເລືອກໂນດເປົ້າໝາຍ',
+            switchNodeHelper:
+                'ການສະຫຼັບໂນດບໍ່ຢຸດການດຳເນີນການ. ພິມໃນເທີມິນອນໂດຍກົງ; ຂໍ້ມູນຈະຖືກສົ່ງໄປຫາໂນດທີ່ເລືອກເທົ່ານັ້ນ.',
+            executorCloseHelper: 'ການປິດຈະຕັດການເຊື່ອມຕໍ່ເທີມິນອນທຸກໂນດ ແລະອາດຢຸດສະຄຣິບທີ່ກຳລັງເຮັດວຽກ. ດຳເນີນຕໍ່ບໍ?',
+            connecting: 'ກຳລັງເຊື່ອມຕໍ່',
+            connected: 'ເຊື່ອມຕໍ່ແລ້ວ',
+            disconnected: 'ຕັດການເຊື່ອມຕໍ່ແລ້ວ',
             script: 'ສະຄຣິບ',
             syncNow: 'ຊິງໂຄໄນດຽວນີ້',
             autoSyncHelper:
@@ -3059,6 +3076,10 @@ const message = {
         selectTimeRange: 'ກະລຸນາເລືອກຊ່ວງເວລາທີ່ຈະສົ່ງອອກ',
     },
     terminal: {
+        passwordless: 'ບໍ່ໃຊ້ລະຫັດຜ່ານ',
+        bootstrapAuth: 'ການຢືນຢັນຄັ້ງທຳອິດ (ບໍ່ບັງຄັບ)',
+        passwordlessSetupHelper: 'ການທົດສອບການເຊື່ອມຕໍ່ຈະຕັ້ງຄ່າ ແລະຢືນຢັນການເຂົ້າລະບົບແບບບໍ່ໃຊ້ລະຫັດຜ່ານ.',
+
         showTerminalButton: 'ທາງລັດ Terminal',
         showTerminalButtonHelper: 'ເມື່ອເປີດໃຊ້ງານ ປຸ່ມທາງລັດ Terminal ຈະປາກົດຢູ່ມຸມຂວາລຸ່ມຂອງໜ້າ.',
         local: 'ພາຍໃນເຄື່ອງ (Local)',
@@ -8134,6 +8155,7 @@ const message = {
             addCluster: 'ເພີ່ມຄລັສເຕີ',
             unhealthyDeleteError: 'ສະຖານະໂນດທີ່ຕິດຕັ້ງຜິດປົກກະຕິ. ກະລຸນາກວດສອບລາຍຊື່ໂນດ!',
             noAvailableMasterVersion: 'ບໍ່ມີແມ່ແບບໂນດຫຼັກທີ່ໃຊ້ໄດ້ໃນໂນດນີ້.',
+            appStoreOnly: "ຕິດຕັ້ງ ແລະ ອັບເກຣດແອັບນີ້ໃນສ່ວນຄວາມພ້ອມໃຊ້ງານສູງຂອງແອັບ.",
             noMatchingReplicaVersion: 'ບໍ່ມີແມ່ແບບໂນດສຳຮອງທີ່ມີເວີຊັນດຽວກັບໂນດຫຼັກໃນໂນດນີ້.',
             installNode: 'ເຊີບເວີທີ່ນຳໃຊ້',
             master: 'ຖານຂໍ້ມູນຫຼັກ',

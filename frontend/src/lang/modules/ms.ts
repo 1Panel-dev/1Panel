@@ -372,6 +372,7 @@ const message = {
             serviceNotStarted: 'Perkhidmatan {0} belum dimulakan.',
         },
         status: {
+            autoSync: 'Penyegerakan automatik',
             autoSyncEnabled: 'Penyegerakan automatik diaktifkan',
             autoSyncDisabled: 'Penyegerakan automatik dinyahaktifkan',
             running: 'Sedang Berjalan',
@@ -2957,6 +2958,9 @@ const message = {
         goSetting: 'Pergi ke tetapan',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Pilihan “Semua” dalam kumpulan mengikuti perubahan ahli kumpulan; laman web yang dipilih secara individu disimpan sebagai senarai tetap.',
+        websiteSelectionMissing: 'Pilihan tidak tersedia',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
@@ -3065,6 +3069,11 @@ const message = {
         cleanDataHelper: 'Padam fail sandaran yang dijana semasa tugas ini.',
         noLogs: 'Tiada keluaran tugas lagi...',
         errPath: 'Laluan sandaran [{0}] salah, tidak boleh dimuat turun!',
+        websiteStartStop: 'Mula/hentikan laman web',
+        startTime: 'Masa mula',
+        stopTime: 'Masa henti',
+        websiteTimeHint: 'Peringatan: dijalankan sekali sehari',
+        websiteTimeInvalid: 'Pilih masa mula dan masa henti; masa mula mesti lebih awal daripada masa henti',
         cutWebsiteLog: 'Putaran log laman web',
         cutWebsiteLogHelper: 'Fail log yang diputar akan disandarkan ke direktori sandaran 1Panel.',
         syncIpGroup: 'Segerakkan kumpulan IP WAF',
@@ -3073,6 +3082,15 @@ const message = {
         unitHours: 'Unit: Jam',
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
         library: {
+            executeScript: 'Jalankan skrip',
+            targetNodes: 'Pilih nod sasaran',
+            switchNodeHelper:
+                'Menukar nod tidak menghentikan pelaksanaan. Taip terus dalam terminal; input hanya dihantar ke nod yang dipilih.',
+            executorCloseHelper:
+                'Menutup akan memutuskan semua terminal nod dan mungkin mengganggu skrip yang sedang berjalan. Teruskan?',
+            connecting: 'Sedang menyambung',
+            connected: 'Disambungkan',
+            disconnected: 'Terputus',
             script: 'Skrip',
             syncNow: 'Segerakan Sekarang',
             autoSyncHelper:
@@ -3194,6 +3212,10 @@ const message = {
         selectTimeRange: 'Pilih julat masa untuk dieksport',
     },
     terminal: {
+        passwordless: 'Tanpa kata laluan',
+        bootstrapAuth: 'Pengesahan awal (pilihan)',
+        passwordlessSetupHelper: 'Ujian sambungan mengkonfigurasi dan mengesahkan akses tanpa kata laluan.',
+
         showTerminalButton: 'Pintasan Terminal',
         showTerminalButtonHelper:
             'Apabila diaktifkan, butang pintasan terminal akan dipaparkan di sudut kanan bawah halaman.',
@@ -8545,6 +8567,7 @@ const message = {
             addCluster: 'Tambah Kluster',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
+            appStoreOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.",
             noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
             installNode: 'Pelayan penggunaan',
             master: 'Pangkalan data utama',
