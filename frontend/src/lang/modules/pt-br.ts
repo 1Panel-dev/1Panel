@@ -3212,6 +3212,10 @@ const message = {
         selectTimeRange: 'Selecione o período para exportar',
     },
     terminal: {
+        passwordless: 'Sem senha',
+        bootstrapAuth: 'Autenticação inicial (opcional)',
+        passwordlessSetupHelper: 'O teste de conexão configura e verifica o acesso sem senha.',
+
         showTerminalButton: 'Atalho para o terminal',
         showTerminalButtonHelper:
             'Ao ativar esta opção, um botão de atalho para o terminal será exibido no canto inferior direito da página.',

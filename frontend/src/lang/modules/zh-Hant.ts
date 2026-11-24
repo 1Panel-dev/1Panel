@@ -2940,6 +2940,10 @@ const message = {
         selectTimeRange: '請選擇匯出時間範圍',
     },
     terminal: {
+        passwordless: '免密',
+        bootstrapAuth: '首次驗證（選填）',
+        passwordlessSetupHelper: '自動重用或產生 SSH 金鑰，測試連線時完成免密設定。',
+
         showTerminalButton: '終端捷徑',
         showTerminalButtonHelper: '啟用後，頁面右下角會顯示終端捷徑按鈕。',
         local: '本機',

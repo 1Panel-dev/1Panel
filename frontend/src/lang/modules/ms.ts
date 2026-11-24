@@ -3197,6 +3197,10 @@ const message = {
         selectTimeRange: 'Pilih julat masa untuk dieksport',
     },
     terminal: {
+        passwordless: 'Tanpa kata laluan',
+        bootstrapAuth: 'Pengesahan awal (pilihan)',
+        passwordlessSetupHelper: 'Ujian sambungan mengkonfigurasi dan mengesahkan akses tanpa kata laluan.',
+
         showTerminalButton: 'Pintasan Terminal',
         showTerminalButtonHelper:
             'Apabila diaktifkan, butang pintasan terminal akan dipaparkan di sudut kanan bawah halaman.',

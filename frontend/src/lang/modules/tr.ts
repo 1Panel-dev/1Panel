@@ -3188,6 +3188,10 @@ const message = {
         selectTimeRange: 'Dışa aktarılacak zaman aralığını seçin',
     },
     terminal: {
+        passwordless: 'Parolasız',
+        bootstrapAuth: 'İlk kimlik doğrulama (isteğe bağlı)',
+        passwordlessSetupHelper: 'Bağlantı testi parolasız erişimi yapılandırır ve doğrular.',
+
         showTerminalButton: 'Terminal kısayolu',
         showTerminalButtonHelper:
             'Etkinleştirildiğinde, sayfanın sağ alt köşesinde terminal kısayol düğmesi görüntülenir.',

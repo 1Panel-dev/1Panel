@@ -59,6 +59,19 @@
                         show-overflow-tooltip
                         prop="description"
                     />
+                    <el-table-column :label="$t('terminal.authMode')" min-width="100">
+                        <template #default="{ row }">
+                            {{
+                                $t(
+                                    row.authMode === 'passwordless'
+                                        ? 'terminal.passwordless'
+                                        : row.authMode === 'key'
+                                          ? 'terminal.keyMode'
+                                          : 'terminal.passwordMode',
+                                )
+                            }}
+                        </template>
+                    </el-table-column>
                     <fu-table-operations width="200px" :buttons="buttons" :label="$t('commons.table.operate')" fix />
                 </ComplexTable>
             </template>

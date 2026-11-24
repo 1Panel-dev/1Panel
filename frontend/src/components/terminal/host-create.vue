@@ -1,6 +1,13 @@
 <template>
     <DrawerPro v-model="dialogVisible" :header="$t('terminal.addHost')" @close="handleClose" size="large">
-        <el-form ref="hostRef" label-width="100px" label-position="top" :model="form" :rules="rules">
+        <el-form
+            v-loading="loading"
+            ref="hostRef"
+            label-width="100px"
+            label-position="top"
+            :model="form"
+            :rules="rules"
+        >
             <el-alert
                 v-if="form.isLocal"
                 class="common-prompt"
@@ -19,8 +26,18 @@
                 <el-radio-group @change="isOK = false" v-model="form.authMode">
                     <el-radio value="password">{{ $t('terminal.passwordMode') }}</el-radio>
                     <el-radio value="key">{{ $t('terminal.keyMode') }}</el-radio>
+                    <el-radio v-if="!form.isLocal" value="passwordless">{{ $t('terminal.passwordless') }}</el-radio>
                 </el-radio-group>
+                <span v-if="form.authMode === 'passwordless' && !form.isLocal" class="input-help">
+                    {{ $t('terminal.passwordlessSetupHelper') }}
+                </span>
             </el-form-item>
+            <PasswordlessAuth
+                ref="passwordlessRef"
+                v-if="form.authMode === 'passwordless' && !form.isLocal"
+                :connection="form"
+                @change="isOK = false"
+            />
             <el-form-item :label="$t('commons.login.password')" v-if="form.authMode === 'password'" prop="password">
                 <el-input @change="isOK = false" clearable show-password type="password" v-model="form.password" />
             </el-form-item>
@@ -30,7 +47,7 @@
             <el-form-item :label="$t('terminal.keyPassword')" v-if="form.authMode === 'key'" prop="passPhrase">
                 <el-input @change="isOK = false" type="password" show-password clearable v-model="form.passPhrase" />
             </el-form-item>
-            <el-checkbox clearable v-model.number="form.rememberPassword">
+            <el-checkbox v-if="form.authMode !== 'passwordless'" clearable v-model.number="form.rememberPassword">
                 {{ $t('terminal.rememberPassword') }}
             </el-checkbox>
             <el-form-item class="mt-2.5" :label="$t('commons.table.port')" prop="port">
@@ -51,10 +68,10 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="dialogVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button @click="submitAddHost(hostRef, 'testConn')">
+                <el-button :loading="loading" @click="submitAddHost(hostRef, 'testConn')">
                     {{ $t('terminal.testConn') }}
                 </el-button>
-                <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostRef, 'saveAndConn')">
+                <el-button type="primary" :disabled="!isOK || loading" @click="submitAddHost(hostRef, 'saveAndConn')">
                     {{ $t('terminal.saveAndConn') }}
                 </el-button>
             </span>
@@ -63,6 +80,7 @@
 </template>
 
 <script setup lang="ts">
+import PasswordlessAuth from '@/components/terminal/passwordless-auth.vue';
 import { ElForm } from 'element-plus';
 import { Host } from '@/api/interface/host';
 import { Rules } from '@/global/form-rules';
@@ -78,8 +96,10 @@ const targetNode = ref('local');
 
 const dialogVisible = ref();
 const isOK = ref(false);
+const loading = ref(false);
 type FormInstance = InstanceType<typeof ElForm>;
 const hostRef = ref<FormInstance>();
+const passwordlessRef = ref<InstanceType<typeof PasswordlessAuth>>();
 
 const groupList = ref();
 const defaultGroup = ref();
@@ -175,15 +195,22 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
         if (!valid) return;
         switch (ops) {
             case 'testConn':
-                await testByInfo(form, targetNode.value).then((res) => {
-                    if (res.data) {
-                        isOK.value = true;
-                        MsgSuccess(i18n.global.t('terminal.connTestOk'));
-                    } else {
-                        isOK.value = false;
-                        MsgError(i18n.global.t('terminal.connTestFailed'));
-                    }
-                });
+                isOK.value = false;
+                loading.value = true;
+                await testByInfo({ ...form, ...passwordlessRef.value?.getTestParams() }, targetNode.value)
+                    .then((res) => {
+                        if (res.data) {
+                            passwordlessRef.value?.onTestSuccess();
+                            isOK.value = true;
+                            MsgSuccess(i18n.global.t('terminal.connTestOk'));
+                        } else {
+                            isOK.value = false;
+                            MsgError(i18n.global.t('terminal.connTestFailed'));
+                        }
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                    });
                 break;
             case 'saveAndConn':
                 let res;

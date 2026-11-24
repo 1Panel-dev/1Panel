@@ -3130,6 +3130,10 @@ const message = {
         selectTimeRange: 'بازه زمانی خروجی را انتخاب کنید',
     },
     terminal: {
+        passwordless: 'بدون گذرواژه',
+        bootstrapAuth: 'احراز هویت اولیه (اختیاری)',
+        passwordlessSetupHelper: 'آزمایش اتصال، دسترسی بدون گذرواژه را تنظیم و بررسی می‌کند.',
+
         showTerminalButton: 'میانبر ترمینال',
         showTerminalButtonHelper:
             'با فعال‌سازی این گزینه، دکمه میانبر ترمینال در گوشه پایین سمت راست صفحه نمایش داده می‌شود.',

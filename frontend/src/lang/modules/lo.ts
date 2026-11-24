@@ -3062,6 +3062,10 @@ const message = {
         selectTimeRange: 'ກະລຸນາເລືອກຊ່ວງເວລາທີ່ຈະສົ່ງອອກ',
     },
     terminal: {
+        passwordless: 'ບໍ່ໃຊ້ລະຫັດຜ່ານ',
+        bootstrapAuth: 'ການຢືນຢັນຄັ້ງທຳອິດ (ບໍ່ບັງຄັບ)',
+        passwordlessSetupHelper: 'ການທົດສອບການເຊື່ອມຕໍ່ຈະຕັ້ງຄ່າ ແລະຢືນຢັນການເຂົ້າລະບົບແບບບໍ່ໃຊ້ລະຫັດຜ່ານ.',
+
         showTerminalButton: 'ທາງລັດ Terminal',
         showTerminalButtonHelper: 'ເມື່ອເປີດໃຊ້ງານ ປຸ່ມທາງລັດ Terminal ຈະປາກົດຢູ່ມຸມຂວາລຸ່ມຂອງໜ້າ.',
         local: 'ພາຍໃນເຄື່ອງ (Local)',

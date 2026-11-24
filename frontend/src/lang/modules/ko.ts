@@ -3097,6 +3097,10 @@ const message = {
         selectTimeRange: '보낼 기간을 선택하세요',
     },
     terminal: {
+        passwordless: '비밀번호 없이 연결',
+        bootstrapAuth: '최초 인증 (선택 사항)',
+        passwordlessSetupHelper: '연결 테스트 시 비밀번호 없는 로그인을 설정하고 확인합니다.',
+
         showTerminalButton: '터미널 바로가기',
         showTerminalButtonHelper: '활성화하면 페이지 오른쪽 하단에 터미널 바로가기 버튼이 표시됩니다.',
         local: '로컬',

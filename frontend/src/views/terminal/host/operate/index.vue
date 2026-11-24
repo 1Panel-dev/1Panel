@@ -11,8 +11,18 @@
                 <el-radio-group @change="isOK = false" v-model="dialogData.rowData!.authMode">
                     <el-radio value="password">{{ $t('terminal.passwordMode') }}</el-radio>
                     <el-radio value="key">{{ $t('terminal.keyMode') }}</el-radio>
+                    <el-radio value="passwordless">{{ $t('terminal.passwordless') }}</el-radio>
                 </el-radio-group>
+                <span v-if="dialogData.rowData.authMode === 'passwordless'" class="input-help">
+                    {{ $t('terminal.passwordlessSetupHelper') }}
+                </span>
             </el-form-item>
+            <PasswordlessAuth
+                ref="passwordlessRef"
+                v-if="dialogData.rowData.authMode === 'passwordless'"
+                :connection="dialogData.rowData"
+                @change="isOK = false"
+            />
             <el-form-item
                 :label="$t('commons.login.password')"
                 v-if="dialogData.rowData!.authMode === 'password'"
@@ -42,7 +52,11 @@
                     v-model="dialogData.rowData!.passPhrase"
                 />
             </el-form-item>
-            <el-checkbox clearable v-model.number="dialogData.rowData!.rememberPassword">
+            <el-checkbox
+                v-if="dialogData.rowData.authMode !== 'passwordless'"
+                clearable
+                v-model.number="dialogData.rowData!.rememberPassword"
+            >
                 {{ $t('terminal.rememberPassword') }}
             </el-checkbox>
             <el-form-item style="margin-top: 10px" :label="$t('commons.table.port')" prop="port">
@@ -63,10 +77,14 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="drawerVisible = false">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button @click="submitAddHost(hostInfoRef, 'testconn')">
+                <el-button :loading="loading" @click="submitAddHost(hostInfoRef, 'testconn')">
                     {{ $t('terminal.testConn') }}
                 </el-button>
-                <el-button type="primary" :disabled="!isOK" @click="submitAddHost(hostInfoRef, dialogData.title)">
+                <el-button
+                    type="primary"
+                    :disabled="!isOK || loading"
+                    @click="submitAddHost(hostInfoRef, dialogData.title)"
+                >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -75,6 +93,7 @@
 </template>
 
 <script lang="ts" setup>
+import PasswordlessAuth from '@/components/terminal/passwordless-auth.vue';
 import { ref, reactive } from 'vue';
 import type { ElForm } from 'element-plus';
 import { Rules } from '@/global/form-rules';
@@ -98,6 +117,7 @@ const dialogData = ref<DialogProps>({
 
 const groupList = ref();
 const acceptParams = (params: DialogProps): void => {
+    isOK.value = false;
     dialogData.value = params;
     title.value = i18n.global.t('commons.button.' + dialogData.value.title);
     drawerVisible.value = true;
@@ -110,6 +130,7 @@ const handleClose = () => {
 
 type FormInstance = InstanceType<typeof ElForm>;
 const hostInfoRef = ref<FormInstance>();
+const passwordlessRef = ref<InstanceType<typeof PasswordlessAuth>>();
 const rules = reactive({
     groupID: [Rules.requiredSelect],
     addr: [Rules.ipV4V6OrDomain],
@@ -162,11 +183,13 @@ const submitAddHost = (formEl: FormInstance | undefined, ops: string) => {
                 });
         }
         if (ops === 'testconn') {
+            isOK.value = false;
             loading.value = true;
-            await testByInfo(dialogData.value.rowData)
+            await testByInfo({ ...dialogData.value.rowData, ...passwordlessRef.value?.getTestParams() })
                 .then((res) => {
                     loading.value = false;
                     if (res.data) {
+                        passwordlessRef.value?.onTestSuccess();
                         isOK.value = true;
                         MsgSuccess(i18n.global.t('terminal.connTestOk'));
                     } else {

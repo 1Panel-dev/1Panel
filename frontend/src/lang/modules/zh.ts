@@ -2963,6 +2963,10 @@ const message = {
         selectTimeRange: '请选择导出时间范围',
     },
     terminal: {
+        passwordless: '免密',
+        bootstrapAuth: '首次认证（可选）',
+        passwordlessSetupHelper: '自动复用或生成 SSH 密钥，测试连接时完成免密配置。',
+
         showTerminalButton: '终端快捷入口',
         showTerminalButtonHelper: '开启后，将在页面右下角显示终端快捷按钮。',
         local: '本机',
