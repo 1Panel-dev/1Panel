@@ -1519,7 +1519,7 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 			GetSitePath(*site, SitePathAuthBasicDir),
 			phpEnabled,
 			site.Proxy,
-			findServerPHPLocation(server),
+			server,
 		)
 		if err != nil {
 			return err

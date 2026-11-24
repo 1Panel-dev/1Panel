@@ -296,7 +296,11 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	location, _ := directives[0].(*components.Location)
 	location.UpdateDirective("auth_basic_user_file", []string{fmt.Sprintf("/www/sites/%s/path_auth/pass/%s", website.Alias, fmt.Sprintf("%s.pass", req.Name))})
 	applyPathAuthLocationMatch(location, req.Path)
-	serverPHPLoc := loadSiteServerPHPLocation(fileOp, website)
+	siteServer := loadSiteServer(fileOp, website)
+	if err = syncPathAuthSensitiveDeny(location, siteServer); err != nil {
+		return buserr.WithErr("ErrUpdateBuWebsite", err)
+	}
+	serverPHPLoc := findServerPHPLocation(siteServer)
 	if err = syncPathAuthLocationPHP(location, serverPHPLoc != nil, website.Proxy, serverPHPLoc); err != nil {
 		return buserr.WithErr("ErrUpdateBuWebsite", err)
 	}
@@ -320,7 +324,11 @@ func (w WebsiteService) UpdatePathAuthBasic(req request.NginxPathAuthUpdate) err
 	return nil
 }
 
-const phpLocationMatch = "~ [^/]\\.php(/|$)"
+const (
+	phpLocationMatch              = "~ [^/]\\.php(/|$)"
+	defaultSensitiveDenyMatch     = `^/(\.user.ini|\.htaccess|\.git|\.env|\.svn|\.project|LICENSE|README.md)`
+	defaultSensitiveDenyDirective = `~ ^/(\.user.ini|\.htaccess|\.git|\.env|\.svn|\.project|LICENSE|README.md)`
+)
 
 func hasRegexMeta(pathVal string) bool {
 	return strings.ContainsAny(pathVal, "*?()[]|$\\+{}")
@@ -364,7 +372,122 @@ func findServerPHPLocation(server *components.Server) components.IDirective {
 	return nil
 }
 
-func loadSiteServerPHPLocation(fileOp files.FileOp, website model.Website) components.IDirective {
+func isDirectDenyLocation(dir components.IDirective) bool {
+	if dir == nil || dir.GetName() != "location" || dir.GetBlock() == nil {
+		return false
+	}
+	params := dir.GetParameters()
+	if len(params) < 2 || (params[0] != "~" && params[0] != "~*") {
+		return false
+	}
+	if strings.Join(params, " ") == phpLocationMatch {
+		return false
+	}
+	blockDirs := dir.GetBlock().GetDirectives()
+	if len(blockDirs) == 0 {
+		return false
+	}
+	for _, child := range blockDirs {
+		name := child.GetName()
+		childParams := child.GetParameters()
+		switch name {
+		case "return":
+			if len(childParams) > 0 && (childParams[0] == "403" || childParams[0] == "404") {
+				return true
+			}
+		case "deny":
+			if len(childParams) > 0 && childParams[0] == "all" {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func findServerSensitiveDenyLocations(server *components.Server) []components.IDirective {
+	if server == nil {
+		return []components.IDirective{newDefaultSensitiveDenyLocation()}
+	}
+	var denyLocations []components.IDirective
+	for _, dir := range server.Directives {
+		if isDirectDenyLocation(dir) {
+			denyLocations = append(denyLocations, dir)
+		}
+	}
+	return denyLocations
+}
+
+func newDefaultSensitiveDenyLocation() components.IDirective {
+	return &components.Directive{
+		Name:       "location",
+		Parameters: []string{"~", defaultSensitiveDenyMatch},
+		Block: &components.Block{
+			Directives: []components.IDirective{
+				&components.Directive{
+					Name:       "return",
+					Parameters: []string{"404"},
+				},
+			},
+		},
+	}
+}
+
+func syncPathAuthSensitiveDeny(location *components.Location, server *components.Server) error {
+	if location == nil || location.Modifier != "^~" {
+		return nil
+	}
+	denyLocations := findServerSensitiveDenyLocations(server)
+	if len(denyLocations) == 0 {
+		return nil
+	}
+	denyKeys := make(map[string]struct{}, len(denyLocations)+1)
+	denyKeys[defaultSensitiveDenyDirective] = struct{}{}
+	seenClone := make(map[string]struct{}, len(denyLocations))
+	clonedDenies := make([]components.IDirective, 0, len(denyLocations))
+	for _, dir := range denyLocations {
+		key := strings.Join(dir.GetParameters(), " ")
+		if _, seen := seenClone[key]; seen {
+			continue
+		}
+		seenClone[key] = struct{}{}
+		denyKeys[key] = struct{}{}
+		cloned, err := cloneNginxDirective(dir)
+		if err != nil {
+			return err
+		}
+		clonedDenies = append(clonedDenies, cloned)
+	}
+
+	var (
+		beforePHP   []components.IDirective
+		phpAndAfter []components.IDirective
+		seenPHP     bool
+	)
+	for _, dir := range location.Directives {
+		if dir.GetName() == "location" {
+			key := strings.Join(dir.GetParameters(), " ")
+			if _, isDeny := denyKeys[key]; isDeny {
+				continue
+			}
+			if key == phpLocationMatch {
+				seenPHP = true
+			}
+		}
+		if seenPHP {
+			phpAndAfter = append(phpAndAfter, dir)
+		} else {
+			beforePHP = append(beforePHP, dir)
+		}
+	}
+	next := make([]components.IDirective, 0, len(beforePHP)+len(clonedDenies)+len(phpAndAfter))
+	next = append(next, beforePHP...)
+	next = append(next, clonedDenies...)
+	next = append(next, phpAndAfter...)
+	location.Directives = next
+	return nil
+}
+
+func loadSiteServer(fileOp files.FileOp, website model.Website) *components.Server {
 	configPath := GetSitePath(website, SiteConf)
 	content, err := fileOp.GetContent(configPath)
 	if err != nil {
@@ -378,7 +501,7 @@ func loadSiteServerPHPLocation(fileOp files.FileOp, website model.Website) compo
 	if len(servers) == 0 {
 		return nil
 	}
-	return findServerPHPLocation(servers[0])
+	return servers[0]
 }
 
 func cloneNginxDirective(dir components.IDirective) (components.IDirective, error) {
@@ -440,7 +563,7 @@ func collectSyncedPathAuthConfigs(
 	authDir string,
 	enablePHP bool,
 	proxy string,
-	serverPHPLoc components.IDirective,
+	server *components.Server,
 ) ([]*components.Config, map[string][]byte, error) {
 	if !fileOp.Stat(authDir) {
 		return nil, nil, nil
@@ -449,6 +572,7 @@ func collectSyncedPathAuthConfigs(
 	if err != nil {
 		return nil, nil, err
 	}
+	serverPHPLoc := findServerPHPLocation(server)
 	var syncedConfigs []*components.Config
 	oldContents := make(map[string][]byte)
 	for _, entry := range entries {
@@ -472,6 +596,9 @@ func collectSyncedPathAuthConfigs(
 			continue
 		}
 		upgradeLegacyPathAuthLocation(location)
+		if err = syncPathAuthSensitiveDeny(location, server); err != nil {
+			return nil, nil, err
+		}
 		if err = syncPathAuthLocationPHP(location, enablePHP, proxy, serverPHPLoc); err != nil {
 			return nil, nil, err
 		}

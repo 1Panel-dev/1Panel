@@ -82,6 +82,9 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 	serverConf := `server {
     listen 80;
     root /www/sites/demo/index;
+    location ~ ^/(\.user.ini|\.htaccess|\.git|\.env|\.svn|\.project|LICENSE|README.md) {
+        return 404;
+    }
     location ~ [^/]\.php(/|$) {
         fastcgi_pass 127.0.0.1:9001;
         include fastcgi-php.conf;
@@ -96,13 +99,12 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 		t.Fatal(err)
 	}
 	server := parsedServerCfg.FindServers()[0]
-	serverPHPLoc := findServerPHPLocation(server)
-	if serverPHPLoc == nil {
+	if findServerPHPLocation(server) == nil {
 		t.Fatal("expected server PHP location to be found")
 	}
 
-	// 1. Legacy ~* config + switch to PHP 8.3 (127.0.0.1:9001): upgrades to ^~ and nests PHP location.
-	configs, _, err := collectSyncedPathAuthConfigs(fileOp, authDir, true, "127.0.0.1:9001", serverPHPLoc)
+	// 1. Legacy ~* config + switch to PHP 8.3 (127.0.0.1:9001): upgrades to ^~, nests sensitive deny before PHP location.
+	configs, _, err := collectSyncedPathAuthConfigs(fileOp, authDir, true, "127.0.0.1:9001", server)
 	if err != nil {
 		t.Fatalf("collectSyncedPathAuthConfigs (enable PHP) failed: %v", err)
 	}
@@ -113,7 +115,12 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 	if !strings.Contains(dumped, "location ^~ /test/ {") {
 		t.Fatalf("expected upgraded ^~ location, got:\n%s", dumped)
 	}
-	if !strings.Contains(dumped, "location ~ [^/]\\.php(/|$) {") || !strings.Contains(dumped, "fastcgi_pass 127.0.0.1:9001;") {
+	denyIdx := strings.Index(dumped, defaultSensitiveDenyMatch)
+	phpIdx := strings.Index(dumped, "location ~ [^/]\\.php(/|$) {")
+	if denyIdx < 0 || phpIdx < 0 || denyIdx > phpIdx {
+		t.Fatalf("expected sensitive-file deny location before nested PHP location, got:\n%s", dumped)
+	}
+	if !strings.Contains(dumped, "fastcgi_pass 127.0.0.1:9001;") {
 		t.Fatalf("expected nested PHP location with fastcgi_pass 127.0.0.1:9001, got:\n%s", dumped)
 	}
 	if !strings.Contains(dumped, "fastcgi_read_timeout 120s;") {
@@ -123,14 +130,17 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 2. Round-trip parse and switch PHP 8.3 -> PHP 7.0 (127.0.0.1:9002): updates fastcgi_pass in place.
-	configs, _, err = collectSyncedPathAuthConfigs(fileOp, authDir, true, "127.0.0.1:9002", serverPHPLoc)
+	// 2. Round-trip parse and switch PHP 8.3 -> PHP 7.0 (127.0.0.1:9002): updates fastcgi_pass in place without duplicating deny or PHP blocks.
+	configs, _, err = collectSyncedPathAuthConfigs(fileOp, authDir, true, "127.0.0.1:9002", server)
 	if err != nil {
 		t.Fatalf("collectSyncedPathAuthConfigs (update PHP version) failed: %v", err)
 	}
 	dumped = nginx.DumpConfig(configs[0], nginx.IndentedStyle)
 	if strings.Count(dumped, "location ~ [^/]\\.php(/|$)") != 1 {
 		t.Fatalf("expected exactly 1 nested PHP location, got:\n%s", dumped)
+	}
+	if strings.Count(dumped, defaultSensitiveDenyMatch) != 1 {
+		t.Fatalf("expected exactly 1 sensitive-file deny location, got:\n%s", dumped)
 	}
 	if !strings.Contains(dumped, "fastcgi_pass 127.0.0.1:9002;") || strings.Contains(dumped, "127.0.0.1:9001") {
 		t.Fatalf("expected fastcgi_pass updated to 127.0.0.1:9002, got:\n%s", dumped)
@@ -139,8 +149,8 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// 3. Switch PHP -> Static: removes nested PHP location while preserving auth_basic.
-	configs, _, err = collectSyncedPathAuthConfigs(fileOp, authDir, false, "", nil)
+	// 3. Switch PHP -> Static: removes nested PHP location while preserving auth_basic and sensitive-file deny.
+	configs, _, err = collectSyncedPathAuthConfigs(fileOp, authDir, false, "", server)
 	if err != nil {
 		t.Fatalf("collectSyncedPathAuthConfigs (switch to static) failed: %v", err)
 	}
@@ -150,6 +160,35 @@ func TestCollectSyncedPathAuthConfigsAcrossPHPSwitches(t *testing.T) {
 	}
 	if !strings.Contains(dumped, "location ^~ /test/ {") || !strings.Contains(dumped, `auth_basic "Authorization";`) {
 		t.Fatalf("expected auth_basic preserved, got:\n%s", dumped)
+	}
+	if !strings.Contains(dumped, defaultSensitiveDenyMatch) || !strings.Contains(dumped, "return 404;") {
+		t.Fatalf("expected sensitive-file deny preserved on static site, got:\n%s", dumped)
+	}
+}
+
+func TestSyncPathAuthPreservesWebsiteDefaultSensitiveDenyOnRoot(t *testing.T) {
+	defaultServerCfg, err := parser.NewStringParser(string(nginx_conf.GetWebsiteFile("website_default.conf"))).Parse()
+	if err != nil {
+		t.Fatalf("parse WebsiteDefault: %v", err)
+	}
+	server := defaultServerCfg.FindServers()[0]
+
+	authCfg, err := parser.NewStringParser(string(nginx_conf.PathAuth)).Parse()
+	if err != nil {
+		t.Fatalf("parse PathAuth: %v", err)
+	}
+	loc := authCfg.Directives[0].(*components.Location)
+	applyPathAuthLocationMatch(loc, "/")
+	if err := syncPathAuthSensitiveDeny(loc, server); err != nil {
+		t.Fatalf("syncPathAuthSensitiveDeny: %v", err)
+	}
+
+	dumped := nginx.DumpConfig(authCfg, nginx.IndentedStyle)
+	if !strings.Contains(dumped, "location ^~ / {") {
+		t.Fatalf("expected priority root auth location, got:\n%s", dumped)
+	}
+	if !strings.Contains(dumped, defaultSensitiveDenyMatch) || !strings.Contains(dumped, "return 404;") {
+		t.Fatalf("expected WebsiteDefault sensitive-file deny nested in ^~ /, got:\n%s", dumped)
 	}
 }
 
