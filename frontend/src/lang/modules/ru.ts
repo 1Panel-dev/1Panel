@@ -363,6 +363,7 @@ const message = {
             serviceNotStarted: 'Сервис {0} не запущен.',
         },
         status: {
+            autoSync: 'Автосинхронизация',
             autoSyncEnabled: 'Автосинхронизация включена',
             autoSyncDisabled: 'Автосинхронизация выключена',
             running: 'Работает',
@@ -3074,6 +3075,15 @@ const message = {
         unitHours: 'Единица: часы',
         alertTitle: 'Плановая задача - {0} «{1}» Оповещение о сбое задачи',
         library: {
+            executeScript: 'Запуск скрипта',
+            targetNodes: 'Выберите целевые узлы',
+            switchNodeHelper:
+                'Переключение узлов не прерывает выполнение. Вводите данные в терминале; они отправляются только выбранному узлу.',
+            executorCloseHelper:
+                'Закрытие отключит терминалы всех узлов и может прервать работающие скрипты. Продолжить?',
+            connecting: 'Подключение',
+            connected: 'Подключено',
+            disconnected: 'Отключено',
             script: 'Скрипт',
             syncNow: 'Синхронизировать Сейчас',
             autoSyncHelper:

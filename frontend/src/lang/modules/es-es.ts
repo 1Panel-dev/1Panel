@@ -366,6 +366,7 @@ const message = {
             serviceNotStarted: 'El servicio {0} no está iniciado.',
         },
         status: {
+            autoSync: 'Sincronización automática',
             autoSyncEnabled: 'Sincronización automática activada',
             autoSyncDisabled: 'Sincronización automática desactivada',
             running: 'En ejecución',
@@ -3100,6 +3101,15 @@ const message = {
         unitHours: 'Unidad: Horas',
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',
         library: {
+            executeScript: 'Ejecutar script',
+            targetNodes: 'Seleccionar nodos de destino',
+            switchNodeHelper:
+                'Cambiar de nodo no interrumpe la ejecución. Escriba en el terminal; la entrada solo se envía al nodo seleccionado.',
+            executorCloseHelper:
+                'Al cerrar se desconectan todos los terminales y pueden interrumpirse los scripts en ejecución. ¿Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Ahora',
             autoSyncHelper:

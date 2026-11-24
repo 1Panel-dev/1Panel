@@ -361,6 +361,7 @@ const message = {
             serviceNotStarted: 'سرویس {0} راه‌اندازی نشده است.',
         },
         status: {
+            autoSync: 'همگام‌سازی خودکار',
             autoSyncEnabled: 'همگام‌سازی خودکار فعال است',
             autoSyncDisabled: 'همگام‌سازی خودکار غیرفعال است',
             running: 'در حال اجرا',
@@ -3019,6 +3020,15 @@ const message = {
         unitHours: 'واحد: ساعت',
         alertTitle: 'وظیفه زمان‌بندی - {0} «{1}» هشدار شکست وظیفه',
         library: {
+            executeScript: 'اجرای اسکریپت',
+            targetNodes: 'انتخاب گره‌های مقصد',
+            switchNodeHelper:
+                'تغییر گره اجرا را متوقف نمی‌کند. مستقیماً در ترمینال تایپ کنید؛ ورودی فقط به گره انتخاب‌شده ارسال می‌شود.',
+            executorCloseHelper:
+                'بستن، اتصال ترمینال همه گره‌ها را قطع می‌کند و ممکن است اجرای اسکریپت‌ها متوقف شود. ادامه می‌دهید؟',
+            connecting: 'در حال اتصال',
+            connected: 'متصل',
+            disconnected: 'قطع شده',
             script: 'اسکریپت',
             syncNow: 'همگام‌سازی اکنون',
             autoSyncHelper:

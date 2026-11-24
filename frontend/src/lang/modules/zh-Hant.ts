@@ -346,6 +346,7 @@ const message = {
             serviceNotStarted: '尚未啟動 {0} 服務',
         },
         status: {
+            autoSync: '自動同步',
             autoSyncEnabled: '自動同步已開啟',
             autoSyncDisabled: '自動同步未開啟',
             running: '已啟動',
@@ -2835,6 +2836,13 @@ const message = {
         unitHours: '單位：小時',
         alertTitle: '計劃任務-{0}「{1}」任務失敗告警',
         library: {
+            executeScript: '執行指令碼',
+            targetNodes: '選擇執行節點',
+            switchNodeHelper: '切換節點不會中斷執行；請直接在終端機內輸入，輸入僅傳送至目前節點。',
+            executorCloseHelper: '關閉將中斷所有節點的終端機連線，可能中斷正在執行的指令碼，是否繼續？',
+            connecting: '連線中',
+            connected: '已連線',
+            disconnected: '已中斷',
             script: '腳本',
             syncNow: '立即同步',
             autoSyncHelper: '開啟自動同步後，每天凌晨更新系統腳本，自訂腳本不受影響；也可手動立即同步。',

@@ -365,6 +365,7 @@ const message = {
             serviceNotStarted: '{0}サービスは開始されません。',
         },
         status: {
+            autoSync: '自動同期',
             autoSyncEnabled: '自動同期は有効です',
             autoSyncDisabled: '自動同期は無効です',
             running: 'ランニング',
@@ -3016,6 +3017,15 @@ const message = {
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
         library: {
+            executeScript: 'スクリプトを実行',
+            targetNodes: '実行ノードを選択',
+            switchNodeHelper:
+                'ノードを切り替えても実行は継続します。ターミナルに直接入力してください。入力は選択中のノードのみに送信されます。',
+            executorCloseHelper:
+                '閉じるとすべてのノードの接続が切れ、実行中のスクリプトが中断される場合があります。続行しますか？',
+            connecting: '接続中',
+            connected: '接続済み',
+            disconnected: '切断済み',
             script: 'スクリプト',
             syncNow: '今すぐ同期',
             autoSyncHelper:

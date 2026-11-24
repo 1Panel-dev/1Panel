@@ -366,6 +366,7 @@ const message = {
             serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
+            autoSync: 'Auto-sync',
             autoSyncEnabled: 'Auto-sync enabled',
             autoSyncDisabled: 'Auto-sync disabled',
             running: 'Running',
@@ -3043,6 +3044,14 @@ const message = {
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
         library: {
+            executeScript: 'Run script',
+            targetNodes: 'Select target nodes',
+            switchNodeHelper:
+                'Switching nodes keeps execution active. Type directly in the terminal; input goes only to the selected node.',
+            executorCloseHelper: 'Closing disconnects all node terminals and may interrupt running scripts. Continue?',
+            connecting: 'Connecting',
+            connected: 'Connected',
+            disconnected: 'Disconnected',
             script: 'Script',
             syncNow: 'Sync Now',
             autoSyncHelper:

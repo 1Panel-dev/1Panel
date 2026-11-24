@@ -372,6 +372,7 @@ const message = {
             serviceNotStarted: 'Perkhidmatan {0} belum dimulakan.',
         },
         status: {
+            autoSync: 'Penyegerakan automatik',
             autoSyncEnabled: 'Penyegerakan automatik diaktifkan',
             autoSyncDisabled: 'Penyegerakan automatik dinyahaktifkan',
             running: 'Sedang Berjalan',
@@ -3076,6 +3077,15 @@ const message = {
         unitHours: 'Unit: Jam',
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
         library: {
+            executeScript: 'Jalankan skrip',
+            targetNodes: 'Pilih nod sasaran',
+            switchNodeHelper:
+                'Menukar nod tidak menghentikan pelaksanaan. Taip terus dalam terminal; input hanya dihantar ke nod yang dipilih.',
+            executorCloseHelper:
+                'Menutup akan memutuskan semua terminal nod dan mungkin mengganggu skrip yang sedang berjalan. Teruskan?',
+            connecting: 'Sedang menyambung',
+            connected: 'Disambungkan',
+            disconnected: 'Terputus',
             script: 'Skrip',
             syncNow: 'Segerakan Sekarang',
             autoSyncHelper:
