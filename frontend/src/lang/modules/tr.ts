@@ -887,7 +887,6 @@ const message = {
                 'Kullanıcı adı: harf, rakam, nokta, alt çizgi veya tire. Parola: en az 12 karakter; başta/sonda boşluk veya satır sonu içeremez.',
             octopAuthHelper:
                 'Parola: harf ve rakam içeren en az 8 karakter; yaygın parolalardan kaçının. Reddedilirse kurulum yönergeleri için uygulama günlüklerini kontrol edin.',
-            initialCredentials: 'İlk giriş bilgileri; uygulamada değiştirildiyse güncel parolayı kullanın.',
             nativeAgentAccessUnavailable:
                 'Mevcut kurulumda uyumlu HTTPS erişim adresi veya bağlantı noktası yok. Uygulama ayarlarını kontrol edin.',
             agent: 'Ajan',

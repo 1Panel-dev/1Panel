@@ -892,7 +892,6 @@ const message = {
                 'Nama pengguna: huruf, nombor, titik, garis bawah atau sempang. Kata laluan: sekurang-kurangnya 12 aksara, tanpa ruang di awal/akhir atau baris baharu.',
             octopAuthHelper:
                 'Kata laluan: sekurang-kurangnya 8 aksara dengan huruf dan nombor; elakkan kata laluan lazim. Jika ditolak, semak arahan persediaan dalam log aplikasi.',
-            initialCredentials: 'Maklumat log masuk awal; gunakan kata laluan semasa jika telah diubah dalam aplikasi.',
             nativeAgentAccessUnavailable:
                 'Pemasangan sedia ada tiada alamat atau port HTTPS yang serasi. Semak tetapan aplikasi.',
             agent: 'Agen',
