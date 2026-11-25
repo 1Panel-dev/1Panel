@@ -470,6 +470,7 @@ const message = {
         firewall: 'Firewall',
         filter: 'Filter',
         ssl: 'Certificate | Certificates',
+        dnsRecord: 'Manage DNS',
         database: 'Database | Databases',
         aiTools: 'AI',
         mcp: 'MCP Management',

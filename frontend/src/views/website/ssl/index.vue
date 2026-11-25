@@ -18,9 +18,6 @@
                 <el-button v-permission type="primary" plain @click="openDnsAccount()">
                     {{ $t('website.dnsAccountManage') }}
                 </el-button>
-                <el-button v-permission type="primary" plain @click="openDnsRecord()">
-                    {{ $t('website.dnsRecordManage') }}
-                </el-button>
                 <el-button v-permission plain @click="deletessl(null)" :disabled="selects.length === 0">
                     {{ $t('commons.button.delete') }}
                 </el-button>
@@ -470,9 +467,6 @@ const openAcmeAccount = () => {
 };
 const openDnsAccount = () => {
     routerToNameWithQuery('SSL-DNS', { uncached: 'true' });
-};
-const openDnsRecord = () => {
-    routerToNameWithQuery('SSL-DNS-RECORD', { uncached: 'true' });
 };
 const openSSL = () => {
     sslCreateRef.value.acceptParams('create');

@@ -1,7 +1,7 @@
 <template>
     <div>
         <RouterButton :buttons="routerButton" />
-        <LayoutContent backName="SSL" :title="$t('website.dnsRecordManage')">
+        <LayoutContent :title="$t('website.dnsRecordManage')">
             <template #leftToolBar>
                 <el-select
                     v-model="accountId"
@@ -228,5 +228,5 @@ onMounted(() => {
     loadAccounts();
 });
 
-const routerButton = [{ label: i18n.global.t('website.dnsRecordManage'), path: '/websites/ssl/dns-record' }];
+const routerButton = [{ label: i18n.global.t('website.dnsRecordManage'), path: '/websites/dns-record' }];
 </script>
