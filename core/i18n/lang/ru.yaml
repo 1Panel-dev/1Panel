@@ -316,6 +316,8 @@ LocalNodeIpFailed: "Не удалось получить IP главного у�
 HandlePrivateKey: "Обработать закрытый ключ узла"
 HandlePublicKey: "Обработать открытый ключ узла"
 ExchangeFile: "Начать синхронизацию {{ .sourcePath }} с узла {{ .source }} на узел {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "Передача {{ .count }} элементов с {{ .source }} на {{ .targetCount }} узлов"
+FileSyncSummary: "Сводка передачи файлов"
 NodeFile: "Файл узла"
 ImageSyncTaskName: "Синхронизировать образы: {{ .count }}"
 SSLSyncTaskName: "Синхронизировать сертификаты: {{ .count }}"

@@ -316,6 +316,8 @@ LocalNodeIpFailed: "마스터 노드 IP를 가져오지 못했습니다. 마스�
 HandlePrivateKey: "노드 개인 키 처리"
 HandlePublicKey: "노드 공개 키 처리"
 ExchangeFile: "노드 {{ .source }}의 {{ .sourcePath }}에서 노드 {{ .dest }}:{{ .destPath }}(으)로 동기화 시작"
+FileSyncTaskName: "{{ .source }}에서 {{ .targetCount }}개 노드로 {{ .count }}개 항목 배포"
+FileSyncSummary: "파일 배포 결과 요약"
 NodeFile: "노드 파일"
 ImageSyncTaskName: "이미지 {{ .count }}개 동기화"
 SSLSyncTaskName: "인증서 {{ .count }}개 동기화"

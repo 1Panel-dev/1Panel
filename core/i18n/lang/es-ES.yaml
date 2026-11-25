@@ -316,6 +316,8 @@ LocalNodeIpFailed: "No se pudo obtener la IP del nodo principal. Edite el nodo p
 HandlePrivateKey: "Procesar la clave privada del nodo"
 HandlePublicKey: "Procesar la clave pública del nodo"
 ExchangeFile: "Iniciar la sincronización de {{ .sourcePath }} desde el nodo {{ .source }} al nodo {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "Distribuir {{ .count }} elementos de {{ .source }} a {{ .targetCount }} nodos"
+FileSyncSummary: "Resumen de distribución de archivos"
 NodeFile: "Archivo del nodo"
 ImageSyncTaskName: "Sincronizar {{ .count }} imágenes"
 SSLSyncTaskName: "Sincronizar {{ .count }} certificados"

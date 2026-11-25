@@ -5147,7 +5147,14 @@ const message = {
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '同期ディレクトリ',
+        syncDirHelp:
+            '対象ノードのディレクトリを絶対パスで入力してください。すべての対象ノードで同じディレクトリを使用します。',
+        syncDirSingleCert: 'ファイルの上書きを防ぐため、ディレクトリを指定する場合は証明書を1つだけ選択してください。',
+        syncDirAbsolute: '同期ディレクトリは絶対パスで指定してください。',
+
+        caUploadHelp:
+            'ca.crt と ca.key を含む、ダウンロードした ZIP ファイルをアップロードしてください（最大 10 MB）。',
         deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
         deleteAndRevoke: '削除して失効',
         create: 'リクエスト',
@@ -8099,6 +8106,31 @@ const message = {
             menu: 'リソース同期',
             file: 'ファイル転送',
             fileSyncConfirm: 'ノード {0} のファイル/フォルダ {1} をノード {2} のディレクトリ {3} に転送しますか？',
+            fileBatchDesc: '任意のノードからファイルまたはフォルダを選択し、複数の宛先ノードに配布します。',
+            fileSourceTitle: '転送元ファイルを選択',
+            fileSourceNode: '転送元ノード',
+            fileTargetDirectory: '宛先ディレクトリ',
+            fileBatchPath: '宛先ディレクトリを一括設定',
+            fileApplyPath: '選択したノードに適用',
+            fileSelectedCount: '{0} 件を選択中',
+            fileSelectedTargets: '{0} ノードを選択中',
+            fileSelectionHint: 'フォルダは元の名前で全体がコピーされ、内部のディレクトリ構造は保持されます。',
+            fileRules:
+                '既存のファイル転送ルールに従います。同名のファイルは更新される場合がありますが、宛先ディレクトリの他のファイルは保持されます。',
+            fileBatchSummary: '{0} 件の項目を {1} 個の宛先ノードに配布',
+            fileTaskHint: '確認後に配布タスクが作成されます。タスク管理で確認できます。',
+            fileBatchConfirm:
+                '下記の宛先ノードと保存先パスを確認してください。同名のファイルが上書きされる場合があります。',
+            fileTargetHint:
+                'ディレクトリはノードごとに設定できます。オフライン、確認失敗、または rsync 未インストールのノードは選択できません。',
+            fileChecking: '確認中',
+            fileCheckFailed: '確認失敗',
+            fileRsyncMissing: 'rsync 未インストール',
+            filePathRequired: '/ で始まる宛先ディレクトリの絶対パスを入力してください。',
+            fileConflictHint:
+                '同じ宛先名を持つ転送元があります。各名前につき1つだけ残してください。選択解除はすべての宛先ノードに適用されます。',
+            fileDeselect: '選択解除',
+            fileSourceChanged: '転送元ノードが変更されました。ファイルを選択し直してください。',
 
             image: 'イメージ転送',
             imageBatchDesc: 'まずソースノードとソースイメージを選択し、その後転送先ノードを選択してください。',

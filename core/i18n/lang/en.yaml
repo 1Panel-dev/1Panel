@@ -316,6 +316,8 @@ LocalNodeIpFailed: "Failed to get master node IP. Edit the master node and add I
 HandlePrivateKey: "Handle node private key"
 HandlePublicKey: "Handle node public key"
 ExchangeFile: "Start syncing {{ .sourcePath }} from node {{ .source }} to node {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "File distribution from {{ .source }}: {{ .count }} item(s) to {{ .targetCount }} node(s)"
+FileSyncSummary: "File distribution summary"
 NodeFile: "Node file"
 ImageSyncTaskName: "Image sync {{ .count }} images"
 SSLSyncTaskName: "Certificate sync {{ .count }} certificates"

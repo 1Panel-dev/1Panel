@@ -316,6 +316,8 @@ LocalNodeIpFailed: "Falha ao obter o IP do nó mestre. Edite o nó mestre e adic
 HandlePrivateKey: "Processar a chave privada do nó"
 HandlePublicKey: "Processar a chave pública do nó"
 ExchangeFile: "Iniciar a sincronização de {{ .sourcePath }} do nó {{ .source }} para o nó {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "Distribuir {{ .count }} itens de {{ .source }} para {{ .targetCount }} nós"
+FileSyncSummary: "Resumo da distribuição de arquivos"
 NodeFile: "Arquivo do nó"
 ImageSyncTaskName: "Sincronizar {{ .count }} imagens"
 SSLSyncTaskName: "Sincronizar {{ .count }} certificados"

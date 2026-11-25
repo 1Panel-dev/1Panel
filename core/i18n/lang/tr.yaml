@@ -316,6 +316,8 @@ LocalNodeIpFailed: "Ana düğüm IP adresi alınamadı. Ana düğümü düzenley
 HandlePrivateKey: "Düğüm özel anahtarını işle"
 HandlePublicKey: "Düğüm genel anahtarını işle"
 ExchangeFile: "{{ .source }} düğümündeki {{ .sourcePath }} yolundan {{ .dest }} düğümündeki {{ .destPath }} yoluna senkronizasyonu başlat"
+FileSyncTaskName: "{{ .source }} düğümünden {{ .targetCount }} düğüme {{ .count }} öğe dağıtımı"
+FileSyncSummary: "Dosya dağıtımı özeti"
 NodeFile: "Düğüm dosyası"
 ImageSyncTaskName: "{{ .count }} imajı senkronize et"
 SSLSyncTaskName: "{{ .count }} sertifikayı senkronize et"

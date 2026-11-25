@@ -5165,6 +5165,11 @@ const message = {
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
     },
     ssl: {
+        syncDir: 'Sync directory',
+        syncDirHelp: 'Absolute directory on target nodes; the same directory is used on every target.',
+        syncDirSingleCert: 'Select only one certificate when specifying a directory to avoid overwriting files.',
+        syncDirAbsolute: 'The sync directory must be an absolute path.',
+
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'The following certificates will be deleted. ACME certificates will be automatically revoked. Continue?',
@@ -8111,6 +8116,32 @@ const message = {
             menu: 'Resource Sync',
             file: 'File Exchange',
             fileSyncConfirm: 'Do you want to transfer file/folder {1} from node {0} to directory {3} on node {2}?',
+            fileBatchDesc: 'Select files or folders from any node and distribute them to multiple target nodes.',
+            fileSourceTitle: 'Select source files',
+            fileSourceNode: 'Source node',
+            fileTargetDirectory: 'Target directory',
+            fileBatchPath: 'Set target directories in bulk',
+            fileApplyPath: 'Apply to selected nodes',
+            fileSelectedCount: '{0} item(s) selected',
+            fileSelectedTargets: '{0} node(s) selected',
+            fileSelectionHint: 'Folders are copied with their original names and internal directory structure.',
+            fileRules:
+                'Existing file transfer rules apply: files with the same name may be updated; other files in the target directory are kept.',
+            fileBatchSummary: 'Distribute {0} item(s) to {1} target node(s)',
+            fileTaskHint:
+                'A distribution task will be created after confirmation and can be viewed in task management.',
+            fileBatchConfirm:
+                'Check the target nodes and destination paths below. Files with the same name may be overwritten.',
+            fileTargetHint:
+                'Set a directory for each node. Offline nodes, nodes that failed the check, and nodes without rsync cannot be selected.',
+            fileChecking: 'Checking',
+            fileCheckFailed: 'Check failed',
+            fileRsyncMissing: 'rsync is not installed',
+            filePathRequired: 'Enter an absolute target directory path starting with /.',
+            fileConflictHint:
+                'These sources share destination names. Deselect items until only one source remains per name. Deselection applies to all target nodes.',
+            fileDeselect: 'Deselect',
+            fileSourceChanged: 'The source node has changed. Select the files again.',
             image: 'Image Exchange',
             imageBatchDesc: 'Select a source node and image first, then batch-transfer to multiple target nodes.',
             imageBatchConfirmPrefix: 'About to transfer {0} images to {1} nodes, for a total of {2} tasks.',

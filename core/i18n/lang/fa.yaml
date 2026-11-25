@@ -316,6 +316,8 @@ LocalNodeIpFailed: "دریافت IP گره اصلی ناموفق بود. گره 
 HandlePrivateKey: "مدیریت کلید خصوصی گره"
 HandlePublicKey: "مدیریت کلید عمومی گره"
 ExchangeFile: "شروع همگام‌سازی {{ .sourcePath }} از گره {{ .source }} به گره {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "توزیع {{ .count }} مورد از {{ .source }} به {{ .targetCount }} گره"
+FileSyncSummary: "خلاصه توزیع فایل"
 NodeFile: "فایل گره"
 ImageSyncTaskName: "همگام‌سازی {{ .count }} تصویر"
 SSLSyncTaskName: "همگام‌سازی {{ .count }} گواهی"

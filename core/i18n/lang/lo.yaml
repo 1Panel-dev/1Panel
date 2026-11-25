@@ -316,6 +316,8 @@ LocalNodeIpFailed: "ຮັບ IP ຂອງໂນດຫຼັກບໍ່ສຳ�
 HandlePrivateKey: "ປະມວນຜົນກະແຈສ່ວນຕົວຂອງໂນດ"
 HandlePublicKey: "ປະມວນຜົນກະແຈສາທາລະນະຂອງໂນດ"
 ExchangeFile: "ເລີ່ມຊິງ {{ .sourcePath }} ຈາກໂນດ {{ .source }} ໄປຫາໂນດ {{ .dest }}:{{ .destPath }}"
+FileSyncTaskName: "ແຈກຢາຍ {{ .count }} ລາຍການຈາກ {{ .source }} ໄປຫາ {{ .targetCount }} ໂນດ"
+FileSyncSummary: "ສະຫຼຸບຜົນການແຈກຢາຍໄຟລ໌"
 NodeFile: "ໄຟລ໌ໂນດ"
 ImageSyncTaskName: "ຊິງອິມເມຈ {{ .count }} ລາຍການ"
 SSLSyncTaskName: "ຊິງໃບຮັບຮອງ {{ .count }} ລາຍການ"

@@ -316,6 +316,8 @@ LocalNodeIpFailed: "マスターノードの IP を取得できませんでし�
 HandlePrivateKey: "ノードの秘密鍵を処理"
 HandlePublicKey: "ノードの公開鍵を処理"
 ExchangeFile: "ノード {{ .source }} の {{ .sourcePath }} からノード {{ .dest }}:{{ .destPath }} への同期を開始"
+FileSyncTaskName: "{{ .source }} から {{ .targetCount }} ノードへ {{ .count }} 項目を配布"
+FileSyncSummary: "ファイル配布結果の概要"
 NodeFile: "ノードファイル"
 ImageSyncTaskName: "{{ .count }} 個のイメージを同期"
 SSLSyncTaskName: "{{ .count }} 件の証明書を同期"
