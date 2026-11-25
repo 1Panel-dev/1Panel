@@ -122,6 +122,9 @@ func (p *PersistentNetwork) ifupdownFiles(files []persistentFile, change Persist
 			netmask, metric := "", ""
 			for _, line := range stanza {
 				f := strings.Fields(line)
+				if fields[3] == "static" && len(f) >= 2 && f[0] == "broadcast" && f[1] != "+" && f[1] != "-" {
+					return true, errors.New("ifupdown configurations with explicit broadcast addresses are read-only")
+				}
 				if len(f) == 2 {
 					if f[0] == "netmask" {
 						netmask = f[1]

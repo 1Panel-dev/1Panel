@@ -117,7 +117,7 @@ func (p *PersistentNetwork) netplanFiles(files []persistentFile, macAddress stri
 			}
 			if match != nil && yamlValue(match, "macaddress") == "" {
 				name := yamlValue(match, "name")
-				if strings.ContainsAny(name, "*?[") {
+				if name == "" || strings.ContainsAny(name, "*?[") {
 					return true, errors.New("Netplan interface patterns matching multiple devices are read-only")
 				}
 			}
