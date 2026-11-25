@@ -8245,6 +8245,9 @@ const message = {
             fileCheckFailed: 'Semakan gagal',
             fileRsyncMissing: 'rsync tidak dipasang',
             filePathRequired: 'Masukkan laluan mutlak direktori sasaran yang bermula dengan /.',
+            fileConflictHint:
+                'Sumber ini berkongsi nama destinasi. Tinggalkan satu sumber bagi setiap nama. Nyahpilihan digunakan pada semua nod sasaran.',
+            fileDeselect: 'Nyahpilih',
             fileSourceChanged: 'Nod sumber telah ditukar. Sila pilih fail semula.',
 
             image: 'Pemindahan Imej',
@@ -8589,7 +8592,7 @@ const message = {
             addCluster: 'Tambah Kluster',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
-            appStoreOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.",
+            appStoreOnly: 'Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.',
             noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
             installNode: 'Pelayan penggunaan',
             master: 'Pangkalan data utama',

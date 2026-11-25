@@ -8300,6 +8300,9 @@ const message = {
             fileCheckFailed: 'Falha na verificação',
             fileRsyncMissing: 'rsync não instalado',
             filePathRequired: 'Insira um caminho absoluto para o diretório de destino que comece com /.',
+            fileConflictHint:
+                'Estas origens têm nomes de destino iguais. Mantenha apenas uma origem por nome. A desmarcação se aplica a todos os nós de destino.',
+            fileDeselect: 'Desmarcar',
             fileSourceChanged: 'O nó de origem foi alterado. Selecione os arquivos novamente.',
 
             image: 'Transferência de Imagens',
@@ -8651,7 +8654,7 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
-            appStoreOnly: "Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.",
+            appStoreOnly: 'Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.',
             noMatchingReplicaVersion:
                 'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',
             installNode: 'Servidor de implantação',

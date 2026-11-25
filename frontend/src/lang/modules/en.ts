@@ -8124,6 +8124,9 @@ const message = {
             fileCheckFailed: 'Check failed',
             fileRsyncMissing: 'rsync is not installed',
             filePathRequired: 'Enter an absolute target directory path starting with /.',
+            fileConflictHint:
+                'These sources share destination names. Deselect items until only one source remains per name. Deselection applies to all target nodes.',
+            fileDeselect: 'Deselect',
             fileSourceChanged: 'The source node has changed. Select the files again.',
             image: 'Image Exchange',
             imageBatchDesc: 'Select a source node and image first, then batch-transfer to multiple target nodes.',

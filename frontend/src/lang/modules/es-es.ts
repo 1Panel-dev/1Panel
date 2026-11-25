@@ -8271,6 +8271,9 @@ const message = {
             fileCheckFailed: 'Error de comprobación',
             fileRsyncMissing: 'rsync no está instalado',
             filePathRequired: 'Introduzca una ruta absoluta para el directorio de destino que comience por /.',
+            fileConflictHint:
+                'Estos orígenes comparten nombres de destino. Deje solo un origen por nombre. La selección se actualiza para todos los nodos de destino.',
+            fileDeselect: 'Deseleccionar',
             fileSourceChanged: 'El nodo de origen ha cambiado. Vuelva a seleccionar los archivos.',
 
             image: 'Transferencia de imágenes',

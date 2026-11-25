@@ -8111,6 +8111,9 @@ const message = {
             fileCheckFailed: '確認失敗',
             fileRsyncMissing: 'rsync 未インストール',
             filePathRequired: '/ で始まる宛先ディレクトリの絶対パスを入力してください。',
+            fileConflictHint:
+                '同じ宛先名を持つ転送元があります。各名前につき1つだけ残してください。選択解除はすべての宛先ノードに適用されます。',
+            fileDeselect: '選択解除',
             fileSourceChanged: '転送元ノードが変更されました。ファイルを選択し直してください。',
 
             image: 'イメージ転送',
@@ -8451,7 +8454,7 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
-            appStoreOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。",
+            appStoreOnly: 'このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。',
             noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
             installNode: '配置先サーバー',
             master: 'プライマリデータベース',

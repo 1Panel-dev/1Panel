@@ -7563,6 +7563,9 @@ const message = {
             fileCheckFailed: '检查失败',
             fileRsyncMissing: '未安装 rsync',
             filePathRequired: '请输入以 / 开头的目标目录绝对路径。',
+            fileConflictHint:
+                '以下来源具有相同的目标名称。请取消多余项，每个名称只保留一项后继续。取消选择将应用到所有目标节点。',
+            fileDeselect: '取消选择',
             fileSourceChanged: '来源节点已切换，请重新选择文件。',
 
             image: '镜像对传',

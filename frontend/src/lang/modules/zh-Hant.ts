@@ -7508,6 +7508,9 @@ const message = {
             fileCheckFailed: '檢查失敗',
             fileRsyncMissing: '未安裝 rsync',
             filePathRequired: '請輸入以 / 開頭的目標目錄絕對路徑。',
+            fileConflictHint:
+                '以下來源具有相同的目標名稱。請取消多餘項，每個名稱只保留一項後繼續。取消選取將套用至所有目標節點。',
+            fileDeselect: '取消選取',
             fileSourceChanged: '來源節點已切換，請重新選擇檔案。',
 
             image: '映像對傳',
@@ -7825,7 +7828,7 @@ const message = {
             addCluster: '新增叢集',
             unhealthyDeleteError: '安裝節點狀態異常，請在節點列表檢查後重試',
             noAvailableMasterVersion: '目前節點沒有可用的主庫範本。',
-            appStoreOnly: "請在「應用高可用」中安裝或升級此應用。",
+            appStoreOnly: '請在「應用高可用」中安裝或升級此應用。',
             noMatchingReplicaVersion: '目前節點沒有與主庫同版本的從庫範本。',
             installNode: '部署伺服器',
             master: '主庫',

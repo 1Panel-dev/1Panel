@@ -8082,6 +8082,9 @@ const message = {
             fileCheckFailed: 'بررسی ناموفق',
             fileRsyncMissing: 'rsync نصب نیست',
             filePathRequired: 'مسیر مطلق دایرکتوری مقصد را که با / شروع می‌شود وارد کنید.',
+            fileConflictHint:
+                'این منابع نام مقصد یکسان دارند. برای هر نام فقط یک منبع نگه دارید. لغو انتخاب برای همه گره‌های مقصد اعمال می‌شود.',
+            fileDeselect: 'لغو انتخاب',
             fileSourceChanged: 'گره مبدأ تغییر کرد. فایل‌ها را دوباره انتخاب کنید.',
             image: 'تبادل تصویر',
             imageBatchDesc:

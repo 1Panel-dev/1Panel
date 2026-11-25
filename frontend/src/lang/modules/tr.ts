@@ -8258,6 +8258,9 @@ const message = {
             fileCheckFailed: 'Denetim başarısız',
             fileRsyncMissing: 'rsync kurulu değil',
             filePathRequired: '/ ile başlayan bir mutlak hedef dizin yolu girin.',
+            fileConflictHint:
+                'Bu kaynakların hedef adları aynı. Her ad için yalnızca bir kaynak bırakın. Seçimin kaldırılması tüm hedef düğümlere uygulanır.',
+            fileDeselect: 'Seçimi kaldır',
             fileSourceChanged: 'Kaynak düğüm değiştirildi. Dosyaları yeniden seçin.',
 
             image: 'İmaj Aktarımı',
@@ -8598,7 +8601,7 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             noAvailableMasterVersion: 'Bu düğümde kullanılabilir bir birincil sunucu şablonu yok.',
-            appStoreOnly: "Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.",
+            appStoreOnly: 'Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.',
             noMatchingReplicaVersion: 'Bu düğümde birincil sunucuyla aynı sürümde bir replika şablonu yok.',
             installNode: 'Dağıtım sunucusu',
             master: 'Birincil veritabanı',

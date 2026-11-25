@@ -110,19 +110,21 @@ const getStatus = async () => {
 };
 
 const onConfirm = async () => {
+    if (loading.value || files.value.length === 0) {
+        return;
+    }
     const version = dialogVersion;
-    const deletedFiles = files.value.map((file) => ({ ...file }));
+    const requestedFiles = files.value.map((file) => ({ ...file }));
     const node = reqNode.value;
     const force = forceDelete.value;
     loading.value = true;
     try {
-        const pros = [];
         let baseDir = '';
-        if (deletedFiles.some((item) => item.isDir)) {
-            const pathRes = await loadBaseDir();
+        if (requestedFiles.some((item) => item.isDir)) {
+            const pathRes = await loadBaseDir(node);
             baseDir = pathRes.data;
         }
-        for (const s of deletedFiles) {
+        for (const s of requestedFiles) {
             if (s['isDir']) {
                 if (s['path'].indexOf('.1panel_clash') > -1) {
                     MsgWarning(i18n.global.t('file.clashDeleteAlert'));
@@ -133,18 +135,26 @@ const onConfirm = async () => {
                     return;
                 }
             }
-            if (node != '') {
-                pros.push(deleteFileByNode({ path: s['path'], isDir: s['isDir'], forceDelete: force }, node));
-            } else {
-                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: force }));
-            }
         }
-        await Promise.all(pros);
-        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        // Validate the entire snapshot before starting any destructive request.
+        const results = await Promise.allSettled(
+            requestedFiles.map((file) => {
+                const request = { path: file.path, isDir: file.isDir, forceDelete: force };
+                return node ? deleteFileByNode(request, node) : deleteFile(request);
+            }),
+        );
+        const deletedFiles = requestedFiles.filter((_, index) => results[index].status === 'fulfilled');
+        const failedFiles = requestedFiles.filter((_, index) => results[index].status === 'rejected');
         if (version === dialogVersion) {
-            open.value = false;
+            files.value = failedFiles;
+            open.value = failedFiles.length > 0;
         }
-        em('close', deletedFiles, node);
+        if (failedFiles.length === 0) {
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        }
+        if (deletedFiles.length > 0) {
+            em('close', deletedFiles, node);
+        }
     } finally {
         if (version === dialogVersion) {
             loading.value = false;
