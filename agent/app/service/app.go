@@ -61,6 +61,8 @@ type IAppService interface {
 type AppInstallHooks struct {
 	AfterCreate    func(appInstall *model.AppInstall) error
 	AfterCopyData  func(appInstall *model.AppInstall) error
+	AfterStart     func(*model.AppInstall, *task.Task) error
+	AfterFinish    func()
 	PrepareSiteDir func(model.App, model.AppDetail, request.AppInstallCreate, *task.Task) error
 }
 
@@ -644,6 +646,11 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		if err = upApp(t, appInstall, req.PullImage, req.UseLifecycleScripts); err != nil {
 			return err
 		}
+		if hooks != nil && hooks.AfterStart != nil {
+			if err := hooks.AfterStart(appInstall, t); err != nil {
+				return err
+			}
+		}
 		updateToolApp(appInstall)
 		return nil
 	}
@@ -661,6 +668,9 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, installTimeout)
 
 	go func() {
+		if hooks != nil && hooks.AfterFinish != nil {
+			defer hooks.AfterFinish()
+		}
 		if taskErr := installTask.Execute(); taskErr != nil {
 			appInstall.Status = constant.StatusInstallErr
 			appInstall.Message = taskErr.Error()
