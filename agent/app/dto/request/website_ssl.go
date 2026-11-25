@@ -131,6 +131,7 @@ type WebsiteSSLUpload struct {
 }
 
 type WebsiteSSLPush struct {
+	SyncDir  string `json:"syncDir"`
 	ID       uint   `json:"id" validate:"required"`
 	PushNode bool   `json:"pushNode"`
 	Nodes    string `json:"nodes"`

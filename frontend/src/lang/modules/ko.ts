@@ -5054,7 +5054,12 @@ const message = {
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '동기화 디렉터리',
+        syncDirHelp: '대상 노드의 절대 디렉터리 경로를 입력하세요. 모든 대상 노드에 동일한 디렉터리가 사용됩니다.',
+        syncDirSingleCert: '파일 덮어쓰기를 방지하려면 디렉터리를 지정할 때 인증서를 하나만 선택하세요.',
+        syncDirAbsolute: '동기화 디렉터리는 절대 경로여야 합니다.',
+
+        caUploadHelp: 'ca.crt와 ca.key가 포함된 다운로드한 ZIP 파일을 업로드하세요(최대 10 MB).',
         deleteConfirm: '다음 인증서를 삭제합니다. ACME 인증서는 자동으로 폐기됩니다. 계속하시겠습니까?',
         deleteAndRevoke: '삭제 및 폐기',
         create: '요청',

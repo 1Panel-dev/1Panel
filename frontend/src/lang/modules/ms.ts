@@ -5244,7 +5244,13 @@ const message = {
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Direktori penyegerakan',
+        syncDirHelp:
+            'Masukkan laluan mutlak direktori pada nod sasaran. Direktori yang sama digunakan pada semua nod sasaran.',
+        syncDirSingleCert: 'Pilih hanya satu sijil apabila menetapkan direktori untuk mengelakkan fail ditulis ganti.',
+        syncDirAbsolute: 'Direktori penyegerakan mestilah laluan mutlak.',
+
+        caUploadHelp: 'Muat naik fail ZIP yang dimuat turun yang mengandungi ca.crt dan ca.key (maksimum 10 MB).',
         deleteConfirm: 'Sijil berikut akan dipadamkan. Sijil ACME akan dibatalkan secara automatik. Teruskan?',
         deleteAndRevoke: 'Padam dan batalkan',
         create: 'Permintaan',

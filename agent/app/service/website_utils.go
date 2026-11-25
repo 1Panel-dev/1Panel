@@ -1584,6 +1584,54 @@ func certificateDirectories(value string) []string {
 	return dirs
 }
 
+func normalizeSSLSyncDir(dir string) (string, error) {
+	dir = strings.TrimSpace(dir)
+	if dir == "" {
+		return "", nil
+	}
+	if !filepath.IsAbs(dir) || strings.ContainsRune(dir, 0) {
+		return "", errors.New("certificate sync directory must be an absolute path")
+	}
+	return filepath.Clean(dir), nil
+}
+
+// Each file is replaced atomically; the certificate pair is not a filesystem transaction.
+func writeSSLSyncFiles(dir, pem, key string) error {
+	dir, err := normalizeSSLSyncDir(dir)
+	if err != nil || dir == "" {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return fmt.Errorf("create certificate sync directory %q: %w", dir, err)
+	}
+	for _, item := range []struct{ name, content string }{{"privkey.pem", key}, {"fullchain.pem", pem}} {
+		if err := replaceSSLSyncFile(dir, item.name, item.content); err != nil {
+			return fmt.Errorf("sync certificate file %q: %w", filepath.Join(dir, item.name), err)
+		}
+	}
+	return nil
+}
+
+func replaceSSLSyncFile(dir, name, content string) error {
+	file, err := os.CreateTemp(dir, ".1panel-ssl-*")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(file.Name())
+	if _, err := file.WriteString(content); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	return os.Rename(file.Name(), filepath.Join(dir, name))
+}
+
 func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
 	if !websiteSSL.PushDir {
 		return
