@@ -8643,6 +8643,20 @@ const message = {
             addCluster: 'Añadir clúster',
             unhealthyDeleteError: 'El nodo tiene estado anómalo, revisa la lista e inténtalo de nuevo',
             noAvailableMasterVersion: 'No hay una plantilla de instancia primaria disponible en este nodo.',
+            backups: 'Copias del clúster',
+            importBackup: 'Importar copia',
+            archivePassphrase: 'Contraseña de la copia',
+            restoreToNew: 'Restaurar en un clúster nuevo',
+            restoreTarget: 'Destino de la restauración',
+            restoreToOriginal: 'Restaurar en el clúster original',
+            restoreOriginalUnavailable: 'Esta copia no tiene un clúster original apto para la restauración.',
+            restoreOriginalWarning:
+                'Se interrumpirán las conexiones de la base de datos. El clúster original volverá al estado de la copia y las réplicas se sincronizarán de nuevo.',
+            restoreOriginalConfirm: 'Escriba el nombre del clúster {0} para confirmar la sobrescritura.',
+            restoreCredentials: 'Utilice las credenciales de administrador y réplica de la copia.',
+            archiveImportHint:
+                'Solo se admiten archivos de copia de seguridad de clústeres .1pha. Use la contraseña configurada al crear la copia.',
+            backupDataSize: 'Tamaño de los datos',
             appStoreOnly: 'Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones.',
             noMatchingReplicaVersion:
                 'En este nodo no hay una plantilla de réplica con la misma versión que la instancia primaria.',

@@ -8470,6 +8470,20 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
+            backups: 'クラスターバックアップ',
+            importBackup: 'バックアップのインポート',
+            archivePassphrase: 'バックアップのパスフレーズ',
+            restoreToNew: '新しいクラスターに復元',
+            restoreTarget: '復元先',
+            restoreToOriginal: '元のクラスターに復元',
+            restoreOriginalUnavailable: 'このバックアップに対応する復元可能なクラスターがありません。',
+            restoreOriginalWarning:
+                'データベース接続が中断されます。元のクラスターのデータはバックアップ時点に戻り、レプリカは再同期されます。',
+            restoreOriginalConfirm: '上書きを確定するにはクラスター名「{0}」を入力してください。',
+            restoreCredentials: 'バックアップ時の管理者およびレプリケーションの認証情報を使用してください。',
+            archiveImportHint:
+                '.1pha 形式のクラスターバックアップのみインポートできます。バックアップ作成時に設定したパスフレーズを使用してください。',
+            backupDataSize: 'データサイズ',
             appStoreOnly: 'このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。',
             noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
             installNode: '配置先サーバー',

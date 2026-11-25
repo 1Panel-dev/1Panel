@@ -8670,6 +8670,20 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
+            backups: 'Backups do cluster',
+            importBackup: 'Importar backup',
+            archivePassphrase: 'Senha do backup',
+            restoreToNew: 'Restaurar em um novo cluster',
+            restoreTarget: 'Destino da restauração',
+            restoreToOriginal: 'Restaurar no cluster original',
+            restoreOriginalUnavailable: 'Este backup não tem um cluster original disponível para restauração.',
+            restoreOriginalWarning:
+                'As conexões com o banco serão interrompidas. O cluster original voltará ao estado do backup e as réplicas serão sincronizadas novamente.',
+            restoreOriginalConfirm: 'Digite o nome do cluster {0} para confirmar a sobrescrita.',
+            restoreCredentials: 'Use as credenciais de administrador e replicação do backup.',
+            archiveImportHint:
+                'Somente arquivos de backup de cluster .1pha são aceitos. Use a senha definida ao criar o backup.',
+            backupDataSize: 'Tamanho dos dados',
             appStoreOnly: 'Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.',
             noMatchingReplicaVersion:
                 'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',

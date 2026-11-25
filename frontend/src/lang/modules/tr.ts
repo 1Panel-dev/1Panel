@@ -8616,6 +8616,20 @@ const message = {
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
             noAvailableMasterVersion: 'Bu düğümde kullanılabilir bir birincil sunucu şablonu yok.',
+            backups: 'Küme yedekleri',
+            importBackup: 'Yedeği içe aktar',
+            archivePassphrase: 'Yedek parolası',
+            restoreToNew: 'Yeni kümeye geri yükle',
+            restoreTarget: 'Geri yükleme hedefi',
+            restoreToOriginal: 'Özgün kümeye geri yükle',
+            restoreOriginalUnavailable: 'Bu yedek için geri yüklenebilecek bir özgün küme yok.',
+            restoreOriginalWarning:
+                'Veritabanı bağlantıları kesilir. Özgün küme yedekteki duruma döner ve replikalar yeniden eşitlenir.',
+            restoreOriginalConfirm: 'Üzerine yazmayı onaylamak için {0} küme adını girin.',
+            restoreCredentials: 'Yedekteki yönetici ve replikasyon kimlik bilgilerini kullanın.',
+            archiveImportHint:
+                'Yalnızca .1pha biçimindeki küme yedekleri desteklenir. Yedek oluşturulurken belirlenen parolayı kullanın.',
+            backupDataSize: 'Veri Boyutu',
             appStoreOnly: 'Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.',
             noMatchingReplicaVersion: 'Bu düğümde birincil sunucuyla aynı sürümde bir replika şablonu yok.',
             installNode: 'Dağıtım sunucusu',
