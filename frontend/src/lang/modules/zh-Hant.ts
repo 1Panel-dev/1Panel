@@ -836,7 +836,6 @@ const message = {
             deepSeekAuthHelper: '使用者名稱僅支援字母、數字、點、底線及連字號；密碼至少 12 位，不含前後空格或換行。',
             octopAuthHelper:
                 '密碼至少 8 位且包含字母及數字，避免常見弱密碼。若初始化拒絕該密碼，請查看應用程式日誌中的設定說明。',
-            initialCredentials: '初始登入資訊；若已在應用程式內修改，以目前密碼為準。',
             nativeAgentAccessUnavailable: '現有安裝缺少相容的 HTTPS 存取位址或連接埠，請檢查應用程式設定。',
             agent: 'Agent',
             account: '模型服務',

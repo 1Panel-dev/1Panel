@@ -853,7 +853,6 @@ const message = {
             deepSeekAuthHelper: '用户名仅支持字母、数字、点、下划线和连字符；密码至少 12 位，不含首尾空格或换行。',
             octopAuthHelper:
                 '密码至少 8 位且包含字母和数字，避免常见弱密码。若初始化拒绝该密码，请查看应用日志中的设置说明。',
-            initialCredentials: '初始登录信息；若已在应用内修改，以当前密码为准。',
             nativeAgentAccessUnavailable: '现有安装缺少兼容的 HTTPS 访问地址或端口，请检查应用设置。',
             agent: '智能体',
             account: '模型服务',

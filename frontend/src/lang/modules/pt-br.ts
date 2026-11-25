@@ -885,7 +885,6 @@ const message = {
                 'Usuário: letras, números, ponto, sublinhado ou hífen. Senha: no mínimo 12 caracteres, sem espaços nas extremidades ou quebras de linha.',
             octopAuthHelper:
                 'Senha: no mínimo 8 caracteres com letras e números; evite senhas comuns. Se rejeitada na inicialização, consulte as instruções nos logs do aplicativo.',
-            initialCredentials: 'Credenciais iniciais; se alteradas no aplicativo, use a senha atual.',
             nativeAgentAccessUnavailable:
                 'A instalação existente não tem endereço ou porta HTTPS compatível. Verifique as configurações do aplicativo.',
             agent: 'Agente',

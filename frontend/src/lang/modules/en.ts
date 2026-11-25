@@ -883,7 +883,6 @@ const message = {
                 'Username: letters, numbers, dot, underscore or hyphen. Password: at least 12 characters, without leading/trailing spaces or line breaks.',
             octopAuthHelper:
                 'Password: at least 8 characters with letters and digits; avoid common passwords. If rejected during initialization, check the application logs for setup instructions.',
-            initialCredentials: "Initial credentials; use the application's current password if changed.",
             nativeAgentAccessUnavailable:
                 'The existing installation has no compatible HTTPS access address or port. Check its application settings.',
             agent: 'Agent',

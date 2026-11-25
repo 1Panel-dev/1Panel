@@ -886,7 +886,6 @@ const message = {
                 'Usuario: letras, números, punto, guion bajo o guion. Contraseña: al menos 12 caracteres, sin espacios al inicio o al final ni saltos de línea.',
             octopAuthHelper:
                 'Contraseña: al menos 8 caracteres con letras y números; evite contraseñas comunes. Si se rechaza al iniciar, consulte las instrucciones en los registros de la aplicación.',
-            initialCredentials: 'Credenciales iniciales; si las cambió en la aplicación, use la contraseña actual.',
             nativeAgentAccessUnavailable:
                 'La instalación existente no tiene una dirección o puerto HTTPS compatible. Revise la configuración de la aplicación.',
             agent: 'Agente',
