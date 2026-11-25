@@ -5778,6 +5778,83 @@ const message = {
         serial: 'Seri Numarası',
         noFail: 'Bağlama hatası sistem başlangıcını etkilemez',
     },
+    networkManage: {
+        routeDetails: 'Rota ayrıntıları',
+        manageIP: 'İlgili IP’yi yönet',
+        connectedRoute: 'IP üzerinden oluşturuldu',
+        connectedRouteHint:
+            'Sistem bu doğrudan bağlı rotayı arayüz IP adresinden otomatik oluşturur. Rota ayrı olarak düzenlenmez. Arayüz ayrıntılarında ilgili IP adresini düzenleyin veya silin.',
+        virtualBridgeReadOnly: 'Sanal arayüz · Salt okunur',
+        virtualBridgeReadOnlyHint: 'Bu sanal arayüz salt okunurdur ve erişilebilirlik denetimlerine dahil edilmez.',
+        loopbackReadOnly: 'Geri döngü arayüzü yapılandırması salt okunurdur.',
+        persistentSourceMissing:
+            '{0} arayüzü için desteklenen kalıcı sistem yapılandırması bulunamadı. Salt okunurdur.',
+        addressReadOnlyReason:
+            'Bu adres dinamiktir, genel kapsamlı değildir veya desteklenen kalıcı yapılandırması yoktur. Salt okunurdur.',
+        routeReadOnlyReason:
+            'Bu rota dinamiktir, çekirdek tarafından oluşturulmuştur veya desteklenen kalıcı yapılandırması yoktur. Salt okunurdur.',
+        persistenceBackend: 'Kalıcı yapılandırma',
+        editIP: 'IP düzenle',
+        editRoute: 'Rotayı düzenle',
+        operationRisk: 'Ağ değişiklikleri bağlantıları kesebilir. Sunucuya erişmek için alternatif bir yol hazırlayın.',
+        confirmInterface: 'Onaylamak için {0} arayüz adını girin.',
+        sourceAddress: 'Kaynak adresi',
+        linkConnected: 'Bağlantı kuruldu',
+        linkDisconnected: 'Bağlantı kesildi',
+        topologySearch: 'Arayüz, IP, ağ geçidi veya hedef ara',
+        topologyHint:
+            'Solda arayüz IP’lerini yönetin. Rota kartları hedef, ağ geçidi ve metriği gösterir. Ayrıntılar için karta tıklayın; çizgiler bağlantının doğrulandığını göstermez.',
+        direct: 'Doğrudan',
+        defaultDestination: 'Varsayılan rota',
+        unknownInterface: 'Belirtilmemiş arayüz',
+        noRoutes: 'Eşleşen rota yok',
+        readOnly: 'Salt okunur',
+        readOnlyRouteHint:
+            'Birden fazla sonraki atlaması olan veya tek bir arabirimi bulunmayan rotalar salt okunurdur.',
+        title: 'Ağ yönetimi',
+        interfaces: 'Ağ arayüzleri',
+        routes: 'Rotalar',
+        addIP: 'IP ekle',
+        ipCount: 'IP sayısı',
+        interfaceID: 'Arayüz kimliği',
+        adminState: 'Yönetim durumu',
+        linkState: 'Bağlantı durumu',
+        mac: 'MAC adresi',
+        flags: 'Bayraklar',
+        address: 'Adres',
+        scope: 'Kapsam',
+        interface: 'Arayüz',
+        configStatus: 'Yapılandırma durumu',
+        managedApplied: 'Kayıtlı · Etkin',
+        managedPending: 'Kayıtlı · Etkin değil',
+        addressWarning:
+            'Bu arayüze atanmış IP adresini kullanın. Genel IP adresi NAT ile eşleniyorsa özel IP adresini girin.',
+        addressRisk:
+            'Kullanımda olan bir IP adresi veya yanlış bir önek uzunluğu panele ya da SSH üzerinden sunucuya erişimi kesintiye uğratabilir.',
+        addressWithPrefix: 'IP adresi / önek uzunluğu',
+        interfaceSelectHint:
+            'Yalnızca kalıcı yapılandırması düzenlenebilen arayüzler listelenir. Geri döngü arayüzleri, salt okunur sanal köprüler ve değiştirilemeyen diğer arayüzler listelenmez.',
+        gatewayHint: 'Doğrudan bağlı alt ağlar için ağ geçidini boş bırakabilirsiniz.',
+        metricHint: 'Aynı hedef alt ağ için genellikle daha düşük metrikli rotalar önceliklidir.',
+        defaultRouteWarning:
+            'Varsayılan rota panelin, SSH bağlantılarının ve diğer hizmetlerin çıkış yolunu değiştirebilir. Bulut konsolu gibi alternatif bir erişim yolu hazırlayın.',
+        interfaceMissing: 'Arayüz bulunamadı',
+        changeWarning:
+            'Ağ ayarlarını değiştirmek panel bağlantısını kesebilir veya hizmetleri durdurabilir. Devam etmeden önce bu sunucuya başka bir yolla erişebildiğinizden emin olun.',
+        cidrHint:
+            '192.0.2.10/24 gösterimindeki /24, 255.255.255.0 alt ağ maskesine karşılık gelir. IPv6 örneği: 2001:db8::10/64.',
+        addRoute: 'Rota ekle',
+        checkRoutes: 'Rota erişilebilirliğini denetle',
+        destination: 'Hedef',
+        metric: 'Metrik',
+        routeTable: 'Tablo',
+        reachability: 'Erişilebilirlik',
+        reachable: 'Erişilebilir',
+        unreachable: 'Erişilemiyor',
+        unchecked: 'Denetlenmedi',
+        check: 'Denetle',
+        destinationHint: 'IPv4/IPv6 adresi veya CIDR ağı desteklenir. Varsayılan rota: default, 0.0.0.0/0 veya ::/0.',
+    },
     xpack: {
         ldap: {
             source: 'Kaynak',

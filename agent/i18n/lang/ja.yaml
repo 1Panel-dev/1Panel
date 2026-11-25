@@ -687,6 +687,17 @@ FormatDiskErr: 'ディスクのフォーマットに失敗しました、{{ .err
 MountDiskErr: 'ディスクのマウントに失敗しました、{{ .err }}'
 XfsNotFound: 'xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください'
 
+# ネットワーク管理
+ErrNetworkPersistencePlatform: "ネットワーク設定の永続化は Linux ノードでのみサポートされます。"
+ErrNetworkPersistencePrivilege: "ネットワーク設定を永続化するには、1Panel Agent をネットワーク管理権限のある root として実行してください。"
+ErrNetworkIPRoute2: "iproute2 をインストールまたは更新し、ip コマンドを利用できることを確認してください。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "このプライマリ IP アドレスには、同じサブネット内にセカンダリアドレスがあります。先にセカンダリアドレスを削除するか、システムのネットワークツールで調整してから再試行してください。"
+ErrNetworkRouteReadOnly: "このルートは読み取り専用です。"
+ErrNetworkPersistenceConflict: "このアドレスまたは経路は既に存在するか、保存済みの設定と競合しています。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "ループバックインターフェースの設定は読み取り専用です。"
+ErrNetworkPersistentSourceMissing: "インターフェース {{ .name }} に対応するシステムの永続設定が見つかりません。読み取り専用です。"
+ErrNetworkVirtualBridgeReadOnly: "この仮想インターフェースは読み取り専用で、到達性チェックの対象外です。"
+
 # ターミナル
 TerminalAIBlockedRiskyCommand: '危険なコマンドをブロックしました: {{ .command }}'
 TerminalAIThinking: 'AI が考えています...'

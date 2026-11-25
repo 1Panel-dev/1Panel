@@ -97,6 +97,14 @@ func (s *HostRouter) InitRouter(Router *gin.RouterGroup) {
 		hostRouter.POST("/disks/mount", baseApi.MountDisk)
 		hostRouter.POST("/disks/unmount", baseApi.UnmountDisk)
 
+		hostRouter.GET("/network", baseApi.GetHostNetworkOverview)
+		hostRouter.POST("/network/address", baseApi.AddHostNetworkAddress)
+		hostRouter.POST("/network/address/del", baseApi.DeleteHostNetworkAddress)
+		hostRouter.POST("/network/routes", baseApi.AddHostNetworkRoute)
+		hostRouter.POST("/network/routes/del", baseApi.DeleteHostNetworkRoute)
+		hostRouter.POST("/network/routes/check", baseApi.CheckHostNetworkRoute)
+		hostRouter.POST("/network/routes/check/batch", baseApi.CheckHostNetworkRoutes)
+
 		hostRouter.GET("/components/:name", baseApi.CheckComponentExistence)
 	}
 }

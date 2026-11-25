@@ -687,6 +687,17 @@ FormatDiskErr: 'Gagal memformat cakera, {{ .err }}'
 MountDiskErr: 'Gagal mengkaitkan cakera, {{ .err }}'
 XfsNotFound: 'Sistem fail xfs tidak dikesan, sila pasang xfsprogs terlebih dahulu'
 
+# Pengurusan rangkaian
+ErrNetworkPersistencePlatform: "Tetapan rangkaian kekal hanya disokong pada nod Linux."
+ErrNetworkPersistencePrivilege: "Tetapan rangkaian kekal memerlukan 1Panel Agent berjalan sebagai root dengan kebenaran pentadbiran rangkaian."
+ErrNetworkIPRoute2: "Pasang atau kemas kini iproute2 dan pastikan arahan ip tersedia.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "Alamat IP utama ini mempunyai alamat sekunder dalam subnet yang sama. Padamkan alamat sekunder dahulu atau laraskannya dengan alat rangkaian sistem sebelum mencuba semula."
+ErrNetworkRouteReadOnly: "Laluan ini adalah baca sahaja."
+ErrNetworkPersistenceConflict: "Alamat atau laluan ini sudah wujud atau bercanggah dengan tetapan yang disimpan.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Konfigurasi antara muka gelung balik adalah baca sahaja."
+ErrNetworkPersistentSourceMissing: "Tiada konfigurasi sistem kekal yang disokong ditemui untuk antara muka {{ .name }}. Ia adalah baca sahaja."
+ErrNetworkVirtualBridgeReadOnly: "Antara muka maya ini adalah baca sahaja dan tidak disertakan dalam semakan kebolehcapaian."
+
 # terminal
 TerminalAIBlockedRiskyCommand: 'Perintah berisiko telah disekat: {{ .command }}'
 TerminalAIThinking: 'AI sedang berfikir...'

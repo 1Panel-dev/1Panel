@@ -35,8 +35,29 @@ func preserveMissingMenus(root, current *[]dto.ShowMenu, fallback []dto.ShowMenu
 func ReconcileHideMenuIntegrity(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu, bool) {
 	updated := cloneMenus(menus)
 	changed := false
+	if networkMenu := findSystemMenu(updated, defaultNetworkMenu()); networkMenu != nil {
+		changed = normalizeSystemFields(networkMenu, defaultNetworkMenu())
+		var deduplicated bool
+		updated, deduplicated = deduplicateSystemMenu(updated, networkMenu, defaultNetworkMenu())
+		changed = changed || deduplicated
+	} else {
+		parentIndex := -1
+		for i := range updated {
+			if updated[i].ID == "7" || updated[i].Label == "System-Menu" {
+				parentIndex = i
+				break
+			}
+		}
+		if parentIndex < 0 {
+			updated = append(updated, dto.ShowMenu{
+				ID: "7", Title: "menu.system", IsShow: true, Label: "System-Menu", Path: "/hosts/files", Sort: 700,
+			})
+			parentIndex = len(updated) - 1
+		}
+		updated, changed = ensureSystemMenu(updated, parentIndex, fallback, defaultNetworkMenu())
+	}
 	if preferredXApp := findSystemMenu(updated, defaultXAppMenu()); preferredXApp != nil {
-		changed = normalizeSystemFields(preferredXApp, defaultXAppMenu())
+		changed = normalizeSystemFields(preferredXApp, defaultXAppMenu()) || changed
 	}
 
 	var removed bool
@@ -74,6 +95,12 @@ func ReconcileHideMenuIntegrity(menus, fallback []dto.ShowMenu) ([]dto.ShowMenu,
 	changed = changed || xAppChanged
 
 	return updated, changed
+}
+
+func defaultNetworkMenu() dto.ShowMenu {
+	return dto.ShowMenu{
+		ID: "78", Title: "networkManage.title", IsShow: true, Label: "NetworkManage", Path: "/hosts/network", Sort: 700,
+	}
 }
 
 func defaultXpackMenu() dto.ShowMenu {

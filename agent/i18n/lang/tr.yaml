@@ -687,6 +687,17 @@ FormatDiskErr: 'Disk biçimlendirme başarısız, {{ .err }}'
 MountDiskErr: 'Disk bağlama başarısız, {{ .err }}'
 XfsNotFound: 'XFS dosya sistemi algılanmadı, lütfen önce xfsprogs''i yükleyin'
 
+# Ağ yönetimi
+ErrNetworkPersistencePlatform: "Kalıcı ağ ayarları yalnızca Linux düğümlerinde desteklenir."
+ErrNetworkPersistencePrivilege: "Kalıcı ağ ayarları için 1Panel Agent, ağ yönetimi yetkisine sahip root olarak çalışmalıdır."
+ErrNetworkIPRoute2: "iproute2 paketini kurun veya güncelleyin ve ip komutunun kullanılabildiğini kontrol edin.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "Bu birincil IP adresinin aynı alt ağda ikincil adresleri var. Önce ikincil adresleri kaldırın veya sistem ağ araçlarıyla düzenleyip yeniden deneyin."
+ErrNetworkRouteReadOnly: "Bu rota salt okunurdur."
+ErrNetworkPersistenceConflict: "Bu adres veya rota zaten var ya da kayıtlı ayarlarla çakışıyor.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Geri döngü arayüzü yapılandırması salt okunurdur."
+ErrNetworkPersistentSourceMissing: "{{ .name }} arayüzü için desteklenen kalıcı sistem yapılandırması bulunamadı. Salt okunurdur."
+ErrNetworkVirtualBridgeReadOnly: "Bu sanal arayüz salt okunurdur ve erişilebilirlik denetimlerine dahil edilmez."
+
 # terminal
 TerminalAIBlockedRiskyCommand: 'Riskli komut engellendi: {{ .command }}'
 TerminalAIThinking: 'AI dusunuyor...'

@@ -687,6 +687,17 @@ FormatDiskErr: 'Format failed: {{ .err }}'
 MountDiskErr: 'Mount failed: {{ .err }}'
 XfsNotFound: 'xfs not found; install xfsprogs first'
 
+# Network management
+ErrNetworkPersistencePlatform: "Persistent network settings are supported only on Linux nodes."
+ErrNetworkPersistencePrivilege: "Persistent network settings require 1Panel Agent to run as root with network administration permissions."
+ErrNetworkIPRoute2: "Install or update iproute2 and check that its ip command is available.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "This primary IP address has secondary addresses in the same subnet. Remove those secondary addresses first, or adjust them with system network tools before retrying."
+ErrNetworkRouteReadOnly: "This route is read only."
+ErrNetworkPersistenceConflict: "This address or route already exists or conflicts with saved settings.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Loopback interface configuration is read-only."
+ErrNetworkPersistentSourceMissing: "No supported persistent system configuration was found for interface {{ .name }}. It is read-only."
+ErrNetworkVirtualBridgeReadOnly: "This virtual interface is read-only and excluded from reachability checks."
+
 # terminal
 TerminalAIBlockedRiskyCommand: 'blocked risky command: {{ .command }}'
 TerminalAIThinking: 'AI is thinking...'
