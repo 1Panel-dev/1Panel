@@ -390,19 +390,23 @@ func createIndexFile(website *model.Website, runtime *model.Runtime, created *we
 
 	switch website.Type {
 	case constant.Static:
-		indexPath = path.Join(indexFolder, "index.html")
-		indexHtml, _ := websiteService.GetDefaultHtml("index")
-		indexContent = indexHtml.Content
+		if !hasExistingIndexFile(indexFolder, "index.html", "index.htm") {
+			indexPath = path.Join(indexFolder, "index.html")
+			indexHtml, _ := websiteService.GetDefaultHtml("index")
+			indexContent = indexHtml.Content
+		}
 	case constant.Runtime:
-		if runtime.Type == constant.RuntimePHP {
+		if runtime.Type == constant.RuntimePHP && !hasExistingIndexFile(indexFolder, "index.php", "index.html", "index.htm") {
 			indexPath = path.Join(indexFolder, "index.php")
 			indexPhp, _ := websiteService.GetDefaultHtml("php")
 			indexContent = indexPhp.Content
 		}
 	}
 
-	if err := created.write(indexPath, []byte(indexContent), constant.FilePerm, true); err != nil {
-		return err
+	if indexPath != "" {
+		if err := created.write(indexPath, []byte(indexContent), constant.FilePerm, true); err != nil {
+			return err
+		}
 	}
 	html404, _ := websiteService.GetDefaultHtml("404")
 	if err := created.write(path.Join(indexFolder, "404.html"), []byte(html404.Content), constant.FilePerm, true); err != nil {
@@ -413,6 +417,16 @@ func createIndexFile(website *model.Website, runtime *model.Runtime, created *we
 	}
 
 	return nil
+}
+
+func hasExistingIndexFile(indexDir string, candidates ...string) bool {
+	for _, name := range candidates {
+		info, err := os.Stat(path.Join(indexDir, name))
+		if err == nil && !info.IsDir() {
+			return true
+		}
+	}
+	return false
 }
 
 func createProxyFile(website *model.Website, created *websiteCreateFiles) error {

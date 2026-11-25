@@ -594,6 +594,7 @@ export namespace Website {
     export interface PHPVersionChange {
         websiteID: number;
         runtimeID: number;
+        createIndexFile?: boolean;
     }
 
     export interface DirConfig {

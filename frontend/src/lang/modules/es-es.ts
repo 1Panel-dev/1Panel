@@ -5074,6 +5074,9 @@ const message = {
         failTimeoutHelper:
             'La duración de la ventana de tiempo para las comprobaciones de estado del servidor. Cuando el número acumulado de fallos alcanza el umbral dentro de este período, el servidor se eliminará temporalmente y se reintentará después de la misma duración. Por defecto 10 segundos',
         staticChangePHPHelper: 'Actualmente es un sitio estático, puedes cambiarlo a PHP',
+        createDefaultIndex: 'Crear archivo {0} predeterminado',
+        createDefaultIndexHelper:
+            'Solo se crea cuando el archivo no existe en el directorio raíz del sitio web, usando la configuración de página predeterminada',
         proxyCache: 'Caché de proxy inverso',
         cacheLimit: 'Límite de espacio de caché',
         shareCache: 'Tamaño de memoria para conteo de caché',

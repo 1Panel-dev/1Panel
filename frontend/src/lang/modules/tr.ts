@@ -5071,6 +5071,9 @@ const message = {
         failTimeoutHelper:
             'Sunucu sağlık kontrolleri için zaman penceresi uzunluğu. Bu süre içinde biriken hata sayısı eşiğe ulaştığında, sunucu geçici olarak kaldırılacak ve aynı süre sonunda yeniden denenir. Varsayılan 10 saniye',
         staticChangePHPHelper: 'Şu anda statik bir web sitesi, PHP web sitesine geçiş yapabilirsiniz',
+        createDefaultIndex: 'Varsayılan {0} dosyasını oluştur',
+        createDefaultIndexHelper:
+            'Yalnızca dosya web sitesi kök dizininde mevcut değilse varsayılan sayfa ayarlarındaki içerikle oluşturulur',
         proxyCache: 'Ters Vekil Önbelleği',
         cacheLimit: 'Önbellek Alanı Sınırı',
         shareCache: 'Önbellek Sayısı Bellek Boyutu',

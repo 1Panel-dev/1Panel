@@ -4883,6 +4883,9 @@ const message = {
         failTimeoutHelper:
             '서버 상태 점검 시간 창 길이. 이 기간 동안 누적 실패 횟수가 임계값에 도달하면 서버가 일시적으로 제거되고 동일한 시간 후에 재시도됩니다. 기본값 10초',
         staticChangePHPHelper: '현재 정적 웹사이트이며 PHP 웹사이트로 전환할 수 있습니다.',
+        createDefaultIndex: '기본 {0} 파일 생성',
+        createDefaultIndexHelper:
+            '웹사이트 루트 디렉터리에 해당 파일이 없는 경우에만 기본 페이지 설정 내용으로 생성됩니다.',
         proxyCache: '리버스 프록시 캐시',
         cacheLimit: '캐시 공간 제한',
         shareCache: '캐시 카운트 메모리 크기',
