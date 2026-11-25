@@ -8239,6 +8239,31 @@ const message = {
             menu: 'Penyegerakan Sumber',
             file: 'Pemindahan Fail',
             fileSyncConfirm: 'Pindahkan fail/folder {1} dari nod {0} ke direktori {3} pada nod {2}?',
+            fileBatchDesc: 'Pilih fail atau folder daripada mana-mana nod dan edarkannya ke beberapa nod sasaran.',
+            fileSourceTitle: 'Pilih fail sumber',
+            fileSourceNode: 'Nod sumber',
+            fileTargetDirectory: 'Direktori sasaran',
+            fileBatchPath: 'Tetapkan direktori sasaran secara pukal',
+            fileApplyPath: 'Gunakan pada nod yang dipilih',
+            fileSelectedCount: '{0} item dipilih',
+            fileSelectedTargets: '{0} nod dipilih',
+            fileSelectionHint: 'Folder disalin sepenuhnya dengan nama asal dan struktur direktori dalaman dikekalkan.',
+            fileRules:
+                'Peraturan pemindahan fail sedia ada digunakan: fail dengan nama yang sama mungkin dikemas kini dan fail lain dalam direktori sasaran dikekalkan.',
+            fileBatchSummary: 'Edarkan {0} item ke {1} nod sasaran',
+            fileTaskHint: 'Selepas pengesahan, tugas pengedaran akan dicipta dan boleh dilihat dalam pengurusan tugas.',
+            fileBatchConfirm:
+                'Semak nod sasaran dan laluan simpanan di bawah. Fail dengan nama yang sama mungkin ditulis ganti.',
+            fileTargetHint:
+                'Direktori boleh ditetapkan secara berasingan bagi setiap nod. Nod luar talian, gagal semakan atau tanpa rsync tidak boleh dipilih.',
+            fileChecking: 'Sedang menyemak',
+            fileCheckFailed: 'Semakan gagal',
+            fileRsyncMissing: 'rsync tidak dipasang',
+            filePathRequired: 'Masukkan laluan mutlak direktori sasaran yang bermula dengan /.',
+            fileConflictHint:
+                'Sumber ini berkongsi nama destinasi. Tinggalkan satu sumber bagi setiap nama. Nyahpilihan digunakan pada semua nod sasaran.',
+            fileDeselect: 'Nyahpilih',
+            fileSourceChanged: 'Nod sumber telah ditukar. Sila pilih fail semula.',
 
             image: 'Pemindahan Imej',
             imageBatchDesc:
@@ -8582,7 +8607,7 @@ const message = {
             addCluster: 'Tambah Kluster',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
-            appStoreOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.",
+            appStoreOnly: 'Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.',
             noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
             installNode: 'Pelayan penggunaan',
             master: 'Pangkalan data utama',

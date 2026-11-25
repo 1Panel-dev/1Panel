@@ -2017,15 +2017,12 @@
 	},
 	"/core/xpack/exchange/file": {
 		"bodyKeys": [
-			"sourceNode",
-			"targetNode",
-			"sourcePath",
-			"targetPath"
+			"sourceNode"
 		],
 		"paramKeys": [],
 		"beforeFunctions": [],
-		"formatZH": "交换文件 [sourcePath] 到 [targetPath]",
-		"formatEN": "exchange file [sourcePath] to [targetPath]"
+		"formatZH": "分发节点文件 [sourceNode]",
+		"formatEN": "distribute node files [sourceNode]"
 	},
 	"/core/xpack/exchange/image": {
 		"bodyKeys": [],
