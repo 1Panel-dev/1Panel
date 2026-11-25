@@ -4,15 +4,14 @@ import "time"
 
 type Website struct {
 	BaseModel
-	Protocol          string    `gorm:"not null" json:"protocol"`
-	PrimaryDomain     string    `gorm:"not null" json:"primaryDomain"`
-	Type              string    `gorm:"not null" json:"type"`
-	Alias             string    `gorm:"not null" json:"alias"`
-	Remark            string    `json:"remark"`
-	Status            string    `gorm:"not null" json:"status"`
-	HttpConfig        string    `gorm:"not null" json:"httpConfig"`
-	HTTPSRedirectPort string    `gorm:"not null;default:inherit" json:"httpsRedirectPort"`
-	ExpireDate        time.Time `json:"expireDate"`
+	Protocol      string    `gorm:"not null" json:"protocol"`
+	PrimaryDomain string    `gorm:"not null" json:"primaryDomain"`
+	Type          string    `gorm:"not null" json:"type"`
+	Alias         string    `gorm:"not null" json:"alias"`
+	Remark        string    `json:"remark"`
+	Status        string    `gorm:"not null" json:"status"`
+	HttpConfig    string    `gorm:"not null" json:"httpConfig"`
+	ExpireDate    time.Time `json:"expireDate"`
 
 	Proxy         string `json:"proxy"`
 	ProxyType     string `json:"proxyType"`

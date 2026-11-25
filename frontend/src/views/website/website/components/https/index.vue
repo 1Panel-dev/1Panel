@@ -8,29 +8,6 @@
             </el-select>
         </el-form-item>
 
-        <el-form-item v-if="showHTTPSRedirectPort" :label="$t('website.HTTPSRedirectPort')" prop="httpsRedirectPort">
-            <el-select v-model="httpsRedirectPortSelection" class="p-w-400">
-                <el-option
-                    :label="
-                        $t('website.HTTPSRedirectPortInherit', [
-                            formData.httpsRedirectCustomPort ? formData.nginxHttpsPort : 443,
-                        ])
-                    "
-                    value="inherit"
-                ></el-option>
-                <el-option
-                    v-if="formData.httpsRedirectCustomPort"
-                    :label="$t('website.HTTPSRedirectPortStandard', [443])"
-                    value="standard"
-                ></el-option>
-                <el-option
-                    v-else
-                    :label="$t('website.HTTPSRedirectPortDefault', [formData.nginxHttpsPort])"
-                    value="default"
-                ></el-option>
-            </el-select>
-        </el-form-item>
-
         <el-form-item label="HSTS" prop="hsts">
             <el-checkbox v-model="formData.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
             <span class="input-help">{{ $t('website.hstsHelper') }}</span>
@@ -188,9 +165,6 @@ interface Props {
     modelValue: {
         httpsPort: string;
         httpConfig: string;
-        httpsRedirectPort?: string;
-        httpsRedirectCustomPort?: boolean;
-        nginxHttpsPort?: number;
         hsts: boolean;
         hstsIncludeSubDomains: boolean;
         http3: boolean;
@@ -231,26 +205,6 @@ const certFileRef = ref();
 const formData = computed({
     get: () => props.modelValue,
     set: (value) => emit('update:modelValue', value),
-});
-
-const showHTTPSRedirectPort = computed(
-    () =>
-        formData.value.httpConfig === 'HTTPToHTTPS' &&
-        Number(formData.value.nginxHttpsPort) > 0 &&
-        formData.value.nginxHttpsPort !== 443,
-);
-
-const httpsRedirectPortSelection = computed({
-    get() {
-        const mode = formData.value.httpsRedirectPort || 'inherit';
-        if (formData.value.httpsRedirectCustomPort) {
-            return mode === 'standard' ? 'standard' : 'inherit';
-        }
-        return mode === 'default' ? 'default' : 'inherit';
-    },
-    set(mode: string) {
-        formData.value.httpsRedirectPort = mode;
-    },
 });
 
 const listAcmeAccount = async () => {

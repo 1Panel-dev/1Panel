@@ -37,10 +37,6 @@ const (
 	HTTPAlso    = "HTTPAlso"
 	HTTPToHTTPS = "HTTPToHTTPS"
 
-	HTTPSRedirectPortInherit  = "inherit"
-	HTTPSRedirectPortDefault  = "default"
-	HTTPSRedirectPortStandard = "standard"
-
 	GetLog     = "get"
 	DisableLog = "disable"
 	EnableLog  = "enable"

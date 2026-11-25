@@ -1058,28 +1058,6 @@ func getHTTPSRedirectCustomPort() bool {
 	return err != nil || value != constant.StatusDisable
 }
 
-// Website redirect modes override the global custom-port policy only when the
-// user has explicitly selected the default Nginx HTTPS port or standard 443.
-func normalizeWebsiteHTTPSRedirectPort(value string) string {
-	switch value {
-	case constant.HTTPSRedirectPortDefault, constant.HTTPSRedirectPortStandard:
-		return value
-	default:
-		return constant.HTTPSRedirectPortInherit
-	}
-}
-
-func websiteHTTPSRedirectUsesCustomPort(value string, globalUseCustomPort bool) bool {
-	switch normalizeWebsiteHTTPSRedirectPort(value) {
-	case constant.HTTPSRedirectPortDefault:
-		return true
-	case constant.HTTPSRedirectPortStandard:
-		return false
-	default:
-		return globalUseCustomPort
-	}
-}
-
 func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPort int, useCustomPort bool) []dto.NginxParam {
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
 	for i := range nginxParams {
@@ -1124,7 +1102,7 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 }
 
 func applyWebsiteSSLConfig(server *components.Server, website model.Website, plan websiteTLSPlan, req request.WebsiteHTTPSOp) {
-	useCustomPort := websiteHTTPSRedirectUsesCustomPort(website.HTTPSRedirectPort, getHTTPSRedirectCustomPort())
+	useCustomPort := getHTTPSRedirectCustomPort()
 	if server.HasStopPage() {
 		defer server.EnableStopPage()
 	}
