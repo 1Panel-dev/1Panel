@@ -423,6 +423,9 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 			}
 		}
 	}
+	if err = resolveRedisParams(req.Params, appDetail.Params, false); err != nil {
+		return nil, err
+	}
 	for key := range req.Params {
 		if !strings.Contains(key, "PANEL_APP_PORT") {
 			continue
@@ -455,25 +458,20 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if req.EditCompose {
-		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
-			return
-		}
-	} else {
+	composeContent := req.DockerCompose
+	if !req.EditCompose {
 		if err = ensureAppDetailCompose(app, &appDetail); err != nil {
 			return
 		}
-		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-			return
-		}
+		composeContent = appDetail.DockerCompose
 	}
-
-	value, ok := composeMap["services"]
-	if !ok || value == nil {
-		err = buserr.New("ErrFileParse")
+	if err = yaml.Unmarshal([]byte(composeContent), &composeMap); err != nil {
 		return
 	}
-	servicesMap := value.(map[string]interface{})
+	servicesMap, ok := composeMap["services"].(map[string]interface{})
+	if !ok || len(servicesMap) == 0 {
+		return nil, buserr.New("ErrFileParse")
+	}
 	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
 	if req.Advanced && req.ContainerName != "" {
 		containerName = req.ContainerName
@@ -511,15 +509,7 @@ func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript
 		}
 	}
 
-	index := 0
-	serviceName := ""
-	for k := range servicesMap {
-		serviceName = k
-		if index > 0 {
-			continue
-		}
-		index++
-	}
+	serviceName := selectPrimaryComposeService(servicesMap, composeContent, app.Key)
 	newServiceName := strings.ToLower(appInstall.Name)
 	if app.Limit == 0 && newServiceName != serviceName && len(servicesMap) == 1 && !req.KeepServiceName {
 		servicesMap[newServiceName] = servicesMap[serviceName]

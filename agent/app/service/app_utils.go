@@ -13,6 +13,7 @@ import (
 	"path"
 	"path/filepath"
 	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -805,11 +806,14 @@ func composeVolumeContainerPath(volume interface{}) (string, bool) {
 	return parts[1], true
 }
 
-func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string, error) {
+func getUpgradeCompose(install *model.AppInstall, detail model.AppDetail) (string, error) {
 	if detail.DockerCompose == "" {
 		return "", nil
 	}
-	composeMap, err := handleUpgradeCompose(install, detail)
+	if err := repairLegacyComposePrimary(install); err != nil {
+		return "", err
+	}
+	composeMap, err := handleUpgradeCompose(*install, detail)
 	if err != nil {
 		return "", err
 	}
@@ -826,11 +830,6 @@ func getUpgradeCompose(install model.AppInstall, detail model.AppDetail) (string
 	if err := AddDockerComposeCommonParam(composeMap, install.ServiceName, config, envs, install.App.Key); err != nil {
 		return "", err
 	}
-	paramByte, err := json.Marshal(envs)
-	if err != nil {
-		return "", err
-	}
-	install.Env = string(paramByte)
 	composeByte, err := yaml.Marshal(composeMap)
 	if err != nil {
 		return "", err
@@ -1930,7 +1929,7 @@ func AddDockerComposeCommonParam(composeMap map[string]interface{}, serviceName 
 	deploy["resources"] = resource
 	serviceValue["deploy"] = deploy
 
-	if req.RestartPolicy != "" {
+	if req.RestartPolicy != "" && !isOneShotComposeService(services, serviceName) {
 		if req.RestartPolicy == "on-failure" {
 			serviceValue["restart"] = "on-failure:5"
 		} else {
@@ -2108,15 +2107,235 @@ func copyAppDetailMissingTracked(fileOp files.FileOp, srcDir, dstDir string, cre
 	return nil
 }
 
-func getRestartPolicy(yml string) string {
-	var project docker.ComposeProject
-	if err := yaml.Unmarshal([]byte(yml), &project); err != nil {
+// Only service selectors carry a panel database name. Text fields carry a literal host.
+func resolveRedisParams(params map[string]interface{}, formJSON string, legacy bool) error {
+	host, supplied := params["PANEL_REDIS_HOST"]
+	name, _ := host.(string)
+	if !supplied || formJSON == "" || (legacy && (name == "" || params["PANEL_REDIS_HOST_NAME"] != nil)) {
+		return nil
+	}
+	var form dto.AppForm
+	if err := json.Unmarshal([]byte(formJSON), &form); err != nil {
+		return err
+	}
+	for _, field := range form.FormFields {
+		if field.EnvKey != "PANEL_REDIS_HOST" || field.Type != "service" {
+			continue
+		}
+		if name == "" && !field.Required {
+			return nil
+		}
+		database, err := databaseRepo.Get(repo.WithByName(name), repo.WithTypes([]string{constant.AppRedis, constant.AppRedisCluster}))
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			if legacy {
+				return nil
+			}
+			return buserr.WithName("ErrDatabaseNotFound", name)
+		}
+		if err != nil {
+			return err
+		}
+		if !legacy && database.AppInstallID > 0 {
+			install, err := appInstallRepo.GetFirst(repo.WithByID(database.AppInstallID))
+			if err != nil {
+				return err
+			}
+			if install.Status != constant.StatusRunning {
+				return buserr.WithName("ErrAppIsDown", install.Name)
+			}
+		}
+		params["PANEL_REDIS_HOST_NAME"] = name
+		params["PANEL_REDIS_HOST"] = database.Address
+		if port := params["PANEL_REDIS_PORT"]; !legacy || port == nil || port == "" {
+			params["PANEL_REDIS_PORT"] = database.Port
+		}
+		if password, ok := params["PANEL_REDIS_ROOT_PASSWORD"].(string); ok && password == "" {
+			params["PANEL_REDIS_ROOT_PASSWORD"] = database.Password
+		}
+		return nil
+	}
+	return nil
+}
+
+func selectPrimaryComposeService(servicesMap map[string]interface{}, composeContent string, appKey string) string {
+	if len(servicesMap) == 0 {
 		return ""
 	}
-	for _, service := range project.Services {
-		return service.Restart
+	ordered := orderedComposeServices(servicesMap, composeContent)
+	if len(ordered) == 1 {
+		return ordered[0]
 	}
-	return ""
+
+	oneShot := collectOneShotComposeServices(servicesMap)
+	candidates := make([]string, 0, len(ordered))
+	for _, name := range ordered {
+		if _, skip := oneShot[name]; !skip {
+			candidates = append(candidates, name)
+		}
+	}
+	if len(candidates) == 0 {
+		candidates = ordered
+	}
+
+	for _, name := range candidates {
+		serviceMap, ok := servicesMap[name].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if containerName, ok := serviceMap["container_name"].(string); ok && strings.TrimSpace(containerName) == "${CONTAINER_NAME}" {
+			return name
+		}
+	}
+	if appKey != "" {
+		for _, name := range candidates {
+			if name == appKey {
+				return name
+			}
+		}
+		for _, name := range candidates {
+			if strings.EqualFold(name, appKey) {
+				return name
+			}
+		}
+	}
+	return candidates[0]
+}
+
+func orderedComposeServices(services map[string]interface{}, content string) []string {
+	var doc struct{ Services yaml.Node }
+	var names []string
+	seen := make(map[string]bool, len(services))
+	if yaml.Unmarshal([]byte(content), &doc) == nil && doc.Services.Kind == yaml.MappingNode {
+		for i := 0; i < len(doc.Services.Content); i += 2 {
+			name := doc.Services.Content[i].Value
+			if _, exists := services[name]; exists && !seen[name] {
+				names = append(names, name)
+				seen[name] = true
+			}
+		}
+	}
+	var remaining []string
+	for name := range services {
+		if !seen[name] {
+			remaining = append(remaining, name)
+		}
+	}
+	sort.Strings(remaining)
+	return append(names, remaining...)
+}
+
+func collectOneShotComposeServices(servicesMap map[string]interface{}) map[string]struct{} {
+	oneShot := make(map[string]struct{})
+	for name, rawService := range servicesMap {
+		serviceMap, ok := rawService.(map[string]interface{})
+		if !ok {
+			continue
+		}
+		if hasSkipStatusCheckLabel(serviceMap) {
+			oneShot[name] = struct{}{}
+		}
+		dependsOn, ok := serviceMap["depends_on"].(map[string]interface{})
+		if !ok {
+			continue
+		}
+		for depName, depRaw := range dependsOn {
+			depCfg, ok := depRaw.(map[string]interface{})
+			if !ok {
+				continue
+			}
+			if cond, ok := depCfg["condition"].(string); ok && strings.TrimSpace(cond) == "service_completed_successfully" {
+				oneShot[depName] = struct{}{}
+			}
+		}
+	}
+	return oneShot
+}
+
+func isOneShotComposeService(servicesMap map[string]interface{}, serviceName string) bool {
+	if len(servicesMap) <= 1 {
+		return false
+	}
+	_, ok := collectOneShotComposeServices(servicesMap)[serviceName]
+	return ok
+}
+
+func hasSkipStatusCheckLabel(serviceMap map[string]interface{}) bool {
+	labels, ok := serviceMap["labels"]
+	if !ok || labels == nil {
+		return false
+	}
+	switch v := labels.(type) {
+	case map[string]interface{}:
+		raw, exists := v["skipStatusCheck"]
+		if !exists {
+			return false
+		}
+		return !strings.EqualFold(strings.TrimSpace(fmt.Sprint(raw)), "false")
+	case []interface{}:
+		for _, item := range v {
+			str, ok := item.(string)
+			if !ok {
+				continue
+			}
+			parts := strings.SplitN(strings.TrimSpace(str), "=", 2)
+			if parts[0] == "skipStatusCheck" {
+				if len(parts) == 1 {
+					return true
+				}
+				return !strings.EqualFold(strings.TrimSpace(parts[1]), "false")
+			}
+		}
+	}
+	return false
+}
+
+func installedComposeService(services map[string]interface{}, content, saved, appKey string) string {
+	if _, ok := services[saved]; ok && !isOneShotComposeService(services, saved) {
+		return saved
+	}
+	return selectPrimaryComposeService(services, content, appKey)
+}
+
+// Older multi-service installations could have recorded the migration job as the main service.
+func repairLegacyComposePrimary(install *model.AppInstall) error {
+	if install.DockerCompose == "" {
+		return nil
+	}
+	var doc map[string]interface{}
+	if err := yaml.Unmarshal([]byte(install.DockerCompose), &doc); err != nil {
+		return err
+	}
+	services, _ := doc["services"].(map[string]interface{})
+	if !isOneShotComposeService(services, install.ServiceName) {
+		return nil
+	}
+	name := installedComposeService(services, install.DockerCompose, install.ServiceName, install.App.Key)
+	if name == "" || isOneShotComposeService(services, name) {
+		return nil
+	}
+	job, _ := services[install.ServiceName].(map[string]interface{})
+	install.ServiceName = name
+	if job["restart"] == "always" || job["restart"] == "unless-stopped" {
+		delete(job, "restart")
+		content, err := yaml.Marshal(doc)
+		if err != nil {
+			return err
+		}
+		install.DockerCompose = string(content)
+	}
+	return nil
+}
+
+func getRestartPolicy(content, serviceName, appKey string) string {
+	var doc map[string]interface{}
+	if err := yaml.Unmarshal([]byte(content), &doc); err != nil {
+		return ""
+	}
+	services, _ := doc["services"].(map[string]interface{})
+	name := installedComposeService(services, content, serviceName, appKey)
+	service, _ := services[name].(map[string]interface{})
+	policy, _ := service["restart"].(string)
+	return policy
 }
 
 func getMajorVersion(version string) string {
@@ -2440,7 +2659,7 @@ func hasLinkDBFromKeys(resourceKeys []string) bool {
 
 func isEditCompose(installed model.AppInstall) bool {
 	detail, _ := appDetailRepo.GetFirst(repo.WithByID(installed.AppDetailId))
-	rawCompose, err := getUpgradeCompose(installed, detail)
+	rawCompose, err := getUpgradeCompose(&installed, detail)
 	if rawCompose == "" || err != nil {
 		return false
 	}

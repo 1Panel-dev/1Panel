@@ -21,6 +21,7 @@
                 v-if="p.type == 'password'"
                 :type="p.type"
                 show-password
+                :disabled="p.disabled"
                 clearable
                 @change="updateParam"
             ></el-input>
