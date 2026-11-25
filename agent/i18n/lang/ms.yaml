@@ -248,6 +248,8 @@ Set: 'Tetapan'
 # sijil SSL
 ErrSSLCannotDelete: 'Sijil {{ .name }} sedang digunakan oleh tapak web dan tidak boleh dipadamkan'
 ErrAccountCannotDelete: 'Akaun dikaitkan dengan sijil dan tidak boleh dipadamkan'
+ErrDnsRecordUnsupported: 'Pengurusan rekod DNS belum disokong untuk penyedia ini'
+ErrDnsAccountNotFound: 'Akaun penyedia DNS tidak ditemui'
 ErrSSLApply: 'Pembaharuan sijil berjaya, muat semula openresty gagal, sila semak konfigurasi'
 ErrEmailIsExist: 'Peti mel sudah wujud'
 ErrSSLKeyNotFound: 'Fail kunci peribadi tidak wujud'

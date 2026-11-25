@@ -238,6 +238,8 @@ Set: 'ຕັ້ງຄ່າ'
 #ssl
 ErrSSLCannotDelete: 'ໃບຮັບຮອງ {{ .name }} ກຳລັງຖືກໃຊ້ງານໂດຍເວັບໄຊ'
 ErrAccountCannotDelete: 'ບັນຊີຖືກເຊື່ອມໂຍງກັບໃບຮັບຮອງ ແລະ ບໍ່ສາມາດລຶບໄດ້'
+ErrDnsRecordUnsupported: 'ຜູ້ໃຫ້ບໍລິການນີ້ຍັງບໍ່ຮອງຮັບການຈັດການບັນທຶກ DNS'
+ErrDnsAccountNotFound: 'ບໍ່ພົບບັນຊີຜູ້ໃຫ້ບໍລິການ DNS'
 ErrSSLApply: 'ຕໍ່ອາຍຸໃບຮັບຮອງແລ້ວ; ແຕ່ການ reload OpenResty ລົ້ມເຫຼວ'
 ErrEmailIsExist: 'ອີເມວມີຢູ່ໃນລະບົບແລ້ວ'
 ErrSSLKeyNotFound: 'ບໍ່ມີໄຟລ໌ກຸນແຈສ່ວນຕົວ (Private key) ຢູ່'

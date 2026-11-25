@@ -248,6 +248,8 @@ Set: 'Configurações'
 # certificado SSL
 ErrSSLCannotDelete: 'O certificado {{ .name }} está sendo usado por um site e não pode ser excluído'
 ErrAccountCannotDelete: 'A conta está associada a um certificado e não pode ser excluída'
+ErrDnsRecordUnsupported: 'O gerenciamento de registros DNS ainda não é compatível com este provedor'
+ErrDnsAccountNotFound: 'Conta do provedor DNS não encontrada'
 ErrSSLApply: 'Renovação do certificado concluída, mas a recarga do OpenResty falhou. Verifique a configuração'
 ErrEmailIsExist: 'A caixa de correio já existe'
 ErrSSLKeyNotFound: 'O arquivo de chave privada não existe'

@@ -248,6 +248,8 @@ Set: '設定'
 # SSL 憑證
 ErrSSLCannotDelete: '{{ .name }} 憑證正在被網站使用，無法刪除'
 ErrAccountCannotDelete: '帳號關聯憑證，無法刪除'
+ErrDnsRecordUnsupported: '該服務商暫不支援 DNS 記錄管理'
+ErrDnsAccountNotFound: '未找到 DNS 服務商帳號'
 ErrSSLApply: '憑證續簽成功，openresty reload 失敗，請檢查設定！'
 ErrEmailIsExist: '信箱已存在'
 ErrSSLKeyNotFound: '私鑰檔案不存在'
