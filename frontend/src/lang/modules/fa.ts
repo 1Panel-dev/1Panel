@@ -4716,6 +4716,10 @@ const message = {
         privateKey: 'کلید (KEY)',
         certificate: 'گواهی (فرمت PEM)',
         HTTPConfig: 'گزینه‌های HTTP',
+        HTTPSRedirectPort: 'پورت تغییر مسیر HTTPS',
+        HTTPSRedirectPortCustom: 'سفارشی',
+        HTTPSRedirectPortManualHelper:
+            'این قاعده تغییر مسیر به‌صورت دستی ویرایش شده یا خارج از مدیریت است و قابل تغییر نیست.',
         HTTPSOnly: 'مسدود کردن درخواست‌های HTTP',
         HTTPToHTTPS: 'تغییر مسیر به HTTPS',
         HTTPAlso: 'اجازه درخواست‌های مستقیم HTTP',

@@ -10,7 +10,7 @@
                 class="moblie-form"
                 ref="httpsForm"
                 label-position="right"
-                label-width="150px"
+                label-width="190px"
                 :model="form"
                 :rules="rules"
             >
@@ -27,7 +27,12 @@
                         <el-text type="warning" class="!ml-2">{{ $t('website.ipWebsiteWarn') }}</el-text>
 
                         <el-divider content-position="left">{{ $t('website.SSLConfig') }}</el-divider>
-                        <HttpsConfig v-model="form" :website-ssl="websiteSSL" @ssl-change="handleSSLChange" />
+                        <HttpsConfig
+                            v-model="form"
+                            :website-ssl="websiteSSL"
+                            show-redirect-port
+                            @ssl-change="handleSSLChange"
+                        />
                         <el-form-item>
                             <el-button v-permission type="primary" @click="submit(httpsForm)">
                                 {{ $t('commons.button.save') }}
@@ -72,6 +77,10 @@ let form = reactive({
     privateKeyPath: '',
     certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
+    globalRedirectPort: 443,
+    siteRedirectPort: null as number | null,
+    redirectPortManaged: false,
+    httpsRedirectPort: null as number | null,
     hsts: true,
     hstsIncludeSubDomains: false,
     algorithm:
@@ -110,6 +119,10 @@ const get = () => {
             if (data.httpConfig != '') {
                 form.httpConfig = data.httpConfig;
             }
+            form.globalRedirectPort = data.globalRedirectPort;
+            form.siteRedirectPort = data.siteRedirectPort ?? null;
+            form.redirectPortManaged = data.redirectPortManaged;
+            form.httpsRedirectPort = null;
             if (data.SSLProtocol && data.SSLProtocol.length > 0) {
                 form.SSLProtocol = data.SSLProtocol;
             }

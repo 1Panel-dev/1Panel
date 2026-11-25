@@ -4830,6 +4830,10 @@ const message = {
         privateKey: 'Kunci (KEY)',
         certificate: 'Sijil (format PEM)',
         HTTPConfig: 'Pilihan HTTP',
+        HTTPSRedirectPort: 'Port ubah hala HTTPS',
+        HTTPSRedirectPortCustom: 'Tersuai',
+        HTTPSRedirectPortManualHelper:
+            'Peraturan ubah hala ini disunting secara manual atau tidak diurus, jadi tidak boleh diubah.',
         HTTPSOnly: 'Blok permintaan HTTP',
         HTTPToHTTPS: 'Alihkan ke HTTPS',
         HTTPAlso: 'Benarkan permintaan HTTP langsung',
@@ -5205,8 +5209,7 @@ const message = {
         sslRejectHandshakeHelper:
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
         httpsRedirectCustomPort: 'Guna ubah hala port tersuai',
-        httpsRedirectCustomPortHelper:
-            'Apabila didayakan, ubah hala HTTP ke HTTPS menggunakan port HTTPS tersuai.',
+        httpsRedirectCustomPortHelper: 'Apabila didayakan, ubah hala HTTP ke HTTPS menggunakan port HTTPS tersuai.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

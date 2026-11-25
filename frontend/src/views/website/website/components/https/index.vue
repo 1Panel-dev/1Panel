@@ -8,6 +8,26 @@
             </el-select>
         </el-form-item>
 
+        <el-form-item v-if="showHTTPSRedirectPort" :label="$t('website.HTTPSRedirectPort')" prop="httpsRedirectPort">
+            <el-input
+                v-model="redirectPortText"
+                class="p-w-400"
+                inputmode="numeric"
+                maxlength="5"
+                :disabled="!redirectPortCustom || !formData.redirectPortManaged"
+                @input="handleRedirectPortInput"
+            >
+                <template #prepend>
+                    <el-checkbox v-model="redirectPortCustom" :disabled="!formData.redirectPortManaged">
+                        {{ $t('website.HTTPSRedirectPortCustom') }}
+                    </el-checkbox>
+                </template>
+            </el-input>
+            <span v-if="!formData.redirectPortManaged" class="input-help">
+                {{ $t('website.HTTPSRedirectPortManualHelper') }}
+            </span>
+        </el-form-item>
+
         <el-form-item label="HSTS" prop="hsts">
             <el-checkbox v-model="formData.hsts">{{ $t('commons.button.enable') }}</el-checkbox>
             <span class="input-help">{{ $t('website.hstsHelper') }}</span>
@@ -165,6 +185,10 @@ interface Props {
     modelValue: {
         httpsPort: string;
         httpConfig: string;
+        httpsRedirectPort?: number | null;
+        globalRedirectPort?: number;
+        siteRedirectPort?: number | null;
+        redirectPortManaged?: boolean;
         hsts: boolean;
         hstsIncludeSubDomains: boolean;
         http3: boolean;
@@ -181,6 +205,7 @@ interface Props {
     };
     websiteSSL?: Website.SSL;
     autoLoad?: boolean;
+    showRedirectPort?: boolean;
 }
 
 interface Emits {
@@ -193,6 +218,7 @@ interface Emits {
 
 const props = withDefaults(defineProps<Props>(), {
     autoLoad: true,
+    showRedirectPort: false,
 });
 
 const emit = defineEmits<Emits>();
@@ -205,6 +231,48 @@ const certFileRef = ref();
 const formData = computed({
     get: () => props.modelValue,
     set: (value) => emit('update:modelValue', value),
+});
+
+const redirectPortCustom = ref(false);
+const redirectPortText = ref('443');
+
+const showHTTPSRedirectPort = computed(() => props.showRedirectPort && formData.value.httpConfig === 'HTTPToHTTPS');
+
+watch(
+    () => [formData.value.redirectPortManaged, formData.value.siteRedirectPort, formData.value.globalRedirectPort],
+    () => {
+        const globalPort = Number(formData.value.globalRedirectPort) || 443;
+        const sitePort = formData.value.siteRedirectPort;
+        if (typeof sitePort !== 'number' || !Number.isInteger(sitePort)) {
+            redirectPortCustom.value = false;
+            redirectPortText.value = '';
+            formData.value.httpsRedirectPort = null;
+            return;
+        }
+        redirectPortCustom.value = sitePort !== globalPort;
+        redirectPortText.value = String(sitePort);
+        formData.value.httpsRedirectPort = redirectPortCustom.value ? sitePort : null;
+    },
+    { immediate: true },
+);
+
+const handleRedirectPortInput = (value: string) => {
+    const digits = value.replace(/\D/g, '').slice(0, 5);
+    redirectPortText.value = digits;
+    const port = Number(digits);
+    formData.value.httpsRedirectPort = redirectPortCustom.value && port > 0 && port <= 65535 ? port : null;
+};
+
+watch(redirectPortCustom, () => {
+    if (!props.showRedirectPort || !formData.value.redirectPortManaged) {
+        return;
+    }
+    if (!redirectPortCustom.value) {
+        redirectPortText.value = String(Number(formData.value.globalRedirectPort) || 443);
+        formData.value.httpsRedirectPort = null;
+        return;
+    }
+    handleRedirectPortInput(redirectPortText.value);
 });
 
 const listAcmeAccount = async () => {

@@ -1,7 +1,7 @@
 <template>
     <el-row :gutter="20" v-loading="loading">
         <el-col :xs="24" :sm="20" :md="16" :lg="14" :xl="14">
-            <el-form ref="nginxForm" label-position="right" label-width="140px" :model="form">
+            <el-form ref="nginxForm" label-position="right" label-width="190px" :model="form">
                 <el-form-item :label="$t('nginx.defaultHttpsStatus')" prop="enable">
                     <el-switch v-model="enable"></el-switch>
                     <span class="input-help">{{ $t('nginx.defaultHttpsHelper1') }}</span>
@@ -10,10 +10,7 @@
                     <el-switch v-model="form.sslRejectHandshake"></el-switch>
                     <span class="input-help">{{ $t('nginx.sslRejectHandshakeHelper') }}</span>
                 </el-form-item>
-                <el-form-item
-                    :label="$t('nginx.httpsRedirectCustomPort')"
-                    prop="httpsRedirectCustomPort"
-                >
+                <el-form-item :label="$t('nginx.httpsRedirectCustomPort')" prop="httpsRedirectCustomPort">
                     <el-switch v-model="form.httpsRedirectCustomPort"></el-switch>
                     <span class="input-help">{{ $t('nginx.httpsRedirectCustomPortHelper') }}</span>
                 </el-form-item>

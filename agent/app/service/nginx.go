@@ -22,10 +22,10 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto/response"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
+	"github.com/1Panel-dev/1Panel/agent/app/model"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/files"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
-	"github.com/1Panel-dev/1Panel/agent/utils/nginx/components"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 )
 
@@ -444,21 +444,43 @@ func (n NginxService) OperateDefaultHTTPs(req request.NginxDefaultHTTPSUpdate) e
 	if err = nginxCheckAndReload(string(content), defaultConfigPath, appInstall.ContainerName); err != nil {
 		return err
 	}
-	if req.HTTPSRedirectCustomPort == nil {
+	previousUseCustomPort := getHTTPSRedirectCustomPort()
+	if req.HTTPSRedirectCustomPort == nil || *req.HTTPSRedirectCustomPort == previousUseCustomPort {
 		return nil
 	}
-	previousUseCustomPort := getHTTPSRedirectCustomPort()
-	if err = updateWebsiteHTTPSRedirectCustomPort(*req.HTTPSRedirectCustomPort); err != nil {
-		return err
+	oldPort := effectiveHTTPSRedirectPort(previousUseCustomPort, appInstall.HttpsPort)
+	newPort := effectiveHTTPSRedirectPort(*req.HTTPSRedirectCustomPort, appInstall.HttpsPort)
+	if oldPort != newPort {
+		if err = updateWebsiteHTTPSRedirectPort(oldPort, newPort); err != nil {
+			return errors.Join(err, restoreDefaultHTTPSConfig(appInstall, defaultConfigPath, content))
+		}
 	}
 	value := constant.StatusDisable
 	if *req.HTTPSRedirectCustomPort {
 		value = constant.StatusEnable
 	}
 	if err = settingRepo.UpdateOrCreate(constant.HTTPSRedirectCustomPortKey, value); err != nil {
-		return errors.Join(err, updateWebsiteHTTPSRedirectCustomPort(previousUseCustomPort))
+		var rollbackErr error
+		if oldPort != newPort {
+			rollbackErr = updateWebsiteHTTPSRedirectPort(newPort, oldPort)
+		}
+		return errors.Join(err, rollbackErr, restoreDefaultHTTPSConfig(appInstall, defaultConfigPath, content))
 	}
 	return nil
+}
+
+func restoreDefaultHTTPSConfig(appInstall model.AppInstall, filePath string, oldContent []byte) error {
+	currentContent, err := os.ReadFile(filePath)
+	if err != nil {
+		return err
+	}
+	if string(currentContent) == string(oldContent) {
+		return nil
+	}
+	if err = os.WriteFile(filePath, oldContent, constant.FilePerm); err != nil {
+		return err
+	}
+	return nginxCheckAndReload(string(currentContent), filePath, appInstall.ContainerName)
 }
 
 func (n NginxService) GetDefaultHttpsStatus() (*response.NginxConfigRes, error) {
@@ -498,7 +520,10 @@ type websiteHTTPSRedirectConfig struct {
 	newContent []byte
 }
 
-func updateWebsiteHTTPSRedirectCustomPort(useCustomPort bool) (err error) {
+func updateWebsiteHTTPSRedirectPort(oldPort, newPort int) (err error) {
+	if oldPort == newPort {
+		return nil
+	}
 	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -510,25 +535,9 @@ func updateWebsiteHTTPSRedirectCustomPort(useCustomPort bool) (err error) {
 
 	var updates []websiteHTTPSRedirectConfig
 	for _, website := range websites {
-		if website.Type == constant.Stream || website.WebsiteSSLID == 0 {
+		if website.Type == constant.Stream {
 			continue
 		}
-		httpConfig := website.HttpConfig
-		if httpConfig == "" {
-			httpConfig = constant.HTTPToHTTPS
-		}
-		if httpConfig != constant.HTTPToHTTPS {
-			continue
-		}
-		domains, err := websiteDomainRepo.GetBy(websiteDomainRepo.WithWebsiteId(website.ID))
-		if err != nil {
-			return err
-		}
-		plan := buildWebsiteTLSPlan(domains, appInstall.HttpPort, appInstall.HttpsPort)
-		if plan.redirectPort == 0 {
-			continue
-		}
-
 		filePath := GetWebsiteConfigPath(website)
 		content, err := os.ReadFile(filePath)
 		if os.IsNotExist(err) {
@@ -543,12 +552,14 @@ func updateWebsiteHTTPSRedirectCustomPort(useCustomPort bool) (err error) {
 		}
 		servers := config.FindServers()
 		if len(servers) == 0 {
-			return fmt.Errorf("website nginx server block is missing: %s", website.PrimaryDomain)
+			continue
 		}
 		server := servers[0]
-		server.AddHTTP2HTTPS(plan.redirectPort, useCustomPort)
-		target := components.HTTPSRedirectTarget(plan.redirectPort, useCustomPort)
-		server.UpdateDirective("error_page", []string{"497", target})
+		state := server.HTTPToHTTPSRedirectState()
+		if !state.Managed || state.Port != oldPort {
+			continue
+		}
+		server.SetHTTPToHTTPSRedirectPort(newPort)
 		config.FilePath = filePath
 		newContent := []byte(nginx.DumpConfig(config, nginx.IndentedStyle))
 		if string(newContent) == string(content) {

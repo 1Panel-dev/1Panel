@@ -4833,6 +4833,10 @@ const message = {
         privateKey: 'Anahtar (KEY)',
         certificate: 'Sertifika (PEM formatı)',
         HTTPConfig: 'HTTP Seçenekleri',
+        HTTPSRedirectPort: 'HTTPS yönlendirme bağlantı noktası',
+        HTTPSRedirectPortCustom: 'Özel',
+        HTTPSRedirectPortManualHelper:
+            'Bu yönlendirme kuralı manuel olarak düzenlendi veya yönetilmiyor; bu nedenle değiştirilemez.',
         HTTPSOnly: 'HTTP isteklerini engelle',
         HTTPToHTTPS: 'HTTPS’ye yönlendir',
         HTTPAlso: 'Doğrudan HTTP isteklerine izin ver',

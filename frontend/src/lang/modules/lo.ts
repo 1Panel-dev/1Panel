@@ -4615,6 +4615,10 @@ const message = {
         privateKey: 'ຄີສ່ວນຕົວ (KEY)',
         certificate: 'ໃບຢັ້ງຢືນ (ຮູບແບບ PEM)',
         HTTPConfig: 'ຕົວເລືອກ HTTP',
+        HTTPSRedirectPort: 'ພອດປ່ຽນເສັ້ນທາງ HTTPS',
+        HTTPSRedirectPortCustom: 'ກຳນົດເອງ',
+        HTTPSRedirectPortManualHelper:
+            'ກົດລະບຽບປ່ຽນເສັ້ນທາງນີ້ຖືກແກ້ໄຂດ້ວຍມື ຫຼື ບໍ່ໄດ້ຢູ່ໃນການຈັດການ ແລະ ບໍ່ສາມາດແກ້ໄຂໄດ້.',
         HTTPSOnly: 'ບລັອກການຮ້ອງຂໍ HTTP',
         HTTPToHTTPS: 'ປ່ຽນເສັ້ນທາງໄປ HTTPS',
         HTTPAlso: 'ອະນຸຍາດການຮ້ອງຂໍ HTTP ໂດຍກົງ',
@@ -4973,8 +4977,7 @@ const message = {
         sslRejectHandshakeHelper:
             'ການເປີດໃຊ້ສິ່ງນີ້ສາມາດຫຼີກລ່ຽງການຮົ່ວໄຫຼຂອງໃບຢັ້ງຢືນ, ແຕ່ການຕັ້ງເວັບໄຊເລີ່ມຕົ້ນຈະເຮັດໃຫ້ການຕັ້ງຄ່ານີ້ບໍ່ມີຜົນ',
         httpsRedirectCustomPort: 'ໃຊ້ພອດກຳນົດເອງໃນການປ່ຽນເສັ້ນທາງ',
-        httpsRedirectCustomPortHelper:
-            'ເມື່ອເປີດໃຊ້, ການປ່ຽນເສັ້ນທາງຈາກ HTTP ໄປ HTTPS ຈະໃຊ້ພອດ HTTPS ກຳນົດເອງ.',
+        httpsRedirectCustomPortHelper: 'ເມື່ອເປີດໃຊ້, ການປ່ຽນເສັ້ນທາງຈາກ HTTP ໄປ HTTPS ຈະໃຊ້ພອດ HTTPS ກຳນົດເອງ.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

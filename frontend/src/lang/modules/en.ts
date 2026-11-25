@@ -4759,6 +4759,10 @@ const message = {
         privateKey: 'Key (KEY)',
         certificate: 'Certificate (PEM format)',
         HTTPConfig: 'HTTP Options',
+        HTTPSRedirectPort: 'HTTPS redirect port',
+        HTTPSRedirectPortCustom: 'Custom',
+        HTTPSRedirectPortManualHelper:
+            'The redirect rule was manually edited or is otherwise unmanaged, so it cannot be modified.',
         HTTPSOnly: 'Block HTTP requests',
         HTTPToHTTPS: 'Redirect to HTTPS',
         HTTPAlso: 'Allow direct HTTP requests',
@@ -5127,8 +5131,7 @@ const message = {
         sslRejectHandshakeHelper:
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
         httpsRedirectCustomPort: 'Use custom port redirect',
-        httpsRedirectCustomPortHelper:
-            'When enabled, HTTP-to-HTTPS redirects use the configured custom HTTPS port.',
+        httpsRedirectCustomPortHelper: 'When enabled, HTTP-to-HTTPS redirects use the configured custom HTTPS port.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

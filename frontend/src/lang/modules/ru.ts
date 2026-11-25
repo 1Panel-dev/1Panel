@@ -4825,6 +4825,10 @@ const message = {
         privateKey: 'Ключ (KEY)',
         certificate: 'Сертификат (формат PEM)',
         HTTPConfig: 'Опции HTTP',
+        HTTPSRedirectPort: 'Порт HTTPS-перенаправления',
+        HTTPSRedirectPortCustom: 'Пользовательский',
+        HTTPSRedirectPortManualHelper:
+            'Это правило изменено вручную или не управляется системой, поэтому его нельзя изменить.',
         HTTPSOnly: 'Блокировать HTTP запросы',
         HTTPToHTTPS: 'Перенаправлять на HTTPS',
         HTTPAlso: 'Разрешить прямые HTTP запросы',

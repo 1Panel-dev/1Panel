@@ -67,6 +67,9 @@ type WebsiteNginxConfig struct {
 type WebsiteHTTPS struct {
 	Enable                bool             `json:"enable"`
 	HttpConfig            string           `json:"httpConfig"`
+	GlobalRedirectPort    int              `json:"globalRedirectPort"`
+	SiteRedirectPort      *int             `json:"siteRedirectPort"`
+	RedirectPortManaged   bool             `json:"redirectPortManaged"`
 	SSL                   model.WebsiteSSL `json:"SSL"`
 	SSLProtocol           []string         `json:"SSLProtocol"`
 	Algorithm             string           `json:"algorithm"`

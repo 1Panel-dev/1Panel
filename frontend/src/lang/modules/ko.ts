@@ -4654,6 +4654,10 @@ const message = {
         privateKey: '키(KEY)',
         certificate: '인증서(PEM 형식)',
         HTTPConfig: 'HTTP 옵션',
+        HTTPSRedirectPort: 'HTTPS 리디렉션 포트',
+        HTTPSRedirectPortCustom: '사용자 지정',
+        HTTPSRedirectPortManualHelper:
+            '이 리디렉션 규칙은 수동으로 편집되었거나 관리 대상이 아니므로 수정할 수 없습니다.',
         HTTPSOnly: 'HTTP 요청 차단',
         HTTPToHTTPS: 'HTTPS로 리디렉션',
         HTTPAlso: 'HTTP 요청 허용',
@@ -5016,8 +5020,7 @@ const message = {
         sslRejectHandshakeHelper:
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
         httpsRedirectCustomPort: '사용자 지정 포트로 리디렉션',
-        httpsRedirectCustomPortHelper:
-            '활성화하면 HTTP에서 HTTPS로 리디렉션할 때 사용자 지정 HTTPS 포트를 사용합니다.',
+        httpsRedirectCustomPortHelper: '활성화하면 HTTP에서 HTTPS로 리디렉션할 때 사용자 지정 HTTPS 포트를 사용합니다.',
     },
     ssl: {
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',

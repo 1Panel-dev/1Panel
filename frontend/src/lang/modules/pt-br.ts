@@ -4853,6 +4853,10 @@ const message = {
         privateKey: 'Chave (KEY)',
         certificate: 'Certificado (formato PEM)',
         HTTPConfig: 'Opções HTTP',
+        HTTPSRedirectPort: 'Porta de redirecionamento HTTPS',
+        HTTPSRedirectPortCustom: 'Personalizada',
+        HTTPSRedirectPortManualHelper:
+            'A regra de redirecionamento foi editada manualmente ou não é gerenciada e, portanto, não pode ser modificada.',
         HTTPSOnly: 'Bloquear requisições HTTP',
         HTTPToHTTPS: 'Redirecionar para HTTPS',
         HTTPAlso: 'Permitir requisições HTTP diretas',
