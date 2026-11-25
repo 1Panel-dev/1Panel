@@ -1495,10 +1495,11 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 				server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
 			}
 		}
-		if req.RuntimeID > 0 && (site.Status != constant.WebStopped || server.HasStopPage()) {
+		phpEnabled := req.RuntimeID > 0 && (site.Status != constant.WebStopped || server.HasStopPage())
+		if phpEnabled {
 			updated := false
 			for _, location := range server.FindDirectives("location") {
-				if strings.Join(location.GetParameters(), " ") == "~ [^/]\\.php(/|$)" && location.GetBlock() != nil {
+				if strings.Join(location.GetParameters(), " ") == phpLocationMatch && location.GetBlock() != nil {
 					location.GetBlock().UpdateDirective("fastcgi_pass", []string{site.Proxy})
 					updated = true
 				}
@@ -1512,6 +1513,21 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		config.FilePath = configPath
 		configs = append(configs, config)
 		oldContents[configPath] = content
+
+		authConfigs, authOldContents, err := collectSyncedPathAuthConfigs(
+			fileOp,
+			GetSitePath(*site, SitePathAuthBasicDir),
+			phpEnabled,
+			site.Proxy,
+			server,
+		)
+		if err != nil {
+			return err
+		}
+		configs = append(configs, authConfigs...)
+		for authPath, authContent := range authOldContents {
+			oldContents[authPath] = authContent
+		}
 	}
 
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
