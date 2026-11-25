@@ -7951,6 +7951,13 @@ const message = {
             appUpgradeHelper: 'Existem {0} aplicativos que precisam ser atualizados',
             dashboardSetting: 'Configurações da Visão Geral',
             keepOneDashboardComponent: 'Mantenha pelo menos uma seção na visão geral',
+            currentNode: 'Nó atual',
+            quickSwitch: 'Troca rápida',
+            allNodes: 'Todos os nós',
+            nodeSearchPlaceholder: 'Pesquisar nome ou endereço do nó',
+            currentNodeNotInResults: 'O nó atual não está nesta página de resultados',
+            upgradableApps: 'Aplicativos atualizáveis',
+            quickSwitchMore: 'Ver todos os nós correspondentes',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',

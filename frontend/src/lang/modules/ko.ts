@@ -7607,6 +7607,13 @@ const message = {
             appUpgradeHelper: '업그레이드가 필요한 앱이 {0}개 있습니다',
             dashboardSetting: '개요 설정',
             keepOneDashboardComponent: '개요 섹션을 하나 이상 유지하세요',
+            currentNode: '현재 노드',
+            quickSwitch: '빠른 전환',
+            allNodes: '모든 노드',
+            nodeSearchPlaceholder: '노드 이름 또는 주소 검색',
+            currentNodeNotInResults: '현재 노드가 이 페이지의 결과에 없습니다',
+            upgradableApps: '업그레이드 가능한 앱',
+            quickSwitchMore: '일치하는 모든 노드 보기',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',

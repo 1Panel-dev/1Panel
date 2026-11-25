@@ -7908,6 +7908,13 @@ const message = {
             appUpgradeHelper: 'Yükseltilmesi gereken {0} uygulama var',
             dashboardSetting: 'Genel Bakış Ayarları',
             keepOneDashboardComponent: 'En az bir genel bakış bölümü bırakın',
+            currentNode: 'Geçerli düğüm',
+            quickSwitch: 'Hızlı geçiş',
+            allNodes: 'Tüm düğümler',
+            nodeSearchPlaceholder: 'Düğüm adı veya adresi ara',
+            currentNodeNotInResults: 'Geçerli düğüm bu sayfanın sonuçlarında bulunmuyor',
+            upgradableApps: 'Yükseltilebilir uygulamalar',
+            quickSwitchMore: 'Eşleşen tüm düğümleri görüntüle',
         },
         customApp: {
             name: 'Özel Uygulama Deposu',

@@ -7897,6 +7897,13 @@ const message = {
             appUpgradeHelper: 'Terdapat {0} apl yang perlu dinaik taraf',
             dashboardSetting: 'Tetapan Gambaran Keseluruhan',
             keepOneDashboardComponent: 'Kekalkan sekurang-kurangnya satu bahagian gambaran keseluruhan',
+            currentNode: 'Nod semasa',
+            quickSwitch: 'Tukar pantas',
+            allNodes: 'Semua nod',
+            nodeSearchPlaceholder: 'Cari nama atau alamat nod',
+            currentNodeNotInResults: 'Nod semasa tiada dalam hasil halaman ini',
+            upgradableApps: 'Apl boleh dinaik taraf',
+            quickSwitchMore: 'Lihat semua nod yang sepadan',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',

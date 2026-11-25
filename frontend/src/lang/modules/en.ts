@@ -7780,6 +7780,13 @@ const message = {
             appUpgradeHelper: 'There are {0} apps that need to be upgraded',
             dashboardSetting: 'Overview Settings',
             keepOneDashboardComponent: 'Keep at least one overview section',
+            currentNode: 'Current Node',
+            quickSwitch: 'Quick Switch',
+            allNodes: 'All Nodes',
+            nodeSearchPlaceholder: 'Search node name or address',
+            currentNodeNotInResults: 'The current node is not on this page',
+            upgradableApps: 'Upgradable Apps',
+            quickSwitchMore: 'View all matching nodes',
         },
         customApp: {
             name: 'Custom App Repository',
