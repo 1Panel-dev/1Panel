@@ -2516,7 +2516,7 @@ const message = {
         imageMissing: 'A imagem necessária não foi encontrada. Baixe {image} no gerenciamento de imagens.',
         imageReady: 'A imagem do Benchmark está pronta para criar testes.',
         imageHelp:
-            'A imagem do Benchmark executa o cliente de carga e envia solicitações ao serviço de modelos selecionado.',
+            'O sistema usa esta imagem para criar um contêiner separado que executa testes de desempenho enviando solicitações ao serviço de modelos selecionado.',
         mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
         goImages: 'Ir ao gerenciamento de imagens',
         goModels: 'Ir aos downloads de modelos',

@@ -2440,7 +2440,8 @@ const message = {
         checkFailed: '확인 실패',
         imageMissing: '필요한 이미지를 찾을 수 없습니다. 이미지 관리에서 {image} 이미지를 가져오세요.',
         imageReady: 'Benchmark 이미지가 준비되었습니다. 벤치마크를 생성할 수 있습니다.',
-        imageHelp: 'Benchmark 이미지는 부하 테스트 클라이언트를 실행하고 선택한 모델 서비스에 요청을 보냅니다.',
+        imageHelp:
+            '시스템은 이 이미지로 별도의 컨테이너를 생성하고, 선택한 모델 서비스에 테스트 요청을 보내 벤치마크를 실행합니다.',
         mainNodeHelp: '벤치마크는 메인 노드에서 실행됩니다. 이미지와 토크나이저를 메인 노드에 준비하세요.',
         goImages: '이미지 관리로 이동',
         goModels: '모델 다운로드로 이동',

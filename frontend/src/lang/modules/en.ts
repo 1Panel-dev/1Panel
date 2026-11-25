@@ -2486,7 +2486,8 @@ const message = {
         checkFailed: 'Check failed',
         imageMissing: 'The required image was not found. Pull {image} in image management.',
         imageReady: 'The Benchmark image is ready for creating tests.',
-        imageHelp: 'The Benchmark image runs the load test client and sends requests to the selected model service.',
+        imageHelp:
+            'The system uses this image to create a separate container that runs benchmarks by sending test requests to the selected model service.',
         mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
         goImages: 'Go to image management',
         goModels: 'Go to model downloads',
