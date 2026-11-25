@@ -2507,7 +2507,8 @@ const message = {
         checkFailed: 'Kontrol başarısız',
         imageMissing: 'Gerekli imaj bulunamadı. İmaj yönetiminde {image} imajını indirin.',
         imageReady: 'Benchmark imajı test oluşturmaya hazır.',
-        imageHelp: 'Benchmark imajı yük testi istemcisini çalıştırır ve seçilen model hizmetine istek gönderir.',
+        imageHelp:
+            'Sistem bu imajdan ayrı bir konteyner oluşturur ve seçilen model hizmetine test istekleri göndererek performans testlerini çalıştırır.',
         mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
         goImages: 'İmaj yönetimine git',
         goModels: 'Model indirmelerine git',

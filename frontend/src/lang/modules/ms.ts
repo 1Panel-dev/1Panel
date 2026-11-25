@@ -2510,7 +2510,7 @@ const message = {
         imageMissing: 'Imej yang diperlukan tidak ditemui. Tarik {image} dalam pengurusan imej.',
         imageReady: 'Imej Benchmark sedia untuk mencipta ujian.',
         imageHelp:
-            'Imej Benchmark menjalankan klien ujian beban dan menghantar permintaan ke perkhidmatan model yang dipilih.',
+            'Sistem menggunakan imej ini untuk mencipta bekas berasingan yang menjalankan ujian penanda aras dengan menghantar permintaan ujian kepada perkhidmatan model yang dipilih.',
         mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
         goImages: 'Ke pengurusan imej',
         goModels: 'Ke muat turun model',
