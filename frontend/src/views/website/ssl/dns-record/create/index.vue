@@ -13,7 +13,16 @@
                 <span class="input-help">{{ $t('website.dnsRecordHostHelper') }}</span>
             </el-form-item>
             <el-form-item :label="$t('website.dnsRecordValue')" prop="value">
-                <el-input v-model.trim="record.value" :type="accountType === 'AWSRoute53' ? 'textarea' : 'text'" />
+                <div class="flex w-full gap-2">
+                    <el-input
+                        class="flex-1"
+                        v-model.trim="record.value"
+                        :type="accountType === 'AWSRoute53' ? 'textarea' : 'text'"
+                    />
+                    <el-button v-if="['A', 'AAAA'].includes(record.type)" :loading="ipLoading" @click="useServerIP">
+                        {{ $t('website.dnsRecordUseIP') }}
+                    </el-button>
+                </div>
                 <span class="input-help" v-if="accountType === 'AWSRoute53'">
                     {{ $t('website.dnsRecordValueHelper') }}
                 </span>
@@ -54,7 +63,9 @@ import { createDnsRecord, updateDnsRecord } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { Rules } from '@/global/form-rules';
 import i18n from '@/lang';
-import { MsgSuccess } from '@/utils/message';
+import { MsgError, MsgSuccess } from '@/utils/message';
+import { getAgentSettingInfo } from '@/api/modules/setting';
+import { useGlobalStore } from '@/composables/useGlobalStore';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 
@@ -93,6 +104,31 @@ const emptyRecord = (): Website.DnsRecord => ({
 });
 const record = ref<Website.DnsRecord>(emptyRecord());
 const em = defineEmits(['saved']);
+
+const { currentNodeAddr } = useGlobalStore();
+const ipLoading = ref(false);
+
+const useServerIP = async () => {
+    ipLoading.value = true;
+    try {
+        const res = await getAgentSettingInfo();
+        const ip = res.data.systemIP || currentNodeAddr.value || '';
+        if (!ip) {
+            MsgError(i18n.global.t('website.dnsRecordUseIPEmpty'));
+            return;
+        }
+        const isV4 = /^(\d{1,3}\.){3}\d{1,3}$/.test(ip);
+        const isV6 = ip.includes(':');
+        if ((record.value.type === 'A' && !isV4) || (record.value.type === 'AAAA' && !isV6)) {
+            MsgError(i18n.global.t('website.dnsRecordUseIPMismatch', [ip]));
+            return;
+        }
+        record.value.value = ip;
+        recordForm.value?.clearValidate('value');
+    } finally {
+        ipLoading.value = false;
+    }
+};
 
 const handleClose = () => {
     recordForm.value?.resetFields();
