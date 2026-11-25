@@ -688,6 +688,17 @@ FormatDiskErr: 'فرمت کردن ناموفق بود: {{ .err }}'
 MountDiskErr: 'اتصال ناموفق بود: {{ .err }}'
 XfsNotFound: 'xfs یافت نشد؛ ابتدا xfsprogs را نصب کنید'
 
+# مدیریت شبکه
+ErrNetworkPersistencePlatform: "تنظیمات پایدار شبکه فقط در گره‌های لینوکس پشتیبانی می‌شود."
+ErrNetworkPersistencePrivilege: "برای تنظیمات پایدار شبکه، 1Panel Agent باید با کاربر root و دسترسی مدیریت شبکه اجرا شود."
+ErrNetworkIPRoute2: "iproute2 را نصب یا به‌روزرسانی کنید و بررسی کنید که فرمان ip در دسترس باشد.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "این نشانی IP اصلی دارای نشانی‌های ثانویه در همان زیرشبکه است. ابتدا نشانی‌های ثانویه را حذف کنید یا آن‌ها را با ابزارهای شبکه سیستم تنظیم کرده و دوباره تلاش کنید."
+ErrNetworkRouteReadOnly: "این مسیر فقط خواندنی است."
+ErrNetworkPersistenceConflict: "این نشانی یا مسیر از قبل وجود دارد یا با تنظیمات ذخیره‌شده تداخل دارد.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "پیکربندی رابط حلقه بازگشت فقط خواندنی است."
+ErrNetworkPersistentSourceMissing: "هیچ پیکربندی پایدار سیستم با پشتیبانی برای رابط {{ .name }} یافت نشد. این رابط فقط خواندنی است."
+ErrNetworkVirtualBridgeReadOnly: "این رابط مجازی فقط خواندنی است و در بررسی دسترسی‌پذیری شرکت نمی‌کند."
+
 # ترمینال
 TerminalAIBlockedRiskyCommand: 'دستور پرخطر مسدود شد: {{ .command }}'
 TerminalAIThinking: 'هوش مصنوعی در حال فکر کردن است...'

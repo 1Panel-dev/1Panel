@@ -687,6 +687,17 @@ FormatDiskErr: 'Не удалось отформатировать диск, {{ 
 MountDiskErr: 'Не удалось подключить диск, {{ .err }}'
 XfsNotFound: 'Файловая система xfs не обнаружена, сначала установите xfsprogs'
 
+# Управление сетью
+ErrNetworkPersistencePlatform: "Постоянные настройки сети поддерживаются только на узлах Linux."
+ErrNetworkPersistencePrivilege: "Для сохранения настроек сети 1Panel Agent должен работать от имени root с правами управления сетью."
+ErrNetworkIPRoute2: "Установите или обновите iproute2 и проверьте доступность команды ip.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "У этого основного IP-адреса есть дополнительные адреса в той же подсети. Сначала удалите дополнительные адреса или измените их системными сетевыми средствами, затем повторите попытку."
+ErrNetworkRouteReadOnly: "Этот маршрут доступен только для чтения."
+ErrNetworkPersistenceConflict: "Этот адрес или маршрут уже существует либо конфликтует с сохранёнными настройками.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Настройка петлевого интерфейса доступна только для чтения."
+ErrNetworkPersistentSourceMissing: "Для интерфейса {{ .name }} не найдена поддерживаемая постоянная конфигурация системы. Доступно только чтение."
+ErrNetworkVirtualBridgeReadOnly: "Этот виртуальный интерфейс доступен только для чтения и исключён из проверок доступности."
+
 # терминал
 TerminalAIBlockedRiskyCommand: 'Опасная команда заблокирована: {{ .command }}'
 TerminalAIThinking: 'AI думает...'

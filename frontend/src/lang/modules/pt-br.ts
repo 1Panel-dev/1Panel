@@ -5806,6 +5806,84 @@ const message = {
         serial: 'Número de Série',
         noFail: 'Falha na montagem não afeta a inicialização do sistema',
     },
+    networkManage: {
+        routeDetails: 'Detalhes da rota',
+        manageIP: 'Gerenciar IP associado',
+        connectedRoute: 'Gerada a partir do IP',
+        connectedRouteHint:
+            'O sistema gera esta rota conectada a partir do IP da interface. Ela não é editada separadamente. Edite ou remova o IP correspondente nos detalhes da interface.',
+        virtualBridgeReadOnly: 'Interface virtual · Somente leitura',
+        virtualBridgeReadOnlyHint:
+            'Esta interface virtual é somente leitura e não participa das verificações de conectividade.',
+        loopbackReadOnly: 'A configuração da interface de loopback é somente leitura.',
+        persistentSourceMissing:
+            'Nenhuma configuração persistente do sistema compatível foi encontrada para a interface {0}. Ela é somente leitura.',
+        addressReadOnlyReason:
+            'Este endereço é dinâmico, não global ou não possui configuração persistente compatível. Ele é somente leitura.',
+        routeReadOnlyReason:
+            'Esta rota é dinâmica, gerada pelo kernel ou não possui configuração persistente compatível. Ela é somente leitura.',
+        persistenceBackend: 'Persistência',
+        editIP: 'Editar IP',
+        editRoute: 'Editar rota',
+        operationRisk:
+            'Alterações na rede podem interromper conexões. Prepare uma forma alternativa de acessar o servidor.',
+        confirmInterface: 'Digite o nome da interface {0} para confirmar.',
+        sourceAddress: 'Endereço de origem',
+        linkConnected: 'Link conectado',
+        linkDisconnected: 'Link desconectado',
+        topologySearch: 'Buscar interface, IP, gateway ou destino',
+        topologyHint:
+            'Gerencie os IPs da interface à esquerda. Os cartões mostram destino, gateway e métrica. Clique em um cartão para ver detalhes; as linhas não indicam conectividade verificada.',
+        direct: 'Direta',
+        defaultDestination: 'Rota padrão',
+        unknownInterface: 'Interface não especificada',
+        noRoutes: 'Nenhuma rota correspondente',
+        readOnly: 'Somente leitura',
+        readOnlyRouteHint: 'Rotas com vários próximos saltos ou sem uma interface única são somente leitura.',
+        title: 'Gerenciamento de rede',
+        interfaces: 'Interfaces de rede',
+        routes: 'Rotas',
+        addIP: 'Adicionar IP',
+        ipCount: 'Quantidade de IPs',
+        interfaceID: 'ID da interface',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado do enlace',
+        mac: 'Endereço MAC',
+        flags: 'Indicadores',
+        address: 'Endereço',
+        scope: 'Escopo',
+        interface: 'Interface',
+        configStatus: 'Estado da configuração',
+        managedApplied: 'Salvo · Ativo',
+        managedPending: 'Salvo · Inativo',
+        addressWarning:
+            'Use o IP atribuído a esta interface. Se o IP público for mapeado por NAT, informe o IP privado.',
+        addressRisk:
+            'Um IP já em uso ou um comprimento de prefixo incorreto pode interromper o acesso ao painel ou por SSH.',
+        addressWithPrefix: 'Endereço IP / comprimento do prefixo',
+        interfaceSelectHint:
+            'São listadas apenas interfaces cuja configuração persistente pode ser alterada. Interfaces de loopback, pontes virtuais somente leitura e outras interfaces que não podem ser alteradas são excluídas.',
+        gatewayHint: 'Deixe o gateway vazio para sub-redes conectadas diretamente.',
+        metricHint: 'Para a mesma sub-rede de destino, as rotas com métrica menor geralmente têm prioridade.',
+        defaultRouteWarning:
+            'Uma rota padrão pode mudar a saída do painel, do SSH e de outros serviços. Prepare um acesso alternativo, como o console da nuvem.',
+        interfaceMissing: 'Interface ausente',
+        changeWarning:
+            'Alterar as configurações de rede pode desconectar o painel ou interromper serviços. Antes de continuar, confirme que você tem outra forma de acessar este servidor.',
+        cidrHint:
+            'Em 192.0.2.10/24, /24 corresponde à máscara de sub-rede 255.255.255.0. Exemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Adicionar rota',
+        checkRoutes: 'Verificar acessibilidade das rotas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabela',
+        reachability: 'Acessibilidade',
+        reachable: 'Acessível',
+        unreachable: 'Inacessível',
+        unchecked: 'Não verificada',
+        check: 'Verificar',
+        destinationHint: 'Aceita endereços IPv4/IPv6 ou redes CIDR. Rota padrão: default, 0.0.0.0/0 ou ::/0.',
+    },
     xpack: {
         ldap: {
             source: 'Origem',

@@ -677,6 +677,17 @@ FormatDiskErr: 'ການຟໍແມັດລົ້ມເຫຼວ: {{ .err }}'
 MountDiskErr: 'ການ Mount ລົ້ມເຫຼວ: {{ .err }}'
 XfsNotFound: 'ບໍ່ພົບ xfs; ກະລຸນາຕິດຕັ້ງ xfsprogs ກ່ອນ'
 
+# ການຈັດການເຄືອຂ່າຍ
+ErrNetworkPersistencePlatform: "ການຕັ້ງຄ່າເຄືອຂ່າຍແບບຖາວອນຮອງຮັບສະເພາະໂນດ Linux."
+ErrNetworkPersistencePrivilege: "1Panel Agent ຕ້ອງເຮັດວຽກເປັນ root ແລະມີສິດຄຸ້ມຄອງເຄືອຂ່າຍ."
+ErrNetworkIPRoute2: "ຕິດຕັ້ງ ຫຼືອັບເດດ iproute2 ແລະກວດວ່າຄຳສັ່ງ ip ໃຊ້ໄດ້.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "ທີ່ຢູ່ IP ຫຼັກນີ້ມີທີ່ຢູ່ຮອງໃນເຄືອຂ່າຍຍ່ອຍດຽວກັນ. ກະລຸນາລຶບທີ່ຢູ່ຮອງກ່ອນ ຫຼື ປັບດ້ວຍເຄື່ອງມືເຄືອຂ່າຍຂອງລະບົບແລ້ວລອງໃໝ່."
+ErrNetworkRouteReadOnly: "ເສັ້ນທາງນີ້ສາມາດເບິ່ງໄດ້ເທົ່ານັ້ນ."
+ErrNetworkPersistenceConflict: "ທີ່ຢູ່ ຫຼື ເສັ້ນທາງນີ້ມີຢູ່ແລ້ວ ຫຼື ຂັດກັບຄ່າທີ່ບັນທຶກໄວ້.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "ການຕັ້ງຄ່າອິນເຕີເຟດ loopback ອ່ານໄດ້ຢ່າງດຽວ."
+ErrNetworkPersistentSourceMissing: "ບໍ່ພົບການຕັ້ງຄ່າຖາວອນຂອງລະບົບທີ່ຮອງຮັບສຳລັບອິນເຕີເຟດ {{ .name }}. ອ່ານໄດ້ຢ່າງດຽວ."
+ErrNetworkVirtualBridgeReadOnly: "ອິນເຕີເຟດສະເໝືອນນີ້ອ່ານໄດ້ຢ່າງດຽວ ແລະ ບໍ່ຮ່ວມໃນການກວດສອບການເຂົ້າເຖິງ."
+
 # terminal
 TerminalAIBlockedRiskyCommand: 'ບລັອກຄຳສັ່ງທີ່ມີຄວາມສ່ຽງ: {{ .command }}'
 TerminalAIThinking: 'AI ກຳລັງຄິດ...'

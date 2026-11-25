@@ -2797,78 +2797,6 @@
 		"formatZH": "创建 postgresql 数据库 [name]",
 		"formatEN": "create postgresql database [name]"
 	},
-	"/databases/pg/users": {
-		"bodyKeys": [
-			"database",
-			"username"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "创建 PostgreSQL 实例 [database] 用户 [username]",
-		"formatEN": "create PostgreSQL instance [database] user [username]"
-	},
-	"/databases/pg/users/update": {
-		"bodyKeys": [
-			"database",
-			"username"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username]",
-		"formatEN": "update PostgreSQL instance [database] user [username]"
-	},
-	"/databases/pg/users/password/save": {
-		"bodyKeys": [
-			"database",
-			"username"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "补充 PostgreSQL 实例 [database] 用户 [username] 密码",
-		"formatEN": "save PostgreSQL instance [database] user [username] password locally"
-	},
-	"/databases/pg/users/password": {
-		"bodyKeys": [
-			"database",
-			"username"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username] 密码",
-		"formatEN": "change PostgreSQL instance [database] user [username] password"
-	},
-	"/databases/pg/users/del": {
-		"bodyKeys": [
-			"database",
-			"username"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "删除 PostgreSQL 实例 [database] 用户 [username]",
-		"formatEN": "delete PostgreSQL instance [database] user [username]"
-	},
-	"/databases/pg/grants": {
-		"bodyKeys": [
-			"database",
-			"username",
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "绑定 PostgreSQL 实例 [database] 数据库 [name] 用户 [username]",
-		"formatEN": "bind PostgreSQL instance [database] database [name] user [username]"
-	},
-	"/databases/pg/grants/del": {
-		"bodyKeys": [
-			"database",
-			"username",
-			"name"
-		],
-		"paramKeys": [],
-		"beforeFunctions": [],
-		"formatZH": "撤销 PostgreSQL 实例 [database] 数据库 [name] 用户 [username] 绑定",
-		"formatEN": "revoke PostgreSQL instance [database] database [name] user [username] binding"
-	},
 	"/databases/pg/bind": {
 		"bodyKeys": [
 			"name",
@@ -2916,6 +2844,28 @@
 		"formatZH": "postgresql 数据库 [name] 描述信息修改 [description]",
 		"formatEN": "The description of the postgresql database [name] is modified =\u003e [description]"
 	},
+	"/databases/pg/grants": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "绑定 PostgreSQL 实例 [database] 数据库 [name] 用户 [username]",
+		"formatEN": "bind PostgreSQL instance [database] database [name] user [username]"
+	},
+	"/databases/pg/grants/del": {
+		"bodyKeys": [
+			"database",
+			"username",
+			"name"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "撤销 PostgreSQL 实例 [database] 数据库 [name] 用户 [username] 绑定",
+		"formatEN": "revoke PostgreSQL instance [database] database [name] user [username] binding"
+	},
 	"/databases/pg/password": {
 		"bodyKeys": [
 			"id"
@@ -2943,6 +2893,56 @@
 		"beforeFunctions": [],
 		"formatZH": "更新数据库 [database] 用户 [username] 权限",
 		"formatEN": "Update [username] privileges of database [database]"
+	},
+	"/databases/pg/users": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "创建 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "create PostgreSQL instance [database] user [username]"
+	},
+	"/databases/pg/users/del": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "删除 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "delete PostgreSQL instance [database] user [username]"
+	},
+	"/databases/pg/users/password": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username] 密码",
+		"formatEN": "change PostgreSQL instance [database] user [username] password"
+	},
+	"/databases/pg/users/password/save": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "补充 PostgreSQL 实例 [database] 用户 [username] 密码",
+		"formatEN": "save PostgreSQL instance [database] user [username] password locally"
+	},
+	"/databases/pg/users/update": {
+		"bodyKeys": [
+			"database",
+			"username"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "修改 PostgreSQL 实例 [database] 用户 [username]",
+		"formatEN": "update PostgreSQL instance [database] user [username]"
 	},
 	"/databases/redis/conf/update": {
 		"bodyKeys": [],
@@ -3554,6 +3554,48 @@
 		"beforeFunctions": [],
 		"formatZH": "修改默认监控网卡 [key]-[value]",
 		"formatEN": "update default monitor [key]-[value]"
+	},
+	"/hosts/network/address": {
+		"bodyKeys": [
+			"interface",
+			"address"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加网卡 [interface] 地址 [address]",
+		"formatEN": "add address [address] to interface [interface]"
+	},
+	"/hosts/network/address/del": {
+		"bodyKeys": [
+			"interface",
+			"address"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "移除网卡 [interface] 地址 [address]",
+		"formatEN": "remove address [address] from interface [interface]"
+	},
+	"/hosts/network/routes": {
+		"bodyKeys": [
+			"destination",
+			"gateway",
+			"interface"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "添加路由 [destination] 网关 [gateway] 设备 [interface]",
+		"formatEN": "add route [destination] gateway [gateway] device [interface]"
+	},
+	"/hosts/network/routes/del": {
+		"bodyKeys": [
+			"destination",
+			"gateway",
+			"interface"
+		],
+		"paramKeys": [],
+		"beforeFunctions": [],
+		"formatZH": "移除路由 [destination] 网关 [gateway] 设备 [interface]",
+		"formatEN": "remove route [destination] gateway [gateway] device [interface]"
 	},
 	"/hosts/ssh/cert": {
 		"bodyKeys": [],

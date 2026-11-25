@@ -687,6 +687,17 @@ FormatDiskErr: '디스크 포맷에 실패했습니다, {{ .err }}'
 MountDiskErr: '디스크 마운트에 실패했습니다, {{ .err }}'
 XfsNotFound: 'xfs 파일 시스템이 감지되지 않았습니다, 먼저 xfsprogs 를 설치하세요'
 
+# 네트워크 관리
+ErrNetworkPersistencePlatform: "네트워크 설정 영구 저장은 Linux 노드에서만 지원됩니다."
+ErrNetworkPersistencePrivilege: "네트워크 설정을 유지하려면 1Panel Agent가 네트워크 관리 권한을 가진 root로 실행되어야 합니다."
+ErrNetworkIPRoute2: "iproute2를 설치하거나 업데이트하고 ip 명령을 사용할 수 있는지 확인하세요.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "이 기본 IP 주소에는 같은 서브넷의 보조 주소가 있습니다. 먼저 보조 주소를 삭제하거나 시스템 네트워크 도구로 조정한 후 다시 시도하세요."
+ErrNetworkRouteReadOnly: "이 경로는 읽기 전용입니다."
+ErrNetworkPersistenceConflict: "이 주소나 경로가 이미 존재하거나 저장된 설정과 충돌합니다.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "루프백 인터페이스 설정은 읽기 전용입니다."
+ErrNetworkPersistentSourceMissing: "인터페이스 {{ .name }}에 지원되는 시스템 영구 설정이 없습니다. 읽기 전용입니다."
+ErrNetworkVirtualBridgeReadOnly: "이 가상 인터페이스는 읽기 전용이며 도달 가능성 검사에서 제외됩니다."
+
 # 터미널
 TerminalAIBlockedRiskyCommand: '위험한 명령이 차단되었습니다: {{ .command }}'
 TerminalAIThinking: 'AI가 생각 중입니다...'

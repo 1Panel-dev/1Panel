@@ -687,6 +687,17 @@ FormatDiskErr: 'Error al formatear disco, {{ .err }}'
 MountDiskErr: 'Error al montar disco, {{ .err }}'
 XfsNotFound: 'No se detectó el sistema de archivos xfs instale xfsprogs primero'
 
+# Gestión de red
+ErrNetworkPersistencePlatform: "La configuración de red persistente solo está disponible en nodos Linux."
+ErrNetworkPersistencePrivilege: "La configuración de red persistente requiere que 1Panel Agent se ejecute como root con permisos de administración de red."
+ErrNetworkIPRoute2: "Instala o actualiza iproute2 y comprueba que el comando ip esté disponible.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "Esta dirección IP primaria tiene direcciones secundarias en la misma subred. Elimine primero las direcciones secundarias o ajústelas con las herramientas de red del sistema antes de volver a intentarlo."
+ErrNetworkRouteReadOnly: "Esta ruta es de solo lectura."
+ErrNetworkPersistenceConflict: "Esta dirección o ruta ya existe o entra en conflicto con la configuración guardada.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "La configuración de la interfaz de bucle invertido es de solo lectura."
+ErrNetworkPersistentSourceMissing: "No se encontró una configuración persistente del sistema compatible para la interfaz {{ .name }}. Es de solo lectura."
+ErrNetworkVirtualBridgeReadOnly: "Esta interfaz virtual es de solo lectura y no participa en las comprobaciones de conectividad."
+
 # terminal
 TerminalAIBlockedRiskyCommand: 'Comando de riesgo bloqueado: {{ .command }}'
 TerminalAIThinking: 'La IA está pensando...'

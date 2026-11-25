@@ -5770,6 +5770,83 @@ const message = {
         partitionAlert: 'Operasi ini memformat seluruh cakera. Pastikan data telah dibackup!',
         mountPoint: 'Titik lekap',
     },
+    networkManage: {
+        routeDetails: 'Butiran laluan',
+        manageIP: 'Urus IP berkaitan',
+        connectedRoute: 'Dijana daripada IP',
+        connectedRouteHint:
+            'Sistem menjana laluan terus ini berdasarkan IP antara muka. Laluan ini tidak disunting secara berasingan. Sunting atau padam IP yang berkaitan dalam butiran antara muka.',
+        virtualBridgeReadOnly: 'Antara muka maya · Baca sahaja',
+        virtualBridgeReadOnlyHint:
+            'Antara muka maya ini adalah baca sahaja dan tidak disertakan dalam semakan kebolehcapaian.',
+        loopbackReadOnly: 'Konfigurasi antara muka gelung balik adalah baca sahaja.',
+        persistentSourceMissing:
+            'Tiada konfigurasi sistem kekal yang disokong ditemui untuk antara muka {0}. Ia adalah baca sahaja.',
+        addressReadOnlyReason:
+            'Alamat ini dinamik, bukan global atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        routeReadOnlyReason:
+            'Laluan ini dinamik, dijana kernel atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        persistenceBackend: 'Kaedah penyimpanan kekal',
+        editIP: 'Edit IP',
+        editRoute: 'Edit laluan',
+        operationRisk: 'Perubahan rangkaian boleh memutuskan sambungan. Sediakan cara alternatif untuk mengakses pelayan.',
+        confirmInterface: 'Masukkan nama antara muka {0} untuk mengesahkan.',
+        sourceAddress: 'Alamat sumber',
+        linkConnected: 'Pautan disambungkan',
+        linkDisconnected: 'Pautan terputus',
+        topologySearch: 'Cari antara muka, IP, get laluan atau destinasi',
+        topologyHint: 'Urus IP antara muka di sebelah kiri. Kad laluan menunjukkan destinasi, get laluan dan metrik. Klik kad untuk butiran; garisan tidak menandakan sambungan telah disahkan.',
+        direct: 'Terus',
+        defaultDestination: 'Laluan lalai',
+        unknownInterface: 'Antara muka tidak ditentukan',
+        noRoutes: 'Tiada laluan sepadan',
+        readOnly: 'Baca sahaja',
+        readOnlyRouteHint: 'Laluan dengan berbilang hop seterusnya atau tanpa antara muka tunggal adalah baca sahaja.',
+        title: 'Pengurusan Rangkaian',
+        interfaces: 'Antara Muka Rangkaian',
+        routes: 'Laluan',
+        addIP: 'Tambah IP',
+        ipCount: 'Bilangan IP',
+        interfaceID: 'ID antara muka',
+        adminState: 'Status pentadbiran',
+        linkState: 'Status pautan',
+        mac: 'Alamat MAC',
+        flags: 'Bendera',
+        address: 'Alamat',
+        scope: 'Skop',
+        interface: 'Antara muka',
+        configStatus: 'Status tetapan',
+        managedApplied: 'Disimpan · Aktif',
+        managedPending: 'Disimpan · Tidak aktif',
+        addressWarning:
+            'Gunakan IP yang diperuntukkan kepada antara muka ini. Jika IP awam dipetakan melalui NAT, masukkan IP persendirian.',
+        addressRisk:
+            'IP yang sedang digunakan atau panjang awalan yang salah boleh memutuskan akses ke panel atau SSH.',
+        interfaceSelectHint:
+            'Hanya antara muka dengan konfigurasi kekal yang boleh diedit disenaraikan. Antara muka gelung balik, jambatan maya baca sahaja dan antara muka lain yang tidak boleh diubah tidak disenaraikan.',
+        gatewayHint: 'Biarkan get laluan kosong untuk subnet yang disambungkan secara langsung.',
+        metricHint:
+            'Untuk subnet destinasi yang sama, laluan dengan metrik lebih rendah biasanya diutamakan.',
+        defaultRouteWarning:
+            'Laluan lalai boleh menukar laluan keluar panel, SSH dan perkhidmatan lain. Sediakan akses alternatif seperti konsol awan.',
+        interfaceMissing: 'Antara muka tiada',
+        changeWarning:
+            'Menukar tetapan rangkaian mungkin memutuskan sambungan panel atau mengganggu perkhidmatan. Pastikan anda mempunyai cara lain untuk mengakses pelayan ini sebelum meneruskan.',
+        addressWithPrefix: 'Alamat IP / panjang awalan',
+        cidrHint:
+            'Dalam 192.0.2.10/24, /24 bersamaan dengan topeng subnet 255.255.255.0. Contoh IPv6: 2001:db8::10/64.',
+        addRoute: 'Tambah laluan',
+        checkRoutes: 'Semak kebolehcapaian laluan',
+        destination: 'Destinasi',
+        metric: 'Metrik',
+        routeTable: 'Jadual penghalaan',
+        reachability: 'Kebolehcapaian',
+        reachable: 'Boleh dicapai',
+        unreachable: 'Tidak boleh dicapai',
+        unchecked: 'Belum disemak',
+        check: 'Semak',
+        destinationHint: 'Menyokong alamat IPv4/IPv6 atau rangkaian CIDR. Laluan lalai: default, 0.0.0.0/0 atau ::/0.',
+    },
     xpack: {
         ldap: {
             source: 'Sumber',

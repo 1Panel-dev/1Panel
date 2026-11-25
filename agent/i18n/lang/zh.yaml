@@ -687,6 +687,17 @@ FormatDiskErr: "格式化磁盘失败，{{ .err }}"
 MountDiskErr: "挂载磁盘失败，{{ .err }}"
 XfsNotFound: "未检测到 xfs 文件系统，请先安装 xfsprogs"
 
+# 网络管理
+ErrNetworkPersistencePlatform: "仅 Linux 节点支持持久化网络配置。"
+ErrNetworkPersistencePrivilege: "持久化网络配置需要以 root 运行的 1Panel Agent，并具备系统网络管理权限。"
+ErrNetworkIPRoute2: "请安装或更新 iproute2，并确认其提供的 ip 命令可用。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "该主 IP 地址下仍有同网段的附加地址。请先删除附加地址，或使用系统网络工具调整后重试。"
+ErrNetworkRouteReadOnly: "该类型路由仅支持查看。"
+ErrNetworkPersistenceConflict: "该地址或路由已存在，或与已保存的配置冲突。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "回环网卡配置仅支持查看。"
+ErrNetworkPersistentSourceMissing: "未找到网卡 {{ .name }} 支持的系统持久化配置，仅支持查看。"
+ErrNetworkVirtualBridgeReadOnly: "此虚拟网卡仅供查看，不参与可达性检测。"
+
 # 终端
 TerminalAIBlockedRiskyCommand: "已拦截风险命令：{{ .command }}"
 TerminalAIThinking: "AI 正在思考..."

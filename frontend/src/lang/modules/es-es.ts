@@ -5775,6 +5775,84 @@ const message = {
         serial: 'Núm. de serie',
         noFail: 'El fallo de montaje no afecta al inicio del sistema',
     },
+    networkManage: {
+        routeDetails: 'Detalles de la ruta',
+        manageIP: 'Gestionar IP asociada',
+        connectedRoute: 'Generada a partir de la IP',
+        connectedRouteHint:
+            'El sistema genera esta ruta conectada a partir de la IP de la interfaz. No se edita por separado. Edite o elimine la IP correspondiente en los detalles de la interfaz.',
+        virtualBridgeReadOnly: 'Interfaz virtual · Solo lectura',
+        virtualBridgeReadOnlyHint:
+            'Esta interfaz virtual es de solo lectura y no participa en las comprobaciones de conectividad.',
+        loopbackReadOnly: 'La configuración de la interfaz de bucle invertido es de solo lectura.',
+        persistentSourceMissing:
+            'No se encontró una configuración persistente del sistema compatible para la interfaz {0}. Es de solo lectura.',
+        addressReadOnlyReason:
+            'Esta dirección es dinámica, no global o no tiene una configuración persistente compatible. Es de solo lectura.',
+        routeReadOnlyReason:
+            'Esta ruta es dinámica, generada por el núcleo o no tiene una configuración persistente compatible. Es de solo lectura.',
+        persistenceBackend: 'Persistencia',
+        editIP: 'Editar IP',
+        editRoute: 'Editar ruta',
+        operationRisk:
+            'Los cambios de red pueden interrumpir las conexiones. Prepare una forma alternativa de acceder al servidor.',
+        confirmInterface: 'Introduzca el nombre de interfaz {0} para confirmar.',
+        sourceAddress: 'Dirección de origen',
+        linkConnected: 'Enlace conectado',
+        linkDisconnected: 'Enlace desconectado',
+        topologySearch: 'Buscar interfaz, IP, puerta de enlace o destino',
+        topologyHint:
+            'Gestione las IP de la interfaz a la izquierda. Las tarjetas muestran destino, puerta de enlace y métrica. Pulse una tarjeta para ver los detalles; las líneas no indican conectividad verificada.',
+        direct: 'Directa',
+        defaultDestination: 'Ruta predeterminada',
+        unknownInterface: 'Interfaz sin especificar',
+        noRoutes: 'No hay rutas coincidentes',
+        readOnly: 'Solo lectura',
+        readOnlyRouteHint: 'Las rutas con varios saltos siguientes o sin una interfaz única son de solo lectura.',
+        title: 'Gestión de redes',
+        interfaces: 'Interfaces de red',
+        routes: 'Rutas',
+        addIP: 'Añadir IP',
+        ipCount: 'Número de IP',
+        interfaceID: 'ID de interfaz',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado del enlace',
+        mac: 'Dirección MAC',
+        flags: 'Indicadores',
+        address: 'Dirección',
+        scope: 'Ámbito',
+        interface: 'Interfaz',
+        configStatus: 'Estado de la configuración',
+        managedApplied: 'Guardado · Activo',
+        managedPending: 'Guardado · Inactivo',
+        addressWarning:
+            'Usa la IP asignada a esta interfaz. Si la IP pública se traduce mediante NAT, introduce la IP privada.',
+        addressRisk:
+            'Una IP que ya está en uso o una longitud de prefijo incorrecta pueden interrumpir el acceso al panel o por SSH.',
+        addressWithPrefix: 'Dirección IP / longitud del prefijo',
+        interfaceSelectHint:
+            'Solo se muestran interfaces cuya configuración persistente se puede modificar. Se excluyen las interfaces de bucle local, los puentes virtuales de solo lectura y otras interfaces que no se pueden modificar.',
+        gatewayHint: 'Deje la puerta de enlace vacía para las subredes conectadas directamente.',
+        metricHint: 'Para la misma subred de destino, suelen tener prioridad las rutas con una métrica menor.',
+        defaultRouteWarning:
+            'Una ruta predeterminada puede cambiar la salida del panel, SSH y otros servicios. Prepara un acceso alternativo, como la consola de la nube.',
+        interfaceMissing: 'Falta la interfaz',
+        changeWarning:
+            'Cambiar la configuración de red puede desconectar el panel o interrumpir los servicios. Antes de continuar, asegúrate de disponer de otra forma de acceder al servidor.',
+        cidrHint:
+            'En 192.0.2.10/24, /24 corresponde a la máscara de subred 255.255.255.0. Ejemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Añadir ruta',
+        checkRoutes: 'Comprobar accesibilidad de las rutas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabla',
+        reachability: 'Accesibilidad',
+        reachable: 'Accesible',
+        unreachable: 'Inaccesible',
+        unchecked: 'Sin comprobar',
+        check: 'Comprobar',
+        destinationHint: 'Admite direcciones IPv4/IPv6 o redes CIDR. Ruta predeterminada: default, 0.0.0.0/0 o ::/0.',
+    },
     xpack: {
         ldap: {
             source: 'Origen',
