@@ -265,6 +265,8 @@ const message = {
             uninstallSuccess: 'Desinstalado com sucesso',
         },
         login: {
+            imageLoadError: 'Não foi possível carregar a imagem',
+            imageLoadErrorHint: 'Possíveis causas: problema de rede, imagem inexistente ou formato não compatível.',
             username: 'Usuário',
             password: 'Senha',
             passkey: 'Login com Passkey',

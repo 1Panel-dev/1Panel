@@ -261,6 +261,8 @@ const message = {
             errImport: 'ເນື້ອໃນໄຟລ໌ຜິດພາດ:',
         },
         login: {
+            imageLoadError: 'ໂຫຼດຮູບພາບບໍ່ສຳເລັດ',
+            imageLoadErrorHint: 'ສາເຫດທີ່ເປັນໄປໄດ້: ບັນຫາເຄືອຂ່າຍ, ບໍ່ພົບຮູບພາບ ຫຼື ຮູບແບບບໍ່ຮອງຮັບ.',
             username: 'ຊື່ຜູ້ໃຊ້',
             password: 'ລະຫັດຜ່ານ',
             passkey: 'ເຂົ້າສູ່ລະບົບດ້ວຍ Passkey',

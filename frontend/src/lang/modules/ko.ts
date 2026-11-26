@@ -263,6 +263,8 @@ const message = {
             uninstallSuccess: '제거 성공',
         },
         login: {
+            imageLoadError: '이미지를 불러오지 못했습니다',
+            imageLoadErrorHint: '가능한 원인: 네트워크 연결 문제, 이미지 없음 또는 지원하지 않는 형식.',
             username: '사용자 이름',
             password: '비밀번호',
             passkey: '패스키 로그인',

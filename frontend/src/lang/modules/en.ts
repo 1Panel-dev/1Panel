@@ -264,6 +264,8 @@ const message = {
             errImport: 'File content is abnormal:',
         },
         login: {
+            imageLoadError: 'Image failed to load',
+            imageLoadErrorHint: 'Possible causes: a network issue, a missing image, or an unsupported format.',
             username: 'Username',
             password: 'Password',
             passkey: 'Passkey Login',

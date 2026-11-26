@@ -394,6 +394,7 @@ import { submitSAML2Navigation } from '@/utils/saml2';
 
 const emit = defineEmits<{
     (e: 'external-login-ready'): void;
+    (e: 'theme-ready'): void;
 }>();
 const i18n = useI18n();
 const {
@@ -996,16 +997,20 @@ onMounted(async () => {
         emit('external-login-ready');
     }
     if (!loginViewActive || isLogin.value) return;
-    if (!isLogin.value && !mfaShow.value) {
-        await Promise.all([loadLDAPStatus(), loadOIDCStatus(), loadSAML2Status()]);
-    }
-    try {
-        await getXpackSettingForTheme();
-    } catch (error) {
-        // 即使获取失败也不影响登录，默认为之前的主题配置
-    }
+    const themeReady = getXpackSettingForTheme()
+        .catch(() => {
+            // 即使获取失败也不影响登录，默认为之前的主题配置
+        })
+        .then(() => {
+            if (!loginViewActive) return;
+            emit('theme-ready');
+            applyLoginButtonTheme();
+        });
+    await Promise.all([
+        themeReady,
+        ...(!isLogin.value && !mfaShow.value ? [loadLDAPStatus(), loadOIDCStatus(), loadSAML2Status()] : []),
+    ]);
     if (!loginViewActive) return;
-    applyLoginButtonTheme();
     if (!ignoreCaptcha.value) {
         loginVerify();
     }

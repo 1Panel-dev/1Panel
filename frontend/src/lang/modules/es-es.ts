@@ -264,6 +264,9 @@ const message = {
             restoreSuccess: 'Restauración completada',
         },
         login: {
+            imageLoadError: 'No se pudo cargar la imagen',
+            imageLoadErrorHint:
+                'Posibles causas: un problema de red, una imagen inexistente o un formato no compatible.',
             username: 'Usuario',
             password: 'Contraseña',
             passkey: 'Inicio de sesión con Passkey',

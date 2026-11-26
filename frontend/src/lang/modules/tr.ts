@@ -268,6 +268,8 @@ const message = {
             restoreSuccess: 'Geri yükleme başarılı',
         },
         login: {
+            imageLoadError: 'Görüntü yüklenemedi',
+            imageLoadErrorHint: 'Olası nedenler: ağ sorunu, eksik görüntü veya desteklenmeyen biçim.',
             username: 'Kullanıcı adı',
             password: 'Şifre',
             passkey: 'Passkey ile giriş',

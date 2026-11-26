@@ -263,6 +263,8 @@ const message = {
             errImport: 'محتوای فایل غیرعادی است:',
         },
         login: {
+            imageLoadError: 'بارگذاری تصویر ناموفق بود',
+            imageLoadErrorHint: 'دلایل احتمالی: مشکل اتصال شبکه، نبودن تصویر یا قالب پشتیبانی‌نشده.',
             username: 'نام کاربری',
             password: 'رمز عبور',
             passkey: 'ورود با کلید عبور',

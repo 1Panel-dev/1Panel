@@ -257,6 +257,8 @@ const message = {
             errImport: '檔案內容異常：',
         },
         login: {
+            imageLoadError: '圖片載入異常',
+            imageLoadErrorHint: '可能原因：網路連線異常、圖片不存在或格式不支援。',
             username: '使用者名稱',
             password: '密碼',
             passkey: '通行金鑰登入',
