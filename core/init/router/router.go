@@ -95,9 +95,9 @@ func Routers() *gin.Engine {
 
 	Router.Use(middleware.FrontendFallback())
 	Router.Use(middleware.WebSocketOriginGuard())
-	Router.Use(middleware.OperationLog(middleware.MCPLogPolicy))
 	Router.Use(middleware.GlobalLoading())
 	Router.Use(xpack.AuthProvider.CoreAPIAuthMiddleware())
+	Router.Use(middleware.OperationLog(middleware.MCPLogPolicy))
 	Router.Use(middleware.PasswordExpired())
 	Router.Use(middleware.CSRFTokenGuard())
 	Router.Use(xpack.AuthProvider.CoreRBACMiddlewares()...)

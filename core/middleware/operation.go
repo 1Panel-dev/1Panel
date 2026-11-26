@@ -7,8 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime"
-	"mime/multipart"
 	"net/http"
 	"net/url"
 	"path"
@@ -51,6 +49,15 @@ func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
 			return
 		}
 
+		if !c.GetBool("API_AUTH") {
+			sessionUser, err := global.SESSION.Get(c)
+			if err != nil || sessionUser.ID == "" || sessionUser.Name == "" {
+				c.Next()
+				return
+			}
+			c.Set(psessionUtils.GinContextSessionUserKey, sessionUser)
+		}
+
 		source := loadLogInfo(c.Request.URL.Path)
 		pathItem := normalizeOperationPath(c.Request.URL.Path)
 		currentNodeItem := c.Request.Header.Get("CurrentNode")
@@ -84,19 +91,16 @@ func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
 		}
 
 		formatMap := make(map[string]interface{})
-		if len(operationDic.BodyKeys) != 0 {
+		isMultipart := strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data")
+		if len(operationDic.BodyKeys) != 0 && !isMultipart {
 			body, err := io.ReadAll(c.Request.Body)
 			if err == nil {
 				c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 			}
 			bodyMap := make(map[string]interface{})
-			if strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
-				bodyMap, _ = parseMultipart(body, c.Request.Header.Get("Content-Type"))
-			} else {
-				decoder := json.NewDecoder(bytes.NewReader(body))
-				decoder.UseNumber()
-				_ = decoder.Decode(&bodyMap)
-			}
+			decoder := json.NewDecoder(bytes.NewReader(body))
+			decoder.UseNumber()
+			_ = decoder.Decode(&bodyMap)
 			for _, key := range operationDic.BodyKeys {
 				if _, ok := bodyMap[key]; ok {
 					formatMap[key] = bodyMap[key]
@@ -138,6 +142,18 @@ func OperationLog(policies ...OperationLogPolicy) gin.HandlerFunc {
 			}
 		} else if record.User != "" {
 			record.AuthMethod = "session"
+		}
+
+		if isMultipart && c.Request.MultipartForm != nil {
+			for _, key := range operationDic.BodyKeys {
+				if values := c.Request.MultipartForm.Value[key]; len(values) > 0 {
+					formatMap[key] = values[0]
+				}
+				if files := c.Request.MultipartForm.File[key]; len(files) > 0 {
+					formatMap[key] = files[0].Filename
+				}
+			}
+			redactCredentialSetting(record.Path, formatMap, formatMap)
 		}
 
 		// Handlers may supply audit values even without database resolution metadata.
@@ -387,36 +403,6 @@ func replaceStr(val string, rep ...string) string {
 		val = strings.ReplaceAll(val, item, "")
 	}
 	return val
-}
-
-func parseMultipart(formData []byte, contentType string) (map[string]interface{}, error) {
-	d, params, err := mime.ParseMediaType(contentType)
-	if err != nil || d != "multipart/form-data" {
-		return nil, http.ErrNotMultipart
-	}
-	boundary, ok := params["boundary"]
-	if !ok {
-		return nil, http.ErrMissingBoundary
-	}
-	reader := multipart.NewReader(bytes.NewReader(formData), boundary)
-	ret := make(map[string]interface{})
-
-	f, err := reader.ReadForm(32 << 20)
-	if err != nil {
-		return nil, err
-	}
-
-	for k, v := range f.Value {
-		if len(v) > 0 {
-			ret[k] = v[0]
-		}
-	}
-	for k, v := range f.File {
-		if len(v) > 0 {
-			ret[k] = v[0].Filename
-		}
-	}
-	return ret, nil
 }
 
 func mergeResolvedData(headerVal string, values map[string]interface{}) {

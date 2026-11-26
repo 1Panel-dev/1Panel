@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
@@ -193,9 +194,14 @@ func GetParamInt32(paramName string, c *gin.Context) (int32, error) {
 // Call before writing the response. Only pass public audit fields, never credentials.
 func SetOperationLogValues(c *gin.Context, values map[string]string) {
 	const header = "X-Op-Resolved"
+	const maxValueBytes = 4096
+	const maxHeaderBytes = 16 << 10
+	const truncated = "...[truncated]"
 	resolved := make(map[string]string)
-	if data, err := base64.RawURLEncoding.DecodeString(c.Writer.Header().Get(header)); err == nil {
-		_ = json.Unmarshal(data, &resolved)
+	if encoded := c.Writer.Header().Get(header); len(encoded) <= maxHeaderBytes {
+		if data, err := base64.RawURLEncoding.DecodeString(encoded); err == nil {
+			_ = json.Unmarshal(data, &resolved)
+		}
 	}
 	if resolved == nil {
 		resolved = make(map[string]string)
@@ -203,10 +209,21 @@ func SetOperationLogValues(c *gin.Context, values map[string]string) {
 	for key, value := range values {
 		resolved[key] = value
 	}
-	data, err := json.Marshal(resolved)
-	if err == nil {
-		c.Header(header, base64.RawURLEncoding.EncodeToString(data))
+	for key, value := range resolved {
+		if len(value) > maxValueBytes {
+			end := maxValueBytes - len(truncated)
+			for end > 0 && !utf8.RuneStart(value[end]) {
+				end--
+			}
+			resolved[key] = value[:end] + truncated
+		}
 	}
+	data, err := json.Marshal(resolved)
+	if err != nil || base64.RawURLEncoding.EncodedLen(len(data)) > maxHeaderBytes {
+		c.Writer.Header().Del(header)
+		return
+	}
+	c.Header(header, base64.RawURLEncoding.EncodeToString(data))
 }
 
 const errorMetadataKey = "error_response_metadata_policies"
