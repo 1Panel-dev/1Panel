@@ -15,9 +15,10 @@ import (
 )
 
 func SessionAuth() gin.HandlerFunc {
+	operationLog := OperationLog()
 	return func(c *gin.Context) {
 		if method, exist := c.Get("authMethod"); exist && method == constant.AuthMethodJWT {
-			c.Next()
+			operationLog(c)
 			return
 		}
 		panelToken := c.GetHeader("1Panel-Token")
@@ -39,7 +40,7 @@ func SessionAuth() gin.HandlerFunc {
 					helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigIPInvalid, nil)
 					return
 				}
-				c.Next()
+				operationLog(c)
 				return
 			} else {
 				helper.ErrorWithDetail(c, constant.CodeErrUnauthorized, constant.ErrApiConfigStatusInvalid, nil)
@@ -64,7 +65,7 @@ func SessionAuth() gin.HandlerFunc {
 		}
 		lifeTime, _ := strconv.Atoi(setting.Value)
 		_ = global.SESSION.Set(sId, psession, lifeTime)
-		c.Next()
+		operationLog(c)
 	}
 }
 

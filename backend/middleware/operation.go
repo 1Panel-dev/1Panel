@@ -78,7 +78,7 @@ func OperationLog() gin.HandlerFunc {
 		}
 
 		formatMap := make(map[string]interface{})
-		if len(operationDic.BodyKeys) != 0 {
+		if len(operationDic.BodyKeys) != 0 && c.ContentType() != "multipart/form-data" {
 			body, err := io.ReadAll(c.Request.Body)
 			if err == nil {
 				c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
