@@ -5203,6 +5203,8 @@ const message = {
         status: 'Estado actual',
         configResource: 'Configuración',
         saveAndReload: 'Guardar y recargar',
+        batchClearProxyCacheWarn:
+            '¿Quieres vaciar la caché del proxy inverso de los {0} sitios seleccionados? La próxima solicitud de contenido que estaba en caché llegará al servidor de origen.',
         clearProxyCache: 'Limpiar caché de proxy inverso',
         clearProxyCacheWarn: 'Esta acción eliminará todos los archivos en el directorio de caché. ¿Deseas continuar?',
         create: 'Agregar nuevo módulo',

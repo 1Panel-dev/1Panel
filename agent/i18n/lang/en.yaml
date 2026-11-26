@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "Website group \"{{ .group }}\" does not exist an
 CronjobWebsiteGroupFallback: "{{ .name }}: website group \"{{ .group }}\" does not exist; imported as a fixed website list that no longer follows group changes"
 CronjobWebsiteMissing: "{{ .name }}: websites not found: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "No selected website groups or websites could be matched"
+
+ProxyCacheClear: "Clear reverse proxy caches"
+ProxyCacheEmpty: "Nothing to clear"
+ProxyCacheSummary: "Cleared {{ .cleared }}, nothing to clear {{ .skipped }}, failed {{ .failed }}"
+ProxyCacheReloadFailed: "Caches cleared, OpenResty reload failed"

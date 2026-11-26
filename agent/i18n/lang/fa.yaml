@@ -933,3 +933,8 @@ ErrCronjobWebsiteGroupMissing: "گروه وب‌سایت «{{ .group }}» وجو
 CronjobWebsiteGroupFallback: "{{ .name }}: گروه وب‌سایت «{{ .group }}» وجود ندارد؛ به‌صورت فهرست ثابت وب‌سایت‌ها وارد شد و دیگر تغییرات گروه را دنبال نمی‌کند"
 CronjobWebsiteMissing: "{{ .name }}: وب‌سایت‌های زیر یافت نشدند: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "هیچ‌یک از گروه‌ها یا وب‌سایت‌های انتخاب‌شده یافت نشد"
+
+ProxyCacheClear: "پاک‌سازی کش پراکسی معکوس"
+ProxyCacheEmpty: "چیزی برای پاک‌سازی وجود ندارد"
+ProxyCacheSummary: "پاک‌شده: {{ .cleared }}، بدون نیاز به پاک‌سازی: {{ .skipped }}، ناموفق: {{ .failed }}"
+ProxyCacheReloadFailed: "کش پاک شد، اما بارگذاری مجدد OpenResty ناموفق بود"

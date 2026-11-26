@@ -4975,6 +4975,8 @@ const message = {
         status: 'ສະຖານະປະຈຸບັນ',
         configResource: 'ການຕັ້ງຄ່າ',
         saveAndReload: 'ບັນທຶກ ແລະ ໂຫຼດໃໝ່',
+        batchClearProxyCacheWarn:
+            'ລ້າງແຄຊ reverse proxy ຂອງ {0} ເວັບໄຊທີ່ເລືອກບໍ? ຄຳຂໍຄັ້ງຕໍ່ໄປສຳລັບເນື້ອຫາທີ່ເຄີຍຢູ່ໃນແຄຊຈະຖືກສົ່ງໄປຫາເຊີບເວີຕົ້ນທາງ.',
         clearProxyCache: 'ລ້າງແຄຊ reverse proxy',
         clearProxyCacheWarn: 'ການດຳເນີນການນີ້ຈະລຶບໄຟລ໌ທັງໝົດໃນໂຟນເດີແຄຊ. ຕ້ອງການຕໍ່ຫຼືບໍ່?',
         create: 'ເພີ່ມໂມດູນໃໝ່',

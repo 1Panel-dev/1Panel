@@ -5107,6 +5107,8 @@ const message = {
         status: '現在のステータス',
         configResource: '構成',
         saveAndReload: '保存してリロードします',
+        batchClearProxyCacheWarn:
+            '選択した {0} 件のサイトのリバースプロキシキャッシュを消去しますか？ キャッシュされていたコンテンツへの次のリクエストはオリジンサーバーに送られます。',
         clearProxyCache: '逆プロキシキャッシュをきれいにします',
         clearProxyCacheWarn:
             'キャッシュで構成されたすべてのWebサイトが影響を受け、「OpenResty」が再起動されます。続けたいですか？',

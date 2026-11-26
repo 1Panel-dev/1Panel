@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "O grupo de sites “{{ .group }}” não existe 
 CronjobWebsiteGroupFallback: "{{ .name }}: o grupo de sites “{{ .group }}” não existe; importado como uma lista fixa de sites que não acompanha mais as alterações do grupo"
 CronjobWebsiteMissing: "{{ .name }}: sites não encontrados: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "Nenhum grupo ou site correspondente à seleção foi encontrado"
+
+ProxyCacheClear: "Limpar cache do proxy reverso"
+ProxyCacheEmpty: "Nenhum cache para limpar"
+ProxyCacheSummary: "Sites com cache limpo: {{ .cleared }}. Sem cache para limpar: {{ .skipped }}. Com falha: {{ .failed }}."
+ProxyCacheReloadFailed: "O cache foi limpo, mas houve uma falha ao recarregar o OpenResty"

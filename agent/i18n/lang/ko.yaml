@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "웹사이트 그룹 “{{ .group }}”이 존재
 CronjobWebsiteGroupFallback: "{{ .name }}: 웹사이트 그룹 “{{ .group }}”이 존재하지 않아 고정 웹사이트 목록으로 가져왔습니다. 이후 그룹 변경은 자동으로 반영되지 않습니다"
 CronjobWebsiteMissing: "{{ .name }}: 다음 웹사이트를 찾을 수 없습니다: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "선택한 웹사이트 그룹 또는 웹사이트와 일치하는 항목을 찾을 수 없습니다"
+
+ProxyCacheClear: "리버스 프록시 캐시 비우기"
+ProxyCacheEmpty: "비울 캐시 없음"
+ProxyCacheSummary: "완료 {{ .cleared }}개, 비울 캐시 없음 {{ .skipped }}개, 실패 {{ .failed }}개"
+ProxyCacheReloadFailed: "캐시는 비웠지만 OpenResty를 다시 로드하지 못했습니다"

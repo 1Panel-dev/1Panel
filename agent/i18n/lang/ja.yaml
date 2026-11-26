@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "サイトグループ「{{ .group }}」が存在
 CronjobWebsiteGroupFallback: "{{ .name }}：サイトグループ「{{ .group }}」が存在しないため、固定のサイトリストとしてインポートしました。今後はグループの変更に追従しません"
 CronjobWebsiteMissing: "{{ .name }}：次のサイトが見つかりません：{{ .website }}"
 ErrCronjobWebsiteImportEmpty: "選択したサイトグループまたはサイトに一致するものが見つかりませんでした"
+
+ProxyCacheClear: "リバースプロキシキャッシュを消去"
+ProxyCacheEmpty: "消去するキャッシュはありません"
+ProxyCacheSummary: "消去済み {{ .cleared }} 件、消去不要 {{ .skipped }} 件、失敗 {{ .failed }} 件"
+ProxyCacheReloadFailed: "キャッシュは消去されましたが、OpenResty の再読み込みに失敗しました"

@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "El grupo de sitios web «{{ .group }}» no exist
 CronjobWebsiteGroupFallback: "{{ .name }}: el grupo de sitios web «{{ .group }}» no existe; se importó como una lista fija de sitios que ya no sigue los cambios del grupo"
 CronjobWebsiteMissing: "{{ .name }}: sitios web no encontrados: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "No se encontró ningún grupo ni sitio web que coincida con la selección"
+
+ProxyCacheClear: "Vaciar la caché del proxy inverso"
+ProxyCacheEmpty: "Nada que vaciar"
+ProxyCacheSummary: "Sitios con caché vaciada: {{ .cleared }}. Sin caché que vaciar: {{ .skipped }}. Con errores: {{ .failed }}."
+ProxyCacheReloadFailed: "Se ha vaciado la caché, pero no se ha podido recargar OpenResty"

@@ -4752,6 +4752,7 @@ const message = {
         status: '當前狀態',
         configResource: '設定修改',
         saveAndReload: '儲存並重載',
+        batchClearProxyCacheWarn: '將清空所選 {0} 個網站的反代快取。首次存取原已快取的內容時會重新請求來源站。',
         clearProxyCache: '清除反代快取',
         clearProxyCacheWarn: '此操作將刪除快取目錄下的所有檔案，是否繼續？',
         create: '新增模組',
