@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "Kumpulan laman web “{{ .group }}” tidak wuju
 CronjobWebsiteGroupFallback: "{{ .name }}: kumpulan laman web “{{ .group }}” tidak wujud; diimport sebagai senarai laman web tetap yang tidak lagi mengikuti perubahan kumpulan"
 CronjobWebsiteMissing: "{{ .name }}: laman web tidak ditemui: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "Tiada kumpulan laman web atau laman web yang sepadan dengan pilihan ditemui"
+
+ProxyCacheClear: "Kosongkan cache proksi terbalik"
+ProxyCacheEmpty: "Tiada cache untuk dikosongkan"
+ProxyCacheSummary: "Dikosongkan: {{ .cleared }}, tiada cache untuk dikosongkan: {{ .skipped }}, gagal: {{ .failed }}"
+ProxyCacheReloadFailed: "Cache telah dikosongkan, tetapi OpenResty gagal dimuat semula"

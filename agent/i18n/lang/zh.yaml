@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "网站组“{{ .group }}”不存在，且无法
 CronjobWebsiteGroupFallback: "{{ .name }}：网站组“{{ .group }}”不存在，已按固定网站名单导入，不再动态跟随分组变化"
 CronjobWebsiteMissing: "{{ .name }}：未找到以下网站：{{ .website }}"
 ErrCronjobWebsiteImportEmpty: "无法匹配任何所选网站组或网站"
+
+ProxyCacheClear: "清空反代缓存"
+ProxyCacheEmpty: "无需清理"
+ProxyCacheSummary: "已清空 {{ .cleared }} 个，无需清理 {{ .skipped }} 个，失败 {{ .failed }} 个"
+ProxyCacheReloadFailed: "缓存已清空，OpenResty 重载失败"

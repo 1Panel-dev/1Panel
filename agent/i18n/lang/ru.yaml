@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "Группа сайтов «{{ .group }}» не 
 CronjobWebsiteGroupFallback: "{{ .name }}: группа сайтов «{{ .group }}» не существует; импортирован фиксированный список сайтов, который больше не учитывает изменения состава группы"
 CronjobWebsiteMissing: "{{ .name }}: не найдены сайты: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "Не найдены группы сайтов или сайты, соответствующие выбору"
+
+ProxyCacheClear: "Очистить кэш обратного прокси"
+ProxyCacheEmpty: "Кэш пуст"
+ProxyCacheSummary: "Кэш очищен: {{ .cleared }}, кэш пуст: {{ .skipped }}, ошибок: {{ .failed }}"
+ProxyCacheReloadFailed: "Кэш очищен, но не удалось перезагрузить конфигурацию OpenResty"

@@ -5231,6 +5231,8 @@ const message = {
         status: 'Status atual',
         configResource: 'Configuração',
         saveAndReload: 'Salvar e recarregar',
+        batchClearProxyCacheWarn:
+            'Limpar o cache do proxy reverso dos {0} sites selecionados? A próxima solicitação de conteúdo que estava em cache será enviada ao servidor de origem.',
         clearProxyCache: 'Limpar cache do proxy reverso',
         clearProxyCacheWarn:
             'Todos os sites com cache configurado serão afetados e o "OpenResty" será reiniciado. Deseja continuar?',

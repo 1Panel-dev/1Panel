@@ -5205,6 +5205,8 @@ const message = {
         status: 'Status Semasa',
         configResource: 'Konfigurasi',
         saveAndReload: 'Simpan dan muat semula',
+        batchClearProxyCacheWarn:
+            'Kosongkan cache proksi terbalik untuk {0} laman web yang dipilih? Permintaan seterusnya untuk kandungan yang sebelum ini dicache akan dihantar ke pelayan asal.',
         clearProxyCache: 'Bersihkan cache proksi terbalik',
         clearProxyCacheWarn:
             'Semua laman web yang dikonfigurasi dengan cache akan terjejas dan "OpenResty" akan dimulakan semula. Adakah anda mahu meneruskan?',

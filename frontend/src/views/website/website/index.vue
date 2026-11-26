@@ -303,6 +303,7 @@
                                     :label="$t('commons.button.set') + $t('website.ssl')"
                                     value="setHttps"
                                 ></el-option>
+                                <el-option :label="$t('nginx.clearProxyCache')" value="clearProxyCache" />
                             </el-select>
                             <el-button
                                 type="primary"
@@ -773,11 +774,18 @@ const batchOp = () => {
             batchReq.ids = selects.value.map((item) => item.id);
             const taskID = newUUID();
             batchReq.taskID = taskID;
+            const clearCache = batchReq.operate === 'clearProxyCache';
             opRef.value.acceptParams({
                 names: names,
-                title: i18n.global.t('website.batchOperate'),
+                nameLimit: clearCache ? 5 : 0,
+                confirmText: clearCache ? i18n.global.t('nginx.clearProxyCache') : undefined,
+                title: i18n.global.t(clearCache ? 'nginx.clearProxyCache' : 'website.batchOperate'),
                 api: batchOperate,
-                msg: i18n.global.t('website.batchOperateHelper', [i18n.global.t('commons.button.' + batchReq.operate)]),
+                msg: clearCache
+                    ? i18n.global.t('nginx.batchClearProxyCacheWarn', [names.length])
+                    : i18n.global.t('website.batchOperateHelper', [
+                          i18n.global.t('commons.button.' + batchReq.operate),
+                      ]),
                 params: batchReq,
                 noMsg: true,
             });

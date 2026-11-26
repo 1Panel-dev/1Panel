@@ -923,3 +923,8 @@ ErrCronjobWebsiteGroupMissing: "ບໍ່ມີກຸ່ມເວັບໄຊ �
 CronjobWebsiteGroupFallback: "{{ .name }}: ບໍ່ມີກຸ່ມເວັບໄຊ “{{ .group }}”; ໄດ້ນຳເຂົ້າເປັນລາຍຊື່ເວັບໄຊຄົງທີ່ ແລະ ຈະບໍ່ຕິດຕາມການປ່ຽນແປງຂອງກຸ່ມອີກ"
 CronjobWebsiteMissing: "{{ .name }}: ບໍ່ພົບເວັບໄຊ: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "ບໍ່ພົບກຸ່ມເວັບໄຊ ຫຼື ເວັບໄຊທີ່ກົງກັບລາຍການທີ່ເລືອກ"
+
+ProxyCacheClear: "ລ້າງແຄຊ reverse proxy"
+ProxyCacheEmpty: "ບໍ່ມີແຄຊທີ່ຕ້ອງລ້າງ"
+ProxyCacheSummary: "ລ້າງແລ້ວ {{ .cleared }}, ບໍ່ມີແຄຊທີ່ຕ້ອງລ້າງ {{ .skipped }}, ລົ້ມເຫຼວ {{ .failed }}"
+ProxyCacheReloadFailed: "ລ້າງແຄຊແລ້ວ ແຕ່ໂຫຼດ OpenResty ຄືນໃໝ່ບໍ່ສຳເລັດ"

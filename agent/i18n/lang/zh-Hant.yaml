@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "網站群組「{{ .group }}」不存在，且無
 CronjobWebsiteGroupFallback: "{{ .name }}：網站群組「{{ .group }}」不存在，已按固定網站名單匯入，不再動態跟隨群組變化"
 CronjobWebsiteMissing: "{{ .name }}：找不到以下網站：{{ .website }}"
 ErrCronjobWebsiteImportEmpty: "無法比對任何所選網站群組或網站"
+
+ProxyCacheClear: "清空反代快取"
+ProxyCacheEmpty: "無需清理"
+ProxyCacheSummary: "已清空 {{ .cleared }} 個，無需清理 {{ .skipped }} 個，失敗 {{ .failed }} 個"
+ProxyCacheReloadFailed: "快取已清空，OpenResty 重新載入失敗"

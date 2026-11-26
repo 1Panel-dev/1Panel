@@ -5210,6 +5210,8 @@ const message = {
         status: 'Geçerli Durum',
         configResource: 'Yapılandırma',
         saveAndReload: 'Kaydet ve yeniden yükle',
+        batchClearProxyCacheWarn:
+            'Seçilen {0} web sitesinin ters vekil önbelleği temizlensin mi? Daha önce önbelleğe alınmış içerik için bir sonraki istek kaynak sunucuya gönderilir.',
         clearProxyCache: 'Ters vekil önbelleğini temizle',
         clearProxyCacheWarn: 'Bu işlem önbellek dizinindeki tüm dosyaları silecektir. Devam etmek istiyor musunuz?',
         create: 'Yeni bir modül ekle',

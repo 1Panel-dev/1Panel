@@ -932,3 +932,8 @@ ErrCronjobWebsiteGroupMissing: "“{{ .group }}” web sitesi grubu mevcut deği
 CronjobWebsiteGroupFallback: "{{ .name }}: “{{ .group }}” web sitesi grubu mevcut değil; artık grup değişikliklerini izlemeyen sabit bir web sitesi listesi olarak içe aktarıldı"
 CronjobWebsiteMissing: "{{ .name }}: bulunamayan web siteleri: {{ .website }}"
 ErrCronjobWebsiteImportEmpty: "Seçimle eşleşen hiçbir web sitesi grubu veya web sitesi bulunamadı"
+
+ProxyCacheClear: "Ters vekil önbelleğini temizle"
+ProxyCacheEmpty: "Temizlenecek önbellek yok"
+ProxyCacheSummary: "Temizlenen: {{ .cleared }}, temizlenecek önbelleği olmayan: {{ .skipped }}, başarısız: {{ .failed }}"
+ProxyCacheReloadFailed: "Önbellek temizlendi ancak OpenResty yeniden yüklenemedi"
