@@ -1,0 +1,69 @@
+# XPanel CI: build + vet + test trên mỗi push/PR vào main (fork-docs/tasks/phase-0-2.md, T1.1)
+name: XP CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: xp-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Test fail sẵn của upstream v2.5.1 (fork-docs/BUILD.md mục 6): test dựng server TLS giả
+  # nhưng code vẫn gọi thật apps-assets.fit2cloud.com. Không sửa test upstream, chỉ bỏ qua.
+  AGENT_TEST_SKIP: "TestOfficialIconSameRevisionRefreshIsReadOnlyUntilSync|TestAppStoreIndexUsesCacheUntilRevisionChanges"
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-go@v6
+        with:
+          go-version-file: core/go.mod
+          cache-dependency-path: |
+            core/go.sum
+            agent/go.sum
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Versions
+        run: go version && node -v && npm -v
+
+      - name: make build_all
+        run: make build_all
+
+      - name: Binaries
+        run: ls -l build/ && file build/*
+
+      - name: go vet (core)
+        working-directory: core
+        run: go vet ./...
+
+      - name: go vet (agent)
+        working-directory: agent
+        run: go vet ./...
+
+      - name: go test (core)
+        working-directory: core
+        run: go test ./...
+
+      - name: go test (agent)
+        working-directory: agent
+        run: go test -skip "$AGENT_TEST_SKIP" ./...
+
+      # Từ T2.1: bash scripts/brand/apply.sh --check
+      # Từ T3.4: node scripts/i18n/check-keys.mjs
