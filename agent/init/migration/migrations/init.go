@@ -1995,3 +1995,10 @@ var AddSSLSyncDir = &gormigrate.Migration{
 		return db.Migrator().AddColumn(&model.WebsiteSSL{}, "SyncDir")
 	},
 }
+
+var AddOllamaModelDescription = &gormigrate.Migration{
+	ID: "20261126-add-ollama-model-description",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.OllamaModel{})
+	},
+}

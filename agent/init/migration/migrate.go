@@ -125,6 +125,7 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.AddAgentAccountStatus,
 		migrations.AddVMDataStoragePools,
 		migrations.AddSSLSyncDir,
+		migrations.AddOllamaModelDescription,
 	}
 }
 

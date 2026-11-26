@@ -6,6 +6,18 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+func (b *BaseApi) UpdateOllamaModelDescription(c *gin.Context) {
+	var req dto.UpdateDescription
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	if err := aiToolService.UpdateDescription(req); err != nil {
+		helper.BadRequest(c, err)
+		return
+	}
+	helper.SuccessWithData(c, nil)
+}
+
 // @Tags AI
 // @Summary Create Ollama model
 // @Accept json
