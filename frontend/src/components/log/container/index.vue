@@ -22,7 +22,7 @@
                 {{ $t('commons.table.date') }}
             </el-checkbox>
         </div>
-        <el-button class="margin-button" @click="openDownloadDialog" icon="Download">
+        <el-button class="margin-button" :loading="downloading" @click="openDownloadDialog" icon="Download">
             {{ $t('commons.button.download') }}
         </el-button>
         <el-button v-permission="'container_manage'" class="margin-button" @click="onClean" icon="Delete">
@@ -36,6 +36,7 @@
         </el-button>
     </el-alert>
     <div class="log-container" :style="styleVars">
+        <div v-if="previewStatus" class="preview-status" role="status">{{ previewStatus }}</div>
         <div class="xterm-log-viewer" ref="terminalElement"></div>
     </div>
     <DialogPro
@@ -82,6 +83,7 @@ import { Terminal } from '@xterm/xterm';
 import { Base64 } from 'js-base64';
 import '@xterm/xterm/css/xterm.css';
 import i18n from '@/lang';
+import { downloadBlob } from '@/utils/file';
 import { dateFormatForName } from '@/utils/date';
 import { computed, nextTick, onMounted, onUnmounted, reactive, ref } from 'vue';
 import { ElMessageBox } from 'element-plus';
@@ -150,6 +152,8 @@ const logSearch = reactive({
     compose: '',
     resource: '',
 });
+const previewStatus = ref('');
+const downloading = ref(false);
 const downloadDialogVisible = ref(false);
 const downloadForm = reactive<{ mode: string; tail: number | string }>({
     mode: 'all',
@@ -191,7 +195,8 @@ const clearTerminal = () => {
     followBottom = true;
 };
 
-const showEventSourceAuthError = (message: string) => {
+const showStreamError = (message: string) => {
+    previewStatus.value = '';
     MsgError(message);
     term?.writeln(message);
 };
@@ -252,6 +257,7 @@ const searchLogs = async (preserveLogs = false) => {
         disconnected.value = false;
     }
     connecting.value = true;
+    previewStatus.value = preserveLogs ? '' : i18n.global.t('commons.status.waiting');
 
     let currentNode = globalCurrentNode.value;
     if (props.node && props.node !== '') {
@@ -268,7 +274,7 @@ const searchLogs = async (preserveLogs = false) => {
     if (authError) {
         connecting.value = false;
         disconnected.value = true;
-        showEventSourceAuthError(authError);
+        showStreamError(authError);
         return;
     }
     const source = new EventSource(url);
@@ -280,27 +286,28 @@ const searchLogs = async (preserveLogs = false) => {
     };
     source.addEventListener('complete', () => {
         if (version !== searchVersion) return;
+        if (previewStatus.value) previewStatus.value = i18n.global.t('commons.log.noLog');
         stopListening();
         disconnected.value = logSearch.isWatch;
     });
     source.addEventListener('container-missing', () => {
         if (version !== searchVersion) return;
         stopListening();
+        previewStatus.value = '';
         const message = i18n.global.t('container.logsUnavailable');
         term?.writeln(message);
         MsgError(message);
     });
     source.onmessage = (event: MessageEvent) => {
         if (version !== searchVersion) return;
+        previewStatus.value = '';
         term?.write(Base64.toUint8Array(event.data));
     };
     source.onerror = (event: MessageEvent) => {
         if (version !== searchVersion) return;
         stopListening();
         disconnected.value = true;
-        if (event.data && event.data != '') {
-            MsgError(event.data);
-        }
+        showStreamError(event.data || i18n.global.t('commons.res.paramError'));
     };
 };
 
@@ -311,16 +318,14 @@ const openDownloadDialog = () => {
 };
 
 const onDownload = async () => {
+    if (downloading.value) return;
     const customTail = Number(downloadForm.tail);
     if (Number.isNaN(customTail) || customTail < 0) {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
     const container = logSearch.compose === '' ? logSearch.container : logSearch.compose;
-    let resource = container;
-    if (props.resource) {
-        resource = props.resource;
-    }
+    const resource = props.resource || container;
     const containerType = logSearch.compose === '' ? 'container' : 'compose';
     const params = {
         container: container,
@@ -329,18 +334,21 @@ const onDownload = async () => {
         timestamp: logSearch.isShowTimestamp,
         containerType: containerType,
     };
-    const addItem = {};
-    addItem['name'] = resource + '-' + dateFormatForName(new Date()) + '.log';
-    DownloadFile(params).then((res) => {
-        const downloadUrl = window.URL.createObjectURL(new Blob([res]));
-        const a = document.createElement('a');
-        a.style.display = 'none';
-        a.href = downloadUrl;
-        a.download = addItem['name'];
-        const event = new MouseEvent('click');
-        a.dispatchEvent(event);
-    });
+    const filename = resource + '-' + dateFormatForName(new Date()) + '.log';
+    downloading.value = true;
     downloadDialogVisible.value = false;
+    try {
+        const res = await DownloadFile(params, props.node);
+        if (!(res instanceof Blob)) return;
+        if (res.type.includes('application/json')) {
+            const error = await new Response(res).json().catch(() => null);
+            MsgError(error?.message || i18n.global.t('commons.res.paramError'));
+            return;
+        }
+        downloadBlob(res, filename);
+    } finally {
+        downloading.value = false;
+    }
 };
 
 const onClean = async () => {
@@ -428,6 +436,13 @@ onUnmounted(() => {
 .log-toolbar :deep(.el-checkbox) {
     white-space: nowrap;
     flex-shrink: 0;
+}
+
+.preview-status {
+    position: absolute;
+    z-index: 1;
+    padding: 4px 8px;
+    color: #e5e7eb;
 }
 
 .download-tail-helper {
