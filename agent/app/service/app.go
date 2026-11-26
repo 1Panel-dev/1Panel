@@ -61,6 +61,8 @@ type IAppService interface {
 type AppInstallHooks struct {
 	AfterCreate    func(appInstall *model.AppInstall) error
 	AfterCopyData  func(appInstall *model.AppInstall) error
+	AfterStart     func(*model.AppInstall, *task.Task) error
+	AfterFinish    func()
 	PrepareSiteDir func(model.App, model.AppDetail, request.AppInstallCreate, *task.Task) error
 }
 
@@ -69,8 +71,7 @@ func NewIAppService() IAppService {
 }
 
 func (a AppService) PageApp(ctx *gin.Context, req request.AppSearch) (*response.AppRes, error) {
-	var opts []repo.DBOption
-	opts = append(opts, appRepo.OrderByRecommend())
+	opts := []repo.DBOption{appRepo.OrderByRecommend(), appRepo.WithKeyNotIn(constant.ClusterAppKeys())}
 	if req.Name != "" {
 		opts = append(opts, appRepo.WithByLikeName(strings.TrimSpace(req.Name)))
 	}
@@ -206,6 +207,7 @@ func (a AppService) GetApp(ctx *gin.Context, key string) (*response.AppDTO, erro
 		return nil, err
 	}
 	appDTO.App = app
+	appDTO.ClusterOnly = constant.IsClusterApp(app.Key)
 	appDTO.App.Description = app.GetDescription(ctx)
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
 	if err != nil {
@@ -371,15 +373,15 @@ func (a AppService) Install(req request.AppInstallCreate, executeScript bool) (a
 	return a.InstallWithHooks(req, executeScript, nil)
 }
 
-func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks) (appInstall *model.AppInstall, err error) {
-	if err = docker.CreateDefaultDockerNetwork(); err != nil {
-		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
-		return
-	}
-	if list, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(list) > 0 {
-		err = buserr.New("ErrAppNameExist")
-		return
-	}
+func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks) (*model.AppInstall, error) {
+	return a.installWithHooks(req, executeScript, hooks, false)
+}
+
+func (a AppService) InstallCluster(req request.AppInstallCreate, executeScript bool) (*model.AppInstall, error) {
+	return a.installWithHooks(req, executeScript, nil, true)
+}
+
+func (a AppService) installWithHooks(req request.AppInstallCreate, executeScript bool, hooks *AppInstallHooks, cluster bool) (appInstall *model.AppInstall, err error) {
 	var (
 		httpPort  int
 		httpsPort int
@@ -392,6 +394,17 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	}
 	app, err = appRepo.GetFirst(repo.WithByID(appDetail.AppId))
 	if err != nil {
+		return
+	}
+	if err = validateClusterAppInstall(app.Key, appDetail.Version, cluster); err != nil {
+		return
+	}
+	if err = docker.CreateDefaultDockerNetwork(); err != nil {
+		err = buserr.WithDetail("Err1PanelNetworkFailed", err.Error(), nil)
+		return
+	}
+	if list, _ := appInstallRepo.ListBy(context.Background(), repo.WithByLowerName(req.Name)); len(list) > 0 {
+		err = buserr.New("ErrAppNameExist")
 		return
 	}
 	if err = checkVllmVersionAccess(app.Key, appDetail.Version); err != nil {
@@ -411,6 +424,9 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 				return nil, buserr.WithName("ErrAppIsDown", databaseInstall.Name)
 			}
 		}
+	}
+	if err = resolveRedisParams(req.Params, appDetail.Params, false); err != nil {
+		return nil, err
 	}
 	for key := range req.Params {
 		if !strings.Contains(key, "PANEL_APP_PORT") {
@@ -444,25 +460,20 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 		App:         app,
 	}
 	composeMap := make(map[string]interface{})
-	if req.EditCompose {
-		if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
-			return
-		}
-	} else {
+	composeContent := req.DockerCompose
+	if !req.EditCompose {
 		if err = ensureAppDetailCompose(app, &appDetail); err != nil {
 			return
 		}
-		if err = yaml.Unmarshal([]byte(appDetail.DockerCompose), &composeMap); err != nil {
-			return
-		}
+		composeContent = appDetail.DockerCompose
 	}
-
-	value, ok := composeMap["services"]
-	if !ok || value == nil {
-		err = buserr.New("ErrFileParse")
+	if err = yaml.Unmarshal([]byte(composeContent), &composeMap); err != nil {
 		return
 	}
-	servicesMap := value.(map[string]interface{})
+	servicesMap, ok := composeMap["services"].(map[string]interface{})
+	if !ok || len(servicesMap) == 0 {
+		return nil, buserr.New("ErrFileParse")
+	}
 	containerName := constant.ContainerPrefix + app.Key + "-" + common.RandStr(4)
 	if req.Advanced && req.ContainerName != "" {
 		containerName = req.ContainerName
@@ -500,15 +511,7 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 		}
 	}
 
-	index := 0
-	serviceName := ""
-	for k := range servicesMap {
-		serviceName = k
-		if index > 0 {
-			continue
-		}
-		index++
-	}
+	serviceName := selectPrimaryComposeService(servicesMap, composeContent, app.Key)
 	newServiceName := strings.ToLower(appInstall.Name)
 	if app.Limit == 0 && newServiceName != serviceName && len(servicesMap) == 1 && !req.KeepServiceName {
 		servicesMap[newServiceName] = servicesMap[serviceName]
@@ -643,6 +646,11 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 		if err = upApp(t, appInstall, req.PullImage, req.UseLifecycleScripts); err != nil {
 			return err
 		}
+		if hooks != nil && hooks.AfterStart != nil {
+			if err := hooks.AfterStart(appInstall, t); err != nil {
+				return err
+			}
+		}
 		updateToolApp(appInstall)
 		return nil
 	}
@@ -660,6 +668,9 @@ func (a AppService) InstallWithHooks(req request.AppInstallCreate, executeScript
 	installTask.AddSubTaskWithOps(task.GetTaskName(appInstall.Name, task.TaskInstall, task.TaskScopeApp), installApp, handleAppStatus, 0, installTimeout)
 
 	go func() {
+		if hooks != nil && hooks.AfterFinish != nil {
+			defer hooks.AfterFinish()
+		}
 		if taskErr := installTask.Execute(); taskErr != nil {
 			appInstall.Status = constant.StatusInstallErr
 			appInstall.Message = taskErr.Error()

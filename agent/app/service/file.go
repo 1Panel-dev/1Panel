@@ -873,9 +873,6 @@ func applyDecompressOwnership(srcPath, dstPath string) error {
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
-	if files.ShouldDenySensitiveFileRead(op.Path) {
-		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
-	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
 		Expand:   !op.IsDetail,
@@ -912,9 +909,6 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 }
 
 func (f *FileService) GetPreviewContent(op request.FileContentReq) (response.FileInfo, error) {
-	if files.ShouldDenySensitiveFileRead(op.Path) {
-		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
-	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
 		Expand:   false,
@@ -1382,11 +1376,6 @@ func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) s
 }
 
 func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
-	for _, p := range d.Paths {
-		if files.ShouldDenySensitiveFileRead(p) {
-			return "", buserr.New("ErrSensitiveFileRead")
-		}
-	}
 	filePath := d.Paths[0]
 	if d.Compress {
 		tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))

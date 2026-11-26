@@ -74,6 +74,7 @@ const message = {
             enable: 'Ativar',
             disable: 'Desativar',
             confirm: 'Confirmar',
+            autoFill: 'Preencher',
             check: 'Verificar',
             submit: 'Enviar',
             cancel: 'Cancelar',
@@ -364,6 +365,7 @@ const message = {
             serviceNotStarted: 'O serviço {0} não está iniciado.',
         },
         status: {
+            autoSync: 'Sincronização automática',
             autoSyncEnabled: 'Sincronização automática ativada',
             autoSyncDisabled: 'Sincronização automática desativada',
             running: 'Em execução',
@@ -883,7 +885,6 @@ const message = {
                 'Usuário: letras, números, ponto, sublinhado ou hífen. Senha: no mínimo 12 caracteres, sem espaços nas extremidades ou quebras de linha.',
             octopAuthHelper:
                 'Senha: no mínimo 8 caracteres com letras e números; evite senhas comuns. Se rejeitada na inicialização, consulte as instruções nos logs do aplicativo.',
-            initialCredentials: 'Credenciais iniciais; se alteradas no aplicativo, use a senha atual.',
             nativeAgentAccessUnavailable:
                 'A instalação existente não tem endereço ou porta HTTPS compatível. Verifique as configurações do aplicativo.',
             agent: 'Agente',
@@ -2515,7 +2516,7 @@ const message = {
         imageMissing: 'A imagem necessária não foi encontrada. Baixe {image} no gerenciamento de imagens.',
         imageReady: 'A imagem do Benchmark está pronta para criar testes.',
         imageHelp:
-            'A imagem do Benchmark executa o cliente de carga e envia solicitações ao serviço de modelos selecionado.',
+            'O sistema usa esta imagem para criar um contêiner separado que executa testes de desempenho enviando solicitações ao serviço de modelos selecionado.',
         mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
         goImages: 'Ir ao gerenciamento de imagens',
         goModels: 'Ir aos downloads de modelos',
@@ -2601,6 +2602,8 @@ const message = {
         missing: 'Não existe',
     },
     container: {
+        logDisconnected:
+            'O fluxo de logs foi desconectado. Reconecte para carregar os logs recentes e retomar a transmissão.',
         logsUnavailable:
             'O contêiner não existe ou foi excluído. Os logs do contêiner não estão disponíveis. Recrie o contêiner e tente novamente.',
         nvidiaSupport: 'Suporte a GPU NVIDIA',
@@ -2967,6 +2970,9 @@ const message = {
         goSetting: 'Ir para configurações',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'A opção “Todos” de um grupo acompanha as alterações dos seus membros; sites selecionados individualmente são salvos como uma lista fixa.',
+        websiteSelectionMissing: 'Seleção indisponível',
         importHelper:
             'Tarefas agendadas duplicadas serão automaticamente ignoradas durante a importação. As tarefas serão definidas como status 【Desativado】 por padrão, e como status 【Aguardando Edição】 quando a associação de dados for anormal.',
         changeStatus: 'Alterar status',
@@ -3065,6 +3071,11 @@ const message = {
         cleanDataHelper: 'Excluir o arquivo de backup gerado durante esta tarefa.',
         noLogs: 'Ainda não há saída de tarefa...',
         errPath: 'Caminho de backup [{0}] com erro, não é possível fazer o download!',
+        websiteStartStop: 'Iniciar/parar site',
+        startTime: 'Horário de início',
+        stopTime: 'Horário de parada',
+        websiteTimeHint: 'Lembrete: executado uma vez por dia',
+        websiteTimeInvalid: 'Selecione os horários de início e de parada; o início deve ser anterior à parada',
         cutWebsiteLog: 'Rotação de log do site',
         cutWebsiteLogHelper: 'Os arquivos de log rotacionados serão salvos no diretório de backup do 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP do WAF',
@@ -3073,6 +3084,15 @@ const message = {
         unitHours: 'Unidade: Horas',
         alertTitle: 'Tarefa Planejada - {0} 「{1}」 Alerta de Falha na Tarefa',
         library: {
+            executeScript: 'Executar script',
+            targetNodes: 'Selecionar nós de destino',
+            switchNodeHelper:
+                'Alternar entre nós mantém a execução. Digite diretamente no terminal; a entrada vai apenas para o nó selecionado.',
+            executorCloseHelper:
+                'Fechar desconecta todos os terminais e pode interromper os scripts em execução. Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Agora',
             autoSyncHelper:
@@ -3206,6 +3226,10 @@ const message = {
         selectTimeRange: 'Selecione o período para exportar',
     },
     terminal: {
+        passwordless: 'Sem senha',
+        bootstrapAuth: 'Autenticação inicial (opcional)',
+        passwordlessSetupHelper: 'O teste de conexão configura e verifica o acesso sem senha.',
+
         showTerminalButton: 'Atalho para o terminal',
         showTerminalButtonHelper:
             'Ao ativar esta opção, um botão de atalho para o terminal será exibido no canto inferior direito da página.',
@@ -4729,6 +4753,18 @@ const message = {
         isEdirWarn: 'Foram detectadas alterações no arquivo docker-compose.yml. Revise a comparação.',
     },
     website: {
+        batchPHP: 'Alterar versão do PHP',
+        batchPHPHelper:
+            'Somente sites PHP serão alterados. Os demais serão ignorados. Ambientes PHP locais não são compatíveis.',
+        batchPHPCount: 'Sites selecionados: {0}; sites PHP: {1}; outros: {2}.',
+        notPHP: 'Não é um site PHP',
+        localPHP: 'Ambientes PHP locais não são compatíveis',
+        samePHP: 'Já utiliza o ambiente PHP de destino',
+        batchPHPResult: 'Resultados',
+        batchPHPStatus_success: 'Sucesso',
+        batchPHPStatus_failed: 'Falha',
+        batchPHPStatus_skipped: 'Ignorado',
+        sslDomainMismatchWebsite: 'Os domínios do certificado não correspondem aos domínios do site',
         primaryDomain: 'Domínio principal',
         otherDomains: 'Outros domínios',
         static: 'Estático',
@@ -5060,6 +5096,9 @@ const message = {
         failTimeoutHelper:
             'O comprimento da janela de tempo para verificações de integridade do servidor. Quando o número acumulado de falhas atinge o limite dentro deste período, o servidor será removido temporariamente e repetido após a mesma duração. Padrão 10 segundos',
         staticChangePHPHelper: 'Atualmente um site estático, pode ser alterado para um site PHP.',
+        createDefaultIndex: 'Criar arquivo {0} padrão',
+        createDefaultIndexHelper:
+            'Criado apenas quando o arquivo não existe no diretório raiz do site, usando as configurações de página padrão',
         proxyCache: 'Cache de Proxy Reverso',
         cacheLimit: 'Limite de Espaço de Cache',
         shareCache: 'Tamanho da Memória de Contagem de Cache',
@@ -5239,7 +5278,14 @@ const message = {
             'Quando ativado, os redirecionamentos de HTTP para HTTPS usam a porta HTTPS personalizada.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Diretório de sincronização',
+        syncDirHelp:
+            'Informe o caminho absoluto do diretório nos nós de destino. O mesmo diretório será usado em todos eles.',
+        syncDirSingleCert:
+            'Selecione apenas um certificado ao especificar um diretório para evitar sobrescrever arquivos.',
+        syncDirAbsolute: 'O diretório de sincronização deve ser um caminho absoluto.',
+
+        caUploadHelp: 'Envie o arquivo ZIP baixado que contém ca.crt e ca.key (máximo de 10 MB).',
         deleteConfirm:
             'Os certificados a seguir serão excluídos. Os certificados ACME serão revogados automaticamente. Continuar?',
         deleteAndRevoke: 'Excluir e revogar',
@@ -5579,6 +5625,10 @@ const message = {
         editRuleConfirm: 'Tem certeza de que deseja modificar esta regra?',
     },
     runtime: {
+        buildLog: 'Log de compilação',
+        extensionInstallFailed: 'Não foi possível instalar algumas extensões do PHP: {extensions}',
+        statusMessageUnavailable:
+            'Não há informações detalhadas sobre o status. Consulte os logs do ambiente de execução para obter mais detalhes.',
         importEnv: 'Importar variáveis de ambiente',
         envImportError: 'Linha {0}: {1}',
         envInvalidAssignment: 'Era esperada uma atribuição NOME=valor válida',
@@ -5763,6 +5813,84 @@ const message = {
         diskType: 'Tipo de Disco',
         serial: 'Número de Série',
         noFail: 'Falha na montagem não afeta a inicialização do sistema',
+    },
+    networkManage: {
+        routeDetails: 'Detalhes da rota',
+        manageIP: 'Gerenciar IP associado',
+        connectedRoute: 'Gerada a partir do IP',
+        connectedRouteHint:
+            'O sistema gera esta rota conectada a partir do IP da interface. Ela não é editada separadamente. Edite ou remova o IP correspondente nos detalhes da interface.',
+        virtualBridgeReadOnly: 'Interface virtual · Somente leitura',
+        virtualBridgeReadOnlyHint:
+            'Esta interface virtual é somente leitura e não participa das verificações de conectividade.',
+        loopbackReadOnly: 'A configuração da interface de loopback é somente leitura.',
+        persistentSourceMissing:
+            'Nenhuma configuração persistente do sistema compatível foi encontrada para a interface {0}. Ela é somente leitura.',
+        addressReadOnlyReason:
+            'Este endereço é dinâmico, não global ou não possui configuração persistente compatível. Ele é somente leitura.',
+        routeReadOnlyReason:
+            'Esta rota é dinâmica, gerada pelo kernel ou não possui configuração persistente compatível. Ela é somente leitura.',
+        persistenceBackend: 'Persistência',
+        editIP: 'Editar IP',
+        editRoute: 'Editar rota',
+        operationRisk:
+            'Alterações na rede podem interromper conexões. Prepare uma forma alternativa de acessar o servidor.',
+        confirmInterface: 'Digite o nome da interface {0} para confirmar.',
+        sourceAddress: 'Endereço de origem',
+        linkConnected: 'Link conectado',
+        linkDisconnected: 'Link desconectado',
+        topologySearch: 'Buscar interface, IP, gateway ou destino',
+        topologyHint:
+            'Gerencie os IPs da interface à esquerda. Os cartões mostram destino, gateway e métrica. Clique em um cartão para ver detalhes; as linhas não indicam conectividade verificada.',
+        direct: 'Direta',
+        defaultDestination: 'Rota padrão',
+        unknownInterface: 'Interface não especificada',
+        noRoutes: 'Nenhuma rota correspondente',
+        readOnly: 'Somente leitura',
+        readOnlyRouteHint: 'Rotas com vários próximos saltos ou sem uma interface única são somente leitura.',
+        title: 'Gerenciamento de rede',
+        interfaces: 'Interfaces de rede',
+        routes: 'Rotas',
+        addIP: 'Adicionar IP',
+        ipCount: 'Quantidade de IPs',
+        interfaceID: 'ID da interface',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado do enlace',
+        mac: 'Endereço MAC',
+        flags: 'Indicadores',
+        address: 'Endereço',
+        scope: 'Escopo',
+        interface: 'Interface',
+        configStatus: 'Estado da configuração',
+        managedApplied: 'Salvo · Ativo',
+        managedPending: 'Salvo · Inativo',
+        addressWarning:
+            'Use o IP atribuído a esta interface. Se o IP público for mapeado por NAT, informe o IP privado.',
+        addressRisk:
+            'Um IP já em uso ou um comprimento de prefixo incorreto pode interromper o acesso ao painel ou por SSH.',
+        addressWithPrefix: 'Endereço IP / comprimento do prefixo',
+        interfaceSelectHint:
+            'São listadas apenas interfaces cuja configuração persistente pode ser alterada. Interfaces de loopback, pontes virtuais somente leitura e outras interfaces que não podem ser alteradas são excluídas.',
+        gatewayHint: 'Deixe o gateway vazio para sub-redes conectadas diretamente.',
+        metricHint: 'Para a mesma sub-rede de destino, as rotas com métrica menor geralmente têm prioridade.',
+        defaultRouteWarning:
+            'Uma rota padrão pode mudar a saída do painel, do SSH e de outros serviços. Prepare um acesso alternativo, como o console da nuvem.',
+        interfaceMissing: 'Interface ausente',
+        changeWarning:
+            'Alterar as configurações de rede pode desconectar o painel ou interromper serviços. Antes de continuar, confirme que você tem outra forma de acessar este servidor.',
+        cidrHint:
+            'Em 192.0.2.10/24, /24 corresponde à máscara de sub-rede 255.255.255.0. Exemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Adicionar rota',
+        checkRoutes: 'Verificar acessibilidade das rotas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabela',
+        reachability: 'Acessibilidade',
+        reachable: 'Acessível',
+        unreachable: 'Inacessível',
+        unchecked: 'Não verificada',
+        check: 'Verificar',
+        destinationHint: 'Aceita endereços IPv4/IPv6 ou redes CIDR. Rota padrão: default, 0.0.0.0/0 ou ::/0.',
     },
     xpack: {
         ldap: {
@@ -7916,6 +8044,13 @@ const message = {
             appUpgradeHelper: 'Existem {0} aplicativos que precisam ser atualizados',
             dashboardSetting: 'Configurações da Visão Geral',
             keepOneDashboardComponent: 'Mantenha pelo menos uma seção na visão geral',
+            currentNode: 'Nó atual',
+            quickSwitch: 'Troca rápida',
+            allNodes: 'Todos os nós',
+            nodeSearchPlaceholder: 'Pesquisar nome ou endereço do nó',
+            currentNodeNotInResults: 'O nó atual não está nesta página de resultados',
+            upgradableApps: 'Aplicativos atualizáveis',
+            quickSwitchMore: 'Ver todos os nós correspondentes',
         },
         customApp: {
             name: 'Repositório de Aplicativos Personalizados',
@@ -8244,6 +8379,33 @@ const message = {
             menu: 'Sincronização de Recursos',
             file: 'Transferência de Arquivos',
             fileSyncConfirm: 'Transferir o arquivo/pasta {1} do nó {0} para o diretório {3} no nó {2}?',
+            fileBatchDesc: 'Selecione arquivos ou pastas de qualquer nó e distribua para vários nós de destino.',
+            fileSourceTitle: 'Selecionar arquivos de origem',
+            fileSourceNode: 'Nó de origem',
+            fileTargetDirectory: 'Diretório de destino',
+            fileBatchPath: 'Definir diretórios de destino em lote',
+            fileApplyPath: 'Aplicar aos nós selecionados',
+            fileSelectedCount: '{0} itens selecionados',
+            fileSelectedTargets: '{0} nós selecionados',
+            fileSelectionHint:
+                'As pastas são copiadas por inteiro com o nome original, preservando a estrutura interna.',
+            fileRules:
+                'As regras de transferência existentes são mantidas: arquivos com o mesmo nome podem ser atualizados e os demais arquivos do diretório de destino são preservados.',
+            fileBatchSummary: 'Distribuir {0} itens para {1} nós de destino',
+            fileTaskHint:
+                'Após a confirmação, uma tarefa de distribuição será criada e poderá ser consultada no gerenciamento de tarefas.',
+            fileBatchConfirm:
+                'Verifique os nós e os caminhos de destino abaixo. Arquivos com o mesmo nome podem ser sobrescritos.',
+            fileTargetHint:
+                'Cada nó pode ter seu próprio diretório. Nós offline, com falha na verificação ou sem rsync não podem ser selecionados.',
+            fileChecking: 'Verificando',
+            fileCheckFailed: 'Falha na verificação',
+            fileRsyncMissing: 'rsync não instalado',
+            filePathRequired: 'Insira um caminho absoluto para o diretório de destino que comece com /.',
+            fileConflictHint:
+                'Estas origens têm nomes de destino iguais. Mantenha apenas uma origem por nome. A desmarcação se aplica a todos os nós de destino.',
+            fileDeselect: 'Desmarcar',
+            fileSourceChanged: 'O nó de origem foi alterado. Selecione os arquivos novamente.',
 
             image: 'Transferência de Imagens',
             imageBatchDesc:
@@ -8591,14 +8753,87 @@ const message = {
             cluster: 'Alta Disponibilidade de Aplicações',
             name: 'Nome do Cluster',
             addCluster: 'Adicionar Cluster',
-            installNode: 'Instalar Nó',
-            master: 'Nó Mestre',
-            slave: 'Nó Escravo',
-            replicaStatus: 'Status Mestre-Escravo',
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
-            replicaStatusError: 'A aquisição do status está anormal, verifique o nó mestre.',
-            masterHostError: 'O IP do nó mestre não pode ser 127.0.0.1',
+            noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
+            backups: 'Backups do cluster',
+            importBackup: 'Importar backup',
+            archivePassphrase: 'Senha do backup',
+            restoreToNew: 'Restaurar em um novo cluster',
+            restoreTarget: 'Destino da restauração',
+            restoreToOriginal: 'Restaurar no cluster original',
+            restoreOriginalUnavailable: 'Este backup não tem um cluster original disponível para restauração.',
+            restoreOriginalWarning:
+                'As conexões com o banco serão interrompidas. O cluster original voltará ao estado do backup e as réplicas serão sincronizadas novamente.',
+            restoreOriginalConfirm: 'Digite o nome do cluster {0} para confirmar a sobrescrita.',
+            restoreCredentials: 'Use as credenciais de administrador e replicação do backup.',
+            archiveImportHint:
+                'Somente arquivos de backup de cluster .1pha são aceitos. Use a senha definida ao criar o backup.',
+            backupDataSize: 'Tamanho dos dados',
+            appStoreOnly: 'Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.',
+            noMatchingReplicaVersion:
+                'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',
+            installNode: 'Servidor de implantação',
+            master: 'Base de dados principal',
+            slave: 'Base de dados de réplica',
+            redisMaster: 'Instância principal',
+            redisReplica: 'Réplica',
+            replicaStatus: 'Detalhes da replicação',
+            replicaStatusError: 'Não foi possível consultar a replicação',
+            masterHostError: 'O endereço do primário não pode ser 127.0.0.1',
+            emptyTitle: 'Nenhum cluster de {0} configurado',
+            emptyDescription:
+                'Em “{2}”, selecione um servidor de implantação e uma versão para criar a {0}. Após a implantação, você pode adicionar uma {1} da mesma versão e consultar o status da replicação, os parâmetros da instância e os logs.',
+            loadFailed: 'Não foi possível carregar os clusters',
+            refreshFailed: 'Falha ao atualizar. Exibindo dados de {0}.',
+            addReplica: 'Adicionar {0}',
+            masterUnavailable: 'A instância principal está indisponível. Verifique seu servidor.',
+            replication: 'Replicação',
+            replicationStatus: 'Status da replicação',
+            configuredReplicas: '{0} instâncias de tipo {1} configuradas',
+            addReplicaPending: 'Aguardando adicionar {0}',
+            checkedAt: 'Verificado em {0}',
+            roleParameters: 'Parâmetros de {0}',
+            parametersFailed: 'Não foi possível consultar os parâmetros',
+            instanceParameters: 'Parâmetros da instância',
+            replicationParameters: 'Configuração da replicação de dados',
+            replicationUserHelp:
+                'A base de dados de réplica usa esta conta para se conectar à base de dados principal e sincronizar os dados.',
+            replicationPasswordHelp:
+                'Autentica o usuário de replicação. Ao adicionar uma base de dados de réplica, use a senha configurada para esta conta na base de dados principal.',
+            configureRole: 'Configurar {0}',
+            sameHost: 'As duas instâncias estão no mesmo servidor. Uma falha do servidor afeta ambas.',
+            versionLocked: 'Corresponde à versão atual do primário.',
+            unset: 'Não definido',
+            noParameters: 'Esta instância não tem parâmetros para exibir',
+            lagSeconds: 'Atraso de replicação (segundos)',
+            offsetBytes: 'Deslocamento de replicação (bytes)',
+            taskQueued: 'Tarefa aceita',
+            removeRecord: 'Remover Registro',
+            removeClusterRecordNotice: 'Esta ação removerá o registro do cluster.',
+            removeMemberRecordNotice: 'Esta ação removerá o registro do membro.',
+            taskAwaitingConfirmation: 'Aguardando confirmação do servidor',
+            taskConfirmationNotice:
+                'Aguardando a confirmação da tarefa em {0}. Após o registro, consulte a Central de tarefas desse servidor ou os logs do cartão.',
+            taskRecordUnavailable:
+                'Não foi possível obter o registro da tarefa. Verifique o resultado do envio e o estado do servidor de implantação.',
+            taskRunning: 'Tarefa em andamento',
+            taskFailed: 'A operação falhou. Consulte o log da tarefa.',
+            parameters: 'Parâmetros',
+            primaryMissing: 'Não foi possível localizar o registro da instância principal.',
+            replicaSourceAddress: 'Endereço de {0}',
+            replicaSourcePort: 'Porta de {0}',
+            replicaSourceAddressHelp: 'Informe um endereço IP ou domínio acessível pelo servidor selecionado.',
+            replicationState: {
+                pending: 'Pendente',
+                waitingForInstance: 'Aguardando a instância ficar pronta',
+                healthy: 'Normal',
+                syncing: 'Sincronizando',
+                lagging: 'Com atraso',
+                disconnected: 'Desconectada',
+                unknown: 'Desconhecida',
+                unavailable: 'Indisponível',
+            },
         },
     },
     template: {

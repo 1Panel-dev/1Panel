@@ -376,5 +376,5 @@ func (b *BaseApi) ImportMasterSSL(c *gin.Context) {
 		helper.InternalServer(c, err)
 		return
 	}
-	helper.Success(c)
+	helper.SuccessWithData(c, gin.H{"syncDir": req.SyncDir, "directoryWritten": req.SyncDir != ""})
 }

@@ -1,10 +1,10 @@
 <template>
     <div v-if="showControl" class="log-toolbar">
-        <el-select @change="searchLogs" class="fetchClass" v-model="logSearch.mode">
+        <el-select @change="searchLogs()" class="fetchClass" v-model="logSearch.mode">
             <template #prefix>{{ $t('container.fetch') }}</template>
             <el-option v-for="item in timeOptions" :key="item.label" :value="item.value" :label="item.label" />
         </el-select>
-        <el-select @change="searchLogs" class="tailClass" v-model.number="logSearch.tail">
+        <el-select @change="searchLogs()" class="tailClass" v-model.number="logSearch.tail">
             <template #prefix>{{ $t('container.lines') }}</template>
             <el-option :value="0" :label="$t('commons.table.all')" />
             <el-option :value="100" :label="100" />
@@ -13,12 +13,12 @@
             <el-option :value="1000" :label="1000" />
         </el-select>
         <div class="margin-button float-left">
-            <el-checkbox border @change="searchLogs" v-model="logSearch.isWatch">
+            <el-checkbox border @change="searchLogs()" v-model="logSearch.isWatch">
                 {{ $t('commons.button.watch') }}
             </el-checkbox>
         </div>
         <div class="margin-button float-left">
-            <el-checkbox border @change="searchLogs" v-model="logSearch.isShowTimestamp">
+            <el-checkbox border @change="searchLogs()" v-model="logSearch.isShowTimestamp">
                 {{ $t('commons.table.date') }}
             </el-checkbox>
         </div>
@@ -29,6 +29,12 @@
             {{ $t('commons.button.clean') }}
         </el-button>
     </div>
+    <el-alert v-if="disconnected" type="warning" :closable="false" show-icon class="mt-2">
+        <template #title>{{ $t('container.logDisconnected') }}</template>
+        <el-button size="small" :loading="connecting" @click="searchLogs(true)">
+            {{ $t('commons.button.reconnect') }}
+        </el-button>
+    </el-alert>
     <div class="log-container" :style="styleVars">
         <div class="xterm-log-viewer" ref="terminalElement"></div>
     </div>
@@ -128,6 +134,8 @@ const styleVars = computed(() => ({
 const terminalElement = ref<HTMLDivElement | null>(null);
 let eventSource: EventSource | null = null;
 let searchVersion = 0;
+const disconnected = ref(false);
+const connecting = ref(false);
 let term: Terminal | null = null;
 const fitAddon = new FitAddon();
 const MAX_VIEW_LINES = 20000;
@@ -170,6 +178,7 @@ const timeOptions = ref([
 
 const stopListening = () => {
     searchVersion++;
+    connecting.value = false;
     if (eventSource) {
         eventSource.close();
         eventSource = null;
@@ -231,14 +240,18 @@ const initTerminal = () => {
     });
 };
 
-const searchLogs = async () => {
+const searchLogs = async (preserveLogs = false) => {
     if (Number(logSearch.tail) < 0) {
         MsgError(i18n.global.t('container.linesHelper'));
         return;
     }
     stopListening();
     const version = searchVersion;
-    clearTerminal();
+    if (!preserveLogs) {
+        clearTerminal();
+        disconnected.value = false;
+    }
+    connecting.value = true;
 
     let currentNode = globalCurrentNode.value;
     if (props.node && props.node !== '') {
@@ -253,11 +266,23 @@ const searchLogs = async () => {
     const authError = await checkStreamAuth(url, currentNode);
     if (version !== searchVersion) return;
     if (authError) {
+        connecting.value = false;
+        disconnected.value = true;
         showEventSourceAuthError(authError);
         return;
     }
     const source = new EventSource(url);
     eventSource = source;
+    source.onopen = () => {
+        if (version !== searchVersion) return;
+        connecting.value = false;
+        disconnected.value = false;
+    };
+    source.addEventListener('complete', () => {
+        if (version !== searchVersion) return;
+        stopListening();
+        disconnected.value = logSearch.isWatch;
+    });
     source.addEventListener('container-missing', () => {
         if (version !== searchVersion) return;
         stopListening();
@@ -272,6 +297,7 @@ const searchLogs = async () => {
     source.onerror = (event: MessageEvent) => {
         if (version !== searchVersion) return;
         stopListening();
+        disconnected.value = true;
         if (event.data && event.data != '') {
             MsgError(event.data);
         }

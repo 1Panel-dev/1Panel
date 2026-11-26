@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'پاک‌سازی فضای کاری بازیابی Compo
 # محیط اجرا
 ErrFileNotExist: 'فایل منبع یافت نشد: {{ .detail }}'
 ErrImageBuildErr: 'ساخت تصویر ناموفق بود'
+PHPBuildImage: "در حال ساخت ایمیج PHP"
+PHPBuildBaseImage: "در حال دریافت ایمیج پایه {{ .name }}"
+PHPBuildStep: "در حال ساخت ایمیج PHP (مرحله {{ .name }})"
+PHPBuildStartContainer: "در حال راه‌اندازی کانتینر PHP"
+PHPBuildInstallExtensions: "در حال نصب افزونه‌های PHP"
+PHPBuildCommitImage: "در حال ذخیره ایمیج با افزونه‌های PHP"
+PHPBuildApplyConfig: "در حال اعمال تنظیمات و راه‌اندازی محیط اجرای PHP"
+PHPBuildSeeLog: "برای جزئیات به build.log مراجعه کنید"
 ErrImageExist: "تصویر از قبل وجود دارد. از نام تصویر دیگری استفاده کنید."
 ErrDelWithWebsite: 'محیط اجرا به یک وب‌سایت متصل است و قابل حذف نیست'
 ErrRuntimeStart: 'شروع ناموفق بود'
@@ -649,6 +657,8 @@ ErrWebhookTestFailed: 'لطفاً پیکربندی وب‌هوک را بررسی
 
 # وظیفه - محیط اجرا
 ErrInstallExtension: 'وظیفه نصب پسوند دیگری در حال اجراست'
+PHPExtensionsInstallWarning: "نصب برخی از افزونه‌های PHP ناموفق بود: {{ .name }}"
+PHPExtensionsInstallManually: "برای ذخیره نصب موفق در ایمیج، دوباره از صفحه افزونه‌ها اقدام کنید. برای عیب‌یابی دستی، فرمان‌های زیر را در میزبان Docker اجرا کنید:"
 
 # قالب ایمیل هشدار
 PanelAlertTitle: "اعلان هشدار پنل"
@@ -677,6 +687,17 @@ PartitionDiskErr: 'پارتیشن‌بندی ناموفق بود: {{ .err }}'
 FormatDiskErr: 'فرمت کردن ناموفق بود: {{ .err }}'
 MountDiskErr: 'اتصال ناموفق بود: {{ .err }}'
 XfsNotFound: 'xfs یافت نشد؛ ابتدا xfsprogs را نصب کنید'
+
+# مدیریت شبکه
+ErrNetworkPersistencePlatform: "تنظیمات پایدار شبکه فقط در گره‌های لینوکس پشتیبانی می‌شود."
+ErrNetworkPersistencePrivilege: "برای تنظیمات پایدار شبکه، 1Panel Agent باید با کاربر root و دسترسی مدیریت شبکه اجرا شود."
+ErrNetworkIPRoute2: "iproute2 را نصب یا به‌روزرسانی کنید و بررسی کنید که فرمان ip در دسترس باشد.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "این نشانی IP اصلی دارای نشانی‌های ثانویه در همان زیرشبکه است. ابتدا نشانی‌های ثانویه را حذف کنید یا آن‌ها را با ابزارهای شبکه سیستم تنظیم کرده و دوباره تلاش کنید."
+ErrNetworkRouteReadOnly: "این مسیر فقط خواندنی است."
+ErrNetworkPersistenceConflict: "این نشانی یا مسیر از قبل وجود دارد یا با تنظیمات ذخیره‌شده تداخل دارد.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "پیکربندی رابط حلقه بازگشت فقط خواندنی است."
+ErrNetworkPersistentSourceMissing: "هیچ پیکربندی پایدار سیستم با پشتیبانی برای رابط {{ .name }} یافت نشد. این رابط فقط خواندنی است."
+ErrNetworkVirtualBridgeReadOnly: "این رابط مجازی فقط خواندنی است و در بررسی دسترسی‌پذیری شرکت نمی‌کند."
 
 # ترمینال
 TerminalAIBlockedRiskyCommand: 'دستور پرخطر مسدود شد: {{ .command }}'
@@ -831,3 +852,84 @@ ErrImageCheckProxyRequired: "برای بررسی به‌روزرسانی تصا�
 ErrPHPExtensionsConflict: "قالب افزونه PHP با این نام و محتوای متفاوت از قبل وجود دارد؛ بازنویسی نشد"
 
 ErrModelTokenizerDirOverlap: "پوشه‌های مدل و توکن‌ساز باید متفاوت باشند و هیچ‌کدام نباید درون دیگری قرار گیرد"
+ErrClusterAppOnly: "این برنامه را در بخش دسترس‌پذیری بالای برنامه‌ها نصب و به‌روزرسانی کنید."
+ErrClusterArchivePassphraseRequired: "گذرواژهٔ نسخهٔ پشتیبان را وارد کنید."
+ErrClusterArchiveTooLarge: "فایل نسخهٔ پشتیبان خوشه بیش از حد بزرگ است."
+ErrClusterArchiveFormat: "قالب این فایل نسخهٔ پشتیبان خوشه پشتیبانی نمی‌شود."
+ErrClusterArchiveTruncated: "فایل نسخهٔ پشتیبان خوشه ناقص است."
+ErrClusterArchiveBlock: "نسخهٔ پشتیبان خوشه حاوی یک بلوک دادهٔ نامعتبر است."
+ErrClusterArchiveAuthentication: "گذرواژهٔ نسخهٔ پشتیبان نادرست است یا فایل نسخهٔ پشتیبان خوشه خراب شده است."
+ErrClusterArchiveTrailingData: "پس از پایان فایل نسخهٔ پشتیبان خوشه داده‌های غیرمنتظره‌ای وجود دارد."
+ErrClusterArchiveManifest: "فرادادهٔ نسخهٔ پشتیبان خوشه نامعتبر است."
+ErrClusterArchiveManifestTooLarge: "فرادادهٔ نسخهٔ پشتیبان خوشه بیش از حد بزرگ است."
+ErrClusterArchiveInvalid: "ساختار فایل نسخهٔ پشتیبان خوشه نامعتبر است."
+ErrClusterArchivePayload: "داده‌های نسخهٔ پشتیبان با فرادادهٔ نسخهٔ پشتیبان خوشه مطابقت ندارند."
+ErrClusterArchiveChecksum: "مقدار چک‌سام داده‌های نسخهٔ پشتیبان خوشه مطابقت ندارد."
+ErrClusterArchiveImportHeader: "سرآیند درخواست وارد کردن نسخهٔ پشتیبان خوشه نامعتبر است."
+ErrClusterBackupID: "شناسهٔ نسخهٔ پشتیبان خوشه نامعتبر است."
+ErrClusterBackupEngineMismatch: "موتور پایگاه دادهٔ نسخهٔ پشتیبان با برنامهٔ انتخاب‌شده مطابقت ندارد."
+ErrClusterBackupSelectFile: "یک فایل پشتیبان خوشه با پسوند ‎.1pha انتخاب کنید."
+ErrClusterBackupFileInaccessible: "فایل پشتیبان خوشه در دسترس نیست."
+ErrClusterBackupRegularFile: "نسخهٔ پشتیبان خوشه باید یک فایل عادی باشد."
+ErrClusterBackupFileChanged: "فایل پشتیبان خوشه تغییر کرده است. دوباره آن را انتخاب کنید."
+ErrClusterBackupNotPrimary: "نمونهٔ انتخاب‌شده، نمونهٔ اصلی خوشهٔ دسترس‌پذیری بالا نیست."
+ErrClusterBackupContainerUnavailable: "کانتینر پایگاه داده در دسترس نیست."
+ErrClusterBackupMySQLInnoDB: "پشتیبان‌گیری آنلاین MySQL مستلزم استفاده از InnoDB در همهٔ جدول‌های کاربران است."
+ErrClusterBackupPostgresRecovery: "نمونهٔ PostgreSQL در حالت بازیابی است."
+ErrClusterBackupPostgresTablespaces: "پشتیبان‌گیری از خوشهٔ PostgreSQL فقط از فضاهای جدولی پیش‌فرض پشتیبانی می‌کند."
+ErrClusterBackupPostgresReplicationCredentials: "اطلاعات احراز هویت تکثیر PostgreSQL در دسترس نیست."
+ErrClusterBackupRedisNotPrimary: "نمونهٔ Redis اصلی نیست."
+ErrClusterBackupRedisVersion: "نسخهٔ Redis قابل تشخیص نیست."
+ErrClusterBackupUnsupportedEngine: "این موتور پایگاه داده از پشتیبان‌گیری خوشه پشتیبانی نمی‌کند."
+ErrClusterCommandFailed: "اجرای {{ .name }} ناموفق بود"
+ErrClusterRestoreCatalogInstance: "بازیابی در یک خوشهٔ جدید به نمونه‌ای جدید نیاز دارد که از الگوی فهرست برنامه‌ها ایجاد شده باشد."
+ErrClusterRestorePrimaryTemplate: "بازیابی به همان الگوی نمونهٔ اصلی که در نسخهٔ پشتیبان ثبت شده است نیاز دارد."
+ErrClusterRestoreUnsupportedEngine: "این موتور پایگاه داده از بازیابی خوشه پشتیبانی نمی‌کند."
+ErrClusterRestoreRedisSnapshot: "تصویر لحظه‌ای Redis نامعتبر است."
+ErrClusterRestorePostgresMajorVersion: "نسخهٔ اصلی داده‌های PostgreSQL با نسخهٔ پشتیبان مطابقت ندارد."
+ErrClusterRestoreSingleContainer: "بازیابی به نمونه‌ای با تنها یک کانتینر پایگاه داده نیاز دارد."
+ErrClusterRestoreCatalogDataMount: "بازیابی به اتصال دادهٔ تعریف‌شده در الگوی فهرست برنامه‌ها نیاز دارد."
+ErrClusterRestoreDataDirectoryNotEmpty: "دایرکتوری دادهٔ مقصد برای بازیابی خالی نیست."
+ErrClusterRestorePostgresUnsafePath: "نسخهٔ پشتیبان PostgreSQL حاوی مسیر ناامن است."
+ErrClusterRestorePostgresFileType: "نسخهٔ پشتیبان PostgreSQL حاوی پیوند یا نوع فایل پشتیبانی‌نشده است."
+ErrClusterRestoreRedisCatalogPersistence: "بازیابی Redis به تنظیمات ماندگاری داده از الگوی فهرست برنامه‌ها نیاز دارد."
+ErrClusterRestoreRedisCatalogRDB: "بازیابی تصویر لحظه‌ای Redis به تنظیمات RDB از الگوی فهرست برنامه‌ها نیاز دارد."
+ErrClusterRestoreMySQLCredentials: "اعتبارسنجی اطلاعات ورود مدیر MySQL بازیابی‌شده انجام نشد. از اطلاعات ورود معتبر در زمان ایجاد نسخهٔ پشتیبان استفاده کنید."
+ErrClusterRestoreEngineVersion: "نسخهٔ {{ .current }} موتور پایگاه داده با نسخهٔ {{ .expected }} نسخهٔ پشتیبان مطابقت ندارد."
+ErrClusterRestoreDatabaseNotReady: "پایگاه دادهٔ بازیابی‌شده آماده نشد"
+ErrClusterRestoreOriginalRequest: "درخواست بازیابی در خوشهٔ اصلی نامعتبر است."
+ErrClusterRestoreMemberVersionChanged: "نسخهٔ عضو خوشه پیش از بازیابی تغییر کرده است."
+ErrClusterRestoreMemberChanged: "عضو خوشه پیش از بازیابی تغییر کرده است."
+ErrClusterRestoreMemberBusy: "وظیفهٔ بازیابی دیگری در حال استفاده از این عضو خوشه است."
+ErrClusterRestoreMemberState: "وضعیت فعلی بازیابی عضو خوشه اجازهٔ این عملیات را نمی‌دهد."
+ErrClusterRestoreRollbackRequiresReview: "ممکن است داده‌های بازیابی‌شده تغییر کرده باشند. بازگشت خودکار مسدود شده و داده‌های قبلی حفظ شده‌اند."
+ErrClusterRestoreOriginalAction: "عملیات بازیابی در خوشهٔ اصلی نامعتبر است."
+ErrClusterRestoreDataMountDirectory: "مسیر اتصال داده‌های خوشه باید یک پوشه باشد."
+ErrClusterRestoreMemberRoleMismatch: "نقش همانندسازی پیکربندی‌شده در کانتینر پایگاه داده با نقش ثبت‌شده برای این عضو مطابقت ندارد."
+ErrClusterRestoreOriginalCatalogMounts: "بازیابی در خوشهٔ اصلی به اتصال‌های پایگاه دادهٔ تعریف‌شده در الگوی برنامه نیاز دارد."
+ErrClusterRestoreDataMountUnavailable: "محل اتصال داده‌های پایگاه داده وجود ندارد یا قابل نوشتن نیست."
+ErrClusterRestoreOriginalTemplateVersion: "نسخهٔ پشتیبان با الگوی برنامه یا نسخهٔ موتور پایگاه دادهٔ خوشهٔ اصلی مطابقت ندارد."
+ErrClusterRestoreValidationContainer: "کانتینر اعتبارسنجی بازیابی با وظیفهٔ بازیابی فعلی مطابقت ندارد."
+ErrClusterRestoreDataOwnership: "خواندن مالک و گروه داده‌های پایگاه داده ممکن نیست."
+ErrClusterRestoreConfigFileType: "پیکربندی پایگاه داده دارای پیوند یا فایل ویژه است."
+ErrClusterRestoreRedisActiveRDB: "برای بازیابی اسنپ‌شات Redis، نمونهٔ در حال اجرا باید از تنظیمات RDB سازگار استفاده کند."
+ErrClusterRestoreDataDirectoryMismatch: "پایگاه دادهٔ در حال اجرا از پوشهٔ دادهٔ مشخص‌شده در الگوی برنامه استفاده نمی‌کند."
+ErrClusterRestoreReplicaNotReady: "نسخهٔ همتای بازیابی‌شده آماده نشد"
+ErrClusterRestoreDataPathDirectory: "مسیر داده‌های بازیابی باید یک پوشه باشد."
+ErrClusterRestoreOriginalDataUnavailable: "پوشهٔ دادهٔ خوشهٔ اصلی وجود ندارد."
+ErrClusterRestoreDataDirectoryChanged: "پوشهٔ دادهٔ خوشه در زمان بازیابی تغییر کرد."
+ErrClusterRestoreDataReplacementIncomplete: "جایگزینی داده‌های خوشه تکمیل نشد."
+ErrClusterRestoreRollbackDirectoryChanged: "پوشهٔ دادهٔ خوشه در زمان بازگردانی عملیات بازیابی تغییر کرد."
+ErrRedisAOFRestoreUnavailable: "بازیابی AOF برای این نسخه Redis در دسترس نیست."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "انتخاب وب‌سایت نامعتبر است: {{ .value }}"
+ErrCronjobWebsiteGroup: "دسترسی به گروه وب‌سایت {{ .id }} امکان‌پذیر نیست"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: هیچ‌یک از وب‌سایت‌های انتخاب‌شده وجود ندارد"
+ErrCronjobWebsiteVersion: "نسخهٔ انتخاب وب‌سایت پشتیبانی نمی‌شود: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "«همهٔ وب‌سایت‌ها» را نمی‌توان هم‌زمان با وب‌سایت‌ها یا گروه‌های مشخص انتخاب کرد"
+ErrCronjobWebsiteGroupName: "نام گروه وب‌سایت نمی‌تواند خالی باشد"
+ErrCronjobWebsiteGroupMissing: "گروه وب‌سایت «{{ .group }}» وجود ندارد و هیچ وب‌سایتی از فهرست ذخیره‌شده یافت نشد"
+CronjobWebsiteGroupFallback: "{{ .name }}: گروه وب‌سایت «{{ .group }}» وجود ندارد؛ به‌صورت فهرست ثابت وب‌سایت‌ها وارد شد و دیگر تغییرات گروه را دنبال نمی‌کند"
+CronjobWebsiteMissing: "{{ .name }}: وب‌سایت‌های زیر یافت نشدند: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "هیچ‌یک از گروه‌ها یا وب‌سایت‌های انتخاب‌شده یافت نشد"

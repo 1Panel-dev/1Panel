@@ -23,9 +23,10 @@ type AppUpdateRes struct {
 
 type AppDTO struct {
 	model.App
-	Installed bool     `json:"installed"`
-	Versions  []string `json:"versions"`
-	Tags      []TagDTO `json:"tags"`
+	ClusterOnly bool     `json:"clusterOnly,omitempty"`
+	Installed   bool     `json:"installed"`
+	Versions    []string `json:"versions"`
+	Tags        []TagDTO `json:"tags"`
 }
 
 type AppItem struct {

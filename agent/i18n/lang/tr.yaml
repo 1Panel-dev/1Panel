@@ -351,6 +351,14 @@ ComposeRecoverCleanup: 'Compose geri yükleme çalışma alanını temizle'
 # çalışma zamanı
 ErrFileNotExist: '{{ .detail }} dosyası mevcut değil Lütfen kaynak dosyanın bütünlüğünü kontrol edin'
 ErrImageBuildErr: 'Image yapı başarısız'
+PHPBuildImage: "PHP imajı oluşturuluyor"
+PHPBuildBaseImage: "Temel imaj alınıyor: {{ .name }}"
+PHPBuildStep: "PHP imajı oluşturuluyor (adım {{ .name }})"
+PHPBuildStartContainer: "PHP konteyneri başlatılıyor"
+PHPBuildInstallExtensions: "PHP eklentileri kuruluyor"
+PHPBuildCommitImage: "PHP eklentilerini içeren imaj kaydediliyor"
+PHPBuildApplyConfig: "Yapılandırma uygulanıyor ve PHP ortamı başlatılıyor"
+PHPBuildSeeLog: "Ayrıntılar için build.log dosyasına bakın"
 ErrImageExist: 'Görüntü zaten var Lütfen görüntü adını değiştirin.'
 ErrDelWithWebsite: 'İşletim ortamı zaten bir web sitesiyle ilişkili ve silinemez'
 ErrRuntimeStart: 'Başlatma başarısız'
@@ -649,6 +657,8 @@ ErrWebhookTestFailed: 'Lütfen Webhook yapılandırmasını kontrol edin. Ayrın
 
 # görev - çalışma zamanı
 ErrInstallExtension: 'Zaten devam eden bir kurulum görevi var, görevin bitmesini bekleyin'
+PHPExtensionsInstallWarning: "Bazı PHP uzantıları yüklenemedi: {{ .name }}"
+PHPExtensionsInstallManually: "Başarılı kurulumları imaja kaydetmek için Uzantılar sayfasından yeniden deneyin. Sorunu elle incelemek için aşağıdaki komutları Docker ana makinesinde çalıştırın:"
 
 # uyarı e-posta şablonu
 PanelAlertTitle: 'Panel Uyarı Bildirimi'
@@ -676,6 +686,17 @@ PartitionDiskErr: 'Bölümleme başarısız, {{ .err }}'
 FormatDiskErr: 'Disk biçimlendirme başarısız, {{ .err }}'
 MountDiskErr: 'Disk bağlama başarısız, {{ .err }}'
 XfsNotFound: 'XFS dosya sistemi algılanmadı, lütfen önce xfsprogs''i yükleyin'
+
+# Ağ yönetimi
+ErrNetworkPersistencePlatform: "Kalıcı ağ ayarları yalnızca Linux düğümlerinde desteklenir."
+ErrNetworkPersistencePrivilege: "Kalıcı ağ ayarları için 1Panel Agent, ağ yönetimi yetkisine sahip root olarak çalışmalıdır."
+ErrNetworkIPRoute2: "iproute2 paketini kurun veya güncelleyin ve ip komutunun kullanılabildiğini kontrol edin.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "Bu birincil IP adresinin aynı alt ağda ikincil adresleri var. Önce ikincil adresleri kaldırın veya sistem ağ araçlarıyla düzenleyip yeniden deneyin."
+ErrNetworkRouteReadOnly: "Bu rota salt okunurdur."
+ErrNetworkPersistenceConflict: "Bu adres veya rota zaten var ya da kayıtlı ayarlarla çakışıyor.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Geri döngü arayüzü yapılandırması salt okunurdur."
+ErrNetworkPersistentSourceMissing: "{{ .name }} arayüzü için desteklenen kalıcı sistem yapılandırması bulunamadı. Salt okunurdur."
+ErrNetworkVirtualBridgeReadOnly: "Bu sanal arayüz salt okunurdur ve erişilebilirlik denetimlerine dahil edilmez."
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'Riskli komut engellendi: {{ .command }}'
@@ -830,3 +851,84 @@ ErrImageCheckProxyRequired: "Geçerli çalışma ortamında imaj güncellemeleri
 ErrPHPExtensionsConflict: "Bu ada sahip ancak içeriği farklı bir PHP uzantı şablonu zaten mevcut; üzerine yazılmadı"
 
 ErrModelTokenizerDirOverlap: "Model ve tokenizer dizinleri farklı olmalı ve biri diğerini içermemelidir"
+ErrClusterAppOnly: "Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin."
+ErrClusterArchivePassphraseRequired: "Yedek parolasını girin."
+ErrClusterArchiveTooLarge: "Küme yedek dosyası çok büyük."
+ErrClusterArchiveFormat: "Bu küme yedek dosyası biçimi desteklenmiyor."
+ErrClusterArchiveTruncated: "Küme yedek dosyası eksik."
+ErrClusterArchiveBlock: "Küme yedeği geçersiz bir veri bloğu içeriyor."
+ErrClusterArchiveAuthentication: "Yedek parolası yanlış veya küme yedek dosyası bozuk."
+ErrClusterArchiveTrailingData: "Küme yedek dosyasının sonunda beklenmeyen veriler var."
+ErrClusterArchiveManifest: "Küme yedeğinin meta verileri geçersiz."
+ErrClusterArchiveManifestTooLarge: "Küme yedeğinin meta verileri çok büyük."
+ErrClusterArchiveInvalid: "Küme yedek dosyasının yapısı geçersiz."
+ErrClusterArchivePayload: "Yedek verileri küme yedeğinin meta verileriyle eşleşmiyor."
+ErrClusterArchiveChecksum: "Küme yedeğindeki verilerin sağlama toplamı eşleşmiyor."
+ErrClusterArchiveImportHeader: "Küme yedeğini içe aktarma isteğinin başlığı geçersiz."
+ErrClusterBackupID: "Küme yedeği kimliği geçersiz."
+ErrClusterBackupEngineMismatch: "Yedekteki veritabanı motoru seçilen uygulamayla eşleşmiyor."
+ErrClusterBackupSelectFile: "Bir küme yedek dosyası (.1pha) seçin."
+ErrClusterBackupFileInaccessible: "Küme yedek dosyasına erişilemiyor."
+ErrClusterBackupRegularFile: "Küme yedeği normal bir dosya olmalıdır."
+ErrClusterBackupFileChanged: "Küme yedek dosyası değişti. Dosyayı yeniden seçin."
+ErrClusterBackupNotPrimary: "Seçilen örnek, yüksek erişilebilirlik kümesinin birincil örneği değil."
+ErrClusterBackupContainerUnavailable: "Veritabanı kapsayıcısı kullanılamıyor."
+ErrClusterBackupMySQLInnoDB: "Çevrimiçi MySQL yedeklemesi için tüm kullanıcı tabloları InnoDB kullanmalıdır."
+ErrClusterBackupPostgresRecovery: "PostgreSQL örneği kurtarma modunda."
+ErrClusterBackupPostgresTablespaces: "PostgreSQL küme yedeklemesi yalnızca varsayılan tablo alanlarını destekler."
+ErrClusterBackupPostgresReplicationCredentials: "PostgreSQL çoğaltma kimlik bilgileri kullanılamıyor."
+ErrClusterBackupRedisNotPrimary: "Redis örneği birincil değil."
+ErrClusterBackupRedisVersion: "Redis sürümü belirlenemedi."
+ErrClusterBackupUnsupportedEngine: "Bu veritabanı motoru küme yedeklemesini desteklemiyor."
+ErrClusterCommandFailed: "{{ .name }} çalıştırılamadı"
+ErrClusterRestoreCatalogInstance: "Yeni bir kümeye geri yükleme için uygulama kataloğu şablonundan oluşturulan yeni bir örnek gerekir."
+ErrClusterRestorePrimaryTemplate: "Geri yükleme için yedekte kayıtlı birincil örnek şablonunun aynısı gerekir."
+ErrClusterRestoreUnsupportedEngine: "Bu veritabanı motoru küme geri yüklemeyi desteklemiyor."
+ErrClusterRestoreRedisSnapshot: "Redis anlık görüntüsü geçersiz."
+ErrClusterRestorePostgresMajorVersion: "PostgreSQL verilerinin ana sürümü yedekteki sürümle eşleşmiyor."
+ErrClusterRestoreSingleContainer: "Geri yükleme için tek bir veritabanı konteyneri içeren bir örnek gerekir."
+ErrClusterRestoreCatalogDataMount: "Geri yükleme için uygulama kataloğu şablonunda tanımlanan veri bağlama noktası gerekir."
+ErrClusterRestoreDataDirectoryNotEmpty: "Geri yüklemenin hedef veri dizini boş değil."
+ErrClusterRestorePostgresUnsafePath: "PostgreSQL yedeği güvenli olmayan bir yol içeriyor."
+ErrClusterRestorePostgresFileType: "PostgreSQL yedeği desteklenmeyen bir bağlantı veya dosya türü içeriyor."
+ErrClusterRestoreRedisCatalogPersistence: "Redis'i geri yüklemek için uygulama kataloğu şablonundaki kalıcılık yapılandırması gerekir."
+ErrClusterRestoreRedisCatalogRDB: "Redis anlık görüntüsünü geri yüklemek için uygulama kataloğu şablonundaki RDB yapılandırması gerekir."
+ErrClusterRestoreMySQLCredentials: "Geri yüklenen MySQL yönetici kimlik bilgileri doğrulanamadı. Yedek oluşturulduğunda geçerli olan kimlik bilgilerini kullanın."
+ErrClusterRestoreEngineVersion: "Veritabanı motorunun {{ .current }} sürümü, yedekteki {{ .expected }} sürümüyle eşleşmiyor."
+ErrClusterRestoreDatabaseNotReady: "Geri yüklenen veritabanı hazır hâle gelmedi"
+ErrClusterRestoreOriginalRequest: "Özgün kümeye geri yükleme isteği geçersiz."
+ErrClusterRestoreMemberVersionChanged: "Küme üyesinin sürümü geri yüklemeden önce değişti."
+ErrClusterRestoreMemberChanged: "Küme üyesi geri yüklemeden önce değişti."
+ErrClusterRestoreMemberBusy: "Bu küme üyesini başka bir geri yükleme görevi kullanıyor."
+ErrClusterRestoreMemberState: "Küme üyesinin mevcut geri yükleme durumu bu işleme izin vermiyor."
+ErrClusterRestoreRollbackRequiresReview: "Geri yüklenen verilere yazılmış olabilir. Otomatik geri alma engellendi ve önceki veriler korundu."
+ErrClusterRestoreOriginalAction: "Özgün kümeye geri yükleme işlemi geçersiz."
+ErrClusterRestoreDataMountDirectory: "Küme verilerinin bağlama yolu bir dizin olmalıdır."
+ErrClusterRestoreMemberRoleMismatch: "Veritabanı kapsayıcısında yapılandırılan çoğaltma rolü, bu üye için kayıtlı rolle eşleşmiyor."
+ErrClusterRestoreOriginalCatalogMounts: "Özgün kümeye geri yüklemek için uygulama şablonunda tanımlanan veritabanı bağlamaları gerekir."
+ErrClusterRestoreDataMountUnavailable: "Veritabanı verilerinin bağlama noktası eksik veya yazılabilir değil."
+ErrClusterRestoreOriginalTemplateVersion: "Yedek, özgün kümenin uygulama şablonuyla veya veritabanı motoru sürümüyle eşleşmiyor."
+ErrClusterRestoreValidationContainer: "Geri yüklemeyi doğrulayan kapsayıcı mevcut geri yükleme göreviyle eşleşmiyor."
+ErrClusterRestoreDataOwnership: "Veritabanı verilerinin sahibi ve grubu okunamadı."
+ErrClusterRestoreConfigFileType: "Veritabanı yapılandırması bir bağlantı veya özel dosya içeriyor."
+ErrClusterRestoreRedisActiveRDB: "Redis anlık görüntüsünü geri yüklemek için çalışan örneğin uyumlu RDB ayarları kullanması gerekir."
+ErrClusterRestoreDataDirectoryMismatch: "Çalışan veritabanı, uygulama şablonunda belirtilen veri dizinini kullanmıyor."
+ErrClusterRestoreReplicaNotReady: "Geri yüklenen replika hazır duruma gelmedi"
+ErrClusterRestoreDataPathDirectory: "Geri yükleme verilerinin yolu bir dizin olmalıdır."
+ErrClusterRestoreOriginalDataUnavailable: "Özgün kümenin veri dizini bulunamadı."
+ErrClusterRestoreDataDirectoryChanged: "Geri yükleme sırasında kümenin veri dizini değişti."
+ErrClusterRestoreDataReplacementIncomplete: "Küme verilerinin değiştirilmesi tamamlanmadı."
+ErrClusterRestoreRollbackDirectoryChanged: "Geri yükleme geri alınırken kümenin veri dizini değişti."
+ErrRedisAOFRestoreUnavailable: "Bu Redis sürümünde AOF geri yükleme kullanılamıyor."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Geçersiz web sitesi seçimi: {{ .value }}"
+ErrCronjobWebsiteGroup: "{{ .id }} web sitesi grubuna erişilemiyor"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: seçilen web sitelerinin hiçbiri mevcut değil"
+ErrCronjobWebsiteVersion: "Desteklenmeyen web sitesi seçim sürümü: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Tüm web siteleri, belirli siteler veya gruplarla birlikte seçilemez"
+ErrCronjobWebsiteGroupName: "Web sitesi grubu adı boş olamaz"
+ErrCronjobWebsiteGroupMissing: "“{{ .group }}” web sitesi grubu mevcut değil ve kaydedilen listede eşleşen hiçbir web sitesi bulunamadı"
+CronjobWebsiteGroupFallback: "{{ .name }}: “{{ .group }}” web sitesi grubu mevcut değil; artık grup değişikliklerini izlemeyen sabit bir web sitesi listesi olarak içe aktarıldı"
+CronjobWebsiteMissing: "{{ .name }}: bulunamayan web siteleri: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Seçimle eşleşen hiçbir web sitesi grubu veya web sitesi bulunamadı"

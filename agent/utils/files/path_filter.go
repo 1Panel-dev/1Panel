@@ -17,7 +17,7 @@ func ShouldFilterSensitivePath(path string) bool {
 			return true
 		}
 	}
-	return ShouldDenySensitiveFileRead(path)
+	return false
 }
 
 func ShouldDenySensitiveFileRead(path string) bool {
@@ -44,4 +44,8 @@ func isSensitiveSSHPath(path string) bool {
 		return !strings.HasSuffix(parts[len(parts)-1], ".pub")
 	}
 	return false
+}
+
+func shouldFilterAISearchPath(path string) bool {
+	return ShouldFilterSensitivePath(path) || ShouldDenySensitiveFileRead(path)
 }

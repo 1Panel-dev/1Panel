@@ -40,7 +40,7 @@ func CollectDirInventory(root string, containSub bool, maxItems int) (items []AI
 		}
 		for _, e := range entries {
 			full := filepath.Join(root, e.Name())
-			if ShouldFilterSensitivePath(full) {
+			if shouldFilterAISearchPath(full) {
 				continue
 			}
 			if len(items) >= maxItems {
@@ -65,7 +65,7 @@ func CollectDirInventory(root string, containSub bool, maxItems int) (items []AI
 		if walkErr != nil {
 			return nil
 		}
-		if ShouldFilterSensitivePath(path) {
+		if shouldFilterAISearchPath(path) {
 			if d.IsDir() {
 				return filepath.SkipDir
 			}

@@ -97,6 +97,9 @@
                         </el-tag>
                     </el-option>
                 </el-select>
+                <el-text v-if="sslDomainMismatch" type="warning" class="w-full mt-1">
+                    {{ $t('website.sslDomainMismatchWebsite') }}
+                </el-text>
             </el-form-item>
         </div>
 
@@ -167,6 +170,7 @@
 
 <script lang="ts" setup>
 import { computed, watch, onMounted, ref } from 'vue';
+import { certificateDomainMismatch } from '@/utils/ssl-domain';
 import { getAccountName } from '@/utils/ssl';
 import { dateFormatSimple } from '@/utils/date';
 import WebsiteSSL from '@/views/website/website/components/website-ssl/index.vue';
@@ -204,6 +208,7 @@ interface Props {
         algorithm: string;
     };
     websiteSSL?: Website.SSL;
+    websiteDomains?: string[];
     autoLoad?: boolean;
     showRedirectPort?: boolean;
 }
@@ -222,6 +227,11 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<Emits>();
+const sslDomainMismatch = computed(
+    () =>
+        props.websiteSSL?.id === props.modelValue.websiteSSLId &&
+        certificateDomainMismatch(props.websiteDomains || [], props.websiteSSL),
+);
 
 const acmeAccounts = ref<AcmeAccount[]>([]);
 const ssls = ref<SSLItem[]>([]);

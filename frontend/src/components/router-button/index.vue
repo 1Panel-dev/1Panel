@@ -2,7 +2,7 @@
     <div>
         <el-card class="router_card p-1 sm:p-0">
             <div class="flex w-full flex-col justify-start sm:items-center items-start sm:justify-between sm:flex-row">
-                <el-radio-group v-model="activeName" @change="handleChange">
+                <el-radio-group :model-value="activeName" @update:model-value="updateActiveName" @change="handleChange">
                     <el-radio-button
                         class="router_card_button"
                         :class="{ 'opacity-50': button.disabled }"
@@ -71,6 +71,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    activePath: {
+        type: String,
+        default: '',
+    },
 });
 
 const router = useRouter();
@@ -94,6 +98,10 @@ const expiresInfo = ref(0);
 const expiresAlertVisible = ref(false);
 const expiresAlertKey = computed(() => (isEnterprise.value ? 'xpack.expiresEnterpriseAlert' : 'xpack.expiresProAlert'));
 
+const updateActiveName = (label: string | number | boolean) => {
+    if (!props.activePath) activeName.value = String(label);
+};
+
 const handleChange = async (label: string) => {
     const btn = buttonArray.value.find((btn) => btn.label === label);
     if (!btn || btn.disabled) {
@@ -114,7 +122,10 @@ onMounted(() => {
 });
 
 watch(
-    () => [router.currentRoute.value.path, buttonArray.value.map((button) => button.label).join('|')],
+    () => [
+        props.activePath || router.currentRoute.value.path,
+        buttonArray.value.map((button) => button.label).join('|'),
+    ],
     () => {
         syncActiveName();
     },
@@ -159,21 +170,11 @@ function syncActiveName() {
         activeName.value = '';
         return;
     }
-    if (buttonArray.value.length) {
-        let isPathExist = false;
-        const btn = buttonArray.value.find((btn) => {
-            return btn.path
-                ? router.currentRoute.value.path.startsWith(btn.path)
-                : btn.name && router.currentRoute.value.name === btn.name;
-        });
-        if (btn) {
-            isPathExist = true;
-            activeName.value = btn.label;
-        }
-        if (!isPathExist) {
-            activeName.value = buttonArray.value[0].label;
-        }
-    }
+    const route = props.activePath ? router.resolve(props.activePath) : router.currentRoute.value;
+    const button = buttonArray.value.find((item) =>
+        item.path ? route.path.startsWith(item.path) : item.name && route.name === item.name,
+    );
+    activeName.value = button?.label ?? buttonArray.value[0].label;
 }
 
 function getExpiresAlertDateKey() {

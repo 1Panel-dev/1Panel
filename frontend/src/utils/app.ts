@@ -19,22 +19,15 @@ export const jumpToInstall = (type: string, key: string) => {
             jumpToPath(router, '/ai/agents/agent');
             return true;
         case 'copaw':
-            router.push({
-                path: '/ai/agents/agent',
-                query: {
-                    uncached: 'true',
-                    open: 'create',
-                    agentType: 'copaw',
-                },
-            });
-            return true;
         case 'hermes-agent':
+        case 'deepseek-harness':
+        case 'octop':
             router.push({
                 path: '/ai/agents/agent',
                 query: {
                     uncached: 'true',
                     open: 'create',
-                    agentType: 'hermes-agent',
+                    agentType: key,
                 },
             });
             return true;

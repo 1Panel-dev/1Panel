@@ -1,7 +1,14 @@
 <template>
     <div class="name-row">
         <div class="name-main" :class="{ 'name-main--actions-only': hideName && !isEditing }">
-            <el-form :model="formData" :rules="rules" ref="formRef" v-if="isEditing" @submit.prevent>
+            <el-form
+                :model="formData"
+                :rules="rules"
+                ref="formRef"
+                v-if="isEditing"
+                class="domain-form"
+                @submit.prevent
+            >
                 <el-form-item prop="domainName" class="inline-form-item">
                     <el-input
                         v-model="formData.domainName"
@@ -35,10 +42,17 @@
                     </span>
                 </el-text>
             </el-tooltip>
+            <el-tooltip
+                v-if="!hideName && row.sslDomainMismatch"
+                :content="$t('website.sslDomainMismatchWebsite')"
+                placement="top"
+            >
+                <el-icon class="ml-1" color="var(--el-color-warning)"><WarningFilled /></el-icon>
+            </el-tooltip>
             <el-popover
                 placement="right"
                 trigger="hover"
-                :width="popoverWidth"
+                width="auto"
                 @before-enter="searchDomains(row.id)"
                 v-if="row.type != 'stream'"
             >
@@ -60,7 +74,14 @@
                     </tbody>
                 </table>
             </el-popover>
-            <el-button v-permission link icon="edit" class="ml-2.5" @click="startEdit" v-if="!isEditing"></el-button>
+            <el-button
+                v-permission
+                link
+                icon="edit"
+                class="ml-2.5"
+                :style="{ visibility: isEditing ? 'hidden' : undefined }"
+                @click="startEdit"
+            ></el-button>
         </div>
         <div v-if="showFavorite">
             <el-tooltip
@@ -85,7 +106,8 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, nextTick, computed } from 'vue';
+import { WarningFilled } from '@element-plus/icons-vue';
+import { ref, nextTick } from 'vue';
 import { listDomains } from '@/api/modules/website';
 import { Website } from '@/api/interface/website';
 import { routerToNameWithParams } from '@/utils/router';
@@ -121,20 +143,6 @@ const isIPv6 = (domain: string): boolean => {
     const cleanDomain = domain.replace(/^\[|\]$/g, '');
     return ipv6Regex.test(cleanDomain);
 };
-
-const popoverWidth = computed(() => {
-    if (domains.value.length === 0) return 300;
-
-    let maxLength = 0;
-    domains.value.forEach((domain) => {
-        const url = getUrl(domain, props.row);
-        maxLength = Math.max(maxLength, url.length);
-    });
-
-    const calculatedWidth = 200 + maxLength * 8 + 60 + 40;
-
-    return Math.min(Math.max(calculatedWidth, 300), 800);
-});
 
 const startEdit = () => {
     formData.domainName = props.row.primaryDomain;
@@ -239,6 +247,7 @@ const shouldShowDomainTooltip = (domain: string) => {
     flex: initial;
 }
 
+.domain-form,
 .domain-text {
     display: inline-flex;
     align-items: center;
@@ -262,6 +271,7 @@ const shouldShowDomainTooltip = (domain: string) => {
     line-height: 1;
 }
 :deep(.el-form-item) {
+    width: 100%;
     margin-bottom: 0;
 }
 :deep(.el-form-item__error) {
@@ -272,7 +282,7 @@ const shouldShowDomainTooltip = (domain: string) => {
 }
 
 .domain-input {
-    width: 200px;
+    width: 100%;
 }
 
 :deep(.website-domain-tooltip) {

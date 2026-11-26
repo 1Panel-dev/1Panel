@@ -3,6 +3,7 @@ package service
 import (
 	"bytes"
 	"context"
+	"crypto/x509"
 	"database/sql"
 	"encoding/base64"
 	"errors"
@@ -82,6 +83,7 @@ type IWebsiteService interface {
 	GetWebsite(id uint) (response.WebsiteDTO, error)
 
 	ChangePHPVersion(req request.WebsitePHPVersionReq) error
+	BatchChangePHPVersion(req request.WebsiteBatchPHPVersionReq) ([]response.WebsiteBatchPHPVersionResult, error)
 	OperateCrossSiteAccess(req request.CrossSiteAccessOp) error
 	ExecComposer(req request.ExecComposerReq) error
 	ChangeGroup(group, newGroup uint) error
@@ -189,10 +191,14 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 	if req.Type != "" {
 		opts = append(opts, websiteRepo.WithType(req.Type))
 	}
+	if req.RuntimeType != "" {
+		opts = append(opts, websiteRepo.WithRuntimeType(req.RuntimeType))
+	}
 	total, websites, err := websiteRepo.Page(req.Page, req.PageSize, opts...)
 	if err != nil {
 		return 0, nil, err
 	}
+	certificates := make(map[uint]*x509.Certificate)
 	for _, web := range websites {
 		var (
 			appName      string
@@ -216,25 +222,31 @@ func (w WebsiteService) PageWebsite(req request.WebsiteSearch) (int64, []respons
 		}
 		sitePath := GetSitePath(web, SiteDir)
 
+		cert, parsed := certificates[web.WebsiteSSLID]
+		if !parsed && web.Protocol == constant.ProtocolHTTPS && web.WebsiteSSLID != 0 {
+			cert, _ = parseCertificatePEM([]byte(web.WebsiteSSL.Pem))
+			certificates[web.WebsiteSSLID] = cert
+		}
 		siteDTO := response.WebsiteRes{
-			ID:            web.ID,
-			CreatedAt:     web.CreatedAt,
-			Protocol:      web.Protocol,
-			PrimaryDomain: web.PrimaryDomain,
-			Type:          web.Type,
-			Remark:        web.Remark,
-			Status:        web.Status,
-			Alias:         web.Alias,
-			AppName:       appName,
-			ExpireDate:    web.ExpireDate,
-			SSLExpireDate: web.WebsiteSSL.ExpireDate,
-			SSLStatus:     checkSSLStatus(web.WebsiteSSL.ExpireDate),
-			RuntimeName:   runtimeName,
-			SitePath:      sitePath,
-			AppInstallID:  appInstallID,
-			RuntimeType:   runtimeType,
-			Favorite:      web.Favorite,
-			IPV6:          web.IPV6,
+			SSLDomainMismatch: websiteCertificateDomainMismatch(web, cert),
+			ID:                web.ID,
+			CreatedAt:         web.CreatedAt,
+			Protocol:          web.Protocol,
+			PrimaryDomain:     web.PrimaryDomain,
+			Type:              web.Type,
+			Remark:            web.Remark,
+			Status:            web.Status,
+			Alias:             web.Alias,
+			AppName:           appName,
+			ExpireDate:        web.ExpireDate,
+			SSLExpireDate:     web.WebsiteSSL.ExpireDate,
+			SSLStatus:         checkSSLStatus(web.WebsiteSSL.ExpireDate),
+			RuntimeName:       runtimeName,
+			SitePath:          sitePath,
+			AppInstallID:      appInstallID,
+			RuntimeType:       runtimeType,
+			Favorite:          web.Favorite,
+			IPV6:              web.IPV6,
 		}
 
 		if siteDTO.Type == constant.Subsite {
@@ -1431,14 +1443,6 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		if oldRuntime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
 		}
-		client, err := docker.NewDockerClient()
-		if err != nil {
-			return err
-		}
-		defer client.Close()
-		if !checkImageLike(client, oldRuntime.Image) {
-			return buserr.WithName("ErrImageNotExist", oldRuntime.Name)
-		}
 	}
 
 	if req.RuntimeID > 0 {
@@ -1448,6 +1452,17 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		}
 		if runtime.Resource == constant.ResourceLocal {
 			return buserr.New("ErrPHPResource")
+		}
+		if runtime.Type != constant.RuntimePHP {
+			return fmt.Errorf("target runtime must be PHP")
+		}
+		client, err := docker.NewDockerClient()
+		if err != nil {
+			return err
+		}
+		defer client.Close()
+		if err := validateWebsitePHPImage(context.Background(), client, runtime.Image, runtime.Name); err != nil {
+			return err
 		}
 		website.RuntimeID = runtime.ID
 		website.AppInstallID = 0
@@ -1494,10 +1509,11 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 				server.UpdateDirective("index", []string{"index.html index.php index.htm default.php default.htm default.html"})
 			}
 		}
-		if req.RuntimeID > 0 && (site.Status != constant.WebStopped || server.HasStopPage()) {
+		phpEnabled := req.RuntimeID > 0 && (site.Status != constant.WebStopped || server.HasStopPage())
+		if phpEnabled {
 			updated := false
 			for _, location := range server.FindDirectives("location") {
-				if strings.Join(location.GetParameters(), " ") == "~ [^/]\\.php(/|$)" && location.GetBlock() != nil {
+				if strings.Join(location.GetParameters(), " ") == phpLocationMatch && location.GetBlock() != nil {
 					location.GetBlock().UpdateDirective("fastcgi_pass", []string{site.Proxy})
 					updated = true
 				}
@@ -1511,16 +1527,21 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 		config.FilePath = configPath
 		configs = append(configs, config)
 		oldContents[configPath] = content
-	}
 
-	indexPath := path.Join(GetSitePath(website, SiteIndexDir), "index.html")
-	indexContent := nginx_conf.Index
-	if req.RuntimeID > 0 {
-		indexPath = path.Join(GetSitePath(website, SiteIndexDir), "index.php")
-		indexContent = nginx_conf.IndexPHP
-	}
-	if !fileOp.Stat(indexPath) {
-		_ = fileOp.WriteFile(indexPath, strings.NewReader(string(indexContent)), constant.FilePerm)
+		authConfigs, authOldContents, err := collectSyncedPathAuthConfigs(
+			fileOp,
+			GetSitePath(*site, SitePathAuthBasicDir),
+			phpEnabled,
+			site.Proxy,
+			server,
+		)
+		if err != nil {
+			return err
+		}
+		configs = append(configs, authConfigs...)
+		for authPath, authContent := range authOldContents {
+			oldContents[authPath] = authContent
+		}
 	}
 
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
@@ -1571,7 +1592,39 @@ func (w WebsiteService) ChangePHPVersion(req request.WebsitePHPVersionReq) (err 
 	if err = opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
 		return err
 	}
-	return tx.Commit().Error
+	if err = tx.Commit().Error; err != nil {
+		return err
+	}
+	if req.CreateIndexFile {
+		createSwitchDefaultIndexFile(fileOp, GetSitePath(website, SiteIndexDir), req.RuntimeID > 0, w.GetDefaultHtml)
+	}
+	return nil
+}
+
+func createSwitchDefaultIndexFile(
+	fileOp files.FileOp,
+	indexDir string,
+	toPHP bool,
+	getDefaultHtml func(string) (*response.WebsiteHtmlRes, error),
+) {
+	indexPath := path.Join(indexDir, "index.html")
+	resourceType := "index"
+	fallbackContent := string(nginx_conf.Index)
+	if toPHP {
+		indexPath = path.Join(indexDir, "index.php")
+		resourceType = "php"
+		fallbackContent = string(nginx_conf.IndexPHP)
+	}
+	if fileOp.Stat(indexPath) {
+		return
+	}
+	indexContent := fallbackContent
+	if getDefaultHtml != nil {
+		if res, htmlErr := getDefaultHtml(resourceType); htmlErr == nil && res != nil && res.Content != "" {
+			indexContent = res.Content
+		}
+	}
+	_ = fileOp.WriteFile(indexPath, strings.NewReader(indexContent), constant.FilePerm)
 }
 
 func (w WebsiteService) UpdateSiteDir(req request.WebsiteUpdateDir) error {
@@ -2690,4 +2743,60 @@ func (w WebsiteService) UpdateStream(req request.StreamUpdate) error {
 	}
 	website.StreamPorts = req.StreamConfig.StreamPorts
 	return websiteRepo.Save(context.Background(), &website)
+}
+
+func (w WebsiteService) BatchChangePHPVersion(req request.WebsiteBatchPHPVersionReq) ([]response.WebsiteBatchPHPVersionResult, error) {
+	target, err := runtimeRepo.GetFirst(context.Background(), repo.WithByID(req.RuntimeID))
+	if err != nil {
+		return nil, err
+	}
+	if target.Type != constant.RuntimePHP {
+		return nil, fmt.Errorf("target runtime must be PHP")
+	}
+	if target.Resource == constant.ResourceLocal {
+		return nil, buserr.New("ErrPHPResource")
+	}
+	results := make([]response.WebsiteBatchPHPVersionResult, 0, len(req.IDs))
+	seen := make(map[uint]bool)
+	for _, id := range req.IDs {
+		if seen[id] {
+			continue
+		}
+		seen[id] = true
+		result := response.WebsiteBatchPHPVersionResult{ID: id, Status: "failed"}
+		website, err := websiteRepo.GetFirst(repo.WithByID(id))
+		if err != nil {
+			result.Message = err.Error()
+			results = append(results, result)
+			continue
+		}
+		result.Domain = website.PrimaryDomain
+		if website.Type != constant.Runtime {
+			result.Status = "skipped"
+			result.Message = "notPHP"
+		} else {
+			runtime, lookupErr := runtimeRepo.GetFirst(context.Background(), repo.WithByID(website.RuntimeID))
+			switch {
+			case lookupErr != nil:
+				result.Message = lookupErr.Error()
+			case runtime.Type != constant.RuntimePHP:
+				result.Status = "skipped"
+				result.Message = "notPHP"
+			case runtime.Resource == constant.ResourceLocal:
+				result.Status = "skipped"
+				result.Message = "localPHP"
+			case website.RuntimeID == req.RuntimeID:
+				result.Status = "skipped"
+				result.Message = "samePHP"
+			default:
+				if err := w.ChangePHPVersion(request.WebsitePHPVersionReq{WebsiteID: id, RuntimeID: req.RuntimeID}); err != nil {
+					result.Message = err.Error()
+				} else {
+					result.Status = "success"
+				}
+			}
+		}
+		results = append(results, result)
+	}
+	return results, nil
 }

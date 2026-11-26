@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"log/slog"
+	"net"
 	"os"
 	"path"
 	"strconv"
@@ -35,6 +36,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
 	"github.com/1Panel-dev/1Panel/agent/utils/ssl"
 	"github.com/1Panel-dev/1Panel/agent/utils/xpack"
+	"golang.org/x/net/idna"
 	gormv2 "gorm.io/gorm"
 )
 
@@ -641,6 +643,38 @@ func runShellScriptFile(workDir, shell string, logger *log.Logger) error {
 	return cmdMgr.Run("bash", file.Name())
 }
 
+// Domain warnings are advisory and intentionally do not check validity dates or trust.
+func websiteCertificateDomainMismatch(website model.Website, cert *x509.Certificate) bool {
+	if website.Protocol != constant.ProtocolHTTPS || cert == nil {
+		return false
+	}
+	for _, domain := range website.Domains {
+		host := strings.TrimSpace(domain.Domain)
+		if h, _, err := net.SplitHostPort(host); err == nil {
+			host = h
+		}
+		host = strings.TrimSuffix(strings.ToLower(strings.Trim(host, "[]")), ".")
+		if host == "" {
+			continue
+		}
+		if net.ParseIP(host) == nil {
+			wildcard := strings.HasPrefix(host, "*.")
+			normalized, err := idna.Lookup.ToASCII(strings.TrimPrefix(host, "*."))
+			if err != nil {
+				continue
+			}
+			host = normalized
+			if wildcard {
+				host = "*." + host
+			}
+		}
+		if cert.VerifyHostname(host) != nil {
+			return true
+		}
+	}
+	return false
+}
+
 func parseCertificatePEM(certPEM []byte) (*x509.Certificate, error) {
 	certBlock, _ := pem.Decode(certPEM)
 	if certBlock == nil {
@@ -958,6 +992,10 @@ func (w WebsiteSSLService) Upload(req request.WebsiteSSLUpload) error {
 }
 
 func (w WebsiteSSLService) PushToNode(req request.WebsiteSSLPush) error {
+	syncDir, err := normalizeSSLSyncDir(req.SyncDir)
+	if err != nil {
+		return err
+	}
 	if !global.IsMaster {
 		return errors.New("only master node can push SSL to nodes")
 	}
@@ -984,11 +1022,13 @@ func (w WebsiteSSLService) PushToNode(req request.WebsiteSSLPush) error {
 	if err := websiteSSLRepo.SaveByMap(websiteSSL, map[string]interface{}{
 		"push_node": pushNode,
 		"nodes":     nodes,
+		"sync_dir":  syncDir,
 	}); err != nil {
 		return err
 	}
 	websiteSSL.PushNode = pushNode
 	websiteSSL.Nodes = nodes
+	websiteSSL.SyncDir = syncDir
 
 	if req.Sync {
 		return xpack.MultiNodeProvider.PushSSLToNode(websiteSSL)
@@ -1000,9 +1040,15 @@ func (w WebsiteSSLService) PushToNode(req request.WebsiteSSLPush) error {
 	}
 	pushTask.AddSubTask(i18n.GetMsgByKey("StartPushSSLToNode"), func(t *task.Task) error {
 		t.Log(i18n.GetMsgByKey("StartPushSSLToNode"))
+		if websiteSSL.SyncDir != "" {
+			t.Log(fmt.Sprintf("Certificate directory sync: nodes=%s directory=%s", websiteSSL.Nodes, websiteSSL.SyncDir))
+		}
 		if err := xpack.MultiNodeProvider.PushSSLToNode(websiteSSL); err != nil {
 			t.Log(i18n.GetMsgWithMap("PushSSLToNodeFailed", map[string]interface{}{"err": err.Error()}))
 			return err
+		}
+		if websiteSSL.SyncDir != "" {
+			t.Log(fmt.Sprintf("Target nodes confirmed certificate files: %s/fullchain.pem, %s/privkey.pem", websiteSSL.SyncDir, websiteSSL.SyncDir))
 		}
 		t.Log(i18n.GetMsgByKey("PushSSLToNodeSuccess"))
 		return nil
@@ -1059,6 +1105,10 @@ func (w WebsiteSSLService) SyncForRestart() error {
 }
 
 func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
+	syncDir, err := normalizeSSLSyncDir(create.SyncDir)
+	if err != nil {
+		return err
+	}
 	websiteSSL, err := websiteSSLRepo.GetFirst(websiteSSLRepo.WithByMasterSSLID(create.ID))
 	if err != nil {
 		if !errors.Is(err, gormv2.ErrRecordNotFound) {
@@ -1077,6 +1127,7 @@ func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
 	websiteSSL.Pem = create.Pem
 	websiteSSL.Type = create.Type
 	websiteSSL.Organization = create.Organization
+	websiteSSL.SyncDir = syncDir
 	websiteSSL.MasterSSLID = create.ID
 	websiteSSL.Domains = create.Domains
 	if websiteSSL.ID == 0 {
@@ -1088,20 +1139,25 @@ func (w WebsiteSSLService) ImportMasterSSL(create model.WebsiteSSL) error {
 			return err
 		}
 	}
-	websites, _ := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	syncErr := writeSSLSyncFiles(websiteSSL.SyncDir, websiteSSL.Pem, websiteSSL.PrivateKey)
+	websites, err := websiteRepo.GetBy(websiteRepo.WithWebsiteSSLID(websiteSSL.ID))
+	if err != nil {
+		return errors.Join(syncErr, err)
+	}
 	if len(websites) == 0 {
-		return nil
+		return syncErr
 	}
 	for _, website := range websites {
 		if err := createPemFile(website, *websiteSSL); err != nil {
+			syncErr = errors.Join(syncErr, fmt.Errorf("update certificate for website %s: %w", website.PrimaryDomain, err))
 			continue
 		}
 	}
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err == nil {
 		if err := opNginx(nginxInstall.ContainerName, constant.NginxReload); err != nil {
-			return err
+			return errors.Join(syncErr, err)
 		}
 	}
-	return nil
+	return syncErr
 }

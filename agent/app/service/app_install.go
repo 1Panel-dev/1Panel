@@ -92,8 +92,15 @@ func (a *AppInstallService) PageWithContext(ctx context.Context, req request.App
 	)
 	opts = append(opts, repo.WithOrderRuleBy("favorite", "descending"))
 	opts = append(opts, repo.WithOrderRuleBy("sort_order", "ascending"))
+	var excludedKeys []string
 	if req.AppStore {
-		appIDs, err := appRepo.GetIDs(ctx, appRepo.WithKeyIn([]string{constant.AppOpenclaw, constant.AppCopaw, constant.AppHermesAgent, constant.AppDeepSeekHarness, constant.AppOctop, "vllm"}))
+		excludedKeys = append(excludedKeys, constant.AppOpenclaw, constant.AppCopaw, constant.AppHermesAgent, constant.AppDeepSeekHarness, constant.AppOctop, "vllm")
+	}
+	if req.AppStore || req.Update {
+		excludedKeys = append(excludedKeys, constant.ClusterAppKeys()...)
+	}
+	if len(excludedKeys) > 0 {
+		appIDs, err := appRepo.GetIDs(ctx, appRepo.WithKeyIn(excludedKeys))
 		if err != nil {
 			return 0, nil, err
 		}
@@ -275,6 +282,22 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	install, err := appInstallRepo.GetFirstByCtx(context.Background(), repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
+	}
+	if req.Operate == constant.Upgrade && constant.IsClusterApp(install.App.Key) {
+		return buserr.New("ErrClusterAppOnly")
+	}
+	if constant.IsClusterApp(install.App.Key) {
+		switch req.Operate {
+		case constant.Start, constant.Stop, constant.Restart, constant.Rebuild, constant.Delete:
+			unlock, err := lockClusterDataOperation(install)
+			if err != nil {
+				return err
+			}
+			defer unlock()
+			if err := guardClusterRestore(install); err != nil {
+				return err
+			}
+		}
 	}
 	if install.App.Key == "ollama" || install.App.Key == "vllm" {
 		if req.Operate != constant.Upgrade {
@@ -485,6 +508,20 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 	if err != nil {
 		return err
 	}
+	if constant.IsClusterApp(installed.App.Key) {
+		unlock, err := lockClusterDataOperation(installed)
+		if err != nil {
+			return err
+		}
+		defer unlock()
+		installed, err = appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
+		if err != nil {
+			return err
+		}
+		if err := guardClusterRestore(installed); err != nil {
+			return err
+		}
+	}
 	if installed.App.Key == "ollama" || installed.App.Key == "vllm" {
 		if _, loaded := appUpgradeLocks.LoadOrStore(installed.ID, struct{}{}); loaded {
 			return buserr.New("TaskIsExecuting")
@@ -549,17 +586,17 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 	}
 
 	backupDockerCompose := installed.DockerCompose
+	if req.Advanced && req.EditCompose {
+		installed.DockerCompose = req.DockerCompose
+	}
+	if err := repairLegacyComposePrimary(&installed); err != nil {
+		return err
+	}
 	updateGPU := installed.App.Key == "ollama" && req.GPU != nil
 	if req.Advanced || updateGPU {
 		composeMap := make(map[string]interface{})
-		if req.Advanced && req.EditCompose {
-			if err = yaml.Unmarshal([]byte(req.DockerCompose), &composeMap); err != nil {
-				return err
-			}
-		} else {
-			if err = yaml.Unmarshal([]byte(installed.DockerCompose), &composeMap); err != nil {
-				return err
-			}
+		if err = yaml.Unmarshal([]byte(installed.DockerCompose), &composeMap); err != nil {
+			return err
 		}
 		if req.Advanced && !req.SkipComposeCommonConfig {
 			if err = AddDockerComposeCommonParam(composeMap, installed.ServiceName, req.AppContainerConfig, req.Params, installed.App.Key); err != nil {
@@ -618,6 +655,9 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 	}
 	backupEnvMaps := maps.Clone(oldEnvMaps)
 	MergeAppEnvironment(req.Params, oldEnvMaps)
+	if oldEnvMaps["PANEL_REDIS_HOST"] != backupEnvMaps["PANEL_REDIS_HOST"] {
+		delete(oldEnvMaps, "PANEL_REDIS_HOST_NAME")
+	}
 	paramByte, err := json.Marshal(oldEnvMaps)
 	if err != nil {
 		return err
@@ -754,7 +794,10 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			types = []string{constant.AppRedis, constant.AppRedisCluster}
 		}
 
-		dbs, _ := databaseRepo.GetList(repo.WithTypes(types))
+		dbs, err := databaseRepo.GetList(repo.WithTypes(types))
+		if err != nil {
+			return nil, err
+		}
 		if len(dbs) == 0 {
 			return res, nil
 		}
@@ -778,7 +821,11 @@ func (a *AppInstallService) GetServices(key string) ([]response.AppService, erro
 			} else {
 				service.From = constant.AppResourceRemote
 				service.Status = constant.StatusRunning
-				service.Config = map[string]string{"PANEL_DB_ROOT_PASSWORD": db.Password, "PANEL_DB_ROOT_USER": db.Username}
+				if db.Type == constant.AppRedis || db.Type == constant.AppRedisCluster {
+					service.Config = map[string]string{"PANEL_REDIS_ROOT_PASSWORD": db.Password}
+				} else {
+					service.Config = map[string]string{"PANEL_DB_ROOT_PASSWORD": db.Password, "PANEL_DB_ROOT_USER": db.Username}
+				}
 			}
 			res = append(res, service)
 		}
@@ -816,6 +863,9 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 	app, err := appRepo.GetFirst(repo.WithByID(install.AppId))
 	if err != nil {
 		return versions, err
+	}
+	if constant.IsClusterApp(app.Key) {
+		return []dto.AppVersion{}, nil
 	}
 	var feishuLegacy, feishuConfigured, feishuChecked bool
 	details, err := appDetailRepo.GetBy(appDetailRepo.WithAppId(app.ID))
@@ -898,7 +948,7 @@ func (a *AppInstallService) GetUpdateVersions(req request.AppUpdateVersion) ([]d
 		if err := ensureAppDetailCompose(app, &detail); err != nil {
 			return versions, err
 		}
-		content, err := getUpgradeCompose(install, detail)
+		content, err := getUpgradeCompose(&install, detail)
 		if err != nil {
 			return versions, err
 		}
@@ -1033,7 +1083,9 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 			appParam.LabelEn = form.LabelEn
 			appParam.Label = form.Label
 			appParam.Value = v
-			if form.Type == "service" {
+			if name, _ := envs["PANEL_REDIS_HOST_NAME"].(string); form.Type == "service" && form.EnvKey == "PANEL_REDIS_HOST" && name != "" {
+				appParam.ShowValue = name
+			} else if form.Type == "service" {
 				appInstall, _ := appInstallRepo.GetFirst(appInstallRepo.WithServiceName(v.(string)))
 				appParam.ShowValue = appInstall.Name
 			} else if form.Type == "select" {
@@ -1120,7 +1172,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 	}
 	res.AppContainerConfig = config
 	res.HostMode = isHostModel(install.DockerCompose)
-	res.RestartPolicy = getRestartPolicy(install.DockerCompose)
+	res.RestartPolicy = getRestartPolicy(install.DockerCompose, install.ServiceName, install.App.Key)
 	res.WebUI = install.WebUI
 	res.Type = install.App.Type
 	rawCompose := install.DockerCompose
@@ -1138,7 +1190,7 @@ func (a *AppInstallService) GetParams(id uint) (*response.AppConfig, error) {
 			res.IsEdit = true
 			return &res, nil
 		}
-		rawCompose, err = getUpgradeCompose(install, detail)
+		rawCompose, err = getUpgradeCompose(&install, detail)
 		if err != nil {
 			return nil, err
 		}

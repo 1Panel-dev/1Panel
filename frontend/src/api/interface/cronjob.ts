@@ -144,6 +144,9 @@ export namespace Cronjob {
         scriptName: string;
         apps: Array<TransHelper>;
         websites: Array<string>;
+        websiteSelectionVersion?: number;
+        allWebsites?: boolean;
+        websiteGroups?: { name: string; websites: string[] }[];
         dbType: string;
         dbNames: Array<TransHelper>;
 

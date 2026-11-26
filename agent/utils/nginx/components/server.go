@@ -500,10 +500,10 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
-func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
-	newDir := Directive{
+func NewPHPProxyDirective(proxy []string, localPath string) *Directive {
+	newDir := &Directive{
 		Name:       "location",
-		Parameters: []string{"~ [^/]\\.php(/|$)"},
+		Parameters: []string{"~", "[^/]\\.php(/|$)"},
 		Block:      &Block{},
 	}
 	block := &Block{}
@@ -564,14 +564,19 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 		})
 	}
 	newDir.Block = block
-	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
+	return newDir
+}
+
+func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
+	newDir := NewPHPProxyDirective(proxy, localPath)
+	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", *newDir)
 }
 
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
 	directives := s.Directives
 	index := -1
 	for i, dir := range directives {
-		if dir.GetName() == name && dir.GetParameters()[0] == key {
+		if dir.GetName() == name && strings.Join(dir.GetParameters(), " ") == key {
 			index = i
 			break
 		}

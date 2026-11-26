@@ -1,7 +1,22 @@
 import http from '@/api';
+import { GlobalStore } from '@/store';
+import { MsgError } from '@/utils/message';
+import i18n from '@/lang';
 import { ResPage, SearchWithPage } from '../interface';
 import { Cronjob } from '../interface/cronjob';
 import { TimeoutEnum } from '@/enums/http-enum';
+
+const requireWebsiteSelectionCapability = async () => {
+    const node = GlobalStore().currentNode;
+    try {
+        const res = await http.get<{ websiteSelectionVersion: number }>('/cronjobs/capabilities');
+        if (res.data?.websiteSelectionVersion !== 2 || GlobalStore().currentNode !== node)
+            throw new Error('Unsupported agent');
+    } catch (error) {
+        MsgError(i18n.global.t('commons.msg.notSupportOperation'));
+        throw error;
+    }
+};
 
 export const searchCronjobPage = (params: Cronjob.Search, node?: string) => {
     const query = node ? `?operateNode=${node}` : '';
@@ -16,8 +31,11 @@ export const editCronjobGroup = (id: number, groupID: number) => {
     return http.post(`/cronjobs/group/update`, { id: id, groupID: groupID });
 };
 
-export const importCronjob = (trans: Array<Cronjob.CronjobTrans>) => {
-    return http.post('cronjobs/import', { cronjobs: trans }, TimeoutEnum.T_60S);
+export const importCronjob = async (trans: Array<Cronjob.CronjobTrans>) => {
+    if (trans.some((item) => item.websiteSelectionVersion || item.websiteGroups?.length || item.allWebsites)) {
+        await requireWebsiteSelectionCapability();
+    }
+    return http.post<{ warnings: string[] }>('cronjobs/import', { cronjobs: trans }, TimeoutEnum.T_60S);
 };
 export const exportCronjob = (params: { ids: Array<number> }) => {
     return http.download<BlobPart>('cronjobs/export', params, { responseType: 'blob', timeout: TimeoutEnum.T_40S });
@@ -35,11 +53,15 @@ export const getRecordLog = (id: number) => {
     return http.post<string>(`/cronjobs/records/log`, { id: id });
 };
 
-export const addCronjob = (params: Cronjob.CronjobOperate) => {
+export const addCronjob = async (params: Cronjob.CronjobOperate) => {
+    if (params.website?.split(',').some((value) => value.startsWith('group:')))
+        await requireWebsiteSelectionCapability();
     return http.post<Cronjob.CronjobOperate>(`/cronjobs`, params);
 };
 
-export const editCronjob = (params: Cronjob.CronjobOperate) => {
+export const editCronjob = async (params: Cronjob.CronjobOperate) => {
+    if (params.website?.split(',').some((value) => value.startsWith('group:')))
+        await requireWebsiteSelectionCapability();
     return http.post(`/cronjobs/update`, params);
 };
 

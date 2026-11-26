@@ -5,49 +5,49 @@
                 <el-button v-permission v-node-admin type="primary" @click="onOpenDialog('create')">
                     {{ $t('commons.button.create') }}
                 </el-button>
-                <el-dropdown @command="handleSyncOp">
+                <el-dropdown :disabled="loading" @command="handleSyncOp" trigger="click" placement="bottom-start">
                     <el-button type="primary" plain>
                         {{ $t('commons.button.sync') }}
                         <el-icon><arrow-down /></el-icon>
                     </el-button>
                     <template #dropdown>
-                        <el-dropdown-menu>
+                        <el-dropdown-menu class="sync-dropdown-menu">
                             <fu-dropdown-item v-permission v-node-admin command="sync">
+                                <el-icon><Refresh /></el-icon>
                                 {{ $t('cronjob.library.syncNow') }}
                             </fu-dropdown-item>
-                            <fu-dropdown-item
-                                v-if="scriptSync === 'Disable'"
-                                v-permission
-                                v-node-admin
-                                command="turnOnSync"
+                            <li
+                                v-if="!isOffline && scriptSync"
+                                class="el-dropdown-menu__item el-dropdown-menu__item--divided sync-option"
+                                role="none"
                             >
-                                {{ $t('cronjob.library.turnOnSync') }}
-                            </fu-dropdown-item>
-                            <fu-dropdown-item
-                                v-if="scriptSync === 'Enable'"
-                                v-permission
-                                v-node-admin
-                                command="turnOffSync"
-                            >
-                                {{ $t('cronjob.library.turnOffSync') }}
-                            </fu-dropdown-item>
+                                <el-icon><Clock /></el-icon>
+                                <span class="sync-option-label">
+                                    {{ $t('commons.status.autoSync') }}
+                                </span>
+                                <el-tooltip :content="$t('cronjob.library.autoSyncHelper')" placement="top">
+                                    <el-icon
+                                        class="sync-help"
+                                        tabindex="0"
+                                        :aria-label="$t('cronjob.library.autoSyncHelper')"
+                                    >
+                                        <InfoFilled />
+                                    </el-icon>
+                                </el-tooltip>
+                                <el-switch
+                                    size="small"
+                                    v-permission
+                                    v-node-admin
+                                    :model-value="scriptSync === 'Enable'"
+                                    :loading="loading"
+                                    :disabled="loading"
+                                    :aria-label="$t('commons.status.autoSync')"
+                                    @change="(enabled) => handleSyncOp(enabled ? 'turnOnSync' : 'turnOffSync')"
+                                />
+                            </li>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
-                <span v-if="!isOffline && scriptSync" class="sync-status">
-                    {{
-                        $t(
-                            scriptSync === 'Enable'
-                                ? 'commons.status.autoSyncEnabled'
-                                : 'commons.status.autoSyncDisabled',
-                        )
-                    }}
-                    <el-tooltip :content="$t('cronjob.library.autoSyncHelper')" placement="top">
-                        <el-icon tabindex="0" :aria-label="$t('cronjob.library.autoSyncHelper')">
-                            <InfoFilled />
-                        </el-icon>
-                    </el-tooltip>
-                </span>
 
                 <el-button v-permission v-node-admin type="primary" plain @click="onOpenGroupDialog()">
                     {{ $t('commons.table.group') }}
@@ -139,7 +139,7 @@
 </template>
 
 <script setup lang="ts">
-import { InfoFilled } from '@element-plus/icons-vue';
+import { Clock, InfoFilled, Refresh } from '@element-plus/icons-vue';
 import { useSearchState } from '@/utils/search-reset';
 import { dateFormat, getCurrentDateFormatted } from '@/utils/date';
 import { deepCopy } from '@/utils/misc';
@@ -158,7 +158,7 @@ import CodemirrorDrawer from '@/components/codemirror-pro/drawer.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getSettingBaseInfo, updateSetting } from '@/api/modules/setting';
 
-const { globalStore, currentNode, isAdminOrNodeAdmin, isMobile, isOffline } = useGlobalStore();
+const { isAdminOrNodeAdmin, isMobile, isOffline } = useGlobalStore();
 
 const myDetail = ref();
 
@@ -266,39 +266,31 @@ const loadSyncStatus = async () => {
     scriptSync.value = res.data.scriptSync;
 };
 const handleSyncOp = async (command: string) => {
-    let val = 'Enable';
-    switch (command) {
-        case 'sync':
-            onSync();
-            return;
-        case 'turnOnSync':
-            val = 'Enable';
-            break;
-        case 'turnOffSync':
-            val = 'Disable';
-            break;
-        default:
-            return;
+    if (loading.value) return;
+    if (command === 'sync') {
+        onSync();
+        return;
     }
-    ElMessageBox.confirm(
-        i18n.global.t('cronjob.library.' + command + 'Helper'),
-        i18n.global.t('cronjob.library.' + command),
-        {
-            confirmButtonText: i18n.global.t('commons.button.confirm'),
-            cancelButtonText: i18n.global.t('commons.button.cancel'),
-            type: 'info',
-        },
-    ).then(async () => {
-        loading.value = true;
-        await updateSetting({ key: 'ScriptSync', value: val })
-            .then(() => {
-                loadSyncStatus();
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    });
+    if (command !== 'turnOnSync' && command !== 'turnOffSync') return;
+    loading.value = true;
+    try {
+        await ElMessageBox.confirm(
+            i18n.global.t('cronjob.library.' + command + 'Helper'),
+            i18n.global.t('cronjob.library.' + command),
+            {
+                confirmButtonText: i18n.global.t('commons.button.confirm'),
+                cancelButtonText: i18n.global.t('commons.button.cancel'),
+                type: 'info',
+            },
+        );
+        await updateSetting({ key: 'ScriptSync', value: command === 'turnOnSync' ? 'Enable' : 'Disable' });
+        await loadSyncStatus();
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+    } catch (error) {
+        if (error !== 'cancel' && error !== 'close') throw error;
+    } finally {
+        loading.value = false;
+    }
 };
 
 const search = async () => {
@@ -328,24 +320,9 @@ const loadGroupOptions = async () => {
 const buttons = [
     {
         label: i18n.global.t('commons.button.handle'),
-        disabled: () => {
-            return !isAdminOrNodeAdmin.value;
-        },
+        disabled: () => !isAdminOrNodeAdmin.value,
         click: (row: Cronjob.ScriptInfo) => {
-            ElMessageBox.confirm(
-                i18n.global.t('cronjob.library.handleHelper', [
-                    currentNode.value === 'local' ? globalStore.getMasterAlias() : currentNode.value,
-                    row.name,
-                ]),
-                i18n.global.t('commons.button.handle'),
-                {
-                    confirmButtonText: i18n.global.t('commons.button.confirm'),
-                    cancelButtonText: i18n.global.t('commons.button.cancel'),
-                    type: 'info',
-                },
-            ).then(() => {
-                runRef.value!.acceptParams({ scriptID: row.id, scriptName: row.name });
-            });
+            runRef.value!.acceptParams({ scriptID: row.id, scriptName: row.name });
         },
     },
     {
@@ -394,13 +371,3 @@ onMounted(() => {
     loadGroupOptions();
 });
 </script>
-
-<style scoped>
-.sync-status {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--el-text-color-secondary);
-    font-size: 13px;
-}
-</style>

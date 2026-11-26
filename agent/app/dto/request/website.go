@@ -5,6 +5,7 @@ import (
 )
 
 type WebsiteSearch struct {
+	RuntimeType string `json:"runtimeType" validate:"omitempty,oneof=php node java go python dotnet"`
 	dto.PageInfo
 	Name           string `json:"name"`
 	OrderBy        string `json:"orderBy" validate:"required,oneof=primary_domain type status createdAt expire_date created_at favorite"`
@@ -244,8 +245,9 @@ type WebsiteDefaultUpdate struct {
 }
 
 type WebsitePHPVersionReq struct {
-	WebsiteID uint `json:"websiteID" validate:"required"`
-	RuntimeID uint `json:"runtimeID"`
+	WebsiteID       uint `json:"websiteID" validate:"required"`
+	RuntimeID       uint `json:"runtimeID"`
+	CreateIndexFile bool `json:"createIndexFile"`
 }
 
 type WebsiteUpdateDir struct {
@@ -393,4 +395,10 @@ type ExecComposerReq struct {
 	User       string `json:"user" validate:"required"`
 	WebsiteID  uint   `json:"websiteID" validate:"required"`
 	TaskID     string `json:"taskID" validate:"required"`
+}
+
+// WebsiteBatchPHPVersionReq changes only existing PHP websites.
+type WebsiteBatchPHPVersionReq struct {
+	IDs       []uint `json:"ids" validate:"required,min=1"`
+	RuntimeID uint   `json:"runtimeID" validate:"required"`
 }

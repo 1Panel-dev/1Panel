@@ -24,32 +24,34 @@ type WebsiteDTO struct {
 }
 
 type WebsiteRes struct {
-	ID            uint      `json:"id"`
-	CreatedAt     time.Time `json:"createdAt"`
-	Protocol      string    `json:"protocol"`
-	PrimaryDomain string    `json:"primaryDomain"`
-	Type          string    `json:"type"`
-	Alias         string    `json:"alias"`
-	Remark        string    `json:"remark"`
-	Status        string    `json:"status"`
-	ExpireDate    time.Time `json:"expireDate"`
-	SitePath      string    `json:"sitePath"`
-	AppName       string    `json:"appName"`
-	RuntimeName   string    `json:"runtimeName"`
-	SSLExpireDate time.Time `json:"sslExpireDate"`
-	SSLStatus     string    `json:"sslStatus"`
-	AppInstallID  uint      `json:"appInstallId"`
-	ChildSites    []string  `json:"childSites"`
-	ParentSite    string    `json:"parentSite"`
-	RuntimeType   string    `json:"runtimeType"`
-	Favorite      bool      `json:"favorite"`
-	IPV6          bool      `json:"IPV6"`
+	SSLDomainMismatch bool      `json:"sslDomainMismatch"`
+	ID                uint      `json:"id"`
+	CreatedAt         time.Time `json:"createdAt"`
+	Protocol          string    `json:"protocol"`
+	PrimaryDomain     string    `json:"primaryDomain"`
+	Type              string    `json:"type"`
+	Alias             string    `json:"alias"`
+	Remark            string    `json:"remark"`
+	Status            string    `json:"status"`
+	ExpireDate        time.Time `json:"expireDate"`
+	SitePath          string    `json:"sitePath"`
+	AppName           string    `json:"appName"`
+	RuntimeName       string    `json:"runtimeName"`
+	SSLExpireDate     time.Time `json:"sslExpireDate"`
+	SSLStatus         string    `json:"sslStatus"`
+	AppInstallID      uint      `json:"appInstallId"`
+	ChildSites        []string  `json:"childSites"`
+	ParentSite        string    `json:"parentSite"`
+	RuntimeType       string    `json:"runtimeType"`
+	Favorite          bool      `json:"favorite"`
+	IPV6              bool      `json:"IPV6"`
 }
 
 type WebsiteOption struct {
-	ID            uint   `json:"id"`
-	PrimaryDomain string `json:"primaryDomain"`
-	Alias         string `json:"alias"`
+	WebsiteGroupID uint   `json:"webSiteGroupId"`
+	ID             uint   `json:"id"`
+	PrimaryDomain  string `json:"primaryDomain"`
+	Alias          string `json:"alias"`
 }
 
 type WebsitePreInstallCheck struct {
@@ -130,4 +132,11 @@ type Database struct {
 	Type         string `json:"type"`
 	From         string `json:"from"`
 	ID           uint   `json:"id"`
+}
+
+type WebsiteBatchPHPVersionResult struct {
+	ID      uint   `json:"id"`
+	Domain  string `json:"domain"`
+	Status  string `json:"status"`
+	Message string `json:"message"`
 }

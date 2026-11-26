@@ -67,6 +67,7 @@ const (
 	TaskInstallCluster = "TaskInstallCluster"
 	TaskCreateCluster  = "TaskCreateCluster"
 	TaskBackup         = "TaskBackup"
+	TaskRecover        = "TaskRecover"
 	TaskPush           = "TaskPush"
 	TaskExec           = "TaskExec"
 )

@@ -41,6 +41,8 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx"
 	"github.com/1Panel-dev/1Panel/agent/utils/nginx/parser"
 	"github.com/1Panel-dev/1Panel/agent/utils/re"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/client"
 	"github.com/pkg/errors"
 	"gorm.io/gorm"
 )
@@ -388,19 +390,23 @@ func createIndexFile(website *model.Website, runtime *model.Runtime, created *we
 
 	switch website.Type {
 	case constant.Static:
-		indexPath = path.Join(indexFolder, "index.html")
-		indexHtml, _ := websiteService.GetDefaultHtml("index")
-		indexContent = indexHtml.Content
+		if !hasExistingIndexFile(indexFolder, "index.html", "index.htm") {
+			indexPath = path.Join(indexFolder, "index.html")
+			indexHtml, _ := websiteService.GetDefaultHtml("index")
+			indexContent = indexHtml.Content
+		}
 	case constant.Runtime:
-		if runtime.Type == constant.RuntimePHP {
+		if runtime.Type == constant.RuntimePHP && !hasExistingIndexFile(indexFolder, "index.php", "index.html", "index.htm") {
 			indexPath = path.Join(indexFolder, "index.php")
 			indexPhp, _ := websiteService.GetDefaultHtml("php")
 			indexContent = indexPhp.Content
 		}
 	}
 
-	if err := created.write(indexPath, []byte(indexContent), constant.FilePerm, true); err != nil {
-		return err
+	if indexPath != "" {
+		if err := created.write(indexPath, []byte(indexContent), constant.FilePerm, true); err != nil {
+			return err
+		}
 	}
 	html404, _ := websiteService.GetDefaultHtml("404")
 	if err := created.write(path.Join(indexFolder, "404.html"), []byte(html404.Content), constant.FilePerm, true); err != nil {
@@ -411,6 +417,16 @@ func createIndexFile(website *model.Website, runtime *model.Runtime, created *we
 	}
 
 	return nil
+}
+
+func hasExistingIndexFile(indexDir string, candidates ...string) bool {
+	for _, name := range candidates {
+		info, err := os.Stat(path.Join(indexDir, name))
+		if err == nil && !info.IsDir() {
+			return true
+		}
+	}
+	return false
 }
 
 func createProxyFile(website *model.Website, created *websiteCreateFiles) error {
@@ -1332,6 +1348,13 @@ func deleteWebsiteFolder(website *model.Website) error {
 }
 
 func opWebsite(website *model.Website, operate string) error {
+	return opWebsiteContext(context.Background(), website, operate)
+}
+
+func opWebsiteContext(ctx context.Context, website *model.Website, operate string) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
 	nginxInstall, err := getNginxFull(website)
 	if err != nil {
 		return err
@@ -1342,6 +1365,7 @@ func opWebsite(website *model.Website, operate string) error {
 		return errors.New("nginx config is not valid")
 	}
 	server := servers[0]
+	before := nginx.DumpConfig(config, nginx.IndentedStyle)
 	if operate == constant.StopWeb {
 		changed := false
 		for _, siteServer := range servers {
@@ -1375,10 +1399,16 @@ func opWebsite(website *model.Website, operate string) error {
 		}
 	}
 
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if before == nginx.DumpConfig(config, nginx.IndentedStyle) {
+		return nil
+	}
 	if err := nginx.WriteConfig(config, nginx.IndentedStyle); err != nil {
 		return err
 	}
-	return nginxCheckAndReload(nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
+	return nginxCheckAndReloadContext(ctx, nginxInstall.SiteConfig.OldContent, config.FilePath, nginxInstall.Install.ContainerName)
 }
 
 func restoreLegacyWebsiteRoutes(server *components.Server, website *model.Website) error {
@@ -1636,6 +1666,54 @@ func certificateDirectories(value string) []string {
 		}
 	}
 	return dirs
+}
+
+func normalizeSSLSyncDir(dir string) (string, error) {
+	dir = strings.TrimSpace(dir)
+	if dir == "" {
+		return "", nil
+	}
+	if !filepath.IsAbs(dir) || strings.ContainsRune(dir, 0) {
+		return "", errors.New("certificate sync directory must be an absolute path")
+	}
+	return filepath.Clean(dir), nil
+}
+
+// Each file is replaced atomically; the certificate pair is not a filesystem transaction.
+func writeSSLSyncFiles(dir, pem, key string) error {
+	dir, err := normalizeSSLSyncDir(dir)
+	if err != nil || dir == "" {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return fmt.Errorf("create certificate sync directory %q: %w", dir, err)
+	}
+	for _, item := range []struct{ name, content string }{{"privkey.pem", key}, {"fullchain.pem", pem}} {
+		if err := replaceSSLSyncFile(dir, item.name, item.content); err != nil {
+			return fmt.Errorf("sync certificate file %q: %w", filepath.Join(dir, item.name), err)
+		}
+	}
+	return nil
+}
+
+func replaceSSLSyncFile(dir, name, content string) error {
+	file, err := os.CreateTemp(dir, ".1panel-ssl-*")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(file.Name())
+	if _, err := file.WriteString(content); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	return os.Rename(file.Name(), filepath.Join(dir, name))
 }
 
 func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {
@@ -2219,4 +2297,24 @@ func getManualWebsiteSSL(req request.WebsiteHTTPSOp) (model.WebsiteSSL, error) {
 	websiteSSL.Pem = certificate
 	websiteSSL.Status = constant.SSLReady
 	return websiteSSL, nil
+}
+
+type websitePHPImageInspector interface {
+	ImageInspect(context.Context, string, ...client.ImageInspectOption) (image.InspectResponse, error)
+}
+
+// Let Docker resolve the full reference, including registries, tags, digests and IDs.
+// A missing source image must not prevent switching away from that environment.
+func validateWebsitePHPImage(ctx context.Context, inspector websitePHPImageInspector, reference, name string) error {
+	if strings.TrimSpace(reference) == "" {
+		return buserr.WithName("ErrImageNotExist", name)
+	}
+	_, err := inspector.ImageInspect(ctx, reference)
+	if client.IsErrNotFound(err) {
+		return buserr.WithName("ErrImageNotExist", name)
+	}
+	if err != nil {
+		return fmt.Errorf("inspect PHP runtime %s image %s: %w", name, reference, err)
+	}
+	return nil
 }

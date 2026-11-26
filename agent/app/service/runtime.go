@@ -242,9 +242,15 @@ func startRuntimeCreateTask(create request.RuntimeCreate, runtime *model.Runtime
 	if err != nil {
 		return err
 	}
-	createTask.AddSubTask(task.GetTaskName(create.Name, task.TaskCreate, task.TaskScopeRuntime), func(t *task.Task) error {
+	run := func(t *task.Task) error {
 		return executeRuntimeCreateTask(create, runtime, app, appDetail, appVersionDir, t)
-	}, nil)
+	}
+	if create.Type == constant.RuntimePHP && create.Resource != constant.ResourceLocal {
+		// Compose and extension commands have their own timeouts. Keep the task open until they exit.
+		createTask.AddSubTaskWithOps(createTask.Name, run, nil, 0, 0)
+	} else {
+		createTask.AddSubTask(createTask.Name, run, nil)
+	}
 	go func() {
 		_ = createTask.Execute()
 	}()
@@ -282,7 +288,7 @@ func executeRuntimeCreateTask(create request.RuntimeCreate, runtime *model.Runti
 
 	switch create.Type {
 	case constant.RuntimePHP:
-		return buildRuntimeWithResult(runtime, "", "", false)
+		return buildRuntimeWithResult(runtime, "", "", false, taskItem)
 	case constant.RuntimeNode, constant.RuntimeJava, constant.RuntimeGo, constant.RuntimePython, constant.RuntimeDotNet:
 		if err := pullRuntimeImagesBeforeStart(create, runtime, taskItem); err != nil {
 			return markRuntimeCreateFailed(runtime, err)
