@@ -9,7 +9,7 @@ Chọn task **chưa xong có số nhỏ nhất** mà mọi task phụ thuộc đ
 | | Task | Phụ thuộc | File đặc tả | Ghi chú |
 |---|---|---|---|---|
 | [x] | **T0.1** Tạo fork và môi trường làm việc | không | [phase-0-2.md](phase-0-2.md) | 2026-11-27. AGENTS.md bị .gitignore upstream bỏ qua → thêm bằng `git add -f`, không sửa .gitignore. WSL là Ubuntu 26.04. Commit dùng email noreply GitHub. |
-| [ ] | **T0.2** Build được từ mã nguồn | T0.1 | [phase-0-2.md](phase-0-2.md) | |
+| [x] | **T0.2** Build được từ mã nguồn | T0.1 | [phase-0-2.md](phase-0-2.md) | 2026-11-27. Không chạy được `1panel-core version` khi chưa cài (panic thiếu /usr/local/bin/1pctl, phiên bản nằm trong DB chứ không trong binary), xem BUILD.md mục 4. arm64 ở `build/arm64/`. Agent có 2 test fail sẵn (TLS). |
 | [ ] | **T0.3** Phân tích gói phát hành và luồng cài đặt của upstream | T0.1 | [phase-0-2.md](phase-0-2.md) | |
 | [ ] | **T1.1** CI kiểm tra build | T0.2 | [phase-0-2.md](phase-0-2.md) | |
 | [ ] | **T1.2** Máy chủ phát hành và workflow release | T0.3, T1.1 | [phase-0-2.md](phase-0-2.md) | |
