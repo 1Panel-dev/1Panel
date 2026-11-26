@@ -4881,6 +4881,10 @@ const message = {
         privateKey: 'Clave privada (KEY)',
         certificate: 'Certificado (formato PEM)',
         HTTPConfig: 'Opciones HTTP',
+        HTTPSRedirectPort: 'Puerto de redirección HTTPS',
+        HTTPSRedirectPortCustom: 'Personalizado',
+        HTTPSRedirectPortManualHelper:
+            'La regla de redirección se editó manualmente o no está gestionada, por lo que no se puede modificar.',
         HTTPSOnly: 'Bloquear peticiones HTTP',
         HTTPToHTTPS: 'Redirigir a HTTPS',
         HTTPAlso: 'Permitir peticiones HTTP directas',
@@ -5234,11 +5238,15 @@ const message = {
             'Scripts a ejecutar antes de compilar, usualmente para descargar código fuente de módulos, instalar dependencias, etc.',
         buildHelper:
             'Los módulos dinámicos se cargan desde la configuración tras compilarse; los módulos estáticos siguen reconstruyendo OpenResty.',
-        defaultHttps: 'HTTPS Anti-manipulación',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Estado de protección contra manipulación',
         defaultHttpsHelper1: 'Habilitar esto puede resolver problemas de manipulación de HTTPS.',
         sslRejectHandshake: 'Rechazar handshake SSL predeterminado',
         sslRejectHandshakeHelper:
             'Habilitar esto puede evitar la fuga de certificados, establecer un sitio web predeterminado invalidará esta configuración',
+        httpsRedirectCustomPort: 'Usar redirección con puerto personalizado',
+        httpsRedirectCustomPortHelper:
+            'Cuando está activado, las redirecciones de HTTP a HTTPS usan el puerto HTTPS personalizado.',
     },
     ssl: {
         syncDir: 'Directorio de sincronización',

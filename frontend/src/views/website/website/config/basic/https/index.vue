@@ -10,7 +10,7 @@
                 class="moblie-form"
                 ref="httpsForm"
                 label-position="right"
-                label-width="150px"
+                label-width="190px"
                 :model="form"
                 :rules="rules"
             >
@@ -30,6 +30,7 @@
                         <HttpsConfig
                             v-model="form"
                             :website-ssl="websiteSSL"
+                            show-redirect-port
                             :website-domains="websiteDomains"
                             @ssl-change="handleSSLChange"
                         />
@@ -77,6 +78,10 @@ let form = reactive({
     privateKeyPath: '',
     certificatePath: '',
     httpConfig: 'HTTPToHTTPS',
+    globalRedirectPort: 443,
+    siteRedirectPort: null as number | null,
+    redirectPortManaged: false,
+    httpsRedirectPort: null as number | null,
     hsts: true,
     hstsIncludeSubDomains: false,
     algorithm:
@@ -119,6 +124,10 @@ const get = () => {
             if (data.httpConfig != '') {
                 form.httpConfig = data.httpConfig;
             }
+            form.globalRedirectPort = data.globalRedirectPort;
+            form.siteRedirectPort = data.siteRedirectPort ?? null;
+            form.redirectPortManaged = data.redirectPortManaged;
+            form.httpsRedirectPort = null;
             if (data.SSLProtocol && data.SSLProtocol.length > 0) {
                 form.SSLProtocol = data.SSLProtocol;
             }

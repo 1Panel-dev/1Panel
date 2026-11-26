@@ -360,6 +360,7 @@ export namespace Website {
         certificate?: string;
         privateKey?: string;
         httpConfig: string;
+        httpsRedirectPort?: number | null;
         SSLProtocol: string[];
         algorithm: string;
         http3: boolean;
@@ -369,6 +370,9 @@ export namespace Website {
         enable: boolean;
         SSL: SSL;
         httpConfig: string;
+        globalRedirectPort: number;
+        siteRedirectPort?: number | null;
+        redirectPortManaged: boolean;
         SSLProtocol: string[];
         algorithm: string;
         hsts: boolean;

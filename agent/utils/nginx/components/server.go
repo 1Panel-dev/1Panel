@@ -606,17 +606,10 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	if httpsPort == 443 {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", "https://$host$request_uri"},
-		})
-	} else {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", fmt.Sprintf("https://$host:%d$request_uri", httpsPort)},
-		})
-	}
+	block.AppendDirectives(&Directive{
+		Name:       "return",
+		Parameters: []string{"301", HTTPSRedirectTarget(httpsPort)},
+	})
 
 	newDir.Block = block
 	directives := make([]IDirective, 0, len(s.Directives)+1)
@@ -643,10 +636,15 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 }
 
 func isHTTP2HTTPSRedirect(dir IDirective) bool {
+	_, ok := http2HTTPSRedirectTarget(dir)
+	return ok
+}
+
+func http2HTTPSRedirectTarget(dir IDirective) (string, bool) {
 	condition := strings.Join(dir.GetParameters(), " ")
 	normalizedCondition := strings.Join(strings.Fields(condition), "")
 	if dir.GetName() != "if" || normalizedCondition != "($scheme=http)" || dir.GetBlock() == nil {
-		return false
+		return "", false
 	}
 	var returnDirective IDirective
 	for _, child := range dir.GetBlock().GetDirectives() {
@@ -654,26 +652,132 @@ func isHTTP2HTTPSRedirect(dir IDirective) bool {
 			continue
 		}
 		if returnDirective != nil || child.GetName() != "return" || child.GetBlock() != nil {
-			return false
+			return "", false
 		}
 		returnDirective = child
 	}
 	if returnDirective == nil {
-		return false
+		return "", false
 	}
 	params := returnDirective.GetParameters()
 	if len(params) != 2 || params[0] != "301" {
-		return false
+		return "", false
 	}
-	if params[1] == "https://$host$request_uri" {
-		return true
+	if _, ok := ParseHTTPToHTTPSRedirectPort(params[1]); !ok {
+		return "", false
 	}
-	port, ok := strings.CutPrefix(params[1], "https://$host:")
+	return params[1], true
+}
+
+// HTTPSRedirectTarget builds the redirect target used by HTTP-to-HTTPS rules.
+func HTTPSRedirectTarget(httpsPort int) string {
+	if httpsPort == 443 {
+		return "https://$host$request_uri"
+	}
+	return fmt.Sprintf("https://$host:%d$request_uri", httpsPort)
+}
+
+// ParseHTTPToHTTPSRedirectPort extracts the port from a managed redirect target.
+func ParseHTTPToHTTPSRedirectPort(target string) (int, bool) {
+	if target == "https://$host$request_uri" {
+		return 443, true
+	}
+	port, ok := strings.CutPrefix(target, "https://$host:")
 	if !ok || !strings.HasSuffix(port, "$request_uri") {
-		return false
+		return 0, false
 	}
 	value, err := strconv.ParseUint(strings.TrimSuffix(port, "$request_uri"), 10, 16)
-	return err == nil && value > 0
+	if err != nil || value == 0 {
+		return 0, false
+	}
+	return int(value), true
+}
+
+// IsHTTPToHTTPSRedirectTarget reports whether target is a managed HTTP-to-HTTPS redirect.
+func IsHTTPToHTTPSRedirectTarget(target string) bool {
+	_, ok := ParseHTTPToHTTPSRedirectPort(target)
+	return ok
+}
+
+type HTTPToHTTPSRedirectState struct {
+	Managed      bool
+	Port         int
+	Present      bool
+	HasUnmanaged bool
+}
+
+// HTTPToHTTPSRedirectState returns the effective managed redirect state of a server.
+func (s *Server) HTTPToHTTPSRedirectState() HTTPToHTTPSRedirectState {
+	ports := make(map[int]struct{})
+	state := HTTPToHTTPSRedirectState{}
+	for _, dir := range s.Directives {
+		switch dir.GetName() {
+		case "if":
+			condition := strings.Join(dir.GetParameters(), " ")
+			if strings.Join(strings.Fields(condition), "") != "($scheme=http)" {
+				continue
+			}
+			state.Present = true
+			target, ok := http2HTTPSRedirectTarget(dir)
+			if !ok {
+				state.HasUnmanaged = true
+				continue
+			}
+			port, _ := ParseHTTPToHTTPSRedirectPort(target)
+			ports[port] = struct{}{}
+		case "error_page":
+			params := dir.GetParameters()
+			if len(params) == 0 || params[0] != "497" {
+				continue
+			}
+			state.Present = true
+			if len(params) < 2 {
+				state.HasUnmanaged = true
+				continue
+			}
+			port, ok := ParseHTTPToHTTPSRedirectPort(params[1])
+			if !ok {
+				state.HasUnmanaged = true
+				continue
+			}
+			ports[port] = struct{}{}
+		}
+	}
+	if len(ports) == 1 {
+		for port := range ports {
+			state.Port = port
+		}
+	}
+	if !state.HasUnmanaged && len(ports) == 1 {
+		state.Managed = true
+	}
+	return state
+}
+
+// SetHTTPToHTTPSRedirectPort updates redirects that are already recognized as managed.
+func (s *Server) SetHTTPToHTTPSRedirectPort(port int) {
+	if !s.HTTPToHTTPSRedirectState().Managed {
+		return
+	}
+	target := HTTPSRedirectTarget(port)
+	for _, dir := range s.Directives {
+		switch dir.GetName() {
+		case "if":
+			if _, ok := http2HTTPSRedirectTarget(dir); ok {
+				dir.GetBlock().UpdateDirective("return", []string{"301", target})
+			}
+		case "error_page":
+			params := dir.GetParameters()
+			if len(params) >= 2 && params[0] == "497" {
+				if _, ok := ParseHTTPToHTTPSRedirectPort(params[1]); ok {
+					directive, ok := dir.(*Directive)
+					if ok {
+						directive.Parameters[1] = target
+					}
+				}
+			}
+		}
+	}
 }
 
 func (s *Server) UpdateAllowIPs(ips []string) {

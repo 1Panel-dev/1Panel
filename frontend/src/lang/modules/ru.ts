@@ -4861,6 +4861,10 @@ const message = {
         privateKey: 'Ключ (KEY)',
         certificate: 'Сертификат (формат PEM)',
         HTTPConfig: 'Опции HTTP',
+        HTTPSRedirectPort: 'Порт HTTPS-перенаправления',
+        HTTPSRedirectPortCustom: 'Пользовательский',
+        HTTPSRedirectPortManualHelper:
+            'Это правило изменено вручную или не управляется системой, поэтому его нельзя изменить.',
         HTTPSOnly: 'Блокировать HTTP запросы',
         HTTPToHTTPS: 'Перенаправлять на HTTPS',
         HTTPAlso: 'Разрешить прямые HTTP запросы',
@@ -5232,11 +5236,15 @@ const message = {
             'Скрипт, выполняемый перед компиляцией, обычно для загрузки исходного кода модуля, установки зависимостей и т.д.',
         buildHelper:
             'Динамические модули загружаются из конфигурации после сборки; статические модули по-прежнему пересобирают OpenResty.',
-        defaultHttps: 'HTTPS Анти-вмешательство',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Статус защиты от вмешательства',
         defaultHttpsHelper1: 'Включение этого параметра может решить проблему вмешательства в HTTPS.',
         sslRejectHandshake: 'Отклонить стандартное SSL-рукопожатие',
         sslRejectHandshakeHelper:
             'Включение этого может предотвратить утечку сертификатов, установка веб-сайта по умолчанию сделает эту настройку недействительной',
+        httpsRedirectCustomPort: 'Использовать перенаправление на пользовательский порт',
+        httpsRedirectCustomPortHelper:
+            'При включении перенаправления с HTTP на HTTPS используют пользовательский HTTPS-порт.',
     },
     ssl: {
         syncDir: 'Каталог синхронизации',

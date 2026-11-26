@@ -9,6 +9,8 @@ const (
 	NginxCheck   = "check"
 	NginxRestart = "restart"
 
+	HTTPSRedirectCustomPortKey = "HTTPSRedirectCustomPort"
+
 	ConfigNew    = "add"
 	ConfigUpdate = "update"
 	ConfigDel    = "delete"

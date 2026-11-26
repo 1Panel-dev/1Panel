@@ -4690,6 +4690,10 @@ const message = {
         privateKey: '키(KEY)',
         certificate: '인증서(PEM 형식)',
         HTTPConfig: 'HTTP 옵션',
+        HTTPSRedirectPort: 'HTTPS 리디렉션 포트',
+        HTTPSRedirectPortCustom: '사용자 지정',
+        HTTPSRedirectPortManualHelper:
+            '이 리디렉션 규칙은 수동으로 편집되었거나 관리 대상이 아니므로 수정할 수 없습니다.',
         HTTPSOnly: 'HTTP 요청 차단',
         HTTPToHTTPS: 'HTTPS로 리디렉션',
         HTTPAlso: 'HTTP 요청 허용',
@@ -5048,11 +5052,14 @@ const message = {
         packagesHelper: '예: git,curl 쉼표로 구분',
         scriptHelper: '컴파일 전에 실행할 스크립트, 일반적으로 모듈 소스 코드 다운로드, 종속성 설치 등',
         buildHelper: '동적 모듈은 빌드 후 설정을 통해 로드되며, 정적 모듈은 여전히 OpenResty를 다시 빌드합니다.',
-        defaultHttps: 'HTTPS 변조 방지',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '변조 방지 상태',
         defaultHttpsHelper1: '이를 활성화하면 HTTPS 변조 문제를 해결할 수 있습니다.',
         sslRejectHandshake: '기본 SSL 핸드셰이크 거부',
         sslRejectHandshakeHelper:
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
+        httpsRedirectCustomPort: '사용자 지정 포트로 리디렉션',
+        httpsRedirectCustomPortHelper: '활성화하면 HTTP에서 HTTPS로 리디렉션할 때 사용자 지정 HTTPS 포트를 사용합니다.',
     },
     ssl: {
         syncDir: '동기화 디렉터리',

@@ -4870,6 +4870,10 @@ const message = {
         privateKey: 'Anahtar (KEY)',
         certificate: 'Sertifika (PEM formatı)',
         HTTPConfig: 'HTTP Seçenekleri',
+        HTTPSRedirectPort: 'HTTPS yönlendirme bağlantı noktası',
+        HTTPSRedirectPortCustom: 'Özel',
+        HTTPSRedirectPortManualHelper:
+            'Bu yönlendirme kuralı manuel olarak düzenlendi veya yönetilmiyor; bu nedenle değiştirilemez.',
         HTTPSOnly: 'HTTP isteklerini engelle',
         HTTPToHTTPS: 'HTTPS’ye yönlendir',
         HTTPAlso: 'Doğrudan HTTP isteklerine izin ver',
@@ -5241,11 +5245,15 @@ const message = {
             'Derlemeden önce çalıştırılacak betikler, genellikle modül kaynak kodunu indirmek, bağımlılıkları kurmak vb. için',
         buildHelper:
             'Dinamik modüller derlemeden sonra yapılandırmadan yüklenir; statik modüller yine OpenResty’yi yeniden derler.',
-        defaultHttps: 'HTTPS Anti-sızdırma',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Anti-sızdırma durumu',
         defaultHttpsHelper1: 'Bu özelliği etkinleştirerek HTTPS sızdırma sorunlarını çözebilirsiniz.',
         sslRejectHandshake: 'Varsayılan SSL el sıkışmasını reddet',
         sslRejectHandshakeHelper:
             'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
+        httpsRedirectCustomPort: 'Özel bağlantı noktasına yönlendir',
+        httpsRedirectCustomPortHelper:
+            'Etkinleştirildiğinde, HTTP’den HTTPS’e yönlendirmeler özel HTTPS bağlantı noktasını kullanır.',
     },
     ssl: {
         syncDir: 'Eşitleme dizini',
