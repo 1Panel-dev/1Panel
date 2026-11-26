@@ -1,11 +1,14 @@
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
 import http from '@/api';
-import { ResPage, SearchWithPage } from '../interface';
+import { DescriptionUpdate, ResPage, SearchWithPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const createOllamaModel = (name: string, taskID: string) => {
-    return http.post(`/ai/ollama/model`, { name: name, taskID: taskID });
+export const updateOllamaModelDescription = (params: DescriptionUpdate) => {
+    return http.post(`/ai/ollama/model/description`, params);
+};
+export const createOllamaModel = (name: string, taskID: string, description = '') => {
+    return http.post(`/ai/ollama/model`, { name: name, taskID: taskID, description });
 };
 export const recreateOllamaModel = (name: string, taskID: string) => {
     return http.post(`/ai/ollama/model/recreate`, { name: name, taskID: taskID });

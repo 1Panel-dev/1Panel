@@ -28,6 +28,9 @@
                     }}
                 </span>
             </el-form-item>
+            <el-form-item v-if="!props.accountId" :label="$t('commons.table.description')" prop="description">
+                <el-input v-model="form.description" type="textarea" :rows="3" maxlength="256" show-word-limit />
+            </el-form-item>
         </el-form>
         <template #footer>
             <span class="dialog-footer">
@@ -54,10 +57,12 @@ const props = defineProps<{ accountId?: number }>();
 const drawerVisible = ref(false);
 const form = reactive({
     name: '',
+    description: '',
 });
 
 const acceptParams = async (): Promise<void> => {
     form.name = '';
+    form.description = '';
     drawerVisible.value = true;
 };
 const emit = defineEmits(['search', 'log']);
@@ -67,9 +72,9 @@ const formRef = ref<FormInstance>();
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    let taskID = newUUID();
     formEl.validate(async (valid) => {
         if (!valid) return;
+        const taskID = newUUID();
         let itemName = form.name.replaceAll('ollama run ', '').replaceAll('ollama pull ', '');
         const request = props.accountId
             ? createAgentAccountModel({
@@ -77,7 +82,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
                   model: { recordId: 0, id: itemName, name: itemName },
                   taskID,
               })
-            : createOllamaModel(itemName, taskID);
+            : createOllamaModel(itemName, taskID, form.description);
         await request.then(() => {
             drawerVisible.value = false;
             emit('search');
