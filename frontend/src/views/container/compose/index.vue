@@ -506,12 +506,41 @@
             </template>
         </LayoutContent>
 
-        <TaskLog ref="taskLogRef" width="70%">
+        <TaskLog ref="taskLogRef" width="70%" @close="search(true)">
             <template #task-footer>
                 <el-button @click="handleClose">{{ $t('commons.table.backToList') }}</el-button>
                 <el-button type="primary" @click="closeTask">{{ $t('commons.table.keepEdit') }}</el-button>
             </template>
         </TaskLog>
+        <DialogPro
+            v-model="operateDialogVisible"
+            :title="$t('commons.operate.' + pendingOperation)"
+            size="small"
+            :show-close="!operateLoading"
+        >
+            <div>
+                {{
+                    $t('container.composeOperatorHelper', [
+                        operateTarget.name,
+                        $t('commons.operate.' + pendingOperation),
+                    ])
+                }}
+            </div>
+            <div class="mt-4">
+                <el-checkbox v-model="operateForcePull" :disabled="operateLoading">
+                    {{ $t('container.forcePull') }}
+                </el-checkbox>
+                <span class="input-help">{{ $t('container.forcePullHelper') }}</span>
+            </div>
+            <template #footer>
+                <el-button :disabled="operateLoading" @click="operateDialogVisible = false">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button type="primary" :loading="operateLoading" @click="submitComposeOperate">
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </template>
+        </DialogPro>
         <FileList ref="fileRef" @choose="loadDir" />
         <DeleteDialog @search="search(true)" ref="dialogDelRef" />
         <ContainerInspectDialog ref="containerInspectRef" />
@@ -882,39 +911,64 @@ const onImportCompose = () => {
     });
 };
 
-const handleComposeOperate = async (operation: 'up' | 'stop' | 'restart' | 'rebuild', row: any) => {
-    const mes = i18n.global.t('container.composeOperatorHelper', [
-        row.name,
+const operateDialogVisible = ref(false);
+const operateLoading = ref(false);
+const pendingOperation = ref<'up' | 'stop' | 'restart' | 'rebuild'>('rebuild');
+const operateTarget = ref({ name: '', path: '' });
+const operateForcePull = ref(false);
+
+const handleComposeOperate = (operation: 'up' | 'stop' | 'restart' | 'rebuild', row: any) => {
+    if (operateLoading.value) return;
+    pendingOperation.value = operation;
+    operateTarget.value = { name: row.name, path: row.path };
+    operateForcePull.value = false;
+    if (operation === 'rebuild') {
+        operateDialogVisible.value = true;
+        return;
+    }
+    ElMessageBox.confirm(
+        i18n.global.t('container.composeOperatorHelper', [row.name, i18n.global.t('commons.operate.' + operation)]),
         i18n.global.t('commons.operate.' + operation),
-    ]);
-    ElMessageBox.confirm(mes, i18n.global.t('commons.operate.' + operation), {
-        confirmButtonText: i18n.global.t('commons.button.confirm'),
-        cancelButtonText: i18n.global.t('commons.button.cancel'),
-        type: 'info',
-    }).then(async () => {
-        loading.value = true;
-        const params = {
-            name: row.name,
-            path: row.path,
-            operation: operation,
+        {
+            confirmButtonText: i18n.global.t('commons.button.confirm'),
+            cancelButtonText: i18n.global.t('commons.button.cancel'),
+            type: 'info',
+        },
+    )
+        .then(() => submitComposeOperate())
+        .catch(() => {});
+};
+
+const submitComposeOperate = async () => {
+    if (operateLoading.value) return;
+    operateLoading.value = true;
+    const taskID = pendingOperation.value === 'rebuild' && operateForcePull.value ? newUUID() : undefined;
+    try {
+        await composeOperate({
+            taskID,
+            name: operateTarget.value.name,
+            path: operateTarget.value.path,
+            operation: pendingOperation.value,
             withFile: false,
             force: false,
-        };
-        await composeOperate(params)
-            .then(async () => {
-                MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
-                await search();
-                if (currentCompose.value) {
-                    const updated = data.value.find((item) => item.name === currentCompose.value.name);
-                    if (updated) {
-                        await loadDetail(updated, true);
-                    }
-                }
-            })
-            .finally(() => {
-                loading.value = false;
-            });
-    });
+            forcePull: pendingOperation.value === 'rebuild' && operateForcePull.value,
+        });
+        operateDialogVisible.value = false;
+        if (taskID) {
+            openTaskLog(taskID);
+            return;
+        }
+        MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
+        await search();
+        if (currentCompose.value) {
+            const updated = data.value.find((item) => item.name === currentCompose.value.name);
+            if (updated) {
+                await loadDetail(updated, true);
+            }
+        }
+    } finally {
+        operateLoading.value = false;
+    }
 };
 
 const loadSize = async (row: any) => {

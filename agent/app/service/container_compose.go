@@ -495,6 +495,47 @@ func isComposeProjectNameEmptyError(err error) bool {
 		strings.Contains(message, "project name can't be empty")
 }
 
+// Run forced pulls as a task so HTTP timeouts do not hide the rebuild result.
+func rebuildComposeWithPull(req dto.ComposeOperation) error {
+	client, err := docker.NewDockerClient()
+	if err != nil {
+		return err
+	}
+	taskItem, err := task.NewTaskWithOps(req.Name, task.TaskRestart, task.TaskScopeCompose, req.TaskID, 1)
+	if err != nil {
+		_ = client.Close()
+		return err
+	}
+	taskItem.AddSubTaskWithOps(i18n.GetMsgByKey("PullImage"), func(t *task.Task) error {
+		images, err := compose.GetComposeImages(req.Path, req.Name)
+		if err != nil {
+			return err
+		}
+		ctx, cancel := context.WithTimeout(context.Background(), containerUpgradePullTimeout)
+		defer cancel()
+		for _, image := range images {
+			if err := pullImagesContext(ctx, t, client, image); err != nil {
+				return fmt.Errorf("pull image %s failed: %w", image, err)
+			}
+		}
+		return ctx.Err()
+	}, nil, 0, 0)
+	taskItem.AddSubTaskWithOps(i18n.GetMsgByKey("TaskRestart"), func(t *task.Task) error {
+		stdout, err := compose.DownAndUp(req.Path, req.Name)
+		if err != nil {
+			return fmt.Errorf("docker-compose rebuild failed, std: %s, err: %w", stdout, err)
+		}
+		return nil
+	}, nil, 0, 0)
+	go func() {
+		defer client.Close()
+		if err := taskItem.Execute(); err != nil {
+			global.LOG.Error(err)
+		}
+	}()
+	return nil
+}
+
 func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 	if cmd.CheckIllegal(req.Path, req.Operation) {
 		return buserr.New("ErrCmdIllegal")
@@ -524,6 +565,9 @@ func (u *ContainerService) ComposeOperation(req dto.ComposeOperation) error {
 			return fmt.Errorf("docker-compose up failed, std: %s, err: %v", stdout, err)
 		}
 	} else if req.Operation == "rebuild" {
+		if req.ForcePull {
+			return rebuildComposeWithPull(req)
+		}
 		if stdout, err := compose.DownAndUp(req.Path, req.Name); err != nil {
 			return fmt.Errorf("docker-compose rebuild failed, std: %s, err: %v", stdout, err)
 		}
