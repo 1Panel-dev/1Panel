@@ -351,6 +351,7 @@ const message = {
             authBasicPassword: 'Harf, rakam ve yaygın özel karakterler destekler, uzunluk 1-72',
             length128Err: 'Uzunluk 128 karakteri geçemez',
             maxLength: 'Uzunluk {0} karakteri geçemez',
+            maxBytes: 'Uzunluk {0} baytı aşamaz',
             alias: 'İngilizce, rakamlar, - ve _ destekler, uzunluk 1-128, ve -_ ile başlayamaz veya bitiremez.',
             vmName: 'İngilizce harfler, sayılar, ".", "-" ve "_" desteklenir; uzunluk 1-64 olmalı ve bir harf veya sayıyla başlamalıdır.',
             vmNetwork:
