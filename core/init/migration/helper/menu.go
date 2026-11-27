@@ -109,6 +109,7 @@ func LoadMenus() string {
 			Children: []dto.ShowMenu{
 				{ID: "31", Disabled: false, Title: "menu.website", IsShow: true, Label: "Website", Path: "/websites", Sort: 100},
 				{ID: "32", Disabled: false, Title: "menu.ssl", IsShow: true, Label: "SSL", Path: "/websites/ssl", Sort: 200},
+				{ID: "35", Disabled: false, Title: "menu.dnsRecord", IsShow: true, Label: "SSL-DNS-RECORD", Path: "/websites/dns-record", Sort: 220},
 				{ID: "34", Disabled: false, Title: "menu.template", IsShow: true, Label: "WebsiteTemplate", Path: "/websites/templates", Sort: 250},
 				{ID: "33", Disabled: false, Title: "menu.runtime", IsShow: true, Label: "PHP", Path: "/websites/runtimes/php", Sort: 300},
 			}},
@@ -211,6 +212,7 @@ func MenuSort() []dto.MenuLabelSort {
 		{Label: "Website-Menu", Sort: 400},
 		{Label: "Website", Sort: 100},
 		{Label: "SSL", Sort: 200},
+		{Label: "SSL-DNS-RECORD", Sort: 220},
 		{Label: "WebsiteTemplate", Sort: 250},
 		{Label: "PHP", Sort: 300},
 		{Label: "Database-Menu", Sort: 500},

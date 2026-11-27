@@ -52,3 +52,9 @@ test('every language defines the Manage DNS strings', () => {
         }
     }
 });
+
+test('Manage DNS is registered in the backend sidebar menu', () => {
+    const entry = /Label: "SSL-DNS-RECORD", Path: "\/websites\/dns-record"/;
+    assert.match(read('../../core/init/migration/helper/menu.go'), entry);
+    assert.match(read('../../core/init/migration/migrate.go'), /migrations\.AddDnsRecordMenu/);
+});
