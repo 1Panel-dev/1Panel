@@ -15,6 +15,7 @@ func commonGroups() []CommonRouter {
 		&AppRouter{},
 		&WebsiteRouter{},
 		&WebsiteDnsAccountRouter{},
+		&WebsiteDnsRecordRouter{},
 		&WebsiteAcmeAccountRouter{},
 		&WebsiteSSLRouter{},
 		&WebsiteTemplateRouter{},

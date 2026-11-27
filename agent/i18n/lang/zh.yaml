@@ -248,6 +248,8 @@ Set: '设置'
 # SSL 证书
 ErrSSLCannotDelete: "{{ .name }} 证书正在被网站使用，无法删除"
 ErrAccountCannotDelete: "账号关联证书，无法删除"
+ErrDnsRecordUnsupported: '该服务商暂不支持 DNS 记录管理'
+ErrDnsAccountNotFound: '未找到 DNS 服务商账号'
 ErrSSLApply: "证书续签成功，但 OpenResty reload 失败，请检查配置"
 ErrEmailIsExist: '邮箱已存在'
 ErrSSLKeyNotFound: '私钥文件不存在'

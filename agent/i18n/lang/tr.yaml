@@ -248,6 +248,8 @@ Set: 'Ayarlar'
 # SSL sertifikası
 ErrSSLCannotDelete: '{{ .name }} sertifikası bir web sitesi tarafından kullanılıyor ve silinemez'
 ErrAccountCannotDelete: 'Hesap bir sertifikayla ilişkili ve silinemez'
+ErrDnsRecordUnsupported: 'DNS kayıt yönetimi bu sağlayıcı için henüz desteklenmiyor'
+ErrDnsAccountNotFound: 'DNS sağlayıcı hesabı bulunamadı'
 ErrSSLApply: 'Sertifika yenileme başarılı, openresty yeniden yükleme başarısız, lütfen yapılandırmayı kontrol edin'
 ErrEmailIsExist: 'Posta kutusu zaten mevcut'
 ErrSSLKeyNotFound: 'Özel anahtar dosyası mevcut değil'

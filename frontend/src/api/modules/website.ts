@@ -95,6 +95,26 @@ export const deleteDnsAccount = (req: Website.DelReq) => {
     return http.post<any>(`/websites/dns/del`, req);
 };
 
+export const searchDnsZones = (req: Website.DnsZoneSearch) => {
+    return http.post<Website.DnsZone[]>(`/websites/dns/record/zones`, req);
+};
+
+export const searchDnsRecords = (req: Website.DnsRecordSearch) => {
+    return http.post<Website.DnsRecord[]>(`/websites/dns/record/search`, req);
+};
+
+export const createDnsRecord = (req: Website.DnsRecordOperate) => {
+    return http.post<any>(`/websites/dns/record`, req);
+};
+
+export const updateDnsRecord = (req: Website.DnsRecordOperate) => {
+    return http.post<any>(`/websites/dns/record/update`, req);
+};
+
+export const deleteDnsRecord = (req: Website.DnsRecordDelete) => {
+    return http.post<any>(`/websites/dns/record/del`, req);
+};
+
 export const searchAcmeAccount = (req: ReqPage) => {
     return http.post<ResPage<Website.AcmeAccount>>(`/websites/acme/search`, req);
 };

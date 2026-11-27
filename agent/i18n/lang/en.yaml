@@ -248,6 +248,8 @@ Set: 'Settings'
 # SSL certificate
 ErrSSLCannotDelete: 'Certificate {{ .name }} is in use by a website'
 ErrAccountCannotDelete: 'Account is linked to a certificate and cannot be deleted'
+ErrDnsRecordUnsupported: 'DNS record management is not supported for this provider yet'
+ErrDnsAccountNotFound: 'DNS provider account not found'
 ErrSSLApply: 'Certificate renewed; OpenResty reload failed'
 ErrEmailIsExist: 'Email already exists'
 ErrSSLKeyNotFound: 'The private key file does not exist'

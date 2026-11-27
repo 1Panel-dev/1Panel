@@ -248,6 +248,8 @@ Set: '설정'
 # SSL 인증서
 ErrSSLCannotDelete: '{{ .name }} 인증서는 웹사이트에서 사용 중이므로 삭제할 수 없습니다.'
 ErrAccountCannotDelete: '계정이 인증서와 연결되어 있어 삭제할 수 없습니다.'
+ErrDnsRecordUnsupported: '이 제공자는 아직 DNS 레코드 관리를 지원하지 않습니다'
+ErrDnsAccountNotFound: 'DNS 제공자 계정을 찾을 수 없습니다'
 ErrSSLApply: '인증서 갱신이 성공했으나, openresty 재로드에 실패했습니다. 구성을 확인해 주세요'
 ErrEmailIsExist: '사서함이 이미 존재합니다'
 ErrSSLKeyNotFound: '개인 키 파일이 존재하지 않습니다'

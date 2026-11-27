@@ -234,6 +234,49 @@ export namespace Website {
         authorization: object;
     }
 
+    export interface DnsZone {
+        id: string;
+        name: string;
+    }
+
+    export interface DnsZoneSearch {
+        accountId: number;
+    }
+
+    export interface DnsRecord {
+        id: string;
+        name: string;
+        type: string;
+        value: string;
+        ttl: number;
+        priority: number;
+        proxied: boolean;
+        remark: string;
+    }
+
+    export interface DnsRecordSearch {
+        accountId: number;
+        zoneId: string;
+        zoneName: string;
+    }
+
+    export interface DnsRecordOperate extends DnsRecordSearch {
+        id?: string;
+        name: string;
+        type: string;
+        value: string;
+        ttl: number;
+        priority: number;
+        proxied: boolean;
+        remark: string;
+    }
+
+    export interface DnsRecordDelete extends DnsRecordSearch {
+        id: string;
+        name: string;
+        type: string;
+    }
+
     export interface SSL extends CommonModel {
         primaryDomain: string;
         privateKey: string;

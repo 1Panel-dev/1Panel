@@ -44,6 +44,16 @@ const webSiteRouter = {
             },
         },
         {
+            path: '/websites/dns-record',
+            name: 'SSL-DNS-RECORD',
+            component: () => import('@/views/website/ssl/dns-record/index.vue'),
+            meta: {
+                icon: 'p-website',
+                title: 'menu.dnsRecord',
+                permission: 'website_cert_view',
+            },
+        },
+        {
             path: '/websites/ssl/ca',
             name: 'SSL-CA',
             component: () => import('@/views/website/ssl/ca/index.vue'),

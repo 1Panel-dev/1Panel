@@ -248,6 +248,8 @@ Set: '設定'
 # SSL証明書
 ErrSSLCannotDelete: '{{ .name }} 証明書は Web サイトで使用されているため、削除できません'
 ErrAccountCannotDelete: 'アカウントは証明書に関連付けられているため、削除できません'
+ErrDnsRecordUnsupported: 'このプロバイダーではDNSレコード管理はまだサポートされていません'
+ErrDnsAccountNotFound: 'DNSプロバイダーアカウントが見つかりません'
 ErrSSLApply: '証明書の更新は成功しましたが、openresty の再ロードに失敗しました。設定を確認してください。'
 ErrEmailIsExist: 'メールボックスは既に存在します'
 ErrSSLKeyNotFound: '秘密鍵ファイルが存在しません'

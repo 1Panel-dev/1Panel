@@ -248,6 +248,8 @@ Set: 'تنظیمات'
 # گواهی SSL
 ErrSSLCannotDelete: 'گواهی {{ .name }} توسط یک وب‌سایت در حال استفاده است'
 ErrAccountCannotDelete: 'حساب به یک گواهی متصل است و قابل حذف نیست'
+ErrDnsRecordUnsupported: 'مدیریت رکورد DNS هنوز برای این ارائه‌دهنده پشتیبانی نمی‌شود'
+ErrDnsAccountNotFound: 'حساب ارائه‌دهنده DNS یافت نشد'
 ErrSSLApply: 'گواهی تمدید شد؛ بارگذاری مجدد OpenResty ناموفق بود'
 ErrEmailIsExist: 'ایمیل از قبل وجود دارد'
 ErrSSLKeyNotFound: 'فایل کلید خصوصی وجود ندارد'
