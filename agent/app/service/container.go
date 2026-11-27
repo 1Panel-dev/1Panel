@@ -857,6 +857,9 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 }
 
 func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
+	// Establish the stream even when the container has no output yet.
+	_, _ = io.WriteString(ctx.Writer, ": connected\n\n")
+	ctx.Writer.Flush()
 	messageChan := make(chan string, 1024)
 	errorChan := make(chan error, 1)
 	logCtx, cancel := context.WithCancel(ctx.Request.Context())

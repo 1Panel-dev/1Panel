@@ -257,7 +257,7 @@ const searchLogs = async (preserveLogs = false) => {
         disconnected.value = false;
     }
     connecting.value = true;
-    previewStatus.value = preserveLogs ? '' : i18n.global.t('commons.status.waiting');
+    previewStatus.value = '';
 
     let currentNode = globalCurrentNode.value;
     if (props.node && props.node !== '') {
@@ -277,16 +277,18 @@ const searchLogs = async (preserveLogs = false) => {
         showStreamError(authError);
         return;
     }
+    let hasLogs = preserveLogs;
     const source = new EventSource(url);
     eventSource = source;
     source.onopen = () => {
         if (version !== searchVersion) return;
         connecting.value = false;
         disconnected.value = false;
+        previewStatus.value = '';
     };
     source.addEventListener('complete', () => {
         if (version !== searchVersion) return;
-        if (previewStatus.value) previewStatus.value = i18n.global.t('commons.log.noLog');
+        if (!hasLogs) previewStatus.value = i18n.global.t('commons.log.noLog');
         stopListening();
         disconnected.value = logSearch.isWatch;
     });
@@ -300,6 +302,7 @@ const searchLogs = async (preserveLogs = false) => {
     });
     source.onmessage = (event: MessageEvent) => {
         if (version !== searchVersion) return;
+        hasLogs = true;
         previewStatus.value = '';
         term?.write(Base64.toUint8Array(event.data));
     };
