@@ -18,15 +18,15 @@ import (
 )
 
 func GetComposeProject(projectName, workDir string, yml []byte, env []byte, skipNormalization bool) (*types.Project, error) {
-	var configFiles []types.ConfigFile
-	configFiles = append(configFiles, types.ConfigFile{
-		Filename: "docker-compose.yml",
-		Content:  yml},
-	)
 	envMap, err := godotenv.UnmarshalBytes(env)
 	if err != nil {
 		return nil, err
 	}
+	return GetComposeProjectWithEnv(projectName, workDir, yml, envMap, skipNormalization)
+}
+
+func GetComposeProjectWithEnv(projectName, workDir string, yml []byte, envMap map[string]string, skipNormalization bool) (*types.Project, error) {
+	configFiles := []types.ConfigFile{{Filename: "docker-compose.yml", Content: yml}}
 	details := types.ConfigDetails{
 		WorkingDir:  workDir,
 		ConfigFiles: configFiles,

@@ -113,6 +113,7 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="passwordTaskRef" @close="emit('checkExist')" />
 </template>
 
 <script lang="ts" setup>
@@ -121,6 +122,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { changeRedisPassword, getDatabase } from '@/api/modules/database';
 import ConfirmDialog from '@/components/confirm-dialog/index.vue';
+import TaskLog from '@/components/log/task/index.vue';
 import { getAppConnInfo } from '@/api/modules/app';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/id';
@@ -130,6 +132,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNodeAddr } = useGlobalStore();
 
 const loading = ref(false);
+const passwordTaskRef = ref<InstanceType<typeof TaskLog>>();
 
 const dialogVisible = ref(false);
 const form = reactive({
@@ -216,10 +219,16 @@ const onSubmit = async () => {
     loading.value = true;
     emit('closeTerminal');
     await changeRedisPassword(form.database, form.password)
-        .then(() => {
+        .then((response) => {
             loading.value = false;
-            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             dialogVisible.value = false;
+            if (response?.data?.taskID) {
+                form.password = '';
+                MsgSuccess(i18n.global.t('xpack.cluster.passwordTaskSubmitted'));
+                passwordTaskRef.value?.openWithTaskID(response.data.taskID, true, 'local');
+                return;
+            }
+            MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
             emit('checkExist');
         })
         .catch(() => {

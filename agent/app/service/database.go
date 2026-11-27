@@ -83,6 +83,9 @@ func (u *DatabaseService) List(dbType string) ([]dto.DatabaseOption, error) {
 			return nil, buserr.WithDetail("ErrStructTransform", err.Error(), nil)
 		}
 		item.Database = db.Name
+		if db.From == "local" && constant.IsClusterApp(db.Type) {
+			item.ClusterInstallID = db.AppInstallID
+		}
 		datas = append(datas, item)
 	}
 	return datas, err

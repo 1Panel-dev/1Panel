@@ -413,12 +413,13 @@ type DatabaseInfo struct {
 }
 
 type DatabaseOption struct {
-	ID       uint   `json:"id"`
-	Type     string `json:"type"`
-	From     string `json:"from"`
-	Database string `json:"database"`
-	Version  string `json:"version"`
-	Address  string `json:"address"`
+	ID               uint   `json:"id"`
+	Type             string `json:"type"`
+	From             string `json:"from"`
+	Database         string `json:"database"`
+	Version          string `json:"version"`
+	Address          string `json:"address"`
+	ClusterInstallID uint   `json:"clusterInstallID,omitempty"`
 }
 
 type DatabaseItem struct {

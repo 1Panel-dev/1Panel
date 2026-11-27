@@ -8758,6 +8758,18 @@ const message = {
             redisReplica: 'Réplica',
             replicaStatus: 'Detalles de replicación',
             replicaStatusError: 'No se pudo consultar la replicación',
+            replicaSource: 'Origen de replicación',
+            replicaDiagnostics: 'Detalles del diagnóstico',
+            replicationReasons: {
+                instanceNotRunning: 'La instancia no está en ejecución',
+                replicaNotConfigured: 'La replicación no está configurada para esta instancia',
+                replicationThreadStopped: 'El hilo receptor o aplicador se ha detenido',
+                replicationThreadConnecting: 'Conectando con el origen de replicación',
+                unexpectedRole: 'La instancia se ejecuta actualmente como primaria',
+                walReceiverAbsent: 'No hay ningún proceso receptor de WAL en ejecución',
+                fullSyncInProgress: 'Se está realizando una sincronización completa',
+                primaryLinkDown: 'Se ha interrumpido la conexión con el origen de replicación',
+            },
             masterHostError: 'La dirección principal no puede ser 127.0.0.1',
             emptyTitle: 'No hay clústeres de {0} configurados',
             emptyDescription:
@@ -8774,6 +8786,19 @@ const message = {
             roleParameters: 'Parámetros de {0}',
             parametersFailed: 'No se pudieron consultar los parámetros',
             instanceParameters: 'Parámetros de instancia',
+            passwordManagement: 'Gestión de contraseñas',
+            passwordRotate: 'Cambiar la contraseña de administrador',
+            passwordRepair: 'Reparar credenciales',
+            passwordRepairRequired:
+                'No se pudo confirmar el último cambio de contraseña. Repare primero las credenciales.',
+            passwordOperationHelp:
+                'El sistema verificará las credenciales de la base de datos y el estado de replicación de los miembros del clúster.',
+            passwordContainerRecreate:
+                'Al aplicar la configuración de inicio actualizada, es posible que se vuelvan a crear los contenedores de los miembros del clúster y se interrumpan brevemente las conexiones a la base de datos.',
+            passwordAffectedMembers: 'Miembros afectados',
+            passwordCurrent: 'Contraseña actual de {0}',
+            passwordCheckFailed: 'No se pudo verificar si el clúster admite cambios de contraseña',
+            passwordTaskSubmitted: 'Tarea de cambio de contraseña enviada',
             replicationParameters: 'Configuración de replicación de datos',
             replicationUserHelp:
                 'La base de datos de réplica utiliza esta cuenta para conectarse a la base de datos principal y sincronizar los datos.',

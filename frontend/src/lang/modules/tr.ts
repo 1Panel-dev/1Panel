@@ -8729,6 +8729,18 @@ const message = {
             redisReplica: 'Kopya',
             replicaStatus: 'Çoğaltma ayrıntıları',
             replicaStatusError: 'Çoğaltma durumu okunamadı',
+            replicaSource: 'Çoğaltma kaynağı',
+            replicaDiagnostics: 'Tanılama ayrıntıları',
+            replicationReasons: {
+                instanceNotRunning: 'Örnek çalışmıyor',
+                replicaNotConfigured: 'Bu örnek için çoğaltma yapılandırılmamış',
+                replicationThreadStopped: 'Alıcı veya uygulayıcı iş parçacığı durmuş',
+                replicationThreadConnecting: 'Çoğaltma kaynağına bağlanılıyor',
+                unexpectedRole: 'Örnek şu anda birincil olarak çalışıyor',
+                walReceiverAbsent: 'Çalışan WAL alıcı işlemi yok',
+                fullSyncInProgress: 'Tam eşitleme devam ediyor',
+                primaryLinkDown: 'Çoğaltma kaynağıyla bağlantı kesildi',
+            },
             masterHostError: 'Birincil adres 127.0.0.1 olamaz',
             emptyTitle: 'Yapılandırılmış {0} kümesi yok',
             emptyDescription:
@@ -8745,6 +8757,18 @@ const message = {
             roleParameters: '{0} parametreleri',
             parametersFailed: 'Örnek parametreleri okunamadı',
             instanceParameters: 'Örnek parametreleri',
+            passwordManagement: 'Parola yönetimi',
+            passwordRotate: 'Yönetici parolasını değiştir',
+            passwordRepair: 'Kimlik bilgilerini onar',
+            passwordRepairRequired: 'Son parola değişikliği doğrulanamadı. Önce kimlik bilgilerini onarın.',
+            passwordOperationHelp:
+                'Sistem, küme üyelerinin veritabanı kimlik bilgilerini ve çoğaltma durumunu doğrular.',
+            passwordContainerRecreate:
+                'Güncellenen başlatma ayarları uygulanırken küme üyelerinin kapsayıcıları yeniden oluşturulabilir ve veritabanı bağlantıları kısa süreliğine kesilebilir.',
+            passwordAffectedMembers: 'Etkilenen üyeler',
+            passwordCurrent: '{0} için geçerli parola',
+            passwordCheckFailed: 'Kümenin parola değişikliğini destekleyip desteklemediği doğrulanamadı',
+            passwordTaskSubmitted: 'Parola değiştirme görevi gönderildi',
             replicationParameters: 'Veri çoğaltma ayarları',
             replicationUserHelp:
                 'Replika veritabanı, birincil veritabanına bağlanmak ve verileri eşitlemek için bu hesabı kullanır.',

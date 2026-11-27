@@ -8784,6 +8784,18 @@ const message = {
             redisReplica: 'Réplica',
             replicaStatus: 'Detalhes da replicação',
             replicaStatusError: 'Não foi possível consultar a replicação',
+            replicaSource: 'Origem da replicação',
+            replicaDiagnostics: 'Detalhes do diagnóstico',
+            replicationReasons: {
+                instanceNotRunning: 'A instância não está em execução',
+                replicaNotConfigured: 'A replicação não está configurada para esta instância',
+                replicationThreadStopped: 'A thread de recepção ou de aplicação foi interrompida',
+                replicationThreadConnecting: 'Conectando à origem da replicação',
+                unexpectedRole: 'A instância está em execução como primária',
+                walReceiverAbsent: 'Nenhum processo receptor de WAL está em execução',
+                fullSyncInProgress: 'Uma sincronização completa está em andamento',
+                primaryLinkDown: 'A conexão com a origem da replicação foi interrompida',
+            },
             masterHostError: 'O endereço do primário não pode ser 127.0.0.1',
             emptyTitle: 'Nenhum cluster de {0} configurado',
             emptyDescription:
@@ -8800,6 +8812,19 @@ const message = {
             roleParameters: 'Parâmetros de {0}',
             parametersFailed: 'Não foi possível consultar os parâmetros',
             instanceParameters: 'Parâmetros da instância',
+            passwordManagement: 'Gerenciamento de senhas',
+            passwordRotate: 'Alterar senha de administrador',
+            passwordRepair: 'Reparar credenciais',
+            passwordRepairRequired:
+                'Não foi possível confirmar a última alteração de senha. Repare primeiro as credenciais.',
+            passwordOperationHelp:
+                'O sistema verificará as credenciais do banco de dados e o estado da replicação dos membros do cluster.',
+            passwordContainerRecreate:
+                'A aplicação das configurações de inicialização atualizadas pode recriar os contêineres dos membros do cluster e interromper brevemente as conexões com o banco de dados.',
+            passwordAffectedMembers: 'Membros afetados',
+            passwordCurrent: 'Senha atual de {0}',
+            passwordCheckFailed: 'Não foi possível verificar se o cluster aceita alterações de senha',
+            passwordTaskSubmitted: 'Tarefa de alteração de senha enviada',
             replicationParameters: 'Configuração da replicação de dados',
             replicationUserHelp:
                 'A base de dados de réplica usa esta conta para se conectar à base de dados principal e sincronizar os dados.',
