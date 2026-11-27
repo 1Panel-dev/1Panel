@@ -198,12 +198,15 @@ func (p *PersistentNetwork) netplanFiles(files []persistentFile, macAddress stri
 	for _, node := range routes.Content {
 		supported := node.Kind == yaml.MappingNode
 		for i := 0; i+1 < len(node.Content); i += 2 {
-			if !slices.Contains([]string{"to", "via", "metric", "table"}, node.Content[i].Value) {
+			if !slices.Contains([]string{"to", "via", "metric", "table", "scope"}, node.Content[i].Value) {
 				supported = false
 			}
 		}
 		table := yamlValue(node, "table")
 		if table != "" && table != "254" {
+			supported = false
+		}
+		if scope := yamlValue(node, "scope"); scope != "" && scope != "global" && (scope != "link" || yamlValue(node, "via") != "") {
 			supported = false
 		}
 		if !supported {
@@ -251,6 +254,8 @@ func (p *PersistentNetwork) netplanFiles(files []persistentFile, macAddress stri
 		setYAMLField(node, "to", &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: routeDestination(route.Destination, route.Family)})
 		if route.Gateway != "" {
 			setYAMLField(node, "via", &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: route.Gateway})
+		} else {
+			setYAMLField(node, "scope", &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!str", Value: "link"})
 		}
 		setYAMLField(node, "metric", &yaml.Node{Kind: yaml.ScalarNode, Tag: "!!int", Value: strconv.FormatUint(uint64(route.Metric), 10)})
 		routes.Content = append(routes.Content, node)

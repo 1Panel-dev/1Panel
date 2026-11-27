@@ -312,6 +312,10 @@ func parseInterfaceRoute(fields []string, family, device string, remove bool) (R
 	}
 	fields = fields[1:]
 	if fields[0] == "-4" || fields[0] == "-6" {
+		family = "IPv4"
+		if fields[0] == "-6" {
+			family = "IPv6"
+		}
 		fields = fields[1:]
 	}
 	if len(fields) < 3 || fields[0] != "route" || fields[1] != "add" && fields[1] != "del" || (fields[1] == "del") != remove {

@@ -129,13 +129,17 @@ func (p *PersistentNetwork) networkManager(change PersistentChange) error {
 		}
 		p.Routes = append(p.Routes, parsed...)
 		gateway := values["gateway"]
+		connectionMetric := values["route-metric"]
+		if is6 && connectionMetric == "0" {
+			connectionMetric = "1024"
+		}
 		var defaultRoute Route
 		if gateway != "" {
 			destination := "0.0.0.0/0"
 			if is6 {
 				destination = "::/0"
 			}
-			metric := values["route-metric"]
+			metric := connectionMetric
 			if metric == "-1" {
 				metric = ""
 			}
@@ -153,8 +157,7 @@ func (p *PersistentNetwork) networkManager(change PersistentChange) error {
 				continue
 			}
 			if gateway != "" && PersistentRouteEqual(defaultRoute, remove) {
-				p.properties = append(p.properties, family+".gateway", "")
-				p.previousProperties = append(p.previousProperties, family+".gateway", gateway)
+				gateway = ""
 				continue
 			}
 			index := slices.IndexFunc(parsed, func(r Route) bool { return PersistentRouteEqual(r, remove) })
@@ -170,8 +173,15 @@ func (p *PersistentNetwork) networkManager(change PersistentChange) error {
 				continue
 			}
 			destination := routeDestination(route.Destination, route.Family)
-			if (destination == "0.0.0.0/0" || destination == "::/0") && values["never-default"] == "yes" {
+			metric := strconv.FormatUint(uint64(route.Metric), 10)
+			isDefault := destination == "0.0.0.0/0" || destination == "::/0"
+			if isDefault && values["never-default"] == "yes" {
 				return errors.New("this NetworkManager connection forbids default routes")
+			}
+			if isDefault && route.Gateway != "" && gateway == "" && len(addresses) > 0 && connectionMetric == metric {
+				gateway = route.Gateway
+				p.requiredProperties = append(p.requiredProperties, family+".addresses", values["addresses"], family+".route-metric", values["route-metric"], family+".never-default", values["never-default"])
+				continue
 			}
 			gateway := route.Gateway
 			if gateway == "" {
@@ -180,12 +190,16 @@ func (p *PersistentNetwork) networkManager(change PersistentChange) error {
 					gateway = "::"
 				}
 			}
-			rawRoutes = append(rawRoutes, routeDestination(route.Destination, route.Family)+" "+gateway+" "+strconv.FormatUint(uint64(route.Metric), 10))
+			rawRoutes = append(rawRoutes, destination+" "+gateway+" "+metric)
 			changed = true
 		}
 		if changed {
 			p.properties = append(p.properties, family+".routes", strings.Join(rawRoutes, ","))
 			p.previousProperties = append(p.previousProperties, family+".routes", values["routes"])
+		}
+		if gateway != values["gateway"] {
+			p.properties = append(p.properties, family+".gateway", gateway)
+			p.previousProperties = append(p.previousProperties, family+".gateway", values["gateway"])
 		}
 	}
 	return nil

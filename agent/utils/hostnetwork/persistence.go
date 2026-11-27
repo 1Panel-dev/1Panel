@@ -51,6 +51,7 @@ type PersistentNetwork struct {
 	connection         string
 	properties         []string
 	previousProperties []string
+	requiredProperties []string
 }
 
 func PreparePersistentNetwork(device string, change PersistentChange) (*PersistentNetwork, error) {
@@ -173,18 +174,22 @@ func (p *PersistentNetwork) Apply() error {
 		if len(p.properties) == 0 {
 			return nil
 		}
-		for i := 0; i+1 < len(p.previousProperties); i += 2 {
-			value, err := cmd.NewCommandMgr(cmd.WithTimeout(15*time.Second)).RunWithStdout("nmcli", "--escape", "no", "-g", p.previousProperties[i], "connection", "show", "uuid", p.connection)
+		properties := append(slices.Clone(p.previousProperties), p.requiredProperties...)
+		for i := 0; i+1 < len(properties); i += 2 {
+			value, err := cmd.NewCommandMgr(cmd.WithTimeout(15*time.Second)).RunWithStdout("nmcli", "--escape", "no", "-g", properties[i], "connection", "show", "uuid", p.connection)
 			value = strings.TrimSpace(value)
 			if value == "--" {
 				value = ""
 			}
-			if err != nil || value != p.previousProperties[i+1] {
+			if err != nil || value != properties[i+1] {
 				return errors.New("NetworkManager connection changed externally")
 			}
 		}
 		_, err := cmd.NewCommandMgr(cmd.WithTimeout(15*time.Second)).RunWithStdout("nmcli", append([]string{"connection", "modify", "uuid", p.connection}, p.properties...)...)
 		if err != nil {
+			if strings.Contains(err.Error(), ".routes") && strings.Contains(err.Error(), "invalid prefix '0'") {
+				err = fmt.Errorf("this NetworkManager version cannot persist this default route independently; gateway compatibility requires a static address, an available gateway slot and a metric matching the connection; otherwise upgrade NetworkManager: %w", err)
+			}
 			return errors.Join(err, p.Rollback())
 		}
 		return nil
