@@ -314,3 +314,20 @@ test('classifies transient request errors', () => {
     assert.equal(isTransientRequestError({ response: { status: 403 } }), false);
     assert.equal(isTransientRequestError({ code: 500, message: 'record not found' }), false);
 });
+
+test('cancellation during the last commit cannot report successful completion', async () => {
+    const controller = new AbortController();
+    const progress = [];
+    await assert.rejects(
+        runExportWindows({
+            start: 0,
+            end: HOUR,
+            signal: controller.signal,
+            fetch: async () => ({ data: null, load: 0 }),
+            commit: async () => controller.abort(),
+            onProgress: (ratio) => progress.push(ratio),
+        }),
+        ExportAbortedError,
+    );
+    assert.deepEqual(progress, [0]);
+});

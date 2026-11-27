@@ -112,7 +112,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, reactive, ref } from 'vue';
+import { computed, onActivated, onBeforeUnmount, onDeactivated, onMounted, reactive, ref } from 'vue';
 import { loadMonitor, getIOOptions, getNetworkOptions } from '@/api/modules/host';
 import { getGPUOptions, loadGPUMonitor } from '@/api/modules/ai';
 import type { RequestConfig } from '@/api';
@@ -121,7 +121,7 @@ import { AI } from '@/api/interface/ai';
 import { shortcuts } from '@/utils/shortcuts';
 import { dateFormatForName, dateFormatSimpleWithSecond } from '@/utils/date';
 import { downloadBlob } from '@/utils/file';
-import { createMonitorExportWriter, MonitorExportColumns } from '@/utils/monitor-export';
+import { createMonitorExportWriter, MonitorExportColumns, MonitorExportWriter } from '@/utils/monitor-export';
 import {
     createBoundaryDeduper,
     ExportAbortedError,
@@ -151,6 +151,7 @@ const netOptionsFailed = ref(false);
 const gpuOptionsFailed = ref(false);
 
 let exportController: AbortController | null = null;
+let optionsController: AbortController | null = null;
 let unmounted = false;
 
 // el-select treats '' as empty and renders the placeholder, so "all devices" uses '*' as a sentinel
@@ -474,17 +475,12 @@ const buildSources = (plan: ExportPlan): ExportSource[] => {
 
 // fetches the range window by window and streams every committed window straight into the file writer
 const exportSources = async (
-    plan: ExportPlan,
     sources: ExportSource[],
     start: Date,
     end: Date,
     controller: AbortController,
+    writer: MonitorExportWriter,
 ) => {
-    const writer = createMonitorExportWriter(
-        sources.map((source) => source.columns),
-        plan.format,
-        `1panel-monitor-${dateFormatForName(new Date())}`,
-    );
     const dedupers = sources.map(() => createBoundaryDeduper());
 
     await runExportWindows({
@@ -528,10 +524,12 @@ const exportSources = async (
             progressTime.value = window.to > window.from ? dateFormatSimpleWithSecond(window.to) : '';
         },
     });
-    return writer;
 };
 
 const onExport = async () => {
+    if (exporting.value) {
+        return;
+    }
     if (form.params.length === 0) {
         MsgWarning(t('monitor.selectMetrics'));
         return;
@@ -541,12 +539,21 @@ const onExport = async () => {
         return;
     }
     const controller = new AbortController();
+    let writer: MonitorExportWriter | undefined;
+    const onAbort = () => {
+        optionsController?.abort();
+        void writer?.dispose();
+    };
+    controller.signal.addEventListener('abort', onAbort, { once: true });
     exportController = controller;
     exporting.value = true;
     progress.value = 0;
     progressTime.value = '';
     try {
         await optionsReady.value;
+        if (controller.signal.aborted) {
+            throw new ExportAbortedError();
+        }
         // retry only the lists that failed on mount; a stale but non-empty gpu list is still usable
         await loadOptions(true);
         if (controller.signal.aborted) {
@@ -573,7 +580,15 @@ const onExport = async () => {
         };
         const [startTime, endTime] = timeRange.value;
         const sources = buildSources(plan);
-        const writer = await exportSources(plan, sources, startTime, endTime, controller);
+        writer = createMonitorExportWriter(
+            sources.map((source) => source.columns),
+            plan.format,
+            `1panel-monitor-${dateFormatForName(new Date())}`,
+        );
+        await exportSources(sources, startTime, endTime, controller, writer);
+        if (controller.signal.aborted) {
+            throw new ExportAbortedError();
+        }
 
         const names = sources.map((source) => source.columns.name);
         const emptyTables = names.filter((name) => writer.rowCount(name) === 0);
@@ -582,6 +597,9 @@ const onExport = async () => {
             return;
         }
         const file = await writer.finish();
+        if (controller.signal.aborted) {
+            throw new ExportAbortedError();
+        }
         downloadBlob(file.content, file.fileName, file.type);
         const labels = (list: string[]) => list.map((name) => tableLabel(name, plan.params)).join(', ');
         if (emptyTables.length > 0) {
@@ -594,7 +612,7 @@ const onExport = async () => {
         if (unmounted) {
             return;
         }
-        if (error instanceof ExportAbortedError) {
+        if (controller.signal.aborted || error instanceof ExportAbortedError) {
             MsgInfo(t('monitor.exportCancelled'));
             return;
         }
@@ -611,6 +629,8 @@ const onExport = async () => {
         }
         throw error;
     } finally {
+        controller.signal.removeEventListener('abort', onAbort);
+        await writer?.dispose();
         exporting.value = false;
         exportController = null;
     }
@@ -622,9 +642,12 @@ const onCancel = () => {
 
 const optionsReady = ref<Promise<void>>(Promise.resolve());
 
-const loadIOOptions = async () => {
+const loadIOOptions = async (signal: AbortSignal) => {
     try {
-        const res = await getIOOptions(currentNode.value);
+        const res = await getIOOptions(currentNode.value, { signal, errorMessageMode: 'manual' });
+        if (signal.aborted) {
+            throw new ExportAbortedError();
+        }
         ioOptions.value = res.data || [];
         ioOptionsFailed.value = false;
     } catch {
@@ -632,9 +655,12 @@ const loadIOOptions = async () => {
     }
 };
 
-const loadNetOptions = async () => {
+const loadNetOptions = async (signal: AbortSignal) => {
     try {
-        const res = await getNetworkOptions(currentNode.value);
+        const res = await getNetworkOptions(currentNode.value, { signal, errorMessageMode: 'manual' });
+        if (signal.aborted) {
+            throw new ExportAbortedError();
+        }
         netOptions.value = res.data || [];
         netOptionsFailed.value = false;
     } catch {
@@ -642,9 +668,12 @@ const loadNetOptions = async () => {
     }
 };
 
-const loadGPUOptions = async () => {
+const loadGPUOptions = async (signal: AbortSignal) => {
     try {
-        const res = await getGPUOptions(currentNode.value);
+        const res = await getGPUOptions(currentNode.value, { signal, errorMessageMode: 'manual' });
+        if (signal.aborted) {
+            throw new ExportAbortedError();
+        }
         gpuOptions.value = (res.data?.supported ? res.data.chartHide || [] : []).map((device) => ({
             ...device,
             value: device.deviceID || `legacy:${device.productName}`,
@@ -657,26 +686,43 @@ const loadGPUOptions = async () => {
 };
 
 const loadOptions = async (onlyFailed = false) => {
-    const jobs: Promise<void>[] = [];
-    if (!onlyFailed || ioOptionsFailed.value) {
-        jobs.push(loadIOOptions());
+    const controller = new AbortController();
+    optionsController = controller;
+    try {
+        const jobs: Promise<void>[] = [];
+        if (!onlyFailed || ioOptionsFailed.value) {
+            jobs.push(loadIOOptions(controller.signal));
+        }
+        if (!onlyFailed || netOptionsFailed.value) {
+            jobs.push(loadNetOptions(controller.signal));
+        }
+        if (!onlyFailed || gpuOptionsFailed.value) {
+            jobs.push(loadGPUOptions(controller.signal));
+        }
+        await Promise.all(jobs);
+    } finally {
+        optionsController = null;
     }
-    if (!onlyFailed || netOptionsFailed.value) {
-        jobs.push(loadNetOptions());
-    }
-    if (!onlyFailed || gpuOptionsFailed.value) {
-        jobs.push(loadGPUOptions());
-    }
-    await Promise.all(jobs);
 };
 
 onMounted(() => {
     optionsReady.value = loadOptions();
 });
 
+onActivated(() => {
+    unmounted = false;
+});
+
+onDeactivated(() => {
+    unmounted = true;
+    optionsController?.abort();
+    exportController?.abort();
+});
+
 onBeforeUnmount(() => {
     // leaving the page stops the export instead of letting it keep fetching in the background
     unmounted = true;
+    optionsController?.abort();
     exportController?.abort();
 });
 </script>

@@ -14,14 +14,12 @@ export interface MonitorExportFile {
     truncated: string[];
 }
 
-// Writes an export incrementally: every batch of rows is encoded as soon as it arrives and moved into
-// Blob chunks, so finished batches leave the JS heap (browsers may page large blobs to disk) and memory
-// stays flat no matter how long the exported range is.
 export interface MonitorExportWriter {
     // rows of one table must be appended in time order
     append(name: string, rows: any[][]): Promise<void>;
     rowCount(name: string): number;
     finish(): Promise<MonitorExportFile>;
+    dispose(): Promise<void>;
 }
 
 const formatCell = (cell: any): string => {
@@ -40,7 +38,7 @@ const isNumberCell = (cell: any): boolean => typeof cell === 'number' && Number.
 const csvEscape = (value: string) => {
     // neutralize formula execution when a non-numeric cell starts with = + - @ or a control char
     let sanitized = value;
-    if (/^[=+\-@\t]/.test(sanitized) && Number.isNaN(Number(sanitized))) {
+    if (/^[\t\r\n＝＋－＠]/.test(sanitized) || (/^[=+\-@]/.test(sanitized) && Number.isNaN(Number(sanitized)))) {
         sanitized = `'${sanitized}`;
     }
     return /[",\n\r]/.test(sanitized) ? `"${sanitized.replace(/"/g, '""')}"` : sanitized;
@@ -79,6 +77,12 @@ class BlobBuffer {
     toBlob(): Blob {
         this.flush();
         return new Blob(this.blobs);
+    }
+
+    clear() {
+        this.blobs = [];
+        this.pending = [];
+        this.pendingSize = 0;
     }
 
     private flush() {
@@ -147,6 +151,8 @@ class ZipEntryWriter {
     private size = 0;
     private out = new BlobBuffer();
     private writer: WritableStreamDefaultWriter<BufferSource> | null = null;
+    private reader: ReadableStreamDefaultReader<Uint8Array> | null = null;
+    private disposal: Promise<void> | null = null;
     private drained: Promise<void> = Promise.resolve();
     private method = 0;
     private name: string;
@@ -157,14 +163,20 @@ class ZipEntryWriter {
         if (stream) {
             this.method = 8;
             this.writer = stream.writable.getWriter();
+            const reader = stream.readable.getReader();
+            this.reader = reader;
             this.drained = (async () => {
-                const reader = stream.readable.getReader();
-                for (;;) {
-                    const { done, value } = await reader.read();
-                    if (done) {
-                        return;
+                try {
+                    for (;;) {
+                        const { done, value } = await reader.read();
+                        if (done) {
+                            return;
+                        }
+                        this.out.push(value as Uint8Array<ArrayBuffer>);
                     }
-                    this.out.push(value as Uint8Array<ArrayBuffer>);
+                } finally {
+                    reader.releaseLock();
+                    this.reader = null;
                 }
             })();
             // surfaced through close(); keeps an early stream failure from becoming an unhandled rejection
@@ -173,6 +185,9 @@ class ZipEntryWriter {
     }
 
     async write(content: string | Uint8Array<ArrayBuffer>) {
+        if (this.disposal) {
+            throw new Error('export writer disposed');
+        }
         const bytes = typeof content === 'string' ? encoder.encode(content) : content;
         if (bytes.length === 0) {
             return;
@@ -187,17 +202,40 @@ class ZipEntryWriter {
     }
 
     async close(): Promise<ZipEntryData> {
-        if (this.writer) {
-            await this.writer.close();
-            await this.drained;
+        try {
+            if (this.disposal) {
+                throw new Error('export writer disposed');
+            }
+            if (this.writer) {
+                await this.writer.close();
+                await this.drained;
+            }
+            if (this.disposal) {
+                throw new Error('export writer disposed');
+            }
+            return {
+                nameBytes: encoder.encode(this.name),
+                crc: (this.crc ^ 0xffffffff) >>> 0,
+                size: this.size,
+                method: this.method,
+                data: this.out.toBlob(),
+            };
+        } finally {
+            await this.dispose();
         }
-        return {
-            nameBytes: encoder.encode(this.name),
-            crc: (this.crc ^ 0xffffffff) >>> 0,
-            size: this.size,
-            method: this.method,
-            data: this.out.toBlob(),
-        };
+    }
+
+    dispose(): Promise<void> {
+        if (!this.disposal) {
+            this.disposal = (async () => {
+                await Promise.allSettled([this.writer?.abort(), this.reader?.cancel()]);
+                await this.drained.catch(() => undefined);
+                this.writer?.releaseLock();
+                this.writer = null;
+                this.out.clear();
+            })();
+        }
+        return this.disposal;
     }
 }
 
@@ -251,8 +289,12 @@ const buildZip = (entries: ZipEntryData[]): Blob => {
 
 const zipStatic = async (name: string, content: string) => {
     const entry = new ZipEntryWriter(name);
-    await entry.write(content);
-    return entry.close();
+    try {
+        await entry.write(content);
+        return await entry.close();
+    } finally {
+        await entry.dispose();
+    }
 };
 
 const xmlEscape = (value: string) =>
@@ -400,6 +442,9 @@ const createCSVWriter = (tables: MonitorExportColumns[], baseName: string): Moni
                     state.rows += rows.length;
                 }
             },
+            async dispose() {
+                buffer.clear();
+            },
             rowCount: (name) => get(name).rows,
             async finish() {
                 return {
@@ -431,6 +476,9 @@ const createCSVWriter = (tables: MonitorExportColumns[], baseName: string): Moni
                 state.rows += rows.length;
             }
         },
+        async dispose() {
+            await Promise.all([...entries.values()].map((entry) => entry.dispose()));
+        },
         rowCount: (name) => get(name).rows,
         async finish() {
             await ready;
@@ -457,6 +505,9 @@ const createJSONWriter = (tables: MonitorExportColumns[], baseName: string): Mon
             const items = rows.map((row) => jsonItem(state.columns, row)).join(',\n');
             buffers.get(name)!.push(state.rows > 0 ? ',\n' + items : items);
             state.rows += rows.length;
+        },
+        async dispose() {
+            buffers.forEach((buffer) => buffer.clear());
         },
         rowCount: (name) => get(name).rows,
         async finish() {
@@ -512,6 +563,9 @@ const createXLSXWriter = (tables: MonitorExportColumns[], baseName: string): Mon
             const xml = accepted.map((row, i) => xlsxRow(state.rows + i + 2, row)).join('');
             await sheets.get(name)!.write(xml);
             state.rows += accepted.length;
+        },
+        async dispose() {
+            await Promise.all([...sheets.values()].map((sheet) => sheet.dispose()));
         },
         rowCount: (name) => get(name).rows,
         async finish() {

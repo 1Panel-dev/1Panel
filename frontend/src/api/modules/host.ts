@@ -13,18 +13,18 @@ export const loadMonitor = (param: Host.MonitorSearch, currentNode?: string, con
         ...config,
     });
 };
-export const getNetworkOptions = (currentNode?: string) => {
+export const getNetworkOptions = (currentNode?: string, config?: RequestConfig) => {
     return http.get<Array<string>>(
         `/hosts/monitor/netoptions`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}), ...config },
     );
 };
-export const getIOOptions = (currentNode?: string) => {
+export const getIOOptions = (currentNode?: string, config?: RequestConfig) => {
     return http.get<Array<string>>(
         `/hosts/monitor/iooptions`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}), ...config },
     );
 };
 export const cleanMonitors = (type: 'host' | 'gpu') => {

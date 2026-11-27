@@ -143,6 +143,7 @@ export async function runExportWindows<T>(options: ExportWindowOptions<T>): Prom
             continue;
         }
         await options.commit(result.data, window);
+        throwIfAborted();
         attempt = 0;
         from = to;
         options.onProgress?.(end > start ? (to - start) / (end - start) : 1, window);

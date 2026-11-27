@@ -192,3 +192,100 @@ test('stops writing an xlsx sheet at the Excel row limit and reports it', async 
         ),
     );
 });
+
+test('escapes CSV formula and control prefixes without changing numeric values', async () => {
+    const writer = createMonitorExportWriter([io], 'csv', 'export');
+    const values = ['=1+1', '+SUM(1)', '-SUM(1)', '@SUM(1)', '\t1', '\r=1+1', '\n=1+1', '＝1+1', '＋1', '－1', '＠x'];
+    await writer.append(
+        'io',
+        values.map((value) => [value]),
+    );
+    await writer.append('io', [[-12.5], [42]]);
+    const file = await writer.finish();
+    const content = await blobText(file.content);
+    for (const value of values) {
+        assert.ok(content.includes("'" + value), JSON.stringify(value));
+    }
+    assert.ok(content.endsWith('\r\n-12.5\r\n42'));
+    await writer.dispose();
+    assert.equal(await blobText(file.content), content);
+});
+
+for (const format of ['csv', 'xlsx']) {
+    for (const outcome of ['success', 'empty', 'cancel', 'write failure', 'finish failure']) {
+        test(`${format} releases compression stream locks after ${outcome}`, async () => {
+            const original = globalThis.CompressionStream;
+            const streams = [];
+            globalThis.CompressionStream = class {
+                constructor() {
+                    const stream = new TransformStream({
+                        transform(chunk, controller) {
+                            if (outcome === 'write failure') {
+                                throw new Error('write failed');
+                            }
+                            controller.enqueue(chunk);
+                        },
+                        flush() {
+                            if (outcome === 'finish failure') {
+                                throw new Error('finish failed');
+                            }
+                        },
+                    });
+                    streams.push(stream);
+                    return stream;
+                }
+            };
+            try {
+                const writer = createMonitorExportWriter([base, io], format, 'export');
+                if (outcome === 'write failure') {
+                    await assert.rejects(writer.append('base', [[t0, 1]]), /write failed/);
+                } else if (outcome !== 'empty') {
+                    await writer.append('base', [[t0, 1]]);
+                    if (outcome === 'success') {
+                        await writer.finish();
+                    } else if (outcome === 'finish failure') {
+                        await assert.rejects(writer.finish(), /finish failed/);
+                    }
+                }
+                await Promise.all([writer.dispose(), writer.dispose()]);
+                assert.ok(streams.length > 0);
+                for (const stream of streams) {
+                    assert.equal(stream.readable.locked, false);
+                    assert.equal(stream.writable.locked, false);
+                }
+            } finally {
+                globalThis.CompressionStream = original;
+            }
+        });
+    }
+}
+
+for (const format of ['csv', 'xlsx']) {
+    for (const operation of ['append', 'finish']) {
+        test(`${format} cancels native compression during ${operation} and releases locks`, async () => {
+            const original = globalThis.CompressionStream;
+            const streams = [];
+            globalThis.CompressionStream = class {
+                constructor(format) {
+                    const stream = new original(format);
+                    streams.push(stream);
+                    return stream;
+                }
+            };
+            try {
+                const writer = createMonitorExportWriter([base, io], format, 'export');
+                await writer.append('base', [[t0, 1]]);
+                const pending = operation === 'append' ? writer.append('base', [[t1, 2]]) : writer.finish();
+                const rejected = assert.rejects(pending);
+                await writer.dispose();
+                await rejected;
+                for (const stream of streams) {
+                    assert.equal(stream.readable.locked, false);
+                    assert.equal(stream.writable.locked, false);
+                }
+            } finally {
+                globalThis.CompressionStream = original;
+            }
+        });
+    }
+}

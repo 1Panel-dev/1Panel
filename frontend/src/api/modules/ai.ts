@@ -58,11 +58,11 @@ export const loadGPUInfo = (refresh = false, currentNode?: string) => {
         headers: currentNode ? { CurrentNode: currentNode } : undefined,
     });
 };
-export const getGPUOptions = (currentNode?: string) => {
+export const getGPUOptions = (currentNode?: string, config?: RequestConfig) => {
     return http.get<AI.MonitorGPUOptions>(
         `/ai/gpu/options`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}), ...config },
     );
 };
 export const loadGPUMonitor = (param: AI.MonitorGPUSearch, currentNode?: string, config?: RequestConfig) => {
