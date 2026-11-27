@@ -37,6 +37,9 @@ func (r *Local) Create(info CreateInfo) error {
 		}
 		return err
 	}
+	if info.Username == "" {
+		return nil
+	}
 	var err error
 	if info.ExistingUser {
 		if !info.SuperUser {
@@ -130,7 +133,7 @@ func (r *Local) Backup(info BackupInfo) error {
 
 	cmdMgr := cmd.NewCommandMgr()
 	if _, err := cmdMgr.RunPipeToFile(path.Join(info.TargetDir, info.FileName),
-		cmd.PipeCommand{Name: "docker", Args: []string{"exec", "-i", "-e", "PGPASSWORD=" + r.Password, r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", info.Name}},
+		cmd.PipeCommand{Name: "docker", Args: []string{"exec", "-i", "-e", "PGPASSWORD=" + r.Password, r.ContainerName, "pg_dump", "-F", "c", "-U", r.Username, "-d", databaseConnectionString(info.Name)}},
 		cmd.PipeCommand{Name: "gzip", Args: []string{"-cf"}},
 	); err != nil {
 		return fmt.Errorf("handle backup database failed, err: %v", err)
@@ -143,7 +146,7 @@ func (r *Local) Recover(info RecoverInfo) error {
 	defer fi.Close()
 
 	cmd := exec.Command("docker", "exec", "-i", "-e", "PGPASSWORD="+r.Password, r.ContainerName,
-		"pg_restore", "-F", "c", "-c", "--if-exists", "--no-owner", "-U", r.Username, "-d", info.Name,
+		"pg_restore", "-F", "c", "-c", "--if-exists", "--no-owner", "-U", r.Username, "-d", databaseConnectionString(info.Name),
 	)
 	if strings.HasSuffix(info.SourceFile, ".gz") {
 		gzipFile, err := os.Open(info.SourceFile)

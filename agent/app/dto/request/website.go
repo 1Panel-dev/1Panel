@@ -213,6 +213,7 @@ type WebsiteHTTPSOp struct {
 	CertificatePath       string   `json:"certificatePath"`
 	ImportType            string   `json:"importType"`
 	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	HTTPSRedirectPort     *int     `json:"httpsRedirectPort" validate:"omitempty,min=1,max=65535"`
 	SSLProtocol           []string `json:"SSLProtocol"`
 	Algorithm             string   `json:"algorithm"`
 	Hsts                  bool     `json:"hsts"`

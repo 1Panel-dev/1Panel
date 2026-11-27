@@ -10,19 +10,20 @@
             <el-input style="margin-top: 10px" v-model="submitInput"></el-input>
         </div>
         <template #footer>
-            <span class="dialog-footer">
+            <DeleteConfirmFooter v-model="submitInput" :confirmation-text="submitInputInfo" :disabled="false">
                 <el-button @click="onCancel">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" :disabled="submitInput !== submitInputInfo" @click="onConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 
 <script lang="ts" setup>
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { ref } from 'vue';
 
 const header = ref();

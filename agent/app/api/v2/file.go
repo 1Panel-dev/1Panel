@@ -480,6 +480,14 @@ func (b *BaseApi) UploadFiles(c *gin.Context) {
 	}
 	uploadFiles := form.File["file"]
 	paths := form.Value["path"]
+	logValues := make(map[string]string)
+	if len(paths) > 0 {
+		logValues["path"] = paths[0]
+	}
+	if len(uploadFiles) > 0 {
+		logValues["file"] = uploadFiles[0].Filename
+	}
+	helper.SetOperationLogValues(c, logValues)
 
 	overwrite := true
 	if ow, ok := form.Value["overwrite"]; ok {

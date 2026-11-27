@@ -175,8 +175,8 @@
                 <el-checkbox v-model="form.syncAgents" :label="$t('aiTools.agents.syncAgents')" />
                 <span class="input-help">{{ $t('aiTools.agents.syncAgentsHelper') }}</span>
             </el-form-item>
-            <el-form-item :label="$t('website.remark')" prop="remark">
-                <el-input v-model="form.remark" />
+            <el-form-item :label="$t('commons.table.description')" prop="remark">
+                <el-input v-model="form.remark" type="textarea" :rows="3" />
             </el-form-item>
         </el-form>
         <template v-if="!inline" #footer>

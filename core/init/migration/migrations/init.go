@@ -1534,3 +1534,12 @@ var UpdateAiMenus = &gormigrate.Migration{
 		})
 	},
 }
+
+var AddNetworkMenu = &gormigrate.Migration{
+	ID: "20261123-add-network-menu",
+	Migrate: func(tx *gorm.DB) error {
+		return helper.AddMenu(dto.ShowMenu{
+			ID: "78", Title: "networkManage.title", IsShow: true, Label: "NetworkManage", Path: "/hosts/network", Sort: 700,
+		}, "7", tx)
+	},
+}

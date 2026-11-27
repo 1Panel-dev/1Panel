@@ -181,20 +181,26 @@ func (f FileOp) DeleteFile(dst string) error {
 	return f.Fs.Remove(dst)
 }
 
-func (f FileOp) CleanDir(dst string) error {
+// CleanDir reports whether any entry was removed, including on partial failure.
+func (f FileOp) CleanDir(dst string) (bool, error) {
 	if IsProtected(dst) {
-		return buserr.New("ErrPathNotDelete")
+		return false, buserr.New("ErrPathNotDelete")
 	}
-	items, err := afero.ReadDir(f.Fs, dst)
+	dir, err := f.Fs.Open(dst)
 	if err != nil {
-		return err
+		return false, err
 	}
-	for _, item := range items {
-		if err := f.Fs.RemoveAll(filepath.Join(dst, item.Name())); err != nil {
-			return err
+	defer dir.Close()
+	names, err := dir.Readdirnames(-1)
+	if err != nil {
+		return false, err
+	}
+	for i, name := range names {
+		if err := f.Fs.RemoveAll(filepath.Join(dst, name)); err != nil {
+			return i > 0, err
 		}
 	}
-	return nil
+	return len(names) > 0, nil
 }
 
 func (f FileOp) RmRf(dst string) error {

@@ -1,7 +1,6 @@
 package client
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"database/sql"
@@ -75,6 +74,9 @@ func (r *Remote) Create(info CreateInfo) error {
 			return buserr.New("ErrDatabaseIsExist")
 		}
 		return err
+	}
+	if info.Username == "" {
+		return nil
 	}
 	var err error
 	if info.ExistingUser {
@@ -171,7 +173,7 @@ func (r *Remote) ChangePassword(info PasswordChangeInfo) error {
 }
 
 func (r *Remote) Backup(info BackupInfo) error {
-	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name) {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User) {
 		return buserr.New("ErrCmdIllegal")
 	}
 	imageTag, err := loadImageTag(info.Database)
@@ -207,7 +209,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 		"--no-owner",
 		"-Fc",
 		"-U", r.User,
-		info.Name,
+		"-d", databaseConnectionString(info.Name),
 	)
 	backupCommand.Stdout = backupFile
 	stderr := &limitedBuffer{limit: maxPgDumpStderrCapture}
@@ -242,7 +244,7 @@ func (r *Remote) Backup(info BackupInfo) error {
 }
 
 func (r *Remote) Recover(info RecoverInfo) error {
-	if cmd.CheckIllegal(r.Password, r.Address, r.User, info.Name, info.Username) {
+	if cmd.CheckIllegal(r.Password, r.Address, r.User) {
 		return buserr.New("ErrCmdIllegal")
 	}
 	imageTag, err := loadImageTag(info.Database)
@@ -285,34 +287,17 @@ func (r *Remote) Recover(info RecoverInfo) error {
 		"--if-exists",
 		"--no-owner",
 		"-U", r.User,
-		"-d", info.Name,
+		"-d", databaseConnectionString(info.Name),
 		"--role="+info.Username,
 	)
 	recoverCommand.Stdin = restoreFile
-	pipe, _ := recoverCommand.StdoutPipe()
-	stderrPipe, _ := recoverCommand.StderrPipe()
-	defer pipe.Close()
-	defer stderrPipe.Close()
-	if err := recoverCommand.Start(); err != nil {
-		return err
-	}
-	reader := bufio.NewReader(pipe)
-	for {
-		readString, err := reader.ReadString('\n')
-		if errors.Is(err, io.EOF) {
-			break
-		}
-		if err != nil {
-			all, _ := io.ReadAll(stderrPipe)
-			global.LOG.Errorf("[PostgreSQL] DB:[%s] Recover Error: %s", info.Name, string(all))
-			return err
-		}
-		global.LOG.Infof("[PostgreSQL] DB:[%s] Restoring: %s", info.Name, readString)
-	}
-	if err := recoverCommand.Wait(); err != nil {
-		all, _ := io.ReadAll(stderrPipe)
-		global.LOG.Errorf("[PostgreSQL] DB:[%s] Recover Error: %s", info.Name, string(all))
-		return err
+	logWriter := info.Task.Logger.Writer()
+	defer logWriter.Close()
+	stderr := &limitedBuffer{limit: maxPgDumpStderrCapture}
+	recoverCommand.Stdout = logWriter
+	recoverCommand.Stderr = io.MultiWriter(logWriter, stderr)
+	if err := recoverCommand.Run(); err != nil {
+		return fmt.Errorf("recover database %s failed, stderr: %s, err: %w", info.Name, strings.TrimSpace(stderr.String()), err)
 	}
 
 	return nil
@@ -323,7 +308,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 	defer cancel()
 
 	var datas []SyncDBInfo
-	rows, err := r.Client.Query("SELECT datname FROM pg_database;")
+	rows, err := r.Client.QueryContext(ctx, "SELECT datname FROM pg_database;")
 	if err != nil {
 		return nil, err
 	}
@@ -331,7 +316,7 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 	for rows.Next() {
 		var dbName string
 		if err := rows.Scan(&dbName); err != nil {
-			continue
+			return nil, err
 		}
 		if len(dbName) == 0 || dbName == "template1" || dbName == "template0" || dbName == r.User {
 			continue
@@ -340,6 +325,9 @@ func (r *Remote) SyncDB() ([]SyncDBInfo, error) {
 	}
 	if errors.Is(ctx.Err(), context.DeadlineExceeded) {
 		return nil, buserr.New("ErrExecTimeOut")
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return datas, nil
 }

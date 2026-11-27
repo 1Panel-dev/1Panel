@@ -1,7 +1,8 @@
 <template>
     <div class="flex flex-wrap items-center justify-between gap-2">
         <el-button
-            class="el-col-offset-1 min-h-8 !px-0"
+            v-if="confirmationText"
+            class="min-h-8 !px-0"
             type="primary"
             link
             native-type="button"

@@ -121,8 +121,9 @@ export const inspect = (params: Container.ContainerInspect) => {
     return http.post<string>(`/containers/inspect`, params);
 };
 
-export const DownloadFile = (params: Container.ContainerLogInfo) => {
-    return http.download<BlobPart>('/containers/download/log', params, {
+export const DownloadFile = (params: Container.ContainerLogInfo, node?: string) => {
+    return http.download<Blob>('/containers/download/log', params, {
+        headers: node ? { CurrentNode: node } : undefined,
         responseType: 'blob',
         timeout: TimeoutEnum.T_5M,
     });

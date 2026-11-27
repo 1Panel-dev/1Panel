@@ -52,6 +52,7 @@ export namespace AI {
     export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent' | 'deepseek-harness' | 'octop';
 
     export interface OllamaModelInfo {
+        description: string;
         id: number;
         name: string;
         size: string;

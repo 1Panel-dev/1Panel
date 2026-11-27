@@ -83,7 +83,7 @@ func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *
 	return c.RequestWithContext(context.Background(), reqUrl, reqMethod, body, ctx)
 }
 
-func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+func (c *ReusableClient) OpenWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (*http.Response, error) {
 	if c == nil || c.client == nil {
 		return nil, errors.New("local agent client is not initialized")
 	}
@@ -115,6 +115,14 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("client do request failed, err: %v", err)
+	}
+	return resp, nil
+}
+
+func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+	resp, err := c.OpenWithContext(requestContext, reqUrl, reqMethod, body, ctx)
+	if err != nil {
+		return nil, err
 	}
 	defer resp.Body.Close()
 

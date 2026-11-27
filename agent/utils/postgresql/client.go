@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"net"
 	"net/url"
 	"time"
 
@@ -33,13 +34,11 @@ func NewPostgresqlClient(conn client.DBInfo) (PostgresqlClient, error) {
 		connArgs := []string{"exec", "-e", fmt.Sprintf("PGPASSWORD=%s", conn.Password), conn.Address, "psql", "-A", "-t", "-U", conn.Username, "-c"}
 		return client.NewLocal(connArgs, conn.Address, conn.Username, conn.Password, conn.Database), nil
 	}
-	escapedUsername := url.QueryEscape(conn.Username)
-	escapedPassword := url.QueryEscape(conn.Password)
 	if len(conn.InitialDB) == 0 {
-		conn.InitialDB = escapedUsername
+		conn.InitialDB = conn.Username
 	}
-	connArgs := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable", escapedUsername, escapedPassword, conn.Address, conn.Port, conn.InitialDB)
-	db, err := sql.Open("pgx", connArgs)
+	connection := url.URL{Scheme: "postgres", User: url.UserPassword(conn.Username, conn.Password), Host: net.JoinHostPort(conn.Address, fmt.Sprint(conn.Port)), Path: "/" + conn.InitialDB, RawQuery: "sslmode=disable"}
+	db, err := sql.Open("pgx", connection.String())
 	if err != nil {
 		return nil, err
 	}

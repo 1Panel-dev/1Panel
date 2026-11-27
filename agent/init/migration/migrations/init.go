@@ -1985,3 +1985,20 @@ var AddAgentAccountStatus = &gormigrate.Migration{
 		return nil
 	},
 }
+
+var AddSSLSyncDir = &gormigrate.Migration{
+	ID: "20261124-add-ssl-sync-dir",
+	Migrate: func(db *gorm.DB) error {
+		if db.Migrator().HasColumn(&model.WebsiteSSL{}, "SyncDir") {
+			return nil
+		}
+		return db.Migrator().AddColumn(&model.WebsiteSSL{}, "SyncDir")
+	},
+}
+
+var AddOllamaModelDescription = &gormigrate.Migration{
+	ID: "20261126-add-ollama-model-description",
+	Migrate: func(tx *gorm.DB) error {
+		return tx.AutoMigrate(&model.OllamaModel{})
+	},
+}

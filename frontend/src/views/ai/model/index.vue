@@ -187,6 +187,16 @@
                         </template>
                     </el-table-column>
                     <el-table-column
+                        prop="remark"
+                        :label="$t('commons.table.description')"
+                        min-width="180"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            {{ row.remark || '—' }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column
                         prop="createdAt"
                         :label="$t('commons.table.createdAt')"
                         :formatter="dateFormat"

@@ -120,6 +120,12 @@ func (u *PostgresqlService) BindUser(req dto.PostgresqlBindUser) error {
 }
 
 func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCreate) (*model.DatabasePostgresql, error) {
+	if req.Name == "" || len(req.Name) > 63 || strings.ContainsRune(req.Name, 0) || (!req.ExistingUser && len(req.Username) > 63) {
+		return nil, buserr.New("ErrInvalidParams")
+	}
+	if req.Username == "" {
+		req.ExistingUser, req.Password, req.SuperUser = false, "", false
+	}
 	if cmd.CheckIllegal(req.Name, req.Format) || (!req.ExistingUser && (cmd.CheckIllegal(req.Username, req.Password) || strings.Contains(req.Password, " "))) {
 		return nil, buserr.New("ErrCmdIllegal")
 	}
@@ -145,7 +151,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 		if !found {
 			return nil, buserr.New("ErrRecordNotFound")
 		}
-	} else if req.Password == "" {
+	} else if req.Username != "" && req.Password == "" {
 		return nil, buserr.New("ErrInvalidParams")
 	}
 
@@ -176,7 +182,7 @@ func (u *PostgresqlService) Create(ctx context.Context, req dto.PostgresqlDBCrea
 	if err := postgresqlRepo.Create(ctx, &createItem); err != nil {
 		return nil, err
 	}
-	if !req.ExistingUser {
+	if req.Username != "" && !req.ExistingUser {
 		user, err := databaseUserRepo.GetEncryptedWithContext(ctx, repo.WithByType("postgresql"), databaseUserRepo.WithByDatabase(req.Database), databaseUserRepo.WithByUser(req.Username, ""))
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
 			return &createItem, err
@@ -209,7 +215,7 @@ func (u *PostgresqlService) LoadFromRemote(database string) error {
 	for _, data := range datas {
 		hasOld := false
 		for i := 0; i < len(databases); i++ {
-			if strings.EqualFold(databases[i].Name, data.Name) && strings.EqualFold(databases[i].PostgresqlName, data.PostgresqlName) {
+			if databases[i].Name == data.Name && databases[i].PostgresqlName == data.PostgresqlName {
 				hasOld = true
 				if databases[i].IsDelete {
 					_ = postgresqlRepo.Update(databases[i].ID, map[string]interface{}{"is_delete": false})

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path"
+	"strconv"
 	"strings"
 	"time"
 
@@ -122,23 +123,36 @@ func handleRedisBackup(redisInfo *repo.RootInfo, parentTask *task.Task, recordID
 		}
 		return nil
 	}
-	itemTask.AddSubTask(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil)
 	if parentTask != nil {
 		return backupDatabase(parentTask)
 	}
 
 	itemTask.AddSubTaskWithOps(i18n.GetMsgByKey("TaskBackup"), backupDatabase, nil, 3, time.Hour)
-	go func() {
-		if err := itemTask.Execute(); err != nil {
-			markBackupFailed(recordID, err)
-			return
-		}
+	if err := itemTask.Execute(); err != nil {
+		return err
+	}
+	if recordID != 0 {
 		backupRepo.UpdateRecordByMap(recordID, map[string]interface{}{"status": constant.StatusSuccess})
-	}()
-	return itemTask.Execute()
+	}
+	return nil
+}
+
+func redisNeedsAOFRestoreGuard(version string) bool {
+	major, _, _ := strings.Cut(version, ".")
+	number, err := strconv.Atoi(major)
+	return err != nil || number >= 8
 }
 
 func handleRedisRecover(redisInfo *repo.RootInfo, parentTask *task.Task, recoverFile string, isRollback bool, secret, taskID string) error {
+	if redisNeedsAOFRestoreGuard(redisInfo.Version) {
+		appendonly, err := configGetStr(redisInfo.ContainerName, redisInfo.Password, "appendonly")
+		if err != nil {
+			return err
+		}
+		if appendonly == "yes" {
+			return buserr.New("ErrRedisAOFRestoreUnavailable")
+		}
+	}
 	var (
 		err      error
 		itemTask *task.Task

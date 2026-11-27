@@ -78,6 +78,7 @@ func coreMigrations() []*gormigrate.Migration {
 		migrations.AddModelServicesMenu,
 		migrations.UpdateAiMenus,
 		migrations.MoveOpsReportMenuToAgent,
+		migrations.AddNetworkMenu,
 		migrations.AddDnsRecordMenu,
 	}
 }

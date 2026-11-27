@@ -1323,17 +1323,22 @@ func loadSSHData(
 		successCount int
 		failedCount  int
 	)
+	histories, err := loadSSHHistoriesFromFile(filePath, status, filter, startTime, endTime, currentYear, nyc)
+	if err != nil || len(histories) == 0 {
+		return datas, 0, 0
+	}
 	getLoc, err := geo.NewGeo()
 	if err != nil {
-		return datas, 0, 0
+		if global.LOG != nil {
+			global.LOG.Warnf("load SSH log GeoIP database failed, continuing without database location: %v", err)
+		}
+	} else {
+		defer getLoc.Close()
 	}
-	histories, err := loadSSHHistoriesFromFile(filePath, status, filter, startTime, endTime, currentYear, nyc)
-	if err != nil {
-		return datas, 0, 0
-	}
+	lang := common.GetLang(ctx)
 	for _, itemData := range histories {
 		if successCount+failedCount >= showCountFrom && (showCountTo == -1 || successCount+failedCount < showCountTo) {
-			itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, common.GetLang(ctx))
+			itemData.Area, _ = geo.GetIPLocation(getLoc, itemData.Address, lang)
 			datas = append(datas, itemData)
 		}
 		if itemData.Status == constant.StatusSuccess {

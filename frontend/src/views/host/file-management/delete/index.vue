@@ -63,14 +63,16 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { loadBaseDir } from '@/api/modules/setting';
 
 const open = ref(false);
-const files = ref();
+const files = ref<File.File[]>([]);
 const loading = ref(false);
-const em = defineEmits(['close']);
+const em = defineEmits<{ close: [files: File.File[], node: string] }>();
 const forceDelete = ref(false);
 const recycleStatus = ref('Enable');
 const reqNode = ref('');
+let dialogVersion = 0;
 
 const acceptParams = (props: File.File[], node: string) => {
+    dialogVersion++;
     reqNode.value = '';
     if (node != '') {
         reqNode.value = node;
@@ -82,13 +84,18 @@ const acceptParams = (props: File.File[], node: string) => {
 };
 
 const getStatus = async () => {
+    const version = dialogVersion;
+    const node = reqNode.value;
     loading.value = true;
     try {
         let res;
-        if (reqNode.value != '') {
-            res = await getRecycleStatusByNode(reqNode.value);
+        if (node != '') {
+            res = await getRecycleStatusByNode(node);
         } else {
             res = await getRecycleStatus();
+        }
+        if (version !== dialogVersion) {
+            return;
         }
         recycleStatus.value = res.data;
         if (recycleStatus.value === 'Disable') {
@@ -96,20 +103,28 @@ const getStatus = async () => {
         }
     } catch (error) {
     } finally {
-        loading.value = false;
+        if (version === dialogVersion) {
+            loading.value = false;
+        }
     }
 };
 
 const onConfirm = async () => {
+    if (loading.value || files.value.length === 0) {
+        return;
+    }
+    const version = dialogVersion;
+    const requestedFiles = files.value.map((file) => ({ ...file }));
+    const node = reqNode.value;
+    const force = forceDelete.value;
     loading.value = true;
     try {
-        const pros = [];
         let baseDir = '';
-        if (files.value.some((item) => item['isDir'])) {
-            const pathRes = await loadBaseDir();
+        if (requestedFiles.some((item) => item.isDir)) {
+            const pathRes = await loadBaseDir(node);
             baseDir = pathRes.data;
         }
-        for (const s of files.value) {
+        for (const s of requestedFiles) {
             if (s['isDir']) {
                 if (s['path'].indexOf('.1panel_clash') > -1) {
                     MsgWarning(i18n.global.t('file.clashDeleteAlert'));
@@ -120,23 +135,30 @@ const onConfirm = async () => {
                     return;
                 }
             }
-            if (reqNode.value != '') {
-                pros.push(
-                    deleteFileByNode(
-                        { path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value },
-                        reqNode.value,
-                    ),
-                );
-            } else {
-                pros.push(deleteFile({ path: s['path'], isDir: s['isDir'], forceDelete: forceDelete.value }));
-            }
         }
-        await Promise.all(pros);
-        MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
-        open.value = false;
-        em('close');
+        // Validate the entire snapshot before starting any destructive request.
+        const results = await Promise.allSettled(
+            requestedFiles.map((file) => {
+                const request = { path: file.path, isDir: file.isDir, forceDelete: force };
+                return node ? deleteFileByNode(request, node) : deleteFile(request);
+            }),
+        );
+        const deletedFiles = requestedFiles.filter((_, index) => results[index].status === 'fulfilled');
+        const failedFiles = requestedFiles.filter((_, index) => results[index].status === 'rejected');
+        if (version === dialogVersion) {
+            files.value = failedFiles;
+            open.value = failedFiles.length > 0;
+        }
+        if (failedFiles.length === 0) {
+            MsgSuccess(i18n.global.t('commons.msg.deleteSuccess'));
+        }
+        if (deletedFiles.length > 0) {
+            em('close', deletedFiles, node);
+        }
     } finally {
-        loading.value = false;
+        if (version === dialogVersion) {
+            loading.value = false;
+        }
     }
 };
 

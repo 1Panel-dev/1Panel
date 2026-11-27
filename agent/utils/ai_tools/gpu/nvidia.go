@@ -50,7 +50,8 @@ func (n nvidiaSMI) LoadInfo(ctx context.Context) (*Info, error) {
 }
 
 func UsesSystemMemory(productName string) bool {
-	return strings.EqualFold(strings.TrimSpace(productName), "NVIDIA GB10")
+	productName = strings.TrimSpace(productName)
+	return strings.EqualFold(productName, "NVIDIA GB10") || strings.EqualFold(productName, "NVIDIA Thor")
 }
 
 func parseNvidiaSMI(buf []byte) (*Info, error) {

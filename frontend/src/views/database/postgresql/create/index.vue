@@ -6,20 +6,21 @@
                     <el-input
                         clearable
                         v-model.trim="form.name"
-                        @input="!form.existingUser && (form.username = form.name)"
+                        @input="form.userMode === 'create' && (form.username = form.name)"
                     ></el-input>
                 </el-form-item>
                 <el-form-item :label="$t('database.userAuthorization')">
-                    <el-radio-group v-model="form.existingUser" @change="changeUserMode">
-                        <el-radio-button :value="true" :disabled="!users.length">
+                    <el-radio-group v-model="form.userMode" @change="changeUserMode">
+                        <el-radio-button value="none">{{ $t('database.noUserAuthorization') }}</el-radio-button>
+                        <el-radio-button value="select" :disabled="!users.length">
                             {{ $t('commons.button.select') }}
                         </el-radio-button>
-                        <el-radio-button :value="false">{{ $t('commons.button.create') }}</el-radio-button>
+                        <el-radio-button value="create">{{ $t('commons.button.create') }}</el-radio-button>
                     </el-radio-group>
                 </el-form-item>
-                <el-form-item :label="$t('commons.login.username')" prop="username">
+                <el-form-item v-if="form.userMode !== 'none'" :label="$t('commons.login.username')" prop="username">
                     <el-select
-                        v-if="form.existingUser"
+                        v-if="form.userMode === 'select'"
                         v-model="form.username"
                         filterable
                         :fit-input-width="true"
@@ -68,7 +69,7 @@
                     </el-select>
                     <el-input v-else clearable v-model.trim="form.username" />
                 </el-form-item>
-                <el-form-item v-if="!form.existingUser" :label="$t('commons.login.password')" prop="password">
+                <el-form-item v-if="form.userMode === 'create'" :label="$t('commons.login.password')" prop="password">
                     <el-input type="password" clearable show-password v-model.trim="form.password">
                         <template #append>
                             <el-button @click="random">{{ $t('commons.button.random') }}</el-button>
@@ -76,7 +77,7 @@
                     </el-input>
                     <span class="input-help">{{ $t('commons.rule.illegalChar') }}</span>
                 </el-form-item>
-                <el-form-item v-if="!form.existingUser" :label="$t('database.permission')" prop="superUser">
+                <el-form-item v-if="form.userMode === 'create'" :label="$t('database.permission')" prop="superUser">
                     <el-checkbox v-model="form.superUser">{{ $t('database.pgSuperUser') }}</el-checkbox>
                     <span class="input-help">{{ $t('database.pgAuthorizationHelper') }}</span>
                 </el-form-item>
@@ -125,12 +126,25 @@ const form = reactive({
     username: '',
     password: '',
     superUser: false,
-    existingUser: false,
+    userMode: 'none',
     description: '',
 });
 const rules = computed(() => ({
-    name: [Rules.requiredInput, Rules.dbName],
-    username: form.existingUser ? [Rules.requiredSelect] : [Rules.requiredInput, Rules.name],
+    name: [
+        Rules.requiredInput,
+        Rules.dbName,
+        {
+            validator: (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+                callback(
+                    new TextEncoder().encode(value).length > 63
+                        ? new Error(i18n.global.t('commons.rule.maxBytes', [63]))
+                        : undefined,
+                );
+            },
+            trigger: 'blur',
+        },
+    ],
+    username: form.userMode === 'select' ? [Rules.requiredSelect] : [Rules.requiredInput, Rules.name],
     password: [Rules.requiredInput, Rules.databasePassword],
 }));
 
@@ -150,14 +164,18 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     form.format = 'UTF8';
     form.username = '';
     form.superUser = false;
-    form.existingUser = false;
+    form.userMode = 'none';
     users.value = [];
     form.description = '';
-    random();
+    form.password = '';
     createVisible.value = true;
     loading.value = true;
     try {
         users.value = (await searchPostgresqlUsers(params.database)).data || [];
+        if (users.value.length) {
+            form.userMode = 'select';
+            changeUserMode();
+        }
     } catch {
         return;
     } finally {
@@ -165,8 +183,12 @@ const acceptParams = async (params: DialogProps): Promise<void> => {
     }
 };
 const changeUserMode = () => {
-    form.username = form.existingUser ? users.value[0]?.username || '' : form.name;
-    form.password = form.existingUser ? '' : getRandomStr(16);
+    form.username = form.userMode === 'select' ? users.value[0]?.username || '' : '';
+    if (form.userMode === 'create') {
+        form.username = form.name;
+    }
+    form.password = form.userMode === 'create' ? getRandomStr(16) : '';
+    form.superUser = form.userMode === 'create';
     formRef.value?.clearValidate();
 };
 const handleClose = () => {
@@ -184,7 +206,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (!valid) return;
 
         loading.value = true;
-        await addPostgresqlDB(form)
+        await addPostgresqlDB({ ...form, existingUser: form.userMode === 'select' })
             .then(() => {
                 loading.value = false;
                 MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));

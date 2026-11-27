@@ -116,6 +116,17 @@ const hostRouter = {
             },
         },
         {
+            path: '/hosts/network',
+            name: 'NetworkManage',
+            component: () => import('@/views/host/network/index.vue'),
+            meta: {
+                icon: 'p-exchange-menu',
+                activeMenu: '/hosts/network',
+                title: 'networkManage.title',
+                permission: 'host_network_view',
+            },
+        },
+        {
             path: '/hosts/process/process',
             name: 'Process',
             component: () => import('@/views/host/process/process/index.vue'),

@@ -34,6 +34,7 @@ var ollamaModelMu sync.Mutex
 type IAIToolService interface {
 	Search(search dto.SearchWithPage) (int64, []dto.OllamaModelInfo, error)
 	Create(req dto.OllamaModelName) error
+	UpdateDescription(req dto.UpdateDescription) error
 	Close(name string) error
 	Recreate(req dto.OllamaModelName) error
 	Delete(req dto.ForceDelete) error
@@ -108,9 +109,10 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 		return err
 	}
 	info := model.OllamaModel{
-		Name:   req.Name,
-		From:   "local",
-		Status: constant.StatusWaiting,
+		Description: req.Description,
+		Name:        req.Name,
+		From:        "local",
+		Status:      constant.StatusWaiting,
 	}
 	if err := aiRepo.Create(&info); err != nil {
 		return err
@@ -140,6 +142,13 @@ func (u *AIToolService) Create(req dto.OllamaModelName) error {
 		}
 	}()
 	return nil
+}
+
+func (u *AIToolService) UpdateDescription(req dto.UpdateDescription) error {
+	if _, err := aiRepo.Get(repo.WithByID(req.ID)); err != nil {
+		return err
+	}
+	return aiRepo.Update(req.ID, map[string]interface{}{"description": req.Description})
 }
 
 func (u *AIToolService) Close(name string) error {

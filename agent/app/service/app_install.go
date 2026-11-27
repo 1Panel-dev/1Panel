@@ -286,6 +286,19 @@ func (a *AppInstallService) Operate(req request.AppInstalledOperate) error {
 	if req.Operate == constant.Upgrade && constant.IsClusterApp(install.App.Key) {
 		return buserr.New("ErrClusterAppOnly")
 	}
+	if constant.IsClusterApp(install.App.Key) {
+		switch req.Operate {
+		case constant.Start, constant.Stop, constant.Restart, constant.Rebuild, constant.Delete:
+			unlock, err := lockClusterDataOperation(install)
+			if err != nil {
+				return err
+			}
+			defer unlock()
+			if err := guardClusterRestore(install); err != nil {
+				return err
+			}
+		}
+	}
 	if install.App.Key == "ollama" || install.App.Key == "vllm" {
 		if req.Operate != constant.Upgrade {
 			if _, loaded := appUpgradeLocks.LoadOrStore(install.ID, struct{}{}); loaded {
@@ -494,6 +507,20 @@ func (a *AppInstallService) UpdateWithBeforeRestart(req request.AppInstalledUpda
 	installed, err := appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
 	if err != nil {
 		return err
+	}
+	if constant.IsClusterApp(installed.App.Key) {
+		unlock, err := lockClusterDataOperation(installed)
+		if err != nil {
+			return err
+		}
+		defer unlock()
+		installed, err = appInstallRepo.GetFirst(repo.WithByID(req.InstallId))
+		if err != nil {
+			return err
+		}
+		if err := guardClusterRestore(installed); err != nil {
+			return err
+		}
 	}
 	if installed.App.Key == "ollama" || installed.App.Key == "vllm" {
 		if _, loaded := appUpgradeLocks.LoadOrStore(installed.ID, struct{}{}); loaded {

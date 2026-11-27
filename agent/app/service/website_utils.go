@@ -560,7 +560,9 @@ func configDefaultNginx(website *model.Website, domains []model.WebsiteDomain, a
 		server.UpdateServerName(serverNames)
 		if initialSSL != nil {
 			plan := buildWebsiteTLSPlan(domains, nginxInstall.HttpPort, nginxInstall.HttpsPort)
-			applyWebsiteSSLConfig(server, *website, plan, initialSSL.request)
+			if err = applyWebsiteSSLConfig(server, *website, plan, initialSSL.request); err != nil {
+				return err
+			}
 			if err = created.write(path.Join(GetSitePath(*website, SiteSSLDir), "fullchain.pem"), []byte(initialSSL.certificate.Pem), constant.FilePerm, false); err != nil {
 				return err
 			}
@@ -1069,8 +1071,76 @@ func getHttpsPort(websiteID uint) map[int]struct{} {
 	return httpsPorts
 }
 
+func getHTTPSRedirectCustomPort() bool {
+	value, err := settingRepo.GetValueByKey(constant.HTTPSRedirectCustomPortKey)
+	return err != nil || value != constant.StatusDisable
+}
+
+func effectiveHTTPSRedirectPort(useCustomPort bool, httpsPort int) int {
+	if useCustomPort && httpsPort > 0 {
+		return httpsPort
+	}
+	return 443
+}
+
+func getGlobalHTTPSRedirectPort() (int, error) {
+	appInstall, err := getAppInstallByKey(constant.AppOpenresty)
+	if err != nil {
+		return 0, err
+	}
+	return effectiveHTTPSRedirectPort(getHTTPSRedirectCustomPort(), appInstall.HttpsPort), nil
+}
+
+func getWebsiteHTTPSRedirectState(website model.Website) (components.HTTPToHTTPSRedirectState, error) {
+	filePath := GetWebsiteConfigPath(website)
+	content, err := os.ReadFile(filePath)
+	if os.IsNotExist(err) {
+		return components.HTTPToHTTPSRedirectState{}, nil
+	}
+	if err != nil {
+		return components.HTTPToHTTPSRedirectState{}, err
+	}
+	config, err := parser.NewStringParser(string(content)).Parse()
+	if err != nil {
+		return components.HTTPToHTTPSRedirectState{}, err
+	}
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return components.HTTPToHTTPSRedirectState{}, nil
+	}
+	return servers[0].HTTPToHTTPSRedirectState(), nil
+}
+
+func resolveWebsiteHTTPSRedirectPort(server *components.Server, req request.WebsiteHTTPSOp) (int, bool, error) {
+	if req.HttpConfig != constant.HTTPToHTTPS {
+		return 0, false, nil
+	}
+	state := server.HTTPToHTTPSRedirectState()
+	if state.HasUnmanaged {
+		return 0, false, nil
+	}
+	if req.HTTPSRedirectPort != nil {
+		return *req.HTTPSRedirectPort, true, nil
+	}
+	port, err := getGlobalHTTPSRedirectPort()
+	if err != nil {
+		return 0, false, err
+	}
+	return port, true, nil
+}
+
 func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPort int) []dto.NginxParam {
 	nginxParams := getNginxParamsFromStaticFile(dto.SSL, []dto.NginxParam{})
+	if redirectPort == 0 {
+		filtered := make([]dto.NginxParam, 0, len(nginxParams))
+		for _, param := range nginxParams {
+			if param.Name == "error_page" && len(param.Params) > 0 && param.Params[0] == "497" {
+				continue
+			}
+			filtered = append(filtered, param)
+		}
+		nginxParams = filtered
+	}
 	for i := range nginxParams {
 		switch nginxParams[i].Name {
 		case "ssl_certificate":
@@ -1088,8 +1158,8 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 				nginxParams[i].Params = []string{"ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:!aNULL:!eNULL:!EXPORT:!DSS:!DES:!RC4:!3DES:!MD5:!PSK:!KRB5:!SRP:!CAMELLIA:!SEED"}
 			}
 		case "error_page":
-			if len(nginxParams[i].Params) >= 2 && nginxParams[i].Params[0] == "497" && redirectPort != 443 && nginxParams[i].Params[1] == "https://$host$request_uri" {
-				nginxParams[i].Params[1] = fmt.Sprintf("https://$host:%d$request_uri", redirectPort)
+			if len(nginxParams[i].Params) >= 2 && nginxParams[i].Params[0] == "497" {
+				nginxParams[i].Params[1] = components.HTTPSRedirectTarget(redirectPort)
 			}
 		}
 	}
@@ -1112,7 +1182,11 @@ func buildWebsiteSSLParams(alias string, req request.WebsiteHTTPSOp, redirectPor
 	return nginxParams
 }
 
-func applyWebsiteSSLConfig(server *components.Server, website model.Website, plan websiteTLSPlan, req request.WebsiteHTTPSOp) {
+func applyWebsiteSSLConfig(server *components.Server, website model.Website, plan websiteTLSPlan, req request.WebsiteHTTPSOp) error {
+	redirectPort, applyRedirect, err := resolveWebsiteHTTPSRedirectPort(server, req)
+	if err != nil {
+		return err
+	}
 	if server.HasStopPage() {
 		defer server.EnableStopPage()
 	}
@@ -1136,8 +1210,8 @@ func applyWebsiteSSLConfig(server *components.Server, website model.Website, pla
 		if plan.hasDefaultHTTP {
 			setListen(server, defaultHTTPPort, website.IPV6, false, website.DefaultServer, false)
 		}
-		if plan.redirectPort > 0 {
-			server.AddHTTP2HTTPS(plan.redirectPort)
+		if applyRedirect {
+			server.AddHTTP2HTTPS(redirectPort)
 		}
 	case constant.HTTPAlso:
 		if plan.hasDefaultHTTP {
@@ -1160,9 +1234,13 @@ func applyWebsiteSSLConfig(server *components.Server, website model.Website, pla
 		server.RemoveDirective("add_header", []string{"Alt-Svc"})
 	}
 
-	for _, param := range buildWebsiteSSLParams(website.Alias, req, plan.redirectPort) {
+	if !applyRedirect {
+		redirectPort = 0
+	}
+	for _, param := range buildWebsiteSSLParams(website.Alias, req, redirectPort) {
 		server.UpdateDirective(param.Name, param.Params)
 	}
+	return nil
 }
 
 func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.WebsiteHTTPSOp) error {
@@ -1175,9 +1253,15 @@ func applySSL(website *model.Website, websiteSSL model.WebsiteSSL, req request.W
 		return nil
 	}
 	config := nginxFull.SiteConfig.Config
-	server := config.FindServers()[0]
+	servers := config.FindServers()
+	if len(servers) == 0 {
+		return nil
+	}
+	server := servers[0]
 	plan := buildWebsiteTLSPlan(domains, nginxFull.Install.HttpPort, nginxFull.Install.HttpsPort)
-	applyWebsiteSSLConfig(server, *website, plan, req)
+	if err = applyWebsiteSSLConfig(server, *website, plan, req); err != nil {
+		return err
+	}
 
 	if err = createPemFile(*website, websiteSSL); err != nil {
 		return err
@@ -1582,6 +1666,54 @@ func certificateDirectories(value string) []string {
 		}
 	}
 	return dirs
+}
+
+func normalizeSSLSyncDir(dir string) (string, error) {
+	dir = strings.TrimSpace(dir)
+	if dir == "" {
+		return "", nil
+	}
+	if !filepath.IsAbs(dir) || strings.ContainsRune(dir, 0) {
+		return "", errors.New("certificate sync directory must be an absolute path")
+	}
+	return filepath.Clean(dir), nil
+}
+
+// Each file is replaced atomically; the certificate pair is not a filesystem transaction.
+func writeSSLSyncFiles(dir, pem, key string) error {
+	dir, err := normalizeSSLSyncDir(dir)
+	if err != nil || dir == "" {
+		return err
+	}
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return fmt.Errorf("create certificate sync directory %q: %w", dir, err)
+	}
+	for _, item := range []struct{ name, content string }{{"privkey.pem", key}, {"fullchain.pem", pem}} {
+		if err := replaceSSLSyncFile(dir, item.name, item.content); err != nil {
+			return fmt.Errorf("sync certificate file %q: %w", filepath.Join(dir, item.name), err)
+		}
+	}
+	return nil
+}
+
+func replaceSSLSyncFile(dir, name, content string) error {
+	file, err := os.CreateTemp(dir, ".1panel-ssl-*")
+	if err != nil {
+		return err
+	}
+	defer os.Remove(file.Name())
+	if _, err := file.WriteString(content); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Sync(); err != nil {
+		file.Close()
+		return err
+	}
+	if err := file.Close(); err != nil {
+		return err
+	}
+	return os.Rename(file.Name(), filepath.Join(dir, name))
 }
 
 func saveCertificateFile(websiteSSL *model.WebsiteSSL, logger *log.Logger) {

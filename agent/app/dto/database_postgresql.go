@@ -38,7 +38,7 @@ type PostgresqlDBCreate struct {
 	From         string `json:"from" validate:"required,oneof=local remote"`
 	Database     string `json:"database" validate:"required"`
 	Format       string `json:"format"`
-	Username     string `json:"username" validate:"required"`
+	Username     string `json:"username"`
 	Password     string `json:"password"`
 	SuperUser    bool   `json:"superUser"`
 	Description  string `json:"description"`

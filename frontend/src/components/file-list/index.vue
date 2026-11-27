@@ -1,5 +1,5 @@
 <template>
-    <DialogPro :title="$t('file.list')" size="w-60" v-model="open" @close="handleClose">
+    <DialogPro :title="$t('file.list')" :size="props.dialogSize || 'w-60'" v-model="open" @close="handleClose">
         <div>
             <div
                 v-show="!searchableStatus"
@@ -64,20 +64,21 @@
                     </div>
                 </div>
             </el-popover>
-            <el-button link @click="onAddItem(true)" type="primary" size="small">
+            <el-button v-if="!props.readOnly" link @click="onAddItem(true)" type="primary" size="small">
                 {{ $t('commons.button.createNewFolder') }}
             </el-button>
-            <el-button link @click="onAddItem(false)" type="primary" size="small">
+            <el-button v-if="!props.readOnly" link @click="onAddItem(false)" type="primary" size="small">
                 {{ $t('commons.button.createNewFile') }}
             </el-button>
         </div>
         <div v-loading="loading">
             <el-table
-                :data="data"
+                :data="listedFiles"
                 highlight-current-row
                 height="40vh"
                 @row-click="handleRowClick"
                 class="cursor-pointer dialog-file-list"
+                :class="{ 'dialog-file-list--read-only': props.readOnly }"
             >
                 <el-table-column v-if="isMultiple && form.dir" width="48">
                     <template #default="{ row }">
@@ -116,7 +117,7 @@
                         </template>
                     </template>
                 </el-table-column>
-                <el-table-column prop="size" width="160px" fix>
+                <el-table-column prop="size" :width="props.readOnly ? 100 : 160" fix>
                     <template #default="{ row }">
                         <el-button
                             type="primary"
@@ -151,7 +152,7 @@
             <div v-if="!isMultiple && selectRow?.path">
                 {{ $t('file.currentSelect') }}
                 <el-tooltip :content="selectRow.path" placement="top">
-                    <el-tag type="success">
+                    <el-tag type="success" :class="{ 'file-list-path-tag': props.readOnly }">
                         <div class="path">
                             <span>{{ selectRow.path }}</span>
                         </div>
@@ -180,11 +181,7 @@
         <template #footer>
             <span class="dialog-footer">
                 <el-button @click="handleClose">{{ $t('commons.button.cancel') }}</el-button>
-                <el-button
-                    type="primary"
-                    @click="selectFile"
-                    :disabled="disBtn || (isMultiple && selectRows.length === 0)"
-                >
+                <el-button type="primary" @click="selectFile" :disabled="!canConfirm">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
             </span>
@@ -201,7 +198,7 @@ import { MsgSuccess, MsgWarning } from '@/utils/message';
 import { useSearchableForSelect } from '@/views/host/file-management/hooks/searchable';
 import { computeSize } from '@/utils/size';
 import { debounce } from '@/utils/misc';
-const props = defineProps<{ currentNode?: string }>();
+const props = defineProps<{ currentNode?: string; fileExtension?: string; readOnly?: boolean; dialogSize?: string }>();
 const data = ref([]);
 const loading = ref(false);
 const paths = ref<string[]>([]);
@@ -226,6 +223,17 @@ const form = reactive({
     dir: false,
     isAll: false,
     disabled: false,
+});
+
+const matchesFileExtension = (path: string) =>
+    !props.fileExtension || path.toLowerCase().endsWith(props.fileExtension.toLowerCase());
+const listedFiles = computed(() =>
+    props.fileExtension ? data.value.filter((item) => item.isDir || matchesFileExtension(item.name)) : data.value,
+);
+const canConfirm = computed(() => {
+    const selected = isMultiple.value ? selectRows.value : [selectRow.value];
+    if (disBtn.value || selected.length === 0) return false;
+    return !props.fileExtension || (!loading.value && selected.every((item) => matchesFileExtension(item.path)));
 });
 
 interface DialogProps {
@@ -253,6 +261,7 @@ const acceptParams = (props: DialogProps): void => {
 };
 
 const selectFile = () => {
+    if (!canConfirm.value) return;
     if (isMultiple.value) {
         em(
             'choose',
@@ -306,7 +315,7 @@ const openDir = async (row: File.File, column: any, event: any) => {
         return;
     }
     // Handle file click
-    const fullPath = (req.path === '/' ? req.path : req.path + '/') + row.name;
+    const fullPath = props.fileExtension ? row.path : (req.path === '/' ? req.path : req.path + '/') + row.name;
     if (isMultiple.value && (form.isAll || !form.dir)) {
         // Multiple mode: toggle selection
         const index = selectRows.value.findIndex((r) => r.path === fullPath);
@@ -410,6 +419,10 @@ const getPaths = (reqPath: string) => {
 
 const search = async (req: File.ReqFile) => {
     req.dir = form.dir;
+    if (props.fileExtension) {
+        data.value = [];
+        selectRow.value.path = '';
+    }
     loading.value = true;
     await getFilesList(req, props.currentNode)
         .then((res) => {
@@ -562,6 +575,13 @@ defineExpose({
 }
 .file-list-bottom {
     margin-top: 10px;
+    .file-list-path-tag {
+        max-width: 100%;
+
+        :deep(.el-tag__content) {
+            min-width: 0;
+        }
+    }
     .path {
         white-space: nowrap;
         overflow: hidden;
@@ -570,6 +590,9 @@ defineExpose({
 }
 :deep(.dialog-file-list .el-table__body tr.current-row > td.el-table__cell) {
     background-color: var(--panel-main-bg-color-4);
+}
+:deep(.dialog-file-list--read-only .el-table__body tr.current-row > td.el-table__cell) {
+    background-color: var(--el-color-primary-light-9);
 }
 
 .favorite-item {

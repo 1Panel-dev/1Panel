@@ -36,7 +36,7 @@
                     <el-form-item :label="$t('app.version')" prop="version">
                         <el-input
                             v-if="clusterVersionLocked"
-                            :model-value="formData.version?.replace(/-slave$/, '') || ''"
+                            :model-value="formData.version?.replace(/-(master|slave)$/, '') || ''"
                             readonly
                         />
                         <el-select
@@ -55,7 +55,11 @@
                         <el-text v-if="clusterVersionNotice" class="mt-1 w-full" type="warning" role="status">
                             {{ $t(clusterVersionNotice) }}
                         </el-text>
-                        <el-text v-else-if="clusterVersionLocked && formData.version" class="mt-1 w-full" type="info">
+                        <el-text
+                            v-else-if="clusterVersionLocked && !restoringCluster && formData.version"
+                            class="mt-1 w-full"
+                            type="info"
+                        >
                             {{ $t('xpack.cluster.versionLocked') }}
                         </el-text>
                     </el-form-item>
@@ -159,7 +163,7 @@
                         @update:nodes="formData.nodes = $event"
                     />
 
-                    <el-form-item prop="editCompose">
+                    <el-form-item v-if="!restoringCluster" prop="editCompose">
                         <el-checkbox v-model="formData.editCompose" :label="$t('app.editCompose')" size="large" />
                         <span class="input-help">{{ $t('app.editComposeHelper') }}</span>
                     </el-form-item>
@@ -210,6 +214,7 @@ interface ClusterProps {
     loadReplicaSource?: () => Promise<App.ClusterReplicaSource>;
     role: 'master' | 'slave';
     excludedMasterVersions: readonly string[];
+    restoreVersion?: string;
 }
 interface Props {
     loading?: boolean;
@@ -249,6 +254,7 @@ const currentApp = ref<any>({});
 const appVersions = ref<string[]>([]);
 const clusterVersionNotice = ref('');
 const clusterVersionLocked = ref(false);
+const restoringCluster = ref(false);
 let clusterFormRequest = 0;
 const operateNode = ref();
 const env = ref();
@@ -432,7 +438,8 @@ const addMasterParams = (appParams: App.AppParams) => {
 const initClusterForm = async (config: ClusterProps) => {
     const request = ++clusterFormRequest;
     resetForm();
-    clusterVersionLocked.value = config.role === 'slave';
+    restoringCluster.value = Boolean(config.restoreVersion);
+    clusterVersionLocked.value = config.role === 'slave' || restoringCluster.value;
     appVersions.value = [];
     env.value = undefined;
     replicaSource.value = undefined;
@@ -457,7 +464,7 @@ const initClusterForm = async (config: ClusterProps) => {
 
     env.value = masterInstall?.env;
     replicaSource.value = source;
-    formData.value.allowPort = allowPort;
+    formData.value.allowPort = config.restoreVersion ? false : allowPort;
     currentApp.value = appResponse.data;
     const versions = appResponse.data.versions ?? [];
     if (config.role === 'slave') {
@@ -467,7 +474,9 @@ const initClusterForm = async (config: ClusterProps) => {
         const suffix = '-master';
         appVersions.value = versions.filter(
             (version) =>
-                version.endsWith(suffix) && !config.excludedMasterVersions.includes(version.slice(0, -suffix.length)),
+                version.endsWith(suffix) &&
+                !config.excludedMasterVersions.includes(version.slice(0, -suffix.length)) &&
+                (!config.restoreVersion || version === config.restoreVersion),
         );
     }
 
@@ -492,6 +501,7 @@ const resetForm = () => {
     Object.assign(formData.value, initFormData());
     clusterVersionNotice.value = '';
     clusterVersionLocked.value = false;
+    restoringCluster.value = false;
     isHostMode.value = false;
     memoryRequired.value = 0;
     gpuSupport.value = false;

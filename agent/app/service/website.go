@@ -1020,6 +1020,20 @@ func (w WebsiteService) GetWebsiteHTTPS(websiteId uint) (response.WebsiteHTTPS, 
 		res        response.WebsiteHTTPS
 		httpsPorts []string
 	)
+	globalRedirectPort, err := getGlobalHTTPSRedirectPort()
+	if err != nil {
+		return response.WebsiteHTTPS{}, err
+	}
+	res.GlobalRedirectPort = globalRedirectPort
+	redirectState, err := getWebsiteHTTPSRedirectState(website)
+	if err != nil {
+		return response.WebsiteHTTPS{}, err
+	}
+	if redirectState.Port > 0 {
+		port := redirectState.Port
+		res.SiteRedirectPort = &port
+	}
+	res.RedirectPortManaged = redirectState.Managed
 
 	httpsPortsMap := getHttpsPort(websiteId)
 	for port := range httpsPortsMap {

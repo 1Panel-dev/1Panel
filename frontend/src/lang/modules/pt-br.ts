@@ -265,6 +265,8 @@ const message = {
             uninstallSuccess: 'Desinstalado com sucesso',
         },
         login: {
+            imageLoadError: 'Não foi possível carregar a imagem',
+            imageLoadErrorHint: 'Possíveis causas: problema de rede, imagem inexistente ou formato não compatível.',
             username: 'Usuário',
             password: 'Senha',
             passkey: 'Login com Passkey',
@@ -349,6 +351,7 @@ const message = {
             authBasicPassword: 'Suporta letras, números e caracteres especiais comuns, comprimento 1-72',
             length128Err: 'O comprimento não pode exceder 128 caracteres',
             maxLength: 'O comprimento não pode exceder {0} caracteres',
+            maxBytes: 'O tamanho não pode exceder {0} bytes',
             alias: 'Suporta letras, números, - e _, comprimento de 1 a 128, e não pode começar ou terminar com -_.',
             vmName: 'Aceita letras, números, ".", "-" e "_"; comprimento: 1-64; deve começar com uma letra ou um número.',
             vmNetwork:
@@ -2517,7 +2520,7 @@ const message = {
         imageMissing: 'A imagem necessária não foi encontrada. Baixe {image} no gerenciamento de imagens.',
         imageReady: 'A imagem do Benchmark está pronta para criar testes.',
         imageHelp:
-            'A imagem do Benchmark executa o cliente de carga e envia solicitações ao serviço de modelos selecionado.',
+            'O sistema usa esta imagem para criar um contêiner separado que executa testes de desempenho enviando solicitações ao serviço de modelos selecionado.',
         mainNodeHelp: 'Os testes são executados no nó principal. Prepare a imagem e o tokenizador nesse nó.',
         goImages: 'Ir ao gerenciamento de imagens',
         goModels: 'Ir aos downloads de modelos',
@@ -4907,6 +4910,10 @@ const message = {
         privateKey: 'Chave (KEY)',
         certificate: 'Certificado (formato PEM)',
         HTTPConfig: 'Opções HTTP',
+        HTTPSRedirectPort: 'Porta de redirecionamento HTTPS',
+        HTTPSRedirectPortCustom: 'Personalizada',
+        HTTPSRedirectPortManualHelper:
+            'A regra de redirecionamento foi editada manualmente ou não é gerenciada e, portanto, não pode ser modificada.',
         HTTPSOnly: 'Bloquear requisições HTTP',
         HTTPToHTTPS: 'Redirecionar para HTTPS',
         HTTPAlso: 'Permitir requisições HTTP diretas',
@@ -5245,6 +5252,8 @@ const message = {
         status: 'Status atual',
         configResource: 'Configuração',
         saveAndReload: 'Salvar e recarregar',
+        batchClearProxyCacheWarn:
+            'Limpar o cache do proxy reverso dos {0} sites selecionados? A próxima solicitação de conteúdo que estava em cache será enviada ao servidor de origem.',
         clearProxyCache: 'Limpar cache do proxy reverso',
         clearProxyCacheWarn:
             'Todos os sites com cache configurado serão afetados e o "OpenResty" será reiniciado. Deseja continuar?',
@@ -5281,14 +5290,25 @@ const message = {
             'Script a ser executado antes da compilação, geralmente para baixar o código-fonte do módulo, instalar dependências, etc.',
         buildHelper:
             'Módulos dinâmicos são carregados pela configuração após a compilação; módulos estáticos ainda recompilam o OpenResty.',
-        defaultHttps: 'Proteção contra adulteração HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Estado da proteção contra adulteração',
         defaultHttpsHelper1: 'A ativação desta opção pode resolver problemas de adulteração HTTPS.',
         sslRejectHandshake: 'Rejeitar handshake SSL padrão',
         sslRejectHandshakeHelper:
             'Ativar isso pode evitar vazamento de certificados, definir um site padrão invalidará esta configuração',
+        httpsRedirectCustomPort: 'Usar redirecionamento com porta personalizada',
+        httpsRedirectCustomPortHelper:
+            'Quando ativado, os redirecionamentos de HTTP para HTTPS usam a porta HTTPS personalizada.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Diretório de sincronização',
+        syncDirHelp:
+            'Informe o caminho absoluto do diretório nos nós de destino. O mesmo diretório será usado em todos eles.',
+        syncDirSingleCert:
+            'Selecione apenas um certificado ao especificar um diretório para evitar sobrescrever arquivos.',
+        syncDirAbsolute: 'O diretório de sincronização deve ser um caminho absoluto.',
+
+        caUploadHelp: 'Envie o arquivo ZIP baixado que contém ca.crt e ca.key (máximo de 10 MB).',
         deleteConfirm:
             'Os certificados a seguir serão excluídos. Os certificados ACME serão revogados automaticamente. Continuar?',
         deleteAndRevoke: 'Excluir e revogar',
@@ -5669,7 +5689,7 @@ const message = {
         runScriptHelper:
             'A lista de comandos de inicialização é gerada a partir do arquivo package.json no diretório de origem.',
         open: 'Abrir',
-        operatorHelper: 'A operação {0} será realizada no ambiente selecionado. Deseja continuar?',
+        operatorHelper: 'A operação {1} será realizada em {0}, deseja continuar? ',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fonte da imagem',
@@ -5816,6 +5836,84 @@ const message = {
         diskType: 'Tipo de Disco',
         serial: 'Número de Série',
         noFail: 'Falha na montagem não afeta a inicialização do sistema',
+    },
+    networkManage: {
+        routeDetails: 'Detalhes da rota',
+        manageIP: 'Gerenciar IP associado',
+        connectedRoute: 'Gerada a partir do IP',
+        connectedRouteHint:
+            'O sistema gera esta rota conectada a partir do IP da interface. Ela não é editada separadamente. Edite ou remova o IP correspondente nos detalhes da interface.',
+        virtualBridgeReadOnly: 'Interface virtual · Somente leitura',
+        virtualBridgeReadOnlyHint:
+            'Esta interface virtual é somente leitura e não participa das verificações de conectividade.',
+        loopbackReadOnly: 'A configuração da interface de loopback é somente leitura.',
+        persistentSourceMissing:
+            'Nenhuma configuração persistente do sistema compatível foi encontrada para a interface {0}. Ela é somente leitura.',
+        addressReadOnlyReason:
+            'Este endereço é dinâmico, não global ou não possui configuração persistente compatível. Ele é somente leitura.',
+        routeReadOnlyReason:
+            'Esta rota é dinâmica, gerada pelo kernel ou não possui configuração persistente compatível. Ela é somente leitura.',
+        persistenceBackend: 'Persistência',
+        editIP: 'Editar IP',
+        editRoute: 'Editar rota',
+        operationRisk:
+            'Alterações na rede podem interromper conexões. Prepare uma forma alternativa de acessar o servidor.',
+        confirmInterface: 'Digite o nome da interface {0} para confirmar.',
+        sourceAddress: 'Endereço de origem',
+        linkConnected: 'Link conectado',
+        linkDisconnected: 'Link desconectado',
+        topologySearch: 'Buscar interface, IP, gateway ou destino',
+        topologyHint:
+            'Gerencie os IPs da interface à esquerda. Os cartões mostram destino, gateway e métrica. Clique em um cartão para ver detalhes; as linhas não indicam conectividade verificada.',
+        direct: 'Direta',
+        defaultDestination: 'Rota padrão',
+        unknownInterface: 'Interface não especificada',
+        noRoutes: 'Nenhuma rota correspondente',
+        readOnly: 'Somente leitura',
+        readOnlyRouteHint: 'Rotas com vários próximos saltos ou sem uma interface única são somente leitura.',
+        title: 'Gerenciamento de rede',
+        interfaces: 'Interfaces de rede',
+        routes: 'Rotas',
+        addIP: 'Adicionar IP',
+        ipCount: 'Quantidade de IPs',
+        interfaceID: 'ID da interface',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado do enlace',
+        mac: 'Endereço MAC',
+        flags: 'Indicadores',
+        address: 'Endereço',
+        scope: 'Escopo',
+        interface: 'Interface',
+        configStatus: 'Estado da configuração',
+        managedApplied: 'Salvo · Ativo',
+        managedPending: 'Salvo · Inativo',
+        addressWarning:
+            'Use o IP atribuído a esta interface. Se o IP público for mapeado por NAT, informe o IP privado.',
+        addressRisk:
+            'Um IP já em uso ou um comprimento de prefixo incorreto pode interromper o acesso ao painel ou por SSH.',
+        addressWithPrefix: 'Endereço IP / comprimento do prefixo',
+        interfaceSelectHint:
+            'São listadas apenas interfaces cuja configuração persistente pode ser alterada. Interfaces de loopback, pontes virtuais somente leitura e outras interfaces que não podem ser alteradas são excluídas.',
+        gatewayHint: 'Deixe o gateway vazio para sub-redes conectadas diretamente.',
+        metricHint: 'Para a mesma sub-rede de destino, as rotas com métrica menor geralmente têm prioridade.',
+        defaultRouteWarning:
+            'Uma rota padrão pode mudar a saída do painel, do SSH e de outros serviços. Prepare um acesso alternativo, como o console da nuvem.',
+        interfaceMissing: 'Interface ausente',
+        changeWarning:
+            'Alterar as configurações de rede pode desconectar o painel ou interromper serviços. Antes de continuar, confirme que você tem outra forma de acessar este servidor.',
+        cidrHint:
+            'Em 192.0.2.10/24, /24 corresponde à máscara de sub-rede 255.255.255.0. Exemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Adicionar rota',
+        checkRoutes: 'Verificar acessibilidade das rotas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabela',
+        reachability: 'Acessibilidade',
+        reachable: 'Acessível',
+        unreachable: 'Inacessível',
+        unchecked: 'Não verificada',
+        check: 'Verificar',
+        destinationHint: 'Aceita endereços IPv4/IPv6 ou redes CIDR. Rota padrão: default, 0.0.0.0/0 ou ::/0.',
     },
     xpack: {
         ldap: {
@@ -8304,6 +8402,33 @@ const message = {
             menu: 'Sincronização de Recursos',
             file: 'Transferência de Arquivos',
             fileSyncConfirm: 'Transferir o arquivo/pasta {1} do nó {0} para o diretório {3} no nó {2}?',
+            fileBatchDesc: 'Selecione arquivos ou pastas de qualquer nó e distribua para vários nós de destino.',
+            fileSourceTitle: 'Selecionar arquivos de origem',
+            fileSourceNode: 'Nó de origem',
+            fileTargetDirectory: 'Diretório de destino',
+            fileBatchPath: 'Definir diretórios de destino em lote',
+            fileApplyPath: 'Aplicar aos nós selecionados',
+            fileSelectedCount: '{0} itens selecionados',
+            fileSelectedTargets: '{0} nós selecionados',
+            fileSelectionHint:
+                'As pastas são copiadas por inteiro com o nome original, preservando a estrutura interna.',
+            fileRules:
+                'As regras de transferência existentes são mantidas: arquivos com o mesmo nome podem ser atualizados e os demais arquivos do diretório de destino são preservados.',
+            fileBatchSummary: 'Distribuir {0} itens para {1} nós de destino',
+            fileTaskHint:
+                'Após a confirmação, uma tarefa de distribuição será criada e poderá ser consultada no gerenciamento de tarefas.',
+            fileBatchConfirm:
+                'Verifique os nós e os caminhos de destino abaixo. Arquivos com o mesmo nome podem ser sobrescritos.',
+            fileTargetHint:
+                'Cada nó pode ter seu próprio diretório. Nós offline, com falha na verificação ou sem rsync não podem ser selecionados.',
+            fileChecking: 'Verificando',
+            fileCheckFailed: 'Falha na verificação',
+            fileRsyncMissing: 'rsync não instalado',
+            filePathRequired: 'Insira um caminho absoluto para o diretório de destino que comece com /.',
+            fileConflictHint:
+                'Estas origens têm nomes de destino iguais. Mantenha apenas uma origem por nome. A desmarcação se aplica a todos os nós de destino.',
+            fileDeselect: 'Desmarcar',
+            fileSourceChanged: 'O nó de origem foi alterado. Selecione os arquivos novamente.',
 
             image: 'Transferência de Imagens',
             imageBatchDesc:
@@ -8654,7 +8779,21 @@ const message = {
             unhealthyDeleteError:
                 'O status do nó de instalação está anormal, verifique a lista de nós e tente novamente!',
             noAvailableMasterVersion: 'Não há um modelo de instância primária disponível neste nó.',
-            appStoreOnly: "Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.",
+            backups: 'Backups do cluster',
+            importBackup: 'Importar backup',
+            archivePassphrase: 'Senha do backup',
+            restoreToNew: 'Restaurar em um novo cluster',
+            restoreTarget: 'Destino da restauração',
+            restoreToOriginal: 'Restaurar no cluster original',
+            restoreOriginalUnavailable: 'Este backup não tem um cluster original disponível para restauração.',
+            restoreOriginalWarning:
+                'As conexões com o banco serão interrompidas. O cluster original voltará ao estado do backup e as réplicas serão sincronizadas novamente.',
+            restoreOriginalConfirm: 'Digite o nome do cluster {0} para confirmar a sobrescrita.',
+            restoreCredentials: 'Use as credenciais de administrador e replicação do backup.',
+            archiveImportHint:
+                'Somente arquivos de backup de cluster .1pha são aceitos. Use a senha definida ao criar o backup.',
+            backupDataSize: 'Tamanho dos dados',
+            appStoreOnly: 'Instale e atualize este aplicativo em Alta Disponibilidade de Aplicativos.',
             noMatchingReplicaVersion:
                 'Este nó não tem um modelo de réplica com a mesma versão que a instância primária.',
             installNode: 'Servidor de implantação',

@@ -265,6 +265,8 @@ const message = {
             uninstallSuccess: 'アンインストール成功',
         },
         login: {
+            imageLoadError: '画像を読み込めませんでした',
+            imageLoadErrorHint: '考えられる原因：ネットワーク接続の問題、画像の不在、または未対応の形式。',
             username: 'ユーザー名',
             password: 'パスワード',
             passkey: 'パスキーでログイン',
@@ -349,6 +351,7 @@ const message = {
             authBasicPassword: '英字、数字、一般的な特殊文字をサポート、長さ1-72',
             length128Err: '長さは128文字を超えることはできません',
             maxLength: '長さは {0} 文字を超えることはできません',
+            maxBytes: '長さは {0} バイト以内にしてください',
             vmName: '英字、数字、"."、"-"、"_"を使用できます。長さは1～64文字で、英字または数字で始める必要があります。',
             vmNetwork:
                 '英字、数字、"."、":"、"-"、"_"を使用できます。長さは1～64文字で、英字または数字で始める必要があります。',
@@ -2467,7 +2470,7 @@ const message = {
         imageMissing: '必要なイメージが見つかりません。イメージ管理で {image} を取得してください。',
         imageReady: 'Benchmark イメージの準備ができました。ベンチマークを作成できます。',
         imageHelp:
-            'Benchmark イメージは負荷テストクライアントを実行し、選択したモデルサービスにリクエストを送信します。',
+            'このイメージから専用のコンテナーを作成し、選択したモデルサービスにテストリクエストを送信してベンチマークを実行します。',
         mainNodeHelp:
             'ベンチマークはメインノードで実行されます。イメージとトークナイザーをメインノードで準備してください。',
         goImages: 'イメージ管理へ',
@@ -4793,6 +4796,9 @@ const message = {
         privateKey: 'キー（キー）',
         certificate: '証明書（PEM形式）',
         HTTPConfig: 'HTTPオプション',
+        HTTPSRedirectPort: 'HTTPS リダイレクトポート',
+        HTTPSRedirectPortCustom: 'カスタム',
+        HTTPSRedirectPortManualHelper: 'このリダイレクトルールは手動で編集されたか管理外のため、変更できません。',
         HTTPSOnly: 'HTTP要求をブロックします',
         HTTPToHTTPS: 'HTTPSにリダイレクトします',
         HTTPAlso: '直接HTTPリクエストを許可します',
@@ -5122,6 +5128,8 @@ const message = {
         status: '現在のステータス',
         configResource: '構成',
         saveAndReload: '保存してリロードします',
+        batchClearProxyCacheWarn:
+            '選択した {0} 件のサイトのリバースプロキシキャッシュを消去しますか？ キャッシュされていたコンテンツへの次のリクエストはオリジンサーバーに送られます。',
         clearProxyCache: '逆プロキシキャッシュをきれいにします',
         clearProxyCacheWarn:
             'キャッシュで構成されたすべてのWebサイトが影響を受け、「OpenResty」が再起動されます。続けたいですか？',
@@ -5158,14 +5166,25 @@ const message = {
             'コンパイル前に実行するスクリプト、通常はモジュールソースコードのダウンロード、依存関係のインストールなど',
         buildHelper:
             '動的モジュールはビルド後に設定から読み込まれます。静的モジュールは引き続き OpenResty を再ビルドします。',
-        defaultHttps: 'HTTPS 改ざん防止',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '改ざん防止ステータス',
         defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
         sslRejectHandshake: 'デフォルト SSL ハンドシェイクを拒否',
         sslRejectHandshakeHelper:
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
+        httpsRedirectCustomPort: 'カスタムポートでリダイレクト',
+        httpsRedirectCustomPortHelper:
+            '有効にすると、HTTP から HTTPS へのリダイレクトでカスタム HTTPS ポートを使用します。',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '同期ディレクトリ',
+        syncDirHelp:
+            '対象ノードのディレクトリを絶対パスで入力してください。すべての対象ノードで同じディレクトリを使用します。',
+        syncDirSingleCert: 'ファイルの上書きを防ぐため、ディレクトリを指定する場合は証明書を1つだけ選択してください。',
+        syncDirAbsolute: '同期ディレクトリは絶対パスで指定してください。',
+
+        caUploadHelp:
+            'ca.crt と ca.key を含む、ダウンロードした ZIP ファイルをアップロードしてください（最大 10 MB）。',
         deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
         deleteAndRevoke: '削除して失効',
         create: 'リクエスト',
@@ -5531,7 +5550,7 @@ const message = {
         runScript: 'スクリプトを実行します',
         runScriptHelper: '起動コマンドリストは、ソースディレクトリのpackage.jsonファイルから解析されます。',
         open: '開ける',
-        operatorHelper: '{0}操作は、選択した動作環境で実行されます。続けたいですか？',
+        operatorHelper: '操作{1}は{0}で実行されます、続行しますか？',
         taobao: 'タオバオ',
         tencent: 'テンセント',
         imageSource: '画像ソース',
@@ -5673,6 +5692,81 @@ const message = {
         diskType: 'ディスクタイプ',
         serial: 'シリアルナンバー',
         noFail: 'マウント失敗はシステム起動に影響しません',
+    },
+    networkManage: {
+        routeDetails: 'ルート詳細',
+        manageIP: '対応する IP を管理',
+        connectedRoute: 'IP から自動生成',
+        connectedRouteHint:
+            'この直結ルートはインターフェースの IP に基づいてシステムが自動生成します。個別には編集せず、インターフェースの詳細で対応する IP を編集または削除してください。',
+        virtualBridgeReadOnly: '仮想インターフェース · 読み取り専用',
+        virtualBridgeReadOnlyHint: 'この仮想インターフェースは読み取り専用で、到達性チェックの対象外です。',
+        loopbackReadOnly: 'ループバックインターフェースの設定は読み取り専用です。',
+        persistentSourceMissing:
+            'インターフェース {0} に対応するシステムの永続設定が見つかりません。読み取り専用です。',
+        addressReadOnlyReason: 'このアドレスは動的、非グローバル、または対応する永続設定がないため、読み取り専用です。',
+        routeReadOnlyReason: 'このルートは動的、カーネル生成、または対応する永続設定がないため、読み取り専用です。',
+        persistenceBackend: '永続化方式',
+        editIP: 'IP を編集',
+        editRoute: 'ルートを編集',
+        operationRisk: 'ネットワークの変更で接続が切れる場合があります。代替のアクセス手段を用意してください。',
+        confirmInterface: '確認のためインターフェース名 {0} を入力してください。',
+        sourceAddress: '送信元アドレス',
+        linkConnected: 'リンク接続済み',
+        linkDisconnected: 'リンク未接続',
+        topologySearch: 'インターフェース、IP、ゲートウェイ、宛先を検索',
+        topologyHint:
+            '左側でインターフェースの IP を管理し、右側のカードで宛先、ゲートウェイ、メトリックを確認します。カードをクリックすると詳細を表示します。線は接続確認済みを意味しません。',
+        direct: '直接接続',
+        defaultDestination: 'デフォルトルート',
+        unknownInterface: '未指定のインターフェース',
+        noRoutes: '一致する経路がありません',
+        readOnly: '読み取り専用',
+        readOnlyRouteHint:
+            '複数のネクストホップがある経路、または単一のインターフェースを特定できない経路は読み取り専用です。',
+        title: 'ネットワーク管理',
+        interfaces: 'ネットワークインターフェース',
+        routes: 'ルート',
+        addIP: 'IPを追加',
+        ipCount: 'IP数',
+        interfaceID: 'インターフェースID',
+        adminState: '管理状態',
+        linkState: 'リンク状態',
+        mac: 'MACアドレス',
+        flags: 'フラグ',
+        address: 'アドレス',
+        scope: 'スコープ',
+        interface: 'インターフェース',
+        configStatus: '設定の状態',
+        managedApplied: '保存済み · 有効',
+        managedPending: '保存済み · 無効',
+        addressWarning:
+            'このインターフェースに割り当てられた IP を入力してください。NAT で公開 IP を割り当てている場合は、プライベート IP を入力してください。',
+        addressRisk:
+            '使用中の IP や誤ったプレフィックス長を設定すると、パネルや SSH に接続できなくなる場合があります。',
+        addressWithPrefix: 'IP アドレス / プレフィックス長',
+        interfaceSelectHint:
+            '永続設定を変更できるインターフェースのみ表示されます。ループバック、読み取り専用の仮想ブリッジ、その他変更できないインターフェースは表示されません。',
+        gatewayHint: '直接接続されたサブネットでは、ゲートウェイを空欄にできます。',
+        metricHint: '宛先サブネットが同じ場合、通常はメトリックが小さい経路が優先されます。',
+        defaultRouteWarning:
+            'デフォルトルートはパネル、SSH、その他のサービスの通信経路を変えることがあります。クラウドコンソールなど別の接続手段を確保してください。',
+        interfaceMissing: 'インターフェースがありません',
+        changeWarning:
+            'ネットワーク設定を変更すると、パネルへの接続やサービスが中断する場合があります。別の方法でこのサーバーにアクセスできることを確認してから続行してください。',
+        cidrHint:
+            '192.0.2.10/24 の /24 はサブネットマスク 255.255.255.0 に相当します。IPv6 の入力例は 2001:db8::10/64 です。',
+        addRoute: 'ルートを追加',
+        checkRoutes: 'ルートの到達性を確認',
+        destination: '宛先',
+        metric: 'メトリック',
+        routeTable: 'ルーティングテーブル',
+        reachability: '到達性',
+        reachable: '到達可能',
+        unreachable: '到達不可',
+        unchecked: '未確認',
+        check: '確認',
+        destinationHint: 'IPv4/IPv6 アドレスまたは CIDR に対応。デフォルトルート：default、0.0.0.0/0 または ::/0。',
     },
     xpack: {
         ldap: {
@@ -8117,6 +8211,31 @@ const message = {
             menu: 'リソース同期',
             file: 'ファイル転送',
             fileSyncConfirm: 'ノード {0} のファイル/フォルダ {1} をノード {2} のディレクトリ {3} に転送しますか？',
+            fileBatchDesc: '任意のノードからファイルまたはフォルダを選択し、複数の宛先ノードに配布します。',
+            fileSourceTitle: '転送元ファイルを選択',
+            fileSourceNode: '転送元ノード',
+            fileTargetDirectory: '宛先ディレクトリ',
+            fileBatchPath: '宛先ディレクトリを一括設定',
+            fileApplyPath: '選択したノードに適用',
+            fileSelectedCount: '{0} 件を選択中',
+            fileSelectedTargets: '{0} ノードを選択中',
+            fileSelectionHint: 'フォルダは元の名前で全体がコピーされ、内部のディレクトリ構造は保持されます。',
+            fileRules:
+                '既存のファイル転送ルールに従います。同名のファイルは更新される場合がありますが、宛先ディレクトリの他のファイルは保持されます。',
+            fileBatchSummary: '{0} 件の項目を {1} 個の宛先ノードに配布',
+            fileTaskHint: '確認後に配布タスクが作成されます。タスク管理で確認できます。',
+            fileBatchConfirm:
+                '下記の宛先ノードと保存先パスを確認してください。同名のファイルが上書きされる場合があります。',
+            fileTargetHint:
+                'ディレクトリはノードごとに設定できます。オフライン、確認失敗、または rsync 未インストールのノードは選択できません。',
+            fileChecking: '確認中',
+            fileCheckFailed: '確認失敗',
+            fileRsyncMissing: 'rsync 未インストール',
+            filePathRequired: '/ で始まる宛先ディレクトリの絶対パスを入力してください。',
+            fileConflictHint:
+                '同じ宛先名を持つ転送元があります。各名前につき1つだけ残してください。選択解除はすべての宛先ノードに適用されます。',
+            fileDeselect: '選択解除',
+            fileSourceChanged: '転送元ノードが変更されました。ファイルを選択し直してください。',
 
             image: 'イメージ転送',
             imageBatchDesc: 'まずソースノードとソースイメージを選択し、その後転送先ノードを選択してください。',
@@ -8456,7 +8575,21 @@ const message = {
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
             noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
-            appStoreOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。",
+            backups: 'クラスターバックアップ',
+            importBackup: 'バックアップのインポート',
+            archivePassphrase: 'バックアップのパスフレーズ',
+            restoreToNew: '新しいクラスターに復元',
+            restoreTarget: '復元先',
+            restoreToOriginal: '元のクラスターに復元',
+            restoreOriginalUnavailable: 'このバックアップに対応する復元可能なクラスターがありません。',
+            restoreOriginalWarning:
+                'データベース接続が中断されます。元のクラスターのデータはバックアップ時点に戻り、レプリカは再同期されます。',
+            restoreOriginalConfirm: '上書きを確定するにはクラスター名「{0}」を入力してください。',
+            restoreCredentials: 'バックアップ時の管理者およびレプリケーションの認証情報を使用してください。',
+            archiveImportHint:
+                '.1pha 形式のクラスターバックアップのみインポートできます。バックアップ作成時に設定したパスフレーズを使用してください。',
+            backupDataSize: 'データサイズ',
+            appStoreOnly: 'このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。',
             noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
             installNode: '配置先サーバー',
             master: 'プライマリデータベース',

@@ -268,6 +268,8 @@ const message = {
             uninstallSuccess: 'Nyahpasang berjaya',
         },
         login: {
+            imageLoadError: 'Imej gagal dimuatkan',
+            imageLoadErrorHint: 'Punca yang mungkin: masalah rangkaian, imej tiada atau format tidak disokong.',
             username: 'Pengguna',
             password: 'Kata Laluan',
             passkey: 'Log masuk Passkey',
@@ -356,6 +358,7 @@ const message = {
             authBasicPassword: 'Menyokong huruf, nombor, dan aksara khas biasa, panjang 1-72',
             length128Err: 'Panjang tidak boleh melebihi 128 aksara',
             maxLength: 'Panjang tidak boleh melebihi {0} aksara',
+            maxBytes: 'Panjang tidak boleh melebihi {0} bait',
             alias: 'Menyokong Bahasa Inggeris, nombor, - dan _, panjang 1-128, dan tidak boleh bermula atau berakhir dengan -_.',
             vmName: 'Menyokong huruf Inggeris, nombor, ".", "-" dan "_"; panjang: 1-64; mesti bermula dengan huruf atau nombor.',
             vmNetwork:
@@ -2511,7 +2514,7 @@ const message = {
         imageMissing: 'Imej yang diperlukan tidak ditemui. Tarik {image} dalam pengurusan imej.',
         imageReady: 'Imej Benchmark sedia untuk mencipta ujian.',
         imageHelp:
-            'Imej Benchmark menjalankan klien ujian beban dan menghantar permintaan ke perkhidmatan model yang dipilih.',
+            'Sistem menggunakan imej ini untuk mencipta bekas berasingan yang menjalankan ujian penanda aras dengan menghantar permintaan ujian kepada perkhidmatan model yang dipilih.',
         mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
         goImages: 'Ke pengurusan imej',
         goModels: 'Ke muat turun model',
@@ -4884,6 +4887,10 @@ const message = {
         privateKey: 'Kunci (KEY)',
         certificate: 'Sijil (format PEM)',
         HTTPConfig: 'Pilihan HTTP',
+        HTTPSRedirectPort: 'Port ubah hala HTTPS',
+        HTTPSRedirectPortCustom: 'Tersuai',
+        HTTPSRedirectPortManualHelper:
+            'Peraturan ubah hala ini disunting secara manual atau tidak diurus, jadi tidak boleh diubah.',
         HTTPSOnly: 'Blok permintaan HTTP',
         HTTPToHTTPS: 'Alihkan ke HTTPS',
         HTTPAlso: 'Benarkan permintaan HTTP langsung',
@@ -5219,6 +5226,8 @@ const message = {
         status: 'Status Semasa',
         configResource: 'Konfigurasi',
         saveAndReload: 'Simpan dan muat semula',
+        batchClearProxyCacheWarn:
+            'Kosongkan cache proksi terbalik untuk {0} laman web yang dipilih? Permintaan seterusnya untuk kandungan yang sebelum ini dicache akan dihantar ke pelayan asal.',
         clearProxyCache: 'Bersihkan cache proksi terbalik',
         clearProxyCacheWarn:
             'Semua laman web yang dikonfigurasi dengan cache akan terjejas dan "OpenResty" akan dimulakan semula. Adakah anda mahu meneruskan?',
@@ -5255,14 +5264,23 @@ const message = {
             'Skrip yang dilaksanakan sebelum penyusunan, biasanya untuk memuat turun sumber kod modul, memasang kebergantungan, dll.',
         buildHelper:
             'Modul dinamik dimuatkan melalui konfigurasi selepas dibina; modul statik tetap membina semula OpenResty.',
-        defaultHttps: 'Anti-usikan HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Status anti-usikan',
         defaultHttpsHelper1: 'Mengaktifkan pilihan ini boleh menyelesaikan masalah usikan HTTPS.',
         sslRejectHandshake: 'Tolak jabat tangan SSL lalai',
         sslRejectHandshakeHelper:
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
+        httpsRedirectCustomPort: 'Guna ubah hala port tersuai',
+        httpsRedirectCustomPortHelper: 'Apabila didayakan, ubah hala HTTP ke HTTPS menggunakan port HTTPS tersuai.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Direktori penyegerakan',
+        syncDirHelp:
+            'Masukkan laluan mutlak direktori pada nod sasaran. Direktori yang sama digunakan pada semua nod sasaran.',
+        syncDirSingleCert: 'Pilih hanya satu sijil apabila menetapkan direktori untuk mengelakkan fail ditulis ganti.',
+        syncDirAbsolute: 'Direktori penyegerakan mestilah laluan mutlak.',
+
+        caUploadHelp: 'Muat naik fail ZIP yang dimuat turun yang mengandungi ca.crt dan ca.key (maksimum 10 MB).',
         deleteConfirm: 'Sijil berikut akan dipadamkan. Sijil ACME akan dibatalkan secara automatik. Teruskan?',
         deleteAndRevoke: 'Padam dan batalkan',
         create: 'Permintaan',
@@ -5781,6 +5799,84 @@ const message = {
         mount: 'Lekap',
         partitionAlert: 'Operasi ini memformat seluruh cakera. Pastikan data telah dibackup!',
         mountPoint: 'Titik lekap',
+    },
+    networkManage: {
+        routeDetails: 'Butiran laluan',
+        manageIP: 'Urus IP berkaitan',
+        connectedRoute: 'Dijana daripada IP',
+        connectedRouteHint:
+            'Sistem menjana laluan terus ini berdasarkan IP antara muka. Laluan ini tidak disunting secara berasingan. Sunting atau padam IP yang berkaitan dalam butiran antara muka.',
+        virtualBridgeReadOnly: 'Antara muka maya · Baca sahaja',
+        virtualBridgeReadOnlyHint:
+            'Antara muka maya ini adalah baca sahaja dan tidak disertakan dalam semakan kebolehcapaian.',
+        loopbackReadOnly: 'Konfigurasi antara muka gelung balik adalah baca sahaja.',
+        persistentSourceMissing:
+            'Tiada konfigurasi sistem kekal yang disokong ditemui untuk antara muka {0}. Ia adalah baca sahaja.',
+        addressReadOnlyReason:
+            'Alamat ini dinamik, bukan global atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        routeReadOnlyReason:
+            'Laluan ini dinamik, dijana kernel atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        persistenceBackend: 'Kaedah penyimpanan kekal',
+        editIP: 'Edit IP',
+        editRoute: 'Edit laluan',
+        operationRisk:
+            'Perubahan rangkaian boleh memutuskan sambungan. Sediakan cara alternatif untuk mengakses pelayan.',
+        confirmInterface: 'Masukkan nama antara muka {0} untuk mengesahkan.',
+        sourceAddress: 'Alamat sumber',
+        linkConnected: 'Pautan disambungkan',
+        linkDisconnected: 'Pautan terputus',
+        topologySearch: 'Cari antara muka, IP, get laluan atau destinasi',
+        topologyHint:
+            'Urus IP antara muka di sebelah kiri. Kad laluan menunjukkan destinasi, get laluan dan metrik. Klik kad untuk butiran; garisan tidak menandakan sambungan telah disahkan.',
+        direct: 'Terus',
+        defaultDestination: 'Laluan lalai',
+        unknownInterface: 'Antara muka tidak ditentukan',
+        noRoutes: 'Tiada laluan sepadan',
+        readOnly: 'Baca sahaja',
+        readOnlyRouteHint: 'Laluan dengan berbilang hop seterusnya atau tanpa antara muka tunggal adalah baca sahaja.',
+        title: 'Pengurusan Rangkaian',
+        interfaces: 'Antara Muka Rangkaian',
+        routes: 'Laluan',
+        addIP: 'Tambah IP',
+        ipCount: 'Bilangan IP',
+        interfaceID: 'ID antara muka',
+        adminState: 'Status pentadbiran',
+        linkState: 'Status pautan',
+        mac: 'Alamat MAC',
+        flags: 'Bendera',
+        address: 'Alamat',
+        scope: 'Skop',
+        interface: 'Antara muka',
+        configStatus: 'Status tetapan',
+        managedApplied: 'Disimpan · Aktif',
+        managedPending: 'Disimpan · Tidak aktif',
+        addressWarning:
+            'Gunakan IP yang diperuntukkan kepada antara muka ini. Jika IP awam dipetakan melalui NAT, masukkan IP persendirian.',
+        addressRisk:
+            'IP yang sedang digunakan atau panjang awalan yang salah boleh memutuskan akses ke panel atau SSH.',
+        interfaceSelectHint:
+            'Hanya antara muka dengan konfigurasi kekal yang boleh diedit disenaraikan. Antara muka gelung balik, jambatan maya baca sahaja dan antara muka lain yang tidak boleh diubah tidak disenaraikan.',
+        gatewayHint: 'Biarkan get laluan kosong untuk subnet yang disambungkan secara langsung.',
+        metricHint: 'Untuk subnet destinasi yang sama, laluan dengan metrik lebih rendah biasanya diutamakan.',
+        defaultRouteWarning:
+            'Laluan lalai boleh menukar laluan keluar panel, SSH dan perkhidmatan lain. Sediakan akses alternatif seperti konsol awan.',
+        interfaceMissing: 'Antara muka tiada',
+        changeWarning:
+            'Menukar tetapan rangkaian mungkin memutuskan sambungan panel atau mengganggu perkhidmatan. Pastikan anda mempunyai cara lain untuk mengakses pelayan ini sebelum meneruskan.',
+        addressWithPrefix: 'Alamat IP / panjang awalan',
+        cidrHint:
+            'Dalam 192.0.2.10/24, /24 bersamaan dengan topeng subnet 255.255.255.0. Contoh IPv6: 2001:db8::10/64.',
+        addRoute: 'Tambah laluan',
+        checkRoutes: 'Semak kebolehcapaian laluan',
+        destination: 'Destinasi',
+        metric: 'Metrik',
+        routeTable: 'Jadual penghalaan',
+        reachability: 'Kebolehcapaian',
+        reachable: 'Boleh dicapai',
+        unreachable: 'Tidak boleh dicapai',
+        unchecked: 'Belum disemak',
+        check: 'Semak',
+        destinationHint: 'Menyokong alamat IPv4/IPv6 atau rangkaian CIDR. Laluan lalai: default, 0.0.0.0/0 atau ::/0.',
     },
     xpack: {
         ldap: {
@@ -8251,6 +8347,31 @@ const message = {
             menu: 'Penyegerakan Sumber',
             file: 'Pemindahan Fail',
             fileSyncConfirm: 'Pindahkan fail/folder {1} dari nod {0} ke direktori {3} pada nod {2}?',
+            fileBatchDesc: 'Pilih fail atau folder daripada mana-mana nod dan edarkannya ke beberapa nod sasaran.',
+            fileSourceTitle: 'Pilih fail sumber',
+            fileSourceNode: 'Nod sumber',
+            fileTargetDirectory: 'Direktori sasaran',
+            fileBatchPath: 'Tetapkan direktori sasaran secara pukal',
+            fileApplyPath: 'Gunakan pada nod yang dipilih',
+            fileSelectedCount: '{0} item dipilih',
+            fileSelectedTargets: '{0} nod dipilih',
+            fileSelectionHint: 'Folder disalin sepenuhnya dengan nama asal dan struktur direktori dalaman dikekalkan.',
+            fileRules:
+                'Peraturan pemindahan fail sedia ada digunakan: fail dengan nama yang sama mungkin dikemas kini dan fail lain dalam direktori sasaran dikekalkan.',
+            fileBatchSummary: 'Edarkan {0} item ke {1} nod sasaran',
+            fileTaskHint: 'Selepas pengesahan, tugas pengedaran akan dicipta dan boleh dilihat dalam pengurusan tugas.',
+            fileBatchConfirm:
+                'Semak nod sasaran dan laluan simpanan di bawah. Fail dengan nama yang sama mungkin ditulis ganti.',
+            fileTargetHint:
+                'Direktori boleh ditetapkan secara berasingan bagi setiap nod. Nod luar talian, gagal semakan atau tanpa rsync tidak boleh dipilih.',
+            fileChecking: 'Sedang menyemak',
+            fileCheckFailed: 'Semakan gagal',
+            fileRsyncMissing: 'rsync tidak dipasang',
+            filePathRequired: 'Masukkan laluan mutlak direktori sasaran yang bermula dengan /.',
+            fileConflictHint:
+                'Sumber ini berkongsi nama destinasi. Tinggalkan satu sumber bagi setiap nama. Nyahpilihan digunakan pada semua nod sasaran.',
+            fileDeselect: 'Nyahpilih',
+            fileSourceChanged: 'Nod sumber telah ditukar. Sila pilih fail semula.',
 
             image: 'Pemindahan Imej',
             imageBatchDesc:
@@ -8594,7 +8715,21 @@ const message = {
             addCluster: 'Tambah Kluster',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
             noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
-            appStoreOnly: "Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.",
+            backups: 'Sandaran kluster',
+            importBackup: 'Import sandaran',
+            archivePassphrase: 'Frasa laluan sandaran',
+            restoreToNew: 'Pulihkan ke kluster baharu',
+            restoreTarget: 'Destinasi pemulihan',
+            restoreToOriginal: 'Pulihkan ke kluster asal',
+            restoreOriginalUnavailable: 'Tiada kluster asal yang layak untuk sandaran ini.',
+            restoreOriginalWarning:
+                'Sambungan pangkalan data akan terputus. Kluster asal akan kembali ke keadaan semasa sandaran dan replika akan disegerakkan semula.',
+            restoreOriginalConfirm: 'Masukkan nama kluster {0} untuk mengesahkan penimpaan.',
+            restoreCredentials: 'Gunakan kelayakan pentadbir dan replikasi daripada sandaran.',
+            archiveImportHint:
+                'Hanya fail sandaran kluster .1pha disokong. Gunakan frasa laluan yang ditetapkan semasa sandaran dibuat.',
+            backupDataSize: 'Saiz Data',
+            appStoreOnly: 'Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.',
             noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
             installNode: 'Pelayan penggunaan',
             master: 'Pangkalan data utama',

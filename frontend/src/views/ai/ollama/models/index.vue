@@ -111,6 +111,28 @@
                         </template>
                     </el-table-column>
                     <el-table-column
+                        :label="$t('commons.table.description')"
+                        prop="description"
+                        min-width="180"
+                        show-overflow-tooltip
+                    >
+                        <template #default="{ row }">
+                            <fu-read-write-switch v-permission :model-value="row.description">
+                                <template #default="{ read }">
+                                    <el-input
+                                        v-model="row.description"
+                                        type="textarea"
+                                        :rows="3"
+                                        maxlength="256"
+                                        show-word-limit
+                                        autofocus
+                                        @blur="onChangeDescription(row, read)"
+                                    />
+                                </template>
+                            </fu-read-write-switch>
+                        </template>
+                    </el-table-column>
+                    <el-table-column
                         min-width="170"
                         :label="$t('commons.table.date')"
                         prop="createdAt"
@@ -167,7 +189,13 @@ import Connection from '@/views/ai/components/connection/index.vue';
 import PortJumpDialog from '@/components/port-jump/index.vue';
 import { App } from '@/api/interface/app';
 import i18n from '@/lang';
-import { deleteOllamaModel, loadOllamaModel, recreateOllamaModel, searchOllamaModel } from '@/api/modules/ai';
+import {
+    deleteOllamaModel,
+    loadOllamaModel,
+    recreateOllamaModel,
+    searchOllamaModel,
+    updateOllamaModelDescription,
+} from '@/api/modules/ai';
 import { AI } from '@/api/interface/ai';
 import { getAppPort } from '@/api/modules/app';
 import { dateFormat } from '@/utils/date';
@@ -235,6 +263,12 @@ const search = async () => {
             paginationConfig.total = 0;
             loading.value = false;
         });
+};
+
+const onChangeDescription = async (row: AI.OllamaModelInfo, read: () => void) => {
+    await updateOllamaModelDescription({ id: row.id, description: row.description });
+    read();
+    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
 };
 
 const onCreate = async () => {

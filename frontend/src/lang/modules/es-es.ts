@@ -264,6 +264,9 @@ const message = {
             restoreSuccess: 'Restauración completada',
         },
         login: {
+            imageLoadError: 'No se pudo cargar la imagen',
+            imageLoadErrorHint:
+                'Posibles causas: un problema de red, una imagen inexistente o un formato no compatible.',
             username: 'Usuario',
             password: 'Contraseña',
             passkey: 'Inicio de sesión con Passkey',
@@ -350,6 +353,7 @@ const message = {
             authBasicPassword: 'Admite letras, números y caracteres especiales comunes, longitud de 1 a 72',
             length128Err: 'La longitud no puede exceder los 128 caracteres',
             maxLength: 'La longitud no puede exceder los {0} caracteres',
+            maxBytes: 'La longitud no puede superar {0} bytes',
             vmName: 'Admite letras inglesas, números, ".", "-" y "_"; longitud de 1 a 64; debe comenzar con una letra o un número.',
             vmNetwork:
                 'Admite letras inglesas, números, ".", ":", "-" y "_"; longitud de 1 a 64; debe comenzar con una letra o un número.',
@@ -2518,7 +2522,7 @@ const message = {
         imageMissing: 'No se encontró la imagen requerida. Descargue {image} en la gestión de imágenes.',
         imageReady: 'La imagen de Benchmark está lista para crear pruebas.',
         imageHelp:
-            'La imagen de Benchmark ejecuta el cliente de carga y envía solicitudes al servicio de modelos seleccionado.',
+            'El sistema utiliza esta imagen para crear un contenedor independiente que ejecuta pruebas de rendimiento enviando solicitudes al servicio de modelos seleccionado.',
         mainNodeHelp: 'Las pruebas se ejecutan en el nodo principal. Prepare la imagen y el tokenizador en ese nodo.',
         goImages: 'Ir a la gestión de imágenes',
         goModels: 'Ir a las descargas de modelos',
@@ -4899,6 +4903,10 @@ const message = {
         privateKey: 'Clave privada (KEY)',
         certificate: 'Certificado (formato PEM)',
         HTTPConfig: 'Opciones HTTP',
+        HTTPSRedirectPort: 'Puerto de redirección HTTPS',
+        HTTPSRedirectPortCustom: 'Personalizado',
+        HTTPSRedirectPortManualHelper:
+            'La regla de redirección se editó manualmente o no está gestionada, por lo que no se puede modificar.',
         HTTPSOnly: 'Bloquear peticiones HTTP',
         HTTPToHTTPS: 'Redirigir a HTTPS',
         HTTPAlso: 'Permitir peticiones HTTP directas',
@@ -5217,6 +5225,8 @@ const message = {
         status: 'Estado actual',
         configResource: 'Configuración',
         saveAndReload: 'Guardar y recargar',
+        batchClearProxyCacheWarn:
+            '¿Quieres vaciar la caché del proxy inverso de los {0} sitios seleccionados? La próxima solicitud de contenido que estaba en caché llegará al servidor de origen.',
         clearProxyCache: 'Limpiar caché de proxy inverso',
         clearProxyCacheWarn: 'Esta acción eliminará todos los archivos en el directorio de caché. ¿Deseas continuar?',
         create: 'Agregar nuevo módulo',
@@ -5252,14 +5262,25 @@ const message = {
             'Scripts a ejecutar antes de compilar, usualmente para descargar código fuente de módulos, instalar dependencias, etc.',
         buildHelper:
             'Los módulos dinámicos se cargan desde la configuración tras compilarse; los módulos estáticos siguen reconstruyendo OpenResty.',
-        defaultHttps: 'HTTPS Anti-manipulación',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Estado de protección contra manipulación',
         defaultHttpsHelper1: 'Habilitar esto puede resolver problemas de manipulación de HTTPS.',
         sslRejectHandshake: 'Rechazar handshake SSL predeterminado',
         sslRejectHandshakeHelper:
             'Habilitar esto puede evitar la fuga de certificados, establecer un sitio web predeterminado invalidará esta configuración',
+        httpsRedirectCustomPort: 'Usar redirección con puerto personalizado',
+        httpsRedirectCustomPortHelper:
+            'Cuando está activado, las redirecciones de HTTP a HTTPS usan el puerto HTTPS personalizado.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Directorio de sincronización',
+        syncDirHelp:
+            'Introduzca la ruta absoluta del directorio en los nodos de destino. Se utilizará el mismo directorio en todos ellos.',
+        syncDirSingleCert:
+            'Seleccione un solo certificado al especificar un directorio para evitar sobrescribir archivos.',
+        syncDirAbsolute: 'El directorio de sincronización debe ser una ruta absoluta.',
+
+        caUploadHelp: 'Suba el archivo ZIP descargado que contiene ca.crt y ca.key (máximo 10 MB).',
         deleteConfirm:
             'Se eliminarán los siguientes certificados. Los certificados ACME se revocarán automáticamente. ¿Desea continuar?',
         deleteAndRevoke: 'Eliminar y revocar',
@@ -5638,7 +5659,7 @@ const message = {
         runScriptHelper:
             'La lista de comandos de inicio se obtiene desde el archivo package.json en el directorio fuente.',
         open: 'Abrir',
-        operatorHelper: 'La operación {0} se ejecutará sobre el entorno de ejecución seleccionado. ¿Deseas continuar?',
+        operatorHelper: 'La operación {1} se ejecutará en {0}, ¿quieres continuar?',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fuente de imagen',
@@ -5785,6 +5806,84 @@ const message = {
         diskType: 'Tipo de disco',
         serial: 'Núm. de serie',
         noFail: 'El fallo de montaje no afecta al inicio del sistema',
+    },
+    networkManage: {
+        routeDetails: 'Detalles de la ruta',
+        manageIP: 'Gestionar IP asociada',
+        connectedRoute: 'Generada a partir de la IP',
+        connectedRouteHint:
+            'El sistema genera esta ruta conectada a partir de la IP de la interfaz. No se edita por separado. Edite o elimine la IP correspondiente en los detalles de la interfaz.',
+        virtualBridgeReadOnly: 'Interfaz virtual · Solo lectura',
+        virtualBridgeReadOnlyHint:
+            'Esta interfaz virtual es de solo lectura y no participa en las comprobaciones de conectividad.',
+        loopbackReadOnly: 'La configuración de la interfaz de bucle invertido es de solo lectura.',
+        persistentSourceMissing:
+            'No se encontró una configuración persistente del sistema compatible para la interfaz {0}. Es de solo lectura.',
+        addressReadOnlyReason:
+            'Esta dirección es dinámica, no global o no tiene una configuración persistente compatible. Es de solo lectura.',
+        routeReadOnlyReason:
+            'Esta ruta es dinámica, generada por el núcleo o no tiene una configuración persistente compatible. Es de solo lectura.',
+        persistenceBackend: 'Persistencia',
+        editIP: 'Editar IP',
+        editRoute: 'Editar ruta',
+        operationRisk:
+            'Los cambios de red pueden interrumpir las conexiones. Prepare una forma alternativa de acceder al servidor.',
+        confirmInterface: 'Introduzca el nombre de interfaz {0} para confirmar.',
+        sourceAddress: 'Dirección de origen',
+        linkConnected: 'Enlace conectado',
+        linkDisconnected: 'Enlace desconectado',
+        topologySearch: 'Buscar interfaz, IP, puerta de enlace o destino',
+        topologyHint:
+            'Gestione las IP de la interfaz a la izquierda. Las tarjetas muestran destino, puerta de enlace y métrica. Pulse una tarjeta para ver los detalles; las líneas no indican conectividad verificada.',
+        direct: 'Directa',
+        defaultDestination: 'Ruta predeterminada',
+        unknownInterface: 'Interfaz sin especificar',
+        noRoutes: 'No hay rutas coincidentes',
+        readOnly: 'Solo lectura',
+        readOnlyRouteHint: 'Las rutas con varios saltos siguientes o sin una interfaz única son de solo lectura.',
+        title: 'Gestión de redes',
+        interfaces: 'Interfaces de red',
+        routes: 'Rutas',
+        addIP: 'Añadir IP',
+        ipCount: 'Número de IP',
+        interfaceID: 'ID de interfaz',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado del enlace',
+        mac: 'Dirección MAC',
+        flags: 'Indicadores',
+        address: 'Dirección',
+        scope: 'Ámbito',
+        interface: 'Interfaz',
+        configStatus: 'Estado de la configuración',
+        managedApplied: 'Guardado · Activo',
+        managedPending: 'Guardado · Inactivo',
+        addressWarning:
+            'Usa la IP asignada a esta interfaz. Si la IP pública se traduce mediante NAT, introduce la IP privada.',
+        addressRisk:
+            'Una IP que ya está en uso o una longitud de prefijo incorrecta pueden interrumpir el acceso al panel o por SSH.',
+        addressWithPrefix: 'Dirección IP / longitud del prefijo',
+        interfaceSelectHint:
+            'Solo se muestran interfaces cuya configuración persistente se puede modificar. Se excluyen las interfaces de bucle local, los puentes virtuales de solo lectura y otras interfaces que no se pueden modificar.',
+        gatewayHint: 'Deje la puerta de enlace vacía para las subredes conectadas directamente.',
+        metricHint: 'Para la misma subred de destino, suelen tener prioridad las rutas con una métrica menor.',
+        defaultRouteWarning:
+            'Una ruta predeterminada puede cambiar la salida del panel, SSH y otros servicios. Prepara un acceso alternativo, como la consola de la nube.',
+        interfaceMissing: 'Falta la interfaz',
+        changeWarning:
+            'Cambiar la configuración de red puede desconectar el panel o interrumpir los servicios. Antes de continuar, asegúrate de disponer de otra forma de acceder al servidor.',
+        cidrHint:
+            'En 192.0.2.10/24, /24 corresponde a la máscara de subred 255.255.255.0. Ejemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Añadir ruta',
+        checkRoutes: 'Comprobar accesibilidad de las rutas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabla',
+        reachability: 'Accesibilidad',
+        reachable: 'Accesible',
+        unreachable: 'Inaccesible',
+        unchecked: 'Sin comprobar',
+        check: 'Comprobar',
+        destinationHint: 'Admite direcciones IPv4/IPv6 o redes CIDR. Ruta predeterminada: default, 0.0.0.0/0 o ::/0.',
     },
     xpack: {
         ldap: {
@@ -8274,6 +8373,34 @@ const message = {
             menu: 'Sincronización de Recursos',
             file: 'Transferencia de archivos',
             fileSyncConfirm: '¿Transferir el archivo/carpeta {1} del nodo {0} al directorio {3} del nodo {2}?',
+            fileBatchDesc:
+                'Seleccione archivos o carpetas de cualquier nodo y distribúyalos a varios nodos de destino.',
+            fileSourceTitle: 'Seleccionar archivos de origen',
+            fileSourceNode: 'Nodo de origen',
+            fileTargetDirectory: 'Directorio de destino',
+            fileBatchPath: 'Establecer directorios de destino en lote',
+            fileApplyPath: 'Aplicar a los nodos seleccionados',
+            fileSelectedCount: '{0} elementos seleccionados',
+            fileSelectedTargets: '{0} nodos seleccionados',
+            fileSelectionHint:
+                'Las carpetas se copian completas con su nombre original y conservan su estructura interna.',
+            fileRules:
+                'Se aplican las reglas de transferencia existentes: los archivos con el mismo nombre pueden actualizarse y los demás archivos del directorio de destino se conservan.',
+            fileBatchSummary: 'Distribuir {0} elementos a {1} nodos de destino',
+            fileTaskHint:
+                'Al confirmar, se crea una tarea de distribución que puede consultar en la gestión de tareas.',
+            fileBatchConfirm:
+                'Revise los nodos y las rutas de destino a continuación. Los archivos con el mismo nombre pueden sobrescribirse.',
+            fileTargetHint:
+                'Puede establecer un directorio por nodo. No se pueden seleccionar nodos desconectados, con comprobaciones fallidas o sin rsync.',
+            fileChecking: 'Comprobando',
+            fileCheckFailed: 'Error de comprobación',
+            fileRsyncMissing: 'rsync no está instalado',
+            filePathRequired: 'Introduzca una ruta absoluta para el directorio de destino que comience por /.',
+            fileConflictHint:
+                'Estos orígenes comparten nombres de destino. Deje solo un origen por nombre. La selección se actualiza para todos los nodos de destino.',
+            fileDeselect: 'Deseleccionar',
+            fileSourceChanged: 'El nodo de origen ha cambiado. Vuelva a seleccionar los archivos.',
 
             image: 'Transferencia de imágenes',
             imageBatchDesc:
@@ -8626,6 +8753,20 @@ const message = {
             addCluster: 'Añadir clúster',
             unhealthyDeleteError: 'El nodo tiene estado anómalo, revisa la lista e inténtalo de nuevo',
             noAvailableMasterVersion: 'No hay una plantilla de instancia primaria disponible en este nodo.',
+            backups: 'Copias del clúster',
+            importBackup: 'Importar copia',
+            archivePassphrase: 'Contraseña de la copia',
+            restoreToNew: 'Restaurar en un clúster nuevo',
+            restoreTarget: 'Destino de la restauración',
+            restoreToOriginal: 'Restaurar en el clúster original',
+            restoreOriginalUnavailable: 'Esta copia no tiene un clúster original apto para la restauración.',
+            restoreOriginalWarning:
+                'Se interrumpirán las conexiones de la base de datos. El clúster original volverá al estado de la copia y las réplicas se sincronizarán de nuevo.',
+            restoreOriginalConfirm: 'Escriba el nombre del clúster {0} para confirmar la sobrescritura.',
+            restoreCredentials: 'Utilice las credenciales de administrador y réplica de la copia.',
+            archiveImportHint:
+                'Solo se admiten archivos de copia de seguridad de clústeres .1pha. Use la contraseña configurada al crear la copia.',
+            backupDataSize: 'Tamaño de los datos',
             appStoreOnly: 'Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones.',
             noMatchingReplicaVersion:
                 'En este nodo no hay una plantilla de réplica con la misma versión que la instancia primaria.',

@@ -137,6 +137,7 @@ type NginxOperateReq struct {
 }
 
 type NginxDefaultHTTPSUpdate struct {
-	Operate            string `json:"operate" validate:"required,oneof=enable disable"`
-	SSLRejectHandshake bool   `json:"sslRejectHandshake"`
+	Operate                 string `json:"operate" validate:"required,oneof=enable disable"`
+	SSLRejectHandshake      bool   `json:"sslRejectHandshake"`
+	HTTPSRedirectCustomPort *bool `json:"httpsRedirectCustomPort"`
 }
