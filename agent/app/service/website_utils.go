@@ -935,6 +935,7 @@ func deleteListenAndServerName(website model.Website, binds []string, domains []
 }
 
 func setListen(server *components.Server, port string, ipv6, http3, defaultServer, ssl bool) {
+	ssl = ssl || listenHasParameter(server, port, "ssl")
 	var params []string
 	if ssl {
 		params = []string{"ssl"}
@@ -946,10 +947,30 @@ func setListen(server *components.Server, port string, ipv6, http3, defaultServe
 	if !ipv6 {
 		return
 	}
-	server.UpdateListen("[::]:"+port, defaultServer, params...)
-	if ssl && http3 {
+	sslV6 := ssl || listenHasParameter(server, "[::]:"+port, "ssl")
+	var paramsV6 []string
+	if sslV6 {
+		paramsV6 = []string{"ssl"}
+	}
+	server.UpdateListen("[::]:"+port, defaultServer, paramsV6...)
+	if sslV6 && http3 {
 		server.UpdateListen("[::]:"+port, defaultServer, "quic")
 	}
+}
+
+// listenHasParameter reports whether the bind already listens with parameter.
+// Every domain of a site shares a port, and the TLS flag belongs to the listen
+// rather than to a server_name, so a port that serves TLS must keep serving it.
+// The SSL checkbox on the domain being added only decides a port that does not
+// serve TLS yet; without this, adding a domain without its own certificate
+// rewrote the site's HTTPS listen as plain HTTP for every domain on that port.
+func listenHasParameter(server *components.Server, bind, parameter string) bool {
+	for _, listen := range server.Listens {
+		if listen.Bind == bind && slices.Contains(listen.Parameters, parameter) {
+			return true
+		}
+	}
+	return false
 }
 
 func removeSSLListen(website model.Website, binds []string) error {
