@@ -328,6 +328,8 @@ type ComposeCreate struct {
 	ForcePull bool   `json:"forcePull"`
 }
 type ComposeOperation struct {
+	TaskID    string `json:"taskID"`
+	ForcePull bool   `json:"forcePull"`
 	Name      string `json:"name" validate:"required"`
 	Path      string `json:"path"`
 	Operation string `json:"operation" validate:"required,oneof=up start restart stop down delete rebuild"`

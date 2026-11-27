@@ -365,6 +365,8 @@ export namespace Container {
         forcePull: boolean;
     }
     export interface ComposeOperation {
+        taskID?: string;
+        forcePull?: boolean;
         name: string;
         operation: string;
         path: string;
