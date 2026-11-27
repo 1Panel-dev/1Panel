@@ -11,7 +11,7 @@ Chọn task **chưa xong có số nhỏ nhất** mà mọi task phụ thuộc đ
 | [x] | **T0.1** Tạo fork và môi trường làm việc | không | [phase-0-2.md](phase-0-2.md) | 2026-11-27. AGENTS.md bị .gitignore upstream bỏ qua → thêm bằng `git add -f`, không sửa .gitignore. WSL là Ubuntu 26.04. Commit dùng email noreply GitHub. |
 | [x] | **T0.2** Build được từ mã nguồn | T0.1 | [phase-0-2.md](phase-0-2.md) | 2026-11-27. Không chạy được `1panel-core version` khi chưa cài (panic thiếu /usr/local/bin/1pctl, phiên bản nằm trong DB chứ không trong binary), xem BUILD.md mục 4. arm64 ở `build/arm64/`. Agent có 2 test fail sẵn (TLS). |
 | [x] | **T0.3** Phân tích gói phát hành và luồng cài đặt của upstream | T0.1 | [phase-0-2.md](phase-0-2.md) | 2026-11-27. Gói chính thức build với `-tags=xpack` (XPanel không dùng). Nâng cấp trong panel không kiểm tra checksum. Phiên bản chỉ nằm trong `ORIGINAL_VERSION` của 1pctl. Xem mục 4 của RELEASE-FORMAT.md. |
-| [~] | **T1.1** CI kiểm tra build | T0.2 | [phase-0-2.md](phase-0-2.md) | |
+| [x] | **T1.1** CI kiểm tra build | T0.2 | [phase-0-2.md](phase-0-2.md) | 2026-11-27. Run 45900232237 xanh, 5 phút 3 giây. Bỏ qua 2 test agent fail sẵn (TLS) bằng `-skip`, không sửa test. Đã tắt tay 3 workflow upstream (Gitee, Issue Translator, PR Handling). |
 | [ ] | **T1.2** Máy chủ phát hành và workflow release | T0.3, T1.1 | [phase-0-2.md](phase-0-2.md) | |
 | [ ] | **T1.3** URL máy chủ đọc từ cấu hình [fork] | T0.3 | [phase-0-2.md](phase-0-2.md) | |
 | [ ] | **T1.4** Installer riêng | T1.2, T1.3 | [phase-0-2.md](phase-0-2.md) | |
