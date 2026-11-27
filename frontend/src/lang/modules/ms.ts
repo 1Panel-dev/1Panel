@@ -358,6 +358,7 @@ const message = {
             authBasicPassword: 'Menyokong huruf, nombor, dan aksara khas biasa, panjang 1-72',
             length128Err: 'Panjang tidak boleh melebihi 128 aksara',
             maxLength: 'Panjang tidak boleh melebihi {0} aksara',
+            maxBytes: 'Panjang tidak boleh melebihi {0} bait',
             alias: 'Menyokong Bahasa Inggeris, nombor, - dan _, panjang 1-128, dan tidak boleh bermula atau berakhir dengan -_.',
             vmName: 'Menyokong huruf Inggeris, nombor, ".", "-" dan "_"; panjang: 1-64; mesti bermula dengan huruf atau nombor.',
             vmNetwork:
@@ -5800,13 +5801,15 @@ const message = {
         persistenceBackend: 'Kaedah penyimpanan kekal',
         editIP: 'Edit IP',
         editRoute: 'Edit laluan',
-        operationRisk: 'Perubahan rangkaian boleh memutuskan sambungan. Sediakan cara alternatif untuk mengakses pelayan.',
+        operationRisk:
+            'Perubahan rangkaian boleh memutuskan sambungan. Sediakan cara alternatif untuk mengakses pelayan.',
         confirmInterface: 'Masukkan nama antara muka {0} untuk mengesahkan.',
         sourceAddress: 'Alamat sumber',
         linkConnected: 'Pautan disambungkan',
         linkDisconnected: 'Pautan terputus',
         topologySearch: 'Cari antara muka, IP, get laluan atau destinasi',
-        topologyHint: 'Urus IP antara muka di sebelah kiri. Kad laluan menunjukkan destinasi, get laluan dan metrik. Klik kad untuk butiran; garisan tidak menandakan sambungan telah disahkan.',
+        topologyHint:
+            'Urus IP antara muka di sebelah kiri. Kad laluan menunjukkan destinasi, get laluan dan metrik. Klik kad untuk butiran; garisan tidak menandakan sambungan telah disahkan.',
         direct: 'Terus',
         defaultDestination: 'Laluan lalai',
         unknownInterface: 'Antara muka tidak ditentukan',
@@ -5836,8 +5839,7 @@ const message = {
         interfaceSelectHint:
             'Hanya antara muka dengan konfigurasi kekal yang boleh diedit disenaraikan. Antara muka gelung balik, jambatan maya baca sahaja dan antara muka lain yang tidak boleh diubah tidak disenaraikan.',
         gatewayHint: 'Biarkan get laluan kosong untuk subnet yang disambungkan secara langsung.',
-        metricHint:
-            'Untuk subnet destinasi yang sama, laluan dengan metrik lebih rendah biasanya diutamakan.',
+        metricHint: 'Untuk subnet destinasi yang sama, laluan dengan metrik lebih rendah biasanya diutamakan.',
         defaultRouteWarning:
             'Laluan lalai boleh menukar laluan keluar panel, SSH dan perkhidmatan lain. Sediakan akses alternatif seperti konsol awan.',
         interfaceMissing: 'Antara muka tiada',

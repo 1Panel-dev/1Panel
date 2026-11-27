@@ -71,3 +71,7 @@ func (r *Remote) ExecSQLForRows(command string, timeout uint) ([]string, error) 
 	}
 	return result, rows.Err()
 }
+
+func databaseConnectionString(database string) string {
+	return "dbname='" + strings.NewReplacer(`\`, `\\`, "'", `\'`).Replace(database) + "'"
+}

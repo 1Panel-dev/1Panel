@@ -352,6 +352,7 @@ const message = {
             authBasicPassword: 'Supports letters, numbers, and common special characters, length 1-72',
             length128Err: 'Length cannot exceed 128 characters',
             maxLength: 'Length cannot exceed {0} characters',
+            maxBytes: 'Length cannot exceed {0} bytes',
             alias: 'Supports English, numbers, - and _, length 1-128, and cannot start or end with -_.',
             vmName: 'Supports English letters, numbers, ".", "-", and "_"; length: 1-64; must start with a letter or number.',
             vmNetwork:

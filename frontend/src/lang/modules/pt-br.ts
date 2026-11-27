@@ -351,6 +351,7 @@ const message = {
             authBasicPassword: 'Suporta letras, números e caracteres especiais comuns, comprimento 1-72',
             length128Err: 'O comprimento não pode exceder 128 caracteres',
             maxLength: 'O comprimento não pode exceder {0} caracteres',
+            maxBytes: 'O tamanho não pode exceder {0} bytes',
             alias: 'Suporta letras, números, - e _, comprimento de 1 a 128, e não pode começar ou terminar com -_.',
             vmName: 'Aceita letras, números, ".", "-" e "_"; comprimento: 1-64; deve começar com uma letra ou um número.',
             vmNetwork:

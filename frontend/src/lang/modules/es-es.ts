@@ -353,6 +353,7 @@ const message = {
             authBasicPassword: 'Admite letras, números y caracteres especiales comunes, longitud de 1 a 72',
             length128Err: 'La longitud no puede exceder los 128 caracteres',
             maxLength: 'La longitud no puede exceder los {0} caracteres',
+            maxBytes: 'La longitud no puede superar {0} bytes',
             vmName: 'Admite letras inglesas, números, ".", "-" y "_"; longitud de 1 a 64; debe comenzar con una letra o un número.',
             vmNetwork:
                 'Admite letras inglesas, números, ".", ":", "-" y "_"; longitud de 1 a 64; debe comenzar con una letra o un número.',
