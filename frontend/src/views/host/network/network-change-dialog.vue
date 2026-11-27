@@ -31,24 +31,27 @@
             </div>
         </div>
         <template #footer>
-            <el-button :disabled="loading" @click="emit('update:modelValue', false)">
-                {{ $t('commons.button.cancel') }}
-            </el-button>
-            <el-button
-                v-permission
-                :type="confirmType"
-                :loading="loading"
-                :disabled="disabled || loading || !device || confirmation !== device"
-                @keydown.enter.prevent.stop
-                @click="emit('confirm', confirmation)"
-            >
-                {{ confirmText || $t('commons.button.confirm') }}
-            </el-button>
+            <DeleteConfirmFooter v-model="confirmation" :confirmation-text="device" :disabled="loading">
+                <el-button :disabled="loading" @click="emit('update:modelValue', false)">
+                    {{ $t('commons.button.cancel') }}
+                </el-button>
+                <el-button
+                    v-permission
+                    :type="confirmType"
+                    :loading="loading"
+                    :disabled="disabled || loading || !device || confirmation !== device"
+                    @keydown.enter.prevent.stop
+                    @click="emit('confirm', confirmation)"
+                >
+                    {{ confirmText || $t('commons.button.confirm') }}
+                </el-button>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 
 <script setup lang="ts">
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { ref, useId, watch } from 'vue';
 
 const props = withDefaults(

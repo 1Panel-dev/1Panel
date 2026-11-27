@@ -5531,7 +5531,7 @@ const message = {
         runScript: 'スクリプトを実行します',
         runScriptHelper: '起動コマンドリストは、ソースディレクトリのpackage.jsonファイルから解析されます。',
         open: '開ける',
-        operatorHelper: '{0}操作は、選択した動作環境で実行されます。続けたいですか？',
+        operatorHelper: '操作{1}は{0}で実行されます、続行しますか？',
         taobao: 'タオバオ',
         tencent: 'テンセント',
         imageSource: '画像ソース',

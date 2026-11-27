@@ -5167,7 +5167,7 @@ const message = {
         runScript: '启动命令',
         runScriptHelper: '启动命令列表是从源码目录下的 package.json 文件中解析而来',
         open: '放开',
-        operatorHelper: '将对选中的运行环境进行 {0} 操作，是否继续？',
+        operatorHelper: '将对选中的 {0} 进行 {1} 操作，是否继续？',
         taobao: '淘宝',
         tencent: '腾讯',
         imageSource: '镜像源',

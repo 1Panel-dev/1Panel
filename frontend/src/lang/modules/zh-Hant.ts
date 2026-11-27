@@ -5127,7 +5127,7 @@ const message = {
         runScript: '啟動指令',
         runScriptHelper: '啟動指令是指容器啟動後執行的指令',
         open: '開啟',
-        operatorHelper: '將對選取的執行環境進行 {0} 操作，是否繼續？ ',
+        operatorHelper: '將對選取的 {0} 進行 {1} 操作，是否繼續？',
         taobao: '淘寶',
         tencent: '騰訊',
         imageSource: '映像源',

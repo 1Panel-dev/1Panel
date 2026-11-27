@@ -23,18 +23,19 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <span class="dialog-footer">
+            <DeleteConfirmFooter v-model="deleteInfo" :confirmation-text="dbName" :disabled="loading">
                 <el-button @click="open = false" :disabled="loading">
                     {{ $t('commons.button.cancel') }}
                 </el-button>
                 <el-button type="primary" @click="submit" :disabled="deleteInfo != dbName || loading">
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 <script lang="ts" setup>
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { FormInstance } from 'element-plus';
 import { ref } from 'vue';
 import i18n from '@/lang';
