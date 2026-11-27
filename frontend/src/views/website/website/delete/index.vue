@@ -38,7 +38,7 @@
             </el-form>
         </div>
         <template #footer>
-            <span class="dialog-footer">
+            <DeleteConfirmFooter v-model="deleteInfo" :confirmation-text="websiteName" :disabled="loading">
                 <el-button @click="handleClose" :disabled="loading">{{ $t('commons.button.cancel') }}</el-button>
                 <el-button
                     v-permission
@@ -48,12 +48,13 @@
                 >
                     {{ $t('commons.button.confirm') }}
                 </el-button>
-            </span>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 
 <script lang="ts" setup>
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { deleteWebsite } from '@/api/modules/website';
 import i18n from '@/lang';
 import { FormInstance } from 'element-plus';

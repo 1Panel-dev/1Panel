@@ -273,7 +273,7 @@ const buttons = [
         label: i18n.global.t('commons.operate.stop'),
         permission: true,
         click: function (row: Runtime.Runtime) {
-            operateRuntime('down', row.id, loading, search);
+            operateRuntime('down', row, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'stop');
@@ -283,7 +283,7 @@ const buttons = [
         label: i18n.global.t('commons.operate.start'),
         permission: true,
         click: function (row: Runtime.Runtime) {
-            operateRuntime('up', row.id, loading, search);
+            operateRuntime('up', row, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'start');
@@ -293,7 +293,7 @@ const buttons = [
         label: i18n.global.t('commons.button.restart'),
         permission: true,
         click: function (row: Runtime.Runtime) {
-            operateRuntime('restart', row.id, loading, search);
+            operateRuntime('restart', row, loading, search);
         },
         disabled: function (row: Runtime.Runtime) {
             return disabledButton(row, 'restart');
@@ -433,7 +433,7 @@ const openDelete = async (row: Runtime.Runtime) => {
     RuntimeDeleteCheck(row.id).then(async (res) => {
         const items = res.data;
         if (res.data && res.data.length > 0) {
-            checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id });
+            checkRef.value.acceptParams({ items: items, key: 'website', installID: row.id, name: row.name });
         } else {
             deleteRef.value.acceptParams(row.id, row.name);
         }

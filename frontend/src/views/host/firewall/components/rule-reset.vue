@@ -33,15 +33,18 @@
             </div>
         </template>
         <template #footer>
-            <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button type="primary" :disabled="confirmation !== provider" @click="submit">
-                {{ $t('commons.button.reset') }}
-            </el-button>
+            <DeleteConfirmFooter v-model="confirmation" :confirmation-text="provider" :disabled="false">
+                <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button type="primary" :disabled="confirmation !== provider" @click="submit">
+                    {{ $t('commons.button.reset') }}
+                </el-button>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 
 <script setup lang="ts">
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { ref } from 'vue';
 import DialogPro from '@/components/dialog-pro/index.vue';
 

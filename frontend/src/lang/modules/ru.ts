@@ -5637,7 +5637,7 @@ const message = {
         runScript: 'Скрипт запуска',
         runScriptHelper: 'Список команд запуска анализируется из файла package.json в исходной директории.',
         open: 'Открыть',
-        operatorHelper: 'Операция {0} будет выполнена для выбранной среды выполнения. Хотите продолжить?',
+        operatorHelper: 'Операция {1} будет выполнена для {0}, продолжить?',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Источник образа',

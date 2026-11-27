@@ -5645,7 +5645,7 @@ const message = {
         runScript: 'Çalıştırma betiği',
         runScriptHelper: 'Kaynak dizindeki package.json dosyasından ayrıştırılan başlatma komutları listesi.',
         open: 'Aç',
-        operatorHelper: 'Seçilen çalışma ortamında {0} işlemi gerçekleştirilecek. Devam etmek istiyor musunuz?',
+        operatorHelper: '{0} üzerinde {1} işlemi gerçekleştirilecek, devam etmek istiyor musunuz?',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Görüntü kaynağı',
