@@ -1,5 +1,5 @@
 # базовые ошибки
-ErrInvalidParams: 'Неверный запрос: {{ .detail }}'
+ErrInvalidParams: 'Неверный запрос{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Неверный формат пользовательских аргументов MCP'
 ErrMcpGatewayArgsConflict: 'Аргумент {{ .name }} управляется 1Panel и не может быть задан в пользовательских аргументах'
 ErrTokenParse: 'Ошибка токена: {{ .detail }}'
@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Не удалось определить имя п�
 ErrComposeProjectNameEmpty: 'Не удалось получить имя проекта из конфигурации Docker Compose или родительского каталога файла. Введите имя и повторите попытку.'
 ErrComposeNameInvalid: 'Недопустимое имя проекта Compose: оно должно начинаться со строчной буквы или цифры, содержать только строчные буквы, цифры, дефисы и подчёркивания и иметь длину от 1 до 256 символов.'
 ErrAppVersionUnavailable: 'Эта версия приложения удалена из удаленного сервиса. Выберите другую версию и повторите попытку.'
-ErrVllmGB10ProOnly: 'Эта версия vLLM доступна только в профессиональной редакции 1Panel.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway можно обновлять только в пределах одного типа базы данных (SQLite или PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'Резервная копия AI Gateway и целевое приложение должны использовать один и тот же тип базы данных (SQLite или PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent можно обновить только до более нового распознанного выпуска, разрешённого настройкой обновления между основными версиями. Для возврата к старой версии восстановите резервную копию.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Ожидание готовности приложения'
 UpgradeBackupDisabled: 'Резервная копия обновления отключена; изменения данных из сценариев обновления нельзя полностью откатить'
 UpgradeRollbackFailed: 'Ошибка отката'
 ErrDatabaseNotFound: 'База данных {{ .name }} не существует'
+
+# vLLM
+ErrVllmGB10ProOnly: 'Эта версия vLLM доступна только в профессиональной редакции 1Panel.'
+ErrVllmGB10ModelUnsupported: 'Эта версия поддерживает только DeepSeek-V4-Flash-0731 или DeepSeek-V4-Flash-Vision-Exp. Выберите каталог соответствующей модели.'
 
 # SSH
 ExportIP: 'IP входа'
@@ -289,6 +292,13 @@ RemoteBackup: 'Для резервного копирования удаленн
 RemoteRecover: 'Для восстановления удаленной базы данных необходимо сначала запустить службу базы данных локального контейнера с помощью образа {{ .name }}, пожалуйста, подождите...'
 Arg: 'Аргумент'
 
+#PostgreSQL
+ErrPgUserProtected: "Системные пользователи и пользователь текущего подключения защищены от этой операции"
+ErrPgSuperUserGrant: "Суперпользователи имеют доступ ко всем базам данных и не требуют отдельной выдачи или отзыва прав"
+ErrPgUserUsed: "Пользователь используется связанными приложениями или сайтами; сначала измените их учётные записи подключения"
+ErrPgUserBound: "Сначала отзовите права этого пользователя на базы данных"
+ErrPgUserPasswordSync: "Пароль пользователя изменён, но синхронизация пароля со следующими приложениями не удалась: {{ .detail }}"
+
 # Redis
 ErrTypeOfRedis: 'Тип файла восстановления не соответствует текущему методу сохранения. Измените его и повторите попытку'
 
@@ -341,6 +351,14 @@ ComposeRecoverCleanup: 'Очистить рабочую область восс�
 # среда выполнения
 ErrFileNotExist: 'Файл {{ .detail }} не существует Проверьте целостность исходного файла'
 ErrImageBuildErr: 'Сборка образа не удалась'
+PHPBuildImage: "Сборка образа PHP"
+PHPBuildBaseImage: "Получение базового образа {{ .name }}"
+PHPBuildStep: "Сборка образа PHP (шаг {{ .name }})"
+PHPBuildStartContainer: "Запуск контейнера PHP"
+PHPBuildInstallExtensions: "Установка расширений PHP"
+PHPBuildCommitImage: "Сохранение образа с расширениями PHP"
+PHPBuildApplyConfig: "Применение настроек и запуск среды PHP"
+PHPBuildSeeLog: "Подробности см. в build.log"
 ErrImageExist: 'Изображение уже существует Пожалуйста, измените имя изображения.'
 ErrDelWithWebsite: 'Операционная среда уже связана с веб-сайтом и не может быть удалена'
 ErrRuntimeStart: 'Запуск не удался'
@@ -639,6 +657,8 @@ ErrWebhookTestFailed: 'Проверьте конфигурацию Webhook. По
 
 # задача - среда выполнения
 ErrInstallExtension: 'Уже выполняется задача установки, подождите, пока задача завершится'
+PHPExtensionsInstallWarning: "Не удалось установить некоторые расширения PHP: {{ .name }}"
+PHPExtensionsInstallManually: "Повторите установку на странице расширений, чтобы сохранить успешно установленные расширения в образе. Для ручной диагностики выполните следующие команды на хосте Docker:"
 
 # шаблон письма оповещения
 PanelAlertTitle: 'Уведомление панели'
@@ -666,6 +686,17 @@ PartitionDiskErr: 'Не удалось разделить, {{ .err }}'
 FormatDiskErr: 'Не удалось отформатировать диск, {{ .err }}'
 MountDiskErr: 'Не удалось подключить диск, {{ .err }}'
 XfsNotFound: 'Файловая система xfs не обнаружена, сначала установите xfsprogs'
+
+# Управление сетью
+ErrNetworkPersistencePlatform: "Постоянные настройки сети поддерживаются только на узлах Linux."
+ErrNetworkPersistencePrivilege: "Для сохранения настроек сети 1Panel Agent должен работать от имени root с правами управления сетью."
+ErrNetworkIPRoute2: "Установите или обновите iproute2 и проверьте доступность команды ip.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "У этого основного IP-адреса есть дополнительные адреса в той же подсети. Сначала удалите дополнительные адреса или измените их системными сетевыми средствами, затем повторите попытку."
+ErrNetworkRouteReadOnly: "Этот маршрут доступен только для чтения."
+ErrNetworkPersistenceConflict: "Этот адрес или маршрут уже существует либо конфликтует с сохранёнными настройками.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Настройка петлевого интерфейса доступна только для чтения."
+ErrNetworkPersistentSourceMissing: "Для интерфейса {{ .name }} не найдена поддерживаемая постоянная конфигурация системы. Доступно только чтение."
+ErrNetworkVirtualBridgeReadOnly: "Этот виртуальный интерфейс доступен только для чтения и исключён из проверок доступности."
 
 # терминал
 TerminalAIBlockedRiskyCommand: 'Опасная команда заблокирована: {{ .command }}'
@@ -820,3 +851,89 @@ ErrImageCheckProxyRequired: "Для проверки обновлений обр
 ErrPHPExtensionsConflict: "Шаблон расширений PHP с таким именем уже существует и имеет другое содержимое; перезапись не выполнена"
 
 ErrModelTokenizerDirOverlap: "Каталоги моделей и токенизаторов должны различаться и не могут быть вложены друг в друга"
+ErrClusterAppOnly: "Устанавливайте и обновляйте это приложение в разделе высокой доступности приложений."
+ErrClusterArchivePassphraseRequired: "Введите пароль резервной копии."
+ErrClusterArchiveTooLarge: "Файл резервной копии кластера слишком большой."
+ErrClusterArchiveFormat: "Этот формат файла резервной копии кластера не поддерживается."
+ErrClusterArchiveTruncated: "Файл резервной копии кластера неполный."
+ErrClusterArchiveBlock: "Резервная копия кластера содержит недопустимый блок данных."
+ErrClusterArchiveAuthentication: "Пароль резервной копии неверен или файл резервной копии кластера повреждён."
+ErrClusterArchiveTrailingData: "После конца файла резервной копии кластера обнаружены лишние данные."
+ErrClusterArchiveManifest: "Некорректные метаданные резервной копии кластера."
+ErrClusterArchiveManifestTooLarge: "Метаданные резервной копии кластера слишком велики."
+ErrClusterArchiveInvalid: "Некорректная структура файла резервной копии кластера."
+ErrClusterArchivePayload: "Данные резервной копии не соответствуют метаданным резервной копии кластера."
+ErrClusterArchiveChecksum: "Контрольная сумма данных резервной копии кластера не совпадает с ожидаемой."
+ErrClusterArchiveImportHeader: "Недопустимый заголовок запроса на импорт резервной копии кластера."
+ErrClusterBackupID: "Недопустимый ID резервной копии кластера."
+ErrClusterBackupEngineMismatch: "СУБД из резервной копии не соответствует выбранному приложению."
+ErrClusterBackupSelectFile: "Выберите файл резервной копии кластера (.1pha)."
+ErrClusterBackupFileInaccessible: "Не удалось получить доступ к файлу резервной копии кластера."
+ErrClusterBackupRegularFile: "Резервная копия кластера должна быть обычным файлом."
+ErrClusterBackupFileChanged: "Файл резервной копии кластера изменился. Выберите его снова."
+ErrClusterBackupNotPrimary: "Выбранный экземпляр не является первичным экземпляром кластера высокой доступности."
+ErrClusterBackupContainerUnavailable: "Контейнер базы данных недоступен."
+ErrClusterBackupMySQLInnoDB: "Для резервного копирования MySQL без остановки необходимо, чтобы все пользовательские таблицы использовали InnoDB."
+ErrClusterBackupPostgresRecovery: "Экземпляр PostgreSQL находится в режиме восстановления."
+ErrClusterBackupPostgresTablespaces: "Резервное копирование кластера PostgreSQL поддерживает только табличные пространства по умолчанию."
+ErrClusterBackupPostgresReplicationCredentials: "Учётные данные для репликации PostgreSQL недоступны."
+ErrClusterBackupRedisNotPrimary: "Экземпляр Redis не является первичным."
+ErrClusterBackupRedisVersion: "Не удалось определить версию Redis."
+ErrClusterBackupUnsupportedEngine: "Эта СУБД не поддерживает резервное копирование кластера."
+ErrClusterCommandFailed: "Не удалось выполнить {{ .name }}"
+ErrClusterRestoreCatalogInstance: "Для восстановления в новый кластер нужен новый экземпляр, созданный по шаблону из каталога приложений."
+ErrClusterRestorePrimaryTemplate: "Для восстановления требуется тот же шаблон основного экземпляра, который указан в резервной копии."
+ErrClusterRestoreUnsupportedEngine: "Эта СУБД не поддерживает восстановление кластеров."
+ErrClusterRestoreRedisSnapshot: "Недействительный снимок Redis."
+ErrClusterRestorePostgresMajorVersion: "Основная версия данных PostgreSQL не совпадает с версией в резервной копии."
+ErrClusterRestoreSingleContainer: "Для восстановления нужен экземпляр с одним контейнером базы данных."
+ErrClusterRestoreCatalogDataMount: "Для восстановления требуется подключение каталога данных, указанное в шаблоне каталога приложений."
+ErrClusterRestoreDataDirectoryNotEmpty: "Целевой каталог данных для восстановления не пуст."
+ErrClusterRestorePostgresUnsafePath: "Резервная копия PostgreSQL содержит небезопасный путь."
+ErrClusterRestorePostgresFileType: "Резервная копия PostgreSQL содержит неподдерживаемую ссылку или тип файла."
+ErrClusterRestoreRedisCatalogPersistence: "Для восстановления Redis требуются настройки сохранения данных из шаблона каталога приложений."
+ErrClusterRestoreRedisCatalogRDB: "Для восстановления снимка Redis требуются настройки RDB из шаблона каталога приложений."
+ErrClusterRestoreMySQLCredentials: "Не удалось проверить учётные данные администратора восстановленной MySQL. Используйте учётные данные, действовавшие на момент создания резервной копии."
+ErrClusterRestoreEngineVersion: "Версия СУБД {{ .current }} не совпадает с версией {{ .expected }} в резервной копии."
+ErrClusterRestoreDatabaseNotReady: "Восстановленная база данных не перешла в состояние готовности"
+ErrClusterRestoreOriginalRequest: "Недопустимый запрос на восстановление в исходном кластере."
+ErrClusterRestoreMemberVersionChanged: "Версия узла кластера изменилась до восстановления."
+ErrClusterRestoreMemberChanged: "Узел кластера изменился до восстановления."
+ErrClusterRestoreMemberBusy: "Этот узел кластера занят другой задачей восстановления."
+ErrClusterRestoreMemberState: "Текущее состояние восстановления узла кластера не допускает эту операцию."
+ErrClusterRestoreRollbackRequiresReview: "В восстановленные данные могли быть внесены изменения. Автоматический откат заблокирован, предыдущие данные сохранены."
+ErrClusterRestoreOriginalAction: "Недопустимая операция восстановления в исходном кластере."
+ErrClusterRestoreDataMountDirectory: "Точка монтирования данных кластера должна быть каталогом."
+ErrClusterRestoreMemberRoleMismatch: "Роль репликации в настройках контейнера базы данных не совпадает с ролью, зарегистрированной для этого узла."
+ErrClusterRestoreOriginalCatalogMounts: "Для восстановления в исходном кластере необходимы точки монтирования базы данных, заданные в шаблоне приложения."
+ErrClusterRestoreDataMountUnavailable: "Точка монтирования данных базы отсутствует или недоступна для записи."
+ErrClusterRestoreOriginalTemplateVersion: "Резервная копия не соответствует шаблону приложения или версии СУБД исходного кластера."
+ErrClusterRestoreValidationContainer: "Контейнер для проверки результата восстановления не соответствует текущей задаче восстановления."
+ErrClusterRestoreDataOwnership: "Не удалось определить владельца и группу данных базы данных."
+ErrClusterRestoreConfigFileType: "Конфигурация базы данных содержит ссылку или специальный файл."
+ErrClusterRestoreRedisActiveRDB: "Для восстановления снимка Redis запущенный экземпляр должен использовать совместимые настройки RDB."
+ErrClusterRestoreDataDirectoryMismatch: "Запущенная база данных не использует каталог данных, заданный в шаблоне приложения."
+ErrClusterRestoreReplicaNotReady: "Восстановленная реплика не перешла в состояние готовности"
+ErrClusterRestoreDataPathDirectory: "Путь к данным восстановления должен указывать на каталог."
+ErrClusterRestoreOriginalDataUnavailable: "Каталог данных исходного кластера отсутствует."
+ErrClusterRestoreDataDirectoryChanged: "Каталог данных кластера изменился во время восстановления."
+ErrClusterRestoreDataReplacementIncomplete: "Замена данных кластера не завершена."
+ErrClusterRestoreRollbackDirectoryChanged: "Каталог данных кластера изменился во время отката восстановления."
+ErrRedisAOFRestoreUnavailable: "Восстановление AOF недоступно для этой версии Redis."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Недопустимый выбор сайтов: {{ .value }}"
+ErrCronjobWebsiteGroup: "Нет доступа к группе сайтов {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: ни один из выбранных сайтов не существует"
+ErrCronjobWebsiteVersion: "Неподдерживаемая версия выбора сайтов: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "Нельзя одновременно выбрать все сайты и отдельные сайты или группы"
+ErrCronjobWebsiteGroupName: "Название группы сайтов не может быть пустым"
+ErrCronjobWebsiteGroupMissing: "Группа сайтов «{{ .group }}» не существует, и ни один сайт из сохранённого списка не найден"
+CronjobWebsiteGroupFallback: "{{ .name }}: группа сайтов «{{ .group }}» не существует; импортирован фиксированный список сайтов, который больше не учитывает изменения состава группы"
+CronjobWebsiteMissing: "{{ .name }}: не найдены сайты: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "Не найдены группы сайтов или сайты, соответствующие выбору"
+
+ProxyCacheClear: "Очистить кэш обратного прокси"
+ProxyCacheEmpty: "Кэш пуст"
+ProxyCacheSummary: "Кэш очищен: {{ .cleared }}, кэш пуст: {{ .skipped }}, ошибок: {{ .failed }}"
+ProxyCacheReloadFailed: "Кэш очищен, но не удалось перезагрузить конфигурацию OpenResty"

@@ -1,5 +1,5 @@
 # base errors
-ErrInvalidParams: 'Bad request: {{ .detail }}'
+ErrInvalidParams: 'Bad request{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Invalid MCP custom argument format'
 ErrMcpGatewayArgsConflict: 'Argument {{ .name }} is managed by 1Panel and cannot be set in custom arguments'
 ErrTokenParse: 'Token error: {{ .detail }}'
@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Failed to parse the project name from Docker Compos
 ErrComposeProjectNameEmpty: 'Unable to derive a project name from Docker Compose config or the file parent directory. Enter a name and try again.'
 ErrComposeNameInvalid: 'Invalid Compose project name: it must start with a lowercase letter or number, contain only lowercase letters, numbers, hyphens, and underscores, and be 1-256 characters long.'
 ErrAppVersionUnavailable: 'This application version has been removed from the remote service. Please select another version and try again.'
-ErrVllmGB10ProOnly: 'This vLLM version is available only in 1Panel Professional Edition.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway can only upgrade within the same database type (SQLite or PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'The AI Gateway backup and target application must use the same database type (SQLite or PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent can only upgrade to a newer recognized release allowed by its cross-version upgrade policy. Restore an older version from a backup instead.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Wait for application readiness'
 UpgradeBackupDisabled: 'Upgrade backup is disabled; data changes made by upgrade scripts cannot be fully rolled back'
 UpgradeRollbackFailed: 'Rollback failed'
 ErrDatabaseNotFound: 'Database not found: {{ .name }}'
+
+# vLLM
+ErrVllmGB10ProOnly: 'This vLLM version is available only in 1Panel Professional Edition.'
+ErrVllmGB10ModelUnsupported: 'This version only supports DeepSeek-V4-Flash-0731 or DeepSeek-V4-Flash-Vision-Exp. Select the corresponding model directory.'
 
 # SSH
 ExportIP: "Login IP"
@@ -289,6 +292,13 @@ RemoteBackup: 'Start local DB container with image {{ .name }} before backing up
 RemoteRecover: 'Start local DB container with image {{ .name }} before restoring remote DB'
 Arg: "Argument"
 
+#PostgreSQL
+ErrPgUserProtected: "System users and the current connection user are protected from this operation"
+ErrPgSuperUserGrant: "Superusers can access all databases and do not require individual grants or revocations"
+ErrPgUserUsed: "This user is used by linked applications or websites; update their connection accounts first"
+ErrPgUserBound: "Revoke this user's database authorizations first"
+ErrPgUserPasswordSync: "The user password was changed, but password synchronization failed for these applications: {{ .detail }}"
+
 # Redis
 ErrTypeOfRedis: 'Backup file type does not match current persistence mode'
 
@@ -341,6 +351,14 @@ ComposeRecoverCleanup: 'Cleanup compose restore workspace'
 # runtime
 ErrFileNotExist: 'Source file not found: {{ .detail }}'
 ErrImageBuildErr: 'Image build failed'
+PHPBuildImage: "Building the PHP image"
+PHPBuildBaseImage: "Resolving base image {{ .name }}"
+PHPBuildStep: "Building the PHP image (step {{ .name }})"
+PHPBuildStartContainer: "Starting the PHP container"
+PHPBuildInstallExtensions: "Installing PHP extensions"
+PHPBuildCommitImage: "Saving the image with PHP extensions"
+PHPBuildApplyConfig: "Applying configuration and starting the PHP runtime"
+PHPBuildSeeLog: "See build.log for details"
 ErrImageExist: "Image already exists. Use a different image name."
 ErrDelWithWebsite: 'Runtime is linked to a website and cannot be deleted'
 ErrRuntimeStart: 'Startup failed'
@@ -639,6 +657,8 @@ ErrWebhookTestFailed: 'Please check the Webhook configuration. See the system lo
 
 # task - runtime
 ErrInstallExtension: 'Another extension install task is running'
+PHPExtensionsInstallWarning: "Some PHP extensions could not be installed: {{ .name }}"
+PHPExtensionsInstallManually: "Retry from the Extensions page to save successful installs to the image. To troubleshoot manually, run the following commands on the Docker host:"
 
 # alert mail template
 PanelAlertTitle: "Panel Alert Notification"
@@ -666,6 +686,17 @@ PartitionDiskErr: 'Partition failed: {{ .err }}'
 FormatDiskErr: 'Format failed: {{ .err }}'
 MountDiskErr: 'Mount failed: {{ .err }}'
 XfsNotFound: 'xfs not found; install xfsprogs first'
+
+# Network management
+ErrNetworkPersistencePlatform: "Persistent network settings are supported only on Linux nodes."
+ErrNetworkPersistencePrivilege: "Persistent network settings require 1Panel Agent to run as root with network administration permissions."
+ErrNetworkIPRoute2: "Install or update iproute2 and check that its ip command is available.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "This primary IP address has secondary addresses in the same subnet. Remove those secondary addresses first, or adjust them with system network tools before retrying."
+ErrNetworkRouteReadOnly: "This route is read only."
+ErrNetworkPersistenceConflict: "This address or route already exists or conflicts with saved settings.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "Loopback interface configuration is read-only."
+ErrNetworkPersistentSourceMissing: "No supported persistent system configuration was found for interface {{ .name }}. It is read-only."
+ErrNetworkVirtualBridgeReadOnly: "This virtual interface is read-only and excluded from reachability checks."
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'blocked risky command: {{ .command }}'
@@ -820,3 +851,89 @@ ErrImageCheckProxyRequired: "To check for image updates in the current runtime e
 ErrPHPExtensionsConflict: "A PHP extension template with this name exists with different content"
 
 ErrModelTokenizerDirOverlap: "The model and tokenizer directories must be different, and neither can contain the other"
+ErrClusterAppOnly: "Install and upgrade this application in Application High Availability."
+ErrClusterArchivePassphraseRequired: "Enter the backup password."
+ErrClusterArchiveTooLarge: "The cluster backup file is too large."
+ErrClusterArchiveFormat: "This cluster backup file format is not supported."
+ErrClusterArchiveTruncated: "The cluster backup file is incomplete."
+ErrClusterArchiveBlock: "The cluster backup contains an invalid data block."
+ErrClusterArchiveAuthentication: "The backup password is incorrect or the cluster backup file is corrupted."
+ErrClusterArchiveTrailingData: "The cluster backup file contains unexpected data after its end."
+ErrClusterArchiveManifest: "The cluster backup metadata is invalid."
+ErrClusterArchiveManifestTooLarge: "The cluster backup metadata is too large."
+ErrClusterArchiveInvalid: "The cluster backup file structure is invalid."
+ErrClusterArchivePayload: "The backup data does not match the cluster backup metadata."
+ErrClusterArchiveChecksum: "The cluster backup data checksum does not match."
+ErrClusterArchiveImportHeader: "The cluster backup import request header is invalid."
+ErrClusterBackupID: "Invalid cluster backup ID."
+ErrClusterBackupEngineMismatch: "The backup database engine does not match the selected application."
+ErrClusterBackupSelectFile: "Select a cluster backup file (.1pha)."
+ErrClusterBackupFileInaccessible: "The cluster backup file cannot be accessed."
+ErrClusterBackupRegularFile: "The cluster backup must be a regular file."
+ErrClusterBackupFileChanged: "The cluster backup file has changed. Select it again."
+ErrClusterBackupNotPrimary: "The selected instance is not a high availability primary."
+ErrClusterBackupContainerUnavailable: "The database container is unavailable."
+ErrClusterBackupMySQLInnoDB: "Online MySQL backup requires all user tables to use InnoDB."
+ErrClusterBackupPostgresRecovery: "The PostgreSQL instance is in recovery mode."
+ErrClusterBackupPostgresTablespaces: "PostgreSQL cluster backup supports only default tablespaces."
+ErrClusterBackupPostgresReplicationCredentials: "PostgreSQL replication credentials are unavailable."
+ErrClusterBackupRedisNotPrimary: "The Redis instance is not a primary."
+ErrClusterBackupRedisVersion: "Unable to determine the Redis version."
+ErrClusterBackupUnsupportedEngine: "This database engine does not support cluster backup."
+ErrClusterCommandFailed: "Failed to execute {{ .name }}"
+ErrClusterRestoreCatalogInstance: "Restoring to a new cluster requires a new instance created from the application catalog template."
+ErrClusterRestorePrimaryTemplate: "Restore requires the exact primary instance template recorded in the backup."
+ErrClusterRestoreUnsupportedEngine: "This database engine does not support cluster restore."
+ErrClusterRestoreRedisSnapshot: "The Redis snapshot is invalid."
+ErrClusterRestorePostgresMajorVersion: "The PostgreSQL data major version does not match the backup."
+ErrClusterRestoreSingleContainer: "Restore requires an instance with a single database container."
+ErrClusterRestoreCatalogDataMount: "Restore requires the data mount defined in the application catalog template."
+ErrClusterRestoreDataDirectoryNotEmpty: "The target data directory for restore is not empty."
+ErrClusterRestorePostgresUnsafePath: "The PostgreSQL backup contains an unsafe path."
+ErrClusterRestorePostgresFileType: "The PostgreSQL backup contains an unsupported link or file type."
+ErrClusterRestoreRedisCatalogPersistence: "Redis restore requires the persistence configuration from the application catalog template."
+ErrClusterRestoreRedisCatalogRDB: "Redis snapshot restore requires the RDB configuration from the application catalog template."
+ErrClusterRestoreMySQLCredentials: "Could not verify the restored MySQL administrator credentials. Use the credentials valid when the backup was created."
+ErrClusterRestoreEngineVersion: "Database engine version {{ .current }} does not match backup version {{ .expected }}."
+ErrClusterRestoreDatabaseNotReady: "The restored database did not become ready"
+ErrClusterRestoreOriginalRequest: "Invalid request to restore to the original cluster."
+ErrClusterRestoreMemberVersionChanged: "The cluster member version changed before restoration."
+ErrClusterRestoreMemberChanged: "The cluster member changed before restoration."
+ErrClusterRestoreMemberBusy: "Another restore task is using this cluster member."
+ErrClusterRestoreMemberState: "The cluster member's current restore state does not allow this operation."
+ErrClusterRestoreRollbackRequiresReview: "The restored data may have received writes. Automatic rollback is blocked, and the previous data has been preserved."
+ErrClusterRestoreOriginalAction: "Invalid operation for restoration to the original cluster."
+ErrClusterRestoreDataMountDirectory: "The cluster data mount must be a directory."
+ErrClusterRestoreMemberRoleMismatch: "The database container's configured replication role does not match the role registered for this member."
+ErrClusterRestoreOriginalCatalogMounts: "Restoring to the original cluster requires the database mounts defined by the application template."
+ErrClusterRestoreDataMountUnavailable: "The database data mount is missing or not writable."
+ErrClusterRestoreOriginalTemplateVersion: "The backup does not match the original cluster's application template or database engine version."
+ErrClusterRestoreValidationContainer: "The container used to validate the restoration does not match the current restore task."
+ErrClusterRestoreDataOwnership: "Unable to read the owner and group of the database data."
+ErrClusterRestoreConfigFileType: "The database configuration contains a link or a special file."
+ErrClusterRestoreRedisActiveRDB: "Restoring a Redis snapshot requires the running instance to use compatible RDB settings."
+ErrClusterRestoreDataDirectoryMismatch: "The running database is not using the data directory specified by the application template."
+ErrClusterRestoreReplicaNotReady: "The restored replica did not become ready"
+ErrClusterRestoreDataPathDirectory: "The restore data path must be a directory."
+ErrClusterRestoreOriginalDataUnavailable: "The original cluster data directory is missing."
+ErrClusterRestoreDataDirectoryChanged: "The cluster data directory changed during restoration."
+ErrClusterRestoreDataReplacementIncomplete: "The cluster data replacement did not finish."
+ErrClusterRestoreRollbackDirectoryChanged: "The cluster data directory changed during restoration rollback."
+ErrRedisAOFRestoreUnavailable: "AOF restore is unavailable for this Redis version."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Invalid website selection: {{ .value }}"
+ErrCronjobWebsiteGroup: "Unable to access website group {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: none of the selected websites exist"
+ErrCronjobWebsiteVersion: "Unsupported website selection version: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "All websites cannot be combined with individual websites or groups"
+ErrCronjobWebsiteGroupName: "Website group name cannot be empty"
+ErrCronjobWebsiteGroupMissing: "Website group \"{{ .group }}\" does not exist and no snapshot websites could be matched"
+CronjobWebsiteGroupFallback: "{{ .name }}: website group \"{{ .group }}\" does not exist; imported as a fixed website list that no longer follows group changes"
+CronjobWebsiteMissing: "{{ .name }}: websites not found: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "No selected website groups or websites could be matched"
+
+ProxyCacheClear: "Clear reverse proxy caches"
+ProxyCacheEmpty: "Nothing to clear"
+ProxyCacheSummary: "Cleared {{ .cleared }}, nothing to clear {{ .skipped }}, failed {{ .failed }}"
+ProxyCacheReloadFailed: "Caches cleared, OpenResty reload failed"

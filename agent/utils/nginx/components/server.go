@@ -1,8 +1,10 @@
 package components
 
 import (
+	"crypto/rand"
 	"errors"
 	"fmt"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -291,6 +293,91 @@ func (s *Server) UpdateRoot(path string) {
 	s.UpdateDirective("root", []string{path})
 }
 
+const StopPageRoot = "/usr/share/nginx/html/stop"
+const stopPageComment = "# 1Panel managed stop page"
+
+const stopPagePattern = `"^/(?![.]well-known/acme-challenge(?:/|$))"`
+
+// EnableStopPage reports whether the configuration needs to be written.
+func (s *Server) EnableStopPage() bool {
+	httpsOnly := slices.ContainsFunc(s.Directives, isHTTP2HTTPSRedirect)
+	if s.HasStopPage() && stopPageRewrite(s.Directives[0]) != nil &&
+		(s.Directives[0].GetName() == "if") == httpsOnly {
+		return false
+	}
+	s.DisableStopPage()
+	// Includes resolve inside OpenResty. Give each activation its own exact
+	// location instead of claiming a fixed URI from the site's namespace.
+	uri := "/.1panel-stop/" + rand.Text() + "/index.html"
+	var rewrite IDirective = &Directive{
+		Name: "rewrite", Comment: stopPageComment,
+		Parameters: []string{stopPagePattern, uri, "last"},
+	}
+	if httpsOnly {
+		// Let HTTP requests follow the site's existing redirect, including its port.
+		rewrite = &Directive{Name: "if", Parameters: []string{"(", "$scheme", "=", "https", ")"},
+			Block: &Block{Directives: []IDirective{rewrite}}}
+	}
+	location := &Directive{
+		Name: "location", Parameters: []string{"=", uri},
+		Block: &Block{Directives: []IDirective{
+			&Directive{Name: "root", Parameters: []string{StopPageRoot}},
+			&Directive{Name: "try_files", Parameters: []string{"/index.html", "=404"}},
+		}},
+	}
+	s.Directives = append([]IDirective{rewrite, location}, s.Directives...)
+	return true
+}
+
+func stopPageRewrite(dir IDirective) IDirective {
+	if dir.GetName() == "if" && dir.GetBlock() != nil {
+		children := dir.GetBlock().GetDirectives()
+		if len(children) != 1 || strings.Join(dir.GetParameters(), "") != "($scheme=https)" {
+			return nil
+		}
+		dir = children[0]
+	}
+	if dir.GetName() == "rewrite" && dir.GetComment() == stopPageComment && len(dir.GetParameters()) == 3 {
+		return dir
+	}
+	return nil
+}
+
+func (s *Server) DisableStopPage() {
+	for _, dir := range s.Directives {
+		if rewrite := stopPageRewrite(dir); rewrite != nil {
+			uri := rewrite.GetParameters()[1]
+			s.Directives = slices.DeleteFunc(s.Directives, func(d IDirective) bool {
+				return d == dir || d.GetName() == "location" && slices.Equal(d.GetParameters(), []string{"=", uri})
+			})
+			return
+		}
+	}
+}
+
+func (s *Server) HasStopPage() bool {
+	for _, dir := range s.Directives {
+		rewrite := stopPageRewrite(dir)
+		if rewrite == nil {
+			continue
+		}
+		params := rewrite.GetParameters()
+		if params[0] != stopPagePattern || params[2] != "last" {
+			return false
+		}
+		for _, location := range s.Directives {
+			if location.GetName() != "location" || !slices.Equal(location.GetParameters(), []string{"=", params[1]}) || location.GetBlock() == nil {
+				continue
+			}
+			children := location.GetBlock().GetDirectives()
+			return len(children) == 2 && children[0].GetName() == "root" &&
+				slices.Equal(children[0].GetParameters(), []string{StopPageRoot}) &&
+				children[1].GetName() == "try_files" && slices.Equal(children[1].GetParameters(), []string{"/index.html", "=404"})
+		}
+	}
+	return false
+}
+
 func (s *Server) UpdateRootProxyForAi(proxy []string) {
 	newDir := Directive{
 		Name:       "location",
@@ -413,10 +500,10 @@ func (s *Server) UpdateRootProxy(proxy []string) {
 	s.UpdateDirectiveBySecondKey("location", "/", newDir)
 }
 
-func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
-	newDir := Directive{
+func NewPHPProxyDirective(proxy []string, localPath string) *Directive {
+	newDir := &Directive{
 		Name:       "location",
-		Parameters: []string{"~ [^/]\\.php(/|$)"},
+		Parameters: []string{"~", "[^/]\\.php(/|$)"},
 		Block:      &Block{},
 	}
 	block := &Block{}
@@ -477,14 +564,19 @@ func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
 		})
 	}
 	newDir.Block = block
-	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", newDir)
+	return newDir
+}
+
+func (s *Server) UpdatePHPProxy(proxy []string, localPath string) {
+	newDir := NewPHPProxyDirective(proxy, localPath)
+	s.UpdateDirectiveBySecondKey("location", "~ [^/]\\.php(/|$)", *newDir)
 }
 
 func (s *Server) UpdateDirectiveBySecondKey(name string, key string, directive Directive) {
 	directives := s.Directives
 	index := -1
 	for i, dir := range directives {
-		if dir.GetName() == name && dir.GetParameters()[0] == key {
+		if dir.GetName() == name && strings.Join(dir.GetParameters(), " ") == key {
 			index = i
 			break
 		}
@@ -514,17 +606,10 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 		Block:      &Block{},
 	}
 	block := &Block{}
-	if httpsPort == 443 {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", "https://$host$request_uri"},
-		})
-	} else {
-		block.AppendDirectives(&Directive{
-			Name:       "return",
-			Parameters: []string{"301", fmt.Sprintf("https://$host:%d$request_uri", httpsPort)},
-		})
-	}
+	block.AppendDirectives(&Directive{
+		Name:       "return",
+		Parameters: []string{"301", HTTPSRedirectTarget(httpsPort)},
+	})
 
 	newDir.Block = block
 	directives := make([]IDirective, 0, len(s.Directives)+1)
@@ -551,10 +636,15 @@ func (s *Server) AddHTTP2HTTPS(httpsPort int) {
 }
 
 func isHTTP2HTTPSRedirect(dir IDirective) bool {
+	_, ok := http2HTTPSRedirectTarget(dir)
+	return ok
+}
+
+func http2HTTPSRedirectTarget(dir IDirective) (string, bool) {
 	condition := strings.Join(dir.GetParameters(), " ")
 	normalizedCondition := strings.Join(strings.Fields(condition), "")
 	if dir.GetName() != "if" || normalizedCondition != "($scheme=http)" || dir.GetBlock() == nil {
-		return false
+		return "", false
 	}
 	var returnDirective IDirective
 	for _, child := range dir.GetBlock().GetDirectives() {
@@ -562,26 +652,132 @@ func isHTTP2HTTPSRedirect(dir IDirective) bool {
 			continue
 		}
 		if returnDirective != nil || child.GetName() != "return" || child.GetBlock() != nil {
-			return false
+			return "", false
 		}
 		returnDirective = child
 	}
 	if returnDirective == nil {
-		return false
+		return "", false
 	}
 	params := returnDirective.GetParameters()
 	if len(params) != 2 || params[0] != "301" {
-		return false
+		return "", false
 	}
-	if params[1] == "https://$host$request_uri" {
-		return true
+	if _, ok := ParseHTTPToHTTPSRedirectPort(params[1]); !ok {
+		return "", false
 	}
-	port, ok := strings.CutPrefix(params[1], "https://$host:")
+	return params[1], true
+}
+
+// HTTPSRedirectTarget builds the redirect target used by HTTP-to-HTTPS rules.
+func HTTPSRedirectTarget(httpsPort int) string {
+	if httpsPort == 443 {
+		return "https://$host$request_uri"
+	}
+	return fmt.Sprintf("https://$host:%d$request_uri", httpsPort)
+}
+
+// ParseHTTPToHTTPSRedirectPort extracts the port from a managed redirect target.
+func ParseHTTPToHTTPSRedirectPort(target string) (int, bool) {
+	if target == "https://$host$request_uri" {
+		return 443, true
+	}
+	port, ok := strings.CutPrefix(target, "https://$host:")
 	if !ok || !strings.HasSuffix(port, "$request_uri") {
-		return false
+		return 0, false
 	}
 	value, err := strconv.ParseUint(strings.TrimSuffix(port, "$request_uri"), 10, 16)
-	return err == nil && value > 0
+	if err != nil || value == 0 {
+		return 0, false
+	}
+	return int(value), true
+}
+
+// IsHTTPToHTTPSRedirectTarget reports whether target is a managed HTTP-to-HTTPS redirect.
+func IsHTTPToHTTPSRedirectTarget(target string) bool {
+	_, ok := ParseHTTPToHTTPSRedirectPort(target)
+	return ok
+}
+
+type HTTPToHTTPSRedirectState struct {
+	Managed      bool
+	Port         int
+	Present      bool
+	HasUnmanaged bool
+}
+
+// HTTPToHTTPSRedirectState returns the effective managed redirect state of a server.
+func (s *Server) HTTPToHTTPSRedirectState() HTTPToHTTPSRedirectState {
+	ports := make(map[int]struct{})
+	state := HTTPToHTTPSRedirectState{}
+	for _, dir := range s.Directives {
+		switch dir.GetName() {
+		case "if":
+			condition := strings.Join(dir.GetParameters(), " ")
+			if strings.Join(strings.Fields(condition), "") != "($scheme=http)" {
+				continue
+			}
+			state.Present = true
+			target, ok := http2HTTPSRedirectTarget(dir)
+			if !ok {
+				state.HasUnmanaged = true
+				continue
+			}
+			port, _ := ParseHTTPToHTTPSRedirectPort(target)
+			ports[port] = struct{}{}
+		case "error_page":
+			params := dir.GetParameters()
+			if len(params) == 0 || params[0] != "497" {
+				continue
+			}
+			state.Present = true
+			if len(params) < 2 {
+				state.HasUnmanaged = true
+				continue
+			}
+			port, ok := ParseHTTPToHTTPSRedirectPort(params[1])
+			if !ok {
+				state.HasUnmanaged = true
+				continue
+			}
+			ports[port] = struct{}{}
+		}
+	}
+	if len(ports) == 1 {
+		for port := range ports {
+			state.Port = port
+		}
+	}
+	if !state.HasUnmanaged && len(ports) == 1 {
+		state.Managed = true
+	}
+	return state
+}
+
+// SetHTTPToHTTPSRedirectPort updates redirects that are already recognized as managed.
+func (s *Server) SetHTTPToHTTPSRedirectPort(port int) {
+	if !s.HTTPToHTTPSRedirectState().Managed {
+		return
+	}
+	target := HTTPSRedirectTarget(port)
+	for _, dir := range s.Directives {
+		switch dir.GetName() {
+		case "if":
+			if _, ok := http2HTTPSRedirectTarget(dir); ok {
+				dir.GetBlock().UpdateDirective("return", []string{"301", target})
+			}
+		case "error_page":
+			params := dir.GetParameters()
+			if len(params) >= 2 && params[0] == "497" {
+				if _, ok := ParseHTTPToHTTPSRedirectPort(params[1]); ok {
+					directive, ok := dir.(*Directive)
+					if ok {
+						directive.Parameters[1] = target
+					}
+				}
+			}
+		}
+	}
 }
 
 func (s *Server) UpdateAllowIPs(ips []string) {

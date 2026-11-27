@@ -296,7 +296,7 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 
 	u.candidate = stagedInstall
 	u.candidate.Name = u.original.Name
-	u.candidate.DockerCompose, err = renderUpgradeCompose(u.candidate, u.detail, u.req.DockerCompose)
+	u.candidate.DockerCompose, err = renderUpgradeCompose(&u.candidate, u.detail, u.req.DockerCompose)
 	if err != nil {
 		return err
 	}
@@ -304,7 +304,7 @@ func (u *appUpgradeContext) prepare(t *task.Task) error {
 		return buserr.WithName("ErrFileNotFound", "docker-compose.yml")
 	}
 
-	u.envContent, err = renderUpgradeEnv(&u.candidate, u.oldEnvContent)
+	u.envContent, err = renderUpgradeEnv(&u.candidate, u.oldEnvContent, u.detail.Params)
 	if err != nil {
 		return err
 	}
@@ -850,7 +850,7 @@ func verifyUpgradeImages(images []string) error {
 	return nil
 }
 
-func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error) {
+func renderUpgradeEnv(install *model.AppInstall, original []byte, formJSON string) ([]byte, error) {
 	originalEnv := make(map[string]string)
 	if len(original) > 0 {
 		var err error
@@ -866,6 +866,27 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 		return nil, err
 	}
 	MergeAppEnvironment(envs, params)
+	if params["PANEL_REDIS_HOST"] != "" && params["PANEL_REDIS_HOST_NAME"] == "" {
+		// Keep explicit values from the live .env when upgrading an older installation.
+		redis := make(map[string]interface{})
+		for _, key := range []string{"PANEL_REDIS_HOST", "PANEL_REDIS_PORT", "PANEL_REDIS_ROOT_PASSWORD"} {
+			if value, ok := originalEnv[key]; ok {
+				redis[key] = value
+			} else if value, ok := params[key]; ok {
+				redis[key] = value
+			}
+		}
+		if err := resolveRedisParams(redis, formJSON, true); err != nil {
+			return nil, err
+		}
+		maps.Copy(envs, redis)
+		MergeAppEnvironment(redis, params)
+		content, err := json.Marshal(envs)
+		if err != nil {
+			return nil, err
+		}
+		install.Env = string(content)
+	}
 	if install.App.Key == "openlist" {
 		// The upgrade script updates this too late for the pre-pull phase.
 		image := "openlistteam/openlist:v" + strings.TrimPrefix(install.Version, "v")
@@ -911,11 +932,14 @@ func renderUpgradeEnv(install *model.AppInstall, original []byte) ([]byte, error
 	return []byte(content), nil
 }
 
-func renderUpgradeCompose(install model.AppInstall, detail model.AppDetail, customCompose string) (string, error) {
+func renderUpgradeCompose(install *model.AppInstall, detail model.AppDetail, customCompose string) (string, error) {
 	if customCompose != "" {
-		return customCompose, nil
+		install.DockerCompose = customCompose
 	}
-	if install.App.Key == vllmAppKeyForUpgrade {
+	if customCompose != "" || install.App.Key == vllmAppKeyForUpgrade {
+		if err := repairLegacyComposePrimary(install); err != nil {
+			return "", err
+		}
 		return install.DockerCompose, nil
 	}
 	return getUpgradeCompose(install, detail)

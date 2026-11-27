@@ -9,13 +9,17 @@ import (
 )
 
 type APIConfig struct {
-	APIType         string
-	BaseURL         string
-	EditableBaseURL bool
-	DiscoverModels  bool
-	DefaultAuthMode string
-	AuthModes       []string
-	Models          []Model
+	Route             string   `json:"route"`
+	DiscoveryRoute    string   `json:"discoveryRoute"`
+	DiscoveryAuthMode string   `json:"discoveryAuthMode"`
+	Purpose           string   `json:"purpose"`
+	Discovery         string   `json:"discovery"`
+	APIType           string   `json:"apiType"`
+	BaseURL           string   `json:"baseUrl"`
+	EditableBaseURL   bool     `json:"editableBaseUrl"`
+	DiscoverModels    bool     `json:"supportsModelDiscovery"`
+	DefaultAuthMode   string   `json:"defaultAuthMode"`
+	AuthModes         []string `json:"authModes"`
 }
 
 const (
@@ -23,245 +27,598 @@ const (
 	AuthModeXAPIKey = "x-api-key"
 )
 
-type Model struct {
-	ID   string
-	Name string
-}
-
 type Meta struct {
+	AccountTypes   []AccountTypePreset
 	Key            string
 	DisplayName    string
 	DisplayNameKey string
 	Sort           uint
 	DefaultAPIType string
-	APIConfigs     []APIConfig
 	EnvKey         string
-	Models         []Model
 }
 
 var catalog = map[string]Meta{
 	"custom": {
-		Key: "custom", DisplayName: "Custom", Sort: 10, DefaultAPIType: "openai-completions", EnvKey: "CUSTOM_API_KEY",
-		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "dashscope-images", "openai-embeddings"),
+		Key:            "custom",
+		DisplayName:    "Custom",
+		Sort:           10,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "CUSTOM_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+					{APIType: "openai-images", Purpose: "image", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-images", Purpose: "image", Discovery: "DiscoveryNone", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-transcriptions", Purpose: "transcription", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-speech", Purpose: "speech", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
 	},
 	"ollama": {
-		Key: "ollama", DisplayName: "Ollama", Sort: 15, DefaultAPIType: "openai-responses",
-		APIConfigs: editableAPIConfigs(false, "openai-responses", "openai-completions", "openai-embeddings"),
-	},
-	// llmman (https://github.com/llmmanorg/llmman): local runner with Ollama/OpenAI-compatible routes on 127.0.0.1:17434.
-	"llmman": {
-		Key: "llmman", DisplayName: "llmman", Sort: 75, DefaultAPIType: "openai-responses",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-responses", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
-			{APIType: "openai-completions", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
-			{APIType: "openai-embeddings", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
+		Key:            "ollama",
+		DisplayName:    "Ollama",
+		Sort:           40,
+		DefaultAPIType: "openai-responses",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-responses", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOllamaModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-completions", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOllamaModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", Discovery: "DiscoveryOllamaModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "openai-images", Purpose: "image", Route: "/v1", Discovery: "DiscoveryOllamaModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", Route: "/v1", Discovery: "DiscoveryOllamaModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
 		},
 	},
 	"vllm": {
-		Key: "vllm", DisplayName: "vLLM", Sort: 20, DefaultAPIType: "openai-completions", EnvKey: "VLLM_API_KEY",
-		APIConfigs: editableAPIConfigs(false, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
+		Key:            "vllm",
+		DisplayName:    "vLLM",
+		Sort:           20,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "VLLM_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer", "x-api-key"}},
+					{APIType: "openai-images", Purpose: "image", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-transcriptions", Purpose: "transcription", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
 	},
 	"1panel-ai-gateway": {
-		Key: "1panel-ai-gateway", DisplayName: "1Panel AI Gateway", DisplayNameKey: "AIProvider1PanelGateway", Sort: 21, DefaultAPIType: "openai-completions", EnvKey: "ONEPANEL_AI_GATEWAY_API_KEY",
-		APIConfigs: editableAPIConfigs(true, "openai-completions", "openai-responses", "anthropic-messages", "openai-images", "openai-embeddings"),
+		Key:            "1panel-ai-gateway",
+		DisplayName:    "1Panel AI Gateway",
+		DisplayNameKey: "AIProvider1PanelGateway",
+		Sort:           30,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "ONEPANEL_AI_GATEWAY_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", EditableBaseURL: true, DiscoverModels: true},
+					{APIType: "openai-responses", Purpose: "text", EditableBaseURL: true, DiscoverModels: true},
+					{APIType: "anthropic-messages", Purpose: "text", EditableBaseURL: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+					{APIType: "openai-images", Purpose: "image", EditableBaseURL: true},
+					{APIType: "openai-embeddings", Purpose: "embedding", EditableBaseURL: true},
+				},
+			},
+		},
 	},
 	"deepseek": {
-		Key: "deepseek", DisplayName: "DeepSeek", Sort: 25, DefaultAPIType: "openai-completions", EnvKey: "DEEPSEEK_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://api.deepseek.com"},
-			{APIType: "openai-responses", BaseURL: "https://api.deepseek.com"},
-			anthropicAPIConfig("https://api.deepseek.com/anthropic", AuthModeXAPIKey),
+		Key:            "deepseek",
+		DisplayName:    "DeepSeek",
+		Sort:           60,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "DEEPSEEK_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.deepseek.com", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://api.deepseek.com", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.deepseek.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
 		},
-		Models: []Model{{ID: "deepseek-flash", Name: "deepseek-flash"}, {ID: "deepseek-v4-pro", Name: "deepseek-v4-pro"}},
 	},
 	"bailian-coding-plan": {
-		Key: "bailian-coding-plan", DisplayNameKey: "AIProviderBailianCodingPlan", Sort: 30, DefaultAPIType: "openai-completions", EnvKey: "QWEN_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://coding.dashscope.aliyuncs.com/v1"},
-			anthropicAPIConfig("https://coding.dashscope.aliyuncs.com/apps/anthropic", AuthModeBearer),
+		Key:            "bailian-coding-plan",
+		DisplayNameKey: "AIProviderBailianCodingPlan",
+		Sort:           210,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "QWEN_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "codingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://coding.dashscope.aliyuncs.com/v1", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://coding.dashscope.aliyuncs.com/apps/anthropic", Route: "/apps/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
 		},
-		Models: []Model{
-			{ID: "qwen3-coder-plus", Name: "Qwen3-Coder-Plus"},
-			{ID: "qwen3-max-2026-01-23", Name: "Qwen3-Max-2026-01-23"},
-			{ID: "qwen3-coder-next", Name: "Qwen3-Coder-Next"},
-			{ID: "glm-4.7", Name: "GLM-4.7"},
-			{ID: "kimi-k2.5", Name: "Kimi K2.5"},
-			{ID: "qwen3.5-plus", Name: "Qwen3.5-Plus"},
-			{ID: "glm-5", Name: "GLM-5"},
-			{ID: "qwen3.6-plus", Name: "Qwen3.6-Plus"},
-			{ID: "qwen3.7-plus", Name: "Qwen3.7-Plus"},
+	},
+	"bailian": {
+		Key:            "bailian",
+		DisplayNameKey: "AIProviderBailian",
+		Sort:           80,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "DASHSCOPE_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "codingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://coding.dashscope.aliyuncs.com/v1", Route: "/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://coding.dashscope.aliyuncs.com/apps/anthropic", Route: "/apps/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "tokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1", Route: "/compatible-mode/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://token-plan.cn-beijing.maas.aliyuncs.com/compatible-mode/v1", Route: "/compatible-mode/v1", Discovery: "DiscoveryNone", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://token-plan.cn-beijing.maas.aliyuncs.com/apps/anthropic", Route: "/apps/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-transcriptions", Purpose: "transcription", BaseURL: "https://token-plan.cn-beijing.maas.aliyuncs.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-speech", Purpose: "speech", BaseURL: "https://token-plan.cn-beijing.maas.aliyuncs.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "payAsYouGo",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1", Route: "/compatible-mode/v1", Discovery: "DiscoveryDashScopeModels", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1", Route: "/compatible-mode/v1", Discovery: "DiscoveryDashScopeModels", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://dashscope.aliyuncs.com/apps/anthropic", Route: "/apps/anthropic", Discovery: "DiscoveryDashScopeModels", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-images", Purpose: "image", BaseURL: "https://dashscope.aliyuncs.com", Discovery: "DiscoveryDashScopeModels", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1", Route: "/compatible-mode/v1", Discovery: "DiscoveryDashScopeModels", DiscoveryRoute: "/compatible-mode/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", BaseURL: "https://dashscope.aliyuncs.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-transcriptions", Purpose: "transcription", BaseURL: "https://dashscope.aliyuncs.com", Discovery: "DiscoveryDashScopeModels", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "dashscope-speech", Purpose: "speech", BaseURL: "https://dashscope.aliyuncs.com", Discovery: "DiscoveryDashScopeModels", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
 		},
 	},
 	"ark-coding-plan": {
-		Key: "ark-coding-plan", DisplayNameKey: "AIProviderArkCodingPlan", Sort: 35, DefaultAPIType: "openai-completions", EnvKey: "ARK_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3"},
-			anthropicAPIConfig("https://ark.cn-beijing.volces.com/api/coding", AuthModeBearer),
-		},
-		Models: []Model{
-			{ID: "ark-code-latest", Name: "Ark Coding Plan"}, {ID: "doubao-seed-code", Name: "Doubao Seed Code"},
-			{ID: "glm-4.7", Name: "GLM 4.7 Coding"}, {ID: "kimi-k2-thinking", Name: "Kimi K2 Thinking"},
-			{ID: "kimi-k2.5", Name: "Kimi K2.5 Coding"}, {ID: "doubao-seed-code-preview-251028", Name: "Doubao Seed Code Preview"},
-		},
-	},
-	"zai": {
-		Key: "zai", DisplayName: "Z.ai", Sort: 40, DefaultAPIType: "openai-completions", EnvKey: "ZAI_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://open.bigmodel.cn/api/paas/v4", EditableBaseURL: true},
-			{APIType: "openai-images", BaseURL: "https://open.bigmodel.cn/api/paas/v4", EditableBaseURL: true},
-		},
-		Models: []Model{{ID: "glm-5", Name: "GLM-5"}, {ID: "glm-4.7", Name: "GLM-4.7"}, {ID: "glm-4.7-flash", Name: "GLM-4.7-Flash"}, {ID: "glm-4.7-flashx", Name: "GLM-4.7-FlashX"}},
-	},
-	"minimax": {
-		Key: "minimax", DisplayName: "MiniMax (CN)", Sort: 45, DefaultAPIType: "anthropic-messages", EnvKey: "MINIMAX_API_KEY",
-		APIConfigs: []APIConfig{
-			anthropicAPIConfig("https://api.minimaxi.com/anthropic", AuthModeXAPIKey, AuthModeBearer),
-			{APIType: "openai-completions", BaseURL: "https://api.minimaxi.com/v1"},
-			{APIType: "minimax-images", BaseURL: "https://api.minimaxi.com"},
-		},
-		Models: []Model{{ID: "MiniMax-M3.1-Flash", Name: "MiniMax M3.1 Flash"}, {ID: "MiniMax-M3", Name: "MiniMax M3"}},
-	},
-	"xiaomi": {
-		Key: "xiaomi", DisplayName: "Xiaomi", Sort: 46, DefaultAPIType: "openai-completions", EnvKey: "XIAOMI_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://api.xiaomimimo.com/v1"},
-			{APIType: "openai-responses", BaseURL: "https://api.xiaomimimo.com/v1"},
-			anthropicAPIConfig("https://api.xiaomimimo.com/anthropic", AuthModeBearer),
-		},
-		Models: []Model{{ID: "mimo-v2.5", Name: "Xiaomi MiMo V2.5"}, {ID: "mimo-v2.5-pro", Name: "Xiaomi MiMo V2.5 Pro"}},
-	},
-	"kimi": {
-		Key: "kimi", DisplayName: "Kimi (CN)", Sort: 50, DefaultAPIType: "openai-completions", EnvKey: "KIMI_API_KEY",
-		APIConfigs: []APIConfig{{APIType: "openai-completions", BaseURL: "https://api.moonshot.cn/v1"}},
-		Models:     []Model{{ID: "kimi-k2.5", Name: "Kimi K2.5"}, {ID: "kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"}, {ID: "kimi-k2-thinking", Name: "Kimi K2 Thinking"}},
-	},
-	"kimi-coding": {
-		Key: "kimi-coding", DisplayName: "Kimi Coding", Sort: 51, DefaultAPIType: "anthropic-messages", EnvKey: "KIMI_API_KEY",
-		APIConfigs: []APIConfig{anthropicAPIConfig("https://api.kimi.com/coding/", AuthModeXAPIKey)},
-		Models:     []Model{{ID: "kimi-code", Name: "Kimi Code"}, {ID: "k2p5", Name: "Kimi K2.5"}},
-	},
-	"openai": {
-		Key: "openai", DisplayName: "OpenAI", Sort: 55, DefaultAPIType: "openai-responses", EnvKey: "OPENAI_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-responses", BaseURL: "https://api.openai.com/v1"},
-			{APIType: "openai-completions", BaseURL: "https://api.openai.com/v1"},
-			{APIType: "openai-images", BaseURL: "https://api.openai.com/v1"},
-			{APIType: "openai-embeddings", BaseURL: "https://api.openai.com/v1", Models: []Model{
-				{ID: "text-embedding-3-small", Name: "text-embedding-3-small"},
-				{ID: "text-embedding-3-large", Name: "text-embedding-3-large"},
-			}},
-		},
-		Models: []Model{{ID: "gpt-5.4", Name: "gpt-5.4"}, {ID: "gpt-5.4-pro", Name: "gpt-5.4-pro"}, {ID: "gpt-5.4-mini", Name: "gpt-5.4-mini"}, {ID: "gpt-5.4-nano", Name: "gpt-5.4-nano"}},
-	},
-	"openrouter": {
-		Key: "openrouter", DisplayName: "OpenRouter", Sort: 56, DefaultAPIType: "openai-completions", EnvKey: "OPENROUTER_API_KEY",
-		APIConfigs: []APIConfig{
-			{APIType: "openai-completions", BaseURL: "https://openrouter.ai/api/v1"},
-			{APIType: "openrouter-images", BaseURL: "https://openrouter.ai"},
-		},
-		Models: []Model{{ID: "openrouter/free", Name: "openrouter/free"}, {ID: "openrouter/auto", Name: "openrouter/auto"}},
-	},
-	"anthropic": {
-		Key: "anthropic", DisplayName: "Anthropic", Sort: 60, DefaultAPIType: "anthropic-messages", EnvKey: "ANTHROPIC_API_KEY",
-		APIConfigs: []APIConfig{anthropicAPIConfig("https://api.anthropic.com", AuthModeXAPIKey)},
-		Models:     []Model{{ID: "claude-sonnet-4-6", Name: "Claude Sonnet 4.6"}, {ID: "claude-opus-4-6", Name: "Claude Opus 4.6"}, {ID: "claude-opus-4-5", Name: "Claude Opus 4.5"}, {ID: "claude-sonnet-4-5", Name: "Claude Sonnet 4.5"}, {ID: "claude-haiku-4-5", Name: "Claude Haiku 4.5"}},
-	},
-	"gemini": {
-		Key: "gemini", DisplayName: "Gemini", Sort: 65, DefaultAPIType: "gemini-generate-content", EnvKey: "GEMINI_API_KEY",
-		APIConfigs: []APIConfig{{APIType: "gemini-generate-content", BaseURL: "https://generativelanguage.googleapis.com"}},
-		Models:     []Model{{ID: "gemini-3-flash-preview", Name: "Gemini 3 Flash Preview"}, {ID: "gemini-flash-latest", Name: "Gemini Flash Latest"}, {ID: "gemini-3-pro-preview", Name: "Gemini 3 Pro Preview"}},
-	},
-	"moonshot": {
-		Key: "moonshot", DisplayName: "Moonshot (Global)", Sort: 70, DefaultAPIType: "openai-completions", EnvKey: "MOONSHOT_API_KEY",
-		APIConfigs: []APIConfig{{APIType: "openai-completions", BaseURL: "https://api.moonshot.ai/v1"}},
-		Models:     []Model{{ID: "kimi-k2.5", Name: "Kimi K2.5"}, {ID: "kimi-k2-0905-preview", Name: "Kimi K2 0905 Preview"}, {ID: "kimi-k2-thinking", Name: "Kimi K2 Thinking"}},
-	},
-	"bailian": {
-		Key: "bailian", DisplayNameKey: "AIProviderBailian", Sort: 31, DefaultAPIType: "openai-completions", EnvKey: "DASHSCOPE_API_KEY",
-		APIConfigs: []APIConfig{
+		Key:            "ark-coding-plan",
+		DisplayNameKey: "AIProviderArkCodingPlan",
+		Sort:           220,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "ARK_API_KEY",
+		AccountTypes: []AccountTypePreset{
 			{
-				APIType: "openai-completions", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-				DiscoverModels: true,
-				Models:         []Model{{ID: "qwen3.7-plus", Name: "qwen3.7-plus"}, {ID: "qwen3.6-plus", Name: "qwen3.6-plus"}, {ID: "qwen3.6-flash", Name: "qwen3.6-flash"}},
-			},
-			{
-				APIType: "openai-responses", BaseURL: "https://dashscope.aliyuncs.com/compatible-mode/v1",
-				DiscoverModels: true,
-				Models:         []Model{{ID: "qwen3.7-plus", Name: "qwen3.7-plus"}, {ID: "qwen3.6-plus", Name: "qwen3.6-plus"}, {ID: "qwen3.6-flash", Name: "qwen3.6-flash"}},
-			},
-			{
-				APIType: "anthropic-messages", BaseURL: "https://dashscope.aliyuncs.com/apps/anthropic",
-				DefaultAuthMode: AuthModeBearer,
-				AuthModes:       []string{AuthModeBearer},
-				Models:          []Model{{ID: "qwen3.7-plus", Name: "qwen3.7-plus"}, {ID: "qwen3.6-plus", Name: "qwen3.6-plus"}, {ID: "qwen3.6-flash", Name: "qwen3.6-flash"}},
-			},
-			{
-				APIType: "dashscope-images", BaseURL: "https://dashscope.aliyuncs.com",
-				Models: []Model{
-					{ID: "qwen-image-2.0-pro", Name: "qwen-image-2.0-pro"},
-					{ID: "qwen-image-2.0", Name: "qwen-image-2.0"},
-					{ID: "wan2.7-image-pro", Name: "wan2.7-image-pro"},
-					{ID: "wan2.7-image", Name: "wan2.7-image"},
+				Key: "codingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding", Route: "/api/coding", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
 				},
 			},
 		},
 	},
 	"ark": {
-		Key: "ark", DisplayNameKey: "AIProviderArk", Sort: 36, DefaultAPIType: "openai-completions", EnvKey: "ARK_API_KEY",
-		APIConfigs: []APIConfig{
+		Key:            "ark",
+		DisplayNameKey: "AIProviderArk",
+		Sort:           110,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "ARK_API_KEY",
+		AccountTypes: []AccountTypePreset{
 			{
-				APIType: "openai-completions", BaseURL: "https://ark.cn-beijing.volces.com/api/v3",
-				DiscoverModels: true,
-				Models:         []Model{{ID: "doubao-seed-2-0-pro-260215", Name: "doubao-seed-2-0-pro-260215"}, {ID: "doubao-seed-2-0-lite-260215", Name: "doubao-seed-2-0-lite-260215"}},
+				Key: "codingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/coding", Route: "/api/coding", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://ark.cn-beijing.volces.com/api/coding/v3", Route: "/api/coding/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/coding/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
 			},
 			{
-				APIType: "openai-responses", BaseURL: "https://ark.cn-beijing.volces.com/api/v3",
-				DiscoverModels: true,
-				Models:         []Model{{ID: "doubao-seed-2-0-pro-260215", Name: "doubao-seed-2-0-pro-260215"}, {ID: "doubao-seed-2-0-lite-260215", Name: "doubao-seed-2-0-lite-260215"}},
+				Key: "agentPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/plan/v3", Route: "/api/plan/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/plan/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/plan/v3", Route: "/api/plan/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/plan/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/plan", Route: "/api/plan", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/plan/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://ark.cn-beijing.volces.com/api/plan/v3", Route: "/api/plan/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/plan/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://ark.cn-beijing.volces.com/api/plan/v3", Route: "/api/plan/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/plan/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
 			},
 			{
-				APIType: "openai-images", BaseURL: "https://ark.cn-beijing.volces.com/api/v3",
-				Models: []Model{
-					{ID: "doubao-seedream-5-0-260128", Name: "doubao-seedream-5-0-260128"},
-					{ID: "doubao-seedream-5-0-lite-260128", Name: "doubao-seedream-5-0-lite-260128"},
-					{ID: "doubao-seedream-4-5-251128", Name: "doubao-seedream-4-5-251128"},
+				Key: "payAsYouGo",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", Route: "/api/v3", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v3", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", Route: "/api/v3", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v3", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", Route: "/api/v3", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v3", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://ark.cn-beijing.volces.com/api/v3", Route: "/api/v3", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v3", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "speech",
+				APIConfigs: []APIConfig{
+					{APIType: "doubao-transcriptions", Purpose: "transcription", BaseURL: "https://openspeech.bytedance.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "x-api-key", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "doubao-speech", Purpose: "speech", BaseURL: "https://openspeech.bytedance.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "x-api-key", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
 				},
 			},
 		},
 	},
-}
-
-func editableAPIConfigs(discoverModels bool, apiTypes ...string) []APIConfig {
-	configs := make([]APIConfig, 0, len(apiTypes))
-	for _, apiType := range apiTypes {
-		if apiType == "anthropic-messages" {
-			config := anthropicAPIConfig("", AuthModeXAPIKey, AuthModeBearer)
-			config.EditableBaseURL = true
-			configs = append(configs, config)
-			continue
-		}
-		configs = append(configs, APIConfig{
-			APIType:         apiType,
-			EditableBaseURL: true,
-			DiscoverModels:  discoverModels && (apiType == "openai-completions" || apiType == "openai-responses"),
-		})
-	}
-	return configs
-}
-
-func anthropicAPIConfig(baseURL, defaultAuthMode string, additionalAuthModes ...string) APIConfig {
-	authModes := []string{defaultAuthMode}
-	for _, authMode := range additionalAuthModes {
-		if authMode != defaultAuthMode {
-			authModes = append(authModes, authMode)
-		}
-	}
-	return APIConfig{
-		APIType:         "anthropic-messages",
-		BaseURL:         baseURL,
-		DefaultAuthMode: defaultAuthMode,
-		AuthModes:       authModes,
-	}
+	"zai": {
+		Key:            "zai",
+		DisplayName:    "Z.ai",
+		Sort:           120,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "ZAI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "chinaCodingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://open.bigmodel.cn/api/coding/paas/v4", Route: "/api/coding/paas/v4", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/coding/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://open.bigmodel.cn/api/anthropic", Route: "/api/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/coding/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "globalCodingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.z.ai/api/coding/paas/v4", Route: "/api/coding/paas/v4", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/coding/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.z.ai/api/anthropic", Route: "/api/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/coding/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "chinaApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://open.bigmodel.cn/api/paas/v4", Route: "/api/paas/v4", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://open.bigmodel.cn/api/anthropic", Route: "/api/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://open.bigmodel.cn/api/paas/v4", Route: "/api/paas/v4", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", BaseURL: "https://open.bigmodel.cn/api/paas/v4", Route: "/api/paas/v4", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "globalApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.z.ai/api/paas/v4", Route: "/api/paas/v4", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.z.ai/api/anthropic", Route: "/api/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://api.z.ai/api/paas/v4", Route: "/api/paas/v4", Discovery: "DiscoveryNone", DiscoveryRoute: "/api/paas/v4", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"minimax": {
+		Key:            "minimax",
+		DisplayName:    "MiniMax (CN)",
+		Sort:           130,
+		DefaultAPIType: "anthropic-messages",
+		EnvKey:         "MINIMAX_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.minimaxi.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/anthropic", DiscoveryAuthMode: "x-api-key", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.minimaxi.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/anthropic", DiscoveryAuthMode: "x-api-key", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://api.minimaxi.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/anthropic", DiscoveryAuthMode: "x-api-key", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "minimax-images", Purpose: "image", BaseURL: "https://api.minimaxi.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "minimax-speech", Purpose: "speech", BaseURL: "https://api.minimaxi.com", Discovery: "DiscoveryNone", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"xiaomi": {
+		Key:            "xiaomi",
+		DisplayName:    "Xiaomi",
+		Sort:           140,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "XIAOMI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "tokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://token-plan-cn.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://token-plan-cn.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://token-plan-cn.xiaomimimo.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", EditableBaseURL: true, DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "payAsYouGo",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://api.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.xiaomimimo.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "mimo-transcriptions", Purpose: "transcription", BaseURL: "https://api.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "mimo-speech", Purpose: "speech", BaseURL: "https://api.xiaomimimo.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"kimi": {
+		Key:            "kimi",
+		DisplayName:    "Kimi (CN)",
+		Sort:           150,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "KIMI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "chinaTokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.kimi.com/coding/v1", Route: "/coding/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.kimi.com/coding", Route: "/coding", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+				},
+			},
+			{
+				Key: "globalTokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.kimi.com/coding/v1", Route: "/coding/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.kimi.com/coding", Route: "/coding", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+				},
+			},
+			{
+				Key: "chinaApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.moonshot.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.moonshot.cn/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "globalApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.moonshot.ai/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.moonshot.ai/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"kimi-coding": {
+		Key:            "kimi-coding",
+		DisplayName:    "Kimi Coding",
+		Sort:           230,
+		DefaultAPIType: "anthropic-messages",
+		EnvKey:         "KIMI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "chinaTokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.kimi.com/coding/v1", Route: "/coding/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.kimi.com/coding", Route: "/coding", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/coding/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key", "bearer"}},
+				},
+			},
+		},
+	},
+	"openai": {
+		Key:            "openai",
+		DisplayName:    "OpenAI",
+		Sort:           170,
+		DefaultAPIType: "openai-responses",
+		EnvKey:         "OPENAI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-transcriptions", Purpose: "transcription", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-speech", Purpose: "speech", BaseURL: "https://api.openai.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"openrouter": {
+		Key:            "openrouter",
+		DisplayName:    "OpenRouter",
+		Sort:           180,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "OPENROUTER_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://openrouter.ai/api", Route: "/api", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openrouter-images", Purpose: "image", BaseURL: "https://openrouter.ai", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-transcriptions", Purpose: "transcription", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-speech", Purpose: "speech", BaseURL: "https://openrouter.ai/api/v1", Route: "/api/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/api/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"anthropic": {
+		Key:            "anthropic",
+		DisplayName:    "Anthropic",
+		Sort:           190,
+		DefaultAPIType: "anthropic-messages",
+		EnvKey:         "ANTHROPIC_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.anthropic.com", Discovery: "DiscoveryAnthropicModels", DiscoveryAuthMode: "x-api-key", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+		},
+	},
+	"gemini": {
+		Key:            "gemini",
+		DisplayName:    "Gemini",
+		Sort:           200,
+		DefaultAPIType: "gemini-generate-content",
+		EnvKey:         "GEMINI_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "gemini-generate-content", Purpose: "text", BaseURL: "https://generativelanguage.googleapis.com", Discovery: "DiscoveryGeminiModels", DiscoveryAuthMode: "x-goog-api-key", DiscoverModels: true, DefaultAuthMode: "x-goog-api-key", AuthModes: []string{"x-goog-api-key"}},
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://generativelanguage.googleapis.com/v1beta/openai", Route: "/v1beta/openai", Discovery: "DiscoveryGeminiModels", DiscoveryAuthMode: "x-goog-api-key", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "gemini-speech", Purpose: "speech", BaseURL: "https://generativelanguage.googleapis.com", Discovery: "DiscoveryGeminiModels", DiscoveryAuthMode: "x-goog-api-key", DiscoverModels: true, DefaultAuthMode: "x-goog-api-key", AuthModes: []string{"x-goog-api-key"}},
+				},
+			},
+		},
+	},
+	"moonshot": {
+		Key:            "moonshot",
+		DisplayName:    "Moonshot (Global)",
+		Sort:           240,
+		DefaultAPIType: "openai-completions",
+		EnvKey:         "MOONSHOT_API_KEY",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "globalApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.moonshot.ai/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.moonshot.ai/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"llmman": {
+		Key:            "llmman",
+		DisplayName:    "llmman",
+		Sort:           250,
+		DefaultAPIType: "openai-responses",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true, DiscoverModels: true},
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true, DiscoverModels: true},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "http://127.0.0.1:17434/v1", EditableBaseURL: true},
+				},
+			},
+		},
+	},
+	"tokenhub": {
+		Key:            "tokenhub",
+		DisplayName:    "TokenHub",
+		Sort:           70,
+		DefaultAPIType: "openai-completions",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "chinaTokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://tokenhub.tencentmaas.com/plan/v3", Route: "/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://tokenhub.tencentmaas.com/plan/anthropic", Route: "/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "globalTokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://tokenhub-intl.tencentmaas.com/plan/v3", Route: "/v3", Discovery: "DiscoveryNone", DiscoveryRoute: "/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://tokenhub-intl.tencentmaas.com/plan/anthropic", Route: "/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/v3", DiscoveryAuthMode: "bearer", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "chinaApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://tokenhub.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://tokenhub.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://tokenhub.tencentmaas.com", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "tokenhub-images", Purpose: "image", BaseURL: "https://tokenhub.tencentmaas.com", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://tokenhub.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "tokenhub-transcriptions", Purpose: "transcription", BaseURL: "https://tokenhub.tencentmaas.com", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "tokenhub-speech", Purpose: "speech", BaseURL: "https://tokenhub.tencentmaas.com", Discovery: "DiscoveryOpenAIModels", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+			{
+				Key: "globalApi",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://tokenhub-intl.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://tokenhub-intl.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://tokenhub-intl.tencentmaas.com", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://tokenhub-intl.tencentmaas.com/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"qianfan": {
+		Key:            "qianfan",
+		DisplayName:    "百度千帆",
+		Sort:           90,
+		DefaultAPIType: "openai-completions",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "codingPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/v2/coding", Route: "/v2/coding", Discovery: "DiscoveryNone", DiscoveryRoute: "/v2/coding", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/anthropic/coding", Route: "/anthropic/coding", Discovery: "DiscoveryNone", DiscoveryRoute: "/v2/coding", DiscoveryAuthMode: "bearer", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "tokenPlan",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryNone", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryNone", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "payAsYouGo",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://qianfan.baidubce.com/anthropic", Route: "/anthropic", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+					{APIType: "openai-images", Purpose: "image", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", BaseURL: "https://qianfan.baidubce.com/v2", Route: "/v2", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v2", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"siliconflow": {
+		Key:            "siliconflow",
+		DisplayName:    "SiliconFlow",
+		Sort:           100,
+		DefaultAPIType: "openai-completions",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "default",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://api.siliconflow.cn", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "siliconflow-images", Purpose: "image", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-embeddings", Purpose: "embedding", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "rerank", Purpose: "rerank", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-transcriptions", Purpose: "transcription", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-speech", Purpose: "speech", BaseURL: "https://api.siliconflow.cn/v1", Route: "/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+				},
+			},
+		},
+	},
+	"opencode": {
+		Key:            "opencode",
+		DisplayName:    "OpenCode",
+		Sort:           160,
+		DefaultAPIType: "openai-completions",
+		AccountTypes: []AccountTypePreset{
+			{
+				Key: "go",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://opencode.ai/zen/go/v1", Route: "/zen/go/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/go/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://opencode.ai/zen/go/v1", Route: "/zen/go/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/go/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://opencode.ai/zen/go", Route: "/zen/go", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/go/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+			{
+				Key: "zen",
+				APIConfigs: []APIConfig{
+					{APIType: "openai-completions", Purpose: "text", BaseURL: "https://opencode.ai/zen/v1", Route: "/zen/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "openai-responses", Purpose: "text", BaseURL: "https://opencode.ai/zen/v1", Route: "/zen/v1", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "bearer", AuthModes: []string{"bearer"}},
+					{APIType: "anthropic-messages", Purpose: "text", BaseURL: "https://opencode.ai/zen", Route: "/zen", Discovery: "DiscoveryOpenAIModels", DiscoveryRoute: "/zen/v1", DiscoveryAuthMode: "bearer", DiscoverModels: true, DefaultAuthMode: "x-api-key", AuthModes: []string{"x-api-key"}},
+				},
+			},
+		},
+	},
 }
 
 func Get(key string) (Meta, bool) {
@@ -269,18 +626,18 @@ func Get(key string) (Meta, bool) {
 	if !ok {
 		return Meta{}, false
 	}
-	return cloneMeta(meta), true
+	return meta, true
 }
 
 func All() map[string]Meta {
 	result := make(map[string]Meta, len(catalog))
 	for key, meta := range catalog {
-		result[key] = cloneMeta(meta)
+		result[key] = meta
 	}
 	return result
 }
 
-func FindAPIConfig(key, apiType string) (APIConfig, bool) {
+func FindAPIConfig(key, apiType string, accountType ...string) (APIConfig, bool) {
 	meta, ok := catalog[key]
 	if !ok {
 		return APIConfig{}, false
@@ -289,42 +646,27 @@ func FindAPIConfig(key, apiType string) (APIConfig, bool) {
 	if target == "" {
 		target = meta.DefaultAPIType
 	}
-	for _, config := range meta.APIConfigs {
-		if config.APIType == target {
-			config.AuthModes = append([]string(nil), config.AuthModes...)
-			config.Models = append([]Model(nil), config.Models...)
-			return config, true
+	presets := meta.AccountTypes
+	if len(accountType) > 0 {
+		preset, ok := FindAccountType(key, accountType[0])
+		if !ok {
+			return APIConfig{}, false
+		}
+		presets = []AccountTypePreset{preset}
+	}
+	for _, preset := range presets {
+		for _, config := range preset.APIConfigs {
+			if config.APIType == target {
+				config.AuthModes = append([]string(nil), config.AuthModes...)
+				return config, true
+			}
 		}
 	}
 	return APIConfig{}, false
 }
 
-func DefaultModels(key, apiType string) []Model {
-	meta, ok := catalog[key]
-	if !ok {
-		return nil
-	}
-	target := strings.TrimSpace(apiType)
-	if target == "" {
-		target = meta.DefaultAPIType
-	}
-	for _, config := range meta.APIConfigs {
-		if config.APIType != target {
-			continue
-		}
-		if len(config.Models) > 0 {
-			return append([]Model(nil), config.Models...)
-		}
-		if IsImageAPIType(config.APIType) || IsEmbeddingAPIType(config.APIType) {
-			return nil
-		}
-		break
-	}
-	return append([]Model(nil), meta.Models...)
-}
-
-func ResolveAuthMode(provider, apiType, requested string) (string, error) {
-	config, ok := FindAPIConfig(provider, apiType)
+func ResolveAuthMode(provider, apiType, requested string, accountType ...string) (string, error) {
+	config, ok := FindAPIConfig(provider, apiType, accountType...)
 	if !ok {
 		return "", fmt.Errorf("provider %s does not support api type %s", provider, apiType)
 	}
@@ -359,8 +701,8 @@ func DefaultAPIType(key string) string {
 	return meta.DefaultAPIType
 }
 
-func ResolveBaseURL(key, apiType, requested string) (string, error) {
-	config, ok := FindAPIConfig(key, apiType)
+func ResolveBaseURL(key, apiType, requested string, accountType ...string) (string, error) {
+	config, ok := FindAPIConfig(key, apiType, accountType...)
 	if !ok {
 		return "", fmt.Errorf("provider %s does not support api type %s", key, apiType)
 	}
@@ -417,7 +759,7 @@ func IsEmbeddingAPIType(apiType string) bool {
 
 func IsImageAPIType(apiType string) bool {
 	switch apiType {
-	case "openai-images", "dashscope-images", "minimax-images", "openrouter-images":
+	case "openai-images", "dashscope-images", "minimax-images", "openrouter-images", "tokenhub-images", "siliconflow-images":
 		return true
 	default:
 		return false
@@ -480,16 +822,4 @@ var legacyModelPrefixes = map[string][]string{
 	"anthropic":           {"anthropic"},
 	"gemini":              {"google", "gemini"},
 	"moonshot":            {"moonshot"},
-}
-
-func cloneMeta(meta Meta) Meta {
-	clone := meta
-	clone.APIConfigs = make([]APIConfig, len(meta.APIConfigs))
-	for index, config := range meta.APIConfigs {
-		clone.APIConfigs[index] = config
-		clone.APIConfigs[index].AuthModes = append([]string(nil), config.AuthModes...)
-		clone.APIConfigs[index].Models = append([]Model(nil), config.Models...)
-	}
-	clone.Models = append([]Model(nil), meta.Models...)
-	return clone
 }

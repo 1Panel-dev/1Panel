@@ -14,18 +14,54 @@
             id="login-container"
         >
             <div class="grid items-stretch w-full" :style="loginGridStyle">
-                <div v-if="showLogo" class="flex justify-center" :style="{ height: containerHeight }">
+                <div
+                    v-if="showLogo"
+                    class="relative flex justify-center overflow-hidden"
+                    :style="{ height: containerHeight }"
+                    :aria-busy="imageStatus === 'loading'"
+                >
+                    <Transition name="login-image-placeholder">
+                        <div
+                            v-if="imageStatus !== 'loaded'"
+                            class="absolute inset-0 flex flex-col items-center justify-center gap-2 px-8 text-center"
+                            role="status"
+                        >
+                            <el-icon
+                                class="login-image-loading"
+                                :class="{ 'is-loading': imageStatus === 'loading' }"
+                                :size="18"
+                                color="var(--el-text-color-placeholder)"
+                                aria-hidden="true"
+                            >
+                                <Loading v-if="imageStatus === 'loading'" />
+                                <Picture v-else />
+                            </el-icon>
+                            <template v-if="imageStatus === 'error'">
+                                <span class="text-sm text-[var(--el-text-color-secondary)]">
+                                    {{ $t('commons.login.imageLoadError') }}
+                                </span>
+                                <span class="text-xs text-[var(--el-text-color-placeholder)] max-w-80">
+                                    {{ $t('commons.login.imageLoadErrorHint') }}
+                                </span>
+                            </template>
+                        </div>
+                    </Transition>
                     <img
-                        v-show="imgLoaded"
-                        :src="loadImage('loginImage')"
-                        class="max-w-full max-h-full object-cover bg-cover bg-center"
+                        v-if="loginImageSrc"
+                        :src="loginImageSrc"
+                        :style="{ opacity: imageStatus === 'loaded' ? 1 : 0 }"
+                        class="login-image relative max-w-full max-h-full object-cover bg-cover bg-center"
                         alt="1panel"
                         @load="onImgLoad"
-                        @error="onImgError"
+                        @error="imageStatus = 'error'"
                     />
                 </div>
                 <div :class="loginFormClass">
-                    <LoginForm ref="loginRef" @external-login-ready="externalLoginPending = false"></LoginForm>
+                    <LoginForm
+                        ref="loginRef"
+                        @external-login-ready="externalLoginPending = false"
+                        @theme-ready="loadImages"
+                    ></LoginForm>
                 </div>
             </div>
         </div>
@@ -35,8 +71,8 @@
 <script setup lang="ts">
 import LoginForm from './components/login-form.vue';
 import { ref, onMounted } from 'vue';
+import { Loading, Picture } from '@element-plus/icons-vue';
 import { useGlobalStore } from '@/composables/useGlobalStore';
-import { preloadImage } from '@/utils/browser';
 import { hasExternalLoginTicket } from '@/utils/external-login';
 defineOptions({ name: 'Login' });
 const { entrance, isEnterprise, themeConfig } = useGlobalStore();
@@ -44,16 +80,15 @@ const backgroundOpacity = ref(1);
 const defaultLoginImage = new URL('@/assets/images/1panel-login.jpg', import.meta.url).href;
 const defaultEnterpriseLoginImage = new URL('@/assets/images/1panel-login-enterprise.png', import.meta.url).href;
 const defaultLoginBgImage = new URL('@/assets/images/1panel-login-bg.jpg', import.meta.url).href;
-const loadedLoginImage = ref<string | null>(null);
-const loadedBackgroundImage = ref<string | null>(null);
+const loginImageSrc = ref('');
 const backgroundStyle = ref<{ backgroundImage?: string; backgroundColor?: string }>({});
-const imgLoaded = ref(false);
+const imageStatus = ref<'loading' | 'loaded' | 'error'>('loading');
 const currentDefaultLoginImage = computed(() => (isEnterprise.value ? defaultEnterpriseLoginImage : defaultLoginImage));
 
 const externalLoginPending = ref(hasExternalLoginTicket());
 
 function onImgLoad() {
-    imgLoaded.value = true;
+    imageStatus.value = 'loaded';
 }
 const mySafetyCode = defineProps({
     code: {
@@ -69,70 +104,39 @@ const getStatus = async () => {
     }
 };
 
-const loadImage = (name: string) => {
+const loadImages = () => {
     const { loginImage, loginBackground, loginBgType } = themeConfig.value;
-    if (name === 'loginImage') {
-        if (loginImage === 'loginImage') {
-            return loadedLoginImage.value || currentDefaultLoginImage.value;
-        }
-        if (loginImage) {
-            return loginImage;
-        }
-        return currentDefaultLoginImage.value;
-    }
-    if (name === 'loginBackground') {
-        if (loginBgType === 'image') {
-            if (loginBackground === 'loginBackground') {
-                return loadedBackgroundImage.value || defaultLoginBgImage;
-            }
-            if (loginBackground) {
-                return loginBackground;
-            }
-            return defaultLoginBgImage;
-        }
-        if (loginBgType === 'color') {
-            return loginBackground;
-        }
-        return defaultLoginBgImage;
-    }
-    return '';
-};
-
-const onImgError = (event: any) => {
-    event.target.src = currentDefaultLoginImage.value;
-    imgLoaded.value = true;
-};
-
-onMounted(async () => {
-    await getStatus();
-    const loginImageUrl = `/api/v2/images/loginImage?t=${Date.now()}`;
-    const backgroundImageUrl = `/api/v2/images/loginBackground?t=${Date.now()}`;
-    if (themeConfig.value.loginImage === 'loginImage') {
-        loadedLoginImage.value = await preloadImage(loginImageUrl);
-    }
-    if (themeConfig.value.loginBgType === 'image' && themeConfig.value.loginBackground === 'loginBackground') {
-        loadedBackgroundImage.value = await preloadImage(backgroundImageUrl);
-    }
-    if (themeConfig.value.loginBgType === 'color') {
+    imageStatus.value = 'loading';
+    loginImageSrc.value =
+        loginImage === 'loginImage'
+            ? `/api/v2/images/loginImage?t=${Date.now()}`
+            : loginImage || currentDefaultLoginImage.value;
+    if (loginBgType === 'color') {
         backgroundStyle.value = {
-            backgroundColor: themeConfig.value.loginBackground,
+            backgroundColor: loginBackground,
         };
-    } else {
-        const img = new Image();
-        const url = loadImage('loginBackground');
-        img.onload = () => {
-            backgroundStyle.value = {
-                backgroundImage: `url(${url})`,
-            };
-        };
-        img.onerror = () => {
-            backgroundStyle.value = {
-                backgroundImage: `url(${defaultLoginBgImage})`,
-            };
-        };
-        img.src = url;
+        return;
     }
-});
+    let url = defaultLoginBgImage;
+    if (loginBgType === 'image' && loginBackground) {
+        url =
+            loginBackground === 'loginBackground' ? `/api/v2/images/loginBackground?t=${Date.now()}` : loginBackground;
+    }
+    const img = new Image();
+    img.onload = () => {
+        backgroundStyle.value = {
+            backgroundImage: `url(${url})`,
+        };
+    };
+    img.onerror = () => {
+        backgroundStyle.value = {
+            backgroundImage: `url(${defaultLoginBgImage})`,
+        };
+    };
+    img.src = url;
+};
+
+onMounted(getStatus);
 
 const FIXED_WIDTH = 1000;
 const FIXED_HEIGHT = 415;
@@ -163,3 +167,32 @@ const loginFormClass = computed(() => {
         : 'flex items-center justify-center p-4 w-full min-w-0';
 });
 </script>
+
+<style scoped lang="scss">
+.login-image {
+    transition: opacity 200ms ease;
+}
+
+.login-image-loading {
+    opacity: 0.5;
+}
+
+.login-image-placeholder-leave-active {
+    transition: opacity 200ms ease;
+}
+
+.login-image-placeholder-leave-to {
+    opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .login-image,
+    .login-image-placeholder-leave-active {
+        transition: none;
+    }
+
+    .login-image-loading {
+        animation: none;
+    }
+}
+</style>

@@ -245,7 +245,14 @@ func (p *Provider) ListSnapshots(ctx context.Context, name string) ([]dto.VMSnap
 	}
 	out := make([]dto.VMSnapshotInfo, 0, len(items))
 	for _, item := range items {
-		out = append(out, dto.VMSnapshotInfo(item))
+		result := dto.VMSnapshotInfo{
+			Name: item.Name, Description: item.Description, CreatedAt: item.CreatedAt, State: item.State,
+			Parent: item.Parent, Path: item.Path, Size: item.Size, Current: item.Current, Children: item.Children,
+		}
+		for _, disk := range item.Disks {
+			result.Disks = append(result.Disks, dto.VMSnapshotDisk(disk))
+		}
+		out = append(out, result)
 	}
 	return out, nil
 }
@@ -256,8 +263,16 @@ func (p *Provider) CreateSnapshot(ctx context.Context, name string, snapshotName
 	}, nil)
 }
 
-func (p *Provider) RecoverSnapshot(ctx context.Context, name string, snapshotName string) error {
-	return p.call(ctx, protocol.ActionRecoverSnapshot, protocol.VMSnapshotReq{Name: name, SnapshotName: snapshotName}, nil)
+func (p *Provider) RecoverSnapshot(ctx context.Context, name string, snapshotName string) ([]dto.VMOrphanItem, error) {
+	var items []protocol.VMOrphanItem
+	if err := p.call(ctx, protocol.ActionRecoverSnapshot, protocol.VMSnapshotReq{Name: name, SnapshotName: snapshotName}, &items); err != nil {
+		return nil, err
+	}
+	out := make([]dto.VMOrphanItem, 0, len(items))
+	for _, item := range items {
+		out = append(out, dto.VMOrphanItem{Type: item.Type, Path: item.Path, Size: item.Size, ModifiedAt: item.ModifiedAt})
+	}
+	return out, nil
 }
 
 func (p *Provider) DeleteSnapshot(ctx context.Context, name string, snapshotName string) error {
@@ -521,8 +536,12 @@ func findHelperPath() (string, error) {
 }
 
 func toProtocolConfig(cfg types.VMConfig) protocol.VMConfig {
+	disks := make([]protocol.VMDataDisk, 0, len(cfg.DataDisks))
+	for _, disk := range cfg.DataDisks {
+		disks = append(disks, protocol.VMDataDisk(disk))
+	}
 	return protocol.VMConfig{
-		Name: cfg.Name, CPU: cfg.CPU, MemoryMiB: cfg.MemoryMiB, DiskSizeGiB: cfg.DiskSizeGiB,
+		Name: cfg.Name, CPU: cfg.CPU, MemoryMiB: cfg.MemoryMiB, DiskSizeGiB: cfg.DiskSizeGiB, DataDisks: disks,
 		DiskBus: cfg.DiskBus, DiskPath: cfg.DiskPath, StoragePool: cfg.StoragePool, ISOPaths: cfg.ISOPaths, ImagePath: cfg.ImagePath,
 		Network: cfg.Network, BootOrder: cfg.BootOrder, AutoStart: cfg.AutoStart,
 		StartAfterCreate: cfg.StartAfterCreate,

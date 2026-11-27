@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
@@ -63,8 +64,8 @@ func (u *DBCommonService) LoadDatabaseFile(req dto.OperationWithNameAndType) (st
 			return "", err
 		}
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql/%s/data/postgresql.conf", req.Name))
-		if strings.HasPrefix(database.Version, "18.") {
-			filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql/%s/data/18/docker/postgresql.conf", req.Name))
+		if majorVersion, err := strconv.Atoi(strings.Split(database.Version, ".")[0]); err == nil && majorVersion >= 18 {
+			filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/postgresql/%s/data/%d/docker/postgresql.conf", req.Name, majorVersion))
 		}
 	case "redis-conf":
 		filePath = path.Join(global.Dir.DataDir, fmt.Sprintf("apps/redis/%s/conf/redis.conf", req.Name))
@@ -94,8 +95,8 @@ func (u *DBCommonService) UpdateConfByFile(req dto.DBConfUpdateByFile) error {
 		path = fmt.Sprintf("%s/%s/%s/data/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
 	case constant.AppPostgresql:
 		path = fmt.Sprintf("%s/%s/%s/data/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
-		if strings.HasPrefix(app.Version, "18.") {
-			path = fmt.Sprintf("%s/%s/%s/data/18/docker/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name)
+		if majorVersion, err := strconv.Atoi(strings.Split(app.Version, ".")[0]); err == nil && majorVersion >= 18 {
+			path = fmt.Sprintf("%s/%s/%s/data/%d/docker/postgresql.conf", global.Dir.AppInstallDir, req.Type, app.Name, majorVersion)
 		}
 	case constant.AppRedis, constant.AppRedisCluster:
 		path = fmt.Sprintf("%s/%s/%s/conf/redis.conf", global.Dir.AppInstallDir, req.Type, app.Name)

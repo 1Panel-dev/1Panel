@@ -1,5 +1,5 @@
 # 基本エラー
-ErrInvalidParams: '不正なリクエスト: {{ .detail }}'
+ErrInvalidParams: '不正なリクエスト{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP カスタム引数の形式が正しくありません'
 ErrMcpGatewayArgsConflict: '引数 {{ .name }} は 1Panel によって管理されているため、カスタム引数には設定できません'
 ErrTokenParse: 'トークンエラー: {{ .detail }}'
@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'Docker Compose 設定出力からプロジェクト
 ErrComposeProjectNameEmpty: 'Docker Compose 設定またはファイルの親ディレクトリからプロジェクト名を推定できません。名前を入力して再試行してください。'
 ErrComposeNameInvalid: 'Compose プロジェクト名の形式が正しくありません。小文字または数字で始まり、小文字、数字、ハイフン、アンダースコアのみを使用した 1～256 文字にしてください。'
 ErrAppVersionUnavailable: '現在のアプリケーションバージョンはリモートサービスから削除されています。別のバージョンを選択して再試行してください。'
-ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway は同じデータベース種別（SQLite または PostgreSQL）間でのみアップグレードできます。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI Gateway のバックアップと復元先アプリのデータベース種別（SQLite または PostgreSQL）は一致している必要があります。'
 ErrHermesUpgradeVersion: 'Hermes Agent は、認識可能でメジャーバージョン間のアップグレード設定に適合する新しいリリースにのみアップグレードできます。以前のバージョンに戻すには、バックアップから復元してください。'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'アプリケーションの準備完了を待機'
 UpgradeBackupDisabled: 'アップグレードバックアップが無効なため、アップグレードスクリプトによるデータ変更を完全にはロールバックできません'
 UpgradeRollbackFailed: 'ロールバックに失敗しました'
 ErrDatabaseNotFound: 'データベース {{ .name }} は存在しません'
+
+# vLLM
+ErrVllmGB10ProOnly: 'この vLLM バージョンは 1Panel プロフェッショナル版でのみ利用できます。'
+ErrVllmGB10ModelUnsupported: 'このバージョンは DeepSeek-V4-Flash-0731 または DeepSeek-V4-Flash-Vision-Exp のみ対応しています。対応するモデルディレクトリを選択してください。'
 
 # SSH
 ExportIP: 'ログインIP'
@@ -289,6 +292,13 @@ RemoteBackup: 'リモートデータベースをバックアップするには�
 RemoteRecover: 'リモートデータベースを復元するには、まずイメージ {{ .name }} を使用してローカルコンテナデータベースサービスを起動する必要があります。しばらくお待ちください...'
 Arg: '引数'
 
+#PostgreSQL
+ErrPgUserProtected: "システムユーザーと現在の接続ユーザーは保護されているため、この操作は実行できません"
+ErrPgSuperUserGrant: "スーパーユーザーは全データベースにアクセスでき、個別の権限付与や取り消しは不要です"
+ErrPgUserUsed: "関連アプリまたはウェブサイトがこのユーザーを使用しています。先に接続アカウントを変更してください"
+ErrPgUserBound: "先にこのユーザーのデータベース権限を取り消してください"
+ErrPgUserPasswordSync: "ユーザーのパスワードは変更されましたが、次のアプリへのパスワード同期に失敗しました：{{ .detail }}"
+
 # Redis
 ErrTypeOfRedis: 'リカバリ ファイルの種類が現在の永続化方法と一致しません。変更して再試行してください'
 
@@ -341,6 +351,14 @@ ComposeRecoverCleanup: 'Compose 復元作業領域をクリーンアップ'
 # ランタイム
 ErrFileNotExist: '{{ .detail }} ファイルが存在しません。ソース ファイルの整合性を確認してください。'
 ErrImageBuildErr: 'イメージのビルドに失敗しました'
+PHPBuildImage: "PHP イメージをビルド中"
+PHPBuildBaseImage: "ベースイメージ {{ .name }} を取得中"
+PHPBuildStep: "PHP イメージをビルド中（ステップ {{ .name }}）"
+PHPBuildStartContainer: "PHP コンテナを起動中"
+PHPBuildInstallExtensions: "PHP 拡張機能をインストール中"
+PHPBuildCommitImage: "拡張機能を含む PHP イメージを保存中"
+PHPBuildApplyConfig: "設定を適用して PHP 実行環境を起動中"
+PHPBuildSeeLog: "詳細は build.log を確認してください"
 ErrImageExist: 'イメージはすでに存在します！イメージ名を変更してください。'
 ErrDelWithWebsite: 'オペレーティング環境は既に Web サイトに関連付けられているため、削除できません'
 ErrRuntimeStart: '起動に失敗しました'
@@ -639,6 +657,8 @@ ErrWebhookTestFailed: 'Webhook の設定を確認してください。詳細は�
 
 # タスク - ランタイム
 ErrInstallExtension: 'インストールタスクが進行中です、タスクが終了するのを待ってください'
+PHPExtensionsInstallWarning: "一部の PHP 拡張機能をインストールできませんでした: {{ .name }}"
+PHPExtensionsInstallManually: "拡張機能の管理画面から再試行すると、インストールに成功した拡張機能がイメージに保存されます。手動で調査するには、Docker ホストで次のコマンドを実行してください:"
 
 # アラートメールテンプレート
 PanelAlertTitle: 'パネルアラート通知'
@@ -666,6 +686,17 @@ PartitionDiskErr: 'パーティションに失敗しました、{{ .err }}'
 FormatDiskErr: 'ディスクのフォーマットに失敗しました、{{ .err }}'
 MountDiskErr: 'ディスクのマウントに失敗しました、{{ .err }}'
 XfsNotFound: 'xfs ファイルシステムが検出されませんでした、最初に xfsprogs をインストールしてください'
+
+# ネットワーク管理
+ErrNetworkPersistencePlatform: "ネットワーク設定の永続化は Linux ノードでのみサポートされます。"
+ErrNetworkPersistencePrivilege: "ネットワーク設定を永続化するには、1Panel Agent をネットワーク管理権限のある root として実行してください。"
+ErrNetworkIPRoute2: "iproute2 をインストールまたは更新し、ip コマンドを利用できることを確認してください。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "このプライマリ IP アドレスには、同じサブネット内にセカンダリアドレスがあります。先にセカンダリアドレスを削除するか、システムのネットワークツールで調整してから再試行してください。"
+ErrNetworkRouteReadOnly: "このルートは読み取り専用です。"
+ErrNetworkPersistenceConflict: "このアドレスまたは経路は既に存在するか、保存済みの設定と競合しています。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "ループバックインターフェースの設定は読み取り専用です。"
+ErrNetworkPersistentSourceMissing: "インターフェース {{ .name }} に対応するシステムの永続設定が見つかりません。読み取り専用です。"
+ErrNetworkVirtualBridgeReadOnly: "この仮想インターフェースは読み取り専用で、到達性チェックの対象外です。"
 
 # ターミナル
 TerminalAIBlockedRiskyCommand: '危険なコマンドをブロックしました: {{ .command }}'
@@ -820,3 +851,89 @@ ErrImageCheckProxyRequired: "現在の実行環境でイメージの更新を確
 ErrPHPExtensionsConflict: "同じ名前で内容が異なる PHP 拡張機能テンプレートが既に存在するため、上書きしませんでした"
 
 ErrModelTokenizerDirOverlap: "モデルとトークナイザーのディレクトリは別々にし、一方が他方を含まないようにしてください"
+ErrClusterAppOnly: "このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。"
+ErrClusterArchivePassphraseRequired: "バックアップパスワードを入力してください。"
+ErrClusterArchiveTooLarge: "クラスターバックアップファイルのサイズが大きすぎます。"
+ErrClusterArchiveFormat: "このクラスターバックアップのファイル形式はサポートされていません。"
+ErrClusterArchiveTruncated: "クラスターバックアップファイルが不完全です。"
+ErrClusterArchiveBlock: "クラスターバックアップに無効なデータブロックが含まれています。"
+ErrClusterArchiveAuthentication: "バックアップパスワードが正しくないか、クラスターバックアップファイルが破損しています。"
+ErrClusterArchiveTrailingData: "クラスターバックアップファイルの末尾に余分なデータがあります。"
+ErrClusterArchiveManifest: "クラスターバックアップのメタデータが無効です。"
+ErrClusterArchiveManifestTooLarge: "クラスターバックアップのメタデータのサイズが大きすぎます。"
+ErrClusterArchiveInvalid: "クラスターバックアップファイルの構造が無効です。"
+ErrClusterArchivePayload: "バックアップデータがクラスターバックアップのメタデータと一致しません。"
+ErrClusterArchiveChecksum: "クラスターバックアップデータのチェックサムが一致しません。"
+ErrClusterArchiveImportHeader: "クラスターバックアップのインポートリクエストヘッダーが無効です。"
+ErrClusterBackupID: "クラスターバックアップの ID が無効です。"
+ErrClusterBackupEngineMismatch: "バックアップのデータベースエンジンが選択したアプリケーションと一致しません。"
+ErrClusterBackupSelectFile: "クラスターバックアップファイル（.1pha）を選択してください。"
+ErrClusterBackupFileInaccessible: "クラスターバックアップファイルにアクセスできません。"
+ErrClusterBackupRegularFile: "クラスターバックアップには通常のファイルを指定してください。"
+ErrClusterBackupFileChanged: "クラスターバックアップファイルが変更されました。もう一度選択してください。"
+ErrClusterBackupNotPrimary: "選択したインスタンスは高可用性クラスターのプライマリインスタンスではありません。"
+ErrClusterBackupContainerUnavailable: "データベースコンテナーを利用できません。"
+ErrClusterBackupMySQLInnoDB: "MySQL のオンラインバックアップでは、すべてのユーザーテーブルで InnoDB を使用する必要があります。"
+ErrClusterBackupPostgresRecovery: "PostgreSQL インスタンスはリカバリーモードです。"
+ErrClusterBackupPostgresTablespaces: "PostgreSQL のクラスターバックアップでは、デフォルトのテーブルスペースのみ使用できます。"
+ErrClusterBackupPostgresReplicationCredentials: "PostgreSQL のレプリケーション認証情報を利用できません。"
+ErrClusterBackupRedisNotPrimary: "Redis インスタンスはプライマリインスタンスではありません。"
+ErrClusterBackupRedisVersion: "Redis のバージョンを取得できません。"
+ErrClusterBackupUnsupportedEngine: "このデータベースエンジンはクラスターバックアップに対応していません。"
+ErrClusterCommandFailed: "{{ .name }} の実行に失敗しました"
+ErrClusterRestoreCatalogInstance: "新しいクラスターへの復元には、アプリケーションカタログのテンプレートから作成した新規インスタンスが必要です。"
+ErrClusterRestorePrimaryTemplate: "復元には、バックアップに記録されているプライマリインスタンスと同一のテンプレートが必要です。"
+ErrClusterRestoreUnsupportedEngine: "このデータベースエンジンはクラスターの復元に対応していません。"
+ErrClusterRestoreRedisSnapshot: "Redis スナップショットが無効です。"
+ErrClusterRestorePostgresMajorVersion: "PostgreSQL データのメジャーバージョンがバックアップと一致しません。"
+ErrClusterRestoreSingleContainer: "復元にはデータベースコンテナが 1 つのインスタンスが必要です。"
+ErrClusterRestoreCatalogDataMount: "復元には、アプリケーションカタログのテンプレートで定義されたデータマウントが必要です。"
+ErrClusterRestoreDataDirectoryNotEmpty: "復元先のデータディレクトリが空ではありません。"
+ErrClusterRestorePostgresUnsafePath: "PostgreSQL バックアップに安全ではないパスが含まれています。"
+ErrClusterRestorePostgresFileType: "PostgreSQL バックアップにサポートされていないリンクまたはファイルの種類が含まれています。"
+ErrClusterRestoreRedisCatalogPersistence: "Redis の復元には、アプリケーションカタログのテンプレートにある永続化設定が必要です。"
+ErrClusterRestoreRedisCatalogRDB: "Redis スナップショットの復元には、アプリケーションカタログのテンプレートにある RDB 設定が必要です。"
+ErrClusterRestoreMySQLCredentials: "復元後の MySQL 管理者の認証情報を確認できませんでした。バックアップ作成時の認証情報を使用してください。"
+ErrClusterRestoreEngineVersion: "データベースエンジンのバージョン {{ .current }} がバックアップのバージョン {{ .expected }} と一致しません。"
+ErrClusterRestoreDatabaseNotReady: "復元したデータベースの準備が完了しませんでした"
+ErrClusterRestoreOriginalRequest: "元のクラスターへの復元リクエストが無効です。"
+ErrClusterRestoreMemberVersionChanged: "復元前にクラスターのメンバーのバージョンが変更されました。"
+ErrClusterRestoreMemberChanged: "復元前にクラスターのメンバーが変更されました。"
+ErrClusterRestoreMemberBusy: "このクラスターのメンバーは別の復元タスクで使用されています。"
+ErrClusterRestoreMemberState: "クラスターのメンバーの現在の復元状態では、この操作を実行できません。"
+ErrClusterRestoreRollbackRequiresReview: "復元後のデータに書き込みが行われた可能性があります。自動ロールバックは実行できません。復元前のデータは保持されています。"
+ErrClusterRestoreOriginalAction: "元のクラスターへの復元操作が無効です。"
+ErrClusterRestoreDataMountDirectory: "クラスターのデータのマウント先はディレクトリである必要があります。"
+ErrClusterRestoreMemberRoleMismatch: "データベースコンテナのレプリケーションロールが、このメンバーに登録されたロールと一致しません。"
+ErrClusterRestoreOriginalCatalogMounts: "元のクラスターへ復元するには、アプリケーションテンプレートで定義されたデータベースのマウント構成が必要です。"
+ErrClusterRestoreDataMountUnavailable: "データベースのデータマウントが存在しないか、書き込みできません。"
+ErrClusterRestoreOriginalTemplateVersion: "バックアップが元のクラスターのアプリケーションテンプレートまたはデータベースエンジンのバージョンと一致しません。"
+ErrClusterRestoreValidationContainer: "復元の検証に使用するコンテナが現在の復元タスクと一致しません。"
+ErrClusterRestoreDataOwnership: "データベースデータの所有者とグループを取得できません。"
+ErrClusterRestoreConfigFileType: "データベースの設定にリンクまたは特殊ファイルが含まれています。"
+ErrClusterRestoreRedisActiveRDB: "Redis のスナップショットを復元するには、稼働中のインスタンスが互換性のある RDB 設定を使用している必要があります。"
+ErrClusterRestoreDataDirectoryMismatch: "稼働中のデータベースがアプリケーションテンプレートで指定されたデータディレクトリを使用していません。"
+ErrClusterRestoreReplicaNotReady: "復元したレプリカが準備完了になりませんでした"
+ErrClusterRestoreDataPathDirectory: "復元データのパスはディレクトリである必要があります。"
+ErrClusterRestoreOriginalDataUnavailable: "元のクラスターのデータディレクトリが見つかりません。"
+ErrClusterRestoreDataDirectoryChanged: "復元中にクラスターのデータディレクトリが変更されました。"
+ErrClusterRestoreDataReplacementIncomplete: "クラスターのデータの置き換えが完了しませんでした。"
+ErrClusterRestoreRollbackDirectoryChanged: "復元のロールバック中にクラスターのデータディレクトリが変更されました。"
+ErrRedisAOFRestoreUnavailable: "この Redis バージョンでは AOF を復元できません。"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "無効なサイト選択：{{ .value }}"
+ErrCronjobWebsiteGroup: "サイトグループ {{ .id }} にアクセスできません"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}：選択したサイトはすべて存在しません"
+ErrCronjobWebsiteVersion: "未対応のサイト選択バージョン：{{ .version }}"
+ErrCronjobWebsiteAllConflict: "「すべてのサイト」と個別のサイトまたはグループは同時に選択できません"
+ErrCronjobWebsiteGroupName: "サイトグループ名は空にできません"
+ErrCronjobWebsiteGroupMissing: "サイトグループ「{{ .group }}」が存在せず、保存された一覧に一致するサイトも見つかりませんでした"
+CronjobWebsiteGroupFallback: "{{ .name }}：サイトグループ「{{ .group }}」が存在しないため、固定のサイトリストとしてインポートしました。今後はグループの変更に追従しません"
+CronjobWebsiteMissing: "{{ .name }}：次のサイトが見つかりません：{{ .website }}"
+ErrCronjobWebsiteImportEmpty: "選択したサイトグループまたはサイトに一致するものが見つかりませんでした"
+
+ProxyCacheClear: "リバースプロキシキャッシュを消去"
+ProxyCacheEmpty: "消去するキャッシュはありません"
+ProxyCacheSummary: "消去済み {{ .cleared }} 件、消去不要 {{ .skipped }} 件、失敗 {{ .failed }} 件"
+ProxyCacheReloadFailed: "キャッシュは消去されましたが、OpenResty の再読み込みに失敗しました"

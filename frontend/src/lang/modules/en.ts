@@ -78,6 +78,7 @@ const message = {
             enable: 'Enable',
             disable: 'Disable',
             confirm: 'Confirm',
+            autoFill: 'Auto-fill',
             check: 'Check',
             submit: 'Submit',
             cancel: 'Cancel',
@@ -263,6 +264,8 @@ const message = {
             errImport: 'File content is abnormal:',
         },
         login: {
+            imageLoadError: 'Image failed to load',
+            imageLoadErrorHint: 'Possible causes: a network issue, a missing image, or an unsupported format.',
             username: 'Username',
             password: 'Password',
             passkey: 'Passkey Login',
@@ -304,8 +307,7 @@ const message = {
             simplePassword:
                 'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-30.',
             dbName: 'This field mustn\'t start with underscore character and must consist of English, numbers, and "_" characters with a length of 1-64.',
-            imageName:
-                'This field must consist of English, numbers, ":", "@", "/", ".", "-", and "_" characters with a length of 1-256.',
+            imageName: `This field must consist of English, numbers, ":", "{'@'}", "/", ".", "-", and "_" characters with a length of 1-256.`,
             volumeName:
                 'This field must consist of English, numbers, ".", "-", and "_" characters with a length of 2-30.',
             supervisorName:
@@ -366,6 +368,7 @@ const message = {
             serviceNotStarted: 'The {0} service is not started.',
         },
         status: {
+            autoSync: 'Auto-sync',
             autoSyncEnabled: 'Auto-sync enabled',
             autoSyncDisabled: 'Auto-sync disabled',
             running: 'Running',
@@ -622,6 +625,7 @@ const message = {
             'This port is the exposed port of the container. You need to save the modification separately and restart the container!',
         loadFromRemote: 'Sync from server',
         userBind: 'Bind user',
+        connectionUser: 'Connection user',
         userAuthorization: 'User authorization',
         noUserAuthorization: 'Do not authorize',
         authorizedDatabaseCount: '{0} authorized database(s)',
@@ -632,10 +636,13 @@ const message = {
         revokeAuthorization: 'Revoke authorization',
         revokeAuthorizationHelper: "Revoke user {0}'s access to database {1}?",
         supplementPassword: 'Add password',
-        supplementPasswordHelper: 'This only saves the existing password to 1Panel and does not change it in MySQL.',
+        supplementPasswordHelper:
+            'This only saves the existing password to 1Panel and does not change the database user password.',
         noUserBind: 'No binding',
-        pgBindHelper:
-            'This operation is used to create a new user and bind it to the target database. Currently, selecting users already existing in the database is not supported.',
+        pgAuthorizationHelper:
+            'Superusers can access all databases in this instance without binding. Ordinary users receive database-level grants only, without table permissions.',
+        pgRevokeAuthorizationHelper:
+            'Revoking authorization does not delete the user. Access through PUBLIC or other roles may remain.',
         pgSuperUser: 'Superuser',
         loadFromRemoteHelper: 'Sync databases, users, and authorizations from the server to 1Panel. Continue?',
         passwordHelper: 'Not available, click to update',
@@ -878,7 +885,6 @@ const message = {
                 'Username: letters, numbers, dot, underscore or hyphen. Password: at least 12 characters, without leading/trailing spaces or line breaks.',
             octopAuthHelper:
                 'Password: at least 8 characters with letters and digits; avoid common passwords. If rejected during initialization, check the application logs for setup instructions.',
-            initialCredentials: "Initial credentials; use the application's current password if changed.",
             nativeAgentAccessUnavailable:
                 'The existing installation has no compatible HTTPS access address or port. Check its application settings.',
             agent: 'Agent',
@@ -1119,6 +1125,33 @@ const message = {
             validateImageAvailabilityHelper: 'Generates one minimal image before saving and may incur charges',
         },
         model: {
+            poolEditHelp: 'Fetch online or add manually. Every model in this list is editable.',
+            poolUnavailable: 'Online discovery is unavailable for this provider type and API. Add model IDs manually.',
+            poolEmpty: 'No models yet. Fetch online or add a model manually.',
+            poolOverwrite:
+                'A successful fetch will replace the entire list, including manual additions and edits. Continue?',
+            poolFetchEmpty: 'No models returned. Your list is unchanged. Retry or add models manually.',
+            poolFetchFailed:
+                'Fetch failed. Your list is unchanged. Check the URL, API key and network, then retry or edit manually.',
+            poolSaveHelp: 'Changes take effect when saved. Models currently in use cannot be removed.',
+
+            accountType: 'Account type',
+            accountTypes: {
+                default: 'Default',
+                payAsYouGo: 'Pay as you go',
+                chinaApi: 'China API',
+                globalApi: 'Global API',
+                chinaCodingPlan: 'China Coding Plan',
+                globalCodingPlan: 'Global Coding Plan',
+                chinaTokenPlan: 'China Token Plan',
+                globalTokenPlan: 'Global Token Plan',
+                speech: 'Speech services',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Check and fetch',
             externalHealthPassed: 'Health check passed',
             externalHealthFailed: 'Health check failed',
@@ -1272,6 +1305,7 @@ const message = {
                 'The form has changed. Regenerating Compose will overwrite manual edits. Continue?',
             deploymentNameHelper:
                 'Application instance name, used for the installation directory and fixed after creation. Set an alias to change the display name.',
+            deploymentAlias: 'Instance alias',
             deploymentAliasHelper:
                 'Optional display alias. Leave empty to use the instance name. Changing the alias does not restart the service.',
             deploymentContainerNameHelper:
@@ -1330,7 +1364,12 @@ const message = {
             container_conn_helper: 'Use this address for inter-container access or connection',
             from_remote: 'This model was not downloaded via 1Panel, no related pull logs.',
             no_logs: 'The pull logs for this model have been deleted and cannot be viewed.',
+            composeFile: 'Compose File',
+            imageCategory: 'Image type',
+            standardImage: 'Standard image',
+            customImage: 'Custom image',
             vllmVersionHelper: {
+                qwen38: 'Custom version for two NVIDIA GB10 devices, optimized for Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'Official Ascend standard version for Ascend A2 series devices.',
                 ascendA3: 'Official Ascend A3 version for Ascend A3 series devices.',
                 ascendA5: 'Official Ascend A5 version for 950DT devices.',
@@ -1340,10 +1379,8 @@ const message = {
                 rtxPro5000:
                     'Custom version for NVIDIA RTX Pro 5000, optimized for DeepSeek-V4.1-Flash-1017. The image is maintained by 1Panel.',
                 dspark: 'Custom version for two NVIDIA GB10 devices, optimized for DeepSeek-V4-Flash. The image is maintained by 1Panel.',
+                dspark4: 'Custom version for four NVIDIA GB10 devices, optimized for DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'Deployment model',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Sync to model service',
             modelAccountAddressHelper:
                 'Container address is for agent containers; 127.0.0.1, system IP, or custom address is for AI Gateway or external services.',
@@ -1352,6 +1389,12 @@ const message = {
             downloader: 'Model Downloads',
             modelDirectoryHelper:
                 'The model list defaults to the model directory configured in Model Preparation > Settings and shows models downloaded to that directory.',
+            vllmGB10Qwen38ModelHelper:
+                'Only the Qwen3.8-Flash-Next-NVFP4 model is supported. Both devices need the complete model at the same path.',
+            vllmGB10DualNodeModelHelper:
+                'Only DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp is supported. Both devices need the complete model at the same path.',
+            vllmGB10FourNodeModelHelper:
+                'Only DeepSeek-V4.1-Flash is supported. All four devices need the complete model at the same path.',
             modelDirectoryPlaceholder: 'Search models or enter a full path',
             selectModel: 'Select model',
             selectModelDirectory: 'Select directory',
@@ -2445,13 +2488,12 @@ const message = {
         checkFailed: 'Check failed',
         imageMissing: 'The required image was not found. Pull {image} in image management.',
         imageReady: 'The Benchmark image is ready for creating tests.',
-        imageHelp: 'The Benchmark image runs the load test client and sends requests to the selected model service.',
+        imageHelp:
+            'The system uses this image to create a separate container that runs benchmarks by sending test requests to the selected model service.',
         mainNodeHelp: 'Benchmarks run on the main node. Prepare the image and tokenizer on that node.',
         goImages: 'Go to image management',
         goModels: 'Go to model downloads',
-        tokenizerHelp: 'Select a tokenizer from the tokenizer directory to encode test text and count tokens.',
-        tokenizerEmpty: 'No models are available. Download a model containing tokenizer files in model downloads.',
-        tokenizerEmptyWithDownload: 'No tokenizers are available. Open {download} to download one.',
+        tokenizerHelp: 'Select a tokenizer or model on the main node to encode test text and count tokens.',
         tokenizerInvalid: 'This tokenizer is unavailable. Select another or download it again in model downloads.',
         schemeHelp:
             'Test schemes define request parameters, concurrency, and execution rules. Prepare at least one available scheme.',
@@ -2528,6 +2570,9 @@ const message = {
         missing: 'Missing',
     },
     container: {
+        logDisconnected: 'The log stream has disconnected. Reconnect to load recent logs and resume streaming.',
+        logsUnavailable:
+            'The container does not exist or has been deleted. Container logs are unavailable. Recreate the container and try again.',
         nvidiaSupport: 'NVIDIA GPU support',
         nvidiaHelper:
             'Register the NVIDIA container runtime. Install NVIDIA Container Toolkit first. Assign GPUs to each container separately.',
@@ -2879,6 +2924,9 @@ const message = {
         exportHelper: 'Export selected images to one tar file.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'All within a group follows membership changes; individual websites form a fixed list.',
+        websiteSelectionMissing: 'Unavailable selection',
         importHelper:
             'Duplicate scheduled tasks will be automatically skipped during import. Tasks will be set to [Disabled] status by default, and set to [Pending Edit] status when data association is abnormal.',
         changeStatus: 'Change status',
@@ -2990,6 +3038,11 @@ const message = {
         cleanDataHelper: 'Delete the backup file generated during this task.',
         noLogs: 'No task output yet...',
         errPath: 'Backup path [{0}] error, cannot download!',
+        websiteStartStop: 'Website start/stop',
+        startTime: 'Start time',
+        stopTime: 'Stop time',
+        websiteTimeHint: 'Reminder: runs daily',
+        websiteTimeInvalid: 'Select both times; start must be earlier than stop',
         cutWebsiteLog: 'Website log rotation',
         cutWebsiteLogHelper: 'The rotated log files will be backed up to the backup directory of 1Panel.',
         syncIpGroup: 'Sync WAF IP groups',
@@ -2998,6 +3051,14 @@ const message = {
         unitHours: 'Unit: Hours',
         alertTitle: 'Planned Task - {0} 「{1}」 Task Failure Alert',
         library: {
+            executeScript: 'Run script',
+            targetNodes: 'Select target nodes',
+            switchNodeHelper:
+                'Switching nodes keeps execution active. Type directly in the terminal; input goes only to the selected node.',
+            executorCloseHelper: 'Closing disconnects all node terminals and may interrupt running scripts. Continue?',
+            connecting: 'Connecting',
+            connected: 'Connected',
+            disconnected: 'Disconnected',
             script: 'Script',
             syncNow: 'Sync Now',
             autoSyncHelper:
@@ -3115,6 +3176,11 @@ const message = {
             'Fetching data after {0} kept failing after several retries, so the export stopped. Check the network or narrow the time range and try again.',
     },
     terminal: {
+        passwordless: 'Passwordless',
+        bootstrapAuth: 'Initial authentication (optional)',
+        passwordlessSetupHelper:
+            'Reuse an existing SSH key or generate one automatically. Testing the connection sets up passwordless access.',
+
         showTerminalButton: 'Terminal Shortcut',
         showTerminalButtonHelper:
             'When enabled, a terminal shortcut button appears in the bottom-right corner of the page.',
@@ -3260,6 +3326,14 @@ const message = {
             syncSiteHelper: 'Sync system time with {0}. Continue?',
         },
         fail2ban: {
+            mode: 'Detection mode',
+            modeHelper:
+                'Choose which SSH connection events count as failures toward an IP ban. Requires Fail2ban 0.10 or later.',
+            modeNormal: 'Default: count failed logins, such as wrong passwords or unknown usernames.',
+            modeDdos: 'Also count connections that time out or disconnect before login.',
+            modeExtra: 'Also count failures caused by connection methods the server does not support.',
+            modeAggressive:
+                'Count all of the above. Stricter protection, with a greater chance of blocking legitimate users.',
             sshPort: 'Listen to SSH port',
             sshPortHelper: 'Current Fail2ban listens to the SSH connection port of the host',
             unActive: 'The Fail2ban service is not enabled at present.',
@@ -3522,6 +3596,10 @@ const message = {
         compressSuccess: 'Compressed successfully',
         deCompressSuccess: 'Decompress succeeded',
         deCompressDst: 'Decompress path',
+        decompressConflictPolicy: 'Existing files',
+        keepExisting: 'Keep existing files',
+        decompressConflictHelper:
+            'Keeping existing files skips conflicting entries. Directories with the same name are still merged.',
         linkType: 'Link type',
         softLink: 'Soft link',
         hardLink: 'Hard link',
@@ -4587,6 +4665,18 @@ const message = {
         isEdirWarn: 'Changes to docker-compose.yml were detected. Please review the diff.',
     },
     website: {
+        batchPHP: 'Switch PHP version',
+        batchPHPHelper:
+            'Only PHP websites will be changed. Other websites are skipped. Local PHP environments are not supported.',
+        batchPHPCount: 'Selected: {0}; PHP websites: {1}; others: {2}.',
+        notPHP: 'Not a PHP website',
+        localPHP: 'Local PHP is not supported',
+        samePHP: 'Already using the target PHP environment',
+        batchPHPResult: 'Results',
+        batchPHPStatus_success: 'Succeeded',
+        batchPHPStatus_failed: 'Failed',
+        batchPHPStatus_skipped: 'Skipped',
+        sslDomainMismatchWebsite: 'The certificate domains do not match the website domains',
         primaryDomain: 'Primary domain',
         otherDomains: 'Other domains',
         static: 'Static',
@@ -4711,6 +4801,10 @@ const message = {
         privateKey: 'Key (KEY)',
         certificate: 'Certificate (PEM format)',
         HTTPConfig: 'HTTP Options',
+        HTTPSRedirectPort: 'HTTPS redirect port',
+        HTTPSRedirectPortCustom: 'Custom',
+        HTTPSRedirectPortManualHelper:
+            'The redirect rule was manually edited or is otherwise unmanaged, so it cannot be modified.',
         HTTPSOnly: 'Block HTTP requests',
         HTTPToHTTPS: 'Redirect to HTTPS',
         HTTPAlso: 'Allow direct HTTP requests',
@@ -4877,6 +4971,8 @@ const message = {
         batchInput: 'Batch Input',
         domainNotFQDN: 'This domain may not be accessible on the public network',
         domainInvalid: 'Invalid domain format',
+        allowFirewall: 'Allow in firewall',
+        allowFirewallHelp: 'Open this TCP port after site creation for all domains using it.',
         domainBatchHelper: 'One domain per line, format: domain:port@ssl\nExample: example.com:443@ssl or example.com',
         generateDomain: 'Generate',
         global: 'Global',
@@ -4907,6 +5003,9 @@ const message = {
         failTimeoutHelper:
             'The time window length for server health checks. When the cumulative number of failures reaches the threshold within this period, the server will be temporarily removed and retried after the same duration. Default 10 seconds',
         staticChangePHPHelper: 'Currently a static website, you can switch to a PHP website',
+        createDefaultIndex: 'Create default {0} file',
+        createDefaultIndexHelper:
+            'Only created when the file does not exist in the website root directory, using the default page settings',
         proxyCache: 'Reverse Proxy Cache',
         cacheLimit: 'Cache Space Limit',
         shareCache: 'Cache Count Memory Size',
@@ -5035,6 +5134,8 @@ const message = {
         status: 'Current Status',
         configResource: 'Configuration',
         saveAndReload: 'Save and reload',
+        batchClearProxyCacheWarn:
+            'Clear the reverse proxy caches of {0} selected websites? The next request for previously cached content will reach the origin server.',
         clearProxyCache: 'Clean reverse proxy cache',
         clearProxyCacheWarn: 'This action will delete all files in the cache directory. Continue?',
         create: 'Add a new module',
@@ -5070,13 +5171,21 @@ const message = {
             'Scripts to execute before compilation, usually for downloading module source code, installing dependencies, etc.',
         buildHelper:
             'Dynamic modules are loaded from configuration after building; static modules still rebuild OpenResty.',
-        defaultHttps: 'HTTPS Anti-tampering',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Anti-tampering status',
         defaultHttpsHelper1: 'Enabling this can resolve HTTPS tampering issues.',
         sslRejectHandshake: 'Reject default SSL handshake',
         sslRejectHandshakeHelper:
             'Enabling this can avoid certificate leakage, setting a default website will invalidate this setting',
+        httpsRedirectCustomPort: 'Use custom port redirect',
+        httpsRedirectCustomPortHelper: 'When enabled, HTTP-to-HTTPS redirects use the configured custom HTTPS port.',
     },
     ssl: {
+        syncDir: 'Sync directory',
+        syncDirHelp: 'Absolute directory on target nodes; the same directory is used on every target.',
+        syncDirSingleCert: 'Select only one certificate when specifying a directory to avoid overwriting files.',
+        syncDirAbsolute: 'The sync directory must be an absolute path.',
+
         caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
         deleteConfirm:
             'The following certificates will be deleted. ACME certificates will be automatically revoked. Continue?',
@@ -5407,6 +5516,9 @@ const message = {
         editRuleConfirm: 'Are you sure you want to modify this rule?',
     },
     runtime: {
+        buildLog: 'Build log',
+        extensionInstallFailed: 'Some PHP extensions could not be installed: {extensions}',
+        statusMessageUnavailable: 'No detailed status information is available. Check the runtime logs for details.',
         importEnv: 'Import Environment Variables',
         envImportError: 'Line {0}: {1}',
         envInvalidAssignment: 'Expected a valid NAME=value assignment',
@@ -5587,6 +5699,81 @@ const message = {
         diskType: 'Disk Type',
         serial: 'Serial Number',
         noFail: 'Mount failure does not affect system startup',
+    },
+    networkManage: {
+        routeDetails: 'Route details',
+        manageIP: 'Manage associated IP',
+        connectedRoute: 'Generated from IP',
+        connectedRouteHint:
+            'The system generates this connected route from the interface IP. It is not edited separately. Edit or remove the corresponding IP in the interface details.',
+        virtualBridgeReadOnly: 'Virtual interface · Read-only',
+        virtualBridgeReadOnlyHint: 'This virtual interface is read-only and excluded from reachability checks.',
+        loopbackReadOnly: 'Loopback interface configuration is read-only.',
+        persistentSourceMissing:
+            'No supported persistent system configuration was found for interface {0}. It is read-only.',
+        addressReadOnlyReason:
+            'This address is dynamic, non-global, or has no supported persistent configuration. It is read-only.',
+        routeReadOnlyReason:
+            'This route is dynamic, kernel-generated, or has no supported persistent configuration. It is read-only.',
+        persistenceBackend: 'Persistence backend',
+        editIP: 'Edit IP',
+        editRoute: 'Edit route',
+        operationRisk: 'Network changes may interrupt connections. Prepare an alternative way to access the server.',
+        confirmInterface: 'Enter the interface name {0} to confirm.',
+        sourceAddress: 'Source address',
+        linkConnected: 'Link connected',
+        linkDisconnected: 'Link disconnected',
+        topologySearch: 'Search interface, IP, gateway or destination',
+        topologyHint:
+            'Manage interface IPs on the left. Route cards show the destination, gateway and metric. Click a card for details; lines do not indicate verified connectivity.',
+        direct: 'Direct',
+        defaultDestination: 'Default route',
+        unknownInterface: 'Unspecified interface',
+        noRoutes: 'No matching routes',
+        readOnly: 'Read only',
+        readOnlyRouteHint: 'Routes with multiple next hops or without a single interface are read only.',
+        title: 'Network Management',
+        interfaces: 'Interfaces',
+        routes: 'Routes',
+        addIP: 'Add IP',
+        ipCount: 'IP count',
+        interfaceID: 'Interface ID',
+        adminState: 'Administrative state',
+        linkState: 'Link state',
+        mac: 'MAC address',
+        flags: 'Flags',
+        address: 'Address',
+        scope: 'Scope',
+        interface: 'Interface',
+        configStatus: 'Configuration status',
+        managedApplied: 'Saved · Active',
+        managedPending: 'Saved · Inactive',
+        addressWarning:
+            'Use the IP assigned to this interface. For a public IP mapped through NAT, enter the private IP.',
+        addressRisk: 'An IP already in use or an incorrect prefix length can interrupt access to the panel or SSH.',
+        addressWithPrefix: 'IP address / prefix length',
+        interfaceSelectHint:
+            'Only interfaces with editable persistent configuration are listed. Loopback interfaces, read-only virtual bridges, and other interfaces that cannot be modified are excluded.',
+        gatewayHint: 'Leave the gateway empty for directly connected subnets.',
+        metricHint: 'For the same destination subnet, routes with a lower metric usually take priority.',
+        defaultRouteWarning:
+            'A default route can change the outbound path for the panel, SSH and other services. Make sure you have alternate access, such as the cloud console.',
+        interfaceMissing: 'Interface missing',
+        changeWarning:
+            'Changing network settings may disconnect the panel or interrupt services. Confirm that you have another way to access this server before continuing.',
+        cidrHint:
+            'In 192.0.2.10/24, /24 corresponds to the subnet mask 255.255.255.0. For IPv6, an example is 2001:db8::10/64.',
+        addRoute: 'Add route',
+        checkRoutes: 'Check route reachability',
+        destination: 'Destination',
+        metric: 'Metric',
+        routeTable: 'Table',
+        reachability: 'Reachability',
+        reachable: 'Reachable',
+        unreachable: 'Unreachable',
+        unchecked: 'Unchecked',
+        check: 'Check',
+        destinationHint: 'Supports IPv4/IPv6 addresses or CIDR networks. Default route: default, 0.0.0.0/0 or ::/0.',
     },
     xpack: {
         ldap: {
@@ -7689,6 +7876,13 @@ const message = {
             appUpgradeHelper: 'There are {0} apps that need to be upgraded',
             dashboardSetting: 'Overview Settings',
             keepOneDashboardComponent: 'Keep at least one overview section',
+            currentNode: 'Current Node',
+            quickSwitch: 'Quick Switch',
+            allNodes: 'All Nodes',
+            nodeSearchPlaceholder: 'Search node name or address',
+            currentNodeNotInResults: 'The current node is not on this page',
+            upgradableApps: 'Upgradable Apps',
+            quickSwitchMore: 'View all matching nodes',
         },
         customApp: {
             name: 'Custom App Repository',
@@ -8013,6 +8207,32 @@ const message = {
             menu: 'Resource Sync',
             file: 'File Exchange',
             fileSyncConfirm: 'Do you want to transfer file/folder {1} from node {0} to directory {3} on node {2}?',
+            fileBatchDesc: 'Select files or folders from any node and distribute them to multiple target nodes.',
+            fileSourceTitle: 'Select source files',
+            fileSourceNode: 'Source node',
+            fileTargetDirectory: 'Target directory',
+            fileBatchPath: 'Set target directories in bulk',
+            fileApplyPath: 'Apply to selected nodes',
+            fileSelectedCount: '{0} item(s) selected',
+            fileSelectedTargets: '{0} node(s) selected',
+            fileSelectionHint: 'Folders are copied with their original names and internal directory structure.',
+            fileRules:
+                'Existing file transfer rules apply: files with the same name may be updated; other files in the target directory are kept.',
+            fileBatchSummary: 'Distribute {0} item(s) to {1} target node(s)',
+            fileTaskHint:
+                'A distribution task will be created after confirmation and can be viewed in task management.',
+            fileBatchConfirm:
+                'Check the target nodes and destination paths below. Files with the same name may be overwritten.',
+            fileTargetHint:
+                'Set a directory for each node. Offline nodes, nodes that failed the check, and nodes without rsync cannot be selected.',
+            fileChecking: 'Checking',
+            fileCheckFailed: 'Check failed',
+            fileRsyncMissing: 'rsync is not installed',
+            filePathRequired: 'Enter an absolute target directory path starting with /.',
+            fileConflictHint:
+                'These sources share destination names. Deselect items until only one source remains per name. Deselection applies to all target nodes.',
+            fileDeselect: 'Deselect',
+            fileSourceChanged: 'The source node has changed. Select the files again.',
             image: 'Image Exchange',
             imageBatchDesc: 'Select a source node and image first, then batch-transfer to multiple target nodes.',
             imageBatchConfirmPrefix: 'About to transfer {0} images to {1} nodes, for a total of {2} tasks.',
@@ -8188,6 +8408,11 @@ const message = {
             createFromTemplate: 'Create from template',
             template: 'Template',
             templateName: 'Template Name',
+            dataDisks: 'Data disks',
+            dataDiskHelper:
+                'Data disks are created empty. Select a storage pool for each disk; the bus type is shared with the system disk. Up to 9 data disks can be added.',
+            templateSystemDiskHelper:
+                'Templates copy only the system disk, excluding data disk contents. You can add empty data disks when creating a VM from a template. Check /etc/fstab mounts and database or application paths that depend on data disks. New disk UUIDs may differ; the panel does not modify guest configuration automatically.',
             convertToTemplate: 'Convert to Template',
             sourceVM: 'Source VM',
             templateSize: 'Template Size',
@@ -8305,7 +8530,7 @@ const message = {
             currentSnapshot: 'Current',
             snapshotEmpty: 'No snapshots',
             snapshotHelper:
-                'A snapshot saves the current VM state as a restore point. Subsequent data changes are recorded in a delta file without changing the original disk. Restoring a snapshot returns the VM to that point in time.',
+                'Snapshots capture and restore all managed writable disks together, excluding memory. Shut down the VM before restoring; its disk set must match the snapshot. Shared or unsupported writable disks prevent snapshot creation.',
             snapshotOperationHelper:
                 'The current snapshot cannot be deleted. Snapshots can be recovered only when the virtual machine is shut off.',
             snapshotRecoverConfirm:
@@ -8341,13 +8566,85 @@ const message = {
             cluster: 'Application High Availability',
             name: 'Cluster Name',
             addCluster: 'Add Cluster',
-            installNode: 'Install Node',
-            master: 'Master Node',
-            slave: 'Slave Node',
-            replicaStatus: 'Master-Slave Status',
             unhealthyDeleteError: 'The installation node status is abnormal, please check the node list and try again!',
-            replicaStatusError: 'Status acquisition is abnormal, please check the master node.',
-            masterHostError: 'The master node IP cannot be 127.0.0.1',
+            noAvailableMasterVersion: 'No primary template is available on this node.',
+            backups: 'Cluster backups',
+            importBackup: 'Import backup',
+            archivePassphrase: 'Backup passphrase',
+            restoreToNew: 'Restore to a new cluster',
+            restoreTarget: 'Restore destination',
+            restoreToOriginal: 'Restore to the original cluster',
+            restoreOriginalUnavailable: 'There is no eligible original cluster for this backup.',
+            restoreOriginalWarning:
+                'Database connections will be interrupted. The original cluster will return to the state captured in this backup, and replicas will resynchronize.',
+            restoreOriginalConfirm: 'Enter the cluster name {0} to confirm the overwrite.',
+            restoreCredentials: 'Use the administrator and replication credentials from the backup.',
+            archiveImportHint:
+                'Only .1pha cluster backup files are supported. Use the passphrase set when the backup was created.',
+            backupDataSize: 'Data Size',
+            appStoreOnly: 'Install and upgrade this application in Application High Availability.',
+            noMatchingReplicaVersion: 'No replica template on this node matches the primary version.',
+            installNode: 'Deployment server',
+            master: 'Primary database',
+            slave: 'Replica database',
+            redisMaster: 'Primary instance',
+            redisReplica: 'Replica',
+            replicaStatus: 'Replication details',
+            replicaStatusError: 'Could not read replication status',
+            masterHostError: 'The primary address cannot be 127.0.0.1',
+            emptyTitle: 'No {0} clusters configured',
+            emptyDescription:
+                'In “{2}”, select a deployment server and version to create the {0}. After deployment, you can add a {1} of the same version and view replication status, instance parameters, and logs.',
+            loadFailed: 'Could not load clusters',
+            refreshFailed: 'Refresh failed. Showing data from {0}.',
+            addReplica: 'Add {0}',
+            masterUnavailable: 'The primary is unavailable. Check its deployment server.',
+            replication: 'Replication',
+            replicationStatus: 'Replication status',
+            configuredReplicas: 'Configured replicas ({1}): {0}',
+            addReplicaPending: 'Waiting for a {0}',
+            checkedAt: 'Checked at {0}',
+            roleParameters: '{0} parameters',
+            parametersFailed: 'Could not read instance parameters',
+            instanceParameters: 'Instance parameters',
+            replicationParameters: 'Data replication settings',
+            replicationUserHelp:
+                'The replica database uses this account to connect to the primary database and synchronize data.',
+            replicationPasswordHelp:
+                'Authenticates the replication user. When adding a replica database, use the password configured for this account on the primary database.',
+            configureRole: 'Configure {0}',
+            sameHost: 'Both instances are on the same server. A server failure affects both.',
+            versionLocked: 'Matches the current primary version.',
+            unset: 'Not set',
+            noParameters: 'This instance has no parameters to display',
+            lagSeconds: 'Replication lag (seconds)',
+            offsetBytes: 'Replication offset (bytes)',
+            taskQueued: 'Task accepted',
+            removeRecord: 'Remove Record',
+            removeClusterRecordNotice: 'This will remove the cluster record.',
+            removeMemberRecordNotice: 'This will remove the member record.',
+            taskAwaitingConfirmation: 'Awaiting server confirmation',
+            taskConfirmationNotice:
+                'Waiting for {0} to confirm the task. Once registered, it will appear in that server’s Task Center and under Logs on the card.',
+            taskRecordUnavailable:
+                'The task record could not be retrieved. Check the submission result and the deployment server.',
+            taskRunning: 'Task in progress',
+            taskFailed: 'Operation failed. See the task log.',
+            parameters: 'Parameters',
+            primaryMissing: 'The primary record is unavailable.',
+            replicaSourceAddress: '{0} address',
+            replicaSourcePort: '{0} port',
+            replicaSourceAddressHelp: 'Enter an IP address or hostname reachable from the selected server.',
+            replicationState: {
+                pending: 'Awaiting check',
+                waitingForInstance: 'Waiting for instance to be ready',
+                healthy: 'Healthy',
+                syncing: 'Syncing',
+                lagging: 'Lagging',
+                disconnected: 'Disconnected',
+                unknown: 'Unknown',
+                unavailable: 'Unavailable',
+            },
         },
     },
     template: {

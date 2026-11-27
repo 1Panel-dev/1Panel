@@ -6,7 +6,13 @@
                     <NodeSelect v-model="targeNode" @change="search()" />
                 </template>
                 <template #rightToolBar>
-                    <el-select v-model="req.status" @change="search()" clearable class="p-w-200">
+                    <el-select
+                        v-model="req.status"
+                        :placeholder="$t('commons.table.all')"
+                        @change="search()"
+                        clearable
+                        class="p-w-200"
+                    >
                         <template #prefix>{{ $t('commons.table.status') }}</template>
                         <el-option :label="$t('commons.table.all')" value=""></el-option>
                         <el-option :label="$t('commons.status.success')" value="Success"></el-option>
@@ -14,10 +20,16 @@
                         <el-option :label="$t('logs.taskRunning')" value="Executing"></el-option>
                     </el-select>
                     <TableRefresh @search="search()" />
-                    <TableSetting title="task-refresh" @search="search()" :rate="5" />
+                    <TableSetting title="task-refresh" @search="!loading && search()" :rate="5" />
                 </template>
                 <template #main>
-                    <ComplexTable :pagination-config="paginationConfig" :data="data" @search="search" :heightDiff="320">
+                    <ComplexTable
+                        :cache-pagination="false"
+                        :pagination-config="paginationConfig"
+                        :data="data"
+                        @search="search()"
+                        :heightDiff="320"
+                    >
                         <el-table-column :label="$t('logs.taskName')" prop="name" min-width="180px">
                             <template #default="{ row }">
                                 {{ translateTaskText(row.name) }}
@@ -87,19 +99,25 @@ const req = reactive({
 });
 const targeNode = ref('local');
 
-const search = async () => {
+let latestSearch = 0;
+const search = async (fallbackToAll = false) => {
+    const searchID = ++latestSearch;
     bus.emit('refreshTask', true);
     req.page = paginationConfig.currentPage;
     req.pageSize = paginationConfig.pageSize;
     loading.value = true;
     try {
-        const res = await searchTasks(req, targeNode.value);
-        loading.value = false;
+        let res = await searchTasks({ ...req }, targeNode.value);
+        if (fallbackToAll && res.data.total === 0 && searchID === latestSearch) {
+            req.status = '';
+            res = await searchTasks({ ...req }, targeNode.value);
+        }
+        if (searchID !== latestSearch) return;
         data.value = res.data.items;
         paginationConfig.total = res.data.total;
     } catch (error) {
     } finally {
-        loading.value = false;
+        if (searchID === latestSearch) loading.value = false;
     }
 };
 
@@ -109,7 +127,9 @@ const openTaskLog = (row: Log.Task) => {
 
 const acceptParams = () => {
     targeNode.value = currentNode.value;
-    search();
+    req.status = 'Executing';
+    paginationConfig.currentPage = 1;
+    search(true);
     open.value = true;
 };
 

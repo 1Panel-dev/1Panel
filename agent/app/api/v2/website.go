@@ -1340,3 +1340,16 @@ func (b *BaseApi) BatchSetHttps(c *gin.Context) {
 	}
 	helper.Success(c)
 }
+
+func (b *BaseApi) BatchChangePHPVersion(c *gin.Context) {
+	var req request.WebsiteBatchPHPVersionReq
+	if err := helper.CheckBindAndValidate(&req, c); err != nil {
+		return
+	}
+	results, err := websiteService.BatchChangePHPVersion(req)
+	if err != nil {
+		helper.InternalServer(c, err)
+		return
+	}
+	helper.SuccessWithData(c, results)
+}

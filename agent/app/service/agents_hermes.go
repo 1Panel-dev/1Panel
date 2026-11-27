@@ -406,7 +406,7 @@ func normalizeHermesTimezone(timezone string) string {
 }
 
 func resolveHermesProvider(provider, apiType string) string {
-	if apiType == "anthropic-messages" && (provider == "deepseek" || provider == "bailian-coding-plan" || provider == "ark-coding-plan" || provider == "xiaomi") {
+	if apiType == "anthropic-messages" && (provider == "deepseek" || provider == "bailian" || provider == "bailian-coding-plan" || provider == "ark" || provider == "ark-coding-plan" || provider == "xiaomi") {
 		return "anthropic"
 	}
 	switch provider {

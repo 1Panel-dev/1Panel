@@ -18,6 +18,7 @@ type IWebsiteRepo interface {
 	WithDefaultServer() DBOption
 	WithDomainLike(domain string) DBOption
 	WithSearchKeyword(keyword string, ids []uint) DBOption
+	WithRuntimeType(runtimeType string) DBOption
 	WithRuntimeID(runtimeID uint) DBOption
 	WithParentID(websiteID uint) DBOption
 	WithType(websiteType string) DBOption
@@ -57,6 +58,13 @@ func (w *WebsiteRepo) WithAppInstallIds(appInstallIDs []uint) DBOption {
 			return db
 		}
 		return db.Where("app_install_id in (?)", appInstallIDs)
+	}
+}
+
+func (w *WebsiteRepo) WithRuntimeType(runtimeType string) DBOption {
+	return func(db *gorm.DB) *gorm.DB {
+		runtimes := db.Session(&gorm.Session{NewDB: true}).Model(&model.Runtime{}).Select("id").Where("type = ?", runtimeType)
+		return db.Where("type = ? AND runtime_id IN (?)", "runtime", runtimes)
 	}
 }
 
@@ -150,7 +158,7 @@ func (w *WebsiteRepo) Page(page, size int, opts ...DBOption) (int64, []model.Web
 	db := getDb(opts...).Model(&model.Website{})
 	count := int64(0)
 	db = db.Count(&count)
-	err := db.Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Find(&websites).Error
+	err := db.Limit(size).Offset(size * (page - 1)).Preload("WebsiteSSL").Preload("Domains").Find(&websites).Error
 	return count, websites, err
 }
 

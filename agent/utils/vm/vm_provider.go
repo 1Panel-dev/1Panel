@@ -30,7 +30,7 @@ type VMProvider interface {
 	Delete(ctx context.Context, name string, force bool, deleteDisk bool, protectedPaths []string) error
 	ListSnapshots(ctx context.Context, name string) ([]dto.VMSnapshotInfo, error)
 	CreateSnapshot(ctx context.Context, name string, snapshotName string, description string) error
-	RecoverSnapshot(ctx context.Context, name string, snapshotName string) error
+	RecoverSnapshot(ctx context.Context, name string, snapshotName string) ([]dto.VMOrphanItem, error)
 	DeleteSnapshot(ctx context.Context, name string, snapshotName string) error
 	Start(ctx context.Context, name string) error
 	Shutdown(ctx context.Context, name string) error

@@ -93,7 +93,7 @@ func SearchFileAIContentHits(root string, inventory []AISearchInventoryItem, opt
 		if err != nil || strings.HasPrefix(underRoot, "..") {
 			continue
 		}
-		if ShouldFilterSensitivePath(fullPath) {
+		if shouldFilterAISearchPath(fullPath) {
 			continue
 		}
 

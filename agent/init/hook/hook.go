@@ -24,6 +24,9 @@ func Init() {
 	handleRecordStatus()
 	handleSnapStatus()
 	handleOllamaModelStatus()
+	if err := repo.NewIAgentAccountRepo().InterruptVerification(); err != nil {
+		global.LOG.Errorf("reset model service verification status failed: %v", err)
+	}
 
 	loadLocalDir()
 

@@ -314,7 +314,7 @@ const docTemplate = `{
 						"Timestamp": []
 					}
 				],
-				"summary": "Update model service model",
+				"summary": "Update model service models",
 				"tags": [
 					"AI"
 				]
@@ -33694,6 +33694,291 @@ const docTemplate = `{
 					"Website"
 				]
 			}
+		},
+		"/hosts/network/address": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkAddressChange"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Add interface address",
+				"tags": [
+					"Host Network"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"interface",
+						"address"
+					],
+					"formatEN": "add address [address] to interface [interface]",
+					"formatZH": "添加网卡 [interface] 地址 [address]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/network/address/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkAddressChange"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Remove interface address",
+				"tags": [
+					"Host Network"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"interface",
+						"address"
+					],
+					"formatEN": "remove address [address] from interface [interface]",
+					"formatZH": "移除网卡 [interface] 地址 [address]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/network": {
+			"get": {
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkOverview"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Get network overview",
+				"tags": [
+					"Host Network"
+				]
+			}
+		},
+		"/hosts/network/routes": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkRouteChange"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Add route",
+				"tags": [
+					"Host Network"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"destination",
+						"gateway",
+						"interface"
+					],
+					"formatEN": "add route [destination] gateway [gateway] device [interface]",
+					"formatZH": "添加路由 [destination] 网关 [gateway] 设备 [interface]",
+					"paramKeys": []
+				}
+			}
+		},
+		"/hosts/network/routes/check": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkRoute"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkRouteCheck"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check route reachability",
+				"tags": [
+					"Host Network"
+				]
+			}
+		},
+		"/hosts/network/routes/check/batch": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkRouteBatchCheck"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"schema": {
+							"items": {
+								"$ref": "#/definitions/dto.HostNetworkRouteCheck"
+							},
+							"type": "array"
+						}
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Check reachability for a batch of routes",
+				"tags": [
+					"Host Network"
+				]
+			}
+		},
+		"/hosts/network/routes/del": {
+			"post": {
+				"consumes": [
+					"application/json"
+				],
+				"parameters": [
+					{
+						"description": "request",
+						"in": "body",
+						"name": "request",
+						"required": true,
+						"schema": {
+							"$ref": "#/definitions/dto.HostNetworkRouteChange"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					},
+					{
+						"Timestamp": []
+					}
+				],
+				"summary": "Remove route",
+				"tags": [
+					"Host Network"
+				],
+				"x-panel-log": {
+					"BeforeFunctions": [],
+					"bodyKeys": [
+						"destination",
+						"gateway",
+						"interface"
+					],
+					"formatEN": "remove route [destination] gateway [gateway] device [interface]",
+					"formatZH": "移除路由 [destination] 网关 [gateway] 设备 [interface]",
+					"paramKeys": []
+				}
+			}
 		}
 	},
 	"definitions": {
@@ -33977,6 +34262,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountCreateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34035,6 +34323,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountInfo": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34080,8 +34371,18 @@ const docTemplate = `{
 				"rememberApiKey": {
 					"type": "boolean"
 				},
+				"validateAvailability": {
+					"type": "boolean"
+				},
 				"verified": {
 					"type": "boolean"
+				},
+				"verifiedAt": {
+					"format": "date-time",
+					"type": "string"
+				},
+				"verifyError": {
+					"type": "string"
 				},
 				"verifyModel": {
 					"type": "string"
@@ -34135,25 +34436,33 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountModelDiscoverReq": {
 			"properties": {
+				"accountId": {
+					"description": "Existing account ID. When provided, connection settings are loaded from the saved account.",
+					"type": "integer"
+				},
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"apiType": {
+					"description": "Required when accountId is not provided.",
+					"type": "string"
+				},
+				"authMode": {
 					"type": "string"
 				},
 				"baseURL": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				},
 				"provider": {
+					"description": "Required when accountId is not provided.",
 					"type": "string"
 				}
 			},
-			"required": [
-				"apiKey",
-				"apiType",
-				"baseURL",
-				"provider"
-			],
 			"type": "object"
 		},
 		"dto.AgentAccountModelReq": {
@@ -34172,18 +34481,31 @@ const docTemplate = `{
 				"accountId": {
 					"type": "integer"
 				},
-				"model": {
-					"$ref": "#/definitions/dto.AgentAccountModel"
+				"models": {
+					"type": "array",
+					"minItems": 1,
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					}
+				},
+				"verifyModel": {
+					"type": "string"
 				}
 			},
 			"required": [
 				"accountId",
-				"model"
+				"models"
 			],
 			"type": "object"
 		},
 		"dto.AgentAccountProviderCountReq": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"providers": {
 					"items": {
 						"type": "string"
@@ -34195,6 +34517,12 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountSearch": {
 			"properties": {
+				"excludeCodingPlanProviders": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
 				"apiType": {
 					"type": "string"
 				},
@@ -34222,6 +34550,9 @@ const docTemplate = `{
 		},
 		"dto.AgentAccountUpdateReq": {
 			"properties": {
+				"accountType": {
+					"type": "string"
+				},
 				"apiKey": {
 					"type": "string"
 				},
@@ -34236,6 +34567,12 @@ const docTemplate = `{
 				},
 				"id": {
 					"type": "integer"
+				},
+				"models": {
+					"items": {
+						"$ref": "#/definitions/dto.AgentAccountModel"
+					},
+					"type": "array"
 				},
 				"name": {
 					"type": "string"
@@ -44654,8 +44991,28 @@ const docTemplate = `{
 			},
 			"type": "object"
 		},
+		"dto.ProviderAccountTypeInfo": {
+			"properties": {
+				"apiTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAPIInfo"
+					},
+					"type": "array"
+				},
+				"key": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
 		"dto.ProviderInfo": {
 			"properties": {
+				"accountTypes": {
+					"items": {
+						"$ref": "#/definitions/dto.ProviderAccountTypeInfo"
+					},
+					"type": "array"
+				},
 				"apiTypes": {
 					"items": {
 						"$ref": "#/definitions/dto.ProviderAPIInfo"
@@ -49787,6 +50144,11 @@ const docTemplate = `{
 			"properties": {
 				"dst": {
 					"type": "string"
+				},
+				"overwrite": {
+					"default": true,
+					"description": "Overwrite existing entries; defaults to true when omitted. False preserves existing entries and merges directories.",
+					"type": "boolean"
 				},
 				"path": {
 					"type": "string"
@@ -55679,6 +56041,324 @@ const docTemplate = `{
 				},
 				"title": {
 					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostNetworkAddress": {
+			"properties": {
+				"address": {
+					"type": "string"
+				},
+				"applied": {
+					"type": "boolean"
+				},
+				"editable": {
+					"type": "boolean"
+				},
+				"family": {
+					"type": "string"
+				},
+				"managed": {
+					"type": "boolean"
+				},
+				"reason": {
+					"type": "string"
+				},
+				"scope": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostNetworkAddressChange": {
+			"properties": {
+				"address": {
+					"type": "string"
+				},
+				"confirmation": {
+					"type": "string"
+				},
+				"interface": {
+					"maxLength": 15,
+					"type": "string"
+				},
+				"previousAddress": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"address",
+				"interface",
+				"confirmation"
+			],
+			"type": "object"
+		},
+		"dto.HostNetworkAddressRequest": {
+			"properties": {
+				"address": {
+					"type": "string"
+				},
+				"interface": {
+					"maxLength": 15,
+					"type": "string"
+				}
+			},
+			"required": [
+				"address",
+				"interface"
+			],
+			"type": "object"
+		},
+		"dto.HostNetworkInterface": {
+			"properties": {
+				"addresses": {
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkAddress"
+					},
+					"type": "array"
+				},
+				"backend": {
+					"type": "string"
+				},
+				"flags": {
+					"items": {
+						"type": "string"
+					},
+					"type": "array"
+				},
+				"index": {
+					"type": "integer"
+				},
+				"linkState": {
+					"type": "string"
+				},
+				"mac": {
+					"type": "string"
+				},
+				"mtu": {
+					"type": "integer"
+				},
+				"name": {
+					"type": "string"
+				},
+				"reason": {
+					"type": "string"
+				},
+				"state": {
+					"type": "string"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostNetworkOverview": {
+			"type": "object",
+			"properties": {
+				"persistence": {
+					"$ref": "#/definitions/dto.HostNetworkPersistence"
+				},
+				"interfaces": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkInterface"
+					}
+				},
+				"routes": {
+					"type": "array",
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkRoute"
+					}
+				}
+			}
+		},
+		"dto.HostNetworkPersistence": {
+			"properties": {
+				"os": {
+					"type": "string"
+				},
+				"reason": {
+					"type": "string"
+				},
+				"supported": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostNetworkRouteChange": {
+			"properties": {
+				"applied": {
+					"type": "boolean"
+				},
+				"confirmation": {
+					"type": "string"
+				},
+				"destination": {
+					"type": "string"
+				},
+				"editable": {
+					"type": "boolean"
+				},
+				"family": {
+					"enum": [
+						"IPv4",
+						"IPv6"
+					],
+					"type": "string"
+				},
+				"gateway": {
+					"type": "string"
+				},
+				"interface": {
+					"maxLength": 15,
+					"type": "string"
+				},
+				"managed": {
+					"type": "boolean"
+				},
+				"metric": {
+					"type": "integer"
+				},
+				"nextHops": {
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkRouteNextHop"
+					},
+					"type": "array"
+				},
+				"previous": {
+					"$ref": "#/definitions/dto.HostNetworkRoute"
+				},
+				"protocol": {
+					"type": "string"
+				},
+				"readOnly": {
+					"type": "boolean"
+				},
+				"reason": {
+					"type": "string"
+				},
+				"scope": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"table": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"destination",
+				"family",
+				"confirmation"
+			],
+			"type": "object"
+		},
+		"dto.HostNetworkRoute": {
+			"properties": {
+				"applied": {
+					"type": "boolean"
+				},
+				"destination": {
+					"type": "string"
+				},
+				"editable": {
+					"type": "boolean"
+				},
+				"family": {
+					"enum": [
+						"IPv4",
+						"IPv6"
+					],
+					"type": "string"
+				},
+				"gateway": {
+					"type": "string"
+				},
+				"interface": {
+					"maxLength": 15,
+					"type": "string"
+				},
+				"managed": {
+					"type": "boolean"
+				},
+				"metric": {
+					"type": "integer"
+				},
+				"nextHops": {
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkRouteNextHop"
+					},
+					"type": "array"
+				},
+				"protocol": {
+					"type": "string"
+				},
+				"readOnly": {
+					"type": "boolean"
+				},
+				"reason": {
+					"type": "string"
+				},
+				"scope": {
+					"type": "string"
+				},
+				"source": {
+					"type": "string"
+				},
+				"table": {
+					"type": "string"
+				}
+			},
+			"required": [
+				"destination",
+				"family"
+			],
+			"type": "object"
+		},
+		"dto.HostNetworkRouteBatchCheck": {
+			"properties": {
+				"routes": {
+					"items": {
+						"$ref": "#/definitions/dto.HostNetworkRoute"
+					},
+					"maxItems": 16,
+					"minItems": 1,
+					"type": "array"
+				}
+			},
+			"required": [
+				"routes"
+			],
+			"type": "object"
+		},
+		"dto.HostNetworkRouteCheck": {
+			"properties": {
+				"failed": {
+					"type": "boolean"
+				},
+				"message": {
+					"type": "string"
+				},
+				"reachable": {
+					"type": "boolean"
+				},
+				"skipped": {
+					"type": "boolean"
+				}
+			},
+			"type": "object"
+		},
+		"dto.HostNetworkRouteNextHop": {
+			"properties": {
+				"gateway": {
+					"type": "string"
+				},
+				"interface": {
+					"type": "string"
+				},
+				"weight": {
+					"type": "integer"
 				}
 			},
 			"type": "object"

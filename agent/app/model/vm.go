@@ -3,23 +3,24 @@ package model
 type VirtualMachine struct {
 	BaseModel
 
-	Name         string   `json:"name"`
-	UUID         string   `json:"uuid"`
-	CPU          int      `json:"cpu"`
-	Memory       int64    `json:"memory"`
-	DiskSize     int64    `json:"diskSize"`
-	DiskBus      string   `json:"diskBus"`
-	DiskPath     string   `json:"diskPath"`
-	StoragePool  string   `json:"storagePool"`
-	ISOPaths     []string `json:"isoPaths" gorm:"serializer:json"`
-	ImagePath    string   `json:"imagePath"`
-	Network      string   `json:"network"`
-	BootOrder    string   `json:"bootOrder"`
-	AutoStart    bool     `json:"autoStart"`
-	Status       string   `json:"status"`
-	TaskID       string   `json:"taskID"`
-	CreateTaskID string   `json:"createTaskID"`
-	Description  string   `json:"description"`
+	Name             string   `json:"name"`
+	UUID             string   `json:"uuid"`
+	CPU              int      `json:"cpu"`
+	Memory           int64    `json:"memory"`
+	DiskSize         int64    `json:"diskSize"`
+	DiskBus          string   `json:"diskBus"`
+	DiskPath         string   `json:"diskPath"`
+	StoragePool      string   `json:"storagePool"`
+	DataStoragePools []string `json:"dataStoragePools" gorm:"serializer:json"`
+	ISOPaths         []string `json:"isoPaths" gorm:"serializer:json"`
+	ImagePath        string   `json:"imagePath"`
+	Network          string   `json:"network"`
+	BootOrder        string   `json:"bootOrder"`
+	AutoStart        bool     `json:"autoStart"`
+	Status           string   `json:"status"`
+	TaskID           string   `json:"taskID"`
+	CreateTaskID     string   `json:"createTaskID"`
+	Description      string   `json:"description"`
 }
 
 type VMTemplate struct {

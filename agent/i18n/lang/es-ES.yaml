@@ -1,5 +1,5 @@
 # errores básicos
-ErrInvalidParams: 'Solicitud inválida: {{ .detail }}'
+ErrInvalidParams: 'Solicitud inválida{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'Formato de argumentos personalizados de MCP no válido'
 ErrMcpGatewayArgsConflict: 'El argumento {{ .name }} está gestionado por 1Panel y no puede definirse en los argumentos personalizados'
 ErrTokenParse: 'Token inválido: {{ .detail }}'
@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: 'No se pudo analizar el nombre del proyecto desde la
 ErrComposeProjectNameEmpty: 'No se pudo derivar un nombre de proyecto desde la configuración de Docker Compose ni desde el directorio padre del archivo. Introduzca un nombre e inténtelo de nuevo.'
 ErrComposeNameInvalid: 'Nombre de proyecto Compose no válido: debe comenzar con una letra minúscula o un número, contener solo letras minúsculas, números, guiones y guiones bajos, y tener entre 1 y 256 caracteres.'
 ErrAppVersionUnavailable: 'Esta versión de la aplicación se ha eliminado del servicio remoto. Seleccione otra versión e inténtelo de nuevo.'
-ErrVllmGB10ProOnly: 'Esta versión de vLLM solo está disponible en 1Panel Professional Edition.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway solo puede actualizarse dentro del mismo tipo de base de datos (SQLite o PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'La copia de seguridad de AI Gateway y la aplicación de destino deben usar el mismo tipo de base de datos (SQLite o PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent solo puede actualizarse a una versión reconocida más reciente permitida por la configuración de actualización entre versiones principales. Para volver a una versión anterior, restaure una copia de seguridad.'
@@ -170,6 +169,10 @@ UpgradeWaitReady: 'Esperar a que la aplicación esté lista'
 UpgradeBackupDisabled: 'La copia de actualización está desactivada; los cambios de datos de los scripts no se pueden revertir por completo'
 UpgradeRollbackFailed: 'Error al revertir'
 ErrDatabaseNotFound: 'La base de datos {{ .name }} no existe'
+
+# vLLM
+ErrVllmGB10ProOnly: 'Esta versión de vLLM solo está disponible en 1Panel Professional Edition.'
+ErrVllmGB10ModelUnsupported: 'Esta versión solo admite DeepSeek-V4-Flash-0731 o DeepSeek-V4-Flash-Vision-Exp. Seleccione el directorio del modelo correspondiente.'
 
 # SSH
 ExportIP: 'IP de inicio de sesión'
@@ -289,6 +292,13 @@ RemoteBackup: 'Para hacer una copia de seguridad de la base de datos remota, pri
 RemoteRecover: 'Para restaurar la base de datos remota, primero debe iniciarse el servicio de base de datos del contenedor local utilizando la imagen {{ .name }}, espere...'
 Arg: 'Argumento'
 
+#PostgreSQL
+ErrPgUserProtected: "Los usuarios del sistema y el usuario de conexión actual están protegidos frente a esta operación"
+ErrPgSuperUserGrant: "Los superusuarios acceden a todas las bases de datos y no requieren autorizaciones ni revocaciones individuales"
+ErrPgUserUsed: "Las aplicaciones o sitios web vinculados usan este usuario; cambie primero sus cuentas de conexión"
+ErrPgUserBound: "Primero revoque las autorizaciones de base de datos de este usuario"
+ErrPgUserPasswordSync: "La contraseña del usuario se cambió, pero no se pudo sincronizar en estas aplicaciones: {{ .detail }}"
+
 # Redis
 ErrTypeOfRedis: 'El tipo de archivo de recuperación no coincide con el método de persistencia actual, modifíquelo e intente'
 
@@ -341,6 +351,14 @@ ComposeRecoverCleanup: 'Limpiar espacio de restauracion de compose'
 # entorno de ejecución
 ErrFileNotExist: 'El archivo {{ .detail }} no existe, verifique la integridad'
 ErrImageBuildErr: 'Fallo al construir la imagen'
+PHPBuildImage: "Construyendo la imagen de PHP"
+PHPBuildBaseImage: "Obteniendo la imagen base {{ .name }}"
+PHPBuildStep: "Construyendo la imagen de PHP (paso {{ .name }})"
+PHPBuildStartContainer: "Iniciando el contenedor PHP"
+PHPBuildInstallExtensions: "Instalando extensiones de PHP"
+PHPBuildCommitImage: "Guardando la imagen con las extensiones de PHP"
+PHPBuildApplyConfig: "Aplicando la configuración e iniciando el entorno PHP"
+PHPBuildSeeLog: "Consulte build.log para más detalles"
 ErrImageExist: 'La imagen ya existe Modifique el nombre de la imagen.'
 ErrDelWithWebsite: 'El entorno de ejecución ya está asociado a un sitio web y no puede eliminarse'
 ErrRuntimeStart: 'Fallo al iniciar'
@@ -639,6 +657,8 @@ ErrWebhookTestFailed: 'Revisa la configuración del Webhook. Consulta los regist
 
 # tarea - entorno de ejecución
 ErrInstallExtension: 'Ya hay una tarea de instalación en curso, espere a que termine'
+PHPExtensionsInstallWarning: "No se pudieron instalar algunas extensiones de PHP: {{ .name }}"
+PHPExtensionsInstallManually: "Vuelve a intentarlo desde la página de extensiones para guardar en la imagen las instalaciones correctas. Para hacer una comprobación manual, ejecuta estos comandos en el host de Docker:"
 
 # plantilla de correo de alerta
 PanelAlertTitle: 'Notificación de alerta del panel'
@@ -666,6 +686,17 @@ PartitionDiskErr: 'Error al particionar, {{ .err }}'
 FormatDiskErr: 'Error al formatear disco, {{ .err }}'
 MountDiskErr: 'Error al montar disco, {{ .err }}'
 XfsNotFound: 'No se detectó el sistema de archivos xfs instale xfsprogs primero'
+
+# Gestión de red
+ErrNetworkPersistencePlatform: "La configuración de red persistente solo está disponible en nodos Linux."
+ErrNetworkPersistencePrivilege: "La configuración de red persistente requiere que 1Panel Agent se ejecute como root con permisos de administración de red."
+ErrNetworkIPRoute2: "Instala o actualiza iproute2 y comprueba que el comando ip esté disponible.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "Esta dirección IP primaria tiene direcciones secundarias en la misma subred. Elimine primero las direcciones secundarias o ajústelas con las herramientas de red del sistema antes de volver a intentarlo."
+ErrNetworkRouteReadOnly: "Esta ruta es de solo lectura."
+ErrNetworkPersistenceConflict: "Esta dirección o ruta ya existe o entra en conflicto con la configuración guardada.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "La configuración de la interfaz de bucle invertido es de solo lectura."
+ErrNetworkPersistentSourceMissing: "No se encontró una configuración persistente del sistema compatible para la interfaz {{ .name }}. Es de solo lectura."
+ErrNetworkVirtualBridgeReadOnly: "Esta interfaz virtual es de solo lectura y no participa en las comprobaciones de conectividad."
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'Comando de riesgo bloqueado: {{ .command }}'
@@ -820,3 +851,89 @@ ErrImageCheckProxyRequired: "Para comprobar actualizaciones de imágenes en el e
 ErrPHPExtensionsConflict: "Ya existe una plantilla de extensiones PHP con este nombre y contenido diferente; no se ha sobrescrito"
 
 ErrModelTokenizerDirOverlap: "Los directorios de modelos y tokenizadores deben ser distintos y ninguno puede contener al otro"
+ErrClusterAppOnly: "Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones."
+ErrClusterArchivePassphraseRequired: "Introduce la contraseña de la copia de seguridad."
+ErrClusterArchiveTooLarge: "El archivo de copia de seguridad del clúster es demasiado grande."
+ErrClusterArchiveFormat: "El formato de este archivo de copia de seguridad del clúster no es compatible."
+ErrClusterArchiveTruncated: "El archivo de copia de seguridad del clúster está incompleto."
+ErrClusterArchiveBlock: "La copia de seguridad del clúster contiene un bloque de datos no válido."
+ErrClusterArchiveAuthentication: "La contraseña de la copia de seguridad es incorrecta o el archivo de copia de seguridad del clúster está dañado."
+ErrClusterArchiveTrailingData: "Hay datos inesperados después del final del archivo de copia de seguridad del clúster."
+ErrClusterArchiveManifest: "Los metadatos de la copia de seguridad del clúster no son válidos."
+ErrClusterArchiveManifestTooLarge: "Los metadatos de la copia de seguridad del clúster son demasiado grandes."
+ErrClusterArchiveInvalid: "La estructura del archivo de copia de seguridad del clúster no es válida."
+ErrClusterArchivePayload: "Los datos de la copia de seguridad no coinciden con los metadatos de la copia de seguridad del clúster."
+ErrClusterArchiveChecksum: "La suma de comprobación de los datos de la copia de seguridad del clúster no coincide."
+ErrClusterArchiveImportHeader: "El encabezado de la solicitud de importación de la copia de seguridad del clúster no es válido."
+ErrClusterBackupID: "El ID de la copia de seguridad del clúster no es válido."
+ErrClusterBackupEngineMismatch: "El motor de base de datos de la copia de seguridad no coincide con la aplicación seleccionada."
+ErrClusterBackupSelectFile: "Seleccione un archivo de copia de seguridad del clúster (.1pha)."
+ErrClusterBackupFileInaccessible: "No se puede acceder al archivo de copia de seguridad del clúster."
+ErrClusterBackupRegularFile: "La copia de seguridad del clúster debe ser un archivo normal."
+ErrClusterBackupFileChanged: "El archivo de copia de seguridad del clúster ha cambiado. Selecciónelo de nuevo."
+ErrClusterBackupNotPrimary: "La instancia seleccionada no es la principal de un clúster de alta disponibilidad."
+ErrClusterBackupContainerUnavailable: "El contenedor de base de datos no está disponible."
+ErrClusterBackupMySQLInnoDB: "La copia de seguridad en línea de MySQL requiere que todas las tablas de usuario utilicen InnoDB."
+ErrClusterBackupPostgresRecovery: "La instancia de PostgreSQL está en modo de recuperación."
+ErrClusterBackupPostgresTablespaces: "La copia de seguridad del clúster de PostgreSQL solo admite los espacios de tablas predeterminados."
+ErrClusterBackupPostgresReplicationCredentials: "Las credenciales de replicación de PostgreSQL no están disponibles."
+ErrClusterBackupRedisNotPrimary: "La instancia de Redis no es la instancia principal."
+ErrClusterBackupRedisVersion: "No se puede determinar la versión de Redis."
+ErrClusterBackupUnsupportedEngine: "Este motor de base de datos no admite copias de seguridad del clúster."
+ErrClusterCommandFailed: "No se pudo ejecutar {{ .name }}"
+ErrClusterRestoreCatalogInstance: "La restauración en un clúster nuevo requiere una instancia nueva creada a partir de la plantilla del catálogo de aplicaciones."
+ErrClusterRestorePrimaryTemplate: "La restauración requiere exactamente la plantilla de la instancia principal registrada en la copia de seguridad."
+ErrClusterRestoreUnsupportedEngine: "Este motor de base de datos no admite la restauración de clústeres."
+ErrClusterRestoreRedisSnapshot: "La instantánea de Redis no es válida."
+ErrClusterRestorePostgresMajorVersion: "La versión principal de los datos de PostgreSQL no coincide con la de la copia de seguridad."
+ErrClusterRestoreSingleContainer: "La restauración requiere una instancia con un solo contenedor de base de datos."
+ErrClusterRestoreCatalogDataMount: "La restauración requiere el montaje de datos definido en la plantilla del catálogo de aplicaciones."
+ErrClusterRestoreDataDirectoryNotEmpty: "El directorio de datos de destino de la restauración no está vacío."
+ErrClusterRestorePostgresUnsafePath: "La copia de seguridad de PostgreSQL contiene una ruta no segura."
+ErrClusterRestorePostgresFileType: "La copia de seguridad de PostgreSQL contiene un enlace o tipo de archivo no admitido."
+ErrClusterRestoreRedisCatalogPersistence: "La restauración de Redis requiere la configuración de persistencia de la plantilla del catálogo de aplicaciones."
+ErrClusterRestoreRedisCatalogRDB: "La restauración de la instantánea de Redis requiere la configuración de RDB de la plantilla del catálogo de aplicaciones."
+ErrClusterRestoreMySQLCredentials: "No se pudieron verificar las credenciales de administrador del MySQL restaurado. Usa las credenciales que eran válidas al crear la copia de seguridad."
+ErrClusterRestoreEngineVersion: "La versión {{ .current }} del motor de base de datos no coincide con la versión {{ .expected }} de la copia de seguridad."
+ErrClusterRestoreDatabaseNotReady: "La base de datos restaurada no llegó a estar lista"
+ErrClusterRestoreOriginalRequest: "La solicitud de restauración en el clúster original no es válida."
+ErrClusterRestoreMemberVersionChanged: "La versión del miembro del clúster cambió antes de la restauración."
+ErrClusterRestoreMemberChanged: "El miembro del clúster cambió antes de la restauración."
+ErrClusterRestoreMemberBusy: "Otra tarea de restauración está usando este miembro del clúster."
+ErrClusterRestoreMemberState: "El estado actual de restauración del miembro del clúster no permite esta operación."
+ErrClusterRestoreRollbackRequiresReview: "Es posible que se haya escrito en los datos restaurados. La reversión automática está bloqueada y se han conservado los datos anteriores."
+ErrClusterRestoreOriginalAction: "La operación de restauración en el clúster original no es válida."
+ErrClusterRestoreDataMountDirectory: "El montaje de datos del clúster debe ser un directorio."
+ErrClusterRestoreMemberRoleMismatch: "El rol de replicación configurado en el contenedor de la base de datos no coincide con el rol registrado para este miembro."
+ErrClusterRestoreOriginalCatalogMounts: "Para restaurar en el clúster original se necesitan los montajes de base de datos definidos en la plantilla de la aplicación."
+ErrClusterRestoreDataMountUnavailable: "Falta el montaje de datos de la base de datos o no se puede escribir en él."
+ErrClusterRestoreOriginalTemplateVersion: "La copia de seguridad no coincide con la plantilla de aplicación o la versión del motor de base de datos del clúster original."
+ErrClusterRestoreValidationContainer: "El contenedor de validación de la restauración no corresponde a la tarea de restauración actual."
+ErrClusterRestoreDataOwnership: "No se pudo leer el propietario ni el grupo de los datos de la base de datos."
+ErrClusterRestoreConfigFileType: "La configuración de la base de datos contiene un enlace o un archivo especial."
+ErrClusterRestoreRedisActiveRDB: "Para restaurar una instantánea de Redis, la instancia en ejecución debe usar una configuración RDB compatible."
+ErrClusterRestoreDataDirectoryMismatch: "La base de datos en ejecución no usa el directorio de datos indicado en la plantilla de la aplicación."
+ErrClusterRestoreReplicaNotReady: "La réplica restaurada no llegó a estar lista"
+ErrClusterRestoreDataPathDirectory: "La ruta de los datos de restauración debe ser un directorio."
+ErrClusterRestoreOriginalDataUnavailable: "No se encuentra el directorio de datos del clúster original."
+ErrClusterRestoreDataDirectoryChanged: "El directorio de datos del clúster cambió durante la restauración."
+ErrClusterRestoreDataReplacementIncomplete: "No se completó la sustitución de los datos del clúster."
+ErrClusterRestoreRollbackDirectoryChanged: "El directorio de datos del clúster cambió durante la reversión de la restauración."
+ErrRedisAOFRestoreUnavailable: "La restauración de AOF no está disponible para esta versión de Redis."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "Selección de sitios web no válida: {{ .value }}"
+ErrCronjobWebsiteGroup: "No se puede acceder al grupo de sitios web {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: ninguno de los sitios web seleccionados existe"
+ErrCronjobWebsiteVersion: "Versión de selección de sitios web no compatible: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "No se pueden seleccionar todos los sitios web junto con sitios o grupos específicos"
+ErrCronjobWebsiteGroupName: "El nombre del grupo de sitios web no puede estar vacío"
+ErrCronjobWebsiteGroupMissing: "El grupo de sitios web «{{ .group }}» no existe y no se encontró ningún sitio coincidente en la lista guardada"
+CronjobWebsiteGroupFallback: "{{ .name }}: el grupo de sitios web «{{ .group }}» no existe; se importó como una lista fija de sitios que ya no sigue los cambios del grupo"
+CronjobWebsiteMissing: "{{ .name }}: sitios web no encontrados: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "No se encontró ningún grupo ni sitio web que coincida con la selección"
+
+ProxyCacheClear: "Vaciar la caché del proxy inverso"
+ProxyCacheEmpty: "Nada que vaciar"
+ProxyCacheSummary: "Sitios con caché vaciada: {{ .cleared }}. Sin caché que vaciar: {{ .skipped }}. Con errores: {{ .failed }}."
+ProxyCacheReloadFailed: "Se ha vaciado la caché, pero no se ha podido recargar OpenResty"

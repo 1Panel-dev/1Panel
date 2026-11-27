@@ -195,19 +195,23 @@ func (s *lexer) scanKeyword() flag.Flag {
 				buf.WriteString(s.readUntil(func(r rune) bool {
 					return r == '}'
 				}))
-				buf.WriteRune(s.read()) //consume latest '}'
-			} else {
-				break
+				prev = s.read() //consume latest '}'
+				buf.WriteRune(prev)
+				continue
 			}
+			break
 		}
-		buf.WriteRune(s.read())
+		prev = s.read()
+		buf.WriteRune(prev)
 	}
 
 	return tok.Lit(buf.String())
 }
 
 func (s *lexer) scanVariable() flag.Flag {
-	return s.NewToken(flag.Variable).Lit(s.readUntil(isKeywordTerminator))
+	tok := s.scanKeyword()
+	tok.Type = flag.Variable
+	return tok
 }
 
 func (s *lexer) read() rune {
@@ -227,10 +231,6 @@ func (s *lexer) read() rune {
 
 func isQuote(ch rune) bool {
 	return ch == '"' || ch == '\'' || ch == '`'
-}
-
-func isKeywordTerminator(ch rune) bool {
-	return isSpace(ch) || isEndOfLine(ch) || ch == '{' || ch == ';'
 }
 
 func isSpace(ch rune) bool {

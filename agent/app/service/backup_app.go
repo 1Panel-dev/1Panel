@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/repo"
+	"github.com/compose-spec/compose-go/v2/dotenv"
 	"github.com/subosito/gotenv"
 
 	"github.com/1Panel-dev/1Panel/agent/app/task"
@@ -538,27 +539,58 @@ func ensureMysqlDBUser(mysqlService IMysqlService, database model.Database, dbIn
 
 func reCreatePostgresqlDB(dbID uint, database model.Database, envMap map[string]interface{}) (*model.DatabasePostgresql, error) {
 	postgresqlService := NewIPostgresqlService()
-	_ = postgresqlService.Delete(context.Background(), dto.PostgresqlDBDelete{
+	dbInfo := getDBCreateInfoFromEnv(envMap, "UTF8")
+	users, err := postgresqlService.ListUsers(dto.PostgresqlUserSearch{Database: database.Name})
+	if err != nil {
+		return nil, err
+	}
+	existingUser := false
+	for _, user := range users {
+		if user.Username != dbInfo.User {
+			continue
+		}
+		if user.Password == "" {
+			return nil, buserr.New("ErrDbUserNotValid")
+		}
+		dbInfo.Password = user.Password
+		existingUser = true
+		break
+	}
+	if err := postgresqlService.Delete(context.Background(), dto.PostgresqlDBDelete{
 		ID:           dbID,
 		Type:         database.Type,
 		Database:     database.Name,
 		DeleteBackup: false,
-		ForceDelete:  true,
-	})
+		ForceDelete:  false,
+	}); err != nil {
+		return nil, err
+	}
 
-	dbInfo := getDBCreateInfoFromEnv(envMap, "UTF8")
 	createDB, err := postgresqlService.Create(context.Background(), dto.PostgresqlDBCreate{
-		Name:      dbInfo.Name,
-		From:      database.From,
-		Database:  database.Name,
-		Format:    dbInfo.Format,
-		Username:  dbInfo.User,
-		Password:  dbInfo.Password,
-		SuperUser: true,
+		ExistingUser: existingUser,
+		Name:         dbInfo.Name,
+		From:         database.From,
+		Database:     database.Name,
+		Format:       dbInfo.Format,
+		Username:     dbInfo.User,
+		Password:     dbInfo.Password,
+		SuperUser:    true,
 	})
 	if err != nil {
 		return nil, err
 	}
+	oldPassword, _ := envMap["PANEL_DB_USER_PASSWORD"].(string)
+	if oldPassword != "" && oldPassword != dbInfo.Password {
+		if datasource, ok := envMap["CASDOOR_DATASOURCE_NAME"].(string); ok {
+			escape := strings.NewReplacer(`\`, `\\`, "'", `\'`)
+			password := "password='" + escape.Replace(dbInfo.Password) + "'"
+			envMap["CASDOOR_DATASOURCE_NAME"] = strings.NewReplacer(
+				"password='"+escape.Replace(oldPassword)+"'", password,
+				"password="+oldPassword, password,
+			).Replace(datasource)
+		}
+	}
+	envMap["PANEL_DB_USER_PASSWORD"] = dbInfo.Password
 	updateCronjobsDBRef(dbID, createDB.ID)
 	return createDB, nil
 }
@@ -594,11 +626,12 @@ func updateCronjobsDBRef(oldDBID, newDBID uint) {
 }
 
 func buildRecoverEnv(appEnv string, backupEnvMap, installedEnvMap map[string]interface{}) (string, string, error) {
+	var appEnvMap map[string]interface{}
+	if err := json.Unmarshal([]byte(appEnv), &appEnvMap); err != nil {
+		return "", "", err
+	}
 	currentHostVal, hasCurrentHost := installedEnvMap["PANEL_DB_HOST"]
 	if hasCurrentHost && fmt.Sprintf("%v", currentHostVal) != "" {
-		backupHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", backupEnvMap["PANEL_DB_HOST"])
-		currentHost := fmt.Sprintf("\"PANEL_DB_HOST\":\"%v\"", currentHostVal)
-		appEnv = strings.ReplaceAll(appEnv, backupHost, currentHost)
 		if _, ok := backupEnvMap["CASDOOR_DATASOURCE_NAME"]; ok {
 			backupEnvMap["CASDOOR_DATASOURCE_NAME"] = strings.ReplaceAll(
 				fmt.Sprintf("%v", backupEnvMap["CASDOOR_DATASOURCE_NAME"]),
@@ -608,37 +641,45 @@ func buildRecoverEnv(appEnv string, backupEnvMap, installedEnvMap map[string]int
 		}
 		backupEnvMap["PANEL_DB_HOST"] = currentHostVal
 	}
+	if appEnvMap == nil {
+		return "", "", buserr.New("ErrInvalidParams")
+	}
+	for _, key := range []string{"PANEL_DB_HOST", "PANEL_DB_USER_PASSWORD", "CASDOOR_DATASOURCE_NAME"} {
+		if value, ok := backupEnvMap[key]; ok {
+			appEnvMap[key] = value
+		}
+	}
+	mergedAppEnv, err := json.Marshal(appEnvMap)
+	if err != nil {
+		return "", "", err
+	}
+	appEnv = string(mergedAppEnv)
 	newEnvMap := make(map[string]string, len(backupEnvMap))
 	MergeAppEnvironment(backupEnvMap, newEnvMap)
 	mergedEnvContent, err := gotenv.Marshal(newEnvMap)
 	if err != nil {
 		return appEnv, "", err
 	}
-	return appEnv, mergedEnvContent, nil
+	lines := strings.Split(mergedEnvContent, "\n")
+	for i, line := range lines {
+		for _, key := range []string{"PANEL_DB_USER_PASSWORD", "CASDOOR_DATASOURCE_NAME"} {
+			if strings.HasPrefix(line, key+"=") {
+				lines[i] = fmt.Sprintf("%s=%q", key, strings.ReplaceAll(newEnvMap[key], "$", "$$"))
+				break
+			}
+		}
+	}
+	return appEnv, strings.Join(lines, "\n"), nil
 }
 
 func getEnvMapByPath(envPath string) (map[string]interface{}, error) {
-	envMap := make(map[string]interface{})
-	envFile, err := os.ReadFile(envPath)
+	values, err := dotenv.ReadWithLookup(func(string) (string, bool) { return "", false }, envPath)
 	if err != nil {
-		return envMap, err
+		return nil, err
 	}
-	lines := strings.Split(string(envFile), "\n")
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" || strings.HasPrefix(line, "#") {
-			continue
-		}
-		parts := strings.SplitN(line, "=", 2)
-		if len(parts) == 2 {
-			value := strings.TrimSpace(parts[1])
-			if len(value) >= 2 {
-				if (value[0] == '"' && value[len(value)-1] == '"') || (value[0] == '\'' && value[len(value)-1] == '\'') {
-					value = value[1 : len(value)-1]
-				}
-			}
-			envMap[parts[0]] = value
-		}
+	envMap := make(map[string]interface{}, len(values))
+	for key, value := range values {
+		envMap[key] = value
 	}
 	return envMap, nil
 }

@@ -146,7 +146,7 @@ export function downloadFile(filePath: string, currentNode: string) {
 }
 
 export function downloadBlob(content: string | Uint8Array<ArrayBuffer> | Blob, fileName: string, type?: string) {
-    const downloadUrl = window.URL.createObjectURL(new Blob([content], type ? { type } : undefined));
+    const downloadUrl = window.URL.createObjectURL(content instanceof Blob ? content : new Blob([content], { type }));
     const a = document.createElement('a');
     a.style.display = 'none';
     a.href = downloadUrl;

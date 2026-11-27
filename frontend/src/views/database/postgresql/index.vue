@@ -37,6 +37,15 @@
                 <el-button
                     v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
                     v-permission
+                    type="primary"
+                    plain
+                    @click="usersRef.acceptParams({ database: currentDBName })"
+                >
+                    {{ $t('commons.table.user') }}
+                </el-button>
+                <el-button
+                    v-if="currentDB && (currentDB.from !== 'local' || postgresqlStatus === 'Running')"
+                    v-permission
                     @click="loadDB"
                     type="primary"
                     plain
@@ -114,7 +123,7 @@
                             </div>
                         </template>
                     </el-table-column>
-                    <el-table-column :label="$t('commons.login.username')" prop="username">
+                    <el-table-column :label="$t('database.connectionUser')" prop="username">
                         <template #default="{ row }">
                             <div class="flex items-center" v-if="row.username">
                                 <span>
@@ -227,8 +236,7 @@
             </template>
         </DialogPro>
 
-        <PrivilegesDialog ref="privilegesRef" @search="search" />
-        <BindDialog ref="bindRef" @search="search" />
+        <UserDialog ref="usersRef" @search="search" />
         <PasswordDialog ref="passwordRef" @search="search" />
         <RootPasswordDialog ref="connRef" />
         <UploadDialog ref="uploadRef" />
@@ -245,12 +253,11 @@
 <script lang="ts" setup>
 import { TABLE_TOOLTIP_OPTIONS } from '@/components/table/shared';
 import { useSearchState } from '@/utils/search-reset';
-import BindDialog from '@/views/database/postgresql/bind/index.vue';
+import UserDialog from '@/views/database/postgresql/user/index.vue';
 import OperateDialog from '@/views/database/postgresql/create/index.vue';
 import DeleteDialog from '@/views/database/postgresql/delete/index.vue';
 import PasswordDialog from '@/views/database/postgresql/password/index.vue';
 import TerminalDialog from '@/components/terminal/database.vue';
-import PrivilegesDialog from '@/views/database/postgresql/privileges/index.vue';
 import RootPasswordDialog from '@/views/database/postgresql/conn/index.vue';
 import AppResources from '@/views/database/postgresql/check/index.vue';
 import AppStatus from '@/components/app-status/index.vue';
@@ -292,8 +299,7 @@ const currentDBName = ref();
 
 const checkRef = ref();
 const deleteRef = ref();
-const bindRef = ref();
-const privilegesRef = ref();
+const usersRef = ref();
 const dialogTerminalRef = ref();
 
 const dashboardName = ref();
@@ -408,7 +414,7 @@ const onBind = async (row: Database.PostgresqlDBInfo) => {
         name: row.name,
         database: currentDBName.value,
     };
-    bindRef.value.acceptParams(param);
+    usersRef.value.acceptParams(param);
 };
 
 const loadDB = async () => {
@@ -551,20 +557,10 @@ const buttons = [
         },
     },
     {
-        label: i18n.global.t('database.permission'),
+        label: i18n.global.t('database.authorizationManagement'),
         permission: true,
-        disabled: (row: Database.PostgresqlDBInfo) => {
-            return !row.username || row.isDelete;
-        },
-        click: (row: Database.PostgresqlDBInfo) => {
-            let param = {
-                database: currentDBName.value,
-                name: row.name,
-                username: row.username,
-                superUser: row.superUser,
-            };
-            privilegesRef.value.acceptParams(param);
-        },
+        disabled: (row: Database.PostgresqlDBInfo) => row.isDelete,
+        click: (row: Database.PostgresqlDBInfo) => onBind(row),
     },
     {
         label: i18n.global.t('database.backupList'),

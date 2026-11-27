@@ -49,24 +49,30 @@ type VMHealthCheckResult struct {
 	Items []VMHealthCheckItem `json:"items"`
 }
 
+type VMDataDisk struct {
+	SizeGiB     int64  `json:"sizeGiB" validate:"required,min=1,max=8388607"`
+	StoragePool string `json:"storagePool"`
+}
+
 type VMCreate struct {
-	TaskID           string   `json:"taskID"`
-	Name             string   `json:"name" validate:"required,vm_name"`
-	CPU              int      `json:"cpu" validate:"required,min=1"`
-	Memory           int64    `json:"memory" validate:"required,min=1"`
-	DiskSize         int64    `json:"diskSize" validate:"required,min=1"`
-	OSType           string   `json:"osType" validate:"omitempty,oneof=windows linux other"`
-	DiskBus          string   `json:"diskBus" validate:"omitempty,oneof=sata virtio"`
-	TemplateID       uint     `json:"templateID"`
-	DiskPath         string   `json:"diskPath"`
-	StoragePool      string   `json:"storagePool"`
-	ISOPaths         []string `json:"isoPaths"`
-	ImagePath        string   `json:"imagePath"`
-	Network          string   `json:"network" validate:"required,vm_common"`
-	BootOrder        string   `json:"bootOrder"`
-	StartAfterCreate bool     `json:"startAfterCreate"`
-	AutoStart        bool     `json:"autoStart"`
-	Description      string   `json:"description"`
+	DataDisks        []VMDataDisk `json:"dataDisks" validate:"max=9,dive"`
+	TaskID           string       `json:"taskID"`
+	Name             string       `json:"name" validate:"required,vm_name"`
+	CPU              int          `json:"cpu" validate:"required,min=1"`
+	Memory           int64        `json:"memory" validate:"required,min=1"`
+	DiskSize         int64        `json:"diskSize" validate:"required,min=1"`
+	OSType           string       `json:"osType" validate:"omitempty,oneof=windows linux other"`
+	DiskBus          string       `json:"diskBus" validate:"omitempty,oneof=sata virtio"`
+	TemplateID       uint         `json:"templateID"`
+	DiskPath         string       `json:"diskPath"`
+	StoragePool      string       `json:"storagePool"`
+	ISOPaths         []string     `json:"isoPaths"`
+	ImagePath        string       `json:"imagePath"`
+	Network          string       `json:"network" validate:"required,vm_common"`
+	BootOrder        string       `json:"bootOrder"`
+	StartAfterCreate bool         `json:"startAfterCreate"`
+	AutoStart        bool         `json:"autoStart"`
+	Description      string       `json:"description"`
 }
 
 type VMTemplateCreate struct {
@@ -172,16 +178,22 @@ type VMSnapshotSearch struct {
 	Name string `json:"name" validate:"required,vm_name"`
 }
 
+type VMSnapshotDisk struct {
+	Target string `json:"target"`
+	Path   string `json:"path"`
+}
+
 type VMSnapshotInfo struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CreatedAt   int64  `json:"createdAt"`
-	State       string `json:"state"`
-	Parent      string `json:"parent"`
-	Path        string `json:"path"`
-	Size        int64  `json:"size"`
-	Current     bool   `json:"current"`
-	Children    int    `json:"children"`
+	Disks       []VMSnapshotDisk `json:"disks"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	CreatedAt   int64            `json:"createdAt"`
+	State       string           `json:"state"`
+	Parent      string           `json:"parent"`
+	Path        string           `json:"path"`
+	Size        int64            `json:"size"`
+	Current     bool             `json:"current"`
+	Children    int              `json:"children"`
 }
 
 type VMIsoSearch struct {
@@ -286,24 +298,26 @@ type VMNetworkUpdate struct {
 }
 
 type VMNetworkItem struct {
-	ID              uint               `json:"id"`
-	Name            string             `json:"name"`
-	Type            string             `json:"type"`
-	BridgeName      string             `json:"bridgeName"`
-	SourceInterface string             `json:"sourceInterface"`
-	CIDR            string             `json:"cidr"`
-	Gateway         string             `json:"gateway"`
-	DHCPStart       string             `json:"dhcpStart"`
-	DHCPEnd         string             `json:"dhcpEnd"`
-	AutoStart       bool               `json:"autoStart"`
-	Description     string             `json:"description"`
-	CreatedAt       string             `json:"createdAt"`
-	Status          string             `json:"status"`
-	VMCount         int                `json:"vmCount"`
-	VMs             []VMResourceRef    `json:"vms"`
-	Registered      bool               `json:"registered"`
-	UsedIPs         []VMNetworkIPUsage `json:"usedIPs"`
-	Error           string             `json:"error"`
+	Addresses       []string                 `json:"addresses"`
+	Interfaces      []VMNetworkInterfaceItem `json:"interfaces"`
+	ID              uint                     `json:"id"`
+	Name            string                   `json:"name"`
+	Type            string                   `json:"type"`
+	BridgeName      string                   `json:"bridgeName"`
+	SourceInterface string                   `json:"sourceInterface"`
+	CIDR            string                   `json:"cidr"`
+	Gateway         string                   `json:"gateway"`
+	DHCPStart       string                   `json:"dhcpStart"`
+	DHCPEnd         string                   `json:"dhcpEnd"`
+	AutoStart       bool                     `json:"autoStart"`
+	Description     string                   `json:"description"`
+	CreatedAt       string                   `json:"createdAt"`
+	Status          string                   `json:"status"`
+	VMCount         int                      `json:"vmCount"`
+	VMs             []VMResourceRef          `json:"vms"`
+	Registered      bool                     `json:"registered"`
+	UsedIPs         []VMNetworkIPUsage       `json:"usedIPs"`
+	Error           string                   `json:"error"`
 }
 
 type VMResourceRef struct {
@@ -387,6 +401,7 @@ type VMInfo struct {
 }
 
 type VMDisk struct {
+	System        bool   `json:"system"`
 	Capacity      int64  `json:"capacity"`
 	Format        string `json:"format"`
 	ReadOnly      bool   `json:"readOnly"`

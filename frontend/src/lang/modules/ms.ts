@@ -75,6 +75,7 @@ const message = {
             enable: 'Aktifkan',
             disable: 'Nyahaktifkan',
             confirm: 'Sahkan',
+            autoFill: 'Isi automatik',
             check: 'Semak',
             submit: 'Hantar',
             cancel: 'Batal',
@@ -267,6 +268,8 @@ const message = {
             uninstallSuccess: 'Nyahpasang berjaya',
         },
         login: {
+            imageLoadError: 'Imej gagal dimuatkan',
+            imageLoadErrorHint: 'Punca yang mungkin: masalah rangkaian, imej tiada atau format tidak disokong.',
             username: 'Pengguna',
             password: 'Kata Laluan',
             passkey: 'Log masuk Passkey',
@@ -308,7 +311,7 @@ const message = {
             simplePassword:
                 'Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-30 aksara.',
             dbName: 'Ruangan ini tidak boleh bermula dengan aksara garis bawah ("_") dan mesti terdiri daripada aksara rumi, nombor, dan "_" dengan panjang 1-64 aksara.',
-            imageName: 'Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, nombor, :@/.-_, panjang 1-256',
+            imageName: "Menyokong bermula dengan bukan aksara khas, Bahasa Inggeris, nombor, :{'@'}/.-_, panjang 1-256",
             composeName:
                 'Menyokong aksara bukan khas pada permulaan, huruf kecil, nombor, "-", dan "_", dengan panjang 1-256 aksara.',
             volumeName:
@@ -371,6 +374,7 @@ const message = {
             serviceNotStarted: 'Perkhidmatan {0} belum dimulakan.',
         },
         status: {
+            autoSync: 'Penyegerakan automatik',
             autoSyncEnabled: 'Penyegerakan automatik diaktifkan',
             autoSyncDisabled: 'Penyegerakan automatik dinyahaktifkan',
             running: 'Sedang Berjalan',
@@ -628,6 +632,7 @@ const message = {
             'Port ini adalah port yang didedahkan oleh kontena. Anda perlu menyimpan pengubahsuaian secara berasingan dan memulakan semula kontena!',
         loadFromRemote: 'Selaras',
         userBind: 'Kaitkan pengguna',
+        connectionUser: 'Pengguna sambungan',
         userAuthorization: 'Kebenaran pengguna',
         noUserAuthorization: 'Jangan beri kebenaran',
         authorizedDatabaseCount: '{0} pangkalan data dibenarkan',
@@ -638,10 +643,13 @@ const message = {
         revokeAuthorization: 'Tarik balik kebenaran',
         revokeAuthorizationHelper: 'Tarik balik akses pengguna {0} kepada pangkalan data {1}?',
         supplementPassword: 'Tambah kata laluan',
-        supplementPasswordHelper: 'Hanya menyimpan kata laluan sedia ada ke 1Panel dan tidak mengubahnya dalam MySQL.',
+        supplementPasswordHelper:
+            'Hanya menyimpan kata laluan sedia ada dalam 1Panel tanpa menukar kata laluan pengguna pangkalan data.',
         noUserBind: 'Tiada kaitan',
-        pgBindHelper:
-            'Operasi ini digunakan untuk mencipta pengguna baharu dan mengaitkannya dengan pangkalan data sasaran. Pada masa ini, memilih pengguna yang sudah wujud dalam pangkalan data tidak disokong.',
+        pgAuthorizationHelper:
+            'Pengguna super boleh mengakses semua pangkalan data dalam tika ini tanpa pautan. Pengguna biasa hanya mengurus kebenaran pangkalan data, bukan kebenaran jadual.',
+        pgRevokeAuthorizationHelper:
+            'Pembatalan kebenaran tidak memadamkan pengguna. Akses melalui PUBLIC atau peranan lain mungkin kekal.',
         pgSuperUser: 'Pengguna Super',
         loadFromRemoteHelper:
             'Ini akan menyelaraskan pangkalan data, pengguna dan kebenaran dari pelayan ke 1Panel. Teruskan?',
@@ -886,7 +894,6 @@ const message = {
                 'Nama pengguna: huruf, nombor, titik, garis bawah atau sempang. Kata laluan: sekurang-kurangnya 12 aksara, tanpa ruang di awal/akhir atau baris baharu.',
             octopAuthHelper:
                 'Kata laluan: sekurang-kurangnya 8 aksara dengan huruf dan nombor; elakkan kata laluan lazim. Jika ditolak, semak arahan persediaan dalam log aplikasi.',
-            initialCredentials: 'Maklumat log masuk awal; gunakan kata laluan semasa jika telah diubah dalam aplikasi.',
             nativeAgentAccessUnavailable:
                 'Pemasangan sedia ada tiada alamat atau port HTTPS yang serasi. Semak tetapan aplikasi.',
             agent: 'Agen',
@@ -1130,6 +1137,34 @@ const message = {
             validateImageAvailabilityHelper: 'Menjana satu imej minimum sebelum menyimpan dan mungkin dikenakan caj',
         },
         model: {
+            poolEditHelp: 'Dapatkan model dalam talian atau tambah secara manual. Semua model boleh disunting.',
+            poolUnavailable:
+                'Jenis pembekal dan API ini tidak menyokong pengambilan dalam talian. Tambah ID model secara manual.',
+            poolEmpty: 'Tiada model. Dapatkan dalam talian atau tambah secara manual.',
+            poolOverwrite:
+                'Pengambilan yang berjaya akan menggantikan seluruh senarai, termasuk tambahan dan suntingan manual. Teruskan?',
+            poolFetchEmpty: 'Tiada model diterima. Senarai dikekalkan. Cuba lagi atau tambah secara manual.',
+            poolFetchFailed:
+                'Pengambilan gagal. Senarai dikekalkan. Semak URL, kunci API dan rangkaian atau sunting secara manual.',
+            poolSaveHelp: 'Perubahan berkuat kuasa selepas disimpan. Model yang sedang digunakan tidak boleh dibuang.',
+
+            accountType: 'Jenis akaun',
+            accountTypes: {
+                default: 'Lalai',
+                payAsYouGo: 'Bayar mengikut penggunaan',
+                chinaApi: 'API China',
+                globalApi: 'API global',
+                chinaCodingPlan: 'Coding Plan China',
+                globalCodingPlan: 'Coding Plan global',
+                chinaTokenPlan: 'Token Plan China',
+                globalTokenPlan: 'Token Plan global',
+                speech: 'Perkhidmatan suara',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Semak dan dapatkan',
             externalHealthPassed: 'Semakan kesihatan berjaya',
             externalHealthFailed: 'Semakan kesihatan gagal',
@@ -1285,6 +1320,7 @@ const message = {
                 'Borang telah berubah. Penjanaan semula Compose akan menimpa suntingan manual. Teruskan?',
             deploymentNameHelper:
                 'Nama instans aplikasi, digunakan untuk direktori pemasangan dan tidak boleh diubah selepas penciptaan. Tetapkan alias untuk mengubah nama paparan.',
+            deploymentAlias: 'Alias instans',
             deploymentAliasHelper:
                 'Alias pilihan untuk paparan senarai. Biarkan kosong untuk menggunakan nama instans. Menukar alias tidak memulakan semula perkhidmatan.',
             deploymentContainerNameHelper:
@@ -1343,7 +1379,12 @@ const message = {
             container_conn_helper: 'Gunakan alamat ini untuk akses atau sambungan antara kontena',
             from_remote: 'Model ini tidak dimuat turun melalui 1Panel; tiada log muat turun berkaitan.',
             no_logs: 'Log muat turun model ini telah dipadam dan tidak boleh dilihat.',
+            composeFile: 'Fail Susunan',
+            imageCategory: 'Jenis imej',
+            standardImage: 'Imej standard',
+            customImage: 'Imej tersuai',
             vllmVersionHelper: {
+                qwen38: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'Versi standard rasmi Ascend untuk peranti siri Ascend A2.',
                 ascendA3: 'Versi rasmi Ascend A3 untuk peranti siri Ascend A3.',
                 ascendA5: 'Versi rasmi Ascend A5 untuk peranti 950DT.',
@@ -1353,10 +1394,8 @@ const message = {
                 rtxPro5000:
                     'Versi tersuai untuk NVIDIA RTX Pro 5000, dioptimumkan untuk DeepSeek-V4.1-Flash-1017. Imej diselenggara oleh 1Panel.',
                 dspark: 'Versi tersuai untuk dua peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4-Flash. Imej diselenggara oleh 1Panel.',
+                dspark4: 'Versi tersuai untuk empat peranti NVIDIA GB10, dioptimumkan untuk DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'Model penggunaan',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Segerakkan ke perkhidmatan model',
             modelAccountAddressHelper:
                 'Alamat kontena sesuai untuk kontena agen; 127.0.0.1, IP sistem, atau alamat tersuai sesuai untuk AI Gateway atau perkhidmatan luaran.',
@@ -1365,6 +1404,12 @@ const message = {
             downloader: 'Muat turun model',
             modelDirectoryHelper:
                 'Secara lalai, senarai model memaparkan model yang dimuat turun dalam direktori yang dikonfigurasi di Persediaan Model > Tetapan.',
+            vllmGB10Qwen38ModelHelper:
+                'Hanya model Qwen3.8-Flash-Next-NVFP4 disokong. Kedua-dua peranti memerlukan model lengkap pada laluan yang sama.',
+            vllmGB10DualNodeModelHelper:
+                'Hanya DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp disokong. Kedua-dua peranti memerlukan model lengkap pada laluan yang sama.',
+            vllmGB10FourNodeModelHelper:
+                'Hanya DeepSeek-V4.1-Flash disokong. Keempat-empat peranti memerlukan model lengkap pada laluan yang sama.',
             modelDirectoryPlaceholder: 'Cari model atau masukkan laluan penuh',
             selectModel: 'Pilih model',
             selectModelDirectory: 'Pilih direktori',
@@ -2467,14 +2512,11 @@ const message = {
         imageMissing: 'Imej yang diperlukan tidak ditemui. Tarik {image} dalam pengurusan imej.',
         imageReady: 'Imej Benchmark sedia untuk mencipta ujian.',
         imageHelp:
-            'Imej Benchmark menjalankan klien ujian beban dan menghantar permintaan ke perkhidmatan model yang dipilih.',
+            'Sistem menggunakan imej ini untuk mencipta bekas berasingan yang menjalankan ujian penanda aras dengan menghantar permintaan ujian kepada perkhidmatan model yang dipilih.',
         mainNodeHelp: 'Penanda aras dijalankan pada nod utama. Sediakan imej dan tokenizer pada nod tersebut.',
         goImages: 'Ke pengurusan imej',
         goModels: 'Ke muat turun model',
-        tokenizerHelp: 'Pilih tokenizer daripada direktori tokenizer untuk mengekod teks ujian dan mengira token.',
-        tokenizerEmpty:
-            'Tiada model tersedia. Muat turun model yang mengandungi fail tokenizer di halaman muat turun model.',
-        tokenizerEmptyWithDownload: 'Tiada tokenizer tersedia. Buka {download} untuk memuat turun.',
+        tokenizerHelp: 'Pilih tokenizer atau model pada nod utama untuk mengekod teks ujian dan mengira token.',
         tokenizerInvalid: 'Tokenizer ini tidak tersedia. Pilih yang lain atau muat turun semula.',
         schemeHelp:
             'Skema ujian menentukan parameter permintaan, keserentakan dan peraturan pelaksanaan. Sediakan sekurang-kurangnya satu skema yang tersedia.',
@@ -2554,6 +2596,10 @@ const message = {
         missing: 'Tiada',
     },
     container: {
+        logDisconnected:
+            'Sambungan strim log telah terputus. Sambung semula untuk memuatkan log terkini dan meneruskan penstriman.',
+        logsUnavailable:
+            'Kontena tidak wujud atau telah dipadamkan. Log kontena tidak tersedia. Cipta semula kontena dan cuba lagi.',
         nvidiaSupport: 'Sokongan GPU NVIDIA',
         nvidiaHelper:
             'Daftarkan runtime kontena NVIDIA. Pasang NVIDIA Container Toolkit dahulu. Peruntukkan GPU kepada setiap kontena secara berasingan.',
@@ -2913,6 +2959,9 @@ const message = {
         goSetting: 'Pergi ke tetapan',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Pilihan “Semua” dalam kumpulan mengikuti perubahan ahli kumpulan; laman web yang dipilih secara individu disimpan sebagai senarai tetap.',
+        websiteSelectionMissing: 'Pilihan tidak tersedia',
         importHelper:
             'Tugas terjadual dengan nama sama akan dilangkau secara automatik semasa import. Tugas akan ditetapkan ke status 【Lumpuh】 secara lalai, dan ditetapkan ke status 【Menunggu Edit】 apabila perkaitan data tidak normal.',
         changeStatus: 'Tukar status',
@@ -3021,6 +3070,11 @@ const message = {
         cleanDataHelper: 'Padam fail sandaran yang dijana semasa tugas ini.',
         noLogs: 'Tiada keluaran tugas lagi...',
         errPath: 'Laluan sandaran [{0}] salah, tidak boleh dimuat turun!',
+        websiteStartStop: 'Mula/hentikan laman web',
+        startTime: 'Masa mula',
+        stopTime: 'Masa henti',
+        websiteTimeHint: 'Peringatan: dijalankan sekali sehari',
+        websiteTimeInvalid: 'Pilih masa mula dan masa henti; masa mula mesti lebih awal daripada masa henti',
         cutWebsiteLog: 'Putaran log laman web',
         cutWebsiteLogHelper: 'Fail log yang diputar akan disandarkan ke direktori sandaran 1Panel.',
         syncIpGroup: 'Segerakkan kumpulan IP WAF',
@@ -3029,6 +3083,15 @@ const message = {
         unitHours: 'Unit: Jam',
         alertTitle: 'Tugas Terancang - {0} 「{1}」 Amaran Kegagalan Tugas',
         library: {
+            executeScript: 'Jalankan skrip',
+            targetNodes: 'Pilih nod sasaran',
+            switchNodeHelper:
+                'Menukar nod tidak menghentikan pelaksanaan. Taip terus dalam terminal; input hanya dihantar ke nod yang dipilih.',
+            executorCloseHelper:
+                'Menutup akan memutuskan semua terminal nod dan mungkin mengganggu skrip yang sedang berjalan. Teruskan?',
+            connecting: 'Sedang menyambung',
+            connected: 'Disambungkan',
+            disconnected: 'Terputus',
             script: 'Skrip',
             syncNow: 'Segerakan Sekarang',
             autoSyncHelper:
@@ -3154,6 +3217,10 @@ const message = {
             'Data selepas {0} masih gagal diambil selepas beberapa percubaan semula, jadi eksport dihentikan. Semak rangkaian atau kecilkan julat masa dan cuba lagi.',
     },
     terminal: {
+        passwordless: 'Tanpa kata laluan',
+        bootstrapAuth: 'Pengesahan awal (pilihan)',
+        passwordlessSetupHelper: 'Ujian sambungan mengkonfigurasi dan mengesahkan akses tanpa kata laluan.',
+
         showTerminalButton: 'Pintasan Terminal',
         showTerminalButtonHelper:
             'Apabila diaktifkan, butang pintasan terminal akan dipaparkan di sudut kanan bawah halaman.',
@@ -3304,6 +3371,15 @@ const message = {
             syncSiteHelper: 'Gunakan {0} untuk penyegerakan masa sistem. Teruskan?',
         },
         fail2ban: {
+            mode: 'Mod pengesanan',
+            modeHelper:
+                'Pilih peristiwa sambungan SSH yang dikira sebagai kegagalan untuk menyekat IP. Memerlukan Fail2ban 0.10 atau lebih baharu.',
+            modeNormal:
+                'Lalai: kira log masuk yang gagal, seperti kata laluan salah atau nama pengguna yang tidak wujud.',
+            modeDdos: 'Turut mengira sambungan yang tamat masa atau terputus sebelum log masuk.',
+            modeExtra: 'Turut mengira kegagalan akibat kaedah sambungan yang tidak disokong pelayan.',
+            modeAggressive:
+                'Mengira semua perkara di atas. Lebih ketat, tetapi lebih berkemungkinan menyekat pengguna yang sah.',
             sshPort: 'Dengar pada port SSH',
             sshPortHelper: 'Fail2ban semasa mendengar pada port sambungan SSH hos',
             unActive: 'Perkhidmatan Fail2ban tidak diaktifkan pada masa ini.',
@@ -3571,6 +3647,10 @@ const message = {
         compressSuccess: 'Berjaya dimampatkan',
         deCompressSuccess: 'Berjaya dinyahmampatkan',
         deCompressDst: 'Laluan nyahmampatan',
+        decompressConflictPolicy: 'Fail sedia ada',
+        keepExisting: 'Kekalkan fail sedia ada',
+        decompressConflictHelper:
+            'Mengekalkan fail sedia ada akan melangkau entri yang bercanggah. Direktori dengan nama yang sama masih digabungkan.',
         linkType: 'Jenis pautan',
         softLink: 'Pautan lembut',
         hardLink: 'Pautan keras',
@@ -4656,6 +4736,18 @@ const message = {
         isEdirWarn: 'Perubahan pada fail docker-compose.yml telah dikesan. Sila semak perbezaannya.',
     },
     website: {
+        batchPHP: 'Tukar versi PHP',
+        batchPHPHelper:
+            'Hanya laman PHP akan diubah. Laman lain akan dilangkau. Persekitaran PHP setempat tidak disokong.',
+        batchPHPCount: 'Laman dipilih: {0}; laman PHP: {1}; lain-lain: {2}.',
+        notPHP: 'Bukan laman PHP',
+        localPHP: 'Persekitaran PHP setempat tidak disokong',
+        samePHP: 'Sudah menggunakan persekitaran PHP sasaran',
+        batchPHPResult: 'Keputusan',
+        batchPHPStatus_success: 'Berjaya',
+        batchPHPStatus_failed: 'Gagal',
+        batchPHPStatus_skipped: 'Dilangkau',
+        sslDomainMismatchWebsite: 'Domain sijil tidak sepadan dengan domain laman web',
         primaryDomain: 'Domain Utama',
         otherDomains: 'Domain Lain',
         static: 'Statik',
@@ -4780,6 +4872,10 @@ const message = {
         privateKey: 'Kunci (KEY)',
         certificate: 'Sijil (format PEM)',
         HTTPConfig: 'Pilihan HTTP',
+        HTTPSRedirectPort: 'Port ubah hala HTTPS',
+        HTTPSRedirectPortCustom: 'Tersuai',
+        HTTPSRedirectPortManualHelper:
+            'Peraturan ubah hala ini disunting secara manual atau tidak diurus, jadi tidak boleh diubah.',
         HTTPSOnly: 'Blok permintaan HTTP',
         HTTPToHTTPS: 'Alihkan ke HTTPS',
         HTTPAlso: 'Benarkan permintaan HTTP langsung',
@@ -4947,6 +5043,8 @@ const message = {
         batchInput: 'Input Kelompok',
         domainNotFQDN: 'Domain ini mungkin tidak boleh diakses di rangkaian awam',
         domainInvalid: 'Format domain tidak sah',
+        allowFirewall: 'Benarkan dalam tembok api',
+        allowFirewallHelp: 'Buka port TCP ini selepas laman dicipta untuk semua domain yang menggunakannya.',
         domainBatchHelper:
             'Satu domain per baris, format: domain:port@ssl\nContoh: example.com:443@ssl atau example.com',
         generateDomain: 'Hasilkan',
@@ -4978,6 +5076,9 @@ const message = {
         failTimeoutHelper:
             'Panjang tetingkap masa untuk pemeriksaan kesihatan pelayan. Apabila bilangan kegagalan terkumpul mencapai ambang dalam tempoh ini, pelayan akan dikeluarkan buat sementara waktu dan dicuba semula selepas tempoh yang sama. Lalai 10 saat',
         staticChangePHPHelper: 'Kini laman web statik, boleh ditukar ke laman web PHP.',
+        createDefaultIndex: 'Cipta fail lalai {0}',
+        createDefaultIndexHelper:
+            'Hanya dicipta apabila fail tidak wujud dalam direktori akar laman web, menggunakan tetapan halaman lalai',
         proxyCache: 'Cache Proksi Terbalik',
         cacheLimit: 'Had Ruang Cache',
         shareCache: 'Saiz Memori Kiraan Cache',
@@ -5110,6 +5211,8 @@ const message = {
         status: 'Status Semasa',
         configResource: 'Konfigurasi',
         saveAndReload: 'Simpan dan muat semula',
+        batchClearProxyCacheWarn:
+            'Kosongkan cache proksi terbalik untuk {0} laman web yang dipilih? Permintaan seterusnya untuk kandungan yang sebelum ini dicache akan dihantar ke pelayan asal.',
         clearProxyCache: 'Bersihkan cache proksi terbalik',
         clearProxyCacheWarn:
             'Semua laman web yang dikonfigurasi dengan cache akan terjejas dan "OpenResty" akan dimulakan semula. Adakah anda mahu meneruskan?',
@@ -5146,14 +5249,23 @@ const message = {
             'Skrip yang dilaksanakan sebelum penyusunan, biasanya untuk memuat turun sumber kod modul, memasang kebergantungan, dll.',
         buildHelper:
             'Modul dinamik dimuatkan melalui konfigurasi selepas dibina; modul statik tetap membina semula OpenResty.',
-        defaultHttps: 'Anti-usikan HTTPS',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Status anti-usikan',
         defaultHttpsHelper1: 'Mengaktifkan pilihan ini boleh menyelesaikan masalah usikan HTTPS.',
         sslRejectHandshake: 'Tolak jabat tangan SSL lalai',
         sslRejectHandshakeHelper:
             'Mengaktifkan ini boleh mengelakkan kebocoran sijil, menetapkan laman web lalai akan membatalkan tetapan ini',
+        httpsRedirectCustomPort: 'Guna ubah hala port tersuai',
+        httpsRedirectCustomPortHelper: 'Apabila didayakan, ubah hala HTTP ke HTTPS menggunakan port HTTPS tersuai.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Direktori penyegerakan',
+        syncDirHelp:
+            'Masukkan laluan mutlak direktori pada nod sasaran. Direktori yang sama digunakan pada semua nod sasaran.',
+        syncDirSingleCert: 'Pilih hanya satu sijil apabila menetapkan direktori untuk mengelakkan fail ditulis ganti.',
+        syncDirAbsolute: 'Direktori penyegerakan mestilah laluan mutlak.',
+
+        caUploadHelp: 'Muat naik fail ZIP yang dimuat turun yang mengandungi ca.crt dan ca.key (maksimum 10 MB).',
         deleteConfirm: 'Sijil berikut akan dipadamkan. Sijil ACME akan dibatalkan secara automatik. Teruskan?',
         deleteAndRevoke: 'Padam dan batalkan',
         create: 'Permintaan',
@@ -5486,6 +5598,10 @@ const message = {
         editRuleConfirm: 'Adakah anda pasti mahu mengubah peraturan ini?',
     },
     runtime: {
+        buildLog: 'Log binaan',
+        extensionInstallFailed: 'Sesetengah sambungan PHP gagal dipasang: {extensions}',
+        statusMessageUnavailable:
+            'Maklumat status terperinci tidak tersedia. Semak log persekitaran masa jalan untuk butiran lanjut.',
         importEnv: 'Import Pemboleh Ubah Persekitaran',
         envImportError: 'Baris {0}: {1}',
         envInvalidAssignment: 'Penetapan NAME=value yang sah diperlukan',
@@ -5668,6 +5784,83 @@ const message = {
         mount: 'Lekap',
         partitionAlert: 'Operasi ini memformat seluruh cakera. Pastikan data telah dibackup!',
         mountPoint: 'Titik lekap',
+    },
+    networkManage: {
+        routeDetails: 'Butiran laluan',
+        manageIP: 'Urus IP berkaitan',
+        connectedRoute: 'Dijana daripada IP',
+        connectedRouteHint:
+            'Sistem menjana laluan terus ini berdasarkan IP antara muka. Laluan ini tidak disunting secara berasingan. Sunting atau padam IP yang berkaitan dalam butiran antara muka.',
+        virtualBridgeReadOnly: 'Antara muka maya · Baca sahaja',
+        virtualBridgeReadOnlyHint:
+            'Antara muka maya ini adalah baca sahaja dan tidak disertakan dalam semakan kebolehcapaian.',
+        loopbackReadOnly: 'Konfigurasi antara muka gelung balik adalah baca sahaja.',
+        persistentSourceMissing:
+            'Tiada konfigurasi sistem kekal yang disokong ditemui untuk antara muka {0}. Ia adalah baca sahaja.',
+        addressReadOnlyReason:
+            'Alamat ini dinamik, bukan global atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        routeReadOnlyReason:
+            'Laluan ini dinamik, dijana kernel atau tiada konfigurasi kekal yang disokong. Ia adalah baca sahaja.',
+        persistenceBackend: 'Kaedah penyimpanan kekal',
+        editIP: 'Edit IP',
+        editRoute: 'Edit laluan',
+        operationRisk: 'Perubahan rangkaian boleh memutuskan sambungan. Sediakan cara alternatif untuk mengakses pelayan.',
+        confirmInterface: 'Masukkan nama antara muka {0} untuk mengesahkan.',
+        sourceAddress: 'Alamat sumber',
+        linkConnected: 'Pautan disambungkan',
+        linkDisconnected: 'Pautan terputus',
+        topologySearch: 'Cari antara muka, IP, get laluan atau destinasi',
+        topologyHint: 'Urus IP antara muka di sebelah kiri. Kad laluan menunjukkan destinasi, get laluan dan metrik. Klik kad untuk butiran; garisan tidak menandakan sambungan telah disahkan.',
+        direct: 'Terus',
+        defaultDestination: 'Laluan lalai',
+        unknownInterface: 'Antara muka tidak ditentukan',
+        noRoutes: 'Tiada laluan sepadan',
+        readOnly: 'Baca sahaja',
+        readOnlyRouteHint: 'Laluan dengan berbilang hop seterusnya atau tanpa antara muka tunggal adalah baca sahaja.',
+        title: 'Pengurusan Rangkaian',
+        interfaces: 'Antara Muka Rangkaian',
+        routes: 'Laluan',
+        addIP: 'Tambah IP',
+        ipCount: 'Bilangan IP',
+        interfaceID: 'ID antara muka',
+        adminState: 'Status pentadbiran',
+        linkState: 'Status pautan',
+        mac: 'Alamat MAC',
+        flags: 'Bendera',
+        address: 'Alamat',
+        scope: 'Skop',
+        interface: 'Antara muka',
+        configStatus: 'Status tetapan',
+        managedApplied: 'Disimpan · Aktif',
+        managedPending: 'Disimpan · Tidak aktif',
+        addressWarning:
+            'Gunakan IP yang diperuntukkan kepada antara muka ini. Jika IP awam dipetakan melalui NAT, masukkan IP persendirian.',
+        addressRisk:
+            'IP yang sedang digunakan atau panjang awalan yang salah boleh memutuskan akses ke panel atau SSH.',
+        interfaceSelectHint:
+            'Hanya antara muka dengan konfigurasi kekal yang boleh diedit disenaraikan. Antara muka gelung balik, jambatan maya baca sahaja dan antara muka lain yang tidak boleh diubah tidak disenaraikan.',
+        gatewayHint: 'Biarkan get laluan kosong untuk subnet yang disambungkan secara langsung.',
+        metricHint:
+            'Untuk subnet destinasi yang sama, laluan dengan metrik lebih rendah biasanya diutamakan.',
+        defaultRouteWarning:
+            'Laluan lalai boleh menukar laluan keluar panel, SSH dan perkhidmatan lain. Sediakan akses alternatif seperti konsol awan.',
+        interfaceMissing: 'Antara muka tiada',
+        changeWarning:
+            'Menukar tetapan rangkaian mungkin memutuskan sambungan panel atau mengganggu perkhidmatan. Pastikan anda mempunyai cara lain untuk mengakses pelayan ini sebelum meneruskan.',
+        addressWithPrefix: 'Alamat IP / panjang awalan',
+        cidrHint:
+            'Dalam 192.0.2.10/24, /24 bersamaan dengan topeng subnet 255.255.255.0. Contoh IPv6: 2001:db8::10/64.',
+        addRoute: 'Tambah laluan',
+        checkRoutes: 'Semak kebolehcapaian laluan',
+        destination: 'Destinasi',
+        metric: 'Metrik',
+        routeTable: 'Jadual penghalaan',
+        reachability: 'Kebolehcapaian',
+        reachable: 'Boleh dicapai',
+        unreachable: 'Tidak boleh dicapai',
+        unchecked: 'Belum disemak',
+        check: 'Semak',
+        destinationHint: 'Menyokong alamat IPv4/IPv6 atau rangkaian CIDR. Laluan lalai: default, 0.0.0.0/0 atau ::/0.',
     },
     xpack: {
         ldap: {
@@ -7802,6 +7995,13 @@ const message = {
             appUpgradeHelper: 'Terdapat {0} apl yang perlu dinaik taraf',
             dashboardSetting: 'Tetapan Gambaran Keseluruhan',
             keepOneDashboardComponent: 'Kekalkan sekurang-kurangnya satu bahagian gambaran keseluruhan',
+            currentNode: 'Nod semasa',
+            quickSwitch: 'Tukar pantas',
+            allNodes: 'Semua nod',
+            nodeSearchPlaceholder: 'Cari nama atau alamat nod',
+            currentNodeNotInResults: 'Nod semasa tiada dalam hasil halaman ini',
+            upgradableApps: 'Apl boleh dinaik taraf',
+            quickSwitchMore: 'Lihat semua nod yang sepadan',
         },
         customApp: {
             name: 'Repositori Aplikasi Khusus',
@@ -8131,6 +8331,31 @@ const message = {
             menu: 'Penyegerakan Sumber',
             file: 'Pemindahan Fail',
             fileSyncConfirm: 'Pindahkan fail/folder {1} dari nod {0} ke direktori {3} pada nod {2}?',
+            fileBatchDesc: 'Pilih fail atau folder daripada mana-mana nod dan edarkannya ke beberapa nod sasaran.',
+            fileSourceTitle: 'Pilih fail sumber',
+            fileSourceNode: 'Nod sumber',
+            fileTargetDirectory: 'Direktori sasaran',
+            fileBatchPath: 'Tetapkan direktori sasaran secara pukal',
+            fileApplyPath: 'Gunakan pada nod yang dipilih',
+            fileSelectedCount: '{0} item dipilih',
+            fileSelectedTargets: '{0} nod dipilih',
+            fileSelectionHint: 'Folder disalin sepenuhnya dengan nama asal dan struktur direktori dalaman dikekalkan.',
+            fileRules:
+                'Peraturan pemindahan fail sedia ada digunakan: fail dengan nama yang sama mungkin dikemas kini dan fail lain dalam direktori sasaran dikekalkan.',
+            fileBatchSummary: 'Edarkan {0} item ke {1} nod sasaran',
+            fileTaskHint: 'Selepas pengesahan, tugas pengedaran akan dicipta dan boleh dilihat dalam pengurusan tugas.',
+            fileBatchConfirm:
+                'Semak nod sasaran dan laluan simpanan di bawah. Fail dengan nama yang sama mungkin ditulis ganti.',
+            fileTargetHint:
+                'Direktori boleh ditetapkan secara berasingan bagi setiap nod. Nod luar talian, gagal semakan atau tanpa rsync tidak boleh dipilih.',
+            fileChecking: 'Sedang menyemak',
+            fileCheckFailed: 'Semakan gagal',
+            fileRsyncMissing: 'rsync tidak dipasang',
+            filePathRequired: 'Masukkan laluan mutlak direktori sasaran yang bermula dengan /.',
+            fileConflictHint:
+                'Sumber ini berkongsi nama destinasi. Tinggalkan satu sumber bagi setiap nama. Nyahpilihan digunakan pada semua nod sasaran.',
+            fileDeselect: 'Nyahpilih',
+            fileSourceChanged: 'Nod sumber telah ditukar. Sila pilih fail semula.',
 
             image: 'Pemindahan Imej',
             imageBatchDesc:
@@ -8314,6 +8539,11 @@ const message = {
             createFromTemplate: 'Cipta daripada templat',
             template: 'Templat',
             templateName: 'Nama templat',
+            dataDisks: 'Cakera data',
+            dataDiskHelper:
+                'Cakera data dicipta kosong. Pilih kumpulan storan bagi setiap cakera; jenis bas adalah sama dengan cakera sistem. Sehingga 9 cakera boleh ditambah.',
+            templateSystemDiskHelper:
+                'Templat hanya menyalin cakera sistem tanpa kandungan cakera data. Cakera data kosong boleh ditambah semasa mencipta VM daripada templat. Semak pelekap /etc/fstab serta laluan pangkalan data dan aplikasi yang bergantung pada cakera data. UUID cakera baharu mungkin berbeza; panel tidak mengubah konfigurasi tetamu secara automatik.',
             convertToTemplate: 'Tukar kepada templat',
             sourceVM: 'VM sumber',
             templateSize: 'Saiz templat',
@@ -8430,7 +8660,7 @@ const message = {
             currentSnapshot: 'Semasa',
             snapshotEmpty: 'Tiada syot kilat',
             snapshotHelper:
-                'Syot kilat menyimpan keadaan semasa VM sebagai titik pemulihan. Perubahan data seterusnya direkodkan dalam fail delta tanpa mengubah cakera asal. Memulihkan syot kilat mengembalikan VM ke keadaan tersebut.',
+                'Petikan menyimpan dan memulihkan semua cakera terurus yang boleh ditulis bersama-sama, tanpa memori. Matikan VM sebelum pemulihan; set cakera mesti sepadan dengan petikan. Cakera boleh tulis yang dikongsi atau tidak disokong menghalang penciptaan petikan.',
             snapshotOperationHelper:
                 'Syot kilat semasa tidak boleh dipadam. Syot kilat hanya boleh dipulihkan apabila mesin maya dimatikan.',
             snapshotRecoverConfirm:
@@ -8467,13 +8697,86 @@ const message = {
             cluster: 'Aplikasi Tinggi Ketersediaan',
             name: 'Nama Kluster',
             addCluster: 'Tambah Kluster',
-            installNode: 'Pasang Node',
-            master: 'Node Utama',
-            slave: 'Node Hamba',
-            replicaStatus: 'Utama-Hamba Status',
             unhealthyDeleteError: 'Status nod pemasangan tidak normal, sila periksa senarai nod dan cuba lagi!',
-            replicaStatusError: 'Pengambilan status tidak normal, sila periksa nod utama.',
-            masterHostError: 'IP nod utama tidak boleh 127.0.0.1',
+            noAvailableMasterVersion: 'Tiada templat utama yang tersedia pada nod ini.',
+            backups: 'Sandaran kluster',
+            importBackup: 'Import sandaran',
+            archivePassphrase: 'Frasa laluan sandaran',
+            restoreToNew: 'Pulihkan ke kluster baharu',
+            restoreTarget: 'Destinasi pemulihan',
+            restoreToOriginal: 'Pulihkan ke kluster asal',
+            restoreOriginalUnavailable: 'Tiada kluster asal yang layak untuk sandaran ini.',
+            restoreOriginalWarning:
+                'Sambungan pangkalan data akan terputus. Kluster asal akan kembali ke keadaan semasa sandaran dan replika akan disegerakkan semula.',
+            restoreOriginalConfirm: 'Masukkan nama kluster {0} untuk mengesahkan penimpaan.',
+            restoreCredentials: 'Gunakan kelayakan pentadbir dan replikasi daripada sandaran.',
+            archiveImportHint:
+                'Hanya fail sandaran kluster .1pha disokong. Gunakan frasa laluan yang ditetapkan semasa sandaran dibuat.',
+            backupDataSize: 'Saiz Data',
+            appStoreOnly: 'Pasang dan naik taraf aplikasi ini di Ketersediaan Tinggi Aplikasi.',
+            noMatchingReplicaVersion: 'Nod ini tidak mempunyai templat replika yang sepadan dengan versi nod utama.',
+            installNode: 'Pelayan penggunaan',
+            master: 'Pangkalan data utama',
+            slave: 'Pangkalan data replika',
+            redisMaster: 'Tika utama',
+            redisReplica: 'Replika',
+            replicaStatus: 'Butiran replikasi',
+            replicaStatusError: 'Status replikasi tidak dapat dibaca',
+            masterHostError: 'Alamat utama tidak boleh berupa 127.0.0.1',
+            emptyTitle: 'Tiada kluster {0} yang dikonfigurasi',
+            emptyDescription:
+                'Dalam “{2}”, pilih pelayan penempatan dan versi untuk mencipta {0}. Selepas penempatan selesai, anda boleh menambah {1} dengan versi yang sama serta menyemak status replikasi, parameter tika dan log.',
+            loadFailed: 'Kluster gagal dimuatkan',
+            refreshFailed: 'Gagal menyegarkan. Data dari {0} dipaparkan.',
+            addReplica: 'Tambah {0}',
+            masterUnavailable: 'Tika utama tidak tersedia. Semak pelayan penggunaannya.',
+            replication: 'Replikasi',
+            replicationStatus: 'Status replikasi',
+            configuredReplicas: '{0} {1} dikonfigurasi',
+            addReplicaPending: 'Menunggu penambahan {0}',
+            checkedAt: 'Disemak pada {0}',
+            roleParameters: 'Parameter {0}',
+            parametersFailed: 'Parameter tika gagal dibaca',
+            instanceParameters: 'Parameter tika',
+            replicationParameters: 'Tetapan replikasi data',
+            replicationUserHelp:
+                'Pangkalan data replika menggunakan akaun ini untuk menyambung ke pangkalan data utama dan menyegerakkan data.',
+            replicationPasswordHelp:
+                'Mengesahkan pengguna replikasi. Apabila menambah pangkalan data replika, gunakan kata laluan yang ditetapkan untuk akaun ini pada pangkalan data utama.',
+            configureRole: 'Konfigurasi {0}',
+            sameHost: 'Kedua-dua tika berada pada pelayan yang sama. Kegagalan pelayan menjejaskan kedua-duanya.',
+            versionLocked: 'Sama dengan versi utama semasa.',
+            unset: 'Belum ditetapkan',
+            noParameters: 'Tiada parameter untuk dipaparkan',
+            lagSeconds: 'Kelewatan replikasi (saat)',
+            offsetBytes: 'Ofset replikasi (bait)',
+            taskQueued: 'Tugas diterima',
+            removeRecord: 'Padam Rekod',
+            removeClusterRecordNotice: 'Tindakan ini akan memadamkan rekod kluster.',
+            removeMemberRecordNotice: 'Tindakan ini akan memadamkan rekod ahli kluster.',
+            taskAwaitingConfirmation: 'Menunggu pengesahan pelayan',
+            taskConfirmationNotice:
+                'Menunggu {0} mengesahkan tugas. Selepas tugas didaftarkan, semak di Pusat Tugas pelayan tersebut atau pada Log dalam kad.',
+            taskRecordUnavailable:
+                'Rekod tugas tidak dapat diperoleh. Semak hasil penghantaran dan keadaan pelayan penempatan.',
+            taskRunning: 'Tugas sedang berjalan',
+            taskFailed: 'Operasi gagal. Semak log tugas.',
+            parameters: 'Parameter',
+            primaryMissing: 'Rekod tika utama tidak ditemui.',
+            replicaSourceAddress: 'Alamat {0}',
+            replicaSourcePort: 'Port {0}',
+            replicaSourceAddressHelp:
+                'Masukkan alamat IP atau nama domain yang boleh dicapai daripada pelayan pilihan.',
+            replicationState: {
+                pending: 'Menunggu semakan',
+                waitingForInstance: 'Menunggu tika sedia',
+                healthy: 'Sihat',
+                syncing: 'Menyegerakkan',
+                lagging: 'Tertinggal',
+                disconnected: 'Terputus',
+                unknown: 'Tidak diketahui',
+                unavailable: 'Tidak tersedia',
+            },
         },
     },
     template: {

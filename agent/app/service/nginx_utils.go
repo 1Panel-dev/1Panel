@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path"
@@ -272,8 +273,13 @@ func deleteNginxConfig(scope string, params []dto.NginxParam, website *model.Web
 		block = config.Config.Block
 	}
 
+	server, isServer := block.(*components.Server)
+	wasStopped := isServer && server.HasStopPage()
 	for _, param := range params {
 		block.RemoveDirective(param.Name, param.Params)
+	}
+	if wasStopped {
+		server.EnableStopPage()
 	}
 
 	if err := nginx.WriteConfig(config.Config, nginx.IndentedStyle); err != nil {
@@ -326,7 +332,11 @@ func getNginxParamsFromStaticFile(scope dto.NginxKey, newParams []dto.NginxParam
 }
 
 func opNginx(containerName, operate string) error {
-	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20 * time.Second))
+	return opNginxContext(context.Background(), containerName, operate)
+}
+
+func opNginxContext(ctx context.Context, containerName, operate string) error {
+	cmdMgr := cmd.NewCommandMgr(cmd.WithTimeout(20*time.Second), cmd.WithContext(ctx))
 	if operate == constant.NginxCheck {
 		return cmdMgr.Run("docker", "exec", "-i", containerName, "nginx", "-t")
 	}
@@ -334,11 +344,15 @@ func opNginx(containerName, operate string) error {
 }
 
 func nginxCheckAndReload(oldContent string, filePath string, containerName string) error {
-	if err := opNginx(containerName, constant.NginxCheck); err != nil {
+	return nginxCheckAndReloadContext(context.Background(), oldContent, filePath, containerName)
+}
+
+func nginxCheckAndReloadContext(ctx context.Context, oldContent string, filePath string, containerName string) error {
+	if err := opNginxContext(ctx, containerName, constant.NginxCheck); err != nil {
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), constant.DirPerm)
 		return err
 	}
-	if err := opNginx(containerName, constant.NginxReload); err != nil {
+	if err := opNginxContext(ctx, containerName, constant.NginxReload); err != nil {
 		_ = files.NewFileOp().WriteFile(filePath, strings.NewReader(oldContent), constant.DirPerm)
 		return err
 	}

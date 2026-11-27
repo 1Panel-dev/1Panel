@@ -108,7 +108,16 @@ func WithByAPIType(apiType string) DBOption {
 
 func WithTextAPIType() DBOption {
 	return func(g *gorm.DB) *gorm.DB {
-		return g.Where("api_type NOT LIKE ? AND api_type <> ?", "%-images", "openai-embeddings")
+		return g.Where("api_type IN ?", []string{"", "openai-completions", "openai-responses", "anthropic-messages", "gemini-generate-content"})
+	}
+}
+
+func WithExcludeCodingPlanProviders(providers []string) DBOption {
+	return func(g *gorm.DB) *gorm.DB {
+		if len(providers) == 0 {
+			return g
+		}
+		return g.Where("(provider NOT IN ? OR account_type IS NULL OR account_type <> ?)", providers, "codingPlan")
 	}
 }
 

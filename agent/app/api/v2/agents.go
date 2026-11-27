@@ -562,7 +562,7 @@ func (b *BaseApi) CreateAgentAccountModel(c *gin.Context) {
 }
 
 // @Tags AI
-// @Summary Update model service model
+// @Summary Update model service models
 // @Accept json
 // @Param request body dto.AgentAccountModelUpdateReq true "request"
 // @Success 200

@@ -52,6 +52,7 @@ export namespace AI {
     export type AgentType = 'openclaw' | 'copaw' | 'hermes-agent' | 'deepseek-harness' | 'octop';
 
     export interface OllamaModelInfo {
+        description: string;
         id: number;
         name: string;
         size: string;
@@ -678,10 +679,13 @@ export namespace AI {
     }
 
     export interface AgentAccountModelDiscoverReq {
-        provider: string;
-        baseURL: string;
-        apiKey: string;
-        apiType: string;
+        accountId?: number;
+        accountType?: string;
+        provider?: string;
+        baseURL?: string;
+        apiKey?: string;
+        apiType?: string;
+        authMode?: string;
     }
 
     export interface AgentAccountModelCreateReq {
@@ -692,7 +696,8 @@ export namespace AI {
 
     export interface AgentAccountModelUpdateReq {
         accountId: number;
-        model: AgentAccountModel;
+        models: AgentAccountModel[];
+        verifyModel: string;
     }
 
     export interface AgentAccountModelDeleteReq {
@@ -716,7 +721,13 @@ export namespace AI {
         models: ProviderModelInfo[];
     }
 
+    export interface ProviderAccountType {
+        key: string;
+        apiTypes: ProviderAPIInfo[];
+    }
+
     export interface ProviderInfo {
+        accountTypes: ProviderAccountType[];
         provider: string;
         displayName: string;
         baseUrl: string;
@@ -726,6 +737,7 @@ export namespace AI {
     }
 
     export interface AgentAccountCreateReq {
+        accountType?: string;
         provider: string;
         name: string;
         apiKey: string;
@@ -740,6 +752,7 @@ export namespace AI {
     }
 
     export interface AgentAccountUpdateReq {
+        accountType?: string;
         id: number;
         name: string;
         apiKey: string;
@@ -755,6 +768,7 @@ export namespace AI {
     }
 
     export interface AgentAccountSearch {
+        excludeCodingPlanProviders?: string[];
         page: number;
         pageSize: number;
         provider: string;
@@ -764,10 +778,12 @@ export namespace AI {
     }
 
     export interface AgentAccountProviderCountReq {
+        excludeCodingPlanProviders?: string[];
         providers: string[];
     }
 
     export interface AgentAccountItem {
+        accountType?: string;
         appInstallId?: number;
         id: number;
         provider: string;
@@ -780,7 +796,7 @@ export namespace AI {
         apiType: string;
         authMode: string;
         verifyModel: string;
-        verified: boolean;
+        status: string;
         validateAvailability: boolean;
         verifiedAt?: string | null;
         verifyError?: string;

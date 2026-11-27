@@ -10,6 +10,7 @@ export const cronjobAlertTypes = [
     'snapshot',
     'curl',
     'cutWebsiteLog',
+    'websiteStartStop',
     'clean',
     'ntp',
     'syncIpGroup',

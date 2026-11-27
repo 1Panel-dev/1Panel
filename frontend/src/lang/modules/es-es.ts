@@ -77,6 +77,7 @@ const message = {
             enable: 'Habilitar',
             disable: 'Deshabilitar',
             confirm: 'Confirmar',
+            autoFill: 'Autocompletar',
             check: 'Comprobar',
             submit: 'Enviar',
             cancel: 'Cancelar',
@@ -263,6 +264,9 @@ const message = {
             restoreSuccess: 'Restauración completada',
         },
         login: {
+            imageLoadError: 'No se pudo cargar la imagen',
+            imageLoadErrorHint:
+                'Posibles causas: un problema de red, una imagen inexistente o un formato no compatible.',
             username: 'Usuario',
             password: 'Contraseña',
             passkey: 'Inicio de sesión con Passkey',
@@ -304,8 +308,7 @@ const message = {
             simplePassword:
                 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 30.',
             dbName: 'Este campo no debe comenzar con el carácter "_" y debe estar compuesto por letras, números y "_" con una longitud de 1 a 64.',
-            imageName:
-                'Este campo debe estar compuesto por letras, números, ":", "@", "/", ".", "-", y "_" con una longitud de 1 a 256.',
+            imageName: `Este campo debe estar compuesto por letras, números, ":", "{'@'}", "/", ".", "-", y "_" con una longitud de 1 a 256.`,
             volumeName:
                 'Este campo debe estar compuesto por letras, números, ".", "-", y "_" con una longitud de 2 a 30.',
             supervisorName:
@@ -366,6 +369,7 @@ const message = {
             serviceNotStarted: 'El servicio {0} no está iniciado.',
         },
         status: {
+            autoSync: 'Sincronización automática',
             autoSyncEnabled: 'Sincronización automática activada',
             autoSyncDisabled: 'Sincronización automática desactivada',
             running: 'En ejecución',
@@ -624,6 +628,7 @@ const message = {
         loadFromRemote: 'Sincronizar desde el servidor',
         userBind: 'Vincular usuario',
         noUserBind: 'Sin vinculación',
+        connectionUser: 'Usuario de conexión',
         userAuthorization: 'Autorización de usuario',
         noUserAuthorization: 'No autorizar',
         authorizedDatabaseCount: '{0} base(s) de datos autorizada(s)',
@@ -634,9 +639,12 @@ const message = {
         revokeAuthorization: 'Revocar autorización',
         revokeAuthorizationHelper: '¿Revocar el acceso del usuario {0} a la base de datos {1}?',
         supplementPassword: 'Añadir contraseña',
-        supplementPasswordHelper: 'Solo guarda la contraseña existente en 1Panel; no cambia la contraseña en MySQL.',
-        pgBindHelper:
-            'Esta operación se utiliza para crear un nuevo usuario y vincularlo a la base de datos destino. Actualmente no se admite seleccionar usuarios ya existentes en la base de datos.',
+        supplementPasswordHelper:
+            'Solo guarda la contraseña existente en 1Panel, sin cambiar la contraseña del usuario de la base de datos.',
+        pgAuthorizationHelper:
+            'Los superusuarios acceden a todas las bases de datos de esta instancia sin vinculación. Para usuarios normales solo se gestionan permisos de base de datos, no de tablas.',
+        pgRevokeAuthorizationHelper:
+            'Revocar la autorización no elimina al usuario. Puede conservar el acceso mediante PUBLIC u otros roles.',
         pgSuperUser: 'Superusuario',
         loadFromRemoteHelper:
             'Esto sincronizará las bases de datos, los usuarios y las autorizaciones del servidor con 1Panel. ¿Desea continuar?',
@@ -881,7 +889,6 @@ const message = {
                 'Usuario: letras, números, punto, guion bajo o guion. Contraseña: al menos 12 caracteres, sin espacios al inicio o al final ni saltos de línea.',
             octopAuthHelper:
                 'Contraseña: al menos 8 caracteres con letras y números; evite contraseñas comunes. Si se rechaza al iniciar, consulte las instrucciones en los registros de la aplicación.',
-            initialCredentials: 'Credenciales iniciales; si las cambió en la aplicación, use la contraseña actual.',
             nativeAgentAccessUnavailable:
                 'La instalación existente no tiene una dirección o puerto HTTPS compatible. Revise la configuración de la aplicación.',
             agent: 'Agente',
@@ -1121,6 +1128,34 @@ const message = {
             validateImageAvailabilityHelper: 'Genera una imagen mínima antes de guardar y puede generar costes',
         },
         model: {
+            poolEditHelp: 'Obtenga modelos en línea o añádalos manualmente. Todos se pueden editar.',
+            poolUnavailable:
+                'Este tipo de proveedor y API no permite obtener modelos en línea. Añada los ID manualmente.',
+            poolEmpty: 'No hay modelos. Obténgalos en línea o añádalos manualmente.',
+            poolOverwrite:
+                'Si la consulta tiene éxito, se reemplazará toda la lista, incluidas las adiciones y ediciones manuales. ¿Continuar?',
+            poolFetchEmpty: 'No se recibieron modelos. La lista se conserva. Reintente o añádalos manualmente.',
+            poolFetchFailed:
+                'Error al obtener modelos. La lista se conserva. Revise la URL, la clave API y la red, o edite manualmente.',
+            poolSaveHelp: 'Los cambios se aplican al guardar. No se pueden quitar modelos en uso.',
+
+            accountType: 'Tipo de cuenta',
+            accountTypes: {
+                default: 'Predeterminado',
+                payAsYouGo: 'Pago por uso',
+                chinaApi: 'API de China',
+                globalApi: 'API global',
+                chinaCodingPlan: 'Coding Plan de China',
+                globalCodingPlan: 'Coding Plan global',
+                chinaTokenPlan: 'Token Plan de China',
+                globalTokenPlan: 'Token Plan global',
+                speech: 'Servicios de voz',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Comprobar y obtener',
             externalHealthPassed: 'Comprobación de salud correcta',
             externalHealthFailed: 'Falló la comprobación de salud',
@@ -1276,6 +1311,7 @@ const message = {
                 'El formulario ha cambiado. Regenerar Compose sobrescribirá los cambios manuales. ¿Continuar?',
             deploymentNameHelper:
                 'Nombre de la instancia, usado en el directorio de instalación y fijo tras crearla. Configure un alias para cambiar el nombre mostrado.',
+            deploymentAlias: 'Alias de la instancia',
             deploymentAliasHelper:
                 'Alias opcional para la lista. Si se deja vacío, se muestra el nombre de la instancia. Cambiar el alias no reinicia el servicio.',
             deploymentContainerNameHelper:
@@ -1334,7 +1370,12 @@ const message = {
             container_conn_helper: 'Utilice esta dirección para el acceso o conexión entre contenedores',
             from_remote: 'Este modelo no fue descargado vía 1Panel, no hay registros de descarga relacionados.',
             no_logs: 'Los registros de descarga de este modelo han sido eliminados y no se pueden consultar.',
+            composeFile: 'Archivo de Orquestación',
+            imageCategory: 'Tipo de imagen',
+            standardImage: 'Imagen estándar',
+            customImage: 'Imagen personalizada',
             vllmVersionHelper: {
+                qwen38: 'Versión personalizada para dos dispositivos NVIDIA GB10, optimizada para Qwen3.8-Flash-Next-NVFP4.',
                 ascend: 'Versión estándar oficial de Ascend para dispositivos de la serie Ascend A2.',
                 ascendA3: 'Versión oficial Ascend A3 para dispositivos de la serie Ascend A3.',
                 ascendA5: 'Versión oficial Ascend A5 para dispositivos 950DT.',
@@ -1344,10 +1385,9 @@ const message = {
                 rtxPro5000:
                     'Versión personalizada para NVIDIA RTX Pro 5000, optimizada para DeepSeek-V4.1-Flash-1017. La imagen es mantenida por 1Panel.',
                 dspark: 'Versión personalizada para dos dispositivos NVIDIA GB10, optimizada para DeepSeek-V4-Flash. La imagen es mantenida por 1Panel.',
+                dspark4:
+                    'Versión personalizada para cuatro dispositivos NVIDIA GB10, optimizada para DeepSeek-V4.1-Flash.',
             },
-            vllmDeployProfile: 'Modelo de despliegue',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Sincronizar con servicio de modelo',
             modelAccountAddressHelper:
                 'La dirección del contenedor es para contenedores de agentes; 127.0.0.1, IP del sistema o dirección personalizada es para AI Gateway o servicios externos.',
@@ -1356,6 +1396,12 @@ const message = {
             downloader: 'Descarga de modelos',
             modelDirectoryHelper:
                 'La lista muestra de forma predeterminada los modelos descargados en el directorio configurado en Preparación de modelos > Configuración.',
+            vllmGB10Qwen38ModelHelper:
+                'Solo se admite el modelo Qwen3.8-Flash-Next-NVFP4. Ambos dispositivos necesitan el modelo completo en la misma ruta.',
+            vllmGB10DualNodeModelHelper:
+                'Solo se admite DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp. Los dos dispositivos necesitan el modelo completo en la misma ruta.',
+            vllmGB10FourNodeModelHelper:
+                'Solo se admite DeepSeek-V4.1-Flash. Los cuatro dispositivos necesitan el modelo completo en la misma ruta.',
             modelDirectoryPlaceholder: 'Buscar modelos o introducir una ruta completa',
             selectModel: 'Seleccionar modelo',
             selectModelDirectory: 'Seleccionar directorio',
@@ -2474,15 +2520,12 @@ const message = {
         imageMissing: 'No se encontró la imagen requerida. Descargue {image} en la gestión de imágenes.',
         imageReady: 'La imagen de Benchmark está lista para crear pruebas.',
         imageHelp:
-            'La imagen de Benchmark ejecuta el cliente de carga y envía solicitudes al servicio de modelos seleccionado.',
+            'El sistema utiliza esta imagen para crear un contenedor independiente que ejecuta pruebas de rendimiento enviando solicitudes al servicio de modelos seleccionado.',
         mainNodeHelp: 'Las pruebas se ejecutan en el nodo principal. Prepare la imagen y el tokenizador en ese nodo.',
         goImages: 'Ir a la gestión de imágenes',
         goModels: 'Ir a las descargas de modelos',
         tokenizerHelp:
-            'Seleccione un tokenizador del directorio de tokenizadores para codificar el texto de prueba y contar tokens.',
-        tokenizerEmpty:
-            'No hay modelos disponibles. Descargue un modelo que incluya archivos de tokenizador en las descargas de modelos.',
-        tokenizerEmptyWithDownload: 'No hay tokenizadores disponibles. Abra {download} para descargar uno.',
+            'Seleccione un tokenizador o modelo en el nodo principal para codificar el texto de prueba y contar tokens.',
         tokenizerInvalid: 'Este tokenizador no está disponible. Seleccione otro o descárguelo de nuevo.',
         schemeHelp:
             'Los planes de prueba definen los parámetros de solicitud, la concurrencia y las reglas de ejecución. Prepare al menos un plan disponible.',
@@ -2562,6 +2605,10 @@ const message = {
         missing: 'No existe',
     },
     container: {
+        logDisconnected:
+            'El flujo de registros se ha desconectado. Vuelve a conectarte para cargar los registros recientes y reanudar la transmisión.',
+        logsUnavailable:
+            'El contenedor no existe o se ha eliminado. Los registros del contenedor no están disponibles. Vuelva a crear el contenedor e inténtelo de nuevo.',
         nvidiaSupport: 'Compatibilidad con GPU NVIDIA',
         nvidiaHelper:
             'Registra el entorno de ejecución de NVIDIA. Instala primero NVIDIA Container Toolkit. Asigna las GPU a cada contenedor por separado.',
@@ -2930,6 +2977,9 @@ const message = {
         exportHelper: 'Exporta las imágenes seleccionadas en un solo archivo tar.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'La opción «Todos» de un grupo sigue los cambios de sus miembros; los sitios seleccionados individualmente se guardan como una lista fija.',
+        websiteSelectionMissing: 'Selección no disponible',
         importHelper:
             'Las tareas programadas duplicadas se omitirán automáticamente durante la importación. Las tareas se establecerán en estado [Deshabilitado] por defecto, y en estado [Pendiente de edición] cuando la asociación de datos sea anormal.',
         changeStatus: 'Cambiar estado',
@@ -3045,6 +3095,11 @@ const message = {
         cleanDataHelper: 'Elimina el archivo de respaldo generado por esta tarea.',
         noLogs: 'Aún no hay salida de tareas...',
         errPath: '¡Error en la ruta de respaldo [{0}], no se puede descargar!',
+        websiteStartStop: 'Iniciar/detener sitio web',
+        startTime: 'Hora de inicio',
+        stopTime: 'Hora de parada',
+        websiteTimeHint: 'Recordatorio: se ejecuta una vez al día',
+        websiteTimeInvalid: 'Seleccione las horas de inicio y de parada; el inicio debe ser anterior a la parada',
         cutWebsiteLog: 'Rotación de logs del sitio',
         cutWebsiteLogHelper: 'Los archivos de log rotados se respaldarán en el directorio de respaldos de 1Panel.',
         syncIpGroup: 'Sincronizar grupos de IP de WAF',
@@ -3053,6 +3108,15 @@ const message = {
         unitHours: 'Unidad: Horas',
         alertTitle: 'Tarea programada - {0} 「{1}」 Alerta de fallo',
         library: {
+            executeScript: 'Ejecutar script',
+            targetNodes: 'Seleccionar nodos de destino',
+            switchNodeHelper:
+                'Cambiar de nodo no interrumpe la ejecución. Escriba en el terminal; la entrada solo se envía al nodo seleccionado.',
+            executorCloseHelper:
+                'Al cerrar se desconectan todos los terminales y pueden interrumpirse los scripts en ejecución. ¿Continuar?',
+            connecting: 'Conectando',
+            connected: 'Conectado',
+            disconnected: 'Desconectado',
             script: 'Script',
             syncNow: 'Sincronizar Ahora',
             autoSyncHelper:
@@ -3176,6 +3240,10 @@ const message = {
             'No se pudieron obtener los datos posteriores a {0} tras varios reintentos, por lo que la exportación se detuvo. Comprueba la red o reduce el intervalo de tiempo e inténtalo de nuevo.',
     },
     terminal: {
+        passwordless: 'Sin contraseña',
+        bootstrapAuth: 'Autenticación inicial (opcional)',
+        passwordlessSetupHelper: 'La prueba de conexión configura y verifica el acceso sin contraseña.',
+
         showTerminalButton: 'Acceso rápido al terminal',
         showTerminalButtonHelper:
             'Al activar esta opción, se mostrará un botón de acceso rápido al terminal en la esquina inferior derecha de la página.',
@@ -3320,6 +3388,15 @@ const message = {
             syncSiteHelper: '¿Sincronizar la hora del sistema con {0}?',
         },
         fail2ban: {
+            mode: 'Modo de detección',
+            modeHelper:
+                'Elija qué eventos de conexión SSH cuentan como fallos para bloquear una IP. Requiere Fail2ban 0.10 o posterior.',
+            modeNormal:
+                'Predeterminado: cuenta accesos fallidos, como contraseñas incorrectas o usuarios inexistentes.',
+            modeDdos: 'También cuenta conexiones que agotan el tiempo de espera o se cortan antes de iniciar sesión.',
+            modeExtra: 'También cuenta fallos por métodos de conexión que el servidor no admite.',
+            modeAggressive:
+                'Cuenta todos los casos anteriores. Es más estricto, pero puede bloquear a más usuarios legítimos.',
             sshPort: 'Puerto SSH',
             sshPortHelper: 'Fail2ban escucha el puerto SSH del host',
             unActive: 'El servicio Fail2ban no está habilitado actualmente.',
@@ -3582,6 +3659,10 @@ const message = {
         compressSuccess: 'Compresión completada correctamente',
         deCompressSuccess: 'Descompresión completada correctamente',
         deCompressDst: 'Ruta de descompresión',
+        decompressConflictPolicy: 'Archivos existentes',
+        keepExisting: 'Conservar archivos existentes',
+        decompressConflictHelper:
+            'Al conservar los archivos existentes, se omiten las entradas en conflicto. Los directorios con el mismo nombre se siguen combinando.',
         linkType: 'Tipo de enlace',
         softLink: 'Enlace simbólico',
         hardLink: 'Enlace físico',
@@ -4673,6 +4754,18 @@ const message = {
         isEdirWarn: 'Se detectaron cambios en el archivo docker-compose.yml. Revise la comparación.',
     },
     website: {
+        batchPHP: 'Cambiar versión de PHP',
+        batchPHPHelper:
+            'Solo se modificarán los sitios PHP. Los demás se omitirán. No se admiten entornos PHP locales.',
+        batchPHPCount: 'Sitios seleccionados: {0}; sitios PHP: {1}; otros: {2}.',
+        notPHP: 'No es un sitio PHP',
+        localPHP: 'No se admiten entornos PHP locales',
+        samePHP: 'Ya utiliza el entorno PHP de destino',
+        batchPHPResult: 'Resultados',
+        batchPHPStatus_success: 'Correcto',
+        batchPHPStatus_failed: 'Error',
+        batchPHPStatus_skipped: 'Omitido',
+        sslDomainMismatchWebsite: 'Los dominios del certificado no coinciden con los dominios del sitio web',
         primaryDomain: 'Dominio principal',
         otherDomains: 'Otros dominios',
         static: 'Estático',
@@ -4795,6 +4888,10 @@ const message = {
         privateKey: 'Clave privada (KEY)',
         certificate: 'Certificado (formato PEM)',
         HTTPConfig: 'Opciones HTTP',
+        HTTPSRedirectPort: 'Puerto de redirección HTTPS',
+        HTTPSRedirectPortCustom: 'Personalizado',
+        HTTPSRedirectPortManualHelper:
+            'La regla de redirección se editó manualmente o no está gestionada, por lo que no se puede modificar.',
         HTTPSOnly: 'Bloquear peticiones HTTP',
         HTTPToHTTPS: 'Redirigir a HTTPS',
         HTTPAlso: 'Permitir peticiones HTTP directas',
@@ -4955,6 +5052,8 @@ const message = {
         batchInput: 'Entrada por Lotes',
         domainNotFQDN: 'Este dominio puede no ser accesible en la red pública',
         domainInvalid: 'Formato de dominio inválido',
+        allowFirewall: 'Permitir en el cortafuegos',
+        allowFirewallHelp: 'Abre este puerto TCP al crear el sitio para todos los dominios que lo usan.',
         domainBatchHelper:
             'Un dominio por línea, formato: dominio:puerto@ssl\nEjemplo: example.com:443@ssl o example.com',
         generateDomain: 'Generar',
@@ -4985,6 +5084,9 @@ const message = {
         failTimeoutHelper:
             'La duración de la ventana de tiempo para las comprobaciones de estado del servidor. Cuando el número acumulado de fallos alcanza el umbral dentro de este período, el servidor se eliminará temporalmente y se reintentará después de la misma duración. Por defecto 10 segundos',
         staticChangePHPHelper: 'Actualmente es un sitio estático, puedes cambiarlo a PHP',
+        createDefaultIndex: 'Crear archivo {0} predeterminado',
+        createDefaultIndexHelper:
+            'Solo se crea cuando el archivo no existe en el directorio raíz del sitio web, usando la configuración de página predeterminada',
         proxyCache: 'Caché de proxy inverso',
         cacheLimit: 'Límite de espacio de caché',
         shareCache: 'Tamaño de memoria para conteo de caché',
@@ -5108,6 +5210,8 @@ const message = {
         status: 'Estado actual',
         configResource: 'Configuración',
         saveAndReload: 'Guardar y recargar',
+        batchClearProxyCacheWarn:
+            '¿Quieres vaciar la caché del proxy inverso de los {0} sitios seleccionados? La próxima solicitud de contenido que estaba en caché llegará al servidor de origen.',
         clearProxyCache: 'Limpiar caché de proxy inverso',
         clearProxyCacheWarn: 'Esta acción eliminará todos los archivos en el directorio de caché. ¿Deseas continuar?',
         create: 'Agregar nuevo módulo',
@@ -5143,14 +5247,25 @@ const message = {
             'Scripts a ejecutar antes de compilar, usualmente para descargar código fuente de módulos, instalar dependencias, etc.',
         buildHelper:
             'Los módulos dinámicos se cargan desde la configuración tras compilarse; los módulos estáticos siguen reconstruyendo OpenResty.',
-        defaultHttps: 'HTTPS Anti-manipulación',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Estado de protección contra manipulación',
         defaultHttpsHelper1: 'Habilitar esto puede resolver problemas de manipulación de HTTPS.',
         sslRejectHandshake: 'Rechazar handshake SSL predeterminado',
         sslRejectHandshakeHelper:
             'Habilitar esto puede evitar la fuga de certificados, establecer un sitio web predeterminado invalidará esta configuración',
+        httpsRedirectCustomPort: 'Usar redirección con puerto personalizado',
+        httpsRedirectCustomPortHelper:
+            'Cuando está activado, las redirecciones de HTTP a HTTPS usan el puerto HTTPS personalizado.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Directorio de sincronización',
+        syncDirHelp:
+            'Introduzca la ruta absoluta del directorio en los nodos de destino. Se utilizará el mismo directorio en todos ellos.',
+        syncDirSingleCert:
+            'Seleccione un solo certificado al especificar un directorio para evitar sobrescribir archivos.',
+        syncDirAbsolute: 'El directorio de sincronización debe ser una ruta absoluta.',
+
+        caUploadHelp: 'Suba el archivo ZIP descargado que contiene ca.crt y ca.key (máximo 10 MB).',
         deleteConfirm:
             'Se eliminarán los siguientes certificados. Los certificados ACME se revocarán automáticamente. ¿Desea continuar?',
         deleteAndRevoke: 'Eliminar y revocar',
@@ -5488,6 +5603,10 @@ const message = {
         editRuleConfirm: '¿Confirma que desea modificar esta regla?',
     },
     runtime: {
+        buildLog: 'Registro de compilación',
+        extensionInstallFailed: 'No se pudieron instalar algunas extensiones de PHP: {extensions}',
+        statusMessageUnavailable:
+            'No hay información detallada sobre el estado. Consulta los registros del entorno de ejecución para obtener más detalles.',
         importEnv: 'Importar variables de entorno',
         envImportError: 'Línea {0}: {1}',
         envInvalidAssignment: 'Se esperaba una asignación NOMBRE=valor válida',
@@ -5672,6 +5791,84 @@ const message = {
         diskType: 'Tipo de disco',
         serial: 'Núm. de serie',
         noFail: 'El fallo de montaje no afecta al inicio del sistema',
+    },
+    networkManage: {
+        routeDetails: 'Detalles de la ruta',
+        manageIP: 'Gestionar IP asociada',
+        connectedRoute: 'Generada a partir de la IP',
+        connectedRouteHint:
+            'El sistema genera esta ruta conectada a partir de la IP de la interfaz. No se edita por separado. Edite o elimine la IP correspondiente en los detalles de la interfaz.',
+        virtualBridgeReadOnly: 'Interfaz virtual · Solo lectura',
+        virtualBridgeReadOnlyHint:
+            'Esta interfaz virtual es de solo lectura y no participa en las comprobaciones de conectividad.',
+        loopbackReadOnly: 'La configuración de la interfaz de bucle invertido es de solo lectura.',
+        persistentSourceMissing:
+            'No se encontró una configuración persistente del sistema compatible para la interfaz {0}. Es de solo lectura.',
+        addressReadOnlyReason:
+            'Esta dirección es dinámica, no global o no tiene una configuración persistente compatible. Es de solo lectura.',
+        routeReadOnlyReason:
+            'Esta ruta es dinámica, generada por el núcleo o no tiene una configuración persistente compatible. Es de solo lectura.',
+        persistenceBackend: 'Persistencia',
+        editIP: 'Editar IP',
+        editRoute: 'Editar ruta',
+        operationRisk:
+            'Los cambios de red pueden interrumpir las conexiones. Prepare una forma alternativa de acceder al servidor.',
+        confirmInterface: 'Introduzca el nombre de interfaz {0} para confirmar.',
+        sourceAddress: 'Dirección de origen',
+        linkConnected: 'Enlace conectado',
+        linkDisconnected: 'Enlace desconectado',
+        topologySearch: 'Buscar interfaz, IP, puerta de enlace o destino',
+        topologyHint:
+            'Gestione las IP de la interfaz a la izquierda. Las tarjetas muestran destino, puerta de enlace y métrica. Pulse una tarjeta para ver los detalles; las líneas no indican conectividad verificada.',
+        direct: 'Directa',
+        defaultDestination: 'Ruta predeterminada',
+        unknownInterface: 'Interfaz sin especificar',
+        noRoutes: 'No hay rutas coincidentes',
+        readOnly: 'Solo lectura',
+        readOnlyRouteHint: 'Las rutas con varios saltos siguientes o sin una interfaz única son de solo lectura.',
+        title: 'Gestión de redes',
+        interfaces: 'Interfaces de red',
+        routes: 'Rutas',
+        addIP: 'Añadir IP',
+        ipCount: 'Número de IP',
+        interfaceID: 'ID de interfaz',
+        adminState: 'Estado administrativo',
+        linkState: 'Estado del enlace',
+        mac: 'Dirección MAC',
+        flags: 'Indicadores',
+        address: 'Dirección',
+        scope: 'Ámbito',
+        interface: 'Interfaz',
+        configStatus: 'Estado de la configuración',
+        managedApplied: 'Guardado · Activo',
+        managedPending: 'Guardado · Inactivo',
+        addressWarning:
+            'Usa la IP asignada a esta interfaz. Si la IP pública se traduce mediante NAT, introduce la IP privada.',
+        addressRisk:
+            'Una IP que ya está en uso o una longitud de prefijo incorrecta pueden interrumpir el acceso al panel o por SSH.',
+        addressWithPrefix: 'Dirección IP / longitud del prefijo',
+        interfaceSelectHint:
+            'Solo se muestran interfaces cuya configuración persistente se puede modificar. Se excluyen las interfaces de bucle local, los puentes virtuales de solo lectura y otras interfaces que no se pueden modificar.',
+        gatewayHint: 'Deje la puerta de enlace vacía para las subredes conectadas directamente.',
+        metricHint: 'Para la misma subred de destino, suelen tener prioridad las rutas con una métrica menor.',
+        defaultRouteWarning:
+            'Una ruta predeterminada puede cambiar la salida del panel, SSH y otros servicios. Prepara un acceso alternativo, como la consola de la nube.',
+        interfaceMissing: 'Falta la interfaz',
+        changeWarning:
+            'Cambiar la configuración de red puede desconectar el panel o interrumpir los servicios. Antes de continuar, asegúrate de disponer de otra forma de acceder al servidor.',
+        cidrHint:
+            'En 192.0.2.10/24, /24 corresponde a la máscara de subred 255.255.255.0. Ejemplo de IPv6: 2001:db8::10/64.',
+        addRoute: 'Añadir ruta',
+        checkRoutes: 'Comprobar accesibilidad de las rutas',
+        destination: 'Destino',
+        metric: 'Métrica',
+        routeTable: 'Tabla',
+        reachability: 'Accesibilidad',
+        reachable: 'Accesible',
+        unreachable: 'Inaccesible',
+        unchecked: 'Sin comprobar',
+        check: 'Comprobar',
+        destinationHint: 'Admite direcciones IPv4/IPv6 o redes CIDR. Ruta predeterminada: default, 0.0.0.0/0 o ::/0.',
     },
     xpack: {
         ldap: {
@@ -7827,6 +8024,13 @@ const message = {
             appUpgradeHelper: 'Hay {0} aplicaciones que necesitan ser actualizadas',
             dashboardSetting: 'Configuración del resumen',
             keepOneDashboardComponent: 'Mantenga al menos una sección del resumen',
+            currentNode: 'Nodo actual',
+            quickSwitch: 'Cambio rápido',
+            allNodes: 'Todos los nodos',
+            nodeSearchPlaceholder: 'Buscar por nombre o dirección del nodo',
+            currentNodeNotInResults: 'El nodo actual no está en esta página de resultados',
+            upgradableApps: 'Aplicaciones actualizables',
+            quickSwitchMore: 'Ver todos los nodos coincidentes',
             addPanel: 'Añadir panel',
             addPanelHelper: 'Tras añadir el panel, podrás acceder rápidamente en [Resumen - Paneles].',
             panel: 'Panel 1Panel',
@@ -8154,6 +8358,34 @@ const message = {
             menu: 'Sincronización de Recursos',
             file: 'Transferencia de archivos',
             fileSyncConfirm: '¿Transferir el archivo/carpeta {1} del nodo {0} al directorio {3} del nodo {2}?',
+            fileBatchDesc:
+                'Seleccione archivos o carpetas de cualquier nodo y distribúyalos a varios nodos de destino.',
+            fileSourceTitle: 'Seleccionar archivos de origen',
+            fileSourceNode: 'Nodo de origen',
+            fileTargetDirectory: 'Directorio de destino',
+            fileBatchPath: 'Establecer directorios de destino en lote',
+            fileApplyPath: 'Aplicar a los nodos seleccionados',
+            fileSelectedCount: '{0} elementos seleccionados',
+            fileSelectedTargets: '{0} nodos seleccionados',
+            fileSelectionHint:
+                'Las carpetas se copian completas con su nombre original y conservan su estructura interna.',
+            fileRules:
+                'Se aplican las reglas de transferencia existentes: los archivos con el mismo nombre pueden actualizarse y los demás archivos del directorio de destino se conservan.',
+            fileBatchSummary: 'Distribuir {0} elementos a {1} nodos de destino',
+            fileTaskHint:
+                'Al confirmar, se crea una tarea de distribución que puede consultar en la gestión de tareas.',
+            fileBatchConfirm:
+                'Revise los nodos y las rutas de destino a continuación. Los archivos con el mismo nombre pueden sobrescribirse.',
+            fileTargetHint:
+                'Puede establecer un directorio por nodo. No se pueden seleccionar nodos desconectados, con comprobaciones fallidas o sin rsync.',
+            fileChecking: 'Comprobando',
+            fileCheckFailed: 'Error de comprobación',
+            fileRsyncMissing: 'rsync no está instalado',
+            filePathRequired: 'Introduzca una ruta absoluta para el directorio de destino que comience por /.',
+            fileConflictHint:
+                'Estos orígenes comparten nombres de destino. Deje solo un origen por nombre. La selección se actualiza para todos los nodos de destino.',
+            fileDeselect: 'Deseleccionar',
+            fileSourceChanged: 'El nodo de origen ha cambiado. Vuelva a seleccionar los archivos.',
 
             image: 'Transferencia de imágenes',
             imageBatchDesc:
@@ -8342,6 +8574,11 @@ const message = {
             createFromTemplate: 'Crear desde plantilla',
             template: 'Plantilla',
             templateName: 'Nombre de la plantilla',
+            dataDisks: 'Discos de datos',
+            dataDiskHelper:
+                'Los discos de datos se crean vacíos. Puede elegir un grupo de almacenamiento para cada disco; el tipo de bus es el mismo que el del disco del sistema. Se pueden añadir hasta 9 discos.',
+            templateSystemDiskHelper:
+                'Las plantillas copian solo el disco del sistema, sin los datos de otros discos. Al crear una VM desde una plantilla puede añadir discos de datos vacíos. Revise los montajes de /etc/fstab y las rutas de bases de datos o aplicaciones que dependan de esos discos. Los UUID pueden cambiar; el panel no modifica automáticamente la configuración del invitado.',
             convertToTemplate: 'Convertir en plantilla',
             sourceVM: 'VM de origen',
             templateSize: 'Tamaño de la plantilla',
@@ -8462,7 +8699,7 @@ const message = {
             currentSnapshot: 'Actual',
             snapshotEmpty: 'No hay instantáneas',
             snapshotHelper:
-                'Una instantánea guarda el estado actual de la VM como punto de restauración. Los cambios posteriores se registran en un archivo delta sin modificar el disco original. Al restaurarla, la VM vuelve a ese momento.',
+                'Las instantáneas guardan y restauran juntos todos los discos administrados con escritura, sin incluir la memoria. Apague la VM antes de restaurar; los discos deben coincidir con la instantánea. Los discos compartidos o no compatibles con escritura impiden crear instantáneas.',
             snapshotOperationHelper:
                 'La instantánea actual no se puede eliminar. Las instantáneas solo se pueden restaurar cuando la máquina virtual está apagada.',
             snapshotRecoverConfirm:
@@ -8499,13 +8736,86 @@ const message = {
             cluster: 'Alta disponibilidad de aplicaciones',
             name: 'Nombre del clúster',
             addCluster: 'Añadir clúster',
-            installNode: 'Instalar nodo',
-            master: 'Nodo maestro',
-            slave: 'Nodo esclavo',
-            replicaStatus: 'Estado maestro-esclavo',
             unhealthyDeleteError: 'El nodo tiene estado anómalo, revisa la lista e inténtalo de nuevo',
-            replicaStatusError: 'Error al obtener estado, revisa el nodo maestro',
-            masterHostError: 'La IP del nodo maestro no puede ser 127.0.0.1',
+            noAvailableMasterVersion: 'No hay una plantilla de instancia primaria disponible en este nodo.',
+            backups: 'Copias del clúster',
+            importBackup: 'Importar copia',
+            archivePassphrase: 'Contraseña de la copia',
+            restoreToNew: 'Restaurar en un clúster nuevo',
+            restoreTarget: 'Destino de la restauración',
+            restoreToOriginal: 'Restaurar en el clúster original',
+            restoreOriginalUnavailable: 'Esta copia no tiene un clúster original apto para la restauración.',
+            restoreOriginalWarning:
+                'Se interrumpirán las conexiones de la base de datos. El clúster original volverá al estado de la copia y las réplicas se sincronizarán de nuevo.',
+            restoreOriginalConfirm: 'Escriba el nombre del clúster {0} para confirmar la sobrescritura.',
+            restoreCredentials: 'Utilice las credenciales de administrador y réplica de la copia.',
+            archiveImportHint:
+                'Solo se admiten archivos de copia de seguridad de clústeres .1pha. Use la contraseña configurada al crear la copia.',
+            backupDataSize: 'Tamaño de los datos',
+            appStoreOnly: 'Instale y actualice esta aplicación en Alta disponibilidad de aplicaciones.',
+            noMatchingReplicaVersion:
+                'En este nodo no hay una plantilla de réplica con la misma versión que la instancia primaria.',
+            installNode: 'Servidor de despliegue',
+            master: 'Base de datos principal',
+            slave: 'Base de datos de réplica',
+            redisMaster: 'Instancia principal',
+            redisReplica: 'Réplica',
+            replicaStatus: 'Detalles de replicación',
+            replicaStatusError: 'No se pudo consultar la replicación',
+            masterHostError: 'La dirección principal no puede ser 127.0.0.1',
+            emptyTitle: 'No hay clústeres de {0} configurados',
+            emptyDescription:
+                'En «{2}», selecciona un servidor de despliegue y una versión para crear la {0}. Tras el despliegue, puedes añadir una {1} de la misma versión y consultar el estado de la replicación, los parámetros de la instancia y los registros.',
+            loadFailed: 'No se pudieron cargar los clústeres',
+            refreshFailed: 'Error al actualizar. Se muestran los datos de {0}.',
+            addReplica: 'Añadir {0}',
+            masterUnavailable: 'La instancia principal no está disponible. Comprueba su servidor.',
+            replication: 'Replicación',
+            replicationStatus: 'Estado de replicación',
+            configuredReplicas: '{0} instancias de tipo {1} configuradas',
+            addReplicaPending: 'Falta añadir {0}',
+            checkedAt: 'Comprobado a las {0}',
+            roleParameters: 'Parámetros de {0}',
+            parametersFailed: 'No se pudieron consultar los parámetros',
+            instanceParameters: 'Parámetros de instancia',
+            replicationParameters: 'Configuración de replicación de datos',
+            replicationUserHelp:
+                'La base de datos de réplica utiliza esta cuenta para conectarse a la base de datos principal y sincronizar los datos.',
+            replicationPasswordHelp:
+                'Sirve para autenticar al usuario de replicación. Al añadir una base de datos de réplica, utiliza la contraseña configurada para esta cuenta en la base de datos principal.',
+            configureRole: 'Configurar {0}',
+            sameHost: 'Las dos instancias están en el mismo servidor. Un fallo del servidor afectará a ambas.',
+            versionLocked: 'Coincide con la versión principal actual.',
+            unset: 'Sin configurar',
+            noParameters: 'Esta instancia no tiene parámetros para mostrar',
+            lagSeconds: 'Retraso de replicación (segundos)',
+            offsetBytes: 'Desplazamiento de replicación (bytes)',
+            taskQueued: 'Tarea aceptada',
+            removeRecord: 'Eliminar registro',
+            removeClusterRecordNotice: 'Se eliminará el registro del clúster.',
+            removeMemberRecordNotice: 'Se eliminará el registro del miembro.',
+            taskAwaitingConfirmation: 'Pendiente de confirmación del servidor',
+            taskConfirmationNotice:
+                'Se espera la confirmación de {0}. Cuando se registre la tarea, podrás consultarla en el centro de tareas de ese servidor o en los registros de la tarjeta.',
+            taskRecordUnavailable:
+                'No se pudo obtener el registro de la tarea. Comprueba el resultado del envío y el estado del servidor de despliegue.',
+            taskRunning: 'Tarea en curso',
+            taskFailed: 'La operación falló. Consulta el registro de la tarea.',
+            parameters: 'Parámetros',
+            primaryMissing: 'No se encontró el registro de la instancia principal.',
+            replicaSourceAddress: 'Dirección de {0}',
+            replicaSourcePort: 'Puerto de {0}',
+            replicaSourceAddressHelp: 'Introduce una dirección IP o un dominio accesible desde el servidor elegido.',
+            replicationState: {
+                pending: 'Pendiente',
+                waitingForInstance: 'Esperando a que la instancia esté lista',
+                healthy: 'Correcta',
+                syncing: 'Sincronizando',
+                lagging: 'Con retraso',
+                disconnected: 'Desconectada',
+                unknown: 'Desconocida',
+                unavailable: 'No disponible',
+            },
         },
     },
     template: {

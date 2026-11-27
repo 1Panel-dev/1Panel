@@ -3,9 +3,9 @@ package protocol
 // VM helper protocol definition shared by the core caller and helper binary.
 
 const (
-	Version      = "1.2.0"
-	API          = "1.2.0"
-	MinVersion   = "1.2.0"
+	Version      = "1.5.0"
+	API          = "1.5.0"
+	MinVersion   = "1.5.0"
 	DefaultURI   = "qemu:///system"
 	HelperBinary = "1panel-kvm"
 )
@@ -77,20 +77,26 @@ type VersionInfo struct {
 	API     string `json:"api"`
 }
 
+type VMDataDisk struct {
+	SizeGiB     int64  `json:"sizeGiB"`
+	StoragePool string `json:"storagePool,omitempty"`
+}
+
 type VMConfig struct {
-	Name             string   `json:"name"`
-	CPU              int      `json:"cpu"`
-	MemoryMiB        int64    `json:"memoryMiB"`
-	DiskSizeGiB      int64    `json:"diskSizeGiB"`
-	DiskBus          string   `json:"diskBus,omitempty"`
-	DiskPath         string   `json:"diskPath,omitempty"`
-	StoragePool      string   `json:"storagePool,omitempty"`
-	ISOPaths         []string `json:"isoPaths"`
-	ImagePath        string   `json:"imagePath,omitempty"`
-	Network          string   `json:"network"`
-	BootOrder        string   `json:"bootOrder,omitempty"`
-	StartAfterCreate bool     `json:"startAfterCreate"`
-	AutoStart        bool     `json:"autoStart"`
+	DataDisks        []VMDataDisk `json:"dataDisks,omitempty"`
+	Name             string       `json:"name"`
+	CPU              int          `json:"cpu"`
+	MemoryMiB        int64        `json:"memoryMiB"`
+	DiskSizeGiB      int64        `json:"diskSizeGiB"`
+	DiskBus          string       `json:"diskBus,omitempty"`
+	DiskPath         string       `json:"diskPath,omitempty"`
+	StoragePool      string       `json:"storagePool,omitempty"`
+	ISOPaths         []string     `json:"isoPaths"`
+	ImagePath        string       `json:"imagePath,omitempty"`
+	Network          string       `json:"network"`
+	BootOrder        string       `json:"bootOrder,omitempty"`
+	StartAfterCreate bool         `json:"startAfterCreate"`
+	AutoStart        bool         `json:"autoStart"`
 }
 
 type VMInfoReq struct {
@@ -126,16 +132,22 @@ type VMSnapshotReq struct {
 	Description  string `json:"description,omitempty"`
 }
 
+type VMSnapshotDisk struct {
+	Target string `json:"target"`
+	Path   string `json:"path"`
+}
+
 type VMSnapshotInfo struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	CreatedAt   int64  `json:"createdAt"`
-	State       string `json:"state"`
-	Parent      string `json:"parent"`
-	Path        string `json:"path"`
-	Size        int64  `json:"size"`
-	Current     bool   `json:"current"`
-	Children    int    `json:"children"`
+	Disks       []VMSnapshotDisk `json:"disks"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	CreatedAt   int64            `json:"createdAt"`
+	State       string           `json:"state"`
+	Parent      string           `json:"parent"`
+	Path        string           `json:"path"`
+	Size        int64            `json:"size"`
+	Current     bool             `json:"current"`
+	Children    int              `json:"children"`
 }
 
 type VMTemplateCreate struct {
@@ -266,6 +278,7 @@ type VMInfo struct {
 }
 
 type VMDisk struct {
+	System        bool   `json:"system"`
 	Capacity      int64  `json:"capacity"`
 	Format        string `json:"format"`
 	ReadOnly      bool   `json:"readOnly"`

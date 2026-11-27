@@ -172,7 +172,13 @@ const loadAccounts = async () => {
         name: '',
     });
     const items = res.data.items || [];
-    const accountOptions = isIntl.value ? items.filter((item) => !blockedProviders.has(item.provider)) : items;
+    const accountOptions = isIntl.value
+        ? items.filter(
+              (item) =>
+                  !blockedProviders.has(item.provider) &&
+                  !(['bailian', 'ark'].includes(item.provider) && item.accountType === 'codingPlan'),
+          )
+        : items;
     const selected = accountOptions.find((item) => item.id === accountId.value);
     modelOptions.value = (selected?.models || []).map((item) => ({
         label: item.name,

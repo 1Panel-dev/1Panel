@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/1Panel-dev/1Panel/core/utils/clientip"
+	"github.com/1Panel-dev/1Panel/core/utils/clusteraccess"
 	"github.com/1Panel-dev/1Panel/core/utils/publicshare"
 )
 
@@ -55,6 +56,9 @@ func newLocalAgentProxy(transport http.RoundTripper) *httputil.ReverseProxy {
 			proxyReq.Out.URL.Host = "unix"
 		},
 		Transport: transport,
+		ModifyResponse: func(response *http.Response) error {
+			return clusteraccess.FilterParameterResponse(response.Request, response)
+		},
 		ErrorHandler: func(rw http.ResponseWriter, req *http.Request, err error) {
 			rw.WriteHeader(http.StatusBadGateway)
 			_, _ = rw.Write([]byte("Bad Gateway: " + err.Error()))

@@ -1,4 +1,4 @@
-ErrInvalidParams: 'ຄຳຮ້ອງຂໍບໍ່ຖືກຕ້ອງ: {{ .detail }}'
+ErrInvalidParams: 'ຄຳຮ້ອງຂໍບໍ່ຖືກຕ້ອງ{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'ຮູບແບບອາກິວເມັນ MCP ກຳນົດເອງບໍ່ຖືກຕ້ອງ'
 ErrMcpGatewayArgsConflict: 'ອາກິວເມັນ {{ .name }} ຖືກຈັດການໂດຍ 1Panel ແລະ ບໍ່ສາມາດຕັ້ງຄ່າໃນອາກິວເມັນກຳນົດເອງໄດ້'
 ErrTokenParse: 'ໂທເຄັນຜິດພາດ: {{ .detail }}'
@@ -129,7 +129,6 @@ ErrComposeProjectNameParse: 'ບໍ່ສາມາດວິເຄາະຊື່
 ErrComposeProjectNameEmpty: 'ບໍ່ສາມາດກຳນົດຊື່ໂຄງການຈາກການຕັ້ງຄ່າ Docker Compose ຫຼື ໂຟນເດີແມ່ຂອງໄຟລ໌ໄດ້. ກະລຸນາປ້ອນຊື່ແລ້ວລອງໃໝ່.'
 ErrComposeNameInvalid: 'ຊື່ໂຄງການ Compose ບໍ່ຖືກຕ້ອງ: ຕ້ອງເລີ່ມດ້ວຍຕົວພິມນ້ອຍ ຫຼື ຕົວເລກ, ໃຊ້ໄດ້ສະເພາະຕົວພິມນ້ອຍ, ຕົວເລກ, ຂີດກາງ ແລະ ຂີດລຸ່ມ, ຄວາມຍາວ 1-256 ຕົວອັກສອນ.'
 ErrAppVersionUnavailable: 'ເວີຊັນແອັບນີ້ຖືກລຶບອອກຈາກບໍລິການທາງໄກແລ້ວ ກະລຸນາເລືອກເວີຊັນອື່ນແລ້ວລອງໃໝ່'
-ErrVllmGB10ProOnly: 'ເວີຊັນ vLLM ນີ້ມີໃຫ້ໃຊ້ສະເພາະໃນ 1Panel Professional Edition ເທົ່ານັ້ນ.'
 ErrAIGatewayDatabaseTypeMismatch: 'AI Gateway ສາມາດອັບເກຣດໄດ້ພາຍໃນປະເພດຖານຂໍ້ມູນດຽວກັນເທົ່ານັ້ນ (SQLite ຫຼື PostgreSQL).'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'ຂໍ້ມູນສຳຮອງ AI Gateway ແລະ ແອັບເປົ້າໝາຍຕ້ອງໃຊ້ປະເພດຖານຂໍ້ມູນດຽວກັນ (SQLite ຫຼື PostgreSQL).'
 ErrHermesUpgradeVersion: 'Hermes Agent ສາມາດອັບເກຣດໄປຫາລຸ້ນໃໝ່ກວ່າທີ່ຮູ້ຈັກ ແລະ ອະນຸຍາດໂດຍການຕັ້ງຄ່າອັບເກຣດຂ້າມລຸ້ນຫຼັກເທົ່ານັ້ນ. ຖ້າຕ້ອງການກັບໄປລຸ້ນເກົ່າ ໃຫ້ກູ້ຄືນຈາກຂໍ້ມູນສຳຮອງ.'
@@ -160,6 +159,10 @@ UpgradeWaitReady: 'ລໍຖ້າແອັບພ້ອມ'
 UpgradeBackupDisabled: 'ປິດການສຳຮອງກ່ອນອັບເກຣດ; ການປ່ຽນແປງຂໍ້ມູນຈາກສະຄຣິບບໍ່ສາມາດຍ້ອນກັບໄດ້ທັງໝົດ'
 UpgradeRollbackFailed: 'ຍ້ອນກັບລົ້ມເຫຼວ'
 ErrDatabaseNotFound: 'ບໍ່ພົບຖານຂໍ້ມູນ: {{ .name }}'
+
+# vLLM
+ErrVllmGB10ProOnly: 'ເວີຊັນ vLLM ນີ້ມີໃຫ້ໃຊ້ສະເພາະໃນ 1Panel Professional Edition ເທົ່ານັ້ນ.'
+ErrVllmGB10ModelUnsupported: 'ເວີຊັນນີ້ຮອງຮັບສະເພາະ DeepSeek-V4-Flash-0731 ຫຼື DeepSeek-V4-Flash-Vision-Exp. ກະລຸນາເລືອກໂຟນເດີໂມເດວທີ່ກົງກັນ.'
 
 #ssh
 ExportIP: "IP ເຂົ້າສູ່ລະບົບ"
@@ -279,6 +282,13 @@ RemoteBackup: 'ກະລຸນາເລີ່ມຄອນເທນເນີຖ�
 RemoteRecover: 'ກະລຸນາເລີ່ມຄອນເທນເນີຖານຂໍ້ມູນພາຍໃນເຄື່ອງດ້ວຍຮູບພາບ {{ .name }} ກ່ອນທີ່ຈະກູ້ຄືນຖານຂໍ້ມູນທາງໄກ'
 Arg: "ອາກິວເມນ"
 
+#PostgreSQL
+ErrPgUserProtected: "ຜູ້ໃຊ້ລະບົບແລະຜູ້ໃຊ້ເຊື່ອມຕໍ່ປັດຈຸບັນຖືກປົກປ້ອງຈາກການດຳເນີນການນີ້"
+ErrPgSuperUserGrant: "ຜູ້ໃຊ້ຂັ້ນສູງເຂົ້າເຖິງທຸກຖານຂໍ້ມູນໄດ້ ໂດຍບໍ່ຕ້ອງໃຫ້ສິດຫຼືຍົກເລີກສິດແຍກຕ່າງຫາກ"
+ErrPgUserUsed: "ແອັບຫຼືເວັບໄຊທີ່ຜູກຢູ່ກຳລັງໃຊ້ຜູ້ໃຊ້ນີ້; ກະລຸນາປ່ຽນບັນຊີເຊື່ອມຕໍ່ກ່ອນ"
+ErrPgUserBound: "ກະລຸນາຍົກເລີກສິດຖານຂໍ້ມູນຂອງຜູ້ໃຊ້ນີ້ກ່ອນ"
+ErrPgUserPasswordSync: "ລະຫັດຜ່ານຜູ້ໃຊ້ຖືກປ່ຽນແລ້ວ ແຕ່ການຊິງລະຫັດຜ່ານໃຫ້ແອັບຕໍ່ໄປນີ້ລົ້ມເຫຼວ: {{ .detail }}"
+
 #redis
 ErrTypeOfRedis: 'ປະເພດໄຟລ໌ສຳຮອງຂໍ້ມູນບໍ່ກົງກັບໂໝດ persistence ປັດຈຸບັນ'
 
@@ -331,6 +341,14 @@ ComposeRecoverCleanup: 'ທຳຄວາມສະອາດພື້ນທີ່�
 #runtime
 ErrFileNotExist: 'ບໍ່ພົບໄຟລ໌ຕົ້ນທາງ: {{ .detail }}'
 ErrImageBuildErr: 'ການສ້າງຮູບພາບ (Image build) ລົ້ມເຫຼວ'
+PHPBuildImage: "ກຳລັງສ້າງອິມເມຈ PHP"
+PHPBuildBaseImage: "ກຳລັງດຶງອິມເມຈພື້ນຖານ {{ .name }}"
+PHPBuildStep: "ກຳລັງສ້າງອິມເມຈ PHP (ຂັ້ນຕອນ {{ .name }})"
+PHPBuildStartContainer: "ກຳລັງເລີ່ມຄອນເທນເນີ PHP"
+PHPBuildInstallExtensions: "ກຳລັງຕິດຕັ້ງສ່ວນຂະຫຍາຍ PHP"
+PHPBuildCommitImage: "ກຳລັງບັນທຶກອິມເມຈພ້ອມສ່ວນຂະຫຍາຍ PHP"
+PHPBuildApplyConfig: "ກຳລັງນຳໃຊ້ການຕັ້ງຄ່າ ແລະເລີ່ມສະພາບແວດລ້ອມ PHP"
+PHPBuildSeeLog: "ເບິ່ງລາຍລະອຽດໃນ build.log"
 ErrImageExist: "ຮູບພາບມີຢູ່ໃນລະບົບແລ້ວ. ກະລຸນາໃຊ້ຊື່ຮູບພາບອື່ນ."
 ErrDelWithWebsite: 'Runtime ຖືກເຊື່ອມໂຍງກັບເວັບໄຊ ແລະ ບໍ່ສາມາດລຶບໄດ້'
 ErrRuntimeStart: 'ການເລີ່ມຕົ້ນລົ້ມເຫຼວ'
@@ -629,6 +647,8 @@ ErrWebhookTestFailed: 'ກະລຸນາກວດສອບການຕັ້ງ
 
 #task - runtime
 ErrInstallExtension: 'ມີວຽກຕິດຕັ້ງສ່ວນເສີມອື່ນກຳລັງເຮັດວຽກຢູ່'
+PHPExtensionsInstallWarning: "ຕິດຕັ້ງສ່ວນເສີມ PHP ບາງລາຍການບໍ່ສຳເລັດ: {{ .name }}"
+PHPExtensionsInstallManually: "ລອງໃໝ່ຈາກໜ້າຈັດການສ່ວນເສີມເພື່ອບັນທຶກສ່ວນເສີມທີ່ຕິດຕັ້ງສຳເລັດໄວ້ໃນອິມເມຈ. ເພື່ອກວດສອບເອງ ໃຫ້ຮັນຄຳສັ່ງຕໍ່ໄປນີ້ຢູ່ໂຮສ Docker:"
 
 # alert mail template
 PanelAlertTitle: "ການແຈ້ງເຕືອນຈາກແຜງຄວບຄຸມ"
@@ -656,6 +676,17 @@ PartitionDiskErr: 'ການແບ່ງພາທິຊັນລົ້ມເຫ�
 FormatDiskErr: 'ການຟໍແມັດລົ້ມເຫຼວ: {{ .err }}'
 MountDiskErr: 'ການ Mount ລົ້ມເຫຼວ: {{ .err }}'
 XfsNotFound: 'ບໍ່ພົບ xfs; ກະລຸນາຕິດຕັ້ງ xfsprogs ກ່ອນ'
+
+# ການຈັດການເຄືອຂ່າຍ
+ErrNetworkPersistencePlatform: "ການຕັ້ງຄ່າເຄືອຂ່າຍແບບຖາວອນຮອງຮັບສະເພາະໂນດ Linux."
+ErrNetworkPersistencePrivilege: "1Panel Agent ຕ້ອງເຮັດວຽກເປັນ root ແລະມີສິດຄຸ້ມຄອງເຄືອຂ່າຍ."
+ErrNetworkIPRoute2: "ຕິດຕັ້ງ ຫຼືອັບເດດ iproute2 ແລະກວດວ່າຄຳສັ່ງ ip ໃຊ້ໄດ້.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "ທີ່ຢູ່ IP ຫຼັກນີ້ມີທີ່ຢູ່ຮອງໃນເຄືອຂ່າຍຍ່ອຍດຽວກັນ. ກະລຸນາລຶບທີ່ຢູ່ຮອງກ່ອນ ຫຼື ປັບດ້ວຍເຄື່ອງມືເຄືອຂ່າຍຂອງລະບົບແລ້ວລອງໃໝ່."
+ErrNetworkRouteReadOnly: "ເສັ້ນທາງນີ້ສາມາດເບິ່ງໄດ້ເທົ່ານັ້ນ."
+ErrNetworkPersistenceConflict: "ທີ່ຢູ່ ຫຼື ເສັ້ນທາງນີ້ມີຢູ່ແລ້ວ ຫຼື ຂັດກັບຄ່າທີ່ບັນທຶກໄວ້.{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "ການຕັ້ງຄ່າອິນເຕີເຟດ loopback ອ່ານໄດ້ຢ່າງດຽວ."
+ErrNetworkPersistentSourceMissing: "ບໍ່ພົບການຕັ້ງຄ່າຖາວອນຂອງລະບົບທີ່ຮອງຮັບສຳລັບອິນເຕີເຟດ {{ .name }}. ອ່ານໄດ້ຢ່າງດຽວ."
+ErrNetworkVirtualBridgeReadOnly: "ອິນເຕີເຟດສະເໝືອນນີ້ອ່ານໄດ້ຢ່າງດຽວ ແລະ ບໍ່ຮ່ວມໃນການກວດສອບການເຂົ້າເຖິງ."
 
 # terminal
 TerminalAIBlockedRiskyCommand: 'ບລັອກຄຳສັ່ງທີ່ມີຄວາມສ່ຽງ: {{ .command }}'
@@ -811,3 +842,89 @@ ErrImageCheckProxyRequired: "ເພື່ອກວດສອບການອັບ
 ErrPHPExtensionsConflict: "ມີແມ່ແບບສ່ວນຂະຫຍາຍ PHP ຊື່ນີ້ຢູ່ແລ້ວແຕ່ເນື້ອຫາຕ່າງກັນ; ບໍ່ໄດ້ຂຽນທັບ"
 
 ErrModelTokenizerDirOverlap: "ໂຟນເດີໂມເດວ ແລະ tokenizer ຕ້ອງແຕກຕ່າງກັນ ແລະ ບໍ່ສາມາດຢູ່ພາຍໃນກັນໄດ້"
+ErrClusterAppOnly: "ຕິດຕັ້ງ ແລະ ອັບເກຣດແອັບນີ້ໃນສ່ວນຄວາມພ້ອມໃຊ້ງານສູງຂອງແອັບ."
+ErrClusterArchivePassphraseRequired: "ກະລຸນາປ້ອນລະຫັດຜ່ານຂອງໄຟລ໌ສຳຮອງ."
+ErrClusterArchiveTooLarge: "ໄຟລ໌ສຳຮອງຂອງຄລັສເຕີໃຫຍ່ເກີນໄປ."
+ErrClusterArchiveFormat: "ບໍ່ຮອງຮັບຮູບແບບໄຟລ໌ສຳຮອງຂອງຄລັສເຕີນີ້."
+ErrClusterArchiveTruncated: "ໄຟລ໌ສຳຮອງຂອງຄລັສເຕີບໍ່ຄົບຖ້ວນ."
+ErrClusterArchiveBlock: "ໄຟລ໌ສຳຮອງຂອງຄລັສເຕີມີບລັອກຂໍ້ມູນທີ່ບໍ່ຖືກຕ້ອງ."
+ErrClusterArchiveAuthentication: "ລະຫັດຜ່ານຂອງໄຟລ໌ສຳຮອງບໍ່ຖືກຕ້ອງ ຫຼື ໄຟລ໌ສຳຮອງຂອງຄລັສເຕີເສຍຫາຍ."
+ErrClusterArchiveTrailingData: "ມີຂໍ້ມູນເກີນຢູ່ທ້າຍໄຟລ໌ສຳຮອງຂອງຄລັສເຕີ."
+ErrClusterArchiveManifest: "ເມຕາເດຕາຂອງໄຟລ໌ສຳຮອງຂອງຄລັສເຕີບໍ່ຖືກຕ້ອງ."
+ErrClusterArchiveManifestTooLarge: "ເມຕາເດຕາຂອງໄຟລ໌ສຳຮອງຂອງຄລັສເຕີໃຫຍ່ເກີນໄປ."
+ErrClusterArchiveInvalid: "ໂຄງສ້າງໄຟລ໌ສຳຮອງຂອງຄລັສເຕີບໍ່ຖືກຕ້ອງ."
+ErrClusterArchivePayload: "ຂໍ້ມູນສຳຮອງບໍ່ກົງກັບເມຕາເດຕາຂອງໄຟລ໌ສຳຮອງຂອງຄລັສເຕີ."
+ErrClusterArchiveChecksum: "ຄ່າກວດສອບຂອງຂໍ້ມູນສຳຮອງຂອງຄລັສເຕີບໍ່ກົງກັນ."
+ErrClusterArchiveImportHeader: "ສ່ວນຫົວຂອງຄຳຂໍນຳເຂົ້າໄຟລ໌ສຳຮອງຂອງຄລັສເຕີບໍ່ຖືກຕ້ອງ."
+ErrClusterBackupID: "ID ຂອງໄຟລ໌ສຳຮອງຄລັສເຕີບໍ່ຖືກຕ້ອງ."
+ErrClusterBackupEngineMismatch: "ກົນໄກຖານຂໍ້ມູນຂອງໄຟລ໌ສຳຮອງບໍ່ກົງກັບແອັບທີ່ເລືອກ."
+ErrClusterBackupSelectFile: "ກະລຸນາເລືອກໄຟລ໌ສຳຮອງຄລັສເຕີ (.1pha)."
+ErrClusterBackupFileInaccessible: "ບໍ່ສາມາດເຂົ້າເຖິງໄຟລ໌ສຳຮອງຄລັສເຕີ."
+ErrClusterBackupRegularFile: "ໄຟລ໌ສຳຮອງຄລັສເຕີຕ້ອງເປັນໄຟລ໌ປົກກະຕິ."
+ErrClusterBackupFileChanged: "ໄຟລ໌ສຳຮອງຄລັສເຕີຖືກປ່ຽນແລ້ວ. ກະລຸນາເລືອກໃໝ່."
+ErrClusterBackupNotPrimary: "ອິນສະແຕນທີ່ເລືອກບໍ່ແມ່ນອິນສະແຕນຫຼັກຂອງຄລັສເຕີຄວາມພ້ອມໃຊ້ງານສູງ."
+ErrClusterBackupContainerUnavailable: "ຄອນເທນເນີຖານຂໍ້ມູນບໍ່ພ້ອມໃຊ້ງານ."
+ErrClusterBackupMySQLInnoDB: "ການສຳຮອງ MySQL ແບບອອນລາຍກຳນົດໃຫ້ຕາຕະລາງຜູ້ໃຊ້ທັງໝົດໃຊ້ InnoDB."
+ErrClusterBackupPostgresRecovery: "ອິນສະແຕນ PostgreSQL ຢູ່ໃນໂໝດກູ້ຄືນ."
+ErrClusterBackupPostgresTablespaces: "ການສຳຮອງຄລັສເຕີ PostgreSQL ຮອງຮັບສະເພາະພື້ນທີ່ຕາຕະລາງເລີ່ມຕົ້ນ."
+ErrClusterBackupPostgresReplicationCredentials: "ຂໍ້ມູນຢືນຢັນຕົວຕົນສຳລັບການຈຳລອງ PostgreSQL ບໍ່ພ້ອມໃຊ້ງານ."
+ErrClusterBackupRedisNotPrimary: "ອິນສະແຕນ Redis ບໍ່ແມ່ນອິນສະແຕນຫຼັກ."
+ErrClusterBackupRedisVersion: "ບໍ່ສາມາດລະບຸເວີຊັນ Redis."
+ErrClusterBackupUnsupportedEngine: "ກົນໄກຖານຂໍ້ມູນນີ້ບໍ່ຮອງຮັບການສຳຮອງຄລັສເຕີ."
+ErrClusterCommandFailed: "ບໍ່ສາມາດເອີ້ນໃຊ້ {{ .name }}"
+ErrClusterRestoreCatalogInstance: "ການກູ້ຄືນໄປຍັງຄລັສເຕີໃໝ່ຕ້ອງໃຊ້ອິນສະແຕນໃໝ່ທີ່ສ້າງຈາກແມ່ແບບໃນລາຍການແອັບ."
+ErrClusterRestorePrimaryTemplate: "ການກູ້ຄືນຕ້ອງໃຊ້ແມ່ແບບອິນສະແຕນຫຼັກດຽວກັບທີ່ລະບຸໃນຂໍ້ມູນສຳຮອງ."
+ErrClusterRestoreUnsupportedEngine: "ເຄື່ອງຈັກຖານຂໍ້ມູນນີ້ບໍ່ຮອງຮັບການກູ້ຄືນຄລັສເຕີ."
+ErrClusterRestoreRedisSnapshot: "ສະແນັບຊັອດ Redis ບໍ່ຖືກຕ້ອງ."
+ErrClusterRestorePostgresMajorVersion: "ເວີຊັນຫຼັກຂອງຂໍ້ມູນ PostgreSQL ບໍ່ກົງກັບຂໍ້ມູນສຳຮອງ."
+ErrClusterRestoreSingleContainer: "ການກູ້ຄືນຕ້ອງໃຊ້ອິນສະແຕນທີ່ມີຄອນເທນເນີຖານຂໍ້ມູນພຽງໜຶ່ງອັນ."
+ErrClusterRestoreCatalogDataMount: "ການກູ້ຄືນຕ້ອງໃຊ້ຈຸດເຊື່ອມຕໍ່ຂໍ້ມູນຕາມທີ່ກຳນົດໃນແມ່ແບບໃນລາຍການແອັບ."
+ErrClusterRestoreDataDirectoryNotEmpty: "ໂຟນເດີຂໍ້ມູນປາຍທາງສຳລັບການກູ້ຄືນບໍ່ວ່າງ."
+ErrClusterRestorePostgresUnsafePath: "ຂໍ້ມູນສຳຮອງ PostgreSQL ມີເສັ້ນທາງທີ່ບໍ່ປອດໄພ."
+ErrClusterRestorePostgresFileType: "ຂໍ້ມູນສຳຮອງ PostgreSQL ມີລິ້ງ ຫຼື ປະເພດໄຟລ໌ທີ່ບໍ່ຮອງຮັບ."
+ErrClusterRestoreRedisCatalogPersistence: "ການກູ້ຄືນ Redis ຕ້ອງໃຊ້ການຕັ້ງຄ່າການຈັດເກັບຖາວອນຈາກແມ່ແບບໃນລາຍການແອັບ."
+ErrClusterRestoreRedisCatalogRDB: "ການກູ້ຄືນສະແນັບຊັອດ Redis ຕ້ອງໃຊ້ການຕັ້ງຄ່າ RDB ຈາກແມ່ແບບໃນລາຍການແອັບ."
+ErrClusterRestoreMySQLCredentials: "ບໍ່ສາມາດຢືນຢັນຂໍ້ມູນເຂົ້າລະບົບຂອງຜູ້ບໍລິຫານ MySQL ຫຼັງຈາກກູ້ຄືນ. ກະລຸນາໃຊ້ຂໍ້ມູນທີ່ໃຊ້ໄດ້ໃນເວລາສ້າງຂໍ້ມູນສຳຮອງ."
+ErrClusterRestoreEngineVersion: "ເວີຊັນເຄື່ອງຈັກຖານຂໍ້ມູນ {{ .current }} ບໍ່ກົງກັບເວີຊັນຂໍ້ມູນສຳຮອງ {{ .expected }}."
+ErrClusterRestoreDatabaseNotReady: "ຖານຂໍ້ມູນທີ່ກູ້ຄືນຍັງບໍ່ພ້ອມ"
+ErrClusterRestoreOriginalRequest: "ຄຳຂໍກູ້ຄືນໄປຍັງຄລັດສະເຕີເດີມບໍ່ຖືກຕ້ອງ."
+ErrClusterRestoreMemberVersionChanged: "ເວີຊັນຂອງສະມາຊິກຄລັດສະເຕີປ່ຽນແປງກ່ອນການກູ້ຄືນ."
+ErrClusterRestoreMemberChanged: "ສະມາຊິກຄລັດສະເຕີປ່ຽນແປງກ່ອນການກູ້ຄືນ."
+ErrClusterRestoreMemberBusy: "ວຽກງານກູ້ຄືນອື່ນກຳລັງໃຊ້ສະມາຊິກຄລັດສະເຕີນີ້."
+ErrClusterRestoreMemberState: "ສະຖານະການກູ້ຄືນປັດຈຸບັນຂອງສະມາຊິກຄລັດສະເຕີບໍ່ອະນຸຍາດການດຳເນີນງານນີ້."
+ErrClusterRestoreRollbackRequiresReview: "ຂໍ້ມູນທີ່ກູ້ຄືນອາດຖືກຂຽນເພີ່ມແລ້ວ. ບໍ່ສາມາດຍ້ອນກັບອັດຕະໂນມັດໄດ້. ຂໍ້ມູນເດີມຖືກເກັບໄວ້ແລ້ວ."
+ErrClusterRestoreOriginalAction: "ການດຳເນີນງານກູ້ຄືນໄປຍັງຄລັດສະເຕີເດີມບໍ່ຖືກຕ້ອງ."
+ErrClusterRestoreDataMountDirectory: "ເສັ້ນທາງການເຊື່ອມຕໍ່ຂໍ້ມູນຄລັດສະເຕີຕ້ອງເປັນໄດເຣັກທໍຣີ."
+ErrClusterRestoreMemberRoleMismatch: "ບົດບາດການຈຳລອງຂໍ້ມູນຂອງຄອນເທນເນີຖານຂໍ້ມູນບໍ່ກົງກັບບົດບາດທີ່ລົງທະບຽນໄວ້."
+ErrClusterRestoreOriginalCatalogMounts: "ການກູ້ຄືນໄປຍັງຄລັດສະເຕີເດີມຕ້ອງໃຊ້ການເຊື່ອມຕໍ່ຖານຂໍ້ມູນຕາມແມ່ແບບແອັບ."
+ErrClusterRestoreDataMountUnavailable: "ບໍ່ພົບການເຊື່ອມຕໍ່ຂໍ້ມູນຖານຂໍ້ມູນ ຫຼື ບໍ່ສາມາດຂຽນໄດ້."
+ErrClusterRestoreOriginalTemplateVersion: "ຂໍ້ມູນສຳຮອງບໍ່ກົງກັບແມ່ແບບແອັບ ຫຼື ເວີຊັນຖານຂໍ້ມູນຂອງຄລັດສະເຕີເດີມ."
+ErrClusterRestoreValidationContainer: "ຄອນເທນເນີສຳລັບກວດສອບການກູ້ຄືນບໍ່ກົງກັບວຽກງານກູ້ຄືນປັດຈຸບັນ."
+ErrClusterRestoreDataOwnership: "ບໍ່ສາມາດອ່ານເຈົ້າຂອງ ແລະ ກຸ່ມຂອງຂໍ້ມູນຖານຂໍ້ມູນໄດ້."
+ErrClusterRestoreConfigFileType: "ການຕັ້ງຄ່າຖານຂໍ້ມູນມີລິ້ງ ຫຼື ໄຟລ໌ພິເສດ."
+ErrClusterRestoreRedisActiveRDB: "ການກູ້ຄືນສະແນັບຊັອດ Redis ຕ້ອງໃຫ້ອິນສະແຕນຊ໌ທີ່ກຳລັງເຮັດວຽກໃຊ້ການຕັ້ງຄ່າ RDB ທີ່ເຂົ້າກັນໄດ້."
+ErrClusterRestoreDataDirectoryMismatch: "ຖານຂໍ້ມູນທີ່ກຳລັງເຮັດວຽກບໍ່ໄດ້ໃຊ້ໄດເຣັກທໍຣີຂໍ້ມູນທີ່ແມ່ແບບແອັບກຳນົດ."
+ErrClusterRestoreReplicaNotReady: "ໂນດສຳເນົາທີ່ກູ້ຄືນຍັງບໍ່ພ້ອມ"
+ErrClusterRestoreDataPathDirectory: "ເສັ້ນທາງຂໍ້ມູນກູ້ຄືນຕ້ອງເປັນໄດເຣັກທໍຣີ."
+ErrClusterRestoreOriginalDataUnavailable: "ບໍ່ພົບໄດເຣັກທໍຣີຂໍ້ມູນຂອງຄລັດສະເຕີເດີມ."
+ErrClusterRestoreDataDirectoryChanged: "ໄດເຣັກທໍຣີຂໍ້ມູນຄລັດສະເຕີປ່ຽນແປງໃນລະຫວ່າງການກູ້ຄືນ."
+ErrClusterRestoreDataReplacementIncomplete: "ການແທນທີ່ຂໍ້ມູນຄລັດສະເຕີຍັງບໍ່ສຳເລັດ."
+ErrClusterRestoreRollbackDirectoryChanged: "ໄດເຣັກທໍຣີຂໍ້ມູນຄລັດສະເຕີປ່ຽນແປງໃນລະຫວ່າງການຍ້ອນການກູ້ຄືນ."
+ErrRedisAOFRestoreUnavailable: "ລຸ້ນ Redis ນີ້ບໍ່ຮອງຮັບການກູ້ຄືນ AOF."
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "ການເລືອກເວັບໄຊບໍ່ຖືກຕ້ອງ: {{ .value }}"
+ErrCronjobWebsiteGroup: "ບໍ່ສາມາດເຂົ້າເຖິງກຸ່ມເວັບໄຊ {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}: ບໍ່ມີເວັບໄຊທີ່ເລືອກເຫຼືອຢູ່"
+ErrCronjobWebsiteVersion: "ບໍ່ຮອງຮັບເວີຊັນການເລືອກເວັບໄຊ: {{ .version }}"
+ErrCronjobWebsiteAllConflict: "ບໍ່ສາມາດເລືອກເວັບໄຊທັງໝົດພ້ອມກັບເວັບໄຊ ຫຼື ກຸ່ມສະເພາະ"
+ErrCronjobWebsiteGroupName: "ຊື່ກຸ່ມເວັບໄຊບໍ່ສາມາດວ່າງເປົ່າ"
+ErrCronjobWebsiteGroupMissing: "ບໍ່ມີກຸ່ມເວັບໄຊ “{{ .group }}” ແລະ ບໍ່ພົບເວັບໄຊທີ່ກົງກັບລາຍຊື່ທີ່ບັນທຶກໄວ້"
+CronjobWebsiteGroupFallback: "{{ .name }}: ບໍ່ມີກຸ່ມເວັບໄຊ “{{ .group }}”; ໄດ້ນຳເຂົ້າເປັນລາຍຊື່ເວັບໄຊຄົງທີ່ ແລະ ຈະບໍ່ຕິດຕາມການປ່ຽນແປງຂອງກຸ່ມອີກ"
+CronjobWebsiteMissing: "{{ .name }}: ບໍ່ພົບເວັບໄຊ: {{ .website }}"
+ErrCronjobWebsiteImportEmpty: "ບໍ່ພົບກຸ່ມເວັບໄຊ ຫຼື ເວັບໄຊທີ່ກົງກັບລາຍການທີ່ເລືອກ"
+
+ProxyCacheClear: "ລ້າງແຄຊ reverse proxy"
+ProxyCacheEmpty: "ບໍ່ມີແຄຊທີ່ຕ້ອງລ້າງ"
+ProxyCacheSummary: "ລ້າງແລ້ວ {{ .cleared }}, ບໍ່ມີແຄຊທີ່ຕ້ອງລ້າງ {{ .skipped }}, ລົ້ມເຫຼວ {{ .failed }}"
+ProxyCacheReloadFailed: "ລ້າງແຄຊແລ້ວ ແຕ່ໂຫຼດ OpenResty ຄືນໃໝ່ບໍ່ສຳເລັດ"

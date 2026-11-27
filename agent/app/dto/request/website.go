@@ -5,6 +5,7 @@ import (
 )
 
 type WebsiteSearch struct {
+	RuntimeType string `json:"runtimeType" validate:"omitempty,oneof=php node java go python dotnet"`
 	dto.PageInfo
 	Name           string `json:"name"`
 	OrderBy        string `json:"orderBy" validate:"required,oneof=primary_domain type status createdAt expire_date created_at favorite"`
@@ -191,9 +192,10 @@ type WebsiteDomainUpdate struct {
 }
 
 type WebsiteDomain struct {
-	Domain string `json:"domain" validate:"required"`
-	Port   int    `json:"port"`
-	SSL    bool   `json:"ssl"`
+	AllowFirewall bool   `json:"allowFirewall"`
+	Domain        string `json:"domain" validate:"required"`
+	Port          int    `json:"port"`
+	SSL           bool   `json:"ssl"`
 }
 
 type WebsiteDomainDelete struct {
@@ -211,6 +213,7 @@ type WebsiteHTTPSOp struct {
 	CertificatePath       string   `json:"certificatePath"`
 	ImportType            string   `json:"importType"`
 	HttpConfig            string   `json:"httpConfig"  validate:"oneof=HTTPSOnly HTTPAlso HTTPToHTTPS"`
+	HTTPSRedirectPort     *int     `json:"httpsRedirectPort" validate:"omitempty,min=1,max=65535"`
 	SSLProtocol           []string `json:"SSLProtocol"`
 	Algorithm             string   `json:"algorithm"`
 	Hsts                  bool     `json:"hsts"`
@@ -242,8 +245,9 @@ type WebsiteDefaultUpdate struct {
 }
 
 type WebsitePHPVersionReq struct {
-	WebsiteID uint `json:"websiteID" validate:"required"`
-	RuntimeID uint `json:"runtimeID"`
+	WebsiteID       uint `json:"websiteID" validate:"required"`
+	RuntimeID       uint `json:"runtimeID"`
+	CreateIndexFile bool `json:"createIndexFile"`
 }
 
 type WebsiteUpdateDir struct {
@@ -258,6 +262,7 @@ type WebsiteUpdateDirPermission struct {
 }
 
 type WebsiteProxyConfig struct {
+	ServiceStatus   string            `json:"serviceStatus,omitempty"`
 	ID              uint              `json:"id" validate:"required"`
 	Operate         string            `json:"operate" validate:"required"`
 	Enable          bool              `json:"enable" `
@@ -390,4 +395,10 @@ type ExecComposerReq struct {
 	User       string `json:"user" validate:"required"`
 	WebsiteID  uint   `json:"websiteID" validate:"required"`
 	TaskID     string `json:"taskID" validate:"required"`
+}
+
+// WebsiteBatchPHPVersionReq changes only existing PHP websites.
+type WebsiteBatchPHPVersionReq struct {
+	IDs       []uint `json:"ids" validate:"required,min=1"`
+	RuntimeID uint   `json:"runtimeID" validate:"required"`
 }

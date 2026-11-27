@@ -58,7 +58,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		if install.App.Key == "ollama" {
 			apiType, apiKey = "openai-responses", "ollama-local"
 		}
-		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, ValidateAvailability: true}
+		account = &model.AgentAccount{Name: name, Provider: install.App.Key, BaseURL: baseURL, APIType: apiType, APIKey: apiKey, RememberAPIKey: true, ValidateAvailability: true, Status: constant.StatusPending}
 	}
 	accountChanged := account.ID == 0 || account.AppInstallID != install.ID || (updateBaseURL && account.BaseURL != baseURL)
 	if apiKey != nil && account.APIKey != strings.TrimSpace(*apiKey) {
@@ -82,7 +82,7 @@ func SyncLocalModelAccount(install model.AppInstall, accountID uint, baseURL str
 		accountChanged = true
 	}
 	if accountChanged && account.ValidateAvailability {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
@@ -129,7 +129,7 @@ func UpdateLocalModelAccountAddress(accountID uint, previousURL, baseURL string)
 	}
 	account.BaseURL = baseURL
 	if account.ValidateAvailability {
-		account.Verified = false
+		account.Status = constant.StatusPending
 		account.VerifiedAt = nil
 		account.VerifyError = ""
 	}
@@ -211,7 +211,7 @@ func updateOllamaModelPool(modelName string, remove bool) error {
 		if sameProviderModelID("ollama", account.VerifyModel, modelName) {
 			account.VerifyModel = ""
 			if account.ValidateAvailability {
-				account.Verified = false
+				account.Status = constant.StatusPending
 				account.VerifiedAt = nil
 				account.VerifyError = ""
 			}
@@ -334,6 +334,34 @@ func deleteRemoteOllamaModel(account *model.AgentAccount, modelName string) erro
 	defer resp.Body.Close()
 	if resp.StatusCode < http.StatusOK || resp.StatusCode >= http.StatusMultipleChoices {
 		return fmt.Errorf("delete Ollama model failed: %s", resp.Status)
+	}
+	return nil
+}
+
+func resolveUpdatedOllamaModels(baseURL, apiKey string, previousModels, models []dto.AgentAccountModel) error {
+	var available []string
+	for index, item := range models {
+		if _, ok := findAgentAccountModelForProvider("ollama", previousModels, item.ID); ok {
+			continue
+		}
+		if available == nil {
+			var err error
+			available, err = providercatalog.DiscoverModels(baseURL, apiKey)
+			if err != nil {
+				return buserr.WithErr("ErrAgentAccountUnavailable", err)
+			}
+		}
+		found := false
+		for _, id := range available {
+			if sameProviderModelID("ollama", id, item.ID) {
+				models[index].ID = id
+				found = true
+				break
+			}
+		}
+		if !found {
+			return buserr.New("ErrRecordNotFound")
+		}
 	}
 	return nil
 }

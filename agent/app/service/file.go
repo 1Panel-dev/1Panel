@@ -54,8 +54,11 @@ const fileHistorySnapshotMaxSize = 10 * 1024 * 1024
 
 var fileTransferLocks = newFileTransferLocks()
 
+var fileListSlots = make(chan struct{}, 2)
+
 type IFileService interface {
 	GetFileList(op request.FileOption) (response.FileInfo, error)
+	GetFileListWithContext(ctx context.Context, op request.FileOption) (response.FileInfo, error)
 	SearchUploadWithPage(req request.SearchUploadWithPage) (int64, interface{}, error)
 	GetFileTree(op request.FileOption) ([]response.FileTree, error)
 	Create(op request.FileCreate) error
@@ -100,19 +103,53 @@ func NewIFileService() IFileService {
 }
 
 func (f *FileService) GetFileList(op request.FileOption) (response.FileInfo, error) {
+	return f.GetFileListWithContext(context.Background(), op)
+}
+
+func acquireFileListSlot(ctx context.Context) (func(), error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
+	select {
+	case fileListSlots <- struct{}{}:
+		if err := ctx.Err(); err != nil {
+			<-fileListSlots
+			return nil, err
+		}
+		return func() { <-fileListSlots }, nil
+	case <-ctx.Done():
+		return nil, ctx.Err()
+	}
+}
+
+func (f *FileService) GetFileListWithContext(ctx context.Context, op request.FileOption) (response.FileInfo, error) {
 	var fileInfo response.FileInfo
+	release, err := acquireFileListSlot(ctx)
+	if err != nil {
+		return fileInfo, err
+	}
+	defer release()
+
 	data, err := os.Stat(op.Path)
-	if err != nil && os.IsNotExist(err) {
-		return fileInfo, nil
+	if err != nil {
+		if os.IsNotExist(err) {
+			return fileInfo, nil
+		}
+		return fileInfo, err
 	}
 	if !data.IsDir() {
 		op.FileOption.Path = filepath.Dir(op.FileOption.Path)
 	}
-	info, err := files.NewFileInfo(op.FileOption)
+	info, err := files.NewFileInfoWithContext(ctx, op.FileOption)
 	if err != nil {
 		return fileInfo, err
 	}
-	shareMap, err := NewIFileShareService().SharePathCodeMap()
+	paths := make([]string, 0, len(info.Items)+1)
+	paths = append(paths, info.Path)
+	for _, item := range info.Items {
+		paths = append(paths, item.Path)
+	}
+	shareMap, err := NewIFileShareService().SharePathCodeMapForPaths(ctx, paths)
 	if err != nil {
 		return fileInfo, err
 	}
@@ -602,6 +639,7 @@ func (f *FileService) StopDeCompress(taskID string) error {
 
 func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	fo := files.NewFileOp()
+	overwrite := c.Overwrite == nil || *c.Overwrite
 	if c.Type == "tar" && len(c.Secret) != 0 {
 		c.Type = "tar.gz"
 	}
@@ -631,7 +669,7 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 			success := false
 			defer func() {
 				_ = os.RemoveAll(tempDst)
-				if !success && !dstExisted {
+				if !success && !dstExisted && overwrite {
 					_ = os.RemoveAll(c.Dst)
 				}
 			}()
@@ -641,10 +679,12 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 			}); err != nil {
 				return err
 			}
-			if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
-				return err
+			if overwrite {
+				if err := fo.CreateDir(c.Dst, constant.DirPerm); err != nil {
+					return err
+				}
 			}
-			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst); err != nil {
+			if err := copyDecompressTree(t.TaskCtx, tempDst, c.Dst, overwrite); err != nil {
 				return err
 			}
 			success = true
@@ -655,7 +695,13 @@ func (f *FileService) DeCompress(c request.FileDeCompress) error {
 	return nil
 }
 
-func copyDecompressTree(ctx context.Context, srcDir, dstDir string) error {
+func copyDecompressTree(ctx context.Context, srcDir, dstDir string, overwrite ...bool) error {
+	if err := ctx.Err(); err != nil {
+		return err
+	}
+	if len(overwrite) > 0 && !overwrite[0] {
+		return copyDecompressTreeKeep(ctx, srcDir, dstDir)
+	}
 	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
 	entries, err := os.ReadDir(srcDir)
 	if err != nil {
@@ -686,7 +732,10 @@ func decompressHardlinkIdentity(info os.FileInfo) (decompressFileIdentity, bool)
 	return decompressFileIdentity{device: uint64(stat.Dev), inode: uint64(stat.Ino)}, true
 }
 
-func copyDecompressEntry(ctx context.Context, srcPath, dstPath string) (retErr error) {
+func copyDecompressEntry(ctx context.Context, srcPath, dstPath string, overwrite ...bool) (retErr error) {
+	if len(overwrite) > 0 && !overwrite[0] {
+		return copyDecompressEntryKeep(ctx, srcPath, dstPath)
+	}
 	state := decompressCopyState{hardlinks: make(map[decompressFileIdentity]string)}
 	return copyDecompressEntryWithState(ctx, srcPath, dstPath, &state)
 }
@@ -824,12 +873,9 @@ func applyDecompressOwnership(srcPath, dstPath string) error {
 }
 
 func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, error) {
-	if files.ShouldDenySensitiveFileRead(op.Path) {
-		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
-	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
-		Expand:   true,
+		Expand:   !op.IsDetail,
 		IsDetail: op.IsDetail,
 	})
 	if err != nil {
@@ -863,9 +909,6 @@ func (f *FileService) GetContent(op request.FileContentReq) (response.FileInfo, 
 }
 
 func (f *FileService) GetPreviewContent(op request.FileContentReq) (response.FileInfo, error) {
-	if files.ShouldDenySensitiveFileRead(op.Path) {
-		return response.FileInfo{}, buserr.New("ErrSensitiveFileRead")
-	}
 	info, err := files.NewFileInfo(files.FileOption{
 		Path:     op.Path,
 		Expand:   false,
@@ -1333,11 +1376,6 @@ func buildHistoryMoveTargetPath(dst, name, sourcePath string, sourceCount int) s
 }
 
 func (f *FileService) FileDownload(d request.FileDownload) (string, error) {
-	for _, p := range d.Paths {
-		if files.ShouldDenySensitiveFileRead(p) {
-			return "", buserr.New("ErrSensitiveFileRead")
-		}
-	}
 	filePath := d.Paths[0]
 	if d.Compress {
 		tempPath := filepath.Join(os.TempDir(), fmt.Sprintf("%d", time.Now().UnixNano()))

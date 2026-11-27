@@ -20,6 +20,21 @@ import (
 	"github.com/1Panel-dev/1Panel/core/i18n"
 )
 
+type AgentResponseError struct {
+	Code    int
+	Message string
+	Data    interface{}
+}
+
+func (e *AgentResponseError) Error() string { return e.Message }
+
+type HTTPStatusError struct {
+	StatusCode int
+	Message    string
+}
+
+func (e *HTTPStatusError) Error() string { return e.Message }
+
 func NewLocalClient(reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
 	client := NewReusableClient()
 	defer client.CloseIdleConnections()
@@ -68,7 +83,7 @@ func (c *ReusableClient) Request(reqUrl, reqMethod string, body io.Reader, ctx *
 	return c.RequestWithContext(context.Background(), reqUrl, reqMethod, body, ctx)
 }
 
-func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+func (c *ReusableClient) OpenWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (*http.Response, error) {
 	if c == nil || c.client == nil {
 		return nil, errors.New("local agent client is not initialized")
 	}
@@ -101,6 +116,14 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 	if err != nil {
 		return nil, fmt.Errorf("client do request failed, err: %v", err)
 	}
+	return resp, nil
+}
+
+func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqUrl, reqMethod string, body io.Reader, ctx *gin.Context) (interface{}, error) {
+	resp, err := c.OpenWithContext(requestContext, reqUrl, reqMethod, body, ctx)
+	if err != nil {
+		return nil, err
+	}
 	defer resp.Body.Close()
 
 	bodyByte, err := io.ReadAll(resp.Body)
@@ -108,14 +131,17 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 		return nil, fmt.Errorf("read resp body from request failed, err: %v", err)
 	}
 	if resp.StatusCode != http.StatusOK {
+		failure := &HTTPStatusError{
+			StatusCode: resp.StatusCode,
+			Message:    fmt.Sprintf("do request failed, err: %v", resp.Status),
+		}
 		var respJSON dto.Response
 		if err := json.Unmarshal(bodyByte, &respJSON); err == nil && respJSON.Message != "" {
-			return nil, fmt.Errorf("do request failed, status=%v, message=%s", resp.Status, respJSON.Message)
+			failure.Message = fmt.Sprintf("do request failed, status=%v, message=%s", resp.Status, respJSON.Message)
+		} else if msg := strings.TrimSpace(string(bodyByte)); msg != "" {
+			failure.Message = fmt.Sprintf("do request failed, status=%v, body=%s", resp.Status, msg)
 		}
-		if msg := strings.TrimSpace(string(bodyByte)); msg != "" {
-			return nil, fmt.Errorf("do request failed, status=%v, body=%s", resp.Status, msg)
-		}
-		return nil, fmt.Errorf("do request failed, err: %v", resp.Status)
+		return nil, failure
 	}
 
 	var respJson dto.Response
@@ -127,7 +153,7 @@ func (c *ReusableClient) RequestWithContext(requestContext context.Context, reqU
 		if global.I18n != nil {
 			message = strings.ReplaceAll(message, i18n.Get("ErrInternalServerKey"), "")
 		}
-		return nil, errors.New(message)
+		return nil, &AgentResponseError{Code: respJson.Code, Message: message, Data: respJson.Data}
 	}
 
 	return respJson.Data, nil

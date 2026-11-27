@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net"
+	"os/user"
 	"path"
 	"strings"
 	"sync"
@@ -42,6 +43,16 @@ func NewClient(c ConnInfo) (*SSHClient, error) {
 	config.User = c.User
 	if c.AuthMode == "password" {
 		config.Auth = []gossh.AuthMethod{gossh.Password(c.Password)}
+	} else if c.AuthMode == "passwordless" {
+		current, err := user.Current()
+		if err != nil {
+			return nil, err
+		}
+		signers, err := loadRemoteSigners(current.HomeDir)
+		if err != nil {
+			return nil, err
+		}
+		config.Auth = []gossh.AuthMethod{gossh.PublicKeys(signers...)}
 	} else {
 		signer, err := makePrivateKeySigner(c.PrivateKey, c.PassPhrase)
 		if err != nil {

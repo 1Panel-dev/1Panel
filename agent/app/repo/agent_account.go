@@ -2,8 +2,10 @@ package repo
 
 import (
 	"strings"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/model"
+	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/global"
 	"gorm.io/gorm"
 )
@@ -17,11 +19,13 @@ type IAgentAccountRepo interface {
 	Create(account *model.AgentAccount) error
 	Save(account *model.AgentAccount) error
 	UpdateVerification(account *model.AgentAccount) error
+	UpdateStatus(id uint, status, verifyError string) error
+	InterruptVerification() error
 	ResetVerificationByAppInstallID(appInstallID uint) error
 	DeleteByID(id uint) error
 	List(opts ...DBOption) ([]model.AgentAccount, error)
 	Count() (int64, error)
-	CountTextByProviders(providers []string) (map[string]int64, error)
+	CountTextByProviders(providers []string, opts ...DBOption) (map[string]int64, error)
 	SaveWithModels(account *model.AgentAccount, models []model.AgentAccountModel) error
 }
 
@@ -62,7 +66,7 @@ func (a AgentAccountRepo) Save(account *model.AgentAccount) error {
 
 func (a AgentAccountRepo) UpdateVerification(account *model.AgentAccount) error {
 	result := getDb().Model(&model.AgentAccount{}).Where("id = ?", account.ID).Updates(map[string]interface{}{
-		"verified":     account.Verified,
+		"status":       account.Status,
 		"verified_at":  account.VerifiedAt,
 		"verify_error": account.VerifyError,
 		"verify_model": account.VerifyModel,
@@ -76,9 +80,21 @@ func (a AgentAccountRepo) UpdateVerification(account *model.AgentAccount) error 
 	return nil
 }
 
+func (a AgentAccountRepo) UpdateStatus(id uint, status, verifyError string) error {
+	return getDb().Model(&model.AgentAccount{}).Where("id = ?", id).UpdateColumns(map[string]interface{}{"status": status, "verify_error": verifyError}).Error
+}
+
+func (a AgentAccountRepo) InterruptVerification() error {
+	return getDb().Model(&model.AgentAccount{}).Where("status = ?", constant.StatusWaiting).Updates(map[string]interface{}{
+		"status":       constant.StatusFailed,
+		"verified_at":  time.Now(),
+		"verify_error": constant.InterruptedMsg,
+	}).Error
+}
+
 func (a AgentAccountRepo) ResetVerificationByAppInstallID(appInstallID uint) error {
 	return getDb().Model(&model.AgentAccount{}).Where("app_install_id = ? AND validate_availability = ?", appInstallID, true).Updates(map[string]interface{}{
-		"verified":     false,
+		"status":       constant.StatusPending,
 		"verified_at":  nil,
 		"verify_error": "",
 	}).Error
@@ -102,7 +118,7 @@ func (a AgentAccountRepo) Count() (int64, error) {
 	return count, err
 }
 
-func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]int64, error) {
+func (a AgentAccountRepo) CountTextByProviders(providers []string, opts ...DBOption) (map[string]int64, error) {
 	normalizedProviders := normalizeProviders(providers)
 	counts := make(map[string]int64, len(normalizedProviders))
 	for _, provider := range normalizedProviders {
@@ -117,7 +133,7 @@ func (a AgentAccountRepo) CountTextByProviders(providers []string) (map[string]i
 		Count    int64
 	}
 	var rows []providerCount
-	if err := getDb().
+	if err := getDb(opts...).
 		Model(&model.AgentAccount{}).
 		Select("provider, COUNT(*) as count").
 		Where("provider IN ?", normalizedProviders).

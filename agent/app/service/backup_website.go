@@ -156,12 +156,14 @@ func handleWebsiteRecover(website *model.Website, parentTask *task.Task, recover
 			if err != nil {
 				return err
 			}
-			taskName := task.GetTaskName(runtime.Name, task.TaskRecover, task.TaskScopeRuntime)
-			t.LogStart(taskName)
-			if err := handleRuntimeRecover(runtime, fmt.Sprintf("%s/%s.runtime.tar.gz", tmpPath, website.Alias), true, ""); err != nil {
-				return err
+			if runtime.Resource != constant.ResourceLocal {
+				taskName := task.GetTaskName(runtime.Name, task.TaskRecover, task.TaskScopeRuntime)
+				t.LogStart(taskName)
+				if err := handleRuntimeRecover(runtime, fmt.Sprintf("%s/%s.runtime.tar.gz", tmpPath, website.Alias), true, ""); err != nil {
+					return err
+				}
+				t.LogSuccess(taskName)
 			}
-			t.LogSuccess(taskName)
 			if oldWebsite.DbID > 0 {
 				if err := recoverWebsiteDatabase(t, oldWebsite.DbID, oldWebsite.DbType, tmpPath, website.Alias); err != nil {
 					return err
@@ -282,11 +284,14 @@ func doWebsiteBackup(website *model.Website, parentTask *task.Task, backupDir, f
 		if err != nil {
 			return err
 		}
-		parentTask.LogStart(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
-		if err = handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes, ""); err != nil {
-			return err
+		// A local PHP runtime is not managed by 1Panel and has no runtime directory to back up.
+		if runtime.Resource != constant.ResourceLocal {
+			parentTask.LogStart(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
+			if err = handleRuntimeBackup(runtime, tmpDir, fmt.Sprintf("%s.runtime.tar.gz", website.Alias), excludes, ""); err != nil {
+				return err
+			}
+			parentTask.LogSuccess(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
 		}
-		parentTask.LogSuccess(task.GetTaskName(runtime.Name, task.TaskBackup, task.TaskScopeRuntime))
 		if website.DbID > 0 {
 			if err = backupDatabaseWithTask(parentTask, website.DbType, tmpDir, website.Alias, website.DbID); err != nil {
 				return err

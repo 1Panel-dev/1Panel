@@ -105,6 +105,22 @@
                                     </el-input>
                                     <span class="input-help">{{ $t('toolbox.fail2ban.sshPortHelper') }}</span>
                                 </el-form-item>
+                                <el-form-item :label="$t('toolbox.fail2ban.mode')" prop="mode">
+                                    <el-input disabled v-model="form.mode">
+                                        <template #append>
+                                            <el-button
+                                                v-permission
+                                                v-node-admin
+                                                :disabled="!compareVersion(form.version, '0.10.0')"
+                                                @click="onChangeMode"
+                                                icon="Setting"
+                                            >
+                                                {{ $t('commons.button.set') }}
+                                            </el-button>
+                                        </template>
+                                    </el-input>
+                                    <span class="input-help">{{ $t('toolbox.fail2ban.modeHelper') }}</span>
+                                </el-form-item>
                                 <el-form-item :label="$t('toolbox.fail2ban.maxRetry')" prop="maxRetry">
                                     <el-input disabled v-model="form.maxRetry">
                                         <template #append>
@@ -203,6 +219,7 @@
         </div>
         <NoSuchService v-else name="Fail2ban" />
 
+        <Mode ref="modeRef" @search="search" />
         <MaxRetry ref="maxRetryRef" @search="search" />
         <BanTime ref="banTimeRef" @search="search" />
         <FindTime ref="findTimeRef" @search="search" />
@@ -216,6 +233,8 @@
 
 <script lang="ts" setup>
 import { onMounted, reactive, ref } from 'vue';
+import Mode from '@/views/toolbox/fail2ban/mode/index.vue';
+import { compareVersion } from '@/utils/version';
 import MaxRetry from '@/views/toolbox/fail2ban/max-retry/index.vue';
 import BanTime from '@/views/toolbox/fail2ban/ban-time/index.vue';
 import FindTime from '@/views/toolbox/fail2ban/find-time/index.vue';
@@ -239,6 +258,7 @@ const confShowType = ref('base');
 
 const portRef = ref();
 const maxRetryRef = ref();
+const modeRef = ref();
 const banTimeRef = ref();
 const findTimeRef = ref();
 const banActionRef = ref();
@@ -256,6 +276,7 @@ const form = reactive({
 
     port: 22,
     maxRetry: 5,
+    mode: 'normal',
     banTime: '',
     banTimeItem: '',
     findTime: '',
@@ -287,6 +308,9 @@ const onSaveFile = async () => {
 };
 const onChangePort = () => {
     portRef.value.acceptParams({ port: form.port });
+};
+const onChangeMode = () => {
+    modeRef.value.acceptParams({ mode: form.mode });
 };
 const onChangeMaxRetry = () => {
     maxRetryRef.value.acceptParams({ maxRetry: form.maxRetry });
@@ -352,6 +376,7 @@ const search = async () => {
 
     form.port = res.data.port;
     form.maxRetry = res.data.maxRetry;
+    form.mode = res.data.mode;
     form.banTime = res.data.banTime;
     form.banTimeItem =
         form.banTime === '-1' ? i18n.global.t('toolbox.fail2ban.banAllTime') : transTimeUnit(form.banTime);

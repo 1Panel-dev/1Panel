@@ -857,6 +857,9 @@ func (u *ContainerService) ContainerLogClean(req dto.OperationWithName) error {
 }
 
 func (u *ContainerService) StreamLogs(ctx *gin.Context, params dto.StreamLog) {
+	// Establish the stream even when the container has no output yet.
+	_, _ = io.WriteString(ctx.Writer, ": connected\n\n")
+	ctx.Writer.Flush()
 	messageChan := make(chan string, 1024)
 	errorChan := make(chan error, 1)
 	logCtx, cancel := context.WithCancel(ctx.Request.Context())
@@ -880,7 +883,13 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 		// The collector closes both channels when it finishes. Drain all buffered
 		// logs before handling its result, or a ready error channel can drop the tail.
 		if err := <-errors; err != nil {
+			if err == errLogContainerMissing {
+				_, _ = fmt.Fprint(w, "event: container-missing\ndata: {}\n\n")
+				return false
+			}
 			_, _ = fmt.Fprintf(w, "event: error\ndata: %v\n\n", err)
+		} else {
+			_, _ = io.WriteString(w, "event: complete\ndata: {}\n\n")
 		}
 		return false
 	}
@@ -889,6 +898,10 @@ func writeContainerLogMessage(w io.Writer, done <-chan struct{}, messages <-chan
 func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- string, errorChan chan<- error) {
 	defer close(messageChan)
 	defer close(errorChan)
+	if err := checkLogContainers(params); err != nil {
+		errorChan <- err
+		return
+	}
 	var cmdArgs []string
 	cmdArgs = append(cmdArgs, "logs")
 	if params.Follow {
@@ -982,7 +995,9 @@ func collectLogs(done <-chan struct{}, params dto.StreamLog, messageChan chan<- 
 			return
 		}
 	}
-	_ = dockerCmd.Wait()
+	if err := dockerCmd.Wait(); err != nil {
+		errorChan <- err
+	}
 }
 
 func (u *ContainerService) DownloadContainerLogs(containerType, container, since, tail string, timestamp bool, c *gin.Context) error {
@@ -1054,12 +1069,12 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 			global.LOG.Errorf("os.Remove() failed: %v", err)
 		}
 	}()
-	copyErr := copyContainerLogOutput(tempFile, stdout)
-	waitErr := dockerCmd.Wait()
-	if copyErr != nil {
+	if copyErr := copyContainerLogOutput(tempFile, stdout); copyErr != nil {
+		killContainerLogProcess(dockerCmd)
+		_ = dockerCmd.Wait()
 		return copyErr
 	}
-	if waitErr != nil {
+	if waitErr := dockerCmd.Wait(); waitErr != nil {
 		if ctx.Err() != nil {
 			return ctx.Err()
 		}
@@ -1068,7 +1083,10 @@ func (u *ContainerService) DownloadContainerLogs(containerType, container, since
 	if _, err := tempFile.Seek(0, io.SeekStart); err != nil {
 		return err
 	}
-	info, _ := tempFile.Stat()
+	info, err := tempFile.Stat()
+	if err != nil {
+		return err
+	}
 
 	c.Header("Content-Length", strconv.FormatInt(info.Size(), 10))
 	c.Header("Content-Disposition", "attachment; filename*=utf-8''"+url.PathEscape(info.Name()))

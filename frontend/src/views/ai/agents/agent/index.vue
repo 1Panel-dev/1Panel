@@ -179,9 +179,6 @@
                                 alignment="start"
                                 :size="2"
                             >
-                                <el-text v-if="row.agentType === 'octop'" type="info" size="small">
-                                    {{ $t('aiTools.agents.initialCredentials') }}
-                                </el-text>
                                 <span>{{ row.dashboardUsername || '-' }}</span>
                                 <el-space alignment="center">
                                     <span>{{ row.dashboardPassword ? '********' : '-' }}</span>

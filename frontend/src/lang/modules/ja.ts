@@ -73,6 +73,7 @@ const message = {
             enable: '有効化',
             disable: '無効化',
             confirm: '確認',
+            autoFill: '自動入力',
             check: 'チェック',
             submit: '送信',
             cancel: 'キャンセル',
@@ -264,6 +265,8 @@ const message = {
             uninstallSuccess: 'アンインストール成功',
         },
         login: {
+            imageLoadError: '画像を読み込めませんでした',
+            imageLoadErrorHint: '考えられる原因：ネットワーク接続の問題、画像の不在、または未対応の形式。',
             username: 'ユーザー名',
             password: 'パスワード',
             passkey: 'パスキーでログイン',
@@ -304,7 +307,7 @@ const message = {
             simplePassword:
                 'このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜30の英語、数字、「_」文字で構成されている必要があります。',
             dbName: 'このフィールドは、アンダースコアキャラクターから始めてはなりません。長さ1〜64の英語、数字、「_」文字で構成されている必要があります。',
-            imageName: '特殊文字で始まらない、英字、数字、:@/.-_をサポート、長さ1-256',
+            imageName: "特殊文字で始まらない、英字、数字、:{'@'}/.-_をサポート、長さ1-256",
             composeName: '最初の特別な文字、小文字、数字、_、長さ1-256をサポートします',
             volumeName:
                 'このフィールドは、英語、数字、「。」、「 - 」、および「_」文字で構成されている必要があります。',
@@ -364,6 +367,7 @@ const message = {
             serviceNotStarted: '{0}サービスは開始されません。',
         },
         status: {
+            autoSync: '自動同期',
             autoSyncEnabled: '自動同期は有効です',
             autoSyncDisabled: '自動同期は無効です',
             running: 'ランニング',
@@ -622,6 +626,7 @@ const message = {
         loadFromRemote: '同期',
         userBind: 'バインドユーザー',
         noUserBind: '未バインド',
+        connectionUser: '接続ユーザー',
         userAuthorization: 'ユーザー権限',
         noUserAuthorization: '権限を付与しない',
         authorizedDatabaseCount: '{0} データベースに権限付与済み',
@@ -632,9 +637,12 @@ const message = {
         revokeAuthorization: '権限を取り消す',
         revokeAuthorizationHelper: 'ユーザー {0} のデータベース {1} へのアクセス権を取り消しますか？',
         supplementPassword: 'パスワードを登録',
-        supplementPasswordHelper: '既存のパスワードを 1Panel に保存するだけで、MySQL のパスワードは変更しません。',
-        pgBindHelper:
-            'この操作は、新しいユーザーを作成し、ターゲットデータベースにバインドするために使用されます。現在、データベースに既存のユーザーを選択することはサポートされていません。',
+        supplementPasswordHelper:
+            '既存のパスワードを 1Panel に保存するだけで、データベースユーザーのパスワードは変更しません。',
+        pgAuthorizationHelper:
+            'スーパーユーザーは紐付けなしでこのインスタンスの全データベースにアクセスできます。一般ユーザーはデータベース単位の権限のみ管理し、テーブル権限は含みません。',
+        pgRevokeAuthorizationHelper:
+            '権限を取り消してもユーザーは削除されません。PUBLIC や他のロール経由のアクセスが残る場合があります。',
         pgSuperUser: 'スーパーユーザー',
         loadFromRemoteHelper: 'サーバー上のデータベース、ユーザー、権限情報を 1Panel に同期します。続行しますか？',
         passwordHelper: '取得できません、クリックして修正',
@@ -874,7 +882,6 @@ const message = {
                 'ユーザー名には英数字、ドット、アンダースコア、ハイフンを使用できます。パスワードは12文字以上で、前後の空白や改行を含めないでください。',
             octopAuthHelper:
                 'パスワードは英字と数字を含む8文字以上とし、よく使われるパスワードを避けてください。初期化時に拒否された場合は、アプリのログで設定手順を確認してください。',
-            initialCredentials: '初期ログイン情報です。アプリ内で変更した場合は現在のパスワードを使用してください。',
             nativeAgentAccessUnavailable:
                 '既存のインストールに対応する HTTPS アクセス先またはポートがありません。アプリの設定を確認してください。',
             agent: 'エージェント',
@@ -1104,6 +1111,33 @@ const message = {
             validateImageAvailabilityHelper: '保存前に最小画像を1枚生成するため、料金が発生する場合があります',
         },
         model: {
+            poolEditHelp: 'オンラインで取得するか手動で追加できます。すべてのモデルを編集できます。',
+            poolUnavailable:
+                'このプロバイダー種別と API はオンライン取得に対応していません。モデル ID を手動で追加してください。',
+            poolEmpty: 'モデルがありません。オンラインで取得するか手動で追加してください。',
+            poolOverwrite: '取得に成功すると、手動で追加・編集した内容を含む一覧全体が置き換わります。続行しますか？',
+            poolFetchEmpty: 'モデルが返されませんでした。一覧は保持されています。再試行するか手動で追加してください。',
+            poolFetchFailed:
+                '取得に失敗しました。一覧は保持されています。URL、API キー、ネットワークを確認して再試行するか、手動で編集してください。',
+            poolSaveHelp: '保存後に反映されます。使用中のモデルは削除できません。',
+
+            accountType: 'アカウント種別',
+            accountTypes: {
+                default: '既定',
+                payAsYouGo: '従量課金',
+                chinaApi: '中国 API',
+                globalApi: '国際 API',
+                chinaCodingPlan: '中国 Coding Plan',
+                globalCodingPlan: '国際 Coding Plan',
+                chinaTokenPlan: '中国 Token Plan',
+                globalTokenPlan: '国際 Token Plan',
+                speech: '音声サービス',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: '確認して取得',
             externalHealthPassed: 'ヘルスチェック成功',
             externalHealthFailed: 'ヘルスチェック失敗',
@@ -1255,6 +1289,7 @@ const message = {
                 'フォームが変更されています。Compose を再生成すると手動の編集内容が上書きされます。続行しますか？',
             deploymentNameHelper:
                 'アプリのインスタンス名です。インストール先ディレクトリに使用され、作成後は変更できません。表示名を変更するには別名を設定してください。',
+            deploymentAlias: 'インスタンスの別名',
             deploymentAliasHelper:
                 '一覧表示用の任意の別名です。空欄の場合はインスタンス名を表示します。別名を変更してもサービスは再起動されません。',
             deploymentContainerNameHelper:
@@ -1311,7 +1346,12 @@ const message = {
             container_conn_helper: 'コンテナ間のアクセスまたは接続にこのアドレスを使用',
             from_remote: 'このモデルは1Panelを介してダウンロードされておらず、関連するプルログはありません。',
             no_logs: 'このモデルのプルログは削除されており、関連するログを表示できません。',
+            composeFile: 'オーケストレーションファイル',
+            imageCategory: 'イメージの種類',
+            standardImage: '標準イメージ',
+            customImage: 'カスタムイメージ',
             vllmVersionHelper: {
+                qwen38: 'NVIDIA GB10 2台向けのカスタム版で、Qwen3.8-Flash-Next-NVFP4 向けに最適化されています。',
                 ascend: 'Ascend A2 シリーズ向けの Ascend 公式標準版です。',
                 ascendA3: 'Ascend A3 シリーズ向けの Ascend 公式 A3 版です。',
                 ascendA5: '950DT 向けの Ascend 公式 A5 版です。',
@@ -1321,10 +1361,8 @@ const message = {
                 rtxPro5000:
                     'NVIDIA RTX Pro 5000 向けカスタム版。DeepSeek-V4.1-Flash-1017 向けに最適化されており、イメージは 1Panel が保守しています。',
                 dspark: 'NVIDIA GB10 の 2 台構成向けカスタム版。DeepSeek-V4-Flash 向けに最適化されており、イメージは 1Panel が保守しています。',
+                dspark4: 'NVIDIA GB10 の 4 台構成向けカスタム版。DeepSeek-V4.1-Flash 向けに最適化されています。',
             },
-            vllmDeployProfile: 'デプロイモデル',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'モデルサービスに同期',
             modelAccountAddressHelper:
                 'コンテナアドレスはエージェントコンテナ向けです。127.0.0.1、システム IP、カスタムアドレスは AI Gateway または外部サービス向けです。',
@@ -1333,6 +1371,12 @@ const message = {
             downloader: 'モデルのダウンロード',
             modelDirectoryHelper:
                 'モデル一覧には、デフォルトで「モデル準備 > 設定」で指定したモデルディレクトリにダウンロード済みのモデルが表示されます。',
+            vllmGB10Qwen38ModelHelper:
+                'Qwen3.8-Flash-Next-NVFP4 のみ対応しています。両方のデバイスで同じパスに完全なモデルを配置してください。',
+            vllmGB10DualNodeModelHelper:
+                'DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp のみ対応。2 台とも同じパスに完全なモデルを配置してください。',
+            vllmGB10FourNodeModelHelper:
+                'DeepSeek-V4.1-Flash のみ対応。4 台すべての同じパスに完全なモデルを配置してください。',
             modelDirectoryPlaceholder: 'モデルを検索するかフルパスを入力',
             selectModel: 'モデルを選択',
             selectModelDirectory: 'ディレクトリを選択',
@@ -2424,15 +2468,13 @@ const message = {
         imageMissing: '必要なイメージが見つかりません。イメージ管理で {image} を取得してください。',
         imageReady: 'Benchmark イメージの準備ができました。ベンチマークを作成できます。',
         imageHelp:
-            'Benchmark イメージは負荷テストクライアントを実行し、選択したモデルサービスにリクエストを送信します。',
+            'このイメージから専用のコンテナーを作成し、選択したモデルサービスにテストリクエストを送信してベンチマークを実行します。',
         mainNodeHelp:
             'ベンチマークはメインノードで実行されます。イメージとトークナイザーをメインノードで準備してください。',
         goImages: 'イメージ管理へ',
         goModels: 'モデルダウンロードへ',
-        tokenizerHelp: 'トークナイザーディレクトリから選択し、テスト文のエンコードとトークン数の計測に使用します。',
-        tokenizerEmpty:
-            '利用できるモデルがありません。モデルダウンロードでトークナイザーファイルを含むモデルをダウンロードしてください。',
-        tokenizerEmptyWithDownload: '利用可能なトークナイザーがありません。{download}からダウンロードしてください。',
+        tokenizerHelp:
+            'メインノード上のトークナイザーまたはモデルを選択し、テスト文のエンコードとトークン数の計測に使用します。',
         tokenizerInvalid: 'このトークナイザーは利用できません。別のものを選択するか、再ダウンロードしてください。',
         schemeHelp:
             'テストプランはリクエストパラメーター、同時実行数、実行ルールを定義します。利用できるプランを少なくとも 1 つ準備してください。',
@@ -2510,6 +2552,10 @@ const message = {
         missing: '存在しない',
     },
     container: {
+        logDisconnected:
+            'ログストリームが切断されました。再接続して最近のログを読み込み、リアルタイムのログ受信を再開してください。',
+        logsUnavailable:
+            'コンテナが存在しないか、削除されています。コンテナのログは表示できません。コンテナを再作成してから、もう一度お試しください。',
         nvidiaSupport: 'NVIDIA GPU サポート',
         nvidiaHelper:
             'NVIDIA コンテナーランタイムを登録します。先に NVIDIA Container Toolkit をインストールしてください。GPU はコンテナーごとに割り当てる必要があります。',
@@ -2861,6 +2907,9 @@ const message = {
             'イメージ操作ではレジストリミラー URL を優先して使用します。空欄にするとレジストリミラーを無効にします。',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'グループ内の「すべて」は所属サイトの変更に追従します。個別に選択したサイトは固定リストとして保存されます。',
+        websiteSelectionMissing: '無効な選択',
         importHelper:
             'インポート時に同名のスケジュールタスクは自動的にスキップされます。タスクはデフォルトで【無効】状態に設定され、データ関連付け異常時には【編集待ち】状態に設定されます。',
         changeStatus: 'ステータスを変更します',
@@ -2961,6 +3010,11 @@ const message = {
         cleanDataHelper: 'このタスク中に生成されたバックアップファイルを削除します。',
         noLogs: 'タスク出力はまだありません...',
         errPath: 'バックアップパス[{0}]エラー、ダウンロードできません！',
+        websiteStartStop: 'ウェブサイトの起動・停止',
+        startTime: '起動時刻',
+        stopTime: '停止時刻',
+        websiteTimeHint: 'お知らせ：毎日1回実行されます',
+        websiteTimeInvalid: '起動時刻と停止時刻を選択してください。起動時刻は停止時刻より前に設定してください',
         cutWebsiteLog: 'ウェブサイトのログローテーション',
         cutWebsiteLogHelper: '回転したログファイルは、1パネルのバックアップディレクトリにバックアップされます。',
         syncIpGroup: 'WAF IP グループを同期',
@@ -2969,6 +3023,15 @@ const message = {
         unitHours: 'ユニット:時間',
         alertTitle: '計画タスク -  {0}「{1}」タスク障害アラート',
         library: {
+            executeScript: 'スクリプトを実行',
+            targetNodes: '実行ノードを選択',
+            switchNodeHelper:
+                'ノードを切り替えても実行は継続します。ターミナルに直接入力してください。入力は選択中のノードのみに送信されます。',
+            executorCloseHelper:
+                '閉じるとすべてのノードの接続が切れ、実行中のスクリプトが中断される場合があります。続行しますか？',
+            connecting: '接続中',
+            connected: '接続済み',
+            disconnected: '切断済み',
             script: 'スクリプト',
             syncNow: '今すぐ同期',
             autoSyncHelper:
@@ -3096,6 +3159,10 @@ const message = {
             '{0} 以降のデータの取得が再試行後も失敗したため、エクスポートを中止しました。ネットワークを確認するか、期間を短くして再試行してください。',
     },
     terminal: {
+        passwordless: 'パスワードレス',
+        bootstrapAuth: '初回認証（任意）',
+        passwordlessSetupHelper: '接続テスト時にパスワードレス接続を設定し、確認します。',
+
         showTerminalButton: 'ターミナルへのショートカット',
         showTerminalButtonHelper: '有効にすると、ページの右下にターミナルへのショートカットボタンが表示されます。',
         local: 'ローカル',
@@ -3239,6 +3306,13 @@ const message = {
             syncSiteHelper: 'システム時刻を {0} と同期しますか？',
         },
         fail2ban: {
+            mode: '検出モード',
+            modeHelper:
+                'どの SSH 接続の動作を失敗として数えるかを選びます。設定した回数に達すると IP を遮断します。Fail2ban 0.10 以降が必要です。',
+            modeNormal: '既定：パスワードの間違いや存在しないユーザー名など、ログイン失敗を数えます。',
+            modeDdos: '既定の検出に加え、接続のタイムアウトやログイン前の切断も数えます。',
+            modeExtra: '既定の検出に加え、サーバーが対応していない接続方法による失敗も数えます。',
+            modeAggressive: '上記すべてを数えます。より厳しく制限するため、正常なユーザーも遮断されやすくなります。',
             sshPort: 'SSHポートを聞いてください',
             sshPortHelper: '現在のFAL2BANは、ホストのSSH接続ポートに耳を傾けます',
             unActive: '現在、Fail2Banサービスは有効になっていません。',
@@ -3501,6 +3575,10 @@ const message = {
         compressSuccess: '正常に圧縮されました',
         deCompressSuccess: '減圧は成功しました',
         deCompressDst: 'パスを減圧します',
+        decompressConflictPolicy: '同名ファイルの処理',
+        keepExisting: '既存ファイルを保持',
+        decompressConflictHelper:
+            '既存ファイルを保持する場合は競合する項目をスキップします。同名のディレクトリは引き続きマージされます。',
         linkType: 'リンクタイプ',
         softLink: 'ソフトリンク',
         hardLink: 'ハードリンク',
@@ -4567,6 +4645,18 @@ const message = {
         isEdirWarn: 'docker-compose.yml ファイルの変更が検出されました。差分を確認してください。',
     },
     website: {
+        batchPHP: 'PHP バージョンを切り替え',
+        batchPHPHelper:
+            'PHP サイトのみ変更します。他のサイトはスキップされます。ローカル PHP 環境はサポートされていません。',
+        batchPHPCount: '選択したサイト: {0}、PHP サイト: {1}、その他: {2}。',
+        notPHP: 'PHP サイトではありません',
+        localPHP: 'ローカル PHP 環境はサポートされていません',
+        samePHP: '既に対象の PHP 環境を使用しています',
+        batchPHPResult: '処理結果',
+        batchPHPStatus_success: '成功',
+        batchPHPStatus_failed: '失敗',
+        batchPHPStatus_skipped: 'スキップ',
+        sslDomainMismatchWebsite: '証明書のドメインがウェブサイトのドメインと一致しません',
         primaryDomain: 'プライマリドメイン',
         otherDomains: '他のドメイン',
         static: '静的',
@@ -4691,6 +4781,9 @@ const message = {
         privateKey: 'キー（キー）',
         certificate: '証明書（PEM形式）',
         HTTPConfig: 'HTTPオプション',
+        HTTPSRedirectPort: 'HTTPS リダイレクトポート',
+        HTTPSRedirectPortCustom: 'カスタム',
+        HTTPSRedirectPortManualHelper: 'このリダイレクトルールは手動で編集されたか管理外のため、変更できません。',
         HTTPSOnly: 'HTTP要求をブロックします',
         HTTPToHTTPS: 'HTTPSにリダイレクトします',
         HTTPAlso: '直接HTTPリクエストを許可します',
@@ -4856,6 +4949,8 @@ const message = {
         batchInput: 'バッチ入力',
         domainNotFQDN: 'このドメインはパブリックネットワークからアクセスできない可能性があります',
         domainInvalid: 'ドメイン形式が正しくありません',
+        allowFirewall: 'ファイアウォールで許可',
+        allowFirewallHelp: 'サイト作成後、この TCP ポートを使用するすべてのドメインに対してポートを開放します。',
         domainBatchHelper: '1行に1ドメイン、形式: domain:port@ssl\n例: example.com:443@ssl または example.com',
         generateDomain: '生成',
         global: 'グローバル',
@@ -4886,6 +4981,9 @@ const message = {
         failTimeoutHelper:
             'サーバーのヘルスチェックの時間ウィンドウの長さ。この期間内に累積障害回数がしきい値に達すると、サーバーは一時的に削除され、同じ時間経過後に再試行されます。デフォルト 10 秒',
         staticChangePHPHelper: '現在は静的ウェブサイトですが、PHPウェブサイトに切り替えることができます。',
+        createDefaultIndex: 'デフォルトの {0} ファイルを作成',
+        createDefaultIndexHelper:
+            'サイトのルートディレクトリに該当ファイルが存在しない場合のみ、デフォルトページ設定の内容で作成されます。',
         proxyCache: 'リバースプロキシキャッシュ',
         cacheLimit: 'キャッシュスペース制限',
         shareCache: 'キャッシュカウントメモリサイズ',
@@ -5015,6 +5113,8 @@ const message = {
         status: '現在のステータス',
         configResource: '構成',
         saveAndReload: '保存してリロードします',
+        batchClearProxyCacheWarn:
+            '選択した {0} 件のサイトのリバースプロキシキャッシュを消去しますか？ キャッシュされていたコンテンツへの次のリクエストはオリジンサーバーに送られます。',
         clearProxyCache: '逆プロキシキャッシュをきれいにします',
         clearProxyCacheWarn:
             'キャッシュで構成されたすべてのWebサイトが影響を受け、「OpenResty」が再起動されます。続けたいですか？',
@@ -5051,14 +5151,25 @@ const message = {
             'コンパイル前に実行するスクリプト、通常はモジュールソースコードのダウンロード、依存関係のインストールなど',
         buildHelper:
             '動的モジュールはビルド後に設定から読み込まれます。静的モジュールは引き続き OpenResty を再ビルドします。',
-        defaultHttps: 'HTTPS 改ざん防止',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '改ざん防止ステータス',
         defaultHttpsHelper1: 'これを有効にすると、HTTPS 改ざん問題を解決できます。',
         sslRejectHandshake: 'デフォルト SSL ハンドシェイクを拒否',
         sslRejectHandshakeHelper:
             '有効にすると証明書の漏洩を防げますが、デフォルト Web サイトを設定するとこの設定は無効になります',
+        httpsRedirectCustomPort: 'カスタムポートでリダイレクト',
+        httpsRedirectCustomPortHelper:
+            '有効にすると、HTTP から HTTPS へのリダイレクトでカスタム HTTPS ポートを使用します。',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '同期ディレクトリ',
+        syncDirHelp:
+            '対象ノードのディレクトリを絶対パスで入力してください。すべての対象ノードで同じディレクトリを使用します。',
+        syncDirSingleCert: 'ファイルの上書きを防ぐため、ディレクトリを指定する場合は証明書を1つだけ選択してください。',
+        syncDirAbsolute: '同期ディレクトリは絶対パスで指定してください。',
+
+        caUploadHelp:
+            'ca.crt と ca.key を含む、ダウンロードした ZIP ファイルをアップロードしてください（最大 10 MB）。',
         deleteConfirm: '以下の証明書を削除します。ACME 証明書は自動的に失効されます。続行しますか？',
         deleteAndRevoke: '削除して失効',
         create: 'リクエスト',
@@ -5384,6 +5495,9 @@ const message = {
         editRuleConfirm: 'このルールを変更してもよろしいですか？',
     },
     runtime: {
+        buildLog: 'ビルドログ',
+        extensionInstallFailed: '一部の PHP 拡張機能をインストールできませんでした: {extensions}',
+        statusMessageUnavailable: '詳細なステータス情報はありません。実行環境のログで詳細を確認してください。',
         importEnv: '環境変数をインポート',
         envImportError: '{0} 行目：{1}',
         envInvalidAssignment: '有効な NAME=value 形式で入力してください',
@@ -5563,6 +5677,81 @@ const message = {
         diskType: 'ディスクタイプ',
         serial: 'シリアルナンバー',
         noFail: 'マウント失敗はシステム起動に影響しません',
+    },
+    networkManage: {
+        routeDetails: 'ルート詳細',
+        manageIP: '対応する IP を管理',
+        connectedRoute: 'IP から自動生成',
+        connectedRouteHint:
+            'この直結ルートはインターフェースの IP に基づいてシステムが自動生成します。個別には編集せず、インターフェースの詳細で対応する IP を編集または削除してください。',
+        virtualBridgeReadOnly: '仮想インターフェース · 読み取り専用',
+        virtualBridgeReadOnlyHint: 'この仮想インターフェースは読み取り専用で、到達性チェックの対象外です。',
+        loopbackReadOnly: 'ループバックインターフェースの設定は読み取り専用です。',
+        persistentSourceMissing:
+            'インターフェース {0} に対応するシステムの永続設定が見つかりません。読み取り専用です。',
+        addressReadOnlyReason: 'このアドレスは動的、非グローバル、または対応する永続設定がないため、読み取り専用です。',
+        routeReadOnlyReason: 'このルートは動的、カーネル生成、または対応する永続設定がないため、読み取り専用です。',
+        persistenceBackend: '永続化方式',
+        editIP: 'IP を編集',
+        editRoute: 'ルートを編集',
+        operationRisk: 'ネットワークの変更で接続が切れる場合があります。代替のアクセス手段を用意してください。',
+        confirmInterface: '確認のためインターフェース名 {0} を入力してください。',
+        sourceAddress: '送信元アドレス',
+        linkConnected: 'リンク接続済み',
+        linkDisconnected: 'リンク未接続',
+        topologySearch: 'インターフェース、IP、ゲートウェイ、宛先を検索',
+        topologyHint:
+            '左側でインターフェースの IP を管理し、右側のカードで宛先、ゲートウェイ、メトリックを確認します。カードをクリックすると詳細を表示します。線は接続確認済みを意味しません。',
+        direct: '直接接続',
+        defaultDestination: 'デフォルトルート',
+        unknownInterface: '未指定のインターフェース',
+        noRoutes: '一致する経路がありません',
+        readOnly: '読み取り専用',
+        readOnlyRouteHint:
+            '複数のネクストホップがある経路、または単一のインターフェースを特定できない経路は読み取り専用です。',
+        title: 'ネットワーク管理',
+        interfaces: 'ネットワークインターフェース',
+        routes: 'ルート',
+        addIP: 'IPを追加',
+        ipCount: 'IP数',
+        interfaceID: 'インターフェースID',
+        adminState: '管理状態',
+        linkState: 'リンク状態',
+        mac: 'MACアドレス',
+        flags: 'フラグ',
+        address: 'アドレス',
+        scope: 'スコープ',
+        interface: 'インターフェース',
+        configStatus: '設定の状態',
+        managedApplied: '保存済み · 有効',
+        managedPending: '保存済み · 無効',
+        addressWarning:
+            'このインターフェースに割り当てられた IP を入力してください。NAT で公開 IP を割り当てている場合は、プライベート IP を入力してください。',
+        addressRisk:
+            '使用中の IP や誤ったプレフィックス長を設定すると、パネルや SSH に接続できなくなる場合があります。',
+        addressWithPrefix: 'IP アドレス / プレフィックス長',
+        interfaceSelectHint:
+            '永続設定を変更できるインターフェースのみ表示されます。ループバック、読み取り専用の仮想ブリッジ、その他変更できないインターフェースは表示されません。',
+        gatewayHint: '直接接続されたサブネットでは、ゲートウェイを空欄にできます。',
+        metricHint: '宛先サブネットが同じ場合、通常はメトリックが小さい経路が優先されます。',
+        defaultRouteWarning:
+            'デフォルトルートはパネル、SSH、その他のサービスの通信経路を変えることがあります。クラウドコンソールなど別の接続手段を確保してください。',
+        interfaceMissing: 'インターフェースがありません',
+        changeWarning:
+            'ネットワーク設定を変更すると、パネルへの接続やサービスが中断する場合があります。別の方法でこのサーバーにアクセスできることを確認してから続行してください。',
+        cidrHint:
+            '192.0.2.10/24 の /24 はサブネットマスク 255.255.255.0 に相当します。IPv6 の入力例は 2001:db8::10/64 です。',
+        addRoute: 'ルートを追加',
+        checkRoutes: 'ルートの到達性を確認',
+        destination: '宛先',
+        metric: 'メトリック',
+        routeTable: 'ルーティングテーブル',
+        reachability: '到達性',
+        reachable: '到達可能',
+        unreachable: '到達不可',
+        unchecked: '未確認',
+        check: '確認',
+        destinationHint: 'IPv4/IPv6 アドレスまたは CIDR に対応。デフォルトルート：default、0.0.0.0/0 または ::/0。',
     },
     xpack: {
         ldap: {
@@ -7675,6 +7864,13 @@ const message = {
             appUpgradeHelper: 'アップグレードが必要なアプリが {0} 個あります',
             dashboardSetting: '概要設定',
             keepOneDashboardComponent: '概要セクションを少なくとも 1 つ残してください',
+            currentNode: '現在のノード',
+            quickSwitch: 'クイック切り替え',
+            allNodes: 'すべてのノード',
+            nodeSearchPlaceholder: 'ノード名またはアドレスで検索',
+            currentNodeNotInResults: '現在のノードはこのページの結果に含まれていません',
+            upgradableApps: 'アップグレード可能なアプリ',
+            quickSwitchMore: '一致するすべてのノードを表示',
         },
         customApp: {
             name: 'カスタムアプリリポジトリ',
@@ -8000,6 +8196,31 @@ const message = {
             menu: 'リソース同期',
             file: 'ファイル転送',
             fileSyncConfirm: 'ノード {0} のファイル/フォルダ {1} をノード {2} のディレクトリ {3} に転送しますか？',
+            fileBatchDesc: '任意のノードからファイルまたはフォルダを選択し、複数の宛先ノードに配布します。',
+            fileSourceTitle: '転送元ファイルを選択',
+            fileSourceNode: '転送元ノード',
+            fileTargetDirectory: '宛先ディレクトリ',
+            fileBatchPath: '宛先ディレクトリを一括設定',
+            fileApplyPath: '選択したノードに適用',
+            fileSelectedCount: '{0} 件を選択中',
+            fileSelectedTargets: '{0} ノードを選択中',
+            fileSelectionHint: 'フォルダは元の名前で全体がコピーされ、内部のディレクトリ構造は保持されます。',
+            fileRules:
+                '既存のファイル転送ルールに従います。同名のファイルは更新される場合がありますが、宛先ディレクトリの他のファイルは保持されます。',
+            fileBatchSummary: '{0} 件の項目を {1} 個の宛先ノードに配布',
+            fileTaskHint: '確認後に配布タスクが作成されます。タスク管理で確認できます。',
+            fileBatchConfirm:
+                '下記の宛先ノードと保存先パスを確認してください。同名のファイルが上書きされる場合があります。',
+            fileTargetHint:
+                'ディレクトリはノードごとに設定できます。オフライン、確認失敗、または rsync 未インストールのノードは選択できません。',
+            fileChecking: '確認中',
+            fileCheckFailed: '確認失敗',
+            fileRsyncMissing: 'rsync 未インストール',
+            filePathRequired: '/ で始まる宛先ディレクトリの絶対パスを入力してください。',
+            fileConflictHint:
+                '同じ宛先名を持つ転送元があります。各名前につき1つだけ残してください。選択解除はすべての宛先ノードに適用されます。',
+            fileDeselect: '選択解除',
+            fileSourceChanged: '転送元ノードが変更されました。ファイルを選択し直してください。',
 
             image: 'イメージ転送',
             imageBatchDesc: 'まずソースノードとソースイメージを選択し、その後転送先ノードを選択してください。',
@@ -8176,6 +8397,11 @@ const message = {
             createFromTemplate: 'テンプレートから作成',
             template: 'テンプレート',
             templateName: 'テンプレート名',
+            dataDisks: 'データディスク',
+            dataDiskHelper:
+                'データディスクは空の状態で作成されます。各ディスクのストレージプールを選択でき、バスの種類はシステムディスクと共通です。最大 9 台追加できます。',
+            templateSystemDiskHelper:
+                'テンプレートにはシステムディスクのみがコピーされ、データディスクの内容は含まれません。テンプレートからの作成時に空のデータディスクを追加できます。/etc/fstab のマウント設定やデータベース、アプリのパス依存を確認してください。新しいディスクの UUID は異なる場合があります。ゲスト設定は自動変更されません。',
             convertToTemplate: 'テンプレートに変換',
             sourceVM: '元の VM',
             templateSize: 'テンプレートサイズ',
@@ -8295,7 +8521,7 @@ const message = {
             currentSnapshot: '現在',
             snapshotEmpty: 'スナップショットがありません',
             snapshotHelper:
-                'スナップショットは現在の VM 状態を復元ポイントとして保存します。以降のデータ変更は元のディスクを変更せず差分ファイルに記録されます。復元すると VM はその時点の状態に戻ります。',
+                'スナップショットは管理対象の書き込み可能な全ディスクを一括保存・復元します。メモリは含みません。復元には停止が必要で、ディスク構成がスナップショットと一致する必要があります。共有または非対応の書き込み可能ディスクがある場合は作成できません。',
             snapshotOperationHelper:
                 '現在のスナップショットは削除できません。スナップショットを復元できるのは仮想マシンが停止している場合のみです。',
             snapshotRecoverConfirm:
@@ -8331,14 +8557,86 @@ const message = {
             cluster: 'アプリケーションの高可用性',
             name: 'クラスタ名',
             addCluster: 'クラスタを追加',
-            installNode: 'ノードをインストール',
-            master: 'マスターノード',
-            slave: 'スレーブノード',
-            replicaStatus: 'マスタースレーブステータス',
             unhealthyDeleteError:
                 'インストールノードのステータスが異常です。ノードリストを確認してから再試行してください！',
-            replicaStatusError: 'ステータスの取得が異常です。マスターノードを確認してください。',
-            masterHostError: 'マスターノードのIPは127.0.0.1にできません',
+            noAvailableMasterVersion: 'このノードで利用できるプライマリのテンプレートがありません。',
+            backups: 'クラスターバックアップ',
+            importBackup: 'バックアップのインポート',
+            archivePassphrase: 'バックアップのパスフレーズ',
+            restoreToNew: '新しいクラスターに復元',
+            restoreTarget: '復元先',
+            restoreToOriginal: '元のクラスターに復元',
+            restoreOriginalUnavailable: 'このバックアップに対応する復元可能なクラスターがありません。',
+            restoreOriginalWarning:
+                'データベース接続が中断されます。元のクラスターのデータはバックアップ時点に戻り、レプリカは再同期されます。',
+            restoreOriginalConfirm: '上書きを確定するにはクラスター名「{0}」を入力してください。',
+            restoreCredentials: 'バックアップ時の管理者およびレプリケーションの認証情報を使用してください。',
+            archiveImportHint:
+                '.1pha 形式のクラスターバックアップのみインポートできます。バックアップ作成時に設定したパスフレーズを使用してください。',
+            backupDataSize: 'データサイズ',
+            appStoreOnly: 'このアプリのインストールとアップグレードは、アプリケーション高可用性から実行してください。',
+            noMatchingReplicaVersion: 'このノードにはプライマリと同じバージョンのレプリカテンプレートがありません。',
+            installNode: '配置先サーバー',
+            master: 'プライマリデータベース',
+            slave: 'レプリカデータベース',
+            redisMaster: 'プライマリインスタンス',
+            redisReplica: 'レプリカ',
+            replicaStatus: 'レプリケーションの詳細',
+            replicaStatusError: 'レプリケーション状態を取得できませんでした',
+            masterHostError: 'プライマリのアドレスに 127.0.0.1 は指定できません',
+            emptyTitle: '{0} クラスターが設定されていません',
+            emptyDescription:
+                '「{2}」で配置先サーバーとバージョンを選択し、{0}を作成してください。配置完了後は、同じバージョンの{1}の追加や、レプリケーション状態、インスタンスパラメーター、ログの確認ができます。',
+            loadFailed: 'クラスターを読み込めませんでした',
+            refreshFailed: '更新できませんでした。{0} のデータを表示しています。',
+            addReplica: '{0}を追加',
+            masterUnavailable: 'プライマリを利用できません。配置先サーバーを確認してください。',
+            replication: 'レプリケーション',
+            replicationStatus: 'レプリケーションの状態',
+            configuredReplicas: '設定済みの{1}は {0} 台',
+            addReplicaPending: '{0}の追加待ち',
+            checkedAt: '確認時刻 {0}',
+            roleParameters: '{0}のパラメーター',
+            parametersFailed: 'インスタンスのパラメーターを取得できませんでした',
+            instanceParameters: 'インスタンスパラメーター',
+            replicationParameters: 'データレプリケーション設定',
+            replicationUserHelp:
+                'レプリカデータベースがプライマリデータベースに接続し、データを同期するためのアカウントです。',
+            replicationPasswordHelp:
+                'レプリケーションユーザーの認証に使用します。レプリカデータベースを追加する際は、プライマリデータベースでこのアカウントに設定したパスワードを使用してください。',
+            configureRole: '{0}を設定',
+            sameHost: '両インスタンスは同じサーバー上にあり、サーバー障害の影響をともに受けます。',
+            versionLocked: '現在のプライマリと同じバージョンです。',
+            unset: '未設定',
+            noParameters: '表示できるパラメーターはありません',
+            lagSeconds: 'レプリケーション遅延（秒）',
+            offsetBytes: 'レプリケーションオフセット（バイト）',
+            taskQueued: 'タスク受付済み',
+            removeRecord: '記録を削除',
+            removeClusterRecordNotice: 'このクラスターの記録を削除します。',
+            removeMemberRecordNotice: 'このメンバーの記録を削除します。',
+            taskAwaitingConfirmation: 'サーバーの確認待ち',
+            taskConfirmationNotice:
+                '{0} によるタスクの確認を待っています。登録後は、そのサーバーのタスクセンターまたはカードの「ログ」で確認できます。',
+            taskRecordUnavailable:
+                'タスクの記録を取得できませんでした。操作の送信結果と配置先サーバーの状態を確認してください。',
+            taskRunning: 'タスク実行中',
+            taskFailed: '操作に失敗しました。タスクログを確認してください。',
+            parameters: 'パラメーター',
+            primaryMissing: 'プライマリの記録が見つかりません。',
+            replicaSourceAddress: '{0}のアドレス',
+            replicaSourcePort: '{0}のポート',
+            replicaSourceAddressHelp: '選択したサーバーから接続できる IP アドレスまたはドメイン名を入力してください。',
+            replicationState: {
+                pending: '確認待ち',
+                waitingForInstance: 'インスタンスの準備待ち',
+                healthy: '正常',
+                syncing: '同期中',
+                lagging: '遅延',
+                disconnected: '切断',
+                unknown: '不明',
+                unavailable: '取得不可',
+            },
         },
     },
     template: {

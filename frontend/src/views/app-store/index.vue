@@ -37,7 +37,7 @@ let buttons = [
 ];
 
 const search = () => {
-    searchAppInstalled({ update: true, page: 1, pageSize: 100 })
+    searchAppInstalled({ update: true, page: 1, pageSize: 100, appStore: true })
         .then((res) => {
             if (res.data.items) {
                 buttons[2].count = res.data.items.length;

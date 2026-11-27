@@ -16,6 +16,7 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/buserr"
 	"github.com/1Panel-dev/1Panel/agent/constant"
 	"github.com/1Panel-dev/1Panel/agent/utils/req_helper"
+	"github.com/spf13/afero"
 	"golang.org/x/text/encoding"
 	"golang.org/x/text/encoding/charmap"
 	"golang.org/x/text/encoding/japanese"
@@ -39,7 +40,11 @@ func IsBlockDevice(mode os.FileMode) bool {
 }
 
 func GetMimeType(path string) string {
-	file, err := os.Open(path)
+	return getMimeTypeFromFS(afero.NewOsFs(), path)
+}
+
+func getMimeTypeFromFS(fs afero.Fs, path string) string {
+	file, err := fs.Open(path)
 	if err != nil {
 		return ""
 	}

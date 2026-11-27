@@ -1,11 +1,14 @@
 import { AI } from '@/api/interface/ai';
 import { App } from '@/api/interface/app';
 import http, { type RequestConfig } from '@/api';
-import { ResPage, SearchWithPage } from '../interface';
+import { DescriptionUpdate, ResPage, SearchWithPage } from '../interface';
 import { TimeoutEnum } from '@/enums/http-enum';
 
-export const createOllamaModel = (name: string, taskID: string) => {
-    return http.post(`/ai/ollama/model`, { name: name, taskID: taskID });
+export const updateOllamaModelDescription = (params: DescriptionUpdate) => {
+    return http.post(`/ai/ollama/model/description`, params);
+};
+export const createOllamaModel = (name: string, taskID: string, description = '') => {
+    return http.post(`/ai/ollama/model`, { name: name, taskID: taskID, description });
 };
 export const recreateOllamaModel = (name: string, taskID: string) => {
     return http.post(`/ai/ollama/model/recreate`, { name: name, taskID: taskID });
@@ -250,7 +253,10 @@ export const updateAgentAccountVerifyModel = (req: AI.AgentAccountVerifyModelUpd
 };
 
 export const discoverAgentAccountModels = (req: AI.AgentAccountModelDiscoverReq) => {
-    return http.post<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req);
+    return http.postWithConfig<AI.AgentAccountModel[]>(`/ai/accounts/models/discover`, req, {
+        timeout: TimeoutEnum.T_60S,
+        errorMessageMode: 'manual',
+    });
 };
 
 export const createAgentAccountModel = (req: AI.AgentAccountModelCreateReq) => {
@@ -263,7 +269,7 @@ export const updateAgentAccountModel = (req: AI.AgentAccountModelUpdateReq) => {
 
 export const verifyAgentAccount = (req: { id: number }, currentNode: string) => {
     return http.postWithConfig(`/ai/accounts/verify`, req, {
-        timeout: TimeoutEnum.T_60S,
+        timeout: 20_000,
         errorMessageMode: 'manual',
         headers: { CurrentNode: currentNode },
     });

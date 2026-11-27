@@ -1,5 +1,5 @@
 # 基礎錯誤
-ErrInvalidParams: '請求參數錯誤: {{ .detail }}'
+ErrInvalidParams: '請求參數錯誤{{ if .detail }}: {{ .detail }}{{ end }}'
 ErrMcpGatewayArgsParse: 'MCP 自訂參數格式錯誤'
 ErrMcpGatewayArgsConflict: '參數 {{ .name }} 由 1Panel 管理，不能在自訂參數中設定'
 ErrTokenParse: 'Token 產生錯誤: {{ .detail }}'
@@ -139,7 +139,6 @@ ErrComposeProjectNameParse: '解析 Docker Compose 設定輸出中的專案名�
 ErrComposeProjectNameEmpty: '無法從 Docker Compose 設定或檔案父目錄中推導出專案名稱，請填寫名稱後重試'
 ErrComposeNameInvalid: 'Compose 專案名稱格式錯誤：必須以小寫字母或數字開頭，僅支援小寫字母、數字、- 和 _，長度為 1-256 個字元'
 ErrAppVersionUnavailable: '目前應用程式版本已從遠端服務下架，請選擇其他版本後重試'
-ErrVllmGB10ProOnly: '此 vLLM 版本僅支援 1Panel 專業版'
 ErrAIGatewayDatabaseTypeMismatch: 'AI 閘道只能在相同資料庫類型（SQLite 或 PostgreSQL）之間升級。'
 ErrAIGatewayRecoverDatabaseTypeMismatch: 'AI 閘道備份與目標應用程式的資料庫類型（SQLite 或 PostgreSQL）必須一致，無法跨資料庫類型還原。'
 ErrHermesUpgradeVersion: 'Hermes Agent 只能升級至可辨識且符合跨版本升級設定的較新版本。如需還原舊版本，請使用備份還原。'
@@ -170,6 +169,10 @@ UpgradeWaitReady: '等待應用程式就緒'
 UpgradeBackupDisabled: '未啟用升級備份，升級腳本產生的資料變更無法完整回滾'
 UpgradeRollbackFailed: '回滾失敗'
 ErrDatabaseNotFound: '資料庫 {{ .name }} 不存在'
+
+# vLLM
+ErrVllmGB10ProOnly: '此 vLLM 版本僅支援 1Panel 專業版'
+ErrVllmGB10ModelUnsupported: '此版本僅支援 DeepSeek-V4-Flash-0731 或 DeepSeek-V4-Flash-Vision-Exp，請選擇對應的模型目錄。'
 
 # SSH
 ExportIP: '登入IP'
@@ -289,6 +292,13 @@ RemoteBackup: '備份遠端資料庫需要先使用映像 {{ .name }} 啟動本�
 RemoteRecover: '復原遠端資料庫需要先使用映像 {{ .name }} 啟動本機容器資料庫服務，請稍候...'
 Arg: '參數'
 
+#PostgreSQL
+ErrPgUserProtected: "系統使用者或目前連線使用者受到保護，無法執行此操作"
+ErrPgSuperUserGrant: "超級使用者可存取所有資料庫，無需單獨授權或撤銷授權"
+ErrPgUserUsed: "關聯應用程式或網站正在使用此使用者，請先調整連線帳號"
+ErrPgUserBound: "請先撤銷此使用者的資料庫授權"
+ErrPgUserPasswordSync: "使用者密碼已修改，但以下應用程式的密碼同步失敗：{{ .detail }}"
+
 # Redis
 ErrTypeOfRedis: '復原檔案類型與目前持久化方式不符，請修改後重試'
 
@@ -341,6 +351,14 @@ ComposeRecoverCleanup: '清理編排還原工作目錄'
 # 執行環境
 ErrFileNotExist: '{{ .detail }} 檔案不存在！請檢查來源檔案完整性！'
 ErrImageBuildErr: '映像build 失敗'
+PHPBuildImage: "正在建置 PHP 映像檔"
+PHPBuildBaseImage: "正在取得基礎映像檔 {{ .name }}"
+PHPBuildStep: "正在建置 PHP 映像檔（步驟 {{ .name }}）"
+PHPBuildStartContainer: "正在啟動 PHP 容器"
+PHPBuildInstallExtensions: "正在安裝 PHP 擴充套件"
+PHPBuildCommitImage: "正在儲存已安裝擴充套件的映像檔"
+PHPBuildApplyConfig: "正在套用設定並啟動 PHP 執行環境"
+PHPBuildSeeLog: "請查看 build.log 以瞭解詳情"
 ErrImageExist: '映像已存在！請修改映像名稱。'
 ErrDelWithWebsite: '執行環境已經關聯網站，無法刪除'
 ErrRuntimeStart: '啟動失敗'
@@ -639,6 +657,8 @@ ErrWebhookTestFailed: '請檢查 Webhook 設定，詳細原因請查看系統日
 
 # 任務 - 執行環境
 ErrInstallExtension: '已有安裝任務正在進行，請等待任務結束'
+PHPExtensionsInstallWarning: "部分 PHP 擴充套件安裝失敗：{{ .name }}"
+PHPExtensionsInstallManually: "可在面板的擴充套件管理頁重試，成功後會儲存至映像檔。也可以在 Docker 主機的終端執行以下命令手動排查："
 
 # 告警郵件範本
 PanelAlertTitle: '面板警示通知'
@@ -666,6 +686,17 @@ PartitionDiskErr: '分區失敗，{{ .err }}'
 FormatDiskErr: '格式化磁碟失敗，{{ .err }}'
 MountDiskErr: '掛載磁碟失敗，{{ .err }}'
 XfsNotFound: '未偵測到 xfs 檔案系統，請先安裝 xfsprogs'
+
+# 網路管理
+ErrNetworkPersistencePlatform: "僅 Linux 節點支援持久化網路設定。"
+ErrNetworkPersistencePrivilege: "持久化網路設定需要以 root 執行的 1Panel Agent，並具備系統網路管理權限。"
+ErrNetworkIPRoute2: "請安裝或更新 iproute2，並確認其提供的 ip 指令可用。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkPrimaryAddress: "此主要 IP 位址下仍有同網段的次要位址。請先刪除次要位址，或使用系統網路工具調整後重試。"
+ErrNetworkRouteReadOnly: "此類型路由僅支援檢視。"
+ErrNetworkPersistenceConflict: "該位址或路由已存在，或與已儲存的設定衝突。{{ if .detail }}: {{ .detail }}{{ end }}"
+ErrNetworkLoopbackReadOnly: "回環網卡設定僅支援檢視。"
+ErrNetworkPersistentSourceMissing: "找不到網卡 {{ .name }} 支援的系統持久化設定，僅支援檢視。"
+ErrNetworkVirtualBridgeReadOnly: "此虛擬網卡僅供檢視，不參與可達性檢測。"
 
 # 終端
 TerminalAIBlockedRiskyCommand: '已攔截風險命令：{{ .command }}'
@@ -820,3 +851,89 @@ ErrImageCheckProxyRequired: "目前運行環境下，如需檢查映像是否更
 ErrPHPExtensionsConflict: "同名 PHP 擴充模版已存在且內容不同，未覆蓋"
 
 ErrModelTokenizerDirOverlap: "模型目錄和分詞器目錄不能相同或互相包含"
+ErrClusterAppOnly: "請在「應用高可用」中安裝或升級此應用。"
+ErrClusterArchivePassphraseRequired: "請輸入備份密碼。"
+ErrClusterArchiveTooLarge: "叢集備份檔案過大。"
+ErrClusterArchiveFormat: "不支援此叢集備份檔案格式。"
+ErrClusterArchiveTruncated: "叢集備份檔案不完整。"
+ErrClusterArchiveBlock: "叢集備份包含無效的資料區塊。"
+ErrClusterArchiveAuthentication: "備份密碼不正確，或叢集備份檔案已損毀。"
+ErrClusterArchiveTrailingData: "叢集備份檔案結尾包含多餘的資料。"
+ErrClusterArchiveManifest: "叢集備份中繼資料無效。"
+ErrClusterArchiveManifestTooLarge: "叢集備份中繼資料過大。"
+ErrClusterArchiveInvalid: "叢集備份檔案結構無效。"
+ErrClusterArchivePayload: "備份資料與叢集備份中繼資料不符。"
+ErrClusterArchiveChecksum: "叢集備份資料總和檢查碼不符。"
+ErrClusterArchiveImportHeader: "叢集備份匯入請求標頭無效。"
+ErrClusterBackupID: "叢集備份 ID 無效。"
+ErrClusterBackupEngineMismatch: "備份檔案的資料庫類型與所選應用程式不符。"
+ErrClusterBackupSelectFile: "請選擇 .1pha 格式的叢集備份檔案。"
+ErrClusterBackupFileInaccessible: "無法存取叢集備份檔案。"
+ErrClusterBackupRegularFile: "叢集備份檔案必須是一般檔案。"
+ErrClusterBackupFileChanged: "叢集備份檔案已變更，請重新選擇。"
+ErrClusterBackupNotPrimary: "所選執行個體不是高可用性叢集的主執行個體。"
+ErrClusterBackupContainerUnavailable: "資料庫容器無法使用。"
+ErrClusterBackupMySQLInnoDB: "MySQL 線上備份要求所有使用者資料表使用 InnoDB。"
+ErrClusterBackupPostgresRecovery: "PostgreSQL 執行個體處於復原模式。"
+ErrClusterBackupPostgresTablespaces: "PostgreSQL 叢集備份僅支援預設資料表空間。"
+ErrClusterBackupPostgresReplicationCredentials: "PostgreSQL 複寫認證無法使用。"
+ErrClusterBackupRedisNotPrimary: "Redis 執行個體不是主執行個體。"
+ErrClusterBackupRedisVersion: "無法取得 Redis 版本。"
+ErrClusterBackupUnsupportedEngine: "此資料庫引擎不支援叢集備份。"
+ErrClusterCommandFailed: "執行 {{ .name }} 失敗"
+ErrClusterRestoreCatalogInstance: "還原至新叢集需要使用應用程式目錄範本建立執行個體。"
+ErrClusterRestorePrimaryTemplate: "還原時必須使用備份中記錄的主資料庫或主要執行個體範本。"
+ErrClusterRestoreUnsupportedEngine: "此資料庫引擎不支援叢集還原。"
+ErrClusterRestoreRedisSnapshot: "Redis 快照無效。"
+ErrClusterRestorePostgresMajorVersion: "PostgreSQL 資料的主要版本與備份不符。"
+ErrClusterRestoreSingleContainer: "還原要求執行個體只包含一個資料庫容器。"
+ErrClusterRestoreCatalogDataMount: "還原需要使用應用程式目錄範本中的資料掛載設定。"
+ErrClusterRestoreDataDirectoryNotEmpty: "還原目標的資料目錄並非空白。"
+ErrClusterRestorePostgresUnsafePath: "PostgreSQL 備份包含不安全的路徑。"
+ErrClusterRestorePostgresFileType: "PostgreSQL 備份包含不支援的連結或檔案類型。"
+ErrClusterRestoreRedisCatalogPersistence: "還原 Redis 需要使用應用程式目錄範本中的持久化設定。"
+ErrClusterRestoreRedisCatalogRDB: "還原 Redis 快照需要使用應用程式目錄範本中的 RDB 設定。"
+ErrClusterRestoreMySQLCredentials: "還原後的 MySQL 管理員認證驗證失敗，請使用備份時的認證。"
+ErrClusterRestoreEngineVersion: "資料庫引擎版本 {{ .current }} 與備份版本 {{ .expected }} 不符。"
+ErrClusterRestoreDatabaseNotReady: "還原後的資料庫尚未就緒"
+ErrClusterRestoreOriginalRequest: "還原至原叢集的請求無效。"
+ErrClusterRestoreMemberVersionChanged: "叢集成員的版本在還原前已變更。"
+ErrClusterRestoreMemberChanged: "叢集成員在還原前已變更。"
+ErrClusterRestoreMemberBusy: "此叢集成員已有其他還原工作。"
+ErrClusterRestoreMemberState: "叢集成員目前的還原狀態不允許執行此操作。"
+ErrClusterRestoreRollbackRequiresReview: "還原後的資料可能已有寫入，無法自動回復。還原前的資料已保留。"
+ErrClusterRestoreOriginalAction: "還原至原叢集的操作無效。"
+ErrClusterRestoreDataMountDirectory: "叢集的資料掛載路徑必須是目錄。"
+ErrClusterRestoreMemberRoleMismatch: "資料庫容器設定的複寫角色與面板紀錄不一致。"
+ErrClusterRestoreOriginalCatalogMounts: "還原至原叢集時，必須使用應用程式範本定義的資料庫掛載。"
+ErrClusterRestoreDataMountUnavailable: "資料庫的資料掛載遺失或無法寫入。"
+ErrClusterRestoreOriginalTemplateVersion: "備份與原叢集的應用程式範本或資料庫版本不符。"
+ErrClusterRestoreValidationContainer: "用於驗證還原結果的容器與目前的還原工作不符。"
+ErrClusterRestoreDataOwnership: "無法讀取資料庫資料的擁有者及所屬群組。"
+ErrClusterRestoreConfigFileType: "資料庫設定中包含連結或特殊檔案。"
+ErrClusterRestoreRedisActiveRDB: "還原 Redis 快照時，執行中的執行個體必須使用相容的 RDB 設定。"
+ErrClusterRestoreDataDirectoryMismatch: "執行中的資料庫未使用應用程式範本指定的資料目錄。"
+ErrClusterRestoreReplicaNotReady: "還原後的從節點未就緒"
+ErrClusterRestoreDataPathDirectory: "還原資料所在的路徑必須是目錄。"
+ErrClusterRestoreOriginalDataUnavailable: "原叢集的資料目錄不存在。"
+ErrClusterRestoreDataDirectoryChanged: "叢集資料目錄在還原期間已變更。"
+ErrClusterRestoreDataReplacementIncomplete: "叢集資料取代尚未完成。"
+ErrClusterRestoreRollbackDirectoryChanged: "叢集資料目錄在還原作業回復期間已變更。"
+ErrRedisAOFRestoreUnavailable: "目前無法還原此 Redis 版本的 AOF 備份。"
+
+# Scheduled task website selection
+ErrCronjobWebsiteSelection: "無效的網站選擇：{{ .value }}"
+ErrCronjobWebsiteGroup: "無法存取網站群組 {{ .id }}"
+ErrCronjobWebsiteExportEmpty: "{{ .name }}：所選網站均已不存在"
+ErrCronjobWebsiteVersion: "不支援的網站選擇版本：{{ .version }}"
+ErrCronjobWebsiteAllConflict: "所有網站不能與指定網站或網站群組同時選擇"
+ErrCronjobWebsiteGroupName: "網站群組名稱不能為空"
+ErrCronjobWebsiteGroupMissing: "網站群組「{{ .group }}」不存在，且無法比對快照中的任何網站"
+CronjobWebsiteGroupFallback: "{{ .name }}：網站群組「{{ .group }}」不存在，已按固定網站名單匯入，不再動態跟隨群組變化"
+CronjobWebsiteMissing: "{{ .name }}：找不到以下網站：{{ .website }}"
+ErrCronjobWebsiteImportEmpty: "無法比對任何所選網站群組或網站"
+
+ProxyCacheClear: "清空反代快取"
+ProxyCacheEmpty: "無需清理"
+ProxyCacheSummary: "已清空 {{ .cleared }} 個，無需清理 {{ .skipped }} 個，失敗 {{ .failed }} 個"
+ProxyCacheReloadFailed: "快取已清空，OpenResty 重新載入失敗"

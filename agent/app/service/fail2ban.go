@@ -4,15 +4,22 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	"syscall"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/buserr"
+	"github.com/1Panel-dev/1Panel/agent/utils/common"
+	"github.com/1Panel-dev/1Panel/agent/utils/re"
 	"github.com/1Panel-dev/1Panel/agent/utils/toolbox"
 )
 
 const defaultFail2BanPath = "/etc/fail2ban/jail.local"
+
+var fail2BanConfigMu sync.Mutex
 
 type Fail2BanService struct{}
 
@@ -36,7 +43,7 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 		return baseInfo, err
 	}
 	baseInfo.IsEnable, baseInfo.IsActive, baseInfo.IsExist = client.Status()
-	if !baseInfo.IsActive {
+	if !baseInfo.IsExist {
 		baseInfo.Version = "-"
 	} else {
 		baseInfo.Version = client.Version()
@@ -49,26 +56,32 @@ func (u *Fail2BanService) LoadBaseInfo() (dto.Fail2BanBaseInfo, error) {
 			return baseInfo, nil
 		}
 	}
+	values := make(map[string]string)
 	lines := strings.Split(string(conf), "\n")
-
-	block := ""
-	for _, line := range lines {
-		if strings.HasPrefix(strings.ToLower(line), "[default]") {
-			block = "default"
-			continue
+	for _, target := range []string{"DEFAULT", "sshd"} {
+		section := ""
+		for _, line := range lines {
+			nextSection, key, value := parseFail2BanLine(line)
+			if nextSection != "" {
+				section = nextSection
+			}
+			if section == target && key != "" {
+				values[key] = value
+			}
 		}
-		if strings.HasPrefix(line, "[sshd]") {
-			block = "sshd"
-			continue
-		}
-		if strings.HasPrefix(line, "[") {
-			block = ""
-			continue
-		}
-		if block != "default" && block != "sshd" {
-			continue
-		}
-		loadFailValue(line, &baseInfo)
+	}
+	baseInfo.Port, _ = strconv.Atoi(values["port"])
+	baseInfo.MaxRetry, _ = strconv.Atoi(values["maxretry"])
+	baseInfo.FindTime = values["findtime"]
+	baseInfo.BanTime = values["bantime"]
+	baseInfo.BanAction = values["banaction"]
+	baseInfo.LogPath = values["logpath"]
+	baseInfo.Mode = values["mode"]
+	if match := re.GetRegex(re.Fail2BanModeValuePattern).FindStringSubmatch(values["filter"]); len(match) == 2 {
+		baseInfo.Mode = strings.Trim(strings.TrimSpace(match[1]), `"'`)
+	}
+	if baseInfo.Mode == "" {
+		baseInfo.Mode = "normal"
 	}
 
 	return baseInfo, nil
@@ -101,7 +114,36 @@ func (u *Fail2BanService) Operate(operation string) error {
 	return client.Operate(operation)
 }
 
+func (u *Fail2BanService) OperateSSHD(req dto.Fail2BanSet) error {
+	if req.Operate == "ignore" {
+		return u.UpdateConf(dto.Fail2BanUpdate{Key: "ignoreip", Value: strings.Join(req.IPs, ",")})
+	}
+	client, err := toolbox.NewFail2Ban()
+	if err != nil {
+		return err
+	}
+	return client.ReBanIPs(req.IPs)
+}
+
 func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
+	fail2BanConfigMu.Lock()
+	defer fail2BanConfigMu.Unlock()
+	req.Value = strings.TrimSpace(req.Value)
+	if req.Key == "mode" {
+		switch req.Value {
+		case "normal", "ddos", "extra", "aggressive":
+		default:
+			return fmt.Errorf("invalid Fail2ban mode: %s", req.Value)
+		}
+		client, err := toolbox.NewFail2Ban()
+		if err != nil {
+			return err
+		}
+		if common.CompareVersion("0.10.0", client.Version()) {
+			return fmt.Errorf("Fail2ban mode requires version 0.10.0 or later")
+		}
+	}
+
 	if req.Key == "banaction" {
 		if req.Value == "firewallcmd-ipset" || req.Value == "ufw" {
 			itemName := "ufw"
@@ -121,62 +163,77 @@ func (u *Fail2BanService) UpdateConf(req dto.Fail2BanUpdate) error {
 			}
 		}
 	}
+	conf, err := os.ReadFile(defaultFail2BanPath)
+	if err != nil {
+		return fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
+	}
 	if req.Key == "logpath" {
 		if _, err := os.Stat(req.Value); err != nil {
 			return err
 		}
 	}
-	conf, err := os.ReadFile(defaultFail2BanPath)
-	if err != nil {
-		return fmt.Errorf("read fail2ban conf of %s failed, err: %v", defaultFail2BanPath, err)
+	ending := "\n"
+	if strings.Contains(string(conf), "\r\n") {
+		ending = "\r\n"
 	}
-	lines := strings.Split(string(conf), "\n")
-
-	isStart, isEnd, hasKey := false, false, false
-	newFile := ""
+	lines := strings.SplitAfter(string(conf), "\n")
+	section := ""
+	hasSection, found := false, false
+	insert := len(lines)
 	for index, line := range lines {
-		if !isStart && strings.HasPrefix(line, "[sshd]") {
-			isStart = true
-			newFile += fmt.Sprintf("%s\n", line)
+		nextSection, key, _ := parseFail2BanLine(line)
+		if nextSection != "" {
+			if section == "sshd" && insert == len(lines) {
+				insert = index
+			}
+			section = nextSection
+			if section == "sshd" {
+				hasSection = true
+			}
 			continue
 		}
-		if !isStart || isEnd {
-			newFile += fmt.Sprintf("%s\n", line)
-			continue
-		}
-		if strings.HasPrefix(line, req.Key) {
-			hasKey = true
-			newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
-			continue
-		}
-		if strings.HasPrefix(line, "[") || index == len(lines)-1 {
-			isEnd = true
-			if !hasKey {
-				newFile += fmt.Sprintf("%s = %s\n", req.Key, req.Value)
+		if section == "sshd" && req.Key == "mode" && key == "filter" {
+			pattern := re.GetRegex(re.Fail2BanModeAssignmentPattern)
+			if pattern.MatchString(line) {
+				lines[index] = pattern.ReplaceAllString(line, "${1}"+req.Value)
+			} else {
+				pattern = re.GetRegex(re.Fail2BanFilterNamePattern)
+				lines[index] = pattern.ReplaceAllString(line, "${1}[mode="+req.Value+"]")
 			}
 		}
-		newFile += line
-		if index != len(lines)-1 {
-			newFile += "\n"
+		if section != "sshd" || key != req.Key {
+			continue
+		}
+		lines[index] = ""
+		if !found {
+			indent := line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+			lines[index] = indent + req.Key + " = " + req.Value
+			if strings.HasSuffix(line, "\n") {
+				lines[index] += ending
+			}
+			found = true
 		}
 	}
-	file, err := os.OpenFile(defaultFail2BanPath, os.O_WRONLY|os.O_TRUNC, 0640)
-	if err != nil {
+	newFile := strings.Join(lines, "")
+	if !found {
+		before := strings.Join(lines[:insert], "")
+		if before != "" && !strings.HasSuffix(before, "\n") {
+			before += ending
+		}
+		if !hasSection {
+			before += "[sshd]" + ending
+		}
+		newFile = before + req.Key + " = " + req.Value + ending + strings.Join(lines[insert:], "")
+	}
+	if err := saveFail2BanConfig(defaultFail2BanPath, newFile); err != nil {
 		return err
 	}
-	defer file.Close()
-	write := bufio.NewWriter(file)
-	_, _ = write.WriteString(newFile)
-	write.Flush()
 
 	client, err := toolbox.NewFail2Ban()
 	if err != nil {
 		return err
 	}
-	if err := client.Operate("restart"); err != nil {
-		return err
-	}
-	return nil
+	return client.Operate("restart")
 }
 
 func (u *Fail2BanService) UpdateConfByFile(req dto.UpdateByFile) error {
@@ -199,52 +256,52 @@ func (u *Fail2BanService) UpdateConfByFile(req dto.UpdateByFile) error {
 	return nil
 }
 
-func (u *Fail2BanService) OperateSSHD(req dto.Fail2BanSet) error {
-	if req.Operate == "ignore" {
-		if err := u.UpdateConf(dto.Fail2BanUpdate{Key: "ignoreip", Value: strings.Join(req.IPs, ",")}); err != nil {
-			return err
-		}
-		return nil
+func parseFail2BanLine(line string) (section, key, value string) {
+	line = strings.TrimSpace(line)
+	if line == "" || strings.HasPrefix(line, "#") || strings.HasPrefix(line, ";") {
+		return "", "", ""
 	}
-	client, err := toolbox.NewFail2Ban()
+	if strings.HasPrefix(line, "[") && strings.HasSuffix(line, "]") {
+		return strings.TrimSpace(line[1 : len(line)-1]), "", ""
+	}
+	key, value, ok := strings.Cut(line, "=")
+	if !ok {
+		return "", "", ""
+	}
+	return "", strings.ToLower(strings.TrimSpace(key)), strings.TrimSpace(value)
+}
+
+func saveFail2BanConfig(path, content string) error {
+	target, err := filepath.EvalSymlinks(path)
 	if err != nil {
 		return err
 	}
-	if err := client.ReBanIPs(req.IPs); err != nil {
+	info, err := os.Stat(target)
+	if err != nil {
 		return err
 	}
-	return nil
-}
-
-func loadFailValue(line string, baseInfo *dto.Fail2BanBaseInfo) {
-	if strings.HasPrefix(line, "port") {
-		itemValue := strings.ReplaceAll(line, "port", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.Port, _ = strconv.Atoi(strings.TrimSpace(itemValue))
+	file, err := os.CreateTemp(filepath.Dir(target), ".fail2ban-*")
+	if err != nil {
+		return err
 	}
-	if strings.HasPrefix(line, "maxretry") {
-		itemValue := strings.ReplaceAll(line, "maxretry", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.MaxRetry, _ = strconv.Atoi(strings.TrimSpace(itemValue))
+	defer os.Remove(file.Name())
+	defer file.Close()
+	if owner, ok := info.Sys().(*syscall.Stat_t); ok {
+		if err := file.Chown(int(owner.Uid), int(owner.Gid)); err != nil {
+			return err
+		}
 	}
-	if strings.HasPrefix(line, "findtime") {
-		itemValue := strings.ReplaceAll(line, "findtime", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.FindTime = strings.TrimSpace(itemValue)
+	if err := file.Chmod(info.Mode().Perm()); err != nil {
+		return err
 	}
-	if strings.HasPrefix(line, "bantime") {
-		itemValue := strings.ReplaceAll(line, "bantime", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.BanTime = strings.TrimSpace(itemValue)
+	if _, err := file.WriteString(content); err != nil {
+		return err
 	}
-	if strings.HasPrefix(line, "banaction") {
-		itemValue := strings.ReplaceAll(line, "banaction", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.BanAction = strings.TrimSpace(itemValue)
+	if err := file.Sync(); err != nil {
+		return err
 	}
-	if strings.HasPrefix(line, "logpath") {
-		itemValue := strings.ReplaceAll(line, "logpath", "")
-		itemValue = strings.ReplaceAll(itemValue, "=", "")
-		baseInfo.LogPath = strings.TrimSpace(itemValue)
+	if err := file.Close(); err != nil {
+		return err
 	}
+	return os.Rename(file.Name(), target)
 }

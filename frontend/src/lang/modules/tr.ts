@@ -79,6 +79,7 @@ const message = {
             enable: 'Etkinleştir',
             disable: 'Devre Dışı Bırak',
             confirm: 'Onayla',
+            autoFill: 'Otomatik doldur',
             check: 'Kontrol et',
             submit: 'Gönder',
             cancel: 'İptal',
@@ -267,6 +268,8 @@ const message = {
             restoreSuccess: 'Geri yükleme başarılı',
         },
         login: {
+            imageLoadError: 'Görüntü yüklenemedi',
+            imageLoadErrorHint: 'Olası nedenler: ağ sorunu, eksik görüntü veya desteklenmeyen biçim.',
             username: 'Kullanıcı adı',
             password: 'Şifre',
             passkey: 'Passkey ile giriş',
@@ -307,8 +310,7 @@ const message = {
             simplePassword:
                 'Bu alan alt çizgi karakteriyle başlamamalı ve İngilizce, rakam, ve "_" karakterlerinden oluşmalı, uzunluk 1-30 olmalıdır.',
             dbName: 'Bu alan alt çizgi karakteriyle başlamamalı ve İngilizce, rakam, ve "_" karakterlerinden oluşmalı, uzunluk 1-64 olmalıdır.',
-            imageName:
-                'Bu alan İngilizce, rakam, ":", "@", "/", ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-256 olmalıdır.',
+            imageName: `Bu alan İngilizce, rakam, ":", "{'@'}", "/", ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-256 olmalıdır.`,
             volumeName: 'Bu alan İngilizce, rakam, ".", "-", ve "_" karakterlerinden oluşmalı, uzunluk 2-30 olmalıdır.',
             supervisorName:
                 'Bu alan özel olmayan karakterlerle başlamalı ve İngilizce, rakam, "-", ve "_" karakterlerinden oluşmalı, uzunluk 1-128 olmalıdır.',
@@ -367,6 +369,7 @@ const message = {
             serviceNotStarted: '{0} servisi başlatılmadı.',
         },
         status: {
+            autoSync: 'Otomatik eşitleme',
             autoSyncEnabled: 'Otomatik eşitleme açık',
             autoSyncDisabled: 'Otomatik eşitleme kapalı',
             running: 'Çalışıyor',
@@ -623,6 +626,7 @@ const message = {
             'Bu port konteynerin açığa çıkan portudur. Değişikliği ayrı olarak kaydetmeniz ve konteyneri yeniden başlatmanız gerekir!',
         loadFromRemote: 'Sunucudan senkronize et',
         userBind: 'Kullanıcı bağla',
+        connectionUser: 'Bağlantı kullanıcısı',
         userAuthorization: 'Kullanıcı yetkilendirmesi',
         noUserAuthorization: 'Yetki verme',
         authorizedDatabaseCount: '{0} veritabanı yetkisi',
@@ -633,10 +637,13 @@ const message = {
         revokeAuthorization: 'Yetkiyi kaldır',
         revokeAuthorizationHelper: '{0} kullanıcısının {1} veritabanına erişimi kaldırılsın mı?',
         supplementPassword: 'Parola ekle',
-        supplementPasswordHelper: 'Yalnızca mevcut parolayı 1Panel içine kaydeder; MySQL parolasını değiştirmez.',
+        supplementPasswordHelper:
+            'Yalnızca mevcut parolayı 1Panel içine kaydeder; veritabanı kullanıcısının parolasını değiştirmez.',
         noUserBind: 'Bağlantı yok',
-        pgBindHelper:
-            'Bu işlem yeni bir kullanıcı oluşturmak ve hedef veritabanına bağlamak için kullanılır. Şu anda veritabanında mevcut olan kullanıcıları seçmek desteklenmiyor.',
+        pgAuthorizationHelper:
+            'Süper kullanıcılar bu örnekteki tüm veritabanlarına bağlama gerekmeden erişir. Normal kullanıcılar için yalnızca veritabanı izinleri yönetilir, tablo izinleri dahil değildir.',
+        pgRevokeAuthorizationHelper:
+            'Yetkinin iptal edilmesi kullanıcıyı silmez. PUBLIC veya diğer roller üzerinden erişim devam edebilir.',
         pgSuperUser: 'Süper Kullanıcı',
         loadFromRemoteHelper:
             'Sunucudaki veritabanlarını, kullanıcıları ve yetkilendirmeleri 1Panel ile eşitler. Devam edilsin mi?',
@@ -882,7 +889,6 @@ const message = {
                 'Kullanıcı adı: harf, rakam, nokta, alt çizgi veya tire. Parola: en az 12 karakter; başta/sonda boşluk veya satır sonu içeremez.',
             octopAuthHelper:
                 'Parola: harf ve rakam içeren en az 8 karakter; yaygın parolalardan kaçının. Reddedilirse kurulum yönergeleri için uygulama günlüklerini kontrol edin.',
-            initialCredentials: 'İlk giriş bilgileri; uygulamada değiştirildiyse güncel parolayı kullanın.',
             nativeAgentAccessUnavailable:
                 'Mevcut kurulumda uyumlu HTTPS erişim adresi veya bağlantı noktası yok. Uygulama ayarlarını kontrol edin.',
             agent: 'Ajan',
@@ -1128,6 +1134,34 @@ const message = {
             validateImageAvailabilityHelper: 'Kaydetmeden önce bir küçük görsel üretir ve ücret doğurabilir',
         },
         model: {
+            poolEditHelp: 'Modelleri çevrimiçi alın veya elle ekleyin. Tüm modeller düzenlenebilir.',
+            poolUnavailable:
+                'Bu sağlayıcı türü ve API çevrimiçi model almayı desteklemiyor. Model kimliklerini elle ekleyin.',
+            poolEmpty: 'Model yok. Çevrimiçi alın veya elle ekleyin.',
+            poolOverwrite:
+                'Başarılı bir alma işlemi, elle eklenenler ve düzenlenenler dahil tüm listeyi değiştirecek. Devam edilsin mi?',
+            poolFetchEmpty: 'Model alınamadı. Liste korundu. Yeniden deneyin veya elle ekleyin.',
+            poolFetchFailed:
+                'Alma işlemi başarısız. Liste korundu. URL, API anahtarı ve ağı kontrol edin ya da elle düzenleyin.',
+            poolSaveHelp: 'Değişiklikler kaydedilince uygulanır. Kullanımdaki modeller kaldırılamaz.',
+
+            accountType: 'Hesap türü',
+            accountTypes: {
+                default: 'Varsayılan',
+                payAsYouGo: 'Kullandıkça öde',
+                chinaApi: 'Çin API',
+                globalApi: 'Küresel API',
+                chinaCodingPlan: 'Çin Coding Plan',
+                globalCodingPlan: 'Küresel Coding Plan',
+                chinaTokenPlan: 'Çin Token Plan',
+                globalTokenPlan: 'Küresel Token Plan',
+                speech: 'Konuşma hizmetleri',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: 'Kontrol et ve getir',
             externalHealthPassed: 'Sağlık kontrolü başarılı',
             externalHealthFailed: 'Sağlık kontrolü başarısız',
@@ -1281,6 +1315,7 @@ const message = {
                 'Form değiştirildi. Compose yeniden oluşturulursa elle yapılan düzenlemeler silinir. Devam edilsin mi?',
             deploymentNameHelper:
                 'Uygulama örneğinin adı, kurulum dizininde kullanılır ve oluşturulduktan sonra değiştirilemez. Görünen adı değiştirmek için takma ad belirleyin.',
+            deploymentAlias: 'Örnek takma adı',
             deploymentAliasHelper:
                 'Listede gösterilecek isteğe bağlı takma ad. Boş bırakılırsa örnek adı kullanılır. Takma adı değiştirmek hizmeti yeniden başlatmaz.',
             deploymentContainerNameHelper:
@@ -1338,7 +1373,12 @@ const message = {
             container_conn_helper: 'Konteynerler arası erişim veya bağlantı için bu adresi kullanın',
             from_remote: 'Bu model 1Panel aracılığıyla indirilmedi, ilgili çekme logları yok.',
             no_logs: 'Bu modelin çekme logları silindi ve görüntülenemiyor.',
+            composeFile: 'Düzenleme Dosyası',
+            imageCategory: 'İmaj türü',
+            standardImage: 'Standart imaj',
+            customImage: 'Özelleştirilmiş imaj',
             vllmVersionHelper: {
+                qwen38: 'İki NVIDIA GB10 cihazı için Qwen3.8-Flash-Next-NVFP4 modeline göre optimize edilmiş özel sürüm.',
                 ascend: 'Ascend A2 serisi cihazlar için resmi Ascend standart sürümü.',
                 ascendA3: 'Ascend A3 serisi cihazlar için resmi Ascend A3 sürümü.',
                 ascendA5: '950DT cihazları için resmi Ascend A5 sürümü.',
@@ -1348,10 +1388,8 @@ const message = {
                 rtxPro5000:
                     'NVIDIA RTX Pro 5000 için DeepSeek-V4.1-Flash-1017’ye optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
                 dspark: 'İki NVIDIA GB10 cihazı için DeepSeek-V4-Flash’a optimize edilmiş özel sürüm. İmajın bakımı 1Panel tarafından yapılır.',
+                dspark4: 'Dört NVIDIA GB10 cihazı için DeepSeek-V4.1-Flash’a optimize edilmiş özel sürüm.',
             },
-            vllmDeployProfile: 'Dağıtım modeli',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: 'Model hizmetine senkronize et',
             modelAccountAddressHelper:
                 'Konteyner adresi ajan konteynerleri içindir; 127.0.0.1, sistem IP veya özel adres AI Gateway ya da harici servisler içindir.',
@@ -1360,6 +1398,12 @@ const message = {
             downloader: 'Model indirme',
             modelDirectoryHelper:
                 'Model listesi varsayılan olarak Model Hazırlığı > Ayarlar bölümünde yapılandırılan dizine indirilen modelleri gösterir.',
+            vllmGB10Qwen38ModelHelper:
+                'Yalnızca Qwen3.8-Flash-Next-NVFP4 modeli desteklenir. Her iki cihazda da modelin tamamı aynı yolda bulunmalıdır.',
+            vllmGB10DualNodeModelHelper:
+                'Yalnızca DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp desteklenir. İki cihazda da aynı yolda eksiksiz model bulunmalıdır.',
+            vllmGB10FourNodeModelHelper:
+                'Yalnızca DeepSeek-V4.1-Flash desteklenir. Dört cihazda da aynı yolda eksiksiz model bulunmalıdır.',
             modelDirectoryPlaceholder: 'Model arayın veya tam yol girin',
             selectModel: 'Model seç',
             selectModelDirectory: 'Dizin seç',
@@ -2465,13 +2509,12 @@ const message = {
         checkFailed: 'Kontrol başarısız',
         imageMissing: 'Gerekli imaj bulunamadı. İmaj yönetiminde {image} imajını indirin.',
         imageReady: 'Benchmark imajı test oluşturmaya hazır.',
-        imageHelp: 'Benchmark imajı yük testi istemcisini çalıştırır ve seçilen model hizmetine istek gönderir.',
+        imageHelp:
+            'Sistem bu imajdan ayrı bir konteyner oluşturur ve seçilen model hizmetine test istekleri göndererek performans testlerini çalıştırır.',
         mainNodeHelp: 'Testler ana düğümde çalışır. İmajı ve tokenizer dosyalarını bu düğümde hazırlayın.',
         goImages: 'İmaj yönetimine git',
         goModels: 'Model indirmelerine git',
-        tokenizerHelp: 'Test metnini kodlamak ve token saymak için tokenizer dizininden bir tokenizer seçin.',
-        tokenizerEmpty: 'Kullanılabilir model yok. Model indirmelerinden tokenizer dosyaları içeren bir model indirin.',
-        tokenizerEmptyWithDownload: 'Kullanılabilir tokenizer yok. İndirmek için {download} sayfasını açın.',
+        tokenizerHelp: 'Test metnini kodlamak ve token saymak için ana düğümde bir tokenizer veya model seçin.',
         tokenizerInvalid: 'Bu tokenizer kullanılamıyor. Başka birini seçin veya yeniden indirin.',
         schemeHelp:
             'Test planları istek parametrelerini, eşzamanlılığı ve yürütme kurallarını tanımlar. En az bir kullanılabilir plan hazırlayın.',
@@ -2549,6 +2592,10 @@ const message = {
         missing: 'Mevcut değil',
     },
     container: {
+        logDisconnected:
+            'Günlük akışının bağlantısı kesildi. Son günlükleri yüklemek ve akışı sürdürmek için yeniden bağlanın.',
+        logsUnavailable:
+            'Konteyner mevcut değil veya silinmiş. Konteyner günlükleri kullanılamıyor. Konteyneri yeniden oluşturup tekrar deneyin.',
         nvidiaSupport: 'NVIDIA GPU desteği',
         nvidiaHelper:
             'NVIDIA konteyner çalışma zamanını kaydeder. Önce NVIDIA Container Toolkit kurun. GPU’ları her konteynere ayrı ayrı atayın.',
@@ -2909,6 +2956,9 @@ const message = {
         exportHelper: 'Seçilen imajları tek bir tar dosyasına aktarır.',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            'Bir gruptaki “Tümü” seçeneği grup üyeliğindeki değişiklikleri izler; tek tek seçilen siteler sabit bir liste olarak kaydedilir.',
+        websiteSelectionMissing: 'Kullanılamayan seçim',
         importHelper:
             'İçe aktarım sırasında aynı isimli zamanlanmış görevler otomatik olarak atlanacaktır. Görevler varsayılan olarak 【Devre Dışı】 durumuna ayarlanır ve veri ilişkilendirme anormalse 【Düzenleme Bekliyor】 durumuna ayarlanır.',
         changeStatus: 'Durumu değiştir',
@@ -3020,6 +3070,12 @@ const message = {
         cleanDataHelper: 'Bu görev sırasında oluşturulan yedekleme dosyasını sil.',
         noLogs: 'Henüz görev çıktısı yok...',
         errPath: 'Yedek yolu [{0}] hatası, indirilemez!',
+        websiteStartStop: 'Web sitesini başlat/durdur',
+        startTime: 'Başlatma zamanı',
+        stopTime: 'Durdurma zamanı',
+        websiteTimeHint: 'Hatırlatma: günde bir kez çalışır',
+        websiteTimeInvalid:
+            'Başlatma ve durdurma zamanlarını seçin; başlatma zamanı durdurma zamanından önce olmalıdır',
         cutWebsiteLog: 'Website log döndürme',
         cutWebsiteLogHelper: 'Döndürülen log dosyaları 1Panel yedek dizinine yedeklenecektir.',
         syncIpGroup: 'WAF IP gruplarını senkronize et',
@@ -3028,6 +3084,15 @@ const message = {
         unitHours: 'Birim: Saat',
         alertTitle: 'Planlanmış Görev - {0} 「{1}」 Görev Başarısızlık Uyarısı',
         library: {
+            executeScript: 'Betiği çalıştır',
+            targetNodes: 'Hedef düğümleri seçin',
+            switchNodeHelper:
+                'Düğüm değiştirmek çalışmayı durdurmaz. Doğrudan terminale yazın; girdi yalnızca seçili düğüme gönderilir.',
+            executorCloseHelper:
+                'Kapatmak tüm düğüm terminallerinin bağlantısını keser ve çalışan betikleri durdurabilir. Devam edilsin mi?',
+            connecting: 'Bağlanıyor',
+            connected: 'Bağlandı',
+            disconnected: 'Bağlantı kesildi',
             script: 'Script',
             syncNow: 'Hemen Senkronize Et',
             autoSyncHelper:
@@ -3145,6 +3210,10 @@ const message = {
             '{0} sonrasındaki veriler birkaç denemeye rağmen alınamadı, dışa aktarma durduruldu. Ağı kontrol edin veya zaman aralığını daraltıp tekrar deneyin.',
     },
     terminal: {
+        passwordless: 'Parolasız',
+        bootstrapAuth: 'İlk kimlik doğrulama (isteğe bağlı)',
+        passwordlessSetupHelper: 'Bağlantı testi parolasız erişimi yapılandırır ve doğrular.',
+
         showTerminalButton: 'Terminal kısayolu',
         showTerminalButtonHelper:
             'Etkinleştirildiğinde, sayfanın sağ alt köşesinde terminal kısayol düğmesi görüntülenir.',
@@ -3295,6 +3364,14 @@ const message = {
             syncSiteHelper: 'Sistem saati {0} ile eşitlensin mi?',
         },
         fail2ban: {
+            mode: 'Algılama modu',
+            modeHelper:
+                'IP engellemesi için hangi SSH bağlantı olaylarının hata sayılacağını seçin. Fail2ban 0.10 veya üzeri gerekir.',
+            modeNormal: 'Varsayılan: yanlış parola veya bilinmeyen kullanıcı adı gibi başarısız girişleri sayar.',
+            modeDdos: 'Zaman aşımına uğrayan veya giriş yapılmadan kesilen bağlantıları da sayar.',
+            modeExtra: 'Sunucunun desteklemediği bağlantı yöntemlerinden kaynaklanan hataları da sayar.',
+            modeAggressive:
+                'Yukarıdakilerin tümünü sayar. Daha katıdır, ancak meşru kullanıcıların engellenme olasılığı da artar.',
             sshPort: 'SSH portunu dinle',
             sshPortHelper: 'Mevcut Fail2ban ana bilgisayarın SSH bağlantı portunu dinler',
             unActive: 'Fail2ban servisi şu anda etkin değil.',
@@ -3561,6 +3638,10 @@ const message = {
         compressSuccess: 'Başarıyla sıkıştırıldı',
         deCompressSuccess: 'Sıkıştırma başarıyla açıldı',
         deCompressDst: 'Sıkıştırma açma yolu',
+        decompressConflictPolicy: 'Mevcut dosyalar',
+        keepExisting: 'Mevcut dosyaları koru',
+        decompressConflictHelper:
+            'Mevcut dosyalar korunurken çakışan öğeler atlanır. Aynı adlı dizinler birleştirilmeye devam eder.',
         linkType: 'Bağlantı türü',
         softLink: 'Yumuşak bağlantı',
         hardLink: 'Sert bağlantı',
@@ -4658,6 +4739,17 @@ const message = {
         isEdirWarn: 'docker-compose.yml dosyasında değişiklikler algılandı. Lütfen farkları inceleyin.',
     },
     website: {
+        batchPHP: 'PHP sürümünü değiştir',
+        batchPHPHelper: 'Yalnızca PHP siteleri değiştirilir. Diğer siteler atlanır. Yerel PHP ortamları desteklenmez.',
+        batchPHPCount: 'Seçilen siteler: {0}; PHP siteleri: {1}; diğerleri: {2}.',
+        notPHP: 'PHP sitesi değil',
+        localPHP: 'Yerel PHP ortamları desteklenmez',
+        samePHP: 'Hedef PHP ortamı zaten kullanılıyor',
+        batchPHPResult: 'Sonuçlar',
+        batchPHPStatus_success: 'Başarılı',
+        batchPHPStatus_failed: 'Başarısız',
+        batchPHPStatus_skipped: 'Atlandı',
+        sslDomainMismatchWebsite: 'Sertifika alan adları web sitesinin alan adlarıyla eşleşmiyor',
         primaryDomain: 'Birincil alan adı',
         otherDomains: 'Diğer alan adları',
         static: 'Statik',
@@ -4784,6 +4876,10 @@ const message = {
         privateKey: 'Anahtar (KEY)',
         certificate: 'Sertifika (PEM formatı)',
         HTTPConfig: 'HTTP Seçenekleri',
+        HTTPSRedirectPort: 'HTTPS yönlendirme bağlantı noktası',
+        HTTPSRedirectPortCustom: 'Özel',
+        HTTPSRedirectPortManualHelper:
+            'Bu yönlendirme kuralı manuel olarak düzenlendi veya yönetilmiyor; bu nedenle değiştirilemez.',
         HTTPSOnly: 'HTTP isteklerini engelle',
         HTTPToHTTPS: 'HTTPS’ye yönlendir',
         HTTPAlso: 'Doğrudan HTTP isteklerine izin ver',
@@ -4952,6 +5048,8 @@ const message = {
         batchInput: 'Toplu Giriş',
         domainNotFQDN: 'Bu alan adı genel ağda erişilebilir olmayabilir',
         domainInvalid: 'Geçersiz alan adı biçimi',
+        allowFirewall: 'Güvenlik duvarında izin ver',
+        allowFirewallHelp: 'Site oluşturulduktan sonra bu TCP bağlantı noktasını kullanan tüm alan adları için açar.',
         domainBatchHelper:
             'Bir satırda bir alan adı, format: domain:port@ssl\nÖrnek: example.com:443@ssl veya example.com',
         generateDomain: 'Oluştur',
@@ -4983,6 +5081,9 @@ const message = {
         failTimeoutHelper:
             'Sunucu sağlık kontrolleri için zaman penceresi uzunluğu. Bu süre içinde biriken hata sayısı eşiğe ulaştığında, sunucu geçici olarak kaldırılacak ve aynı süre sonunda yeniden denenir. Varsayılan 10 saniye',
         staticChangePHPHelper: 'Şu anda statik bir web sitesi, PHP web sitesine geçiş yapabilirsiniz',
+        createDefaultIndex: 'Varsayılan {0} dosyasını oluştur',
+        createDefaultIndexHelper:
+            'Yalnızca dosya web sitesi kök dizininde mevcut değilse varsayılan sayfa ayarlarındaki içerikle oluşturulur',
         proxyCache: 'Ters Vekil Önbelleği',
         cacheLimit: 'Önbellek Alanı Sınırı',
         shareCache: 'Önbellek Sayısı Bellek Boyutu',
@@ -5115,6 +5216,8 @@ const message = {
         status: 'Geçerli Durum',
         configResource: 'Yapılandırma',
         saveAndReload: 'Kaydet ve yeniden yükle',
+        batchClearProxyCacheWarn:
+            'Seçilen {0} web sitesinin ters vekil önbelleği temizlensin mi? Daha önce önbelleğe alınmış içerik için bir sonraki istek kaynak sunucuya gönderilir.',
         clearProxyCache: 'Ters vekil önbelleğini temizle',
         clearProxyCacheWarn: 'Bu işlem önbellek dizinindeki tüm dosyaları silecektir. Devam etmek istiyor musunuz?',
         create: 'Yeni bir modül ekle',
@@ -5150,14 +5253,24 @@ const message = {
             'Derlemeden önce çalıştırılacak betikler, genellikle modül kaynak kodunu indirmek, bağımlılıkları kurmak vb. için',
         buildHelper:
             'Dinamik modüller derlemeden sonra yapılandırmadan yüklenir; statik modüller yine OpenResty’yi yeniden derler.',
-        defaultHttps: 'HTTPS Anti-sızdırma',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: 'Anti-sızdırma durumu',
         defaultHttpsHelper1: 'Bu özelliği etkinleştirerek HTTPS sızdırma sorunlarını çözebilirsiniz.',
         sslRejectHandshake: 'Varsayılan SSL el sıkışmasını reddet',
         sslRejectHandshakeHelper:
             'Etkinleştirilmesi sertifika sızıntısını önleyebilir, varsayılan bir web sitesi ayarlamak bu ayarı geçersiz kılar',
+        httpsRedirectCustomPort: 'Özel bağlantı noktasına yönlendir',
+        httpsRedirectCustomPortHelper:
+            'Etkinleştirildiğinde, HTTP’den HTTPS’e yönlendirmeler özel HTTPS bağlantı noktasını kullanır.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: 'Eşitleme dizini',
+        syncDirHelp: 'Hedef düğümlerdeki dizinin mutlak yolunu girin. Tüm hedef düğümlerde aynı dizin kullanılır.',
+        syncDirSingleCert:
+            'Dosyaların üzerine yazılmasını önlemek için dizin belirtirken yalnızca bir sertifika seçin.',
+        syncDirAbsolute: 'Eşitleme dizini mutlak bir yol olmalıdır.',
+
+        caUploadHelp: 'ca.crt ve ca.key içeren, indirdiğiniz ZIP dosyasını yükleyin (en fazla 10 MB).',
         deleteConfirm:
             'Aşağıdaki sertifikalar silinecek. ACME sertifikaları otomatik olarak iptal edilecek. Devam edilsin mi?',
         deleteAndRevoke: 'Sil ve iptal et',
@@ -5495,6 +5608,10 @@ const message = {
         editRuleConfirm: 'Bu kuralı değiştirmek istediğinizden emin misiniz?',
     },
     runtime: {
+        buildLog: 'Derleme günlüğü',
+        extensionInstallFailed: 'Bazı PHP uzantıları yüklenemedi: {extensions}',
+        statusMessageUnavailable:
+            'Ayrıntılı durum bilgisi mevcut değil. Ayrıntılar için çalışma ortamı günlüklerini kontrol edin.',
         importEnv: 'Ortam Değişkenlerini İçe Aktar',
         envImportError: 'Satır {0}: {1}',
         envInvalidAssignment: 'Geçerli bir NAME=value ataması bekleniyor',
@@ -5677,6 +5794,83 @@ const message = {
         diskType: 'Disk Türü',
         serial: 'Seri Numarası',
         noFail: 'Bağlama hatası sistem başlangıcını etkilemez',
+    },
+    networkManage: {
+        routeDetails: 'Rota ayrıntıları',
+        manageIP: 'İlgili IP’yi yönet',
+        connectedRoute: 'IP üzerinden oluşturuldu',
+        connectedRouteHint:
+            'Sistem bu doğrudan bağlı rotayı arayüz IP adresinden otomatik oluşturur. Rota ayrı olarak düzenlenmez. Arayüz ayrıntılarında ilgili IP adresini düzenleyin veya silin.',
+        virtualBridgeReadOnly: 'Sanal arayüz · Salt okunur',
+        virtualBridgeReadOnlyHint: 'Bu sanal arayüz salt okunurdur ve erişilebilirlik denetimlerine dahil edilmez.',
+        loopbackReadOnly: 'Geri döngü arayüzü yapılandırması salt okunurdur.',
+        persistentSourceMissing:
+            '{0} arayüzü için desteklenen kalıcı sistem yapılandırması bulunamadı. Salt okunurdur.',
+        addressReadOnlyReason:
+            'Bu adres dinamiktir, genel kapsamlı değildir veya desteklenen kalıcı yapılandırması yoktur. Salt okunurdur.',
+        routeReadOnlyReason:
+            'Bu rota dinamiktir, çekirdek tarafından oluşturulmuştur veya desteklenen kalıcı yapılandırması yoktur. Salt okunurdur.',
+        persistenceBackend: 'Kalıcı yapılandırma',
+        editIP: 'IP düzenle',
+        editRoute: 'Rotayı düzenle',
+        operationRisk: 'Ağ değişiklikleri bağlantıları kesebilir. Sunucuya erişmek için alternatif bir yol hazırlayın.',
+        confirmInterface: 'Onaylamak için {0} arayüz adını girin.',
+        sourceAddress: 'Kaynak adresi',
+        linkConnected: 'Bağlantı kuruldu',
+        linkDisconnected: 'Bağlantı kesildi',
+        topologySearch: 'Arayüz, IP, ağ geçidi veya hedef ara',
+        topologyHint:
+            'Solda arayüz IP’lerini yönetin. Rota kartları hedef, ağ geçidi ve metriği gösterir. Ayrıntılar için karta tıklayın; çizgiler bağlantının doğrulandığını göstermez.',
+        direct: 'Doğrudan',
+        defaultDestination: 'Varsayılan rota',
+        unknownInterface: 'Belirtilmemiş arayüz',
+        noRoutes: 'Eşleşen rota yok',
+        readOnly: 'Salt okunur',
+        readOnlyRouteHint:
+            'Birden fazla sonraki atlaması olan veya tek bir arabirimi bulunmayan rotalar salt okunurdur.',
+        title: 'Ağ yönetimi',
+        interfaces: 'Ağ arayüzleri',
+        routes: 'Rotalar',
+        addIP: 'IP ekle',
+        ipCount: 'IP sayısı',
+        interfaceID: 'Arayüz kimliği',
+        adminState: 'Yönetim durumu',
+        linkState: 'Bağlantı durumu',
+        mac: 'MAC adresi',
+        flags: 'Bayraklar',
+        address: 'Adres',
+        scope: 'Kapsam',
+        interface: 'Arayüz',
+        configStatus: 'Yapılandırma durumu',
+        managedApplied: 'Kayıtlı · Etkin',
+        managedPending: 'Kayıtlı · Etkin değil',
+        addressWarning:
+            'Bu arayüze atanmış IP adresini kullanın. Genel IP adresi NAT ile eşleniyorsa özel IP adresini girin.',
+        addressRisk:
+            'Kullanımda olan bir IP adresi veya yanlış bir önek uzunluğu panele ya da SSH üzerinden sunucuya erişimi kesintiye uğratabilir.',
+        addressWithPrefix: 'IP adresi / önek uzunluğu',
+        interfaceSelectHint:
+            'Yalnızca kalıcı yapılandırması düzenlenebilen arayüzler listelenir. Geri döngü arayüzleri, salt okunur sanal köprüler ve değiştirilemeyen diğer arayüzler listelenmez.',
+        gatewayHint: 'Doğrudan bağlı alt ağlar için ağ geçidini boş bırakabilirsiniz.',
+        metricHint: 'Aynı hedef alt ağ için genellikle daha düşük metrikli rotalar önceliklidir.',
+        defaultRouteWarning:
+            'Varsayılan rota panelin, SSH bağlantılarının ve diğer hizmetlerin çıkış yolunu değiştirebilir. Bulut konsolu gibi alternatif bir erişim yolu hazırlayın.',
+        interfaceMissing: 'Arayüz bulunamadı',
+        changeWarning:
+            'Ağ ayarlarını değiştirmek panel bağlantısını kesebilir veya hizmetleri durdurabilir. Devam etmeden önce bu sunucuya başka bir yolla erişebildiğinizden emin olun.',
+        cidrHint:
+            '192.0.2.10/24 gösterimindeki /24, 255.255.255.0 alt ağ maskesine karşılık gelir. IPv6 örneği: 2001:db8::10/64.',
+        addRoute: 'Rota ekle',
+        checkRoutes: 'Rota erişilebilirliğini denetle',
+        destination: 'Hedef',
+        metric: 'Metrik',
+        routeTable: 'Tablo',
+        reachability: 'Erişilebilirlik',
+        reachable: 'Erişilebilir',
+        unreachable: 'Erişilemiyor',
+        unchecked: 'Denetlenmedi',
+        check: 'Denetle',
+        destinationHint: 'IPv4/IPv6 adresi veya CIDR ağı desteklenir. Varsayılan rota: default, 0.0.0.0/0 veya ::/0.',
     },
     xpack: {
         ldap: {
@@ -7814,6 +8008,13 @@ const message = {
             appUpgradeHelper: 'Yükseltilmesi gereken {0} uygulama var',
             dashboardSetting: 'Genel Bakış Ayarları',
             keepOneDashboardComponent: 'En az bir genel bakış bölümü bırakın',
+            currentNode: 'Geçerli düğüm',
+            quickSwitch: 'Hızlı geçiş',
+            allNodes: 'Tüm düğümler',
+            nodeSearchPlaceholder: 'Düğüm adı veya adresi ara',
+            currentNodeNotInResults: 'Geçerli düğüm bu sayfanın sonuçlarında bulunmuyor',
+            upgradableApps: 'Yükseltilebilir uygulamalar',
+            quickSwitchMore: 'Eşleşen tüm düğümleri görüntüle',
         },
         customApp: {
             name: 'Özel Uygulama Deposu',
@@ -8145,6 +8346,31 @@ const message = {
             menu: 'Kaynak Senkronizasyonu',
             file: 'Dosya Aktarımı',
             fileSyncConfirm: '{0} düğümündeki {1} dosya/klasörü {2} düğümündeki {3} dizinine aktarmak istiyor musunuz?',
+            fileBatchDesc: 'Herhangi bir düğümden dosya veya klasör seçerek birden fazla hedef düğüme dağıtın.',
+            fileSourceTitle: 'Kaynak dosyaları seç',
+            fileSourceNode: 'Kaynak düğüm',
+            fileTargetDirectory: 'Hedef dizin',
+            fileBatchPath: 'Hedef dizinleri toplu ayarla',
+            fileApplyPath: 'Seçili düğümlere uygula',
+            fileSelectedCount: '{0} öğe seçildi',
+            fileSelectedTargets: '{0} düğüm seçildi',
+            fileSelectionHint: 'Klasörler özgün adlarıyla tümüyle kopyalanır ve iç dizin yapısı korunur.',
+            fileRules:
+                'Mevcut dosya aktarım kuralları uygulanır: aynı adlı dosyalar güncellenebilir, hedef dizindeki diğer dosyalar korunur.',
+            fileBatchSummary: '{0} öğeyi {1} hedef düğüme dağıt',
+            fileTaskHint: 'Onaydan sonra bir dağıtım görevi oluşturulur. Görev yönetiminden görüntüleyebilirsiniz.',
+            fileBatchConfirm:
+                'Aşağıdaki hedef düğümleri ve kayıt yollarını kontrol edin. Aynı adlı dosyaların üzerine yazılabilir.',
+            fileTargetHint:
+                'Her düğüm için ayrı bir dizin ayarlanabilir. Çevrimdışı, denetimi başarısız veya rsync kurulu olmayan düğümler seçilemez.',
+            fileChecking: 'Denetleniyor',
+            fileCheckFailed: 'Denetim başarısız',
+            fileRsyncMissing: 'rsync kurulu değil',
+            filePathRequired: '/ ile başlayan bir mutlak hedef dizin yolu girin.',
+            fileConflictHint:
+                'Bu kaynakların hedef adları aynı. Her ad için yalnızca bir kaynak bırakın. Seçimin kaldırılması tüm hedef düğümlere uygulanır.',
+            fileDeselect: 'Seçimi kaldır',
+            fileSourceChanged: 'Kaynak düğüm değiştirildi. Dosyaları yeniden seçin.',
 
             image: 'İmaj Aktarımı',
             imageBatchDesc: 'Önce kaynak düğümü ve kaynak imajları seçin, ardından iletim için hedef düğümleri seçin.',
@@ -8322,6 +8548,11 @@ const message = {
             createFromTemplate: 'Şablondan oluştur',
             template: 'Şablon',
             templateName: 'Şablon adı',
+            dataDisks: 'Veri diskleri',
+            dataDiskHelper:
+                'Veri diskleri boş oluşturulur. Her disk için bir depolama havuzu seçilebilir; veri yolu türü sistem diskiyle aynıdır. En fazla 9 disk eklenebilir.',
+            templateSystemDiskHelper:
+                'Şablonlar yalnızca sistem diskini kopyalar; veri disklerinin içeriği dahil edilmez. Şablondan VM oluştururken boş veri diskleri ekleyebilirsiniz. /etc/fstab bağlamalarını ve veri disklerine bağımlı veritabanı veya uygulama yollarını kontrol edin. Yeni disklerin UUID değerleri farklı olabilir; panel konuk yapılandırmasını otomatik değiştirmez.',
             convertToTemplate: 'Şablona dönüştür',
             sourceVM: 'Kaynak VM',
             templateSize: 'Şablon boyutu',
@@ -8440,7 +8671,7 @@ const message = {
             currentSnapshot: 'Geçerli',
             snapshotEmpty: 'Anlık görüntü yok',
             snapshotHelper:
-                'Anlık görüntü, geçerli VM durumunu geri yükleme noktası olarak kaydeder. Sonraki veri değişiklikleri özgün diski değiştirmeden bir fark dosyasına kaydedilir. Anlık görüntünün geri yüklenmesi VM’yi bu duruma döndürür.',
+                'Anlık görüntüler, yönetilen tüm yazılabilir diskleri birlikte kaydeder ve geri yükler; bellek dahil değildir. Geri yüklemeden önce VM kapatılmalı ve disk kümesi anlık görüntüyle eşleşmelidir. Paylaşılan veya desteklenmeyen yazılabilir diskler oluşturmayı engeller.',
             snapshotOperationHelper:
                 'Geçerli anlık görüntü silinemez. Anlık görüntüler yalnızca sanal makine kapalıyken geri yüklenebilir.',
             snapshotRecoverConfirm:
@@ -8476,14 +8707,86 @@ const message = {
             cluster: 'Uygulama yüksek kullanılabilirliği',
             name: 'Küme adı',
             addCluster: 'Küme ekle',
-            installNode: 'Düğüm kur',
-            master: 'Ana düğüm',
-            slave: 'İkincil düğüm',
-            replicaStatus: 'Ana-Çalışan Durumu',
             unhealthyDeleteError:
                 'Yükleme düğümü durumu anormal, lütfen düğüm listesini kontrol edin ve tekrar deneyin!',
-            replicaStatusError: 'Durum alımı anormal, lütfen ana düğümü kontrol edin.',
-            masterHostError: "Ana düğüm IP'si 127.0.0.1 olamaz",
+            noAvailableMasterVersion: 'Bu düğümde kullanılabilir bir birincil sunucu şablonu yok.',
+            backups: 'Küme yedekleri',
+            importBackup: 'Yedeği içe aktar',
+            archivePassphrase: 'Yedek parolası',
+            restoreToNew: 'Yeni kümeye geri yükle',
+            restoreTarget: 'Geri yükleme hedefi',
+            restoreToOriginal: 'Özgün kümeye geri yükle',
+            restoreOriginalUnavailable: 'Bu yedek için geri yüklenebilecek bir özgün küme yok.',
+            restoreOriginalWarning:
+                'Veritabanı bağlantıları kesilir. Özgün küme yedekteki duruma döner ve replikalar yeniden eşitlenir.',
+            restoreOriginalConfirm: 'Üzerine yazmayı onaylamak için {0} küme adını girin.',
+            restoreCredentials: 'Yedekteki yönetici ve replikasyon kimlik bilgilerini kullanın.',
+            archiveImportHint:
+                'Yalnızca .1pha biçimindeki küme yedekleri desteklenir. Yedek oluşturulurken belirlenen parolayı kullanın.',
+            backupDataSize: 'Veri Boyutu',
+            appStoreOnly: 'Bu uygulamayı Uygulama Yüksek Erişilebilirliği bölümünde kurun ve yükseltin.',
+            noMatchingReplicaVersion: 'Bu düğümde birincil sunucuyla aynı sürümde bir replika şablonu yok.',
+            installNode: 'Dağıtım sunucusu',
+            master: 'Birincil veritabanı',
+            slave: 'Replika veritabanı',
+            redisMaster: 'Birincil örnek',
+            redisReplica: 'Kopya',
+            replicaStatus: 'Çoğaltma ayrıntıları',
+            replicaStatusError: 'Çoğaltma durumu okunamadı',
+            masterHostError: 'Birincil adres 127.0.0.1 olamaz',
+            emptyTitle: 'Yapılandırılmış {0} kümesi yok',
+            emptyDescription:
+                '“{2}” bölümünde {0} oluşturmak için dağıtım sunucusunu ve sürümü seçin. Dağıtımdan sonra aynı sürümde bir {1} ekleyebilir ve çoğaltma durumunu, örnek parametrelerini ve günlükleri görüntüleyebilirsiniz.',
+            loadFailed: 'Kümeler yüklenemedi',
+            refreshFailed: 'Yenileme başarısız. {0} verileri gösteriliyor.',
+            addReplica: '{0} ekle',
+            masterUnavailable: 'Birincil örneğe ulaşılamıyor. Dağıtım sunucusunu kontrol edin.',
+            replication: 'Çoğaltma',
+            replicationStatus: 'Çoğaltma durumu',
+            configuredReplicas: 'Yapılandırılan {1} sayısı: {0}',
+            addReplicaPending: '{0} eklenmesi bekleniyor',
+            checkedAt: 'Kontrol zamanı: {0}',
+            roleParameters: '{0} parametreleri',
+            parametersFailed: 'Örnek parametreleri okunamadı',
+            instanceParameters: 'Örnek parametreleri',
+            replicationParameters: 'Veri çoğaltma ayarları',
+            replicationUserHelp:
+                'Replika veritabanı, birincil veritabanına bağlanmak ve verileri eşitlemek için bu hesabı kullanır.',
+            replicationPasswordHelp:
+                'Çoğaltma kullanıcısının kimliğini doğrular. Replika veritabanı eklerken birincil veritabanında bu hesap için ayarlanan parolayı kullanın.',
+            configureRole: '{0} yapılandır',
+            sameHost: 'İki örnek de aynı sunucuda. Sunucu arızası her ikisini de etkiler.',
+            versionLocked: 'Mevcut birincil sürümle eşleşir.',
+            unset: 'Ayarlanmamış',
+            noParameters: 'Görüntülenecek parametre yok',
+            lagSeconds: 'Çoğaltma gecikmesi (saniye)',
+            offsetBytes: 'Çoğaltma konumu (bayt)',
+            taskQueued: 'Görev kabul edildi',
+            removeRecord: 'Kaydı Sil',
+            removeClusterRecordNotice: 'Bu işlem küme kaydını kaldırır.',
+            removeMemberRecordNotice: 'Bu işlem üye kaydını kaldırır.',
+            taskAwaitingConfirmation: 'Sunucu onayı bekleniyor',
+            taskConfirmationNotice:
+                '{0} sunucusunun görevi onaylaması bekleniyor. Görev kaydedildiğinde ilgili sunucunun Görev Merkezi veya karttaki günlükler üzerinden görüntülenebilir.',
+            taskRecordUnavailable:
+                'Görev kaydı alınamadı. İşlemin gönderim sonucunu ve dağıtım sunucusunun durumunu kontrol edin.',
+            taskRunning: 'Görev çalışıyor',
+            taskFailed: 'İşlem başarısız oldu. Görev günlüğünü kontrol edin.',
+            parameters: 'Parametreler',
+            primaryMissing: 'Birincil örneğin kaydı bulunamadı.',
+            replicaSourceAddress: '{0} adresi',
+            replicaSourcePort: '{0} bağlantı noktası',
+            replicaSourceAddressHelp: 'Seçilen sunucudan erişilebilen bir IP adresi veya alan adı girin.',
+            replicationState: {
+                pending: 'Kontrol bekliyor',
+                waitingForInstance: 'Örneğin hazır olması bekleniyor',
+                healthy: 'Sağlıklı',
+                syncing: 'Eşitleniyor',
+                lagging: 'Gecikiyor',
+                disconnected: 'Bağlantı kesildi',
+                unknown: 'Bilinmiyor',
+                unavailable: 'Alınamadı',
+            },
         },
     },
     template: {

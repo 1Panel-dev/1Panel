@@ -24,7 +24,7 @@ import (
 	"github.com/jinzhu/copier"
 )
 
-var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "clean", "ntp", "syncIpGroup", "cleanLog"}
+var cronJobAlertTypes = []string{"shell", "app", "website", "database", "directory", "log", "snapshot", "curl", "cutWebsiteLog", "websiteStartStop", "clean", "ntp", "syncIpGroup", "cleanLog"}
 
 func CreateTaskScanEmailAlertLog(alert dto.AlertDTO, create dto.AlertLogCreate, pushAlert dto.PushAlert, method string, transport *http.Transport, agentInfo *dto.AgentInfo, emailConfig model.AlertConfig) error {
 	params := CreateTaskAlertParams(pushAlert)
@@ -324,6 +324,8 @@ func GetCronJobTypeName(cronJobType string) string {
 		module = "备份目录"
 	case "curl":
 		module = "访问 URL"
+	case "websiteStartStop":
+		module = "网站启停"
 	case "cutWebsiteLog":
 		module = "切割网站日志"
 	case "clean":

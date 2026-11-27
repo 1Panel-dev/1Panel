@@ -1,6 +1,12 @@
 package types
 
+type VMDataDisk struct {
+	SizeGiB     int64
+	StoragePool string
+}
+
 type VMConfig struct {
+	DataDisks        []VMDataDisk
 	Name             string
 	CPU              int
 	MemoryMiB        int64

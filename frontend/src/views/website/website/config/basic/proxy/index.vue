@@ -34,6 +34,17 @@
                 />
             </template>
         </el-table-column>
+        <el-table-column :label="$t('aiTools.model.serviceStatus')" min-width="120">
+            <template #default="{ row }">
+                <span class="proxy-service-status">
+                    <span
+                        class="proxy-service-dot"
+                        :style="{ backgroundColor: 'var(--el-color-' + proxyServiceStatus(row).type + ')' }"
+                    />
+                    {{ $t(proxyServiceStatus(row).label) }}
+                </span>
+            </template>
+        </el-table-column>
         <fu-table-operations
             :ellipsis="10"
             width="260px"
@@ -81,6 +92,14 @@ const fileRef = ref();
 const opRef = ref();
 const cacheRef = ref();
 const hasCache = ref(false);
+
+const serviceStates = {
+    healthy: { type: 'success', label: 'aiTools.model.readinessReady' },
+    unhealthy: { type: 'danger', label: 'aiTools.model.readinessNotReady' },
+    stopped: { type: 'info', label: 'aiTools.model.readinessNotRunning' },
+    unknown: { type: 'info', label: 'commons.status.unknown' },
+};
+const proxyServiceStatus = (row: Website.ProxyConfig) => serviceStates[row.serviceStatus || 'unknown'];
 
 const buttons = [
     {
@@ -238,3 +257,17 @@ onMounted(() => {
     search();
 });
 </script>
+
+<style scoped>
+.proxy-service-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+.proxy-service-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+</style>

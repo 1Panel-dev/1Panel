@@ -2,13 +2,18 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"errors"
 	"fmt"
+	"net"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/dto/request"
@@ -417,6 +422,7 @@ func (w WebsiteService) GetProxies(id uint) (res []request.WebsiteProxyConfig, e
 		proxyConfig.Preflight = location.Preflight
 		res = append(res, proxyConfig)
 	}
+	checkProxyServices(res)
 	return
 }
 
@@ -454,13 +460,33 @@ func (w WebsiteService) ClearProxyCache(req request.NginxCommonReq) error {
 	if err != nil {
 		return err
 	}
-	cacheDir := GetSitePath(website, SiteCacheDir)
-	fileOp := files.NewFileOp()
-	if fileOp.Stat(cacheDir) {
-		if err = fileOp.CleanDir(cacheDir); err != nil {
-			return err
+	if _, err := cleanWebsiteProxyCache(GetSiteDir(""), website.Alias); err != nil {
+		return err
+	}
+	return reloadProxyCacheNginx()
+}
+
+func cleanWebsiteProxyCache(sitesDir, alias string) (bool, error) {
+	if alias == "" || alias == "." || alias == ".." || filepath.Base(alias) != alias {
+		return false, fmt.Errorf("invalid website alias %q", alias)
+	}
+	cacheDir := filepath.Join(sitesDir, alias, "cache")
+	for _, dir := range []string{filepath.Dir(cacheDir), cacheDir} {
+		info, err := os.Lstat(dir)
+		if os.IsNotExist(err) {
+			return false, nil
+		}
+		if err != nil {
+			return false, err
+		}
+		if !info.IsDir() {
+			return false, fmt.Errorf("%s is not a directory", dir)
 		}
 	}
+	return files.NewFileOp().CleanDir(cacheDir)
+}
+
+func reloadProxyCacheNginx() error {
 	nginxInstall, err := getAppInstallByKey(constant.AppOpenresty)
 	if err != nil {
 		return err
@@ -521,4 +547,56 @@ func (w WebsiteService) UpdateProxyStatus(req request.WebsiteProxyStatusUpdate) 
 		return updateNginxConfig(constant.NginxScopeServer, nil, &website)
 	}
 	return errors.New("unknown status")
+}
+
+// checkProxyServices bounds the whole list check so unreachable targets do not
+// make list latency grow with the number of proxies.
+func checkProxyServices(proxies []request.WebsiteProxyConfig) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+	var wg sync.WaitGroup
+	slots := make(chan struct{}, 10)
+	for i := range proxies {
+		wg.Add(1)
+		go func(i int) {
+			defer wg.Done()
+			if !proxies[i].Enable {
+				proxies[i].ServiceStatus = "stopped"
+				return
+			}
+			select {
+			case slots <- struct{}{}:
+				defer func() { <-slots }()
+			case <-ctx.Done():
+				proxies[i].ServiceStatus = "unhealthy"
+				return
+			}
+			proxies[i].ServiceStatus = proxyPortStatus(ctx, proxies[i].ProxyPass)
+		}(i)
+	}
+	wg.Wait()
+}
+
+func proxyPortStatus(ctx context.Context, target string) string {
+	u, err := url.Parse(target)
+	if err != nil || u.Hostname() == "" || strings.Contains(target, "$") || (u.Scheme != "http" && u.Scheme != "https") {
+		return "unknown"
+	}
+	port := u.Port()
+	if port == "" {
+		// A bare hostname can refer to an nginx upstream group.
+		if net.ParseIP(u.Hostname()) == nil && !strings.Contains(u.Hostname(), ".") && u.Hostname() != "localhost" {
+			return "unknown"
+		}
+		port = "80"
+		if u.Scheme == "https" {
+			port = "443"
+		}
+	}
+	conn, err := (&net.Dialer{}).DialContext(ctx, "tcp", net.JoinHostPort(u.Hostname(), port))
+	if err != nil {
+		return "unhealthy"
+	}
+	_ = conn.Close()
+	return "healthy"
 }

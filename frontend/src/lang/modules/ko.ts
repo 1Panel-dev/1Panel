@@ -73,6 +73,7 @@ const message = {
             enable: '활성화',
             disable: '비활성화',
             confirm: '확인',
+            autoFill: '자동 입력',
             check: '검사',
             submit: '제출',
             cancel: '취소',
@@ -262,6 +263,8 @@ const message = {
             uninstallSuccess: '제거 성공',
         },
         login: {
+            imageLoadError: '이미지를 불러오지 못했습니다',
+            imageLoadErrorHint: '가능한 원인: 네트워크 연결 문제, 이미지 없음 또는 지원하지 않는 형식.',
             username: '사용자 이름',
             password: '비밀번호',
             passkey: '패스키 로그인',
@@ -302,7 +305,7 @@ const message = {
             simplePassword:
                 '이 필드는 "_"로 시작할 수 없으며, 영어, 숫자 및 "_" 문자로 구성되어야 하며 길이는 1-30 자여야 합니다.',
             dbName: '이 필드는 "_"로 시작할 수 없으며, 영어, 숫자 및 "_" 문자로 구성되어야 하며 길이는 1-64 자여야 합니다.',
-            imageName: '특수 문자로 시작하지 않고, 영어, 숫자, :@/.-_ 지원, 길이 1-256',
+            imageName: "특수 문자로 시작하지 않고, 영어, 숫자, :{'@'}/.-_ 지원, 길이 1-256",
             composeName: '특수 문자로 시작할 수 없으며, 소문자, 숫자, "-", "_"를 지원하며 길이는 1-256 자여야 합니다.',
             volumeName: '이 필드는 영어, 숫자, ".", "-", "_" 문자로 구성되어야 하며 길이는 2-30 자여야 합니다.',
             supervisorName:
@@ -359,6 +362,7 @@ const message = {
             serviceNotStarted: '{0} 서비스가 시작되지 않았습니다.',
         },
         status: {
+            autoSync: '자동 동기화',
             autoSyncEnabled: '자동 동기화 켜짐',
             autoSyncDisabled: '자동 동기화 꺼짐',
             running: '실행 중',
@@ -615,6 +619,7 @@ const message = {
         loadFromRemote: '동기화',
         userBind: '사용자 바인딩',
         noUserBind: '바인딩 없음',
+        connectionUser: '연결 사용자',
         userAuthorization: '사용자 권한',
         noUserAuthorization: '권한 부여 안 함',
         authorizedDatabaseCount: '데이터베이스 {0}개 권한 보유',
@@ -625,9 +630,12 @@ const message = {
         revokeAuthorization: '권한 취소',
         revokeAuthorizationHelper: '사용자 {0}의 데이터베이스 {1} 접근 권한을 취소하시겠습니까?',
         supplementPassword: '비밀번호 추가',
-        supplementPasswordHelper: '기존 비밀번호를 1Panel에만 저장하며 MySQL 비밀번호는 변경하지 않습니다.',
-        pgBindHelper:
-            '이 작업은 새 사용자를 생성하여 대상 데이터베이스에 바인딩하는 데 사용됩니다. 현재 데이터베이스에 이미 존재하는 사용자 선택은 지원되지 않습니다.',
+        supplementPasswordHelper:
+            '기존 비밀번호를 1Panel에 저장하기만 하며 데이터베이스 사용자 비밀번호는 변경하지 않습니다.',
+        pgAuthorizationHelper:
+            '슈퍼유저는 연결 설정 없이 이 인스턴스의 모든 데이터베이스에 접근합니다. 일반 사용자는 데이터베이스 권한만 관리하며 테이블 권한은 포함하지 않습니다.',
+        pgRevokeAuthorizationHelper:
+            '권한을 철회해도 사용자는 삭제되지 않습니다. PUBLIC 또는 다른 역할을 통한 접근 권한은 남을 수 있습니다.',
         pgSuperUser: '슈퍼 사용자',
         loadFromRemoteHelper: '서버의 데이터베이스, 사용자 및 권한 정보를 1Panel로 동기화합니다. 계속하시겠습니까?',
         passwordHelper: '확인 불가, 수정하려면 클릭',
@@ -867,7 +875,6 @@ const message = {
                 '사용자 이름은 영문, 숫자, 점, 밑줄, 하이픈만 지원합니다. 비밀번호는 12자 이상이며 앞뒤 공백이나 줄바꿈을 포함할 수 없습니다.',
             octopAuthHelper:
                 '비밀번호는 문자와 숫자를 포함한 8자 이상이어야 하며 흔한 비밀번호는 피하세요. 초기화 시 거부되면 앱 로그의 설정 안내를 확인하세요.',
-            initialCredentials: '초기 로그인 정보입니다. 앱에서 변경했다면 현재 비밀번호를 사용하세요.',
             nativeAgentAccessUnavailable:
                 '기존 설치에 호환되는 HTTPS 접속 주소 또는 포트가 없습니다. 앱 설정을 확인하세요.',
             agent: '에이전트',
@@ -1096,6 +1103,32 @@ const message = {
             validateImageAvailabilityHelper: '저장 전에 최소 이미지 한 장을 생성하며 비용이 발생할 수 있습니다',
         },
         model: {
+            poolEditHelp: '온라인으로 가져오거나 직접 추가하세요. 모든 모델을 수정할 수 있습니다.',
+            poolUnavailable: '이 공급자 유형과 API는 온라인 가져오기를 지원하지 않습니다. 모델 ID를 직접 추가하세요.',
+            poolEmpty: '모델이 없습니다. 온라인으로 가져오거나 직접 추가하세요.',
+            poolOverwrite: '가져오기에 성공하면 수동 추가 및 수정 사항을 포함한 전체 목록이 교체됩니다. 계속할까요?',
+            poolFetchEmpty: '모델이 반환되지 않았습니다. 기존 목록은 유지됩니다. 다시 시도하거나 직접 추가하세요.',
+            poolFetchFailed:
+                '가져오기에 실패했습니다. 기존 목록은 유지됩니다. URL, API 키, 네트워크를 확인한 후 다시 시도하거나 직접 수정하세요.',
+            poolSaveHelp: '저장 후 적용됩니다. 사용 중인 모델은 삭제할 수 없습니다.',
+
+            accountType: '계정 유형',
+            accountTypes: {
+                default: '기본',
+                payAsYouGo: '종량제',
+                chinaApi: '중국 API',
+                globalApi: '글로벌 API',
+                chinaCodingPlan: '중국 Coding Plan',
+                globalCodingPlan: '글로벌 Coding Plan',
+                chinaTokenPlan: '중국 Token Plan',
+                globalTokenPlan: '글로벌 Token Plan',
+                speech: '음성 서비스',
+                codingPlan: 'Coding Plan',
+                tokenPlan: 'Token Plan',
+                agentPlan: 'Agent Plan',
+                go: 'Go',
+                zen: 'Zen',
+            },
             externalInspect: '확인 및 가져오기',
             externalHealthPassed: '상태 확인 성공',
             externalHealthFailed: '상태 확인 실패',
@@ -1244,6 +1277,7 @@ const message = {
                 '양식이 변경되었습니다. Compose를 다시 생성하면 수동 편집 내용이 덮어써집니다. 계속할까요?',
             deploymentNameHelper:
                 '앱 인스턴스 이름으로, 설치 디렉터리에 사용되며 생성 후 변경할 수 없습니다. 표시 이름을 바꾸려면 별칭을 설정하세요.',
+            deploymentAlias: '인스턴스 별칭',
             deploymentAliasHelper:
                 '목록에 표시할 별칭입니다. 비워 두면 인스턴스 이름이 표시됩니다. 별칭을 변경해도 서비스는 다시 시작되지 않습니다.',
             deploymentContainerNameHelper:
@@ -1299,7 +1333,12 @@ const message = {
             container_conn_helper: '컨테이너 간 접근 또는 연결에 이 주소를 사용',
             from_remote: '이 모델은 1Panel을 통해 다운로드되지 않았으며 관련 풀 로그가 없습니다.',
             no_logs: '이 모델의 풀 로그가 삭제되어 관련 로그를 볼 수 없습니다.',
+            composeFile: '컴포즈 파일',
+            imageCategory: '이미지 유형',
+            standardImage: '표준 이미지',
+            customImage: '맞춤 이미지',
             vllmVersionHelper: {
+                qwen38: 'NVIDIA GB10 두 대용 사용자 지정 버전으로, Qwen3.8-Flash-Next-NVFP4에 최적화되어 있습니다.',
                 ascend: 'Ascend A2 시리즈 장치용 Ascend 공식 표준 버전입니다.',
                 ascendA3: 'Ascend A3 시리즈 장치용 Ascend 공식 A3 버전입니다.',
                 ascendA5: '950DT 장치용 Ascend 공식 A5 버전입니다.',
@@ -1309,10 +1348,8 @@ const message = {
                 rtxPro5000:
                     'NVIDIA RTX Pro 5000용 맞춤 버전으로, DeepSeek-V4.1-Flash-1017에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
                 dspark: 'NVIDIA GB10 장치 2대 구성용 맞춤 버전으로, DeepSeek-V4-Flash에 최적화되어 있습니다. 이미지는 1Panel이 유지 관리합니다.',
+                dspark4: 'NVIDIA GB10 장치 4대 구성용 맞춤 버전으로, DeepSeek-V4.1-Flash에 최적화되어 있습니다.',
             },
-            vllmDeployProfile: '배포 모델',
-            vllmProfileFlash0731: 'DeepSeek V4 Flash 0731',
-            vllmProfileVisionExp: 'DeepSeek V4 Flash Vision Exp',
             syncModelAccount: '모델 서비스에 동기화',
             modelAccountAddressHelper:
                 '컨테이너 주소는 에이전트 컨테이너 호출에 적합합니다. 127.0.0.1, 시스템 IP 또는 사용자 지정 주소는 AI Gateway 또는 외부 서비스 호출에 적합합니다.',
@@ -1321,6 +1358,12 @@ const message = {
             downloader: '모델 다운로드',
             modelDirectoryHelper:
                 '모델 목록은 기본적으로 “모델 준비 > 설정”에서 구성한 모델 디렉터리에 다운로드된 모델을 표시합니다.',
+            vllmGB10Qwen38ModelHelper:
+                'Qwen3.8-Flash-Next-NVFP4 모델만 지원합니다. 두 장치 모두 동일한 경로에 전체 모델이 있어야 합니다.',
+            vllmGB10DualNodeModelHelper:
+                'DeepSeek-V4-Flash-0731 / DeepSeek-V4-Flash-Vision-Exp만 지원합니다. 장치 2대 모두 동일한 경로에 전체 모델을 배치하세요.',
+            vllmGB10FourNodeModelHelper:
+                'DeepSeek-V4.1-Flash만 지원합니다. 장치 4대 모두 동일한 경로에 전체 모델을 배치하세요.',
             modelDirectoryPlaceholder: '모델 검색 또는 전체 경로 입력',
             selectModel: '모델 선택',
             selectModelDirectory: '디렉터리 선택',
@@ -2399,14 +2442,12 @@ const message = {
         checkFailed: '확인 실패',
         imageMissing: '필요한 이미지를 찾을 수 없습니다. 이미지 관리에서 {image} 이미지를 가져오세요.',
         imageReady: 'Benchmark 이미지가 준비되었습니다. 벤치마크를 생성할 수 있습니다.',
-        imageHelp: 'Benchmark 이미지는 부하 테스트 클라이언트를 실행하고 선택한 모델 서비스에 요청을 보냅니다.',
+        imageHelp:
+            '시스템은 이 이미지로 별도의 컨테이너를 생성하고, 선택한 모델 서비스에 테스트 요청을 보내 벤치마크를 실행합니다.',
         mainNodeHelp: '벤치마크는 메인 노드에서 실행됩니다. 이미지와 토크나이저를 메인 노드에 준비하세요.',
         goImages: '이미지 관리로 이동',
         goModels: '모델 다운로드로 이동',
-        tokenizerHelp: '토크나이저 디렉터리에서 항목을 선택하여 테스트 텍스트를 인코딩하고 토큰 수를 계산하세요.',
-        tokenizerEmpty:
-            '사용 가능한 모델이 없습니다. 모델 다운로드에서 토크나이저 파일이 포함된 모델을 다운로드하세요.',
-        tokenizerEmptyWithDownload: '사용 가능한 토크나이저가 없습니다. {download}에서 다운로드하세요.',
+        tokenizerHelp: '메인 노드의 토크나이저 또는 모델을 선택하여 테스트 텍스트를 인코딩하고 토큰 수를 계산하세요.',
         tokenizerInvalid: '이 토크나이저는 사용할 수 없습니다. 다른 항목을 선택하거나 다시 다운로드하세요.',
         schemeHelp:
             '테스트 계획은 요청 매개변수, 동시 실행 수 및 실행 규칙을 정의합니다. 사용 가능한 계획을 하나 이상 준비하세요.',
@@ -2482,6 +2523,10 @@ const message = {
         missing: '없음',
     },
     container: {
+        logDisconnected:
+            '로그 스트림 연결이 끊어졌습니다. 다시 연결하여 최근 로그를 불러오고 실시간 로그 수신을 재개하세요.',
+        logsUnavailable:
+            '컨테이너가 존재하지 않거나 삭제되었습니다. 컨테이너 로그를 확인할 수 없습니다. 컨테이너를 다시 생성한 후 재시도하세요.',
         nvidiaSupport: 'NVIDIA GPU 지원',
         nvidiaHelper:
             'NVIDIA 컨테이너 런타임을 등록합니다. 먼저 NVIDIA Container Toolkit을 설치하세요. GPU는 각 컨테이너에 별도로 할당해야 합니다.',
@@ -2826,6 +2871,9 @@ const message = {
         goSetting: '설정으로 이동',
     },
     cronjob: {
+        websiteGroupDynamicHelper:
+            '그룹 내 “전체”를 선택하면 그룹 구성 변경이 자동으로 반영됩니다. 개별 사이트를 선택하면 고정 목록으로 저장됩니다.',
+        websiteSelectionMissing: '유효하지 않은 선택',
         importHelper:
             '가져오기 시 동일한 이름의 예약 작업은 자동으로 건너뜁니다. 작업은 기본적으로 【비활성화】 상태로 설정되며, 데이터 연동 이상 시 【편집 대기】 상태로 설정됩니다.',
         changeStatus: '상태 변경',
@@ -2930,6 +2978,11 @@ const message = {
         cleanDataHelper: '이 작업에서 생성된 백업 파일을 삭제합니다.',
         noLogs: '작업 출력이 아직 없습니다...',
         errPath: '백업 경로 [{0}] 오류, 다운로드할 수 없습니다!',
+        websiteStartStop: '웹사이트 시작/중지',
+        startTime: '시작 시간',
+        stopTime: '중지 시간',
+        websiteTimeHint: '안내: 매일 한 번 실행됩니다',
+        websiteTimeInvalid: '시작 시간과 중지 시간을 선택하세요. 시작 시간은 중지 시간보다 빨라야 합니다',
         cutWebsiteLog: '웹사이트 로그 회전',
         cutWebsiteLogHelper: '회전된 로그 파일은 1Panel 의 백업 디렉토리로 백업됩니다.',
         syncIpGroup: 'WAF IP 그룹 동기화',
@@ -2938,6 +2991,15 @@ const message = {
         unitHours: '단위: 시간',
         alertTitle: '예정된 작업 - {0} 「{1}」 작업 실패 경고',
         library: {
+            executeScript: '스크립트 실행',
+            targetNodes: '실행할 노드 선택',
+            switchNodeHelper:
+                '노드를 전환해도 실행은 계속됩니다. 터미널에 직접 입력하세요. 입력은 선택한 노드에만 전송됩니다.',
+            executorCloseHelper:
+                '닫으면 모든 노드의 터미널 연결이 해제되며 실행 중인 스크립트가 중단될 수 있습니다. 계속하시겠습니까?',
+            connecting: '연결 중',
+            connected: '연결됨',
+            disconnected: '연결 끊김',
             script: '스크립트',
             syncNow: '지금 동기화',
             autoSyncHelper:
@@ -3056,6 +3118,10 @@ const message = {
             '{0} 이후 데이터를 여러 번 재시도했지만 가져오지 못해 내보내기를 중단했습니다. 네트워크를 확인하거나 기간을 줄여 다시 시도하세요.',
     },
     terminal: {
+        passwordless: '비밀번호 없이 연결',
+        bootstrapAuth: '최초 인증 (선택 사항)',
+        passwordlessSetupHelper: '연결 테스트 시 비밀번호 없는 로그인을 설정하고 확인합니다.',
+
         showTerminalButton: '터미널 바로가기',
         showTerminalButtonHelper: '활성화하면 페이지 오른쪽 하단에 터미널 바로가기 버튼이 표시됩니다.',
         local: '로컬',
@@ -3191,6 +3257,13 @@ const message = {
             syncSiteHelper: '{0}을(를) 기준으로 시스템 시간을 동기화하시겠습니까?',
         },
         fail2ban: {
+            mode: '탐지 모드',
+            modeHelper:
+                '어떤 SSH 연결 동작을 실패로 셀지 선택합니다. 설정한 횟수에 도달하면 IP를 차단합니다. Fail2ban 0.10 이상이 필요합니다.',
+            modeNormal: '기본값: 잘못된 비밀번호나 존재하지 않는 사용자 이름 등 로그인 실패를 셉니다.',
+            modeDdos: '기본 탐지에 더해 연결 시간 초과나 로그인 전 연결 종료도 셉니다.',
+            modeExtra: '기본 탐지에 더해 서버가 지원하지 않는 연결 방식으로 인한 실패도 셉니다.',
+            modeAggressive: '위의 모든 동작을 셉니다. 더 엄격하게 차단하므로 정상 사용자도 차단될 가능성이 높아집니다.',
             sshPort: 'SSH 포트 청취',
             sshPortHelper: '현재 Fail2ban 은 호스트의 SSH 연결 포트를 청취합니다.',
             unActive: '현재 Fail2ban 서비스가 활성화되어 있지 않습니다.',
@@ -3449,6 +3522,10 @@ const message = {
         compressSuccess: '압축 성공',
         deCompressSuccess: '압축 해제 성공',
         deCompressDst: '압축 해제 경로',
+        decompressConflictPolicy: '기존 파일 처리',
+        keepExisting: '기존 파일 유지',
+        decompressConflictHelper:
+            '기존 파일을 유지하면 충돌하는 항목을 건너뜁니다. 이름이 같은 디렉터리는 계속 병합됩니다.',
         linkType: '링크 유형',
         softLink: '소프트 링크',
         hardLink: '하드 링크',
@@ -4487,6 +4564,17 @@ const message = {
         isEdirWarn: 'docker-compose.yml 파일 변경이 감지되었습니다. 차이점을 확인해 주세요.',
     },
     website: {
+        batchPHP: 'PHP 버전 전환',
+        batchPHPHelper: 'PHP 웹사이트에만 적용됩니다. 다른 웹사이트는 건너뜁니다. 로컬 PHP 환경은 지원되지 않습니다.',
+        batchPHPCount: '선택한 웹사이트: {0}, PHP 웹사이트: {1}, 기타: {2}.',
+        notPHP: 'PHP 웹사이트가 아닙니다',
+        localPHP: '로컬 PHP 환경은 지원되지 않습니다',
+        samePHP: '이미 대상 PHP 환경을 사용 중입니다',
+        batchPHPResult: '처리 결과',
+        batchPHPStatus_success: '성공',
+        batchPHPStatus_failed: '실패',
+        batchPHPStatus_skipped: '건너뜀',
+        sslDomainMismatchWebsite: '인증서 도메인이 웹사이트 도메인과 일치하지 않습니다',
         primaryDomain: '기본 도메인',
         otherDomains: '기타 도메인',
         static: '정적',
@@ -4608,6 +4696,10 @@ const message = {
         privateKey: '키(KEY)',
         certificate: '인증서(PEM 형식)',
         HTTPConfig: 'HTTP 옵션',
+        HTTPSRedirectPort: 'HTTPS 리디렉션 포트',
+        HTTPSRedirectPortCustom: '사용자 지정',
+        HTTPSRedirectPortManualHelper:
+            '이 리디렉션 규칙은 수동으로 편집되었거나 관리 대상이 아니므로 수정할 수 없습니다.',
         HTTPSOnly: 'HTTP 요청 차단',
         HTTPToHTTPS: 'HTTPS로 리디렉션',
         HTTPAlso: 'HTTP 요청 허용',
@@ -4770,6 +4862,8 @@ const message = {
         batchInput: '일괄 입력',
         domainNotFQDN: '이 도메인은 공용 네트워크에서 액세스할 수 없을 수 있습니다',
         domainInvalid: '도메인 형식이 올바르지 않습니다',
+        allowFirewall: '방화벽에서 허용',
+        allowFirewallHelp: '사이트 생성 후 이 TCP 포트를 사용하는 모든 도메인에 대해 포트를 엽니다.',
         domainBatchHelper: '한 줄에 하나의 도메인, 형식: domain:port@ssl\n예: example.com:443@ssl 또는 example.com',
         generateDomain: '생성',
         global: '글로벌',
@@ -4799,6 +4893,9 @@ const message = {
         failTimeoutHelper:
             '서버 상태 점검 시간 창 길이. 이 기간 동안 누적 실패 횟수가 임계값에 도달하면 서버가 일시적으로 제거되고 동일한 시간 후에 재시도됩니다. 기본값 10초',
         staticChangePHPHelper: '현재 정적 웹사이트이며 PHP 웹사이트로 전환할 수 있습니다.',
+        createDefaultIndex: '기본 {0} 파일 생성',
+        createDefaultIndexHelper:
+            '웹사이트 루트 디렉터리에 해당 파일이 없는 경우에만 기본 페이지 설정 내용으로 생성됩니다.',
         proxyCache: '리버스 프록시 캐시',
         cacheLimit: '캐시 공간 제한',
         shareCache: '캐시 카운트 메모리 크기',
@@ -4927,6 +5024,8 @@ const message = {
         status: '현재 상태',
         configResource: '구성',
         saveAndReload: '저장 및 다시 로드',
+        batchClearProxyCacheWarn:
+            '선택한 웹사이트 {0}개의 리버스 프록시 캐시를 비울까요? 캐시되어 있던 콘텐츠에 대한 다음 요청은 원본 서버로 전달됩니다.',
         clearProxyCache: '리버스 프록시 캐시 삭제',
         clearProxyCacheWarn:
             '캐시가 구성된 모든 웹사이트에 영향을 미치며 OpenResty 가 다시 시작됩니다. 계속하시겠습니까?',
@@ -4961,14 +5060,22 @@ const message = {
         packagesHelper: '예: git,curl 쉼표로 구분',
         scriptHelper: '컴파일 전에 실행할 스크립트, 일반적으로 모듈 소스 코드 다운로드, 종속성 설치 등',
         buildHelper: '동적 모듈은 빌드 후 설정을 통해 로드되며, 정적 모듈은 여전히 OpenResty를 다시 빌드합니다.',
-        defaultHttps: 'HTTPS 변조 방지',
+        defaultHttps: 'HTTPS',
+        defaultHttpsStatus: '변조 방지 상태',
         defaultHttpsHelper1: '이를 활성화하면 HTTPS 변조 문제를 해결할 수 있습니다.',
         sslRejectHandshake: '기본 SSL 핸드셰이크 거부',
         sslRejectHandshakeHelper:
             '활성화하면 인증서 누출을 방지할 수 있지만, 기본 웹사이트를 설정하면 이 설정이 무효화됩니다',
+        httpsRedirectCustomPort: '사용자 지정 포트로 리디렉션',
+        httpsRedirectCustomPortHelper: '활성화하면 HTTP에서 HTTPS로 리디렉션할 때 사용자 지정 HTTPS 포트를 사용합니다.',
     },
     ssl: {
-        caUploadHelp: 'Upload the downloaded ZIP containing ca.crt and ca.key (up to 10 MB).',
+        syncDir: '동기화 디렉터리',
+        syncDirHelp: '대상 노드의 절대 디렉터리 경로를 입력하세요. 모든 대상 노드에 동일한 디렉터리가 사용됩니다.',
+        syncDirSingleCert: '파일 덮어쓰기를 방지하려면 디렉터리를 지정할 때 인증서를 하나만 선택하세요.',
+        syncDirAbsolute: '동기화 디렉터리는 절대 경로여야 합니다.',
+
+        caUploadHelp: 'ca.crt와 ca.key가 포함된 다운로드한 ZIP 파일을 업로드하세요(최대 10 MB).',
         deleteConfirm: '다음 인증서를 삭제합니다. ACME 인증서는 자동으로 폐기됩니다. 계속하시겠습니까?',
         deleteAndRevoke: '삭제 및 폐기',
         create: '요청',
@@ -5288,6 +5395,9 @@ const message = {
         editRuleConfirm: '이 규칙을 수정하시겠습니까?',
     },
     runtime: {
+        buildLog: '빌드 로그',
+        extensionInstallFailed: '일부 PHP 확장을 설치하지 못했습니다: {extensions}',
+        statusMessageUnavailable: '자세한 상태 정보가 없습니다. 실행 환경 로그에서 자세한 내용을 확인하세요.',
         importEnv: '환경 변수 가져오기',
         envImportError: '{0}행: {1}',
         envInvalidAssignment: '유효한 NAME=value 형식이 필요합니다',
@@ -5465,6 +5575,79 @@ const message = {
         diskType: '디스크 유형',
         serial: '시리얼 번호',
         noFail: '마운트 실패는 시스템 시작에 영향을 미치지 않습니다',
+    },
+    networkManage: {
+        routeDetails: '경로 상세 정보',
+        manageIP: '해당 IP 관리',
+        connectedRoute: 'IP에서 자동 생성',
+        connectedRouteHint:
+            '이 직접 연결 경로는 인터페이스 IP를 기반으로 시스템이 자동 생성합니다. 별도로 편집하지 않고 인터페이스 상세 정보에서 해당 IP를 편집하거나 삭제하세요.',
+        virtualBridgeReadOnly: '가상 인터페이스 · 읽기 전용',
+        virtualBridgeReadOnlyHint: '이 가상 인터페이스는 읽기 전용이며 도달 가능성 검사에서 제외됩니다.',
+        loopbackReadOnly: '루프백 인터페이스 설정은 읽기 전용입니다.',
+        persistentSourceMissing: '인터페이스 {0}에 지원되는 시스템 영구 설정이 없습니다. 읽기 전용입니다.',
+        addressReadOnlyReason:
+            '이 주소는 동적 주소이거나 전역 주소가 아니거나 지원되는 영구 설정이 없어 읽기 전용입니다.',
+        routeReadOnlyReason:
+            '이 경로는 동적 경로이거나 커널에서 생성되었거나 지원되는 영구 설정이 없어 읽기 전용입니다.',
+        persistenceBackend: '영구 저장 방식',
+        editIP: 'IP 편집',
+        editRoute: '경로 편집',
+        operationRisk: '네트워크 변경으로 연결이 끊길 수 있습니다. 대체 접속 수단을 미리 준비하세요.',
+        confirmInterface: '확인하려면 인터페이스 이름 {0}을 입력하세요.',
+        sourceAddress: '출발지 주소',
+        linkConnected: '링크 연결됨',
+        linkDisconnected: '링크 연결 끊김',
+        topologySearch: '인터페이스, IP, 게이트웨이 또는 대상 검색',
+        topologyHint: '왼쪽에서 인터페이스 IP를 관리합니다. 오른쪽 카드에는 대상, 게이트웨이, 메트릭이 표시됩니다. 카드를 클릭하면 상세 정보를 볼 수 있으며, 선은 연결 확인을 의미하지 않습니다.',
+        direct: '직접 연결',
+        defaultDestination: '기본 경로',
+        unknownInterface: '지정되지 않은 인터페이스',
+        noRoutes: '일치하는 경로 없음',
+        readOnly: '읽기 전용',
+        readOnlyRouteHint: '다음 홉이 여러 개이거나 단일 인터페이스를 확인할 수 없는 경로는 읽기 전용입니다.',
+        title: '네트워크 관리',
+        interfaces: '네트워크 인터페이스',
+        routes: '경로',
+        addIP: 'IP 추가',
+        ipCount: 'IP 수',
+        interfaceID: '인터페이스 ID',
+        adminState: '관리 상태',
+        linkState: '링크 상태',
+        mac: 'MAC 주소',
+        flags: '플래그',
+        address: '주소',
+        scope: '범위',
+        interface: '인터페이스',
+        configStatus: '설정 상태',
+        managedApplied: '저장됨 · 활성',
+        managedPending: '저장됨 · 비활성',
+        addressWarning:
+            '이 인터페이스에 할당된 IP를 입력하세요. 공인 IP가 NAT를 통해 매핑된 경우 사설 IP를 입력하세요.',
+        addressRisk: '이미 사용 중인 IP나 잘못된 접두사 길이를 입력하면 패널 또는 SSH 연결이 끊길 수 있습니다.',
+        interfaceSelectHint:
+            '영구 설정을 수정할 수 있는 인터페이스만 표시됩니다. 루프백 인터페이스, 읽기 전용 가상 브리지 및 수정할 수 없는 기타 인터페이스는 제외됩니다.',
+        gatewayHint: '직접 연결된 서브넷은 게이트웨이를 비워 둘 수 있습니다.',
+        metricHint: '대상 서브넷이 같으면 일반적으로 메트릭이 낮은 경로가 우선됩니다.',
+        defaultRouteWarning:
+            '기본 경로는 패널, SSH 및 기타 서비스의 발신 경로를 바꿀 수 있습니다. 클라우드 콘솔과 같은 대체 접속 수단을 확보하세요.',
+        interfaceMissing: '인터페이스 없음',
+        changeWarning:
+            '네트워크 설정을 변경하면 패널 연결이 끊기거나 서비스가 중단될 수 있습니다. 계속하기 전에 다른 방법으로 이 서버에 접근할 수 있는지 확인하세요.',
+        addressWithPrefix: 'IP 주소 / 접두사 길이',
+        cidrHint:
+            '192.0.2.10/24에서 /24는 서브넷 마스크 255.255.255.0에 해당합니다. IPv6 주소의 예는 2001:db8::10/64입니다.',
+        addRoute: '경로 추가',
+        checkRoutes: '경로 도달 가능성 확인',
+        destination: '대상',
+        metric: '메트릭',
+        routeTable: '라우팅 테이블',
+        reachability: '도달 가능성',
+        reachable: '도달 가능',
+        unreachable: '도달 불가',
+        unchecked: '미확인',
+        check: '확인',
+        destinationHint: 'IPv4/IPv6 주소 또는 CIDR 네트워크를 지원합니다. 기본 경로: default, 0.0.0.0/0 또는 ::/0.',
     },
     xpack: {
         ldap: {
@@ -7518,6 +7701,13 @@ const message = {
             appUpgradeHelper: '업그레이드가 필요한 앱이 {0}개 있습니다',
             dashboardSetting: '개요 설정',
             keepOneDashboardComponent: '개요 섹션을 하나 이상 유지하세요',
+            currentNode: '현재 노드',
+            quickSwitch: '빠른 전환',
+            allNodes: '모든 노드',
+            nodeSearchPlaceholder: '노드 이름 또는 주소 검색',
+            currentNodeNotInResults: '현재 노드가 이 페이지의 결과에 없습니다',
+            upgradableApps: '업그레이드 가능한 앱',
+            quickSwitchMore: '일치하는 모든 노드 보기',
         },
         customApp: {
             name: '사용자 정의 앱 저장소',
@@ -7838,6 +8028,30 @@ const message = {
             menu: '리소스 동기화',
             file: '파일 전송',
             fileSyncConfirm: '{0} 노드의 파일/폴더 {1}을(를) {2} 노드의 디렉터리 {3}(으)로 전송하시겠습니까?',
+            fileBatchDesc: '원하는 노드에서 파일 또는 폴더를 선택하여 여러 대상 노드에 배포합니다.',
+            fileSourceTitle: '원본 파일 선택',
+            fileSourceNode: '원본 노드',
+            fileTargetDirectory: '대상 디렉터리',
+            fileBatchPath: '대상 디렉터리 일괄 설정',
+            fileApplyPath: '선택한 노드에 적용',
+            fileSelectedCount: '{0}개 항목 선택됨',
+            fileSelectedTargets: '{0}개 노드 선택됨',
+            fileSelectionHint: '폴더는 원래 이름으로 전체 복사되며 내부 디렉터리 구조가 유지됩니다.',
+            fileRules:
+                '기존 파일 전송 규칙을 따릅니다. 이름이 같은 파일은 업데이트될 수 있으며 대상 디렉터리의 다른 파일은 유지됩니다.',
+            fileBatchSummary: '{0}개 항목을 {1}개 대상 노드에 배포',
+            fileTaskHint: '확인하면 배포 작업이 생성됩니다. 작업 관리에서 확인할 수 있습니다.',
+            fileBatchConfirm: '아래 대상 노드와 저장 경로를 확인하세요. 같은 이름의 파일이 덮어써질 수 있습니다.',
+            fileTargetHint:
+                '노드별로 디렉터리를 설정할 수 있습니다. 오프라인이거나 검사에 실패했거나 rsync가 설치되지 않은 노드는 선택할 수 없습니다.',
+            fileChecking: '검사 중',
+            fileCheckFailed: '검사 실패',
+            fileRsyncMissing: 'rsync가 설치되지 않음',
+            filePathRequired: '/로 시작하는 대상 디렉터리의 절대 경로를 입력하세요.',
+            fileConflictHint:
+                '대상 이름이 같은 원본이 있습니다. 이름마다 하나만 남기세요. 선택 해제는 모든 대상 노드에 적용됩니다.',
+            fileDeselect: '선택 해제',
+            fileSourceChanged: '원본 노드가 변경되었습니다. 파일을 다시 선택하세요.',
 
             image: '이미지 전송',
             imageBatchDesc: '먼저 원본 노드와 원본 이미지를 선택한 후 대상 노드를 선택하여 전달합니다.',
@@ -8013,6 +8227,11 @@ const message = {
             createFromTemplate: '템플릿에서 생성',
             template: '템플릿',
             templateName: '템플릿 이름',
+            dataDisks: '데이터 디스크',
+            dataDiskHelper:
+                '데이터 디스크는 빈 디스크로 생성됩니다. 디스크마다 스토리지 풀을 선택할 수 있으며 버스 유형은 시스템 디스크와 동일합니다. 최대 9개까지 추가할 수 있습니다.',
+            templateSystemDiskHelper:
+                '템플릿은 시스템 디스크만 복사하며 데이터 디스크 내용은 포함하지 않습니다. 템플릿으로 생성할 때 빈 데이터 디스크를 추가할 수 있습니다. /etc/fstab 마운트와 데이터베이스 및 앱 경로의 데이터 디스크 의존성을 확인하세요. 새 디스크의 UUID가 다를 수 있으며 게스트 설정은 자동 변경되지 않습니다.',
             convertToTemplate: '템플릿으로 변환',
             sourceVM: '원본 VM',
             templateSize: '템플릿 크기',
@@ -8129,7 +8348,7 @@ const message = {
             currentSnapshot: '현재',
             snapshotEmpty: '스냅샷 없음',
             snapshotHelper:
-                '스냅샷은 현재 VM 상태를 복원 지점으로 저장합니다. 이후 데이터 변경은 원본 디스크를 변경하지 않고 델타 파일에 기록됩니다. 스냅샷을 복구하면 VM이 해당 시점의 상태로 돌아갑니다.',
+                '스냅샷은 관리되는 모든 쓰기 가능한 디스크를 함께 저장하고 복원하며 메모리는 포함하지 않습니다. 복원 전 VM을 종료해야 하며 디스크 구성이 스냅샷과 일치해야 합니다. 공유 또는 미지원 쓰기 가능 디스크가 있으면 생성할 수 없습니다.',
             snapshotOperationHelper:
                 '현재 스냅샷은 삭제할 수 없습니다. 가상 머신이 종료된 경우에만 스냅샷을 복구할 수 있습니다.',
             snapshotRecoverConfirm:
@@ -8164,13 +8383,84 @@ const message = {
             cluster: '애플리케이션 고가용성',
             name: '클러스터 이름',
             addCluster: '클러스터 추가',
-            installNode: '노드 설치',
-            master: '마스터 노드',
-            slave: '슬레이브 노드',
-            replicaStatus: '마스터-슬레이브 상태',
             unhealthyDeleteError: '설치 노드 상태가 비정상입니다. 노드 목록을 확인한 후 다시 시도하세요!',
-            replicaStatusError: '상태 획득이 비정상입니다. 마스터 노드를 확인하세요.',
-            masterHostError: '마스터 노드의 IP는 127.0.0.1이 될 수 없습니다',
+            noAvailableMasterVersion: '이 노드에 사용할 수 있는 마스터 템플릿이 없습니다.',
+            backups: '클러스터 백업',
+            importBackup: '백업 가져오기',
+            archivePassphrase: '백업 암호',
+            restoreToNew: '새 클러스터로 복원',
+            restoreTarget: '복원 대상',
+            restoreToOriginal: '원래 클러스터로 복원',
+            restoreOriginalUnavailable: '이 백업을 복원할 수 있는 원래 클러스터가 없습니다.',
+            restoreOriginalWarning:
+                '데이터베이스 연결이 끊깁니다. 원래 클러스터는 백업 시점의 상태로 돌아가며 복제본은 다시 동기화됩니다.',
+            restoreOriginalConfirm: '덮어쓰기를 확인하려면 클러스터 이름 {0}을 입력하세요.',
+            restoreCredentials: '백업 당시의 관리자 및 복제 자격 증명을 사용하세요.',
+            archiveImportHint:
+                '.1pha 형식의 클러스터 백업 파일만 가져올 수 있습니다. 백업을 만들 때 설정한 암호를 사용하세요.',
+            backupDataSize: '데이터 크기',
+            appStoreOnly: '이 애플리케이션은 애플리케이션 고가용성에서 설치하거나 업그레이드하세요.',
+            noMatchingReplicaVersion: '이 노드에 마스터와 버전이 같은 복제본 템플릿이 없습니다.',
+            installNode: '배포 서버',
+            master: '주 데이터베이스',
+            slave: '복제 데이터베이스',
+            redisMaster: '주 인스턴스',
+            redisReplica: '복제본',
+            replicaStatus: '복제 상세',
+            replicaStatusError: '복제 상태를 읽을 수 없습니다',
+            masterHostError: '주 인스턴스 주소는 127.0.0.1일 수 없습니다',
+            emptyTitle: '구성된 {0} 클러스터가 없습니다',
+            emptyDescription:
+                '‘{2}’에서 배포 서버와 버전을 선택하여 {0}를 생성하세요. 배포가 완료되면 동일한 버전의 {1} 추가가 가능하며, 복제 상태, 인스턴스 매개변수 및 로그를 확인할 수 있습니다.',
+            loadFailed: '클러스터를 불러오지 못했습니다',
+            refreshFailed: '새로 고침에 실패했습니다. {0}의 데이터를 표시합니다.',
+            addReplica: '{0} 추가',
+            masterUnavailable: '주 인스턴스를 사용할 수 없습니다. 배포 서버를 확인하세요.',
+            replication: '복제',
+            replicationStatus: '복제 상태',
+            configuredReplicas: '구성된 {1} {0}개',
+            addReplicaPending: '{0} 추가 대기 중',
+            checkedAt: '확인 시각 {0}',
+            roleParameters: '{0} 매개변수',
+            parametersFailed: '인스턴스 매개변수를 읽을 수 없습니다',
+            instanceParameters: '인스턴스 매개변수',
+            replicationParameters: '데이터 복제 설정',
+            replicationUserHelp:
+                '복제 데이터베이스가 주 데이터베이스에 연결해 데이터를 동기화할 때 사용하는 계정입니다.',
+            replicationPasswordHelp:
+                '복제 사용자 인증에 사용합니다. 복제 데이터베이스를 추가할 때는 주 데이터베이스에서 이 계정에 설정한 비밀번호를 사용하세요.',
+            configureRole: '{0} 구성',
+            sameHost: '두 인스턴스가 같은 서버에 있습니다. 서버 장애 시 둘 다 영향을 받습니다.',
+            versionLocked: '현재 주 인스턴스와 버전이 같습니다.',
+            unset: '미설정',
+            noParameters: '표시할 매개변수가 없습니다',
+            lagSeconds: '복제 지연(초)',
+            offsetBytes: '복제 오프셋(바이트)',
+            taskQueued: '작업 접수됨',
+            removeRecord: '기록 삭제',
+            removeClusterRecordNotice: '이 작업은 클러스터 기록을 삭제합니다.',
+            removeMemberRecordNotice: '이 작업은 구성원 기록을 삭제합니다.',
+            taskAwaitingConfirmation: '서버 확인 대기 중',
+            taskConfirmationNotice:
+                '{0}의 작업 확인을 기다리고 있습니다. 작업이 등록되면 해당 서버의 작업 센터 또는 카드의 로그에서 확인할 수 있습니다.',
+            taskRecordUnavailable: '해당 작업 기록을 가져올 수 없습니다. 작업 제출 결과와 배포 서버 상태를 확인하세요.',
+            taskRunning: '작업 진행 중',
+            taskFailed: '작업이 실패했습니다. 작업 로그를 확인하세요.',
+            parameters: '매개변수',
+            primaryMissing: '주 인스턴스 기록을 찾을 수 없습니다.',
+            replicaSourceAddress: '{0} 주소',
+            replicaSourcePort: '{0} 포트',
+            replicaSourceAddressHelp: '선택한 서버에서 접근할 수 있는 IP 주소 또는 도메인 이름을 입력하세요.',
+            replicationState: {
+                pending: '확인 대기',
+                waitingForInstance: '인스턴스 준비 대기',
+                healthy: '정상',
+                syncing: '동기화 중',
+                lagging: '지연',
+                disconnected: '연결 끊김',
+                unknown: '알 수 없음',
+                unavailable: '조회 불가',
+            },
         },
     },
     template: {

@@ -175,6 +175,7 @@ const systemIP = ref('');
 const lastAutoAllowedOrigins = ref('');
 const allowedOriginsAutoFilled = ref(true);
 const { isIntl } = useGlobalStore();
+const excludeCodingPlanProviders = computed(() => (isIntl.value ? ['bailian', 'ark'] : []));
 
 const form = reactive({
     name: '',
@@ -430,7 +431,10 @@ const loadProviderAccountCounts = async (providers: string[]) => {
     if (providerList.length === 0) {
         return;
     }
-    const res = await countAgentAccountsByProvider({ providers: providerList });
+    const res = await countAgentAccountsByProvider({
+        providers: providerList,
+        excludeCodingPlanProviders: excludeCodingPlanProviders.value,
+    });
     const counts = res.data || {};
     providerList.forEach((provider) => {
         providerAccountCount.value[provider] = counts[provider] || 0;
@@ -451,11 +455,12 @@ const loadAccounts = async () => {
         pageSize: 200,
         provider: form.provider,
         textOnly: true,
+        excludeCodingPlanProviders: excludeCodingPlanProviders.value,
         name: '',
     };
     const res = await pageAgentAccounts(req);
     accountOptions.value = res.data.items || [];
-    providerAccountCount.value[form.provider] = res.data.total || accountOptions.value.length;
+    providerAccountCount.value[form.provider] = res.data.total ?? accountOptions.value.length;
     if (accountOptions.value.length > 0) {
         form.accountId = accountOptions.value[0].id;
         handleAccountChange();

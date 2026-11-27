@@ -20,6 +20,7 @@ type IPostgresqlRepo interface {
 	Create(ctx context.Context, postgresql *model.DatabasePostgresql) error
 	Delete(ctx context.Context, opts ...DBOption) error
 	Update(id uint, vars map[string]interface{}) error
+	SaveUserPassword(user *model.DatabaseUser) error
 	DeleteLocal(ctx context.Context) error
 }
 
@@ -104,6 +105,20 @@ func (u *PostgresqlRepo) DeleteLocal(ctx context.Context) error {
 
 func (u *PostgresqlRepo) Update(id uint, vars map[string]interface{}) error {
 	return global.DB.Model(&model.DatabasePostgresql{}).Where("id = ?", id).Updates(vars).Error
+}
+
+func (u *PostgresqlRepo) SaveUserPassword(user *model.DatabaseUser) error {
+	password, err := encrypt.StringEncrypt(user.Password)
+	if err != nil {
+		return err
+	}
+	user.Password = password
+	return global.DB.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Save(user).Error; err != nil {
+			return err
+		}
+		return tx.Model(&model.DatabasePostgresql{}).Where("postgresql_name = ? AND username = ?", user.Database, user.Username).Update("password", password).Error
+	})
 }
 
 func (u *PostgresqlRepo) WithByPostgresqlName(postgresqlName string) DBOption {

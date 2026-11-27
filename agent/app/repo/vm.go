@@ -95,12 +95,14 @@ func (v *VMRepo) Create(vm *model.VirtualMachine) error {
 }
 
 func (v *VMRepo) Update(id uint, vars map[string]interface{}) error {
-	if paths, ok := vars["iso_paths"].([]string); ok {
-		data, err := json.Marshal(paths)
-		if err != nil {
-			return err
+	for _, key := range []string{"iso_paths", "data_storage_pools"} {
+		if paths, ok := vars[key].([]string); ok {
+			data, err := json.Marshal(paths)
+			if err != nil {
+				return err
+			}
+			vars[key] = string(data)
 		}
-		vars["iso_paths"] = string(data)
 	}
 	return global.DB.Model(&model.VirtualMachine{}).Where("id = ?", id).Updates(vars).Error
 }

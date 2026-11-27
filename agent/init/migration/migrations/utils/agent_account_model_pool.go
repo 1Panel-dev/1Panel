@@ -7,7 +7,6 @@ import (
 	"github.com/1Panel-dev/1Panel/agent/app/dto"
 	"github.com/1Panel-dev/1Panel/agent/app/model"
 	providercatalog "github.com/1Panel-dev/1Panel/agent/app/provider"
-	"github.com/1Panel-dev/1Panel/agent/app/service"
 
 	"gorm.io/gorm"
 )
@@ -57,7 +56,6 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *legacyAgentAccountMod
 	if account == nil {
 		return nil, nil
 	}
-	baseAccount := account.AgentAccount
 	requested := make([]dto.AgentAccountModel, 0)
 	if strings.TrimSpace(account.LegacyModels) != "" {
 		if err := json.Unmarshal([]byte(account.LegacyModels), &requested); err != nil {
@@ -93,14 +91,7 @@ func buildMigratedAgentAccountModels(tx *gorm.DB, account *legacyAgentAccountMod
 			appendModel(agent.Model)
 		}
 	}
-	models, err := service.MergeCatalogAgentAccountModelsForMigration(&baseAccount, requested)
-	if err != nil {
-		if strings.TrimSpace(err.Error()) == "model is required" {
-			return nil, nil
-		}
-		return nil, err
-	}
-	return models, nil
+	return requested, nil
 }
 
 func NormalizeAgentAccountModelIDs(tx *gorm.DB) error {

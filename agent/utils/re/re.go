@@ -16,6 +16,7 @@ const (
 	ComposeDisallowedCharsPattern      = `[^a-z0-9_-]+`
 	ComposeNamePattern                 = `^[a-z0-9][a-z0-9_-]{0,255}$`
 	ComposeEnvVarPattern               = `\$\{([^}]+)\}`
+	HostNetworkRouteTokenPattern       = `^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,31}$`
 	DiskKeyValuePattern                = `([A-Za-z0-9_]+)=("([^"\\]|\\.)*"|[^ \t]+)`
 	ValidatorNamePattern               = `^[a-zA-Z\p{Han}]{1}[a-zA-Z0-9_\p{Han}]{0,30}$`
 	ValidatorIPPattern                 = `^((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})(\.((2(5[0-5]|[0-4]\d))|[0-1]?\d{1,2})){3}$`
@@ -39,6 +40,9 @@ const (
 	SQLIdentifierPattern               = `^[A-Za-z_][A-Za-z0-9_]*$`
 	NginxHostPattern                   = `^[a-zA-Z0-9.-]+(:[0-9]+)?$`
 	NginxPathPattern                   = `^/[a-zA-Z0-9._/\-]*$`
+	Fail2BanModeValuePattern           = `(?:\[|,)\s*mode\s*=\s*([^,\]]+)`
+	Fail2BanModeAssignmentPattern      = `([\[,]\s*mode\s*=\s*)[^,\]]+`
+	Fail2BanFilterNamePattern          = `^(\s*filter\s*=\s*[^\s\[#;]+)`
 	SSHSyslogLinePattern               = `^([A-Z][a-z]{2}\s+\d{1,2}\s+\d{2}:\d{2}:\d{2})\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
 	SSHRFC3339LinePattern              = `^(\d{4}-\d{2}-\d{2}T\S+)\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
 	SSHDateTimeLinePattern             = `^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2})\s+\S+\s+(sshd(?:-session)?)(?:\[(\d+)\])?:\s+(.*)$`
@@ -83,6 +87,7 @@ func Init() {
 		ComposeDisallowedCharsPattern,
 		ComposeNamePattern,
 		ComposeEnvVarPattern,
+		HostNetworkRouteTokenPattern,
 		DiskKeyValuePattern,
 		ValidatorNamePattern,
 		ValidatorIPPattern,
@@ -106,6 +111,9 @@ func Init() {
 		SQLIdentifierPattern,
 		NginxHostPattern,
 		NginxPathPattern,
+		Fail2BanModeValuePattern,
+		Fail2BanModeAssignmentPattern,
+		Fail2BanFilterNamePattern,
 		SSHSyslogLinePattern,
 		SSHRFC3339LinePattern,
 		SSHDateTimeLinePattern,

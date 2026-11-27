@@ -91,7 +91,7 @@ interface AgentAccountOption {
     name: string;
     provider?: string;
     providerName?: string;
-    verified?: boolean;
+    status?: string;
     validateAvailability?: boolean;
 }
 
@@ -128,12 +128,12 @@ const openDrawer = () => {
 
 const verificationLabel = (item: AgentAccountOption) => {
     if (item.validateAvailability === false) return i18n.global.t('aiTools.agents.verifySkipped');
-    return item.verified ? 'OK' : 'N/A';
+    return item.status === 'Success' ? 'OK' : 'N/A';
 };
 
 const verificationTagType = (item: AgentAccountOption) => {
     if (item.validateAvailability === false) return 'info';
-    return item.verified ? 'success' : 'warning';
+    return item.status === 'Success' ? 'success' : 'warning';
 };
 
 const loadAgentAccounts = async () => {

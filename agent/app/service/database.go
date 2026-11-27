@@ -137,7 +137,7 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 	var err error
 	switch req.Type {
 	case constant.AppPostgresql:
-		_, err = postgresql.NewPostgresqlClient(pgclient.DBInfo{
+		pgClient, connectErr := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:      "remote",
 			Address:   req.Address,
 			Port:      req.Port,
@@ -146,6 +146,10 @@ func (u *DatabaseService) CheckDatabase(req dto.DatabaseCreate) bool {
 			Password:  req.Password,
 			Timeout:   req.Timeout,
 		})
+		if connectErr == nil {
+			pgClient.Close()
+		}
+		err = connectErr
 	case constant.AppRedis:
 		_, err = redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
@@ -200,7 +204,7 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 	}
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
+		pgClient, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:      "remote",
 			Address:   req.Address,
 			Port:      req.Port,
@@ -208,9 +212,11 @@ func (u *DatabaseService) Create(req dto.DatabaseCreate) error {
 			Username:  req.Username,
 			Password:  req.Password,
 			Timeout:   req.Timeout,
-		}); err != nil {
+		})
+		if err != nil {
 			return err
 		}
+		pgClient.Close()
 	case constant.AppRedis:
 		if _, err := redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,
@@ -302,6 +308,9 @@ func (u *DatabaseService) Delete(req dto.DatabaseDelete) error {
 				return err
 			}
 		} else {
+			if err := databaseUserRepo.Delete(repo.WithByType("postgresql"), databaseUserRepo.WithByDatabase(db.Name)); err != nil && !req.ForceDelete {
+				return err
+			}
 			if err := postgresqlRepo.Delete(context.Background(), postgresqlRepo.WithByPostgresqlName(db.Name)); err != nil && !req.ForceDelete {
 				return err
 			}
@@ -316,7 +325,7 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 	}
 	switch req.Type {
 	case constant.AppPostgresql:
-		if _, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
+		pgClient, err := postgresql.NewPostgresqlClient(pgclient.DBInfo{
 			From:      "remote",
 			Address:   req.Address,
 			Port:      req.Port,
@@ -324,9 +333,11 @@ func (u *DatabaseService) Update(req dto.DatabaseUpdate) error {
 			Username:  req.Username,
 			Password:  req.Password,
 			Timeout:   req.Timeout,
-		}); err != nil {
+		})
+		if err != nil {
 			return err
 		}
+		pgClient.Close()
 	case constant.AppRedis:
 		if _, err := redisclient.NewRedisClient(redisclient.DBInfo{
 			Address:  req.Address,

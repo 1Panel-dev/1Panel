@@ -120,7 +120,12 @@ func agentDBMigrations() []*gormigrate.Migration {
 		migrations.MigrateVMDatabase,
 		migrations.UpdateModelServicesQuickJumpRouter,
 		migrations.AddAgentAccountVerificationResult,
+		migrations.AddAgentAccountType,
 		migrations.AddGPUGroup,
+		migrations.AddAgentAccountStatus,
+		migrations.AddVMDataStoragePools,
+		migrations.AddSSLSyncDir,
+		migrations.AddOllamaModelDescription,
 	}
 }
 

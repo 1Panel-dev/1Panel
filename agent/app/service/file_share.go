@@ -1,6 +1,7 @@
 package service
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/sha256"
 	"crypto/subtle"
@@ -43,6 +44,7 @@ type IFileShareService interface {
 	GetPublicByCode(code string) (*response.FileSharePublicInfo, error)
 	DeleteByPath(path string) error
 	SharePathCodeMap() (map[string]string, error)
+	SharePathCodeMapForPaths(ctx context.Context, paths []string) (map[string]string, error)
 	Check(code, password string) error
 	PrepareDownload(code, password string) (filePath, fileName string, err error)
 }
@@ -324,6 +326,28 @@ func (s *FileShareService) SharePathCodeMap() (map[string]string, error) {
 	return result, nil
 }
 
+func (s *FileShareService) SharePathCodeMapForPaths(ctx context.Context, paths []string) (map[string]string, error) {
+	items, err := fileShareRepo.ListByPaths(ctx, paths)
+	if err != nil {
+		return nil, err
+	}
+	result := make(map[string]string, len(items))
+	now := time.Now().Unix()
+	for _, item := range items {
+		if err := ctx.Err(); err != nil {
+			return nil, err
+		}
+		if item.ExpiresUnix > 0 && now > item.ExpiresUnix {
+			continue
+		}
+		if _, err := os.Stat(item.Path); err != nil {
+			continue
+		}
+		result[item.Path] = item.Token
+	}
+	return result, nil
+}
+
 func (s *FileShareService) Check(code, password string) error {
 	_, err := s.check(code, password)
 	return err
@@ -379,6 +403,9 @@ func (s *FileShareService) check(code, password string) (*model.FileShare, error
 	if err != nil || info.IsDir() {
 		_ = fileShareRepo.Delete(repo.WithByID(item.ID))
 		return nil, buserr.New("ErrFileSharePath")
+	}
+	if files.ShouldDenySensitiveFileRead(item.Path) {
+		return nil, buserr.New("ErrSensitiveFileRead")
 	}
 
 	return &item, nil

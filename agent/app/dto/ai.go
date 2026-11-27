@@ -65,6 +65,7 @@ type ModelGPUConfig struct {
 }
 
 type OllamaModelInfo struct {
+	Description  string `json:"description"`
 	ID           uint   `json:"id"`
 	Name         string `json:"name"`
 	Size         string `json:"size"`
@@ -77,8 +78,9 @@ type OllamaModelInfo struct {
 }
 
 type OllamaModelName struct {
-	Name   string `json:"name"`
-	TaskID string `json:"taskID"`
+	Description string `json:"description" validate:"max=256"`
+	Name        string `json:"name"`
+	TaskID      string `json:"taskID"`
 }
 
 type OllamaModelAccountSync struct {

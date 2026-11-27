@@ -83,7 +83,10 @@ func (u *CronjobService) handleApp(cronjob model.Cronjob, startTime time.Time, t
 }
 
 func (u *CronjobService) handleWebsite(cronjob model.Cronjob, startTime time.Time, taskItem *task.Task) error {
-	webs := loadWebsForJob(cronjob)
+	webs, err := loadWebsForJob(cronjob)
+	if err != nil {
+		return err
+	}
 	if len(webs) == 0 {
 		addSkipTask("Website", taskItem)
 		return nil
@@ -489,22 +492,6 @@ func loadDbsForJob(cronjob model.Cronjob) []DatabaseHelper {
 		}
 	}
 	return dbs
-}
-
-func loadWebsForJob(cronjob model.Cronjob) []model.Website {
-	var list []model.Website
-	if cronjob.Website == "all" {
-		list, _ = websiteRepo.List()
-		return list
-	}
-	websites := strings.Split(cronjob.Website, ",")
-	var idItems []uint
-	for i := 0; i < len(websites); i++ {
-		itemID, _ := strconv.Atoi(websites[i])
-		idItems = append(idItems, uint(itemID))
-	}
-	list, _ = websiteRepo.GetBy(repo.WithByIDs(idItems))
-	return list
 }
 
 func handleBackupLogs(taskItem *task.Task, targetDir, fileName string, secret string) error {

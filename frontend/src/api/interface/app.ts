@@ -6,6 +6,7 @@ export namespace App {
         enabled: boolean;
     }
     export interface App extends CommonModel {
+        clusterOnly?: boolean;
         name: string;
         icon?: string;
         key: string;
@@ -110,6 +111,8 @@ export namespace App {
         required: boolean;
         default: any;
         envKey: string;
+        disabled?: boolean;
+        rule?: string;
         key?: string;
         values?: ServiceParam[];
         child?: FromFieldChild;
@@ -149,6 +152,7 @@ export namespace App {
     }
 
     export interface AppInstallSearch extends ReqPage {
+        appStore?: boolean;
         name?: string;
         tags?: string[];
         update?: boolean;
@@ -182,6 +186,12 @@ export namespace App {
         appStatus?: string;
         appType?: string;
         version?: string;
+    }
+
+    export interface ClusterReplicaSource {
+        host: string;
+        port: number;
+        internal: boolean;
     }
 
     export interface AppInstalledInfo {

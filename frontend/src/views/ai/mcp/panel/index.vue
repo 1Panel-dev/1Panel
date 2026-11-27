@@ -17,7 +17,7 @@
                     <el-button
                         v-permission="'mcp_access_manage'"
                         type="primary"
-                        :disabled="!serviceReady || !catalogAvailable || !tools.length || !nodes.length"
+                        :disabled="credentialsUnavailable || !catalogAvailable || !tools.length || !nodes.length"
                         @click="editor?.open()"
                     >
                         {{ $t('panelMCP.create') }}
@@ -31,7 +31,7 @@
             <template v-if="!showInstallEmpty" #main>
                 <div class="relative min-w-0">
                     <el-card
-                        v-if="serviceChecked && !serviceReady"
+                        v-if="serviceChecked && !serviceReady && !serviceStopped"
                         :class="credentialTableMasked ? 'mask-prompt mcp-service-prompt' : '!mb-4'"
                         role="status"
                     >
@@ -72,7 +72,7 @@
                     </el-card>
                     <div :class="{ mask: credentialTableMasked }" :inert="credentialTableMasked">
                         <el-alert
-                            v-if="serviceReady && !catalogAvailable && !catalogLoading"
+                            v-if="canLoadCatalog && !catalogAvailable && !catalogLoading"
                             :title="$t('panelMCP.catalogUnavailable')"
                             type="warning"
                             :closable="false"
@@ -83,7 +83,7 @@
                             </el-button>
                         </el-alert>
                         <el-alert
-                            v-else-if="serviceReady && catalogAvailable && !tools.length"
+                            v-else-if="canLoadCatalog && catalogAvailable && !tools.length"
                             :title="$t('panelMCP.catalogEmpty')"
                             type="info"
                             :closable="false"
@@ -469,6 +469,8 @@ const serviceReady = computed(
         serviceStatus.value.status === 'running' &&
         serviceStatus.value.ready,
 );
+const serviceStopped = computed(() => !!serviceStatus.value?.installed && serviceStatus.value.status === 'stopped');
+const canLoadCatalog = computed(() => serviceReady.value || serviceStopped.value);
 const credentialsUnavailable = computed(() => serviceChecked.value && !serviceStatus.value?.installed);
 const canInstallService = computed(
     () =>
@@ -494,15 +496,15 @@ const servicePrompt = computed(() => {
     return i18n.global.t('panelMCP.serviceUnhealthy');
 });
 const updateServiceStatus = (value: PanelMCP.ServiceStatus | undefined) => {
-    const wasReady = serviceReady.value;
+    const couldLoadCatalog = canLoadCatalog.value;
     serviceStatus.value = value;
     serviceChecked.value = true;
     if (value?.status !== 'unsupported') dockerStatus.value = undefined;
-    if (!serviceReady.value) {
+    if (!canLoadCatalog.value) {
         catalogVersion++;
         catalogAvailable.value = false;
         catalogLoading.value = false;
-    } else if (!wasReady) {
+    } else if (!couldLoadCatalog) {
         void loadCatalog();
     }
 };
@@ -556,7 +558,7 @@ const showInstallEmpty = computed(
 );
 const pageLoading = computed(() => !serviceChecked.value || (loading.value && !showInstallEmpty.value));
 const credentialTableMasked = computed(
-    () => credentialsUnavailable.value || (!serviceReady.value && !hasStoredCredentials.value),
+    () => credentialsUnavailable.value || (!serviceReady.value && !serviceStopped.value && !hasStoredCredentials.value),
 );
 const clientConfig = computed(() =>
     !connectionVisible.value || (detail.value && !connectionToken.value)
@@ -667,7 +669,7 @@ const loadCatalog = async () => {
 };
 const refresh = () => {
     void search();
-    if (serviceReady.value) void loadCatalog();
+    if (canLoadCatalog.value) void loadCatalog();
 };
 const showConnection = (entry?: PanelMCP.Credential) => {
     if (credentialsUnavailable.value) return;
