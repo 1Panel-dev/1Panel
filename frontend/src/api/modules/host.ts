@@ -1,4 +1,4 @@
-import http from '@/api';
+import http, { type RequestConfig } from '@/api';
 import { ResPage, ReqPage } from '../interface';
 import { Host } from '../interface/host';
 import { TimeoutEnum } from '@/enums/http-enum';
@@ -6,26 +6,25 @@ import { deepCopy } from '@/utils/misc';
 import { encodeBase64Fields } from '@/utils/base64';
 
 // monitors
-export const loadMonitor = (param: Host.MonitorSearch, currentNode?: string) => {
-    return http.post<Array<Host.MonitorData>>(
-        `/hosts/monitor/search`,
-        param,
-        TimeoutEnum.T_60S,
-        currentNode ? { CurrentNode: currentNode } : undefined,
-    );
+export const loadMonitor = (param: Host.MonitorSearch, currentNode?: string, config?: RequestConfig) => {
+    return http.postWithConfig<Array<Host.MonitorData>>(`/hosts/monitor/search`, param, {
+        timeout: TimeoutEnum.T_60S,
+        ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}),
+        ...config,
+    });
 };
-export const getNetworkOptions = (currentNode?: string) => {
+export const getNetworkOptions = (currentNode?: string, config?: RequestConfig) => {
     return http.get<Array<string>>(
         `/hosts/monitor/netoptions`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}), ...config },
     );
 };
-export const getIOOptions = (currentNode?: string) => {
+export const getIOOptions = (currentNode?: string, config?: RequestConfig) => {
     return http.get<Array<string>>(
         `/hosts/monitor/iooptions`,
         {},
-        currentNode ? { headers: { CurrentNode: currentNode } } : {},
+        { ...(currentNode ? { headers: { CurrentNode: currentNode } } : {}), ...config },
     );
 };
 export const cleanMonitors = (type: 'host' | 'gpu') => {
