@@ -228,7 +228,7 @@ const message = {
             createSuccess: '创建成功',
             updateSuccess: '更新成功',
             uploadSuccess: '上传成功',
-            operateConfirm: '如果确认操作，请手动输入 ',
+            operateConfirm: '如果确认操作，请输入 ',
             inputOrSelect: '请选择或输入',
             selectOne: '请选择一个{0}',
             copyFailed: '复制失败',
