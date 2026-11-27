@@ -265,6 +265,9 @@ const message = {
             uninstallSuccess: 'Удаление выполнено',
         },
         login: {
+            imageLoadError: 'Не удалось загрузить изображение',
+            imageLoadErrorHint:
+                'Возможные причины: проблема с сетью, отсутствие изображения или неподдерживаемый формат.',
             username: 'пользователя',
             password: 'Пароль',
             passkey: 'Вход по passkey',

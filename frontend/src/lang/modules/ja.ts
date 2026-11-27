@@ -265,6 +265,8 @@ const message = {
             uninstallSuccess: 'アンインストール成功',
         },
         login: {
+            imageLoadError: '画像を読み込めませんでした',
+            imageLoadErrorHint: '考えられる原因：ネットワーク接続の問題、画像の不在、または未対応の形式。',
             username: 'ユーザー名',
             password: 'パスワード',
             passkey: 'パスキーでログイン',

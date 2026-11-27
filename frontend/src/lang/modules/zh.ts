@@ -257,6 +257,8 @@ const message = {
             errImport: '文件内容异常：',
         },
         login: {
+            imageLoadError: '图片加载异常',
+            imageLoadErrorHint: '可能原因：网络连接异常、图片不存在或格式不支持。',
             username: '用户名',
             password: '密码',
             welcome: '欢迎回来，请使用用户名和密码登录。',

@@ -268,6 +268,8 @@ const message = {
             uninstallSuccess: 'Nyahpasang berjaya',
         },
         login: {
+            imageLoadError: 'Imej gagal dimuatkan',
+            imageLoadErrorHint: 'Punca yang mungkin: masalah rangkaian, imej tiada atau format tidak disokong.',
             username: 'Pengguna',
             password: 'Kata Laluan',
             passkey: 'Log masuk Passkey',
