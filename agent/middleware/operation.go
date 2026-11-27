@@ -6,9 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime"
-	"mime/multipart"
-	"net/http"
 	"path"
 	"strings"
 	"sync"
@@ -49,7 +46,7 @@ type functionInfo struct {
 
 func OperationResolveMeta() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if c.GetHeader(headerNeedOperationResolve) != "1" {
+		if c.GetHeader(headerNeedOperationResolve) != "1" || strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
 			c.Next()
 			return
 		}
@@ -72,13 +69,9 @@ func OperationResolveMeta() gin.HandlerFunc {
 			if err == nil {
 				c.Request.Body = io.NopCloser(bytes.NewBuffer(body))
 				bodyMap := make(map[string]interface{})
-				if strings.Contains(c.Request.Header.Get("Content-Type"), "multipart/form-data") {
-					bodyMap, _ = parseMultipart(body, c.Request.Header.Get("Content-Type"))
-				} else {
-					decoder := json.NewDecoder(bytes.NewReader(body))
-					decoder.UseNumber()
-					_ = decoder.Decode(&bodyMap)
-				}
+				decoder := json.NewDecoder(bytes.NewReader(body))
+				decoder.UseNumber()
+				_ = decoder.Decode(&bodyMap)
 				for _, key := range meta.BodyKeys {
 					if value, ok := bodyMap[key]; ok {
 						values[key] = value
@@ -103,35 +96,6 @@ func loadOperationMeta() (map[string]operationMeta, error) {
 		logMetaLoadErr = json.Unmarshal(docs.XLogJson, &logMetaData)
 	})
 	return logMetaData, logMetaLoadErr
-}
-
-func parseMultipart(formData []byte, contentType string) (map[string]interface{}, error) {
-	d, params, err := mime.ParseMediaType(contentType)
-	if err != nil || d != "multipart/form-data" {
-		return nil, http.ErrNotMultipart
-	}
-	boundary, ok := params["boundary"]
-	if !ok {
-		return nil, http.ErrMissingBoundary
-	}
-	reader := multipart.NewReader(bytes.NewReader(formData), boundary)
-	ret := make(map[string]interface{})
-
-	f, err := reader.ReadForm(32 << 20)
-	if err != nil {
-		return nil, err
-	}
-	for k, v := range f.Value {
-		if len(v) > 0 {
-			ret[k] = v[0]
-		}
-	}
-	for k, v := range f.File {
-		if len(v) > 0 {
-			ret[k] = v[0].Filename
-		}
-	}
-	return ret, nil
 }
 
 func resolveOperationValues(pathItem string, values map[string]interface{}, beforeFunctions []functionInfo) (map[string]string, error) {

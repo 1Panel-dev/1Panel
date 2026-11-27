@@ -269,6 +269,7 @@ func (b *BaseApi) UploadSSLFile(c *gin.Context) {
 	var req request.WebsiteSSLFileUpload
 
 	req.Description = c.PostForm("description")
+	helper.SetOperationLogValues(c, map[string]string{"type": c.PostForm("type")})
 	req.Nodes = c.PostForm("nodes")
 	req.PushNode, _ = strconv.ParseBool(c.PostForm("pushNode"))
 	sslID := c.PostForm("sslID")

@@ -98,6 +98,15 @@ func (b *BaseApi) UploadContainerFile(c *gin.Context) {
 	containerIDs := form.Value["containerID"]
 	paths := form.Value["path"]
 	uploadFiles := form.File["file"]
+	logValues := make(map[string]string)
+	if len(containerIDs) > 0 {
+		logValues["containerID"] = containerIDs[0]
+	}
+	if len(paths) > 0 {
+		logValues["path"] = paths[0]
+	}
+	helper.SetOperationLogValues(c, logValues)
+
 	if len(containerIDs) == 0 || len(paths) == 0 || len(uploadFiles) == 0 {
 		helper.BadRequest(c, errors.New("invalid container file upload params"))
 		return
