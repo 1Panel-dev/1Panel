@@ -5640,7 +5640,7 @@ const message = {
         runScriptHelper:
             'La lista de comandos de inicio se obtiene desde el archivo package.json en el directorio fuente.',
         open: 'Abrir',
-        operatorHelper: 'La operación {0} se ejecutará sobre el entorno de ejecución seleccionado. ¿Deseas continuar?',
+        operatorHelper: 'La operación {1} se ejecutará en {0}, ¿quieres continuar?',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fuente de imagen',

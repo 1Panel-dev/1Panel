@@ -222,7 +222,11 @@
                 <el-input class="mt-2.5" v-model="submitInput"></el-input>
             </div>
             <template #footer>
-                <span class="dialog-footer">
+                <DeleteConfirmFooter
+                    v-model="submitInput"
+                    :confirmation-text="$t('database.restartNow')"
+                    :disabled="false"
+                >
                     <el-button
                         @click="
                             open = false;
@@ -239,7 +243,7 @@
                     >
                         {{ $t('commons.button.confirm') }}
                     </el-button>
-                </span>
+                </DeleteConfirmFooter>
             </template>
         </DialogPro>
 
@@ -260,6 +264,7 @@
 </template>
 
 <script lang="ts" setup>
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { ElMessageBox, FormInstance } from 'element-plus';
 import { onMounted, reactive, ref } from 'vue';
 import CodemirrorPro from '@/components/codemirror-pro/index.vue';

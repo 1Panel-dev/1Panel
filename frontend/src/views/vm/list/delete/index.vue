@@ -19,21 +19,24 @@
             </el-form-item>
         </el-form>
         <template #footer>
-            <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
-            <el-button
-                v-permission
-                type="primary"
-                :loading="loading"
-                :disabled="form.confirmName !== source?.name"
-                @click="submit"
-            >
-                {{ $t('commons.button.confirm') }}
-            </el-button>
+            <DeleteConfirmFooter v-model="form.confirmName" :confirmation-text="source?.name || ''" :disabled="loading">
+                <el-button @click="visible = false">{{ $t('commons.button.cancel') }}</el-button>
+                <el-button
+                    v-permission
+                    type="primary"
+                    :loading="loading"
+                    :disabled="form.confirmName !== source?.name"
+                    @click="submit"
+                >
+                    {{ $t('commons.button.confirm') }}
+                </el-button>
+            </DeleteConfirmFooter>
         </template>
     </DialogPro>
 </template>
 
 <script setup lang="ts">
+import DeleteConfirmFooter from '@/components/delete-confirm-footer/index.vue';
 import { reactive, ref } from 'vue';
 import i18n from '@/lang';
 import { newUUID } from '@/utils/id';

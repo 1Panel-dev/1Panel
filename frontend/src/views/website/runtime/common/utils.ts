@@ -5,10 +5,15 @@ import { Ref } from 'vue';
 import { MsgError, MsgSuccess } from '@/utils/message';
 import { Runtime } from '@/api/interface/runtime';
 
-export const operateRuntime = async (operate: string, ID: number, loading: Ref<boolean>, search: () => void) => {
+export const operateRuntime = async (
+    operate: string,
+    row: Runtime.Runtime,
+    loading: Ref<boolean>,
+    search: () => void,
+) => {
     try {
         const action = await ElMessageBox.confirm(
-            i18n.global.t('runtime.operatorHelper', [i18n.global.t('commons.operate.' + operate)]),
+            i18n.global.t('runtime.operatorHelper', [row.name, i18n.global.t('commons.operate.' + operate)]),
             i18n.global.t('commons.operate.' + operate),
             {
                 confirmButtonText: i18n.global.t('commons.button.confirm'),
@@ -19,7 +24,7 @@ export const operateRuntime = async (operate: string, ID: number, loading: Ref<b
 
         if (action === 'confirm') {
             loading.value = true;
-            await OperateRuntime({ operate: operate, ID: ID });
+            await OperateRuntime({ operate: operate, ID: row.id });
             search();
         }
     } catch (error) {
