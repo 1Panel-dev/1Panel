@@ -4,7 +4,7 @@
             <el-col :span="20" :offset="2" v-if="open">
                 <el-alert
                     type="error"
-                    :description="$t('app.deleteHelper', [$t('runtime.runtime')])"
+                    :description="$t('app.deleteHelper', [installData.name])"
                     center
                     show-icon
                     :closable="false"
@@ -60,11 +60,13 @@ import ErrPrompt from '@/components/error-prompt/index.vue';
 interface CheckRrops {
     items: App.AppInstallResource[];
     installID: number;
+    name: string;
     key: string;
 }
 const installData = ref<CheckRrops>({
     items: [],
     installID: 0,
+    name: '',
     key: '',
 });
 const open = ref(false);
@@ -77,6 +79,7 @@ const acceptParams = (props: CheckRrops) => {
     forceDelete.value = false;
     installData.value.installID = props.installID;
     installData.value.key = props.key;
+    installData.value.name = props.name;
     installData.value.items = [];
     installData.value.items = props.items;
     installData.value.items.forEach((item) => {

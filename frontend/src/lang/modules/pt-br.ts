@@ -5668,7 +5668,7 @@ const message = {
         runScriptHelper:
             'A lista de comandos de inicialização é gerada a partir do arquivo package.json no diretório de origem.',
         open: 'Abrir',
-        operatorHelper: 'A operação {0} será realizada no ambiente selecionado. Deseja continuar?',
+        operatorHelper: 'A operação {1} será realizada em {0}, deseja continuar? ',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Fonte da imagem',

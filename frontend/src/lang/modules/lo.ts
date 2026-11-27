@@ -5372,7 +5372,7 @@ const message = {
         runScript: 'ສະຄຣິບທີ່ຣັນ',
         runScriptHelper: 'ລາຍການຄຳສັ່ງເລີ່ມຕົ້ນຖືກວິເຄາະຈາກໄຟລ໌ package.json ໃນໂຟນເດີຕົ້ນທາງ.',
         open: 'ເປີດ',
-        operatorHelper: 'ການດຳເນີນການ {0} ຈະຖືກເຮັດກັບສະພາບແວດລ້ອມຣັນທາມທີ່ເລືອກ. ຕ້ອງການຕໍ່ຫຼືບໍ່? ',
+        operatorHelper: 'ການດຳເນີນການ {1} ຈະຖືກເຮັດກັບ {0}, ຕ້ອງການຕໍ່ຫຼືບໍ່? ',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'ແຫຼ່ງອິມເມຈ',

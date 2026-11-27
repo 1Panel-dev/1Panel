@@ -5549,7 +5549,7 @@ const message = {
         runScript: 'Run script',
         runScriptHelper: 'The startup command list is parsed from the package.json file in the source directory.',
         open: 'Open',
-        operatorHelper: 'The {0} operation will be performed on the selected operating environment. Continue? ',
+        operatorHelper: 'Operation {1} will be performed on {0}, continue? ',
         taobao: 'Taobao',
         tencent: 'Tencent',
         imageSource: 'Image source',

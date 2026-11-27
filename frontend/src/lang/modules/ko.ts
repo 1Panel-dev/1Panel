@@ -5428,7 +5428,7 @@ const message = {
         runScript: '실행 스크립트',
         runScriptHelper: '시작 명령 목록은 소스 디렉터리의 package.json 파일에서 분석됩니다.',
         open: '열기',
-        operatorHelper: '{0} 작업이 선택된 운영 환경에서 수행됩니다. 계속하시겠습니까?',
+        operatorHelper: '{1} 작업을 {0}에서 수행합니다. 계속하시겠습니까?',
         taobao: '타오바오',
         tencent: '텐센트',
         imageSource: '이미지 소스',
