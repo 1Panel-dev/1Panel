@@ -8746,6 +8746,18 @@ const message = {
             redisReplica: 'Реплика',
             replicaStatus: 'Сведения о репликации',
             replicaStatusError: 'Не удалось прочитать состояние репликации',
+            replicaSource: 'Источник репликации',
+            replicaDiagnostics: 'Сведения диагностики',
+            replicationReasons: {
+                instanceNotRunning: 'Экземпляр не запущен',
+                replicaNotConfigured: 'Для этого экземпляра не настроена репликация',
+                replicationThreadStopped: 'Поток приёма или применения данных остановлен',
+                replicationThreadConnecting: 'Подключение к источнику репликации',
+                unexpectedRole: 'Экземпляр сейчас работает в основной роли',
+                walReceiverAbsent: 'Нет запущенного процесса приёма WAL',
+                fullSyncInProgress: 'Выполняется полная синхронизация',
+                primaryLinkDown: 'Соединение с источником репликации разорвано',
+            },
             masterHostError: 'Адрес первичного экземпляра не может быть 127.0.0.1',
             emptyTitle: 'Кластеры {0} не настроены',
             emptyDescription:
@@ -8762,6 +8774,19 @@ const message = {
             roleParameters: 'Параметры ({0})',
             parametersFailed: 'Не удалось прочитать параметры экземпляра',
             instanceParameters: 'Параметры экземпляра',
+            passwordManagement: 'Управление паролями',
+            passwordRotate: 'Изменить пароль администратора',
+            passwordRepair: 'Исправить учётные данные',
+            passwordRepairRequired:
+                'Результат последней смены пароля не подтверждён. Сначала исправьте учётные данные.',
+            passwordOperationHelp:
+                'Система проверит учётные данные базы данных и состояние репликации участников кластера.',
+            passwordContainerRecreate:
+                'При применении обновлённых параметров запуска контейнеры узлов кластера могут быть пересозданы, а подключения к базе данных — кратковременно прерваны.',
+            passwordAffectedMembers: 'Затронутые участники',
+            passwordCurrent: 'Действующий пароль ({0})',
+            passwordCheckFailed: 'Не удалось проверить, поддерживает ли кластер смену пароля',
+            passwordTaskSubmitted: 'Задача смены пароля отправлена',
             replicationParameters: 'Настройки репликации данных',
             replicationUserHelp:
                 'Реплика базы данных использует эту учётную запись для подключения к основной базе данных и синхронизации данных.',

@@ -8547,6 +8547,18 @@ const message = {
             redisReplica: 'رونوشت',
             replicaStatus: 'جزئیات تکثیر',
             replicaStatusError: 'خواندن وضعیت تکثیر ممکن نشد',
+            replicaSource: 'منبع تکثیر',
+            replicaDiagnostics: 'جزئیات عیب‌یابی',
+            replicationReasons: {
+                instanceNotRunning: 'نمونه در حال اجرا نیست',
+                replicaNotConfigured: 'تکثیر برای این نمونه پیکربندی نشده است',
+                replicationThreadStopped: 'رشتهٔ دریافت یا اعمال داده‌ها متوقف شده است',
+                replicationThreadConnecting: 'در حال اتصال به منبع تکثیر',
+                unexpectedRole: 'نمونه در حال حاضر با نقش اصلی اجرا می‌شود',
+                walReceiverAbsent: 'هیچ فرایند دریافت‌کنندهٔ WAL در حال اجرا نیست',
+                fullSyncInProgress: 'همگام‌سازی کامل در حال انجام است',
+                primaryLinkDown: 'اتصال به منبع تکثیر قطع شده است',
+            },
             masterHostError: 'نشانی نمونهٔ اصلی نمی‌تواند 127.0.0.1 باشد',
             emptyTitle: 'هیچ خوشه‌ای برای {0} پیکربندی نشده است',
             emptyDescription:
@@ -8563,6 +8575,18 @@ const message = {
             roleParameters: 'پارامترهای {0}',
             parametersFailed: 'خواندن پارامترهای نمونه ممکن نشد',
             instanceParameters: 'پارامترهای نمونه',
+            passwordManagement: 'مدیریت گذرواژه',
+            passwordRotate: 'تغییر گذرواژهٔ مدیر',
+            passwordRepair: 'ترمیم اطلاعات احراز هویت',
+            passwordRepairRequired: 'آخرین تغییر گذرواژه تأیید نشد. ابتدا اطلاعات احراز هویت را ترمیم کنید.',
+            passwordOperationHelp:
+                'سامانه اطلاعات احراز هویت پایگاه داده و وضعیت همانندسازی اعضای خوشه را بررسی می‌کند.',
+            passwordContainerRecreate:
+                'اعمال تنظیمات به‌روزشدهٔ راه‌اندازی ممکن است کانتینرهای اعضای خوشه را دوباره ایجاد کند و اتصال‌های پایگاه داده را برای مدت کوتاهی قطع کند.',
+            passwordAffectedMembers: 'اعضای متأثر',
+            passwordCurrent: 'گذرواژهٔ فعلی {0}',
+            passwordCheckFailed: 'امکان بررسی پشتیبانی خوشه از تغییر گذرواژه وجود نداشت',
+            passwordTaskSubmitted: 'وظیفهٔ تغییر گذرواژه ارسال شد',
             replicationParameters: 'تنظیمات تکثیر داده‌ها',
             replicationUserHelp:
                 'پایگاه دادهٔ رونوشت با این حساب به پایگاه دادهٔ اصلی متصل می‌شود و داده‌ها را همگام‌سازی می‌کند.',

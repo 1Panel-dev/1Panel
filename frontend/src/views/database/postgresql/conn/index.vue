@@ -122,6 +122,7 @@
             </span>
         </template>
     </DrawerPro>
+    <TaskLog ref="passwordTaskRef" />
 </template>
 
 <script lang="ts" setup>
@@ -131,6 +132,7 @@ import i18n from '@/lang';
 import { ElForm } from 'element-plus';
 import { getDatabase, updatePostgresqlPassword } from '@/api/modules/database';
 import { getAppConnInfo } from '@/api/modules/app';
+import TaskLog from '@/components/log/task/index.vue';
 import { MsgSuccess } from '@/utils/message';
 import { getRandomStr } from '@/utils/id';
 import { copyText } from '@/utils/clipboard';
@@ -139,6 +141,7 @@ import { useGlobalStore } from '@/composables/useGlobalStore';
 const { currentNodeAddr } = useGlobalStore();
 
 const loading = ref(false);
+const passwordTaskRef = ref<InstanceType<typeof TaskLog>>();
 
 const dialogVisible = ref(false);
 const form = reactive({
@@ -254,10 +257,16 @@ const onSave = async (formEl: FormInstance | undefined) => {
             };
             loading.value = true;
             await updatePostgresqlPassword(param)
-                .then(() => {
+                .then((response) => {
                     loading.value = false;
-                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                     dialogVisible.value = false;
+                    if (response?.data?.taskID) {
+                        form.password = '';
+                        MsgSuccess(i18n.global.t('xpack.cluster.passwordTaskSubmitted'));
+                        passwordTaskRef.value?.openWithTaskID(response.data.taskID, true, 'local');
+                        return;
+                    }
+                    MsgSuccess(i18n.global.t('commons.msg.operationSuccess'));
                 })
                 .catch(() => {
                     loading.value = false;

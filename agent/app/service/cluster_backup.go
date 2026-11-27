@@ -189,7 +189,7 @@ func newClusterDatabase(install model.AppInstall) (clusterDatabase, error) {
 	return clusterDatabase{install: install, env: values}, nil
 }
 
-func (d clusterDatabase) exec(ctx context.Context, out io.Writer, input io.Reader, credential, secret string, args ...string) error {
+func (d clusterDatabase) command(ctx context.Context, credential, secret string, args ...string) *exec.Cmd {
 	dockerArgs := []string{"exec", "-i"}
 	if credential != "" {
 		dockerArgs = append(dockerArgs, "-e", credential)
@@ -203,6 +203,11 @@ func (d clusterDatabase) exec(ctx context.Context, out io.Writer, input io.Reade
 	if d.dockerHost != "" {
 		command.Env = append(command.Environ(), "DOCKER_HOST="+d.dockerHost, "DOCKER_CONTEXT=")
 	}
+	return command
+}
+
+func (d clusterDatabase) exec(ctx context.Context, out io.Writer, input io.Reader, credential, secret string, args ...string) error {
+	command := d.command(ctx, credential, secret, args...)
 	command.Stdout, command.Stdin = out, input
 	if err := command.Run(); err != nil {
 		return fmt.Errorf("%s: %w", buserr.WithName("ErrClusterCommandFailed", args[0]), err)

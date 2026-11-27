@@ -44,7 +44,7 @@ export const deleteCheckPostgresqlDB = (params: Database.PostgresqlDBDeleteCheck
 export const updatePostgresqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
     encodeBase64Fields(request, ['value']);
-    return http.post(`/databases/pg/password`, request, TimeoutEnum.T_40S);
+    return http.post<{ taskID?: string }>(`/databases/pg/password`, request, TimeoutEnum.T_40S);
 };
 export const deletePostgresqlDB = (params: Database.PostgresqlDBDelete) => {
     return http.post(`/databases/pg/del`, params, TimeoutEnum.T_40S);
@@ -105,7 +105,7 @@ export const updateMysqlAccess = (params: Database.ChangeInfo) => {
 export const updateMysqlPassword = (params: Database.ChangeInfo) => {
     let request = deepCopy(params) as Database.ChangeInfo;
     encodeBase64Fields(request, ['value']);
-    return http.post(`/databases/change/password`, request);
+    return http.post<{ taskID?: string }>(`/databases/change/password`, request);
 };
 export const updateMysqlDescription = (params: DescriptionUpdate) => {
     return http.post(`/databases/description/update`, params);
@@ -202,7 +202,7 @@ export const changeRedisPassword = (database: string, password: string) => {
     if (password) {
         password = encodeBase64(password);
     }
-    return http.post(`/databases/redis/password`, { database: database, value: password });
+    return http.post<{ taskID?: string }>(`/databases/redis/password`, { database: database, value: password });
 };
 export const updateRedisPersistenceConf = (params: Database.RedisConfPersistenceUpdate) => {
     return http.post(`/databases/redis/persistence/update`, params);

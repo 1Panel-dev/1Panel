@@ -8587,6 +8587,18 @@ const message = {
             redisReplica: 'Replica',
             replicaStatus: 'Replication details',
             replicaStatusError: 'Could not read replication status',
+            replicaSource: 'Replication source',
+            replicaDiagnostics: 'Diagnostic details',
+            replicationReasons: {
+                instanceNotRunning: 'The instance is not running',
+                replicaNotConfigured: 'Replication is not configured for this instance',
+                replicationThreadStopped: 'The receiver or applier thread has stopped',
+                replicationThreadConnecting: 'Connecting to the replication source',
+                unexpectedRole: 'The instance is currently running as the primary',
+                walReceiverAbsent: 'No WAL receiver process is running',
+                fullSyncInProgress: 'A full synchronization is in progress',
+                primaryLinkDown: 'The connection to the replication source is down',
+            },
             masterHostError: 'The primary address cannot be 127.0.0.1',
             emptyTitle: 'No {0} clusters configured',
             emptyDescription:
@@ -8603,6 +8615,18 @@ const message = {
             roleParameters: '{0} parameters',
             parametersFailed: 'Could not read instance parameters',
             instanceParameters: 'Instance parameters',
+            passwordManagement: 'Password management',
+            passwordRotate: 'Change administrator password',
+            passwordRepair: 'Repair credentials',
+            passwordRepairRequired: 'The last password change could not be confirmed. Repair the credentials first.',
+            passwordOperationHelp:
+                'The system will verify the database credentials and replication status of the cluster members.',
+            passwordContainerRecreate:
+                'Applying updated startup settings may recreate member containers and briefly interrupt database connections.',
+            passwordAffectedMembers: 'Affected members',
+            passwordCurrent: 'Current password for the {0}',
+            passwordCheckFailed: 'Could not verify whether the cluster supports password changes',
+            passwordTaskSubmitted: 'Password change task submitted',
             replicationParameters: 'Data replication settings',
             replicationUserHelp:
                 'The replica database uses this account to connect to the primary database and synchronize data.',

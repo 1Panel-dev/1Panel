@@ -8718,6 +8718,18 @@ const message = {
             redisReplica: 'Replika',
             replicaStatus: 'Butiran replikasi',
             replicaStatusError: 'Status replikasi tidak dapat dibaca',
+            replicaSource: 'Sumber replikasi',
+            replicaDiagnostics: 'Butiran diagnostik',
+            replicationReasons: {
+                instanceNotRunning: 'Tika belum berjalan',
+                replicaNotConfigured: 'Replikasi belum dikonfigurasi untuk tika ini',
+                replicationThreadStopped: 'Bebenang penerima atau penerap telah berhenti',
+                replicationThreadConnecting: 'Sedang menyambung ke sumber replikasi',
+                unexpectedRole: 'Tika sedang beroperasi dalam peranan utama',
+                walReceiverAbsent: 'Tiada proses penerima WAL yang sedang berjalan',
+                fullSyncInProgress: 'Penyegerakan penuh sedang dijalankan',
+                primaryLinkDown: 'Sambungan ke sumber replikasi telah terputus',
+            },
             masterHostError: 'Alamat utama tidak boleh berupa 127.0.0.1',
             emptyTitle: 'Tiada kluster {0} yang dikonfigurasi',
             emptyDescription:
@@ -8734,6 +8746,19 @@ const message = {
             roleParameters: 'Parameter {0}',
             parametersFailed: 'Parameter tika gagal dibaca',
             instanceParameters: 'Parameter tika',
+            passwordManagement: 'Pengurusan kata laluan',
+            passwordRotate: 'Tukar kata laluan pentadbir',
+            passwordRepair: 'Baiki kelayakan',
+            passwordRepairRequired:
+                'Pertukaran kata laluan terakhir tidak dapat disahkan. Baiki kelayakan terlebih dahulu.',
+            passwordOperationHelp:
+                'Sistem akan mengesahkan kelayakan pangkalan data dan status replikasi ahli kluster.',
+            passwordContainerRecreate:
+                'Penggunaan tetapan permulaan yang dikemas kini mungkin menyebabkan bekas ahli kluster dicipta semula dan sambungan pangkalan data terganggu seketika.',
+            passwordAffectedMembers: 'Ahli yang terjejas',
+            passwordCurrent: 'Kata laluan semasa bagi {0}',
+            passwordCheckFailed: 'Tidak dapat mengesahkan sama ada kluster menyokong pertukaran kata laluan',
+            passwordTaskSubmitted: 'Tugas pertukaran kata laluan telah dihantar',
             replicationParameters: 'Tetapan replikasi data',
             replicationUserHelp:
                 'Pangkalan data replika menggunakan akaun ini untuk menyambung ke pangkalan data utama dan menyegerakkan data.',

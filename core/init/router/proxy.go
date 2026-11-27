@@ -18,6 +18,7 @@ import (
 	"github.com/1Panel-dev/1Panel/core/init/proxy"
 	psessionUtils "github.com/1Panel-dev/1Panel/core/init/session/psession"
 	"github.com/1Panel-dev/1Panel/core/middleware"
+	rou "github.com/1Panel-dev/1Panel/core/router"
 	"github.com/1Panel-dev/1Panel/core/utils/clusteraccess"
 	"github.com/1Panel-dev/1Panel/core/utils/mcpapi"
 	"github.com/1Panel-dev/1Panel/core/utils/req_helper/proxy_local"
@@ -53,6 +54,7 @@ func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 			c.AbortWithStatus(http.StatusForbidden)
 			return
 		}
+		var authenticatedNode string
 		if _, owner, ok := mcpapi.Identity(c.Request); ok {
 			nodeID, _ := mcpapi.NodeID(c.Request)
 			provider, supported := xpack.AuthProvider.(providers.MCPAPIAuthorizer)
@@ -73,6 +75,7 @@ func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 				return
 			}
 			c.Request.Header.Set("CurrentNode", url.QueryEscape(nodeName))
+			authenticatedNode = nodeName
 			mcpapi.SetForwardedHeaders(c.Request.Header, c.Request)
 		}
 		reqPath := c.Request.URL.Path
@@ -125,6 +128,14 @@ func Proxy(policies ...agentProxyPolicy) gin.HandlerFunc {
 					return
 				}
 			}
+		}
+		passwordNode := currentNode
+		if authenticatedNode != "" {
+			passwordNode = authenticatedNode
+		}
+		if rou.InterceptClusterDatabasePassword(c, passwordNode) {
+			c.Abort()
+			return
 		}
 
 		if authorizer, ok := xpack.AuthProvider.(clusteraccess.Authorizer); ok {

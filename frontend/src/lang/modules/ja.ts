@@ -8579,6 +8579,18 @@ const message = {
             redisReplica: 'レプリカ',
             replicaStatus: 'レプリケーションの詳細',
             replicaStatusError: 'レプリケーション状態を取得できませんでした',
+            replicaSource: 'レプリケーション元',
+            replicaDiagnostics: '診断情報',
+            replicationReasons: {
+                instanceNotRunning: 'インスタンスが稼働していません',
+                replicaNotConfigured: 'このインスタンスにはレプリケーションが設定されていません',
+                replicationThreadStopped: '受信スレッドまたは適用スレッドが停止しています',
+                replicationThreadConnecting: 'レプリケーション元に接続中です',
+                unexpectedRole: 'インスタンスは現在プライマリとして動作しています',
+                walReceiverAbsent: 'WAL 受信プロセスが稼働していません',
+                fullSyncInProgress: '完全同期を実行中です',
+                primaryLinkDown: 'レプリケーション元への接続が切断されています',
+            },
             masterHostError: 'プライマリのアドレスに 127.0.0.1 は指定できません',
             emptyTitle: '{0} クラスターが設定されていません',
             emptyDescription:
@@ -8595,6 +8607,18 @@ const message = {
             roleParameters: '{0}のパラメーター',
             parametersFailed: 'インスタンスのパラメーターを取得できませんでした',
             instanceParameters: 'インスタンスパラメーター',
+            passwordManagement: 'パスワード管理',
+            passwordRotate: '管理者パスワードを変更',
+            passwordRepair: '認証情報を修復',
+            passwordRepairRequired: '前回のパスワード変更を確認できませんでした。先に認証情報を修復してください。',
+            passwordOperationHelp:
+                'システムはクラスターメンバーのデータベース認証情報とレプリケーションの状態を確認します。',
+            passwordContainerRecreate:
+                '更新された起動設定を適用すると、クラスターのコンテナーが再作成され、データベース接続が一時的に切断される場合があります。',
+            passwordAffectedMembers: '影響を受けるメンバー',
+            passwordCurrent: '{0}の現在のパスワード',
+            passwordCheckFailed: 'クラスターがパスワード変更に対応しているか確認できませんでした',
+            passwordTaskSubmitted: 'パスワード変更タスクを送信しました',
             replicationParameters: 'データレプリケーション設定',
             replicationUserHelp:
                 'レプリカデータベースがプライマリデータベースに接続し、データを同期するためのアカウントです。',
